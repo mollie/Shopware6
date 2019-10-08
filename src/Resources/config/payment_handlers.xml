@@ -1,0 +1,239 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <!-- Default PaymentHandler -->
+        <service id="Kiener\MolliePayments\Handler\PaymentHandler" class="Kiener\MolliePayments\Handler\PaymentHandler">
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler" />
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService" />
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService" />
+            <argument type="service" id="Mollie\Api\MollieApiClient" />
+            <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
+            <argument type="service" id="monolog.logger"/>
+            <argument type="service" id="router.default"/>
+            <tag name="shopware.payment.method.async" />
+        </service>
+
+        <!-- Apple Pay PaymentHandler -->
+        <service id="Kiener\MolliePayments\Handler\Method\ApplePayPayment" class="Kiener\MolliePayments\Handler\Method\ApplePayPayment">
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler" />
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService" />
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService" />
+            <argument type="service" id="Mollie\Api\MollieApiClient" />
+            <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
+            <argument type="service" id="monolog.logger"/>
+            <argument type="service" id="router.default"/>
+            <tag name="shopware.payment.method.async" />
+        </service>
+
+        <!-- BanContact PaymentHandler -->
+        <service id="Kiener\MolliePayments\Handler\Method\BanContactPayment" class="Kiener\MolliePayments\Handler\Method\BanContactPayment">
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler" />
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService" />
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService" />
+            <argument type="service" id="Mollie\Api\MollieApiClient" />
+            <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
+            <argument type="service" id="monolog.logger"/>
+            <argument type="service" id="router.default"/>
+            <tag name="shopware.payment.method.async" />
+        </service>
+
+        <!-- Bank Transfer PaymentHandler -->
+        <service id="Kiener\MolliePayments\Handler\Method\BankTransferPayment" class="Kiener\MolliePayments\Handler\Method\BankTransferPayment">
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler" />
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService" />
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService" />
+            <argument type="service" id="Mollie\Api\MollieApiClient" />
+            <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
+            <argument type="service" id="monolog.logger"/>
+            <argument type="service" id="router.default"/>
+            <tag name="shopware.payment.method.async" />
+        </service>
+
+        <!-- Belfius PaymentHandler -->
+        <service id="Kiener\MolliePayments\Handler\Method\BelfiusPayment" class="Kiener\MolliePayments\Handler\Method\BelfiusPayment">
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler" />
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService" />
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService" />
+            <argument type="service" id="Mollie\Api\MollieApiClient" />
+            <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
+            <argument type="service" id="monolog.logger"/>
+            <argument type="service" id="router.default"/>
+            <tag name="shopware.payment.method.async" />
+        </service>
+
+        <!-- Credit Card PaymentHandler -->
+        <service id="Kiener\MolliePayments\Handler\Method\CreditCardPayment" class="Kiener\MolliePayments\Handler\Method\CreditCardPayment">
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler" />
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService" />
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService" />
+            <argument type="service" id="Mollie\Api\MollieApiClient" />
+            <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
+            <argument type="service" id="monolog.logger"/>
+            <argument type="service" id="router.default"/>
+            <tag name="shopware.payment.method.async" />
+        </service>
+
+        <!-- Direct Debit PaymentHandler -->
+        <service id="Kiener\MolliePayments\Handler\Method\DirectDebitPayment" class="Kiener\MolliePayments\Handler\Method\DirectDebitPayment">
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler" />
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService" />
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService" />
+            <argument type="service" id="Mollie\Api\MollieApiClient" />
+            <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
+            <argument type="service" id="monolog.logger"/>
+            <argument type="service" id="router.default"/>
+            <tag name="shopware.payment.method.async" />
+        </service>
+
+        <!-- Eps PaymentHandler -->
+        <service id="Kiener\MolliePayments\Handler\Method\EpsPayment" class="Kiener\MolliePayments\Handler\Method\EpsPayment">
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler" />
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService" />
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService" />
+            <argument type="service" id="Mollie\Api\MollieApiClient" />
+            <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
+            <argument type="service" id="monolog.logger"/>
+            <argument type="service" id="router.default"/>
+            <tag name="shopware.payment.method.async" />
+        </service>
+
+        <!-- Gift Card PaymentHandler -->
+        <service id="Kiener\MolliePayments\Handler\Method\GiftCardPayment" class="Kiener\MolliePayments\Handler\Method\GiftCardPayment">
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler" />
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService" />
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService" />
+            <argument type="service" id="Mollie\Api\MollieApiClient" />
+            <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
+            <argument type="service" id="monolog.logger"/>
+            <argument type="service" id="router.default"/>
+            <tag name="shopware.payment.method.async" />
+        </service>
+
+        <!-- GiroPay PaymentHandler -->
+        <service id="Kiener\MolliePayments\Handler\Method\GiroPayPayment" class="Kiener\MolliePayments\Handler\Method\GiroPayPayment">
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler" />
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService" />
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService" />
+            <argument type="service" id="Mollie\Api\MollieApiClient" />
+            <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
+            <argument type="service" id="monolog.logger"/>
+            <argument type="service" id="router.default"/>
+            <tag name="shopware.payment.method.async" />
+        </service>
+
+        <!-- iDeal PaymentHandler -->
+        <service id="Kiener\MolliePayments\Handler\Method\iDealPayment" class="Kiener\MolliePayments\Handler\Method\iDealPayment">
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler" />
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService" />
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService" />
+            <argument type="service" id="Mollie\Api\MollieApiClient" />
+            <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
+            <argument type="service" id="monolog.logger"/>
+            <argument type="service" id="router.default"/>
+            <tag name="shopware.payment.method.async" />
+        </service>
+
+        <!-- ING HomePay PaymentHandler -->
+        <service id="Kiener\MolliePayments\Handler\Method\IngHomePayPayment" class="Kiener\MolliePayments\Handler\Method\IngHomePayPayment">
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler" />
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService" />
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService" />
+            <argument type="service" id="Mollie\Api\MollieApiClient" />
+            <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
+            <argument type="service" id="monolog.logger"/>
+            <argument type="service" id="router.default"/>
+            <tag name="shopware.payment.method.async" />
+        </service>
+
+        <!-- KBC PaymentHandler -->
+        <service id="Kiener\MolliePayments\Handler\Method\KbcPayment" class="Kiener\MolliePayments\Handler\Method\KbcPayment">
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler" />
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService" />
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService" />
+            <argument type="service" id="Mollie\Api\MollieApiClient" />
+            <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
+            <argument type="service" id="monolog.logger"/>
+            <argument type="service" id="router.default"/>
+            <tag name="shopware.payment.method.async" />
+        </service>
+
+        <!-- Klarna Pay Later PaymentHandler -->
+        <service id="Kiener\MolliePayments\Handler\Method\KlarnaPayLaterPayment" class="Kiener\MolliePayments\Handler\Method\KlarnaPayLaterPayment">
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler" />
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService" />
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService" />
+            <argument type="service" id="Mollie\Api\MollieApiClient" />
+            <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
+            <argument type="service" id="monolog.logger"/>
+            <argument type="service" id="router.default"/>
+            <tag name="shopware.payment.method.async" />
+        </service>
+
+        <!-- Klarna Slice It PaymentHandler -->
+        <service id="Kiener\MolliePayments\Handler\Method\KlarnaSliceItPayment" class="Kiener\MolliePayments\Handler\Method\KlarnaSliceItPayment">
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler" />
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService" />
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService" />
+            <argument type="service" id="Mollie\Api\MollieApiClient" />
+            <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
+            <argument type="service" id="monolog.logger"/>
+            <argument type="service" id="router.default"/>
+            <tag name="shopware.payment.method.async" />
+        </service>
+
+        <!-- PayPal PaymentHandler -->
+        <service id="Kiener\MolliePayments\Handler\Method\PayPalPayment" class="Kiener\MolliePayments\Handler\Method\PayPalPayment">
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler" />
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService" />
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService" />
+            <argument type="service" id="Mollie\Api\MollieApiClient" />
+            <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
+            <argument type="service" id="monolog.logger"/>
+            <argument type="service" id="router.default"/>
+            <tag name="shopware.payment.method.async" />
+        </service>
+
+        <!-- PaySafeCard PaymentHandler -->
+        <service id="Kiener\MolliePayments\Handler\Method\PaySafeCardPayment" class="Kiener\MolliePayments\Handler\Method\PaySafeCardPayment">
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler" />
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService" />
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService" />
+            <argument type="service" id="Mollie\Api\MollieApiClient" />
+            <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
+            <argument type="service" id="monolog.logger"/>
+            <argument type="service" id="router.default"/>
+            <tag name="shopware.payment.method.async" />
+        </service>
+
+        <!-- Przelewy24 PaymentHandler -->
+        <service id="Kiener\MolliePayments\Handler\Method\Przelewy24Payment" class="Kiener\MolliePayments\Handler\Method\Przelewy24Payment">
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler" />
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService" />
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService" />
+            <argument type="service" id="Mollie\Api\MollieApiClient" />
+            <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
+            <argument type="service" id="monolog.logger"/>
+            <argument type="service" id="router.default"/>
+            <tag name="shopware.payment.method.async" />
+        </service>
+
+        <!-- Sofort PaymentHandler -->
+        <service id="Kiener\MolliePayments\Handler\Method\SofortPayment" class="Kiener\MolliePayments\Handler\Method\SofortPayment">
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler" />
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService" />
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService" />
+            <argument type="service" id="Mollie\Api\MollieApiClient" />
+            <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
+            <argument type="service" id="monolog.logger"/>
+            <argument type="service" id="router.default"/>
+            <tag name="shopware.payment.method.async" />
+        </service>
+
+    </services>
+
+</container>

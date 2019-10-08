@@ -1,0 +1,36 @@
+{
+  "name": "kiener/mollie-payments-plugin",
+  "description": "Mollie Payments",
+  "version": "v1.0.0",
+  "type": "shopware-platform-plugin",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Kiener Digital Commerce"
+    }
+  ],
+  "require": {
+    "shopware/core": "*",
+    "mollie/mollie-api-php": "^2.0"
+  },
+  "extra": {
+    "shopware-plugin-class": "Kiener\\MolliePayments\\MolliePayments",
+    "copyright": "(c) by Kiener Digital Commerce",
+    "label": {
+      "de-DE": "Mollie Zahlungen",
+      "en-GB": "Mollie Payments",
+      "nl-NL": "Mollie Betalingen"
+    },
+    "description": {
+      "de-DE": "Mit Mollie integrieren Sie alle wichtigen internationalen und lokalen Zahlungsmethoden in nur einem Schritt in Ihren Shopware-Webshop. Starten Sie noch heute!",
+      "en-GB": "With Mollie you integrate every major global and local payment method in your Shopware webshop in one go. Start growing your business with effortless payments today!",
+      "nl-NL": "Met Mollie integreer je alle belangrijke internationale en lokale betaalmethoden in één keer in je Shopware webshop. Start vandaag nog!"
+    }
+  },
+  "autoload": {
+    "psr-4": {
+      "Kiener\\MolliePayments\\": "src/",
+      "Mollie\\Api\\": "vendor/mollie/mollie-api-php/src/"
+    }
+  }
+}

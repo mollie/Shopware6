@@ -5,9 +5,9 @@
 
 With Mollie you integrate every major global and local payment method in your Shopware webshop in one go. Start growing your business with effortless payments today!
 
-## Expected release date
+## Installation
 
-Mollie Payments for Shopware 6 is actively being developed. The first release of Mollie Payments for Shopware 6 is expected in the first week of October 2019.
+Clone this project into a folder named MolliePayments in custom/plugins. Afterwards run `composer install` in that MolliePayments folder. Now you are able to install and activate the plugin within Shopware 6.
 
 ## Contact
 

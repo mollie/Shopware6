@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/master/src/Core/System/SystemConfig/Schema/config.xsd">
+    <card>
+        <title>Mollie API</title>
+        <title lang="de-DE">Mollie API</title>
+        <title lang="nl-NL">Mollie API</title>
+
+        <input-field>
+            <name>liveApiKey</name>
+            <label>Live Key</label>
+            <label lang="de-DE">Live Key</label>
+            <label lang="nl-NL">Live-sleutel</label>
+        </input-field>
+        <input-field>
+            <name>testApiKey</name>
+            <label>Test Key</label>
+            <label lang="de-DE">Test Key</label>
+            <label lang="nl-NL">Test-sleutel</label>
+        </input-field>
+        <input-field type="bool">
+            <name>testMode</name>
+            <label>Test Mode</label>
+            <label lang="de-DE">Test Mode</label>
+            <label lang="nl-NL">Test Modus</label>
+        </input-field>
+    </card>
+</config>
