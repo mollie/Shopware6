@@ -37,7 +37,6 @@
         <service id="Kiener\MolliePayments\Service\CustomFieldService" class="Kiener\MolliePayments\Service\CustomFieldService">
             <argument type="service" id="service_container" />
             <argument type="service" id="custom_field_set.repository" />
-            <argument type="service" id="monolog.logger"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\OrderService" class="Kiener\MolliePayments\Service\OrderService">

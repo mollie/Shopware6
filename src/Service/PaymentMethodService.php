@@ -25,7 +25,6 @@ use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Exceptions\IncompatiblePlatform;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Types\PaymentMethod;
-use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
@@ -47,9 +46,6 @@ class PaymentMethodService
     /** @var string */
     protected $className;
 
-
-    protected $logger;
-
     /**
      * PaymentMethodHelper constructor.
      *
@@ -62,13 +58,11 @@ class PaymentMethodService
         EntityRepositoryInterface $paymentRepository,
         PluginIdProvider $pluginIdProvider,
         EntityRepositoryInterface $systemConfigRepository,
-        LoggerInterface $logger,
         $className = null)
     {
         $this->paymentRepository = $paymentRepository;
         $this->pluginIdProvider = $pluginIdProvider;
         $this->systemConfigRepository = $systemConfigRepository;
-        $this->logger = $logger;
         $this->className = $className;
     }
 
@@ -87,7 +81,7 @@ class PaymentMethodService
         try {
             $paymentMethods = $this->getPaymentMethods($context);
         } catch (IncompatiblePlatform $e) {
-            $this->logger->error($e->getMessage(), [$e]);
+            // @todo Handle IncompatiblePlatform exception
         }
 
         foreach ($paymentMethods as $paymentMethod) {
@@ -277,7 +271,7 @@ class PaymentMethodService
             $availableMethods = $apiClient->methods->allAvailable();
             $activeMethods = $apiClient->methods->allActive();
         } catch (ApiException $e) {
-            $this->logger->error($e->getMessage(), [$e]);
+            // @todo Handle ApiException
         }
 
         // Add payment methods to array
@@ -321,7 +315,7 @@ class PaymentMethodService
         try {
             $mollieSettings = $settingService->getSettings($context);
         } catch (InconsistentCriteriaIdsException $e) {
-            $this->logger->error($e->getMessage(), [$e]);
+            // @todo Handle InconsistentCriteriaIdsException
         }
 
         if ($mollieSettings === null) {
@@ -337,7 +331,7 @@ class PaymentMethodService
         try {
             $client->setApiKey($apiKey);
         } catch (ApiException $e) {
-            $this->logger->error($e->getMessage(), [$e]);
+            // @todo Handle ApiException
             $client = null;
         }
 

@@ -19,9 +19,6 @@ class CustomFieldService
     /** @var EntityRepository */
     protected $customFieldSetRepository;
 
-    /** @var LoggerInterface */
-    protected $logger;
-
     /**
      * CustomFieldService constructor.
      *
@@ -31,13 +28,11 @@ class CustomFieldService
      */
     public function __construct(
         $container,
-        EntityRepository $customFieldSetRepository,
-        LoggerInterface $logger
+        EntityRepository $customFieldSetRepository
     )
     {
         $this->container = $container;
         $this->customFieldSetRepository = $customFieldSetRepository;
-        $this->logger = $logger;
     }
 
     public function addCustomFields(Context $context)
@@ -97,7 +92,7 @@ class CustomFieldService
                 ]
             ]], $context);
         } catch (Exception $e) {
-            $this->logger->error($e->getMessage(), [$e]);
+            // @todo Handle Exception
         }
     }
 }

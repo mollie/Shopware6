@@ -60,8 +60,7 @@ class MolliePayments extends Plugin
         // Add custom fields
         $customFieldService = new CustomFieldService(
             $this->container,
-            $this->container->get('custom_field_set.repository'),
-            $this->container->get('monolog.logger')
+            $this->container->get('custom_field_set.repository')
         );
 
         $customFieldService->addCustomFields($context->getContext());
@@ -71,7 +70,6 @@ class MolliePayments extends Plugin
             $this->container->get('payment_method.repository'),
             $this->container->get(PluginIdProvider::class),
             $this->container->get('system_config.repository'),
-            $this->container->get('monolog.logger'),
             $this->getClassName()
         );
 
