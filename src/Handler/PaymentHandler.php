@@ -9,7 +9,6 @@ use Kiener\MolliePayments\Service\OrderService;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order;
-use Mollie\Api\Resources\Payment;
 use Mollie\Api\Types\PaymentStatus;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -17,7 +16,6 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStat
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\AsynchronousPaymentHandlerInterface;
 use Shopware\Core\Checkout\Payment\Exception\CustomerCanceledAsyncPaymentException;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Shopware\Core\Framework\Language\LanguageEntity;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
@@ -30,6 +28,9 @@ use Symfony\Component\Routing\RouterInterface;
 
 class PaymentHandler implements AsynchronousPaymentHandlerInterface
 {
+    public const PAYMENT_METHOD_NAME = '';
+    public const PAYMENT_METHOD_DESCRIPTION = '';
+
     /** @var string */
     protected $paymentMethod;
 
@@ -284,6 +285,14 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         $webhookUrl = $this->router->generate('frontend.mollie.webhook', [
             'transactionId' => $transaction->getOrderTransaction()->getId()
         ], $this->router::ABSOLUTE_URL);
+
+        /**
+         * During local testing, we set this webhook URL to null, as our local URL
+         * is not supported by the Mollie API.
+         *
+         * @todo Remove webhook URL clearance before publishing.
+         */
+        $webhookUrl = null;
 
         /**
          * Build an array of order data to send in the request

@@ -7,5 +7,9 @@ use Mollie\Api\Types\PaymentMethod;
 
 class Przelewy24Payment extends PaymentHandler
 {
-    protected $paymentMethod = PaymentMethod::PRZELEWY24;
+    public const PAYMENT_METHOD_NAME = PaymentMethod::PRZELEWY24;
+    public const PAYMENT_METHOD_DESCRIPTION = 'Przelewy24';
+
+    /** @var string */
+    protected $paymentMethod = self::PAYMENT_METHOD_NAME;
 }

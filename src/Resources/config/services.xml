@@ -44,6 +44,12 @@
             <argument type="service" id="monolog.logger"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Service\PaymentService" class="Kiener\MolliePayments\Service\PaymentService">
+            <argument type="service" id="payment_method.repository" />
+            <argument type="service" id="Shopware\Core\Framework\Plugin\Util\PluginIdProvider" />
+            <argument type="service" id="system_config.repository" />
+        </service>
+
         <service id="Kiener\MolliePayments\Service\SettingsService" class="Kiener\MolliePayments\Service\SettingsService">
             <argument type="service" id="system_config.repository" />
         </service>
@@ -58,6 +64,13 @@
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
+        </service>
+
+        <!-- Subscribers -->
+        <service id="Kiener\MolliePayments\Subscriber\PaymentMethodSubscriber" class="Kiener\MolliePayments\Subscriber\PaymentMethodSubscriber">
+            <argument type="service" id="Mollie\Api\MollieApiClient" />
+            <argument type="service" id="payment_method.repository" />
+            <tag name="kernel.event_subscriber" />
         </service>
 
     </services>

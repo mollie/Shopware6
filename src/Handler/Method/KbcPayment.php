@@ -7,5 +7,9 @@ use Mollie\Api\Types\PaymentMethod;
 
 class KbcPayment extends PaymentHandler
 {
-    protected $paymentMethod = PaymentMethod::KBC;
+    public const PAYMENT_METHOD_NAME = PaymentMethod::KBC;
+    public const PAYMENT_METHOD_DESCRIPTION = 'KBC/CBC Payment Button';
+
+    /** @var string */
+    protected $paymentMethod = self::PAYMENT_METHOD_NAME;
 }

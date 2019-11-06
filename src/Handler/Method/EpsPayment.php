@@ -7,5 +7,9 @@ use Mollie\Api\Types\PaymentMethod;
 
 class EpsPayment extends PaymentHandler
 {
-    protected $paymentMethod = PaymentMethod::EPS;
+    public const PAYMENT_METHOD_NAME = PaymentMethod::EPS;
+    public const PAYMENT_METHOD_DESCRIPTION = 'eps';
+
+    /** @var string */
+    protected $paymentMethod = self::PAYMENT_METHOD_NAME;
 }

@@ -7,5 +7,9 @@ use Mollie\Api\Types\PaymentMethod;
 
 class BankTransferPayment extends PaymentHandler
 {
-    protected $paymentMethod = PaymentMethod::BANKTRANSFER;
+    public const PAYMENT_METHOD_NAME = PaymentMethod::BANKTRANSFER;
+    public const PAYMENT_METHOD_DESCRIPTION = 'Banktransfer';
+
+    /** @var string */
+    protected $paymentMethod = self::PAYMENT_METHOD_NAME;
 }

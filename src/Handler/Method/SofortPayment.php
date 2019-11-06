@@ -7,5 +7,9 @@ use Mollie\Api\Types\PaymentMethod;
 
 class SofortPayment extends PaymentHandler
 {
-    protected $paymentMethod = PaymentMethod::SOFORT;
+    public const PAYMENT_METHOD_NAME = PaymentMethod::SOFORT;
+    public const PAYMENT_METHOD_DESCRIPTION = 'SOFORT Banking';
+
+    /** @var string */
+    protected $paymentMethod = self::PAYMENT_METHOD_NAME;
 }

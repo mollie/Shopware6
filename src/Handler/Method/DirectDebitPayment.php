@@ -7,5 +7,9 @@ use Mollie\Api\Types\PaymentMethod;
 
 class DirectDebitPayment extends PaymentHandler
 {
-    protected $paymentMethod = PaymentMethod::DIRECTDEBIT;
+    public const PAYMENT_METHOD_NAME = PaymentMethod::DIRECTDEBIT;
+    public const PAYMENT_METHOD_DESCRIPTION = 'SEPA Direct Debit';
+
+    /** @var string */
+    protected $paymentMethod = self::PAYMENT_METHOD_NAME;
 }

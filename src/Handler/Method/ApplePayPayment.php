@@ -7,5 +7,9 @@ use Mollie\Api\Types\PaymentMethod;
 
 class ApplePayPayment extends PaymentHandler
 {
-    protected $paymentMethod = PaymentMethod::APPLEPAY;
+    public const PAYMENT_METHOD_NAME = PaymentMethod::APPLEPAY;
+    public const PAYMENT_METHOD_DESCRIPTION = 'Apple Pay';
+
+    /** @var string */
+    protected $paymentMethod = self::PAYMENT_METHOD_NAME;
 }

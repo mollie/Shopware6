@@ -7,5 +7,9 @@ use Mollie\Api\Types\PaymentMethod;
 
 class CreditCardPayment extends PaymentHandler
 {
-    protected $paymentMethod = PaymentMethod::CREDITCARD;
+    public const PAYMENT_METHOD_NAME = PaymentMethod::CREDITCARD;
+    public const PAYMENT_METHOD_DESCRIPTION = 'Credit card';
+
+    /** @var string */
+    protected $paymentMethod = self::PAYMENT_METHOD_NAME;
 }

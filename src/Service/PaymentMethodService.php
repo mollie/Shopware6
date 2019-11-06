@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Service;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Handler\Method\BanContactPayment;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
+use Kiener\MolliePayments\Handler\Method\BelfiusPayment;
 use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
 use Kiener\MolliePayments\Handler\Method\DirectDebitPayment;
 use Kiener\MolliePayments\Handler\Method\EpsPayment;
@@ -19,12 +20,7 @@ use Kiener\MolliePayments\Handler\Method\PayPalPayment;
 use Kiener\MolliePayments\Handler\Method\PaySafeCardPayment;
 use Kiener\MolliePayments\Handler\Method\Przelewy24Payment;
 use Kiener\MolliePayments\Handler\Method\SofortPayment;
-use Kiener\MolliePayments\Service\SettingsService;
-use Kiener\MolliePayments\Setting\MollieSettingStruct;
-use Mollie\Api\Exceptions\ApiException;
-use Mollie\Api\Exceptions\IncompatiblePlatform;
-use Mollie\Api\MollieApiClient;
-use Mollie\Api\Types\PaymentMethod;
+use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
@@ -76,30 +72,16 @@ class PaymentMethodService
 
         // Variables
         $paymentData = [];
-        $paymentMethods = null;
-
-        try {
-            $paymentMethods = $this->getPaymentMethods($context);
-        } catch (IncompatiblePlatform $e) {
-            // @todo Handle IncompatiblePlatform exception
-        }
+        $paymentMethods = $this->getPaymentMethods($context);
 
         foreach ($paymentMethods as $paymentMethod) {
-            // Get the PaymentHandler class
-            $paymentHandlerClass = $this->getPaymentHandlerClass($paymentMethod->id);
-
-            if ($paymentHandlerClass === null) {
-                continue;
-            }
-
             // Build array of payment method data
             $paymentMethodData = [
-                'handlerIdentifier' => $paymentHandlerClass,
-                'name' => $paymentMethod->description,
+                'handlerIdentifier' => $paymentMethod['handler'],
+                'name' => $paymentMethod['description'],
                 'pluginId' => $pluginId,
-                'active' => $paymentMethod->active ?? false,
                 'customFields' => [
-                    'mollie_payment_method_name' => $paymentMethod->id
+                    'mollie_payment_method_name' => $paymentMethod['name']
                 ]
             ];
 
@@ -113,7 +95,7 @@ class PaymentMethodService
                 // On error, we assume the payment method doesn't exist
             }
 
-            if ($existingPaymentMethodId !== null) {
+            if (isset($existingPaymentMethodId) && $existingPaymentMethodId !== null) {
                 $paymentMethodData['id'] = $existingPaymentMethodId;
             }
 
@@ -128,101 +110,30 @@ class PaymentMethodService
     }
 
     /**
-     * @param $paymentMethod
-     * @return string|null
+     * Get payment method by ID.
+     *
+     * @param $id
+     * @return PaymentMethodEntity
+     * @throws InconsistentCriteriaIdsException
      */
-    public function getPaymentHandlerClass($paymentMethod)
+    public function getPaymentMethodById($id) : ?PaymentMethodEntity
     {
-        // Return Apple Pay PaymentHandler
-        if ($paymentMethod === PaymentMethod::APPLEPAY) {
-            return ApplePayPayment::class;
+        // Fetch ID for update
+        $paymentCriteria = new Criteria();
+        $paymentCriteria->addFilter(new EqualsFilter('id', $id));
+
+        // Get payment methods
+        $paymentMethods = $this->paymentRepository->search($paymentCriteria, Context::createDefaultContext());
+
+        if ($paymentMethods->getTotal() === 0) {
+            return null;
         }
 
-        // Return BanContact PaymentHandler
-        if ($paymentMethod === PaymentMethod::BANCONTACT) {
-            return BanContactPayment::class;
-        }
-
-        // Return Bank Transfer PaymentHandler
-        if ($paymentMethod === PaymentMethod::BANKTRANSFER) {
-            return BankTransferPayment::class;
-        }
-
-        // Return Credit Card PaymentHandler
-        if ($paymentMethod === PaymentMethod::CREDITCARD) {
-            return CreditCardPayment::class;
-        }
-
-        // Return Direct Debit PaymentHandler
-        if ($paymentMethod === PaymentMethod::DIRECTDEBIT) {
-            return DirectDebitPayment::class;
-        }
-
-        // Return EPS PaymentHandler
-        if ($paymentMethod === PaymentMethod::EPS) {
-            return EpsPayment::class;
-        }
-
-        // Return Gift Card PaymentHandler
-        if ($paymentMethod === PaymentMethod::GIFTCARD) {
-            return GiftCardPayment::class;
-        }
-
-        // Return GiroPay PaymentHandler
-        if ($paymentMethod === PaymentMethod::GIROPAY) {
-            return GiroPayPayment::class;
-        }
-
-        // Return iDeal PaymentHandler
-        if ($paymentMethod === PaymentMethod::IDEAL) {
-            return iDealPayment::class;
-        }
-
-        // Return ING HomePay PaymentHandler
-        if ($paymentMethod === PaymentMethod::INGHOMEPAY) {
-            return IngHomePayPayment::class;
-        }
-
-        // Return KBC PaymentHandler
-        if ($paymentMethod === PaymentMethod::KBC) {
-            return KbcPayment::class;
-        }
-
-        // Return Klarna Pay Later PaymentHandler
-        if ($paymentMethod === PaymentMethod::KLARNA_PAY_LATER) {
-            return KlarnaPayLaterPayment::class;
-        }
-
-        // Return Klarna Slice It PaymentHandler
-        if ($paymentMethod === PaymentMethod::KLARNA_SLICE_IT) {
-            return KlarnaSliceItPayment::class;
-        }
-
-        // Return PayPal PaymentHandler
-        if ($paymentMethod === PaymentMethod::PAYPAL) {
-            return PayPalPayment::class;
-        }
-
-        // Return PaySafeCard PaymentHandler
-        if ($paymentMethod === PaymentMethod::PAYSAFECARD) {
-            return PaySafeCardPayment::class;
-        }
-
-        // Return Prezelewy24 PaymentHandler
-        if ($paymentMethod === PaymentMethod::PRZELEWY24) {
-            return Przelewy24Payment::class;
-        }
-
-        // Return SOFORT PaymentHandler
-        if ($paymentMethod === PaymentMethod::SOFORT) {
-            return SofortPayment::class;
-        }
-
-        return null;
+        return $paymentMethods->first();
     }
 
     /**
-     * Get payment method by name.
+     * Get payment method ID by name.
      *
      * @param $name
      * @return string|null
@@ -250,47 +161,21 @@ class PaymentMethodService
      *
      * @param Context|null $context
      * @return array
-     * @throws IncompatiblePlatform
      */
     private function getPaymentMethods(?Context $context = null) : array
     {
         // Variables
         $paymentMethods = [];
-        $availableMethods = null;
-        $activeMethods = null;
-
-        /** @var \Mollie\Api\MollieApiClient $apiClient */
-        $apiClient = $this->getApiClient($context);
-
-        if ($apiClient === null) {
-            return $paymentMethods;
-        }
-
-        // Get all available payment methods
-        try {
-            $availableMethods = $apiClient->methods->allAvailable();
-            $activeMethods = $apiClient->methods->allActive();
-        } catch (ApiException $e) {
-            // @todo Handle ApiException
-        }
+        $availableMethods = $this->getPaymentHandlers();
 
         // Add payment methods to array
         if ($availableMethods !== null) {
             foreach ($availableMethods as $availableMethod) {
-                $paymentMethods[] = $availableMethod;
-            }
-        }
-
-        // Check if method is active
-        if ($activeMethods !== null) {
-            foreach ($paymentMethods as $paymentMethod) {
-                $paymentMethod->active = false;
-
-                foreach ($activeMethods as $activeMethod) {
-                    if ($paymentMethod->id === $activeMethod->id) {
-                        $paymentMethod->active = true;
-                    }
-                }
+                $paymentMethods[] = [
+                    'name' => constant($availableMethod . '::PAYMENT_METHOD_NAME'),
+                    'description' => constant($availableMethod . '::PAYMENT_METHOD_DESCRIPTION'),
+                    'handler' => $availableMethod,
+                ];
             }
         }
 
@@ -298,43 +183,31 @@ class PaymentMethodService
     }
 
     /**
-     * Get an instance of the Mollie API client.
+     * Returns an array of payment handlers.
      *
-     * @param Context|null $context
-     * @return MollieApiClient|null
-     * @throws IncompatiblePlatform
+     * @return array
      */
-    private function getApiClient(?Context $context = null) : ?MollieApiClient
+    public function getPaymentHandlers()
     {
-        $client = null;
-
-        /** @var SettingsService $settingService */
-        $settingService = new SettingsService($this->systemConfigRepository);
-
-        /** @var MollieSettingStruct $mollieSettings */
-        try {
-            $mollieSettings = $settingService->getSettings($context);
-        } catch (InconsistentCriteriaIdsException $e) {
-            // @todo Handle InconsistentCriteriaIdsException
-        }
-
-        if ($mollieSettings === null) {
-            return null;
-        }
-
-        // Get API key
-        $apiKey = $mollieSettings->isTestMode() === true ? $mollieSettings->getTestApiKey() : $mollieSettings->getLiveApiKey();
-
-        // Create client
-        $client = new MollieApiClient();
-
-        try {
-            $client->setApiKey($apiKey);
-        } catch (ApiException $e) {
-            // @todo Handle ApiException
-            $client = null;
-        }
-
-        return $client;
+        return [
+            ApplePayPayment::class,
+            BanContactPayment::class,
+            BankTransferPayment::class,
+            BelfiusPayment::class,
+            CreditCardPayment::class,
+            DirectDebitPayment::class,
+            EpsPayment::class,
+            GiftCardPayment::class,
+            GiroPayPayment::class,
+            iDealPayment::class,
+            IngHomePayPayment::class,
+            KbcPayment::class,
+            KlarnaPayLaterPayment::class,
+            KlarnaSliceItPayment::class,
+            PayPalPayment::class,
+            PaySafeCardPayment::class,
+            Przelewy24Payment::class,
+            SofortPayment::class,
+        ];
     }
 }

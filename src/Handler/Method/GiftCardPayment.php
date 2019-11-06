@@ -7,5 +7,9 @@ use Mollie\Api\Types\PaymentMethod;
 
 class GiftCardPayment extends PaymentHandler
 {
-    protected $paymentMethod = PaymentMethod::GIFTCARD;
+    public const PAYMENT_METHOD_NAME = PaymentMethod::GIFTCARD;
+    public const PAYMENT_METHOD_DESCRIPTION = 'Gift cards';
+
+    /** @var string */
+    protected $paymentMethod = self::PAYMENT_METHOD_NAME;
 }

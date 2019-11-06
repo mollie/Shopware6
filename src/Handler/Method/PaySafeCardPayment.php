@@ -7,5 +7,9 @@ use Mollie\Api\Types\PaymentMethod;
 
 class PaySafeCardPayment extends PaymentHandler
 {
-    protected $paymentMethod = PaymentMethod::PAYSAFECARD;
+    public const PAYMENT_METHOD_NAME = PaymentMethod::PAYSAFECARD;
+    public const PAYMENT_METHOD_DESCRIPTION = 'paysafecard';
+
+    /** @var string */
+    protected $paymentMethod = self::PAYMENT_METHOD_NAME;
 }

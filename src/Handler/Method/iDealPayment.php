@@ -7,5 +7,9 @@ use Mollie\Api\Types\PaymentMethod;
 
 class iDealPayment extends PaymentHandler
 {
-    protected $paymentMethod = PaymentMethod::IDEAL;
+    public const PAYMENT_METHOD_NAME = PaymentMethod::IDEAL;
+    public const PAYMENT_METHOD_DESCRIPTION = 'iDEAL';
+
+    /** @var string */
+    protected $paymentMethod = self::PAYMENT_METHOD_NAME;
 }

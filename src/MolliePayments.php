@@ -5,9 +5,6 @@ namespace Kiener\MolliePayments;
 use Exception;
 use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\PaymentMethodService;
-use Shopware\Core\Checkout\Customer\CustomerDefinition;
-use Shopware\Core\Framework\CustomField\CustomFieldTypes;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Plugin;
 use Shopware\Core\Framework\Plugin\Context\ActivateContext;
 use Shopware\Core\Framework\Plugin\Context\DeactivateContext;
@@ -46,16 +43,6 @@ class MolliePayments extends Plugin
     public function install(InstallContext $context) : void
     {
         parent::install($context);
-    }
-
-    public function uninstall(UninstallContext $context) : void
-    {
-        parent::uninstall($context);
-    }
-
-    public function activate(ActivateContext $context) : void
-    {
-        parent::activate($context);
 
         // Add custom fields
         $customFieldService = new CustomFieldService(
@@ -74,6 +61,16 @@ class MolliePayments extends Plugin
         );
 
         $paymentMethodHelper->addPaymentMethods($context->getContext());
+    }
+
+    public function uninstall(UninstallContext $context) : void
+    {
+        parent::uninstall($context);
+    }
+
+    public function activate(ActivateContext $context) : void
+    {
+        parent::activate($context);
     }
 
     public function deactivate(DeactivateContext $context) : void
