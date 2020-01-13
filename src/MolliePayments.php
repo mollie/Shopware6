@@ -57,7 +57,7 @@ class MolliePayments extends Plugin
             $this->container->get('payment_method.repository'),
             $this->container->get(PluginIdProvider::class),
             $this->container->get('system_config.repository'),
-            $this->getClassName()
+            get_class($this)
         );
 
         $paymentMethodHelper->addPaymentMethods($context->getContext());

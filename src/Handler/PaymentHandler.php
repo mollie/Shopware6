@@ -17,7 +17,7 @@ use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\AsynchronousPaymentHandlerInterface;
 use Shopware\Core\Checkout\Payment\Exception\CustomerCanceledAsyncPaymentException;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
-use Shopware\Core\Framework\Language\LanguageEntity;
+use Shopware\Core\System\Language\LanguageEntity;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\Currency\CurrencyEntity;
 use Shopware\Core\System\Locale\LocaleEntity;
@@ -287,14 +287,6 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         ], $this->router::ABSOLUTE_URL);
 
         /**
-         * During local testing, we set this webhook URL to null, as our local URL
-         * is not supported by the Mollie API.
-         *
-         * @todo Remove webhook URL clearance before publishing.
-         */
-        $webhookUrl = null;
-
-        /**
          * Build an array of order data to send in the request
          * to Mollie's Orders API to create an order payment.
          */
@@ -319,6 +311,11 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             ),
             'payment' => []
         ];
+
+        // Remove webhook URL on dev-environments
+        if (strtolower(getenv('APP_ENV')) === 'dev') {
+            unset($orderData['webhookUrl']);
+        }
 
         $orderData = array_merge($orderData, $this->paymentMethodData);
 

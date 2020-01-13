@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
@@ -7,8 +7,8 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerDefinition;
 use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\CustomField\CustomFieldTypes;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\System\CustomField\CustomFieldTypes;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class CustomFieldService
@@ -16,19 +16,19 @@ class CustomFieldService
     /** @var ContainerInterface */
     protected $container;
 
-    /** @var EntityRepository */
+    /** @var EntityRepositoryInterface */
     protected $customFieldSetRepository;
 
     /**
      * CustomFieldService constructor.
      *
      * @param ContainerInterface $container
-     * @param EntityRepository $customFieldSetRepository
+     * @param EntityRepositoryInterface $customFieldSetRepository
      * @param LoggerInterface $logger
      */
     public function __construct(
         $container,
-        EntityRepository $customFieldSetRepository
+        EntityRepositoryInterface $customFieldSetRepository
     )
     {
         $this->container = $container;
