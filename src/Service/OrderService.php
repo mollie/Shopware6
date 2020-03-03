@@ -185,12 +185,16 @@ class OrderService
     /**
      * Return an array of price data; currency and value.
      * @param string $currency
-     * @param float $price
+     * @param float|null $price
      * @param int $decimals
      * @return array
      */
-    public function getPriceArray(string $currency, float $price, int $decimals = 2) : array
+    public function getPriceArray(string $currency, ?float $price, int $decimals = 2) : array
     {
+        if (null === $price) {
+            $price = 0.0;
+        }
+
         return [
             'currency' => $currency,
             'value' => number_format($price, $decimals, '.', '')
