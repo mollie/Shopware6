@@ -29,6 +29,35 @@ class CustomerService
     }
 
     /**
+     * Stores the credit card token in the custom fields of the customer.
+     *
+     * @param CustomerEntity $customer
+     * @param string $cardToken
+     * @param Context $context
+     *
+     * @return \Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent
+     */
+    public function setCardToken(CustomerEntity $customer, string $cardToken, Context $context)
+    {
+        // Get existing custom fields
+        $customFields = $customer->getCustomFields();
+
+        // If custom fields are empty, create a new array
+        if (!is_array($customFields)) {
+            $customFields = [];
+        }
+
+        // Store the card token in the custom fields
+        $customFields['mollie_payments']['credit_card_token'] = $cardToken;
+
+        // Store the custom fields on the customer
+        return $this->customerRepository->update([[
+            'id' => $customer->getId(),
+            'customFields' => $customFields
+        ]], $context);
+    }
+
+    /**
      * Return a customer entity with address associations.
      *
      * @param string $customerId

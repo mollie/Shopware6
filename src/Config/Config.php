@@ -30,4 +30,9 @@ class Config
     {
         return (bool) self::$systemConfigService->get(self::SYSTEM_CONFIG_DOMAIN . 'testMode');
     }
+
+    public static function enableCreditCardComponents() : bool
+    {
+        return (bool) self::$systemConfigService->get(self::SYSTEM_CONFIG_DOMAIN . 'enableCreditCardComponents');
+    }
 }

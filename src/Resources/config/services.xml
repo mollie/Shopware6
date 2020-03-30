@@ -30,7 +30,7 @@
 
         <!-- Services -->
         <service id="Kiener\MolliePayments\Service\CustomerService" class="Kiener\MolliePayments\Service\CustomerService">
-            <argument type="service" id="system_config.repository" />
+            <argument type="service" id="customer.repository" />
             <argument type="service" id="monolog.logger"/>
         </service>
 
@@ -55,6 +55,15 @@
         </service>
 
         <!-- Webhook Controller -->
+        <service id="Kiener\MolliePayments\Storefront\Controller\ComponentsController" public="true">
+            <argument type="service" id="Kiener\MolliePayments\Config\Config" />
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService" />
+            <argument type="service" id="Mollie\Api\MollieApiClient" />
+
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
         <service id="Kiener\MolliePayments\Storefront\Controller\WebhookController" public="true">
             <argument type="service" id="router.default"/>
             <argument type="service" id="order_transaction.repository" />
@@ -67,10 +76,26 @@
         </service>
 
         <!-- Subscribers -->
+        <service id="Kiener\MolliePayments\Subscriber\PaymentStateSubscriber" class="Kiener\MolliePayments\Subscriber\PaymentStateSubscriber">
+            <argument type="service" id="Mollie\Api\MollieApiClient" />
+            <argument type="service" id="order_transaction.repository" />
+            <tag name="kernel.event_subscriber" />
+        </service>
+
         <service id="Kiener\MolliePayments\Subscriber\PaymentMethodSubscriber" class="Kiener\MolliePayments\Subscriber\PaymentMethodSubscriber">
             <argument type="service" id="Mollie\Api\MollieApiClient" />
             <argument type="service" id="payment_method.repository" />
             <tag name="kernel.event_subscriber" />
+        </service>
+
+        <service id="Kiener\MolliePayments\Subscriber\CheckoutConfirmPageSubscriber" class="Kiener\MolliePayments\Subscriber\CheckoutConfirmPageSubscriber">
+            <argument type="service" id="Kiener\MolliePayments\Config\Config" />
+            <tag name="kernel.event_subscriber" />
+        </service>
+
+        <!-- Snippets -->
+        <service id="Kiener\MolliePayments\Resources\snippet\en_GB\SnippetFile_en_GB" public="true">
+            <tag name="shopware.snippet.file"/>
         </service>
 
     </services>

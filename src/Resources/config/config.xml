@@ -24,5 +24,11 @@
             <label lang="de-DE">Test Mode</label>
             <label lang="nl-NL">Test Modus</label>
         </input-field>
+        <input-field type="bool">
+            <name>enableCreditCardComponents</name>
+            <label>Credit Card Components</label>
+            <label lang="de-DE">Credit Card Components</label>
+            <label lang="nl-NL">Credit Card Components</label>
+        </input-field>
     </card>
 </config>

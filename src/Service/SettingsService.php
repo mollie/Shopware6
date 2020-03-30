@@ -8,6 +8,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\SystemConfig\SystemConfigCollection;
 use Shopware\Core\System\SystemConfig\SystemConfigEntity;
 
@@ -26,22 +27,24 @@ class SettingsService
     /**
      * Get Mollie settings from configuration.
      *
+     * @param string       $salesChannelId
      * @param Context|null $context
+     *
      * @return MollieSettingStruct
      * @throws InconsistentCriteriaIdsException
      */
-    public function getSettings(?Context $context = null) : MollieSettingStruct
+    public function getSettings(string $salesChannelId, ?Context $context = null): MollieSettingStruct
     {
         $structData = [];
 
         /** @var SystemConfigCollection $settingsCollection */
-        $settingsCollection = $this->getMollieConfigurationCollection($context);
+        $settingsCollection = $this->getMollieConfigurationCollection($salesChannelId, $context);
 
         /** @var SystemConfigEntity $systemConfigEntity */
-        foreach ($settingsCollection as $systemConfigEntity)
-        {
+        foreach ($settingsCollection as $systemConfigEntity) {
             $configurationKey = $systemConfigEntity->getConfigurationKey();
-            $identifier = (string) substr($configurationKey, \strlen(self::SYSTEM_CONFIG_DOMAIN));
+
+            $identifier = (string)substr($configurationKey, \strlen(self::SYSTEM_CONFIG_DOMAIN));
 
             if ($identifier === '') {
                 continue;
@@ -56,11 +59,13 @@ class SettingsService
     /**
      * Get Mollie configuration collection.
      *
+     * @param string       $salesChannelId
      * @param Context|null $context
+     *
      * @return SystemConfigCollection
      * @throws InconsistentCriteriaIdsException
      */
-    protected function getMollieConfigurationCollection(?Context $context = null) : SystemConfigCollection
+    protected function getMollieConfigurationCollection(string $salesChannelId, ?Context $context = null): SystemConfigCollection
     {
         // Set default context
         if ($context === null) {
@@ -69,7 +74,8 @@ class SettingsService
 
         // Create filter criteria
         $criteria = (new Criteria())
-            ->addFilter(new ContainsFilter('configurationKey', self::SYSTEM_CONFIG_DOMAIN));
+            ->addFilter(new ContainsFilter('configurationKey', self::SYSTEM_CONFIG_DOMAIN))
+            ->addFilter(new EqualsFilter('salesChannelId', $salesChannelId));
 
         /** @var SystemConfigCollection $systemConfigCollection */
         $systemConfigCollection = $this->systemConfigRepository
