@@ -49,7 +49,7 @@ class WebhookController extends StorefrontController
 
     /**
      * @RouteScope(scopes={"storefront"})
-     * @Route("/mollie/webhook/{transactionId}", name="frontend.mollie.webhook", options={"seo"="false"}, methods={"GET"})
+     * @Route("/mollie/webhook/{transactionId}", name="frontend.mollie.webhook", options={"seo"="false"}, methods={"GET", "POST"})
      *
      * @return Response
      */
