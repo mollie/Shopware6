@@ -1,7 +1,7 @@
 {
   "name": "kiener/mollie-payments-plugin",
   "description": "Mollie Payments",
-  "version": "v1.0.4",
+  "version": "v1.0.7",
   "type": "shopware-platform-plugin",
   "license": "MIT",
   "authors": [
@@ -26,6 +26,9 @@
       "en-GB": "With Mollie you integrate every major global and local payment method in your Shopware webshop in one go. Start growing your business with effortless payments today!",
       "nl-NL": "Met Mollie integreer je alle belangrijke internationale en lokale betaalmethoden in één keer in je Shopware webshop. Start vandaag nog!"
     }
+  },
+  "config": {
+    "optimize-autoloader": true
   },
   "autoload": {
     "psr-4": {

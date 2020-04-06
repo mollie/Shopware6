@@ -113,7 +113,9 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      * @param RequestDataBag                $dataBag
      * @param SalesChannelContext           $salesChannelContext
      *
-     * @return RedirectResponse @see AsyncPaymentProcessException exception if an error ocurres while processing the payment
+     * @return RedirectResponse @see AsyncPaymentProcessException exception if an error ocurres while processing the
+     *                          payment
+     * @throws ApiException
      */
     public function pay(
         AsyncPaymentTransactionStruct $transaction,
@@ -121,6 +123,11 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         SalesChannelContext $salesChannelContext
     ): RedirectResponse
     {
+        /**
+         * Set the API keys at Mollie based on the current context.
+         */
+        $this->setApiKeysBySalesChannelContext($salesChannelContext);
+
         /**
          * Prepare the order for the Mollie Orders API and retrieve
          * a payment URL to redirect the customer to in order
@@ -148,8 +155,10 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      *
      * @param AsyncPaymentTransactionStruct $transaction
      * @param Request                       $request
-     * @param SalesChannelContext           $salesChannelContext @see AsyncPaymentFinalizeException exception if an error ocurres while calling an external payment API
-     *                                                           Throw a @throws RuntimeException*@throws CustomerCanceledAsyncPaymentException
+     * @param SalesChannelContext           $salesChannelContext @see AsyncPaymentFinalizeException exception if an
+     *                                                           error ocurres while calling an external payment API
+     *                                                           Throw a @throws RuntimeException*@throws
+     *                                                           CustomerCanceledAsyncPaymentException
      *
      * @throws CustomerCanceledAsyncPaymentException
      * @throws InconsistentCriteriaIdsException
@@ -157,6 +166,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      * @throws StateMachineInvalidEntityIdException
      * @throws StateMachineInvalidStateFieldException
      * @throws StateMachineNotFoundException
+     * @throws ApiException
      * @see CustomerCanceledAsyncPaymentException exception if the customer canceled the payment process on
      * payment provider page
      */
@@ -181,6 +191,11 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         if ($mollieOrderId === null) {
             throw new RuntimeException('There is no Mollie order ID stored on order ' . $order->getOrderNumber());
         }
+
+        /**
+         * Set the API keys at Mollie based on the current context.
+         */
+        $this->setApiKeysBySalesChannelContext($salesChannelContext);
 
         /**
          * Retrieve the order from Mollie's Orders API, so we can set the status of the order
@@ -209,7 +224,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
          */
         try {
             $paymentStatus = $this->paymentStatusHelper->processPaymentStatus(
-                $transaction->getOrderTransaction()->getId(),
+                $transaction->getOrderTransaction(),
                 $order,
                 $mollieOrder,
                 $salesChannelContext->getContext()
@@ -240,7 +255,6 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      * @param SalesChannelContext           $salesChannelContext
      *
      * @return string|null
-     * @throws ApiException
      */
     public function prepare(AsyncPaymentTransactionStruct $transaction, SalesChannelContext $salesChannelContext): ?string
     {
@@ -305,13 +319,6 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
          * @var LocaleEntity   $locale
          */
         $locale = $order->getLanguage() !== null ? $order->getLanguage()->getLocale() : null;
-
-        try {
-            $mollieSettings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
-            $this->apiClient->setApiKey(strtolower($_ENV['APP_ENV']) === 'prod' && !$mollieSettings->isTestMode() ? $mollieSettings->getLiveApiKey() : $mollieSettings->getTestApiKey());
-        } catch (InconsistentCriteriaIdsException $e) {
-            throw new RuntimeException('Could not set Mollie Api Key' . $e->getMessage());
-        }
 
         /**
          * Build an array of order data to send in the request
@@ -401,5 +408,25 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
          * @var string $paymentUrl
          */
         return isset($mollieOrder) ? $mollieOrder->getCheckoutUrl() : null;
+    }
+
+    /**
+     * Sets the API keys for Mollie based on the current context.
+     *
+     * @param SalesChannelContext $context
+     *
+     * @throws ApiException
+     */
+    private function setApiKeysBySalesChannelContext(SalesChannelContext $context): void
+    {
+        try {
+            $mollieSettings = $this->settingsService->getSettings($context->getSalesChannel()->getId());
+
+            $this->apiClient->setApiKey(
+                strtolower($_ENV['APP_ENV']) === 'prod' && !$mollieSettings->isTestMode() ? $mollieSettings->getLiveApiKey() : $mollieSettings->getTestApiKey()
+            );
+        } catch (InconsistentCriteriaIdsException $e) {
+            throw new RuntimeException('Could not set Mollie Api Key' . $e->getMessage());
+        }
     }
 }

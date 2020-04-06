@@ -64,11 +64,13 @@
                 <argument type="service" id="service_container"/>
             </call>
         </service>
+
         <service id="Kiener\MolliePayments\Storefront\Controller\WebhookController" public="true">
             <argument type="service" id="router.default"/>
             <argument type="service" id="order_transaction.repository" />
             <argument type="service" id="Mollie\Api\MollieApiClient" />
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService" />
 
             <call method="setContainer">
                 <argument type="service" id="service_container"/>

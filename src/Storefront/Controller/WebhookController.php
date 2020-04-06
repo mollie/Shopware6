@@ -4,9 +4,11 @@ namespace Kiener\MolliePayments\Storefront\Controller;
 
 use Exception;
 use Kiener\MolliePayments\Helper\PaymentStatusHelper;
+use Kiener\MolliePayments\Service\SettingsService;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order;
+use RuntimeException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -34,24 +36,31 @@ class WebhookController extends StorefrontController
     /** @var PaymentStatusHelper */
     protected $paymentStatusHelper;
 
+    /** @var SettingsService */
+    protected $settingsService;
+
     public function __construct(
         RouterInterface $router,
         EntityRepository $orderTransactionRepository,
         MollieApiClient $apiClient,
-        PaymentStatusHelper $paymentStatusHelper
+        PaymentStatusHelper $paymentStatusHelper,
+        SettingsService $settingsService
     )
     {
         $this->router = $router;
         $this->orderTransactionRepository = $orderTransactionRepository;
         $this->apiClient = $apiClient;
         $this->paymentStatusHelper = $paymentStatusHelper;
+        $this->settingsService = $settingsService;
     }
 
     /**
      * @RouteScope(scopes={"storefront"})
-     * @Route("/mollie/webhook/{transactionId}", name="frontend.mollie.webhook", options={"seo"="false"}, methods={"GET"})
+     * @Route("/mollie/webhook/{transactionId}", defaults={"csrf_protected"=false}, name="frontend.mollie.webhook",
+     *                                           options={"seo"="false"}, methods={"GET", "POST"})
      *
      * @return Response
+     * @throws ApiException
      */
     public function webhookCall(SalesChannelContext $context, $transactionId) : Response
     {
@@ -73,6 +82,7 @@ class WebhookController extends StorefrontController
         try {
             $criteria = new Criteria();
             $criteria->addFilter(new EqualsFilter('id', $transactionId));
+            $criteria->addAssociation('order');
         } catch (InconsistentCriteriaIdsException $e) {
             $errorMessage = $errorMessage ?? $e->getMessage();
         }
@@ -116,6 +126,11 @@ class WebhookController extends StorefrontController
         }
 
         /**
+         * Set the API keys at Mollie based on the current context.
+         */
+        $this->setApiKeysBySalesChannelContext($context);
+
+        /**
          * With the order ID from the custom fields, we fetch the order from Mollie's
          * Orders API.
          *
@@ -142,7 +157,7 @@ class WebhookController extends StorefrontController
         if ($mollieOrder !== null) {
             try {
                 $paymentStatus = $this->paymentStatusHelper->processPaymentStatus(
-                    $transactionId,
+                    $transaction,
                     $order,
                     $mollieOrder,
                     $context->getContext()
@@ -203,5 +218,25 @@ class WebhookController extends StorefrontController
         return new Response(json_encode($data), 200, [
             'Content-Type' => 'application/json'
         ]);
+    }
+
+    /**
+     * Sets the API keys for Mollie based on the current context.
+     *
+     * @param SalesChannelContext $context
+     *
+     * @throws ApiException
+     */
+    private function setApiKeysBySalesChannelContext(SalesChannelContext $context): void
+    {
+        try {
+            $mollieSettings = $this->settingsService->getSettings($context->getSalesChannel()->getId());
+
+            $this->apiClient->setApiKey(
+                strtolower($_ENV['APP_ENV']) === 'prod' && !$mollieSettings->isTestMode() ? $mollieSettings->getLiveApiKey() : $mollieSettings->getTestApiKey()
+            );
+        } catch (InconsistentCriteriaIdsException $e) {
+            throw new RuntimeException('Could not set Mollie Api Key' . $e->getMessage());
+        }
     }
 }

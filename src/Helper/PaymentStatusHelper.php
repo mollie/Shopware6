@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Helper;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Types\PaymentStatus;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
@@ -27,7 +28,7 @@ class PaymentStatusHelper
      * Processes the payment status for a Mollie Order. Uses the transaction state handler
      * to handle the transaction to a new status.
      *
-     * @param string $transactionId
+     * @param OrderTransactionEntity $transaction
      * @param OrderEntity $order
      * @param Order $mollieOrder
      * @param Context $context
@@ -39,7 +40,7 @@ class PaymentStatusHelper
      * @throws \Shopware\Core\System\StateMachine\Exception\StateMachineNotFoundException
      */
     public function processPaymentStatus(
-        string $transactionId,
+        OrderTransactionEntity $transaction,
         OrderEntity $order,
         Order $mollieOrder,
         Context $context
@@ -53,6 +54,7 @@ class PaymentStatusHelper
         $pendingNumber = 0;
         $payments = $mollieOrder->payments();
         $paymentsTotal = $payments !== null ? $payments->count() : 0;
+        $transactionState = $transaction->getStateMachineState();
 
         /**
          * We gather the states for all payments in order to handle
@@ -90,16 +92,24 @@ class PaymentStatusHelper
         /**
          * The order is paid.
          */
-        if ($mollieOrder->isPaid()) {
-            $this->orderTransactionStateHandler->pay($transactionId, $context);
+        if (
+            $mollieOrder->isPaid()
+                && $transactionState !== null
+            && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_PAID
+        ) {
+            $this->orderTransactionStateHandler->pay($transaction->getId(), $context);
             return PaymentStatus::STATUS_PAID;
         }
 
         /**
          * The order is cancelled.
          */
-        if ($mollieOrder->isCanceled()) {
-            $this->orderTransactionStateHandler->cancel($transactionId, $context);
+        if (
+            $transactionState !== null
+            && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_CANCELED
+            && $mollieOrder->isCanceled()
+        ) {
+            $this->orderTransactionStateHandler->cancel($transaction->getId(), $context);
             return PaymentStatus::STATUS_CANCELED;
         }
 
@@ -107,15 +117,23 @@ class PaymentStatusHelper
          * All payments are authorized, therefore the order payment is authorized. We
          * transition to paid as Shopware 6 has no transition to a authorized state (yet).
          */
-        if ($authorizedNumber > 0 && $authorizedNumber === $paymentsTotal) {
+        if (
+            $authorizedNumber > 0
+            && $authorizedNumber === $paymentsTotal
+        ) {
             return PaymentStatus::STATUS_OPEN;
         }
 
         /**
          * All payments are cancelled, therefore the order payment is canceled.
          */
-        if ($cancelledNumber > 0 && $cancelledNumber === $paymentsTotal) {
-            $this->orderTransactionStateHandler->cancel($transactionId, $context);
+        if (
+            $cancelledNumber > 0
+            && $cancelledNumber === $paymentsTotal
+            && $transactionState !== null
+            && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_CANCELED
+        ) {
+            $this->orderTransactionStateHandler->cancel($transaction->getId(), $context);
             return PaymentStatus::STATUS_CANCELED;
         }
 
@@ -123,8 +141,13 @@ class PaymentStatusHelper
          * All payments expired, therefore the order payment expired. We transition
          * to cancelled as Shopware 6 has no transition to a expired state (yet).
          */
-        if ($expiredNumber > 0 && $expiredNumber === $paymentsTotal) {
-            $this->orderTransactionStateHandler->cancel($transactionId, $context);
+        if (
+            $expiredNumber > 0
+            && $expiredNumber === $paymentsTotal
+            && $transactionState !== null
+            && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_CANCELED
+        ) {
+            $this->orderTransactionStateHandler->cancel($transaction->getId(), $context);
             return PaymentStatus::STATUS_CANCELED;
         }
 
@@ -132,8 +155,13 @@ class PaymentStatusHelper
          * All payments failed, therefore the order payment failed. We transition
          * to cancelled as Shopware 6 has no transition to a failed state (yet).
          */
-        if ($failedNumber > 0 && $failedNumber === $paymentsTotal) {
-            $this->orderTransactionStateHandler->cancel($transactionId, $context);
+        if (
+            $failedNumber > 0
+            && $failedNumber === $paymentsTotal
+            && $transactionState !== null
+            && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_CANCELED
+        ) {
+            $this->orderTransactionStateHandler->cancel($transaction->getId(), $context);
             return PaymentStatus::STATUS_CANCELED;
         }
 
@@ -141,15 +169,22 @@ class PaymentStatusHelper
          * All payments are pending, therefore the order payment is pending. We
          * transition to paid as Shopware 6 has no transition to a pending state (yet).
          */
-        if ($pendingNumber > 0 && $pendingNumber === $paymentsTotal) {
+        if (
+            $pendingNumber > 0
+            && $pendingNumber === $paymentsTotal
+        ) {
             return PaymentStatus::STATUS_PAID;
         }
 
         /**
          * The paid amount is equal to the total amount, therefore the order is paid.
          */
-        if ($paidNumber > 0 && $paidNumber === $order->getAmountTotal()) {
-            $this->orderTransactionStateHandler->pay($transactionId, $context);
+        if (
+            $paidNumber > 0
+            && $paidNumber === $order->getAmountTotal()
+            && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_PAID
+        ) {
+            $this->orderTransactionStateHandler->pay($transaction->getId(), $context);
             return PaymentStatus::STATUS_PAID;
         }
 

@@ -2,6 +2,8 @@
 
 namespace Kiener\MolliePayments;
 
+require_once __DIR__ . '/../vendor/autoload.php';
+
 use Exception;
 use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\PaymentMethodService;

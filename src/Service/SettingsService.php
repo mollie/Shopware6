@@ -59,13 +59,13 @@ class SettingsService
     /**
      * Get Mollie configuration collection.
      *
-     * @param string       $salesChannelId
+     * @param string|null  $salesChannelId
      * @param Context|null $context
      *
      * @return SystemConfigCollection
      * @throws InconsistentCriteriaIdsException
      */
-    protected function getMollieConfigurationCollection(string $salesChannelId, ?Context $context = null): SystemConfigCollection
+    protected function getMollieConfigurationCollection(string $salesChannelId = null, ?Context $context = null): SystemConfigCollection
     {
         // Set default context
         if ($context === null) {
@@ -74,8 +74,12 @@ class SettingsService
 
         // Create filter criteria
         $criteria = (new Criteria())
-            ->addFilter(new ContainsFilter('configurationKey', self::SYSTEM_CONFIG_DOMAIN))
-            ->addFilter(new EqualsFilter('salesChannelId', $salesChannelId));
+            ->addFilter(new ContainsFilter('configurationKey', self::SYSTEM_CONFIG_DOMAIN));
+
+        // Add the sales channel id to the criteria
+        if ($salesChannelId !== null) {
+            $criteria->addFilter(new EqualsFilter('salesChannelId', $salesChannelId));
+        }
 
         /** @var SystemConfigCollection $systemConfigCollection */
         $systemConfigCollection = $this->systemConfigRepository
