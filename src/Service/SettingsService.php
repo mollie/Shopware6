@@ -27,13 +27,13 @@ class SettingsService
     /**
      * Get Mollie settings from configuration.
      *
-     * @param string       $salesChannelId
+     * @param string|null  $salesChannelId
      * @param Context|null $context
      *
      * @return MollieSettingStruct
      * @throws InconsistentCriteriaIdsException
      */
-    public function getSettings(string $salesChannelId, ?Context $context = null): MollieSettingStruct
+    public function getSettings(?string $salesChannelId = null, ?Context $context = null): MollieSettingStruct
     {
         $structData = [];
 
@@ -65,7 +65,7 @@ class SettingsService
      * @return SystemConfigCollection
      * @throws InconsistentCriteriaIdsException
      */
-    protected function getMollieConfigurationCollection(string $salesChannelId = null, ?Context $context = null): SystemConfigCollection
+    protected function getMollieConfigurationCollection(?string $salesChannelId = null, ?Context $context = null): SystemConfigCollection
     {
         // Set default context
         if ($context === null) {
