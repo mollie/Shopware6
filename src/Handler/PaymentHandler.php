@@ -5,14 +5,17 @@ namespace Kiener\MolliePayments\Handler;
 use Exception;
 use Kiener\MolliePayments\Helper\PaymentStatusHelper;
 use Kiener\MolliePayments\Service\CustomerService;
+use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
+use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Types\PaymentStatus;
-use Psr\Log\LoggerInterface;
+use Monolog\Logger;
 use RuntimeException;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\AsynchronousPaymentHandlerInterface;
@@ -36,6 +39,20 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
     public const PAYMENT_METHOD_NAME = '';
     public const PAYMENT_METHOD_DESCRIPTION = '';
 
+    protected const FIELD_AMOUNT = 'amount';
+    protected const FIELD_REDIRECT_URL = 'redirectUrl';
+    protected const FIELD_LOCALE = 'locale';
+    protected const FIELD_METHOD = 'method';
+    protected const FIELD_ORDER_NUMBER = 'orderNumber';
+    protected const FIELD_LINES = 'lines';
+    protected const FIELD_BILLING_ADDRESS = 'billingAddress';
+    protected const FIELD_BILLING_EMAIL = 'billingEmail';
+    protected const FIELD_SHIPPING_ADDRESS = 'shippingAddress';
+    protected const FIELD_PAYMENT = 'payment';
+    protected const FIELD_WEBHOOK_URL = 'webhookUrl';
+    protected const FIELD_DUE_DATE = 'dueDate';
+    protected const FIELD_EXPIRES_AT = 'expiresAt';
+
     /** @var string */
     protected $paymentMethod;
 
@@ -43,30 +60,31 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
     protected $paymentMethodData = [];
 
     /** @var OrderTransactionStateHandler */
-    private $transactionStateHandler;
+    protected $transactionStateHandler;
 
     /** @var OrderService */
-    private $orderService;
+    protected $orderService;
 
     /** @var CustomerService */
-    private $customerService;
+    protected $customerService;
 
     /** @var MollieApiClient */
-    private $apiClient;
+    protected $apiClient;
 
-    /**
-     * @var SettingsService
-     */
-    private $settingsService;
+    /** @var SettingsService */
+    protected $settingsService;
 
     /** @var PaymentStatusHelper */
-    private $paymentStatusHelper;
+    protected $paymentStatusHelper;
 
-    /** @var LoggerInterface */
-    private $logger;
+    /** @var LoggerService */
+    protected $logger;
 
     /** @var RouterInterface */
-    private $router;
+    protected $router;
+
+    /** @var string $environment */
+    protected $environment;
 
     /**
      * PaymentHandler constructor.
@@ -77,8 +95,9 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      * @param MollieApiClient              $apiClient
      * @param SettingsService              $settingsService
      * @param PaymentStatusHelper          $paymentStatusHelper
-     * @param LoggerInterface              $logger
+     * @param LoggerService                $logger
      * @param RouterInterface              $router
+     * @param string                       $environment
      */
     public function __construct(
         OrderTransactionStateHandler $transactionStateHandler,
@@ -87,8 +106,9 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         MollieApiClient $apiClient,
         SettingsService $settingsService,
         PaymentStatusHelper $paymentStatusHelper,
-        LoggerInterface $logger,
-        RouterInterface $router
+        LoggerService $logger,
+        RouterInterface $router,
+        string $environment
     )
     {
         $this->transactionStateHandler = $transactionStateHandler;
@@ -99,6 +119,19 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         $this->logger = $logger;
         $this->router = $router;
         $this->settingsService = $settingsService;
+        $this->environment = $environment;
+    }
+
+    /**
+     * @param array               $orderData
+     * @param SalesChannelContext $salesChannelContext
+     * @param CustomerEntity      $customer
+     * @param LocaleEntity        $locale
+     *
+     * @return array
+     */
+    protected function processPaymentMethodSpecificParameters(array $orderData, SalesChannelContext $salesChannelContext, CustomerEntity $customer, LocaleEntity $locale): array
+    {
     }
 
     /**
@@ -128,6 +161,8 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
          */
         $this->setApiKeysBySalesChannelContext($salesChannelContext);
 
+        //ToDo: Data for specific payment methods vullen. Functie aanroepen die met specifieke payment methods overriden
+
         /**
          * Prepare the order for the Mollie Orders API and retrieve
          * a payment URL to redirect the customer to in order
@@ -136,8 +171,29 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         try {
             $paymentUrl = $this->prepare($transaction, $salesChannelContext);
         } catch (Exception $e) {
-            $this->logger->error($e->getMessage(), [$e]);
-            throw new RuntimeException('Could not create a Mollie Payment Url: ' . $e->getMessage());
+            $this->logger->addEntry(
+                $e->getMessage(),
+                $salesChannelContext->getContext(),
+                $e,
+                [
+                    'function' => 'order-prepare',
+                ],
+                Logger::ERROR
+            );
+
+            throw new RuntimeException(sprintf('Could not create a Mollie Payment Url, error: %s', $e->getMessage()));
+        }
+
+        // Set the payment status to in progress
+        if (
+            isset($paymentUrl)
+            && !empty($paymentUrl)
+            && method_exists($this->transactionStateHandler, 'process')
+        ) {
+            $this->transactionStateHandler->process(
+                $transaction->getOrderTransaction()->getId(),
+                $salesChannelContext->getContext()
+            );
         }
 
         /**
@@ -189,7 +245,22 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         $mollieOrderId = $orderCustomFields['mollie_payments']['order_id'] ?? null;
 
         if ($mollieOrderId === null) {
-            throw new RuntimeException('There is no Mollie order ID stored on order ' . $order->getOrderNumber());
+            // Set the error message
+            $errorMessage = sprintf('The Mollie id for order %s could not be found', $order->getOrderNumber());
+
+            // Log the error message in the database
+            $this->logger->addEntry(
+                $errorMessage,
+                $salesChannelContext->getContext(),
+                null,
+                [
+                    'function' => 'finalize-payment',
+                ],
+                Logger::ERROR
+            );
+
+            // Throw the error
+            throw new RuntimeException($errorMessage);
         }
 
         /**
@@ -206,7 +277,15 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
                 'embed' => 'payments'
             ]);
         } catch (ApiException $e) {
-            $this->logger->error($e->getMessage(), [$e]);
+            $this->logger->addEntry(
+                $e->getMessage(),
+                $salesChannelContext->getContext(),
+                $e,
+                [
+                    'function' => 'get-mollie-order',
+                ],
+                Logger::ERROR
+            );
         }
 
         /**
@@ -230,16 +309,27 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
                 $salesChannelContext->getContext()
             );
         } catch (Exception $e) {
-            $this->logger->error($e->getMessage(), [$e]);
+            $this->logger->addEntry(
+                $e->getMessage(),
+                $salesChannelContext->getContext(),
+                $e,
+                [
+                    'function' => 'finalize-payment',
+                ],
+                Logger::ERROR
+            );
         }
 
         /**
          * If the payment was cancelled by the customer, throw an exception
          * to let the shop handle the cancellation.
          */
-        if (isset($paymentStatus) && $paymentStatus === PaymentStatus::STATUS_CANCELED) {
+        if (
+            isset($paymentStatus)
+            && ($paymentStatus === PaymentStatus::STATUS_CANCELED || $paymentStatus === PaymentStatus::STATUS_FAILED)
+        ) {
             $this->transactionStateHandler
-                ->cancel($transaction->getOrderTransaction()->getId(), $salesChannelContext->getContext());
+                ->reopen($transaction->getOrderTransaction()->getId(), $salesChannelContext->getContext());
 
             throw new CustomerCanceledAsyncPaymentException(
                 'Payment for order ' . $order->getOrderNumber() . ' (' . $mollieOrder->id . ') was cancelled by the customer.', ''
@@ -325,32 +415,61 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
          * to Mollie's Orders API to create an order payment.
          */
         $orderData = [
-            'amount' => $this->orderService->getPriceArray(
+            self::FIELD_AMOUNT => $this->orderService->getPriceArray(
                 $currency !== null ? $currency->getIsoCode() : 'EUR',
                 $order->getAmountTotal()
             ),
-            'redirectUrl' => $transaction->getReturnUrl(),
-            'locale' => $locale !== null ? $locale->getCode() : null,
-            'method' => $this->paymentMethod,
-            'orderNumber' => $order->getOrderNumber(),
-            'lines' => $this->orderService->getOrderLinesArray($order),
-            'billingAddress' => $this->customerService->getAddressArray(
+            self::FIELD_REDIRECT_URL => $transaction->getReturnUrl(),
+            self::FIELD_LOCALE => $locale !== null ? $locale->getCode() : null,
+            self::FIELD_METHOD => $this->paymentMethod,
+            self::FIELD_ORDER_NUMBER => $order->getOrderNumber(),
+            self::FIELD_LINES => $this->orderService->getOrderLinesArray($order),
+            self::FIELD_BILLING_ADDRESS => $this->customerService->getAddressArray(
                 $customer->getDefaultBillingAddress(),
                 $customer
             ),
-            'shippingAddress' => $this->customerService->getAddressArray(
+            self::FIELD_SHIPPING_ADDRESS => $this->customerService->getAddressArray(
                 $customer->getDefaultShippingAddress(),
                 $customer
             ),
-            'payment' => []
+            self::FIELD_PAYMENT => []
         ];
+
+        /**
+         * Try to fetch the Order Lifetime configuration. If it is can be fetched, set it expiresAt field
+         * The expiresAt is optional and defaults to 28 days if not set
+         *
+         * @var MollieSettingStruct $settings
+         */
+        $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
+
+        try {
+            $dueDate = $settings->getOrderLifetimeDate();
+
+            if ($dueDate !== null) {
+                $orderData[self::FIELD_EXPIRES_AT] = $dueDate;
+            }
+        } catch (Exception $e) {
+            $this->logger->addEntry(
+                $e->getMessage(),
+                $salesChannelContext->getContext(),
+                $e,
+                [
+                    'function' => 'finalize-payment',
+                ],
+                Logger::ERROR
+            );
+        }
+
+        // Temporarily disabled due to errors with Paypal
+        // $orderData = $this->processPaymentMethodSpecificParameters($orderData, $salesChannelContext, $customer, $locale);
 
         /**
          * Generate the URL for Mollie's webhook call only on prod environment. This webhook is used
          * to handle payment updates.
          */
-        if (strtolower($_ENV['APP_ENV']) === 'prod') {
-            $orderData['webhookUrl'] = $this->router->generate('frontend.mollie.webhook', [
+        if ($this->environment === 'prod') {
+            $orderData[self::FIELD_WEBHOOK_URL] = $this->router->generate('frontend.mollie.webhook', [
                 'transactionId' => $transaction->getOrderTransaction()->getId()
             ], $this->router::ABSOLUTE_URL);
         }
@@ -367,6 +486,18 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
 
         $orderData = array_merge($orderData, $this->paymentMethodData);
 
+        // Log the order data
+        if ($settings->isDebugMode()) {
+            $this->logger->addEntry(
+                sprintf('Order %s is prepared to be paid through Mollie', $order->getOrderNumber()),
+                $salesChannelContext->getContext(),
+                null,
+                [
+                    'orderData' => $orderData,
+                ]
+            );
+        }
+
         /**
          * Create an order at Mollie based on the prepared
          * array of order data.
@@ -377,8 +508,17 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         try {
             $mollieOrder = $this->apiClient->orders->create($orderData);
         } catch (ApiException $e) {
-            throw new RuntimeException('Could not create Mollie order: ' . $e->getMessage());
-            // @todo Handle exception
+            $this->logger->addEntry(
+                $e->getMessage(),
+                $salesChannelContext->getContext(),
+                $e,
+                [
+                    'function' => 'finalize-payment',
+                ],
+                Logger::ERROR
+            );
+
+            throw new RuntimeException(sprintf('Could not create Mollie order, error: %s', $e->getMessage()));
         }
 
         /**
@@ -420,13 +560,38 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
     private function setApiKeysBySalesChannelContext(SalesChannelContext $context): void
     {
         try {
-            $mollieSettings = $this->settingsService->getSettings($context->getSalesChannel()->getId());
+            /** @var MollieSettingStruct $settings */
+            $settings = $this->settingsService->getSettings($context->getSalesChannel()->getId());
 
-            $this->apiClient->setApiKey(
-                strtolower($_ENV['APP_ENV']) === 'prod' && !$mollieSettings->isTestMode() ? $mollieSettings->getLiveApiKey() : $mollieSettings->getTestApiKey()
-            );
+            /** @var string $apiKey */
+            $apiKey = $settings->isTestMode() === false ? $settings->getLiveApiKey() : $settings->getTestApiKey();
+
+            // Log the used API keys
+            if ($settings->isDebugMode()) {
+                $this->logger->addEntry(
+                    sprintf('Selected API key %s for sales channel %s', $apiKey, $context->getSalesChannel()->getName()),
+                    $context->getContext(),
+                    null,
+                    [
+                        'apiKey' => $apiKey,
+                    ]
+                );
+            }
+
+            // Set the API key
+            $this->apiClient->setApiKey($apiKey);
         } catch (InconsistentCriteriaIdsException $e) {
-            throw new RuntimeException('Could not set Mollie Api Key' . $e->getMessage());
+            $this->logger->addEntry(
+                $e->getMessage(),
+                $context->getContext(),
+                $e,
+                [
+                    'function' => 'set-mollie-api-key',
+                ],
+                Logger::ERROR
+            );
+
+            throw new RuntimeException(sprintf('Could not set Mollie Api Key, error: %s', $e->getMessage()));
         }
     }
 }

@@ -189,7 +189,7 @@ class OrderService
      * @param int $decimals
      * @return array
      */
-    public function getPriceArray(string $currency, float $price, int $decimals = 2) : array
+    public function getPriceArray(string $currency, ?float $price = null, int $decimals = 2) : array
     {
         if ($price === null) {
             $price = 0.0;

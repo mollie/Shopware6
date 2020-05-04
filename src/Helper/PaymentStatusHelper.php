@@ -1,5 +1,6 @@
 <?php
 
+
 namespace Kiener\MolliePayments\Helper;
 
 use Mollie\Api\Resources\Order;
@@ -29,9 +30,10 @@ class PaymentStatusHelper
      * to handle the transaction to a new status.
      *
      * @param OrderTransactionEntity $transaction
-     * @param OrderEntity $order
-     * @param Order $mollieOrder
-     * @param Context $context
+     * @param OrderEntity            $order
+     * @param Order                  $mollieOrder
+     * @param Context                $context
+     *
      * @return bool
      * @throws \Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException
      * @throws \Shopware\Core\System\StateMachine\Exception\IllegalTransitionException
@@ -44,7 +46,7 @@ class PaymentStatusHelper
         OrderEntity $order,
         Order $mollieOrder,
         Context $context
-    ) : string
+    ): string
     {
         $paidNumber = 0;
         $authorizedNumber = 0;
@@ -93,11 +95,11 @@ class PaymentStatusHelper
          * The order is paid.
          */
         if (
-            $mollieOrder->isPaid()
-                && $transactionState !== null
+            $transactionState !== null
             && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_PAID
+            && $mollieOrder->isPaid()
         ) {
-            $this->orderTransactionStateHandler->pay($transaction->getId(), $context);
+            $this->orderTransactionStateHandler->paid($transaction->getId(), $context);
             return PaymentStatus::STATUS_PAID;
         }
 
@@ -159,10 +161,18 @@ class PaymentStatusHelper
             $failedNumber > 0
             && $failedNumber === $paymentsTotal
             && $transactionState !== null
-            && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_CANCELED
+            && (
+                $transactionState->getTechnicalName() !== PaymentStatus::STATUS_FAILED
+                && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_CANCELED
+            )
         ) {
-            $this->orderTransactionStateHandler->cancel($transaction->getId(), $context);
-            return PaymentStatus::STATUS_CANCELED;
+            if (method_exists($this->orderTransactionStateHandler, 'fail')) {
+                $this->orderTransactionStateHandler->fail($transaction->getId(), $context);
+            } else {
+                $this->orderTransactionStateHandler->cancel($transaction->getId(), $context);
+            }
+
+            return PaymentStatus::STATUS_FAILED;
         }
 
         /**
@@ -184,7 +194,7 @@ class PaymentStatusHelper
             && $paidNumber === $order->getAmountTotal()
             && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_PAID
         ) {
-            $this->orderTransactionStateHandler->pay($transaction->getId(), $context);
+            $this->orderTransactionStateHandler->paid($transaction->getId(), $context);
             return PaymentStatus::STATUS_PAID;
         }
 

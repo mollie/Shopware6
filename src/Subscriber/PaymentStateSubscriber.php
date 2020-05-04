@@ -2,17 +2,14 @@
 
 namespace Kiener\MolliePayments\Subscriber;
 
+use Kiener\MolliePayments\Service\TransactionService;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Order\OrderEvents;
-use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PaymentStateSubscriber implements EventSubscriberInterface
@@ -20,8 +17,8 @@ class PaymentStateSubscriber implements EventSubscriberInterface
     /** @var MollieApiClient $apiClient */
     private $apiClient;
 
-    /** @var EntityRepositoryInterface $orderTransactionRepository */
-    private $orderTransactionRepository;
+    /** @var TransactionService */
+    private $transactionService;
 
     /**
      * Returns an array of event names this subscriber wants to listen to.
@@ -52,16 +49,15 @@ class PaymentStateSubscriber implements EventSubscriberInterface
      * Creates a new instance of PaymentMethodSubscriber.
      *
      * @param MollieApiClient $apiClient
-     * @param EntityRepositoryInterface $orderTransactionRepository
-     * @param EntityRepositoryInterface $stateMachineStateRepository
+     * @param TransactionService $transactionService
      */
     public function __construct(
         MollieApiClient $apiClient,
-        EntityRepositoryInterface $orderTransactionRepository
+        TransactionService $transactionService
     )
     {
         $this->apiClient = $apiClient;
-        $this->orderTransactionRepository = $orderTransactionRepository;
+        $this->transactionService = $transactionService;
     }
 
     /**
@@ -81,7 +77,10 @@ class PaymentStateSubscriber implements EventSubscriberInterface
 
             try {
                 /** @var OrderTransactionEntity $transaction */
-                $transaction = $this->getTransaction($transactionId, $transactionVersionId);
+                $transaction = $this->transactionService->getTransactionById(
+                    $transactionId,
+                    $transactionVersionId
+                );
             } catch (InconsistentCriteriaIdsException $e) {
                 // @todo Handle exception
             }
@@ -118,30 +117,5 @@ class PaymentStateSubscriber implements EventSubscriberInterface
                 $mollieOrder->refundAll();
             }
         }
-    }
-
-    /**
-     * Finds a transaction by id.
-     *
-     * @param $transactionId
-     * @param $versionId
-     * @return OrderTransactionEntity|null
-     * @throws InconsistentCriteriaIdsException
-     */
-    private function getTransaction($transactionId, $versionId): ?OrderTransactionEntity
-    {
-        $transactionCriteria = new Criteria();
-        $transactionCriteria->addFilter(new EqualsFilter('id', $transactionId));
-        $transactionCriteria->addFilter(new EqualsFilter('versionId', $versionId));
-        $transactionCriteria->addAssociation('order');
-
-        /** @var OrderTransactionCollection $transactions */
-        $transactions = $this->orderTransactionRepository->search($transactionCriteria, Context::createDefaultContext());
-
-        if ($transactions->count() === 0) {
-            return null;
-        }
-
-        return $transactions->first();
     }
 }

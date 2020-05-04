@@ -3,8 +3,11 @@
 namespace Kiener\MolliePayments\Storefront\Controller;
 
 use Exception;
+use Kiener\MolliePayments\Helper\DeliveryStateHelper;
 use Kiener\MolliePayments\Helper\PaymentStatusHelper;
+use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\SettingsService;
+use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order;
@@ -18,6 +21,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\RouterInterface;
@@ -25,33 +29,43 @@ use Symfony\Component\Routing\RouterInterface;
 class WebhookController extends StorefrontController
 {
     /** @var RouterInterface */
-    protected $router;
+    private $router;
 
     /** @var EntityRepository */
-    protected $orderTransactionRepository;
+    private $orderTransactionRepository;
 
     /** @var MollieApiClient */
-    protected $apiClient;
+    private $apiClient;
+
+    /** @var DeliveryStateHelper */
+    private $deliveryStateHelper;
 
     /** @var PaymentStatusHelper */
-    protected $paymentStatusHelper;
+    private $paymentStatusHelper;
 
     /** @var SettingsService */
-    protected $settingsService;
+    private $settingsService;
+
+    /** @var LoggerService */
+    private $logger;
 
     public function __construct(
         RouterInterface $router,
         EntityRepository $orderTransactionRepository,
         MollieApiClient $apiClient,
+        DeliveryStateHelper $deliveryStateHelper,
         PaymentStatusHelper $paymentStatusHelper,
-        SettingsService $settingsService
+        SettingsService $settingsService,
+        LoggerService $logger
     )
     {
         $this->router = $router;
         $this->orderTransactionRepository = $orderTransactionRepository;
         $this->apiClient = $apiClient;
+        $this->deliveryStateHelper = $deliveryStateHelper;
         $this->paymentStatusHelper = $paymentStatusHelper;
         $this->settingsService = $settingsService;
+        $this->logger = $logger;
     }
 
     /**
@@ -59,10 +73,13 @@ class WebhookController extends StorefrontController
      * @Route("/mollie/webhook/{transactionId}", defaults={"csrf_protected"=false}, name="frontend.mollie.webhook",
      *                                           options={"seo"="false"}, methods={"GET", "POST"})
      *
-     * @return Response
+     * @param SalesChannelContext $context
+     * @param                     $transactionId
+     *
+     * @return JsonResponse
      * @throws ApiException
      */
-    public function webhookCall(SalesChannelContext $context, $transactionId) : Response
+    public function webhookCall(SalesChannelContext $context, $transactionId): JsonResponse
     {
         $criteria = null;
         $transaction = null;
@@ -72,6 +89,24 @@ class WebhookController extends StorefrontController
         $mollieOrderId = null;
         $paymentStatus = null;
         $errorMessage = null;
+
+        /** @var MollieSettingStruct $settings */
+        $settings = $this->settingsService->getSettings(
+            $context->getSalesChannel()->getId(),
+            $context->getContext()
+        );
+
+        // Add a message to the log that the webhook has been triggered.
+        if ($settings->isDebugMode()) {
+            $this->logger->addEntry(
+                sprintf('Webhook for transaction %s is triggered.', $transactionId),
+                $context->getContext(),
+                null,
+                [
+                    'transactionId' => $transactionId,
+                ]
+            );
+        }
 
         /**
          * Create a search criteria to find the transaction by it's ID in the
@@ -165,6 +200,16 @@ class WebhookController extends StorefrontController
             } catch (Exception $e) {
                 $errorMessage = $errorMessage ?? $e->getMessage();
             }
+
+            try {
+                $this->deliveryStateHelper->shipDelivery(
+                    $order,
+                    $mollieOrder,
+                    $context->getContext()
+                );
+            } catch (Exception $e) {
+                $errorMessage = $errorMessage ?? $e->getMessage();
+            }
         } else {
             $errorMessage = $errorMessage ?? 'No order found in the Orders API with ID ' . $mollieOrderId ?? '<unknown>';
         }
@@ -180,43 +225,26 @@ class WebhookController extends StorefrontController
          * If any errors occurred during the webhook call, we return an error message.
          */
         if ($errorMessage !== null) {
-            return $this->returnJson([
+            $this->logger->addEntry(
+                $errorMessage,
+                $context->getContext(),
+                null,
+                [
+                    'function' => 'webhook',
+                ]
+            );
+
+            return new JsonResponse([
                 'success' => false,
                 'error' => $errorMessage
-            ]);
+            ], 422);
         }
 
         /**
          * If no errors occurred during the webhook call, we return a success message.
          */
-        return $this->returnJson([
+        return new JsonResponse([
             'success' => true
-        ]);
-    }
-
-    /**
-     * Returns the URL of the webhook controller.
-     *
-     * @param $transactionId
-     * @return string
-     */
-    public function getWebhookUrl($transactionId) : string
-    {
-        return $this->router->generate('frontend.mollie.webhook', [
-            'transactionId' => $transactionId
-        ]);
-    }
-
-    /**
-     * Returns a JSON response.
-     *
-     * @param array $data
-     * @return Response
-     */
-    protected function returnJson(array $data) : Response
-    {
-        return new Response(json_encode($data), 200, [
-            'Content-Type' => 'application/json'
         ]);
     }
 
@@ -230,13 +258,37 @@ class WebhookController extends StorefrontController
     private function setApiKeysBySalesChannelContext(SalesChannelContext $context): void
     {
         try {
-            $mollieSettings = $this->settingsService->getSettings($context->getSalesChannel()->getId());
+            /** @var MollieSettingStruct $settings */
+            $settings = $this->settingsService->getSettings($context->getSalesChannel()->getId());
 
-            $this->apiClient->setApiKey(
-                strtolower($_ENV['APP_ENV']) === 'prod' && !$mollieSettings->isTestMode() ? $mollieSettings->getLiveApiKey() : $mollieSettings->getTestApiKey()
-            );
+            /** @var string $apiKey */
+            $apiKey = $settings->isTestMode() === false ? $settings->getLiveApiKey() : $settings->getTestApiKey();
+
+            // Log the used API keys
+            if ($settings->isDebugMode()) {
+                $this->logger->addEntry(
+                    sprintf('Selected API key %s for sales channel %s', $apiKey, $context->getSalesChannel()->getName()),
+                    $context->getContext(),
+                    null,
+                    [
+                        'apiKey' => $apiKey,
+                    ]
+                );
+            }
+
+            // Set the API key
+            $this->apiClient->setApiKey($apiKey);
         } catch (InconsistentCriteriaIdsException $e) {
-            throw new RuntimeException('Could not set Mollie Api Key' . $e->getMessage());
+            $this->logger->addEntry(
+                $e->getMessage(),
+                $context->getContext(),
+                $e,
+                [
+                    'function' => 'set-mollie-api-key',
+                ]
+            );
+
+            throw new RuntimeException(sprintf('Could not set Mollie Api Key, error: %s', $e->getMessage()));
         }
     }
 }

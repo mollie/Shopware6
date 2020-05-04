@@ -25,10 +25,28 @@
             <label lang="nl-NL">Test Modus</label>
         </input-field>
         <input-field type="bool">
+            <name>debugMode</name>
+            <label>Debug Mode</label>
+            <label lang="de-DE">Debug Mode</label>
+            <label lang="nl-NL">Debug Modus</label>
+        </input-field>
+        <input-field type="bool">
             <name>enableCreditCardComponents</name>
             <label>Credit Card Components</label>
             <label lang="de-DE">Credit Card Components</label>
             <label lang="nl-NL">Credit Card Components</label>
+        </input-field>
+        <input-field type="int">
+            <name>paymentMethodBankTransferDueDateDays</name>
+            <label>Bank Transfer Due Date Days</label>
+            <label lang="de-DE">Bank Transfer Due Date Days</label>
+            <label lang="nl-NL">Bank Transfer Due Date Days</label>
+        </input-field>
+        <input-field type="int">
+            <name>orderLifetimeDays</name>
+            <label>Order Lifetime Days</label>
+            <label lang="de-DE">Order Lifetime Day</label>
+            <label lang="nl-NL">Order Lifetime Day</label>
         </input-field>
     </card>
 </config>
