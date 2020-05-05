@@ -99,7 +99,12 @@ class PaymentStatusHelper
             && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_PAID
             && $mollieOrder->isPaid()
         ) {
-            $this->orderTransactionStateHandler->paid($transaction->getId(), $context);
+            if (method_exists($this->orderTransactionStateHandler, 'paid')) {
+                $this->orderTransactionStateHandler->paid($transaction->getId(), $context);
+            } else {
+                $this->orderTransactionStateHandler->pay($transaction->getId(), $context);
+            }
+
             return PaymentStatus::STATUS_PAID;
         }
 
@@ -194,7 +199,12 @@ class PaymentStatusHelper
             && $paidNumber === $order->getAmountTotal()
             && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_PAID
         ) {
-            $this->orderTransactionStateHandler->paid($transaction->getId(), $context);
+            if (method_exists($this->orderTransactionStateHandler, 'paid')) {
+                $this->orderTransactionStateHandler->paid($transaction->getId(), $context);
+            } else {
+                $this->orderTransactionStateHandler->pay($transaction->getId(), $context);
+            }
+
             return PaymentStatus::STATUS_PAID;
         }
 
