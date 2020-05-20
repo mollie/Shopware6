@@ -6,7 +6,7 @@
            name="paymentMethodId"
            value="{{ payment.id }}"
            {% if payment.id is same as(defaultPaymentMethodId) %}checked="checked"{% endif %}
-           class="custom-control-input payment-method-input {{ payment.customFields.mollie_payment_method_name }}">
+           class="custom-control-input payment-method-input {{ payment.translated.customFields.mollie_payment_method_name }}">
 {% endblock %}
 
 {% block component_payment_method_description %}
@@ -14,7 +14,7 @@
 
     {# load mollie creditcard components #}
     {%
-        if payment.customFields.mollie_payment_method_name == 'creditcard'
+        if payment.translated.customFields.mollie_payment_method_name == 'creditcard'
         and page.enable_credit_card_components == true
     %}
         <div class="mollie-components-credit-card" id="mollie_components_credit_card">

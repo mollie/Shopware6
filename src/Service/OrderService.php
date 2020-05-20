@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Service;
 use Mollie\Api\Types\OrderLineType;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
+use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTax;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
@@ -17,29 +18,46 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 
 class OrderService
 {
+    public const ORDER_LINE_ITEM_ID = 'orderLineItemId';
+
     /** @var EntityRepository */
     protected $orderRepository;
+
+    /** @var EntityRepository */
+    protected $orderLineItemRepository;
 
     /** @var LoggerInterface */
     protected $logger;
 
     public function __construct(
         EntityRepository $orderRepository,
+        EntityRepository $orderLineItemRepository,
         LoggerInterface $logger
     )
     {
         $this->orderRepository = $orderRepository;
+        $this->orderLineItemRepository = $orderLineItemRepository;
         $this->logger = $logger;
     }
 
     /**
-     * Return the order repository.
+     * Returns the order repository.
      *
      * @return EntityRepository
      */
-    public function getRepository()
+    public function getOrderRepository()
     {
         return $this->orderRepository;
+    }
+
+    /**
+     * Returns the order line item repository.
+     *
+     * @return EntityRepository
+     */
+    public function getOrderLineItemRepository()
+    {
+        return $this->orderLineItemRepository;
     }
 
     /**
@@ -79,7 +97,7 @@ class OrderService
      * @param OrderEntity $order
      * @return array
      */
-    public function getOrderLinesArray(OrderEntity $order)
+    public function getOrderLinesArray(OrderEntity $order): array
     {
         // Variables
         $lines = [];
@@ -110,6 +128,44 @@ class OrderService
                 $vatAmount = $item->getTotalPrice() * ($vatRate / ($vatRate + 100));
             }
 
+            // Remove VAT if the order is tax free
+            if ($order->getTaxStatus() === CartPrice::TAX_STATE_FREE) {
+                $vatRate = 0.0;
+                $vatAmount = 0.0;
+            }
+
+            // Get the SKU
+            $sku = null;
+
+            if ($item->getProduct() !== null) {
+                $sku = $item->getProduct()->getProductNumber();
+            }
+
+            // Get the image
+            $imageUrl = null;
+
+            if (
+                $item->getProduct() !== null
+                && $item->getProduct()->getMedia() !== null
+                && $item->getProduct()->getMedia()->count()
+                && $item->getProduct()->getMedia()->first() !== null
+                && $item->getProduct()->getMedia()->first()->getMedia()
+            ) {
+                $imageUrl = $item->getProduct()->getMedia()->first()->getMedia()->getUrl();
+            }
+
+            // Get the product URL
+            $productUrl = null;
+
+            if (
+                $item->getProduct() !== null
+                && $item->getProduct()->getSeoUrls() !== null
+                && $item->getProduct()->getSeoUrls()->count()
+                && $item->getProduct()->getSeoUrls()->first() !== null
+            ) {
+                $productUrl = $item->getProduct()->getSeoUrls()->first()->getUrl();
+            }
+
             // Build the order lines array
             $lines[] = [
                 'type' =>  $this->getLineItemType($item),
@@ -119,9 +175,12 @@ class OrderService
                 'totalAmount' => $this->getPriceArray($currencyCode, $item->getTotalPrice()),
                 'vatRate' => number_format($vatRate, 2, '.', ''),
                 'vatAmount' => $this->getPriceArray($currencyCode, $vatAmount),
-                'sku' => null,
-                'imageUrl' => null,
-                'productUrl' => null,
+                'sku' => $sku,
+                'imageUrl' => $imageUrl,
+                'productUrl' => $productUrl,
+                'metadata' => [
+                    self::ORDER_LINE_ITEM_ID => $item->getId(),
+                ],
             ];
         }
 
@@ -163,6 +222,12 @@ class OrderService
 
         if ($vatAmount === null && $vatRate > 0) {
             $vatAmount = $shipping->getTotalPrice() * ($vatRate / ($vatRate + 100));
+        }
+
+        // Remove VAT if the order is tax free
+        if ($order->getTaxStatus() === CartPrice::TAX_STATE_FREE) {
+            $vatRate = 0.0;
+            $vatAmount = 0.0;
         }
 
         // Build the order line array

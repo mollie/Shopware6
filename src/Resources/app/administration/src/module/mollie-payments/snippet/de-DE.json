@@ -1,0 +1,35 @@
+{
+  "mollie-payments": {
+    "general": {
+      "mainMenuItemGeneral": "Mollie Payments",
+      "descriptionTextModule": "Mollie Payments",
+      "refundThroughMollie": "Refund through Mollie",
+      "shipThroughMollie": "Ship through Mollie"
+    },
+    "modals": {
+      "refund": {
+        "title": "Refund an order line item through Mollie",
+        "content": "Fill out the quantity of this item ({refundableQuantity} out of {quantity} left to refund) to be refunded to the customer.",
+        "quantityPlaceholder": "The quantity to refund...",
+        "createCreditText": "Create a credit item for this refund.",
+        "confirmButton": "Refund",
+        "cancelButton": "Do not refund"
+      },
+      "shipping": {
+        "title": "Ship an order line item through Mollie",
+        "content": "Fill out the quantity of this item ({shippableQuantity} out of {quantity} left to ship) to be shipped to the customer.",
+        "quantityPlaceholder": "The quantity to ship...",
+        "confirmButton": "Ship",
+        "cancelButton": "Do not ship"
+      }
+    }
+  },
+  "sw-order": {
+    "detailExtended": {
+      "columnRefunded": "Refunded",
+      "columnShipped": "Shipped",
+      "totalRefunds": "Refunded amount ({quantity} items)",
+      "totalShipments": "Shipped amount ({quantity} items)"
+    }
+  }
+}

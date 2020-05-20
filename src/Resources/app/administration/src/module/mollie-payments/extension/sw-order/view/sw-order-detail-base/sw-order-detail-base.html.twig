@@ -1,0 +1,7 @@
+{% block sw_order_detail_base_line_items_summary_entries %}
+    {% parent %}
+    <dt v-if="refundedItems > 0"><strong>{{ $tc('sw-order.detailExtended.totalRefunds', 0, { quantity: refundedItems }) }}</strong></dt>
+    <dd v-if="refundedItems > 0"><strong>{{ refundedAmount | currency(order.currency.shortName) }}</strong></dd>
+    <dt v-if="shippedItems > 0"><strong>{{ $tc('sw-order.detailExtended.totalShipments', 0, { quantity: shippedItems }) }}</strong></dt>
+    <dd v-if="shippedItems > 0"><strong>{{ shippedAmount | currency(order.currency.shortName) }}</strong></dd>
+{% endblock %}

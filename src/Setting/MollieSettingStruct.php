@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Setting;
 
 use DateTime;
+use DateTimeZone;
 use Exception;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Shopware\Core\Framework\Struct\Struct;
@@ -31,6 +32,11 @@ class MollieSettingStruct extends Struct
      * @var bool
      */
     protected $debugMode = false;
+
+    /**
+     * @var bool
+     */
+    protected $enableCreditCardComponents = false;
 
     /**
      * @var int
@@ -119,6 +125,25 @@ class MollieSettingStruct extends Struct
     }
 
     /**
+     * @return bool
+     */
+    public function getEnableCreditCardComponents()
+    {
+        return $this->enableCreditCardComponents;
+    }
+
+    /**
+     * @param bool $enableCreditCardComponents
+     *
+     * @return self
+     */
+    public function setEnableCreditCardComponents(bool $enableCreditCardComponents): self
+    {
+        $this->enableCreditCardComponents = $enableCreditCardComponents;
+        return $this;
+    }
+
+    /**
      * @return int
      */
     public function getPaymentMethodBankTransferDueDateDays(): int
@@ -164,6 +189,7 @@ class MollieSettingStruct extends Struct
     public function getOrderLifetimeDate(): string
     {
         return (new DateTime())
+            ->setTimezone(new DateTimeZone(DateTimeZone::UTC))
             ->modify(sprintf('+%d day', $this->getOrderLifetimeDays()))
             ->format('Y-m-d');
     }

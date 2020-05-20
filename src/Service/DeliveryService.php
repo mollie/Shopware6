@@ -125,7 +125,7 @@ class DeliveryService
     ): EntityWrittenContainerEvent
     {
         return $this->getRepository()->update(
-            $data,
+            [$data],
             $context ?? Context::createDefaultContext()
         );
     }

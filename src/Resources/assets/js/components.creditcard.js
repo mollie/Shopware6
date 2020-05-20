@@ -142,7 +142,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     return;
                 }
 
-                const fetchUrl = '/mollie/components/store-card-token/' + customerId.getAttribute('value') + '/' + token;
+                const fetchUrl = '[shop_url]/mollie/components/store-card-token/' + customerId.getAttribute('value') + '/' + token;
 
                 console.log(fetchUrl);
 

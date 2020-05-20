@@ -39,14 +39,14 @@
         <input-field type="int">
             <name>paymentMethodBankTransferDueDateDays</name>
             <label>Bank Transfer Due Date Days</label>
-            <label lang="de-DE">Bank Transfer Due Date Days</label>
-            <label lang="nl-NL">Bank Transfer Due Date Days</label>
+            <label lang="de-DE">Bank Transfer Due Date (in days from order creation)</label>
+            <label lang="nl-NL">Bank Transfer Due Date (in days from order creation)</label>
         </input-field>
         <input-field type="int">
             <name>orderLifetimeDays</name>
             <label>Order Lifetime Days</label>
-            <label lang="de-DE">Order Lifetime Day</label>
-            <label lang="nl-NL">Order Lifetime Day</label>
+            <label lang="de-DE">Order Lifetime (in days from order creation)</label>
+            <label lang="nl-NL">Order Lifetime (in days from order creation)</label>
         </input-field>
     </card>
 </config>

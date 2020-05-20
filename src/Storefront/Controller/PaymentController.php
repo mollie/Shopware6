@@ -11,9 +11,11 @@ use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order;
+use Mollie\Api\Types\PaymentStatus;
 use RuntimeException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -22,11 +24,12 @@ use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\RouterInterface;
 
-class WebhookController extends StorefrontController
+class PaymentController extends StorefrontController
 {
     /** @var RouterInterface */
     private $router;
@@ -70,25 +73,29 @@ class WebhookController extends StorefrontController
 
     /**
      * @RouteScope(scopes={"storefront"})
-     * @Route("/mollie/webhook/{transactionId}", defaults={"csrf_protected"=false}, name="frontend.mollie.webhook",
+     * @Route("/mollie/payment/{transactionId}/{returnUrl}", defaults={"csrf_protected"=false}, name="frontend.mollie.payment",
      *                                           options={"seo"="false"}, methods={"GET", "POST"})
      *
      * @param SalesChannelContext $context
      * @param                     $transactionId
      *
-     * @return JsonResponse
+     * @param                     $returnUrl
+     *
+     * @return Response|RedirectResponse
      * @throws ApiException
      */
-    public function webhookCall(SalesChannelContext $context, $transactionId): JsonResponse
+    public function payment(SalesChannelContext $context, $transactionId, $returnUrl): ?Response
     {
         $criteria = null;
-        $transaction = null;
-        $order = null;
         $customFields = null;
+        $errorMessage = null;
         $mollieOrder = null;
         $mollieOrderId = null;
+        $order = null;
+        $paymentFailed = false;
         $paymentStatus = null;
-        $errorMessage = null;
+        $redirectUrl = urldecode($returnUrl);
+        $transaction = null;
 
         /** @var MollieSettingStruct $settings */
         $settings = $this->settingsService->getSettings(
@@ -99,7 +106,7 @@ class WebhookController extends StorefrontController
         // Add a message to the log that the webhook has been triggered.
         if ($settings->isDebugMode()) {
             $this->logger->addEntry(
-                sprintf('Webhook for transaction %s is triggered.', $transactionId),
+                sprintf('Payment return for transaction %s is triggered.', $transactionId),
                 $context->getContext(),
                 null,
                 [
@@ -200,17 +207,6 @@ class WebhookController extends StorefrontController
             } catch (Exception $e) {
                 $errorMessage = $errorMessage ?? $e->getMessage();
             }
-
-            // @todo Handle partial shipments better and make shipping status configurable
-//            try {
-//                $this->deliveryStateHelper->shipDelivery(
-//                    $order,
-//                    $mollieOrder,
-//                    $context->getContext()
-//                );
-//            } catch (Exception $e) {
-//                $errorMessage = $errorMessage ?? $e->getMessage();
-//            }
         } else {
             $errorMessage = $errorMessage ?? 'No order found in the Orders API with ID ' . $mollieOrderId ?? '<unknown>';
         }
@@ -222,6 +218,21 @@ class WebhookController extends StorefrontController
             $errorMessage = $errorMessage ?? 'The payment status has not been set for order with ID ' . $mollieOrderId ?? '<unknown>';
         }
 
+        if (
+            $paymentStatus !== null
+            && (
+                $paymentStatus === PaymentStatus::STATUS_CANCELED
+                || $paymentStatus === PaymentStatus::STATUS_FAILED
+            )
+        ) {
+            $paymentFailed = true;
+            $mollieOrder->createPayment([]);
+
+            if ($mollieOrder->getCheckoutUrl() !== null) {
+                $redirectUrl = $mollieOrder->getCheckoutUrl();
+            }
+        }
+
         /**
          * If any errors occurred during the webhook call, we return an error message.
          */
@@ -231,22 +242,19 @@ class WebhookController extends StorefrontController
                 $context->getContext(),
                 null,
                 [
-                    'function' => 'webhook',
+                    'function' => 'payment',
                 ]
             );
-
-            return new JsonResponse([
-                'success' => false,
-                'error' => $errorMessage
-            ], 422);
         }
 
-        /**
-         * If no errors occurred during the webhook call, we return a success message.
-         */
-        return new JsonResponse([
-            'success' => true
-        ]);
+        // If the payment failed, render a storefront to let the customer know
+        if ($paymentFailed === true) {
+            return $this->renderStorefront('@Storefront/storefront/page/checkout/payment/failed.html.twig', [
+                'redirectUrl' => $redirectUrl
+            ]);
+        }
+
+        return new RedirectResponse($redirectUrl);
     }
 
     /**

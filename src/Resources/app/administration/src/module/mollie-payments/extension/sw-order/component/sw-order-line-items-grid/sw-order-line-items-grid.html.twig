@@ -1,0 +1,83 @@
+{% block sw_order_line_items_grid_grid_actions %}
+    {% parent %}
+
+<template #action-modals="{ item }">
+    <sw-modal v-if="showRefundModal === item.id"
+              @modal-close="onCloseRefundModal"
+              :title="$tc('mollie-payments.modals.refund.title')"
+              variant="small">
+
+        <p>
+            {{ $tc('mollie-payments.modals.refund.content', 0, { quantity: item.quantity, refundableQuantity: refundableQuantity(item) }) }}
+        </p>
+
+        <br />
+
+        <sw-number-field numberType="integer"
+                         size="medium"
+                         :step="1"
+                         :placeholder="$tc('mollie-payments.modals.refund.quantityPlaceholder')"
+                         :min="0"
+                         :value="1"
+                         :max="refundableQuantity(item)"
+                         v-model="quantityToRefund">
+        </sw-number-field>
+
+        <template slot="modal-footer">
+            <sw-button @click="onCloseRefundModal" size="small">
+                {{ $tc('mollie-payments.modals.refund.cancelButton') }}
+            </sw-button>
+            <sw-button @click="onConfirmRefund(item)" variant="primary" size="small">
+                {{ $tc('mollie-payments.modals.refund.confirmButton') }}
+            </sw-button>
+        </template>
+    </sw-modal>
+
+    <sw-modal v-if="showShippingModal === item.id"
+              @modal-close="onCloseShippingModal"
+              :title="$tc('mollie-payments.modals.shipping.title')"
+              variant="small">
+
+        <p>
+            {{ $tc('mollie-payments.modals.shipping.content', 0, { quantity: item.quantity, shippableQuantity: shippableQuantity(item) }) }}
+        </p>
+
+        <br />
+
+        <sw-number-field numberType="integer"
+                         size="medium"
+                         :step="1"
+                         :placeholder="$tc('mollie-payments.modals.shipping.quantityPlaceholder')"
+                         :min="0"
+                         :value="1"
+                         :max="shippableQuantity(item)"
+                         v-model="quantityToShip">
+        </sw-number-field>
+
+        <template slot="modal-footer">
+            <sw-button @click="onCloseShippingModal" size="small">
+                {{ $tc('mollie-payments.modals.shipping.cancelButton') }}
+            </sw-button>
+            <sw-button @click="onConfirmShipping(item)" variant="primary" size="small">
+                {{ $tc('mollie-payments.modals.shipping.confirmButton') }}
+            </sw-button>
+        </template>
+    </sw-modal>
+</template>
+{% endblock %}
+
+{% block sw_order_line_items_grid_grid_actions_show %}
+    {% parent %}
+
+<sw-context-menu-item :disabled="!isShippable(item)"
+                      icon="default-object-paperplane"
+                      @click="onShipItem(item)">
+    {{ $tc('mollie-payments.general.shipThroughMollie') }}
+</sw-context-menu-item>
+
+<sw-context-menu-item :disabled="!isRefundable(item)"
+                      icon="default-arrow-360-left"
+                      @click="onRefundItem(item)">
+    {{ $tc('mollie-payments.general.refundThroughMollie') }}
+</sw-context-menu-item>
+{% endblock %}

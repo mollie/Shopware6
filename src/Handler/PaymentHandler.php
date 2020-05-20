@@ -12,6 +12,7 @@ use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order;
+use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Types\PaymentStatus;
 use Monolog\Logger;
 use RuntimeException;
@@ -52,6 +53,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
     protected const FIELD_WEBHOOK_URL = 'webhookUrl';
     protected const FIELD_DUE_DATE = 'dueDate';
     protected const FIELD_EXPIRES_AT = 'expiresAt';
+    protected const ENV_LOCAL_DEVELOPMENT = 'MOLLIE_LOCAL_DEVELOPMENT';
 
     /** @var string */
     protected $paymentMethod;
@@ -419,7 +421,10 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
                 $currency !== null ? $currency->getIsoCode() : 'EUR',
                 $order->getAmountTotal()
             ),
-            self::FIELD_REDIRECT_URL => $transaction->getReturnUrl(),
+            self::FIELD_REDIRECT_URL => $this->router->generate('frontend.mollie.payment', [
+                'transactionId' => $transaction->getOrderTransaction()->getId(),
+                'returnUrl' => urlencode($transaction->getReturnUrl())
+            ], $this->router::ABSOLUTE_URL),
             self::FIELD_LOCALE => $locale !== null ? $locale->getCode() : null,
             self::FIELD_METHOD => $this->paymentMethod,
             self::FIELD_ORDER_NUMBER => $order->getOrderNumber(),
@@ -468,7 +473,10 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
          * Generate the URL for Mollie's webhook call only on prod environment. This webhook is used
          * to handle payment updates.
          */
-        if ($this->environment === 'prod') {
+        if (
+            getenv(self::ENV_LOCAL_DEVELOPMENT) === false
+            || (bool) getenv(self::ENV_LOCAL_DEVELOPMENT) === false
+        ) {
             $orderData[self::FIELD_WEBHOOK_URL] = $this->router->generate('frontend.mollie.webhook', [
                 'transactionId' => $transaction->getOrderTransaction()->getId()
             ], $this->router::ABSOLUTE_URL);
@@ -528,7 +536,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
          * and payment status.
          */
         if (isset($mollieOrder, $mollieOrder->id)) {
-            $this->orderService->getRepository()->update([[
+            $this->orderService->getOrderRepository()->update([[
                 'id' => $order->getId(),
                 'customFields' => [
                     'mollie_payments' => [
@@ -536,6 +544,30 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
                     ]
                 ]
             ]], $salesChannelContext->getContext());
+
+            // Update the order lines with the corresponding id's from Mollie
+            $orderLineUpdate = [];
+
+            /** @var OrderLine $line */
+            foreach ($mollieOrder->lines as $line) {
+                if (isset($line->metadata->{ $this->orderService::ORDER_LINE_ITEM_ID })) {
+                    $orderLineUpdate[] = [
+                        'id' => $line->metadata->{ $this->orderService::ORDER_LINE_ITEM_ID },
+                        'customFields' => [
+                            'mollie_payments' => [
+                                'order_line_id' => $line->id,
+                            ],
+                        ],
+                    ];
+                }
+            }
+
+            if (!empty($orderLineUpdate)) {
+                $this->orderService->getOrderLineItemRepository()->update(
+                    $orderLineUpdate,
+                    $salesChannelContext->getContext()
+                );
+            }
         }
 
         /**

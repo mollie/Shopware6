@@ -13,11 +13,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class CustomFieldService
 {
+    public const KEY_CUSTOM_FIELDS = 'customFields';
+    public const KEY_CUSTOM_FIELD_DOMAIN = 'mollie_payments';
+
     /** @var ContainerInterface */
-    protected $container;
+    private $container;
 
     /** @var EntityRepositoryInterface */
-    protected $customFieldSetRepository;
+    private $customFieldSetRepository;
 
     /**
      * CustomFieldService constructor.

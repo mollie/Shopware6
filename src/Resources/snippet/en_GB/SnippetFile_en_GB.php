@@ -8,12 +8,12 @@ class SnippetFile_en_GB implements SnippetFileInterface
 {
     public function getName(): string
     {
-        return 'mollie.components.creditcard.en-GB';
+        return 'mollie.payments.en-GB';
     }
 
     public function getPath(): string
     {
-        return __DIR__ . '/mollie.components.creditcard.en-GB.json';
+        return __DIR__ . '/mollie.payments.en-GB.json';
     }
 
     public function getIso(): string

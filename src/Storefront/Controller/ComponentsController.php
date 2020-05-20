@@ -2,8 +2,9 @@
 
 namespace Kiener\MolliePayments\Storefront\Controller;
 
-use Kiener\MolliePayments\Config\Config;
 use Kiener\MolliePayments\Service\CustomerService;
+use Kiener\MolliePayments\Service\SettingsService;
+use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
@@ -12,27 +13,33 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Router;
 
 class ComponentsController extends StorefrontController
 {
-    /** @var Config */
-    protected $config;
+    /** @var MollieApiClient */
+    private $apiClient;
 
     /** @var CustomerService */
-    protected $customerService;
+    private $customerService;
 
-    /** @var MollieApiClient */
-    protected $apiClient;
+    /** @var Router */
+    private $router;
+
+    /** @var SettingsService */
+    private $settingsService;
 
     public function __construct(
-        Config $config,
+        MollieApiClient $apiClient,
         CustomerService $customerService,
-        MollieApiClient $apiClient
+        Router $router,
+        SettingsService $settingsService
     )
     {
-        $this->config = $config;
-        $this->customerService = $customerService;
         $this->apiClient = $apiClient;
+        $this->customerService = $customerService;
+        $this->router = $router;
+        $this->settingsService = $settingsService;
     }
 
     /**
@@ -85,6 +92,12 @@ class ComponentsController extends StorefrontController
         $javascript = '';
         $mollieProfileId = '';
 
+        /** @var MollieSettingStruct $settings */
+        $settings = $this->settingsService->getSettings(
+            $context->getSalesChannel()->getId(),
+            $context->getContext()
+        );
+
         /**
          * Fetches the profile id from Mollie's API for the current key.
          */
@@ -105,12 +118,20 @@ class ComponentsController extends StorefrontController
             $javascript = file_get_contents(__DIR__ . '/../../Resources/assets/js/components.creditcard.js');
         }
 
+        /** @var string $shopUrl */
+        $shopUrl = $this->router->generate('frontend.home.page', [], $this->router::ABSOLUTE_URL);
+
+        if (substr($shopUrl, -1) === '/') {
+            $shopUrl = substr($shopUrl, 0, -1);
+        }
+
         /**
          * Replace variables in the javascript file.
          */
         $javascript = str_replace('[mollie_profile_id]', $mollieProfileId, $javascript);
+        $javascript = str_replace('[shop_url]', $shopUrl, $javascript);
         $javascript = str_replace('[mollie_locale]', $this->getLocale($context), $javascript);
-        $javascript = str_replace('[mollie_testmode]', $this->config::testMode() === true ? 'true' : 'false', $javascript);
+        $javascript = str_replace('[mollie_testmode]', $settings->isTestMode() === true ? 'true' : 'false', $javascript);
 
         /**
          * Output the javascript code.

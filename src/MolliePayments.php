@@ -2,6 +2,8 @@
 
 namespace Kiener\MolliePayments;
 
+require_once __DIR__ . '/../vendor/autoload.php';
+
 use Exception;
 use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\PaymentMethodService;
@@ -51,16 +53,12 @@ class MolliePayments extends Plugin
         );
 
         $customFieldService->addCustomFields($context->getContext());
+    }
 
-        // Add payment methods
-        $paymentMethodHelper = new PaymentMethodService(
-            $this->container->get('payment_method.repository'),
-            $this->container->get(PluginIdProvider::class),
-            $this->container->get('system_config.repository'),
-            get_class($this)
-        );
+    public function postInstall(InstallContext $context): void
+    {
+        parent::postInstall($context);
 
-        $paymentMethodHelper->addPaymentMethods($context->getContext());
     }
 
     public function uninstall(UninstallContext $context) : void
@@ -71,6 +69,14 @@ class MolliePayments extends Plugin
     public function activate(ActivateContext $context) : void
     {
         parent::activate($context);
+
+        /** @var PaymentMethodService $paymentMethodHelper */
+        $paymentMethodHelper = $this->container->get('Kiener\MolliePayments\Service\PaymentMethodService');
+
+        // Add payment methods
+        $paymentMethodHelper
+            ->setClassName(get_class($this))
+            ->addPaymentMethods($context->getContext());
     }
 
     public function deactivate(DeactivateContext $context) : void
