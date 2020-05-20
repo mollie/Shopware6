@@ -53,7 +53,7 @@ class MollieSettingStruct extends Struct
      */
     public function getLiveApiKey(): string
     {
-        return $this->liveApiKey;
+        return (string) $this->liveApiKey;
     }
 
     /**
@@ -72,7 +72,7 @@ class MollieSettingStruct extends Struct
      */
     public function getTestApiKey(): string
     {
-        return $this->testApiKey;
+        return (string) $this->testApiKey;
     }
 
     /**
@@ -91,7 +91,7 @@ class MollieSettingStruct extends Struct
      */
     public function isTestMode(): bool
     {
-        return $this->testMode;
+        return (bool) $this->testMode;
     }
 
     /**
@@ -110,7 +110,7 @@ class MollieSettingStruct extends Struct
      */
     public function isDebugMode(): bool
     {
-        return $this->debugMode;
+        return (bool) $this->debugMode;
     }
 
     /**
@@ -129,7 +129,7 @@ class MollieSettingStruct extends Struct
      */
     public function getEnableCreditCardComponents()
     {
-        return $this->enableCreditCardComponents;
+        return (bool) $this->enableCreditCardComponents;
     }
 
     /**
