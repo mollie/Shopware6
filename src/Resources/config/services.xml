@@ -168,7 +168,9 @@
         <service id="Kiener\MolliePayments\Resources\snippet\en_GB\SnippetFile_en_GB" public="true">
             <tag name="shopware.snippet.file"/>
         </service>
-
+        <service id="Kiener\MolliePayments\Resources\snippet\de_DE\SnippetFile_de_DE" public="true">
+            <tag name="shopware.snippet.file"/>
+        </service>
     </services>
 
 </container>
