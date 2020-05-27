@@ -51,7 +51,8 @@ class LoggerService
 
         // Add data to the log entry
         $logEntry = [
-            self::LOG_ENTRY_KEY_MESSAGE => $message,
+            // The `message` column is limited to 255 chars
+            self::LOG_ENTRY_KEY_MESSAGE => mb_substr($message, 0, 254),
             self::LOG_ENTRY_KEY_LEVEL => $level,
             self::LOG_ENTRY_KEY_CHANNEL => self::LOG_ENTRY_CHANNEL,
             self::LOG_ENTRY_KEY_CONTEXT => [

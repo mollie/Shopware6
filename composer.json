@@ -11,7 +11,8 @@
   ],
   "require": {
     "shopware/core": "*",
-    "mollie/mollie-api-php": "^2.0"
+    "mollie/mollie-api-php": "^2.0",
+    "ext-mbstring": "*"
   },
   "extra": {
     "shopware-plugin-class": "Kiener\\MolliePayments\\MolliePayments",
