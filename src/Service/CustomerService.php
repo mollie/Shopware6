@@ -71,10 +71,12 @@ class CustomerService
         try {
             $criteria = new Criteria();
             $criteria->addFilter(new EqualsFilter('id', $customerId));
-            $criteria->addAssociation('activeShippingAddress');
-            $criteria->addAssociation('activeBillingAddress');
-            $criteria->addAssociation('defaultShippingAddress');
-            $criteria->addAssociation('defaultBillingAddress');
+            $criteria->addAssociations([
+                'activeShippingAddress.country',
+                'activeBillingAddress.country',
+                'defaultShippingAddress.country',
+                'defaultBillingAddress.country',
+            ]);
 
             /** @var CustomerEntity $customer */
             $customer = $this->customerRepository->search($criteria, $context)->first();
