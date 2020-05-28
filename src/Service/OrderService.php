@@ -129,7 +129,12 @@ class OrderService
             }
 
             // Remove VAT if the order is tax free
-            if ($order->getTaxStatus() === CartPrice::TAX_STATE_FREE) {
+            if (
+                in_array($order->getTaxStatus(), [
+                    CartPrice::TAX_STATE_FREE,
+                    CartPrice::TAX_STATE_NET
+                ], true)
+            ) {
                 $vatRate = 0.0;
                 $vatAmount = 0.0;
             }
@@ -225,7 +230,12 @@ class OrderService
         }
 
         // Remove VAT if the order is tax free
-        if ($order->getTaxStatus() === CartPrice::TAX_STATE_FREE) {
+        if (
+            in_array($order->getTaxStatus(), [
+                CartPrice::TAX_STATE_FREE,
+                CartPrice::TAX_STATE_NET
+            ], true)
+        ) {
             $vatRate = 0.0;
             $vatAmount = 0.0;
         }

@@ -163,7 +163,18 @@ class WebhookController extends StorefrontController
         /**
          * Set the API keys at Mollie based on the current context.
          */
-        $this->setApiKeysBySalesChannelContext($context);
+        try {
+            $this->setApiKeysBySalesChannelContext($context);
+        } catch (Exception $e) {
+            $this->logger->addEntry(
+                $e->getMessage(),
+                $context->getContext(),
+                $e,
+                [
+                    'function' => 'webhook-set-api-keys'
+                ]
+            );
+        }
 
         /**
          * With the order ID from the custom fields, we fetch the order from Mollie's

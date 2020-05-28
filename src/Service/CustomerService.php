@@ -13,6 +13,9 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 
 class CustomerService
 {
+    public const CUSTOM_FIELDS_KEY_CREDIT_CARD_TOKEN = 'credit_card_token';
+    public const CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER = 'preferred_ideal_issuer';
+
     /** @var EntityRepository */
     protected $customerRepository;
 
@@ -48,7 +51,36 @@ class CustomerService
         }
 
         // Store the card token in the custom fields
-        $customFields['mollie_payments']['credit_card_token'] = $cardToken;
+        $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_CREDIT_CARD_TOKEN] = $cardToken;
+
+        // Store the custom fields on the customer
+        return $this->customerRepository->update([[
+            'id' => $customer->getId(),
+            'customFields' => $customFields
+        ]], $context);
+    }
+
+    /**
+     * Stores the ideal issuer in the custom fields of the customer.
+     *
+     * @param CustomerEntity $customer
+     * @param string         $issuerId
+     * @param Context        $context
+     *
+     * @return \Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent
+     */
+    public function setIDealIssuer(CustomerEntity $customer, string $issuerId, Context $context)
+    {
+        // Get existing custom fields
+        $customFields = $customer->getCustomFields();
+
+        // If custom fields are empty, create a new array
+        if (!is_array($customFields)) {
+            $customFields = [];
+        }
+
+        // Store the card token in the custom fields
+        $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER] = $issuerId;
 
         // Store the custom fields on the customer
         return $this->customerRepository->update([[
@@ -75,6 +107,12 @@ class CustomerService
             $criteria->addAssociation('activeBillingAddress');
             $criteria->addAssociation('defaultShippingAddress');
             $criteria->addAssociation('defaultBillingAddress');
+            $criteria->addAssociations([
+                'activeShippingAddress.country',
+                'activeBillingAddress.country',
+                'defaultShippingAddress.country',
+                'defaultBillingAddress.country',
+            ]);
 
             /** @var CustomerEntity $customer */
             $customer = $this->customerRepository->search($criteria, $context)->first();

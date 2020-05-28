@@ -13,8 +13,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class CustomFieldService
 {
-    public const KEY_CUSTOM_FIELDS = 'customFields';
-    public const KEY_CUSTOM_FIELD_DOMAIN = 'mollie_payments';
+    public const CUSTOM_FIELDS_KEY = 'customFields';
+    public const CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS = 'mollie_payments';
 
     /** @var ContainerInterface */
     private $container;
@@ -60,7 +60,7 @@ class CustomFieldService
                         'type' => CustomFieldTypes::TEXT,
                         'config' => [
                             'componentName' => 'sw-field',
-                            'customFieldType' => 'text',
+                            'customFieldType' => CustomFieldTypes::TEXT,
                             'customFieldPosition' => 1,
                             'label' => [
                                 'en-GB' => 'Mollie transaction ID',
@@ -74,7 +74,7 @@ class CustomFieldService
                         'type' => CustomFieldTypes::TEXT,
                         'config' => [
                             'componentName' => 'sw-field',
-                            'customFieldType' => 'text',
+                            'customFieldType' => CustomFieldTypes::TEXT,
                             'customFieldPosition' => 1,
                             'label' => [
                                 'en-GB' => 'Preferred iDeal issuer',
@@ -86,11 +86,11 @@ class CustomFieldService
                 'relations' => [
                     [
                         'id' => $mollieOrderFieldId,
-                        'entityName' => $this->container->get(OrderDefinition::class)->getEntityName()
+                        'entityName' => OrderDefinition::ENTITY_NAME
                     ],
                     [
                         'id' => $iDealIssuerFieldId,
-                        'entityName' => $this->container->get(CustomerDefinition::class)->getEntityName()
+                        'entityName' => CustomerDefinition::ENTITY_NAME
                     ]
                 ]
             ]], $context);

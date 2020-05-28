@@ -3,6 +3,8 @@
 
 namespace Kiener\MolliePayments\Helper;
 
+use Exception;
+use Kiener\MolliePayments\Service\LoggerService;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Types\PaymentStatus;
@@ -13,16 +15,35 @@ use Shopware\Core\Framework\Context;
 
 class PaymentStatusHelper
 {
+    /** @var LoggerService */
+    protected $logger;
+
+    /** @var OrderTransactionStateHandler */
     protected $orderTransactionStateHandler;
 
     /**
      * PaymentStatusHelper constructor.
      *
+     * @param LoggerService                $logger
      * @param OrderTransactionStateHandler $orderTransactionStateHandler
      */
-    public function __construct(OrderTransactionStateHandler $orderTransactionStateHandler)
+    public function __construct(
+        LoggerService $logger,
+        OrderTransactionStateHandler $orderTransactionStateHandler
+    )
     {
+        $this->logger = $logger;
         $this->orderTransactionStateHandler = $orderTransactionStateHandler;
+    }
+
+    /**
+     * Order transaction state handler.
+     *
+     * @return OrderTransactionStateHandler
+     */
+    public function getOrderTransactionStateHandler(): OrderTransactionStateHandler
+    {
+        return $this->orderTransactionStateHandler;
     }
 
     /**
@@ -34,12 +55,7 @@ class PaymentStatusHelper
      * @param Order                  $mollieOrder
      * @param Context                $context
      *
-     * @return bool
-     * @throws \Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException
-     * @throws \Shopware\Core\System\StateMachine\Exception\IllegalTransitionException
-     * @throws \Shopware\Core\System\StateMachine\Exception\StateMachineInvalidEntityIdException
-     * @throws \Shopware\Core\System\StateMachine\Exception\StateMachineInvalidStateFieldException
-     * @throws \Shopware\Core\System\StateMachine\Exception\StateMachineNotFoundException
+     * @return string
      */
     public function processPaymentStatus(
         OrderTransactionEntity $transaction,
@@ -99,10 +115,21 @@ class PaymentStatusHelper
             && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_PAID
             && $mollieOrder->isPaid()
         ) {
-            if (method_exists($this->orderTransactionStateHandler, 'paid')) {
-                $this->orderTransactionStateHandler->paid($transaction->getId(), $context);
-            } else {
-                $this->orderTransactionStateHandler->pay($transaction->getId(), $context);
+            try {
+                if (method_exists($this->orderTransactionStateHandler, 'paid')) {
+                    $this->orderTransactionStateHandler->paid($transaction->getId(), $context);
+                } else {
+                    $this->orderTransactionStateHandler->pay($transaction->getId(), $context);
+                }
+            } catch (Exception $e) {
+                $this->logger->addEntry(
+                    $e->getMessage(),
+                    $context,
+                    $e,
+                    [
+                        'function' => 'payment-set-transaction-state'
+                    ]
+                );
             }
 
             return PaymentStatus::STATUS_PAID;
@@ -116,7 +143,19 @@ class PaymentStatusHelper
             && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_CANCELED
             && $mollieOrder->isCanceled()
         ) {
-            $this->orderTransactionStateHandler->cancel($transaction->getId(), $context);
+            try {
+                $this->orderTransactionStateHandler->cancel($transaction->getId(), $context);
+            } catch (Exception $e) {
+                $this->logger->addEntry(
+                    $e->getMessage(),
+                    $context,
+                    $e,
+                    [
+                        'function' => 'payment-set-transaction-state'
+                    ]
+                );
+            }
+
             return PaymentStatus::STATUS_CANCELED;
         }
 
@@ -140,7 +179,19 @@ class PaymentStatusHelper
             && $transactionState !== null
             && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_CANCELED
         ) {
-            $this->orderTransactionStateHandler->cancel($transaction->getId(), $context);
+            try {
+                $this->orderTransactionStateHandler->cancel($transaction->getId(), $context);
+            } catch (Exception $e) {
+                $this->logger->addEntry(
+                    $e->getMessage(),
+                    $context,
+                    $e,
+                    [
+                        'function' => 'payment-set-transaction-state'
+                    ]
+                );
+            }
+
             return PaymentStatus::STATUS_CANCELED;
         }
 
@@ -154,7 +205,19 @@ class PaymentStatusHelper
             && $transactionState !== null
             && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_CANCELED
         ) {
-            $this->orderTransactionStateHandler->cancel($transaction->getId(), $context);
+            try {
+                $this->orderTransactionStateHandler->cancel($transaction->getId(), $context);
+            } catch (Exception $e) {
+                $this->logger->addEntry(
+                    $e->getMessage(),
+                    $context,
+                    $e,
+                    [
+                        'function' => 'payment-set-transaction-state'
+                    ]
+                );
+            }
+
             return PaymentStatus::STATUS_CANCELED;
         }
 
@@ -171,10 +234,21 @@ class PaymentStatusHelper
                 && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_CANCELED
             )
         ) {
-            if (method_exists($this->orderTransactionStateHandler, 'fail')) {
-                $this->orderTransactionStateHandler->fail($transaction->getId(), $context);
-            } else {
-                $this->orderTransactionStateHandler->cancel($transaction->getId(), $context);
+            try {
+                if (method_exists($this->orderTransactionStateHandler, 'fail')) {
+                    $this->orderTransactionStateHandler->fail($transaction->getId(), $context);
+                } else {
+                    $this->orderTransactionStateHandler->cancel($transaction->getId(), $context);
+                }
+            } catch (Exception $e) {
+                $this->logger->addEntry(
+                    $e->getMessage(),
+                    $context,
+                    $e,
+                    [
+                        'function' => 'payment-set-transaction-state'
+                    ]
+                );
             }
 
             return PaymentStatus::STATUS_FAILED;
@@ -199,10 +273,21 @@ class PaymentStatusHelper
             && $paidNumber === $order->getAmountTotal()
             && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_PAID
         ) {
-            if (method_exists($this->orderTransactionStateHandler, 'paid')) {
-                $this->orderTransactionStateHandler->paid($transaction->getId(), $context);
-            } else {
-                $this->orderTransactionStateHandler->pay($transaction->getId(), $context);
+            try {
+                if (method_exists($this->orderTransactionStateHandler, 'paid')) {
+                    $this->orderTransactionStateHandler->paid($transaction->getId(), $context);
+                } else {
+                    $this->orderTransactionStateHandler->pay($transaction->getId(), $context);
+                }
+            } catch (Exception $e) {
+                $this->logger->addEntry(
+                    $e->getMessage(),
+                    $context,
+                    $e,
+                    [
+                        'function' => 'payment-set-transaction-state'
+                    ]
+                );
             }
 
             return PaymentStatus::STATUS_PAID;

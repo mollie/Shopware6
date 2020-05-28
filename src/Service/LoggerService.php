@@ -51,9 +51,9 @@ class LoggerService
 
         // Add data to the log entry
         $logEntry = [
-            self::LOG_ENTRY_KEY_MESSAGE => $message,
+            self::LOG_ENTRY_KEY_MESSAGE => mb_substr($message, 0, 255),
             self::LOG_ENTRY_KEY_LEVEL => $level,
-            self::LOG_ENTRY_KEY_CHANNEL => self::LOG_ENTRY_CHANNEL,
+            self::LOG_ENTRY_KEY_CHANNEL => mb_substr(self::LOG_ENTRY_CHANNEL, 0, 255),
             self::LOG_ENTRY_KEY_CONTEXT => [
                 self::LOG_ENTRY_KEY_SOURCE => self::LOG_SOURCE,
                 self::LOG_ENTRY_KEY_ADDITIONAL_DATA => $additionalData,

@@ -26,23 +26,27 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class RefundController extends StorefrontController
 {
-    public const KEY_REFUNDED_QUANTITY = 'refundedQuantity';
-    public const KEY_CREATE_CREDIT_ITEM = 'createCredit';
+    public const CUSTOM_FIELDS_KEY_REFUNDED_QUANTITY = 'refundedQuantity';
+    public const CUSTOM_FIELDS_KEY_CREATE_CREDIT_ITEM = 'createCredit';
 
-    private const KEY_AMOUNT = 'amount';
-    private const KEY_ID = 'id';
-    private const KEY_ITEMS = 'items';
-    private const KEY_ORDER_LINE_ITEM_ID = 'itemId';
-    private const KEY_LINES = 'lines';
-    private const KEY_ORDER_ID = 'order_id';
-    private const KEY_ORDER_LINE_ID = 'order_line_id';
-    private const KEY_ORDER_LINE_QUANTITY = 'quantity';
-    private const KEY_QUANTITY = 'quantity';
-    private const KEY_REFUND_ID = 'refund_id';
-    private const KEY_REFUNDS = 'refunds';
-    private const KEY_ORDER_LINE_ITEM_VERSION_ID = 'versionId';
-    private const KEY_SUCCESS = 'success';
-    private const KEY_TEST_MODE = 'testmode';
+    private const CUSTOM_FIELDS_KEY_ORDER_ID = 'order_id';
+    private const CUSTOM_FIELDS_KEY_ORDER_LINE_ID = 'order_line_id';
+    private const CUSTOM_FIELDS_KEY_REFUND_ID = 'refund_id';
+    private const CUSTOM_FIELDS_KEY_REFUNDS = 'refunds';
+    private const CUSTOM_FIELDS_KEY_QUANTITY = 'quantity';
+
+    private const REFUND_DATA_KEY_ID = 'id';
+    private const REFUND_DATA_KEY_LINES = 'lines';
+    private const REFUND_DATA_KEY_QUANTITY = self::CUSTOM_FIELDS_KEY_QUANTITY;
+    private const REFUND_DATA_KEY_TEST_MODE = 'testmode';
+
+    private const REQUEST_KEY_ORDER_LINE_ITEM_ID = 'itemId';
+    private const REQUEST_KEY_ORDER_LINE_QUANTITY = self::CUSTOM_FIELDS_KEY_QUANTITY;
+    private const REQUEST_KEY_ORDER_LINE_ITEM_VERSION_ID = 'versionId';
+
+    private const RESPONSE_KEY_AMOUNT = 'amount';
+    private const RESPONSE_KEY_ITEMS = 'items';
+    private const RESPONSE_KEY_SUCCESS = 'success';
 
     /** @var MollieApiFactory */
     private $apiFactory;
@@ -118,17 +122,17 @@ class RefundController extends StorefrontController
         $quantity = 0;
 
         if (
-            (string) $request->get(self::KEY_ORDER_LINE_ITEM_ID) !== ''
-            && (string) $request->get(self::KEY_ORDER_LINE_ITEM_VERSION_ID) !== ''
+            (string) $request->get(self::REQUEST_KEY_ORDER_LINE_ITEM_ID) !== ''
+            && (string) $request->get(self::REQUEST_KEY_ORDER_LINE_ITEM_VERSION_ID) !== ''
         ) {
             $orderLineItem = $this->getOrderLineItemById(
-                $request->get(self::KEY_ORDER_LINE_ITEM_ID),
-                $request->get(self::KEY_ORDER_LINE_ITEM_VERSION_ID)
+                $request->get(self::REQUEST_KEY_ORDER_LINE_ITEM_ID),
+                $request->get(self::REQUEST_KEY_ORDER_LINE_ITEM_VERSION_ID)
             );
         }
 
-        if ((int) $request->get(self::KEY_ORDER_LINE_QUANTITY) > 0) {
-            $quantity = (int) $request->get(self::KEY_ORDER_LINE_QUANTITY);
+        if ((int) $request->get(self::REQUEST_KEY_ORDER_LINE_QUANTITY) > 0) {
+            $quantity = (int) $request->get(self::REQUEST_KEY_ORDER_LINE_QUANTITY);
         }
 
         if (
@@ -141,18 +145,18 @@ class RefundController extends StorefrontController
         if (
             $orderLineItem !== null
             && !empty($customFields)
-            && isset($customFields[CustomFieldService::KEY_CUSTOM_FIELD_DOMAIN][self::KEY_ORDER_LINE_ID])
+            && isset($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_ORDER_LINE_ID])
         ) {
-            $orderLineId = $customFields[CustomFieldService::KEY_CUSTOM_FIELD_DOMAIN][self::KEY_ORDER_LINE_ID];
+            $orderLineId = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_ORDER_LINE_ID];
         }
 
         if (
             $orderLineItem !== null
             && $orderLineItem->getOrder() !== null
             && !empty($orderLineItem->getOrder()->getCustomFields())
-            && isset($orderLineItem->getOrder()->getCustomFields()[CustomFieldService::KEY_CUSTOM_FIELD_DOMAIN][self::KEY_ORDER_ID])
+            && isset($orderLineItem->getOrder()->getCustomFields()[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_ORDER_ID])
         ) {
-            $orderId = $orderLineItem->getOrder()->getCustomFields()[CustomFieldService::KEY_CUSTOM_FIELD_DOMAIN][self::KEY_ORDER_ID];
+            $orderId = $orderLineItem->getOrder()->getCustomFields()[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_ORDER_ID];
         }
 
         if ($orderLineItem->getOrder() !== null) {
@@ -193,7 +197,7 @@ class RefundController extends StorefrontController
 
             if ($settings->isTestMode() && $apiClient->usesOAuth()) {
                 $orderParameters = [
-                    self::KEY_TEST_MODE => true
+                    self::REFUND_DATA_KEY_TEST_MODE => true
                 ];
             }
 
@@ -205,16 +209,16 @@ class RefundController extends StorefrontController
 
             if ($order !== null && isset($order->id)) {
                 $refundData = [
-                    self::KEY_LINES => [
+                    self::REFUND_DATA_KEY_LINES => [
                         [
-                            self::KEY_ID => $orderLineId,
-                            self::KEY_QUANTITY => $quantity,
+                            self::REFUND_DATA_KEY_ID => $orderLineId,
+                            self::REFUND_DATA_KEY_QUANTITY => $quantity,
                         ],
                     ],
                 ];
 
                 if ($settings->isTestMode() && $apiClient->usesOAuth()) {
-                    $refundData[self::KEY_TEST_MODE] = true;
+                    $refundData[self::REFUND_DATA_KEY_TEST_MODE] = true;
                 }
 
                 try {
@@ -226,23 +230,23 @@ class RefundController extends StorefrontController
                 if (isset($refund->id)) {
                     $success = true;
 
-                    if (!isset($customFields[CustomFieldService::KEY_CUSTOM_FIELD_DOMAIN][self::KEY_REFUNDS])) {
-                        $customFields[CustomFieldService::KEY_CUSTOM_FIELD_DOMAIN][self::KEY_REFUNDS] = [];
+                    if (!isset($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_REFUNDS])) {
+                        $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_REFUNDS] = [];
                     }
 
-                    if (!is_array($customFields[CustomFieldService::KEY_CUSTOM_FIELD_DOMAIN][self::KEY_REFUNDS])) {
-                        $customFields[CustomFieldService::KEY_CUSTOM_FIELD_DOMAIN][self::KEY_REFUNDS] = [];
+                    if (!is_array($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_REFUNDS])) {
+                        $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_REFUNDS] = [];
                     }
 
-                    $customFields[CustomFieldService::KEY_CUSTOM_FIELD_DOMAIN][self::KEY_REFUNDS][] = [
-                        self::KEY_REFUND_ID => $refund->id,
-                        self::KEY_QUANTITY => $quantity,
+                    $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_REFUNDS][] = [
+                        self::CUSTOM_FIELDS_KEY_REFUND_ID => $refund->id,
+                        self::CUSTOM_FIELDS_KEY_QUANTITY => $quantity,
                     ];
 
-                    if (isset($customFields[self::KEY_REFUNDED_QUANTITY])) {
-                        $customFields[self::KEY_REFUNDED_QUANTITY] += $quantity;
+                    if (isset($customFields[self::CUSTOM_FIELDS_KEY_REFUNDED_QUANTITY])) {
+                        $customFields[self::CUSTOM_FIELDS_KEY_REFUNDED_QUANTITY] += $quantity;
                     } else {
-                        $customFields[self::KEY_REFUNDED_QUANTITY] = $quantity;
+                        $customFields[self::CUSTOM_FIELDS_KEY_REFUNDED_QUANTITY] = $quantity;
                     }
                 }
             }
@@ -250,14 +254,14 @@ class RefundController extends StorefrontController
             // Update the custom fields of the order line item
             $this->orderLineItemRepository->update([
                 [
-                    self::KEY_ID => $orderLineItem->getId(),
-                    CustomFieldService::KEY_CUSTOM_FIELDS => $customFields,
+                    self::REFUND_DATA_KEY_ID => $orderLineItem->getId(),
+                    CustomFieldService::CUSTOM_FIELDS_KEY => $customFields,
                 ]
             ], Context::createDefaultContext());
         }
 
         return new JsonResponse([
-            self::KEY_SUCCESS => $success,
+            self::RESPONSE_KEY_SUCCESS => $success,
         ]);
     }
 
@@ -294,17 +298,17 @@ class RefundController extends StorefrontController
             foreach ($order->getLineItems() as $lineItem) {
                 if (
                     !empty($lineItem->getCustomFields())
-                    && isset($lineItem->getCustomFields()[self::KEY_REFUNDED_QUANTITY])
+                    && isset($lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_REFUNDED_QUANTITY])
                 ) {
-                    $amount += ($lineItem->getUnitPrice() * (int) $lineItem->getCustomFields()[self::KEY_REFUNDED_QUANTITY]);
-                    $items += (int) $lineItem->getCustomFields()[self::KEY_REFUNDED_QUANTITY];
+                    $amount += ($lineItem->getUnitPrice() * (int) $lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_REFUNDED_QUANTITY]);
+                    $items += (int) $lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_REFUNDED_QUANTITY];
                 }
             }
         }
 
         return new JsonResponse([
-            self::KEY_AMOUNT => $amount,
-            self::KEY_ITEMS => $items,
+            self::RESPONSE_KEY_AMOUNT => $amount,
+            self::RESPONSE_KEY_ITEMS => $items,
         ]);
     }
 

@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Storefront\Controller;
 use Exception;
 use Kiener\MolliePayments\Helper\DeliveryStateHelper;
 use Kiener\MolliePayments\Helper\PaymentStatusHelper;
+use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
@@ -15,7 +16,6 @@ use Mollie\Api\Types\PaymentStatus;
 use RuntimeException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -23,7 +23,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -73,18 +72,16 @@ class PaymentController extends StorefrontController
 
     /**
      * @RouteScope(scopes={"storefront"})
-     * @Route("/mollie/payment/{transactionId}/{returnUrl}", defaults={"csrf_protected"=false}, name="frontend.mollie.payment",
+     * @Route("/mollie/payment/{transactionId}", defaults={"csrf_protected"=false}, name="frontend.mollie.payment",
      *                                           options={"seo"="false"}, methods={"GET", "POST"})
      *
      * @param SalesChannelContext $context
      * @param                     $transactionId
      *
-     * @param                     $returnUrl
-     *
      * @return Response|RedirectResponse
      * @throws ApiException
      */
-    public function payment(SalesChannelContext $context, $transactionId, $returnUrl): ?Response
+    public function payment(SalesChannelContext $context, $transactionId): ?Response
     {
         $criteria = null;
         $customFields = null;
@@ -94,7 +91,7 @@ class PaymentController extends StorefrontController
         $order = null;
         $paymentFailed = false;
         $paymentStatus = null;
-        $redirectUrl = urldecode($returnUrl);
+        $redirectUrl = null;
         $transaction = null;
 
         /** @var MollieSettingStruct $settings */
@@ -176,19 +173,28 @@ class PaymentController extends StorefrontController
          * With the order ID from the custom fields, we fetch the order from Mollie's
          * Orders API.
          *
+         * The transaction return URL is used for redirecting the customer to the checkout
+         * finish page.
+         *
          * @var $mollieOrder
          */
-        if (is_array($customFields) && isset($customFields['mollie_payments']['order_id'])) {
-            /** @var string $mollieOrderId */
-            $mollieOrderId = $customFields['mollie_payments']['order_id'];
+        if (is_array($customFields)) {
+            if (isset($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS]['order_id'])) {
+                /** @var string $mollieOrderId */
+                $mollieOrderId = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS]['order_id'];
 
-            /** @var Order $mollieOrder */
-            try {
-                $mollieOrder = $this->apiClient->orders->get($mollieOrderId, [
-                    'embed' => 'payments'
-                ]);
-            } catch (ApiException $e) {
-                $errorMessage = $errorMessage ?? $e->getMessage();
+                /** @var Order $mollieOrder */
+                try {
+                    $mollieOrder = $this->apiClient->orders->get($mollieOrderId, [
+                        'embed' => 'payments'
+                    ]);
+                } catch (ApiException $e) {
+                    $errorMessage = $errorMessage ?? $e->getMessage();
+                }
+            }
+
+            if (isset($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS]['transactionReturnUrl'])) {
+                $redirectUrl = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS]['transactionReturnUrl'];
             }
         }
 
@@ -229,6 +235,23 @@ class PaymentController extends StorefrontController
             $mollieOrder->createPayment([]);
 
             if ($mollieOrder->getCheckoutUrl() !== null) {
+                // Reopen the order transaction
+                try {
+                    $this->paymentStatusHelper->getOrderTransactionStateHandler()->reopen(
+                        $transactionId,
+                        $context->getContext()
+                    );
+                } catch (Exception $e) {
+                    $this->logger->addEntry(
+                        $e->getMessage(),
+                        $context->getContext(),
+                        $e,
+                        [
+                            'function' => 'payment-set-transaction-state'
+                        ]
+                    );
+                }
+
                 $redirectUrl = $mollieOrder->getCheckoutUrl();
             }
         }
@@ -248,7 +271,25 @@ class PaymentController extends StorefrontController
         }
 
         // If the payment failed, render a storefront to let the customer know
-        if ($paymentFailed === true) {
+        if ($paymentFailed === true && (string) $redirectUrl !== '') {
+
+            // If we redirect to the payment screen, set the transaction to in progress
+            try {
+                $this->paymentStatusHelper->getOrderTransactionStateHandler()->process(
+                    $transactionId,
+                    $context->getContext()
+                );
+            } catch (Exception $e) {
+                $this->logger->addEntry(
+                    $e->getMessage(),
+                    $context->getContext(),
+                    $e,
+                    [
+                        'function' => 'payment-set-transaction-state'
+                    ]
+                );
+            }
+
             return $this->renderStorefront('@Storefront/storefront/page/checkout/payment/failed.html.twig', [
                 'redirectUrl' => $redirectUrl
             ]);

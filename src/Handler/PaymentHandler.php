@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Handler;
 use Exception;
 use Kiener\MolliePayments\Helper\PaymentStatusHelper;
 use Kiener\MolliePayments\Service\CustomerService;
+use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
@@ -13,9 +14,11 @@ use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\OrderLine;
+use Mollie\Api\Types\PaymentMethod;
 use Mollie\Api\Types\PaymentStatus;
 use Monolog\Logger;
 use RuntimeException;
+use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
@@ -161,7 +164,18 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         /**
          * Set the API keys at Mollie based on the current context.
          */
-        $this->setApiKeysBySalesChannelContext($salesChannelContext);
+        try {
+            $this->setApiKeysBySalesChannelContext($salesChannelContext);
+        } catch (Exception $e) {
+            $this->logger->addEntry(
+                $e->getMessage(),
+                $salesChannelContext->getContext(),
+                $e,
+                [
+                    'function' => 'payment-handler-set-api-keys'
+                ]
+            );
+        }
 
         //ToDo: Data for specific payment methods vullen. Functie aanroepen die met specifieke payment methods overriden
 
@@ -192,10 +206,21 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             && !empty($paymentUrl)
             && method_exists($this->transactionStateHandler, 'process')
         ) {
-            $this->transactionStateHandler->process(
-                $transaction->getOrderTransaction()->getId(),
-                $salesChannelContext->getContext()
-            );
+            try {
+                $this->transactionStateHandler->process(
+                    $transaction->getOrderTransaction()->getId(),
+                    $salesChannelContext->getContext()
+                );
+            } catch (Exception $e) {
+                $this->logger->addEntry(
+                    $e->getMessage(),
+                    $salesChannelContext->getContext(),
+                    $e,
+                    [
+                        'function' => 'payment-handler-set-transaction-state'
+                    ]
+                );
+            }
         }
 
         /**
@@ -268,7 +293,18 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         /**
          * Set the API keys at Mollie based on the current context.
          */
-        $this->setApiKeysBySalesChannelContext($salesChannelContext);
+        try {
+            $this->setApiKeysBySalesChannelContext($salesChannelContext);
+        } catch (Exception $e) {
+            $this->logger->addEntry(
+                $e->getMessage(),
+                $salesChannelContext->getContext(),
+                $e,
+                [
+                    'function' => 'payment-set-transaction-state'
+                ]
+            );
+        }
 
         /**
          * Retrieve the order from Mollie's Orders API, so we can set the status of the order
@@ -330,8 +366,19 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             isset($paymentStatus)
             && ($paymentStatus === PaymentStatus::STATUS_CANCELED || $paymentStatus === PaymentStatus::STATUS_FAILED)
         ) {
-            $this->transactionStateHandler
-                ->reopen($transaction->getOrderTransaction()->getId(), $salesChannelContext->getContext());
+            try {
+                $this->transactionStateHandler
+                    ->reopen($transaction->getOrderTransaction()->getId(), $salesChannelContext->getContext());
+            } catch (Exception $e) {
+                $this->logger->addEntry(
+                    $e->getMessage(),
+                    $salesChannelContext->getContext(),
+                    $e,
+                    [
+                        'function' => 'payment-handler-set-transaction-state'
+                    ]
+                );
+            }
 
             throw new CustomerCanceledAsyncPaymentException(
                 'Payment for order ' . $order->getOrderNumber() . ' (' . $mollieOrder->id . ') was cancelled by the customer.', ''
@@ -423,7 +470,6 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             ),
             self::FIELD_REDIRECT_URL => $this->router->generate('frontend.mollie.payment', [
                 'transactionId' => $transaction->getOrderTransaction()->getId(),
-                'returnUrl' => urlencode($transaction->getReturnUrl())
             ], $this->router::ABSOLUTE_URL),
             self::FIELD_LOCALE => $locale !== null ? $locale->getCode() : null,
             self::FIELD_METHOD => $this->paymentMethod,
@@ -439,6 +485,22 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             ),
             self::FIELD_PAYMENT => []
         ];
+
+        /**
+         * Handle vat free orders.
+         */
+        if (
+            in_array($transaction->getOrder()->getTaxStatus(), [
+                    CartPrice::TAX_STATE_NET,
+                    CartPrice::TAX_STATE_FREE
+                ]
+            , true)
+        ) {
+            $orderData[self::FIELD_AMOUNT] = $this->orderService->getPriceArray(
+                $currency !== null ? $currency->getIsoCode() : 'EUR',
+                $order->getAmountNet()
+            );
+        }
 
         /**
          * Try to fetch the Order Lifetime configuration. If it is can be fetched, set it expiresAt field
@@ -484,12 +546,23 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
 
         $customFields = $customer->getCustomFields();
 
+        // @todo Handle credit card tokens from the Credit Card payment handler
         if (
-            isset($customFields['mollie_payments']['credit_card_token'])
-            && (string)$customFields['mollie_payments']['credit_card_token'] !== ''
+            $this->paymentMethod === PaymentMethod::CREDITCARD
+            && isset($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_CREDIT_CARD_TOKEN])
+            && (string)$customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_CREDIT_CARD_TOKEN] !== ''
         ) {
-            $orderData['payment']['cardToken'] = $customFields['mollie_payments']['credit_card_token'];
+            $orderData['payment']['cardToken'] = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_CREDIT_CARD_TOKEN];
             $this->customerService->setCardToken($customer, '', $salesChannelContext->getContext());
+        }
+
+        // @todo Handle iDeal issuers from the iDeal payment handler
+        if (
+            $this->paymentMethod === PaymentMethod::IDEAL
+            && isset($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER])
+            && (string)$customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER] !== ''
+        ) {
+            $orderData['payment']['issuer'] = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER];
         }
 
         $orderData = array_merge($orderData, $this->paymentMethodData);
@@ -539,8 +612,9 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             $this->orderService->getOrderRepository()->update([[
                 'id' => $order->getId(),
                 'customFields' => [
-                    'mollie_payments' => [
-                        'order_id' => $mollieOrder->id
+                    CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS => [
+                        'order_id' => $mollieOrder->id,
+                        'transactionReturnUrl' => $transaction->getReturnUrl(),
                     ]
                 ]
             ]], $salesChannelContext->getContext());
@@ -554,7 +628,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
                     $orderLineUpdate[] = [
                         'id' => $line->metadata->{ $this->orderService::ORDER_LINE_ITEM_ID },
                         'customFields' => [
-                            'mollie_payments' => [
+                            CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS => [
                                 'order_line_id' => $line->id,
                             ],
                         ],

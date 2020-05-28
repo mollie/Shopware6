@@ -113,9 +113,41 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
                 $customFields !== null
                 && isset($customFields[self::PARAM_MOLLIE_PAYMENTS][self::PARAM_ORDER_ID])
             ) {
-                $mollieOrder = $this->apiClient->orders->get(
-                    $customFields[self::PARAM_MOLLIE_PAYMENTS][self::PARAM_ORDER_ID]
-                );
+                try {
+                    $parameters = [
+                        'mode' => 'live',
+                    ];
+
+                    if ($this->apiClient->usesOAuth()) {
+                        $parameters = [
+                            'testmode' => false,
+                        ];
+                    }
+
+                    $mollieOrder = $this->apiClient->orders->get(
+                        $customFields[self::PARAM_MOLLIE_PAYMENTS][self::PARAM_ORDER_ID],
+                        $parameters
+                    );
+                } catch (\Exception $e) {
+                    //
+                }
+
+                if ($mollieOrder === null) {
+                    $parameters = [
+                        'mode' => 'test',
+                    ];
+
+                    if ($this->apiClient->usesOAuth()) {
+                        $parameters = [
+                            'testmode' => true,
+                        ];
+                    }
+
+                    $mollieOrder = $this->apiClient->orders->get(
+                        $customFields[self::PARAM_MOLLIE_PAYMENTS][self::PARAM_ORDER_ID],
+                        $parameters
+                    );
+                }
             }
 
             // Ship the order

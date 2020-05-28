@@ -305,7 +305,7 @@ class PaymentMethodService
             BankTransferPayment::class,
             BelfiusPayment::class,
             CreditCardPayment::class,
-            DirectDebitPayment::class,
+            // DirectDebitPayment::class,   // Is removed for now because it's only used for recurring
             EpsPayment::class,
             GiftCardPayment::class,
             GiroPayPayment::class,

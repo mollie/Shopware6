@@ -24,22 +24,26 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ShippingController extends StorefrontController
 {
-    public const KEY_SHIPPED_QUANTITY = 'shippedQuantity';
+    public const CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY = 'shippedQuantity';
 
-    private const KEY_AMOUNT = 'amount';
-    private const KEY_ID = 'id';
-    private const KEY_ITEMS = 'items';
-    private const KEY_LINES = 'lines';
-    private const KEY_ORDER_ID = 'order_id';
-    private const KEY_ORDER_LINE_ID = 'order_line_id';
-    private const KEY_ORDER_LINE_ITEM_ID = 'itemId';
-    private const KEY_ORDER_LINE_ITEM_VERSION_ID = 'versionId';
-    private const KEY_ORDER_LINE_QUANTITY = 'quantity';
-    private const KEY_QUANTITY = 'quantity';
-    private const KEY_SHIPMENT_ID = 'shipment_id';
-    private const KEY_SHIPMENTS = 'shipments';
-    private const KEY_SUCCESS = 'success';
-    private const KEY_TEST_MODE = 'testmode';
+    private const CUSTOM_FIELDS_KEY_ORDER_ID = 'order_id';
+    private const CUSTOM_FIELDS_KEY_ORDER_LINE_ID = 'order_line_id';
+    private const CUSTOM_FIELDS_KEY_QUANTITY = 'quantity';
+    private const CUSTOM_FIELDS_KEY_SHIPMENT_ID = 'shipment_id';
+    private const CUSTOM_FIELDS_KEY_SHIPMENTS = 'shipments';
+
+    private const REQUEST_KEY_ORDER_LINE_ITEM_ID = 'itemId';
+    private const REQUEST_KEY_ORDER_LINE_ITEM_VERSION_ID = 'versionId';
+    private const REQUEST_KEY_ORDER_LINE_QUANTITY = self::CUSTOM_FIELDS_KEY_QUANTITY;
+
+    private const RESPONSE_KEY_AMOUNT = 'amount';
+    private const RESPONSE_KEY_ITEMS = 'items';
+    private const RESPONSE_KEY_SUCCESS = 'success';
+
+    private const SHIPPING_DATA_KEY_ID = 'id';
+    private const SHIPPING_DATA_KEY_LINES = 'lines';
+    private const SHIPPING_DATA_KEY_QUANTITY = self::CUSTOM_FIELDS_KEY_QUANTITY;
+    private const SHIPPING_DATA_KEY_TEST_MODE = 'testmode';
 
     /** @var MollieApiFactory */
     private $apiFactory;
@@ -109,17 +113,17 @@ class ShippingController extends StorefrontController
         $quantity = 0;
 
         if (
-            (string) $request->get(self::KEY_ORDER_LINE_ITEM_ID) !== ''
-            && (string) $request->get(self::KEY_ORDER_LINE_ITEM_VERSION_ID) !== ''
+            (string) $request->get(self::REQUEST_KEY_ORDER_LINE_ITEM_ID) !== ''
+            && (string) $request->get(self::REQUEST_KEY_ORDER_LINE_ITEM_VERSION_ID) !== ''
         ) {
             $orderLineItem = $this->getOrderLineItemById(
-                $request->get(self::KEY_ORDER_LINE_ITEM_ID),
-                $request->get(self::KEY_ORDER_LINE_ITEM_VERSION_ID)
+                $request->get(self::REQUEST_KEY_ORDER_LINE_ITEM_ID),
+                $request->get(self::REQUEST_KEY_ORDER_LINE_ITEM_VERSION_ID)
             );
         }
 
-        if ((int) $request->get(self::KEY_ORDER_LINE_QUANTITY) > 0) {
-            $quantity = (int) $request->get(self::KEY_ORDER_LINE_QUANTITY);
+        if ((int) $request->get(self::REQUEST_KEY_ORDER_LINE_QUANTITY) > 0) {
+            $quantity = (int) $request->get(self::REQUEST_KEY_ORDER_LINE_QUANTITY);
         }
 
         if (
@@ -132,18 +136,18 @@ class ShippingController extends StorefrontController
         if (
             $orderLineItem !== null
             && !empty($customFields)
-            && isset($customFields[CustomFieldService::KEY_CUSTOM_FIELD_DOMAIN][self::KEY_ORDER_LINE_ID])
+            && isset($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_ORDER_LINE_ID])
         ) {
-            $orderLineId = $customFields[CustomFieldService::KEY_CUSTOM_FIELD_DOMAIN][self::KEY_ORDER_LINE_ID];
+            $orderLineId = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_ORDER_LINE_ID];
         }
 
         if (
             $orderLineItem !== null
             && $orderLineItem->getOrder() !== null
             && !empty($orderLineItem->getOrder()->getCustomFields())
-            && isset($orderLineItem->getOrder()->getCustomFields()[CustomFieldService::KEY_CUSTOM_FIELD_DOMAIN][self::KEY_ORDER_ID])
+            && isset($orderLineItem->getOrder()->getCustomFields()[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_ORDER_ID])
         ) {
-            $orderId = $orderLineItem->getOrder()->getCustomFields()[CustomFieldService::KEY_CUSTOM_FIELD_DOMAIN][self::KEY_ORDER_ID];
+            $orderId = $orderLineItem->getOrder()->getCustomFields()[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_ORDER_ID];
         }
 
         if (
@@ -167,7 +171,7 @@ class ShippingController extends StorefrontController
 
             if ($settings->isTestMode() && $apiClient->usesOAuth()) {
                 $orderParameters = [
-                    self::KEY_TEST_MODE => true
+                    self::SHIPPING_DATA_KEY_TEST_MODE => true
                 ];
             }
 
@@ -175,16 +179,16 @@ class ShippingController extends StorefrontController
 
             if ($order !== null && isset($order->id)) {
                 $shipmentData = [
-                    self::KEY_LINES => [
+                    self::SHIPPING_DATA_KEY_LINES => [
                         [
-                            self::KEY_ID => $orderLineId,
-                            self::KEY_QUANTITY => $quantity,
+                            self::SHIPPING_DATA_KEY_ID => $orderLineId,
+                            self::SHIPPING_DATA_KEY_QUANTITY => $quantity,
                         ],
                     ],
                 ];
 
                 if ($settings->isTestMode() && $apiClient->usesOAuth()) {
-                    $shipmentData[self::KEY_TEST_MODE] = true;
+                    $shipmentData[self::SHIPPING_DATA_KEY_TEST_MODE] = true;
                 }
 
                 $shipment = $apiClient->shipments->createFor($order, $shipmentData);
@@ -192,23 +196,23 @@ class ShippingController extends StorefrontController
                 if (isset($shipment->id)) {
                     $success = true;
 
-                    if (!isset($customFields[CustomFieldService::KEY_CUSTOM_FIELD_DOMAIN][self::KEY_SHIPMENTS])) {
-                        $customFields[CustomFieldService::KEY_CUSTOM_FIELD_DOMAIN][self::KEY_SHIPMENTS] = [];
+                    if (!isset($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_SHIPMENTS])) {
+                        $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_SHIPMENTS] = [];
                     }
 
-                    if (!is_array($customFields[CustomFieldService::KEY_CUSTOM_FIELD_DOMAIN][self::KEY_SHIPMENTS])) {
-                        $customFields[CustomFieldService::KEY_CUSTOM_FIELD_DOMAIN][self::KEY_SHIPMENTS] = [];
+                    if (!is_array($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_SHIPMENTS])) {
+                        $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_SHIPMENTS] = [];
                     }
 
-                    $customFields[CustomFieldService::KEY_CUSTOM_FIELD_DOMAIN][self::KEY_SHIPMENTS][] = [
-                        self::KEY_SHIPMENT_ID => $shipment->id,
-                        self::KEY_QUANTITY => $quantity,
+                    $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_SHIPMENTS][] = [
+                        self::CUSTOM_FIELDS_KEY_SHIPMENT_ID => $shipment->id,
+                        self::CUSTOM_FIELDS_KEY_QUANTITY => $quantity,
                     ];
 
-                    if (isset($customFields[self::KEY_SHIPPED_QUANTITY])) {
-                        $customFields[self::KEY_SHIPPED_QUANTITY] += $quantity;
+                    if (isset($customFields[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY])) {
+                        $customFields[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY] += $quantity;
                     } else {
-                        $customFields[self::KEY_SHIPPED_QUANTITY] = $quantity;
+                        $customFields[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY] = $quantity;
                     }
                 }
             }
@@ -216,14 +220,14 @@ class ShippingController extends StorefrontController
             // Update the custom fields of the order line item
             $this->orderLineItemRepository->update([
                 [
-                    self::KEY_ID => $orderLineItem->getId(),
-                    CustomFieldService::KEY_CUSTOM_FIELDS => $customFields,
+                    self::SHIPPING_DATA_KEY_ID => $orderLineItem->getId(),
+                    CustomFieldService::CUSTOM_FIELDS_KEY => $customFields,
                 ]
             ], Context::createDefaultContext());
         }
 
         return new JsonResponse([
-            self::KEY_SUCCESS => $success,
+            self::RESPONSE_KEY_SUCCESS => $success,
         ]);
     }
 
@@ -260,17 +264,17 @@ class ShippingController extends StorefrontController
             foreach ($order->getLineItems() as $lineItem) {
                 if (
                     !empty($lineItem->getCustomFields())
-                    && isset($lineItem->getCustomFields()[self::KEY_SHIPPED_QUANTITY])
+                    && isset($lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY])
                 ) {
-                    $amount += ($lineItem->getUnitPrice() * (int) $lineItem->getCustomFields()[self::KEY_SHIPPED_QUANTITY]);
-                    $items += (int) $lineItem->getCustomFields()[self::KEY_SHIPPED_QUANTITY];
+                    $amount += ($lineItem->getUnitPrice() * (int) $lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY]);
+                    $items += (int) $lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY];
                 }
             }
         }
 
         return new JsonResponse([
-            self::KEY_AMOUNT => $amount,
-            self::KEY_ITEMS => $items,
+            self::RESPONSE_KEY_AMOUNT => $amount,
+            self::RESPONSE_KEY_ITEMS => $items,
         ]);
     }
 

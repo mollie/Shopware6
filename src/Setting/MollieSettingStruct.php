@@ -24,6 +24,11 @@ class MollieSettingStruct extends Struct
     protected $testApiKey;
 
     /**
+     * @var string
+     */
+    protected $profileId;
+
+    /**
      * @var bool
      */
     protected $testMode = true;
@@ -83,6 +88,25 @@ class MollieSettingStruct extends Struct
     public function setTestApiKey(string $testApiKey): self
     {
         $this->testApiKey = $testApiKey;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getProfileId(): ?string
+    {
+        return $this->profileId;
+    }
+
+    /**
+     * @param string $profileId
+     *
+     * @return MollieSettingStruct
+     */
+    public function setProfileId(string $profileId): self
+    {
+        $this->profileId = $profileId;
         return $this;
     }
 

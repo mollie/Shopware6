@@ -33,8 +33,8 @@
         </service>
 
         <service id="Kiener\MolliePayments\Helper\PaymentStatusHelper" class="Kiener\MolliePayments\Helper\PaymentStatusHelper">
+            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService" />
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler" />
-            <argument type="service" id="monolog.logger"/>
         </service>
 
         <!-- Services -->
@@ -79,10 +79,14 @@
 
         <!-- Controller -->
         <service id="Kiener\MolliePayments\Storefront\Controller\ComponentsController" public="true">
-            <argument type="service" id="Mollie\Api\MollieApiClient" />
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService" />
-            <argument type="service" id="router.default"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService" />
+
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+        <service id="Kiener\MolliePayments\Storefront\Controller\IDealIssuerController" public="true">
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService" />
 
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
@@ -142,6 +146,7 @@
 
         <!-- Subscribers -->
         <service id="Kiener\MolliePayments\Subscriber\CheckoutConfirmPageSubscriber" class="Kiener\MolliePayments\Subscriber\CheckoutConfirmPageSubscriber">
+            <argument type="service" id="Mollie\Api\MollieApiClient" />
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService" />
             <tag name="kernel.event_subscriber" />
         </service>

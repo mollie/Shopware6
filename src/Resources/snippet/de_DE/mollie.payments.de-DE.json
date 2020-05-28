@@ -1,0 +1,21 @@
+{
+  "molliePayments": {
+    "messages": {
+      "payment": {
+        "error": "Zahlung fehlgeschlagen",
+        "failed": "Die Zahlung ist fehlgeschlagen oder wurde storniert. Sie werden zu Mollie weitergeleitet, wo Sie Ihre Zahlung mit der Methode Ihrer Wahl abschließen können. "
+      },
+      "redirecting": "Leiten Sie weiter zu: "
+    },
+    "components": {
+      "creditCard": {
+        "headLine": "Kreditkarteninformationen",
+        "cardHolderLabel": "Name des Kreditkarteninhabers",
+        "cardNumberLabel": "Kreditkartennummer",
+        "cardExpiryDateLabel": "Ablaufdatum",
+        "cardVerificationCodeLabel": "CVC",
+        "creditCardTagLine": "Zahlung gesichert und zur Verfügung gestellt von"
+      }
+    }
+  }
+}
