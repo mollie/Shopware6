@@ -31,8 +31,8 @@ class Przelewy24Payment extends PaymentHandler
         LocaleEntity $locale
     ): array
     {
-        if (!array_key_exists(self::FIELD_BILLING_EMAIL, $orderData[self::FIELD_PAYMENT]) || in_array($orderData[self::FIELD_PAYMENT][self::FIELD_BILLING_EMAIL], [null, ''], true)) {
-            $orderData[self::FIELD_PAYMENT][self::FIELD_BILLING_EMAIL] = $customer->getEmail();
+        if (!array_key_exists(static::FIELD_BILLING_EMAIL, $orderData[static::FIELD_PAYMENT]) || in_array($orderData[static::FIELD_PAYMENT][static::FIELD_BILLING_EMAIL], [null, ''], true)) {
+            $orderData[static::FIELD_PAYMENT][static::FIELD_BILLING_EMAIL] = $customer->getEmail();
         }
 
         return $orderData;

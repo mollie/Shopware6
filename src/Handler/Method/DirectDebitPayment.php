@@ -25,8 +25,8 @@ class DirectDebitPayment extends PaymentHandler
         LocaleEntity $locale
     ): array
     {
-        if (!array_key_exists(self::FIELD_SEPA_DIRECT_DEBIT_CONSUMER_NAME, $orderData[self::FIELD_PAYMENT]) || in_array($orderData[self::FIELD_PAYMENT][self::FIELD_SEPA_DIRECT_DEBIT_CONSUMER_NAME], [null, ''], true)) {
-            $orderData[self::FIELD_PAYMENT][self::FIELD_SEPA_DIRECT_DEBIT_CONSUMER_NAME] = sprintf('%s %s', $customer->getFirstName(), $customer->getLastName());
+        if (!array_key_exists(static::FIELD_SEPA_DIRECT_DEBIT_CONSUMER_NAME, $orderData[static::FIELD_PAYMENT]) || in_array($orderData[static::FIELD_PAYMENT][static::FIELD_SEPA_DIRECT_DEBIT_CONSUMER_NAME], [null, ''], true)) {
+            $orderData[static::FIELD_PAYMENT][self::FIELD_SEPA_DIRECT_DEBIT_CONSUMER_NAME] = sprintf('%s %s', $customer->getFirstName(), $customer->getLastName());
         }
 
         return $orderData;

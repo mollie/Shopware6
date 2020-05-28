@@ -24,8 +24,8 @@ class PaySafeCardPayment extends PaymentHandler
         LocaleEntity $locale
     ): array
     {
-        if (!array_key_exists(self::FIELD_PAY_SAFE_CARD_CUSTOMER_REFERENCE, $orderData[self::FIELD_PAYMENT]) || in_array($orderData[self::FIELD_PAYMENT][self::FIELD_PAY_SAFE_CARD_CUSTOMER_REFERENCE], [null, ''], true)) {
-            $orderData[self::FIELD_PAYMENT][self::FIELD_PAY_SAFE_CARD_CUSTOMER_REFERENCE] = $customer->getCustomerNumber();
+        if (!array_key_exists(static::FIELD_PAY_SAFE_CARD_CUSTOMER_REFERENCE, $orderData[static::FIELD_PAYMENT]) || in_array($orderData[static::FIELD_PAYMENT][static::FIELD_PAY_SAFE_CARD_CUSTOMER_REFERENCE], [null, ''], true)) {
+            $orderData[static::FIELD_PAYMENT][static::FIELD_PAY_SAFE_CARD_CUSTOMER_REFERENCE] = $customer->getCustomerNumber();
         }
 
         return $orderData;

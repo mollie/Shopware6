@@ -25,11 +25,11 @@ class PayPalPayment extends PaymentHandler
         LocaleEntity $locale
     ): array
     {
-        if (!array_key_exists(self::FIELD_PAYPAL_DESCRIPTION, $orderData[self::FIELD_PAYMENT]) || in_array($orderData[self::FIELD_PAYMENT][self::FIELD_PAYPAL_DESCRIPTION], [null, ''], true)) {
-            $orderData[self::FIELD_PAYMENT][self::FIELD_PAYPAL_DESCRIPTION] = sprintf('Order %s', $orderData[PaymentHandler::FIELD_ORDER_NUMBER]);
+        if (!array_key_exists(static::FIELD_PAYPAL_DESCRIPTION, $orderData[static::FIELD_PAYMENT]) || in_array($orderData[static::FIELD_PAYMENT][static::FIELD_PAYPAL_DESCRIPTION], [null, ''], true)) {
+            $orderData[static::FIELD_PAYMENT][static::FIELD_PAYPAL_DESCRIPTION] = sprintf('Order %s', $orderData[PaymentHandler::FIELD_ORDER_NUMBER]);
         }
 
-        if (!array_key_exists(self::FIELD_PAYPAL_DIGITAL_GOODS, $orderData[self::FIELD_PAYMENT]) || in_array($orderData[self::FIELD_PAYMENT][self::FIELD_PAYPAL_DIGITAL_GOODS], [null, ''], true)) {
+        if (!array_key_exists(static::FIELD_PAYPAL_DIGITAL_GOODS, $orderData[static::FIELD_PAYMENT]) || in_array($orderData[static::FIELD_PAYMENT][static::FIELD_PAYPAL_DIGITAL_GOODS], [null, ''], true)) {
             // ToDo: Digital downloads zitten nog niet in Shopware 6
         }
 

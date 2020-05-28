@@ -25,7 +25,7 @@ class ApplePayPayment extends PaymentHandler
         LocaleEntity $locale
     ): array
     {
-        if (!array_key_exists(self::FIELD_APPLE_PAY_PAYMENT_TOKEN, $orderData[self::FIELD_PAYMENT]) || in_array($orderData[self::FIELD_PAYMENT][self::FIELD_APPLE_PAY_PAYMENT_TOKEN], [null, ''], true)) {
+        if (!array_key_exists(static::FIELD_APPLE_PAY_PAYMENT_TOKEN, $orderData[static::FIELD_PAYMENT]) || in_array($orderData[static::FIELD_PAYMENT][static::FIELD_APPLE_PAY_PAYMENT_TOKEN], [null, ''], true)) {
             // Laten we voor nu even liggen
         }
 

@@ -36,17 +36,17 @@ class BankTransferPayment extends PaymentHandler
         LocaleEntity $locale
     ): array
     {
-        if (!array_key_exists(self::FIELD_BILLING_EMAIL, $orderData[self::FIELD_PAYMENT]) || in_array($orderData[self::FIELD_PAYMENT][self::FIELD_BILLING_EMAIL], [null, ''], true)) {
-            $orderData[self::FIELD_PAYMENT][self::FIELD_BILLING_EMAIL] = $customer->getEmail();
+        if (!array_key_exists(static::FIELD_BILLING_EMAIL, $orderData[static::FIELD_PAYMENT]) || in_array($orderData[static::FIELD_PAYMENT][static::FIELD_BILLING_EMAIL], [null, ''], true)) {
+            $orderData[static::FIELD_PAYMENT][static::FIELD_BILLING_EMAIL] = $customer->getEmail();
         }
 
-        if (!array_key_exists(self::FIELD_DUE_DATE, $orderData[self::FIELD_PAYMENT]) || in_array($orderData[self::FIELD_PAYMENT][self::FIELD_DUE_DATE], [null, ''], true)) {
+        if (!array_key_exists(static::FIELD_DUE_DATE, $orderData[static::FIELD_PAYMENT]) || in_array($orderData[static::FIELD_PAYMENT][static::FIELD_DUE_DATE], [null, ''], true)) {
             /** @var MollieSettingStruct $settings */
             $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
 
             try {
                 $dueDate = $settings->getPaymentMethodBankTransferDueDate();
-                $orderData[self::FIELD_PAYMENT][self::FIELD_DUE_DATE] = $dueDate;
+                $orderData[static::FIELD_PAYMENT][static::FIELD_DUE_DATE] = $dueDate;
             } catch (Exception $e) {
                 $this->logger->addEntry(
                     $e->getMessage(),
@@ -59,8 +59,8 @@ class BankTransferPayment extends PaymentHandler
             }
         }
 
-        if (!array_key_exists(self::FIELD_LOCALE, $orderData[self::FIELD_PAYMENT]) || in_array($orderData[self::FIELD_PAYMENT][self::FIELD_LOCALE], [null, ''], true)) {
-            $orderData[self::FIELD_PAYMENT][self::FIELD_LOCALE] = $locale->getCode();
+        if (!array_key_exists(static::FIELD_LOCALE, $orderData[static::FIELD_PAYMENT]) || in_array($orderData[static::FIELD_PAYMENT][static::FIELD_LOCALE], [null, ''], true)) {
+            $orderData[static::FIELD_PAYMENT][static::FIELD_LOCALE] = $locale->getCode();
         }
 
         return $orderData;

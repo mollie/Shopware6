@@ -26,11 +26,11 @@ class KbcPayment extends PaymentHandler
         LocaleEntity $locale
     ): array
     {
-        if (!array_key_exists(self::FIELD_KBC_DESCRIPTION, $orderData[self::FIELD_PAYMENT]) || in_array($orderData[self::FIELD_PAYMENT][self::FIELD_KBC_DESCRIPTION], [null, ''], true)) {
-            $orderData[self::FIELD_PAYMENT][self::FIELD_KBC_DESCRIPTION] = substr($orderData[PaymentHandler::FIELD_ORDER_NUMBER], -self::KBC_DESCRIPTION_LENGTH);
+        if (!array_key_exists(static::FIELD_KBC_DESCRIPTION, $orderData[static::FIELD_PAYMENT]) || in_array($orderData[static::FIELD_PAYMENT][static::FIELD_KBC_DESCRIPTION], [null, ''], true)) {
+            $orderData[static::FIELD_PAYMENT][static::FIELD_KBC_DESCRIPTION] = substr($orderData[PaymentHandler::FIELD_ORDER_NUMBER], -static::KBC_DESCRIPTION_LENGTH);
         }
 
-        if (!array_key_exists(self::FIELD_KBC_ISSUER, $orderData[self::FIELD_PAYMENT]) || in_array($orderData[self::FIELD_PAYMENT][self::FIELD_KBC_ISSUER], [null, ''], true)) {
+        if (!array_key_exists(static::FIELD_KBC_ISSUER, $orderData[static::FIELD_PAYMENT]) || in_array($orderData[static::FIELD_PAYMENT][static::FIELD_KBC_ISSUER], [null, ''], true)) {
             // ToDo: Pas zodra ingebouwd in frontent, gebeurt voorlopig niet
         }
 

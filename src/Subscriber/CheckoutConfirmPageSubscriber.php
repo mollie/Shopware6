@@ -10,6 +10,7 @@ use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Method;
 use Mollie\Api\Types\PaymentMethod;
+use Shopware\Storefront\Page\PageLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
 
@@ -61,7 +62,10 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
         $this->settingsService = $settingsService;
     }
 
-    public function addDataToPage(CheckoutConfirmPageLoadedEvent $args): void
+    /**
+     * @param PageLoadedEvent|CheckoutConfirmPageLoadedEvent $args
+     */
+    public function addDataToPage($args): void
     {
         $this->addMollieLocaleVariableToPage($args);
         $this->addMollieProfileIdVariableToPage($args);
@@ -73,9 +77,9 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     /**
      * Adds the locale for Mollie components to the storefront.
      *
-     * @param CheckoutConfirmPageLoadedEvent $args
+     * @param PageLoadedEvent|CheckoutConfirmPageLoadedEvent $args
      */
-    public function addMollieLocaleVariableToPage(CheckoutConfirmPageLoadedEvent $args): void
+    public function addMollieLocaleVariableToPage($args): void
     {
         /**
          * Build an array of available locales.
@@ -131,9 +135,9 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     /**
      * Adds the test mode variable to the storefront.
      *
-     * @param CheckoutConfirmPageLoadedEvent $args
+     * @param PageLoadedEvent|CheckoutConfirmPageLoadedEvent $args
      */
-    public function addMollieTestModeVariableToPage(CheckoutConfirmPageLoadedEvent $args): void
+    public function addMollieTestModeVariableToPage($args): void
     {
         /** @var MollieSettingStruct $settings */
         $settings = $this->settingsService->getSettings(
@@ -146,7 +150,12 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
         ]);
     }
 
-    public function addMollieProfileIdVariableToPage(CheckoutConfirmPageLoadedEvent $args): void
+    /**
+     * Adds the profile id to the storefront.
+     *
+     * @param PageLoadedEvent|CheckoutConfirmPageLoadedEvent $args
+     */
+    public function addMollieProfileIdVariableToPage($args): void
     {
         /** @var string $mollieProfileId */
         $mollieProfileId = '';
@@ -176,9 +185,9 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     /**
      * Adds the components variable to the storefront.
      *
-     * @param CheckoutConfirmPageLoadedEvent $args
+     * @param PageLoadedEvent|CheckoutConfirmPageLoadedEvent $args
      */
-    public function addMollieComponentsVariableToPage(CheckoutConfirmPageLoadedEvent $args)
+    public function addMollieComponentsVariableToPage($args)
     {
         /** @var MollieSettingStruct $settings */
         $settings = $this->settingsService->getSettings(
@@ -194,9 +203,9 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     /**
      * Adds ideal issuers variable to the storefront.
      *
-     * @param CheckoutConfirmPageLoadedEvent $args
+     * @param PageLoadedEvent|CheckoutConfirmPageLoadedEvent $args
      */
-    public function addMollieIdealIssuersVariableToPage(CheckoutConfirmPageLoadedEvent $args)
+    public function addMollieIdealIssuersVariableToPage($args)
     {
         /** @var array $customFields */
         $customFields = [];

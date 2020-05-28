@@ -106,7 +106,7 @@ Component.override('sw-order-line-items-grid', {
             let refundable = false;
 
             if (
-                item.type === this.lineItemTypes.PRODUCT
+                item.type === 'product'
                 && (
                     item.customFields !== undefined
                     && item.customFields !== null
@@ -117,7 +117,7 @@ Component.override('sw-order-line-items-grid', {
                 )
                 && (
                     item.customFields.refundedQuantity === undefined
-                    || parseInt(item.customFields.refundedQuantity) < item.quantity
+                    || parseInt(item.customFields.refundedQuantity, 10) < item.quantity
                 )
             ) {
                 refundable = true;
@@ -130,7 +130,7 @@ Component.override('sw-order-line-items-grid', {
             let shippable = false;
 
             if (
-                item.type === this.lineItemTypes.PRODUCT
+                item.type === 'product'
                 && (
                     item.customFields !== undefined
                     && item.customFields !== null
@@ -141,7 +141,7 @@ Component.override('sw-order-line-items-grid', {
                 )
                 && (
                     item.customFields.shippedQuantity === undefined
-                    || parseInt(item.customFields.shippedQuantity) < item.quantity
+                    || parseInt(item.customFields.shippedQuantity, 10) < item.quantity
                 )
             ) {
                 shippable = true;
@@ -155,7 +155,7 @@ Component.override('sw-order-line-items-grid', {
                 item.customFields !== undefined
                 && item.customFields.refundedQuantity !== undefined
             ) {
-                return item.quantity - parseInt(item.customFields.refundedQuantity);
+                return item.quantity - parseInt(item.customFields.refundedQuantity, 10);
             }
 
             return item.quantity;
@@ -167,7 +167,7 @@ Component.override('sw-order-line-items-grid', {
                 && item.customFields.shippedQuantity !== undefined
                 && item.customFields.refundedQuantity !== undefined
             ) {
-                return item.quantity - parseInt(item.customFields.shippedQuantity) - parseInt(item.customFields.refundedQuantity);
+                return item.quantity - parseInt(item.customFields.shippedQuantity, 10) - parseInt(item.customFields.refundedQuantity, 10);
             }
 
             if (
@@ -175,7 +175,7 @@ Component.override('sw-order-line-items-grid', {
                 && item.customFields.shippedQuantity === undefined
                 && item.customFields.refundedQuantity !== undefined
             ) {
-                return item.quantity - parseInt(item.customFields.refundedQuantity);
+                return item.quantity - parseInt(item.customFields.refundedQuantity, 10);
             }
 
             return item.quantity;

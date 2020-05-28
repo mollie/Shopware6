@@ -26,8 +26,8 @@ class CreditCardPayment extends PaymentHandler
     {
         $customFields = $customer->getCustomFields();
 
-        if (!array_key_exists(self::FIELD_CREDIT_CARD_TOKEN, $orderData[self::FIELD_PAYMENT]) || in_array($orderData[self::FIELD_PAYMENT][self::FIELD_CREDIT_CARD_TOKEN], [null, ''], true)) {
-            $orderData[self::FIELD_PAYMENT][self::FIELD_CREDIT_CARD_TOKEN] = $customFields['mollie_payments']['credit_card_token'];
+        if (!array_key_exists(static::FIELD_CREDIT_CARD_TOKEN, $orderData[static::FIELD_PAYMENT]) || in_array($orderData[static::FIELD_PAYMENT][static::FIELD_CREDIT_CARD_TOKEN], [null, ''], true)) {
+            $orderData[static::FIELD_PAYMENT][static::FIELD_CREDIT_CARD_TOKEN] = $customFields['mollie_payments']['credit_card_token'];
             $this->customerService->setCardToken($customer, '', $salesChannelContext->getContext());
         }
 
