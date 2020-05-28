@@ -489,13 +489,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         /**
          * Handle vat free orders.
          */
-        if (
-            in_array($transaction->getOrder()->getTaxStatus(), [
-                    CartPrice::TAX_STATE_NET,
-                    CartPrice::TAX_STATE_FREE
-                ]
-            , true)
-        ) {
+        if ($transaction->getOrder()->getTaxStatus() === CartPrice::TAX_STATE_FREE) {
             $orderData[self::FIELD_AMOUNT] = $this->orderService->getPriceArray(
                 $currency !== null ? $currency->getIsoCode() : 'EUR',
                 $order->getAmountNet()
