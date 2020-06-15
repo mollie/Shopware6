@@ -1,7 +1,7 @@
 {
   "name": "kiener/mollie-payments-plugin",
   "description": "Mollie Payments",
-  "version": "v1.0.13",
+  "version": "v1.0.14",
   "type": "shopware-platform-plugin",
   "license": "MIT",
   "authors": [
@@ -35,5 +35,13 @@
       "Kiener\\MolliePayments\\": "src/",
       "Mollie\\Api\\": "vendor/mollie/mollie-api-php/src/"
     }
+  },
+  "suggest": {
+    "shopware/storefront": "Require '*'. Enables features like Creditcard Components and iDeal issuer selector.",
+    "shopware/administration": "Require '*'. Enables features like partial shipping and refunding."
+  },
+  "conflict": {
+    "shopware/storefront": "<6,>=7",
+    "shopware/administration": "<6,>=7"
   }
 }

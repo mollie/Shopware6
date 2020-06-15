@@ -3,7 +3,7 @@ import Plugin from 'src/plugin-system/plugin.class';
 export default class MollieCreditCardComponents extends Plugin {
     init() {
         // get controller
-        let mollieController = document.querySelector('div.mollie-components-controller');
+        const mollieController = document.querySelector('div.mollie-components-controller');
 
         // remove existing mollie controller
         if (mollieController !== undefined && mollieController !== null) {
@@ -11,8 +11,8 @@ export default class MollieCreditCardComponents extends Plugin {
         }
 
         // get container
-        let container = document.querySelector('div.mollie-components-credit-card');
-        let cardToken = document.querySelector('#cardHolder');
+        const container = document.querySelector('div.mollie-components-credit-card');
+        const cardToken = document.querySelector('#cardHolder');
 
         if (
             container !== undefined
@@ -20,10 +20,10 @@ export default class MollieCreditCardComponents extends Plugin {
             && cardToken !== undefined
             && cardToken !== null
         ) {
-            let locale = container.getAttribute('data-locale');
-            let profileId = container.getAttribute('data-profile-id');
+            const locale = container.getAttribute('data-locale');
+            const profileId = container.getAttribute('data-profile-id');
             let shopUrl = container.getAttribute('data-shop-url');
-            let testMode = container.getAttribute('data-test-mode');
+            const testMode = container.getAttribute('data-test-mode');
 
             if (shopUrl.substr(-1) === '/') {
                 shopUrl = shopUrl.substr(0, shopUrl.length - 1);
@@ -44,37 +44,37 @@ export default class MollieCreditCardComponents extends Plugin {
                         fontSize: '14px',
                         padding: '10px 10px',
                         '::placeholder': {
-                            color: 'rgba(68, 68, 68, 0.2)',
+                            color: 'rgba(68, 68, 68, 0.2)'
                         }
                     },
                     valid: {
-                        color: '#090',
+                        color: '#090'
                     },
                     invalid: {
-                        backgroundColor: '#fff1f3',
-                    },
+                        backgroundColor: '#fff1f3'
+                    }
                 }
             };
 
             const cardHolder = {
-                name: "cardHolder",
-                id: "#cardHolder",
-                errors: "cardHolderError"
+                name: 'cardHolder',
+                id: '#cardHolder',
+                errors: 'cardHolderError'
             };
             const cardNumber = {
-                name: "cardNumber",
-                id: "#cardNumber",
-                errors: "cardNumberError"
+                name: 'cardNumber',
+                id: '#cardNumber',
+                errors: 'cardNumberError'
             };
             const expiryDate = {
-                name: "expiryDate",
-                id: "#expiryDate",
-                errors: "expiryDateError"
+                name: 'expiryDate',
+                id: '#expiryDate',
+                errors: 'expiryDateError'
             };
             const verificationCode = {
-                name: "verificationCode",
-                id: "#verificationCode",
-                errors: "verificationCodeError"
+                name: 'verificationCode',
+                id: '#verificationCode',
+                errors: 'verificationCodeError'
             };
 
             const inputs = [cardHolder, cardNumber, expiryDate, verificationCode];
@@ -100,7 +100,7 @@ export default class MollieCreditCardComponents extends Plugin {
 
             const setFocus = (componentName, isFocused) => {
                 const element = document.querySelector(componentName);
-                element.classList.toggle("is-focused", isFocused);
+                element.classList.toggle('is-focused', isFocused);
             };
 
             const disableForm = () => {
@@ -191,7 +191,7 @@ export default class MollieCreditCardComponents extends Plugin {
                     const fetchUrl = shopUrl + '/mollie/components/store-card-token/' + customerId + '/' + token;
 
                     // Store the token on the customer
-                    fetch(fetchUrl, { headers: { "Content-Type": "application/json; charset=utf-8" } })
+                    fetch(fetchUrl, { headers: { 'Content-Type': 'application/json; charset=utf-8' } })
                         .then(() => {
                             // Add token to the form
                             const tokenInput = document.getElementById('cardToken');

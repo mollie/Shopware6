@@ -8,6 +8,7 @@ use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTax;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
+use Shopware\Core\Checkout\Cart\Tax\TaxCalculator;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Promotion\Cart\PromotionProcessor;
@@ -166,13 +167,29 @@ class OrderService
                 $productUrl = $item->getProduct()->getSeoUrls()->first()->getUrl();
             }
 
+            // Get the prices
+            $unitPrice = $item->getUnitPrice();
+            $totalAmount = $item->getTotalPrice();
+
+            // Add tax when order is net
+            if ($item->getPrice() !== null) {
+                $unitPrice = $item->getPrice()->getUnitPrice();
+                $totalAmount = $item->getPrice()->getTotalPrice();
+                $vatAmount = $item->getPrice()->getCalculatedTaxes()->getAmount();
+
+                if ($order->getTaxStatus() === CartPrice::TAX_STATE_NET) {
+                    $unitPrice *= ((100 + $vatRate) / 100);
+                    $totalAmount += $vatAmount;
+                }
+            }
+
             // Build the order lines array
             $lines[] = [
                 'type' =>  $this->getLineItemType($item),
                 'name' => $item->getLabel(),
                 'quantity' => $item->getQuantity(),
-                'unitPrice' => $this->getPriceArray($currencyCode, $item->getUnitPrice()),
-                'totalAmount' => $this->getPriceArray($currencyCode, $item->getTotalPrice()),
+                'unitPrice' => $this->getPriceArray($currencyCode, $unitPrice),
+                'totalAmount' => $this->getPriceArray($currencyCode, $totalAmount),
                 'vatRate' => number_format($vatRate, 2, '.', ''),
                 'vatAmount' => $this->getPriceArray($currencyCode, $vatAmount),
                 'sku' => $sku,
@@ -216,18 +233,23 @@ class OrderService
             $shippingTax = $this->getLineItemTax($shipping->getCalculatedTaxes());
         }
 
-        // Get VAT rate and amount
+        // Get VAT rate
         $vatRate = $shippingTax !== null ? $shippingTax->getTaxRate() : 0.0;
-        $vatAmount = $vatAmount = $shippingTax !== null ? $shippingTax->getTax() : null;
-
-        if ($vatAmount === null && $vatRate > 0) {
-            $vatAmount = $shipping->getTotalPrice() * ($vatRate / ($vatRate + 100));
-        }
 
         // Remove VAT if the order is tax free
         if ($order->getTaxStatus() === CartPrice::TAX_STATE_FREE) {
             $vatRate = 0.0;
-            $vatAmount = 0.0;
+        }
+
+        // Get the prices
+        $unitPrice = $shipping->getUnitPrice();
+        $totalAmount = $shipping->getTotalPrice();
+        $vatAmount = $shipping->getCalculatedTaxes()->getAmount();
+
+        // Add tax when order is net
+        if ($order->getTaxStatus() === CartPrice::TAX_STATE_NET) {
+            $unitPrice *= (100 + $vatRate) / 100;
+            $totalAmount += $vatAmount;
         }
 
         // Build the order line array
@@ -235,8 +257,8 @@ class OrderService
             'type' =>  OrderLineType::TYPE_SHIPPING_FEE,
             'name' => 'Shipping',
             'quantity' => $shipping->getQuantity(),
-            'unitPrice' => $this->getPriceArray($currencyCode, $shipping->getUnitPrice()),
-            'totalAmount' => $this->getPriceArray($currencyCode, $shipping->getTotalPrice()),
+            'unitPrice' => $this->getPriceArray($currencyCode, $unitPrice),
+            'totalAmount' => $this->getPriceArray($currencyCode, $totalAmount),
             'vatRate' => number_format($vatRate, 2, '.', ''),
             'vatAmount' => $this->getPriceArray($currencyCode, $vatAmount),
             'sku' => null,

@@ -35,6 +35,7 @@
         <service id="Kiener\MolliePayments\Helper\PaymentStatusHelper" class="Kiener\MolliePayments\Helper\PaymentStatusHelper">
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService" />
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler" />
+            <argument type="service" id="Shopware\Core\System\StateMachine\StateMachineRegistry" />
         </service>
 
         <!-- Services -->
@@ -59,7 +60,7 @@
         <service id="Kiener\MolliePayments\Service\OrderService" class="Kiener\MolliePayments\Service\OrderService">
             <argument type="service" id="order.repository" />
             <argument type="service" id="order_line_item.repository" />
-            <argument type="service" id="monolog.logger"/>
+            <argument type="service" id="monolog.logger" />
         </service>
 
         <service id="Kiener\MolliePayments\Service\PaymentMethodService" class="Kiener\MolliePayments\Service\PaymentMethodService" public="true">

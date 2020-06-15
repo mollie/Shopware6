@@ -18,12 +18,6 @@
             <label lang="de-DE">Test Key</label>
             <label lang="nl-NL">Test-sleutel</label>
         </input-field>
-        <input-field>
-            <name>profileId</name>
-            <label>Mollie Profile ID</label>
-            <label lang="de-DE">Mollie Profile ID</label>
-            <label lang="nl-NL">Mollie Profile ID</label>
-        </input-field>
         <input-field type="bool">
             <name>testMode</name>
             <label>Test Mode</label>

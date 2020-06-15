@@ -3,7 +3,7 @@ import Plugin from 'src/plugin-system/plugin.class';
 export default class MollieIDealIssuer extends Plugin {
     init() {
         // get container
-        let container = document.querySelector('div.mollie-ideal-issuer');
+        const container = document.querySelector('div.mollie-ideal-issuer');
 
         if (
             container !== undefined
@@ -11,7 +11,7 @@ export default class MollieIDealIssuer extends Plugin {
         ) {
             let shopUrl = container.getAttribute('data-shop-url');
             //let issuer = container.getAttribute('data-issuer');
-            let iDealIssuer = document.querySelector('#iDealIssuer');
+            const iDealIssuer = document.querySelector('#iDealIssuer');
 
             if (shopUrl.substr(-1) === '/') {
                 shopUrl = shopUrl.substr(0, shopUrl.length - 1);
@@ -80,7 +80,7 @@ export default class MollieIDealIssuer extends Plugin {
                     const fetchUrl = shopUrl + '/mollie/ideal/store-issuer/' + customerId + '/' + iDealIssuer.value;
 
                     // Store the token on the customer
-                    fetch(fetchUrl, { headers: { "Content-Type": "application/json; charset=utf-8" } })
+                    fetch(fetchUrl, { headers: { 'Content-Type': 'application/json; charset=utf-8' } })
                         .then(paymentForm.submit())
                         .catch(paymentForm.submit());
                 }

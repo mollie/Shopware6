@@ -317,7 +317,7 @@ class PaymentController extends StorefrontController
             // Log the used API keys
             if ($settings->isDebugMode()) {
                 $this->logger->addEntry(
-                    sprintf('Selected API key %s for sales channel %s', $apiKey, $context->getSalesChannel()->getName()),
+                    sprintf('Selected API key %s for sales channel %s (%s)', $apiKey, $context->getSalesChannel()->getName(), $settings->isTestMode() ? 'test-mode' : 'live-mode'),
                     $context->getContext(),
                     null,
                     [
