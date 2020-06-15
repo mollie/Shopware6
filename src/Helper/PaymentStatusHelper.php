@@ -177,30 +177,7 @@ class PaymentStatusHelper
         if (
             $authorizedNumber > 0
             && $authorizedNumber === $paymentsTotal
-            && $transactionState !== null
-            && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_CANCELED
         ) {
-            try {
-                $this->stateMachineRegistry->transition(
-                    new Transition(
-                        OrderTransactionDefinition::ENTITY_NAME,
-                        $transaction->getId(),
-                        PaymentStatusConfigurator::TRANSITION_ACTION_AUTHORIZED,
-                        'stateId'
-                    ),
-                    $context
-                );
-            } catch (Exception $e) {
-                $this->logger->addEntry(
-                    $e->getMessage(),
-                    $context,
-                    $e,
-                    [
-                        'function' => 'payment-set-transaction-state'
-                    ]
-                );
-            }
-
             return PaymentStatus::STATUS_AUTHORIZED;
         }
 
