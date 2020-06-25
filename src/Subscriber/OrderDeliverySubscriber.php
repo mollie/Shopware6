@@ -82,6 +82,10 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
             $customFields = null;
             $mollieOrder = null;
 
+            if (!isset($payload['stateId'])) {
+                continue;
+            }
+
             try {
                 /** @var OrderDeliveryEntity $delivery */
                 $delivery = $this->deliveryService->getDeliveryById(
@@ -114,10 +118,6 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
                 && isset($customFields[self::PARAM_MOLLIE_PAYMENTS][self::PARAM_ORDER_ID])
             ) {
                 try {
-                    $parameters = [
-                        'mode' => 'live',
-                    ];
-
                     if ($this->apiClient->usesOAuth()) {
                         $parameters = [
                             'testmode' => false,
@@ -126,17 +126,13 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
 
                     $mollieOrder = $this->apiClient->orders->get(
                         $customFields[self::PARAM_MOLLIE_PAYMENTS][self::PARAM_ORDER_ID],
-                        $parameters
+                        $parameters ?? []
                     );
                 } catch (\Exception $e) {
                     //
                 }
 
                 if ($mollieOrder === null) {
-                    $parameters = [
-                        'mode' => 'test',
-                    ];
-
                     if ($this->apiClient->usesOAuth()) {
                         $parameters = [
                             'testmode' => true,
@@ -145,7 +141,7 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
 
                     $mollieOrder = $this->apiClient->orders->get(
                         $customFields[self::PARAM_MOLLIE_PAYMENTS][self::PARAM_ORDER_ID],
-                        $parameters
+                        $parameters ?? []
                     );
                 }
             }
