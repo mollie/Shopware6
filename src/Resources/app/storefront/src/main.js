@@ -12,6 +12,6 @@ import MollieApplePayPaymentMethod
 
 // Register them via the existing PluginManager
 const PluginManager = window.PluginManager;
-PluginManager.register('MollieCreditCardComponents', MollieCreditCardComponents);
+PluginManager.register('MollieCreditCardComponents', MollieCreditCardComponents, '#mollie_components_credit_card');
 PluginManager.register('MollieIDealIssuer', MollieIDealIssuer);
 PluginManager.register('MollieApplePayPaymentMethod', MollieApplePayPaymentMethod);

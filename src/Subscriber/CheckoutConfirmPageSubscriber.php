@@ -1,6 +1,7 @@
 <?php
 
 namespace Kiener\MolliePayments\Subscriber;
+
 use Exception;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\CustomFieldService;
@@ -263,12 +264,11 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
         try {
             $ideal = $this->apiClient->methods->get(PaymentMethod::IDEAL, $parameters);
         } catch (Exception $e) {
-            file_put_contents(__DIR__ . '/errors.txt', $e->getMessage());
+            //
         }
 
         // Assign issuers to storefront
         if ($ideal !== null) {
-            file_put_contents(__DIR__ . '/issuers.txt', print_r($ideal->issuers, true));
             $args->getPage()->assign([
                 'ideal_issuers' => $ideal->issuers,
                 'preferred_issuer' => $preferredIssuer,

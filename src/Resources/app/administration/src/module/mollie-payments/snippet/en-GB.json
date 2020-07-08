@@ -31,5 +31,14 @@
       "totalRefunds": "Refunded amount ({quantity} items)",
       "totalShipments": "Shipped amount ({quantity} items)"
     }
+  },
+  "sw-payment": {
+    "testButton": "Test",
+    "testApiKeys": {
+      "title": "Mollie Payments",
+      "apiKey": "API key",
+      "isValid": "is valid",
+      "isInvalid": "is invalid"
+    }
   }
 }

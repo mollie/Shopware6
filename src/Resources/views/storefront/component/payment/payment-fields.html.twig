@@ -15,12 +15,16 @@
     {# load mollie creditcard components #}
     {% if payment.translated.customFields.mollie_payment_method_name == 'creditcard' %}
         <div id="mollie_components_credit_card"
-             class="mollie-components-credit-card d-none"
-             data-customer-id="{{ context.customer.id }}"
-             data-profile-id="{{ page.mollie_profile_id }}"
-             data-locale="{{ page.mollie_locale }}"
-             data-shop-url="{{ seoUrl('frontend.home.page') }}"
-             data-test-mode="{{ page.mollie_test_mode }}">
+            class="mollie-components-credit-card d-none"
+            {% if page.enable_credit_card_components == true %}
+            data-mollie-credit-card-components-options='{
+                "customerId": "{{ context.customer.id }}",
+                "locale": "{{ page.mollie_locale }}",
+                "profileId": "{{ page.mollie_profile_id }}",
+                "shopUrl": "{{ seoUrl('frontend.home.page') }}",
+                "testMode": {{ page.mollie_test_mode }}
+            }'
+            {% endif %}>
 
             {% if page.enable_credit_card_components == true %}
                 <input type="hidden" name="mollie_shopware_credit_card_token" id="cardToken" value="" />

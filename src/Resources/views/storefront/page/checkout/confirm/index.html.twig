@@ -1,6 +1,9 @@
 {% sw_extends '@Storefront/storefront/page/checkout/confirm/index.html.twig' %}
 
 {% block page_checkout_main_content %}
-    <script src="https://js.mollie.com/v1/mollie.js"></script>
+    {% if page.enable_credit_card_components == true %}
+        <script src="https://js.mollie.com/v1/mollie.js"></script>
+    {% endif %}
+
     {{ parent() }}
 {% endblock %}

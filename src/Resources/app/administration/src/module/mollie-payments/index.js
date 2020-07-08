@@ -1,4 +1,5 @@
 import './extension/sw-order';
+import './extension/sw-plugin';
 
 import deDE from './snippet/de-DE.json';
 import enGB from './snippet/en-GB.json';
