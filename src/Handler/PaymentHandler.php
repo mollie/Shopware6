@@ -153,7 +153,6 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      *
      * @return RedirectResponse @see AsyncPaymentProcessException exception if an error ocurres while processing the
      *                          payment
-     * @throws ApiException
      */
     public function pay(
         AsyncPaymentTransactionStruct $transaction,
@@ -249,7 +248,6 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      * @throws StateMachineInvalidEntityIdException
      * @throws StateMachineInvalidStateFieldException
      * @throws StateMachineNotFoundException
-     * @throws ApiException
      * @see CustomerCanceledAsyncPaymentException exception if the customer canceled the payment process on
      * payment provider page
      */

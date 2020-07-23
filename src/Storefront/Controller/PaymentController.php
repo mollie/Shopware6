@@ -3,6 +3,8 @@
 namespace Kiener\MolliePayments\Storefront\Controller;
 
 use Exception;
+use Kiener\MolliePayments\Event\PaymentPageFailEvent;
+use Kiener\MolliePayments\Event\PaymentPageRedirectEvent;
 use Kiener\MolliePayments\Helper\DeliveryStateHelper;
 use Kiener\MolliePayments\Helper\PaymentStatusHelper;
 use Kiener\MolliePayments\Service\CustomFieldService;
@@ -20,6 +22,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\Event\BusinessEventDispatcher;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
@@ -42,6 +45,9 @@ class PaymentController extends StorefrontController
     /** @var DeliveryStateHelper */
     private $deliveryStateHelper;
 
+    /** @var BusinessEventDispatcher */
+    private $eventDispatcher;
+
     /** @var PaymentStatusHelper */
     private $paymentStatusHelper;
 
@@ -56,6 +62,7 @@ class PaymentController extends StorefrontController
         EntityRepository $orderTransactionRepository,
         MollieApiClient $apiClient,
         DeliveryStateHelper $deliveryStateHelper,
+        BusinessEventDispatcher $eventDispatcher,
         PaymentStatusHelper $paymentStatusHelper,
         SettingsService $settingsService,
         LoggerService $logger
@@ -65,6 +72,7 @@ class PaymentController extends StorefrontController
         $this->orderTransactionRepository = $orderTransactionRepository;
         $this->apiClient = $apiClient;
         $this->deliveryStateHelper = $deliveryStateHelper;
+        $this->eventDispatcher = $eventDispatcher;
         $this->paymentStatusHelper = $paymentStatusHelper;
         $this->settingsService = $settingsService;
         $this->logger = $logger;
@@ -290,10 +298,30 @@ class PaymentController extends StorefrontController
                 );
             }
 
+            $paymentPageFailEvent = new PaymentPageFailEvent(
+                $context->getContext(),
+                $order,
+                $mollieOrder,
+                $context->getSalesChannel()->getId(),
+                $redirectUrl
+            );
+
+            $this->eventDispatcher->dispatch($paymentPageFailEvent, $paymentPageFailEvent::EVENT_NAME);
+
             return $this->renderStorefront('@Storefront/storefront/page/checkout/payment/failed.html.twig', [
                 'redirectUrl' => $redirectUrl
             ]);
         }
+
+        $paymentPageRedirectEvent = new PaymentPageRedirectEvent(
+            $context->getContext(),
+            $order,
+            $mollieOrder,
+            $context->getSalesChannel()->getId(),
+            $redirectUrl
+        );
+
+        $this->eventDispatcher->dispatch($paymentPageRedirectEvent, $paymentPageRedirectEvent::EVENT_NAME);
 
         return new RedirectResponse($redirectUrl);
     }

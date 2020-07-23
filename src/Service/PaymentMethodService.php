@@ -20,6 +20,7 @@ use Kiener\MolliePayments\Handler\Method\PayPalPayment;
 use Kiener\MolliePayments\Handler\Method\PaySafeCardPayment;
 use Kiener\MolliePayments\Handler\Method\Przelewy24Payment;
 use Kiener\MolliePayments\Handler\Method\SofortPayment;
+use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Method;
 use Mollie\Api\Resources\MethodCollection;
@@ -157,7 +158,7 @@ class PaymentMethodService
      * @param MollieApiClient $apiClient
      * @param Context         $context
      *
-     * @throws \Mollie\Api\Exceptions\ApiException
+     * @throws ApiException
      */
     public function activatePaymentMethods(MollieApiClient $apiClient, Context $context): void
     {
@@ -185,7 +186,7 @@ class PaymentMethodService
 
         if (!empty($handlers)) {
             foreach ($handlers as $handler) {
-                /** @var string $paymentMethodId */
+                /** @var string|null $paymentMethodId */
                 $paymentMethodId = $this->getPaymentMethodId($handler['class'], $handler['name']);
 
                 /** @var PaymentMethodEntity $paymentMethod */
@@ -245,9 +246,10 @@ class PaymentMethodService
     /**
      * Get payment method ID by name.
      *
+     * @param $handlerIdentifier
      * @param $name
+     *
      * @return string|null
-     * @throws InconsistentCriteriaIdsException
      */
     private function getPaymentMethodId($handlerIdentifier, $name) : ?string
     {

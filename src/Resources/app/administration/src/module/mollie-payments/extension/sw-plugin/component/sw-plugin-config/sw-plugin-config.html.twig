@@ -1,23 +1,11 @@
 {#{% sw_extends 'administration/module/sw-plugin/component/sw-plugin-config/sw-plugin-config.html.twig' %}#}
 
-{% block sw_plugin_config_actions %}
-<template #smart-bar-actions>
-    {% block sw_plugin_config_actions_abort %}
-    <sw-button :routerLink="{ name: 'sw.plugin.index' }">
-        {{ $tc('global.default.cancel') }}
-    </sw-button>
-    {% endblock %}
+{% block sw_plugin_config_actions_abort %}
+    {% parent %}
 
     {% block sw_plugin_config_actions_test %}
-    <sw-button @click="onTestButtonClicked">
+    <sw-button @click="onTestButtonClicked" v-if="domain === 'MolliePayments.config'">
         {{ $tc('sw-payment.testButton') }}
     </sw-button>
     {% endblock %}
-
-    {% block sw_plugin_config_actions_save %}
-    <sw-button variant="primary" class="sw-plugin-config__save-action" @click.prevent="onSave">
-        {{ $tc('global.default.save') }}
-    </sw-button>
-    {% endblock %}
-</template>
 {% endblock %}

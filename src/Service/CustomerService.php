@@ -8,6 +8,7 @@ use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 
@@ -38,7 +39,7 @@ class CustomerService
      * @param string $cardToken
      * @param Context $context
      *
-     * @return \Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent
+     * @return EntityWrittenContainerEvent
      */
     public function setCardToken(CustomerEntity $customer, string $cardToken, Context $context)
     {
@@ -67,7 +68,7 @@ class CustomerService
      * @param string         $issuerId
      * @param Context        $context
      *
-     * @return \Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent
+     * @return EntityWrittenContainerEvent
      */
     public function setIDealIssuer(CustomerEntity $customer, string $issuerId, Context $context)
     {

@@ -207,7 +207,7 @@ class RefundController extends StorefrontController
                 //
             }
 
-            if ($order !== null && isset($order->id)) {
+            if (isset($order, $order->id)) {
                 $refundData = [
                     self::REFUND_DATA_KEY_LINES => [
                         [
@@ -227,7 +227,7 @@ class RefundController extends StorefrontController
                     //
                 }
 
-                if (isset($refund->id)) {
+                if (isset($refund, $refund->id)) {
                     $success = true;
 
                     if (!isset($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_REFUNDS])) {
@@ -273,8 +273,6 @@ class RefundController extends StorefrontController
      * @param Request $request
      *
      * @return JsonResponse
-     * @throws ApiException
-     * @throws IncompatiblePlatform
      */
     public function total(Request $request): JsonResponse
     {
