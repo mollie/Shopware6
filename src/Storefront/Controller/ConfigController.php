@@ -23,8 +23,6 @@ class ConfigController extends StorefrontController
      * @param Request $request
      *
      * @return JsonResponse
-     * @throws ApiException
-     * @throws IncompatiblePlatform
      */
     public function testApiKeys(Request $request): JsonResponse
     {

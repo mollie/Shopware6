@@ -77,7 +77,6 @@ class WebhookController extends StorefrontController
      * @param                     $transactionId
      *
      * @return JsonResponse
-     * @throws ApiException
      */
     public function webhookCall(SalesChannelContext $context, $transactionId): JsonResponse
     {

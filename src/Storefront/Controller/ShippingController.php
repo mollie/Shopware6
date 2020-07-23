@@ -239,8 +239,6 @@ class ShippingController extends StorefrontController
      * @param Request $request
      *
      * @return JsonResponse
-     * @throws ApiException
-     * @throws IncompatiblePlatform
      */
     public function total(Request $request): JsonResponse
     {

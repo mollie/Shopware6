@@ -4,7 +4,6 @@
 namespace Kiener\MolliePayments\Helper;
 
 use Exception;
-use Kiener\MolliePayments\Config\PaymentStatusConfigurator;
 use Kiener\MolliePayments\Service\LoggerService;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\Payment;
