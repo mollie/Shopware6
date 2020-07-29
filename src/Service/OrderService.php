@@ -22,6 +22,8 @@ class OrderService
 {
     public const ORDER_LINE_ITEM_ID = 'orderLineItemId';
 
+    private const LINE_ITEM_TYPE_CUSTOM_PRODUCTS = 'customized-products';
+
     private const TAX_ARRAY_KEY_TAX = 'tax';
     private const TAX_ARRAY_KEY_TAX_RATE = 'taxRate';
     private const TAX_ARRAY_KEY_PRICE = 'price';
@@ -109,7 +111,7 @@ class OrderService
     {
         // Variables
         $lines = [];
-        $lineItems = $order->getLineItems();
+        $lineItems = $order->getNestedLineItems();
 
         if ($lineItems === null || $lineItems->count() === 0) {
             return $lines;
@@ -192,7 +194,7 @@ class OrderService
 
             // Build the order lines array
             $lines[] = [
-                'type' =>  $this->getLineItemType($item),
+                'type' => $this->getLineItemType($item),
                 'name' => $item->getLabel(),
                 'quantity' => $item->getQuantity(),
                 'unitPrice' => $this->getPriceArray($currencyCode, $unitPrice),
@@ -235,7 +237,6 @@ class OrderService
 
         // Get shipping tax
         $shippingTax = null;
-        $shippingTaxes = null;
 
         if ($shipping->getCalculatedTaxes() !== null) {
             $shippingTax = $this->getLineItemTax($shipping->getCalculatedTaxes());
@@ -256,7 +257,7 @@ class OrderService
 
         // Add tax when order is net
         if ($order->getTaxStatus() === CartPrice::TAX_STATE_NET) {
-            $unitPrice *= (100 + $vatRate) / 100;
+            $unitPrice *= ((100 + $vatRate) / 100);
             $totalAmount += $vatAmount;
         }
 
@@ -315,6 +316,10 @@ class OrderService
         if ($item->getType() === PromotionProcessor::LINE_ITEM_TYPE ||
             $item->getTotalPrice() < 0) {
             return OrderLineType::TYPE_DISCOUNT;
+        }
+
+        if ($item->getType() === static::LINE_ITEM_TYPE_CUSTOM_PRODUCTS) {
+            return OrderLineType::TYPE_PHYSICAL;
         }
 
         return OrderLineType::TYPE_DIGITAL;
