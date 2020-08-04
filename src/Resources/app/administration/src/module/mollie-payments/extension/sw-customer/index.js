@@ -1,0 +1,1 @@
+import './component/sw-customer-base-info';

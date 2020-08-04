@@ -6,18 +6,22 @@ use Exception;
 use Kiener\MolliePayments\Event\PaymentPageFailEvent;
 use Kiener\MolliePayments\Event\PaymentPageRedirectEvent;
 use Kiener\MolliePayments\Helper\DeliveryStateHelper;
+use Kiener\MolliePayments\Helper\OrderStateHelper;
 use Kiener\MolliePayments\Helper\PaymentStatusHelper;
 use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\SettingsService;
+use Kiener\MolliePayments\Service\TransactionService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Types\PaymentStatus;
 use RuntimeException;
+use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Checkout\Order\OrderStates;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -36,9 +40,6 @@ class PaymentController extends StorefrontController
     /** @var RouterInterface */
     private $router;
 
-    /** @var EntityRepository */
-    private $orderTransactionRepository;
-
     /** @var MollieApiClient */
     private $apiClient;
 
@@ -48,33 +49,41 @@ class PaymentController extends StorefrontController
     /** @var BusinessEventDispatcher */
     private $eventDispatcher;
 
+    /** @var OrderStateHelper */
+    private $orderStateHelper;
+
     /** @var PaymentStatusHelper */
     private $paymentStatusHelper;
 
     /** @var SettingsService */
     private $settingsService;
 
+    /** @var TransactionService */
+    private $transactionService;
+
     /** @var LoggerService */
     private $logger;
 
     public function __construct(
         RouterInterface $router,
-        EntityRepository $orderTransactionRepository,
         MollieApiClient $apiClient,
         DeliveryStateHelper $deliveryStateHelper,
         BusinessEventDispatcher $eventDispatcher,
+        OrderStateHelper $orderStateHelper,
         PaymentStatusHelper $paymentStatusHelper,
         SettingsService $settingsService,
+        TransactionService $transactionService,
         LoggerService $logger
     )
     {
         $this->router = $router;
-        $this->orderTransactionRepository = $orderTransactionRepository;
         $this->apiClient = $apiClient;
         $this->deliveryStateHelper = $deliveryStateHelper;
         $this->eventDispatcher = $eventDispatcher;
+        $this->orderStateHelper = $orderStateHelper;
         $this->paymentStatusHelper = $paymentStatusHelper;
         $this->settingsService = $settingsService;
+        $this->transactionService = $transactionService;
         $this->logger = $logger;
     }
 
@@ -121,32 +130,16 @@ class PaymentController extends StorefrontController
         }
 
         /**
-         * Create a search criteria to find the transaction by it's ID in the
-         * transaction repository.
-         *
-         * @var $criteria
-         */
-        try {
-            $criteria = new Criteria();
-            $criteria->addFilter(new EqualsFilter('id', $transactionId));
-            $criteria->addAssociation('order');
-        } catch (InconsistentCriteriaIdsException $e) {
-            $errorMessage = $errorMessage ?? $e->getMessage();
-        }
-
-        /**
          * Get the transaction from the order transaction repository. With the
          * transaction we can fetch the order from the database.
          *
          * @var OrderTransactionEntity $transaction
          */
-        if ($criteria !== null) {
-            try {
-                $transaction = $this->orderTransactionRepository->search($criteria, $context->getContext())->first();
-            } catch (Exception $e) {
-                $errorMessage = $errorMessage ?? $e->getMessage();
-            }
-        }
+        $transaction = $this->transactionService->getTransactionById(
+            $transactionId,
+            null,
+            $context->getContext()
+        );
 
         /**
          * Get the order entity from the transaction. With the order entity, we can
@@ -243,23 +236,6 @@ class PaymentController extends StorefrontController
             $mollieOrder->createPayment([]);
 
             if ($mollieOrder->getCheckoutUrl() !== null) {
-                // Reopen the order transaction
-                try {
-                    $this->paymentStatusHelper->getOrderTransactionStateHandler()->reopen(
-                        $transactionId,
-                        $context->getContext()
-                    );
-                } catch (Exception $e) {
-                    $this->logger->addEntry(
-                        $e->getMessage(),
-                        $context->getContext(),
-                        $e,
-                        [
-                            'function' => 'payment-set-transaction-state'
-                        ]
-                    );
-                }
-
                 $redirectUrl = $mollieOrder->getCheckoutUrl();
             }
         }
@@ -280,24 +256,6 @@ class PaymentController extends StorefrontController
 
         // If the payment failed, render a storefront to let the customer know
         if ($paymentFailed === true && (string) $redirectUrl !== '') {
-
-            // If we redirect to the payment screen, set the transaction to in progress
-            try {
-                $this->paymentStatusHelper->getOrderTransactionStateHandler()->process(
-                    $transactionId,
-                    $context->getContext()
-                );
-            } catch (Exception $e) {
-                $this->logger->addEntry(
-                    $e->getMessage(),
-                    $context->getContext(),
-                    $e,
-                    [
-                        'function' => 'payment-set-transaction-state'
-                    ]
-                );
-            }
-
             $paymentPageFailEvent = new PaymentPageFailEvent(
                 $context->getContext(),
                 $order,
@@ -309,7 +267,11 @@ class PaymentController extends StorefrontController
             $this->eventDispatcher->dispatch($paymentPageFailEvent, $paymentPageFailEvent::EVENT_NAME);
 
             return $this->renderStorefront('@Storefront/storefront/page/checkout/payment/failed.html.twig', [
-                'redirectUrl' => $redirectUrl
+                'redirectUrl' => $this->router->generate('frontend.mollie.payment.retry', [
+                    'transactionId' => $transactionId,
+                    'redirectUrl' => urlencode($redirectUrl),
+                ]),
+                'displayUrl' => $redirectUrl,
             ]);
         }
 
@@ -322,6 +284,101 @@ class PaymentController extends StorefrontController
         );
 
         $this->eventDispatcher->dispatch($paymentPageRedirectEvent, $paymentPageRedirectEvent::EVENT_NAME);
+
+        return new RedirectResponse($redirectUrl);
+    }
+
+    /**
+     * @RouteScope(scopes={"storefront"})
+     * @Route("/mollie/payment/retry/{transactionId}/{redirectUrl}", defaults={"csrf_protected"=false},
+     *                                                               name="frontend.mollie.payment.retry",
+     *                                                               options={"seo"="false"}, methods={"GET", "POST"})
+     *
+     * @param SalesChannelContext $context
+     * @param                     $transactionId
+     *
+     * @param                     $redirectUrl
+     *
+     * @return Response|RedirectResponse
+     * @throws Exception
+     */
+    public function retry(SalesChannelContext $context, $transactionId, $redirectUrl): RedirectResponse
+    {
+        /** @var string $redirectUrl */
+        $redirectUrl = urldecode($redirectUrl);
+
+        if (!filter_var($redirectUrl, FILTER_VALIDATE_URL)) {
+            throw new Exception('The redirect URL is invalid.');
+        }
+
+        /**
+         * Get the transaction from the order transaction repository. With the
+         * transaction we can fetch the order from the database.
+         *
+         * @var OrderTransactionEntity $transaction
+         */
+        $transaction = $this->transactionService->getTransactionById(
+            $transactionId,
+            null,
+            $context->getContext()
+        );
+
+        /**
+         * Get the order entity from the transaction. With the order entity, we can
+         * retrieve the Mollie ID from it's custom fields and fetch the payment
+         * status from Mollie's Orders API.
+         *
+         * @var OrderEntity $order
+         */
+        if ($transaction !== null) {
+            $order = $transaction->getOrder();
+        }
+
+        // Throw an error if the order is not found
+        if (!isset($order)) {
+            throw new OrderNotFoundException($transaction->getOrderId());
+        }
+
+        // Reopen the order
+        $this->orderStateHelper->setOrderState(
+            $order,
+            OrderStates::STATE_OPEN,
+            $context->getContext()
+        );
+
+        // Reopen the order transaction
+        try {
+            $this->paymentStatusHelper->getOrderTransactionStateHandler()->reopen(
+                $transactionId,
+                $context->getContext()
+            );
+        } catch (Exception $e) {
+            $this->logger->addEntry(
+                $e->getMessage(),
+                $context->getContext(),
+                $e,
+                [
+                    'function' => 'payment-set-transaction-state'
+                ]
+            );
+        }
+
+        // If we redirect to the payment screen, set the transaction to in progress
+        try {
+            $this->paymentStatusHelper->getOrderTransactionStateHandler()->process(
+                $transactionId,
+                $context->getContext()
+            );
+        } catch (Exception $e) {
+            $this->logger->addEntry(
+                $e->getMessage(),
+                $context->getContext(),
+                $e,
+                [
+                    'function' => 'payment-set-transaction-state'
+                ]
+            );
+        }
 
         return new RedirectResponse($redirectUrl);
     }

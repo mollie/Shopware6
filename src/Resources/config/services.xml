@@ -32,9 +32,16 @@
             <argument type="service" id="Shopware\Core\Framework\StateMachine\StateMachineRegistry" />
         </service>
 
+        <service id="Kiener\MolliePayments\Helper\OrderStateHelper" class="Kiener\MolliePayments\Helper\OrderStateHelper">
+            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService" />
+            <argument type="service" id="Shopware\Core\System\StateMachine\StateMachineRegistry" />
+        </service>
+
         <service id="Kiener\MolliePayments\Helper\PaymentStatusHelper" class="Kiener\MolliePayments\Helper\PaymentStatusHelper">
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService" />
+            <argument type="service" id="Kiener\MolliePayments\Helper\OrderStateHelper" />
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler" />
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService" />
             <argument type="service" id="Shopware\Core\System\StateMachine\StateMachineRegistry" />
         </service>
 
@@ -126,12 +133,13 @@
 
         <service id="Kiener\MolliePayments\Storefront\Controller\PaymentController" public="true">
             <argument type="service" id="router.default"/>
-            <argument type="service" id="order_transaction.repository" />
             <argument type="service" id="Mollie\Api\MollieApiClient" />
             <argument type="service" id="Kiener\MolliePayments\Helper\DeliveryStateHelper" />
             <argument type="service" id="Shopware\Core\Framework\Event\BusinessEventDispatcher" />
+            <argument type="service" id="Kiener\MolliePayments\Helper\OrderStateHelper" />
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService" />
+            <argument type="service" id="Kiener\MolliePayments\Service\TransactionService" />
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService" />
 
             <call method="setContainer">

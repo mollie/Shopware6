@@ -28,6 +28,7 @@
     "detailExtended": {
       "columnRefunded": "Refunded",
       "columnShipped": "Shipped",
+      "labelMollieOrderId": "Mollie Order ID",
       "totalRefunds": "Refunded amount ({quantity} items)",
       "totalShipments": "Shipped amount ({quantity} items)"
     }
@@ -39,6 +40,11 @@
       "apiKey": "API key",
       "isValid": "is valid",
       "isInvalid": "is invalid"
+    }
+  },
+  "sw-customer": {
+    "extendedInfo": {
+      "labelPreferredIdealIssuer": "Preferred iDeal issuer"
     }
   }
 }

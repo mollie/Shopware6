@@ -2,22 +2,29 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/master/src/Core/System/SystemConfig/Schema/config.xsd">
     <card>
-        <title>Mollie API</title>
-        <title lang="de-DE">Mollie API</title>
-        <title lang="nl-NL">Mollie API</title>
+        <title>API</title>
+        <title lang="de-DE">API</title>
+        <title lang="nl-NL">API</title>
 
         <input-field>
             <name>liveApiKey</name>
+            <copyable>true</copyable>
             <label>Live Key</label>
             <label lang="de-DE">Live Key</label>
             <label lang="nl-NL">Live-sleutel</label>
         </input-field>
         <input-field>
             <name>testApiKey</name>
+            <copyable>true</copyable>
             <label>Test Key</label>
             <label lang="de-DE">Test Key</label>
             <label lang="nl-NL">Test-sleutel</label>
         </input-field>
+    </card>
+    <card>
+        <title>Modes</title>
+        <title lang="de-DE">Modes</title>
+        <title lang="nl-NL">Modi</title>
         <input-field type="bool">
             <name>testMode</name>
             <label>Test Mode</label>
@@ -26,10 +33,16 @@
         </input-field>
         <input-field type="bool">
             <name>debugMode</name>
+
             <label>Debug Mode</label>
             <label lang="de-DE">Debug Mode</label>
             <label lang="nl-NL">Debug Modus</label>
         </input-field>
+    </card>
+    <card>
+        <title>Configuration</title>
+        <title lang="de-DE">Components</title>
+        <title lang="nl-NL">Components</title>
         <input-field type="bool">
             <name>enableCreditCardComponents</name>
             <label>Credit Card Components</label>
@@ -47,6 +60,128 @@
             <label>Order Lifetime Days</label>
             <label lang="de-DE">Order Lifetime (in days from order creation)</label>
             <label lang="nl-NL">Order Lifetime (in days from order creation)</label>
+        </input-field>
+    </card>
+    <card>
+        <title>Order State Automation</title>
+        <title lang="de-DE">Order State Automation</title>
+        <title lang="nl-NL">Bestelstatus Automatisering</title>
+
+        <input-field type="single-select">
+            <name>orderStateWithAPaidTransaction</name>
+            <label>Order state with a paid transaction</label>
+            <label lang="de-DE">Order state with a paid transaction</label>
+            <label lang="nl-NL">Bestelstatus bij een betaalde transactie</label>
+            <options>
+                <option>
+                    <id>skip</id>
+                    <name>Skip this status</name>
+                    <name lang="de-DE">Skip this status</name>
+                    <name lang="nl-NL">Sla deze status over</name>
+                </option>
+                <option>
+                    <id>open</id>
+                    <name>Open</name>
+                    <name lang="de-DE">Open</name>
+                    <name lang="nl-NL">Open</name>
+                </option>
+                <option>
+                    <id>in_progress</id>
+                    <name>In progress</name>
+                    <name lang="de-DE">In progress</name>
+                    <name lang="nl-NL">In verwerking</name>
+                </option>
+                <option>
+                    <id>completed</id>
+                    <name>Completed</name>
+                    <name lang="de-DE">Completed</name>
+                    <name lang="nl-NL">Voltooid</name>
+                </option>
+                <option>
+                    <id>cancelled</id>
+                    <name>Cancelled</name>
+                    <name lang="de-DE">Cancelled</name>
+                    <name lang="nl-NL">Geannuleerd</name>
+                </option>
+            </options>
+        </input-field>
+
+        <input-field type="single-select">
+            <name>orderStateWithAFailedTransaction</name>
+            <label>Order state with a failed transaction</label>
+            <label lang="de-DE">Order state with a failed transaction</label>
+            <label lang="nl-NL">Bestelstatus bij een mislukte transactie</label>
+            <options>
+                <option>
+                    <id>skip</id>
+                    <name>Skip this status</name>
+                    <name lang="de-DE">Skip this status</name>
+                    <name lang="nl-NL">Sla deze status over</name>
+                </option>
+                <option>
+                    <id>open</id>
+                    <name>Open</name>
+                    <name lang="de-DE">Open</name>
+                    <name lang="nl-NL">Open</name>
+                </option>
+                <option>
+                    <id>in_progress</id>
+                    <name>In progress</name>
+                    <name lang="de-DE">In progress</name>
+                    <name lang="nl-NL">In verwerking</name>
+                </option>
+                <option>
+                    <id>completed</id>
+                    <name>Completed</name>
+                    <name lang="de-DE">Completed</name>
+                    <name lang="nl-NL">Voltooid</name>
+                </option>
+                <option>
+                    <id>cancelled</id>
+                    <name>Cancelled</name>
+                    <name lang="de-DE">Cancelled</name>
+                    <name lang="nl-NL">Geannuleerd</name>
+                </option>
+            </options>
+        </input-field>
+
+        <input-field type="single-select">
+            <name>orderStateWithACancelledTransaction</name>
+            <label>Order state with a cancelled transaction</label>
+            <label lang="de-DE">Order state with a cancelled transaction</label>
+            <label lang="nl-NL">Bestelstatus bij een geannuleerde transactie</label>
+            <options>
+                <option>
+                    <id>skip</id>
+                    <name>Skip this status</name>
+                    <name lang="de-DE">Skip this status</name>
+                    <name lang="nl-NL">Sla deze status over</name>
+                </option>
+                <option>
+                    <id>open</id>
+                    <name>Open</name>
+                    <name lang="de-DE">Open</name>
+                    <name lang="nl-NL">Open</name>
+                </option>
+                <option>
+                    <id>in_progress</id>
+                    <name>In progress</name>
+                    <name lang="de-DE">In progress</name>
+                    <name lang="nl-NL">In verwerking</name>
+                </option>
+                <option>
+                    <id>completed</id>
+                    <name>Completed</name>
+                    <name lang="de-DE">Completed</name>
+                    <name lang="nl-NL">Voltooid</name>
+                </option>
+                <option>
+                    <id>cancelled</id>
+                    <name>Cancelled</name>
+                    <name lang="de-DE">Cancelled</name>
+                    <name lang="nl-NL">Geannuleerd</name>
+                </option>
+            </options>
         </input-field>
     </card>
 </config>
