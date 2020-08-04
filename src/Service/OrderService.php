@@ -202,8 +202,8 @@ class OrderService
                 'vatRate' => number_format($vatRate, 2, '.', ''),
                 'vatAmount' => $this->getPriceArray($currencyCode, $vatAmount),
                 'sku' => $sku,
-                'imageUrl' => $imageUrl,
-                'productUrl' => $productUrl,
+                'imageUrl' => urlencode($imageUrl),
+                'productUrl' => urlencode($productUrl),
                 'metadata' => [
                     self::ORDER_LINE_ITEM_ID => $item->getId(),
                 ],

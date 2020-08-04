@@ -10,13 +10,16 @@
                             <h1>{{ "molliePayments.messages.payment.error"|trans|striptags }}</h1>
 
                             <p>
-                                {{ "molliePayments.messages.payment.failed"|trans|striptags }} {{ "molliePayments.messages.redirecting"|trans|striptags }}<a href="{{ redirectUrl }}">{{ redirectUrl }}</a>.
+                                {{ "molliePayments.messages.payment.failed"|trans|striptags }} {{ "molliePayments.messages.redirecting"|trans|striptags }}<a href="{{ redirectUrl }}">{{ displayUrl }}</a>.
+                            </p>
+                            <p>
+                                <a href="{{ redirectUrl }}" class="btn btn-primary">{{ "molliePayments.messages.payment.buttonPayThroughMollie"|trans|striptags }}</a>&nbsp;
+                                <a href="{{ path('frontend.home.page') }}" class="btn btn-secondary">{{ "molliePayments.messages.payment.buttonReturnToShop"|trans|striptags }}</a>
                             </p>
                         </div>
                     </div>
                 </div>
             </div>
-            <script> setTimeout(function() { window.location = '{{ redirectUrl }}'; }, 5000); </script>
         {% endblock %}
     </div>
 {% endblock %}

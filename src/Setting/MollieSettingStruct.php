@@ -10,6 +10,8 @@ use Shopware\Core\Framework\Struct\Struct;
 
 class MollieSettingStruct extends Struct
 {
+    public const ORDER_STATE_SKIP = 'skip';
+
     private const ORDER_EXPIRES_AT_MIN_DAYS = 1;
     private const ORDER_EXPIRES_AT_MAX_DAYS = 100;
 
@@ -52,6 +54,21 @@ class MollieSettingStruct extends Struct
      * @var int
      */
     protected $orderLifetimeDays;
+
+    /**
+     * @var string
+     */
+    protected $orderStateWithAPaidTransaction = self::ORDER_STATE_SKIP;
+
+    /**
+     * @var string
+     */
+    protected $orderStateWithAFailedTransaction = self::ORDER_STATE_SKIP;
+
+    /**
+     * @var string
+     */
+    protected $orderStateWithACancelledTransaction = self::ORDER_STATE_SKIP;
 
     /**
      * @return string
@@ -216,5 +233,29 @@ class MollieSettingStruct extends Struct
             ->setTimezone(new DateTimeZone(DateTimeZone::UTC))
             ->modify(sprintf('+%d day', $this->getOrderLifetimeDays()))
             ->format('Y-m-d');
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrderStateWithAPaidTransaction(): string
+    {
+        return (string) $this->orderStateWithAPaidTransaction;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrderStateWithAFailedTransaction(): string
+    {
+        return (string) $this->orderStateWithAFailedTransaction;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrderStateWithACancelledTransaction(): string
+    {
+        return (string) $this->orderStateWithACancelledTransaction;
     }
 }

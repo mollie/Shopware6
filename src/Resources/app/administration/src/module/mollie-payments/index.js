@@ -1,3 +1,4 @@
+import './extension/sw-customer';
 import './extension/sw-order';
 import './extension/sw-plugin';
 
