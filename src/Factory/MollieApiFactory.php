@@ -3,73 +3,93 @@
 namespace Kiener\MolliePayments\Factory;
 
 use Exception;
-use Kiener\MolliePayments\Config\Config;
+use Kiener\MolliePayments\Service\ConfigService;
+use Kiener\MolliePayments\Service\SettingsService;
+use Kiener\MolliePayments\Setting\MollieSettingStruct;
+use Mollie\Api\Exceptions\IncompatiblePlatform;
 use Mollie\Api\MollieApiClient;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Kernel;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class MollieApiFactory
 {
-    /** @var ContainerInterface $container */
-    protected $container;
+    /** @var MollieApiClient */
+    private $apiClient;
 
-    /** @var Config $config */
-    protected $config;
+    /** @var SettingsService */
+    private $settingsService;
 
     /** @var LoggerInterface */
-    protected $logger;
-
-    /** @var MollieApiClient $apiClient */
-    protected $apiClient;
+    private $logger;
 
     /**
      * Create a new instance of MollieApiFactory.
      *
-     * @param ContainerInterface $container
-     * @param Config $config
+     * @param SettingsService $settingsService
      * @param LoggerInterface $logger
      */
     public function __construct(
-        ContainerInterface $container,
-        Config $config,
+        SettingsService $settingsService,
         LoggerInterface $logger
     )
     {
-        $this->container = $container;
-        $this->config = $config;
+        $this->settingsService = $settingsService;
         $this->logger = $logger;
     }
 
     /**
      * Create a new instance of the Mollie API client.
      *
-     * @throws \Mollie\Api\Exceptions\IncompatiblePlatform
+     * @param string|null $salesChannelId
+     *
+     * @return MollieApiClient
+     * @throws IncompatiblePlatform
      */
-    public function createClient()
+    public function createClient(?string $salesChannelId = null): MollieApiClient
     {
         if ($this->apiClient === null) {
-            $this->apiClient = new MollieApiClient();
+            $this->apiClient = $this->getClient($salesChannelId);
+        }
 
-            try {
-                // Set the API key
-                $this->apiClient->setApiKey(
-                    $this->config::testMode() ? $this->config::testApiKey() : $this->config::liveApiKey()
-                );
+        return $this->apiClient;
+    }
 
-                // Add platform data
-                $this->apiClient->addVersionString(
-                    'Shopware/' .
-                    Kernel::SHOPWARE_FALLBACK_VERSION
-                );
+    /**
+     * Returns a new instance of the Mollie API client.
+     *
+     * @param string|null  $salesChannelId
+     * @param Context|null $context
+     *
+     * @return MollieApiClient
+     * @throws IncompatiblePlatform
+     */
+    public function getClient(?string $salesChannelId = null, ?Context $context = null): MollieApiClient
+    {
+        /** @var MollieApiClient apiClient */
+        $this->apiClient = new MollieApiClient();
 
-                // @todo Add plugin version variable
-                $this->apiClient->addVersionString(
-                    'MollieShopware6/1.0.2'
-                );
-            } catch (Exception $e) {
-                $this->logger->error($e->getMessage(), [$e]);
-            }
+        /** @var MollieSettingStruct $settings */
+        $settings = $this->settingsService->getSettings($salesChannelId, $context);
+
+        try {
+            // Set the API key
+            $this->apiClient->setApiKey(
+                $settings->isTestMode() ? $settings->getTestApiKey() : $settings->getLiveApiKey()
+            );
+
+            // Add platform data
+            $this->apiClient->addVersionString(
+                'Shopware/' .
+                Kernel::SHOPWARE_FALLBACK_VERSION
+            );
+
+            // @todo Add plugin version variable
+            $this->apiClient->addVersionString(
+                'MollieShopware6/1.2.1'
+            );
+        } catch (Exception $e) {
+            $this->logger->error($e->getMessage(), [$e]);
         }
 
         return $this->apiClient;

@@ -1,0 +1,25 @@
+{% sw_extends '@Storefront/storefront/base.html.twig' %}
+
+{% block base_main_inner %}
+    <div class="container-main">
+        {% block page_content %}
+            <div class="cms-page">
+                <div class="cms-sections">
+                    <div class="cms-section-default container">
+                        <div class="cms-block">
+                            <h1>{{ "molliePayments.messages.payment.error"|trans|striptags }}</h1>
+
+                            <p>
+                                {{ "molliePayments.messages.payment.failed"|trans|striptags }} {{ "molliePayments.messages.redirecting"|trans|striptags }}<a href="{{ redirectUrl }}">{{ displayUrl }}</a>.
+                            </p>
+                            <p>
+                                <a href="{{ redirectUrl }}" class="btn btn-primary">{{ "molliePayments.messages.payment.buttonPayThroughMollie"|trans|striptags }}</a>&nbsp;
+                                <a href="{{ path('frontend.home.page') }}" class="btn btn-secondary">{{ "molliePayments.messages.payment.buttonReturnToShop"|trans|striptags }}</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endblock %}
+    </div>
+{% endblock %}

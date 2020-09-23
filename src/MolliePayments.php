@@ -10,7 +10,7 @@ use Shopware\Core\Framework\Plugin\Context\ActivateContext;
 use Shopware\Core\Framework\Plugin\Context\DeactivateContext;
 use Shopware\Core\Framework\Plugin\Context\InstallContext;
 use Shopware\Core\Framework\Plugin\Context\UninstallContext;
-use Shopware\Core\Framework\Plugin\Util\PluginIdProvider;
+use Shopware\Core\Framework\Plugin\Context\UpdateContext;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -51,16 +51,17 @@ class MolliePayments extends Plugin
         );
 
         $customFieldService->addCustomFields($context->getContext());
+    }
 
-        // Add payment methods
-        $paymentMethodHelper = new PaymentMethodService(
-            $this->container->get('payment_method.repository'),
-            $this->container->get(PluginIdProvider::class),
-            $this->container->get('system_config.repository'),
-            get_class($this)
-        );
+    public function update(UpdateContext $context): void
+    {
+        parent::update($context);
+    }
 
-        $paymentMethodHelper->addPaymentMethods($context->getContext());
+    public function postInstall(InstallContext $context): void
+    {
+        parent::postInstall($context);
+
     }
 
     public function uninstall(UninstallContext $context) : void
@@ -71,6 +72,14 @@ class MolliePayments extends Plugin
     public function activate(ActivateContext $context) : void
     {
         parent::activate($context);
+
+        /** @var PaymentMethodService $paymentMethodHelper */
+        $paymentMethodHelper = $this->container->get('Kiener\MolliePayments\Service\PaymentMethodService');
+
+        // Add payment methods
+        $paymentMethodHelper
+            ->setClassName(get_class($this))
+            ->addPaymentMethods($context->getContext());
     }
 
     public function deactivate(DeactivateContext $context) : void

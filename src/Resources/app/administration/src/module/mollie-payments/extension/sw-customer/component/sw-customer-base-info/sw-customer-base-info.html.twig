@@ -1,0 +1,9 @@
+{% block sw_customer_base_metadata_default_payment %}
+    {% parent %}
+    <sw-description-list v-if="preferredIdealIssuer">
+        <dt class="sw-customer-base-info__label">{{ $tc('sw-customer.extendedInfo.labelPreferredIdealIssuer') }}</dt>
+        <dd class="sw-customer-base__label-preferred-ideal-issuer">
+            {{ preferredIdealIssuer }}
+        </dd>
+    </sw-description-list>
+{% endblock %}

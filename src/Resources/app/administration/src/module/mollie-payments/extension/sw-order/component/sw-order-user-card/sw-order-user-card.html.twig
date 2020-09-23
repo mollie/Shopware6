@@ -1,0 +1,8 @@
+{% block sw_order_detail_base_secondary_info_payment %}
+    {% parent %}
+
+    <template v-if="mollieOrderId">
+        <dt>{{ $tc('sw-order.detailExtended.labelMollieOrderId') }}</dt>
+        <dd>{{ mollieOrderId }}</dd>
+    </template>
+{% endblock %}

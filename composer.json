@@ -1,7 +1,7 @@
 {
   "name": "kiener/mollie-payments-plugin",
   "description": "Mollie Payments",
-  "version": "v1.0.3",
+  "version": "v1.2.1",
   "type": "shopware-platform-plugin",
   "license": "MIT",
   "authors": [
@@ -11,6 +11,8 @@
   ],
   "require": {
     "shopware/core": "*",
+    "shopware/administration": "*",
+    "shopware/storefront": "*",
     "mollie/mollie-api-php": "^2.0"
   },
   "extra": {
@@ -25,12 +27,33 @@
       "de-DE": "Mit Mollie integrieren Sie alle wichtigen internationalen und lokalen Zahlungsmethoden in nur einem Schritt in Ihren Shopware-Webshop. Starten Sie noch heute!",
       "en-GB": "With Mollie you integrate every major global and local payment method in your Shopware webshop in one go. Start growing your business with effortless payments today!",
       "nl-NL": "Met Mollie integreer je alle belangrijke internationale en lokale betaalmethoden in één keer in je Shopware webshop. Start vandaag nog!"
+    },
+    "manufacturerLink": {
+      "de-DE": "https://store.shopware.com/mollie.html",
+      "en-GB": "https://store.shopware.com/mollie.html",
+      "nl-NL": "https://store.shopware.com/mollie.html"
+    },
+    "supportLink": {
+      "de-DE": "https://www.mollie.com/contact",
+      "en-GB": "https://www.mollie.com/contact",
+      "nl-NL": "https://www.mollie.com/contact"
     }
+  },
+  "config": {
+    "optimize-autoloader": true
   },
   "autoload": {
     "psr-4": {
       "Kiener\\MolliePayments\\": "src/",
       "Mollie\\Api\\": "vendor/mollie/mollie-api-php/src/"
     }
+  },
+  "suggest": {
+    "shopware/storefront": "Require '*'. Enables features like Creditcard Components and iDeal issuer selector.",
+    "shopware/administration": "Require '*'. Enables features like partial shipping and refunding."
+  },
+  "conflict": {
+    "shopware/storefront": "<6,>=7",
+    "shopware/administration": "<6,>=7"
   }
 }
