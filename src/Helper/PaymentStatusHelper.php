@@ -200,6 +200,24 @@ class PaymentStatusHelper
             $authorizedNumber > 0
             && $authorizedNumber === $paymentsTotal
         ) {
+            try {
+                if (method_exists($this->orderTransactionStateHandler, 'paid')) {
+                    $this->orderTransactionStateHandler->paid($transaction->getId(), $context);
+                } else {
+                    $this->orderTransactionStateHandler->pay($transaction->getId(), $context);
+                }
+            } catch (Exception $e) {
+                $this->logger->addEntry(
+                    $e->getMessage(),
+                    $context,
+                    $e,
+                    [
+                        'function' => 'payment-set-transaction-state'
+                    ]
+                );
+            }
+            // Process the order state automation
+            $this->orderStateHelper->setOrderState($order, $settings->getOrderStateWithAPaidTransaction(), $context);
             return PaymentStatus::STATUS_AUTHORIZED;
         }
 
