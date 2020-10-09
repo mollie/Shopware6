@@ -14,6 +14,7 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
+use Mollie\Api\Resources\Customer;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Types\PaymentMethod;
@@ -190,6 +191,10 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             /** @var OrderEntity $order */
             $order = $this->getOrderFromTransaction($transaction, $salesChannelContext);
 
+            /** @var Customer $customer */
+            $customer = null;
+
+
             /** @var array $orderData */
             $orderData = [];
 
@@ -198,6 +203,12 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
 
             // Prepare the order data for Mollie.
             if ($order !== null) {
+                $orderCustomer = $order->getOrderCustomer();
+                if ($orderCustomer !== null) {
+                    if ($orderCustomer->getCustomer() !== null) {
+                        $customer = $orderCustomer->getCustomer();
+                    }
+                }
                 $orderData = $this->prepareOrderForMollie(
                     $this->paymentMethod,
                     $transaction->getOrderTransaction()->getId(),
@@ -602,6 +613,13 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         ) {
             $orderData['payment']['cardToken'] = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_CREDIT_CARD_TOKEN];
             $this->customerService->setCardToken($customer, '', $salesChannelContext->getContext());
+        }
+
+        // To connect orders too customers.
+        if (isset($customFields[CustomerService::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID])
+            && (string)$customFields[CustomerService::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID] !== ''
+        ) {
+            $orderData['payment']['customerId'] = $customFields[CustomerService::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID];
         }
 
         // @todo Handle iDeal issuers from the iDeal payment handler

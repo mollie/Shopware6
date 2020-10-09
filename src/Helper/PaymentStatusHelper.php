@@ -9,11 +9,14 @@ use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Types\PaymentStatus;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionDefinition;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Shopware\Core\System\StateMachine\StateMachineRegistry;
+use Shopware\Core\System\StateMachine\Transition;
 
 class PaymentStatusHelper
 {
@@ -193,19 +196,22 @@ class PaymentStatusHelper
         }
 
         /**
-         * All payments are authorized, therefore the order payment is authorized. We
-         * transition to paid as Shopware 6 has no transition to a authorized state (yet).
+            Transaction method done manually since 6.3.2
          */
         if (
             $authorizedNumber > 0
             && $authorizedNumber === $paymentsTotal
         ) {
             try {
-                if (method_exists($this->orderTransactionStateHandler, 'paid')) {
-                    $this->orderTransactionStateHandler->paid($transaction->getId(), $context);
-                } else {
-                    $this->orderTransactionStateHandler->pay($transaction->getId(), $context);
-                }
+                $this->stateMachineRegistry->transition(
+                    new Transition(
+                        OrderTransactionDefinition::ENTITY_NAME,
+                        $transaction->getId(),
+                        StateMachineTransitionActions::ACTION_AUTHORIZE,
+                        'stateId'
+                    ),
+                    $context
+                );
             } catch (Exception $e) {
                 $this->logger->addEntry(
                     $e->getMessage(),
@@ -216,8 +222,6 @@ class PaymentStatusHelper
                     ]
                 );
             }
-            // Process the order state automation
-            $this->orderStateHelper->setOrderState($order, $settings->getOrderStateWithAPaidTransaction(), $context);
             return PaymentStatus::STATUS_AUTHORIZED;
         }
 

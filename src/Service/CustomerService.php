@@ -22,6 +22,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CustomerService
 {
+    public const CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID = 'customer_id';
     public const CUSTOM_FIELDS_KEY_CREDIT_CARD_TOKEN = 'credit_card_token';
     public const CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER = 'preferred_ideal_issuer';
 
@@ -139,6 +140,25 @@ class CustomerService
             'customFields' => $customFields
         ]], $context);
     }
+
+    /**
+     * Stores the custom fields.
+     *
+     * @param CustomerEntity $customer
+     * @param array $customFields
+     * @param Context $context
+     *
+     * @return EntityWrittenContainerEvent
+     */
+    public function saveCustomerCustomFields(CustomerEntity $customer, array $customFields, Context $context)
+    {
+        // Store the custom fields on the customer
+        return $this->customerRepository->update([[
+            'id' => $customer->getId(),
+            'customFields' => $customFields
+        ]], $context);
+    }
+
 
     /**
      * Stores the ideal issuer in the custom fields of the customer.

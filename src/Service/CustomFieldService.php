@@ -43,8 +43,8 @@ class CustomFieldService
         try {
             $customFieldSetId = 'cfc5bddd41594779a00cd4aa31885530';
             $mollieOrderFieldId = '14cf2e774a67a3b3374b187948046038';
+            $mollieCustomerFieldId = '14cf2e775a67a1b337xb1871480460aa';
             $iDealIssuerFieldId = '486a390718f043a28bc6434be6f36aec';
-
             $this->customFieldSetRepository->upsert([[
                 'id' => $customFieldSetId,
                 'name' => 'mollie_payments',
@@ -54,6 +54,20 @@ class CustomFieldService
                     ]
                 ],
                 'customFields' => [
+                    [
+                        'id' => $mollieCustomerFieldId,
+                        'name' => 'customer_id',
+                        'type' => CustomFieldTypes::TEXT,
+                        'config' => [
+                            'componentName' => 'sw-field',
+                            'customFieldType' => CustomFieldTypes::TEXT,
+                            'customFieldPosition' => 1,
+                            'label' => [
+                                'en-GB' => 'Mollie customer ID',
+                                'nl-NL' => 'Mollie customer ID'
+                            ]
+                        ]
+                    ],
                     [
                         'id' => $mollieOrderFieldId,
                         'name' => 'order_id',
@@ -84,6 +98,10 @@ class CustomFieldService
                     ]
                 ],
                 'relations' => [
+                    [
+                        'id' => $mollieCustomerFieldId,
+                        'entityName' => CustomerDefinition::ENTITY_NAME
+                    ],
                     [
                         'id' => $mollieOrderFieldId,
                         'entityName' => OrderDefinition::ENTITY_NAME
