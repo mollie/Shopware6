@@ -222,6 +222,8 @@ class PaymentStatusHelper
                     ]
                 );
             }
+            // Process the order state automation
+            $this->orderStateHelper->setOrderState($order, $settings->getOrderStateWithAAuthorizedTransaction(), $context);
             return PaymentStatus::STATUS_AUTHORIZED;
         }
 

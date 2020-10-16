@@ -48,6 +48,11 @@ class MollieSettingStruct extends Struct
     /**
      * @var bool
      */
+    protected $noCustomersAtMollie = false;
+
+    /**
+     * @var bool
+     */
     protected $enableCreditCardComponents = false;
 
     /**
@@ -74,6 +79,11 @@ class MollieSettingStruct extends Struct
      * @var string
      */
     protected $orderStateWithACancelledTransaction = self::ORDER_STATE_SKIP;
+
+    /**
+     * @var string
+     */
+    protected $orderStateWithAAuthorizedTransaction = self::ORDER_STATE_SKIP;
 
     /**
      * @return string
@@ -169,6 +179,26 @@ class MollieSettingStruct extends Struct
         $this->shopwareFailedPayment = $shopwareFailedPayment;
         return $this;
     }
+
+    /**
+     * @return bool
+     */
+    public function createNoCustomersAtMollie(): bool
+    {
+        return (bool) $this->noCustomersAtMollie;
+    }
+
+    /**
+     * @param bool $noCustomersAtMollie
+     *
+     * @return self
+     */
+    public function setCreateNoCustomersAtMollie(bool $noCustomersAtMollie): self
+    {
+        $this->noCustomersAtMollie = $noCustomersAtMollie;
+        return $this;
+    }
+
 
     /**
      * @return bool
@@ -281,5 +311,13 @@ class MollieSettingStruct extends Struct
     public function getOrderStateWithACancelledTransaction(): string
     {
         return (string) $this->orderStateWithACancelledTransaction;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrderStateWithAAuthorizedTransaction(): string
+    {
+        return (string) $this->orderStateWithAAuthorizedTransaction;
     }
 }

@@ -77,7 +77,7 @@ class CustomerRegistrationSubscriber implements EventSubscriberInterface
         if ($context !== null) {
         $salesChannelId = $context->getSource()->getSalesChannelId();
         $settings = $this->settingsService->getSettings($salesChannelId);
-        if ($settings->isTestMode() === false) {
+        if ($settings->isTestMode() === false && $settings->createNoCustomersAtMollie() === true) {
         foreach ($entityWrittenEvent->getPayloads() as $payload) {
             $id = (isset($payload['id'])) ? $payload['id'] : null;
             $name = (isset($payload['firstName']) && isset($payload['lastName'])) ? $payload['firstName'] .' '. $payload['lastName']  : null;
