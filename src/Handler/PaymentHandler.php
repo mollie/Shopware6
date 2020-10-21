@@ -618,9 +618,12 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         // To connect orders too customers.
         if (isset($customFields[CustomerService::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID])
             && (string)$customFields[CustomerService::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID] !== ''
+            && $settings->createNoCustomersAtMollie() === false
+            && $settings->isTestMode() === false
         ) {
             $orderData['payment']['customerId'] = $customFields[CustomerService::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID];
         }
+
 
         // @todo Handle iDeal issuers from the iDeal payment handler
         if (

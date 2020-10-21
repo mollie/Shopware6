@@ -75,39 +75,47 @@ class CustomerRegistrationSubscriber implements EventSubscriberInterface
     {
         $context = $entityWrittenEvent->getContext();
         if ($context !== null) {
-        $salesChannelId = $context->getSource()->getSalesChannelId();
-        $settings = $this->settingsService->getSettings($salesChannelId);
-        if ($settings->isTestMode() === false && $settings->createNoCustomersAtMollie() === true) {
-        foreach ($entityWrittenEvent->getPayloads() as $payload) {
-            $id = (isset($payload['id'])) ? $payload['id'] : null;
-            $name = (isset($payload['firstName']) && isset($payload['lastName'])) ? $payload['firstName'] .' '. $payload['lastName']  : null;
-            $email = (isset($payload['email'])) ? $payload['email'] : null;
-            $guest = (isset($payload['guest'])) ? $payload['guest'] : null;
-            if ($name !== null
-                && $email !== null
-                && $guest === false
-                && $id !== null) {
-                try {
-                    $mollieCustomer = $this->apiClient->customers->create([
-                        'name' => $name,
-                        'email' => $email,
-                    ]);
+        $source = $context->getSource();
+            if ($source !== null) {
+                if (method_exists($source, 'getSalesChannelId')) {
+            $salesChannelId = $source->getSalesChannelId();
+                    if (!empty($salesChannelId)) {
+                    $settings = $this->settingsService->getSettings($salesChannelId);
+                        if ($settings->isTestMode() === false && $settings->createNoCustomersAtMollie() === true) {
+                            foreach ($entityWrittenEvent->getPayloads() as $payload) {
+                                $id = (isset($payload['id'])) ? $payload['id'] : null;
+                                $name = (isset($payload['firstName']) && isset($payload['lastName'])) ? $payload['firstName'] .' '. $payload['lastName']  : null;
+                                $email = (isset($payload['email'])) ? $payload['email'] : null;
+                                $guest = (isset($payload['guest'])) ? $payload['guest'] : null;
+                                if ($name !== null
+                                    && $email !== null
+                                    && $guest === false
+                                    && $id !== null) {
+                                    try {
+                                        $mollieCustomer = $this->apiClient->customers->create([
+                                            'name' => $name,
+                                            'email' => $email,
+                                        ]);
 
-                    $customer = $this->customerService->getCustomer($id, $entityWrittenEvent->getContext());
-                    if ($customer !== null) {
-                        $customer->setCustomFields([
-                            'customer_id' => $mollieCustomer->id
-                        ]);
+                                        $customer = $this->customerService->getCustomer($id, $entityWrittenEvent->getContext());
+                                        if ($customer !== null) {
+                                            $customer->setCustomFields([
+                                                'customer_id' => $mollieCustomer->id
+                                            ]);
 
-                        $this->customerService->saveCustomerCustomFields($customer,
-                            $customer->getCustomFields(),
-                        $entityWrittenEvent->getContext());
+                                            $this->customerService->saveCustomerCustomFields($customer,
+                                                $customer->getCustomFields(),
+                                            $entityWrittenEvent->getContext());
+                                        }
+                                    } catch (ApiException $e) {
+
+                                    }
+                                }
+                            }
+                        }
                     }
-                } catch (ApiException $e) {
                 }
             }
-        }
-        }
         }
     }
 }
