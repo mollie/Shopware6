@@ -14,6 +14,13 @@ use Mollie\Api\Types\PaymentMethod;
 use Shopware\Storefront\Page\PageLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
+use Shopware\Core\System\Language\LanguageEntity;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+
+
+
 
 class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
 {
@@ -22,6 +29,13 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
 
     /** @var SettingsService */
     private $settingsService;
+
+    /** @var EntityRepositoryInterface */
+    private $languageRepositoryInterface;
+
+    /** @var EntityRepositoryInterface */
+    private $localeRepositoryInterface;
+
 
     /**
      * Returns an array of event names this subscriber wants to listen to.
@@ -56,11 +70,16 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
      */
     public function __construct(
         MollieApiClient $apiClient,
-        SettingsService $settingsService
+        SettingsService $settingsService,
+        EntityRepositoryInterface $languageRepositoryInterface,
+        EntityRepositoryInterface $localeRepositoryInterface
+
     )
     {
         $this->apiClient = $apiClient;
         $this->settingsService = $settingsService;
+        $this->languageRepositoryInterface = $languageRepositoryInterface;
+        $this->localeRepositoryInterface = $localeRepositoryInterface;
     }
 
     /**
@@ -82,11 +101,14 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
      */
     public function addMollieLocaleVariableToPage($args): void
     {
+
+
         /**
          * Build an array of available locales.
          */
         $availableLocales = [
             'en_US',
+            'en_GB',
             'nl_NL',
             'fr_FR',
             'it_IT',
@@ -110,23 +132,49 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
         /**
          * Get the language object from the sales channel context.
          */
-        $language = $args->getSalesChannelContext()->getSalesChannel()->getLanguage();
+        $locale = '';
+
+        $context = $args->getContext();
+        $salesChannelContext = $args->getSalesChannelContext();
+
+        if ($context !== null &&  $salesChannelContext !== null) {
+            $salesChannel = $salesChannelContext->getSalesChannel();
+            if ($salesChannel !== null) {
+                $languageId = $salesChannel->getLanguageId();
+                if ($languageId !== null) {
+                $languageCriteria = new Criteria();
+                $languageCriteria->addFilter(new EqualsFilter('id', $languageId));
+
+                $languages = $this->languageRepositoryInterface->search($languageCriteria, $args->getContext());
+                $localeId = $languages->first()->getLocaleId();
+                $localeCriteria = new Criteria();
+                $localeCriteria->addFilter(new EqualsFilter('id', $localeId));
+
+                $locales = $this->localeRepositoryInterface->search($localeCriteria, $args->getContext());
+                $locale = $locales->first()->getCode();
+
+                }
+            }
+        }
+
+
 
         /**
          * Set the locale based on the current storefront.
          */
-        $locale = '';
 
-        if ($language !== null && $language->getLocale() !== null) {
-            $locale = str_replace('-', '_', $language->getLocale()->getCode());
+
+        if ($locale !== null && $locale !== '') {
+            $locale = str_replace('-', '_', $locale);
         }
 
         /**
          * Check if the shop locale is available.
          */
         if ($locale === '' || !in_array($locale, $availableLocales, true)) {
-            $locale = 'en_US';
+            $locale = 'en_GB';
         }
+
 
         $args->getPage()->assign([
             'mollie_locale' => $locale,
