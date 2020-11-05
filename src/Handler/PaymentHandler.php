@@ -498,7 +498,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
          * Therefore we stop the process.
          */
         if ($customer === null) {
-            return null;
+            throw new \UnexpectedValueException('Customer data could not be found');
         }
 
         /**
