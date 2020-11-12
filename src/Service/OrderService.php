@@ -302,7 +302,7 @@ class OrderService
 
         return [
             'currency' => $currency,
-            'value' => number_format($price, $decimals, '.', '')
+            'value' => number_format(round($price, $decimals), $decimals, '.', '')
         ];
     }
 
