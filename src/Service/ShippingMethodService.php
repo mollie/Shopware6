@@ -58,7 +58,6 @@ class ShippingMethodService
             ->addFilter(new EqualsFilter('active', true))
             ->addFilter(new EqualsFilter('salesChannels.id', $salesChannelContext->getSalesChannel()->getId()))
             ->addFilter(new EqualsAnyFilter('availabilityRuleId', $salesChannelContext->getRuleIds()))
-            ->addSorting(new FieldSorting('prices.price', FieldSorting::ASCENDING))
             ->addAssociation('prices')
             ->addAssociation('salesChannels');
 
@@ -131,6 +130,10 @@ class ShippingMethodService
                 ];
             }
         }
+
+        usort($shippingMethods, function($a, $b) {
+            return $a['amount'] - $b['amount'];
+        });
 
         return $shippingMethods;
     }

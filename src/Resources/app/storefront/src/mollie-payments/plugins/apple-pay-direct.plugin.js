@@ -2,8 +2,8 @@ import Plugin from 'src/plugin-system/plugin.class';
 import HttpClient from 'src/service/http-client.service';
 
 export default class MollieApplePayDirect extends Plugin {
-    options = {
-        from: null,
+    _data = {
+        form: null,
         selectedProduct: null,
         shippingContact: null,
         shippingMethodId: null,
@@ -34,7 +34,7 @@ export default class MollieApplePayDirect extends Plugin {
     }
 
     totalAmount() {
-        return this.options.cartAmount + this.options.shippingAmount;
+        return this._data.cartAmount + this._data.shippingAmount;
     }
 
     isApplePayAvailable() {
@@ -64,25 +64,25 @@ export default class MollieApplePayDirect extends Plugin {
 
                     me.clearNotification();
 
-                    me.options.form = item.parentNode;
+                    me._data.form = item.parentNode;
 
-                    let csrfTokens = me.options.form.querySelectorAll('#mollie-apd-csrf input[name="_mollie_csrf_token"]');
+                    let csrfTokens = me._data.form.querySelectorAll('#mollie-apd-csrf input[name="_mollie_csrf_token"]');
 
                     if (csrfTokens.length > 1) {
-                        me.options.csrfTokenAuthorize = csrfTokens[0].value;
-                        me.options.csrfTokenShippingMethods = csrfTokens[1].value;
+                        me._data.csrfTokenAuthorize = csrfTokens[0].value;
+                        me._data.csrfTokenShippingMethods = csrfTokens[1].value;
                     }
 
-                    let productId = me.options.form.querySelector('input[name="id"]').value;
-                    let productName = me.options.form.querySelector('input[name="name"]').value;
-                    let productPrice = me.options.form.querySelector('input[name="price"]').value;
-                    let countryCode = me.options.form.querySelector('input[name="countryCode"]').value;
-                    let currency = me.options.form.querySelector('input[name="currency"]').value;
+                    let productId = me._data.form.querySelector('input[name="id"]').value;
+                    let productName = me._data.form.querySelector('input[name="name"]').value;
+                    let productPrice = me._data.form.querySelector('input[name="price"]').value;
+                    let countryCode = me._data.form.querySelector('input[name="countryCode"]').value;
+                    let currency = me._data.form.querySelector('input[name="currency"]').value;
 
                     let productPricePromise = me.getProductPrice(productId);
 
-                    me.options.cartAmount = productPrice;
-                    me.options.currency = currency;
+                    me._data.cartAmount = productPrice;
+                    me._data.currency = currency;
 
                     me.createPaymentRequest(
                         'product',
@@ -92,8 +92,8 @@ export default class MollieApplePayDirect extends Plugin {
                     );
 
                     productPricePromise.then(function (product) {
-                        me.options.selectedProduct = product.data;
-                        me.options.cartAmount = me.options.selectedProduct.price;
+                        me._data.selectedProduct = product.data;
+                        me._data.cartAmount = me._data.selectedProduct.price;
                     });
                 });
             });
@@ -110,7 +110,7 @@ export default class MollieApplePayDirect extends Plugin {
             supportedNetworks: ["amex", "maestro", "masterCard", "visa", "vPay"],
             merchantCapabilities: ['supports3DS'],
             requiredShippingContactFields: ["name", "postalAddress", "phone", "email"],
-            total: {label: label, amount: this.options.cartAmount}
+            total: {label: label, amount: this._data.cartAmount}
         };
 
         // eslint-disable-next-line no-undef
@@ -134,11 +134,11 @@ export default class MollieApplePayDirect extends Plugin {
 
         session.onshippingcontactselected = function (event) {
             // Store the shipping contact for later use
-            me.options.shippingContact = event.shippingContact;
+            me._data.shippingContact = event.shippingContact;
 
             // Get the country code
-            if (me.options.shippingContact.countryCode !== undefined) {
-                countryCode = me.options.shippingContact.countryCode;
+            if (me._data.shippingContact.countryCode !== undefined) {
+                countryCode = me._data.shippingContact.countryCode;
             }
 
             // eslint-disable-next-line no-undef
@@ -154,8 +154,8 @@ export default class MollieApplePayDirect extends Plugin {
                         me.displayNotification(shippingMethods.error, session);
                     } else {
                         if (shippingMethods.length) {
-                            me.options.shippingMethodId = shippingMethods[0].identifier;
-                            me.options.shippingAmount = shippingMethods[0].amount;
+                            me._data.shippingMethodId = shippingMethods[0].identifier;
+                            me._data.shippingAmount = shippingMethods[0].amount;
                         }
 
                         let total = {
@@ -168,12 +168,12 @@ export default class MollieApplePayDirect extends Plugin {
                             {
                                 type: 'final',
                                 label: 'Subtotal',
-                                amount: me.options.cartAmount
+                                amount: me._data.cartAmount
                             },
                             {
                                 type: 'final',
                                 label: 'Shipping costs',
-                                amount: me.options.shippingAmount
+                                amount: me._data.shippingAmount
                             }
                         ];
 
@@ -181,9 +181,9 @@ export default class MollieApplePayDirect extends Plugin {
                         let shippingPromise = me.getShippingAmount();
 
                         shippingPromise.then(function (shippingCosts) {
-                            me.options.cartToken = shippingCosts.cartToken;
-                            me.options.shippingMethodId = shippingCosts.shippingMethod.id;
-                            me.options.shippingAmount = shippingCosts.totalPrice;
+                            me._data.cartToken = shippingCosts.cartToken;
+                            me._data.shippingMethodId = shippingCosts.shippingMethod.id;
+                            me._data.shippingAmount = shippingCosts.totalPrice;
                         }).catch((reason => {
                             me.displayNotification(reason, session);
                         }));
@@ -202,15 +202,15 @@ export default class MollieApplePayDirect extends Plugin {
 
         session.onshippingmethodselected = function (event) {
             // Get the shipping method id
-            me.options.shippingMethodId = event.shippingMethod.identifier;
+            me._data.shippingMethodId = event.shippingMethod.identifier;
 
             // Get shipping amount
             let shippingPromise = me.getShippingAmount();
 
             shippingPromise
                 .then(function (shippingCosts) {
-                    me.options.cartToken = shippingCosts.cartToken;
-                    me.options.shippingAmount = shippingCosts.totalPrice;
+                    me._data.cartToken = shippingCosts.cartToken;
+                    me._data.shippingAmount = shippingCosts.totalPrice;
 
                     // eslint-disable-next-line no-undef
                     let status = ApplePaySession.STATUS_SUCCESS;
@@ -225,12 +225,12 @@ export default class MollieApplePayDirect extends Plugin {
                         {
                             type: 'final',
                             label: 'Subtotal',
-                            amount: me.options.cartAmount
+                            amount: me._data.cartAmount
                         },
                         {
                             type: 'final',
                             label: 'Shipping costs',
-                            amount: me.options.shippingAmount
+                            amount: me._data.shippingAmount
                         }
                     ];
 
@@ -256,12 +256,12 @@ export default class MollieApplePayDirect extends Plugin {
                 {
                     type: 'final',
                     label: 'Subtotal',
-                    amount: me.options.cartAmount
+                    amount: me._data.cartAmount
                 },
                 {
                     type: 'final',
                     label: 'Shipping costs',
-                    amount: me.options.shippingAmount
+                    amount: me._data.shippingAmount
                 }
             ];
 
@@ -345,15 +345,15 @@ export default class MollieApplePayDirect extends Plugin {
         let postData = {
             paymentToken: JSON.stringify(payment.token),
             shippingContact: JSON.stringify(payment.shippingContact),
-            currency: me.options.currency,
-            customer: me.options.shippingContact,
-            productId: me.options.selectedProduct.id,
-            shippingMethodId: me.options.shippingMethodId,
-            cartAmount: me.options.cartAmount,
-            cartToken: me.options.cartToken,
-            shippingAmount: me.options.shippingAmount,
+            currency: me._data.currency,
+            customer: me._data.shippingContact,
+            productId: me._data.selectedProduct.id,
+            shippingMethodId: me._data.shippingMethodId,
+            cartAmount: me._data.cartAmount,
+            cartToken: me._data.cartToken,
+            shippingAmount: me._data.shippingAmount,
             totalAmount: me.totalAmount(),
-            _csrf_token: me.options.csrfTokenAuthorize
+            _csrf_token: me._data.csrfTokenAuthorize
         };
 
         return new Promise(function (resolve) {
@@ -376,7 +376,7 @@ export default class MollieApplePayDirect extends Plugin {
     getShippingAmount() {
         let me = this;
         return new Promise(function (resolve, reject) {
-            fetch('/mollie/apple-pay/shipping-costs/' + me.options.shippingMethodId + '/' + me.options.selectedProduct.id)
+            fetch('/mollie/apple-pay/shipping-costs/' + me._data.shippingMethodId + '/' + me._data.selectedProduct.id)
                 .then(response => response.json())
                 .then(data => resolve(data))
                 // eslint-disable-next-line no-unused-vars
@@ -390,7 +390,7 @@ export default class MollieApplePayDirect extends Plugin {
         let me = this;
         let postData = {
             countryCode: countryCode,
-            _csrf_token: me.options.csrfTokenShippingMethods
+            _csrf_token: me._data.csrfTokenShippingMethods
         };
 
         return new Promise(function (resolve) {
