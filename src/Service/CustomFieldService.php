@@ -8,6 +8,7 @@ use Shopware\Core\Checkout\Customer\CustomerDefinition;
 use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\CustomField\CustomFieldTypes;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -41,12 +42,12 @@ class CustomFieldService
     public function addCustomFields(Context $context)
     {
         try {
-            $customFieldSetId = 'cfc5bddd41594779a00cd4aa31885530';
-            $mollieOrderFieldId = '14cf2e774a67a3b3374b187948046038';
-            $mollieCustomerFieldId = '14cf2e775a67a1b337xb1871480460aa';
-            $iDealIssuerFieldId = '486a390718f043a28bc6434be6f36aec';
+            $mollieOrderFieldId = Uuid::randomHex();
+            $mollieCustomerFieldId = Uuid::randomHex();
+            $iDealIssuerFieldId = Uuid::randomHex();
+
             $this->customFieldSetRepository->upsert([[
-                'id' => $customFieldSetId,
+                'id' => Uuid::randomHex(),
                 'name' => 'mollie_payments',
                 'config' => [
                     'label' => [
