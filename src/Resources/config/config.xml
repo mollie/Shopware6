@@ -49,6 +49,12 @@
             <label lang="de-DE">Credit Card Components</label>
             <label lang="nl-NL">Credit Card Components</label>
         </input-field>
+        <input-field type="bool">
+            <name>enableApplePayDirect</name>
+            <label>Enable Apple Pay Direct</label>
+            <label lang="de-DE">Enable Apple Pay Direct</label>
+            <label lang="nl-NL">Enable Apple Pay Direct</label>
+        </input-field>
         <input-field type="int">
             <name>paymentMethodBankTransferDueDateDays</name>
             <label>Bank Transfer Due Date Days</label>

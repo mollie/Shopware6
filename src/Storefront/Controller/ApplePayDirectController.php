@@ -124,10 +124,16 @@ class ApplePayDirectController extends StorefrontController
     {
         $available = false;
 
+        /** @var MollieSettingStruct $settings */
+        $settings = $this->settingsService->getSettings(
+            $context->getSalesChannel()->getId(),
+            $context->getContext()
+        );
+
         /** @var array|null $paymentMethodIds */
         $paymentMethodIds = $context->getSalesChannel()->getPaymentMethodIds();
 
-        if (is_array($paymentMethodIds) && !empty($paymentMethodIds)) {
+        if (is_array($paymentMethodIds) && !empty($paymentMethodIds) && $settings->isEnableApplePayDirect()) {
             $applePayMethodId = $this->getPaymentMethodId(ApplePayPayment::class, $context->getContext());
 
             if ((string) $applePayMethodId !== '') {

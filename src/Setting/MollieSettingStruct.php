@@ -56,6 +56,11 @@ class MollieSettingStruct extends Struct
     protected $enableCreditCardComponents = false;
 
     /**
+     * @var bool
+     */
+    protected $enableApplePayDirect = false;
+
+    /**
      * @var int
      */
     protected $paymentMethodBankTransferDueDateDays;
@@ -319,5 +324,21 @@ class MollieSettingStruct extends Struct
     public function getOrderStateWithAAuthorizedTransaction(): string
     {
         return (string) $this->orderStateWithAAuthorizedTransaction;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnableApplePayDirect(): bool
+    {
+        return $this->enableApplePayDirect;
+    }
+
+    /**
+     * @param bool $enableApplePayDirect
+     */
+    public function setEnableApplePayDirect(bool $enableApplePayDirect): void
+    {
+        $this->enableApplePayDirect = $enableApplePayDirect;
     }
 }
