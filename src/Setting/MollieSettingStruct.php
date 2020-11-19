@@ -284,7 +284,7 @@ class MollieSettingStruct extends Struct
     public function getOrderLifetimeDate(): string
     {
         return (new DateTime())
-            ->setTimezone(new DateTimeZone(DateTimeZone::UTC))
+            ->setTimezone(new DateTimeZone('UTC'))
             ->modify(sprintf('+%d day', $this->getOrderLifetimeDays()))
             ->format('Y-m-d');
     }
