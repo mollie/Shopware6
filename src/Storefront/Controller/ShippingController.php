@@ -13,7 +13,7 @@ use Mollie\Api\MollieApiClient;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
@@ -48,7 +48,7 @@ class ShippingController extends StorefrontController
     /** @var MollieApiFactory */
     private $apiFactory;
 
-    /** @var EntityRepository */
+    /** @var EntityRepositoryInterface */
     private $orderLineItemRepository;
 
     /** @var OrderService */
@@ -61,13 +61,13 @@ class ShippingController extends StorefrontController
      * Creates a new instance of the onboarding controller.
      *
      * @param MollieApiFactory $apiFactory
-     * @param EntityRepository $orderLineItemRepository
-     * @param OrderService     $orderService
-     * @param SettingsService  $settingsService
+     * @param EntityRepositoryInterface $orderLineItemRepository
+     * @param OrderService $orderService
+     * @param SettingsService $settingsService
      */
     public function __construct(
         MollieApiFactory $apiFactory,
-        EntityRepository $orderLineItemRepository,
+        EntityRepositoryInterface $orderLineItemRepository,
         OrderService $orderService,
         SettingsService $settingsService
     )
@@ -113,8 +113,8 @@ class ShippingController extends StorefrontController
         $quantity = 0;
 
         if (
-            (string) $request->get(self::REQUEST_KEY_ORDER_LINE_ITEM_ID) !== ''
-            && (string) $request->get(self::REQUEST_KEY_ORDER_LINE_ITEM_VERSION_ID) !== ''
+            (string)$request->get(self::REQUEST_KEY_ORDER_LINE_ITEM_ID) !== ''
+            && (string)$request->get(self::REQUEST_KEY_ORDER_LINE_ITEM_VERSION_ID) !== ''
         ) {
             $orderLineItem = $this->getOrderLineItemById(
                 $request->get(self::REQUEST_KEY_ORDER_LINE_ITEM_ID),
@@ -122,8 +122,8 @@ class ShippingController extends StorefrontController
             );
         }
 
-        if ((int) $request->get(self::REQUEST_KEY_ORDER_LINE_QUANTITY) > 0) {
-            $quantity = (int) $request->get(self::REQUEST_KEY_ORDER_LINE_QUANTITY);
+        if ((int)$request->get(self::REQUEST_KEY_ORDER_LINE_QUANTITY) > 0) {
+            $quantity = (int)$request->get(self::REQUEST_KEY_ORDER_LINE_QUANTITY);
         }
 
         if (
@@ -151,8 +151,8 @@ class ShippingController extends StorefrontController
         }
 
         if (
-            (string) $orderId !== ''
-            && (string) $orderLineId !== ''
+            (string)$orderId !== ''
+            && (string)$orderLineId !== ''
             && $quantity > 0
         ) {
             $apiClient = $this->apiFactory->createClient(
@@ -264,8 +264,8 @@ class ShippingController extends StorefrontController
                     !empty($lineItem->getCustomFields())
                     && isset($lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY])
                 ) {
-                    $amount += ($lineItem->getUnitPrice() * (int) $lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY]);
-                    $items += (int) $lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY];
+                    $amount += ($lineItem->getUnitPrice() * (int)$lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY]);
+                    $items += (int)$lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY];
                 }
             }
         }
@@ -280,7 +280,7 @@ class ShippingController extends StorefrontController
      * Returns an order line item by id.
      *
      * @param              $lineItemId
-     * @param null         $versionId
+     * @param null $versionId
      * @param Context|null $context
      *
      * @return OrderLineItemEntity|null
