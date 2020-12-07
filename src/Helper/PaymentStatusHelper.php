@@ -14,6 +14,9 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEnti
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Shopware\Core\System\StateMachine\StateMachineRegistry;
 use Shopware\Core\System\StateMachine\Transition;
@@ -35,6 +38,11 @@ class PaymentStatusHelper
     /** @var StateMachineRegistry */
     protected $stateMachineRegistry;
 
+    /** @var EntityRepositoryInterface */
+    protected $paymentMethodRepository;
+
+    /** @var EntityRepositoryInterface */
+    protected $orderTransactionRepository;
     /**
      * PaymentStatusHelper constructor.
      *
@@ -48,7 +56,9 @@ class PaymentStatusHelper
         OrderStateHelper $orderStateHelper,
         OrderTransactionStateHandler $orderTransactionStateHandler,
         SettingsService $settingsService,
-        StateMachineRegistry $stateMachineRegistry
+        StateMachineRegistry $stateMachineRegistry,
+        EntityRepositoryInterface $paymentMethodRepository,
+        EntityRepositoryInterface $orderTransactionRepository
     )
     {
         $this->logger = $logger;
@@ -56,6 +66,9 @@ class PaymentStatusHelper
         $this->orderTransactionStateHandler = $orderTransactionStateHandler;
         $this->settingsService = $settingsService;
         $this->stateMachineRegistry = $stateMachineRegistry;
+
+        $this->paymentMethodRepository = $paymentMethodRepository;
+        $this->orderTransactionRepository = $orderTransactionRepository;
     }
 
     /**
@@ -135,6 +148,38 @@ class PaymentStatusHelper
                     $authorizedNumber++;
                 }
             }
+        }
+
+        /**
+         * Correct the payment method if a different one was selected in mollie
+         */
+        try {
+            $molliePaymentMethodId = $this->paymentMethodRepository->searchIds(
+                (new Criteria())
+                    ->addFilter(new EqualsFilter('customFields.mollie_payment_method_name', $mollieOrder->method)),
+                $context
+            )->firstId();
+
+            if(!is_null($molliePaymentMethodId) && $molliePaymentMethodId !== $transaction->getPaymentMethodId()) {
+                $transaction->setPaymentMethodId($molliePaymentMethodId);
+
+                $this->orderTransactionRepository->update([
+                    [
+                        'id' => $transaction->getUniqueIdentifier(),
+                        'paymentMethodId' => $molliePaymentMethodId
+                    ]
+                ],
+                $context);
+            }
+        } catch(\Throwable $e) {
+            $this->logger->addEntry(
+                $e->getMessage(),
+                $context,
+                $e,
+                [
+                    'function' => 'payment-set-transaction-method'
+                ]
+            );
         }
 
         /**

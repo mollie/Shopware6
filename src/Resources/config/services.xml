@@ -43,6 +43,8 @@
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler" />
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService" />
             <argument type="service" id="Shopware\Core\System\StateMachine\StateMachineRegistry" />
+            <argument type="service" id="payment_method.repository"/>
+            <argument type="service" id="order_transaction.repository"/>
         </service>
 
         <!-- Services -->
