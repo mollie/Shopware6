@@ -10,10 +10,7 @@
     }
   ],
   "require": {
-    "shopware/core": "*",
-    "shopware/administration": "*",
-    "shopware/storefront": "*",
-    "mollie/mollie-api-php": "^2.0"
+    "mollie/mollie-api-php": "~2.25"
   },
   "extra": {
     "shopware-plugin-class": "Kiener\\MolliePayments\\MolliePayments",
