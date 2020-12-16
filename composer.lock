@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1a00e457cdad70b32666ac743d6e35fa",
+    "content-hash": "a15beae78280385a0635afec15144e67",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -298,16 +298,16 @@
         },
         {
             "name": "mollie/mollie-api-php",
-            "version": "v2.24.0",
+            "version": "v2.27.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mollie/mollie-api-php.git",
-                "reference": "52bd606724109906d61226698c8b031ccae9e637"
+                "reference": "84ce19b6ab73392592ac1f1e13e37caabb69482a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mollie/mollie-api-php/zipball/52bd606724109906d61226698c8b031ccae9e637",
-                "reference": "52bd606724109906d61226698c8b031ccae9e637",
+                "url": "https://api.github.com/repos/mollie/mollie-api-php/zipball/84ce19b6ab73392592ac1f1e13e37caabb69482a",
+                "reference": "84ce19b6ab73392592ac1f1e13e37caabb69482a",
                 "shasum": ""
             },
             "require": {
@@ -320,7 +320,8 @@
             },
             "require-dev": {
                 "eloquent/liberator": "^2.0",
-                "phpunit/phpunit": "^5.7 || ^6.5 || ^7.1"
+                "friendsofphp/php-cs-fixer": "^v2.17",
+                "phpunit/phpunit": "^5.7 || ^6.5 || ^7.1 || ^8.5"
             },
             "suggest": {
                 "mollie/oauth2-mollie-php": "Use OAuth to authenticate with the Mollie API. This is needed for some endpoints. Visit https://docs.mollie.com/ for more information."
@@ -380,7 +381,7 @@
                 "sofortbanking",
                 "subscriptions"
             ],
-            "time": "2020-10-15T12:55:48+00:00"
+            "time": "2020-12-15T09:00:48+00:00"
         },
         {
             "name": "psr/http-client",
