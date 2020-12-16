@@ -10,6 +10,9 @@
     }
   ],
   "require": {
+    "shopware/core": "*",
+    "shopware/administration": "*",
+    "shopware/storefront": "*",
     "mollie/mollie-api-php": "~2.25"
   },
   "extra": {
