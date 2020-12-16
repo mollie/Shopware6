@@ -86,7 +86,7 @@ class MollieApiFactory
 
             // @todo Add plugin version variable
             $this->apiClient->addVersionString(
-                'MollieShopware6/1.3.7'
+                'MollieShopware6/1.3.8'
             );
         } catch (Exception $e) {
             $this->logger->error($e->getMessage(), [$e]);
