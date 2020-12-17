@@ -287,9 +287,11 @@ abstract class AbstractExpressCheckoutController extends StorefrontController
         }
     }
 
-    protected function createReturnUrlForOrder(OrderEntity $order): string {
+    protected function createReturnUrlForOrder(OrderEntity $order, ?string $errorUrl = null): string {
         $finishUrl = $this->generateUrl('frontend.checkout.finish.page', ['orderId' => $order->getUniqueIdentifier()]);
-        $errorUrl = $this->generateUrl('frontend.account.edit-order.page', ['orderId' => $order->getUniqueIdentifier()]);
+        if(is_null($errorUrl)) {
+            $errorUrl = $this->generateUrl('frontend.account.edit-order.page', ['orderId' => $order->getUniqueIdentifier()]);
+        }
 
         $transactions = $order->getTransactions()->filterByState(OrderTransactionStates::STATE_OPEN);
         $transaction = $transactions->last();

@@ -47,7 +47,7 @@ export default class MolliePaypalExpressCheckout extends Plugin {
         }).then(data => {
             ElementLoadingIndicatorUtil.remove(self.el);
 
-            let paymentUrl;
+            let checkoutUrl;
 
             if (
                 data.errors !== undefined
@@ -63,15 +63,15 @@ export default class MolliePaypalExpressCheckout extends Plugin {
 
                 self.displayNotification(message);
             } else if (
-                data.paymentUrl !== undefined
-                && data.paymentUrl !== null
-                && data.paymentUrl !== ''
+                data.checkoutUrl !== undefined
+                && data.checkoutUrl !== null
+                && data.checkoutUrl !== ''
             ) {
-                paymentUrl = data.paymentUrl;
+                checkoutUrl = data.checkoutUrl;
             }
 
-            if (!!paymentUrl) {
-                document.location = paymentUrl;
+            if (!!checkoutUrl) {
+                document.location = checkoutUrl;
             }
         })
     }
@@ -85,6 +85,7 @@ export default class MolliePaypalExpressCheckout extends Plugin {
             currencyId: this.options.currencyId,
             countryCode: this.options.countryCode,
             shippingMethodId: this.options.shippingMethodId,
+            location: location.toString(),
         };
 
         if (window.csrf.enabled && window.csrf.mode === 'twig') {

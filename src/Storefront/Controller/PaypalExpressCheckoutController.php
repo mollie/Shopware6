@@ -141,8 +141,11 @@ class PaypalExpressCheckoutController extends AbstractExpressCheckoutController
         /** @var string|null $returnUrl */
         $returnUrl = null;
 
-        /** @var string|null $returnUrl */
-        $paymentUrl = null;
+        /** @var string|null $checkoutUrl */
+        $checkoutUrl = null;
+
+        /** @var string|null $errorUrl */
+        $errorUrl = $request->get('location');
 
         /** @var OrderTransactionEntity|null $transaction */
         $transaction = null;
@@ -238,7 +241,7 @@ class PaypalExpressCheckoutController extends AbstractExpressCheckoutController
 
         // Get the return URL for the order
         if ($order !== null) {
-            $returnUrl = $this->createReturnUrlForOrder($order);
+            $returnUrl = $this->createReturnUrlForOrder($order, $errorUrl);
         }
 
         // Create the order at Mollie
@@ -257,7 +260,7 @@ class PaypalExpressCheckoutController extends AbstractExpressCheckoutController
 
                 // Get the payment url from the order at Mollie.
                 if ($mollieOrder !== null) {
-                    $paymentUrl = isset($mollieOrder) ? $mollieOrder->getCheckoutUrl() : null;
+                    $checkoutUrl = isset($mollieOrder) ? $mollieOrder->getCheckoutUrl() : null;
                 }
             } catch (\Exception $e) {
                 $errors[] = $e->getMessage();
@@ -267,7 +270,7 @@ class PaypalExpressCheckoutController extends AbstractExpressCheckoutController
         }
 
         return new JsonResponse([
-            'paymentUrl' => $paymentUrl,
+            'checkoutUrl' => $checkoutUrl,
             'errors' => $errors
         ]);
     }
