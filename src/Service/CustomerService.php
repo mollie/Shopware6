@@ -9,6 +9,7 @@ use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Customer\Event\CustomerBeforeLoginEvent;
 use Shopware\Core\Checkout\Customer\Event\CustomerLoginEvent;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
+use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -252,13 +253,13 @@ class CustomerService
     /**
      * Returns a customer for a given array of customer data.
      *
-     * @param array               $customerData
-     * @param string              $paymentMethodId
+     * @param array $customerData
+     * @param PaymentMethodEntity $paymentMethod
      * @param SalesChannelContext $context
      *
-     * @return CustomerEntity|null|false
+     * @return CustomerEntity|null
      */
-    public function createCustomerForApplePayDirect(array $customerData, string $paymentMethodId, SalesChannelContext $context)
+    public function createCustomerFromData(array $customerData, ?PaymentMethodEntity $paymentMethod, SalesChannelContext $context)
     {
         /** @var string $customerId */
         $customerId = Uuid::randomHex();
@@ -327,17 +328,18 @@ class CustomerService
             && $postalCode !== null
             && (string) $salutationId !== ''
             && $street !== null
+            && !is_null($paymentMethod)
         ) {
             $customer = [
                 'id' => $customerId,
                 'salutationId' => $salutationId,
                 'firstName' => $givenName,
                 'lastName' => $familyName,
-                'customerNumber' => 'ApplePay.' . time(),
+                'customerNumber' => $paymentMethod->getName() . '.' . time(),
                 'guest' => true,
                 'email' => $emailAddress,
                 'password' => Uuid::randomHex(),
-                'defaultPaymentMethodId' => $paymentMethodId,
+                'defaultPaymentMethodId' => $paymentMethod->getUniqueIdentifier(),
                 'groupId' => Defaults::FALLBACK_CUSTOMER_GROUP,
                 'salesChannelId' => $context->getSalesChannel()->getId(),
                 'defaultBillingAddressId' => $addressId,
@@ -364,7 +366,7 @@ class CustomerService
             return $this->getCustomer($customerId, $context->getContext());
         }
 
-        return false;
+        return null;
     }
 
     /**

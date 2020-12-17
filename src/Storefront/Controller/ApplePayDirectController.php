@@ -353,9 +353,9 @@ class ApplePayDirectController extends StorefrontController
         // Create the customer
         if (is_array($shippingContact) && !empty($shippingContact)) {
             try {
-                $customer = $this->customerService->createCustomerForApplePayDirect(
+                $customer = $this->customerService->createCustomerFromData(
                     $shippingContact,
-                    $this->getPaymentMethodId(ApplePayPayment::class, $context->getContext()),
+                    $this->getPaymentMethod(ApplePayPayment::class, $context->getContext()),
                     $context
                 );
             } catch (Exception $e) {

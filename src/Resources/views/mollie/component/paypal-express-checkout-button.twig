@@ -1,0 +1,17 @@
+<div class="mollie-paypal-express-checkout {{ cols }}">
+    {% set paypal_ecs = {
+        productId: product.id,
+        productName: product.translated.name,
+        productPrice: productPrice,
+        currency: context.currency.translated.shortName,
+        currencyId: context.currency.id,
+        countryCode: context.shippingLocation.country.iso,
+        shippingMethodId: context.shippingMethod.id,
+        csrfToken: sw_csrf("frontend.mollie.paypal-ecs.checkout", {"mode": "token"})
+    } %}
+    <button type="button" class="btn btn-primary btn-block btn-buy js-paypal-ecs w-100"
+            data-mollie-paypal-express-checkout="true"
+            data-mollie-paypal-express-checkout-options="{{ paypal_ecs | json_encode }}">
+        &nbsp;Paypal ECS
+    </button>
+</div>

@@ -127,6 +127,24 @@
                 <argument type="service" id="service_container"/>
             </call>
         </service>
+        <service id="Kiener\MolliePayments\Storefront\Controller\PaypalExpressCheckoutController" public="true">
+            <argument type="service" id="Mollie\Api\MollieApiClient" />
+            <argument type="service" id="Kiener\MolliePayments\Service\CartService" />
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService" />
+            <argument type="service" id="Kiener\MolliePayments\Service\ShopService" />
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService" />
+            <argument type="service" id="Kiener\MolliePayments\Handler\PaymentHandler" />
+            <argument type="service" id="payment_method.repository" />
+            <argument type="service" id="Kiener\MolliePayments\Service\ProductService" />
+            <argument type="service" id="Shopware\Storefront\Framework\Routing\Router"/>
+            <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService" />
+            <argument type="service" id="Kiener\MolliePayments\Service\ShippingMethodService" />
+
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
 
         <service id="Kiener\MolliePayments\Storefront\Controller\ComponentsController" public="true">
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService" />

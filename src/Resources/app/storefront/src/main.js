@@ -13,9 +13,12 @@ import MollieApplePayDirect
 import MollieApplePayPaymentMethod
     from './mollie-payments/plugins/apple-pay-payment-method.plugin';
 
+import MolliePaypalExpressCheckout from "./mollie-payments/plugins/paypal-express-checkout.plugin";
+
 // Register them via the existing PluginManager
 const PluginManager = window.PluginManager;
 PluginManager.register('MollieCreditCardComponents', MollieCreditCardComponents, '#mollie_components_credit_card');
 PluginManager.register('MollieIDealIssuer', MollieIDealIssuer);
 PluginManager.register('MollieApplePayDirect', MollieApplePayDirect);
 PluginManager.register('MollieApplePayPaymentMethod', MollieApplePayPaymentMethod);
+PluginManager.register('MolliePaypalExpressCheckout', MolliePaypalExpressCheckout, '[data-mollie-paypal-express-checkout]')
