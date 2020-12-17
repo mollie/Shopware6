@@ -380,6 +380,10 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             );
         }
 
+        if($request->get('_express_checkout') && method_exists($this, 'finalizeExpressCheckout')) {
+            $this->finalizeExpressCheckout($mollieOrder, $order);
+        }
+
         /**
          * Process the payment status of the order. Returns a PaymentStatus string which
          * we can use to throw an exception when the payment is cancelled.

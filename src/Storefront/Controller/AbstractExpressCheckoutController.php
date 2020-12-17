@@ -313,7 +313,10 @@ abstract class AbstractExpressCheckoutController extends StorefrontController
 
     protected function assembleReturnUrl(string $token): string
     {
-        $parameter = ['_sw_payment_token' => $token];
+        $parameter = [
+            '_sw_payment_token' => $token,
+            '_express_checkout' => true,
+        ];
 
         return $this->router->generate('payment.finalize.transaction', $parameter, UrlGeneratorInterface::ABSOLUTE_URL);
     }
