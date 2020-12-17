@@ -89,7 +89,7 @@ class CartService
         $cartToken = Uuid::randomHex();
 
         // Create a cart
-        $cart = new Cart('apple-pay-direct', $cartToken);
+        $cart = new Cart(strtolower($paymentMethod->getName()) . '.express-checkout', $cartToken);
 
         /** @var LineItem $lineItem */
         $lineItem = new LineItem(

@@ -24,7 +24,10 @@ use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Checkout\Payment\Cart\Token\TokenFactoryInterfaceV2;
+use Shopware\Core\Checkout\Payment\Cart\Token\TokenStruct;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Content\Product\ProductEntity;
@@ -44,6 +47,8 @@ use Shopware\Storefront\Framework\Routing\Router;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 abstract class AbstractExpressCheckoutController extends StorefrontController
 {
@@ -56,25 +61,35 @@ abstract class AbstractExpressCheckoutController extends StorefrontController
     /** @var EntityRepositoryInterface */
     protected $paymentMethodRepository;
 
+    /** @var RouterInterface */
+    protected $router;
+
     /** @var SalesChannelContextFactory */
     protected $salesChannelContextFactory;
 
     /** @var SettingsService */
     protected $settingsService;
 
+    /** @var TokenFactoryInterfaceV2 */
+    protected $tokenFactory;
+
     public function __construct(
         MollieApiClient $apiClient,
         PaymentHandler $paymentHandler,
         EntityRepositoryInterface $paymentMethodRepository,
+        RouterInterface $router,
         SalesChannelContextFactory $salesChannelContextFactory,
-        SettingsService $settingsService
+        SettingsService $settingsService,
+        TokenFactoryInterfaceV2 $tokenFactory
     )
     {
         $this->apiClient = $apiClient;
         $this->paymentHandler = $paymentHandler;
         $this->paymentMethodRepository = $paymentMethodRepository;
+        $this->router = $router;
         $this->salesChannelContextFactory = $salesChannelContextFactory;
         $this->settingsService = $settingsService;
+        $this->tokenFactory = $tokenFactory;
     }
 
 
@@ -270,5 +285,34 @@ abstract class AbstractExpressCheckoutController extends StorefrontController
         } catch (InconsistentCriteriaIdsException $e) {
             throw new RuntimeException(sprintf('Could not set Mollie Api Key, error: %s', $e->getMessage()));
         }
+    }
+
+    protected function createReturnUrlForOrder(OrderEntity $order): string {
+        $finishUrl = $this->generateUrl('frontend.checkout.finish.page', ['orderId' => $order->getUniqueIdentifier()]);
+        $errorUrl = $this->generateUrl('frontend.account.edit-order.page', ['orderId' => $order->getUniqueIdentifier()]);
+
+        $transactions = $order->getTransactions()->filterByState(OrderTransactionStates::STATE_OPEN);
+        $transaction = $transactions->last();
+
+        $tokenStruct = new TokenStruct(
+            null,
+            null,
+            $transaction->getPaymentMethodId(),
+            $transaction->getId(),
+            $finishUrl,
+            null,
+            $errorUrl
+        );
+
+        $token = $this->tokenFactory->generateToken($tokenStruct);
+
+        return $this->assembleReturnUrl($token);
+    }
+
+    protected function assembleReturnUrl(string $token): string
+    {
+        $parameter = ['_sw_payment_token' => $token];
+
+        return $this->router->generate('payment.finalize.transaction', $parameter, UrlGeneratorInterface::ABSOLUTE_URL);
     }
 }

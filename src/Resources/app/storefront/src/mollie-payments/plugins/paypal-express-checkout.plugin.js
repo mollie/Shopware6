@@ -18,7 +18,6 @@ export default class MolliePaypalExpressCheckout extends Plugin {
     init() {
         this._client = new HttpClient();
         this._registerEvents();
-        console.log(123);
     }
 
     update() {
@@ -26,16 +25,55 @@ export default class MolliePaypalExpressCheckout extends Plugin {
     }
 
     _onClick(event) {
-        const data = this._getRequestData();
-
         ElementLoadingIndicatorUtil.create(this.el);
 
-        this._client.post(this.options.route, JSON.stringify(data), content => this._parseRequest(JSON.parse(content)));
+        this._checkout();
+        // this._client.post(this.options.route, JSON.stringify(data), content => this._parseRequest(JSON.parse(content)));
     }
-    _parseRequest(data) {
-        console.log(data);
 
-        ElementLoadingIndicatorUtil.remove(this.el);
+    _checkout() {
+        this._doCheckout()
+            .catch((reason => {
+                this.displayNotification(reason);
+            }))
+    }
+
+    _doCheckout() {
+        const data = this._getRequestData();
+        const self = this;
+
+        return new Promise(function (resolve) {
+            self._client.post(self.options.route, JSON.stringify(data), response => resolve(JSON.parse(response)));
+        }).then(data => {
+            ElementLoadingIndicatorUtil.remove(self.el);
+
+            let paymentUrl;
+
+            if (
+                data.errors !== undefined
+                && data.errors !== null
+                && data.errors.length > 0
+            ) {
+                // Display the error message
+                let message = '';
+
+                data.errors.forEach(function (error) {
+                    message += error + '<br />';
+                });
+
+                self.displayNotification(message);
+            } else if (
+                data.paymentUrl !== undefined
+                && data.paymentUrl !== null
+                && data.paymentUrl !== ''
+            ) {
+                paymentUrl = data.paymentUrl;
+            }
+
+            if (!!paymentUrl) {
+                document.location = paymentUrl;
+            }
+        })
     }
 
     _getRequestData() {
@@ -60,5 +98,28 @@ export default class MolliePaypalExpressCheckout extends Plugin {
         const onClick = this._onClick.bind(this);
         this.el.removeEventListener('click', onClick);
         this.el.addEventListener('click', onClick);
+    }
+
+
+    displayNotification(message, type) {
+        let flashBagsContainer = document.querySelector('div.flashbags.container');
+
+        if (type === undefined || type === null) {
+            type = 'danger';
+        }
+
+        if (flashBagsContainer !== undefined) {
+            let html = `<div role="alert" class="alert alert-${type}"><div class="alert-content-container"><div class="alert-content">${message}</div></div></div>`;
+            flashBagsContainer.innerHTML = html;
+            window.scrollTo(0, 0);
+        }
+    }
+
+    clearNotification() {
+        let flashBagsContainer = document.querySelector('div.flashbags.container');
+
+        if (flashBagsContainer !== undefined) {
+            flashBagsContainer.innerHTML = '';
+        }
     }
 }

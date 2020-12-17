@@ -335,7 +335,7 @@ class CustomerService
                 'salutationId' => $salutationId,
                 'firstName' => $givenName,
                 'lastName' => $familyName,
-                'customerNumber' => $paymentMethod->getName() . '.' . time(),
+                'customerNumber' => $paymentMethod->getName() . '.Express-Checkout.' . date('YmdHis'),
                 'guest' => true,
                 'email' => $emailAddress,
                 'password' => Uuid::randomHex(),
