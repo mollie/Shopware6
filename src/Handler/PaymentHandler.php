@@ -45,20 +45,20 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
     public const PAYMENT_METHOD_NAME = '';
     public const PAYMENT_METHOD_DESCRIPTION = '';
 
-    protected const FIELD_AMOUNT = 'amount';
-    protected const FIELD_REDIRECT_URL = 'redirectUrl';
-    protected const FIELD_LOCALE = 'locale';
-    protected const FIELD_METHOD = 'method';
-    protected const FIELD_ORDER_NUMBER = 'orderNumber';
-    protected const FIELD_LINES = 'lines';
-    protected const FIELD_BILLING_ADDRESS = 'billingAddress';
-    protected const FIELD_BILLING_EMAIL = 'billingEmail';
-    protected const FIELD_SHIPPING_ADDRESS = 'shippingAddress';
-    protected const FIELD_PAYMENT = 'payment';
-    protected const FIELD_WEBHOOK_URL = 'webhookUrl';
-    protected const FIELD_DUE_DATE = 'dueDate';
-    protected const FIELD_EXPIRES_AT = 'expiresAt';
-    protected const ENV_LOCAL_DEVELOPMENT = 'MOLLIE_LOCAL_DEVELOPMENT';
+    public const FIELD_AMOUNT = 'amount';
+    public const FIELD_REDIRECT_URL = 'redirectUrl';
+    public const FIELD_LOCALE = 'locale';
+    public const FIELD_METHOD = 'method';
+    public const FIELD_ORDER_NUMBER = 'orderNumber';
+    public const FIELD_LINES = 'lines';
+    public const FIELD_BILLING_ADDRESS = 'billingAddress';
+    public const FIELD_BILLING_EMAIL = 'billingEmail';
+    public const FIELD_SHIPPING_ADDRESS = 'shippingAddress';
+    public const FIELD_PAYMENT = 'payment';
+    public const FIELD_WEBHOOK_URL = 'webhookUrl';
+    public const FIELD_DUE_DATE = 'dueDate';
+    public const FIELD_EXPIRES_AT = 'expiresAt';
+    public const ENV_LOCAL_DEVELOPMENT = 'MOLLIE_LOCAL_DEVELOPMENT';
 
     /** @var string */
     protected $paymentMethod;

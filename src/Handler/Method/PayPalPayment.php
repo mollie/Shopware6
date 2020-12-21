@@ -40,6 +40,6 @@ class PayPalPayment extends PaymentHandler
     }
 
     protected function finalizeExpressCheckout(Order $mollieOrder, OrderEntity $order, Context $context) {
-        $this->orderService->updateOrderCustomerWithMollieData($mollieOrder, $order->getUniqueIdentifier(), $context);
+        $this->orderService->updateOrderWithMollieData($mollieOrder, $order->getUniqueIdentifier(), $context);
     }
 }

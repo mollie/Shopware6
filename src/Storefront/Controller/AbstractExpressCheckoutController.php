@@ -92,7 +92,6 @@ abstract class AbstractExpressCheckoutController extends StorefrontController
         $this->tokenFactory = $tokenFactory;
     }
 
-
     /**
      * Returns an order that is created through the Mollie API.
      *
@@ -127,6 +126,7 @@ abstract class AbstractExpressCheckoutController extends StorefrontController
             $salesChannelContext,
             $paymentData
         );
+
 
         // Create the order at Mollie
         if (

@@ -377,7 +377,7 @@ class OrderService
         }
     }
 
-    public function updateOrderCustomerWithMollieData(Order $mollieOrder, string $orderId, Context $context)
+    public function updateOrderWithMollieData(Order $mollieOrder, string $orderId, Context $context)
     {
         $order = $this->getOrder($orderId, $context);
 
@@ -398,6 +398,10 @@ class OrderService
             return;
         }
 
+        if(!isset($paymentDetails->shippingAddress)) {
+            throw new \Exception("No shipping address provided by the payment processor");
+        }
+
         list($firstName, $lastName) = explode(' ', $paymentDetails->consumerName, 2);
         $email = $paymentDetails->consumerAccount;
 
@@ -412,6 +416,8 @@ class OrderService
         foreach($order->getAddresses() as $address) {
             $addresses[] = [
                 'id' => $address->getUniqueIdentifier(),
+                'firstName' => $firstName,
+                'lastName' => $lastName,
                 'street' => $paymentDetails->shippingAddress->streetAndNumber,
                 'zipcode' => $paymentDetails->shippingAddress->postalCode,
                 'city' => $paymentDetails->shippingAddress->city,

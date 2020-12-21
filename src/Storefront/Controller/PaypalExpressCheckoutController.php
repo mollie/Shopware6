@@ -12,6 +12,7 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\ShippingMethodService;
 use Kiener\MolliePayments\Service\ShopService;
 use Mollie\Api\MollieApiClient;
+use Mollie\Api\Resources\Order;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
@@ -326,5 +327,58 @@ class PaypalExpressCheckoutController extends AbstractExpressCheckoutController
         }
 
         return $order;
+    }
+
+    /**
+     * Returns an order that is created through the Mollie API.
+     *
+     * @param string                 $applePaymentToken
+     * @param OrderEntity            $order
+     * @param string                 $returnUrl
+     * @param OrderTransactionEntity $transaction
+     *
+     * @param SalesChannelContext    $salesChannelContext
+     *
+     * @return Order|null
+     * @throws RuntimeException
+     */
+    protected function createOrderAtMollie(
+        string $molliePaymentMethod,
+        OrderEntity $order,
+        string $returnUrl,
+        OrderTransactionEntity $transaction,
+        SalesChannelContext $salesChannelContext,
+        array $paymentData = []
+    ): ?Order
+    {
+        /** @var Order $mollieOrder */
+        $mollieOrder = null;
+
+        /** @var array $orderData */
+        $orderData = $this->paymentHandler->prepareOrderForMollie(
+            $molliePaymentMethod,
+            $transaction->getId(),
+            $order,
+            (string) $returnUrl,
+            $salesChannelContext,
+            $paymentData
+        );
+
+        unset($orderData[PaymentHandler::FIELD_SHIPPING_ADDRESS]);
+
+        // Create the order at Mollie
+        if (
+            is_array($orderData)
+            && !empty($orderData)
+        ) {
+            $mollieOrder = $this->paymentHandler->createOrderAtMollie(
+                $orderData,
+                (string)$returnUrl,
+                $order,
+                $salesChannelContext
+            );
+        }
+
+        return $mollieOrder;
     }
 }
