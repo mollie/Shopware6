@@ -189,7 +189,6 @@ class PaypalExpressCheckoutController extends AbstractExpressCheckoutController
                         'familyName' => 'placeholder', //lastname
                         'givenName' => 'placeholder', //firstname
                         'locality' => 'placeholder', //city
-                        'phoneNumber' => '0612345678',
                         'postalCode' => '1234AB',
                         'addressLines' => [
                             'placeholder'
