@@ -3,9 +3,7 @@
 namespace Kiener\MolliePayments\Handler;
 
 use Exception;
-use Kiener\MolliePayments\Helper\ModeHelper;
 use Kiener\MolliePayments\Helper\PaymentStatusHelper;
-use Kiener\MolliePayments\Helper\ProfileHelper;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\LoggerService;
@@ -99,14 +97,14 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      * PaymentHandler constructor.
      *
      * @param OrderTransactionStateHandler $transactionStateHandler
-     * @param OrderService                 $orderService
-     * @param CustomerService              $customerService
-     * @param MollieApiClient              $apiClient
-     * @param SettingsService              $settingsService
-     * @param PaymentStatusHelper          $paymentStatusHelper
-     * @param LoggerService                $logger
-     * @param RouterInterface              $router
-     * @param string                       $environment
+     * @param OrderService $orderService
+     * @param CustomerService $customerService
+     * @param MollieApiClient $apiClient
+     * @param SettingsService $settingsService
+     * @param PaymentStatusHelper $paymentStatusHelper
+     * @param LoggerService $logger
+     * @param RouterInterface $router
+     * @param string $environment
      */
     public function __construct(
         OrderTransactionStateHandler $transactionStateHandler,
@@ -132,10 +130,10 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
     }
 
     /**
-     * @param array               $orderData
+     * @param array $orderData
      * @param SalesChannelContext $salesChannelContext
-     * @param CustomerEntity      $customer
-     * @param LocaleEntity        $locale
+     * @param CustomerEntity $customer
+     * @param LocaleEntity $locale
      *
      * @return array
      */
@@ -152,8 +150,8 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      * Throw a
      *
      * @param AsyncPaymentTransactionStruct $transaction
-     * @param RequestDataBag                $dataBag
-     * @param SalesChannelContext           $salesChannelContext
+     * @param RequestDataBag $dataBag
+     * @param SalesChannelContext $salesChannelContext
      *
      * @return RedirectResponse @see AsyncPaymentProcessException exception if an error ocurres while processing the
      *                          payment
@@ -283,8 +281,8 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      * Throw a
      *
      * @param AsyncPaymentTransactionStruct $transaction
-     * @param Request                       $request
-     * @param SalesChannelContext           $salesChannelContext @see AsyncPaymentFinalizeException exception if an
+     * @param Request $request
+     * @param SalesChannelContext $salesChannelContext @see AsyncPaymentFinalizeException exception if an
      *                                                           error ocurres while calling an external payment API
      *                                                           Throw a @throws RuntimeException*@throws
      *                                                           CustomerCanceledAsyncPaymentException
@@ -380,8 +378,14 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             );
         }
 
-        if($request->get('_express_checkout') && method_exists($this, 'finalizeExpressCheckout')) {
-            $this->finalizeExpressCheckout($mollieOrder, $order);
+
+        if (!is_null($request->get('_express_checkout')) &&
+            (
+                $request->request->getAlnum('_express_checkout') === self::PAYMENT_METHOD_NAME ||
+                $request->request->getBoolean('_express_checkout') === true
+            ) &&
+            method_exists($this, 'finalizeExpressCheckout')) {
+            $this->finalizeExpressCheckout($mollieOrder, $order, $salesChannelContext->getContext());
         }
 
         /**
@@ -440,7 +444,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      * Returns an order entity of a transaction.
      *
      * @param AsyncPaymentTransactionStruct $transaction
-     * @param SalesChannelContext           $salesChannelContext
+     * @param SalesChannelContext $salesChannelContext
      *
      * @return OrderEntity|null
      */
@@ -453,13 +457,13 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
     /**
      * Returns a prepared array to create an order at Mollie.
      *
-     * @param string              $paymentMethod
-     * @param string              $transactionId
-     * @param OrderEntity         $order
-     * @param string              $returnUrl
+     * @param string $paymentMethod
+     * @param string $transactionId
+     * @param OrderEntity $order
+     * @param string $returnUrl
      * @param SalesChannelContext $salesChannelContext
      *
-     * @param array               $paymentData
+     * @param array $paymentData
      *
      * @return array
      */
@@ -528,7 +532,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
          * in the customer's language.
          *
          * @var LanguageEntity $language
-         * @var LocaleEntity   $locale
+         * @var LocaleEntity $locale
          */
         $locale = $order->getLanguage() !== null ? $order->getLanguage()->getLocale() : null;
 
@@ -601,7 +605,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
          */
         if (
             getenv(self::ENV_LOCAL_DEVELOPMENT) === false
-            || (bool) getenv(self::ENV_LOCAL_DEVELOPMENT) === false
+            || (bool)getenv(self::ENV_LOCAL_DEVELOPMENT) === false
         ) {
             $orderData[self::FIELD_WEBHOOK_URL] = $this->router->generate('frontend.mollie.webhook', [
                 'transactionId' => $transactionId
@@ -659,9 +663,9 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
     /**
      * Returns an order that is created through the Mollie API.
      *
-     * @param array               $orderData
-     * @param string              $returnUrl
-     * @param OrderEntity         $order
+     * @param array $orderData
+     * @param string $returnUrl
+     * @param OrderEntity $order
      * @param SalesChannelContext $salesChannelContext
      *
      * @return Order|null
@@ -718,9 +722,9 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
 
             /** @var OrderLine $line */
             foreach ($mollieOrder->lines as $line) {
-                if (isset($line->metadata->{ $this->orderService::ORDER_LINE_ITEM_ID })) {
+                if (isset($line->metadata->{$this->orderService::ORDER_LINE_ITEM_ID})) {
                     $orderLineUpdate[] = [
-                        'id' => $line->metadata->{ $this->orderService::ORDER_LINE_ITEM_ID },
+                        'id' => $line->metadata->{$this->orderService::ORDER_LINE_ITEM_ID},
                         'customFields' => [
                             CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS => [
                                 'order_line_id' => $line->id,

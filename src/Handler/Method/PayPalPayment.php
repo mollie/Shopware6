@@ -7,6 +7,7 @@ use Mollie\Api\Resources\Order;
 use Mollie\Api\Types\PaymentMethod;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\System\Locale\LocaleEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
@@ -38,7 +39,7 @@ class PayPalPayment extends PaymentHandler
         return $orderData;
     }
 
-    protected function finalizeExpressCheckout(Order $mollieOrder, OrderEntity $order) {
-        dd($mollieOrder, $order);
+    protected function finalizeExpressCheckout(Order $mollieOrder, OrderEntity $order, Context $context) {
+        $this->orderService->updateOrderCustomerWithMollieData($mollieOrder, $order->getUniqueIdentifier(), $context);
     }
 }

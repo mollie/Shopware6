@@ -3,7 +3,9 @@
 namespace Kiener\MolliePayments\Service;
 
 use Exception;
+use Mollie\Api\Resources\Order;
 use Mollie\Api\Types\OrderLineType;
+use Mollie\Api\Types\PaymentStatus;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
@@ -34,17 +36,22 @@ class OrderService
     /** @var EntityRepositoryInterface */
     protected $orderLineItemRepository;
 
+    /** @var EntityRepositoryInterface */
+    protected $countryRepository;
+
     /** @var LoggerInterface */
     protected $logger;
 
     public function __construct(
         EntityRepositoryInterface $orderRepository,
         EntityRepositoryInterface $orderLineItemRepository,
+        EntityRepositoryInterface $countryRepository,
         LoggerInterface $logger
     )
     {
         $this->orderRepository = $orderRepository;
         $this->orderLineItemRepository = $orderLineItemRepository;
+        $this->countryRepository = $countryRepository;
         $this->logger = $logger;
     }
 
@@ -368,5 +375,61 @@ class OrderService
                 $tax[self::TAX_ARRAY_KEY_PRICE]
             );
         }
+    }
+
+    public function updateOrderCustomerWithMollieData(Order $mollieOrder, string $orderId, Context $context)
+    {
+        $order = $this->getOrder($orderId, $context);
+
+        if (!isset($mollieOrder->_embedded->payments)) {
+            return;
+        }
+
+        $paymentDetails = null;
+
+        foreach ($mollieOrder->_embedded->payments as $payment) {
+            if ($payment->status === PaymentStatus::STATUS_PAID) {
+                $paymentDetails = $payment->details;
+                break;
+            }
+        }
+
+        if (is_null($paymentDetails)) {
+            return;
+        }
+
+        list($firstName, $lastName) = explode(' ', $paymentDetails->consumerName, 2);
+        $email = $paymentDetails->consumerAccount;
+
+        $countryId = $this->countryRepository->searchIds(
+            (new Criteria())
+                ->addFilter(new EqualsFilter('iso', $paymentDetails->shippingAddress->country)),
+            $context
+        )->firstId();
+
+        $addresses = [];
+
+        foreach($order->getAddresses() as $address) {
+            $addresses[] = [
+                'id' => $address->getUniqueIdentifier(),
+                'street' => $paymentDetails->shippingAddress->streetAndNumber,
+                'zipcode' => $paymentDetails->shippingAddress->postalCode,
+                'city' => $paymentDetails->shippingAddress->city,
+                'countryId' => $countryId
+            ];
+        }
+
+        $orderUpdate = [
+            'id' => $order->getUniqueIdentifier(),
+            'orderCustomer' => [
+                'id' => $order->getOrderCustomer()->getUniqueIdentifier(),
+                'firstName' => $firstName,
+                'lastName' => $lastName,
+                'email' => $email,
+            ],
+            'addresses' => $addresses
+        ];
+
+        $this->orderRepository->update([$orderUpdate], $context);
     }
 }
