@@ -43,13 +43,14 @@ class PaymentStatusHelper
 
     /** @var EntityRepositoryInterface */
     protected $orderTransactionRepository;
+
     /**
      * PaymentStatusHelper constructor.
      *
-     * @param LoggerService                $logger
+     * @param LoggerService $logger
      * @param OrderTransactionStateHandler $orderTransactionStateHandler
-     * @param SettingsService              $settingsService
-     * @param StateMachineRegistry         $stateMachineRegistry
+     * @param SettingsService $settingsService
+     * @param StateMachineRegistry $stateMachineRegistry
      */
     public function __construct(
         LoggerService $logger,
@@ -86,10 +87,10 @@ class PaymentStatusHelper
      * to handle the transaction to a new status.
      *
      * @param OrderTransactionEntity $transaction
-     * @param OrderEntity            $order
-     * @param Order                  $mollieOrder
-     * @param Context                $context
-     * @param string|null            $salesChannelId
+     * @param OrderEntity $order
+     * @param Order $mollieOrder
+     * @param Context $context
+     * @param string|null $salesChannelId
      *
      * @return string
      */
@@ -160,7 +161,7 @@ class PaymentStatusHelper
                 $context
             )->firstId();
 
-            if(!is_null($molliePaymentMethodId) && $molliePaymentMethodId !== $transaction->getPaymentMethodId()) {
+            if (!is_null($molliePaymentMethodId) && $molliePaymentMethodId !== $transaction->getPaymentMethodId()) {
                 $transaction->setPaymentMethodId($molliePaymentMethodId);
 
                 $this->orderTransactionRepository->update([
@@ -169,9 +170,9 @@ class PaymentStatusHelper
                         'paymentMethodId' => $molliePaymentMethodId
                     ]
                 ],
-                $context);
+                    $context);
             }
-        } catch(\Throwable $e) {
+        } catch (\Throwable $e) {
             $this->logger->addEntry(
                 $e->getMessage(),
                 $context,
@@ -188,6 +189,7 @@ class PaymentStatusHelper
         if (
             $transactionState !== null
             && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_PAID
+            // FIXME: Should probably check against OrderTransactionStates constants here
             && $mollieOrder->isPaid()
         ) {
             try {
@@ -219,6 +221,7 @@ class PaymentStatusHelper
         if (
             $transactionState !== null
             && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_CANCELED
+            // FIXME: Should probably check against OrderTransactionStates constants here
             && $mollieOrder->isCanceled()
         ) {
             try {
@@ -240,33 +243,31 @@ class PaymentStatusHelper
             return PaymentStatus::STATUS_CANCELED;
         }
 
-        /**
-            Transaction method done manually since 6.3.2
-         */
-        if (
-            $authorizedNumber > 0
-            && $authorizedNumber === $paymentsTotal
-        ) {
-            try {
-                $this->stateMachineRegistry->transition(
-                    new Transition(
-                        OrderTransactionDefinition::ENTITY_NAME,
-                        $transaction->getId(),
-                        StateMachineTransitionActions::ACTION_AUTHORIZE,
-                        'stateId'
-                    ),
-                    $context
-                );
-            } catch (Exception $e) {
-                $this->logger->addEntry(
-                    $e->getMessage(),
-                    $context,
-                    $e,
-                    [
-                        'function' => 'payment-set-transaction-state'
-                    ]
-                );
+        if ($mollieOrder->isAuthorized()) {
+            // FIXME: Should probably check against OrderTransactionStates constants here
+            if ($transactionState !== null && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_AUTHORIZED) {
+                try {
+                    $this->stateMachineRegistry->transition(
+                        new Transition(
+                            OrderTransactionDefinition::ENTITY_NAME,
+                            $transaction->getId(),
+                            StateMachineTransitionActions::ACTION_AUTHORIZE,
+                            'stateId'
+                        ),
+                        $context
+                    );
+                } catch (Exception $e) {
+                    $this->logger->addEntry(
+                        $e->getMessage(),
+                        $context,
+                        $e,
+                        [
+                            'function' => 'payment-set-transaction-state'
+                        ]
+                    );
+                }
             }
+
             // Process the order state automation
             $this->orderStateHelper->setOrderState($order, $settings->getOrderStateWithAAuthorizedTransaction(), $context);
             return PaymentStatus::STATUS_AUTHORIZED;
@@ -280,6 +281,7 @@ class PaymentStatusHelper
             && $cancelledNumber === $paymentsTotal
             && $transactionState !== null
             && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_CANCELED
+            // FIXME: Should probably check against OrderTransactionStates constants here
         ) {
             try {
                 $this->orderTransactionStateHandler->cancel($transaction->getId(), $context);
@@ -309,6 +311,7 @@ class PaymentStatusHelper
             && $expiredNumber === $paymentsTotal
             && $transactionState !== null
             && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_CANCELED
+            // FIXME: Should probably check against OrderTransactionStates constants here
         ) {
             try {
                 $this->orderTransactionStateHandler->cancel($transaction->getId(), $context);
@@ -340,6 +343,7 @@ class PaymentStatusHelper
             && (
                 $transactionState->getTechnicalName() !== PaymentStatus::STATUS_FAILED
                 && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_CANCELED
+                // FIXME: Should probably check against OrderTransactionStates constants here
             )
         ) {
             try {
@@ -383,6 +387,7 @@ class PaymentStatusHelper
             $paidNumber > 0
             && $paidNumber === $order->getAmountTotal()
             && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_PAID
+            // FIXME: Should probably check against OrderTransactionStates constants here
         ) {
             try {
                 if (method_exists($this->orderTransactionStateHandler, 'paid')) {
