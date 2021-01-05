@@ -340,6 +340,7 @@ class PaypalExpressCheckoutController extends AbstractExpressCheckoutController
         );
 
         unset($orderData[PaymentHandler::FIELD_SHIPPING_ADDRESS]);
+        unset($orderData[PaymentHandler::FIELD_BILLING_ADDRESS]);
 
         // Create the order at Mollie
         if (
