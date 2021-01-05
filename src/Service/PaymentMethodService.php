@@ -350,12 +350,22 @@ class PaymentMethodService
             $mediaId = $icons->first()->getId();
         } else {
             // Add icon to the media library
-            $iconBlob = file_get_contents('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.png');
+
+            $iconBlob = file_get_contents('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.svg');
+
+            if(!empty(trim($iconBlob))) {
+                $iconMime = 'image/svg+xml';
+                $iconExt = 'svg';
+            } else {
+                $iconBlob = file_get_contents('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.png');
+                $iconMime = 'image/png';
+                $iconExt = 'png';
+            }
 
             $mediaId = $this->mediaService->saveFile(
                 $iconBlob,
-                'png',
-                'image/png',
+                $iconExt,
+                $iconMime,
                 $fileName,
                 $context,
                 'Mollie Payments - Icons',
