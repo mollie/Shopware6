@@ -6,6 +6,7 @@ use Kiener\MolliePayments\Handler\Method\PayPalPayment;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\CartService;
 use Kiener\MolliePayments\Service\CustomerService;
+use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\ProductService;
 use Kiener\MolliePayments\Service\SettingsService;
@@ -17,10 +18,8 @@ use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\Token\TokenFactoryInterfaceV2;
-use Shopware\Core\Checkout\Payment\Cart\Token\TokenStruct;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -307,12 +306,12 @@ class PaypalExpressCheckoutController extends AbstractExpressCheckoutController
     /**
      * Returns an order that is created through the Mollie API.
      *
-     * @param string                 $applePaymentToken
-     * @param OrderEntity            $order
-     * @param string                 $returnUrl
+     * @param string $applePaymentToken
+     * @param OrderEntity $order
+     * @param string $returnUrl
      * @param OrderTransactionEntity $transaction
      *
-     * @param SalesChannelContext    $salesChannelContext
+     * @param SalesChannelContext $salesChannelContext
      *
      * @return Order|null
      * @throws RuntimeException
@@ -334,7 +333,7 @@ class PaypalExpressCheckoutController extends AbstractExpressCheckoutController
             $molliePaymentMethod,
             $transaction->getId(),
             $order,
-            (string) $returnUrl,
+            (string)$returnUrl,
             $salesChannelContext,
             $paymentData
         );
@@ -354,6 +353,17 @@ class PaypalExpressCheckoutController extends AbstractExpressCheckoutController
                 $salesChannelContext
             );
         }
+
+        $order = $this->orderService->getOrder($order->getUniqueIdentifier(), $salesChannelContext->getContext());
+
+        $this->orderService->getOrderRepository()->update([[
+            'id' => $order->getId(),
+            'customFields' => array_merge_recursive($order->getCustomFields(), [
+                CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS => [
+                    PaymentHandler::EXPRESS_CHECKOUT => PayPalPayment::PAYMENT_METHOD_NAME,
+                ]
+            ])
+        ]], $salesChannelContext->getContext());
 
         return $mollieOrder;
     }

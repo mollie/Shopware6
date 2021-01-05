@@ -3,6 +3,9 @@
 namespace Kiener\MolliePayments\Service;
 
 use Exception;
+use Kiener\MolliePayments\Handler\PaymentHandler;
+use Mollie\Api\Resources\Order;
+use Mollie\Api\Types\PaymentStatus;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
@@ -48,12 +51,12 @@ class CustomerService
     /**
      * Creates a new instance of the customer service.
      *
-     * @param EntityRepositoryInterface    $countryRepository
-     * @param EntityRepositoryInterface    $customerRepository
-     * @param EventDispatcherInterface     $eventDispatcher
-     * @param LoggerInterface              $logger
+     * @param EntityRepositoryInterface $countryRepository
+     * @param EntityRepositoryInterface $customerRepository
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param LoggerInterface $logger
      * @param SalesChannelContextPersister $salesChannelContextPersister
-     * @param EntityRepositoryInterface    $salutationRepository
+     * @param EntityRepositoryInterface $salutationRepository
      */
     public function __construct(
         EntityRepositoryInterface $countryRepository,
@@ -75,7 +78,7 @@ class CustomerService
     /**
      * Login the customer.
      *
-     * @param CustomerEntity      $customer
+     * @param CustomerEntity $customer
      * @param SalesChannelContext $context
      *
      * @return string|null
@@ -165,8 +168,8 @@ class CustomerService
      * Stores the ideal issuer in the custom fields of the customer.
      *
      * @param CustomerEntity $customer
-     * @param string         $issuerId
-     * @param Context        $context
+     * @param string $issuerId
+     * @param Context $context
      *
      * @return EntityWrittenContainerEvent
      */
@@ -197,7 +200,7 @@ class CustomerService
      * @param Context $context
      * @return CustomerEntity|null
      */
-    public function getCustomer(string $customerId, Context $context) : ?CustomerEntity
+    public function getCustomer(string $customerId, Context $context): ?CustomerEntity
     {
         $customer = null;
 
@@ -320,13 +323,13 @@ class CustomerService
 
         // Create a new customer
         if (
-            (string) $countryId !== ''
+            (string)$countryId !== ''
             && $emailAddress !== null
             && $familyName !== null
             && $givenName !== null
             && $locality !== null
             && $postalCode !== null
-            && (string) $salutationId !== ''
+            && (string)$salutationId !== ''
             && $street !== null
             && !is_null($paymentMethod)
         ) {
@@ -372,7 +375,7 @@ class CustomerService
     /**
      * Returns a country id by it's iso code.
      *
-     * @param string  $countryCode
+     * @param string $countryCode
      * @param Context $context
      *
      * @return string|null
@@ -412,5 +415,86 @@ class CustomerService
         } catch (Exception $e) {
             return null;
         }
+    }
+
+    public function updateCustomerWithMollieData(Order $mollieOrder, string $customerId, Context $context)
+    {
+        $customer = $this->getCustomer($customerId, $context);
+
+        if (!isset($mollieOrder->_embedded->payments)) {
+            return;
+        }
+
+        $paymentDetails = null;
+
+        foreach ($mollieOrder->_embedded->payments as $payment) {
+            if ($payment->status === PaymentStatus::STATUS_PAID) {
+                $paymentDetails = $payment->details;
+                break;
+            }
+        }
+
+        if (is_null($paymentDetails)) {
+            return;
+        }
+
+        if (!isset($paymentDetails->shippingAddress)) {
+            if (
+                getenv(PaymentHandler::ENV_LOCAL_DEVELOPMENT) === false
+                || (bool)getenv(PaymentHandler::ENV_LOCAL_DEVELOPMENT) === false
+            ) {
+                throw new \Exception("No shipping address provided by the payment processor");
+            } else {
+                $paymentDetails->shippingAddress = new \stdClass();
+                $paymentDetails->shippingAddress->streetAndNumber = "Express Checkout Test Address";
+                $paymentDetails->shippingAddress->postalCode = "Express Checkout Test Zipcode";
+                $paymentDetails->shippingAddress->city = "Express Checkout Test City";
+                $paymentDetails->shippingAddress->country = "NL";
+            }
+        }
+
+        list($firstName, $lastName) = explode(' ', $paymentDetails->consumerName, 2);
+        $email = $paymentDetails->consumerAccount;
+
+        $countryId = $this->countryRepository->searchIds(
+            (new Criteria())
+                ->addFilter(new EqualsFilter('iso', $paymentDetails->shippingAddress->country)),
+            $context
+        )->firstId();
+
+        $billingAddress = [
+            'id' => $customer->getDefaultBillingAddress()->getUniqueIdentifier(),
+            'firstName' => $firstName,
+            'lastName' => $lastName,
+            'street' => $paymentDetails->shippingAddress->streetAndNumber,
+            'zipcode' => $paymentDetails->shippingAddress->postalCode,
+            'city' => $paymentDetails->shippingAddress->city,
+            'countryId' => $countryId
+        ];
+
+        $shippingAddress = [
+            'id' => $customer->getDefaultShippingAddress()->getUniqueIdentifier(),
+            'firstName' => $firstName,
+            'lastName' => $lastName,
+            'street' => $paymentDetails->shippingAddress->streetAndNumber,
+            'zipcode' => $paymentDetails->shippingAddress->postalCode,
+            'city' => $paymentDetails->shippingAddress->city,
+            'countryId' => $countryId
+        ];
+
+        $customerUpdate = [
+            'id' => $customer->getUniqueIdentifier(),
+            'firstName' => $firstName,
+            'lastName' => $lastName,
+            'email' => $email,
+            'defaultBillingAddress' => $billingAddress,
+            'defaultShippingAddress' => $shippingAddress,
+            'activeBillingAddress' => $billingAddress,
+            'activeShippingAddress' => $shippingAddress,
+        ];
+
+        $this->customerRepository->update([$customerUpdate], $context);
+
+
     }
 }
