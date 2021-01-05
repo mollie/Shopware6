@@ -35,10 +35,6 @@ use Symfony\Component\Routing\RouterInterface;
 
 class PaypalExpressCheckoutController extends AbstractExpressCheckoutController
 {
-//
-//    /** @var MollieApiClient */
-//    private $apiClient;
-
     /** @var CartService */
     private $cartService;
 
@@ -50,24 +46,9 @@ class PaypalExpressCheckoutController extends AbstractExpressCheckoutController
 
     /** @var OrderService */
     private $orderService;
-//
-//    /** @var PaymentHandler */
-//    private $paymentHandler;
-//
-//    /** @var EntityRepositoryInterface */
-//    private $paymentMethodRepository;
 
     /** @var ProductService */
     private $productService;
-//
-//    /** @var RouterInterface */
-//    private $router;
-//
-//    /** @var SalesChannelContextFactory */
-//    private $salesChannelContextFactory;
-//
-//    /** @var SettingsService */
-//    private $settingsService;
 
     /** @var ShippingMethodService */
     private $shippingMethodService;
@@ -88,17 +69,11 @@ class PaypalExpressCheckoutController extends AbstractExpressCheckoutController
         TokenFactoryInterfaceV2 $tokenFactory
     )
     {
-//        $this->apiClient = $apiClient;
         $this->cartService = $cartService;
         $this->customerService = $customerService;
         $this->shopService = $shopService;
         $this->orderService = $orderService;
-//        $this->paymentHandler = $paymentHandler;
-//        $this->paymentMethodRepository = $paymentMethodRepository;
         $this->productService = $productService;
-//        $this->router = $router;
-//        $this->salesChannelContextFactory = $salesChannelContextFactory;
-//        $this->settingsService = $settingsService;
         $this->shippingMethodService = $shippingMethodService;
 
         parent::__construct(
