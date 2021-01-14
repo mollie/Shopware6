@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Service;
 
 use Exception;
+use Kiener\MolliePayments\Handler\PaymentHandler;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Types\OrderLineType;
 use Mollie\Api\Types\PaymentStatus;
@@ -398,8 +399,19 @@ class OrderService
             return;
         }
 
-        if(!isset($paymentDetails->shippingAddress)) {
-            throw new \Exception("No shipping address provided by the payment processor");
+        if (!isset($paymentDetails->shippingAddress)) {
+            if (
+                getenv(PaymentHandler::ENV_LOCAL_DEVELOPMENT) === false
+                || (bool)getenv(PaymentHandler::ENV_LOCAL_DEVELOPMENT) === false
+            ) {
+                throw new \Exception("No shipping address provided by the payment processor");
+            } else {
+                $paymentDetails->shippingAddress = new \stdClass();
+                $paymentDetails->shippingAddress->streetAndNumber = "Express Checkout Test Address";
+                $paymentDetails->shippingAddress->postalCode = "Express Checkout Test Zipcode";
+                $paymentDetails->shippingAddress->city = "Express Checkout Test City";
+                $paymentDetails->shippingAddress->country = "NL";
+            }
         }
 
         list($firstName, $lastName) = explode(' ', $paymentDetails->consumerName, 2);
@@ -413,7 +425,7 @@ class OrderService
 
         $addresses = [];
 
-        foreach($order->getAddresses() as $address) {
+        foreach ($order->getAddresses() as $address) {
             $addresses[] = [
                 'id' => $address->getUniqueIdentifier(),
                 'firstName' => $firstName,

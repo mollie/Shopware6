@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Storefront\Controller;
 use Exception;
 use Kiener\MolliePayments\Event\PaymentPageFailEvent;
 use Kiener\MolliePayments\Event\PaymentPageRedirectEvent;
+use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Helper\DeliveryStateHelper;
 use Kiener\MolliePayments\Helper\OrderStateHelper;
 use Kiener\MolliePayments\Helper\PaymentStatusHelper;
@@ -22,16 +23,13 @@ use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\OrderStates;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\PaymentHandlerRegistry;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Event\BusinessEventDispatcher;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\RouterInterface;
@@ -65,6 +63,9 @@ class PaymentController extends StorefrontController
     /** @var LoggerService */
     private $logger;
 
+    /** @var PaymentHandlerRegistry */
+    private $paymentHandlerRegistry;
+
     public function __construct(
         RouterInterface $router,
         MollieApiClient $apiClient,
@@ -74,7 +75,8 @@ class PaymentController extends StorefrontController
         PaymentStatusHelper $paymentStatusHelper,
         SettingsService $settingsService,
         TransactionService $transactionService,
-        LoggerService $logger
+        LoggerService $logger,
+        PaymentHandlerRegistry $paymentHandlerRegistry
     )
     {
         $this->router = $router;
@@ -86,6 +88,7 @@ class PaymentController extends StorefrontController
         $this->settingsService = $settingsService;
         $this->transactionService = $transactionService;
         $this->logger = $logger;
+        $this->paymentHandlerRegistry = $paymentHandlerRegistry;
     }
 
     /**
@@ -200,6 +203,24 @@ class PaymentController extends StorefrontController
             }
         }
 
+
+        // Do finalize express checkout here.
+        if (
+            $mollieOrder->isPaid() &&
+            is_array($customFields) &&
+            isset($customFields['mollie_payments'][PaymentHandler::EXPRESS_CHECKOUT])) {
+
+            $paymentMethod = $transaction->getPaymentMethod();
+
+            /** @var PaymentHandler $paymentHandler */
+            $paymentHandler = $this->paymentHandlerRegistry->getAsyncHandler($paymentMethod->getHandlerIdentifier());
+
+            if ($paymentHandler::PAYMENT_METHOD_NAME === $customFields['mollie_payments'][PaymentHandler::EXPRESS_CHECKOUT]) {
+                $paymentHandler->updateExpressCheckout($mollieOrder, $order, $context);
+            }
+        }
+
+
         /**
          * The payment status of the order is fetched from Mollie's Orders API. We
          * use this payment status to set the status in Shopware.
@@ -285,6 +306,7 @@ class PaymentController extends StorefrontController
         $this->eventDispatcher->dispatch($paymentPageRedirectEvent, $paymentPageRedirectEvent::EVENT_NAME);
         return new RedirectResponse($redirectUrl);
     }
+
     /**
      * @RouteScope(scopes={"storefront"})
      * @Route("/mollie/payment/retry/{transactionId}/{redirectUrl}", defaults={"csrf_protected"=false},

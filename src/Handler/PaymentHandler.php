@@ -60,6 +60,8 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
     public const FIELD_EXPIRES_AT = 'expiresAt';
     public const ENV_LOCAL_DEVELOPMENT = 'MOLLIE_LOCAL_DEVELOPMENT';
 
+    public const EXPRESS_CHECKOUT = 'express-checkout';
+
     /** @var string */
     protected $paymentMethod;
 
@@ -377,16 +379,16 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
                 'We can\'t fetch the order ' . $order->getOrderNumber() . ' (' . $mollieOrderId . ') from the Orders API'
             );
         }
-
-
-        if (!is_null($request->get('_express_checkout')) &&
-            (
-                $request->request->getAlnum('_express_checkout') === self::PAYMENT_METHOD_NAME ||
-                $request->request->getBoolean('_express_checkout') === true
-            ) &&
-            method_exists($this, 'finalizeExpressCheckout')) {
-            $this->finalizeExpressCheckout($mollieOrder, $order, $salesChannelContext->getContext());
-        }
+//
+//
+//        if (!is_null($request->get('_express_checkout')) &&
+//            (
+//                $request->request->getAlnum('_express_checkout') === self::PAYMENT_METHOD_NAME ||
+//                $request->request->getBoolean('_express_checkout') === true
+//            ) &&
+//            method_exists($this, 'finalizeExpressCheckout')) {
+//            $this->finalizeExpressCheckout($mollieOrder, $order, $salesChannelContext->getContext());
+//        }
 
         /**
          * Process the payment status of the order. Returns a PaymentStatus string which
@@ -743,6 +745,23 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         }
 
         return $mollieOrder;
+    }
+
+    /**
+     * Function to use when using express checkout, to update the order with customer data from mollie.
+     *
+     * @param Order $mollieOrder
+     * @param OrderEntity $order
+     * @param SalesChannelContext $context
+     * @throws Exception
+     */
+    public function updateExpressCheckout(Order $mollieOrder, OrderEntity $order, SalesChannelContext $context)
+    {
+        $this->orderService->updateOrderWithMollieData($mollieOrder, $order->getUniqueIdentifier(), $context->getContext());
+
+        if (!is_null($context->getCustomer()) && $context->getCustomer()->getGuest()) {
+            $this->customerService->updateCustomerWithMollieData($mollieOrder, $context->getCustomer()->getUniqueIdentifier(), $context->getContext());
+        }
     }
 
     /**

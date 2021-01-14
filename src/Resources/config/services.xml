@@ -204,6 +204,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\TransactionService" />
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService" />
 
+            <argument type="service" id="Shopware\Core\Checkout\Payment\Cart\PaymentHandler\PaymentHandlerRegistry" />
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>

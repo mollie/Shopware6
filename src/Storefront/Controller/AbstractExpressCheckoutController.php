@@ -4,49 +4,28 @@ namespace Kiener\MolliePayments\Storefront\Controller;
 
 
 use Exception;
-use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Handler\PaymentHandler;
-use Kiener\MolliePayments\Helper\ProfileHelper;
-use Kiener\MolliePayments\Service\CartService;
-use Kiener\MolliePayments\Service\CustomerService;
-use Kiener\MolliePayments\Service\OrderService;
-use Kiener\MolliePayments\Service\ProductService;
 use Kiener\MolliePayments\Service\SettingsService;
-use Kiener\MolliePayments\Service\ShippingMethodService;
-use Kiener\MolliePayments\Service\ShopService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order;
-use Mollie\Api\Resources\Profile;
 use RuntimeException;
-use Shopware\Core\Checkout\Cart\Cart;
-use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\Token\TokenFactoryInterfaceV2;
 use Shopware\Core\Checkout\Payment\Cart\Token\TokenStruct;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
-use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
-use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
-use Shopware\Core\Framework\DataAbstractionLayer\Pricing\Price;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
-use Shopware\Core\Framework\Routing\Annotation\RouteScope;
-use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
-use Shopware\Storefront\Framework\Routing\Router;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -95,12 +74,12 @@ abstract class AbstractExpressCheckoutController extends StorefrontController
     /**
      * Returns an order that is created through the Mollie API.
      *
-     * @param string                 $applePaymentToken
-     * @param OrderEntity            $order
-     * @param string                 $returnUrl
+     * @param string $applePaymentToken
+     * @param OrderEntity $order
+     * @param string $returnUrl
      * @param OrderTransactionEntity $transaction
      *
-     * @param SalesChannelContext    $salesChannelContext
+     * @param SalesChannelContext $salesChannelContext
      *
      * @return Order|null
      * @throws RuntimeException
@@ -122,7 +101,7 @@ abstract class AbstractExpressCheckoutController extends StorefrontController
             $molliePaymentMethod,
             $transaction->getId(),
             $order,
-            (string) $returnUrl,
+            (string)$returnUrl,
             $salesChannelContext,
             $paymentData
         );
@@ -147,7 +126,7 @@ abstract class AbstractExpressCheckoutController extends StorefrontController
     /**
      * Returns a payment method by it's handler.
      *
-     * @param string       $handlerIdentifier
+     * @param string $handlerIdentifier
      * @param Context|null $context
      *
      * @return PaymentMethodEntity|null
@@ -176,7 +155,7 @@ abstract class AbstractExpressCheckoutController extends StorefrontController
     /**
      * Returns a payment method id by it's handler.
      *
-     * @param string       $handlerIdentifier
+     * @param string $handlerIdentifier
      * @param Context|null $context
      *
      * @return array|mixed|string|null
@@ -200,13 +179,13 @@ abstract class AbstractExpressCheckoutController extends StorefrontController
      * but this doesn't effect the context given as parameter.
      * Because of that, a new context for the following operations is created
      *
-     * @param string              $newToken
+     * @param string $newToken
      * @param SalesChannelContext $context
      *
-     * @param string|null         $countryId
-     * @param string              $customerId
-     * @param string              $paymentMethodId
-     * @param string|null         $shippingMethodId
+     * @param string|null $countryId
+     * @param string $customerId
+     * @param string $paymentMethodId
+     * @param string|null $shippingMethodId
      *
      * @return SalesChannelContext
      */
@@ -223,22 +202,22 @@ abstract class AbstractExpressCheckoutController extends StorefrontController
         $options = [];
 
         // Add country to options
-        if ((string) $countryId !== '') {
+        if ((string)$countryId !== '') {
             $options[SalesChannelContextService::COUNTRY_ID] = $countryId;
         }
 
         // Add customer to options
-        if ((string) $customerId !== '') {
+        if ((string)$customerId !== '') {
             $options[SalesChannelContextService::CUSTOMER_ID] = $customerId;
         }
 
         // Add payment method to options
-        if ((string) $paymentMethodId !== '') {
+        if ((string)$paymentMethodId !== '') {
             $options[SalesChannelContextService::PAYMENT_METHOD_ID] = $paymentMethodId;
         }
 
         // Add shipping method to options
-        if ((string) $shippingMethodId !== '') {
+        if ((string)$shippingMethodId !== '') {
             $options[SalesChannelContextService::SHIPPING_METHOD_ID] = $shippingMethodId;
         }
 
@@ -259,7 +238,7 @@ abstract class AbstractExpressCheckoutController extends StorefrontController
      *
      * @param SalesChannelContext $context
      *
-     * @param string|null         $mode
+     * @param string|null $mode
      *
      * @throws ApiException
      */
@@ -287,9 +266,10 @@ abstract class AbstractExpressCheckoutController extends StorefrontController
         }
     }
 
-    protected function createReturnUrlForOrder(OrderEntity $order, ?string $errorUrl = null): string {
+    protected function createReturnUrlForOrder(OrderEntity $order, ?string $errorUrl = null): string
+    {
         $finishUrl = $this->generateUrl('frontend.checkout.finish.page', ['orderId' => $order->getUniqueIdentifier()]);
-        if(is_null($errorUrl)) {
+        if (is_null($errorUrl)) {
             $errorUrl = $this->generateUrl('frontend.account.edit-order.page', ['orderId' => $order->getUniqueIdentifier()]);
         }
 
@@ -308,14 +288,13 @@ abstract class AbstractExpressCheckoutController extends StorefrontController
 
         $token = $this->tokenFactory->generateToken($tokenStruct);
 
-        return $this->assembleReturnUrl($token, $transaction->getPaymentMethod()->getCustomFields()['mollie_payment_method_name']);
+        return $this->assembleReturnUrl($token);
     }
 
-    protected function assembleReturnUrl(string $token, ?string $paymentMethodName = null): string
+    protected function assembleReturnUrl(string $token): string
     {
         $parameter = [
             '_sw_payment_token' => $token,
-            '_express_checkout' => $paymentMethodName ?? true,
         ];
 
         return $this->router->generate('payment.finalize.transaction', $parameter, UrlGeneratorInterface::ABSOLUTE_URL);
