@@ -17,6 +17,10 @@
         <div class="mb-2 d-none only-support-apple-pay">
             {% include '@MolliePayments/mollie/component/apple-pay-direct-button.twig' %}
         </div>
+
+        {% include '@MolliePayments/mollie/component/paypal-express-checkout-button.twig' with {
+            cols: 'mb-2'
+        } %}
     {% endif %}
 
     {{ parent() }}
