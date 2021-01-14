@@ -9,14 +9,14 @@
         shippingMethodId: context.shippingMethod.id,
         csrfToken: sw_csrf("frontend.mollie.paypal-ecs.checkout", {"mode": "token"})
     } %}
-    <button type="button" class="btn btn-primary btn-block btn-buy js-paypal-ecs w-100 d-none"
+    <button type="button" class="btn btn-primary btn-block js-paypal-ecs w-100 d-none"
             data-mollie-paypal-express-checkout="true"
             data-mollie-paypal-express-checkout-options="{{ paypal_ecs | json_encode }}">
         <span>{{ "molliePayments.components.paypalExpressCheckoutButton.label"|trans }}</span>
         <svg xmlns="http://www.w3.org/2000/svg"
              viewBox="0 0 526.77502 140.375"
-             height="28.075"
-             width="105.355"
+             height="24"
+             width="90"
              xml:space="preserve"
              version="1.1"
              id="svg2">
