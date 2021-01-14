@@ -437,7 +437,11 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
 
             throw new CustomerCanceledAsyncPaymentException(
                 $transaction->getOrderTransaction()->getUniqueIdentifier(),
-                'Payment for order ' . $order->getOrderNumber() . ' (' . $mollieOrder->id . ') was cancelled by the customer.'
+                sprintf(
+                    'Payment for order %s (%s) was cancelled by the customer.',
+                    $order->getOrderNumber(),
+                    $mollieOrder->id
+                )
             );
         }
     }

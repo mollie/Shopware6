@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Subscriber;
 
 
 use Kiener\MolliePayments\Service\CustomFieldService;
+use Kiener\MolliePayments\Service\PaymentMethodService;
 use Mollie\Api\MollieApiClient;
 use Shopware\Core\Checkout\Order\Event\OrderStateMachineStateChangeEvent;
 use Shopware\Core\Checkout\Order\OrderStates;
@@ -30,11 +31,16 @@ class OrderStateSubscriber implements EventSubscriberInterface
     /** @var MollieApiClient $apiClient */
     private $apiClient;
 
+    /** @var PaymentMethodService */
+    private $paymentMethodService;
+
     public function __construct(
-        MollieApiClient $apiClient
+        MollieApiClient $apiClient,
+        PaymentMethodService $paymentMethodService
     )
     {
         $this->apiClient = $apiClient;
+        $this->paymentMethodService = $paymentMethodService;
     }
 
     public function onEnterOrderStateCancelled(OrderStateMachineStateChangeEvent $event)
@@ -42,13 +48,21 @@ class OrderStateSubscriber implements EventSubscriberInterface
         $molliePaymentMethod = null;
 
         // use filterByState(OrderTransactionStates::STATE_OPEN)?
-        $paymentMethod = $event->getOrder()->getTransactions()->last()->getPaymentMethod();
-        if (!is_null($paymentMethod->getCustomFields())
+        $lastTransaction = $event->getOrder()->getTransactions()->last();
+
+        $paymentMethod = $lastTransaction->getPaymentMethod();
+
+        if (is_null($paymentMethod) && !is_null($lastTransaction->getPaymentMethodId())) {
+            $paymentMethod = $this->paymentMethodService->getPaymentMethodById($lastTransaction->getPaymentMethodId());
+        }
+
+        if (!is_null($paymentMethod) && !is_null($paymentMethod->getCustomFields())
             && array_key_exists('mollie_payment_method_name', $paymentMethod->getCustomFields())) {
             $molliePaymentMethod = $paymentMethod->getCustomFields()['mollie_payment_method_name'];
         }
 
-        if(is_null($molliePaymentMethod) || !in_array($molliePaymentMethod, ['klarnapaylater', 'klarnasliceit'])) {
+        if (is_null($molliePaymentMethod) ||
+            !in_array($molliePaymentMethod, ['klarnapaylater', 'klarnasliceit'])) {
             return;
         }
 
