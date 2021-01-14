@@ -3,6 +3,7 @@
 {% block base_script_router %}
     {{ parent() }}
     <script>
+        window.router['frontend.mollie.paypal-ecs.available'] = '{{ path('frontend.mollie.paypal-ecs.available') }}';
         window.router['frontend.mollie.paypal-ecs.checkout'] = '{{ path('frontend.mollie.paypal-ecs.checkout') }}';
     </script>
 {% endblock %}

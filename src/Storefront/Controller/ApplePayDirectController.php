@@ -640,15 +640,10 @@ class ApplePayDirectController extends StorefrontController
             $criteria->addFilter(new EqualsFilter('handlerIdentifier', $handlerIdentifier));
 
             // Get payment methods
-            $paymentMethods = $this->paymentMethodRepository->search($criteria, $context ?? Context::createDefaultContext());
-
-            if (
-                $paymentMethods !== null
-                && $paymentMethods->count()
-                && $paymentMethods->first() !== null
-            ) {
-                return $paymentMethods->first();
-            }
+            return $this->paymentMethodRepository->search(
+                $criteria,
+                $context ?? Context::createDefaultContext()
+            )->first();
         } catch (Exception $e) {
             return null;
         }
@@ -665,13 +660,13 @@ class ApplePayDirectController extends StorefrontController
     private function getPaymentMethodId(string $handlerIdentifier, Context $context = null)
     {
         try {
-            $criteria = new Criteria();
-            $criteria->addFilter(new EqualsFilter('handlerIdentifier', $handlerIdentifier));
+            $paymentMethod = $this->getPaymentMethod($handlerIdentifier, $context);
 
-            // Get payment methods
-            $paymentMethods = $this->paymentMethodRepository->searchIds($criteria, $context ?? Context::createDefaultContext())->getIds();
-            return !empty($paymentMethods) ? $paymentMethods[0] : null;
-        } catch (Exception $e) {
+            if(!is_null($paymentMethod)) {
+                return $paymentMethod->getId();
+            }
+            return null;
+        } catch (\Throwable $e) {
             return null;
         }
     }

@@ -61,6 +61,11 @@ class MollieSettingStruct extends Struct
     protected $enableApplePayDirect = false;
 
     /**
+     * @var bool
+     */
+    protected $enablePayPalShortcut = false;
+
+    /**
      * @var int
      */
     protected $paymentMethodBankTransferDueDateDays;
@@ -340,5 +345,21 @@ class MollieSettingStruct extends Struct
     public function setEnableApplePayDirect(bool $enableApplePayDirect): void
     {
         $this->enableApplePayDirect = $enableApplePayDirect;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnablePayPalShortcut(): bool
+    {
+        return $this->enablePayPalShortcut;
+    }
+
+    /**
+     * @param bool $enablePayPalShortcut
+     */
+    public function setEnablePayPalShortcut(bool $enablePayPalShortcut): void
+    {
+        $this->enablePayPalShortcut = $enablePayPalShortcut;
     }
 }

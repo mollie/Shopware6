@@ -88,6 +88,42 @@ class PaypalExpressCheckoutController extends AbstractExpressCheckoutController
 
     /**
      * @RouteScope(scopes={"storefront"})
+     * @Route("/mollie/paypal-ecs/available",
+     *     defaults={"XmlHttpRequest"=true},
+     *     name="frontend.mollie.paypal-ecs.available",
+     *     options={"seo"="false"},
+     *     methods={"GET"}
+     *     )
+     *
+     * @param SalesChannelContext $context
+     *
+     * @return JsonResponse
+     */
+    public function available(Request $request, SalesChannelContext $context): JsonResponse
+    {
+        $isAvailable = false;
+
+        $settings = $this->settingsService->getSettings(
+            $context->getSalesChannel()->getId(),
+            $context->getContext()
+        );
+
+        if($settings->isEnablePayPalShortcut()) {
+            /** @var string[]|null $paymentMethodIds */
+            $paymentMethodIds = $context->getSalesChannel()->getPaymentMethodIds();
+
+            $paymentMethod = $this->getPaymentMethod(PayPalPayment::class, $context->getContext());
+
+            $isAvailable = $paymentMethod->getActive() && in_array($paymentMethod->getId(), $paymentMethodIds);
+        }
+
+        return new JsonResponse([
+            'isAvailable' => $isAvailable
+        ]);
+    }
+
+    /**
+     * @RouteScope(scopes={"storefront"})
      * @Route("/mollie/paypal-ecs/checkout",
      *     defaults={"XmlHttpRequest"=true},
      *     name="frontend.mollie.paypal-ecs.checkout",

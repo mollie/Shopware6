@@ -12,23 +12,38 @@ export default class MolliePaypalExpressCheckout extends Plugin {
         countryCode: null,
         shippingMethodId: null,
         route: window.router['frontend.mollie.paypal-ecs.checkout'],
+        availableRoute: window.router['frontend.mollie.paypal-ecs.available'],
         csrfToken: null,
     }
 
     init() {
         this._client = new HttpClient();
-        this._registerEvents();
+        this._available()
+            .then(() => this.el.classList.remove('d-none'))
+            .then(() => this._registerEvents());
     }
 
     update() {
-        this._registerEvents();
+        this._available().then(() => this._registerEvents());
     }
 
-    _onClick(event) {
+    _available() {
+        const self = this;
+        return new Promise((resolve) => {
+            self._client.get(self.options.availableRoute, response => resolve(JSON.parse(response)))
+        }).then(expressCheckout => {
+            if (expressCheckout.isAvailable) {
+                Promise.resolve();
+            } else {
+                Promise.reject();
+            }
+        })
+    }
+
+    _onClick() {
         ElementLoadingIndicatorUtil.create(this.el);
 
         this._checkout();
-        // this._client.post(this.options.route, JSON.stringify(data), content => this._parseRequest(JSON.parse(content)));
     }
 
     _checkout() {
