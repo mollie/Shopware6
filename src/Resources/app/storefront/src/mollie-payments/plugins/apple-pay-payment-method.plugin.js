@@ -10,7 +10,7 @@ export default class MollieApplePayPaymentMethod extends Plugin {
                 Element.prototype.msMatchesSelector ||
                 Element.prototype.oMatchesSelector ||
                 Element.prototype.webkitMatchesSelector ||
-                function(s) {
+                function (s) {
                     let matches = (this.document || this.ownerDocument).querySelectorAll(s), i = matches.length;
                     // eslint-disable-next-line no-empty
                     while (--i >= 0 && matches.item(i) !== this) {}

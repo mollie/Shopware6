@@ -80,7 +80,7 @@ export default class MollieIDealIssuer extends Plugin {
                     const fetchUrl = shopUrl + '/mollie/ideal/store-issuer/' + customerId + '/' + iDealIssuer.value;
 
                     // Store the token on the customer
-                    fetch(fetchUrl, { headers: { 'Content-Type': 'application/json; charset=utf-8' } })
+                    fetch(fetchUrl, {headers: {'Content-Type': 'application/json; charset=utf-8'}})
                         .then(paymentForm.submit())
                         .catch(paymentForm.submit());
                 }
