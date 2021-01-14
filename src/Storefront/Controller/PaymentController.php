@@ -286,13 +286,16 @@ class PaymentController extends StorefrontController
 
             $this->eventDispatcher->dispatch($paymentPageFailEvent, $paymentPageFailEvent::EVENT_NAME);
 
-            return $this->renderStorefront('@Storefront/storefront/page/checkout/payment/failed.html.twig', [
-                'redirectUrl' => $this->router->generate('frontend.mollie.payment.retry', [
-                    'transactionId' => $transactionId,
-                    'redirectUrl' => urlencode($redirectUrl),
-                ]),
-                'displayUrl' => $redirectUrl,
-            ]);
+            return $this->renderStorefront(
+                '@Storefront/storefront/page/checkout/payment/failed.html.twig',
+                [
+                    'redirectUrl' => $this->router->generate('frontend.mollie.payment.retry', [
+                        'transactionId' => $transactionId,
+                        'redirectUrl' => urlencode($redirectUrl),
+                    ]),
+                    'displayUrl' => $redirectUrl,
+                ]
+            );
         }
 
         $paymentPageRedirectEvent = new PaymentPageRedirectEvent(
