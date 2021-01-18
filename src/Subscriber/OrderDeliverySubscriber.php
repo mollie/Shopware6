@@ -172,8 +172,16 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
                     || $delivery->getCustomFields()[self::PARAM_MOLLIE_PAYMENTS][self::PARAM_IS_SHIPPED] === false
                 )
             ) {
-                // Ship the order at Mollie
-                $mollieOrder->shipAll();
+                $itemsToBeShipped = 0;
+
+                foreach($mollieOrder->lines as $line) {
+                    $itemsToBeShipped += $line->shippableQuantity ?? 0;
+                }
+
+                if($itemsToBeShipped > 0) {
+                    // Ship the order at Mollie
+                    $mollieOrder->shipAll();
+                }
 
                 // Add is shipped flag to custom fields
                 $this->deliveryService->updateDelivery([
