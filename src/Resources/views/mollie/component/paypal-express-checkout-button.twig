@@ -2,16 +2,16 @@
     {% set settings = page.extensions[constant('Kiener\\MolliePayments\\Subscriber\\PayPalExpressCheckoutSubscriber::MOLLIE_PAYPAL_EXPRESS_CHECKOUT_BUTTON_DATA_EXTENSION_ID')] %}
 
     {% if settings and settings.enabled %}
+    {#            productName: product.translated.name,#}
+    {#            productPrice: productPrice,#}
+    {#            currency: context.currency.translated.shortName,#}
+    {#            currencyId: context.currency.id,#}
         {% set paypal_ecs = {
             productId: product.id,
-        productName: product.translated.name,
-        productPrice: productPrice,
-        currency: context.currency.translated.shortName,
-        currencyId: context.currency.id,
             countryCode: context.shippingLocation.country.iso,
             shippingMethodId: context.shippingMethod.id,
             csrfToken: sw_csrf("frontend.mollie.paypal-ecs.checkout", {"mode": "token"}),
-    } %}
+            cartToken: page.cart ? page.cart.token : null,
         } %}
         <button type="button" class="btn btn-primary btn-block js-paypal-ecs w-100 d-none paypal-{{ settings.color }}"
                 data-mollie-paypal-express-checkout="true"

@@ -140,6 +140,9 @@ class PaypalExpressCheckoutController extends AbstractExpressCheckoutController
         /** @var Cart $cart */
         $cart = null;
 
+        /** @var string|null $shippingMethodId */
+        $cartToken = $request->get('cartToken');
+
         /** @var CustomerEntity|null $customer */
         $customer = $context->getCustomer();
 
@@ -176,12 +179,14 @@ class PaypalExpressCheckoutController extends AbstractExpressCheckoutController
         /** @var ShippingMethodEntity $shippingMethod */
         $shippingMethod = $this->shippingMethodService->getShippingMethodById($shippingMethodId, $context);
 
-        // Create a new cart for the given product
-        if (
+        if(!is_null($cartToken)) {
+            $cart = $this->cartService->getCart($cartToken, $context);
+        } else if (
             $paymentMethod !== null
             && $shippingMethod !== null
             && $productId !== null
         ) {
+            // Create a new cart for the given product
             $cart = $this->cartService->createCartForProduct(
                 $productId,
                 $paymentMethod,

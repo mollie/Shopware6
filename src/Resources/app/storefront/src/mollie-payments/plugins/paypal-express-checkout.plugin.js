@@ -5,15 +5,16 @@ import ElementLoadingIndicatorUtil from 'src/utility/loading-indicator/element-l
 export default class MolliePaypalExpressCheckout extends Plugin {
     static options = {
         productId: null,
-        productName: null,
-        productPrice: null,
-        currency: null,
-        currencyId: null,
+        // productName: null,
+        // productPrice: null,
+        // currency: null,
+        // currencyId: null,
         countryCode: null,
         shippingMethodId: null,
         route: window.router['frontend.mollie.paypal-ecs.checkout'],
         availableRoute: window.router['frontend.mollie.paypal-ecs.available'],
         csrfToken: null,
+        cartToken: null,
     }
 
     init() {
@@ -94,12 +95,13 @@ export default class MolliePaypalExpressCheckout extends Plugin {
     _getRequestData() {
         const data = {
             productId: this.options.productId,
-            productName: this.options.productName,
-            productPrice: this.options.productPrice,
-            currency: this.options.currency,
-            currencyId: this.options.currencyId,
+            // productName: this.options.productName,
+            // productPrice: this.options.productPrice,
+            // currency: this.options.currency,
+            // currencyId: this.options.currencyId,
             countryCode: this.options.countryCode,
             shippingMethodId: this.options.shippingMethodId,
+            cartToken: this.options.cartToken,
             location: location.toString(),
         };
 
@@ -115,7 +117,6 @@ export default class MolliePaypalExpressCheckout extends Plugin {
         this.el.removeEventListener('click', onClick);
         this.el.addEventListener('click', onClick);
     }
-
 
     displayNotification(message, type) {
         let flashBagsContainer = document.querySelector('div.flashbags.container');
