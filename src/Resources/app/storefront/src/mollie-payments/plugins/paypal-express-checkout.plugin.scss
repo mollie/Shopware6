@@ -1,25 +1,126 @@
 $paypal-gold: #ffc439;
-$paypal-text-dark: #111;
+$paypal-gold-border: $paypal-gold;
+$paypal-gold-text: #111;
+
+$paypal-blue: #009cde;
+$paypal-blue-border: $paypal-blue;
+$paypal-blue-text: #fff;
+
+$paypal-silver: #eee;
+$paypal-silver-border: $paypal-silver;
+$paypal-silver-text: #2C2E2F;
+
+$paypal-white: #fff;
+$paypal-white-border: #2C2E2F;
+$paypal-white-text: #2C2E2F;
+
+$paypal-black: #2C2E2F;
+$paypal-black-border: $paypal-black;
+$paypal-black-text: #fff;
 
 .mollie-paypal-express-checkout {
     button {
-        background-color: $paypal-gold;
-        border-color: $paypal-gold;
-        color: $paypal-text-dark !important;
-
-        &:hover, &:active {
-            background-color: darken($paypal-gold, 10) !important;
-            border-color: darken($paypal-gold, 10) !important;
-        }
-
-        &:focus {
-            box-shadow: 0 0 0 0.2rem transparentize($paypal-gold, 0.5) !important;
-        }
-
-        svg {
-            margin-left: 4px;
+        img {
             max-height: 24px;
             max-width: 90px;
         }
+
+        &.paypal {
+            &-gold {
+                background-color: $paypal-gold;
+                border-color: $paypal-gold-border;
+                color: $paypal-gold-text !important;
+
+                &:hover, &:active {
+                    background-color: darken($paypal-gold, 10) !important;
+                    border-color: darken($paypal-gold-border, 10) !important;
+                }
+
+                &:focus {
+                    box-shadow: 0 0 0 0.2rem transparentize($paypal-gold-border, 0.5) !important;
+
+                    &:hover, &:active {
+                        box-shadow: 0 0 0 0.2rem transparentize(darken($paypal-gold-border, 10), 0.5) !important;
+                    }
+                }
+            }
+
+            &-blue {
+                background-color: $paypal-blue;
+                border-color: $paypal-blue-border;
+                color: $paypal-blue-text !important;
+
+                &:hover, &:active {
+                    background-color: lighten($paypal-blue, 10) !important;
+                    border-color: lighten($paypal-blue-border, 10) !important;
+                }
+
+                &:focus {
+                    box-shadow: 0 0 0 0.2rem transparentize($paypal-blue-border, 0.5) !important;
+
+                    &:hover, &:active {
+                        box-shadow: 0 0 0 0.2rem transparentize(lighten($paypal-blue-border, 10), 0.5) !important;
+                    }
+                }
+            }
+
+            &-silver {
+                background-color: $paypal-silver;
+                border-color: $paypal-silver-border;
+                color: $paypal-silver-text !important;
+
+                &:hover, &:active {
+                    background-color: darken($paypal-silver, 10) !important;
+                    border-color: darken($paypal-silver-border, 10) !important;
+                }
+
+                &:focus {
+                    box-shadow: 0 0 0 0.2rem transparentize($paypal-silver-border, 0.5) !important;
+
+                    &:hover, &:active {
+                        box-shadow: 0 0 0 0.2rem transparentize(darken($paypal-silver-border, 10), 0.5) !important;
+                    }
+                }
+            }
+
+            &-white {
+                background-color: $paypal-white;
+                border-color: $paypal-white-border;
+                color: $paypal-white-text !important;
+
+                &:hover, &:active {
+                    background-color: darken($paypal-white, 10) !important;
+                    border-color: darken($paypal-white-border, 10) !important;
+                }
+
+                &:focus {
+                    box-shadow: 0 0 0 0.2rem transparentize($paypal-white-border, 0.5) !important;
+
+                    &:hover, &:active {
+                        box-shadow: 0 0 0 0.2rem transparentize(darken($paypal-white-border, 10), 0.5) !important;
+                    }
+                }
+            }
+
+            &-black {
+                background-color: $paypal-black;
+                border-color: $paypal-black-border;
+                color: $paypal-black-text !important;
+
+                &:hover, &:active {
+                    background-color: lighten($paypal-black, 10) !important;
+                    border-color: lighten($paypal-black-border, 10) !important;
+                }
+
+                &:focus {
+                    box-shadow: 0 0 0 0.2rem transparentize($paypal-black-border, 0.5) !important;
+
+                    &:hover, &:active {
+                        box-shadow: 0 0 0 0.2rem transparentize(lighten($paypal-black-border, 10), 0.5) !important;
+                    }
+                }
+            }
+        }
+
     }
 }

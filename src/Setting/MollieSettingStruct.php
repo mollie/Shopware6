@@ -61,11 +61,6 @@ class MollieSettingStruct extends Struct
     protected $enableApplePayDirect = false;
 
     /**
-     * @var bool
-     */
-    protected $enablePayPalShortcut = false;
-
-    /**
      * @var int
      */
     protected $paymentMethodBankTransferDueDateDays;
@@ -74,6 +69,16 @@ class MollieSettingStruct extends Struct
      * @var int
      */
     protected $orderLifetimeDays;
+
+    /**
+     * @var bool
+     */
+    protected $enablePayPalShortcut = false;
+
+    /**
+     * @var string
+     */
+    protected $paypalShortcutButtonColor = 'gold';
 
     /**
      * @var string
@@ -362,4 +367,21 @@ class MollieSettingStruct extends Struct
     {
         $this->enablePayPalShortcut = $enablePayPalShortcut;
     }
+
+    /**
+     * @return string
+     */
+    public function getPaypalShortcutButtonColor(): string
+    {
+        return $this->paypalShortcutButtonColor;
+    }
+
+    /**
+     * @param string $paypalShortcutButtonColor
+     */
+    public function setPaypalShortcutButtonColor(string $paypalShortcutButtonColor): void
+    {
+        $this->paypalShortcutButtonColor = $paypalShortcutButtonColor;
+    }
+
 }

@@ -266,6 +266,11 @@
             <tag name="kernel.event_subscriber" />
         </service>
 
+        <service id="Kiener\MolliePayments\Subscriber\PaypalExpressCheckoutSubscriber" class="Kiener\MolliePayments\Subscriber\PaypalExpressCheckoutSubscriber">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <tag name="kernel.event_subscriber" />
+        </service>
+
         <!-- Snippets -->
         <service id="Kiener\MolliePayments\Resources\snippet\en_GB\SnippetFile_en_GB" public="true">
             <tag name="shopware.snippet.file"/>

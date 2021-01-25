@@ -33,7 +33,6 @@
         </input-field>
         <input-field type="bool">
             <name>debugMode</name>
-
             <label>Debug Mode</label>
             <label lang="de-DE">Debug Mode</label>
             <label lang="nl-NL">Debug Modus</label>
@@ -54,12 +53,6 @@
             <label>Enable Apple Pay Direct</label>
             <label lang="de-DE">Enable Apple Pay Direct</label>
             <label lang="nl-NL">Enable Apple Pay Direct</label>
-        </input-field>
-        <input-field type="bool">
-            <name>enablePayPalShortcut</name>
-            <label>Enable PayPal Shortcut</label>
-            <label lang="de-DE">Enable PayPal Shortcut</label>
-            <label lang="nl-NL">Enable PayPal Shortcut</label>
         </input-field>
         <input-field type="int">
             <name>paymentMethodBankTransferDueDateDays</name>
@@ -86,6 +79,58 @@
             <label lang="nl-NL">Do not create customers at Mollie.</label>
         </input-field>
     </card>
+
+    <card>
+        <title>PayPal</title>
+        <title lang="de-DE">PayPal</title>
+        <title lang="nl-NL">PayPal</title>
+        <input-field type="bool">
+            <name>enablePayPalShortcut</name>
+            <label>Enable PayPal Shortcut</label>
+            <label lang="de-DE">Enable PayPal Shortcut</label>
+            <label lang="nl-NL">Enable PayPal Shortcut</label>
+        </input-field>
+        <input-field type="single-select">
+            <name>paypalShortcutButtonColor</name>
+            <label>PayPal Shortcut button color</label>
+            <label lang="de-DE">PayPal Shortcut button color</label>
+            <label lang="nl-NL">Paypal Shortcut kleur</label>
+            <options>
+                <option>
+                    <id>gold</id>
+                    <name>Gold</name>
+                    <name lang="de-DE">Gold</name>
+                    <name lang="nl-NL">Goud</name>
+                </option>
+                <option>
+                    <id>blue</id>
+                    <name>Blue</name>
+                    <name lang="de-DE">Blue</name>
+                    <name lang="nl-NL">Blauw</name>
+                </option>
+                <option>
+                    <id>silver</id>
+                    <name>Silver</name>
+                    <name lang="de-DE">Silver</name>
+                    <name lang="nl-NL">Zilver</name>
+                </option>
+                <option>
+                    <id>white</id>
+                    <name>White</name>
+                    <name lang="de-DE">White</name>
+                    <name lang="nl-NL">Wit</name>
+                </option>
+                <option>
+                    <id>black</id>
+                    <name>Black</name>
+                    <name lang="de-DE">Black</name>
+                    <name lang="nl-NL">Zwart</name>
+                </option>
+            </options>
+        </input-field>
+    </card>
+
+
     <card>
         <title>Order State Automation</title>
         <title lang="de-DE">Order State Automation</title>
