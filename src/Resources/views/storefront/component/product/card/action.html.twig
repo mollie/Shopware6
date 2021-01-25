@@ -1,0 +1,23 @@
+{% sw_extends '@Storefront/storefront/component/product/card/action.html.twig' %}
+
+{% block component_product_box_action_buy %}
+    {% set productPrice = 0 %}
+
+    {% if product.calculatedPrices|length == 1 %}
+        {% set productPrice = product.calculatedPrices.first.unitPrice %}
+    {% else %}
+        {% set productPrice = product.calculatedPrice.unitPrice %}
+
+        {% if listPrice.percentage > 0 %}
+            {% set productPrice = listPrice.price %}
+        {% endif %}
+    {% endif %}
+
+    {% if productPrice > 0 %}
+        <div class="mb-2 d-none only-support-apple-pay">
+            {% include '@MolliePayments/mollie/component/apple-pay-direct-button.twig' %}
+        </div>
+    {% endif %}
+
+    {{ parent() }}
+{% endblock %}

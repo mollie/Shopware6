@@ -31,6 +31,7 @@ use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\RouterInterface;
@@ -225,21 +226,6 @@ class PaymentController extends StorefrontController
             $errorMessage = $errorMessage ?? 'The payment status has not been set for order with ID ' . $mollieOrderId ?? '<unknown>';
         }
 
-        if (
-            $paymentStatus !== null
-            && (
-                $paymentStatus === PaymentStatus::STATUS_CANCELED
-                || $paymentStatus === PaymentStatus::STATUS_FAILED
-            )
-        ) {
-            $paymentFailed = true;
-            $mollieOrder->createPayment([]);
-
-            if ($mollieOrder->getCheckoutUrl() !== null) {
-                $redirectUrl = $mollieOrder->getCheckoutUrl();
-            }
-        }
-
         /**
          * If any errors occurred during the webhook call, we return an error message.
          */
@@ -254,8 +240,21 @@ class PaymentController extends StorefrontController
             );
         }
 
-        // If the payment failed, render a storefront to let the customer know
-        if ($paymentFailed === true && (string) $redirectUrl !== '') {
+        if (
+            $paymentStatus !== null
+            && (
+                $paymentStatus === PaymentStatus::STATUS_CANCELED
+                || $paymentStatus === PaymentStatus::STATUS_FAILED
+            )
+            && $this->settingsService->getSettings($context->getSalesChannel()->getId())
+                ->isShopwareFailedPaymentMethod() === false
+        ) {
+            $mollieOrder->createPayment([]);
+
+            if ($mollieOrder->getCheckoutUrl() !== null) {
+                $redirectUrl = $mollieOrder->getCheckoutUrl();
+            }
+
             $paymentPageFailEvent = new PaymentPageFailEvent(
                 $context->getContext(),
                 $order,
@@ -284,10 +283,8 @@ class PaymentController extends StorefrontController
         );
 
         $this->eventDispatcher->dispatch($paymentPageRedirectEvent, $paymentPageRedirectEvent::EVENT_NAME);
-
         return new RedirectResponse($redirectUrl);
     }
-
     /**
      * @RouteScope(scopes={"storefront"})
      * @Route("/mollie/payment/retry/{transactionId}/{redirectUrl}", defaults={"csrf_protected"=false},

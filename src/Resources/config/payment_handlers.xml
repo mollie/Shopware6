@@ -15,7 +15,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService" />
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService" />
-            <argument type="service" id="router.default"/>
+            <argument type="service" id="router"/>
             <argument>%kernel.environment%</argument>
             <tag name="shopware.payment.method.async" />
         </service>
@@ -29,7 +29,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService" />
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService" />
-            <argument type="service" id="router.default"/>
+            <argument type="service" id="router"/>
             <argument>%kernel.environment%</argument>
             <tag name="shopware.payment.method.async" />
         </service>
@@ -43,7 +43,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService" />
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService" />
-            <argument type="service" id="router.default"/>
+            <argument type="service" id="router"/>
             <argument>%kernel.environment%</argument>
             <tag name="shopware.payment.method.async" />
         </service>
@@ -57,7 +57,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService" />
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService" />
-            <argument type="service" id="router.default"/>
+            <argument type="service" id="router"/>
             <argument>%kernel.environment%</argument>
             <tag name="shopware.payment.method.async" />
         </service>
@@ -71,7 +71,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService" />
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService" />
-            <argument type="service" id="router.default"/>
+            <argument type="service" id="router"/>
             <argument>%kernel.environment%</argument>
             <tag name="shopware.payment.method.async" />
         </service>
@@ -85,7 +85,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService" />
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService" />
-            <argument type="service" id="router.default"/>
+            <argument type="service" id="router"/>
             <argument>%kernel.environment%</argument>
             <tag name="shopware.payment.method.async" />
         </service>
@@ -99,7 +99,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService" />
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService" />
-            <argument type="service" id="router.default"/>
+            <argument type="service" id="router"/>
             <argument>%kernel.environment%</argument>
             <tag name="shopware.payment.method.async" />
         </service>
@@ -113,7 +113,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService" />
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService" />
-            <argument type="service" id="router.default"/>
+            <argument type="service" id="router"/>
             <argument>%kernel.environment%</argument>
             <tag name="shopware.payment.method.async" />
         </service>
@@ -127,7 +127,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService" />
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService" />
-            <argument type="service" id="router.default"/>
+            <argument type="service" id="router"/>
             <argument>%kernel.environment%</argument>
             <tag name="shopware.payment.method.async" />
         </service>
@@ -141,7 +141,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService" />
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService" />
-            <argument type="service" id="router.default"/>
+            <argument type="service" id="router"/>
             <argument>%kernel.environment%</argument>
             <tag name="shopware.payment.method.async" />
         </service>
@@ -155,7 +155,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService" />
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService" />
-            <argument type="service" id="router.default"/>
+            <argument type="service" id="router"/>
             <argument>%kernel.environment%</argument>
             <tag name="shopware.payment.method.async" />
         </service>
@@ -169,7 +169,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService" />
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService" />
-            <argument type="service" id="router.default"/>
+            <argument type="service" id="router"/>
             <argument>%kernel.environment%</argument>
             <tag name="shopware.payment.method.async" />
         </service>
@@ -183,7 +183,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService" />
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService" />
-            <argument type="service" id="router.default"/>
+            <argument type="service" id="router"/>
             <argument>%kernel.environment%</argument>
             <tag name="shopware.payment.method.async" />
         </service>
@@ -197,7 +197,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService" />
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService" />
-            <argument type="service" id="router.default"/>
+            <argument type="service" id="router"/>
             <argument>%kernel.environment%</argument>
             <tag name="shopware.payment.method.async" />
         </service>
@@ -211,7 +211,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService" />
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService" />
-            <argument type="service" id="router.default"/>
+            <argument type="service" id="router"/>
             <argument>%kernel.environment%</argument>
             <tag name="shopware.payment.method.async" />
         </service>
@@ -225,7 +225,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService" />
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService" />
-            <argument type="service" id="router.default"/>
+            <argument type="service" id="router"/>
             <argument>%kernel.environment%</argument>
             <tag name="shopware.payment.method.async" />
         </service>
@@ -239,7 +239,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService" />
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService" />
-            <argument type="service" id="router.default"/>
+            <argument type="service" id="router"/>
             <argument>%kernel.environment%</argument>
             <tag name="shopware.payment.method.async" />
         </service>
@@ -253,7 +253,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService" />
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService" />
-            <argument type="service" id="router.default"/>
+            <argument type="service" id="router"/>
             <argument>%kernel.environment%</argument>
             <tag name="shopware.payment.method.async" />
         </service>
@@ -267,7 +267,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService" />
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper" />
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService" />
-            <argument type="service" id="router.default"/>
+            <argument type="service" id="router"/>
             <argument>%kernel.environment%</argument>
             <tag name="shopware.payment.method.async" />
         </service>

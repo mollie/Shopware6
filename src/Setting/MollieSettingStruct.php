@@ -43,7 +43,22 @@ class MollieSettingStruct extends Struct
     /**
      * @var bool
      */
+    protected $shopwareFailedPayment = false;
+
+    /**
+     * @var bool
+     */
+    protected $noCustomersAtMollie = false;
+
+    /**
+     * @var bool
+     */
     protected $enableCreditCardComponents = false;
+
+    /**
+     * @var bool
+     */
+    protected $enableApplePayDirect = false;
 
     /**
      * @var int
@@ -69,6 +84,11 @@ class MollieSettingStruct extends Struct
      * @var string
      */
     protected $orderStateWithACancelledTransaction = self::ORDER_STATE_SKIP;
+
+    /**
+     * @var string
+     */
+    protected $orderStateWithAAuthorizedTransaction = self::ORDER_STATE_SKIP;
 
     /**
      * @return string
@@ -145,6 +165,45 @@ class MollieSettingStruct extends Struct
         $this->testMode = $testMode;
         return $this;
     }
+
+    /**
+     * @return bool
+     */
+    public function isShopwareFailedPaymentMethod(): bool
+    {
+        return (bool) $this->shopwareFailedPayment;
+    }
+
+    /**
+     * @param bool $shopwareFailedPayment
+     *
+     * @return self
+     */
+    public function setShopwareFailedPaymentMethod(bool $shopwareFailedPayment): self
+    {
+        $this->shopwareFailedPayment = $shopwareFailedPayment;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function createNoCustomersAtMollie(): bool
+    {
+        return (bool) $this->noCustomersAtMollie;
+    }
+
+    /**
+     * @param bool $noCustomersAtMollie
+     *
+     * @return self
+     */
+    public function setCreateNoCustomersAtMollie(bool $noCustomersAtMollie): self
+    {
+        $this->noCustomersAtMollie = $noCustomersAtMollie;
+        return $this;
+    }
+
 
     /**
      * @return bool
@@ -230,7 +289,7 @@ class MollieSettingStruct extends Struct
     public function getOrderLifetimeDate(): string
     {
         return (new DateTime())
-            ->setTimezone(new DateTimeZone(DateTimeZone::UTC))
+            ->setTimezone(new DateTimeZone('UTC'))
             ->modify(sprintf('+%d day', $this->getOrderLifetimeDays()))
             ->format('Y-m-d');
     }
@@ -257,5 +316,29 @@ class MollieSettingStruct extends Struct
     public function getOrderStateWithACancelledTransaction(): string
     {
         return (string) $this->orderStateWithACancelledTransaction;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrderStateWithAAuthorizedTransaction(): string
+    {
+        return (string) $this->orderStateWithAAuthorizedTransaction;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnableApplePayDirect(): bool
+    {
+        return $this->enableApplePayDirect;
+    }
+
+    /**
+     * @param bool $enableApplePayDirect
+     */
+    public function setEnableApplePayDirect(bool $enableApplePayDirect): void
+    {
+        $this->enableApplePayDirect = $enableApplePayDirect;
     }
 }

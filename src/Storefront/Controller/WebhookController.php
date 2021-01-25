@@ -14,7 +14,7 @@ use Mollie\Api\Resources\Order;
 use RuntimeException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -22,7 +22,6 @@ use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -31,7 +30,7 @@ class WebhookController extends StorefrontController
     /** @var RouterInterface */
     private $router;
 
-    /** @var EntityRepository */
+    /** @var EntityRepositoryInterface */
     private $orderTransactionRepository;
 
     /** @var MollieApiClient */
@@ -51,7 +50,7 @@ class WebhookController extends StorefrontController
 
     public function __construct(
         RouterInterface $router,
-        EntityRepository $orderTransactionRepository,
+        EntityRepositoryInterface $orderTransactionRepository,
         MollieApiClient $apiClient,
         DeliveryStateHelper $deliveryStateHelper,
         PaymentStatusHelper $paymentStatusHelper,

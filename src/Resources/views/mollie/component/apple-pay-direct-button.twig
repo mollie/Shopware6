@@ -1,0 +1,20 @@
+<div class="mollie-apple-pay-direct {{ cols }}">
+    <div id="mollie-apd-csrf" class="d-none" >
+        <input type="hidden" name="_mollie_csrf_token"
+               value="{{ sw_csrf('frontend.mollie.apple-pay.authorize', {"mode": "token"})}}"
+        >
+        <input type="hidden" name="_mollie_csrf_token"
+               value="{{ sw_csrf('frontend.mollie.apple-pay.shipping-methods', {"mode": "token"})}}"
+        >
+    </div>
+    <input type="hidden" name="id" value="{{ product.id }}" />
+    <input type="hidden" name="name" value="{{ product.translated.name }}" />
+    <input type="hidden" name="price" value="{{ productPrice }}" />
+    <input type="hidden" name="currency" value="{{ context.currency.translated.shortName }}" />
+    <input type="hidden" name="currencyId" value="{{ context.currency.id }}" />
+    <input type="hidden" name="countryCode" value="{{ context.shippingLocation.country.iso }}" />
+    <button type="submit" class="btn btn-primary btn-block btn-buy apple-pay-button-with-text apple-pay-button-black js-apple-pay w-100 d-none">
+        {# space to match height other buttons #}
+        &nbsp;
+    </button>
+</div>

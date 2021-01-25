@@ -17,6 +17,9 @@
         "cardExpiryDateLabel": "Expiration date",
         "cardVerificationCodeLabel": "CVC",
         "creditCardTagLine": "Payment secured and powered by"
+      },
+      "applePayDirectButton": {
+        "label": "Buy with Apple Pay"
       }
     }
   }

@@ -4,12 +4,12 @@ namespace Kiener\MolliePayments\Subscriber;
 
 use Exception;
 use Kiener\MolliePayments\Service\DeliveryService;
+use Kiener\MolliePayments\Service\SettingsService;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryStates;
 use Shopware\Core\Checkout\Order\OrderEvents;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -27,6 +27,9 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
 
     /** @var DeliveryService */
     private $deliveryService;
+
+    /** @var SettingsService */
+    protected $settingsService;
 
     /**
      * Returns an array of event names this subscriber wants to listen to.
@@ -61,11 +64,13 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
      */
     public function __construct(
         MollieApiClient $apiClient,
-        DeliveryService $deliveryService
+        DeliveryService $deliveryService,
+        SettingsService $settingsService
     )
     {
         $this->apiClient = $apiClient;
         $this->deliveryService = $deliveryService;
+        $this->settingsService = $settingsService;
     }
 
     /**
@@ -113,6 +118,16 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
                 $customFields = $order->getCustomFields();
             }
 
+            // Correct API key
+            if ($order !== null) {
+                $settings = $this->settingsService->getSettings($order->getSalesChannelId());
+
+                $this->apiClient->setApiKey(!$settings->isTestMode()
+                    ? $settings->getLiveApiKey()
+                    : $settings->getTestApiKey()
+                );
+            }
+
             // Get the order at Mollie
             if (
                 $customFields !== null
@@ -157,8 +172,16 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
                     || $delivery->getCustomFields()[self::PARAM_MOLLIE_PAYMENTS][self::PARAM_IS_SHIPPED] === false
                 )
             ) {
-                // Ship the order at Mollie
-                $mollieOrder->shipAll();
+                $itemsToBeShipped = 0;
+
+                foreach($mollieOrder->lines as $line) {
+                    $itemsToBeShipped += $line->shippableQuantity ?? 0;
+                }
+
+                if($itemsToBeShipped > 0) {
+                    // Ship the order at Mollie
+                    $mollieOrder->shipAll();
+                }
 
                 // Add is shipped flag to custom fields
                 $this->deliveryService->updateDelivery([

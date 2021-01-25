@@ -15,7 +15,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
@@ -51,7 +51,7 @@ class RefundController extends StorefrontController
     /** @var MollieApiFactory */
     private $apiFactory;
 
-    /** @var EntityRepository */
+    /** @var EntityRepositoryInterface */
     private $orderLineItemRepository;
 
     /** @var OrderService */
@@ -66,15 +66,15 @@ class RefundController extends StorefrontController
     /**
      * Creates a new instance of the onboarding controller.
      *
-     * @param MollieApiFactory             $apiFactory
-     * @param EntityRepository             $orderLineItemRepository
-     * @param OrderService                 $orderService
+     * @param MollieApiFactory $apiFactory
+     * @param EntityRepositoryInterface $orderLineItemRepository
+     * @param OrderService $orderService
      * @param OrderTransactionStateHandler $orderTransactionStateHandler
-     * @param SettingsService              $settingsService
+     * @param SettingsService $settingsService
      */
     public function __construct(
         MollieApiFactory $apiFactory,
-        EntityRepository $orderLineItemRepository,
+        EntityRepositoryInterface $orderLineItemRepository,
         OrderService $orderService,
         OrderTransactionStateHandler $orderTransactionStateHandler,
         SettingsService $settingsService
@@ -122,8 +122,8 @@ class RefundController extends StorefrontController
         $quantity = 0;
 
         if (
-            (string) $request->get(self::REQUEST_KEY_ORDER_LINE_ITEM_ID) !== ''
-            && (string) $request->get(self::REQUEST_KEY_ORDER_LINE_ITEM_VERSION_ID) !== ''
+            (string)$request->get(self::REQUEST_KEY_ORDER_LINE_ITEM_ID) !== ''
+            && (string)$request->get(self::REQUEST_KEY_ORDER_LINE_ITEM_VERSION_ID) !== ''
         ) {
             $orderLineItem = $this->getOrderLineItemById(
                 $request->get(self::REQUEST_KEY_ORDER_LINE_ITEM_ID),
@@ -131,8 +131,8 @@ class RefundController extends StorefrontController
             );
         }
 
-        if ((int) $request->get(self::REQUEST_KEY_ORDER_LINE_QUANTITY) > 0) {
-            $quantity = (int) $request->get(self::REQUEST_KEY_ORDER_LINE_QUANTITY);
+        if ((int)$request->get(self::REQUEST_KEY_ORDER_LINE_QUANTITY) > 0) {
+            $quantity = (int)$request->get(self::REQUEST_KEY_ORDER_LINE_QUANTITY);
         }
 
         if (
@@ -177,8 +177,8 @@ class RefundController extends StorefrontController
         }
 
         if (
-            (string) $orderId !== ''
-            && (string) $orderLineId !== ''
+            (string)$orderId !== ''
+            && (string)$orderLineId !== ''
             && $quantity > 0
         ) {
             $apiClient = $this->apiFactory->createClient(
@@ -298,8 +298,8 @@ class RefundController extends StorefrontController
                     !empty($lineItem->getCustomFields())
                     && isset($lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_REFUNDED_QUANTITY])
                 ) {
-                    $amount += ($lineItem->getUnitPrice() * (int) $lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_REFUNDED_QUANTITY]);
-                    $items += (int) $lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_REFUNDED_QUANTITY];
+                    $amount += ($lineItem->getUnitPrice() * (int)$lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_REFUNDED_QUANTITY]);
+                    $items += (int)$lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_REFUNDED_QUANTITY];
                 }
             }
         }
@@ -314,7 +314,7 @@ class RefundController extends StorefrontController
      * Returns an order line item by id.
      *
      * @param              $lineItemId
-     * @param null         $versionId
+     * @param null $versionId
      * @param Context|null $context
      *
      * @return OrderLineItemEntity|null

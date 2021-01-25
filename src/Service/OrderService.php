@@ -15,6 +15,7 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Promotion\Cart\PromotionProcessor;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 
@@ -28,18 +29,18 @@ class OrderService
     private const TAX_ARRAY_KEY_TAX_RATE = 'taxRate';
     private const TAX_ARRAY_KEY_PRICE = 'price';
 
-    /** @var EntityRepository */
+    /** @var EntityRepositoryInterface */
     protected $orderRepository;
 
-    /** @var EntityRepository */
+    /** @var EntityRepositoryInterface */
     protected $orderLineItemRepository;
 
     /** @var LoggerInterface */
     protected $logger;
 
     public function __construct(
-        EntityRepository $orderRepository,
-        EntityRepository $orderLineItemRepository,
+        EntityRepositoryInterface $orderRepository,
+        EntityRepositoryInterface $orderLineItemRepository,
         LoggerInterface $logger
     )
     {
@@ -75,7 +76,7 @@ class OrderService
      * @param Context $context
      * @return OrderEntity|null
      */
-    public function getOrder(string $orderId, Context $context) : ?OrderEntity
+    public function getOrder(string $orderId, Context $context): ?OrderEntity
     {
         $order = null;
 
@@ -91,6 +92,8 @@ class OrderService
             $criteria->addAssociation('lineItems.product.media');
             $criteria->addAssociation('deliveries');
             $criteria->addAssociation('deliveries.shippingOrderAddress');
+            $criteria->addAssociation('transactions');
+            $criteria->addAssociation('transactions.paymentMethod');
 
             /** @var OrderEntity $order */
             $order = $this->orderRepository->search($criteria, $context)->first();
@@ -221,7 +224,7 @@ class OrderService
      * @param OrderEntity $order
      * @return array
      */
-    public function getShippingItemArray(OrderEntity $order) : array
+    public function getShippingItemArray(OrderEntity $order): array
     {
         // Variables
         $line = [];
@@ -252,18 +255,25 @@ class OrderService
 
         // Get the prices
         $unitPrice = $shipping->getUnitPrice();
-        $totalAmount = $shipping->getTotalPrice();
+        $totalAmount = $totalAmountTemp = $shipping->getTotalPrice();
         $vatAmount = $shipping->getCalculatedTaxes()->getAmount();
+        $vatRateTemp = $vatRate;
 
         // Add tax when order is net
         if ($order->getTaxStatus() === CartPrice::TAX_STATE_NET) {
             $unitPrice *= ((100 + $vatRate) / 100);
             $totalAmount += $vatAmount;
+            //Check if Vat is still correct by recalculating different Vat users
+            $multiShipVatAmount = ($totalAmountTemp / 100) * $vatRateTemp;
+            //if Vat Amount is off because of multiple Vat's reset it.
+            if ($multiShipVatAmount !== $vatRate) {
+                $vatAmount = $multiShipVatAmount;
+            }
         }
 
         // Build the order line array
         $shippingLine = [
-            'type' =>  OrderLineType::TYPE_SHIPPING_FEE,
+            'type' => OrderLineType::TYPE_SHIPPING_FEE,
             'name' => 'Shipping',
             'quantity' => $shipping->getQuantity(),
             'unitPrice' => $this->getPriceArray($currencyCode, $unitPrice),
@@ -271,8 +281,8 @@ class OrderService
             'vatRate' => number_format($vatRate, 2, '.', ''),
             'vatAmount' => $this->getPriceArray($currencyCode, $vatAmount),
             'sku' => null,
-            'imageUrl' => null,
-            'productUrl' => null,
+//            'imageUrl' => null,
+//            'productUrl' => null,
         ];
 
         return $shippingLine;
@@ -285,7 +295,7 @@ class OrderService
      * @param int $decimals
      * @return array
      */
-    public function getPriceArray(string $currency, ?float $price = null, int $decimals = 2) : array
+    public function getPriceArray(string $currency, ?float $price = null, int $decimals = 2): array
     {
         if ($price === null) {
             $price = 0.0;
@@ -293,7 +303,7 @@ class OrderService
 
         return [
             'currency' => $currency,
-            'value' => number_format($price, $decimals, '.', '')
+            'value' => number_format(round($price, $decimals), $decimals, '.', '')
         ];
     }
 
@@ -303,7 +313,7 @@ class OrderService
      * @param OrderLineItemEntity $item
      * @return string|null
      */
-    public function getLineItemType(OrderLineItemEntity $item) : ?string
+    public function getLineItemType(OrderLineItemEntity $item): ?string
     {
         if ($item->getType() === LineItem::PRODUCT_LINE_ITEM_TYPE) {
             return OrderLineType::TYPE_PHYSICAL;
@@ -339,9 +349,9 @@ class OrderService
             return $taxCollection->first();
         } else {
             $tax = [
-                self::TAX_ARRAY_KEY_TAX      => 0,
+                self::TAX_ARRAY_KEY_TAX => 0,
                 self::TAX_ARRAY_KEY_TAX_RATE => 0,
-                self::TAX_ARRAY_KEY_PRICE    => 0,
+                self::TAX_ARRAY_KEY_PRICE => 0,
             ];
 
             $taxCollection->map(static function (CalculatedTax $calculatedTax) use (&$tax) {

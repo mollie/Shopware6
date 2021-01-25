@@ -3,7 +3,9 @@
 namespace Kiener\MolliePayments\Handler;
 
 use Exception;
+use Kiener\MolliePayments\Helper\ModeHelper;
 use Kiener\MolliePayments\Helper\PaymentStatusHelper;
+use Kiener\MolliePayments\Helper\ProfileHelper;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\LoggerService;
@@ -12,6 +14,7 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
+use Mollie\Api\Resources\Customer;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Types\PaymentMethod;
@@ -21,13 +24,14 @@ use RuntimeException;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\AsynchronousPaymentHandlerInterface;
 use Shopware\Core\Checkout\Payment\Exception\CustomerCanceledAsyncPaymentException;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
-use Shopware\Core\Framework\Language\LanguageEntity;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\Currency\CurrencyEntity;
+use Shopware\Core\System\Language\LanguageEntity;
 use Shopware\Core\System\Locale\LocaleEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\StateMachine\Exception\IllegalTransitionException;
@@ -184,7 +188,50 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
          * to finish the payment.
          */
         try {
-            $paymentUrl = $this->prepare($transaction, $salesChannelContext);
+            /** @var OrderEntity $order */
+            $order = $this->getOrderFromTransaction($transaction, $salesChannelContext);
+
+            /** @var Customer $customer */
+            $customer = null;
+
+
+            /** @var array $orderData */
+            $orderData = [];
+
+            /** @var Order|null $mollieOrder */
+            $mollieOrder = null;
+
+            // Prepare the order data for Mollie.
+            if ($order !== null) {
+                $orderCustomer = $order->getOrderCustomer();
+                if ($orderCustomer !== null) {
+                    if ($orderCustomer->getCustomer() !== null) {
+                        $customer = $orderCustomer->getCustomer();
+                    }
+                }
+                $orderData = $this->prepareOrderForMollie(
+                    $this->paymentMethod,
+                    $transaction->getOrderTransaction()->getId(),
+                    $order,
+                    $transaction->getReturnUrl(),
+                    $salesChannelContext
+                );
+            }
+
+            // Create an order at Mollie, based on the order data.
+            if (!empty($orderData)) {
+                $mollieOrder = $this->createOrderAtMollie(
+                    $orderData,
+                    $transaction->getReturnUrl(),
+                    $order,
+                    $salesChannelContext
+                );
+            }
+
+            // Get the payment url from the order at Mollie.
+            if ($mollieOrder !== null) {
+                $paymentUrl = isset($mollieOrder) ? $mollieOrder->getCheckoutUrl() : null;
+            }
         } catch (Exception $e) {
             $this->logger->addEntry(
                 $e->getMessage(),
@@ -379,29 +426,57 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             }
 
             throw new CustomerCanceledAsyncPaymentException(
-                'Payment for order ' . $order->getOrderNumber() . ' (' . $mollieOrder->id . ') was cancelled by the customer.', ''
+                $transaction->getOrderTransaction()->getUniqueIdentifier(),
+                sprintf(
+                    'Payment for order %s (%s) was cancelled by the customer.',
+                    $order->getOrderNumber(),
+                    $mollieOrder->id
+                )
             );
         }
     }
 
     /**
-     * Prepares the order payload to send to Mollie's Orders API. Create
-     * an order based on this payload and retrieves a payment URL.
+     * Returns an order entity of a transaction.
      *
      * @param AsyncPaymentTransactionStruct $transaction
      * @param SalesChannelContext           $salesChannelContext
      *
-     * @return string|null
+     * @return OrderEntity|null
      */
-    public function prepare(AsyncPaymentTransactionStruct $transaction, SalesChannelContext $salesChannelContext): ?string
+    public function getOrderFromTransaction(AsyncPaymentTransactionStruct $transaction, SalesChannelContext $salesChannelContext): ?OrderEntity
     {
-        /**
-         * Retrieve the order from the order service in order to
-         * get an enriched order entity. This is necessary to have
-         * currency, locale and language available in the order entity.
-         */
         $order = $this->orderService->getOrder($transaction->getOrder()->getId(), $salesChannelContext->getContext());
-        $order = $order ?? $transaction->getOrder();
+        return $order ?? $transaction->getOrder();
+    }
+
+    /**
+     * Returns a prepared array to create an order at Mollie.
+     *
+     * @param string              $paymentMethod
+     * @param string              $transactionId
+     * @param OrderEntity         $order
+     * @param string              $returnUrl
+     * @param SalesChannelContext $salesChannelContext
+     *
+     * @param array               $paymentData
+     *
+     * @return array
+     */
+    public function prepareOrderForMollie(
+        string $paymentMethod,
+        string $transactionId,
+        OrderEntity $order,
+        string $returnUrl,
+        SalesChannelContext $salesChannelContext,
+        array $paymentData = []
+    ): array
+    {
+        /** @var MollieSettingStruct $settings */
+        $settings = $this->settingsService->getSettings(
+            $salesChannelContext->getSalesChannel()->getId(),
+            $salesChannelContext->getContext()
+        );
 
         /**
          * Retrieve the customer from the customer service in order to
@@ -428,7 +503,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
          * Therefore we stop the process.
          */
         if ($customer === null) {
-            return null;
+            throw new \UnexpectedValueException('Customer data could not be found');
         }
 
         /**
@@ -467,10 +542,11 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
                 $order->getAmountTotal()
             ),
             self::FIELD_REDIRECT_URL => $this->router->generate('frontend.mollie.payment', [
-                'transactionId' => $transaction->getOrderTransaction()->getId(),
+                'transactionId' => $transactionId,
+                'returnUrl' => urlencode($returnUrl),
             ], $this->router::ABSOLUTE_URL),
             self::FIELD_LOCALE => $locale !== null ? $locale->getCode() : null,
-            self::FIELD_METHOD => $this->paymentMethod,
+            self::FIELD_METHOD => $paymentMethod,
             self::FIELD_ORDER_NUMBER => $order->getOrderNumber(),
             self::FIELD_LINES => $this->orderService->getOrderLinesArray($order),
             self::FIELD_BILLING_ADDRESS => $this->customerService->getAddressArray(
@@ -481,13 +557,13 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
                 $customer->getDefaultShippingAddress(),
                 $customer
             ),
-            self::FIELD_PAYMENT => []
+            self::FIELD_PAYMENT => $paymentData,
         ];
 
         /**
          * Handle vat free orders.
          */
-        if ($transaction->getOrder()->getTaxStatus() === CartPrice::TAX_STATE_FREE) {
+        if ($order->getTaxStatus() === CartPrice::TAX_STATE_FREE) {
             $orderData[self::FIELD_AMOUNT] = $this->orderService->getPriceArray(
                 $currency !== null ? $currency->getIsoCode() : 'EUR',
                 $order->getAmountNet()
@@ -497,11 +573,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         /**
          * Try to fetch the Order Lifetime configuration. If it is can be fetched, set it expiresAt field
          * The expiresAt is optional and defaults to 28 days if not set
-         *
-         * @var MollieSettingStruct $settings
          */
-        $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
-
         try {
             $dueDate = $settings->getOrderLifetimeDate();
 
@@ -532,7 +604,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             || (bool) getenv(self::ENV_LOCAL_DEVELOPMENT) === false
         ) {
             $orderData[self::FIELD_WEBHOOK_URL] = $this->router->generate('frontend.mollie.webhook', [
-                'transactionId' => $transaction->getOrderTransaction()->getId()
+                'transactionId' => $transactionId
             ], $this->router::ABSOLUTE_URL);
         }
 
@@ -547,6 +619,16 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             $orderData['payment']['cardToken'] = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_CREDIT_CARD_TOKEN];
             $this->customerService->setCardToken($customer, '', $salesChannelContext->getContext());
         }
+
+        // To connect orders too customers.
+        if (isset($customFields[CustomerService::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID])
+            && (string)$customFields[CustomerService::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID] !== ''
+            && $settings->createNoCustomersAtMollie() === false
+            && $settings->isTestMode() === false
+        ) {
+            $orderData['payment']['customerId'] = $customFields[CustomerService::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID];
+        }
+
 
         // @todo Handle iDeal issuers from the iDeal payment handler
         if (
@@ -570,6 +652,26 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
                 ]
             );
         }
+
+        return $orderData;
+    }
+
+    /**
+     * Returns an order that is created through the Mollie API.
+     *
+     * @param array               $orderData
+     * @param string              $returnUrl
+     * @param OrderEntity         $order
+     * @param SalesChannelContext $salesChannelContext
+     *
+     * @return Order|null
+     *
+     * @throws RuntimeException
+     */
+    public function createOrderAtMollie(array $orderData, string $returnUrl, OrderEntity $order, SalesChannelContext $salesChannelContext): ?Order
+    {
+        /** @var Order|null $mollieOrder */
+        $mollieOrder = null;
 
         /**
          * Create an order at Mollie based on the prepared
@@ -606,7 +708,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
                 'customFields' => [
                     CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS => [
                         'order_id' => $mollieOrder->id,
-                        'transactionReturnUrl' => $transaction->getReturnUrl(),
+                        'transactionReturnUrl' => $returnUrl,
                     ]
                 ]
             ]], $salesChannelContext->getContext());
@@ -636,16 +738,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             }
         }
 
-        /**
-         * Return the payment URL from the Mollie order, we redirect
-         * the customer to this URL to finish the payment.
-         *
-         * Afterwards, the customer is redirect to the finish page
-         * in Shopware, which leads to @finalize()
-         *
-         * @var string $paymentUrl
-         */
-        return isset($mollieOrder) ? $mollieOrder->getCheckoutUrl() : null;
+        return $mollieOrder;
     }
 
     /**

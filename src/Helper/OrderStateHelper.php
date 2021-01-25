@@ -40,6 +40,29 @@ class OrderStateHelper
      */
     public function setOrderState(OrderEntity $order, string $orderState, Context $context): bool
     {
+
+        try {
+            $this->stateMachineRegistry->transition(
+                new Transition(
+                    OrderDefinition::ENTITY_NAME,
+                    $order->getId(),
+                    StateMachineTransitionActions::ACTION_REOPEN,
+                    'stateId'
+                ),
+                $context
+            );
+        } catch (Exception $e) {
+            $this->logger->addEntry(
+                $e->getMessage(),
+                $context,
+                $e,
+                [
+                    'function' => 'payment-automate-order-state',
+                ]
+            );
+        }
+
+        $completedOrCancelled = false;
         // Collect an array of possible order states
         $orderStates = [
             OrderStates::STATE_OPEN,
@@ -62,6 +85,12 @@ class OrderStateHelper
             $transitionName = StateMachineTransitionActions::ACTION_PROCESS;
         }
 
+        if ($orderState === OrderStates::STATE_COMPLETED ||
+            $orderState === OrderStates::STATE_CANCELLED
+        ) {
+            $completedOrCancelled = true;
+        }
+
         if ($orderState === OrderStates::STATE_COMPLETED) {
             $transitionName = StateMachineTransitionActions::ACTION_COMPLETE;
         }
@@ -70,6 +99,28 @@ class OrderStateHelper
             $transitionName = StateMachineTransitionActions::ACTION_CANCEL;
         }
 
+        if ($completedOrCancelled) {
+                try {
+                    $this->stateMachineRegistry->transition(
+                        new Transition(
+                            OrderDefinition::ENTITY_NAME,
+                            $order->getId(),
+                            StateMachineTransitionActions::ACTION_PROCESS,
+                            'stateId'
+                        ),
+                        $context
+                    );
+                } catch (Exception $e) {
+                    $this->logger->addEntry(
+                        $e->getMessage(),
+                        $context,
+                        $e,
+                        [
+                            'function' => 'payment-automate-order-state',
+                        ]
+                    );
+                }
+        }
         // Transition the order
         if (isset($transitionName)) {
             try {

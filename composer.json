@@ -1,7 +1,7 @@
 {
   "name": "kiener/mollie-payments-plugin",
   "description": "Mollie Payments",
-  "version": "v1.0.19",
+  "version": "v1.3.11",
   "type": "shopware-platform-plugin",
   "license": "MIT",
   "authors": [
@@ -13,7 +13,7 @@
     "shopware/core": "*",
     "shopware/administration": "*",
     "shopware/storefront": "*",
-    "mollie/mollie-api-php": "^2.0"
+    "mollie/mollie-api-php": "~2.25"
   },
   "extra": {
     "shopware-plugin-class": "Kiener\\MolliePayments\\MolliePayments",

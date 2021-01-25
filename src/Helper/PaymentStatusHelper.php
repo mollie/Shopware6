@@ -9,11 +9,17 @@ use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Types\PaymentStatus;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionDefinition;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Shopware\Core\System\StateMachine\StateMachineRegistry;
+use Shopware\Core\System\StateMachine\Transition;
 
 class PaymentStatusHelper
 {
@@ -32,20 +38,28 @@ class PaymentStatusHelper
     /** @var StateMachineRegistry */
     protected $stateMachineRegistry;
 
+    /** @var EntityRepositoryInterface */
+    protected $paymentMethodRepository;
+
+    /** @var EntityRepositoryInterface */
+    protected $orderTransactionRepository;
+
     /**
      * PaymentStatusHelper constructor.
      *
-     * @param LoggerService                $logger
+     * @param LoggerService $logger
      * @param OrderTransactionStateHandler $orderTransactionStateHandler
-     * @param SettingsService              $settingsService
-     * @param StateMachineRegistry         $stateMachineRegistry
+     * @param SettingsService $settingsService
+     * @param StateMachineRegistry $stateMachineRegistry
      */
     public function __construct(
         LoggerService $logger,
         OrderStateHelper $orderStateHelper,
         OrderTransactionStateHandler $orderTransactionStateHandler,
         SettingsService $settingsService,
-        StateMachineRegistry $stateMachineRegistry
+        StateMachineRegistry $stateMachineRegistry,
+        EntityRepositoryInterface $paymentMethodRepository,
+        EntityRepositoryInterface $orderTransactionRepository
     )
     {
         $this->logger = $logger;
@@ -53,6 +67,9 @@ class PaymentStatusHelper
         $this->orderTransactionStateHandler = $orderTransactionStateHandler;
         $this->settingsService = $settingsService;
         $this->stateMachineRegistry = $stateMachineRegistry;
+
+        $this->paymentMethodRepository = $paymentMethodRepository;
+        $this->orderTransactionRepository = $orderTransactionRepository;
     }
 
     /**
@@ -70,10 +87,10 @@ class PaymentStatusHelper
      * to handle the transaction to a new status.
      *
      * @param OrderTransactionEntity $transaction
-     * @param OrderEntity            $order
-     * @param Order                  $mollieOrder
-     * @param Context                $context
-     * @param string|null            $salesChannelId
+     * @param OrderEntity $order
+     * @param Order $mollieOrder
+     * @param Context $context
+     * @param string|null $salesChannelId
      *
      * @return string
      */
@@ -135,11 +152,44 @@ class PaymentStatusHelper
         }
 
         /**
+         * Correct the payment method if a different one was selected in mollie
+         */
+        try {
+            $molliePaymentMethodId = $this->paymentMethodRepository->searchIds(
+                (new Criteria())
+                    ->addFilter(new EqualsFilter('customFields.mollie_payment_method_name', $mollieOrder->method)),
+                $context
+            )->firstId();
+
+            if (!is_null($molliePaymentMethodId) && $molliePaymentMethodId !== $transaction->getPaymentMethodId()) {
+                $transaction->setPaymentMethodId($molliePaymentMethodId);
+
+                $this->orderTransactionRepository->update([
+                    [
+                        'id' => $transaction->getUniqueIdentifier(),
+                        'paymentMethodId' => $molliePaymentMethodId
+                    ]
+                ],
+                    $context);
+            }
+        } catch (\Throwable $e) {
+            $this->logger->addEntry(
+                $e->getMessage(),
+                $context,
+                $e,
+                [
+                    'function' => 'payment-set-transaction-method'
+                ]
+            );
+        }
+
+        /**
          * The order is paid.
          */
         if (
             $transactionState !== null
             && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_PAID
+            // FIXME: Should probably check against OrderTransactionStates constants here
             && $mollieOrder->isPaid()
         ) {
             try {
@@ -171,6 +221,7 @@ class PaymentStatusHelper
         if (
             $transactionState !== null
             && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_CANCELED
+            // FIXME: Should probably check against OrderTransactionStates constants here
             && $mollieOrder->isCanceled()
         ) {
             try {
@@ -192,14 +243,33 @@ class PaymentStatusHelper
             return PaymentStatus::STATUS_CANCELED;
         }
 
-        /**
-         * All payments are authorized, therefore the order payment is authorized. We
-         * transition to paid as Shopware 6 has no transition to a authorized state (yet).
-         */
-        if (
-            $authorizedNumber > 0
-            && $authorizedNumber === $paymentsTotal
-        ) {
+        if ($mollieOrder->isAuthorized()) {
+            // FIXME: Should probably check against OrderTransactionStates constants here
+            if ($transactionState !== null && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_AUTHORIZED) {
+                try {
+                    $this->stateMachineRegistry->transition(
+                        new Transition(
+                            OrderTransactionDefinition::ENTITY_NAME,
+                            $transaction->getId(),
+                            StateMachineTransitionActions::ACTION_AUTHORIZE,
+                            'stateId'
+                        ),
+                        $context
+                    );
+                } catch (Exception $e) {
+                    $this->logger->addEntry(
+                        $e->getMessage(),
+                        $context,
+                        $e,
+                        [
+                            'function' => 'payment-set-transaction-state'
+                        ]
+                    );
+                }
+            }
+
+            // Process the order state automation
+            $this->orderStateHelper->setOrderState($order, $settings->getOrderStateWithAAuthorizedTransaction(), $context);
             return PaymentStatus::STATUS_AUTHORIZED;
         }
 
@@ -211,6 +281,7 @@ class PaymentStatusHelper
             && $cancelledNumber === $paymentsTotal
             && $transactionState !== null
             && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_CANCELED
+            // FIXME: Should probably check against OrderTransactionStates constants here
         ) {
             try {
                 $this->orderTransactionStateHandler->cancel($transaction->getId(), $context);
@@ -240,6 +311,7 @@ class PaymentStatusHelper
             && $expiredNumber === $paymentsTotal
             && $transactionState !== null
             && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_CANCELED
+            // FIXME: Should probably check against OrderTransactionStates constants here
         ) {
             try {
                 $this->orderTransactionStateHandler->cancel($transaction->getId(), $context);
@@ -271,6 +343,7 @@ class PaymentStatusHelper
             && (
                 $transactionState->getTechnicalName() !== PaymentStatus::STATUS_FAILED
                 && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_CANCELED
+                // FIXME: Should probably check against OrderTransactionStates constants here
             )
         ) {
             try {
@@ -314,6 +387,7 @@ class PaymentStatusHelper
             $paidNumber > 0
             && $paidNumber === $order->getAmountTotal()
             && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_PAID
+            // FIXME: Should probably check against OrderTransactionStates constants here
         ) {
             try {
                 if (method_exists($this->orderTransactionStateHandler, 'paid')) {
