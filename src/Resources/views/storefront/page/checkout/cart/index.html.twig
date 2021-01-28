@@ -1,12 +1,12 @@
-{% sw_extends '@Storefront/storefront/component/checkout/offcanvas-cart.html.twig' %}
+{% sw_extends '@Storefront/storefront/page/checkout/cart/index.html.twig' %}
 
-{% block component_offcanvas_cart_actions_checkout %}
-    {% if isCartNotEmpty %}
+{% block page_checkout_cart_action_proceed %}
+    <div class="checkout-aside-action">
         {% include '@MolliePayments/mollie/component/paypal-express-checkout-button.twig' with {
             cols: 'mb-2',
             cartToken: page.cart.token,
         } %}
-    {% endif %}
+    </div>
 
     {{ parent() }}
 {% endblock %}
