@@ -12,33 +12,17 @@ export default class MolliePaypalExpressCheckout extends Plugin {
         countryCode: null,
         shippingMethodId: null,
         route: window.router['frontend.mollie.paypal-ecs.checkout'],
-        availableRoute: window.router['frontend.mollie.paypal-ecs.available'],
         csrfToken: null,
         cartToken: null,
     }
 
     init() {
         this._client = new HttpClient();
-        this._available()
-            .then(() => this.el.classList.remove('d-none'))
-            .then(() => this._registerEvents());
+        this._registerEvents();
     }
 
     update() {
-        this._available().then(() => this._registerEvents());
-    }
-
-    _available() {
-        const self = this;
-        return new Promise((resolve) => {
-            self._client.get(self.options.availableRoute, response => resolve(JSON.parse(response)))
-        }).then(expressCheckout => {
-            if (expressCheckout.isAvailable) {
-                Promise.resolve();
-            } else {
-                Promise.reject();
-            }
-        })
+        this._registerEvents();
     }
 
     _onClick() {
@@ -95,13 +79,9 @@ export default class MolliePaypalExpressCheckout extends Plugin {
     _getRequestData() {
         const data = {
             productId: this.options.productId,
-            // productName: this.options.productName,
-            // productPrice: this.options.productPrice,
-            // currency: this.options.currency,
-            // currencyId: this.options.currencyId,
+            cartToken: this.options.cartToken,
             countryCode: this.options.countryCode,
             shippingMethodId: this.options.shippingMethodId,
-            cartToken: this.options.cartToken,
             location: location.toString(),
         };
 

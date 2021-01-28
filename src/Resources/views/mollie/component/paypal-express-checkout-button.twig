@@ -1,7 +1,7 @@
 <div class="mollie-paypal-express-checkout {{ cols }}">
     {% set settings = page.extensions[constant('Kiener\\MolliePayments\\Subscriber\\PayPalExpressCheckoutSubscriber::MOLLIE_PAYPAL_EXPRESS_CHECKOUT_BUTTON_DATA_EXTENSION_ID')] %}
 
-    {% if settings and settings.enabled %}
+    {% if settings and settings.available %}
         {% set paypal_ecs = {
             productId: product.id,
             countryCode: context.shippingLocation.country.iso,
@@ -9,7 +9,7 @@
             csrfToken: sw_csrf("frontend.mollie.paypal-ecs.checkout", {"mode": "token"}),
             cartToken: cartToken ?? null
         } %}
-        <button type="button" class="btn btn-primary btn-block js-paypal-ecs w-100 d-none paypal-{{ settings.color }}"
+        <button type="button" class="btn btn-primary btn-block js-paypal-ecs w-100 paypal-{{ settings.color }}"
                 data-mollie-paypal-express-checkout="true"
                 data-mollie-paypal-express-checkout-options="{{ paypal_ecs | json_encode }}">
             {% set label = "molliePayments.components.paypalExpressCheckoutButton." ~ settings.label %}
