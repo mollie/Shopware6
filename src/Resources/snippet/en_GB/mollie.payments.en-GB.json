@@ -22,7 +22,8 @@
                 "label": "Buy with Apple Pay"
             },
             "paypalExpressCheckoutButton": {
-                "label": "Buy with"
+                "buy": "Buy with",
+                "checkout": "Checkout with"
             }
         }
     }

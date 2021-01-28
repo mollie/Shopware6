@@ -22,7 +22,8 @@
                 "label": "Kaufen Sie mit Apple Pay"
             },
             "paypalExpressCheckoutButton": {
-                "label": "Zahlen mit"
+                "buy": "Zahlen mit",
+                "checkout": "Kaufen mit"
             }
         }
     }

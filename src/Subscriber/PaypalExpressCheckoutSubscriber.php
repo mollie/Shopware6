@@ -74,6 +74,7 @@ class PaypalExpressCheckoutSubscriber implements EventSubscriberInterface
         return new ArrayStruct([
             'enabled' => $settings->isEnablePayPalShortcut(),
             'color' => $settings->getPaypalShortcutButtonColor(),
+            'label' => $settings->getPaypalShortcutButtonLabel(),
         ]);
     }
 }

@@ -128,6 +128,22 @@
                 </option>
             </options>
         </input-field>
+        <input-field type="single-select">
+            <name>paypalShortcutButtonLabel</name>
+            <label>PayPal Shortcut button label</label>
+            <label lang="de-DE">PayPal Shortcut button label</label>
+            <label lang="nl-NL">Paypal Shortcut knop tekst</label>
+            <options>
+                <option>
+                    <id>buy</id>
+                    <name>Buy with PayPal</name>
+                </option>
+                <option>
+                    <id>checkout</id>
+                    <name>Checkout with PayPal</name>
+                </option>
+            </options>
+        </input-field>
     </card>
 
 

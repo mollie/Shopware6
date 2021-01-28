@@ -12,14 +12,15 @@
         <button type="button" class="btn btn-primary btn-block js-paypal-ecs w-100 d-none paypal-{{ settings.color }}"
                 data-mollie-paypal-express-checkout="true"
                 data-mollie-paypal-express-checkout-options="{{ paypal_ecs | json_encode }}">
-            <span>{{ "molliePayments.components.paypalExpressCheckoutButton.label"|trans }}</span>
-
+            {% set label = "molliePayments.components.paypalExpressCheckoutButton." ~ settings.label %}
             {% set icon = (settings.color in ["blue", "black"]) ? "paypal-white" : "paypal" %}
 
+            <span>{{ label | trans }}</span>
+
             <img src="{{ asset('bundles/molliepayments/static/img/paypal/' ~ icon ~ '-logo.svg') }}" class="ml-1"
-                 alt="{{ "molliePayments.components.paypalExpressCheckoutButton.label"|trans }} PayPal">
+                 alt="{{ label | trans }} PayPal">
             <img src="{{ asset('bundles/molliepayments/static/img/paypal/' ~ icon ~ '.svg') }}"
-                 alt="{{ "molliePayments.components.paypalExpressCheckoutButton.label"|trans }} PayPal">
+                 alt="{{ label | trans }} PayPal">
         </button>
     {% endif %}
 </div>

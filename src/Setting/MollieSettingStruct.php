@@ -83,6 +83,11 @@ class MollieSettingStruct extends Struct
     /**
      * @var string
      */
+    protected $paypalShortcutButtonLabel = 'buy';
+
+    /**
+     * @var string
+     */
     protected $orderStateWithAPaidTransaction = self::ORDER_STATE_SKIP;
 
     /**
@@ -382,6 +387,22 @@ class MollieSettingStruct extends Struct
     public function setPaypalShortcutButtonColor(string $paypalShortcutButtonColor): void
     {
         $this->paypalShortcutButtonColor = $paypalShortcutButtonColor;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPaypalShortcutButtonLabel(): string
+    {
+        return $this->paypalShortcutButtonLabel;
+    }
+
+    /**
+     * @param string $paypalShortcutButtonLabel
+     */
+    public function setPaypalShortcutButtonLabel(string $paypalShortcutButtonLabel): void
+    {
+        $this->paypalShortcutButtonLabel = $paypalShortcutButtonLabel;
     }
 
 }
