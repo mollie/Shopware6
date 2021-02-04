@@ -95,6 +95,7 @@ class PaypalExpressCheckoutController extends AbstractExpressCheckoutController
      *     methods={"POST"}
      *     )
      *
+     * @param Request $request
      * @param SalesChannelContext $context
      *
      * @return JsonResponse
@@ -258,8 +259,7 @@ class PaypalExpressCheckoutController extends AbstractExpressCheckoutController
     /**
      *
      * @param CustomerEntity $customer
-     * @param string $cartToken
-     *
+     * @param Cart $cart
      * @param string $shippingMethodId
      * @param SalesChannelContext $context
      *
@@ -311,15 +311,14 @@ class PaypalExpressCheckoutController extends AbstractExpressCheckoutController
     /**
      * Returns an order that is created through the Mollie API.
      *
-     * @param string $applePaymentToken
+     * @param string $molliePaymentMethod
      * @param OrderEntity $order
      * @param string $returnUrl
      * @param OrderTransactionEntity $transaction
      *
      * @param SalesChannelContext $salesChannelContext
-     *
+     * @param array $paymentData
      * @return Order|null
-     * @throws RuntimeException
      */
     protected function createOrderAtMollie(
         string $molliePaymentMethod,
