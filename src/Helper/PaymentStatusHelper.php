@@ -340,31 +340,31 @@ class PaymentStatusHelper
             $failedNumber > 0
             && $failedNumber === $paymentsTotal
             && $transactionState !== null
-            && (
+        ) {
+            if (
                 $transactionState->getTechnicalName() !== PaymentStatus::STATUS_FAILED
                 && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_CANCELED
-                // FIXME: Should probably check against OrderTransactionStates constants here
-            )
-        ) {
-            try {
-                if (method_exists($this->orderTransactionStateHandler, 'fail')) {
-                    $this->orderTransactionStateHandler->fail($transaction->getId(), $context);
-                } else {
-                    $this->orderTransactionStateHandler->cancel($transaction->getId(), $context);
+            ) {
+                try {
+                    if (method_exists($this->orderTransactionStateHandler, 'fail')) {
+                        $this->orderTransactionStateHandler->fail($transaction->getId(), $context);
+                    } else {
+                        $this->orderTransactionStateHandler->cancel($transaction->getId(), $context);
+                    }
+                } catch (Exception $e) {
+                    $this->logger->addEntry(
+                        $e->getMessage(),
+                        $context,
+                        $e,
+                        [
+                            'function' => 'payment-set-transaction-state'
+                        ]
+                    );
                 }
-            } catch (Exception $e) {
-                $this->logger->addEntry(
-                    $e->getMessage(),
-                    $context,
-                    $e,
-                    [
-                        'function' => 'payment-set-transaction-state'
-                    ]
-                );
-            }
 
-            // Process the order state automation
-            $this->orderStateHelper->setOrderState($order, $settings->getOrderStateWithAFailedTransaction(), $context);
+                // Process the order state automation
+                $this->orderStateHelper->setOrderState($order, $settings->getOrderStateWithAFailedTransaction(), $context);
+            }
 
             return PaymentStatus::STATUS_FAILED;
         }
