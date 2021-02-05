@@ -23,102 +23,102 @@
     </card>
     <card>
         <title>Modes</title>
-        <title lang="de-DE">Modes</title>
+        <title lang="de-DE">Modi</title>
         <title lang="nl-NL">Modi</title>
         <input-field type="bool">
             <name>testMode</name>
             <label>Test Mode</label>
-            <label lang="de-DE">Test Mode</label>
+            <label lang="de-DE">Test Modus</label>
             <label lang="nl-NL">Test Modus</label>
         </input-field>
         <input-field type="bool">
             <name>debugMode</name>
 
             <label>Debug Mode</label>
-            <label lang="de-DE">Debug Mode</label>
+            <label lang="de-DE">Debug Modus</label>
             <label lang="nl-NL">Debug Modus</label>
         </input-field>
     </card>
     <card>
-        <title>Configuration</title>
-        <title lang="de-DE">Components</title>
-        <title lang="nl-NL">Components</title>
+        <title>Components</title>
+        <title lang="de-DE">Komponenten</title>
+        <title lang="nl-NL">Componenten</title>
         <input-field type="bool">
             <name>enableCreditCardComponents</name>
             <label>Credit Card Components</label>
-            <label lang="de-DE">Credit Card Components</label>
-            <label lang="nl-NL">Credit Card Components</label>
+            <label lang="de-DE">Kreditkarten Komponenten</label>
+            <label lang="nl-NL">Credit Card componenten</label>
         </input-field>
         <input-field type="bool">
             <name>enableApplePayDirect</name>
             <label>Enable Apple Pay Direct</label>
-            <label lang="de-DE">Enable Apple Pay Direct</label>
-            <label lang="nl-NL">Enable Apple Pay Direct</label>
+            <label lang="de-DE">Apple Pay Direct aktivieren</label>
+            <label lang="nl-NL">Apple Pay Direct activeren</label>
         </input-field>
         <input-field type="int">
             <name>paymentMethodBankTransferDueDateDays</name>
             <label>Bank Transfer Due Date Days</label>
-            <label lang="de-DE">Bank Transfer Due Date (in days from order creation)</label>
-            <label lang="nl-NL">Bank Transfer Due Date (in days from order creation)</label>
+            <label lang="de-DE">Banküberweisung Fälligkeitsdauer (in Tagen seit Bestelleingang)</label>
+            <label lang="nl-NL">Bankoverschrijving vervaldatum (in dagen vanaf ontvangen bestelling)</label>
         </input-field>
         <input-field type="int">
             <name>orderLifetimeDays</name>
             <label>Order Lifetime Days</label>
-            <label lang="de-DE">Order Lifetime (in days from order creation)</label>
-            <label lang="nl-NL">Order Lifetime (in days from order creation)</label>
+            <label lang="de-DE">Bestellungs Lebensdauer bei Mollie (in Tagen seit Bestelleingang)</label>
+            <label lang="nl-NL">Levensduur bestelling bij Mollie (in dagen vanaf ontvangen bestelling)</label>
         </input-field>
         <input-field type="bool">
             <name>shopwareFailedPayment</name>
             <label>Use standard failed payment redirect.</label>
-            <label lang="de-DE">Use standard failed payment redirect.</label>
-            <label lang="nl-NL">Use standard failed payment redirect.</label>
+            <label lang="de-DE">Standard Shopware Verhalten bei fehlgeschlagenen Bestellungen benutzen</label>
+            <label lang="nl-NL">Gebruik standaard Shopware redirect voor mislukte bestellingen.</label>
         </input-field>
         <input-field type="bool">
             <name>noCustomersAtMollie</name>
             <label>Do not create customers at Mollie.</label>
-            <label lang="de-DE">Do not create customers at Mollie.</label>
-            <label lang="nl-NL">Do not create customers at Mollie.</label>
+            <label lang="de-DE">Kunden nicht bei Mollie anlegen.</label>
+            <label lang="nl-NL">Geen klanten creëren bij Mollie.</label>
         </input-field>
     </card>
     <card>
         <title>Order State Automation</title>
-        <title lang="de-DE">Order State Automation</title>
-        <title lang="nl-NL">Bestelstatus Automatisering</title>
+        <title lang="de-DE">Automatisch Order Status setzen</title>
+        <title lang="nl-NL">Automatisch bestelstatus instellen</title>
 
         <input-field type="single-select">
             <name>orderStateWithAPaidTransaction</name>
             <label>Order state with a paid transaction</label>
-            <label lang="de-DE">Order state with a paid transaction</label>
+            <label lang="de-DE">Bestellstatus bei einer bezahlten Transaktion</label>
             <label lang="nl-NL">Bestelstatus bij een betaalde transactie</label>
             <options>
                 <option>
                     <id>skip</id>
                     <name>Skip this status</name>
-                    <name lang="de-DE">Skip this status</name>
+                    <name lang="de-DE">nichts machen</name>
                     <name lang="nl-NL">Sla deze status over</name>
                 </option>
                 <option>
                     <id>open</id>
                     <name>Open</name>
-                    <name lang="de-DE">Open</name>
+                    <name lang="de-DE">Offen</name>
                     <name lang="nl-NL">Open</name>
                 </option>
                 <option>
                     <id>in_progress</id>
                     <name>In progress</name>
-                    <name lang="de-DE">In progress</name>
-                    <name lang="nl-NL">In verwerking</name>
+                    <name lang="de-DE">In Bearbeitung</name>
+                    <name lang="nl-NL">In uitvoering</name>
                 </option>
                 <option>
                     <id>completed</id>
                     <name>Completed</name>
-                    <name lang="de-DE">Completed</name>
+                    <name lang="de-DE">Komplett</name>
                     <name lang="nl-NL">Voltooid</name>
                 </option>
                 <option>
                     <id>cancelled</id>
                     <name>Cancelled</name>
-                    <name lang="de-DE">Cancelled</name>
+                    <name lang="de-DE">Abgebrochen</name>
                     <name lang="nl-NL">Geannuleerd</name>
                 </option>
             </options>
@@ -127,37 +127,37 @@
         <input-field type="single-select">
             <name>orderStateWithAFailedTransaction</name>
             <label>Order state with a failed transaction</label>
-            <label lang="de-DE">Order state with a failed transaction</label>
+            <label lang="de-DE">Bestellstatus bei einer fehlgeschlagenen Transaktion</label>
             <label lang="nl-NL">Bestelstatus bij een mislukte transactie</label>
             <options>
                 <option>
                     <id>skip</id>
                     <name>Skip this status</name>
-                    <name lang="de-DE">Skip this status</name>
+                    <name lang="de-DE">nichts machen</name>
                     <name lang="nl-NL">Sla deze status over</name>
                 </option>
                 <option>
                     <id>open</id>
                     <name>Open</name>
-                    <name lang="de-DE">Open</name>
+                    <name lang="de-DE">Offen</name>
                     <name lang="nl-NL">Open</name>
                 </option>
                 <option>
                     <id>in_progress</id>
                     <name>In progress</name>
-                    <name lang="de-DE">In progress</name>
-                    <name lang="nl-NL">In verwerking</name>
+                    <name lang="de-DE">In Bearbeitung</name>
+                    <name lang="nl-NL">In uitvoering</name>
                 </option>
                 <option>
                     <id>completed</id>
                     <name>Completed</name>
-                    <name lang="de-DE">Completed</name>
+                    <name lang="de-DE">Komplett</name>
                     <name lang="nl-NL">Voltooid</name>
                 </option>
                 <option>
                     <id>cancelled</id>
                     <name>Cancelled</name>
-                    <name lang="de-DE">Cancelled</name>
+                    <name lang="de-DE">Abgebrochen</name>
                     <name lang="nl-NL">Geannuleerd</name>
                 </option>
             </options>
@@ -166,37 +166,37 @@
         <input-field type="single-select">
             <name>orderStateWithACancelledTransaction</name>
             <label>Order state with a cancelled transaction</label>
-            <label lang="de-DE">Order state with a cancelled transaction</label>
+            <label lang="de-DE">Bestellstatus bei einer abgebrochenen Transaktion</label>
             <label lang="nl-NL">Bestelstatus bij een geannuleerde transactie</label>
             <options>
                 <option>
                     <id>skip</id>
                     <name>Skip this status</name>
-                    <name lang="de-DE">Skip this status</name>
+                    <name lang="de-DE">nichts machen</name>
                     <name lang="nl-NL">Sla deze status over</name>
                 </option>
                 <option>
                     <id>open</id>
                     <name>Open</name>
-                    <name lang="de-DE">Open</name>
+                    <name lang="de-DE">Offen</name>
                     <name lang="nl-NL">Open</name>
                 </option>
                 <option>
                     <id>in_progress</id>
                     <name>In progress</name>
-                    <name lang="de-DE">In progress</name>
-                    <name lang="nl-NL">In verwerking</name>
+                    <name lang="de-DE">In Bearbeitung</name>
+                    <name lang="nl-NL">In uitvoering</name>
                 </option>
                 <option>
                     <id>completed</id>
                     <name>Completed</name>
-                    <name lang="de-DE">Completed</name>
+                    <name lang="de-DE">Komplett</name>
                     <name lang="nl-NL">Voltooid</name>
                 </option>
                 <option>
                     <id>cancelled</id>
                     <name>Cancelled</name>
-                    <name lang="de-DE">Cancelled</name>
+                    <name lang="de-DE">Abgebrochen</name>
                     <name lang="nl-NL">Geannuleerd</name>
                 </option>
             </options>
@@ -204,37 +204,37 @@
         <input-field type="single-select">
             <name>orderStateWithAAuthorizedTransaction</name>
             <label>Order state with a authorized transaction</label>
-            <label lang="de-DE">Order state with a authorized transaction</label>
+            <label lang="de-DE">Bestellstatus bei einer authorisierten Transaktion</label>
             <label lang="nl-NL">Bestelstatus bij een geautoriseerde transactie</label>
             <options>
                 <option>
                     <id>skip</id>
                     <name>Skip this status</name>
-                    <name lang="de-DE">Skip this status</name>
+                    <name lang="de-DE">nichts machen</name>
                     <name lang="nl-NL">Sla deze status over</name>
                 </option>
                 <option>
                     <id>open</id>
                     <name>Open</name>
-                    <name lang="de-DE">Open</name>
+                    <name lang="de-DE">Offen</name>
                     <name lang="nl-NL">Open</name>
                 </option>
                 <option>
                     <id>in_progress</id>
                     <name>In progress</name>
-                    <name lang="de-DE">In progress</name>
-                    <name lang="nl-NL">In verwerking</name>
+                    <name lang="de-DE">In Bearbeitung</name>
+                    <name lang="nl-NL">In uitvoering</name>
                 </option>
                 <option>
                     <id>completed</id>
                     <name>Completed</name>
-                    <name lang="de-DE">Completed</name>
+                    <name lang="de-DE">Komplett</name>
                     <name lang="nl-NL">Voltooid</name>
                 </option>
                 <option>
                     <id>cancelled</id>
                     <name>Cancelled</name>
-                    <name lang="de-DE">Cancelled</name>
+                    <name lang="de-DE">Abgebrochen</name>
                     <name lang="nl-NL">Geannuleerd</name>
                 </option>
             </options>

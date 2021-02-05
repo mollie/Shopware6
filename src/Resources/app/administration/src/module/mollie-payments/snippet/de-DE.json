@@ -1,36 +1,36 @@
 {
   "mollie-payments": {
     "general": {
-      "mainMenuItemGeneral": "Mollie Payments",
-      "descriptionTextModule": "Mollie Payments",
-      "refundThroughMollie": "Refund through Mollie",
-      "shipThroughMollie": "Ship through Mollie"
+      "mainMenuItemGeneral": "Mollie Payments Zahlungen",
+      "descriptionTextModule": "Mollie Payments Zahlungen",
+      "refundThroughMollie": "Rückerstattung über Mollie",
+      "shipThroughMollie": "Versand bei Mollie melden"
     },
     "modals": {
       "refund": {
-        "title": "Refund an order line item through Mollie",
-        "content": "Fill out the quantity of this item ({refundableQuantity} out of {quantity} left to refund) to be refunded to the customer.",
-        "quantityPlaceholder": "The quantity to refund...",
+        "title": "Bestellposition über Mollie rückerstatten",
+        "content": "Menge dieser Bestellposition ({refundableQuantity} von {quantity} für Rückerstattung möglich) für die Rückerstattung an den Kunden.",
+        "quantityPlaceholder": "Menge für Rückerstattung...",
         "createCreditText": "Create a credit item for this refund.",
-        "confirmButton": "Refund",
-        "cancelButton": "Do not refund"
+        "confirmButton": "Rückerstatten",
+        "cancelButton": "Abbrechen"
       },
       "shipping": {
-        "title": "Ship an order line item through Mollie",
-        "content": "Fill out the quantity of this item ({shippableQuantity} out of {quantity} left to ship) to be shipped to the customer.",
-        "quantityPlaceholder": "The quantity to ship...",
-        "confirmButton": "Ship",
-        "cancelButton": "Do not ship"
+        "title": "Versand der Bestellposition an Mollie melden",
+        "content": "Menge dieser Bestellposition ({shippableQuantity} von {quantity} für Versand noch möglich), die an den Kunden versandt wurden.",
+        "quantityPlaceholder": "Menge der versendeten Ware...",
+        "confirmButton": "Versandmeldung bei Mollie",
+        "cancelButton": "Abbrechen"
       }
     }
   },
   "sw-order": {
     "detailExtended": {
-      "columnRefunded": "Refunded",
-      "columnShipped": "Shipped",
-      "labelMollieOrderId": "Mollie Order ID",
-      "totalRefunds": "Refunded amount ({quantity} items)",
-      "totalShipments": "Shipped amount ({quantity} items)"
+      "columnRefunded": "Rückerstattet",
+      "columnShipped": "Versandt",
+      "labelMollieOrderId": "Mollie Bestell ID",
+      "totalRefunds": "Rückerstattete Menge ({quantity} Stück)",
+      "totalShipments": "Versandte Menge ({quantity} Stück)"
     }
   },
   "sw-payment": {
@@ -44,7 +44,7 @@
   },
   "sw-customer": {
     "extendedInfo": {
-      "labelPreferredIdealIssuer": "Preferred iDeal issuer"
+      "labelPreferredIdealIssuer": "Bevorzugter iDeal Aussteller"
     }
   }
 }
