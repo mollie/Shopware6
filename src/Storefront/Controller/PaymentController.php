@@ -215,6 +215,10 @@ class PaymentController extends StorefrontController
             /** @var PaymentHandler $paymentHandler */
             $paymentHandler = $this->paymentHandlerRegistry->getAsyncHandler($paymentMethod->getHandlerIdentifier());
 
+            if(is_null($paymentHandler)) {
+                $errorMessage = 'Using Mollie Express Checkout but using incorrect payment handler or handler could not be found.';
+            }
+
             if ($paymentHandler::PAYMENT_METHOD_NAME === $customFields['mollie_payments'][PaymentHandler::EXPRESS_CHECKOUT]) {
                 $paymentHandler->updateExpressCheckout($mollieOrder, $order, $context);
             }

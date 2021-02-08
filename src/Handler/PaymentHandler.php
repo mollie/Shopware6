@@ -379,16 +379,6 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
                 'We can\'t fetch the order ' . $order->getOrderNumber() . ' (' . $mollieOrderId . ') from the Orders API'
             );
         }
-//
-//
-//        if (!is_null($request->get('_express_checkout')) &&
-//            (
-//                $request->request->getAlnum('_express_checkout') === self::PAYMENT_METHOD_NAME ||
-//                $request->request->getBoolean('_express_checkout') === true
-//            ) &&
-//            method_exists($this, 'finalizeExpressCheckout')) {
-//            $this->finalizeExpressCheckout($mollieOrder, $order, $salesChannelContext->getContext());
-//        }
 
         /**
          * Process the payment status of the order. Returns a PaymentStatus string which

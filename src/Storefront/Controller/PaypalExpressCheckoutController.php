@@ -198,6 +198,7 @@ class PaypalExpressCheckoutController extends AbstractExpressCheckoutController
                     $customer,
                     $cart,
                     (string)$shippingMethodId,
+                    (string)$paymentMethod->getId(),
                     $context
                 );
             } catch (\Throwable $e) {
@@ -266,7 +267,13 @@ class PaypalExpressCheckoutController extends AbstractExpressCheckoutController
      * @return OrderEntity|null
      * @throws \Exception
      */
-    private function process(CustomerEntity $customer, Cart $cart, string $shippingMethodId, SalesChannelContext $context): ?OrderEntity
+    private function process(
+        CustomerEntity $customer,
+        Cart $cart,
+        string $shippingMethodId,
+        string $paymentMethodId,
+        SalesChannelContext $context)
+    : ?OrderEntity
     {
         // Handle errors
         if (
@@ -292,7 +299,7 @@ class PaypalExpressCheckoutController extends AbstractExpressCheckoutController
                 $context,
                 $customer->getDefaultShippingAddress() !== null ? $customer->getDefaultShippingAddress()->getCountryId() : null,
                 $customer->getUniqueIdentifier(),
-                $customer->getDefaultPaymentMethod() !== null ? $customer->getDefaultPaymentMethod()->getId() : null,
+                $paymentMethodId,
                 $shippingMethodId
             );
 
