@@ -100,7 +100,9 @@ class CustomerService
                 'customerId' => $customer->getId(),
                 'billingAddressId' => null,
                 'shippingAddressId' => null,
-            ]
+            ],
+            $context->getSalesChannel()->getId(),
+            $customer->getId()
         );
 
         /** @var CustomerLoginEvent $event */
