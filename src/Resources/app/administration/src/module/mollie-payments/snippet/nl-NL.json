@@ -1,0 +1,50 @@
+{
+  "mollie-payments": {
+    "general": {
+      "mainMenuItemGeneral": "Mollie betalingen",
+      "descriptionTextModule": "Mollie betalingen",
+      "refundThroughMollie": "Terugbetaling via Mollie",
+      "shipThroughMollie": "Verzending door Mollie"
+    },
+    "modals": {
+      "refund": {
+        "title": "Terugbetaling van een order line item via Mollie",
+        "content": "Vul de hoeveelheid van dit item in ({refundableQuantity} van {quantity} over voor terugbetaling) die aan de klant moet worden terugbetaald.",
+        "quantityPlaceholder": "De terug te betalen hoeveelheid...",
+        "createCreditText": "Creëer een credit-item voor deze terugbetaling.",
+        "confirmButton": "Terugbetaling",
+        "cancelButton": "Niet terugbetalen"
+      },
+      "verzending": {
+        "title": "Verzend een order line item via Mollie",
+        "content": "Vul de hoeveelheid van dit item in ({shippableQuantity} van {quantity} over voor verzending) om naar de klant te verzenden.",
+        "quantityPlaceholder": "De te verzenden hoeveelheid...",
+        "confirmButton": "Verzenden",
+        "cancelButton": "Niet verzenden"
+      }
+    }
+  },
+  "sw-order": {
+    "detailExtended": {
+      "columnRefunded": "Terugbetaald",
+      "columnShipped": "Verzonden",
+      "labelMollieOrderId": "Mollie Order ID",
+      "totalRefunds": "Terugbetaald bedrag ({quantity} items)",
+      "totalShipments": "Verzonden bedrag ({quantity} items)"
+    }
+  },
+  "sw-payment": {
+    "testButton": "Controlle",
+    "testApiKeys": {
+      "title": "Mollie Payments",
+      "apiKey": "API Key",
+      "isValid": "is geldig",
+      "isInvalid": "is geldig"
+    }
+  },
+  "sw-customer": {
+    "extendedInfo": {
+      "labelPreferredIdealIssuer": "Voorkeur iDeal verstrekker"
+    }
+  }
+}

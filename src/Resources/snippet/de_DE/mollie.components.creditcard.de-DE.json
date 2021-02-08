@@ -1,0 +1,14 @@
+{
+  "molliePayments": {
+    "components": {
+      "creditCard": {
+        "headLine": "Kreditkarteninformationen",
+        "cardHolderLabel": "Name des Kreditkarteninhabers",
+        "cardNumberLabel": "Kreditkartennummer",
+        "cardExpiryDateLabel": "Ablaufdatum",
+        "cardVerificationCodeLabel": "CVC",
+        "creditCardTagLine": "Zahlung gesichert und zur Verfügung gestellt von"
+      }
+    }
+  }
+}
