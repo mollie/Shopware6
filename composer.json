@@ -10,9 +10,6 @@
     }
   ],
   "require": {
-    "shopware/core": "*",
-    "shopware/administration": "*",
-    "shopware/storefront": "*",
     "mollie/mollie-api-php": "~2.25"
   },
   "extra": {
@@ -55,5 +52,11 @@
   "conflict": {
     "shopware/storefront": "<6,>=7",
     "shopware/administration": "<6,>=7"
+  },
+  "require-dev": {
+    "shopware/core": "*",
+    "shopware/administration": "*",
+    "shopware/storefront": "*",
+    "phpunit/phpunit": "^9.5"
   }
 }

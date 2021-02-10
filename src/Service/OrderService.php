@@ -3,9 +3,12 @@
 namespace Kiener\MolliePayments\Service;
 
 use Exception;
+use Kiener\MolliePayments\Exception\MissingPriceLineItemException;
+use Kiener\MolliePayments\Validator\OrderLineItemValidator;
 use Mollie\Api\Types\OrderLineType;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
+use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTax;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
@@ -38,15 +41,29 @@ class OrderService
     /** @var LoggerInterface */
     protected $logger;
 
+    /**
+     * @var ApiTaxCalculator
+     */
+    private $apiTaxCalculator;
+
+    /**
+     * @var OrderLineItemValidator
+     */
+    private $orderLineItemValidator;
+
     public function __construct(
         EntityRepositoryInterface $orderRepository,
         EntityRepositoryInterface $orderLineItemRepository,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        ApiTaxCalculator $apiTaxCalculator,
+        OrderLineItemValidator $orderLineItemValidator
     )
     {
         $this->orderRepository = $orderRepository;
         $this->orderLineItemRepository = $orderLineItemRepository;
         $this->logger = $logger;
+        $this->apiTaxCalculator = $apiTaxCalculator;
+        $this->orderLineItemValidator = $orderLineItemValidator;
     }
 
     /**
@@ -109,6 +126,7 @@ class OrderService
      *
      * @param OrderEntity $order
      * @return array
+     * @throws MissingPriceLineItemException
      */
     public function getOrderLinesArray(OrderEntity $order): array
     {
@@ -124,34 +142,27 @@ class OrderService
         $currency = $order->getCurrency();
         $currencyCode = $currency !== null ? $currency->getIsoCode() : 'EUR';
 
+        /** @var OrderLineItemEntity $item */
         foreach ($lineItems as $item) {
-            // Get tax
-            $itemTax = null;
-
-            if ($item->getPrice() !== null &&
-                $item->getPrice()->getCalculatedTaxes() !== null) {
-                $itemTax = $this->getLineItemTax($item->getPrice()->getCalculatedTaxes());
-            }
-
-            // Get VAT rate and amount
-            $vatRate = $itemTax !== null ? $itemTax->getTaxRate() : 0.0;
-            $vatAmount = $itemTax !== null ? $itemTax->getTax() : null;
-
-            if ($vatAmount === null && $vatRate > 0) {
-                $vatAmount = $item->getTotalPrice() * ($vatRate / ($vatRate + 100));
-            }
-
-            // Remove VAT if the order is tax free
-            if ($order->getTaxStatus() === CartPrice::TAX_STATE_FREE) {
-                $vatRate = 0.0;
-                $vatAmount = 0.0;
-            }
-
             // Get the SKU
             $sku = null;
 
             if ($item->getProduct() !== null) {
                 $sku = $item->getProduct()->getProductNumber();
+            }
+
+            try {
+                $molliePreparedApiPrices = $this->hydrateLineItemPriceData($item, $order->getTaxStatus(), $currencyCode);
+            } catch (MissingPriceLineItemException $e) {
+                $this->logger->critical(
+                    sprintf(
+                        'The order could not be prepared for mollie api. The LineItem with id (%s), sku (%s) has no prices',
+                        $item->getId(),
+                        (string)$sku
+                    )
+                );
+
+                throw new MissingPriceLineItemException($item->getId());
             }
 
             // Get the image
@@ -179,31 +190,15 @@ class OrderService
                 $productUrl = $item->getProduct()->getSeoUrls()->first()->getUrl();
             }
 
-            // Get the prices
-            $unitPrice = $item->getUnitPrice();
-            $totalAmount = $item->getTotalPrice();
-
-            // Add tax when order is net
-            if ($item->getPrice() !== null) {
-                $unitPrice = $item->getPrice()->getUnitPrice();
-                $totalAmount = $item->getPrice()->getTotalPrice();
-                $vatAmount = $item->getPrice()->getCalculatedTaxes()->getAmount();
-
-                if ($order->getTaxStatus() === CartPrice::TAX_STATE_NET) {
-                    $unitPrice *= ((100 + $vatRate) / 100);
-                    $totalAmount += $vatAmount;
-                }
-            }
-
             // Build the order lines array
             $lines[] = [
                 'type' => $this->getLineItemType($item),
                 'name' => $item->getLabel(),
                 'quantity' => $item->getQuantity(),
-                'unitPrice' => $this->getPriceArray($currencyCode, $unitPrice),
-                'totalAmount' => $this->getPriceArray($currencyCode, $totalAmount),
-                'vatRate' => number_format($vatRate, 2, '.', ''),
-                'vatAmount' => $this->getPriceArray($currencyCode, $vatAmount),
+                'unitPrice' => $molliePreparedApiPrices['unitPrice'],
+                'totalAmount' => $molliePreparedApiPrices['totalAmount'],
+                'vatRate' => $molliePreparedApiPrices['vatRate'],
+                'vatAmount' => $molliePreparedApiPrices['vatAmount'],
                 'sku' => $sku,
                 'imageUrl' => urlencode($imageUrl),
                 'productUrl' => urlencode($productUrl),
@@ -286,6 +281,53 @@ class OrderService
         ];
 
         return $shippingLine;
+    }
+
+    /**
+     * returns an array of totalPrice, unitPrice and vatAmount that is calculated like mollie api does
+     * @param OrderLineItemEntity $item
+     * @param string $orderTaxType
+     * @param string $currencyCode
+     * @return array
+     */
+    public function hydrateLineItemPriceData(OrderLineItemEntity $item, string $orderTaxType, string $currencyCode): array
+    {
+        $this->orderLineItemValidator->validate($item);
+
+        $price = $item->getPrice();
+        $taxCollection = $price->getCalculatedTaxes();
+
+        $vatRate = 0.0;
+        $itemTax = $this->getLineItemTax($taxCollection);
+        if ($itemTax instanceof CalculatedTax) {
+            $vatRate = $itemTax->getTaxRate();
+        }
+
+        $unitPrice = $price->getUnitPrice();
+        $lineItemTotalPrice = $item->getTotalPrice();
+
+        // If the order is of type TAX_STATE_NET the $lineItemTotalPrice and unit price
+        // is a net price.
+        // For correct mollie api tax calculations we have to calculate the shopware gross
+        // price
+        if ($orderTaxType === CartPrice::TAX_STATE_NET) {
+            $unitPrice *= ((100 + $vatRate) / 100);
+            $lineItemTotalPrice += $taxCollection->getAmount();
+        }
+
+        // Remove VAT if the order is tax free
+        if ($orderTaxType === CartPrice::TAX_STATE_FREE) {
+            $vatRate = 0.0;
+        }
+
+        $vatAmount = $this->apiTaxCalculator->calculateTaxAmount($lineItemTotalPrice, $vatRate);
+
+        return [
+            'unitPrice' => $this->getPriceArray($currencyCode, $unitPrice),
+            'totalAmount' => $this->getPriceArray($currencyCode, $lineItemTotalPrice),
+            'vatAmount' => $this->getPriceArray($currencyCode, $vatAmount),
+            'vatRate' => number_format($vatRate, 2, '.', '')
+        ];
     }
 
     /**
