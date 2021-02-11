@@ -78,7 +78,6 @@
             <argument type="service" id="order.repository" />
             <argument type="service" id="order_line_item.repository" />
             <argument type="service" id="monolog.logger" />
-            <argument type="service" id="Kiener\MolliePayments\Service\ApiTaxCalculator"/>
             <argument type="service" id="Kiener\MolliePayments\Validator\OrderLineItemValidator"/>
         </service>
 

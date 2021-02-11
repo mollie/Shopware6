@@ -4,11 +4,10 @@
 namespace Kiener\MolliePayments\Tests\Service;
 
 
-use Kiener\MolliePayments\Service\ApiTaxCalculator;
 use Kiener\MolliePayments\Service\OrderService;
-use Kiener\MolliePayments\Tests\Fake\LoggerFake;
 use Kiener\MolliePayments\Validator\OrderLineItemValidator;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTax;
@@ -31,12 +30,11 @@ class OrderServiceTest extends TestCase
     {
         $orderRepository = $this->getMockBuilder(EntityRepositoryInterface::class)->getMock();
         $lineItemRepository = $this->getMockBuilder(EntityRepositoryInterface::class)->getMock();
-        $logger = new LoggerFake();
+        $logger = new NullLogger();
         $this->orderService = new OrderService(
             $orderRepository,
             $lineItemRepository,
             $logger,
-            new ApiTaxCalculator(),
             new OrderLineItemValidator()
         );
 
@@ -53,7 +51,7 @@ class OrderServiceTest extends TestCase
      */
     public function testRecalculationTaxAmount(string $expected, string $orderTaxType, string $currencyCode, OrderLineItemEntity $lineItem): void
     {
-        $mollieApiValues = $this->orderService->hydrateLineItemPriceData($lineItem, $orderTaxType, $currencyCode);
+        $mollieApiValues = $this->orderService->calculateLineItemPriceData($lineItem, $orderTaxType, $currencyCode);
         $actual = $mollieApiValues['vatAmount']['value'];
         $this->assertSame($expected, $actual);
     }
@@ -98,7 +96,12 @@ class OrderServiceTest extends TestCase
                 'EUR',
                 $this->createOrderLineItemEntity(1, 129.79, 129.79, 9.08, 7.0)
             ],
-
+            'gross price configuration, 13.68 gross price other taxAmount' => [
+                "1.89",
+                CartPrice::TAX_STATE_GROSS,
+                'EUR',
+                $this->createOrderLineItemEntity(1, 1.1368, 13.68, 1.88, 16)
+            ],
         ];
     }
 

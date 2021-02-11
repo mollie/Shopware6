@@ -32,6 +32,8 @@ class OrderService
     private const TAX_ARRAY_KEY_TAX_RATE = 'taxRate';
     private const TAX_ARRAY_KEY_PRICE = 'price';
 
+    private const MOLLIE_PRICE_PRECISION = 2;
+
     /** @var EntityRepositoryInterface */
     protected $orderRepository;
 
@@ -55,14 +57,12 @@ class OrderService
         EntityRepositoryInterface $orderRepository,
         EntityRepositoryInterface $orderLineItemRepository,
         LoggerInterface $logger,
-        ApiTaxCalculator $apiTaxCalculator,
         OrderLineItemValidator $orderLineItemValidator
     )
     {
         $this->orderRepository = $orderRepository;
         $this->orderLineItemRepository = $orderLineItemRepository;
         $this->logger = $logger;
-        $this->apiTaxCalculator = $apiTaxCalculator;
         $this->orderLineItemValidator = $orderLineItemValidator;
     }
 
@@ -152,7 +152,7 @@ class OrderService
             }
 
             try {
-                $molliePreparedApiPrices = $this->hydrateLineItemPriceData($item, $order->getTaxStatus(), $currencyCode);
+                $molliePreparedApiPrices = $this->calculateLineItemPriceData($item, $order->getTaxStatus(), $currencyCode);
             } catch (MissingPriceLineItemException $e) {
                 $this->logger->critical(
                     sprintf(
@@ -162,7 +162,7 @@ class OrderService
                     )
                 );
 
-                throw new MissingPriceLineItemException($item->getId());
+                throw $e;
             }
 
             // Get the image
@@ -290,7 +290,7 @@ class OrderService
      * @param string $currencyCode
      * @return array
      */
-    public function hydrateLineItemPriceData(OrderLineItemEntity $item, string $orderTaxType, string $currencyCode): array
+    public function calculateLineItemPriceData(OrderLineItemEntity $item, string $orderTaxType, string $currencyCode): array
     {
         $this->orderLineItemValidator->validate($item);
 
@@ -315,18 +315,23 @@ class OrderService
             $lineItemTotalPrice += $taxCollection->getAmount();
         }
 
+        $unitPrice = round($unitPrice, self::MOLLIE_PRICE_PRECISION);
+
         // Remove VAT if the order is tax free
         if ($orderTaxType === CartPrice::TAX_STATE_FREE) {
             $vatRate = 0.0;
         }
 
-        $vatAmount = $this->apiTaxCalculator->calculateTaxAmount($lineItemTotalPrice, $vatRate);
+        $roundedLineItemTotalPrice = round($lineItemTotalPrice, self::MOLLIE_PRICE_PRECISION);
+        $roundedVatRate = round($vatRate, self::MOLLIE_PRICE_PRECISION);
+        $vatAmount = $roundedLineItemTotalPrice * ($roundedVatRate / (100 + $roundedVatRate));
+        $roundedVatAmount = round($vatAmount, self::MOLLIE_PRICE_PRECISION);
 
         return [
             'unitPrice' => $this->getPriceArray($currencyCode, $unitPrice),
-            'totalAmount' => $this->getPriceArray($currencyCode, $lineItemTotalPrice),
-            'vatAmount' => $this->getPriceArray($currencyCode, $vatAmount),
-            'vatRate' => number_format($vatRate, 2, '.', '')
+            'totalAmount' => $this->getPriceArray($currencyCode, $roundedLineItemTotalPrice),
+            'vatAmount' => $this->getPriceArray($currencyCode, $roundedVatAmount),
+            'vatRate' => number_format($roundedVatRate, self::MOLLIE_PRICE_PRECISION, '.', '')
         ];
     }
 
@@ -337,7 +342,7 @@ class OrderService
      * @param int $decimals
      * @return array
      */
-    public function getPriceArray(string $currency, ?float $price = null, int $decimals = 2): array
+    public function getPriceArray(string $currency, ?float $price = null): array
     {
         if ($price === null) {
             $price = 0.0;
@@ -345,7 +350,7 @@ class OrderService
 
         return [
             'currency' => $currency,
-            'value' => number_format(round($price, $decimals), $decimals, '.', '')
+            'value' => number_format(round($price, self::MOLLIE_PRICE_PRECISION), self::MOLLIE_PRICE_PRECISION, '.', '')
         ];
     }
 
