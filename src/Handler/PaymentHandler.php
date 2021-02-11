@@ -751,10 +751,25 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      */
     public function updateExpressCheckout(Order $mollieOrder, OrderEntity $order, SalesChannelContext $context)
     {
-        $this->orderService->updateOrderWithMollieData($mollieOrder, $order->getUniqueIdentifier(), $context->getContext());
+        $settings = $this->settingsService->getSettings(
+            $context->getSalesChannel()->getId(),
+            $context->getContext()
+        );
+
+        $this->orderService->updateOrderWithMollieData(
+            $mollieOrder,
+            $order->getUniqueIdentifier(),
+            $settings,
+            $context->getContext()
+        );
 
         if (!is_null($context->getCustomer()) && $context->getCustomer()->getGuest()) {
-            $this->customerService->updateCustomerWithMollieData($mollieOrder, $context->getCustomer()->getUniqueIdentifier(), $context->getContext());
+            $this->customerService->updateCustomerWithMollieData(
+                $mollieOrder,
+                $context->getCustomer()->getUniqueIdentifier(),
+                $settings,
+                $context->getContext()
+            );
         }
     }
 

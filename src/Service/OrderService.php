@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Service;
 
 use Exception;
 use Kiener\MolliePayments\Handler\PaymentHandler;
+use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Types\OrderLineType;
 use Mollie\Api\Types\PaymentStatus;
@@ -379,7 +380,12 @@ class OrderService
         }
     }
 
-    public function updateOrderWithMollieData(Order $mollieOrder, string $orderId, Context $context)
+    public function updateOrderWithMollieData(
+        Order $mollieOrder,
+        string $orderId,
+        MollieSettingStruct $settings,
+        Context $context
+    )
     {
         $order = $this->getOrder($orderId, $context);
 
@@ -401,17 +407,14 @@ class OrderService
         }
 
         if (!isset($paymentDetails->shippingAddress)) {
-            if (
-                getenv(PaymentHandler::ENV_LOCAL_DEVELOPMENT) === false
-                || (bool)getenv(PaymentHandler::ENV_LOCAL_DEVELOPMENT) === false
-            ) {
-                throw new \Exception("No shipping address provided by the payment processor");
-            } else {
+            if ($settings->isTestMode()) {
                 $paymentDetails->shippingAddress = new \stdClass();
                 $paymentDetails->shippingAddress->streetAndNumber = "Express Checkout Test Address";
                 $paymentDetails->shippingAddress->postalCode = "Express Checkout Test Zipcode";
                 $paymentDetails->shippingAddress->city = "Express Checkout Test City";
                 $paymentDetails->shippingAddress->country = "NL";
+            } else {
+                throw new \Exception("No shipping address provided by the payment processor");
             }
         }
 
