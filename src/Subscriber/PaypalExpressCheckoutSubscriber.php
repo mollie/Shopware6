@@ -98,6 +98,11 @@ class PaypalExpressCheckoutSubscriber implements EventSubscriberInterface
 
         return new ArrayStruct([
             'available' => $isAvailable,
+            'pages' => [
+                'cart' => $settings->isShowPayPalShortcutOnCartPages(),
+                'detail' => $settings->isShowPayPalShortcutOnDetailPages(),
+                'listing' => $settings->isShowPayPalShortcutOnListingPages(),
+            ],
             'color' => $settings->getPaypalShortcutButtonColor(),
             'label' => $settings->getPaypalShortcutButtonLabel(),
         ]);

@@ -18,9 +18,13 @@
             {% include '@MolliePayments/mollie/component/apple-pay-direct-button.twig' %}
         </div>
 
-        {% include '@MolliePayments/mollie/component/paypal-express-checkout-button.twig' with {
-            cols: 'mb-2'
-        } %}
+        {% set paypalSettings = page.extensions[constant('Kiener\\MolliePayments\\Subscriber\\PayPalExpressCheckoutSubscriber::MOLLIE_PAYPAL_EXPRESS_CHECKOUT_BUTTON_DATA_EXTENSION_ID')] %}
+
+        {% if paypalSettings.pages.listing %}
+            {% include '@MolliePayments/mollie/component/paypal-express-checkout-button.twig' with {
+                cols: 'mb-2'
+            } %}
+        {% endif %}
     {% endif %}
 
     {{ parent() }}

@@ -20,8 +20,13 @@
 
         {% if buyable and productPrice > 0 %}
             <div class="form-row mt-3 justify-content-end">
-                {% include '@MolliePayments/mollie/component/apple-pay-direct-button.twig' with {cols: 'col-8'}%}
-                {% include '@MolliePayments/mollie/component/paypal-express-checkout-button.twig' with {cols: 'col-8'}%}
+                {% include '@MolliePayments/mollie/component/apple-pay-direct-button.twig' with {cols: 'col-8'} %}
+
+                {% set paypalSettings = page.extensions[constant('Kiener\\MolliePayments\\Subscriber\\PayPalExpressCheckoutSubscriber::MOLLIE_PAYPAL_EXPRESS_CHECKOUT_BUTTON_DATA_EXTENSION_ID')] %}
+
+                {% if paypalSettings.pages.detail %}
+                    {% include '@MolliePayments/mollie/component/paypal-express-checkout-button.twig' with {cols: 'col-8'} %}
+                {% endif %}
             </div>
         {% endif %}
 

@@ -1,7 +1,9 @@
 {% sw_extends '@Storefront/storefront/component/checkout/offcanvas-cart.html.twig' %}
 
 {% block component_offcanvas_cart_actions_checkout %}
-    {% if isCartNotEmpty %}
+    {% set paypalSettings = page.extensions[constant('Kiener\\MolliePayments\\Subscriber\\PayPalExpressCheckoutSubscriber::MOLLIE_PAYPAL_EXPRESS_CHECKOUT_BUTTON_DATA_EXTENSION_ID')] %}
+
+    {% if isCartNotEmpty and paypalSettings.pages.cart %}
         {% include '@MolliePayments/mollie/component/paypal-express-checkout-button.twig' with {
             cols: 'mb-2',
             cartToken: page.cart.token,

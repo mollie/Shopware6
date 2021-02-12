@@ -76,6 +76,21 @@ class MollieSettingStruct extends Struct
     protected $enablePayPalShortcut = false;
 
     /**
+     * @var bool
+     */
+    protected $showPayPalShortcutOnDetailPages = false;
+
+    /**
+     * @var bool
+     */
+    protected $showPayPalShortcutOnListingPages = false;
+
+    /**
+     * @var bool
+     */
+    protected $showPayPalShortcutOnCartPages = false;
+
+    /**
      * @var string
      */
     protected $paypalShortcutButtonColor = 'gold';
@@ -405,4 +420,51 @@ class MollieSettingStruct extends Struct
         $this->paypalShortcutButtonLabel = $paypalShortcutButtonLabel;
     }
 
+    /**
+     * @return bool
+     */
+    public function isShowPayPalShortcutOnDetailPages(): bool
+    {
+        return $this->showPayPalShortcutOnDetailPages;
+    }
+
+    /**
+     * @param bool $showPayPalShortcutOnDetailPages
+     */
+    public function setShowPayPalShortcutOnDetailPages(bool $showPayPalShortcutOnDetailPages): void
+    {
+        $this->showPayPalShortcutOnDetailPages = $showPayPalShortcutOnDetailPages;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowPayPalShortcutOnListingPages(): bool
+    {
+        return $this->showPayPalShortcutOnListingPages;
+    }
+
+    /**
+     * @param bool $showPayPalShortcutOnListingPages
+     */
+    public function setShowPayPalShortcutOnListingPages(bool $showPayPalShortcutOnListingPages): void
+    {
+        $this->showPayPalShortcutOnListingPages = $showPayPalShortcutOnListingPages;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowPayPalShortcutOnCartPages(): bool
+    {
+        return $this->showPayPalShortcutOnCartPages;
+    }
+
+    /**
+     * @param bool $showPayPalShortcutOnCartPages
+     */
+    public function setShowPayPalShortcutOnCartPages(bool $showPayPalShortcutOnCartPages): void
+    {
+        $this->showPayPalShortcutOnCartPages = $showPayPalShortcutOnCartPages;
+    }
 }

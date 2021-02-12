@@ -2,10 +2,14 @@
 
 {% block page_checkout_cart_action_proceed %}
     <div class="checkout-aside-action">
-        {% include '@MolliePayments/mollie/component/paypal-express-checkout-button.twig' with {
-            cols: 'mb-2',
-            cartToken: page.cart.token,
-        } %}
+        {% set paypalSettings = page.extensions[constant('Kiener\\MolliePayments\\Subscriber\\PayPalExpressCheckoutSubscriber::MOLLIE_PAYPAL_EXPRESS_CHECKOUT_BUTTON_DATA_EXTENSION_ID')] %}
+
+        {% if paypalSettings.pages.cart %}
+            {% include '@MolliePayments/mollie/component/paypal-express-checkout-button.twig' with {
+                cols: 'mb-2',
+                cartToken: page.cart.token,
+            } %}
+        {% endif %}
     </div>
 
     {{ parent() }}
