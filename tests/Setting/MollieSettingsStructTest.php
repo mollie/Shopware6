@@ -16,7 +16,6 @@ final class MollieSettingsStructTest extends TestCase
     /**
      * test to get a maximum range of order life time days
      *
-     * @author Vitalij Mik
      * @dataProvider orderLifeTimeDaysData
      * @param $lifeTimeDays
      * @param int|null $realLifeTimeDays
@@ -36,7 +35,6 @@ final class MollieSettingsStructTest extends TestCase
     /**
      * test get the correct calculation based on oderLifetimeDays config
      *
-     * @author Vitalij Mik
      * @dataProvider orderLifeTimeDaysData
      * @param $lifeTimeDays
      * @param int|null $realLifeTimeDays
