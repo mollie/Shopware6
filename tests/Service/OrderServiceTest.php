@@ -30,10 +30,12 @@ class OrderServiceTest extends TestCase
     {
         $orderRepository = $this->getMockBuilder(EntityRepositoryInterface::class)->getMock();
         $lineItemRepository = $this->getMockBuilder(EntityRepositoryInterface::class)->getMock();
+        $countryRepository = $this->getMockBuilder(EntityRepositoryInterface::class)->getMock();
         $logger = new NullLogger();
         $this->orderService = new OrderService(
             $orderRepository,
             $lineItemRepository,
+            $countryRepository,
             $logger,
             new OrderLineItemValidator()
         );
