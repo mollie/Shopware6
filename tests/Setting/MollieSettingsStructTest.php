@@ -8,9 +8,7 @@ use DateTimeZone;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @copyright 2021 dasistweb GmbH (https://www.dasistweb.de)
- */
+
 final class MollieSettingsStructTest extends TestCase
 {
 
