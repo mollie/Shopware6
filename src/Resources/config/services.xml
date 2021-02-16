@@ -59,6 +59,7 @@
             <argument type="service" id="monolog.logger"/>
             <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister"/>
             <argument type="service" id="salutation.repository" />
+            <argument>%kernel.shopware_version%</argument>
         </service>
 
         <service id="Kiener\MolliePayments\Service\CustomFieldService" class="Kiener\MolliePayments\Service\CustomFieldService">

@@ -49,6 +49,9 @@ class CustomerService
     /** @var EntityRepositoryInterface */
     private $salutationRepository;
 
+    /** @var string */
+    private $shopwareVersion;
+
     /**
      * Creates a new instance of the customer service.
      *
@@ -58,6 +61,7 @@ class CustomerService
      * @param LoggerInterface $logger
      * @param SalesChannelContextPersister $salesChannelContextPersister
      * @param EntityRepositoryInterface $salutationRepository
+     * @param string $shopwareVersion
      */
     public function __construct(
         EntityRepositoryInterface $countryRepository,
@@ -65,7 +69,8 @@ class CustomerService
         EventDispatcherInterface $eventDispatcher,
         LoggerInterface $logger,
         SalesChannelContextPersister $salesChannelContextPersister,
-        EntityRepositoryInterface $salutationRepository
+        EntityRepositoryInterface $salutationRepository,
+        string $shopwareVersion
     )
     {
         $this->countryRepository = $countryRepository;
@@ -74,6 +79,7 @@ class CustomerService
         $this->logger = $logger;
         $this->salesChannelContextPersister = $salesChannelContextPersister;
         $this->salutationRepository = $salutationRepository;
+        $this->shopwareVersion = $shopwareVersion;
     }
 
     /**
@@ -96,19 +102,44 @@ class CustomerService
         $this->eventDispatcher->dispatch($event);
 
         /** @var string $newToken */
-        $newToken = $this->salesChannelContextPersister->replace($context->getToken());
+        $newToken = $this->salesChannelContextPersister->replace($context->getToken(), $context);
 
         // Persist the new token
-        $this->salesChannelContextPersister->save(
-            $newToken,
-            [
-                'customerId' => $customer->getId(),
-                'billingAddressId' => null,
-                'shippingAddressId' => null,
-            ],
-            $context->getSalesChannel()->getId(),
-            $customer->getId()
-        );
+        if(version_compare($this->shopwareVersion, '6.3.3', '<')) {
+            // Shopware 6.3.2.x and lower
+            $this->salesChannelContextPersister->save(
+                $newToken,
+                [
+                    'customerId' => $customer->getId(),
+                    'billingAddressId' => null,
+                    'shippingAddressId' => null,
+                ]
+            );
+        } else if (version_compare($this->shopwareVersion, '6.3.4', '<')
+            && version_compare($this->shopwareVersion, '6.3.3', '>=')) {
+            // Shopware 6.3.3.x
+            $this->salesChannelContextPersister->save(
+                $newToken,
+                [
+                    'customerId' => $customer->getId(),
+                    'billingAddressId' => null,
+                    'shippingAddressId' => null,
+                ],
+                $customer->getId()
+            );
+        } else {
+            // Shopware 6.3.4+
+            $this->salesChannelContextPersister->save(
+                $newToken,
+                [
+                    'customerId' => $customer->getId(),
+                    'billingAddressId' => null,
+                    'shippingAddressId' => null,
+                ],
+                $context->getSalesChannel()->getId(),
+                $customer->getId()
+            );
+        }
 
         /** @var CustomerLoginEvent $event */
         $event = new CustomerLoginEvent($context, $customer, $newToken);
