@@ -12,7 +12,7 @@
   </coverage>
   <testsuites>
     <testsuite name="MolliePayments Tests">
-      <directory>./oder kotests</directory>
+      <directory>./tests</directory>
     </testsuite>
   </testsuites>
 </phpunit>
