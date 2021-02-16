@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Helper;
 
 use Exception;
 use Kiener\MolliePayments\Service\LoggerService;
+use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\OrderStates;
@@ -33,13 +34,16 @@ class OrderStateHelper
      * Handle order state automation.
      *
      * @param OrderEntity $order
-     * @param string      $orderState
-     * @param Context     $context
+     * @param string $orderState
+     * @param Context $context
      *
      * @return bool
      */
     public function setOrderState(OrderEntity $order, string $orderState, Context $context): bool
     {
+        if ($orderState === MollieSettingStruct::ORDER_STATE_SKIP) {
+            return false;
+        }
 
         try {
             $this->stateMachineRegistry->transition(

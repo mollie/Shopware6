@@ -79,6 +79,7 @@
             <argument type="service" id="order_line_item.repository" />
             <argument type="service" id="country.repository" />
             <argument type="service" id="monolog.logger" />
+            <argument type="service" id="Kiener\MolliePayments\Validator\OrderLineItemValidator"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\PaymentMethodService" class="Kiener\MolliePayments\Service\PaymentMethodService" public="true">
@@ -107,6 +108,8 @@
         <service id="Kiener\MolliePayments\Service\TransactionService" class="Kiener\MolliePayments\Service\TransactionService">
             <argument type="service" id="order_transaction.repository" />
         </service>
+
+        <service id="Kiener\MolliePayments\Service\ApiTaxCalculator"/>
 
 
         <!-- Controllers -->
@@ -282,6 +285,10 @@
         <service id="Kiener\MolliePayments\Resources\snippet\nl_NL\SnippetFile_nl_NL" public="true">
             <tag name="shopware.snippet.file"/>
         </service>
+
+        <!-- Validators -->
+        <service id="Kiener\MolliePayments\Validator\OrderLineItemValidator"/>
+
     </services>
 
 </container>
