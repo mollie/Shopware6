@@ -1,6 +1,11 @@
 {
     "molliePayments": {
         "messages": {
+            "expressCheckout": {
+                "cancelled": "Die Zahlung wurde storniert.",
+                "failed": "Die Zahlung ist fehlgeschlagen.",
+                "unknown": "Etwas ist schiefgelaufen."
+            },
             "payment": {
                 "error": "Zahlung fehlgeschlagen",
                 "failed": "Die Zahlung ist fehlgeschlagen oder wurde storniert. Sie werden zu Mollie weitergeleitet, wo Sie Ihre Zahlung mit der Methode Ihrer Wahl abschließen können. ",

@@ -271,6 +271,33 @@ class PaymentController extends StorefrontController
                 $paymentStatus === PaymentStatus::STATUS_CANCELED
                 || $paymentStatus === PaymentStatus::STATUS_FAILED
             )
+            && is_array($customFields)
+            && isset($customFields['mollie_payments'][PaymentHandler::EXPRESS_CHECKOUT])
+        ) {
+            switch($paymentStatus) {
+                case PaymentStatus::STATUS_CANCELED:
+                    $type = 'info';
+                    $message = 'molliePayments.messages.expressCheckout.cancelled';
+                    break;
+                case PaymentStatus::STATUS_FAILED:
+                    $type = 'danger';
+                    $message = 'molliePayments.messages.expressCheckout.failed';
+                    break;
+                default:
+                    $type = 'danger';
+                    $message = 'molliePayments.messages.expressCheckout.unknown';
+            }
+
+            $this->addFlash($type, $this->trans($message));
+        }
+
+
+        if (
+            $paymentStatus !== null
+            && (
+                $paymentStatus === PaymentStatus::STATUS_CANCELED
+                || $paymentStatus === PaymentStatus::STATUS_FAILED
+            )
             && $this->settingsService->getSettings($context->getSalesChannel()->getId())
                 ->isShopwareFailedPaymentMethod() === false
         ) {

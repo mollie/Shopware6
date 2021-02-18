@@ -1,6 +1,11 @@
 {
     "molliePayments": {
         "messages": {
+            "expressCheckout": {
+                "cancelled": "You've cancelled payment.",
+                "failed": "The payment has failed.",
+                "unknown": "Something went wrong."
+            },
             "payment": {
                 "error": "Payment failed",
                 "failed": "The payment is failed or was canceled. You will be redirected to Mollie, where you can finish your payment with the method of your choice. ",
