@@ -73,32 +73,32 @@ class MollieSettingStruct extends Struct
     /**
      * @var bool
      */
-    protected $enablePayPalShortcut = false;
+    protected $enablePayPalExpressCheckout = false;
 
     /**
      * @var bool
      */
-    protected $showPayPalShortcutOnDetailPages = false;
+    protected $showPayPalExpressCheckoutButtonOnDetailPages = false;
 
     /**
      * @var bool
      */
-    protected $showPayPalShortcutOnListingPages = false;
+    protected $showPayPalExpressCheckoutButtonOnListingPages = false;
 
     /**
      * @var bool
      */
-    protected $showPayPalShortcutOnCartPages = false;
+    protected $showPayPalExpressCheckoutButtonOnCartPages = false;
 
     /**
      * @var string
      */
-    protected $paypalShortcutButtonColor = 'gold';
+    protected $paypalExpressCheckoutButtonColor = 'gold';
 
     /**
      * @var string
      */
-    protected $paypalShortcutButtonLabel = 'buy';
+    protected $paypalExpressCheckoutButtonLabel = 'buy';
 
     /**
      * @var string
@@ -375,96 +375,96 @@ class MollieSettingStruct extends Struct
     /**
      * @return bool
      */
-    public function isEnablePayPalShortcut(): bool
+    public function isEnablePayPalExpressCheckout(): bool
     {
-        return $this->enablePayPalShortcut;
+        return $this->enablePayPalExpressCheckout;
     }
 
     /**
-     * @param bool $enablePayPalShortcut
+     * @param bool $enablePayPalExpressCheckout
      */
-    public function setEnablePayPalShortcut(bool $enablePayPalShortcut): void
+    public function setEnablePayPalExpressCheckout(bool $enablePayPalExpressCheckout): void
     {
-        $this->enablePayPalShortcut = $enablePayPalShortcut;
+        $this->enablePayPalExpressCheckout = $enablePayPalExpressCheckout;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowPayPalExpressCheckoutButtonOnDetailPages(): bool
+    {
+        return $this->showPayPalExpressCheckoutButtonOnDetailPages;
+    }
+
+    /**
+     * @param bool $showPayPalExpressCheckoutButtonOnDetailPages
+     */
+    public function setShowPayPalExpressCheckoutButtonOnDetailPages(bool $showPayPalExpressCheckoutButtonOnDetailPages): void
+    {
+        $this->showPayPalExpressCheckoutButtonOnDetailPages = $showPayPalExpressCheckoutButtonOnDetailPages;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowPayPalExpressCheckoutButtonOnListingPages(): bool
+    {
+        return $this->showPayPalExpressCheckoutButtonOnListingPages;
+    }
+
+    /**
+     * @param bool $showPayPalExpressCheckoutButtonOnListingPages
+     */
+    public function setShowPayPalExpressCheckoutButtonOnListingPages(bool $showPayPalExpressCheckoutButtonOnListingPages): void
+    {
+        $this->showPayPalExpressCheckoutButtonOnListingPages = $showPayPalExpressCheckoutButtonOnListingPages;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowPayPalExpressCheckoutButtonOnCartPages(): bool
+    {
+        return $this->showPayPalExpressCheckoutButtonOnCartPages;
+    }
+
+    /**
+     * @param bool $showPayPalExpressCheckoutButtonOnCartPages
+     */
+    public function setShowPayPalExpressCheckoutButtonOnCartPages(bool $showPayPalExpressCheckoutButtonOnCartPages): void
+    {
+        $this->showPayPalExpressCheckoutButtonOnCartPages = $showPayPalExpressCheckoutButtonOnCartPages;
     }
 
     /**
      * @return string
      */
-    public function getPaypalShortcutButtonColor(): string
+    public function getPaypalExpressCheckoutButtonColor(): string
     {
-        return $this->paypalShortcutButtonColor;
+        return $this->paypalExpressCheckoutButtonColor;
     }
 
     /**
-     * @param string $paypalShortcutButtonColor
+     * @param string $paypalExpressCheckoutButtonColor
      */
-    public function setPaypalShortcutButtonColor(string $paypalShortcutButtonColor): void
+    public function setPaypalExpressCheckoutButtonColor(string $paypalExpressCheckoutButtonColor): void
     {
-        $this->paypalShortcutButtonColor = $paypalShortcutButtonColor;
+        $this->paypalExpressCheckoutButtonColor = $paypalExpressCheckoutButtonColor;
     }
 
     /**
      * @return string
      */
-    public function getPaypalShortcutButtonLabel(): string
+    public function getPaypalExpressCheckoutButtonLabel(): string
     {
-        return $this->paypalShortcutButtonLabel;
+        return $this->paypalExpressCheckoutButtonLabel;
     }
 
     /**
-     * @param string $paypalShortcutButtonLabel
+     * @param string $paypalExpressCheckoutButtonLabel
      */
-    public function setPaypalShortcutButtonLabel(string $paypalShortcutButtonLabel): void
+    public function setPaypalExpressCheckoutButtonLabel(string $paypalExpressCheckoutButtonLabel): void
     {
-        $this->paypalShortcutButtonLabel = $paypalShortcutButtonLabel;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isShowPayPalShortcutOnDetailPages(): bool
-    {
-        return $this->showPayPalShortcutOnDetailPages;
-    }
-
-    /**
-     * @param bool $showPayPalShortcutOnDetailPages
-     */
-    public function setShowPayPalShortcutOnDetailPages(bool $showPayPalShortcutOnDetailPages): void
-    {
-        $this->showPayPalShortcutOnDetailPages = $showPayPalShortcutOnDetailPages;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isShowPayPalShortcutOnListingPages(): bool
-    {
-        return $this->showPayPalShortcutOnListingPages;
-    }
-
-    /**
-     * @param bool $showPayPalShortcutOnListingPages
-     */
-    public function setShowPayPalShortcutOnListingPages(bool $showPayPalShortcutOnListingPages): void
-    {
-        $this->showPayPalShortcutOnListingPages = $showPayPalShortcutOnListingPages;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isShowPayPalShortcutOnCartPages(): bool
-    {
-        return $this->showPayPalShortcutOnCartPages;
-    }
-
-    /**
-     * @param bool $showPayPalShortcutOnCartPages
-     */
-    public function setShowPayPalShortcutOnCartPages(bool $showPayPalShortcutOnCartPages): void
-    {
-        $this->showPayPalShortcutOnCartPages = $showPayPalShortcutOnCartPages;
+        $this->paypalExpressCheckoutButtonLabel = $paypalExpressCheckoutButtonLabel;
     }
 }

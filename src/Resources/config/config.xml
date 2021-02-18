@@ -81,38 +81,38 @@
     </card>
 
     <card>
-        <title>PayPal</title>
-        <title lang="de-DE">PayPal</title>
-        <title lang="nl-NL">PayPal</title>
+        <title>PayPal Express</title>
+        <title lang="de-DE">PayPal Express</title>
+        <title lang="nl-NL">PayPal Express</title>
         <input-field type="bool">
-            <name>enablePayPalShortcut</name>
-            <label>Enable PayPal Shortcut</label>
-            <label lang="de-DE">Enable PayPal Shortcut</label>
-            <label lang="nl-NL">Enable PayPal Shortcut</label>
+            <name>enablePayPalExpressCheckout</name>
+            <label>Enable PayPal Express checkout</label>
+            <label lang="de-DE">Enable PayPal Express checkout</label>
+            <label lang="nl-NL">Enable PayPal Express checkout</label>
         </input-field>
         <input-field type="bool">
-            <name>showPayPalShortcutOnDetailPages</name>
-            <label>Show PayPal Shortcut on detail pages</label>
-            <label lang="de-DE">Show PayPal Shortcut on detail pages</label>
-            <label lang="nl-NL">Show PayPal Shortcut on detail pages</label>
+            <name>showPayPalExpressCheckoutButtonOnDetailPages</name>
+            <label>Show PayPal Express checkout button on detail pages</label>
+            <label lang="de-DE">Show PayPal Express checkout button on detail pages</label>
+            <label lang="nl-NL">Show PayPal Express checkout button  on detail pages</label>
         </input-field>
         <input-field type="bool">
-            <name>showPayPalShortcutOnListingPages</name>
-            <label>Show PayPal Shortcut on listing pages</label>
-            <label lang="de-DE">Show PayPal Shortcut on listing pages</label>
-            <label lang="nl-NL">Show PayPal Shortcut on listing pages</label>
+            <name>showPayPalExpressCheckoutButtonOnListingPages</name>
+            <label>Show PayPal Express checkout button on listing pages</label>
+            <label lang="de-DE">Show PayPal Express checkout button on listing pages</label>
+            <label lang="nl-NL">Show PayPal Express checkout button on listing pages</label>
         </input-field>
         <input-field type="bool">
-            <name>showPayPalShortcutOnCartPages</name>
-            <label>Show PayPal Shortcut in the cart</label>
-            <label lang="de-DE">Show PayPal Shortcut in the cart</label>
-            <label lang="nl-NL">Show PayPal Shortcut in the cart</label>
+            <name>showPayPalExpressCheckoutButtonOnCartPages</name>
+            <label>Show PayPal Express checkout button in the cart</label>
+            <label lang="de-DE">Show PayPal Express checkout button in the cart</label>
+            <label lang="nl-NL">Show PayPal Express checkout button in the cart</label>
         </input-field>
         <input-field type="single-select">
-            <name>paypalShortcutButtonColor</name>
-            <label>PayPal Shortcut button color</label>
-            <label lang="de-DE">PayPal Shortcut button color</label>
-            <label lang="nl-NL">Paypal Shortcut kleur</label>
+            <name>paypalExpressCheckoutButtonColor</name>
+            <label>PayPal Express checkout button color</label>
+            <label lang="de-DE">PayPal Express checkout button color</label>
+            <label lang="nl-NL">Paypal Express checkout kleur</label>
             <options>
                 <option>
                     <id>gold</id>
@@ -147,10 +147,10 @@
             </options>
         </input-field>
         <input-field type="single-select">
-            <name>paypalShortcutButtonLabel</name>
-            <label>PayPal Shortcut button label</label>
-            <label lang="de-DE">PayPal Shortcut button label</label>
-            <label lang="nl-NL">Paypal Shortcut knop tekst</label>
+            <name>paypalExpressCheckoutButtonLabel</name>
+            <label>PayPal Express checkout button label</label>
+            <label lang="de-DE">PayPal Express checkout button label</label>
+            <label lang="nl-NL">Paypal Express checkout knop tekst</label>
             <options>
                 <option>
                     <id>buy</id>

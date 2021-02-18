@@ -87,7 +87,7 @@ class PaypalExpressCheckoutSubscriber implements EventSubscriberInterface
 
         $isAvailable = false;
 
-        if($settings->isEnablePayPalShortcut()) {
+        if($settings->isEnablePayPalExpressCheckout()) {
             /** @var string[]|null $paymentMethodIds */
             $paymentMethodIds = $context->getSalesChannel()->getPaymentMethodIds();
 
@@ -99,12 +99,12 @@ class PaypalExpressCheckoutSubscriber implements EventSubscriberInterface
         return new ArrayStruct([
             'available' => $isAvailable,
             'pages' => [
-                'cart' => $settings->isShowPayPalShortcutOnCartPages(),
-                'detail' => $settings->isShowPayPalShortcutOnDetailPages(),
-                'listing' => $settings->isShowPayPalShortcutOnListingPages(),
+                'cart' => $settings->isShowPayPalExpressCheckoutButtonOnCartPages(),
+                'detail' => $settings->isShowPayPalExpressCheckoutButtonOnDetailPages(),
+                'listing' => $settings->isShowPayPalExpressCheckoutButtonOnListingPages(),
             ],
-            'color' => $settings->getPaypalShortcutButtonColor(),
-            'label' => $settings->getPaypalShortcutButtonLabel(),
+            'color' => $settings->getPaypalExpressCheckoutButtonColor(),
+            'label' => $settings->getPaypalExpressCheckoutButtonLabel(),
         ]);
     }
 
