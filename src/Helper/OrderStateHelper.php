@@ -45,6 +45,12 @@ class OrderStateHelper
             return false;
         }
 
+        $currentStatus = $order->getStateMachineState()->getTechnicalName();
+
+        if ($currentStatus === $orderState) {
+            return false;
+        }
+
         try {
             $this->stateMachineRegistry->transition(
                 new Transition(
@@ -104,26 +110,26 @@ class OrderStateHelper
         }
 
         if ($completedOrCancelled) {
-                try {
-                    $this->stateMachineRegistry->transition(
-                        new Transition(
-                            OrderDefinition::ENTITY_NAME,
-                            $order->getId(),
-                            StateMachineTransitionActions::ACTION_PROCESS,
-                            'stateId'
-                        ),
-                        $context
-                    );
-                } catch (Exception $e) {
-                    $this->logger->addEntry(
-                        $e->getMessage(),
-                        $context,
-                        $e,
-                        [
-                            'function' => 'payment-automate-order-state',
-                        ]
-                    );
-                }
+            try {
+                $this->stateMachineRegistry->transition(
+                    new Transition(
+                        OrderDefinition::ENTITY_NAME,
+                        $order->getId(),
+                        StateMachineTransitionActions::ACTION_PROCESS,
+                        'stateId'
+                    ),
+                    $context
+                );
+            } catch (Exception $e) {
+                $this->logger->addEntry(
+                    $e->getMessage(),
+                    $context,
+                    $e,
+                    [
+                        'function' => 'payment-automate-order-state',
+                    ]
+                );
+            }
         }
         // Transition the order
         if (isset($transitionName)) {

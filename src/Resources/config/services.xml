@@ -109,8 +109,7 @@
             <argument type="service" id="order_transaction.repository" />
         </service>
 
-        <service id="Kiener\MolliePayments\Service\ApiTaxCalculator"/>
-
+        <service id="Kiener\MolliePayments\Service\MolliePaymentStatus"/>
 
         <!-- Controllers -->
         <service id="Kiener\MolliePayments\Storefront\Controller\ApplePayDirectController" public="true">
