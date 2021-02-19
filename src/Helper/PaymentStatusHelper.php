@@ -164,12 +164,14 @@ class PaymentStatusHelper
             }
 
             try {
+                // ensure that we may only fetch mollie payment methods
                 $molliePaymentMethodId = $this->paymentMethodRepository->searchIds(
                     (new Criteria())
                         ->addFilter(
-                            new AndFilter(
-                                new ContainsFilter('handler_identifier','Kiener\MolliePayments\Handler\Method'),
-                                new EqualsFilter('customFields.mollie_payment_method_name', $currentCustomerSelectedPaymentMethod)
+                            new AndFilter([
+                                    new ContainsFilter('handlerIdentifier', 'Kiener\MolliePayments\Handler\Method'),
+                                    new EqualsFilter('customFields.mollie_payment_method_name', $currentCustomerSelectedPaymentMethod)
+                                ]
                             )
                         ),
                     $context

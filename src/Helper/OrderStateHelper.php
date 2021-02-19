@@ -41,12 +41,14 @@ class OrderStateHelper
      */
     public function setOrderState(OrderEntity $order, string $orderState, Context $context): bool
     {
+        // if order state is skip we don't set a new order state
         if ($orderState === MollieSettingStruct::ORDER_STATE_SKIP) {
             return false;
         }
 
         $currentStatus = $order->getStateMachineState()->getTechnicalName();
 
+        // if current state is same as status that shoould be set, we don't need to do a transition
         if ($currentStatus === $orderState) {
             return false;
         }

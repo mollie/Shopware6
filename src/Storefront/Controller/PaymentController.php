@@ -250,9 +250,7 @@ class PaymentController extends StorefrontController
             && $this->settingsService->getSettings($context->getSalesChannel()->getId())
                 ->isShopwareFailedPaymentMethod() === false
         ) {
-            $molliePaymentStatusService = new MolliePaymentStatus();
-            $molliePaymentStatus = $molliePaymentStatusService->getCurrentPaymentStatus($mollieOrder->payments()->getArrayCopy());
-            if ($molliePaymentStatus !== PaymentStatus::STATUS_OPEN) {
+            if ($mollieOrder->status != PaymentStatus::STATUS_OPEN) {
                 $mollieOrder->createPayment([]);
             }
 
