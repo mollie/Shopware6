@@ -6,6 +6,7 @@ use Exception;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Resources\Order;
+use Mollie\Api\Types\OrderStatus;
 use Mollie\Api\Types\PaymentStatus;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
@@ -458,6 +459,10 @@ class CustomerService
         Context $context
     )
     {
+        if($mollieOrder->status !== OrderStatus::STATUS_PAID) {
+            return;
+        }
+
         $customer = $this->getCustomer($customerId, $context);
 
         if (!isset($mollieOrder->_embedded->payments)) {

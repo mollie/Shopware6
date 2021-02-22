@@ -9,6 +9,7 @@ use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Validator\OrderLineItemValidator;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Types\OrderLineType;
+use Mollie\Api\Types\OrderStatus;
 use Mollie\Api\Types\PaymentStatus;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
@@ -434,6 +435,10 @@ class OrderService
         Context $context
     )
     {
+        if($mollieOrder->status !== OrderStatus::STATUS_PAID) {
+            return;
+        }
+
         $order = $this->getOrder($orderId, $context);
 
         if (!isset($mollieOrder->_embedded->payments)) {
