@@ -6,6 +6,7 @@ use Exception;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Resources\Order;
+use Mollie\Api\Resources\Payment;
 use Mollie\Api\Types\OrderStatus;
 use Mollie\Api\Types\PaymentStatus;
 use Psr\Log\LoggerInterface;
@@ -469,14 +470,29 @@ class CustomerService
             return;
         }
 
-        $paymentDetails = null;
+        $paidPayments = array_filter($mollieOrder->_embedded->payments, function($payment) {
+            /** @var Payment $payment */
+            return $payment->status === PaymentStatus::STATUS_PAID;
+        });
 
-        foreach ($mollieOrder->_embedded->payments as $payment) {
-            if ($payment->status === PaymentStatus::STATUS_PAID) {
-                $paymentDetails = $payment->details;
-                break;
-            }
+        if(count($paidPayments) == 0) {
+            return;
+        } elseif(count($paidPayments) > 1) {
+            usort($paidPayments, function($a, $b) {
+                /** @var Payment $a */
+                /** @var Payment $b */
+                $aTime = !is_null($a->paidAt)
+                    ? \DateTime::createFromFormat(DATE_ISO8601, $a->paidAt)->getTimestamp()
+                    : 0;
+                $bTime = !is_null($b->paidAt)
+                    ? \DateTime::createFromFormat(DATE_ISO8601, $b->paidAt)->getTimestamp()
+                    : 0;
+
+                return $aTime - $bTime;
+            });
         }
+
+        $paymentDetails = $paidPayments[count($paidPayments) - 1]->details;
 
         if (is_null($paymentDetails)) {
             return;
