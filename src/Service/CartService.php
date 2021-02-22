@@ -99,6 +99,8 @@ class CartService
             1
         );
 
+        $lineItem->setStackable(true);
+
         return $this->salesChannelCartService->add($cart, $lineItem, $newSalesChannelContext);
     }
 }

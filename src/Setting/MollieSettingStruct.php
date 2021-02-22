@@ -299,10 +299,14 @@ class MollieSettingStruct extends Struct
     }
 
     /**
-     * @return int
+     * @return ?int
      */
-    public function getOrderLifetimeDays(): int
+    public function getOrderLifetimeDays(): ?int
     {
+        if(!$this->orderLifetimeDays)
+        {
+            return null;
+        }
         return min(
             max(
                 self::ORDER_EXPIRES_AT_MIN_DAYS,
@@ -316,11 +320,16 @@ class MollieSettingStruct extends Struct
      * @return string
      * @throws Exception
      */
-    public function getOrderLifetimeDate(): string
+    public function getOrderLifetimeDate(): ?string
     {
+        $orderLifeTimeDays = $this->getOrderLifetimeDays();
+        if(!$orderLifeTimeDays)
+        {
+            return null;
+        }
         return (new DateTime())
             ->setTimezone(new DateTimeZone('UTC'))
-            ->modify(sprintf('+%d day', $this->getOrderLifetimeDays()))
+            ->modify(sprintf('+%d day', $orderLifeTimeDays))
             ->format('Y-m-d');
     }
 

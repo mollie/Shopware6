@@ -50,11 +50,6 @@ class OrderService
     protected $logger;
 
     /**
-     * @var ApiTaxCalculator
-     */
-    private $apiTaxCalculator;
-
-    /**
      * @var OrderLineItemValidator
      */
     private $orderLineItemValidator;

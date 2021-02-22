@@ -16,6 +16,8 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\AndFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Shopware\Core\System\StateMachine\StateMachineRegistry;
@@ -151,36 +153,51 @@ class PaymentStatusHelper
             }
         }
 
-        /**
-         * Correct the payment method if a different one was selected in mollie
-         */
-        try {
-            $molliePaymentMethodId = $this->paymentMethodRepository->searchIds(
-                (new Criteria())
-                    ->addFilter(new EqualsFilter('customFields.mollie_payment_method_name', $mollieOrder->method)),
-                $context
-            )->firstId();
+        $useMollieFailureHandling = !$settings->isShopwareFailedPaymentMethod();
 
-            if (!is_null($molliePaymentMethodId) && $molliePaymentMethodId !== $transaction->getPaymentMethodId()) {
-                $transaction->setPaymentMethodId($molliePaymentMethodId);
+        if ($useMollieFailureHandling) {
+            $currentCustomerSelectedPaymentMethod = $mollieOrder->method;
 
-                $this->orderTransactionRepository->update([
-                    [
-                        'id' => $transaction->getUniqueIdentifier(),
-                        'paymentMethodId' => $molliePaymentMethodId
-                    ]
-                ],
-                    $context);
+            if (is_null($currentCustomerSelectedPaymentMethod)) {
+
+                return PaymentStatus::STATUS_CANCELED;
             }
-        } catch (\Throwable $e) {
-            $this->logger->addEntry(
-                $e->getMessage(),
-                $context,
-                $e,
-                [
-                    'function' => 'payment-set-transaction-method'
-                ]
-            );
+
+            try {
+                // ensure that we may only fetch mollie payment methods
+                $molliePaymentMethodId = $this->paymentMethodRepository->searchIds(
+                    (new Criteria())
+                        ->addFilter(
+                            new AndFilter([
+                                    new ContainsFilter('handlerIdentifier', 'Kiener\MolliePayments\Handler\Method'),
+                                    new EqualsFilter('customFields.mollie_payment_method_name', $currentCustomerSelectedPaymentMethod)
+                                ]
+                            )
+                        ),
+                    $context
+                )->firstId();
+
+                if (!is_null($molliePaymentMethodId) && $molliePaymentMethodId !== $transaction->getPaymentMethodId()) {
+                    $transaction->setPaymentMethodId($molliePaymentMethodId);
+
+                    $this->orderTransactionRepository->update([
+                        [
+                            'id' => $transaction->getUniqueIdentifier(),
+                            'paymentMethodId' => $molliePaymentMethodId
+                        ]
+                    ],
+                        $context);
+                }
+            } catch (\Throwable $e) {
+                $this->logger->addEntry(
+                    $e->getMessage(),
+                    $context,
+                    $e,
+                    [
+                        'function' => 'payment-set-transaction-method'
+                    ]
+                );
+            };
         }
 
         /**
