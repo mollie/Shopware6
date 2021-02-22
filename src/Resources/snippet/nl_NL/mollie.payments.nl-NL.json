@@ -25,6 +25,10 @@
             },
             "applePayDirectButton": {
                 "label": "Koop met Apple Pay"
+            },
+            "paypalExpressCheckoutButton": {
+                "buy": "Betalen met",
+                "checkout": "Kopen met"
             }
         }
     }

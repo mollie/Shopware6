@@ -87,31 +87,31 @@
         <input-field type="bool">
             <name>enablePayPalExpressCheckout</name>
             <label>Enable PayPal Express checkout</label>
-            <label lang="de-DE">Enable PayPal Express checkout</label>
-            <label lang="nl-NL">Enable PayPal Express checkout</label>
+            <label lang="de-DE">PayPal Express aktivieren</label>
+            <label lang="nl-NL">Activeer PayPal Express</label>
         </input-field>
         <input-field type="bool">
             <name>showPayPalExpressCheckoutButtonOnDetailPages</name>
             <label>Show PayPal Express checkout button on detail pages</label>
-            <label lang="de-DE">Show PayPal Express checkout button on detail pages</label>
-            <label lang="nl-NL">Show PayPal Express checkout button  on detail pages</label>
+            <label lang="de-DE">PayPal Express auf den Produkt Detail Seiten einblenden</label>
+            <label lang="nl-NL">Toon PayPal Express checkout button op detailpagina's</label>
         </input-field>
         <input-field type="bool">
             <name>showPayPalExpressCheckoutButtonOnListingPages</name>
             <label>Show PayPal Express checkout button on listing pages</label>
-            <label lang="de-DE">Show PayPal Express checkout button on listing pages</label>
-            <label lang="nl-NL">Show PayPal Express checkout button on listing pages</label>
+            <label lang="de-DE">PayPal Express auf den Listing Seiten einblenden</label>
+            <label lang="nl-NL">Toon PayPal Express checkout button op listing pagina's</label>
         </input-field>
         <input-field type="bool">
             <name>showPayPalExpressCheckoutButtonOnCartPages</name>
             <label>Show PayPal Express checkout button in the cart</label>
-            <label lang="de-DE">Show PayPal Express checkout button in the cart</label>
-            <label lang="nl-NL">Show PayPal Express checkout button in the cart</label>
+            <label lang="de-DE">PayPal Express im Warenkorb einblenden</label>
+            <label lang="nl-NL">Toon PayPal Express checkout button in de winkelwagen</label>
         </input-field>
         <input-field type="single-select">
             <name>paypalExpressCheckoutButtonColor</name>
             <label>PayPal Express checkout button color</label>
-            <label lang="de-DE">PayPal Express checkout button color</label>
+            <label lang="de-DE">PayPal Express Button Farbe</label>
             <label lang="nl-NL">Paypal Express checkout kleur</label>
             <options>
                 <option>
@@ -123,25 +123,25 @@
                 <option>
                     <id>blue</id>
                     <name>Blue</name>
-                    <name lang="de-DE">Blue</name>
+                    <name lang="de-DE">Blau</name>
                     <name lang="nl-NL">Blauw</name>
                 </option>
                 <option>
                     <id>silver</id>
                     <name>Silver</name>
-                    <name lang="de-DE">Silver</name>
+                    <name lang="de-DE">Silber</name>
                     <name lang="nl-NL">Zilver</name>
                 </option>
                 <option>
                     <id>white</id>
                     <name>White</name>
-                    <name lang="de-DE">White</name>
+                    <name lang="de-DE">Weiß</name>
                     <name lang="nl-NL">Wit</name>
                 </option>
                 <option>
                     <id>black</id>
                     <name>Black</name>
-                    <name lang="de-DE">Black</name>
+                    <name lang="de-DE">Schwarz</name>
                     <name lang="nl-NL">Zwart</name>
                 </option>
             </options>
@@ -149,16 +149,20 @@
         <input-field type="single-select">
             <name>paypalExpressCheckoutButtonLabel</name>
             <label>PayPal Express checkout button label</label>
-            <label lang="de-DE">PayPal Express checkout button label</label>
-            <label lang="nl-NL">Paypal Express checkout knop tekst</label>
+            <label lang="de-DE">PayPal Express Button Text</label>
+            <label lang="nl-NL">PayPal Express checkout knop tekst</label>
             <options>
                 <option>
                     <id>buy</id>
                     <name>Buy with PayPal</name>
+                    <name lang="de-DE">Zahlen mit PayPal</name>
+                    <name lang="nl-NL">Betalen met PayPal</name>
                 </option>
                 <option>
                     <id>checkout</id>
                     <name>Checkout with PayPal</name>
+                    <name lang="de-DE">Kaufen mit PayPal</name>
+                    <name lang="nl-NL">Kopen met PayPal</name>
                 </option>
             </options>
         </input-field>
