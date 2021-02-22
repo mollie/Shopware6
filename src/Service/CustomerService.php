@@ -466,19 +466,26 @@ class CustomerService
 
         $customer = $this->getCustomer($customerId, $context);
 
-        if (!isset($mollieOrder->_embedded->payments)) {
+        $paymentCollection = $mollieOrder->payments();
+
+        if ($paymentCollection->count() == 0) {
             return;
         }
 
-        $paidPayments = array_filter($mollieOrder->_embedded->payments, function($payment) {
-            /** @var Payment $payment */
-            return $payment->status === PaymentStatus::STATUS_PAID;
-        });
+        $paymentCollection->exchangeArray(
+            array_filter(
+                $paymentCollection->getArrayCopy(),
+                function ($payment) {
+                    /** @var Payment $payment */
+                    return $payment->isPaid();
+                }
+            )
+        );
 
-        if(count($paidPayments) == 0) {
+        if ($paymentCollection->count() == 0) {
             return;
-        } elseif(count($paidPayments) > 1) {
-            usort($paidPayments, function($a, $b) {
+        } else if ($paymentCollection->count() > 1) {
+            $paymentCollection->uasort(function ($a, $b) {
                 /** @var Payment $a */
                 /** @var Payment $b */
                 $aTime = !is_null($a->paidAt)
@@ -492,7 +499,7 @@ class CustomerService
             });
         }
 
-        $paymentDetails = $paidPayments[count($paidPayments) - 1]->details;
+        $paymentDetails = $paymentCollection[$paymentCollection->count() - 1]->details;
 
         if (is_null($paymentDetails)) {
             return;

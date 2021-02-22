@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Service;
 
 use Exception;
 use Kiener\MolliePayments\Exception\MissingPriceLineItemException;
-use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Validator\OrderLineItemValidator;
 use Mollie\Api\Resources\Order;
@@ -14,11 +13,9 @@ use Mollie\Api\Types\OrderStatus;
 use Mollie\Api\Types\PaymentStatus;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
-use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTax;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
-use Shopware\Core\Checkout\Cart\Tax\TaxCalculator;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Promotion\Cart\PromotionProcessor;
@@ -436,25 +433,32 @@ class OrderService
         Context $context
     )
     {
-        if($mollieOrder->status !== OrderStatus::STATUS_PAID) {
+        if ($mollieOrder->status !== OrderStatus::STATUS_PAID) {
             return;
         }
 
         $order = $this->getOrder($orderId, $context);
 
-        if (!isset($mollieOrder->_embedded->payments)) {
+        $paymentCollection = $mollieOrder->payments();
+
+        if ($paymentCollection->count() == 0) {
             return;
         }
 
-        $paidPayments = array_filter($mollieOrder->_embedded->payments, function($payment) {
-            /** @var Payment $payment */
-            return $payment->status === PaymentStatus::STATUS_PAID;
-        });
+        $paymentCollection->exchangeArray(
+            array_filter(
+                $paymentCollection->getArrayCopy(),
+                function ($payment) {
+                    /** @var Payment $payment */
+                    return $payment->isPaid();
+                }
+            )
+        );
 
-        if(count($paidPayments) == 0) {
+        if ($paymentCollection->count() == 0) {
             return;
-        } elseif(count($paidPayments) > 1) {
-            usort($paidPayments, function($a, $b) {
+        } else if ($paymentCollection->count() > 1) {
+            $paymentCollection->uasort(function ($a, $b) {
                 /** @var Payment $a */
                 /** @var Payment $b */
                 $aTime = !is_null($a->paidAt)
@@ -468,7 +472,7 @@ class OrderService
             });
         }
 
-        $paymentDetails = $paidPayments[count($paidPayments) - 1]->details;
+        $paymentDetails = $paymentCollection[$paymentCollection->count() - 1]->details;
 
         if (is_null($paymentDetails)) {
             return;
