@@ -10,6 +10,7 @@ use Kiener\MolliePayments\Helper\OrderStateHelper;
 use Kiener\MolliePayments\Helper\PaymentStatusHelper;
 use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\LoggerService;
+use Kiener\MolliePayments\Service\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\TransactionService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
@@ -249,7 +250,9 @@ class PaymentController extends StorefrontController
             && $this->settingsService->getSettings($context->getSalesChannel()->getId())
                 ->isShopwareFailedPaymentMethod() === false
         ) {
-            $mollieOrder->createPayment([]);
+            if ($mollieOrder->status != PaymentStatus::STATUS_OPEN) {
+                $mollieOrder->createPayment([]);
+            }
 
             if ($mollieOrder->getCheckoutUrl() !== null) {
                 $redirectUrl = $mollieOrder->getCheckoutUrl();
@@ -285,6 +288,7 @@ class PaymentController extends StorefrontController
         $this->eventDispatcher->dispatch($paymentPageRedirectEvent, $paymentPageRedirectEvent::EVENT_NAME);
         return new RedirectResponse($redirectUrl);
     }
+
     /**
      * @RouteScope(scopes={"storefront"})
      * @Route("/mollie/payment/retry/{transactionId}/{redirectUrl}", defaults={"csrf_protected"=false},
