@@ -5,10 +5,6 @@ import ElementLoadingIndicatorUtil from 'src/utility/loading-indicator/element-l
 export default class MolliePaypalExpressCheckout extends Plugin {
     static options = {
         productId: null,
-        // productName: null,
-        // productPrice: null,
-        // currency: null,
-        // currencyId: null,
         countryCode: null,
         shippingMethodId: null,
         route: window.router['frontend.mollie.paypal-ecs.checkout'],
