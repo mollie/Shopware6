@@ -21,6 +21,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEnti
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\Token\TokenFactoryInterfaceV2;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
+use Shopware\Core\Checkout\Promotion\Cart\PromotionCartAddedInformationError;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
@@ -144,7 +145,7 @@ class PaypalExpressCheckoutController extends AbstractExpressCheckoutController
         /** @var ShippingMethodEntity $shippingMethod */
         $shippingMethod = $this->shippingMethodService->getShippingMethodById($shippingMethodId, $context);
 
-        if(!is_null($cartToken)) {
+        if (!is_null($cartToken)) {
             $cart = $this->cartService->getCart($cartToken, $context);
         } else if (
             $paymentMethod !== null
@@ -272,15 +273,20 @@ class PaypalExpressCheckoutController extends AbstractExpressCheckoutController
         Cart $cart,
         string $shippingMethodId,
         string $paymentMethodId,
-        SalesChannelContext $context)
-    : ?OrderEntity
+        SalesChannelContext $context): ?OrderEntity
     {
         // Handle errors
-        if (
-            $cart->getErrors()->count()
-            && $cart->getErrors()->first() !== null
-        ) {
-            throw new \Exception($cart->getErrors()->first()->getMessage());
+        $errors = $cart->getErrors();
+
+        if ($errors->count() > 0) {
+            foreach ($errors as $error) {
+                // if it is only a promotion added info notice, it is no error
+                if ($error instanceof PromotionCartAddedInformationError) {
+                    continue;
+                }
+
+                throw new \Exception($error->getMessage());
+            }
         }
 
         /** @var OrderEntity $order */
