@@ -38,6 +38,12 @@
             <label lang="de-DE">Debug Modus</label>
             <label lang="nl-NL">Debug Modus</label>
         </input-field>
+        <input-field type="bool">
+            <name>headlessMode</name>
+            <label>Headless integration</label>
+            <label lang="de-DE">Headless Integration</label>
+            <label lang="nl-NL">Headless Integration</label>
+        </input-field>
     </card>
     <card>
         <title>Components</title>
