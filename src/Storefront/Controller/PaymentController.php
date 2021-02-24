@@ -14,6 +14,7 @@ use Kiener\MolliePayments\Service\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\TransactionService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
+use Kiener\MolliePayments\Validator\DoesOpenPaymentExist;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order;
@@ -250,7 +251,7 @@ class PaymentController extends StorefrontController
             && $this->settingsService->getSettings($context->getSalesChannel()->getId())
                 ->isShopwareFailedPaymentMethod() === false
         ) {
-            if ($mollieOrder->status != PaymentStatus::STATUS_OPEN) {
+            if (!DoesOpenPaymentExist::validate($mollieOrder->payments()->getArrayCopy())) {
                 $mollieOrder->createPayment([]);
             }
 
