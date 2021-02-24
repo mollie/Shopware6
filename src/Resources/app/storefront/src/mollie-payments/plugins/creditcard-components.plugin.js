@@ -22,7 +22,7 @@ export default class MollieCreditCardComponents extends Plugin {
         }
 
         // Fix the trailing slash in the shop URL
-        if (this.options.shopUrl.substr(-1) === '/') {
+        if (this.options.shopUrl != null && this.options.shopUrl.substr(-1) === '/') {
             this.options.shopUrl = this.options.shopUrl.substr(0, this.options.shopUrl.length - 1);
         }
 
