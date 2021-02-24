@@ -249,6 +249,16 @@
             <tag name="kernel.event_subscriber" />
         </service>
 
+        <service id="Kiener\MolliePayments\Subscriber\OrderRepeaterSubscriber">
+            <argument id="session" type="service"/>
+            <argument id="order.repository" type="service"/>
+            <argument id="Shopware\Core\Checkout\Cart\Order\OrderConverter" type="service"/>
+            <argument id="Shopware\Core\Checkout\Cart\CartPersister" type="service"/>
+            <argument id="logger" type="service"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+
         <!-- Snippets -->
         <service id="Kiener\MolliePayments\Resources\snippet\en_GB\SnippetFile_en_GB" public="true">
             <tag name="shopware.snippet.file"/>
