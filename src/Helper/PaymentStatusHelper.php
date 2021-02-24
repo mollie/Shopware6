@@ -19,6 +19,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\AndFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Shopware\Core\System\StateMachine\StateMachineRegistry;
 use Shopware\Core\System\StateMachine\Transition;
@@ -168,7 +169,7 @@ class PaymentStatusHelper
                 $molliePaymentMethodId = $this->paymentMethodRepository->searchIds(
                     (new Criteria())
                         ->addFilter(
-                            new AndFilter([
+                            new MultiFilter('AND', [
                                     new ContainsFilter('handlerIdentifier', 'Kiener\MolliePayments\Handler\Method'),
                                     new EqualsFilter('customFields.mollie_payment_method_name', $currentCustomerSelectedPaymentMethod)
                                 ]
