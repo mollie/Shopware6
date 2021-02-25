@@ -49,22 +49,22 @@ class BrowserBackHookController extends StorefrontController
     {
 
         $lastOrderId = $this->session->get(OrderRepeaterSubscriber::ORDER_ID_SESSION_KEY);
+
         if (!$lastOrderId) {
             return $this->callInnerController($request, $context);
         }
-        $criteria = new Criteria([$lastOrderId]);
-        $searchContext = Context::createDefaultContext();
-        $searchResult = $this->orderRepository->search($criteria, $searchContext);
-        if ($searchResult->count() === 0) {
-            $this->logger->warning('Failed to find orderID by session, deleting the sessionId', ['lastOrderId' => $lastOrderId]);
-            $this->session->remove(OrderRepeaterSubscriber::ORDER_ID_SESSION_KEY);
 
-            return $this->callInnerController($request, $context);
-        }
         $this->session->remove(OrderRepeaterSubscriber::ORDER_ID_SESSION_KEY);
 
-        return $this->redirectToRoute('frontend.account.edit-order.page', ['orderId' => $lastOrderId, 'error-code' => 'CHECKOUT__CUSTOMER_CANCELED_EXTERNAL_PAYMENT']);
+        $criteria = new Criteria([$lastOrderId]);
+        $searchResult = $this->orderRepository->search($criteria, Context::createDefaultContext());
 
+        if ($searchResult->count() === 0) {
+            $this->logger->warning('Failed to find orderID by session, deleting the sessionId', ['lastOrderId' => $lastOrderId]);
+            return $this->callInnerController($request, $context);
+        }
+
+        return $this->redirectToRoute('frontend.account.edit-order.page', ['orderId' => $lastOrderId, 'error-code' => 'CHECKOUT__CUSTOMER_CANCELED_EXTERNAL_PAYMENT']);
     }
 
     private function callInnerController(Request $request, SalesChannelContext $context)
