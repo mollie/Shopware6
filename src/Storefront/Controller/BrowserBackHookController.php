@@ -17,8 +17,17 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class BrowserBackHookController extends StorefrontController
 {
+    /**
+     * @var Session
+     */
     private $session;
+    /**
+     * @var EntityRepositoryInterface
+     */
     private $orderRepository;
+    /**
+     * @var LoggerInterface
+     */
     private $logger;
     /**
      * @var CheckoutController
@@ -26,9 +35,10 @@ class BrowserBackHookController extends StorefrontController
     private $checkoutController;
 
     /**
-     * @param $session
-     * @param $orderRepository
-     * @param $logger
+     * @param Session $session
+     * @param EntityRepositoryInterface $orderRepository
+     * @param CheckoutController $checkoutController
+     * @param LoggerInterface $logger
      */
     public function __construct(Session $session, EntityRepositoryInterface $orderRepository, CheckoutController $checkoutController, LoggerInterface $logger)
     {
@@ -59,6 +69,7 @@ class BrowserBackHookController extends StorefrontController
 
         if ($searchResult->count() === 0) {
             $this->logger->warning('Failed to find orderID by session, deleting the sessionId', ['lastOrderId' => $lastOrderId]);
+
             return $this->callInnerController($request, $context);
         }
 
