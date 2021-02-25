@@ -17,8 +17,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class BrowserBackHookController extends StorefrontController
 {
-
-
     private $session;
     private $orderRepository;
     private $logger;
