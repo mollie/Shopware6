@@ -41,7 +41,15 @@ class OrderStateHelper
      */
     public function setOrderState(OrderEntity $order, string $orderState, Context $context): bool
     {
+        // if order state is skip we don't set a new order state
         if ($orderState === MollieSettingStruct::ORDER_STATE_SKIP) {
+            return false;
+        }
+
+        $currentStatus = $order->getStateMachineState()->getTechnicalName();
+
+        // if current state is same as status that shoould be set, we don't need to do a transition
+        if ($currentStatus === $orderState) {
             return false;
         }
 
@@ -104,26 +112,26 @@ class OrderStateHelper
         }
 
         if ($completedOrCancelled) {
-                try {
-                    $this->stateMachineRegistry->transition(
-                        new Transition(
-                            OrderDefinition::ENTITY_NAME,
-                            $order->getId(),
-                            StateMachineTransitionActions::ACTION_PROCESS,
-                            'stateId'
-                        ),
-                        $context
-                    );
-                } catch (Exception $e) {
-                    $this->logger->addEntry(
-                        $e->getMessage(),
-                        $context,
-                        $e,
-                        [
-                            'function' => 'payment-automate-order-state',
-                        ]
-                    );
-                }
+            try {
+                $this->stateMachineRegistry->transition(
+                    new Transition(
+                        OrderDefinition::ENTITY_NAME,
+                        $order->getId(),
+                        StateMachineTransitionActions::ACTION_PROCESS,
+                        'stateId'
+                    ),
+                    $context
+                );
+            } catch (Exception $e) {
+                $this->logger->addEntry(
+                    $e->getMessage(),
+                    $context,
+                    $e,
+                    [
+                        'function' => 'payment-automate-order-state',
+                    ]
+                );
+            }
         }
         // Transition the order
         if (isset($transitionName)) {

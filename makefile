@@ -29,4 +29,4 @@ test: ## Starts all Tests
 # ------------------------------------------------------------------------------------------------------------
 
 release: ## Creates a new ZIP package
-	@cd .. && zip -qq -r -0 MolliePayments-$(PLUGIN_VERSION).zip MolliePayments/ -x '*.git*' '*.reports*' '*.travis.yml*' '*/tests*' '*/makefile' '*.DS_Store'
+	@cd .. && zip -qq -r -0 MolliePayments-$(PLUGIN_VERSION).zip MolliePayments/ -x '*.git*' '*.reports*' '*.travis.yml*' '*/tests*' '*/makefile' '*.DS_Store' '*phpunit*'
