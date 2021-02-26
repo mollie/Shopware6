@@ -12,8 +12,8 @@ class MollieSettingStruct extends Struct
 {
     public const ORDER_STATE_SKIP = 'skip';
 
-    private const ORDER_EXPIRES_AT_MIN_DAYS = 1;
-    private const ORDER_EXPIRES_AT_MAX_DAYS = 100;
+    public const ORDER_EXPIRES_AT_MIN_DAYS = 1;
+    public const ORDER_EXPIRES_AT_MAX_DAYS = 100;
 
     /**
      * @var string
@@ -95,7 +95,7 @@ class MollieSettingStruct extends Struct
      */
     public function getLiveApiKey(): string
     {
-        return (string) $this->liveApiKey;
+        return (string)$this->liveApiKey;
     }
 
     /**
@@ -114,7 +114,7 @@ class MollieSettingStruct extends Struct
      */
     public function getTestApiKey(): string
     {
-        return (string) $this->testApiKey;
+        return (string)$this->testApiKey;
     }
 
     /**
@@ -152,7 +152,7 @@ class MollieSettingStruct extends Struct
      */
     public function isTestMode(): bool
     {
-        return (bool) $this->testMode;
+        return (bool)$this->testMode;
     }
 
     /**
@@ -171,7 +171,7 @@ class MollieSettingStruct extends Struct
      */
     public function isShopwareFailedPaymentMethod(): bool
     {
-        return (bool) $this->shopwareFailedPayment;
+        return (bool)$this->shopwareFailedPayment;
     }
 
     /**
@@ -190,7 +190,7 @@ class MollieSettingStruct extends Struct
      */
     public function createNoCustomersAtMollie(): bool
     {
-        return (bool) $this->noCustomersAtMollie;
+        return (bool)$this->noCustomersAtMollie;
     }
 
     /**
@@ -210,7 +210,7 @@ class MollieSettingStruct extends Struct
      */
     public function isDebugMode(): bool
     {
-        return (bool) $this->debugMode;
+        return (bool)$this->debugMode;
     }
 
     /**
@@ -229,7 +229,7 @@ class MollieSettingStruct extends Struct
      */
     public function getEnableCreditCardComponents()
     {
-        return (bool) $this->enableCreditCardComponents;
+        return (bool)$this->enableCreditCardComponents;
     }
 
     /**
@@ -246,8 +246,13 @@ class MollieSettingStruct extends Struct
     /**
      * @return int
      */
-    public function getPaymentMethodBankTransferDueDateDays(): int
+    public function getPaymentMethodBankTransferDueDateDays(): ?int
     {
+        if (!$this->paymentMethodBankTransferDueDateDays) {
+
+            return null;
+        }
+
         return min(
             max(
                 BankTransferPayment::DUE_DATE_MIN_DAYS,
@@ -258,13 +263,22 @@ class MollieSettingStruct extends Struct
     }
 
     /**
-     * @return string The Due date in YYYY-MM-DD format
+     * returns bank transfer due date in YYYY-MM-DD format or null
+     *
+     * @return string|null
      * @throws Exception
      */
-    public function getPaymentMethodBankTransferDueDate(): string
+    public function getPaymentMethodBankTransferDueDate(): ?string
     {
+        $dueDate = $this->getPaymentMethodBankTransferDueDateDays();
+        if (!$dueDate) {
+
+            return null;
+        }
+
         return (new DateTime())
-            ->modify(sprintf('+%d day', $this->getPaymentMethodBankTransferDueDateDays()))
+            ->setTimezone(new DateTimeZone('UTC'))
+            ->modify(sprintf('+%d day', $dueDate))
             ->format('Y-m-d');
     }
 
@@ -273,8 +287,7 @@ class MollieSettingStruct extends Struct
      */
     public function getOrderLifetimeDays(): ?int
     {
-        if(!$this->orderLifetimeDays)
-        {
+        if (!$this->orderLifetimeDays) {
             return null;
         }
         return min(
@@ -293,8 +306,7 @@ class MollieSettingStruct extends Struct
     public function getOrderLifetimeDate(): ?string
     {
         $orderLifeTimeDays = $this->getOrderLifetimeDays();
-        if(!$orderLifeTimeDays)
-        {
+        if (!$orderLifeTimeDays) {
             return null;
         }
         return (new DateTime())
@@ -308,7 +320,7 @@ class MollieSettingStruct extends Struct
      */
     public function getOrderStateWithAPaidTransaction(): string
     {
-        return (string) $this->orderStateWithAPaidTransaction;
+        return (string)$this->orderStateWithAPaidTransaction;
     }
 
     /**
@@ -316,7 +328,7 @@ class MollieSettingStruct extends Struct
      */
     public function getOrderStateWithAFailedTransaction(): string
     {
-        return (string) $this->orderStateWithAFailedTransaction;
+        return (string)$this->orderStateWithAFailedTransaction;
     }
 
     /**
@@ -324,7 +336,7 @@ class MollieSettingStruct extends Struct
      */
     public function getOrderStateWithACancelledTransaction(): string
     {
-        return (string) $this->orderStateWithACancelledTransaction;
+        return (string)$this->orderStateWithACancelledTransaction;
     }
 
     /**
@@ -332,7 +344,7 @@ class MollieSettingStruct extends Struct
      */
     public function getOrderStateWithAAuthorizedTransaction(): string
     {
-        return (string) $this->orderStateWithAAuthorizedTransaction;
+        return (string)$this->orderStateWithAAuthorizedTransaction;
     }
 
     /**

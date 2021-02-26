@@ -64,7 +64,7 @@ class OrderService
     /**
      * Returns the order repository.
      *
-     * @return EntityRepository
+     * @return EntityRepositoryInterface
      */
     public function getOrderRepository()
     {
@@ -74,7 +74,7 @@ class OrderService
     /**
      * Returns the order line item repository.
      *
-     * @return EntityRepository
+     * @return EntityRepositoryInterface
      */
     public function getOrderLineItemRepository()
     {
