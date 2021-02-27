@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Subscriber;
 
 use Exception;
+use Kiener\MolliePayments\Facade\MollieShipment;
 use Kiener\MolliePayments\Service\DeliveryService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Mollie\Api\Exceptions\ApiException;
@@ -12,6 +13,8 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryStates;
 use Shopware\Core\Checkout\Order\OrderEvents;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
+use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
+use Shopware\Core\System\StateMachine\Event\StateMachineStateChangeEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class OrderDeliverySubscriber implements EventSubscriberInterface
@@ -30,6 +33,11 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
 
     /** @var SettingsService */
     protected $settingsService;
+
+    /**
+     * @var MollieShipment
+     */
+    private $mollieShipment;
 
     /**
      * Returns an array of event names this subscriber wants to listen to.
@@ -52,7 +60,7 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            OrderEvents::ORDER_DELIVERY_WRITTEN_EVENT => 'onOrderDeliveryWritten'
+            'state_machine.order_delivery.state_changed' => 'onOrderDeliveryChanged',
         ];
     }
 
@@ -64,131 +72,25 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
      */
     public function __construct(
         MollieApiClient $apiClient,
-        DeliveryService $deliveryService,
-        SettingsService $settingsService
+        DeliveryService $deliveryService
     )
     {
         $this->apiClient = $apiClient;
         $this->deliveryService = $deliveryService;
-        $this->settingsService = $settingsService;
     }
 
-    /**
-     * Refunds the transaction at Mollie if the payment state is refunded.
-     *
-     * @param EntityWrittenEvent $args
-     * @throws ApiException
-     */
-    public function onOrderDeliveryWritten(EntityWrittenEvent $args): void
+    public function onOrderDeliveryChanged(StateMachineStateChangeEvent $event): void
     {
-        foreach ($args->getPayloads() as $payload) {
-            $deliveryId = $payload['id'];
-            $deliveryVersionId = $payload['versionId'];
-            $order = null;
-            $customFields = null;
-            $mollieOrder = null;
-
-            if (!isset($payload['stateId'])) {
-                continue;
-            }
-
-            try {
-                /** @var OrderDeliveryEntity $delivery */
-                $delivery = $this->deliveryService->getDeliveryById(
-                    $deliveryId,
-                    $deliveryVersionId,
-                    $args->getContext()
-                );
-            } catch (InconsistentCriteriaIdsException $e) {
-                // @todo Handle exception
-            }
-
-            // Get the order from the transaction
-            if (
-                $delivery !== null
-            ) {
-                $order = $delivery->getOrder();
-            }
-
-            // Get the custom fields from the order
-            if (
-                $order !== null
-                && $order->getCustomFields() !== null
-            ) {
-                $customFields = $order->getCustomFields();
-            }
-
-            // Correct API key
-            if ($order !== null) {
-                $settings = $this->settingsService->getSettings($order->getSalesChannelId());
-
-                $this->apiClient->setApiKey(!$settings->isTestMode()
-                    ? $settings->getLiveApiKey()
-                    : $settings->getTestApiKey()
-                );
-            }
-
-            // Get the order at Mollie
-            if (
-                $customFields !== null
-                && isset($customFields[self::PARAM_MOLLIE_PAYMENTS][self::PARAM_ORDER_ID])
-            ) {
-                try {
-                    if ($this->apiClient->usesOAuth()) {
-                        $parameters = [
-                            'testmode' => false,
-                        ];
-                    }
-
-                    $mollieOrder = $this->apiClient->orders->get(
-                        $customFields[self::PARAM_MOLLIE_PAYMENTS][self::PARAM_ORDER_ID],
-                        $parameters ?? []
-                    );
-                } catch (Exception $e) {
-                    //
-                }
-
-                if ($mollieOrder === null) {
-                    if ($this->apiClient->usesOAuth()) {
-                        $parameters = [
-                            'testmode' => true,
-                        ];
-                    }
-
-                    $mollieOrder = $this->apiClient->orders->get(
-                        $customFields[self::PARAM_MOLLIE_PAYMENTS][self::PARAM_ORDER_ID],
-                        $parameters ?? []
-                    );
-                }
-            }
-
-            // Ship the order
-            if (
-                $mollieOrder !== null
-                && $delivery->getStateMachineState() !== null
-                && $delivery->getStateMachineState()->getTechnicalName() === OrderDeliveryStates::STATE_SHIPPED
-                && (
-                    !isset($delivery->getCustomFields()[self::PARAM_MOLLIE_PAYMENTS][self::PARAM_IS_SHIPPED])
-                    || $delivery->getCustomFields()[self::PARAM_MOLLIE_PAYMENTS][self::PARAM_IS_SHIPPED] === false
-                )
-            ) {
-                $itemsToBeShipped = 0;
-
-                foreach($mollieOrder->lines as $line) {
-                    $itemsToBeShipped += $line->shippableQuantity ?? 0;
-                }
-
-                if($itemsToBeShipped > 0) {
-                    // Ship the order at Mollie
-                    $mollieOrder->shipAll();
-                }
-
-                // Add is shipped flag to custom fields
-                $this->deliveryService->updateDelivery([
-                    self::PARAM_ID => $delivery->getId(),
-                    self::PARAM_CUSTOM_FIELDS => $this->deliveryService->addShippedToCustomFields($order->getCustomFields(), true),
-                ], $args->getContext());
-            }
+        if ($event->getTransitionSide() !== StateMachineStateChangeEvent::STATE_MACHINE_TRANSITION_SIDE_ENTER) {
+            return;
         }
+
+        $transitionName = $event->getTransition()->getTransitionName();
+
+        if ($transitionName !== StateMachineTransitionActions::ACTION_SHIP) {
+            return;
+        }
+
+        $this->mollieShipment->setShipment($event->getTransition()->getEntityId(), $event->getContext());
     }
 }
