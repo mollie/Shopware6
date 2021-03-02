@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Tests\Facade;
 
-
 use Kiener\MolliePayments\Facade\MollieShipment;
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Service\MollieApi\Order;
@@ -18,9 +17,6 @@ use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Uuid\Uuid;
 
-/**
- * @copyright 2021 dasistweb GmbH (https://www.dasistweb.de)
- */
 class MollieShipmentTest extends TestCase
 {
 

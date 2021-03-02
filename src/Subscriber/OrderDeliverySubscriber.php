@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Subscriber;
 
@@ -19,11 +19,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class OrderDeliverySubscriber implements EventSubscriberInterface
 {
-    private const PARAM_ID = 'id';
-    private const PARAM_ORDER_ID = 'order_id';
-    private const PARAM_CUSTOM_FIELDS = 'customFields';
-    private const PARAM_MOLLIE_PAYMENTS = 'mollie_payments';
-    private const PARAM_IS_SHIPPED = 'is_shipped';
 
     /** @var MollieApiClient */
     private $apiClient;

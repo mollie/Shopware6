@@ -1,16 +1,12 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
-
 
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 
-/**
- * @copyright 2021 dasistweb GmbH (https://www.dasistweb.de)
- */
 class OrderDeliveryService
 {
 

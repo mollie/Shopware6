@@ -1,15 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
-
 
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 
-/**
- * @copyright 2021 dasistweb GmbH (https://www.dasistweb.de)
- */
 class MolliePaymentExtractor
 {
     /**

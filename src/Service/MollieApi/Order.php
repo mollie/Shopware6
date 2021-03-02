@@ -2,14 +2,10 @@
 
 namespace Kiener\MolliePayments\Service\MollieApi;
 
-
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Mollie\Api\Exceptions\ApiException;
 use Psr\Log\LoggerInterface;
 
-/**
- * @copyright 2021 dasistweb GmbH (https://www.dasistweb.de)
- */
 class Order
 {
 

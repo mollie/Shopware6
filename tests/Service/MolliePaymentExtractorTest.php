@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Tests\Service;
 
-
 use Kiener\MolliePayments\Service\MolliePaymentExtractor;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
@@ -10,9 +9,6 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEnti
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Uuid\Uuid;
 
-/**
- * @copyright 2021 dasistweb GmbH (https://www.dasistweb.de)
- */
 class MolliePaymentExtractorTest extends TestCase
 {
 
