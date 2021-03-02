@@ -46,7 +46,9 @@ class BankTransferPayment extends PaymentHandler
 
             try {
                 $dueDate = $settings->getPaymentMethodBankTransferDueDate();
-                $orderData[static::FIELD_PAYMENT][static::FIELD_DUE_DATE] = $dueDate;
+                if (!is_null($dueDate)) {
+                    $orderData[static::FIELD_PAYMENT][static::FIELD_DUE_DATE] = $dueDate;
+                }
             } catch (Exception $e) {
                 $this->logger->addEntry(
                     $e->getMessage(),

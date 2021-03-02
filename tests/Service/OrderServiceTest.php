@@ -28,8 +28,8 @@ class OrderServiceTest extends TestCase
 
     public function setUp(): void
     {
-        $orderRepository = $this->getMockBuilder(EntityRepositoryInterface::class)->getMock();
-        $lineItemRepository = $this->getMockBuilder(EntityRepositoryInterface::class)->getMock();
+        $orderRepository = $this->getMockBuilder(EntityRepositoryInterface::class)->disableOriginalConstructor()->getMock();
+        $lineItemRepository = $this->getMockBuilder(EntityRepositoryInterface::class)->disableOriginalConstructor()->getMock();
         $logger = new NullLogger();
         $this->orderService = new OrderService(
             $orderRepository,
