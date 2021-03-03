@@ -8,16 +8,13 @@ use Kiener\MolliePayments\Validator\OrderLineItemValidator;
 use Mollie\Api\Types\OrderLineType;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
-use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTax;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
-use Shopware\Core\Checkout\Cart\Tax\TaxCalculator;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Promotion\Cart\PromotionProcessor;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -146,19 +143,7 @@ class OrderService
                 $sku = $item->getProduct()->getProductNumber();
             }
 
-            try {
-                $molliePreparedApiPrices = $this->calculateLineItemPriceData($item, $order->getTaxStatus(), $currencyCode);
-            } catch (MissingPriceLineItemException $e) {
-                $this->logger->critical(
-                    sprintf(
-                        'The order could not be prepared for mollie api. The LineItem with id (%s), sku (%s) has no prices',
-                        $item->getId(),
-                        (string)$sku
-                    )
-                );
-
-                throw $e;
-            }
+            $molliePreparedApiPrices = $this->calculateLineItemPriceData($item, $order->getTaxStatus(), $currencyCode);
 
             // Get the image
             $imageUrl = null;
