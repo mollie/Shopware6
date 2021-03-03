@@ -35,7 +35,7 @@ class OrderServiceTest extends TestCase
             $orderRepository,
             $lineItemRepository,
             $logger,
-            new OrderLineItemValidator()
+            new OrderLineItemValidator($logger)
         );
 
     }

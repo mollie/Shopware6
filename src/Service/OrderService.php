@@ -283,6 +283,11 @@ class OrderService
             $vatRate = $itemTax->getTaxRate();
         }
 
+        // Remove VAT if the order is tax free
+        if ($orderTaxType === CartPrice::TAX_STATE_FREE) {
+            $vatRate = 0.0;
+        }
+
         $unitPrice = $price->getUnitPrice();
         $lineItemTotalPrice = $item->getTotalPrice();
 
@@ -297,10 +302,6 @@ class OrderService
 
         $unitPrice = round($unitPrice, self::MOLLIE_PRICE_PRECISION);
 
-        // Remove VAT if the order is tax free
-        if ($orderTaxType === CartPrice::TAX_STATE_FREE) {
-            $vatRate = 0.0;
-        }
 
         $roundedLineItemTotalPrice = round($lineItemTotalPrice, self::MOLLIE_PRICE_PRECISION);
         $roundedVatRate = round($vatRate, self::MOLLIE_PRICE_PRECISION);
