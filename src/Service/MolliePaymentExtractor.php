@@ -43,8 +43,12 @@ class MolliePaymentExtractor
         return null;
     }
 
-    private function isMolliePayment(OrderTransactionEntity $transaction): bool
+    private function isMolliePayment(?OrderTransactionEntity $transaction): bool
     {
+        if (!$transaction instanceof OrderTransactionEntity) {
+            return false;
+        }
+
         $molliePaymentsNamespace = 'Kiener\MolliePayments\Handler\Method';
 
         $handlerName = substr($transaction->getPaymentMethod()->getHandlerIdentifier(), 0, strlen($molliePaymentsNamespace));
