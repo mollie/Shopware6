@@ -71,11 +71,15 @@ class MollieShipmentTest extends TestCase
         $deliveryId = 'foo';
         $this->orderDeliveryService->method('getDelivery')->willReturn(null);
 
-        $this->logger->expects($this->once())->method('debug')->with(
+        // warning is logged
+        $this->logger->expects($this->once())->method('warning')->with(
             sprintf('Order delivery with id %s could not be found in database', $deliveryId)
         );
+        // custom fields for shipping are never written
         $this->orderDeliveryService->expects($this->never())->method('updateCustomFields');
+        // api call is never done
         $this->mollieApiOrderService->expects($this->never())->method('setShipment');
+        // result value of facade is false
         self::assertFalse($this->mollieShipment->setShipment($deliveryId, $context));
     }
 
@@ -86,11 +90,15 @@ class MollieShipmentTest extends TestCase
         $deliveryId = $delivery->getId();
         $this->orderDeliveryService->method('getDelivery')->willReturn($delivery);
 
-        $this->logger->expects($this->once())->method('debug')->with(
+        // warning is logged
+        $this->logger->expects($this->once())->method('warning')->with(
             sprintf('Loaded delivery with id %s does not have an order in database', $deliveryId)
         );
+        // custom fields for shipping are never written
         $this->orderDeliveryService->expects($this->never())->method('updateCustomFields');
+        // api call is never done
         $this->mollieApiOrderService->expects($this->never())->method('setShipment');
+        // result value of facade is false
         self::assertFalse($this->mollieShipment->setShipment($deliveryId, $context));
     }
 
@@ -102,11 +110,15 @@ class MollieShipmentTest extends TestCase
         $deliveryId = $delivery->getId();
         $this->orderDeliveryService->method('getDelivery')->willReturn($delivery);
 
-        $this->logger->expects($this->once())->method('debug')->with(
+        // warning is logged
+        $this->logger->expects($this->once())->method('warning')->with(
             sprintf('Mollie orderId does not exist in shopware order (%s)', (string)$order->getOrderNumber())
         );
+        // custom fields for shipping are never written
         $this->orderDeliveryService->expects($this->never())->method('updateCustomFields');
+        // api call is never done
         $this->mollieApiOrderService->expects($this->never())->method('setShipment');
+        // result value of facade is false
         self::assertFalse($this->mollieShipment->setShipment($deliveryId, $context));
     }
 
@@ -120,14 +132,18 @@ class MollieShipmentTest extends TestCase
         $deliveryId = $delivery->getId();
         $this->orderDeliveryService->method('getDelivery')->willReturn($delivery);
 
+        // warning is logged
         $this->logger->expects($this->once())->method('info')->with(
             sprintf(
                 'The last transaction of the order (%s) is not a mollie payment! No shipment will be sent to mollie',
                 (string)$order->getOrderNumber()
             )
         );
+        // custom fields for shipping are never written
         $this->orderDeliveryService->expects($this->never())->method('updateCustomFields');
+        // api call is never done
         $this->mollieApiOrderService->expects($this->never())->method('setShipment');
+        // result value of facade is false
         self::assertFalse($this->mollieShipment->setShipment($deliveryId, $context));
     }
 
@@ -148,9 +164,13 @@ class MollieShipmentTest extends TestCase
             ->with($mollieOrderId, $salesChannelId)
             ->willReturn(false);
 
+        // custom fields for shipping are never written
         $this->orderDeliveryService->expects($this->never())->method('updateCustomFields');
+        // no logs are written
         $this->logger->expects($this->never())->method('info');
         $this->logger->expects($this->never())->method('debug');
+        $this->logger->expects($this->never())->method('warning');
+        // result value of facade is false
         self::assertFalse($this->mollieShipment->setShipment($deliveryId, $context));
     }
 
@@ -171,14 +191,24 @@ class MollieShipmentTest extends TestCase
             ->with($mollieOrderId, $salesChannelId)
             ->willReturn(true);
 
+        // custom fields for shipping are written
         $this->orderDeliveryService->expects($this->once())
             ->method('updateCustomFields')
             ->with($delivery, [CustomFieldsInterface::DELIVERY_SHIPPED => true], $context);
+        // no logs are written
         $this->logger->expects($this->never())->method('info');
         $this->logger->expects($this->never())->method('debug');
+        $this->logger->expects($this->never())->method('warning');
+        // result value of facade is true
         self::assertTrue($this->mollieShipment->setShipment($deliveryId, $context));
     }
 
+    /**
+     * create a delivery entity and set the order in delivery if given
+     *
+     * @param OrderEntity|null $order
+     * @return OrderDeliveryEntity
+     */
     private function createDelivery(?OrderEntity $order): OrderDeliveryEntity
     {
         $delivery = new OrderDeliveryEntity();
@@ -191,6 +221,12 @@ class MollieShipmentTest extends TestCase
         return $delivery;
     }
 
+    /**
+     * create an order entity and set the transaction in order if given
+     *
+     * @param OrderTransactionEntity|null $transaction
+     * @return OrderEntity
+     */
     private function createOrder(?OrderTransactionEntity $transaction): OrderEntity
     {
         $order = new OrderEntity();
@@ -205,13 +241,19 @@ class MollieShipmentTest extends TestCase
         return $order;
     }
 
-    private function createTransaction(string $methodName): OrderTransactionEntity
+    /**
+     * create a transaction with a payment with given payment handler name
+     *
+     * @param string $paymentHandlerName
+     * @return OrderTransactionEntity
+     */
+    private function createTransaction(string $paymentHandlerName): OrderTransactionEntity
     {
         $transaction = new OrderTransactionEntity();
         $transaction->setId(Uuid::randomHex());
         $paymentMethod = new PaymentMethodEntity();
         $paymentMethod->setId(Uuid::randomHex());
-        $paymentMethod->setHandlerIdentifier($methodName);
+        $paymentMethod->setHandlerIdentifier($paymentHandlerName);
         $transaction->setCreatedAt(new \DateTime());
         $transaction->setPaymentMethod($paymentMethod);
 

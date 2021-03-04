@@ -36,14 +36,23 @@ class MolliePaymentExtractor
 
         $lastTransaction = $collection->last();
 
-        $molliePaymentsNamespace = 'Kiener\MolliePayments\Handler\Method';
-
-        $handlerName = substr($lastTransaction->getPaymentMethod()->getHandlerIdentifier(), 0, strlen($molliePaymentsNamespace));
-
-        if ($handlerName !== $molliePaymentsNamespace) {
-            return null;
+        if ($this->isMolliePayment($lastTransaction)) {
+            return $lastTransaction;
         }
 
-        return $lastTransaction;
+        return null;
+    }
+
+    private function isMolliePayment(OrderTransactionEntity $transaction): bool
+    {
+        $molliePaymentsNamespace = 'Kiener\MolliePayments\Handler\Method';
+
+        $handlerName = substr($transaction->getPaymentMethod()->getHandlerIdentifier(), 0, strlen($molliePaymentsNamespace));
+
+        if ($handlerName === $molliePaymentsNamespace) {
+            return true;
+        }
+
+        return false;
     }
 }

@@ -52,7 +52,7 @@ class MollieShipment
         $delivery = $this->orderDeliveryService->getDelivery($orderDeliveryId, $context);
 
         if (!$delivery instanceof OrderDeliveryEntity) {
-            $this->logger->debug(
+            $this->logger->warning(
                 sprintf('Order delivery with id %s could not be found in database', $orderDeliveryId)
             );
 
@@ -62,7 +62,7 @@ class MollieShipment
         $order = $delivery->getOrder();
 
         if (!$order instanceof OrderEntity) {
-            $this->logger->debug(
+            $this->logger->warning(
                 sprintf('Loaded delivery with id %s does not have an order in database', $orderDeliveryId)
             );
 
@@ -72,7 +72,7 @@ class MollieShipment
         $customFields = $order->getCustomFields();
 
         if (!isset($customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY])) {
-            $this->logger->debug(
+            $this->logger->warning(
                 sprintf('Mollie orderId does not exist in shopware order (%s)', (string)$order->getOrderNumber())
             );
 

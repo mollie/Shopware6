@@ -2,17 +2,9 @@
 
 namespace Kiener\MolliePayments\Subscriber;
 
-use Exception;
 use Kiener\MolliePayments\Facade\MollieShipment;
-use Kiener\MolliePayments\Service\DeliveryService;
 use Kiener\MolliePayments\Service\SettingsService;
-use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
-use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
-use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryStates;
-use Shopware\Core\Checkout\Order\OrderEvents;
-use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
-use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Shopware\Core\System\StateMachine\Event\StateMachineStateChangeEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -23,15 +15,10 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
     /** @var MollieApiClient */
     private $apiClient;
 
-    /** @var DeliveryService */
-    private $deliveryService;
-
     /** @var SettingsService */
     protected $settingsService;
 
-    /**
-     * @var MollieShipment
-     */
+    /** @var MollieShipment */
     private $mollieShipment;
 
     /**
@@ -63,15 +50,15 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
      * Creates a new instance of PaymentMethodSubscriber.
      *
      * @param MollieApiClient $apiClient
-     * @param DeliveryService $deliveryService
+     * @param MollieShipment $mollieShipment
      */
     public function __construct(
         MollieApiClient $apiClient,
-        DeliveryService $deliveryService
+        MollieShipment $mollieShipment
     )
     {
         $this->apiClient = $apiClient;
-        $this->deliveryService = $deliveryService;
+        $this->mollieShipment = $mollieShipment;
     }
 
     public function onOrderDeliveryChanged(StateMachineStateChangeEvent $event): void
