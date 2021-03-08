@@ -71,7 +71,7 @@ class MollieShipment
 
         $customFields = $order->getCustomFields();
 
-        if (!isset($customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY])) {
+        if (!is_array($customFields) || !isset($customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY])) {
             $this->logger->warning(
                 sprintf('Mollie orderId does not exist in shopware order (%s)', (string)$order->getOrderNumber())
             );

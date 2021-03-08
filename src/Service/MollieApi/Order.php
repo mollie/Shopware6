@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Service\MollieApi;
 
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Mollie\Api\Exceptions\ApiException;
+use Mollie\Api\Resources\OrderLine;
 use Psr\Log\LoggerInterface;
 
 class Order
@@ -47,8 +48,13 @@ class Order
 
         $shouldCreateShipment = false;
 
-        foreach ($mollieOrder->lines as $line) {
-            if ($line->shippableQuantity > 0) {
+        /** @var OrderLine $orderLine */
+        foreach ($mollieOrder->lines() as $orderLine) {
+            if (!$orderLine instanceof OrderLine) {
+                continue;
+            }
+
+            if ($orderLine->shippableQuantity > 0) {
                 $shouldCreateShipment = true;
                 break;
             }
