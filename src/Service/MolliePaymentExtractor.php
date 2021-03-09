@@ -49,14 +49,11 @@ class MolliePaymentExtractor
             return false;
         }
 
-        $molliePaymentsNamespace = 'Kiener\MolliePayments\Handler\Method';
+        $pattern = sprintf(
+            '/^%s/',
+            preg_quote('Kiener\MolliePayments\Handler\Method')
+        );
 
-        $handlerName = substr($transaction->getPaymentMethod()->getHandlerIdentifier(), 0, strlen($molliePaymentsNamespace));
-
-        if ($handlerName === $molliePaymentsNamespace) {
-            return true;
-        }
-
-        return false;
+        return preg_match($pattern, $transaction->getPaymentMethod()->getHandlerIdentifier()) === 1;
     }
 }

@@ -69,9 +69,9 @@ class MollieShipment
             return false;
         }
 
-        $customFields = $order->getCustomFields();
+        $mollieOrderId = $customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY] ?? null;
 
-        if (!is_array($customFields) || !isset($customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY])) {
+        if (!$mollieOrderId) {
             $this->logger->warning(
                 sprintf('Mollie orderId does not exist in shopware order (%s)', (string)$order->getOrderNumber())
             );
@@ -93,12 +93,10 @@ class MollieShipment
             return false;
         }
 
-        $mollieOrderId = $customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY];
-
         $addedMollieShipment = $this->mollieApiOrderService->setShipment($mollieOrderId, $order->getSalesChannelId());
 
         if ($addedMollieShipment) {
-            $values[CustomFieldsInterface::DELIVERY_SHIPPED] = true;
+            $values = [CustomFieldsInterface::DELIVERY_SHIPPED => true];
             $this->orderDeliveryService->updateCustomFields($delivery, $values, $context);
         }
 

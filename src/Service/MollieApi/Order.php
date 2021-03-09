@@ -22,7 +22,6 @@ class Order
 
     public function __construct(MollieApiFactory $clientFactory, LoggerInterface $logger)
     {
-
         $this->clientFactory = $clientFactory;
         $this->logger = $logger;
     }
@@ -39,31 +38,19 @@ class Order
                     'API error occured when fetching mollie order %s with message %s',
                     $mollieOrderId,
                     $e->getMessage()
-                ),
-                $e->getTrace()
+                )
             );
 
-            return false;
+            throw $e;
         }
-
-        $shouldCreateShipment = false;
 
         /** @var OrderLine $orderLine */
         foreach ($mollieOrder->lines() as $orderLine) {
-            if (!$orderLine instanceof OrderLine) {
-                continue;
-            }
-
             if ($orderLine->shippableQuantity > 0) {
-                $shouldCreateShipment = true;
-                break;
+                $mollieOrder->shipAll();
+
+                return true;
             }
-        }
-
-        if ($shouldCreateShipment) {
-            $mollieOrder->shipAll();
-
-            return true;
         }
 
         return false;
