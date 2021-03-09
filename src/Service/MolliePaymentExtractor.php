@@ -8,10 +8,12 @@ use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 
 class MolliePaymentExtractor
 {
+    public const MOLLIE_PAYMENT_HANDLER_NAMESPACE = 'Kiener\MolliePayments\Handler\Method';
+
     /**
      * method extracts last created transaction if it is a mollie payment transaction.
      *
-     * @param OrderTransactionCollection $collection
+     * @param OrderTransactionCollection|null $collection
      * @return OrderTransactionEntity|null
      */
     public function extractLast(?OrderTransactionCollection $collection): ?OrderTransactionEntity
@@ -47,7 +49,7 @@ class MolliePaymentExtractor
     {
         $pattern = sprintf(
             '/^%s/',
-            preg_quote('Kiener\MolliePayments\Handler\Method')
+            preg_quote(self::MOLLIE_PAYMENT_HANDLER_NAMESPACE)
         );
 
         return preg_match($pattern, $transaction->getPaymentMethod()->getHandlerIdentifier()) === 1;

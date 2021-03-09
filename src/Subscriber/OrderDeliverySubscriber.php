@@ -11,22 +11,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class OrderDeliverySubscriber implements EventSubscriberInterface
 {
-
-    /** @var MollieApiClient */
-    private $apiClient;
-
-    /** @var SettingsService */
-    protected $settingsService;
-
     /** @var MollieShipment */
     private $mollieShipment;
 
     public function __construct(
-        MollieApiClient $apiClient,
         MollieShipment $mollieShipment
     )
     {
-        $this->apiClient = $apiClient;
         $this->mollieShipment = $mollieShipment;
     }
 

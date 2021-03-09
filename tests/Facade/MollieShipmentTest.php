@@ -19,7 +19,6 @@ use Shopware\Core\Framework\Uuid\Uuid;
 
 class MollieShipmentTest extends TestCase
 {
-
     /**
      * @var MolliePaymentExtractor
      */
@@ -50,8 +49,14 @@ class MollieShipmentTest extends TestCase
      */
     private $orderNumber;
 
+    /**
+     * @var Context
+     */
+    private $context;
+
     public function setup(): void
     {
+        $this->context = Context::createDefaultContext();
         $this->extractor = new MolliePaymentExtractor();
         $this->mollieApiOrderService = $this->getMockBuilder(Order::class)->disableOriginalConstructor()->getMock();
         $this->orderDeliveryService = $this->getMockBuilder(OrderDeliveryService::class)->disableOriginalConstructor()->getMock();
@@ -67,7 +72,6 @@ class MollieShipmentTest extends TestCase
 
     public function testInvalidDeliveryId(): void
     {
-        $context = $this->getMockBuilder(Context::class)->disableOriginalConstructor()->getMock();
         $deliveryId = 'foo';
         $this->orderDeliveryService->method('getDelivery')->willReturn(null);
 
@@ -80,12 +84,11 @@ class MollieShipmentTest extends TestCase
         // api call is never done
         $this->mollieApiOrderService->expects($this->never())->method('setShipment');
         // result value of facade is false
-        self::assertFalse($this->mollieShipment->setShipment($deliveryId, $context));
+        self::assertFalse($this->mollieShipment->setShipment($deliveryId, $this->context));
     }
 
     public function testMissingOrder(): void
     {
-        $context = $this->getMockBuilder(Context::class)->disableOriginalConstructor()->getMock();
         $delivery = $this->createDelivery(null);
         $deliveryId = $delivery->getId();
         $this->orderDeliveryService->method('getDelivery')->willReturn($delivery);
@@ -99,12 +102,11 @@ class MollieShipmentTest extends TestCase
         // api call is never done
         $this->mollieApiOrderService->expects($this->never())->method('setShipment');
         // result value of facade is false
-        self::assertFalse($this->mollieShipment->setShipment($deliveryId, $context));
+        self::assertFalse($this->mollieShipment->setShipment($deliveryId, $this->context));
     }
 
     public function testMissingCustomFieldsInOrder(): void
     {
-        $context = $this->getMockBuilder(Context::class)->disableOriginalConstructor()->getMock();
         $order = $this->createOrder(null);
         $delivery = $this->createDelivery($order);
         $deliveryId = $delivery->getId();
@@ -119,12 +121,11 @@ class MollieShipmentTest extends TestCase
         // api call is never done
         $this->mollieApiOrderService->expects($this->never())->method('setShipment');
         // result value of facade is false
-        self::assertFalse($this->mollieShipment->setShipment($deliveryId, $context));
+        self::assertFalse($this->mollieShipment->setShipment($deliveryId, $this->context));
     }
 
     public function testMissingLastMollieTransaction(): void
     {
-        $context = $this->getMockBuilder(Context::class)->disableOriginalConstructor()->getMock();
         $order = $this->createOrder(null);
         $customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY] = 'foo';
         $order->setCustomFields($customFields);
@@ -144,12 +145,11 @@ class MollieShipmentTest extends TestCase
         // api call is never done
         $this->mollieApiOrderService->expects($this->never())->method('setShipment');
         // result value of facade is false
-        self::assertFalse($this->mollieShipment->setShipment($deliveryId, $context));
+        self::assertFalse($this->mollieShipment->setShipment($deliveryId, $this->context));
     }
 
     public function testThatOrderDeliveryCustomFieldsAreNotWrittenWhenApiCallUnsuccessful(): void
     {
-        $context = $this->getMockBuilder(Context::class)->disableOriginalConstructor()->getMock();
         $transaction = $this->createTransaction('Kiener\MolliePayments\Handler\Method\FooMethod');
         $order = $this->createOrder($transaction);
         $mollieOrderId = 'foo';
@@ -171,12 +171,11 @@ class MollieShipmentTest extends TestCase
         $this->logger->expects($this->never())->method('debug');
         $this->logger->expects($this->never())->method('warning');
         // result value of facade is false
-        self::assertFalse($this->mollieShipment->setShipment($deliveryId, $context));
+        self::assertFalse($this->mollieShipment->setShipment($deliveryId, $this->context));
     }
 
     public function testThatOrderDeliveryCustomFieldsAreWrittenWhenApiCallSuccessful(): void
     {
-        $context = $this->getMockBuilder(Context::class)->disableOriginalConstructor()->getMock();
         $transaction = $this->createTransaction('Kiener\MolliePayments\Handler\Method\FooMethod');
         $order = $this->createOrder($transaction);
         $mollieOrderId = 'foo';
@@ -194,13 +193,13 @@ class MollieShipmentTest extends TestCase
         // custom fields for shipping are written
         $this->orderDeliveryService->expects($this->once())
             ->method('updateCustomFields')
-            ->with($delivery, [CustomFieldsInterface::DELIVERY_SHIPPED => true], $context);
+            ->with($delivery, [CustomFieldsInterface::DELIVERY_SHIPPED => true], $this->context);
         // no logs are written
         $this->logger->expects($this->never())->method('info');
         $this->logger->expects($this->never())->method('debug');
         $this->logger->expects($this->never())->method('warning');
         // result value of facade is true
-        self::assertTrue($this->mollieShipment->setShipment($deliveryId, $context));
+        self::assertTrue($this->mollieShipment->setShipment($deliveryId, $this->context));
     }
 
     /**
