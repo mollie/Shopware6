@@ -36,19 +36,15 @@ class MolliePaymentExtractor
 
         $lastTransaction = $collection->last();
 
-        if ($this->isMolliePayment($lastTransaction)) {
+        if ($lastTransaction instanceof OrderTransactionEntity && $this->isMolliePayment($lastTransaction)) {
             return $lastTransaction;
         }
 
         return null;
     }
 
-    private function isMolliePayment(?OrderTransactionEntity $transaction): bool
+    private function isMolliePayment(OrderTransactionEntity $transaction): bool
     {
-        if (!$transaction instanceof OrderTransactionEntity) {
-            return false;
-        }
-
         $pattern = sprintf(
             '/^%s/',
             preg_quote('Kiener\MolliePayments\Handler\Method')
