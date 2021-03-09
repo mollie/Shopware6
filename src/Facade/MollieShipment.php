@@ -69,6 +69,7 @@ class MollieShipment
             return false;
         }
 
+        $customFields = $order->getCustomFields();
         $mollieOrderId = $customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY] ?? null;
 
         if (!$mollieOrderId) {
