@@ -15,7 +15,6 @@ Component.override('sw-order-detail-base', {
     data() {
         return {
             refundedAmount: 0.0,
-            refundedItems: 0,
             shippedAmount: 0,
             shippedItems: 0,
         }
@@ -28,12 +27,10 @@ Component.override('sw-order-detail-base', {
 
     mounted() {
         if (this.orderId !== '') {
-            this.MolliePaymentsRefundService.total({
-                orderId: this.orderId
-            })
+            this.MolliePaymentsRefundService
+                .total({orderId: this.orderId})
                 .then((response) => {
                     this.refundedAmount = response.amount;
-                    this.refundedItems = response.items;
                 });
 
             this.MolliePaymentsShippingService.total({

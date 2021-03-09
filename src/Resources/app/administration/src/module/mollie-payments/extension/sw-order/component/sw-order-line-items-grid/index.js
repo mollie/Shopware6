@@ -17,9 +17,8 @@ Component.override('sw-order-line-items-grid', {
             showRefundModal: false,
             showShippingModal: false,
             createCredit: false,
-            quantityToRefund: 1,
             quantityToShip: 1,
-            refundQuantity: 0,
+            refundAmount: 0.0,
             shippingQuantity: 0
         };
     },
@@ -27,17 +26,6 @@ Component.override('sw-order-line-items-grid', {
     computed: {
         getLineItemColumns() {
             const columnDefinitions = this.$super('getLineItemColumns');
-
-            columnDefinitions.push(
-                {
-                    property: 'customFields.refundedQuantity',
-                    label: this.$tc('sw-order.detailExtended.columnRefunded'),
-                    allowResize: false,
-                    align: 'right',
-                    inlineEdit: false,
-                    width: '100px'
-                }
-            );
 
             columnDefinitions.push(
                 {
@@ -51,32 +39,42 @@ Component.override('sw-order-line-items-grid', {
             );
 
             return columnDefinitions;
-        }
+        },
+
+        isRefundable() {
+            try {
+                return (this.order.amountTotal - this.order.customFields.mollie_payments.refundedAmount) > 0 || true;
+            } catch(e) {
+                return true;
+            }
+        },
     },
 
     methods: {
-        onRefundItem(item) {
-            this.showRefundModal = item.id;
+        onRefund() {
+            this.showRefundModal = true;
         },
 
         onCloseRefundModal() {
             this.showRefundModal = false;
         },
 
-        onConfirmRefund(item) {
+        onConfirmRefund() {
             this.showRefundModal = false;
 
-            if (this.quantityToRefund > 0) {
-                this.MolliePaymentsRefundService.refund({
-                    itemId: item.id,
-                    versionId: item.versionId,
-                    quantity: this.quantityToRefund,
-                    createCredit: this.createCredit
-                })
-                    .then(document.location.reload());
-            }
+            console.log(this.order);
 
-            this.quantityToRefund = 0;
+                // this.MolliePaymentsRefundService.refund({
+                //     itemId: item.id,
+                //     versionId: item.versionId,
+                //     quantity: this.quantityToRefund,
+                //     createCredit: this.createCredit
+                // })
+
+            // this.$emit('refund-success');
+
+
+
         },
 
         onShipItem(item) {
@@ -102,29 +100,6 @@ Component.override('sw-order-line-items-grid', {
             this.quantityToShip = 0;
         },
 
-        isRefundable(item) {
-            let refundable = false;
-
-            if (
-                item.type === 'product'
-                && (
-                    item.customFields !== undefined
-                    && item.customFields !== null
-                    && item.customFields.mollie_payments !== undefined
-                    && item.customFields.mollie_payments !== null
-                    && item.customFields.mollie_payments.order_line_id !== undefined
-                    && item.customFields.mollie_payments.order_line_id !== null
-                )
-                && (
-                    item.customFields.refundedQuantity === undefined
-                    || parseInt(item.customFields.refundedQuantity, 10) < item.quantity
-                )
-            ) {
-                refundable = true;
-            }
-
-            return refundable;
-        },
 
         isShippable(item) {
             let shippable = false;
@@ -148,17 +123,6 @@ Component.override('sw-order-line-items-grid', {
             }
 
             return shippable;
-        },
-
-        refundableQuantity(item) {
-            if (
-                item.customFields !== undefined
-                && item.customFields.refundedQuantity !== undefined
-            ) {
-                return item.quantity - parseInt(item.customFields.refundedQuantity, 10);
-            }
-
-            return item.quantity;
         },
 
         shippableQuantity(item) {
