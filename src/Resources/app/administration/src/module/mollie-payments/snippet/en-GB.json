@@ -29,7 +29,7 @@
       "columnRefunded": "Refunded",
       "columnShipped": "Shipped",
       "labelMollieOrderId": "Mollie Order ID",
-      "totalRefunds": "Refunded amount ({quantity} items)",
+      "totalRefunds": "Refunded amount",
       "totalShipments": "Shipped amount ({quantity} items)"
     }
   },

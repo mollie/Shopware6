@@ -29,7 +29,7 @@
       "columnRefunded": "Terugbetaald",
       "columnShipped": "Verzonden",
       "labelMollieOrderId": "Mollie Order ID",
-      "totalRefunds": "Terugbetaald bedrag ({quantity} items)",
+      "totalRefunds": "Terugbetaald bedrag",
       "totalShipments": "Verzonden bedrag ({quantity} items)"
     }
   },

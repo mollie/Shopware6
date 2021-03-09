@@ -29,7 +29,7 @@
       "columnRefunded": "Rückerstattet",
       "columnShipped": "Versandt",
       "labelMollieOrderId": "Mollie Bestell ID",
-      "totalRefunds": "Rückerstattete Menge ({quantity} Stück)",
+      "totalRefunds": "Rückerstattete Menge",
       "totalShipments": "Versandte Menge ({quantity} Stück)"
     }
   },

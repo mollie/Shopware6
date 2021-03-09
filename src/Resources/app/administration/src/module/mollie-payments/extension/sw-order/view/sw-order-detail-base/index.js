@@ -1,6 +1,6 @@
 import template from './sw-order-detail-base.html.twig';
 
-const { Component } = Shopware;
+const {Component} = Shopware;
 
 Component.override('sw-order-detail-base', {
     template,
@@ -30,12 +30,11 @@ Component.override('sw-order-detail-base', {
             this.MolliePaymentsRefundService
                 .total({orderId: this.orderId})
                 .then((response) => {
-                    this.refundedAmount = response.amount;
+                    this.refundedAmount = response.refunded;
                 });
 
-            this.MolliePaymentsShippingService.total({
-                orderId: this.orderId
-            })
+            this.MolliePaymentsShippingService
+                .total({orderId: this.orderId})
                 .then((response) => {
                     this.shippedAmount = response.amount;
                     this.shippedItems = response.items;
