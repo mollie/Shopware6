@@ -27,12 +27,12 @@ class MolliePaymentExtractor
         }
 
         // only transactions with a payment method
-        $collection->filter(function (OrderTransactionEntity $transaction) {
+        $collection->filter(static function (OrderTransactionEntity $transaction) {
             return ($transaction->getPaymentMethod() instanceof PaymentMethodEntity);
         });
 
         // sort all transactions chronological
-        $collection->sort(function (OrderTransactionEntity $a, OrderTransactionEntity $b) {
+        $collection->sort(static function (OrderTransactionEntity $a, OrderTransactionEntity $b) {
             return $a->getCreatedAt() > $b->getCreatedAt();
         });
 
