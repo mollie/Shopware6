@@ -35,7 +35,7 @@ class OrderServiceTest extends TestCase
             $orderRepository,
             $lineItemRepository,
             $logger,
-            new OrderLineItemValidator()
+            new OrderLineItemValidator($logger)
         );
 
     }
@@ -105,7 +105,7 @@ class OrderServiceTest extends TestCase
         ];
     }
 
-    public function createOrderLineItemEntity(int $quantity, float $unitPrice, float $totalPrice, float $taxAmount, float $taxRate, $orderTaxType = CartPrice::TAX_STATE_GROSS): OrderLineItemEntity
+    private function createOrderLineItemEntity(int $quantity, float $unitPrice, float $totalPrice, float $taxAmount, float $taxRate, $orderTaxType = CartPrice::TAX_STATE_GROSS): OrderLineItemEntity
     {
         $calculatedTax = new CalculatedTax($taxAmount, $taxRate, $totalPrice);
         $tax = new CalculatedTaxCollection();

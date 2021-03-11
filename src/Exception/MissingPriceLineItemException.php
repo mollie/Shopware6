@@ -17,7 +17,7 @@ class MissingPriceLineItemException extends ShopwareHttpException
 
     public function getErrorCode(): string
     {
-        return 'ORDER__LINE_ITEM_MISSING_PRICE_COLLECTION';
+        return 'MOLLIE_PAYMENTS__LINE_ITEM_MISSING_PRICE_COLLECTION';
     }
 
     public function getStatusCode(): int

@@ -17,7 +17,6 @@ class OrderDeliveryService
 
     public function __construct(EntityRepositoryInterface $orderDeliveryRepository)
     {
-
         $this->orderDeliveryRepository = $orderDeliveryRepository;
     }
 
@@ -27,14 +26,7 @@ class OrderDeliveryService
         $criteria->addAssociations(['order', 'order.transactions', 'order.transactions.paymentMethod']);
         $result = $this->orderDeliveryRepository->search($criteria, $context);
 
-        if ($result->count() === 0) {
-            return null;
-        }
-
-        /** @var OrderDeliveryEntity $delivery */
-        $delivery = $result->first();
-
-        return $delivery;
+        return $result->first();
     }
 
     public function updateCustomFields(OrderDeliveryEntity $delivery, array $values, Context $context): void

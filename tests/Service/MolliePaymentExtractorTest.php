@@ -11,6 +11,7 @@ use Shopware\Core\Framework\Uuid\Uuid;
 
 class MolliePaymentExtractorTest extends TestCase
 {
+    public const MOLLIE_PAYMENT_METHOD = MolliePaymentExtractor::MOLLIE_PAYMENT_HANDLER_NAMESPACE . '\FooMethod';
 
     public function testExtractWithNullCollection(): void
     {
@@ -20,13 +21,13 @@ class MolliePaymentExtractorTest extends TestCase
 
     public function testExtractWithEmptyCollection(): void
     {
-        $extractor = new MolliePaymentExtractor;
+        $extractor = new MolliePaymentExtractor();
         self::assertNull($extractor->extractLast(new OrderTransactionCollection([])));
     }
 
     public function testExtractWithSingleMollieTransactionCollection(): void
     {
-        $transaction = $this->createTransaction(new \DateTime(), 'Kiener\MolliePayments\Handler\Method\FooMethod');
+        $transaction = $this->createTransaction(new \DateTime(), self::MOLLIE_PAYMENT_METHOD);
         $collection = new OrderTransactionCollection([$transaction]);
         $extractor = new MolliePaymentExtractor();
         self::assertSame($transaction, $extractor->extractLast($collection));
@@ -37,26 +38,17 @@ class MolliePaymentExtractorTest extends TestCase
         $transaction = $this->createTransaction(new \DateTime(), 'FooMethod');
         $collection = new OrderTransactionCollection([$transaction]);
         $extractor = new MolliePaymentExtractor();
-        self::assertSame(null, $extractor->extractLast($collection));
-    }
-
-    public function testExtractWithSingleTransactionCollection(): void
-    {
-        $transaction = $this->createTransaction(new \DateTime(), 'Kiener\MolliePayments\Handler\Method\FooMethod');
-        $collection = new OrderTransactionCollection([$transaction]);
-        $extractor = new MolliePaymentExtractor();
-        self::assertSame($transaction, $extractor->extractLast($collection));
+        self::assertNull($extractor->extractLast($collection));
     }
 
     public function testExtractWithMultiTransactionCollection(): void
     {
-        $mollieMethod = 'Kiener\MolliePayments\Handler\Method\FooMethod';
         $twoDaysAgo = (new \DateTime())->modify('-2 days');
         $yesterday = (new \DateTime())->modify('-1 day');
         $threeDaysAgo = (new \DateTime())->modify('-3 days');
         $transactionThree = $this->createTransaction($threeDaysAgo, 'foo');
-        $transactionTwo = $this->createTransaction($twoDaysAgo, $mollieMethod);
-        $transactionOne = $this->createTransaction($yesterday, $mollieMethod);
+        $transactionTwo = $this->createTransaction($twoDaysAgo, self::MOLLIE_PAYMENT_METHOD);
+        $transactionOne = $this->createTransaction($yesterday, self::MOLLIE_PAYMENT_METHOD);
         $collection = new OrderTransactionCollection([$transactionTwo, $transactionOne, $transactionThree]);
         $extractor = new MolliePaymentExtractor();
 
@@ -65,16 +57,15 @@ class MolliePaymentExtractorTest extends TestCase
 
     public function testExtractWithMultiLastNotMollieTransactionCollection(): void
     {
-        $mollieMethod = 'Kiener\MolliePayments\Handler\Method\FooMethod';
         $twoDaysAgo = (new \DateTime())->modify('-2 days');
         $yesterday = (new \DateTime())->modify('-1 day');
         $threeDaysAgo = (new \DateTime())->modify('-3 days');
-        $transactionThree = $this->createTransaction($threeDaysAgo, $mollieMethod);
-        $transactionTwo = $this->createTransaction($twoDaysAgo, $mollieMethod);
+        $transactionThree = $this->createTransaction($threeDaysAgo, self::MOLLIE_PAYMENT_METHOD);
+        $transactionTwo = $this->createTransaction($twoDaysAgo, self::MOLLIE_PAYMENT_METHOD);
         $transactionOne = $this->createTransaction($yesterday, 'foo');
         $collection = new OrderTransactionCollection([$transactionTwo, $transactionOne, $transactionThree]);
         $extractor = new MolliePaymentExtractor();
-        self::assertSame(null, $extractor->extractLast($collection));
+        self::assertNull($extractor->extractLast($collection));
     }
 
     private function createTransaction(\DateTime $createdAt, ?string $paymentMethodName): OrderTransactionEntity

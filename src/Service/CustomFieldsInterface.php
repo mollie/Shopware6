@@ -9,7 +9,6 @@ namespace Kiener\MolliePayments\Service;
  */
 interface CustomFieldsInterface
 {
-
     public const MOLLIE_KEY = 'mollie_payments';
 
     public const ORDER_KEY = 'order_id';

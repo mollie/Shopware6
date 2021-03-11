@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Service\MollieApi;
 
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Mollie\Api\Exceptions\ApiException;
+use Mollie\Api\Resources\OrderLine;
 use Psr\Log\LoggerInterface;
 
 class Order
@@ -21,7 +22,6 @@ class Order
 
     public function __construct(MollieApiFactory $clientFactory, LoggerInterface $logger)
     {
-
         $this->clientFactory = $clientFactory;
         $this->logger = $logger;
     }
@@ -38,26 +38,19 @@ class Order
                     'API error occured when fetching mollie order %s with message %s',
                     $mollieOrderId,
                     $e->getMessage()
-                ),
-                $e->getTrace()
+                )
             );
 
-            return false;
+            throw $e;
         }
 
-        $shouldCreateShipment = false;
+        /** @var OrderLine $orderLine */
+        foreach ($mollieOrder->lines() as $orderLine) {
+            if ($orderLine->shippableQuantity > 0) {
+                $mollieOrder->shipAll();
 
-        foreach ($mollieOrder->lines as $line) {
-            if ($line->shippableQuantity > 0) {
-                $shouldCreateShipment = true;
-                break;
+                return true;
             }
-        }
-
-        if ($shouldCreateShipment) {
-            $mollieOrder->shipAll();
-
-            return true;
         }
 
         return false;

@@ -8,10 +8,12 @@ use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 
 class MolliePaymentExtractor
 {
+    public const MOLLIE_PAYMENT_HANDLER_NAMESPACE = 'Kiener\MolliePayments\Handler\Method';
+
     /**
      * method extracts last created transaction if it is a mollie payment transaction.
      *
-     * @param OrderTransactionCollection $collection
+     * @param OrderTransactionCollection|null $collection
      * @return OrderTransactionEntity|null
      */
     public function extractLast(?OrderTransactionCollection $collection): ?OrderTransactionEntity
@@ -25,38 +27,31 @@ class MolliePaymentExtractor
         }
 
         // only transactions with a payment method
-        $collection->filter(function (OrderTransactionEntity $transaction) {
+        $collection->filter(static function (OrderTransactionEntity $transaction) {
             return ($transaction->getPaymentMethod() instanceof PaymentMethodEntity);
         });
 
         // sort all transactions chronological
-        $collection->sort(function (OrderTransactionEntity $a, OrderTransactionEntity $b) {
+        $collection->sort(static function (OrderTransactionEntity $a, OrderTransactionEntity $b) {
             return $a->getCreatedAt() > $b->getCreatedAt();
         });
 
         $lastTransaction = $collection->last();
 
-        if ($this->isMolliePayment($lastTransaction)) {
+        if ($lastTransaction instanceof OrderTransactionEntity && $this->isMolliePayment($lastTransaction)) {
             return $lastTransaction;
         }
 
         return null;
     }
 
-    private function isMolliePayment(?OrderTransactionEntity $transaction): bool
+    private function isMolliePayment(OrderTransactionEntity $transaction): bool
     {
-        if (!$transaction instanceof OrderTransactionEntity) {
-            return false;
-        }
+        $pattern = sprintf(
+            '/^%s/',
+            preg_quote(self::MOLLIE_PAYMENT_HANDLER_NAMESPACE)
+        );
 
-        $molliePaymentsNamespace = 'Kiener\MolliePayments\Handler\Method';
-
-        $handlerName = substr($transaction->getPaymentMethod()->getHandlerIdentifier(), 0, strlen($molliePaymentsNamespace));
-
-        if ($handlerName === $molliePaymentsNamespace) {
-            return true;
-        }
-
-        return false;
+        return preg_match($pattern, $transaction->getPaymentMethod()->getHandlerIdentifier()) === 1;
     }
 }
