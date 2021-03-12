@@ -47,7 +47,7 @@ class ApiClientConfigurator
             $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannelId());
 
             /** @var string $apiKey */
-            $apiKey = $settings->isTestMode() === false ? $settings->getLiveApiKey() : $settings->getTestApiKey();
+            $apiKey = $settings->isTestMode() ? $settings->getTestApiKey() : $settings->getLiveApiKey();
 
             // Log the used API keys
             if ($settings->isDebugMode()) {
