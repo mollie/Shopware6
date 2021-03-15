@@ -5,15 +5,9 @@ const {Component} = Shopware;
 Component.override('sw-order-detail-base', {
     template,
 
-    props: {
-        orderId: {
-            type: String,
-            required: true
-        },
-    },
-
     data() {
         return {
+            refundableAmount: 0.0,
             refundedAmount: 0.0,
             shippedAmount: 0,
             shippedItems: 0,
@@ -30,6 +24,7 @@ Component.override('sw-order-detail-base', {
             this.MolliePaymentsRefundService
                 .total({orderId: this.orderId})
                 .then((response) => {
+                    this.refundableAmount = response.refundable;
                     this.refundedAmount = response.refunded;
                 });
 

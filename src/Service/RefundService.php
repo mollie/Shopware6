@@ -3,6 +3,12 @@
 namespace Kiener\MolliePayments\Service;
 
 use Kiener\MolliePayments\Factory\MollieApiFactory;
+use Mollie\Api\Exceptions\ApiException;
+use Mollie\Api\Exceptions\IncompatiblePlatform;
+use Mollie\Api\MollieApiClient;
+use Mollie\Api\Resources\Payment;
+use Mollie\Api\Resources\Refund;
+use Mollie\Api\Types\PaymentStatus;
 use Shopware\Core\Checkout\Order\OrderEntity;
 
 class RefundService
@@ -16,40 +22,117 @@ class RefundService
     /** @var OrderService */
     private $orderService;
 
+    /** @var SettingsService */
+    private $settingsService;
+
     /**
      * CustomFieldService constructor.
      *
      * @param OrderService $orderService
      */
     public function __construct(
-        OrderService $orderService
+        MollieApiFactory $apiFactory,
+        OrderService $orderService,
+        SettingsService $settingsService
     )
     {
+        $this->apiFactory = $apiFactory;
         $this->orderService = $orderService;
+        $this->settingsService = $settingsService;
     }
 
-    public function getRefundedAmount(OrderEntity $order): float
+    /**
+     * @param OrderEntity $order
+     * @param float $amount
+     * @return bool
+     * @throws ApiException
+     */
+    public function refund(OrderEntity $order, float $amount): bool
     {
+        $payment = $this->getPaymentForOrder($order);
 
-        $customFields = $order->getCustomFields();
+        $refund = $payment->refund([
+            'amount' => [
+                'value' => number_format($amount, 2, '.', ''),
+                'currency' => $order->getCurrency()->getIsoCode()
+            ],
+            'description' => "Refunded through Shopware administration. Order number {$order->getOrderNumber()}"
+        ]);
 
-        if (is_null($customFields)) {
-            return 0.0;
-        }
-
-        if (array_key_exists(CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS, $customFields)) {
-            $refundedAmount = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CF_REFUNDED_AMOUNT]
-                ?? 0.0;
-        } else {
-            $refundedAmount = $this->getRefundedAmountFromLineitems($order);
-        }
-
-        return $refundedAmount;
+        return $refund instanceof Refund;
     }
 
+    /**
+     * @param OrderEntity $order
+     * @return float
+     */
     public function getRefundableAmount(OrderEntity $order): float
     {
-        return $order->getAmountTotal() - $this->getRefundedAmount($order);
+        $payment = $this->getPaymentForOrder($order);
+
+        if (is_null($payment)) {
+            return 0;
+        }
+
+        return $payment->getAmountRemaining();
+    }
+
+    /**
+     * @param OrderEntity $order
+     * @return float
+     */
+    public function getRefundedAmount(OrderEntity $order): float
+    {
+        $payment = $this->getPaymentForOrder($order);
+
+        if (is_null($payment)) {
+            return 0;
+        }
+
+        return $payment->getAmountRefunded();
+    }
+
+    /**
+     * @param OrderEntity $order
+     * @return Payment
+     */
+    private function getPaymentForOrder(OrderEntity $order): ?Payment
+    {
+        $apiClient = $this->getApiClientForOrder($order);
+
+        if (is_null($apiClient)) {
+            return null;
+        }
+
+        try {
+            $mollieOrderId = $order->getCustomFields()[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS]['order_id'];
+        } catch (\Throwable $e) {
+            $mollieOrderId = null;
+        }
+
+        if (is_null($mollieOrderId)) {
+            return null;
+        }
+
+        try {
+            $mollieOrder = $apiClient->orders->get($mollieOrderId, ["embed" => "payments"]);
+        } catch (ApiException $e) {
+            return null;
+        }
+
+        if (is_null($mollieOrder)) {
+            return null;
+        }
+
+        $paidPayments = array_filter($mollieOrder->payments()->getArrayCopy(), function ($payment) {
+            return $payment->status === PaymentStatus::STATUS_PAID;
+        });
+
+        if (count($paidPayments) === 0) {
+            return null;
+        }
+
+        return $paidPayments[0];
     }
 
     /**
@@ -57,7 +140,8 @@ class RefundService
      * @param OrderEntity $order
      * @return float
      */
-    private function getRefundedAmountFromLineitems(OrderEntity $order): float {
+    private function getRefundedAmountFromLineItems(OrderEntity $order): float
+    {
         $amount = 0.0;
 
         foreach ($order->getLineItems() as $lineItem) {
@@ -70,5 +154,18 @@ class RefundService
         }
 
         return $amount;
+    }
+
+    /**
+     * @param OrderEntity $order
+     * @return MollieApiClient
+     */
+    private function getApiClientForOrder(OrderEntity $order): ?MollieApiClient
+    {
+        try {
+            return $this->apiFactory->createClient($order->getSalesChannelId());
+        } catch (IncompatiblePlatform $e) {
+            return null;
+        }
     }
 }

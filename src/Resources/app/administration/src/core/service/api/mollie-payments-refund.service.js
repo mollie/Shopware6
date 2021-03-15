@@ -5,15 +5,13 @@ class MolliePaymentsRefundService extends ApiService {
         super(httpClient, loginService, apiEndpoint);
     }
 
-    refund(data = {itemId: null, versionId: null, quantity: null, createCredit: null}) {
-        const headers = this.getBasicHeaders();
-
+    __post(endpoint = '', data = {}, headers = {}) {
         return this.httpClient
             .post(
-                `_action/${this.getApiBasePath()}/refund`,
+                `_action/${this.getApiBasePath()}/refund${endpoint}`,
                 JSON.stringify(data),
                 {
-                    headers: headers
+                    headers: this.getBasicHeaders(headers)
                 }
             )
             .then((response) => {
@@ -21,20 +19,12 @@ class MolliePaymentsRefundService extends ApiService {
             });
     }
 
-    total(data = {orderId: null}) {
-        const headers = this.getBasicHeaders();
+    refund(data = {orderId: null, amount: null}) {
+        return this.__post('', data);
+    }
 
-        return this.httpClient
-            .post(
-                `_action/${this.getApiBasePath()}/refund/total`,
-                JSON.stringify(data),
-                {
-                    headers: headers
-                }
-            )
-            .then((response) => {
-                return ApiService.handleResponse(response);
-            });
+    total(data = {orderId: null}) {
+        return this.__post('/total', data);
     }
 }
 

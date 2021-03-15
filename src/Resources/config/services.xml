@@ -88,7 +88,9 @@
         </service>
 
         <service id="Kiener\MolliePayments\Service\RefundService" class="Kiener\MolliePayments\Service\RefundService">
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\PaymentMethodService" class="Kiener\MolliePayments\Service\PaymentMethodService" public="true">

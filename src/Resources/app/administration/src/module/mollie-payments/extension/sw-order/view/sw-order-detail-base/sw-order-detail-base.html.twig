@@ -3,6 +3,8 @@
                               :context="versionContext"
                               :editable="isEditing"
                               ref="sw-order-line-item-grid"
+                              :refundableAmount="refundableAmount"
+                              :refundedAmount="refundedAmount"
                               @refund-success="saveAndReload"
                               @item-delete="saveAndRecalculate"
                               @item-edit="recalculateAndReload"

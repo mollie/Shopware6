@@ -1,27 +1,53 @@
 {
-  "mollie-payments": {
-    "general": {
-      "mainMenuItemGeneral": "Mollie Payments Zahlungen",
-      "descriptionTextModule": "Mollie Payments Zahlungen",
-      "refundThroughMollie": "Rückerstattung über Mollie",
-      "shipThroughMollie": "Versand bei Mollie melden"
+    "mollie-payments": {
+        "general": {
+            "mainMenuItemGeneral": "Mollie Payments Zahlungen",
+            "descriptionTextModule": "Mollie Payments Zahlungen",
+            "refundThroughMollie": "Rückerstattung über Mollie",
+            "shipThroughMollie": "Versand bei Mollie melden"
+        },
+        "modals": {
+            "refund": {
+                "title": "Bestellposition über Mollie rückerstatten",
+                "content": "Menge dieser Bestellposition ({refundableQuantity} von {quantity} für Rückerstattung möglich) für die Rückerstattung an den Kunden.",
+                "success": "Es wurde eine Rückerstattung bei Mollie erstellt. Es kann bis zu 2 Stunden dauern, bis die Rückerstattung abgeschlossen ist. Bis dahin können Sie die Rückerstattung in Ihrem Mollie Dashboard stornieren.",
+                "error": "Beim Erstellen einer Rückerstattung ist etwas schief gelaufen.",
+                "confirmButton": "Rückerstatten",
+                "cancelButton": "Abbrechen"
+            },
+            "shipping": {
+                "title": "Versand der Bestellposition an Mollie melden",
+                "content": "Menge dieser Bestellposition ({shippableQuantity} von {quantity} für Versand noch möglich), die an den Kunden versandt wurden.",
+                "quantityPlaceholder": "Menge der versendeten Ware...",
+                "confirmButton": "Versandmeldung bei Mollie",
+                "cancelButton": "Abbrechen"
+            }
+        }
     },
-    "modals": {
-      "refund": {
-        "title": "Bestellposition über Mollie rückerstatten",
-        "content": "Menge dieser Bestellposition ({refundableQuantity} von {quantity} für Rückerstattung möglich) für die Rückerstattung an den Kunden.",
-        "quantityPlaceholder": "Menge für Rückerstattung...",
-        "createCreditText": "Create a credit item for this refund.",
-        "confirmButton": "Rückerstatten",
-        "cancelButton": "Abbrechen"
-      },
-      "shipping": {
-        "title": "Versand der Bestellposition an Mollie melden",
-        "content": "Menge dieser Bestellposition ({shippableQuantity} von {quantity} für Versand noch möglich), die an den Kunden versandt wurden.",
-        "quantityPlaceholder": "Menge der versendeten Ware...",
-        "confirmButton": "Versandmeldung bei Mollie",
-        "cancelButton": "Abbrechen"
-      }
+    "sw-order": {
+        "detailExtended": {
+            "columnRefunded": "Rückerstattet",
+            "columnShipped": "Versandt",
+            "labelMollieOrderId": "Mollie Bestell ID",
+            "totalRefunds": "Rückerstattete Menge",
+            "totalRefundable": "Rückerstattbar",
+            "totalRefundableHelpText": "Sie können mit Mollie bis zu 25 € auf den Totalbetrag zurückzahlen.",
+            "totalShipments": "Versandte Menge ({quantity} Stück)"
+        }
+    },
+    "sw-payment": {
+        "testButton": "Prüfung",
+        "testApiKeys": {
+            "title": "Mollie Payments",
+            "apiKey": "API Schlüssel",
+            "isValid": "ist gültig",
+            "isInvalid": "ist gültig"
+        }
+    },
+    "sw-customer": {
+        "extendedInfo": {
+            "labelPreferredIdealIssuer": "Bevorzugter iDeal Aussteller"
+        }
     }
   },
   "sw-order": {

@@ -1,14 +1,29 @@
 import template from './sw-order-line-items-grid.html.twig';
 
-const { Component, Service } = Shopware;
+const {Component, Mixin} = Shopware;
 
 Component.override('sw-order-line-items-grid', {
     template,
+
+    mixins: [
+        Mixin.getByName('notification')
+    ],
 
     inject: [
         'MolliePaymentsRefundService',
         'MolliePaymentsShippingService',
     ],
+
+    props: {
+        refundableAmount: {
+            type: Number,
+            required: true
+        },
+        refundedAmount: {
+            type: Number,
+            required: true
+        },
+    },
 
     data() {
         return {
@@ -42,16 +57,12 @@ Component.override('sw-order-line-items-grid', {
         },
 
         isRefundable() {
-            try {
-                return (this.order.amountTotal - this.order.customFields.mollie_payments.refundedAmount) > 0 || true;
-            } catch(e) {
-                return true;
-            }
+            return this.refundableAmount > 0;
         },
     },
 
     methods: {
-        onRefund() {
+        onOpenRefundModal() {
             this.showRefundModal = true;
         },
 
@@ -60,21 +71,31 @@ Component.override('sw-order-line-items-grid', {
         },
 
         onConfirmRefund() {
-            this.showRefundModal = false;
-
-            console.log(this.order);
-
-                // this.MolliePaymentsRefundService.refund({
-                //     itemId: item.id,
-                //     versionId: item.versionId,
-                //     quantity: this.quantityToRefund,
-                //     createCredit: this.createCredit
-                // })
-
-            // this.$emit('refund-success');
-
-
-
+            this.MolliePaymentsRefundService
+                .refund({
+                    orderId: this.order.id,
+                    amount: this.refundAmount,
+                })
+                .then((response) => {
+                    if (response.success) {
+                        this.createNotificationSuccess({
+                            message: this.$tc('mollie-payments.modals.refund.success')
+                        });
+                        this.showRefundModal = false;
+                    } else {
+                        this.createNotificationError({
+                            message: this.$tc('mollie-payments.modals.refund.error')
+                        });
+                    }
+                })
+                .then(() => {
+                    this.$emit('refund-success');
+                })
+                .catch((response) => {
+                    this.createNotificationError({
+                        message: response.message
+                    });
+                });
         },
 
         onShipItem(item) {
