@@ -1,0 +1,119 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+    branches:
+      - master
+
+jobs:
+
+  syntax_checks:
+    name: Syntax Checks | PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: [ '7.2', '7.3', '7.4', '8.0' ]
+    steps:
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+
+      - name: PHP Syntax Checks
+        run: find . -name '*.php' -not -path "./vendor/*" -not -path "./tests/*" | xargs -n 1 -P4 php -l
+
+  # ------------------------------------------------------------------------------------------------------------------------
+
+  unit_tests:
+    name: Unit Tests | PHP ${{ matrix.php }}
+    needs: syntax_checks
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: [ '7.4' ]
+    steps:
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+
+      - name: Install Dependencies
+        run: make dev -B
+
+      - name: Run PHPUnit
+        run: make test -B
+
+  # ------------------------------------------------------------------------------------------------------------------------
+
+  analyzers:
+    name: Static Analyzers
+    needs: unit_tests
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+
+      - name: Install Dependencies
+        run: make dev -B
+
+      - name: Run PHPStan
+        run: make stan -B
+
+  # ------------------------------------------------------------------------------------------------------------------------
+
+  integration:
+    name: Integration Tests | Shopware ${{ matrix.shopware }}
+    needs: analyzers
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        shopware: [ '6.3.5.2', '6.3.0', '6.2.0', '6.1.0' ]
+    steps:
+
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+
+      - name: Install PROD Dependencies
+        run: make install -B
+
+      - name: Start Docker
+        run: docker run --rm --env PHP_VERSION=7.4 -p 80:80 --name shop -d dockware/play:${{ matrix.shopware }}
+
+      - name: Upload into Docker
+        run: docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MollieShopware
+
+      - name: Wait for Docker Container
+        uses: jakejarvis/wait-action@master
+        with:
+          time: '30s'
+
+      - name: Dockware Output
+        run: docker logs shop
+
+      - name: Install Plugin
+        run: |
+          docker exec shop bash -c "php bin/console plugin:refresh"
+          docker exec shop bash -c "php bin/console plugin:install MolliePayments --activate"

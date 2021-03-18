@@ -1,0 +1,11 @@
+parameters:
+    level: 1
+    paths:
+        - ./src
+    excludes_analyse:
+    # for now we exclude most of the stuff
+    # the current task is to add phpstan, and not fix everything
+        - ./src/Handler/*
+        - ./src/Storefront/*
+        - ./src/Subscriber/*
+
