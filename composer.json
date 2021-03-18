@@ -57,6 +57,7 @@
     "shopware/core": "*",
     "shopware/administration": "*",
     "shopware/storefront": "*",
-    "phpunit/phpunit": "^9.5"
+    "phpunit/phpunit": "^9.5",
+    "phpstan/phpstan": "^0.12.81"
   }
 }
