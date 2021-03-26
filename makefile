@@ -25,7 +25,7 @@ clean: ## Cleans all dependencies
 # ------------------------------------------------------------------------------------------------------------
 
 test: ## Starts all Tests
-	php vendor/bin/phpunit --configuration=phpunit.xml
+	@XDEBUG_MODE=coverage php vendor/bin/phpunit --configuration=phpunit.xml --coverage-html ../../../public/.reports/mollie/coverage
 
 stan: ## Starts the PHPStan Analyser
 	@php vendor/bin/phpstan analyse -c phpstan.neon
