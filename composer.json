@@ -58,6 +58,8 @@
     "shopware/administration": "*",
     "shopware/storefront": "*",
     "phpunit/phpunit": "^9.5",
-    "phpstan/phpstan": "^0.12.81"
+    "phpstan/phpstan": "^0.12.81",
+    "friendsofphp/php-cs-fixer": "^2.18",
+    "nunomaduro/phpinsights": "^1.14"
   }
 }
