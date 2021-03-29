@@ -81,6 +81,8 @@ class RefundController extends StorefrontController
      * @RouteScope(scopes={"api"})
      * @Route("/api/v{version}/_action/mollie/refund",
      *         defaults={"auth_enabled"=true}, name="api.action.mollie.refund", methods={"POST"})
+     * @Route("/api/_action/mollie/refund",
+     *         defaults={"auth_enabled"=true}, name="api.action.mollie.refund", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -122,6 +124,8 @@ class RefundController extends StorefrontController
     /**
      * @RouteScope(scopes={"api"})
      * @Route("/api/v{version}/_action/mollie/refund/total",
+     *         defaults={"auth_enabled"=true}, name="api.action.mollie.refund.total", methods={"POST"})
+     * @Route("/api/_action/mollie/refund/total",
      *         defaults={"auth_enabled"=true}, name="api.action.mollie.refund.total", methods={"POST"})
      *
      * @param RequestDataBag $data
