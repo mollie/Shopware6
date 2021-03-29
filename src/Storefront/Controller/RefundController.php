@@ -83,9 +83,10 @@ class RefundController extends StorefrontController
      *         defaults={"auth_enabled"=true}, name="api.action.mollie.refund", methods={"POST"})
      *
      * @param RequestDataBag $data
+     * @param Context $context
      * @return JsonResponse
      */
-    public function refund(RequestDataBag $data): JsonResponse
+    public function refund(RequestDataBag $data, Context $context): JsonResponse
     {
         $orderId = $data->getAlnum('orderId');
 
@@ -95,7 +96,7 @@ class RefundController extends StorefrontController
             ], 400);
         }
 
-        $order = $this->orderService->getOrder($orderId, Context::createDefaultContext());
+        $order = $this->orderService->getOrder($orderId, $context);
 
         if (is_null($order)) {
             return $this->json([
@@ -123,11 +124,11 @@ class RefundController extends StorefrontController
      * @Route("/api/v{version}/_action/mollie/refund/total",
      *         defaults={"auth_enabled"=true}, name="api.action.mollie.refund.total", methods={"POST"})
      *
-     * @param Request $request
-     *
+     * @param RequestDataBag $data
+     * @param Context $context
      * @return JsonResponse
      */
-    public function total(RequestDataBag $data): JsonResponse
+    public function total(RequestDataBag $data, Context $context): JsonResponse
     {
         $orderId = $data->getAlnum('orderId');
 
@@ -137,7 +138,7 @@ class RefundController extends StorefrontController
             ], 400);
         }
 
-        $order = $this->orderService->getOrder($orderId, Context::createDefaultContext());
+        $order = $this->orderService->getOrder($orderId, $context);
 
         if (is_null($order)) {
             return $this->json([
