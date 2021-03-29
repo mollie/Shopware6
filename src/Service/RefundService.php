@@ -125,7 +125,7 @@ class RefundService
         }
 
         $paidPayments = array_filter($mollieOrder->payments()->getArrayCopy(), function ($payment) {
-            return $payment->status === PaymentStatus::STATUS_PAID;
+            return in_array($payment->status, [PaymentStatus::STATUS_PAID, PaymentStatus::STATUS_AUTHORIZED]);
         });
 
         if (count($paidPayments) === 0) {
