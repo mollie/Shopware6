@@ -136,27 +136,6 @@ class RefundService
     }
 
     /**
-     * function for getting the refunded amount from older orders, when order refund requests were used
-     * @param OrderEntity $order
-     * @return float
-     */
-    private function getRefundedAmountFromLineItems(OrderEntity $order): float
-    {
-        $amount = 0.0;
-
-        foreach ($order->getLineItems() as $lineItem) {
-            if (
-                !empty($lineItem->getCustomFields())
-                && isset($lineItem->getCustomFields()[self::CF_REFUNDED_QUANTITY])
-            ) {
-                $amount += ($lineItem->getUnitPrice() * (int)$lineItem->getCustomFields()[self::CF_REFUNDED_QUANTITY]);
-            }
-        }
-
-        return $amount;
-    }
-
-    /**
      * @param OrderEntity $order
      * @return MollieApiClient
      */
