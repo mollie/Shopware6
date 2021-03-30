@@ -5,7 +5,9 @@
                               ref="sw-order-line-item-grid"
                               :refundableAmount="refundableAmount"
                               :refundedAmount="refundedAmount"
+                              :refunds="refunds"
                               @refund-success="saveAndReload"
+                              @refund-cancelled="saveAndReload"
                               @item-delete="saveAndRecalculate"
                               @item-edit="recalculateAndReload"
                               @existing-item-edit="saveAndRecalculate"
@@ -18,6 +20,10 @@
     {% parent %}
     <dt v-if="refundedAmount > 0"><strong>{{ $tc('sw-order.detailExtended.totalRefunds') }}</strong></dt>
     <dd v-if="refundedAmount > 0"><strong>{{ refundedAmount | currency(order.currency.shortName) }}</strong></dd>
+
+    <dt v-if="refundAmountPending > 0"><strong>{{ $tc('sw-order.detailExtended.totalRefunds') }}</strong></dt>
+    <dd v-if="refundAmountPending > 0"><strong>{{ refundAmountPending | currency(order.currency.shortName) }}</strong></dd>
+
     <dt v-if="shippedItems > 0"><strong>{{ $tc('sw-order.detailExtended.totalShipments', 0, { quantity: shippedItems }) }}</strong></dt>
     <dd v-if="shippedItems > 0"><strong>{{ shippedAmount | currency(order.currency.shortName) }}</strong></dd>
 {% endblock %}

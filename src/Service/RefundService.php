@@ -28,7 +28,9 @@ class RefundService
     /**
      * CustomFieldService constructor.
      *
+     * @param MollieApiFactory $apiFactory
      * @param OrderService $orderService
+     * @param SettingsService $settingsService
      */
     public function __construct(
         MollieApiFactory $apiFactory,
@@ -60,6 +62,72 @@ class RefundService
         ]);
 
         return $refund instanceof Refund;
+    }
+
+    /**
+     * @param OrderEntity $order
+     * @param string $refundId
+     * @return bool
+     * @throws ApiException
+     */
+    public function cancel(OrderEntity $order, string $refundId): bool
+    {
+        $payment = $this->getPaymentForOrder($order);
+
+        if (is_null($payment)) {
+            return false;
+        }
+
+        $refund = $payment->getRefund($refundId);
+
+        if(is_null($refund)) {
+            return false;
+        }
+
+        $refund->cancel();
+
+        return true;
+    }
+
+    /**
+     * @param OrderEntity $order
+     * @return array|null
+     * @throws ApiException
+     */
+    public function getRefunds(OrderEntity $order): ?array
+    {
+        $payment = $this->getPaymentForOrder($order);
+
+        if (is_null($payment)) {
+            return null;
+        }
+
+        $refunds = $payment->refunds();
+
+        return array_map(function ($refund) {
+            /** @var Refund $refund */
+            return [
+                'id' => $refund->id,
+                'orderId' => $refund->orderId,
+                'paymentId' => $refund->paymentId,
+                'amount' => [
+                    'value' => $refund->amount->value,
+                    'currency' => $refund->amount->currency,
+                ],
+                'settlementAmount' => [
+                    'value' => $refund->settlementAmount->value,
+                    'currency' => $refund->settlementAmount->currency,
+                ],
+                'description' => $refund->description,
+                'createdAt' => $refund->createdAt,
+                'status' => $refund->status,
+                'isFailed' => $refund->isFailed(),
+                'isPending' => $refund->isPending(),
+                'isProcessing' => $refund->isProcessing(),
+                'isQueued' => $refund->isQueued(),
+                'isTransferred' => $refund->isTransferred(),
+            ];
+        }, $refunds->getArrayCopy());
     }
 
     /**

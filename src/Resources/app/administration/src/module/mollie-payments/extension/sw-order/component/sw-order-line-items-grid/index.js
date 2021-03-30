@@ -23,6 +23,10 @@ Component.override('sw-order-line-items-grid', {
             type: Number,
             required: true
         },
+        refunds: {
+            type: Array,
+            required: true
+        },
     },
 
     data() {
@@ -56,12 +60,44 @@ Component.override('sw-order-line-items-grid', {
             return columnDefinitions;
         },
 
+        getRefundListColumns() {
+            return [
+                {
+                    property: 'amount.value',
+                    label: this.$tc('sw-order.detailExtended.columnShipped'),
+                    width: '100px'
+                },
+                {
+                    property: 'status',
+                    label: this.$tc('sw-order.detailExtended.columnShipped'),
+                    width: '100px'
+                },
+
+                {
+                    property: 'createdAt',
+                    label: this.$tc('sw-order.detailExtended.columnShipped'),
+                    width: '100px'
+                },
+            ];
+        },
+
+        isMollieOrder() {
+            return (this.order.customFields !== null && 'mollie_payments' in this.order.customFields);
+        },
+
         isRefundable() {
             return this.refundableAmount > 0;
         },
     },
 
+    created() {
+        this.createdComponent();
+    },
+
     methods: {
+        createdComponent() {
+        },
+
         onOpenRefundModal() {
             this.showRefundModal = true;
         },
@@ -98,6 +134,38 @@ Component.override('sw-order-line-items-grid', {
                 });
         },
 
+        isRefundCancelable(item) {
+            return item.isPending || item.isQueued;
+        },
+
+        cancelRefund(item) {
+            this.MolliePaymentsRefundService
+                .cancel({
+                    orderId: this.order.id,
+                    refundId: item.id
+                })
+                .then((response) => {
+                    if (response.success) {
+                        this.createNotificationSuccess({
+                            message: this.$tc('mollie-payments.modals.refund.success')
+                        });
+                        this.showRefundModal = false;
+                    } else {
+                        this.createNotificationError({
+                            message: this.$tc('mollie-payments.modals.refund.error')
+                        });
+                    }
+                })
+                .then(() => {
+                    this.$emit('refund-cancelled');
+                })
+                .catch((response) => {
+                    this.createNotificationError({
+                        message: response.message
+                    });
+                });
+        },
+
         onShipItem(item) {
             this.showShippingModal = item.id;
         },
@@ -120,7 +188,6 @@ Component.override('sw-order-line-items-grid', {
 
             this.quantityToShip = 0;
         },
-
 
         isShippable(item) {
             let shippable = false;

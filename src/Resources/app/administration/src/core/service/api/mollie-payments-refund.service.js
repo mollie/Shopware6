@@ -23,6 +23,14 @@ class MolliePaymentsRefundService extends ApiService {
         return this.__post('', data);
     }
 
+    cancel(data = {orderId: null, refundId: null}) {
+        return this.__post('/cancel', data);
+    }
+
+    list(data = {orderId: null}) {
+        return this.__post('/list', data);
+    }
+
     total(data = {orderId: null}) {
         return this.__post('/total', data);
     }
