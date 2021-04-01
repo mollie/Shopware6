@@ -87,7 +87,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 7.2
+          php-version: 7.4
 
       - name: Install Dependencies
         run: make dev -B
@@ -107,7 +107,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 7.2
+          php-version: 7.4
 
       - name: Install Dependencies
         run: make dev -B
@@ -138,18 +138,13 @@ jobs:
         run: make install -B
 
       - name: Start Docker
-        run: docker run --rm --env PHP_VERSION=7.4 -p 80:80 --name shop -d dockware/play:${{ matrix.shopware }}
+        run: |
+          docker run --rm -p 80:80 --name shop -d dockware/play:${{ matrix.shopware }}
+          sleep 30
+          docker logs shop
 
       - name: Upload into Docker
         run: docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MollieShopware
-
-      - name: Wait for Docker Container
-        uses: jakejarvis/wait-action@master
-        with:
-          time: '30s'
-
-      - name: Dockware Output
-        run: docker logs shop
 
       - name: Install Plugin
         run: |
