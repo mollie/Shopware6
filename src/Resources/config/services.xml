@@ -6,6 +6,7 @@
 
     <imports>
         <import resource="services/api.xml"/>
+        <import resource="services/controller.xml"/>
         <import resource="services/facades.xml"/>
         <import resource="services/services.xml"/>
         <import resource="services/snippets.xml"/>
@@ -27,7 +28,7 @@
         <!-- Helpers -->
         <service id="Kiener\MolliePayments\Helper\DeliveryStateHelper" class="Kiener\MolliePayments\Helper\DeliveryStateHelper">
             <argument type="service" id="Kiener\MolliePayments\Service\DeliveryService"/>
-            <argument type="service" id="Shopware\Core\Framework\StateMachine\StateMachineRegistry"/>
+            <argument type="service" id="Shopware\Core\System\StateMachine\StateMachineRegistry"/>
         </service>
 
         <service id="Kiener\MolliePayments\Helper\OrderStateHelper" class="Kiener\MolliePayments\Helper\OrderStateHelper">
@@ -135,37 +136,8 @@
             </call>
         </service>
 
-        <service id="Kiener\MolliePayments\Storefront\Controller\ConfigController" public="true">
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-        </service>
-
         <service id="Kiener\MolliePayments\Storefront\Controller\IDealIssuerController" public="true">
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-        </service>
-
-        <service id="Kiener\MolliePayments\Storefront\Controller\RefundController" public="true">
-            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
-            <argument type="service" id="order_line_item.repository"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
-            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-        </service>
-
-        <service id="Kiener\MolliePayments\Storefront\Controller\ShippingController" public="true">
-            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
-            <argument type="service" id="order_line_item.repository"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
 
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
