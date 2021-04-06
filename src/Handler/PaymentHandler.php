@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Handler;
 
 use Exception;
+use Kiener\MolliePayments\Exception\PaymentUrlException;
 use Kiener\MolliePayments\Helper\ModeHelper;
 use Kiener\MolliePayments\Helper\PaymentStatusHelper;
 use Kiener\MolliePayments\Helper\ProfileHelper;
@@ -23,6 +24,7 @@ use Monolog\Logger;
 use RuntimeException;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
@@ -243,7 +245,13 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
                 Logger::ERROR
             );
 
-            throw new RuntimeException(sprintf('Could not create a Mollie Payment Url, error: %s', $e->getMessage()));
+            $transactions = $order->getTransactions();
+            $transactions->sort(function(OrderTransactionEntity $a, OrderTransactionEntity $b) {
+                return $a->getCreatedAt() <=> $b->getCreatedAt();
+            });
+            $lastTransaction = $transactions->last();
+
+            throw new PaymentUrlException($lastTransaction->getId(), sprintf('Could not create a Mollie Payment Url, error: %s', $e->getMessage()));
         }
 
         // Set the payment status to in progress
