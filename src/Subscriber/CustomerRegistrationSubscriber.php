@@ -59,8 +59,7 @@ class CustomerRegistrationSubscriber implements EventSubscriberInterface
         CustomerService $customerService,
         SettingsService $settingsService
 
-    )
-    {
+    ) {
         $this->apiClient = $apiClient;
         $this->customerService = $customerService;
         $this->settingsService = $settingsService;
@@ -74,47 +73,75 @@ class CustomerRegistrationSubscriber implements EventSubscriberInterface
     public function onCustomerRegistration(EntityWrittenEvent $entityWrittenEvent): void
     {
         $context = $entityWrittenEvent->getContext();
-        if ($context !== null) {
+
+        if ($context === null) {
+            return;
+        }
+
         $source = $context->getSource();
-            if ($source !== null) {
-                if (method_exists($source, 'getSalesChannelId')) {
-            $salesChannelId = $source->getSalesChannelId();
-                    if (!empty($salesChannelId)) {
-                    $settings = $this->settingsService->getSettings($salesChannelId);
-                        if ($settings->isTestMode() === false && $settings->createNoCustomersAtMollie() === true) {
-                            foreach ($entityWrittenEvent->getPayloads() as $payload) {
-                                $id = (isset($payload['id'])) ? $payload['id'] : null;
-                                $name = (isset($payload['firstName']) && isset($payload['lastName'])) ? $payload['firstName'] .' '. $payload['lastName']  : null;
-                                $email = (isset($payload['email'])) ? $payload['email'] : null;
-                                $guest = (isset($payload['guest'])) ? $payload['guest'] : null;
-                                if ($name !== null
-                                    && $email !== null
-                                    && $guest === false
-                                    && $id !== null) {
-                                    try {
-                                        $mollieCustomer = $this->apiClient->customers->create([
-                                            'name' => $name,
-                                            'email' => $email,
-                                        ]);
 
-                                        $customer = $this->customerService->getCustomer($id, $entityWrittenEvent->getContext());
-                                        if ($customer !== null) {
-                                            $customer->setCustomFields([
-                                                'customer_id' => $mollieCustomer->id
-                                            ]);
+        if ($source === null && !method_exists($source, 'getSalesChannelId')) {
+            return;
+        }
 
-                                            $this->customerService->saveCustomerCustomFields($customer,
-                                                $customer->getCustomFields(),
-                                            $entityWrittenEvent->getContext());
-                                        }
-                                    } catch (ApiException $e) {
+        $settings = $this->settingsService->getSettings($source->getSalesChannelId());
 
-                                    }
-                                }
-                            }
-                        }
-                    }
+        if ($settings->isTestMode() && $settings->createNoCustomersAtMollie()) {
+            return;
+        }
+
+        foreach ($entityWrittenEvent->getPayloads() as $payload) {
+            $id = null;
+            $name = null;
+            $email = null;
+            $guest = null;
+
+            if (isset($payload['id'])) {
+                $id = $payload['id'];
+            }
+
+            if (isset($payload['firstName'], $payload['lastName'])) {
+                $name = \sprintf('%s %s', $payload['firstName'], $payload['lastName']);
+            }
+
+            if (isset($payload['email'])) {
+                $email = $payload['email'];
+            }
+
+            if (isset($payload['guest'])) {
+                $guest = $payload['guest'];
+            }
+
+            if ($name === null && $email === null && $id === null && !$guest) {
+                return;
+            }
+
+            try {
+                $mollieCustomer = $this->apiClient->customers->create(
+                    [
+                        'name'  => $name,
+                        'email' => $email,
+                    ]
+                );
+
+                $customer = $this->customerService->getCustomer($id, $entityWrittenEvent->getContext());
+
+                if ($customer === null) {
+                    return;
                 }
+
+                $customer->setCustomFields(
+                    [
+                        'customer_id' => $mollieCustomer->id
+                    ]
+                );
+
+                $this->customerService->saveCustomerCustomFields(
+                    $customer,
+                    $customer->getCustomFields(),
+                    $entityWrittenEvent->getContext()
+                );
+            } catch (ApiException $e) {
             }
         }
     }
