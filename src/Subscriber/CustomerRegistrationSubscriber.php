@@ -126,7 +126,13 @@ class CustomerRegistrationSubscriber implements EventSubscriberInterface
 
                 $customer = $this->customerService->getCustomer($id, $entityWrittenEvent->getContext());
 
-                if ($customer === null) {
+                if (
+                    (
+                        \array_key_exists('customFields', $payload) &&
+                        \array_key_exists('customer_id', $payload['customFields'])
+                    ) ||
+                    $customer === null
+                ) {
                     return;
                 }
 
