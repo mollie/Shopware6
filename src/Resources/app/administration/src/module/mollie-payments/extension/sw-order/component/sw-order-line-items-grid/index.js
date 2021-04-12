@@ -86,7 +86,7 @@ Component.override('sw-order-line-items-grid', {
         },
 
         isRefundable() {
-            return this.refundableAmount > 0;
+            return this.remainingAmount > 0;
         },
     },
 
