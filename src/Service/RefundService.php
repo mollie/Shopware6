@@ -6,6 +6,7 @@ use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Exceptions\IncompatiblePlatform;
 use Mollie\Api\MollieApiClient;
+use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\Refund;
 use Mollie\Api\Types\PaymentStatus;
@@ -13,17 +14,8 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 
 class RefundService
 {
-    public const CF_REFUNDED_AMOUNT = 'refundedAmount';
-    public const CF_REFUNDED_QUANTITY = 'refundedQuantity';
-
     /** @var MollieApiFactory */
     private $apiFactory;
-
-    /** @var OrderService */
-    private $orderService;
-
-    /** @var SettingsService */
-    private $settingsService;
 
     /**
      * CustomFieldService constructor.
@@ -33,14 +25,10 @@ class RefundService
      * @param SettingsService $settingsService
      */
     public function __construct(
-        MollieApiFactory $apiFactory,
-        OrderService $orderService,
-        SettingsService $settingsService
+        MollieApiFactory $apiFactory
     )
     {
         $this->apiFactory = $apiFactory;
-        $this->orderService = $orderService;
-        $this->settingsService = $settingsService;
     }
 
     /**
@@ -74,13 +62,15 @@ class RefundService
     {
         $payment = $this->getPaymentForOrder($order);
 
-        if (is_null($payment)) {
+        // We don't have a valid Mollie payment for this order, so there is no refund to cancel
+        if (!($payment instanceof Payment)) {
             return false;
         }
 
         $refund = $payment->getRefund($refundId);
 
-        if(is_null($refund)) {
+        // This payment does not have a refund with $refundId, so we cannot cancel it.
+        if (!($refund instanceof Refund)) {
             return false;
         }
 
@@ -91,19 +81,22 @@ class RefundService
 
     /**
      * @param OrderEntity $order
-     * @return array|null
+     * @return array
      * @throws ApiException
      */
-    public function getRefunds(OrderEntity $order): ?array
+    public function getRefunds(OrderEntity $order): array
     {
         $payment = $this->getPaymentForOrder($order);
 
-        if (is_null($payment)) {
-            return null;
+        // We don't have a valid Mollie payment for this order, so there cannot be any refunds yet.
+        if (!($payment instanceof Payment)) {
+            return [];
         }
 
         $refunds = $payment->refunds();
 
+        // Apparently Refund::amount and Refund::settlementAmount don't json encode very well, resulting in an empty
+        // array, so we build an array manually.
         return array_map(function ($refund) {
             /** @var Refund $refund */
             return [
@@ -134,11 +127,12 @@ class RefundService
      * @param OrderEntity $order
      * @return float
      */
-    public function getRefundableAmount(OrderEntity $order): float
+    public function getRemainingAmount(OrderEntity $order): float
     {
         $payment = $this->getPaymentForOrder($order);
 
-        if (is_null($payment)) {
+        // We don't have a valid Mollie payment for this order, so nothing can be refunded.
+        if (!($payment instanceof Payment)) {
             return 0;
         }
 
@@ -153,7 +147,8 @@ class RefundService
     {
         $payment = $this->getPaymentForOrder($order);
 
-        if (is_null($payment)) {
+        // We don't have a valid Mollie payment for this order, so nothing can be refunded.
+        if (!($payment instanceof Payment)) {
             return 0;
         }
 
@@ -168,13 +163,14 @@ class RefundService
     {
         $apiClient = $this->getApiClientForOrder($order);
 
-        if (is_null($apiClient)) {
+        if (!($apiClient instanceof MollieApiClient)) {
             return null;
         }
 
         try {
             $mollieOrderId = $order->getCustomFields()[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS]['order_id'];
         } catch (\Throwable $e) {
+            // No Mollie order id in custom fields, so it's not an order paid with Mollie.
             $mollieOrderId = null;
         }
 
@@ -188,10 +184,11 @@ class RefundService
             return null;
         }
 
-        if (is_null($mollieOrder)) {
+        if (!($mollieOrder instanceof Order)) {
             return null;
         }
 
+        // Filter for paid/authorized payments only.
         $paidPayments = array_filter($mollieOrder->payments()->getArrayCopy(), function ($payment) {
             return in_array($payment->status, [PaymentStatus::STATUS_PAID, PaymentStatus::STATUS_AUTHORIZED]);
         });
@@ -200,6 +197,7 @@ class RefundService
             return null;
         }
 
+        // Return first found paid/authorized payment.
         return $paidPayments[0];
     }
 

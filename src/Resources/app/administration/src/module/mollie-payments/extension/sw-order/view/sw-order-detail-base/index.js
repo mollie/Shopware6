@@ -11,7 +11,7 @@ Component.override('sw-order-detail-base', {
 
     data() {
         return {
-            refundableAmount: 0.0,
+            remainingAmount: 0.0,
             refundedAmount: 0.0,
             refundAmountPending: 0.0,
             refunds: [],
@@ -37,7 +37,7 @@ Component.override('sw-order-detail-base', {
                 this.MolliePaymentsRefundService
                     .total({orderId: this.order.id})
                     .then((response) => {
-                        this.refundableAmount = response.refundable;
+                        this.remainingAmount = response.remaining;
                         this.refundedAmount = response.refunded;
                     })
                     .catch((response) => {

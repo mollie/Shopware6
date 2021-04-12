@@ -15,7 +15,7 @@ Component.override('sw-order-line-items-grid', {
     ],
 
     props: {
-        refundableAmount: {
+        remainingAmount: {
             type: Number,
             required: true
         },

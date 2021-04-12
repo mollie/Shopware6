@@ -23,17 +23,11 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class RefundController extends StorefrontController
 {
-    private const RESPONSE_KEY_REFUNDABLE = 'refundable';
+    private const RESPONSE_KEY_REMAINING = 'remaining';
     private const RESPONSE_KEY_REFUNDED = 'refunded';
-
-    /** @var MollieApiFactory */
-    private $apiFactory;
 
     /** @var LoggerInterface */
     private $logger;
-
-    /** @var EntityRepositoryInterface */
-    private $orderLineItemRepository;
 
     /** @var OrderService */
     private $orderService;
@@ -50,27 +44,21 @@ class RefundController extends StorefrontController
     /**
      * Creates a new instance of the onboarding controller.
      *
-     * @param MollieApiFactory $apiFactory
      * @param LoggerInterface $logger
-     * @param EntityRepositoryInterface $orderLineItemRepository
      * @param OrderService $orderService
      * @param OrderTransactionStateHandler $orderTransactionStateHandler
      * @param SettingsService $settingsService
      * @param RefundService $refundService
      */
     public function __construct(
-        MollieApiFactory $apiFactory,
         LoggerInterface $logger,
-        EntityRepositoryInterface $orderLineItemRepository,
         OrderService $orderService,
         OrderTransactionStateHandler $orderTransactionStateHandler,
         SettingsService $settingsService,
         RefundService $refundService
     )
     {
-        $this->apiFactory = $apiFactory;
         $this->logger = $logger;
-        $this->orderLineItemRepository = $orderLineItemRepository;
         $this->orderService = $orderService;
         $this->orderTransactionStateHandler = $orderTransactionStateHandler;
         $this->settingsService = $settingsService;
@@ -164,7 +152,7 @@ class RefundController extends StorefrontController
             $refunds = $this->refundService->getRefunds($order);
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
-            return $this->json(['error' => $e->getMessage()], $e->getStatusCode());
+            return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
         } catch (\Throwable $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], 500);
@@ -193,18 +181,18 @@ class RefundController extends StorefrontController
 
             $this->refundService->getRefunds($order);
 
-            $refundable = $this->refundService->getRefundableAmount($order);
+            $remaining = $this->refundService->getRemainingAmount($order);
             $refunded = $this->refundService->getRefundedAmount($order);
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
-            return $this->json(['error' => $e->getMessage()], $e->getStatusCode());
+            return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
         } catch (\Throwable $e) {
             $this->logger->error($e->getMessage());
-            return $this->json(['error' => $e->getMessage()], 404);
+            return $this->json(['message' => $e->getMessage()], 404);
         }
 
         return $this->json([
-            self::RESPONSE_KEY_REFUNDABLE => $refundable,
+            self::RESPONSE_KEY_REMAINING => $remaining,
             self::RESPONSE_KEY_REFUNDED => $refunded,
         ]);
     }
@@ -222,7 +210,7 @@ class RefundController extends StorefrontController
 
         $order = $this->orderService->getOrder($orderId, $context);
 
-        if (is_null($order)) {
+        if (!($order instanceof OrderEntity)) {
             throw new InvalidOrderException($orderId);
         }
 

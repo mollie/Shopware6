@@ -30,8 +30,8 @@
             "columnShipped": "Versandt",
             "labelMollieOrderId": "Mollie Bestell ID",
             "totalRefunds": "Rückerstattete Menge",
-            "totalRefundable": "Rückerstattbar",
-            "totalRefundableHelpText": "Sie können mit Mollie bis zu 25 € auf den Totalbetrag zurückzahlen.",
+            "totalRemaining": "Rückerstattbar",
+            "totalRemainingHelpText": "Sie können mit Mollie bis zu 25 € auf den Totalbetrag zurückzahlen.",
             "totalShipments": "Versandte Menge ({quantity} Stück)"
         }
     },
