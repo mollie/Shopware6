@@ -1,0 +1,11 @@
+{# {% sw_extends 'administration/module/sw-extension/component/page/sw-extension-config/sw-extension-config.html.twig' %} #}
+{% block sw_extension_config_actions_save %}
+    {% block sw_plugin_config_actions_test %}
+        FOO
+        <sw-button @click="onTestButtonClicked" v-if="domain === 'MolliePayments.config'">
+            {{ $tc('sw-payment.testButton') }}
+        </sw-button>
+    {% endblock %}
+
+    {% parent %}
+{% endblock %}

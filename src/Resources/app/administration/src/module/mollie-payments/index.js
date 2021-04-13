@@ -1,9 +1,11 @@
 import './extension/sw-customer';
 import './extension/sw-order';
 import './extension/sw-plugin';
+import './extension/sw-extension';
 
 import deDE from './snippet/de-DE.json';
 import enGB from './snippet/en-GB.json';
+import nlNL from './snippet/nl-NL.json'
 
 const { Module } = Shopware;
 
@@ -19,6 +21,7 @@ Module.register('mollie-payments', {
 
     snippets: {
         'de-DE': deDE,
-        'en-GB': enGB
+        'en-GB': enGB,
+        'nl-NL': nlNL
     }
 });
