@@ -13,7 +13,31 @@
                 "success": "Er is een terugbetaling aangemaakt bij Mollie. Het kan 2 uur duren voordat de terugbetaling is voltooid. Tot deze tijd kunt u de terugbetaling annuleren in uw Mollie Dashboard.",
                 "error": "Er is iets mis gegaan bij het aanmaken van een terugbetaling.",
                 "confirmButton": "Terugbetalen",
-                "cancelButton": "Niet terugbetalen"
+                "cancelButton": "Niet terugbetalen",
+                "list": {
+                    "column": {
+                        "amount": "Bedrag",
+                        "status": "Status",
+                        "date": "Datum"
+                    },
+                    "context": {
+                        "cancel": "Annuleer deze terugbetaling\n"
+                    },
+                    "status": {
+                        "queued": "In wachtrij",
+                        "pending": "In afwachting",
+                        "processing": "In behandeling",
+                        "refunded": "Terugbetaald",
+                        "failed": "Mislukt"
+                    },
+                    "status-description": {
+                        "queued": "De terugbetaling wordt in de wachtrij geplaatst totdat er voldoende saldo is om de terugbetaling te verwerken. U kunt de terugbetaling nog steeds annuleren.",
+                        "pending": "De terugbetaling wordt de volgende werkdag naar de bank gestuurd. U kunt de terugbetaling nog annuleren.",
+                        "processing": "De terugbetaling is naar de bank gestuurd. Het bedrag wordt zo spoedig mogelijk overgemaakt op de rekening van de klant.",
+                        "refunded": "Het restitutiebedrag is overgemaakt naar de klant.",
+                        "failed": "De terugbetaling is mislukt na verwerking. De klant heeft bijvoorbeeld zijn/haar bankrekening opgeheven. Het geld zal worden teruggestort op de rekening."
+                    }
+                }
             },
             "shipping": {
                 "title": "Verzend een order line item via Mollie",

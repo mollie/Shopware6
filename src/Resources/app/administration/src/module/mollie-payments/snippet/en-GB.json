@@ -13,7 +13,31 @@
                 "success": "A refund has been created in Mollie. It may take 2 hours for the refund to complete. Until this time, you can cancel the refund in your Mollie Dashboard.",
                 "error": "Something went wrong creating a refund.",
                 "confirmButton": "Refund",
-                "cancelButton": "Do not refund"
+                "cancelButton": "Do not refund",
+                "list": {
+                    "column": {
+                        "amount": "Amount",
+                        "status": "Status",
+                        "date": "Date"
+                    },
+                    "context": {
+                        "cancel": "Cancel this refund"
+                    },
+                    "status": {
+                        "queued": "Queued",
+                        "pending": "Pending",
+                        "processing": "Processing",
+                        "refunded": "Refunded",
+                        "failed": "Failed"
+                    },
+                    "status-description": {
+                        "queued": "The refund is queued until there is enough balance to process te refund. You can still cancel the refund.",
+                        "pending": "The refund will be sent to the bank on the next business day. You can still cancel the refund.",
+                        "processing": "The refund has been sent to the bank. The refund amount will be transferred to the consumer account as soon as possible.",
+                        "refunded": "The refund amount has been transferred to the consumer.",
+                        "failed": "The refund has failed after processing. For example, the customer has closed his / her bank account. The funds will be returned to your account."
+                    }
+                }
             },
             "shipping": {
                 "title": "Ship an order line item through Mollie",

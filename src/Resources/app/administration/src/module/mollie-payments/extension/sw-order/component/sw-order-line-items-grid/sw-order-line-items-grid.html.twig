@@ -13,19 +13,16 @@
         {% block sw_order_line_items_grid_actions_actions %}
             <div align="right">
                 <sw-button-group :disabled="isLoading">
-
-                    {% block sw_order_line_items_grid_actions_actions_refund %}
-                        <sw-button class="sw-order-line-items-grid__actions-container-refund-btn"
-                                   variant="ghost"
-                                   size="small"
-                                   :disabled="!isRefundable"
-                                   v-if="isMollieOrder"
-                                   @click="onOpenRefundModal">
-                            <sw-icon name="default-arrow-360-left" decorative>
-                            </sw-icon>
-                            {{ $tc('mollie-payments.general.refundThroughMollie') }}
-                        </sw-button>
-                    {% endblock %}
+                    <sw-button class="sw-order-line-items-grid__actions-container-refund-btn"
+                               variant="ghost"
+                               size="small"
+                               :disabled="!isRefundable"
+                               v-if="isMollieOrder"
+                               @click="onOpenRefundModal">
+                        <sw-icon name="default-arrow-360-left" decorative>
+                        </sw-icon>
+                        {{ $tc('mollie-payments.general.refundThroughMollie') }}
+                    </sw-button>
                 </sw-button-group>
             </div>
         {% endblock %}
@@ -42,7 +39,16 @@
                 :showSelection="false"
                 v-if="refunds.length > 0">
                 <template #column-amount.value="{ item }">
-                    {{ item.amount.value | currency(item.amount.currency) }}
+                    <sw-container columns="1fr auto" gap="8px" align="center">
+                        {{ item.amount.value | currency(item.amount.currency) }}
+                        <sw-help-text :text="item.description"></sw-help-text>
+                    </sw-container>
+                </template>
+                <template #column-status="{ item }">
+                    <sw-container columns="1fr auto" gap="8px" align="center">
+                        {{ getStatus(item.status) }}
+                        <sw-help-text :text="getStatusDescription(item.status)"></sw-help-text>
+                    </sw-container>
                 </template>
                 <template #column-createdAt="{ item }">
                     {{ item.createdAt | date({hour: '2-digit', minute: '2-digit'}) }}
@@ -51,9 +57,7 @@
                     <sw-context-menu-item :disabled="!isRefundCancelable(item)"
                                           variant="danger"
                                           @click="cancelRefund(item)">
-                        {% block sw_order_line_items_grid_grid_actions_show_label %}
-                            {{ $tc('sw-order.detailBase.contextMenuShowProduct') }}
-                        {% endblock %}
+                        {{ $tc('mollie-payments.modals.refund.list.context.cancel') }}
                     </sw-context-menu-item>
                 </template>
             </sw-data-grid>
@@ -84,9 +88,9 @@
                         {% block sw_order_line_items_grid_refund_summary_amount_remaining %}
                             <dt>{{ $tc('sw-order.detailExtended.totalRemaining') }}</dt>
                             <dd>
-                                <sw-container columns="1fr auto" gap="16px">
+                                <sw-container columns="1fr auto" gap="16px" align="center">
                                     {{ remainingAmount | currency(order.currency.shortName) }}
-                                    <sw-help-text :text="$tc('sw-order.detailExtended.totalRemainingHelpText') "></sw-help-text>
+                                    <sw-help-text :text="$tc('sw-order.detailExtended.totalRemainingHelpText')"></sw-help-text>
                                 </sw-container>
                             </dd>
                         {% endblock %}

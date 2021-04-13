@@ -8,12 +8,36 @@
         },
         "modals": {
             "refund": {
-                "title": "Bestellposition über Mollie rückerstatten",
+                "title": "Rückerstattung über Mollie",
                 "content": "Menge dieser Bestellposition ({refundableQuantity} von {quantity} für Rückerstattung möglich) für die Rückerstattung an den Kunden.",
                 "success": "Es wurde eine Rückerstattung bei Mollie erstellt. Es kann bis zu 2 Stunden dauern, bis die Rückerstattung abgeschlossen ist. Bis dahin können Sie die Rückerstattung in Ihrem Mollie Dashboard stornieren.",
                 "error": "Beim Erstellen einer Rückerstattung ist etwas schief gelaufen.",
                 "confirmButton": "Rückerstatten",
-                "cancelButton": "Abbrechen"
+                "cancelButton": "Abbrechen",
+                "list": {
+                    "column": {
+                        "amount": "Betrag",
+                        "status": "Status",
+                        "date": "Datum"
+                    },
+                    "context": {
+                        "cancel": "Diese Rückerstattung stornieren"
+                    },
+                    "status": {
+                        "queued": "Warteschlange",
+                        "pending": "Ausstehend",
+                        "processing": "Processing",
+                        "refunded": "Erstattet",
+                        "failed": "Gescheitert"
+                    },
+                    "status-description": {
+                        "queued": "Die Rückerstattung steht in der Warteschlange, bis genügend Guthaben vorhanden ist, um die Rückerstattung zu verarbeiten. Sie können die Rückerstattung noch stornieren.",
+                        "pending": "Die Rückerstattung wird am nächsten Werktag an die Bank gesendet. Sie können die Rückerstattung immer noch stornieren.",
+                        "processing": "Die Rückerstattung wurde an die Bank gesendet. Der Rückerstattungsbetrag wird so schnell wie möglich auf das Kundenkonto überwiesen.",
+                        "refunded": "Der Rückerstattungsbetrag wurde an den Kunden überwiesen.",
+                        "failed": "Die Rückerstattung ist nach der Bearbeitung fehlgeschlagen. Zum Beispiel hat der Kunde sein Bankkonto geschlossen. Das Geld wird auf das Konto zurücküberwiesen."
+                    }
+                }
             },
             "shipping": {
                 "title": "Versand der Bestellposition an Mollie melden",

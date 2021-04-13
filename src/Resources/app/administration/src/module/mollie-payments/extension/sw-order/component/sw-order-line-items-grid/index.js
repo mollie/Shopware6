@@ -64,18 +64,15 @@ Component.override('sw-order-line-items-grid', {
             return [
                 {
                     property: 'amount.value',
-                    label: this.$tc('sw-order.detailExtended.columnShipped'),
-                    width: '100px'
+                    label: this.$tc('mollie-payments.modals.refund.list.column.amount')
                 },
                 {
                     property: 'status',
-                    label: this.$tc('sw-order.detailExtended.columnShipped'),
-                    width: '100px'
+                    label: this.$tc('mollie-payments.modals.refund.list.column.status')
                 },
-
                 {
                     property: 'createdAt',
-                    label: this.$tc('sw-order.detailExtended.columnShipped'),
+                    label: this.$tc('mollie-payments.modals.refund.list.column.date'),
                     width: '100px'
                 },
             ];
@@ -164,6 +161,14 @@ Component.override('sw-order-line-items-grid', {
                         message: response.message
                     });
                 });
+        },
+
+        getStatus(status) {
+            return this.$tc('mollie-payments.modals.refund.list.status.' + status);
+        },
+
+        getStatusDescription(status) {
+            return this.$tc('mollie-payments.modals.refund.list.status-description.' + status);
         },
 
         onShipItem(item) {
