@@ -42,7 +42,7 @@ class RefundService
         $payment = $this->getPaymentForOrder($order);
 
         // We don't have a valid Mollie payment for this order, so we cant refund
-        if(!($payment instanceof Payment)) {
+        if (!($payment instanceof Payment)) {
             return false;
         }
 
@@ -76,6 +76,11 @@ class RefundService
 
         // This payment does not have a refund with $refundId, so we cannot cancel it.
         if (!($refund instanceof Refund)) {
+            return false;
+        }
+
+        // Refunds can only be cancelled when they're still queued or pending.
+        if (!$refund->isQueued() && !$refund->isPending()) {
             return false;
         }
 
