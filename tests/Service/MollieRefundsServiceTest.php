@@ -15,220 +15,236 @@ use Mollie\Api\Resources\RefundCollection;
 use Mollie\Api\Types\PaymentStatus;
 use Mollie\Api\Types\RefundStatus;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Order\OrderEntity;
 
 class MollieRefundsServiceTest extends TestCase
 {
-
-
-    public function setUp(): void
+    /**
+     * Test getting correct refunded amount from RefundService;
+     *
+     * @param float $expected
+     * @param bool $isMollieOrder
+     * @param string|null $paymentStatus
+     * @param float $refundedAmount
+     * @dataProvider getAmountsTestData
+     */
+    public function testRefundedAmount(float $expected, bool $isMollieOrder, ?string $paymentStatus, float $refundedAmount)
     {
-        $logger = new NullLogger();
+        $orderEntityMock = $this->getOrderEntityMock($isMollieOrder);
+        $apiFactoryMock = $this->getApiFactoryMock($isMollieOrder, $paymentStatus, $refundedAmount);
+
+        $refundService = new RefundService($apiFactoryMock);
+
+        static::assertEquals($expected, $refundService->getRefundedAmount($orderEntityMock));
     }
 
     /**
-     * Test refunded amount with open payments
+     * Test getting correct refunded amount from RefundService;
+     *
+     * @param float $expected
+     * @param bool $isMollieOrder
+     * @param string|null $paymentStatus
+     * @param float $remainingAmount
+     * @dataProvider getAmountsTestData
      */
-    public function testGetRefundedAmountOpen()
+    public function testRemainingAmount(
+        float $expected,
+        bool $isMollieOrder,
+        ?string $paymentStatus,
+        float $remainingAmount
+    ): void
     {
-        $refundService = new RefundService($this->getApiMock(PaymentStatus::STATUS_OPEN));
+        $orderEntityMock = $this->getOrderEntityMock($isMollieOrder);
+        $apiFactoryMock = $this->getApiFactoryMock($isMollieOrder, $paymentStatus, $remainingAmount);
 
-        $orderEntity = $this->getOrderEntityMock(true);
+        $refundService = new RefundService($apiFactoryMock);
 
-        $refundAmount = $refundService->getRefundedAmount($orderEntity);
-
-        static::assertEquals(0, $refundAmount );
+        static::assertEquals($expected, $refundService->getRefundedAmount($orderEntityMock));
     }
 
     /**
-     * Test refunded amount with paid payments
+     * @param int $expected
+     * @param bool $isMollieOrder
+     * @param string|null $paymentStatus
+     * @param array $refunds
+     * @dataProvider getRefundListTestData
      */
-    public function testGetRefundedAmountPaid()
+    public function testRefundList(
+        int $expected,
+        bool $isMollieOrder,
+        ?string $paymentStatus,
+        array $refunds
+    ): void
     {
-        $refundService = new RefundService($this->getApiMock(PaymentStatus::STATUS_PAID));
+        $orderEntityMock = $this->getOrderEntityMock($isMollieOrder);
+        $apiFactoryMock = $this->getApiFactoryMock($isMollieOrder, $paymentStatus, 0, $refunds);
 
-        $orderEntity = $this->getOrderEntityMock(true);
+        $refundService = new RefundService($apiFactoryMock);
 
-        $refundAmount = $refundService->getRefundedAmount($orderEntity);
-
-        static::assertEquals(24.99, $refundAmount );
+        static::assertCount($expected, $refundService->getRefunds($orderEntityMock));
     }
 
-    /**
-     * Test refunded amount with authorized payments
-     */
-    public function testGetRefundedAmountAuthorized()
+    public function getAmountsTestData(): array
     {
-        $refundService = new RefundService($this->getApiMock(PaymentStatus::STATUS_AUTHORIZED));
-
-        $orderEntity = $this->getOrderEntityMock(true);
-
-        $refundAmount = $refundService->getRefundedAmount($orderEntity);
-
-        static::assertEquals(24.99, $refundAmount );
-    }
-
-    /**
-     * Test refunded amount without mollieId
-     */
-    public function testGetRefundedAmountNotMollieOrder()
-    {
-        $refundService = new RefundService($this->getApiMock(PaymentStatus::STATUS_OPEN));
-
-        $orderEntity = $this->getOrderEntityMock(false);
-
-        $refundAmount = $refundService->getRefundedAmount($orderEntity);
-
-        static::assertEquals(0, $refundAmount );
-    }
-
-    /**
-     * Test remaining amount with open payments
-     */
-    public function testGetRemainingAmountOpen()
-    {
-        $refundService = new RefundService($this->getApiMock(PaymentStatus::STATUS_OPEN));
-
-        $orderEntity = $this->getOrderEntityMock(true);
-
-        $refundAmount = $refundService->getRemainingAmount($orderEntity);
-
-        static::assertEquals(0, $refundAmount );
-    }
-
-    /**
-     * Test remaining amount with paid payments
-     */
-    public function testGetRemainingAmountPaid()
-    {
-        $refundService = new RefundService($this->getApiMock(PaymentStatus::STATUS_PAID));
-
-        $orderEntity = $this->getOrderEntityMock(true);
-
-        $refundAmount = $refundService->getRemainingAmount($orderEntity);
-
-        static::assertEquals(48.98, $refundAmount );
-    }
-
-    /**
-     * Test remaining amount with authorized payments
-     */
-    public function testGetRemainingAmountAuthorized()
-    {
-        $refundService = new RefundService($this->getApiMock(PaymentStatus::STATUS_AUTHORIZED));
-
-        $orderEntity = $this->getOrderEntityMock(true);
-
-        $refundAmount = $refundService->getRemainingAmount($orderEntity);
-
-        static::assertEquals(48.98, $refundAmount );
-    }
-
-    /**
-     * Test remaining amount without mollieId
-     */
-    public function testGetRemainingAmountNotMollieOrder()
-    {
-        $refundService = new RefundService($this->getApiMock(PaymentStatus::STATUS_OPEN));
-
-        $orderEntity = $this->getOrderEntityMock(false);
-
-        $refundAmount = $refundService->getRemainingAmount($orderEntity);
-
-        static::assertEquals(0, $refundAmount );
-    }
-
-    /**
-     * Test refunds list
-     */
-    public function testGetRefundsList()
-    {
-        $refundService = new RefundService($this->getApiMock(PaymentStatus::STATUS_PAID));
-
-        $refunds = $refundService->getRefunds($this->getOrderEntityMock(true));
-
-        static::assertIsArray($refunds);
-        static::assertCount(1, $refunds);
-    }
-
-    /**
-     * @psalm-param null|callable(Method): void
-     */
-    private function getApiMock($paymentStatus, ?callable $configureMethod = null): MollieApiFactory
-    {
-        $apiFactoryMock = static::getMockBuilder(MollieApiFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $clientMock = static::getMockBuilder(MollieApiClient::class)
-            ->getMock();
-        $orderEndpointMock = static::getMockBuilder(OrderEndpoint::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $orderMock = static::getMockBuilder(Order::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $paymentCollectionMock = static::getMockBuilder(PaymentCollection::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $paymentMock = static::getMockBuilder(Payment::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $clientMock->orders = $orderEndpointMock;
-        $paymentMock->status = $paymentStatus;
-
-        $apiFactoryMock->method('createClient')->willReturn($clientMock);
-        $orderEndpointMock->method('get')->willReturn($orderMock);
-        $orderMock->method('payments')->willReturn($paymentCollectionMock);
-        $paymentCollectionMock->method('getArrayCopy')->willReturn([$paymentMock]);
-        $paymentMock->method('getAmountRefunded')->willReturn(24.99);
-        $paymentMock->method('getAmountRemaining')->willReturn(48.98);
-        $paymentMock->method('refunds')->willReturn($this->getRefundsCollectionMock());
-
-        return $apiFactoryMock;
-    }
-
-    private function getOrderEntityMock(bool $isMollieOrder):OrderEntity
-    {
-        $orderEntityMock = static::getMockBuilder(OrderEntity::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $orderEntityMock->method('getSalesChannelId')->willReturn('string');
-
-        if($isMollieOrder) {
-            $orderEntityMock->method('getCustomFields')->willReturn([CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS => ['order_id' => 'testkey']]);
-        }
-        return $orderEntityMock;
-    }
-
-    private function getRefundsCollectionMock():RefundCollection
-    {
-        $refundCollectionMock = static::getMockBuilder(RefundCollection::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $refundMock = static::getMockBuilder(Refund::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $refundMock->id = 'test_id';
-        $refundMock->amount = (object) [
-            'value' => 24.99,
-            'currency' => 'EUR'
-            ];
-        $refundMock->createdAt = '2013-12-25T10:30:54+00:00';
-        $refundMock->description = 'Unit test refund';
-        $refundMock->paymentId = 'tr_123456';
-        $refundMock->settlementAmount = (object)[
-            'value' => -24.99,
-            'currency' => 'EUR'
+        return [
+            'Not a Mollie order' => [
+                0,
+                false,
+                null,
+                0
+            ],
+            'Mollie order, payment open' => [
+                0,
+                true,
+                PaymentStatus::STATUS_OPEN,
+                24.99
+            ],
+            'Mollie order, payment paid' => [
+                24.99,
+                true,
+                PaymentStatus::STATUS_PAID,
+                24.99
+            ],
+            'Mollie order, payment authorized' => [
+                24.99,
+                true,
+                PaymentStatus::STATUS_AUTHORIZED,
+                24.99
+            ]
         ];
-        $refundMock->status = RefundStatus::STATUS_REFUNDED;
-        $refundMock->_links = (object)[];
+    }
 
-        $refundCollectionMock->method('getArrayCopy')->willReturn([$refundMock]);
+    public function getRefundListTestData(): array
+    {
+        return [
+            'Not a Mollie order' => [
+                0,
+                false,
+                null,
+                []
+            ],
+            'Mollie order, payment open' => [
+                0,
+                true,
+                PaymentStatus::STATUS_OPEN,
+                []
+            ],
+            'Mollie order, payment paid' => [
+                1,
+                true,
+                PaymentStatus::STATUS_PAID,
+                [
+                    [
+                        'status' => RefundStatus::STATUS_REFUNDED,
+                        'amount' => 24.99
+                    ]
+                ]
+            ],
+            'Mollie order, payment authorized' => [
+                1,
+                true,
+                PaymentStatus::STATUS_AUTHORIZED,
+                [
+                    [
+                        'status' => RefundStatus::STATUS_REFUNDED,
+                        'amount' => 24.99
+                    ]
+                ]
+            ]
+        ];
+    }
 
-        return $refundCollectionMock;
+    private function getApiFactoryMock(
+        bool $isMollieOrder,
+        ?string $paymentStatus,
+        float $amount,
+        array $refunds = []
+    ): MollieApiFactory
+    {
+        $clientMock = $this->createMock(MollieApiClient::class);
+
+        if ($isMollieOrder) {
+            $paymentMock = $this->createConfiguredMock(
+                Payment::class,
+                [
+                    'getAmountRefunded' => $amount,
+                    'getAmountRemaining' => $amount,
+                    'refunds' => $this->getRefundsCollectionMock($refunds)
+                ]
+            );
+            $paymentMock->status = $paymentStatus;
+
+            $paymentCollectionMock = $this->createConfiguredMock(
+                PaymentCollection::class,
+                ['getArrayCopy' => [$paymentMock]]
+            );
+
+            $orderMock = $this->createConfiguredMock(
+                Order::class,
+                ['payments' => $paymentCollectionMock]
+            );
+
+            $orderEndpointMock = $this->createConfiguredMock(
+                OrderEndpoint::class,
+                ['get' => $orderMock]
+            );
+
+            $clientMock->orders = $orderEndpointMock;
+        }
+
+        return $this->createConfiguredMock(
+            MollieApiFactory::class,
+            ['createClient' => $clientMock]
+        );
+    }
+
+    private function getOrderEntityMock(bool $isMollieOrder): OrderEntity
+    {
+        return $this->createConfiguredMock(
+            OrderEntity::class,
+            [
+                'getSalesChannelId' => 'foo',
+                'getCustomFields' => $isMollieOrder
+                    ? [
+                        CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS => [
+                            'order_id' => 'bar'
+                        ]
+                    ]
+                    : null
+            ]
+        );
+    }
+
+    private function getRefundsCollectionMock(array $refunds = []): RefundCollection
+    {
+        $refundMocks = [];
+
+        foreach ($refunds as $refund) {
+            $refundMock = $this->createMock(Refund::class);
+
+            $refundMock->id = 'foo_id';
+            $refundMock->amount = (object)[
+                'value' => $refund['amount'],
+                'currency' => 'EUR'
+            ];
+            $refundMock->createdAt = date(DATE_ISO8601);
+            $refundMock->description = 'Unit test refund';
+            $refundMock->paymentId = 'bar_id';
+            $refundMock->settlementAmount = (object)[
+                'value' => -($refund['amount']),
+                'currency' => 'EUR'
+            ];
+            $refundMock->status = $refund['status'];
+            $refundMock->_links = (object)[];
+
+            $refundMocks[] = $refundMock;
+        }
+
+        return $this->createConfiguredMock(
+            RefundCollection::class,
+            [
+                'getArrayCopy' => $refundMocks
+            ]
+        );
     }
 }
