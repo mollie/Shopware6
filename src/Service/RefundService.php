@@ -41,6 +41,11 @@ class RefundService
     {
         $payment = $this->getPaymentForOrder($order);
 
+        // We don't have a valid Mollie payment for this order, so we cant refund
+        if(!($payment instanceof Payment)) {
+            return false;
+        }
+
         $refund = $payment->refund([
             'amount' => [
                 'value' => number_format($amount, 2, '.', ''),
