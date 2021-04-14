@@ -3,12 +3,11 @@
 namespace Kiener\MolliePayments\Subscriber;
 
 use Kiener\MolliePayments\Service\CustomerService;
+use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
-use RuntimeException;
 use Shopware\Core\Checkout\Customer\Event\CustomerRegisterEvent;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -23,6 +22,9 @@ class CustomerRegistrationSubscriber implements EventSubscriberInterface
 
     /** @var SettingsService */
     private $settingsService;
+
+    /** @var LoggerService */
+    private $loggerService;
 
     /**
      * Returns an array of event names this subscriber wants to listen to.
@@ -57,12 +59,13 @@ class CustomerRegistrationSubscriber implements EventSubscriberInterface
     public function __construct(
         MollieApiClient $apiClient,
         CustomerService $customerService,
-        SettingsService $settingsService
-
+        SettingsService $settingsService,
+        LoggerService $loggerService
     ) {
         $this->apiClient = $apiClient;
         $this->customerService = $customerService;
         $this->settingsService = $settingsService;
+        $this->loggerService = $loggerService;
     }
 
     /**
@@ -86,35 +89,18 @@ class CustomerRegistrationSubscriber implements EventSubscriberInterface
 
         $settings = $this->settingsService->getSettings($source->getSalesChannelId());
 
-        if ($settings->isTestMode() && $settings->createNoCustomersAtMollie()) {
+        if ($settings->createNoCustomersAtMollie()) {
             return;
         }
 
         foreach ($entityWrittenEvent->getPayloads() as $payload) {
-            $id = null;
-            $name = null;
-            $email = null;
-            $guest = null;
-
-            if (isset($payload['id'])) {
-                $id = $payload['id'];
-            }
-
-            if (isset($payload['firstName'], $payload['lastName'])) {
-                $name = \sprintf('%s %s', $payload['firstName'], $payload['lastName']);
-            }
-
-            if (isset($payload['email'])) {
-                $email = $payload['email'];
-            }
-
-            if (isset($payload['guest'])) {
-                $guest = $payload['guest'];
-            }
-
-            if ($name === null && $email === null && $id === null && !$guest) {
+            if (isset($payload['firstName'], $payload['lastName']) || isset($payload['email']) || isset($payload['id']) || isset($payload['guest'])) {
                 return;
             }
+
+            $id = $payload['id'];
+            $name = \sprintf('%s %s', $payload['firstName'], $payload['lastName']);
+            $email = $payload['email'];
 
             try {
                 $mollieCustomer = $this->apiClient->customers->create(
@@ -129,7 +115,7 @@ class CustomerRegistrationSubscriber implements EventSubscriberInterface
                 if (
                     (
                         \array_key_exists('customFields', $payload) &&
-                        \array_key_exists('customer_id', $payload['customFields'])
+                        \array_key_exists(CustomerService::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID, $payload['customFields'])
                     ) ||
                     $customer === null
                 ) {
@@ -148,6 +134,7 @@ class CustomerRegistrationSubscriber implements EventSubscriberInterface
                     $entityWrittenEvent->getContext()
                 );
             } catch (ApiException $e) {
+                $this->loggerService->addEntry('Customer could not be registered.', $context, $e);
             }
         }
     }
