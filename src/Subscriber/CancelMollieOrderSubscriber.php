@@ -6,6 +6,7 @@ use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\OrderService;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
+use Mollie\Api\Types\OrderStatus;
 use Monolog\Logger;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Shopware\Core\System\StateMachine\Event\StateMachineStateChangeEvent;
@@ -13,6 +14,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CancelMollieOrderSubscriber implements EventSubscriberInterface
 {
+    public const MOLLIE_CANCEL_ORDER_STATES = [
+        OrderStatus::STATUS_CREATED,
+        OrderStatus::STATUS_AUTHORIZED,
+        OrderStatus::STATUS_SHIPPING
+    ];
     /**
      * @var string
      */
@@ -81,7 +87,7 @@ class CancelMollieOrderSubscriber implements EventSubscriberInterface
         try {
             $mollieOrder = $this->apiClient->orders->get($mollieOrderId);
 
-            if (in_array($mollieOrder->status, ['created', 'authorized', 'shipping'])) {
+            if (in_array($mollieOrder->status, [self::MOLLIE_CANCEL_ORDER_STATES])) {
                 $this->apiClient->orders->cancel($mollieOrderId);
             }
         } catch (ApiException $e) {

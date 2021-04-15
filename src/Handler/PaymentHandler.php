@@ -4,9 +4,7 @@ namespace Kiener\MolliePayments\Handler;
 
 use Exception;
 use Kiener\MolliePayments\Exception\PaymentUrlException;
-use Kiener\MolliePayments\Helper\ModeHelper;
 use Kiener\MolliePayments\Helper\PaymentStatusHelper;
-use Kiener\MolliePayments\Helper\ProfileHelper;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\LoggerService;
@@ -611,11 +609,11 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             getenv(self::ENV_LOCAL_DEVELOPMENT) === false
             || (bool) getenv(self::ENV_LOCAL_DEVELOPMENT) === false
         ) {
-            $webhookUrl=$this->router->generate('frontend.mollie.webhook', [
+            $webhookUrl = $this->router->generate('frontend.mollie.webhook', [
                 'transactionId' => $transactionId
             ], $this->router::ABSOLUTE_URL);
             $orderData[self::FIELD_WEBHOOK_URL] = $webhookUrl;
-            $orderData['payment']['webhookUrl']=$webhookUrl;
+            $orderData['payment']['webhookUrl'] = $webhookUrl;
         }
 
         $customFields = $customer->getCustomFields();
