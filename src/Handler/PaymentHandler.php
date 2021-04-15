@@ -611,9 +611,11 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             getenv(self::ENV_LOCAL_DEVELOPMENT) === false
             || (bool) getenv(self::ENV_LOCAL_DEVELOPMENT) === false
         ) {
-            $orderData[self::FIELD_WEBHOOK_URL] = $this->router->generate('frontend.mollie.webhook', [
+            $webhookUrl=$this->router->generate('frontend.mollie.webhook', [
                 'transactionId' => $transactionId
             ], $this->router::ABSOLUTE_URL);
+            $orderData[self::FIELD_WEBHOOK_URL] = $webhookUrl;
+            $orderData['payment']['webhookUrl']=$webhookUrl;
         }
 
         $customFields = $customer->getCustomFields();

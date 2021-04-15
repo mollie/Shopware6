@@ -10,5 +10,13 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Subscriber\CancelMollieOrderSubscriber">
+            <argument type="service" id="Mollie\Api\MollieApiClient"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
+            <argument>%kernel.shopware_version%</argument>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
     </services>
 </container>
