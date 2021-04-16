@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Helper;
 
 use Exception;
 use Kiener\MolliePayments\Service\LoggerService;
+use Kiener\MolliePayments\Service\Order\OrderStateService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Resources\Order;
@@ -16,7 +17,6 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\AndFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
@@ -29,8 +29,8 @@ class PaymentStatusHelper
     /** @var LoggerService */
     protected $logger;
 
-    /** @var OrderStateHelper */
-    protected $orderStateHelper;
+    /** @var OrderStateService */
+    protected $orderStateService;
 
     /** @var OrderTransactionStateHandler */
     protected $orderTransactionStateHandler;
@@ -57,7 +57,7 @@ class PaymentStatusHelper
      */
     public function __construct(
         LoggerService $logger,
-        OrderStateHelper $orderStateHelper,
+        OrderStateService $orderStateHelper,
         OrderTransactionStateHandler $orderTransactionStateHandler,
         SettingsService $settingsService,
         StateMachineRegistry $stateMachineRegistry,
@@ -66,7 +66,7 @@ class PaymentStatusHelper
     )
     {
         $this->logger = $logger;
-        $this->orderStateHelper = $orderStateHelper;
+        $this->orderStateService = $orderStateHelper;
         $this->orderTransactionStateHandler = $orderTransactionStateHandler;
         $this->settingsService = $settingsService;
         $this->stateMachineRegistry = $stateMachineRegistry;
@@ -228,7 +228,7 @@ class PaymentStatusHelper
             }
 
             // Process the order state automation
-            $this->orderStateHelper->setOrderState($order, $settings->getOrderStateWithAPaidTransaction(), $context);
+            $this->orderStateService->setOrderState($order, $settings->getOrderStateWithAPaidTransaction(), $context);
 
             return PaymentStatus::STATUS_PAID;
         }
@@ -256,7 +256,7 @@ class PaymentStatusHelper
             }
 
             // Process the order state automation
-            $this->orderStateHelper->setOrderState($order, $settings->getOrderStateWithACancelledTransaction(), $context);
+            $this->orderStateService->setOrderState($order, $settings->getOrderStateWithACancelledTransaction(), $context);
 
             return PaymentStatus::STATUS_CANCELED;
         }
@@ -287,7 +287,7 @@ class PaymentStatusHelper
             }
 
             // Process the order state automation
-            $this->orderStateHelper->setOrderState($order, $settings->getOrderStateWithAAuthorizedTransaction(), $context);
+            $this->orderStateService->setOrderState($order, $settings->getOrderStateWithAAuthorizedTransaction(), $context);
             return PaymentStatus::STATUS_AUTHORIZED;
         }
 
@@ -315,7 +315,7 @@ class PaymentStatusHelper
             }
 
             // Process the order state automation
-            $this->orderStateHelper->setOrderState($order, $settings->getOrderStateWithACancelledTransaction(), $context);
+            $this->orderStateService->setOrderState($order, $settings->getOrderStateWithACancelledTransaction(), $context);
 
             return PaymentStatus::STATUS_CANCELED;
         }
@@ -345,7 +345,7 @@ class PaymentStatusHelper
             }
 
             // Process the order state automation
-            $this->orderStateHelper->setOrderState($order, $settings->getOrderStateWithACancelledTransaction(), $context);
+            $this->orderStateService->setOrderState($order, $settings->getOrderStateWithACancelledTransaction(), $context);
 
             return PaymentStatus::STATUS_CANCELED;
         }
@@ -381,7 +381,7 @@ class PaymentStatusHelper
                 }
 
                 // Process the order state automation
-                $this->orderStateHelper->setOrderState($order, $settings->getOrderStateWithAFailedTransaction(), $context);
+                $this->orderStateService->setOrderState($order, $settings->getOrderStateWithAFailedTransaction(), $context);
             }
 
             return PaymentStatus::STATUS_FAILED;
@@ -425,7 +425,7 @@ class PaymentStatusHelper
             }
 
             // Process the order state automation
-            $this->orderStateHelper->setOrderState($order, $settings->getOrderStateWithAPaidTransaction(), $context);
+            $this->orderStateService->setOrderState($order, $settings->getOrderStateWithAPaidTransaction(), $context);
 
             return PaymentStatus::STATUS_PAID;
         }
