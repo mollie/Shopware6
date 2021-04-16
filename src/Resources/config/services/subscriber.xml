@@ -18,5 +18,11 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Subscriber\PaymentStateSubscriber" class="Kiener\MolliePayments\Subscriber\PaymentStateSubscriber">
+            <argument type="service" id="Kiener\MolliePayments\Facade\SetMollieOrderRefunded"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
     </services>
 </container>
