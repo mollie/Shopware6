@@ -11,5 +11,12 @@
             <argument type="service" id="Kiener\MolliePayments\Service\OrderDeliveryService"/>
             <argument type="service" id="monolog.logger"/>
         </service>
+
+        <service id="Kiener\MolliePayments\Facade\SetMollieOrderRefunded">
+            <argument type="service" id="Kiener\MolliePayments\Service\TransactionService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
+        </service>
+
     </services>
 </container>
