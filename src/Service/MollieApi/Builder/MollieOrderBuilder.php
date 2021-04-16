@@ -2,18 +2,13 @@
 
 namespace Kiener\MolliePayments\Service\MollieApi\Builder;
 
-
-use Kiener\MolliePayments\Exception\OrderCustomerNotFound;
 use Kiener\MolliePayments\Handler\PaymentHandler;
-use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher;
 use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
-use Monolog\Logger;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
-use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\Routing\RouterInterface;
@@ -58,7 +53,7 @@ class MollieOrderBuilder
     /**
      * @var MollieOrderCustomerEnricher
      */
-    private MollieOrderCustomerEnricher $customerEnricher;
+    private $customerEnricher;
 
     public function __construct(
         SettingsService $settingsService,
@@ -97,9 +92,16 @@ class MollieOrderBuilder
 
         $orderData = [];
         $orderData['amount'] = $this->priceBuilder->build($order->getAmountTotal(), $currency->getIsoCode());
+        if ($order->getTaxStatus() === CartPrice::TAX_STATE_FREE) {
+            $orderData['amount'] = $this->priceBuilder->build($order->getAmountNet(), $currency->getIsoCode());
+        }
+        $orderData['locale'] = $locale;
+        $orderData['method'] = $paymentMethod;
+        $orderData['orderNumber'] = $order->getOrderNumber();
+        $orderData['payment'] = $paymentData;
 
         // create urls
-        $orderData['redirectUrl'] = $this->router->generate(
+        $redirectUrl = $this->router->generate(
             'frontend.mollie.payment',
             [
                 'transactionId' => $transactionId,
@@ -107,23 +109,19 @@ class MollieOrderBuilder
             ],
             $this->router::ABSOLUTE_URL
         );
-        $orderData['webhookUrl'] = $this->router->generate(
+        $webhookUrl = $this->router->generate(
             'frontend.mollie.webhook',
             ['transactionId' => $transactionId],
             $this->router::ABSOLUTE_URL
         );
 
-        $orderData['locale'] = $locale;
-        $orderData['method'] = $paymentMethod;
-        $orderData['orderNumber'] = $order->getOrderNumber();
+        $orderData['redirectUrl'] = $redirectUrl;
+        $orderData['webhookUrl'] = $webhookUrl;
+        $orderData['payment']['webhookUrl'] = $webhookUrl;
+
         $orderData['lines'] = $this->lineItemBuilder->buildLineItems($order);
         $orderData['billingAddress'] = $this->addressBuilder->build($customer->getEmail(), $customer->getDefaultBillingAddress());
         $orderData['shippingAddress'] = $this->addressBuilder->build($customer->getEmail(), $customer->getActiveShippingAddress());
-        $orderData['payment'] = $paymentData;
-
-        if ($order->getTaxStatus() === CartPrice::TAX_STATE_FREE) {
-            $orderData['amount'] = $this->priceBuilder->build($order->getAmountNet(), $currency->getIsoCode());
-        }
 
         /** @var MollieSettingStruct $settings */
         $settings = $this->settingsService->getSettings(
@@ -131,7 +129,7 @@ class MollieOrderBuilder
             $salesChannelContext->getContext()
         );
 
-        // set order lifetime like configred
+        // set order lifetime like configured
         $dueDate = $settings->getOrderLifetimeDate();
 
         if ($dueDate !== null) {
