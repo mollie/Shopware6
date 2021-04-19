@@ -94,13 +94,28 @@ class CustomerRegistrationSubscriber implements EventSubscriberInterface
         }
 
         foreach ($entityWrittenEvent->getPayloads() as $payload) {
-            if (isset($payload['firstName'], $payload['lastName']) || isset($payload['email']) || isset($payload['id']) || isset($payload['guest'])) {
-                return;
+            if (
+                \array_key_exists('customFields', $payload) &&
+                \array_key_exists(CustomerService::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID, $payload['customFields'])
+            ) {
+                // Escape if the payload already writes the mollie Id to the custom Fields
+                continue;
+            }
+
+            if (!isset($payload['firstName'], $payload['lastName'], $payload['email'], $payload['id'], $payload['guest'])) {
+                // Escape if we do not have the information mollie wants
+                continue;
             }
 
             $id = $payload['id'];
             $name = \sprintf('%s %s', $payload['firstName'], $payload['lastName']);
             $email = $payload['email'];
+
+            $customer = $this->customerService->getCustomer($id, $entityWrittenEvent->getContext());
+
+            if ($customer === null){
+                continue;
+            }
 
             try {
                 $mollieCustomer = $this->apiClient->customers->create(
@@ -109,18 +124,6 @@ class CustomerRegistrationSubscriber implements EventSubscriberInterface
                         'email' => $email,
                     ]
                 );
-
-                $customer = $this->customerService->getCustomer($id, $entityWrittenEvent->getContext());
-
-                if (
-                    (
-                        \array_key_exists('customFields', $payload) &&
-                        \array_key_exists(CustomerService::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID, $payload['customFields'])
-                    ) ||
-                    $customer === null
-                ) {
-                    return;
-                }
 
                 $customer->setCustomFields(
                     [
