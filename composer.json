@@ -45,6 +45,11 @@
       "Mollie\\Api\\": "vendor/mollie/mollie-api-php/src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "MolliePayments\\Tests\\": "tests/PHPUnit/"
+    }
+  },
   "suggest": {
     "shopware/storefront": "Require '*'. Enables features like Creditcard Components and iDeal issuer selector.",
     "shopware/administration": "Require '*'. Enables features like partial shipping and refunding."
