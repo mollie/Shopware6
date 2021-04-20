@@ -177,17 +177,17 @@ class CustomerService
     /**
      * Stores the custom fields.
      *
-     * @param CustomerEntity $customer
+     * @param string $customerID
      * @param array $customFields
      * @param Context $context
      *
      * @return EntityWrittenContainerEvent
      */
-    public function saveCustomerCustomFields(CustomerEntity $customer, array $customFields, Context $context)
+    public function saveCustomerCustomFields(string $customerID, array $customFields, Context $context)
     {
         // Store the custom fields on the customer
         return $this->customerRepository->update([[
-            'id' => $customer->getId(),
+            'id' => $customerID,
             'customFields' => $customFields
         ]], $context);
     }
