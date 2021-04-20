@@ -212,6 +212,7 @@
             <argument type="service" id="Mollie\Api\MollieApiClient"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
