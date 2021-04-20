@@ -111,12 +111,6 @@ class CustomerRegistrationSubscriber implements EventSubscriberInterface
             $name = \sprintf('%s %s', $payload['firstName'], $payload['lastName']);
             $email = $payload['email'];
 
-            $customer = $this->customerService->getCustomer($id, $entityWrittenEvent->getContext());
-
-            if ($customer === null){
-                continue;
-            }
-
             try {
                 $mollieCustomer = $this->apiClient->customers->create(
                     [
@@ -125,15 +119,9 @@ class CustomerRegistrationSubscriber implements EventSubscriberInterface
                     ]
                 );
 
-                $customer->setCustomFields(
-                    [
-                        'customer_id' => $mollieCustomer->id
-                    ]
-                );
-
                 $this->customerService->saveCustomerCustomFields(
-                    $customer,
-                    $customer->getCustomFields(),
+                    $id,
+                    ['customer_id' => $mollieCustomer->id],
                     $entityWrittenEvent->getContext()
                 );
             } catch (ApiException $e) {
