@@ -2,18 +2,18 @@
 
 namespace Kiener\MolliePayments\Exception;
 
-
 use Shopware\Core\Checkout\Payment\Exception\PaymentProcessException;
 
-/**
- * @copyright 2021 dasistweb GmbH (https://www.dasistweb.de)
- */
+
 class PaymentUrlException extends PaymentProcessException
 {
 
-
+    /**
+     * @return string
+     */
     public function getErrorCode(): string
     {
-        return (string) parent::getCode();
+        return (string)parent::getCode();
     }
+
 }
