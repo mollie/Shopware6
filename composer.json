@@ -47,7 +47,8 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "MolliePayments\\Tests\\": "tests/PHPUnit/"
+      "MolliePayments\\Tests\\": "tests/PHPUnit/",
+      "MolliePayments\\PHPStan\\": "tests/PHPStan/"
     }
   },
   "suggest": {
