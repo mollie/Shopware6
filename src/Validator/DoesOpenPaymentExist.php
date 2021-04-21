@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 namespace Kiener\MolliePayments\Validator;
 
@@ -6,7 +6,9 @@ namespace Kiener\MolliePayments\Validator;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Types\PaymentStatus;
 
-
+/**
+ * @copyright 2021 dasistweb GmbH (https://www.dasistweb.de)
+ */
 class DoesOpenPaymentExist
 {
 

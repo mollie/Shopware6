@@ -9,10 +9,3 @@ parameters:
         - ./src/Storefront/*
         - ./src/Subscriber/*
 
-services:
-    - class: MolliePayments\PHPStan\Rules\StrictTypeRule
-      tags:
-        - phpstan.rules.rule
-    - class: MolliePayments\PHPStan\Rules\NoManufacturerRule
-      tags:
-        - phpstan.rules.rule
