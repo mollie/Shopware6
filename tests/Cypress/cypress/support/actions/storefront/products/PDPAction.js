@@ -1,17 +1,19 @@
 import PDPRepository from 'Repositories/storefront/products/PDPRepository';
 
-class PDPAction {
+export default class PDPAction {
+
 
     /**
      *
+     * @param quantity
      */
-    addToCart() {
+    addToCart(quantity) {
 
         const repo = new PDPRepository();
+
+        repo.getQuantity().select(quantity + "");
 
         repo.getAddToCartButton().click();
     }
 
 }
-
-export default PDPAction;
