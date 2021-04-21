@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace MolliePayments\Tests\Helper;
+namespace MolliePayments\Tests\Service\Order;
 
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\Order\OrderTransitionService;
