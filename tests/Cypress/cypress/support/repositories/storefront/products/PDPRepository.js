@@ -8,4 +8,12 @@ export default class PDPRepository {
         return cy.get('.buy-widget-container > .col-8 > .btn');
     }
 
+    /**
+     *
+     * @returns {*}
+     */
+    getQuantity() {
+        return cy.get('.custom-select');
+    }
+
 }

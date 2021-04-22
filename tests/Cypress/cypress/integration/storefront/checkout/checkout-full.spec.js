@@ -37,6 +37,7 @@ const device = devices.getFirstDevice();
 const payments = [
     {key: 'paypal', name: 'PayPal'},
     {key: 'klarnapaylater', name: 'Pay later'},
+    {key: 'klarnasliceit', name: 'Slice it'},
     {key: 'ideal', name: 'iDEAL'},
     {key: 'sofort', name: 'SOFORT'},
     {key: 'eps', name: 'eps'},
@@ -45,6 +46,7 @@ const payments = [
     {key: 'przelewy24', name: 'Przelewy24'},
     {key: 'kbc', name: 'KBC'},
     {key: 'belfius', name: 'Belfius'},
+    {key: 'banktransfer', name: 'Banktransfer'},
 ];
 
 
@@ -73,7 +75,7 @@ context("Checkout Tests", () => {
 
                     topMenu.clickOnHome();
                     listing.clickOnFirstProduct();
-                    pdp.addToCart();
+                    pdp.addToCart(3);
 
                     checkout.goToCheckoutInOffCanvas();
 
@@ -97,7 +99,7 @@ context("Checkout Tests", () => {
                     cy.get('.header__amount').contains(totalSum);
 
 
-                    if (payment.key === 'klarnapaylater') {
+                    if (payment.key === 'klarnapaylater' || payment.key === 'klarnasliceit') {
 
                         molliePayment.selectAuthorized();
 
@@ -116,6 +118,7 @@ context("Checkout Tests", () => {
 
                     // we should now get back to the shop
                     // with a successful order message
+                    cy.url().should('include', '/checkout/finish');
                     cy.contains('Thank you for your order');
                 })
 
@@ -134,7 +137,7 @@ context("Checkout Tests", () => {
 
                 topMenu.clickOnHome();
                 listing.clickOnFirstProduct();
-                pdp.addToCart();
+                pdp.addToCart(1);
                 checkout.goToCheckoutInOffCanvas();
 
                 checkout.switchPaymentMethod('PayPal');
