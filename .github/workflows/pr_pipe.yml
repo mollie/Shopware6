@@ -138,7 +138,7 @@ jobs:
           docker logs shop
 
       - name: Upload into Docker
-        run: docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MollieShopware
+        run: docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
 
       - name: Install Plugin
         run: |
