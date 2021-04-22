@@ -90,7 +90,7 @@ jobs:
         run: make csfix -B
 
   phpinsights:
-    name: PHP CS Fixer
+    name: PHPInsights
     needs: phpcsfixer
     runs-on: ubuntu-latest
     steps:
