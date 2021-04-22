@@ -10,8 +10,8 @@ on:
 
 jobs:
 
-  syntax_checks:
-    name: Syntax Checks | PHP ${{ matrix.php }}
+  php_checks:
+    name: PHP Syntax Checks | PHP ${{ matrix.php }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -26,13 +26,32 @@ jobs:
           php-version: ${{ matrix.php }}
 
       - name: PHP Syntax Checks
-        run: find . -name '*.php' -not -path "./vendor/*" -not -path "./tests/*" | xargs -n 1 -P4 php -l
+        run: make phpcheck -B
+
+  php_min:
+    name: PHP 7.2 Compatibility
+    needs: php_checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+
+      - name: Install Dependencies
+        run: make dev -B
+
+      - name: PHP Compatibility Checks
+        run: make phpmin -B
 
   # ------------------------------------------------------------------------------------------------------------------------
 
   unit_tests:
     name: Unit Tests | PHP ${{ matrix.php }}
-    needs: syntax_checks
+    needs: php_min
     runs-on: ubuntu-latest
     strategy:
       matrix:
