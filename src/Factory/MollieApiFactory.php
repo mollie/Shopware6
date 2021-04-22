@@ -48,17 +48,17 @@ class MollieApiFactory
      */
     public function createClient(?string $salesChannelId = null): MollieApiClient
     {
-        if ($this->apiClient === null) {
-            $this->apiClient = $this->getClient($salesChannelId);
-        }
-
-        return $this->apiClient;
+        # TODO Refactor into getClient() below
+        # the singleton approach here was too risky,
+        # everyone who used this was never able to switch api keys through sales channels.
+        # now its the same as getClient() -> should be combined one day
+        return $this->getClient($salesChannelId);
     }
 
     /**
      * Returns a new instance of the Mollie API client.
      *
-     * @param string|null  $salesChannelId
+     * @param string|null $salesChannelId
      * @param Context|null $context
      *
      * @return MollieApiClient

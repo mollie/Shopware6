@@ -217,7 +217,7 @@
         </service>
 
         <service id="Kiener\MolliePayments\Subscriber\CheckoutConfirmPageSubscriber" class="Kiener\MolliePayments\Subscriber\CheckoutConfirmPageSubscriber">
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="language.repository"/>
             <argument type="service" id="locale.repository"/>
