@@ -83,7 +83,7 @@ class CustomerRegistrationSubscriber implements EventSubscriberInterface
 
         $source = $context->getSource();
 
-        if ($source === null && !method_exists($source, 'getSalesChannelId')) {
+        if ($source === null | !method_exists($source, 'getSalesChannelId')) {
             return;
         }
 
