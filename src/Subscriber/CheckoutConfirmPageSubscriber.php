@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Subscriber;
 
 use Exception;
+use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\SettingsService;
@@ -14,26 +15,42 @@ use Mollie\Api\Types\PaymentMethod;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
-use Shopware\Core\System\Language\LanguageEntity;
 use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
 use Shopware\Storefront\Page\PageLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 
-
-
 class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
 {
-    /** @var MollieApiClient */
+
+    /**
+     * @var MollieApiFactory
+     */
+    private $apiFactory;
+
+    /**
+     * @var MollieApiClient
+     */
     private $apiClient;
 
-    /** @var SettingsService */
+    /**
+     * @var SettingsService
+     */
     private $settingsService;
 
-    /** @var EntityRepositoryInterface */
+    /**
+     * @var MollieSettingStruct
+     */
+    private $settings;
+
+    /**
+     * @var EntityRepositoryInterface
+     */
     private $languageRepositoryInterface;
 
-    /** @var EntityRepositoryInterface */
+    /**
+     * @var EntityRepositoryInterface
+     */
     private $localeRepositoryInterface;
 
 
@@ -63,30 +80,39 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Creates a new instance of the checkout confirm page subscriber.
-     *
-     * @param MollieApiClient $apiClient
+     * CheckoutConfirmPageSubscriber constructor.
+     * @param MollieApiFactory $apiFactory
      * @param SettingsService $settingsService
+     * @param EntityRepositoryInterface $languageRepositoryInterface
+     * @param EntityRepositoryInterface $localeRepositoryInterface
      */
-    public function __construct(
-        MollieApiClient $apiClient,
-        SettingsService $settingsService,
-        EntityRepositoryInterface $languageRepositoryInterface,
-        EntityRepositoryInterface $localeRepositoryInterface
-
-    )
+    public function __construct(MollieApiFactory $apiFactory, SettingsService $settingsService, EntityRepositoryInterface $languageRepositoryInterface, EntityRepositoryInterface $localeRepositoryInterface)
     {
-        $this->apiClient = $apiClient;
+        $this->apiFactory = $apiFactory;
         $this->settingsService = $settingsService;
         $this->languageRepositoryInterface = $languageRepositoryInterface;
         $this->localeRepositoryInterface = $localeRepositoryInterface;
     }
 
     /**
-     * @param PageLoadedEvent|CheckoutConfirmPageLoadedEvent $args
+     * @param CheckoutConfirmPageLoadedEvent $args
+     * @throws \Mollie\Api\Exceptions\IncompatiblePlatform
      */
-    public function addDataToPage($args): void
+    public function addDataToPage(CheckoutConfirmPageLoadedEvent $args): void
     {
+        # load our settings for the
+        # current request
+        $this->settings = $this->settingsService->getSettings(
+            $args->getSalesChannelContext()->getSalesChannel()->getId(),
+            $args->getContext()
+        );
+
+        # now use our factory to get the correct
+        # client with the correct sales channel settings
+        $this->apiClient = $this->apiFactory->createClient(
+            $args->getSalesChannelContext()->getSalesChannel()->getId()
+        );
+
         $this->addMollieLocaleVariableToPage($args);
         $this->addMollieProfileIdVariableToPage($args);
         $this->addMollieTestModeVariableToPage($args);
@@ -97,12 +123,10 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     /**
      * Adds the locale for Mollie components to the storefront.
      *
-     * @param PageLoadedEvent|CheckoutConfirmPageLoadedEvent $args
+     * @param CheckoutConfirmPageLoadedEvent $args
      */
-    public function addMollieLocaleVariableToPage($args): void
+    private function addMollieLocaleVariableToPage(CheckoutConfirmPageLoadedEvent $args): void
     {
-
-
         /**
          * Build an array of available locales.
          */
@@ -137,26 +161,25 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
         $context = $args->getContext();
         $salesChannelContext = $args->getSalesChannelContext();
 
-        if ($context !== null &&  $salesChannelContext !== null) {
+        if ($context !== null && $salesChannelContext !== null) {
             $salesChannel = $salesChannelContext->getSalesChannel();
             if ($salesChannel !== null) {
                 $languageId = $salesChannel->getLanguageId();
                 if ($languageId !== null) {
-                $languageCriteria = new Criteria();
-                $languageCriteria->addFilter(new EqualsFilter('id', $languageId));
+                    $languageCriteria = new Criteria();
+                    $languageCriteria->addFilter(new EqualsFilter('id', $languageId));
 
-                $languages = $this->languageRepositoryInterface->search($languageCriteria, $args->getContext());
-                $localeId = $languages->first()->getLocaleId();
-                $localeCriteria = new Criteria();
-                $localeCriteria->addFilter(new EqualsFilter('id', $localeId));
+                    $languages = $this->languageRepositoryInterface->search($languageCriteria, $args->getContext());
+                    $localeId = $languages->first()->getLocaleId();
+                    $localeCriteria = new Criteria();
+                    $localeCriteria->addFilter(new EqualsFilter('id', $localeId));
 
-                $locales = $this->localeRepositoryInterface->search($localeCriteria, $args->getContext());
-                $locale = $locales->first()->getCode();
+                    $locales = $this->localeRepositoryInterface->search($localeCriteria, $args->getContext());
+                    $locale = $locales->first()->getCode();
 
                 }
             }
         }
-
 
 
         /**
@@ -184,27 +207,21 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     /**
      * Adds the test mode variable to the storefront.
      *
-     * @param PageLoadedEvent|CheckoutConfirmPageLoadedEvent $args
+     * @param CheckoutConfirmPageLoadedEvent $args
      */
-    public function addMollieTestModeVariableToPage($args): void
+    private function addMollieTestModeVariableToPage(CheckoutConfirmPageLoadedEvent $args): void
     {
-        /** @var MollieSettingStruct $settings */
-        $settings = $this->settingsService->getSettings(
-            $args->getSalesChannelContext()->getSalesChannel()->getId(),
-            $args->getContext()
-        );
-
         $args->getPage()->assign([
-            'mollie_test_mode' => $settings->isTestMode() ? 'true' : 'false',
+            'mollie_test_mode' => $this->settings->isTestMode() ? 'true' : 'false',
         ]);
     }
 
     /**
      * Adds the profile id to the storefront.
      *
-     * @param PageLoadedEvent|CheckoutConfirmPageLoadedEvent $args
+     * @param CheckoutConfirmPageLoadedEvent $args
      */
-    public function addMollieProfileIdVariableToPage($args): void
+    private function addMollieProfileIdVariableToPage(CheckoutConfirmPageLoadedEvent $args): void
     {
         /** @var string $mollieProfileId */
         $mollieProfileId = '';
@@ -234,27 +251,21 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     /**
      * Adds the components variable to the storefront.
      *
-     * @param PageLoadedEvent|CheckoutConfirmPageLoadedEvent $args
+     * @param CheckoutConfirmPageLoadedEvent $args
      */
-    public function addMollieComponentsVariableToPage($args)
+    private function addMollieComponentsVariableToPage(CheckoutConfirmPageLoadedEvent $args)
     {
-        /** @var MollieSettingStruct $settings */
-        $settings = $this->settingsService->getSettings(
-            $args->getSalesChannelContext()->getSalesChannel()->getId(),
-            $args->getContext()
-        );
-
         $args->getPage()->assign([
-            'enable_credit_card_components' => $settings->getEnableCreditCardComponents(),
+            'enable_credit_card_components' => $this->settings->getEnableCreditCardComponents(),
         ]);
     }
 
     /**
      * Adds ideal issuers variable to the storefront.
      *
-     * @param PageLoadedEvent|CheckoutConfirmPageLoadedEvent $args
+     * @param CheckoutConfirmPageLoadedEvent $args
      */
-    public function addMollieIdealIssuersVariableToPage($args)
+    private function addMollieIdealIssuersVariableToPage(CheckoutConfirmPageLoadedEvent $args)
     {
         /** @var array $customFields */
         $customFields = [];
@@ -323,4 +334,5 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
             ]);
         }
     }
+
 }
