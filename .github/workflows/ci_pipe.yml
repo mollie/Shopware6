@@ -201,7 +201,6 @@ jobs:
       - name: Upload into Docker
         run: |
           docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
-          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make install -B'
 
       - name: Install Plugin
         run: |
