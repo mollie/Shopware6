@@ -206,9 +206,9 @@ jobs:
         run: |
           docker exec shop bash -c 'php bin/console plugin:refresh'
           docker exec shop bash -c 'php bin/console plugin:install MolliePayments --activate'
-          docker exec shop bash -c 'php bin/console system:config:set MolliePayments MolliePayments.config.liveApiKey ${{ secrets.MOLLIE_APIKEY_TEST }}'
-          docker exec shop bash -c 'php bin/console system:config:set MolliePayments MolliePayments.config.testApiKey ${{ secrets.MOLLIE_APIKEY_TEST }}'
-          docker exec shop bash -c 'php bin/console system:config:set MolliePayments MolliePayments.config.testMode true'
+          docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.liveApiKey ${{ secrets.MOLLIE_APIKEY_TEST }}'
+          docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.testApiKey ${{ secrets.MOLLIE_APIKEY_TEST }}'
+          docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.testMode true'
           docker exec shop bash -c 'php bin/console cache:clear'
 
       - name: Install Cypress
