@@ -181,6 +181,14 @@ jobs:
       - name: Clone Code
         uses: actions/checkout@v2
 
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+
+      - name: Install Dependencies
+        run: make install -B
+
       - name: Start Docker
         run: |
           docker run --rm -p 80:80 --name shop -d dockware/play:${{ matrix.shopware }}
@@ -191,7 +199,8 @@ jobs:
           docker exec shop bash -c "mysql -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='http://local.mollie.shop';\""
 
       - name: Upload into Docker
-        run: docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
+        run: |
+          docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
 
       - name: Install Plugin
         run: |
