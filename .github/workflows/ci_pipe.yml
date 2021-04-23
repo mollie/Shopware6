@@ -139,7 +139,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        shopware: [ '6.1.0' ]
+        shopware: [ '6.2.0', '6.1.0' ]
     steps:
 
       - name: Clone Code
@@ -175,7 +175,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        shopware: [ '6.3.5.2', '6.3.0', '6.2.0' ]
+        shopware: [ '6.3.5.2', '6.3.0' ]
     steps:
 
       - name: Clone Code
