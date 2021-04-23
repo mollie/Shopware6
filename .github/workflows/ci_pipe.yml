@@ -191,7 +191,9 @@ jobs:
           docker exec shop bash -c "mysql -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='http://local.mollie.shop';\""
 
       - name: Upload into Docker
-        run: docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
+        run: |
+          docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
+          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make install -B'
 
       - name: Install Plugin
         run: |
