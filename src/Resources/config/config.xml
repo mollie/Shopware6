@@ -20,6 +20,9 @@
             <label lang="de-DE">Test Key</label>
             <label lang="nl-NL">Test-sleutel</label>
         </input-field>
+        <component name="mollie-test-api-key">
+            <name>mollieTestKeyButton</name>
+        </component>
     </card>
     <card>
         <title>Modes</title>
