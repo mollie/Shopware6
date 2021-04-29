@@ -10,5 +10,14 @@
         </service>
 
         <service id="Kiener\MolliePayments\Service\MolliePaymentExtractor"/>
+
+        <service id="Kiener\MolliePayments\Service\OrderService" class="Kiener\MolliePayments\Service\OrderService">
+            <argument type="service" id="order.repository"/>
+            <argument type="service" id="order_line_item.repository"/>
+            <argument type="service" id="monolog.logger"/>
+            <argument type="service" id="Kiener\MolliePayments\Validator\OrderLineItemValidator"/>
+            <argument type="service" id="Kiener\MolliePayments\Validator\OrderTotalRoundingValidator"/>
+            <argument>%kernel.shopware_version%</argument>
+        </service>
     </services>
 </container>

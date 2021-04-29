@@ -6,6 +6,7 @@ namespace MolliePayments\Tests\Service;
 
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Validator\OrderLineItemValidator;
+use Kiener\MolliePayments\Validator\OrderTotalRoundingValidator;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
@@ -35,7 +36,9 @@ class OrderServiceTest extends TestCase
             $orderRepository,
             $lineItemRepository,
             $logger,
-            new OrderLineItemValidator($logger)
+            new OrderLineItemValidator($logger),
+            new OrderTotalRoundingValidator(),
+            '6.3.5.4'
         );
 
     }
