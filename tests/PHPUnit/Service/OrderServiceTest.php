@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 
-namespace Kiener\MolliePayments\Tests\Service;
+namespace MolliePayments\Tests\Service;
 
 
 use Kiener\MolliePayments\Service\OrderService;

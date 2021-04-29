@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Tests\Facade;
+namespace MolliePayments\Tests\Facade;
 
 use Kiener\MolliePayments\Facade\MollieShipment;
 use Kiener\MolliePayments\Service\CustomFieldsInterface;

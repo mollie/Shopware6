@@ -1,7 +1,7 @@
 {
   "name": "kiener/mollie-payments-plugin",
   "description": "Mollie Payments",
-  "version": "v1.3.14",
+  "version": "v1.3.16",
   "type": "shopware-platform-plugin",
   "license": "MIT",
   "authors": [
@@ -45,6 +45,12 @@
       "Mollie\\Api\\": "vendor/mollie/mollie-api-php/src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "MolliePayments\\Tests\\": "tests/PHPUnit/",
+      "MolliePayments\\PHPStan\\": "tests/PHPStan/"
+    }
+  },
   "suggest": {
     "shopware/storefront": "Require '*'. Enables features like Creditcard Components and iDeal issuer selector.",
     "shopware/administration": "Require '*'. Enables features like partial shipping and refunding."
@@ -61,5 +67,13 @@
     "phpstan/phpstan": "^0.12.82",
     "friendsofphp/php-cs-fixer": "^2.18",
     "nunomaduro/phpinsights": "^1.14"
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "[ ! -f vendor/bin/phpcs ] || vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility"
+    ],
+    "post-update-cmd": [
+      "[ ! -f vendor/bin/phpcs ] || vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility"
+    ]
   }
 }

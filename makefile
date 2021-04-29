@@ -27,6 +27,12 @@ clean: ## Cleans all dependencies
 test: ## Starts all Tests
 	@XDEBUG_MODE=coverage php vendor/bin/phpunit --configuration=phpunit.xml --coverage-html ../../../public/.reports/mollie/coverage
 
+phpcheck: ## Starts the PHP syntax checks
+	@find . -name '*.php' -not -path "./vendor/*" -not -path "./tests/*" | xargs -n 1 -P4 php -l
+
+phpmin: ## Starts the PHP compatibility checks
+	@php vendor/bin/phpcs -p --standard=PHPCompatibility --extensions=php --runtime-set testVersion 7.2 ./src
+
 csfix: ## Starts the PHP CS Fixer
 	@php vendor/bin/php-cs-fixer fix --config=./.php_cs.php --dry-run
 
@@ -40,6 +46,8 @@ insights: ## Starts the PHPInsights Analyser
 
 pr: ## Prepares everything for a Pull Request
 	@php vendor/bin/php-cs-fixer fix --config=./.php_cs.php
+	@make phpcheck -B
+	@make phpmin -B
 	@make stan -B
 	@make test -B
 

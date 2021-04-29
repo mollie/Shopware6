@@ -3,12 +3,11 @@
 namespace Kiener\MolliePayments\Subscriber;
 
 use Kiener\MolliePayments\Service\CustomerService;
+use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
-use RuntimeException;
 use Shopware\Core\Checkout\Customer\Event\CustomerRegisterEvent;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -23,6 +22,9 @@ class CustomerRegistrationSubscriber implements EventSubscriberInterface
 
     /** @var SettingsService */
     private $settingsService;
+
+    /** @var LoggerService */
+    private $loggerService;
 
     /**
      * Returns an array of event names this subscriber wants to listen to.
@@ -57,13 +59,13 @@ class CustomerRegistrationSubscriber implements EventSubscriberInterface
     public function __construct(
         MollieApiClient $apiClient,
         CustomerService $customerService,
-        SettingsService $settingsService
-
-    )
-    {
+        SettingsService $settingsService,
+        LoggerService $loggerService
+    ) {
         $this->apiClient = $apiClient;
         $this->customerService = $customerService;
         $this->settingsService = $settingsService;
+        $this->loggerService = $loggerService;
     }
 
     /**
@@ -74,47 +76,56 @@ class CustomerRegistrationSubscriber implements EventSubscriberInterface
     public function onCustomerRegistration(EntityWrittenEvent $entityWrittenEvent): void
     {
         $context = $entityWrittenEvent->getContext();
-        if ($context !== null) {
+
+        if ($context === null) {
+            return;
+        }
+
         $source = $context->getSource();
-            if ($source !== null) {
-                if (method_exists($source, 'getSalesChannelId')) {
-            $salesChannelId = $source->getSalesChannelId();
-                    if (!empty($salesChannelId)) {
-                    $settings = $this->settingsService->getSettings($salesChannelId);
-                        if ($settings->isTestMode() === false && $settings->createNoCustomersAtMollie() === true) {
-                            foreach ($entityWrittenEvent->getPayloads() as $payload) {
-                                $id = (isset($payload['id'])) ? $payload['id'] : null;
-                                $name = (isset($payload['firstName']) && isset($payload['lastName'])) ? $payload['firstName'] .' '. $payload['lastName']  : null;
-                                $email = (isset($payload['email'])) ? $payload['email'] : null;
-                                $guest = (isset($payload['guest'])) ? $payload['guest'] : null;
-                                if ($name !== null
-                                    && $email !== null
-                                    && $guest === false
-                                    && $id !== null) {
-                                    try {
-                                        $mollieCustomer = $this->apiClient->customers->create([
-                                            'name' => $name,
-                                            'email' => $email,
-                                        ]);
 
-                                        $customer = $this->customerService->getCustomer($id, $entityWrittenEvent->getContext());
-                                        if ($customer !== null) {
-                                            $customer->setCustomFields([
-                                                'customer_id' => $mollieCustomer->id
-                                            ]);
+        if ($source === null | !method_exists($source, 'getSalesChannelId')) {
+            return;
+        }
 
-                                            $this->customerService->saveCustomerCustomFields($customer,
-                                                $customer->getCustomFields(),
-                                            $entityWrittenEvent->getContext());
-                                        }
-                                    } catch (ApiException $e) {
+        $settings = $this->settingsService->getSettings($source->getSalesChannelId());
 
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+        if ($settings->createNoCustomersAtMollie()) {
+            return;
+        }
+
+        foreach ($entityWrittenEvent->getPayloads() as $payload) {
+            if (
+                \array_key_exists('customFields', $payload) &&
+                \array_key_exists(CustomerService::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID, $payload['customFields'])
+            ) {
+                // Escape if the payload already writes the mollie Id to the custom Fields
+                continue;
+            }
+
+            if (!isset($payload['firstName'], $payload['lastName'], $payload['email'], $payload['id'], $payload['guest'])) {
+                // Escape if we do not have the information mollie wants
+                continue;
+            }
+
+            $id = $payload['id'];
+            $name = \sprintf('%s %s', $payload['firstName'], $payload['lastName']);
+            $email = $payload['email'];
+
+            try {
+                $mollieCustomer = $this->apiClient->customers->create(
+                    [
+                        'name'  => $name,
+                        'email' => $email,
+                    ]
+                );
+
+                $this->customerService->saveCustomerCustomFields(
+                    $id,
+                    ['customer_id' => $mollieCustomer->id],
+                    $entityWrittenEvent->getContext()
+                );
+            } catch (ApiException $e) {
+                $this->loggerService->addEntry('Customer could not be registered.', $context, $e);
             }
         }
     }

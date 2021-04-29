@@ -6,11 +6,10 @@ use Exception;
 use Kiener\MolliePayments\Event\PaymentPageFailEvent;
 use Kiener\MolliePayments\Event\PaymentPageRedirectEvent;
 use Kiener\MolliePayments\Helper\DeliveryStateHelper;
-use Kiener\MolliePayments\Helper\OrderStateHelper;
 use Kiener\MolliePayments\Helper\PaymentStatusHelper;
 use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\LoggerService;
-use Kiener\MolliePayments\Service\MolliePaymentStatus;
+use Kiener\MolliePayments\Service\Order\OrderStateService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\TransactionService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
@@ -24,16 +23,12 @@ use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\OrderStates;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Event\BusinessEventDispatcher;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\RouterInterface;
@@ -52,8 +47,8 @@ class PaymentController extends StorefrontController
     /** @var BusinessEventDispatcher */
     private $eventDispatcher;
 
-    /** @var OrderStateHelper */
-    private $orderStateHelper;
+    /** @var OrderStateService */
+    private $orderStateService;
 
     /** @var PaymentStatusHelper */
     private $paymentStatusHelper;
@@ -72,7 +67,7 @@ class PaymentController extends StorefrontController
         MollieApiClient $apiClient,
         DeliveryStateHelper $deliveryStateHelper,
         BusinessEventDispatcher $eventDispatcher,
-        OrderStateHelper $orderStateHelper,
+        OrderStateService $orderStateService,
         PaymentStatusHelper $paymentStatusHelper,
         SettingsService $settingsService,
         TransactionService $transactionService,
@@ -83,7 +78,7 @@ class PaymentController extends StorefrontController
         $this->apiClient = $apiClient;
         $this->deliveryStateHelper = $deliveryStateHelper;
         $this->eventDispatcher = $eventDispatcher;
-        $this->orderStateHelper = $orderStateHelper;
+        $this->orderStateService = $orderStateService;
         $this->paymentStatusHelper = $paymentStatusHelper;
         $this->settingsService = $settingsService;
         $this->transactionService = $transactionService;
@@ -342,7 +337,7 @@ class PaymentController extends StorefrontController
         }
 
         // Reopen the order
-        $this->orderStateHelper->setOrderState(
+        $this->orderStateService->setOrderState(
             $order,
             OrderStates::STATE_OPEN,
             $context->getContext()

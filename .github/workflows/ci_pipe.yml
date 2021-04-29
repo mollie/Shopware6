@@ -1,9 +1,6 @@
 name: CI Pipeline
 
 on:
-  pull_request:
-    branches:
-      - master
   push:
     branches:
       - master
@@ -13,8 +10,8 @@ on:
 
 jobs:
 
-  syntax_checks:
-    name: Syntax Checks | PHP ${{ matrix.php }}
+  php_checks:
+    name: PHP Syntax Checks | PHP ${{ matrix.php }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -29,13 +26,32 @@ jobs:
           php-version: ${{ matrix.php }}
 
       - name: PHP Syntax Checks
-        run: find . -name '*.php' -not -path "./vendor/*" -not -path "./tests/*" | xargs -n 1 -P4 php -l
+        run: make phpcheck -B
+
+  php_min:
+    name: PHP 7.2 Compatibility
+    needs: php_checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+
+      - name: Install Dependencies
+        run: make dev -B
+
+      - name: PHP Compatibility Checks
+        run: make phpmin -B
 
   # ------------------------------------------------------------------------------------------------------------------------
 
   unit_tests:
     name: Unit Tests | PHP ${{ matrix.php }}
-    needs: syntax_checks
+    needs: php_min
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -96,7 +112,7 @@ jobs:
         run: make csfix -B
 
   phpinsights:
-    name: PHP CS Fixer
+    name: PHPInsights
     needs: phpcsfixer
     runs-on: ubuntu-latest
     steps:
@@ -123,7 +139,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        shopware: [ '6.3.5.2', '6.3.0', '6.2.0', '6.1.0' ]
+        shopware: [ '6.2.0', '6.1.0' ]
     steps:
 
       - name: Clone Code
@@ -144,9 +160,69 @@ jobs:
           docker logs shop
 
       - name: Upload into Docker
-        run: docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MollieShopware
+        run: docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
 
       - name: Install Plugin
         run: |
           docker exec shop bash -c "php bin/console plugin:refresh"
           docker exec shop bash -c "php bin/console plugin:install MolliePayments --activate"
+
+  # ------------------------------------------------------------------------------------------------------------------------
+
+  e2e:
+    name: E2E Tests | Shopware ${{ matrix.shopware }}
+    needs: integration
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        shopware: [ '6.3.5.2', '6.3.0' ]
+    steps:
+
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+
+      - name: Install Dependencies
+        run: make install -B
+
+      - name: Start Docker
+        run: |
+          docker run --rm -p 80:80 --name shop -d dockware/play:${{ matrix.shopware }}
+          sleep 30
+          docker logs shop
+          # now change the domain of our shop, mollie doesn't work with localhost
+          sudo echo "127.0.0.1 local.mollie.shop" | sudo tee -a /etc/hosts
+          docker exec shop bash -c "mysql -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='http://local.mollie.shop';\""
+
+      - name: Upload into Docker
+        run: |
+          docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
+
+      - name: Install Plugin
+        run: |
+          docker exec shop bash -c 'php bin/console plugin:refresh'
+          docker exec shop bash -c 'php bin/console plugin:install MolliePayments --activate'
+          docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.liveApiKey ${{ secrets.MOLLIE_APIKEY_TEST }}'
+          docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.testApiKey ${{ secrets.MOLLIE_APIKEY_TEST }}'
+          docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.testMode true'
+          docker exec shop bash -c 'php bin/console cache:clear'
+
+      - name: Install Cypress
+        run: cd tests/Cypress && make install -B
+
+      - name: Start Cypress
+        run: cd tests/Cypress && make run url=http://local.mollie.shop
+
+      - name: Store Cypress Results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: cypress_results_sw_v${{ matrix.shopware }}
+          retention-days: 1
+          path: |
+            tests/Cypress/cypress/videos
+            tests/Cypress/cypress/screenshots

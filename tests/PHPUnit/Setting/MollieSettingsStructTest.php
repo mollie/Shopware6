@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Tests\Setting;
+namespace MolliePayments\Tests\Setting;
 
 use DateTime;
 use DateTimeZone;

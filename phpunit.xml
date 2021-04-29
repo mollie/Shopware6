@@ -9,7 +9,7 @@
 
     <testsuites>
         <testsuite name="MolliePayments Tests">
-            <directory>./tests</directory>
+            <directory>./tests/PHPUnit</directory>
         </testsuite>
     </testsuites>
 
