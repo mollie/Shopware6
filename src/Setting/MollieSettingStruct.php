@@ -190,7 +190,10 @@ class MollieSettingStruct extends Struct
      */
     public function createNoCustomersAtMollie(): bool
     {
-        return (bool)$this->noCustomersAtMollie;
+        # we remove this feature for now.
+        # it has to be redesigned to avoid problems
+        return true;
+        # return (bool)$this->noCustomersAtMollie;
     }
 
     /**
