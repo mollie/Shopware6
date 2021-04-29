@@ -229,8 +229,9 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             }
 
             // Get the payment url from the order at Mollie.
+            // If it's not set, e.g. because it was MIT, and order is paid, go directly success URL
             if ($mollieOrder !== null) {
-                $paymentUrl = isset($mollieOrder) ? $mollieOrder->getCheckoutUrl() : null;
+                $finalizeUrl = $mollieOrder->isPaid() ? $transaction->getReturnUrl() : $mollieOrder->getCheckoutUrl();
             }
         } catch (Exception $e) {
             $this->logger->addEntry(
@@ -254,8 +255,8 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
 
         // Set the payment status to in progress
         if (
-            isset($paymentUrl)
-            && !empty($paymentUrl)
+            isset($finalizeUrl)
+            && !empty($finalizeUrl)
             && method_exists($this->transactionStateHandler, 'process')
         ) {
             try {
@@ -276,11 +277,12 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         }
 
         /**
-         * Redirect the customer to the payment URL. Afterwards the
-         * customer is redirected back to Shopware's finish page, which
-         * leads to the @finalize function.
+         * Redirect the customer to the payment URL, if available.
+         * If not, we redirect to the success URL.
+         * Afterwards the customer is redirected back to Shopware's
+         * finish page, which leads to the @finalize function.
          */
-        return RedirectResponse::create($paymentUrl);
+        return RedirectResponse::create($finalizeUrl);
     }
 
     /**
