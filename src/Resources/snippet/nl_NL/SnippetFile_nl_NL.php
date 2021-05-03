@@ -8,12 +8,12 @@ class SnippetFile_nl_NL implements SnippetFileInterface
 {
     public function getName(): string
     {
-        return 'mollie.payments.nl-NL';
+        return 'mollie-payments.nl-NL';
     }
 
     public function getPath(): string
     {
-        return __DIR__ . '/mollie.payments.nl-NL.json';
+        return __DIR__ . '/mollie-payments.nl-NL.json';
     }
 
     public function getIso(): string

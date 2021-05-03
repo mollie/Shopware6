@@ -10,12 +10,12 @@ class SnippetFile_de_DE implements SnippetFileInterface
 {
     public function getName(): string
     {
-        return 'mollie.payments.de-DE';
+        return 'mollie-payments.de-DE';
     }
 
     public function getPath(): string
     {
-        return __DIR__.'/mollie.payments.de-DE.json';
+        return __DIR__ . '/mollie-payments.de-DE.json';
     }
 
     public function getIso(): string
