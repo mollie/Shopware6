@@ -118,10 +118,10 @@
             <argument type="service" id="payment_method.repository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\ProductService"/>
             <argument type="service" id="router"/>
-            <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\ShippingMethodService"/>
-
+            <argument type="service" id="service_container"/>
+            <argument>%kernel.shopware_version%</argument>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
