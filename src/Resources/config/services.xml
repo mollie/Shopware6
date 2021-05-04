@@ -159,10 +159,8 @@
         </service>
 
         <service id="Kiener\MolliePayments\Storefront\Controller\WebhookController" public="true">
-            <argument type="service" id="router"/>
             <argument type="service" id="order_transaction.repository"/>
             <argument type="service" id="Mollie\Api\MollieApiClient"/>
-            <argument type="service" id="Kiener\MolliePayments\Helper\DeliveryStateHelper"/>
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
