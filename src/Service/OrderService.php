@@ -443,7 +443,7 @@ class OrderService
             return OrderLineType::TYPE_DISCOUNT;
         }
 
-        if ($item->getType() === static::LINE_ITEM_TYPE_CUSTOM_PRODUCTS) {
+        if ($item->getType() === self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS) {
             return OrderLineType::TYPE_PHYSICAL;
         }
 

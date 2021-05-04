@@ -41,9 +41,6 @@ class PaymentController extends StorefrontController
     /** @var MollieApiClient */
     private $apiClient;
 
-    /** @var DeliveryStateHelper */
-    private $deliveryStateHelper;
-
     /** @var BusinessEventDispatcher */
     private $eventDispatcher;
 
@@ -65,7 +62,6 @@ class PaymentController extends StorefrontController
     public function __construct(
         RouterInterface $router,
         MollieApiClient $apiClient,
-        DeliveryStateHelper $deliveryStateHelper,
         BusinessEventDispatcher $eventDispatcher,
         OrderStateService $orderStateService,
         PaymentStatusHelper $paymentStatusHelper,
@@ -76,7 +72,6 @@ class PaymentController extends StorefrontController
     {
         $this->router = $router;
         $this->apiClient = $apiClient;
-        $this->deliveryStateHelper = $deliveryStateHelper;
         $this->eventDispatcher = $eventDispatcher;
         $this->orderStateService = $orderStateService;
         $this->paymentStatusHelper = $paymentStatusHelper;

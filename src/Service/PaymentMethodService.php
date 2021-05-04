@@ -7,7 +7,6 @@ use Kiener\MolliePayments\Handler\Method\BanContactPayment;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Kiener\MolliePayments\Handler\Method\BelfiusPayment;
 use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
-use Kiener\MolliePayments\Handler\Method\DirectDebitPayment;
 use Kiener\MolliePayments\Handler\Method\EpsPayment;
 use Kiener\MolliePayments\Handler\Method\GiftCardPayment;
 use Kiener\MolliePayments\Handler\Method\GiroPayPayment;
@@ -28,7 +27,6 @@ use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Content\Media\MediaCollection;
 use Shopware\Core\Content\Media\MediaService;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
@@ -190,9 +188,6 @@ class PaymentMethodService
                 /** @var string|null $paymentMethodId */
                 $paymentMethodId = $this->getPaymentMethodId($handler['class'], $handler['name']);
 
-                /** @var PaymentMethodEntity $paymentMethod */
-                $paymentMethod = null;
-
                 if ((string) $paymentMethodId !== '') {
                     $this->activatePaymentMethod($paymentMethodId, true, $context);
                 }
@@ -215,10 +210,14 @@ class PaymentMethodService
         Context $context = null
     ): EntityWrittenContainerEvent
     {
-        return $this->paymentRepository->upsert([[
-            'id' => $paymentMethodId,
-            'active' => $active
-        ]], $context ?? Context::createDefaultContext());
+        return $this->paymentRepository->upsert(
+            [
+                [
+                    'id' => $paymentMethodId,
+                    'active' => $active
+                ]
+            ],
+            $context ?? Context::createDefaultContext());
     }
 
     /**

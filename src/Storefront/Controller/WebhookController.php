@@ -3,7 +3,6 @@
 namespace Kiener\MolliePayments\Storefront\Controller;
 
 use Exception;
-use Kiener\MolliePayments\Helper\DeliveryStateHelper;
 use Kiener\MolliePayments\Helper\PaymentStatusHelper;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\SettingsService;
@@ -23,21 +22,14 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Routing\RouterInterface;
 
 class WebhookController extends StorefrontController
 {
-    /** @var RouterInterface */
-    private $router;
-
     /** @var EntityRepositoryInterface */
     private $orderTransactionRepository;
 
     /** @var MollieApiClient */
     private $apiClient;
-
-    /** @var DeliveryStateHelper */
-    private $deliveryStateHelper;
 
     /** @var PaymentStatusHelper */
     private $paymentStatusHelper;
@@ -49,19 +41,15 @@ class WebhookController extends StorefrontController
     private $logger;
 
     public function __construct(
-        RouterInterface $router,
         EntityRepositoryInterface $orderTransactionRepository,
         MollieApiClient $apiClient,
-        DeliveryStateHelper $deliveryStateHelper,
         PaymentStatusHelper $paymentStatusHelper,
         SettingsService $settingsService,
         LoggerService $logger
     )
     {
-        $this->router = $router;
         $this->orderTransactionRepository = $orderTransactionRepository;
         $this->apiClient = $apiClient;
-        $this->deliveryStateHelper = $deliveryStateHelper;
         $this->paymentStatusHelper = $paymentStatusHelper;
         $this->settingsService = $settingsService;
         $this->logger = $logger;

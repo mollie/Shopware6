@@ -24,7 +24,7 @@ class iDealPayment extends PaymentHandler
         LocaleEntity $locale
     ): array
     {
-        if (!array_key_exists(static::FIELD_IDEAL_ISSUER, $orderData[static::FIELD_PAYMENT]) || in_array($orderData[static::FIELD_PAYMENT][static::FIELD_IDEAL_ISSUER], [null, ''], true)) {
+        if (!array_key_exists(self::FIELD_IDEAL_ISSUER, $orderData[PaymentHandler::FIELD_PAYMENT]) || in_array($orderData[PaymentHandler::FIELD_PAYMENT][self::FIELD_IDEAL_ISSUER], [null, ''], true)) {
             //ToDo: Dropdown met banken in checkout, daarna deze vullen
         }
 
