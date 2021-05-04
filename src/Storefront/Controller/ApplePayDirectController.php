@@ -35,8 +35,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\Uuid\Uuid;
-use Shopware\Core\System\SalesChannel\Context\CachedSalesChannelContextFactory;
-use Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
@@ -75,15 +73,14 @@ class ApplePayDirectController extends StorefrontController
     /** @var RouterInterface */
     private $router;
 
-    /** @var SalesChannelContextFactory */
-    private $salesChannelContextFactory;
-
     /** @var SettingsService */
     private $settingsService;
 
     /** @var ShippingMethodService */
     private $shippingMethodService;
-    private string $shopwareVersion;
+
+    /** @var string */
+    private $shopwareVersion;
 
     public function __construct(
         MollieApiClient $apiClient,
