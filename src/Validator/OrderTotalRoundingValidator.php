@@ -15,9 +15,9 @@ class OrderTotalRoundingValidator
      * @param string $orderTaxState
      * @return bool
      */
-    public function validate(int $decimals, bool $roundForNet, float $interval, string $orderTaxState): bool
+    public function isNewRoundingActive(int $decimals, bool $roundForNet, float $interval, string $orderTaxState): bool
     {
-        if (!$this->validateShouldRound($decimals, $roundForNet, $orderTaxState)) {
+        if (!$this->considerRounding($decimals, $roundForNet, $orderTaxState)) {
             return false;
         }
 
@@ -34,7 +34,7 @@ class OrderTotalRoundingValidator
      * @param string $taxState
      * @return bool
      */
-    public function validateShouldRound(int $decimals, bool $roundForNet, string $taxState): bool
+    private function considerRounding(int $decimals, bool $roundForNet, string $taxState): bool
     {
         if ($decimals !== 2) {
             return false;

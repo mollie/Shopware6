@@ -229,19 +229,16 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             }
 
             if (!$mollieOrder instanceof Order) {
-                throw new Exception('Couldn\'t create payment at mollie');
+                throw new Exception("Couldn't create payment at mollie");
             }
 
             // first check if we got a checkoutUrl from mollie (in case of creditcard components
             // it could be that payment is already finished, checkout url misses in these cases)
             $paymentUrl = $mollieOrder->getCheckoutUrl();
 
-            if ($paymentUrl === null) {
-                if ($mollieOrder->isPaid()) {
-                    $paymentUrl = $mollieOrder->redirectUrl;
-                } else {
-                    throw new Exception('Didn\'t get a valid checkoutUrl for mollie payment');
-                }
+            if (empty($paymentUrl)) {
+                // if it misses => take transaction finalize url (we will check in payment url)
+                $paymentUrl = $transaction->getReturnUrl();
             }
         } catch (Exception $e) {
             $this->logger->addEntry(

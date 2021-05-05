@@ -18,7 +18,7 @@ class OrderTotalRoundingValidatorTest extends TestCase
         $roundForNet = true;
         $orderTaxState = CartPrice::TAX_STATE_NET;
 
-        $this->assertFalse((new OrderTotalRoundingValidator())->validate($decimals, $roundForNet, $interval, $orderTaxState));
+        $this->assertFalse((new OrderTotalRoundingValidator())->isNewRoundingActive($decimals, $roundForNet, $interval, $orderTaxState));
     }
 
     /**
@@ -33,7 +33,7 @@ class OrderTotalRoundingValidatorTest extends TestCase
         $roundForNet = true;
         $orderTaxState = CartPrice::TAX_STATE_NET;
 
-        $this->assertFalse((new OrderTotalRoundingValidator())->validate($decimals, $roundForNet, $interval, $orderTaxState));
+        $this->assertFalse((new OrderTotalRoundingValidator())->isNewRoundingActive($decimals, $roundForNet, $interval, $orderTaxState));
     }
 
     /**
@@ -49,7 +49,7 @@ class OrderTotalRoundingValidatorTest extends TestCase
         $roundForNet = false;
         $orderTaxState = CartPrice::TAX_STATE_NET;
 
-        $this->assertFalse((new OrderTotalRoundingValidator())->validate($decimals, $roundForNet, $interval, $orderTaxState));
+        $this->assertFalse((new OrderTotalRoundingValidator())->isNewRoundingActive($decimals, $roundForNet, $interval, $orderTaxState));
     }
 
     /**
@@ -58,18 +58,18 @@ class OrderTotalRoundingValidatorTest extends TestCase
      * if the tax state is configured that net rounding should be available and we have a NET order,
      * then rounding could be responsible for price differences
      */
-    public function testValidateCorrectTaxState(): void
+    public function testValidateCorrectTaxStateNetRounding(): void
     {
         $decimals = 2;
         $interval = 0.5;
         $roundForNet = true;
         $orderTaxState = CartPrice::TAX_STATE_NET;
 
-        $this->assertTrue((new OrderTotalRoundingValidator())->validate($decimals, $roundForNet, $interval, $orderTaxState));
+        $this->assertTrue((new OrderTotalRoundingValidator())->isNewRoundingActive($decimals, $roundForNet, $interval, $orderTaxState));
     }
 
     /**
-     * wrong tax state config => validator should return false
+     * net price shouldn't be rounded, it's a gross order, ignore net setting => validator returns true
      *
      * if the tax state is configured that no net rounding should be available and we have a GROSS order,
      * then rounding could be responsible for price differences
@@ -81,6 +81,6 @@ class OrderTotalRoundingValidatorTest extends TestCase
         $roundForNet = false;
         $orderTaxState = CartPrice::TAX_STATE_GROSS;
 
-        $this->assertTrue((new OrderTotalRoundingValidator())->validate($decimals, $roundForNet, $interval, $orderTaxState));
+        $this->assertTrue((new OrderTotalRoundingValidator())->isNewRoundingActive($decimals, $roundForNet, $interval, $orderTaxState));
     }
 }

@@ -243,7 +243,7 @@ class OrderService
         $rounding = $order->getTotalRounding();
 
         // is there a configuration that could lead to a unexpected rounding ( > 0.01 interval )
-        if (!$this->validator->validate(
+        if (!$this->validator->isNewRoundingActive(
             $rounding->getDecimals(),
             $rounding->roundForNet(),
             $rounding->getInterval(),
@@ -276,7 +276,7 @@ class OrderService
             'totalAmount' => $this->getPriceArray($currencyCode, $roundedLineItemTotalPrice),
             'vatRate' => number_format(0.0, self::MOLLIE_PRICE_PRECISION, '.', ''),
             'vatAmount' => $this->getPriceArray($currencyCode, 0.00),
-            'sku' => 'SHOPWARE ROUNDING ITEM'
+            'sku' => 'SHOPWARE-ROUNDING-ITEM'
         ];
     }
 

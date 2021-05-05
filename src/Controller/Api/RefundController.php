@@ -104,6 +104,8 @@ class RefundController extends AbstractController
     }
 
     /**
+     * refund action for Shopware versions >=6.4
+     *
      * @RouteScope(scopes={"api"})
      * @Route("/api/mollie/refund",
      *         defaults={"auth_enabled"=true}, name="api.action.mollie.refund-64", methods={"POST"})
