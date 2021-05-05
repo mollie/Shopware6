@@ -89,7 +89,7 @@ class RefundController extends AbstractController
 
     /**
      * @RouteScope(scopes={"api"})
-     * @Route("/api/_action/mollie/refund",
+     * @Route("/api/v{version}/_action/mollie/refund",
      *         defaults={"auth_enabled"=true}, name="api.action.mollie.refund", methods={"POST"})
      *
      * @param Request $request
