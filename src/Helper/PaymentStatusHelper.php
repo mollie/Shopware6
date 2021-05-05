@@ -263,7 +263,7 @@ class PaymentStatusHelper
 
         if ($mollieOrder->isAuthorized()) {
             if ($transactionState !== null && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_AUTHORIZED) {
-                if (defined('StateMachineTransitionActions::ACTION_AUTHORIZE')) {
+                if (defined('Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions::ACTION_AUTHORIZE')) {
                     $transitionAction = StateMachineTransitionActions::ACTION_AUTHORIZE;
                 } else {
                     $transitionAction = StateMachineTransitionActions::ACTION_PAY;
