@@ -357,10 +357,12 @@ class PaymentController extends StorefrontController
 
         // If we redirect to the payment screen, set the transaction to in progress
         try {
-            $this->paymentStatusHelper->getOrderTransactionStateHandler()->process(
-                $transactionId,
-                $context->getContext()
-            );
+            if (method_exists($this->paymentStatusHelper->getOrderTransactionStateHandler(),'process')) {
+                $this->paymentStatusHelper->getOrderTransactionStateHandler()->process(
+                    $transactionId,
+                    $context->getContext()
+                );
+            }
         } catch (Exception $e) {
             $this->logger->addEntry(
                 $e->getMessage(),
