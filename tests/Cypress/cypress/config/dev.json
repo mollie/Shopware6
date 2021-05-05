@@ -3,7 +3,7 @@
     "watchForFileChanges": false,
     "trashAssetsBeforeRuns": true,
     "screenshotOnRunFailure": true,
-    "video": false,
+    "video": true,
     "devices": [
         {
             "key": "desktop",
