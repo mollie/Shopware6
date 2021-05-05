@@ -175,7 +175,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        shopware: [ '6.3.5.2', '6.3.0' ]
+        shopware: [ '6.3.5.2' ]
     steps:
 
       - name: Clone Code
@@ -217,6 +217,14 @@ jobs:
       - name: Start Cypress
         run: cd tests/Cypress && make run url=http://local.mollie.shop
 
+      - name: Download Logs
+        if: ${{ always() }}
+        run: |
+          mkdir -p $(pwd)/tests/Cypress/cypress/logs/shopware
+          mkdir -p $(pwd)/tests/Cypress/cypress/logs/apache
+          docker cp shop:/var/www/html/var/log/. $(pwd)/tests/Cypress/cypress/logs/shopware
+          docker cp shop:/var/log/php/. $(pwd)/tests/Cypress/cypress/logs/apache
+
       - name: Store Cypress Results
         if: ${{ always() }}
         uses: actions/upload-artifact@v2
@@ -224,5 +232,6 @@ jobs:
           name: cypress_results_sw_v${{ matrix.shopware }}
           retention-days: 1
           path: |
+            tests/Cypress/cypress/logs
             tests/Cypress/cypress/videos
             tests/Cypress/cypress/screenshots
