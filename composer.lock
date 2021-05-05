@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "79775699260210555799641373cad34d",
+    "content-hash": "8c959d3d2af4933c1e2e16c35ed29780",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -61,11 +61,6 @@
                 "ssl",
                 "tls"
             ],
-            "support": {
-                "irc": "irc://irc.freenode.org/composer",
-                "issues": "https://github.com/composer/ca-bundle/issues",
-                "source": "https://github.com/composer/ca-bundle/tree/1.2.9"
-            },
             "funding": [
                 {
                     "url": "https://packagist.com",
@@ -147,10 +142,6 @@
                 "rest",
                 "web service"
             ],
-            "support": {
-                "issues": "https://github.com/guzzle/guzzle/issues",
-                "source": "https://github.com/guzzle/guzzle/tree/6.5"
-            },
             "time": "2019-12-23T11:57:10+00:00"
         },
         {
@@ -610,16 +601,16 @@
         },
         {
             "name": "composer/composer",
-            "version": "1.10.21",
+            "version": "1.10.22",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/composer.git",
-                "reference": "04021432f4a9cbd9351dd166b8c193f42c36a39c"
+                "reference": "28c9dfbe2351635961f670773e8d7b17bc5eda25"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/composer/zipball/04021432f4a9cbd9351dd166b8c193f42c36a39c",
-                "reference": "04021432f4a9cbd9351dd166b8c193f42c36a39c",
+                "url": "https://api.github.com/repos/composer/composer/zipball/28c9dfbe2351635961f670773e8d7b17bc5eda25",
+                "reference": "28c9dfbe2351635961f670773e8d7b17bc5eda25",
                 "shasum": ""
             },
             "require": {
@@ -700,7 +691,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-04-01T07:16:35+00:00"
+            "time": "2021-04-27T11:10:45+00:00"
         },
         {
             "name": "composer/package-versions-deprecated",
@@ -7612,16 +7603,16 @@
         },
         {
             "name": "symfony/console",
-            "version": "v4.4.21",
+            "version": "v4.4.22",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "1ba4560dbbb9fcf5ae28b61f71f49c678086cf23"
+                "reference": "36bbd079b69b94bcc9c9c9e1e37ca3b1e7971625"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/1ba4560dbbb9fcf5ae28b61f71f49c678086cf23",
-                "reference": "1ba4560dbbb9fcf5ae28b61f71f49c678086cf23",
+                "url": "https://api.github.com/repos/symfony/console/zipball/36bbd079b69b94bcc9c9c9e1e37ca3b1e7971625",
+                "reference": "36bbd079b69b94bcc9c9c9e1e37ca3b1e7971625",
                 "shasum": ""
             },
             "require": {
@@ -7694,7 +7685,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-03-26T09:23:24+00:00"
+            "time": "2021-04-16T17:32:19+00:00"
         },
         {
             "name": "symfony/debug",
@@ -8191,16 +8182,16 @@
         },
         {
             "name": "symfony/filesystem",
-            "version": "v4.4.21",
+            "version": "v4.4.22",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/filesystem.git",
-                "reference": "940826c465be2690c9fae91b2793481e5cbd6834"
+                "reference": "f0f06656a18304cdeacb2c4c0113a2b78a2b4c2a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/filesystem/zipball/940826c465be2690c9fae91b2793481e5cbd6834",
-                "reference": "940826c465be2690c9fae91b2793481e5cbd6834",
+                "url": "https://api.github.com/repos/symfony/filesystem/zipball/f0f06656a18304cdeacb2c4c0113a2b78a2b4c2a",
+                "reference": "f0f06656a18304cdeacb2c4c0113a2b78a2b4c2a",
                 "shasum": ""
             },
             "require": {
@@ -8246,7 +8237,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-03-28T09:59:32+00:00"
+            "time": "2021-04-01T10:24:12+00:00"
         },
         {
             "name": "symfony/finder",
@@ -10117,16 +10108,16 @@
         },
         {
             "name": "symfony/process",
-            "version": "v4.4.20",
+            "version": "v4.4.22",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
-                "reference": "7e950b6366d4da90292c2e7fa820b3c1842b965a"
+                "reference": "f5481b22729d465acb1cea3455fc04ce84b0148b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/7e950b6366d4da90292c2e7fa820b3c1842b965a",
-                "reference": "7e950b6366d4da90292c2e7fa820b3c1842b965a",
+                "url": "https://api.github.com/repos/symfony/process/zipball/f5481b22729d465acb1cea3455fc04ce84b0148b",
+                "reference": "f5481b22729d465acb1cea3455fc04ce84b0148b",
                 "shasum": ""
             },
             "require": {
@@ -10171,7 +10162,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-01-27T09:09:26+00:00"
+            "time": "2021-04-07T16:22:29+00:00"
         },
         {
             "name": "symfony/property-access",
