@@ -104,11 +104,7 @@ context("Checkout Tests", () => {
                         molliePayment.selectAuthorized();
 
                     } else {
-
-                        if (payment.key === 'ideal') {
-                            mollieIssuer.selectIDEAL();
-                        }
-
+                        
                         if (payment.key === 'kbc') {
                             mollieIssuer.selectKBC();
                         }
