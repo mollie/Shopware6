@@ -36,17 +36,6 @@ const device = devices.getFirstDevice();
 
 const payments = [
     {key: 'paypal', name: 'PayPal'},
-    {key: 'klarnapaylater', name: 'Pay later'},
-    {key: 'klarnasliceit', name: 'Slice it'},
-    {key: 'ideal', name: 'iDEAL'},
-    {key: 'sofort', name: 'SOFORT'},
-    {key: 'eps', name: 'eps'},
-    {key: 'giropay', name: 'Giropay'},
-    {key: 'mistercash', name: 'Bancontact'},
-    {key: 'przelewy24', name: 'Przelewy24'},
-    {key: 'kbc', name: 'KBC'},
-    {key: 'belfius', name: 'Belfius'},
-    {key: 'banktransfer', name: 'Banktransfer'},
 ];
 
 
@@ -125,34 +114,5 @@ context("Checkout Tests", () => {
             })
         })
     })
-
-    describe('Failed Checkout', () => {
-        context(devices.getDescription(device), () => {
-
-            it('Pay with PayPal', () => {
-
-                cy.visit('/');
-
-                login.doLogin(user_email, user_pwd);
-
-                topMenu.clickOnHome();
-                listing.clickOnFirstProduct();
-                pdp.addToCart(1);
-                checkout.goToCheckoutInOffCanvas();
-
-                checkout.switchPaymentMethod('PayPal');
-                checkout.placeOrderOnConfirm();
-
-                molliePayment.selectFailed();
-
-                // verify that we are back in our shop
-                // if the payment fails, the order is finished but
-                // we still have the option to change the payment method
-                cy.url().should('include', '/account/order/edit');
-                cy.contains('We received your order, but the payment was aborted');
-            })
-
-        })
-    })
-
+    
 })
