@@ -36,6 +36,17 @@ const device = devices.getFirstDevice();
 
 const payments = [
     {key: 'paypal', name: 'PayPal'},
+    {key: 'klarnapaylater', name: 'Pay later'},
+    {key: 'klarnasliceit', name: 'Slice it'},
+    {key: 'ideal', name: 'iDEAL'},
+    {key: 'sofort', name: 'SOFORT'},
+    {key: 'eps', name: 'eps'},
+    {key: 'giropay', name: 'Giropay'},
+    {key: 'mistercash', name: 'Bancontact'},
+    {key: 'przelewy24', name: 'Przelewy24'},
+    {key: 'kbc', name: 'KBC'},
+    {key: 'belfius', name: 'Belfius'},
+    {key: 'banktransfer', name: 'Banktransfer'},
 ];
 
 
