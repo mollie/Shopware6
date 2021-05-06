@@ -10,6 +10,7 @@ use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
+use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
@@ -96,6 +97,11 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
     protected $environment;
 
     /**
+     * @var WebhookBuilder
+     */
+    private $webhookBuilder;
+
+    /**
      * PaymentHandler constructor.
      *
      * @param OrderTransactionStateHandler $transactionStateHandler
@@ -129,6 +135,8 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         $this->router = $router;
         $this->settingsService = $settingsService;
         $this->environment = $environment;
+
+        $this->webhookBuilder = new WebhookBuilder($router);
     }
 
     /**
@@ -609,20 +617,15 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         // Temporarily disabled due to errors with Paypal
         // $orderData = $this->processPaymentMethodSpecificParameters($orderData, $salesChannelContext, $customer, $locale);
 
-        /**
-         * Generate the URL for Mollie's webhook call only on prod environment. This webhook is used
-         * to handle payment updates.
-         */
-        if (
-            getenv(self::ENV_LOCAL_DEVELOPMENT) === false
-            || (bool) getenv(self::ENV_LOCAL_DEVELOPMENT) === false
-        ) {
-            $webhookUrl = $this->router->generate('frontend.mollie.webhook', [
-                'transactionId' => $transactionId
-            ], $this->router::ABSOLUTE_URL);
-            $orderData[self::FIELD_WEBHOOK_URL] = $webhookUrl;
-            $orderData['payment']['webhookUrl'] = $webhookUrl;
-        }
+
+        
+        # create our webhook url
+        # and assign it to both required fields in the order
+        $webhookUrl = $this->webhookBuilder->buildWebhook($transactionId);
+        $orderData[self::FIELD_WEBHOOK_URL] = $webhookUrl;
+        $orderData['payment']['webhookUrl'] = $webhookUrl;
+
+
 
         $customFields = $customer->getCustomFields();
 
