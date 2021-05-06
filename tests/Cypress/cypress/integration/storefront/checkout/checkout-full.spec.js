@@ -125,7 +125,7 @@ context("Checkout Tests", () => {
     describe('Failed Checkout', () => {
         context(devices.getDescription(device), () => {
 
-            it('Pay with PayPal', () => {
+            it('Failed payment with PayPal', () => {
 
                 cy.visit('/');
 
@@ -144,8 +144,8 @@ context("Checkout Tests", () => {
                 // verify that we are back in our shop
                 // if the payment fails, the order is finished but
                 // we still have the option to change the payment method
-                cy.url().should('include', '/account/order/edit');
-                cy.contains('We received your order, but the payment was aborted');
+                cy.url().should('include', '/mollie/payment/');
+                cy.contains('The payment is failed or was canceled.');
             })
 
         })
