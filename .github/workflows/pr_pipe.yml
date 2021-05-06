@@ -8,11 +8,8 @@ on:
 jobs:
 
   php_checks:
-    name: PHP Syntax Checks | PHP ${{ matrix.php }}
+    name: PHP Syntax Checks
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        php: [ '7.2', '7.3', '7.4', '8.0' ]
     steps:
       - name: Clone Code
         uses: actions/checkout@v2
@@ -20,7 +17,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php }}
+          php-version: 7.4
 
       - name: PHP Syntax Checks
         run: make phpcheck -B
