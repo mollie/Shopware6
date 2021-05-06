@@ -208,7 +208,7 @@ class PaymentStatusHelper
             $transactionState !== null
             && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_PAID
             // FIXME: Should probably check against OrderTransactionStates constants here
-            && $mollieOrder->isPaid()
+            && ($mollieOrder->isPaid() || $mollieOrder->isCompleted())
         ) {
             try {
                 if (method_exists($this->orderTransactionStateHandler, 'paid')) {
