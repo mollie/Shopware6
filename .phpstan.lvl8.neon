@@ -1,0 +1,17 @@
+parameters:
+    level: 8
+    paths:
+        - ./src
+    excludes_analyse:
+        - ./src/Controller/*
+        - ./src/Handler/*
+        - ./src/Helper/*
+        - ./src/Resources/*
+        - ./src/Service/*
+        - ./src/Storefront/*
+        - ./src/Subscriber/*
+
+services:
+    - class: MolliePayments\PHPStan\Rules\NoManufacturerRule
+      tags:
+        - phpstan.rules.rule
