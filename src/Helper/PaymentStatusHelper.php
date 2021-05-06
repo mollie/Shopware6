@@ -262,14 +262,19 @@ class PaymentStatusHelper
         }
 
         if ($mollieOrder->isAuthorized()) {
-            // FIXME: Should probably check against OrderTransactionStates constants here
             if ($transactionState !== null && $transactionState->getTechnicalName() !== PaymentStatus::STATUS_AUTHORIZED) {
+                if (defined('Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions::ACTION_AUTHORIZE')) {
+                    $transitionAction = StateMachineTransitionActions::ACTION_AUTHORIZE;
+                } else {
+                    $transitionAction = StateMachineTransitionActions::ACTION_PAY;
+                }
+
                 try {
                     $this->stateMachineRegistry->transition(
                         new Transition(
                             OrderTransactionDefinition::ENTITY_NAME,
                             $transaction->getId(),
-                            StateMachineTransitionActions::ACTION_AUTHORIZE,
+                            $transitionAction,
                             'stateId'
                         ),
                         $context

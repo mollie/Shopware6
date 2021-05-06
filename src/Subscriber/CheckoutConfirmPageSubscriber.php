@@ -15,6 +15,7 @@ use Mollie\Api\Types\PaymentMethod;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Storefront\Page\Account\Order\AccountEditOrderPageLoadedEvent;
 use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
 use Shopware\Storefront\Page\PageLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -76,6 +77,7 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     {
         return [
             CheckoutConfirmPageLoadedEvent::class => 'addDataToPage',
+            AccountEditOrderPageLoadedEvent::class => 'addDataToPage',
         ];
     }
 
@@ -95,10 +97,10 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param CheckoutConfirmPageLoadedEvent $args
+     * @param CheckoutConfirmPageLoadedEvent|AccountEditOrderPageLoadedEvent $args
      * @throws \Mollie\Api\Exceptions\IncompatiblePlatform
      */
-    public function addDataToPage(CheckoutConfirmPageLoadedEvent $args): void
+    public function addDataToPage($args): void
     {
         # load our settings for the
         # current request
@@ -123,9 +125,9 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     /**
      * Adds the locale for Mollie components to the storefront.
      *
-     * @param CheckoutConfirmPageLoadedEvent $args
+     * @param CheckoutConfirmPageLoadedEvent|AccountEditOrderPageLoadedEvent $args
      */
-    private function addMollieLocaleVariableToPage(CheckoutConfirmPageLoadedEvent $args): void
+    private function addMollieLocaleVariableToPage($args): void
     {
         /**
          * Build an array of available locales.
@@ -207,9 +209,9 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     /**
      * Adds the test mode variable to the storefront.
      *
-     * @param CheckoutConfirmPageLoadedEvent $args
+     * @param CheckoutConfirmPageLoadedEvent|AccountEditOrderPageLoadedEvent $args
      */
-    private function addMollieTestModeVariableToPage(CheckoutConfirmPageLoadedEvent $args): void
+    private function addMollieTestModeVariableToPage($args): void
     {
         $args->getPage()->assign([
             'mollie_test_mode' => $this->settings->isTestMode() ? 'true' : 'false',
@@ -219,9 +221,9 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     /**
      * Adds the profile id to the storefront.
      *
-     * @param CheckoutConfirmPageLoadedEvent $args
+     * @param CheckoutConfirmPageLoadedEvent|AccountEditOrderPageLoadedEvent $args
      */
-    private function addMollieProfileIdVariableToPage(CheckoutConfirmPageLoadedEvent $args): void
+    private function addMollieProfileIdVariableToPage($args): void
     {
         /** @var string $mollieProfileId */
         $mollieProfileId = '';
@@ -251,9 +253,9 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     /**
      * Adds the components variable to the storefront.
      *
-     * @param CheckoutConfirmPageLoadedEvent $args
+     * @param CheckoutConfirmPageLoadedEvent|AccountEditOrderPageLoadedEvent $args
      */
-    private function addMollieComponentsVariableToPage(CheckoutConfirmPageLoadedEvent $args)
+    private function addMollieComponentsVariableToPage($args)
     {
         $args->getPage()->assign([
             'enable_credit_card_components' => $this->settings->getEnableCreditCardComponents(),
@@ -263,9 +265,9 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     /**
      * Adds ideal issuers variable to the storefront.
      *
-     * @param CheckoutConfirmPageLoadedEvent $args
+     * @param CheckoutConfirmPageLoadedEvent|AccountEditOrderPageLoadedEvent $args
      */
-    private function addMollieIdealIssuersVariableToPage(CheckoutConfirmPageLoadedEvent $args)
+    private function addMollieIdealIssuersVariableToPage($args)
     {
         /** @var array $customFields */
         $customFields = [];

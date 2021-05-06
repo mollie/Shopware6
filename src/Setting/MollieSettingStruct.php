@@ -190,7 +190,11 @@ class MollieSettingStruct extends Struct
      */
     public function createNoCustomersAtMollie(): bool
     {
-        return (bool)$this->noCustomersAtMollie;
+        // this feature is deactivated at the moment. The existing implementation is not taking care of the mollie profile id
+        // that has been used when creating the mollie customer.
+        // The whole feature needs refactoring, at the meantime it is deactivated
+        return true;
+        //return (bool)$this->noCustomersAtMollie;
     }
 
     /**

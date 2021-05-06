@@ -1,19 +1,17 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Storefront\Controller;
+namespace Kiener\MolliePayments\Controller\Api;
 
 use Exception;
-use Mollie\Api\Exceptions\ApiException;
-use Mollie\Api\Exceptions\IncompatiblePlatform;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Profile;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
-use Shopware\Storefront\Controller\StorefrontController;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-class ConfigController extends StorefrontController
+class ConfigController extends AbstractController
 {
     /**
      * @RouteScope(scopes={"api"})
@@ -32,6 +30,31 @@ class ConfigController extends StorefrontController
         // Get the test API key
         $testApiKey = $request->get('testApiKey');
 
+        return $this->getResponse($liveApiKey, $testApiKey);
+    }
+
+    /**
+     * @RouteScope(scopes={"api"})
+     * @Route("/api/_action/mollie/config/test-api-keys",
+     *         defaults={"auth_enabled"=true}, name="api.action.mollie.config.test-api-keys-64", methods={"POST"})
+     *
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    public function testApiKeys64(Request $request): JsonResponse
+    {
+        // Get the live API key
+        $liveApiKey = $request->get('liveApiKey');
+
+        // Get the test API key
+        $testApiKey = $request->get('testApiKey');
+
+        return $this->getResponse($liveApiKey, $testApiKey);
+    }
+
+    private function getResponse(string $liveApiKey, string $testApiKey): JsonResponse
+    {
         /** @var array $keys */
         $keys = [
             [

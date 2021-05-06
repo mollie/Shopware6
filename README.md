@@ -16,7 +16,10 @@ Mollie offers various payment methods which can be easily integrated into your S
 
 Once the onboarding process in your Mollie account is completed, start accepting payments. You’ll usually be up and running within one working day.
 
-Maintenance of our official plugin is performed by our [Shopware development partner Kiener](https://www.kiener.nl/).
+## Shopware 6.4 notes
+If you are using the new currency rounding feature in shopware 6.4 (total rounding interval > 0.01) we will add the rounding difference amount as new lineItem to the mollie order. We are not calculating taxes for it, because Shopware isn't calculating taxes for the discount / surcharge of the rounding amount.
+
+We advise, that you speak to your lawyer or tax consultant if you want to use the new rounding feature.
 
 ## Manual installation
 There are two ways of installing this plugin manually: You can either checkout this repository on your machine (in the plugins folder of your Shopware installation) or you can download the zip file above (most recent version can be found here: [master](https://github.com/mollie/Shopware/archive/master.zip)) and extract this on your machine (in the very same plugins folder).

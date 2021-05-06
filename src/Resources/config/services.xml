@@ -6,10 +6,12 @@
 
     <imports>
         <import resource="services/api.xml"/>
+        <import resource="services/controller.xml"/>
         <import resource="services/facades.xml"/>
         <import resource="services/services.xml"/>
         <import resource="services/snippets.xml"/>
         <import resource="services/subscriber.xml"/>
+        <import resource="services/validators.xml"/>
     </imports>
 
     <services>
@@ -27,7 +29,7 @@
         <!-- Helpers -->
         <service id="Kiener\MolliePayments\Helper\DeliveryStateHelper" class="Kiener\MolliePayments\Helper\DeliveryStateHelper">
             <argument type="service" id="Kiener\MolliePayments\Service\DeliveryService"/>
-            <argument type="service" id="Shopware\Core\Framework\StateMachine\StateMachineRegistry"/>
+            <argument type="service" id="Shopware\Core\System\StateMachine\StateMachineRegistry"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\Order\OrderStateService" class="Kiener\MolliePayments\Service\Order\OrderStateService">
@@ -78,13 +80,6 @@
             <argument type="service" id="log_entry.repository"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\OrderService" class="Kiener\MolliePayments\Service\OrderService">
-            <argument type="service" id="order.repository"/>
-            <argument type="service" id="order_line_item.repository"/>
-            <argument type="service" id="monolog.logger"/>
-            <argument type="service" id="Kiener\MolliePayments\Validator\OrderLineItemValidator"/>
-        </service>
-
         <service id="Kiener\MolliePayments\Service\PaymentMethodService" class="Kiener\MolliePayments\Service\PaymentMethodService" public="true">
             <argument type="service" id="Shopware\Core\Content\Media\MediaService"/>
             <argument type="service" id="media.repository"/>
@@ -123,10 +118,10 @@
             <argument type="service" id="payment_method.repository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\ProductService"/>
             <argument type="service" id="router"/>
-            <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\ShippingMethodService"/>
-
+            <argument type="service" id="service_container"/>
+            <argument>%kernel.shopware_version%</argument>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
@@ -140,37 +135,8 @@
             </call>
         </service>
 
-        <service id="Kiener\MolliePayments\Storefront\Controller\ConfigController" public="true">
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-        </service>
-
         <service id="Kiener\MolliePayments\Storefront\Controller\IDealIssuerController" public="true">
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-        </service>
-
-        <service id="Kiener\MolliePayments\Storefront\Controller\RefundController" public="true">
-            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
-            <argument type="service" id="order_line_item.repository"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
-            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-        </service>
-
-        <service id="Kiener\MolliePayments\Storefront\Controller\ShippingController" public="true">
-            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
-            <argument type="service" id="order_line_item.repository"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
 
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
@@ -180,7 +146,6 @@
         <service id="Kiener\MolliePayments\Storefront\Controller\PaymentController" public="true">
             <argument type="service" id="router"/>
             <argument type="service" id="Mollie\Api\MollieApiClient"/>
-            <argument type="service" id="Kiener\MolliePayments\Helper\DeliveryStateHelper"/>
             <argument type="service" id="Shopware\Core\Framework\Event\BusinessEventDispatcher"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStateService"/>
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper"/>
@@ -194,10 +159,8 @@
         </service>
 
         <service id="Kiener\MolliePayments\Storefront\Controller\WebhookController" public="true">
-            <argument type="service" id="router"/>
             <argument type="service" id="order_transaction.repository"/>
             <argument type="service" id="Mollie\Api\MollieApiClient"/>
-            <argument type="service" id="Kiener\MolliePayments\Helper\DeliveryStateHelper"/>
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
@@ -238,11 +201,6 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-
-        <!-- Validators -->
-        <service id="Kiener\MolliePayments\Validator\OrderLineItemValidator">
-            <argument type="service" id="monolog.logger"/>
-        </service>
 
     </services>
 

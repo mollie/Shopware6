@@ -35,11 +35,11 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\Uuid\Uuid;
-use Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
 use Shopware\Storefront\Framework\Routing\Router;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -73,14 +73,14 @@ class ApplePayDirectController extends StorefrontController
     /** @var RouterInterface */
     private $router;
 
-    /** @var SalesChannelContextFactory */
-    private $salesChannelContextFactory;
-
     /** @var SettingsService */
     private $settingsService;
 
     /** @var ShippingMethodService */
     private $shippingMethodService;
+
+    /** @var string */
+    private $shopwareVersion;
 
     public function __construct(
         MollieApiClient $apiClient,
@@ -92,9 +92,10 @@ class ApplePayDirectController extends StorefrontController
         EntityRepositoryInterface $paymentMethodRepository,
         ProductService $productService,
         Router $router,
-        SalesChannelContextFactory $salesChannelContextFactory,
         SettingsService $settingsService,
-        ShippingMethodService $shippingMethodService
+        ShippingMethodService $shippingMethodService,
+        ContainerInterface $container,
+        string $shopwareVersion
     )
     {
         $this->apiClient = $apiClient;
@@ -106,9 +107,10 @@ class ApplePayDirectController extends StorefrontController
         $this->paymentMethodRepository = $paymentMethodRepository;
         $this->productService = $productService;
         $this->router = $router;
-        $this->salesChannelContextFactory = $salesChannelContextFactory;
         $this->settingsService = $settingsService;
         $this->shippingMethodService = $shippingMethodService;
+        $this->container = $container;
+        $this->shopwareVersion = $shopwareVersion;
     }
 
     /**
@@ -714,16 +716,23 @@ class ApplePayDirectController extends StorefrontController
         }
 
         // Add payment method to options
-        if ((string) $paymentMethodId !== '') {
+        if ((string)$paymentMethodId !== '') {
             $options[SalesChannelContextService::PAYMENT_METHOD_ID] = $paymentMethodId;
         }
 
         // Add shipping method to options
-        if ((string) $shippingMethodId !== '') {
+        if ((string)$shippingMethodId !== '') {
             $options[SalesChannelContextService::SHIPPING_METHOD_ID] = $shippingMethodId;
         }
 
-        $salesChannelContext = $this->salesChannelContextFactory->create(
+        $salesChannelFactory = null;
+        if (version_compare($this->shopwareVersion,'6.4','>=')) {
+            $salesChannelFactory=$this->container->get('Shopware\Core\System\SalesChannel\Context\CachedSalesChannelContextFactory');
+        } else {
+            $salesChannelFactory=$this->container->get('Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory');
+        }
+
+        $salesChannelContext = $salesChannelFactory->create(
             $newToken,
             $context->getSalesChannel()->getId(),
             $options
