@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Service;
 use Exception;
 use Kiener\MolliePayments\Exception\MissingPriceLineItemException;
 use Kiener\MolliePayments\Validator\OrderLineItemValidator;
+use Kiener\MolliePayments\Validator\OrderTotalRoundingValidator;
 use Mollie\Api\Types\OrderLineType;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
@@ -45,17 +46,31 @@ class OrderService
      */
     private $orderLineItemValidator;
 
+    /**
+     * @var OrderTotalRoundingValidator
+     */
+    private $validator;
+
+    /**
+     * @var string
+     */
+    private $shopwareVersion;
+
     public function __construct(
         EntityRepositoryInterface $orderRepository,
         EntityRepositoryInterface $orderLineItemRepository,
         LoggerInterface $logger,
-        OrderLineItemValidator $orderLineItemValidator
+        OrderLineItemValidator $orderLineItemValidator,
+        OrderTotalRoundingValidator $validator,
+        string $shopwareVersion
     )
     {
         $this->orderRepository = $orderRepository;
         $this->orderLineItemRepository = $orderLineItemRepository;
         $this->logger = $logger;
         $this->orderLineItemValidator = $orderLineItemValidator;
+        $this->validator = $validator;
+        $this->shopwareVersion = $shopwareVersion;
     }
 
     /**
@@ -188,9 +203,81 @@ class OrderService
             ];
         }
 
+        $roundingLineItem = $this->getRoundingLineItem($order, $currencyCode);
+
+        if (!empty($roundingLineItem)) {
+            $lines[] = $roundingLineItem;
+        }
+
         $lines[] = $this->getShippingItemArray($order);
 
         return $lines;
+    }
+
+    /**
+     * with version 6.4 there is a rounding on total amount. This could lead to differences
+     * between order total amount and the sum of all lineitems (including shipping)
+     *
+     * The mollie api checks if both are equal and will reject payment if they are not equal
+     * Shopware isn't calculating any taxes for this discount/surcharge
+     * Because of this we are adding a discount lineitem to the lineitems and are calculating
+     * it with 0% tax like shopware does
+     *
+     * The function will only return a lineItem if
+     * - shopware version >= 6.4
+     * - total amount rounding is active and configured that differences could exist
+     * - and if discrepances do exist at all
+     *
+     * @param OrderEntity $order
+     * @param string $currencyCode
+     * @return array
+     */
+    public function getRoundingLineItem(OrderEntity $order, string $currencyCode): array
+    {
+        // is shopware version >= 6.4
+        if (version_compare($this->shopwareVersion, '6.4', '<')) {
+            // if not return
+            return [];
+        }
+
+        $rounding = $order->getTotalRounding();
+
+        // is there a configuration that could lead to a unexpected rounding ( > 0.01 interval )
+        if (!$this->validator->isNewRoundingActive(
+            $rounding->getDecimals(),
+            $rounding->roundForNet(),
+            $rounding->getInterval(),
+            $order->getTaxStatus())
+        ) {
+            // if not return
+            return [];
+        }
+
+        $amountTotal = $order->getAmountTotal();
+        $positionPrice = $order->getPositionPrice();
+        $shippingTotal = $order->getShippingTotal();
+
+        // are there price differences between total amount and all lineitems (including shipping)
+        if ($amountTotal === $positionPrice + $shippingTotal) {
+            // if not return
+            return [];
+        }
+
+        $price = $amountTotal - ($positionPrice + $shippingTotal);
+        $roundedLineItemTotalPrice = round($price, self::MOLLIE_PRICE_PRECISION);
+        $itemName = ($price < 0) ? 'Shopware Rounding Discount' : 'Shopware Rounding Surcharge';
+
+        // Build the order lines array
+        return [
+            'type' => OrderLineType::TYPE_DISCOUNT,
+            'name' => $itemName,
+            'quantity' => 1,
+            'unitPrice' => $this->getPriceArray($currencyCode, $roundedLineItemTotalPrice),
+            'totalAmount' => $this->getPriceArray($currencyCode, $roundedLineItemTotalPrice),
+            'vatRate' => number_format(0.0, self::MOLLIE_PRICE_PRECISION, '.', ''),
+            'vatAmount' => $this->getPriceArray($currencyCode, 0.00),
+            'sku' => 'SHOPWARE-ROUNDING-ITEM'
+        ];
     }
 
     /**
@@ -356,7 +443,7 @@ class OrderService
             return OrderLineType::TYPE_DISCOUNT;
         }
 
-        if ($item->getType() === static::LINE_ITEM_TYPE_CUSTOM_PRODUCTS) {
+        if ($item->getType() === self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS) {
             return OrderLineType::TYPE_PHYSICAL;
         }
 

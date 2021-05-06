@@ -1,8 +1,8 @@
-import template from './sw-plugin-config.html.twig';
+import template from "./mollie-test-api-key.html.twig";
 
-const { Component, Mixin } = Shopware;
+const {Component, Mixin} = Shopware;
 
-Component.override('sw-plugin-config', {
+Component.register('mollie-test-api-key', {
     template,
 
     inject: [

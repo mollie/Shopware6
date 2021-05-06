@@ -1,0 +1,16 @@
+{# compatible with >= sw6.4 #}
+{% sw_extends '@Storefront/storefront/component/payment/payment-method.html.twig' %}
+
+{% block component_payment_method_description %}
+    {{ parent() }}
+
+    {# load mollie creditcard components #}
+    {% if payment.translated.customFields.mollie_payment_method_name == 'creditcard' %}
+        {% sw_include '@MolliePayments/storefront/component/payment/component/cc-fields.html.twig' with {
+            showIfActive: (payment.id is same as(selectedPaymentMethodId)),
+            sw64: true
+        } %}
+    {% elseif payment.translated.customFields.mollie_payment_method_name == 'ideal' %}
+        {% sw_include '@MolliePayments/storefront/component/payment/component/ideal-fields.html.twig' %}
+    {% endif %}
+{% endblock %}

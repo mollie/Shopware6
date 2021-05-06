@@ -4,6 +4,9 @@ import 'regenerator-runtime';
 import MollieCreditCardComponents
     from './mollie-payments/plugins/creditcard-components.plugin';
 
+import MollieCreditCardComponentsSw64
+    from './mollie-payments/plugins/creditcard-components-sw64.plugin';
+
 import MollieIDealIssuer
     from './mollie-payments/plugins/ideal-issuer.plugin';
 
@@ -15,7 +18,18 @@ import MollieApplePayPaymentMethod
 
 // Register them via the existing PluginManager
 const PluginManager = window.PluginManager;
-PluginManager.register('MollieCreditCardComponents', MollieCreditCardComponents, '#mollie_components_credit_card');
 PluginManager.register('MollieIDealIssuer', MollieIDealIssuer);
 PluginManager.register('MollieApplePayDirect', MollieApplePayDirect);
 PluginManager.register('MollieApplePayPaymentMethod', MollieApplePayPaymentMethod);
+
+// < Sw 6.4 Version
+PluginManager.register('MollieCreditCardComponents', MollieCreditCardComponents, '#mollie_components_credit_card');
+
+// >= Sw 6.4 Version
+PluginManager.register('MollieCreditCardComponentsSw64', MollieCreditCardComponentsSw64, '#mollie_components_credit_card_sw64');
+
+// < Sw 6.4 Version
+PluginManager.register('MollieCreditCardComponents', MollieCreditCardComponents, '#mollie_components_credit_card');
+
+// >= Sw 6.4 Version
+PluginManager.register('MollieCreditCardComponentsSw64', MollieCreditCardComponentsSw64, '#mollie_components_credit_card_sw64');

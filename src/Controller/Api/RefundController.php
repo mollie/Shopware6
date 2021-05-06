@@ -1,6 +1,6 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Storefront\Controller;
+namespace Kiener\MolliePayments\Controller\Api;
 
 use Exception;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
@@ -19,12 +19,12 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
-use Shopware\Storefront\Controller\StorefrontController;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-class RefundController extends StorefrontController
+class RefundController extends AbstractController
 {
     public const CUSTOM_FIELDS_KEY_REFUNDED_QUANTITY = 'refundedQuantity';
     public const CUSTOM_FIELDS_KEY_CREATE_CREDIT_ITEM = 'createCredit';
@@ -99,6 +99,29 @@ class RefundController extends StorefrontController
      * @throws IncompatiblePlatform
      */
     public function refund(Request $request): JsonResponse
+    {
+        return $this->getRefundResponse($request);
+    }
+
+    /**
+     * refund action for Shopware versions >=6.4
+     *
+     * @RouteScope(scopes={"api"})
+     * @Route("/api/mollie/refund",
+     *         defaults={"auth_enabled"=true}, name="api.action.mollie.refund-64", methods={"POST"})
+     *
+     * @param Request $request
+     *
+     * @return JsonResponse
+     * @throws ApiException
+     * @throws IncompatiblePlatform
+     */
+    public function refund64(Request $request): JsonResponse
+    {
+        return $this->getRefundResponse($request);
+    }
+
+    private function getRefundResponse(Request $request): JsonResponse
     {
         /** @var MollieApiClient|null $apiClient */
         $apiClient = null;
@@ -276,6 +299,31 @@ class RefundController extends StorefrontController
      */
     public function total(Request $request): JsonResponse
     {
+        /** @var string|null $orderId */
+        $orderId = $request->get('orderId');
+
+        return $this->getTotalResponse($orderId);
+    }
+
+    /**
+     * @RouteScope(scopes={"api"})
+     * @Route("/api/_action/mollie/refund/total",
+     *         defaults={"auth_enabled"=true}, name="api.action.mollie.refund.total-64", methods={"POST"})
+     *
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    public function total64(Request $request): JsonResponse
+    {
+        /** @var string|null $orderId */
+        $orderId = $request->get('orderId');
+
+        return $this->getTotalResponse($orderId);
+    }
+
+    private function getTotalResponse(?string $orderId): JsonResponse
+    {
         /** @var float $amount */
         $amount = 0.0;
 
@@ -285,10 +333,7 @@ class RefundController extends StorefrontController
         /** @var OrderEntity $order */
         $order = null;
 
-        /** @var string $orderId */
-        $orderId = $request->get('orderId');
-
-        if ($orderId !== '') {
+        if (!empty($orderId)) {
             $order = $this->orderService->getOrder($orderId, Context::createDefaultContext());
         }
 

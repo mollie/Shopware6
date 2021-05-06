@@ -1,0 +1,12 @@
+<div class="mollie-ideal-issuer d-none"
+     data-customer-id="{{ context.customer.id }}"
+     data-shop-url="{{ seoUrl('frontend.home.page') }}">
+
+    {% if page.ideal_issuers %}
+        <select id="iDealIssuer" name="mollie_ideal_issuer" class="custom-select">
+            {% for issuer in page.ideal_issuers %}
+                <option value="{{ issuer.id }}"{% if issuer.id is same as(page.preferred_issuer) %} selected{% endif %}>{{ issuer.name }}</option>
+            {% endfor %}
+        </select>
+    {% endif %}
+</div>

@@ -111,31 +111,11 @@ jobs:
       - name: Run PHP CS Fixer
         run: make csfix -B
 
-  phpinsights:
-    name: PHPInsights
-    needs: phpcsfixer
-    runs-on: ubuntu-latest
-    steps:
-
-      - name: Clone Code
-        uses: actions/checkout@v2
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 7.4
-
-      - name: Install Dependencies
-        run: make dev -B
-
-      - name: Run PHPInsights Analyser
-        run: make insights -B
-
   # ------------------------------------------------------------------------------------------------------------------------
 
   integration:
     name: Integration Tests | Shopware ${{ matrix.shopware }}
-    needs: phpinsights
+    needs: phpcsfixer
     runs-on: ubuntu-latest
     strategy:
       matrix:

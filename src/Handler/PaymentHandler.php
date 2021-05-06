@@ -228,9 +228,17 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
                 );
             }
 
-            // Get the payment url from the order at Mollie.
-            if ($mollieOrder !== null) {
-                $paymentUrl = isset($mollieOrder) ? $mollieOrder->getCheckoutUrl() : null;
+            if (!$mollieOrder instanceof Order) {
+                throw new Exception("Couldn't create payment at mollie");
+            }
+
+            // first check if we got a checkoutUrl from mollie (in case of creditcard components
+            // it could be that payment is already finished, checkout url misses in these cases)
+            $paymentUrl = $mollieOrder->getCheckoutUrl();
+
+            if (empty($paymentUrl)) {
+                // if it misses => take transaction finalize url (we will check in payment url)
+                $paymentUrl = $transaction->getReturnUrl();
             }
         } catch (Exception $e) {
             $this->logger->addEntry(
@@ -636,7 +644,6 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         ) {
             $orderData['payment']['customerId'] = $customFields[CustomerService::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID];
         }
-
 
         // @todo Handle iDeal issuers from the iDeal payment handler
         if (

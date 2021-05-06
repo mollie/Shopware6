@@ -34,7 +34,7 @@
     }
   },
   "sw-payment": {
-    "testButton": "Prüfung",
+    "testButton": "Prüfe API Keys",
     "testApiKeys": {
       "title": "Mollie Payments",
       "apiKey": "API Schlüssel",
