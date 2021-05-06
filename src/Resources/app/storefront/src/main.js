@@ -27,9 +27,3 @@ PluginManager.register('MollieCreditCardComponents', MollieCreditCardComponents,
 
 // >= Sw 6.4 Version
 PluginManager.register('MollieCreditCardComponentsSw64', MollieCreditCardComponentsSw64, '#mollie_components_credit_card_sw64');
-
-// < Sw 6.4 Version
-PluginManager.register('MollieCreditCardComponents', MollieCreditCardComponents, '#mollie_components_credit_card');
-
-// >= Sw 6.4 Version
-PluginManager.register('MollieCreditCardComponentsSw64', MollieCreditCardComponentsSw64, '#mollie_components_credit_card_sw64');
