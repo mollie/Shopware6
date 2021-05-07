@@ -149,6 +149,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      */
     protected function processPaymentMethodSpecificParameters(array $orderData, SalesChannelContext $salesChannelContext, CustomerEntity $customer, LocaleEntity $locale): array
     {
+        return [];
     }
 
     /**
@@ -269,6 +270,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         }
 
         // Set the payment status to in progress
+        /** @var string|null $paymentUrl */
         if (
             isset($paymentUrl)
             && !empty($paymentUrl)
@@ -618,7 +620,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         // $orderData = $this->processPaymentMethodSpecificParameters($orderData, $salesChannelContext, $customer, $locale);
 
 
-        
+
         # create our webhook url
         # and assign it to both required fields in the order
         $webhookUrl = $this->webhookBuilder->buildWebhook($transactionId);
@@ -720,6 +722,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
          * the order from Mollie after payment to set the order
          * and payment status.
          */
+        /** @var Order|null $mollieOrder */
         if (isset($mollieOrder, $mollieOrder->id)) {
             $this->orderService->getOrderRepository()->update([[
                 'id' => $order->getId(),

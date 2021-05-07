@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments;
 use Exception;
 use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\PaymentMethodService;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\Plugin;
 use Shopware\Core\Framework\Plugin\Context\ActivateContext;
 use Shopware\Core\Framework\Plugin\Context\DeactivateContext;
@@ -44,10 +45,13 @@ class MolliePayments extends Plugin
     {
         parent::install($context);
 
+        /** @var EntityRepositoryInterface $customFieldRepository */
+        $customFieldRepository = $this->container->get('custom_field_set.repository');
+
         // Add custom fields
         $customFieldService = new CustomFieldService(
             $this->container,
-            $this->container->get('custom_field_set.repository')
+            $customFieldRepository
         );
 
         $customFieldService->addCustomFields($context->getContext());

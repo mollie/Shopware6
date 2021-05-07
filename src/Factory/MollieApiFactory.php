@@ -66,10 +66,8 @@ class MollieApiFactory
      */
     public function getClient(?string $salesChannelId = null, ?Context $context = null): MollieApiClient
     {
-        /** @var MollieApiClient apiClient */
         $this->apiClient = new MollieApiClient();
 
-        /** @var MollieSettingStruct $settings */
         $settings = $this->settingsService->getSettings($salesChannelId, $context);
 
         try {
