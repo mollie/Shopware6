@@ -651,6 +651,9 @@ class ApplePayDirectController extends StorefrontController
             ) {
                 return $paymentMethods->first();
             }
+
+            return null;
+
         } catch (Exception $e) {
             return null;
         }
