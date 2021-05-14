@@ -35,6 +35,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\Uuid\Uuid;
+use Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
@@ -82,6 +83,12 @@ class ApplePayDirectController extends StorefrontController
     /** @var string */
     private $shopwareVersion;
 
+    /** @var SalesChannelContextFactory */
+    private $salesChannelContextFactory;
+
+    /**
+     * @param SalesChannelContextFactory $salesChannelContextFactory
+     */
     public function __construct(
         MollieApiClient $apiClient,
         CartService $cartService,
@@ -95,7 +102,8 @@ class ApplePayDirectController extends StorefrontController
         SettingsService $settingsService,
         ShippingMethodService $shippingMethodService,
         ContainerInterface $container,
-        string $shopwareVersion
+        string $shopwareVersion,
+        $salesChannelContextfactory
     )
     {
         $this->apiClient = $apiClient;
@@ -111,6 +119,7 @@ class ApplePayDirectController extends StorefrontController
         $this->shippingMethodService = $shippingMethodService;
         $this->container = $container;
         $this->shopwareVersion = $shopwareVersion;
+        $this->salesChannelContextFactory = $salesChannelContextfactory;
     }
 
     /**
@@ -736,14 +745,7 @@ class ApplePayDirectController extends StorefrontController
             $options[SalesChannelContextService::LANGUAGE_ID] = $languageId;
         }
 
-        $salesChannelFactory = null;
-        if (version_compare($this->shopwareVersion,'6.4','>=')) {
-            $salesChannelFactory=$this->container->get('Shopware\Core\System\SalesChannel\Context\CachedSalesChannelContextFactory');
-        } else {
-            $salesChannelFactory=$this->container->get('Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory');
-        }
-
-        $salesChannelContext = $salesChannelFactory->create(
+        $salesChannelContext = $this->salesChannelContextFactory->create(
             $newToken,
             $context->getSalesChannel()->getId(),
             $options
