@@ -64,6 +64,7 @@ class MolliePayments extends Plugin
 
         if($context->getPlugin()->isActive() === true) {
             // add domain verification
+            /** @var ApplePayDomainVerificationService $domainVerificationService */
             $domainVerificationService = $this->container->get(ApplePayDomainVerificationService::class);
             $domainVerificationService->downloadDomainAssociationFile();
         }
@@ -92,6 +93,7 @@ class MolliePayments extends Plugin
             ->addPaymentMethods($context->getContext());
 
         // add domain verification
+        /** @var ApplePayDomainVerificationService $domainVerificationService */
         $domainVerificationService = $this->container->get(ApplePayDomainVerificationService::class);
         $domainVerificationService->downloadDomainAssociationFile();
     }
