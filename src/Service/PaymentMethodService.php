@@ -377,10 +377,14 @@ class PaymentMethodService
      * @return bool
      */
     public function isPaidApplePayTransaction(OrderTransactionEntity $transaction, Order $mollieOrder) : bool {
-        if(null === $transaction->getPaymentMethod()) {
-            return false;
+        $paymentMethodId = $transaction->getPaymentMethodId();
+        $paymentMethod = $transaction->getPaymentMethod();
+
+        if(null === $paymentMethod) {
+            $criteria = new Criteria([$paymentMethodId]);
+            $paymentMethod = $this->paymentRepository->search($criteria, Context::createDefaultContext())->first();
         }
 
-        return $transaction->getPaymentMethod()->getHandlerIdentifier() === ApplePayPayment::class && $mollieOrder->isPaid() === true;
+        return $paymentMethod->getHandlerIdentifier() === ApplePayPayment::class && $mollieOrder->isPaid() === true;
     }
 }
