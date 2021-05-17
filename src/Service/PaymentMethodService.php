@@ -23,8 +23,6 @@ use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Method;
 use Mollie\Api\Resources\MethodCollection;
-use Mollie\Api\Resources\Order;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Content\Media\MediaCollection;
 use Shopware\Core\Content\Media\MediaService;
@@ -335,6 +333,9 @@ class PaymentMethodService
      */
     private function getMediaId(array $paymentMethod, Context $context): string
     {
+        /** @var string $mediaId */
+        $mediaId = '';
+
         /** @var string $fileName */
         $fileName = $paymentMethod['name'] . '-icon';
 
@@ -345,38 +346,33 @@ class PaymentMethodService
         $icons = $this->mediaRepository->search($criteria, $context);
 
         if ($icons->count() && $icons->first() !== null) {
-            return $icons->first()->getId();
+            $mediaId = $icons->first()->getId();
+        } else {
+            // Add icon to the media library
+
+            $iconBlob = file_get_contents('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.svg');
+
+            if(!empty(trim($iconBlob))) {
+                $iconMime = 'image/svg+xml';
+                $iconExt = 'svg';
+            } else {
+                $iconBlob = file_get_contents('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.png');
+                $iconMime = 'image/png';
+                $iconExt = 'png';
+            }
+
+            $mediaId = $this->mediaService->saveFile(
+                $iconBlob,
+                $iconExt,
+                $iconMime,
+                $fileName,
+                $context,
+                'Mollie Payments - Icons',
+                null,
+                false
+            );
         }
 
-        // Add icon to the media library
-        $iconMime = 'image/svg+xml';
-        $iconExt = 'svg';
-        $iconBlob = file_get_contents('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.svg');
-
-        if(empty(trim($iconBlob))) {
-            $iconBlob = file_get_contents('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.png');
-            $iconMime = 'image/png';
-            $iconExt = 'png';
-        }
-
-        return $this->mediaService->saveFile(
-            $iconBlob,
-            $iconExt,
-            $iconMime,
-            $fileName,
-            $context,
-            'Mollie Payments - Icons',
-            null,
-            false
-        );
-    }
-
-    /**
-     * @param OrderTransactionEntity $transaction
-     * @param Order $mollieOrder
-     * @return bool
-     */
-    public function isPaidApplePayTransaction(OrderTransactionEntity $transaction, Order $mollieOrder) : bool {
-        return $transaction->getPaymentMethod()->getHandlerIdentifier() === ApplePayPayment::class && $mollieOrder->isPaid() === true;
+        return $mediaId;
     }
 }

@@ -35,7 +35,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\Uuid\Uuid;
-use Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
@@ -83,12 +82,6 @@ class ApplePayDirectController extends StorefrontController
     /** @var string */
     private $shopwareVersion;
 
-    /** @var SalesChannelContextFactory */
-    private $salesChannelContextFactory;
-
-    /**
-     * @param SalesChannelContextFactory $salesChannelContextFactory
-     */
     public function __construct(
         MollieApiClient $apiClient,
         CartService $cartService,
@@ -102,8 +95,7 @@ class ApplePayDirectController extends StorefrontController
         SettingsService $settingsService,
         ShippingMethodService $shippingMethodService,
         ContainerInterface $container,
-        string $shopwareVersion,
-        $salesChannelContextfactory
+        string $shopwareVersion
     )
     {
         $this->apiClient = $apiClient;
@@ -119,7 +111,6 @@ class ApplePayDirectController extends StorefrontController
         $this->shippingMethodService = $shippingMethodService;
         $this->container = $container;
         $this->shopwareVersion = $shopwareVersion;
-        $this->salesChannelContextFactory = $salesChannelContextfactory;
     }
 
     /**
@@ -471,8 +462,7 @@ class ApplePayDirectController extends StorefrontController
                 $this->customerService->getCountryId($countryCode, $context->getContext()),
                 null,
                 null,
-                null,
-                $context->getContext()->getLanguageId()
+                null
             );
         } else {
             $newSalesChannelContext = $context;
@@ -570,8 +560,7 @@ class ApplePayDirectController extends StorefrontController
                 $customer->getDefaultShippingAddress() !== null ? $customer->getDefaultShippingAddress()->getCountryId() : null,
                 $customer->getId(),
                 $customer->getDefaultPaymentMethod() !== null ? $customer->getDefaultPaymentMethod()->getId() : null,
-                $shippingMethodId,
-                $context->getContext()->getLanguageId()
+                $shippingMethodId
             );
 
             // Persist the order
@@ -713,8 +702,7 @@ class ApplePayDirectController extends StorefrontController
         ?string $countryId,
         ?string $customerId,
         ?string $paymentMethodId = null,
-        ?string $shippingMethodId = null,
-        ?string $languageId = null
+        ?string $shippingMethodId = null
     ): SalesChannelContext
     {
         /** @var array $options */
@@ -740,12 +728,14 @@ class ApplePayDirectController extends StorefrontController
             $options[SalesChannelContextService::SHIPPING_METHOD_ID] = $shippingMethodId;
         }
 
-        // Add language to options
-        if ((string) $languageId !== '') {
-            $options[SalesChannelContextService::LANGUAGE_ID] = $languageId;
+        $salesChannelFactory = null;
+        if (version_compare($this->shopwareVersion,'6.4','>=')) {
+            $salesChannelFactory=$this->container->get('Shopware\Core\System\SalesChannel\Context\CachedSalesChannelContextFactory');
+        } else {
+            $salesChannelFactory=$this->container->get('Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory');
         }
 
-        $salesChannelContext = $this->salesChannelContextFactory->create(
+        $salesChannelContext = $salesChannelFactory->create(
             $newToken,
             $context->getSalesChannel()->getId(),
             $options

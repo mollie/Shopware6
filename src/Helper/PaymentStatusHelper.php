@@ -3,10 +3,8 @@
 namespace Kiener\MolliePayments\Helper;
 
 use Exception;
-use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\Order\OrderStateService;
-use Kiener\MolliePayments\Service\PaymentMethodService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Resources\Order;
@@ -49,9 +47,6 @@ class PaymentStatusHelper
     /** @var EntityRepositoryInterface */
     protected $orderTransactionRepository;
 
-    /** @var PaymentMethodService */
-    protected $paymentMethodService;
-
     /**
      * PaymentStatusHelper constructor.
      *
@@ -67,8 +62,7 @@ class PaymentStatusHelper
         SettingsService $settingsService,
         StateMachineRegistry $stateMachineRegistry,
         EntityRepositoryInterface $paymentMethodRepository,
-        EntityRepositoryInterface $orderTransactionRepository,
-        PaymentMethodService $paymentMethodService
+        EntityRepositoryInterface $orderTransactionRepository
     )
     {
         $this->logger = $logger;
@@ -79,7 +73,6 @@ class PaymentStatusHelper
 
         $this->paymentMethodRepository = $paymentMethodRepository;
         $this->orderTransactionRepository = $orderTransactionRepository;
-        $this->paymentMethodService = $paymentMethodService;
     }
 
     /**
@@ -163,8 +156,7 @@ class PaymentStatusHelper
 
         $useMollieFailureHandling = !$settings->isShopwareFailedPaymentMethod();
 
-        if ($useMollieFailureHandling
-            && $this->paymentMethodService->isPaidApplePayTransaction($transaction, $mollieOrder) === false) {
+        if ($useMollieFailureHandling) {
             $currentCustomerSelectedPaymentMethod = $mollieOrder->method;
 
             if (is_null($currentCustomerSelectedPaymentMethod)) {

@@ -104,7 +104,6 @@ class WebhookController extends StorefrontController
             $criteria = new Criteria();
             $criteria->addFilter(new EqualsFilter('id', $transactionId));
             $criteria->addAssociation('order');
-            $criteria->addAssociation('paymentMethod');
         } catch (InconsistentCriteriaIdsException $e) {
             $errorMessage = $errorMessage ?? $e->getMessage();
         }

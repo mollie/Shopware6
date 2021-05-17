@@ -3,7 +3,6 @@
 namespace Kiener\MolliePayments;
 
 use Exception;
-use Kiener\MolliePayments\Service\ApplePayDomainVerificationService;
 use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\PaymentMethodService;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -61,18 +60,12 @@ class MolliePayments extends Plugin
     public function update(UpdateContext $context): void
     {
         parent::update($context);
-
-        if($context->getPlugin()->isActive() === true) {
-            // add domain verification
-            /** @var ApplePayDomainVerificationService $domainVerificationService */
-            $domainVerificationService = $this->container->get(ApplePayDomainVerificationService::class);
-            $domainVerificationService->downloadDomainAssociationFile();
-        }
     }
 
     public function postInstall(InstallContext $context): void
     {
         parent::postInstall($context);
+
     }
 
     public function uninstall(UninstallContext $context) : void
@@ -91,11 +84,6 @@ class MolliePayments extends Plugin
         $paymentMethodHelper
             ->setClassName(get_class($this))
             ->addPaymentMethods($context->getContext());
-
-        // add domain verification
-        /** @var ApplePayDomainVerificationService $domainVerificationService */
-        $domainVerificationService = $this->container->get(ApplePayDomainVerificationService::class);
-        $domainVerificationService->downloadDomainAssociationFile();
     }
 
     public function deactivate(DeactivateContext $context) : void

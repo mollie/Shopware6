@@ -50,7 +50,6 @@
             <argument type="service" id="Shopware\Core\System\StateMachine\StateMachineRegistry"/>
             <argument type="service" id="payment_method.repository"/>
             <argument type="service" id="order_transaction.repository"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\PaymentMethodService"/>
         </service>
 
         <!-- Services -->
@@ -71,10 +70,6 @@
         <service id="Kiener\MolliePayments\Service\CustomFieldService" class="Kiener\MolliePayments\Service\CustomFieldService">
             <argument type="service" id="service_container"/>
             <argument type="service" id="custom_field_set.repository"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Service\ApplePayDomainVerificationService" public="true">
-            <argument type="service" id="shopware.filesystem.public"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\DeliveryService" class="Kiener\MolliePayments\Service\DeliveryService">
@@ -127,7 +122,6 @@
             <argument type="service" id="Kiener\MolliePayments\Service\ShippingMethodService"/>
             <argument type="service" id="service_container"/>
             <argument>%kernel.shopware_version%</argument>
-            <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
@@ -206,6 +200,8 @@
             <argument type="service" id="payment_method.repository"/>
             <tag name="kernel.event_subscriber"/>
         </service>
+
+
     </services>
 
 </container>
