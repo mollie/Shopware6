@@ -380,7 +380,7 @@ class PaymentMethodService
         $paymentMethodId = $transaction->getPaymentMethodId();
         $paymentMethod = $transaction->getPaymentMethod();
 
-        if(null === $paymentMethod) {
+        if(!$paymentMethod instanceof PaymentMethodEntity) {
             $criteria = new Criteria([$paymentMethodId]);
             $paymentMethod = $this->paymentRepository->search($criteria, Context::createDefaultContext())->first();
         }
