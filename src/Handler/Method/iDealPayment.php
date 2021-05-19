@@ -24,8 +24,16 @@ class iDealPayment extends PaymentHandler
         LocaleEntity $locale
     ): array
     {
-        if (!array_key_exists(self::FIELD_IDEAL_ISSUER, $orderData[PaymentHandler::FIELD_PAYMENT]) || in_array($orderData[PaymentHandler::FIELD_PAYMENT][self::FIELD_IDEAL_ISSUER], [null, ''], true)) {
-            //ToDo: Dropdown met banken in checkout, daarna deze vullen
+        $customFields = $customer->getCustomFields() ?? [];
+
+        $issuer = $customFields['mollie_payments']['preferred_ideal_issuer'] ?? '';
+
+        if (empty($issuer)) {
+            return $orderData;
+        }
+
+        if (!isset($orderData['payment']['issuer']) || empty($orderData['payment']['issuer'])) {
+            $orderData['payment']['issuer'] = $issuer;
         }
 
         return $orderData;

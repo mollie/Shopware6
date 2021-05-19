@@ -24,7 +24,7 @@ class Przelewy24Payment extends PaymentHandler
      *
      * @return array
      */
-    protected function processPaymentMethodSpecificParameters(
+    public function processPaymentMethodSpecificParameters(
         array $orderData,
         SalesChannelContext $salesChannelContext,
         CustomerEntity $customer,

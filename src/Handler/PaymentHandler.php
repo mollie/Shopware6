@@ -167,7 +167,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      *
      * @return array
      */
-    protected function processPaymentMethodSpecificParameters(array $orderData, SalesChannelContext $salesChannelContext, CustomerEntity $customer, LocaleEntity $locale): array
+    public function processPaymentMethodSpecificParameters(array $orderData, SalesChannelContext $salesChannelContext, CustomerEntity $customer, LocaleEntity $locale): array
     {
     }
 
@@ -206,7 +206,13 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             try {
                 $this->apiOrderService->cancelOrder($mollieOrderId, $salesChannelContext);
             } catch (MollieOrderCouldNotBeCancelledException $e) {
-                // we do nothing here.
+                $this->logger->addEntry(
+                    $e->getMessage(),
+                    $salesChannelContext->getContext(),
+                    $e,
+                    ['shopwareOrderNumber' => $order->getOrderNumber()],
+                    Logger::WARNING
+                );
             }
 
             unset($customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY]);
@@ -229,9 +235,9 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         );
 
 
-            if (!$mollieOrder instanceof Order) {
-                throw new Exception("Couldn't create payment at mollie");
-            }
+        if (!$mollieOrder instanceof Order) {
+            $this->logErrorAndThrowException('Could not generate or fetch a mollie order! Aborting payment process', $salesChannelContext);
+        }
 
             // first check if we got a checkoutUrl from mollie (in case of creditcard components
             // it could be that payment is already finished, checkout url misses in these cases)
@@ -607,35 +613,37 @@ throw new PaymentUrlException($lastTransaction->getId(), sprintf('Could not crea
 
         $customFields = $customer->getCustomFields();
 
-        // @todo Handle credit card tokens from the Credit Card payment handler
-        if (
-            $this->paymentMethod === PaymentMethod::CREDITCARD
-            && isset($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_CREDIT_CARD_TOKEN])
-            && (string)$customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_CREDIT_CARD_TOKEN] !== ''
-        ) {
-            $orderData['payment']['cardToken'] = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_CREDIT_CARD_TOKEN];
-            $this->customerService->setCardToken($customer, '', $salesChannelContext->getContext());
-        }
-
-        // To connect orders too customers.
-        if (isset($customFields[CustomerService::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID])
-            && (string)$customFields[CustomerService::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID] !== ''
-            && $settings->createNoCustomersAtMollie() === false
-            && $settings->isTestMode() === false
-        ) {
-            $orderData['payment']['customerId'] = $customFields[CustomerService::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID];
-        }
+//        // @todo Handle credit card tokens from the Credit Card payment handler
+//        if (
+//            $this->paymentMethod === PaymentMethod::CREDITCARD
+//            && isset($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_CREDIT_CARD_TOKEN])
+//            && (string)$customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_CREDIT_CARD_TOKEN] !== ''
+//        ) {
+//            $orderData['payment']['cardToken'] = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_CREDIT_CARD_TOKEN];
+//            $this->customerService->setCardToken($customer, '', $salesChannelContext->getContext());
+//        }
+//
+//        // To connect orders too customers.
+//        if (isset($customFields[CustomerService::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID])
+//            && (string)$customFields[CustomerService::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID] !== ''
+//            && $settings->createNoCustomersAtMollie() === false
+//            && $settings->isTestMode() === false
+//        ) {
+//            $orderData['payment']['customerId'] = $customFields[CustomerService::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID];
+//        }
 
         // @todo Handle iDeal issuers from the iDeal payment handler
-        if (
-            $this->paymentMethod === PaymentMethod::IDEAL
-            && isset($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER])
-            && (string)$customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER] !== ''
-        ) {
-            $orderData['payment']['issuer'] = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER];
-        }
+//        if (
+//            $this->paymentMethod === PaymentMethod::IDEAL
+//            && isset($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER])
+//            && (string)$customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER] !== ''
+//        ) {
+//            $orderData['payment']['issuer'] = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER];
+//        }
 
-        $orderData = array_merge($orderData, $this->paymentMethodData);
+
+        //@todo don't think its used at all
+        //$orderData = array_merge($orderData, $this->paymentMethodData);
 
         // Log the order data
         if ($settings->isDebugMode()) {
@@ -714,9 +722,9 @@ throw new PaymentUrlException($lastTransaction->getId(), sprintf('Could not crea
 
             /** @var OrderLine $line */
             foreach ($mollieOrder->lines as $line) {
-                if (isset($line->metadata->{ $this->orderService::ORDER_LINE_ITEM_ID })) {
+                if (isset($line->metadata->{$this->orderService::ORDER_LINE_ITEM_ID})) {
                     $orderLineUpdate[] = [
-                        'id' => $line->metadata->{ $this->orderService::ORDER_LINE_ITEM_ID },
+                        'id' => $line->metadata->{$this->orderService::ORDER_LINE_ITEM_ID},
                         'customFields' => [
                             CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS => [
                                 'order_line_id' => $line->id,

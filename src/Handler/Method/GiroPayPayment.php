@@ -16,7 +16,7 @@ class GiroPayPayment extends PaymentHandler
     /** @var string */
     protected $paymentMethod = self::PAYMENT_METHOD_NAME;
 
-    protected function processPaymentMethodSpecificParameters(
+    public function processPaymentMethodSpecificParameters(
         array $orderData,
         SalesChannelContext $salesChannelContext,
         CustomerEntity $customer,

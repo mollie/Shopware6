@@ -6,12 +6,10 @@
 
     <imports>
         <import resource="services/api.xml"/>
-        <import resource="services/controller.xml"/>
         <import resource="services/facades.xml"/>
         <import resource="services/services.xml"/>
         <import resource="services/snippets.xml"/>
         <import resource="services/subscriber.xml"/>
-        <import resource="services/validators.xml"/>
     </imports>
 
     <services>
@@ -83,6 +81,13 @@
 
         <service id="Kiener\MolliePayments\Service\LoggerService" class="Kiener\MolliePayments\Service\LoggerService">
             <argument type="service" id="log_entry.repository"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Service\OrderService" class="Kiener\MolliePayments\Service\OrderService">
+            <argument type="service" id="order.repository"/>
+            <argument type="service" id="order_line_item.repository"/>
+            <argument type="service" id="monolog.logger"/>
+            <argument type="service" id="Kiener\MolliePayments\Validator\OrderLineItemValidator"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\PaymentMethodService" class="Kiener\MolliePayments\Service\PaymentMethodService" public="true">

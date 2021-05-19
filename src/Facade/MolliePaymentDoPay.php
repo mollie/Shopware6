@@ -3,6 +3,8 @@
 namespace Kiener\MolliePayments\Facade;
 
 use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeCancelledException;
+use Kiener\MolliePayments\Handler\PaymentHandler;
+use Kiener\MolliePayments\Hydrator\MollieOrderHydrator;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\MollieApi\Order as ApiOrderService;
 use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
@@ -28,23 +30,42 @@ class MolliePaymentDoPay
      * @var LoggerService
      */
     private $logger;
+    /**
+     * @var MollieOrderHydrator
+     */
+    private MollieOrderHydrator $orderHydrator;
 
     /**
      * @param ApiOrderService $apiOrderService
+     * @param EntityRepositoryInterface $orderRepository
+     * @param MollieOrderHydrator $orderHydrator
+     * @param LoggerService $logger
      */
-    public function __construct(ApiOrderService $apiOrderService, EntityRepositoryInterface $orderRepository, LoggerService $logger)
+    public function __construct(
+        ApiOrderService $apiOrderService,
+        EntityRepositoryInterface $orderRepository,
+        MollieOrderHydrator $orderHydrator,
+        LoggerService $logger
+    )
     {
 
         $this->apiOrderService = $apiOrderService;
         $this->orderRepository = $orderRepository;
         $this->logger = $logger;
+        $this->orderHydrator = $orderHydrator;
     }
 
-    public function getPaymentUrl(string $paymentMethod, AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext): string
+    public function getPaymentUrl(
+        string $paymentMethod,
+        AsyncPaymentTransactionStruct $transactionStruct,
+        SalesChannelContext $salesChannelContext,
+        PaymentHandler $paymentHandler
+    ): string
     {
         $order = $this->getOrder($transactionStruct->getOrder()->getId(), $salesChannelContext);
         $customFields = new MollieOrderCustomFieldsStruct($order->getCustomFields());
 
+        // cancel existing mollie order if we may find one, unfortunately we may not reuse an existing mollie order if we need another payment method
         $mollieOrderId = $customFields->getMollieOrderId();
         if (!empty($mollieOrderId)) {
             // cancel previous payment at mollie
@@ -53,14 +74,30 @@ class MolliePaymentDoPay
             } catch (MollieOrderCouldNotBeCancelledException $e) {
                 // we do nothing here. This should not happen, but if it happens it will not harm
                 $this->logger->addEntry(
-                    sprintf('Tried to cancel mollie order (%s). Api call resulted in error', $mollieOrderId),
-                    $salesChannelContext->getContext()
+                    $e->getMessage(),
+                    $salesChannelContext->getContext(),
+                    $e,
+                    ['shopwareOrderNumber' => $order->getOrderNumber()],
+                    Logger::WARNING
                 );
             }
 
             $customFields->setMollieOrderId(null);
         }
 
+        // create new mollie order
+        $mollieOrderArray = $this->orderHydrator->hydrate(
+            $order,
+            $transactionStruct->getOrderTransaction()->getId(),
+            $paymentMethod,
+            $transactionStruct->getReturnUrl(),
+            $salesChannelContext,
+            $paymentHandler
+        );
+
+        // create
+
+        $mollieOrderArray=$paymentHandler->processPaymentMethodSpecificParameters($mollieOrderArray,$salesChannelContext,)
 
     }
 

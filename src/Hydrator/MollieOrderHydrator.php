@@ -4,8 +4,10 @@ namespace Kiener\MolliePayments\Hydrator;
 
 
 use Kiener\MolliePayments\Exception\OrderCustomerNotFound;
+use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\LoggerService;
+use Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher;
 use Kiener\MolliePayments\Service\MollieApi\MollieOrderLineItemBuilder;
 use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
 use Kiener\MolliePayments\Service\SettingsService;
@@ -56,6 +58,10 @@ class MollieOrderHydrator
      * @var MollieAddressHydrator
      */
     private $addressHydrator;
+    /**
+     * @var MollieOrderCustomerEnricher
+     */
+    private MollieOrderCustomerEnricher $enricher;
 
     public function __construct(
         SettingsService $settingsService,
@@ -65,6 +71,7 @@ class MollieOrderHydrator
         MolliePriceHydrator $priceHydrator,
         MollieOrderLineItemBuilder $builder,
         MollieAddressHydrator $addressHydrator,
+        MollieOrderCustomerEnricher $enricher,
         LoggerService $loggerService
     )
     {
@@ -76,6 +83,7 @@ class MollieOrderHydrator
         $this->priceHydrator = $priceHydrator;
         $this->builder = $builder;
         $this->addressHydrator = $addressHydrator;
+        $this->enricher = $enricher;
     }
 
     public function hydrate(
@@ -84,6 +92,7 @@ class MollieOrderHydrator
         string $paymentMethod,
         string $returnUrl,
         SalesChannelContext $salesChannelContext,
+        PaymentHandler $handler,
         array $paymentData = []
     ): array
     {
@@ -93,6 +102,8 @@ class MollieOrderHydrator
 
         $orderData = [];
         $orderData['amount'] = $this->priceHydrator->hydrate($order->getAmountTotal(), $currency->getIsoCode());
+
+        // create urls
         $orderData['redirectUrl'] = $this->router->generate(
             'frontend.mollie.payment',
             [
@@ -101,6 +112,12 @@ class MollieOrderHydrator
             ],
             $this->router::ABSOLUTE_URL
         );
+        $orderData['webhookUrl'] = $this->router->generate(
+            'frontend.mollie.webhook',
+            ['transactionId' => $transactionId],
+            $this->router::ABSOLUTE_URL
+        );
+
         $orderData['locale'] = $locale;
         $orderData['method'] = $paymentMethod;
         $orderData['orderNumber'] = $order->getOrderNumber();
@@ -119,11 +136,18 @@ class MollieOrderHydrator
             $salesChannelContext->getContext()
         );
 
+        // set order lifetime like configred
         $dueDate = $settings->getOrderLifetimeDate();
 
         if ($dueDate !== null) {
             $orderData['expiresAt'] = $dueDate;
         }
+
+        // add payment specific data
+        $orderData = $handler->processPaymentMethodSpecificParameters($orderData, $salesChannelContext, $customer, $locale);
+
+        // enrich data with create customer at mollie
+        $orderData=$this->enricher->enrich($orderData, $customer, $settings);
 
         return $orderData;
     }
@@ -151,10 +175,4 @@ class MollieOrderHydrator
 
         return $enrichedCustomer;
     }
-
-    private function prepareMolliePriceArray(?float $price, ?string $currency): array
-    {
-
-    }
-
 }

@@ -27,7 +27,7 @@ class BankTransferPayment extends PaymentHandler
      *
      * @return array
      */
-    protected function processPaymentMethodSpecificParameters(
+    public function processPaymentMethodSpecificParameters(
         array $orderData,
         SalesChannelContext $salesChannelContext,
         CustomerEntity $customer,
