@@ -2,16 +2,17 @@
 
 namespace Kiener\MolliePayments\Facade;
 
-use Kiener\MolliePayments\Exception\InvalidMollieOrderException;
 use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeCancelledException;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Service\MollieApi\Order as ApiOrderService;
+use Kiener\MolliePayments\Service\Order\UpdateOrderLineItems;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
+use Mollie\Api\Resources\Order as MollieOrder;
 use Monolog\Logger;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -47,6 +48,11 @@ class MolliePaymentDoPay
      * @var UpdateOrderCustomFields
      */
     private UpdateOrderCustomFields $updateOrderCustomFields;
+    /**
+     * @var UpdateOrderLineItems
+     */
+    private UpdateOrderLineItems $updateOrderLineItems;
+
 
     /**
      * @param ApiOrderService $apiOrderService
@@ -55,6 +61,7 @@ class MolliePaymentDoPay
      * @param OrderService $orderService
      * @param ApiOrderService $apiOrder
      * @param UpdateOrderCustomFields $updateOrderCustomFields
+     * @param UpdateOrderLineItems $updateOrderLineItems
      * @param LoggerService $logger
      */
     public function __construct(
@@ -64,6 +71,7 @@ class MolliePaymentDoPay
         OrderService $orderService,
         Order $apiOrder,
         UpdateOrderCustomFields $updateOrderCustomFields,
+        UpdateOrderLineItems $updateOrderLineItems,
         LoggerService $logger
     )
     {
@@ -74,20 +82,24 @@ class MolliePaymentDoPay
         $this->orderService = $orderService;
         $this->apiOrder = $apiOrder;
         $this->updateOrderCustomFields = $updateOrderCustomFields;
+        $this->updateOrderLineItems = $updateOrderLineItems;
     }
 
-    public function getPaymentUrl(
+    public function preparePayProcessAtMollie(
         string $paymentMethod,
         AsyncPaymentTransactionStruct $transactionStruct,
         SalesChannelContext $salesChannelContext,
         PaymentHandler $paymentHandler
     ): string
     {
+        // get order with all needed associations
         $order = $this->orderService->getOrder($transactionStruct->getOrder()->getId(), $salesChannelContext->getContext());
         $customFields = new MollieOrderCustomFieldsStruct($order->getCustomFields());
+        $customFields->setTransactionReturnUrl($transactionStruct->getReturnUrl());
 
         // cancel existing mollie order if we may find one, unfortunately we may not reuse an existing mollie order if we need another payment method
         $mollieOrderId = $customFields->getMollieOrderId();
+
         if (!empty($mollieOrderId)) {
             // cancel previous payment at mollie
             try {
@@ -103,7 +115,7 @@ class MolliePaymentDoPay
                 );
             }
 
-            //@todo save customFields here !
+            // even if cancel previous order has not been successful, we will not use this order again
             $customFields->setMollieOrderId(null);
         }
 
@@ -120,28 +132,15 @@ class MolliePaymentDoPay
         // create new order at mollie
         $mollieOrder = $this->apiOrder->createOrder($mollieOrderArray, $salesChannelContext);
 
-        // save custom fields orderid of mollie
-        $this->updateOrderCustomFields->updateOrder($order, $mollieOrder, $transactionStruct->getReturnUrl(), $salesChannelContext);
+        if ($mollieOrder instanceof MollieOrder) {
+            $customFields->setMollieOrderId($mollieOrder->getId());
+            $customFields->setMolliePaymentUrl($mollieOrder->getCheckoutUrl());
 
-        // return mollie return url
-        $mollieCheckoutUrl = $mollieOrder->getCheckoutUrl();
-
-        if (is_null($mollieCheckoutUrl)) {
-            $this->logger->addEntry(
-                sprintf(
-                    'Could not get mollie payment url (Order: %s, MollieOrder: %s)',
-                    $order->getOrderNumber(),
-                    $mollieOrder->id
-                ),
-                $salesChannelContext->getContext(),
-                null,
-                null,
-                Logger::CRITICAL
-            );
-
-            throw new InvalidMollieOrderException();
+            // save custom fields orderid of mollie
+            $this->updateOrderCustomFields->updateOrder($order->getId(), $customFields, $salesChannelContext);
+            $this->updateOrderLineItems->updateOrderLineItems($mollieOrder, $salesChannelContext);
         }
 
-        return $mollieCheckoutUrl;
+        return $customFields->getMolliePaymentUrl() ?? $customFields->getTransactionReturnUrl() ?? $transactionStruct->getReturnUrl();
     }
 }

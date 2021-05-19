@@ -8,12 +8,14 @@ namespace Kiener\MolliePayments\Struct;
  */
 class MollieOrderCustomFieldsStruct
 {
-    public const MOLLIE_KEY = 'mollie_payments';
-
-    public const ORDER_KEY = 'order_id';
-
     /** @var string|null */
     private $mollieOrderId;
+
+    /** @var string|null */
+    private $transactionReturnUrl;
+
+    /** @var string|null */
+    private $molliePaymentUrl;
 
     public function __construct(array $orderCustomFields = [])
     {
@@ -38,34 +40,69 @@ class MollieOrderCustomFieldsStruct
         $this->mollieOrderId = $mollieOrderId;
     }
 
+    /**
+     * @return string|null
+     */
+    public function getTransactionReturnUrl(): ?string
+    {
+        return $this->transactionReturnUrl;
+    }
+
+    /**
+     * @param string|null $transactionReturnUrl
+     */
+    public function setTransactionReturnUrl(?string $transactionReturnUrl): void
+    {
+        $this->transactionReturnUrl = $transactionReturnUrl;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getMolliePaymentUrl(): ?string
+    {
+        return $this->molliePaymentUrl;
+    }
+
+    /**
+     * @param string|null $molliePaymentUrl
+     */
+    public function setMolliePaymentUrl(?string $molliePaymentUrl): void
+    {
+        $this->molliePaymentUrl = $molliePaymentUrl;
+    }
+
+    public function getMollieCustomFields(): array
+    {
+        if (empty($this->mollieOrderId)) {
+            return ['mollie_payments' => []];
+        }
+
+        return [
+            'mollie_payments' => [
+                'order_id' => $this->mollieOrderId,
+                'transactionReturnUrl' => (string)$this->transactionReturnUrl,
+                'molliePaymentUrl' => (string)$this->molliePaymentUrl
+            ]
+        ];
+    }
+
     private function setCustomFields(array $customFields): void
     {
-        if (!isset($customFields[self::MOLLIE_KEY])) {
+        if (!isset($customFields['mollie_payments'])) {
             return;
         }
 
-        if (isset($customFields[self::MOLLIE_KEY][self::ORDER_KEY])) {
-            $this->setMollieOrderId((string)$customFields[self::MOLLIE_KEY][self::ORDER_KEY]);
-        }
-    }
-
-    public function setMollieCustomFields(array $customFields = []): array
-    {
-        if (!empty($this->getMollieOrderId())) {
-            $customFields = $this->setKey($customFields, self::ORDER_KEY, $this->getMollieOrderId());
+        if (isset($customFields['mollie_payments']['order_id'])) {
+            $this->setMollieOrderId((string)$customFields['mollie_payments']['order_id']);
         }
 
-        return $customFields;
-    }
-
-    public function setKey(array $customFields, string $key, string $value): array
-    {
-        if (!isset($customFields[self::MOLLIE_KEY])) {
-            $customFields[self::MOLLIE_KEY] = [];
+        if (isset($customFields['mollie_payments']['transactionReturnUrl'])) {
+            $this->setTransactionReturnUrl((string)$customFields['mollie_payments']['transactionReturnUrl']);
         }
 
-        $customFields[self::MOLLIE_KEY][$key] = $value;
-
-        return $customFields;
+        if (isset($customFields['mollie_payments']['molliePaymentUrl'])) {
+            $this->setMolliePaymentUrl((string)$customFields['mollie_payments']['molliePaymentUrl']);
+        }
     }
 }

@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Handler\Method;
 
-use Exception;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Mollie\Api\Types\PaymentMethod;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
@@ -35,26 +34,11 @@ class BankTransferPayment extends PaymentHandler
     ): array
     {
         $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
+        $dueDate = $settings->getPaymentMethodBankTransferDueDate();
 
-        try {
-            $dueDate = $settings->getPaymentMethodBankTransferDueDate();
+        if (!empty($dueDate)) {
 
-            if (is_null($dueDate)) {
-                unset($orderData[self::FIELD_EXPIRES_AT]);
-
-                return $orderData;
-            }
-
-            $orderData[self::FIELD_EXPIRES_AT] = $dueDate;
-        } catch (Exception $e) {
-            $this->logger->addEntry(
-                $e->getMessage(),
-                $salesChannelContext->getContext(),
-                $e,
-                [
-                    'function' => 'finalize-payment',
-                ]
-            );
+            $orderData['expiresAt'] = $dueDate;
         }
 
         return $orderData;

@@ -41,7 +41,7 @@ class MollieOrderBuilder
     private $priceBuilder;
 
     /**
-     * @var MollieOrderLineItemBuilder
+     * @var MollieLineItemBuilder
      */
     private $lineItemBuilder;
 
@@ -60,7 +60,7 @@ class MollieOrderBuilder
         OrderDataExtractor $extractor,
         RouterInterface $router,
         MollieOrderPriceBuilder $priceBuilder,
-        MollieOrderLineItemBuilder $lineItemBuilder,
+        MollieLineItemBuilder $lineItemBuilder,
         MollieOrderAddressBuilder $addressBuilder,
         MollieOrderCustomerEnricher $customerEnricher,
         LoggerService $loggerService
@@ -119,7 +119,11 @@ class MollieOrderBuilder
         $orderData['webhookUrl'] = $webhookUrl;
         $orderData['payment']['webhookUrl'] = $webhookUrl;
 
-        $orderData['lines'] = $this->lineItemBuilder->buildLineItems($order);
+        $lines = $this->lineItemBuilder->buildLineItems($order);
+
+
+        $orderData['lines'] = $lines;
+
         $orderData['billingAddress'] = $this->addressBuilder->build($customer->getEmail(), $customer->getDefaultBillingAddress());
         $orderData['shippingAddress'] = $this->addressBuilder->build($customer->getEmail(), $customer->getActiveShippingAddress());
 
@@ -140,7 +144,7 @@ class MollieOrderBuilder
         $orderData = $handler->processPaymentMethodSpecificParameters($orderData, $salesChannelContext, $customer, $locale);
 
         // enrich data with create customer at mollie
-        $orderData=$this->customerEnricher->enrich($orderData, $customer, $settings);
+        $orderData = $this->customerEnricher->enrich($orderData, $customer, $settings);
 
         // Log the builded order data
         if ($settings->isDebugMode()) {

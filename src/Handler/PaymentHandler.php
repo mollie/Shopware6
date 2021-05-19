@@ -195,7 +195,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
     {
         die('do refactoring first !');
 
-        $paymentUrl = $this->payFacade->getPaymentUrl($this->paymentMethod, $transaction, $salesChannelContext);
+        $paymentUrl = $this->payFacade->preparePayProcessAtMollie($this->paymentMethod, $transaction, $salesChannelContext);
 
 //        $order = $this->orderService->getOrder($transaction->getOrder()->getId(), $salesChannelContext->getContext()) ?? $transaction->getOrder();
 //        $customFields = $order->getCustomFields();
