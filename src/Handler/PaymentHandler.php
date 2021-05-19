@@ -4,10 +4,10 @@ namespace Kiener\MolliePayments\Handler;
 
 use Exception;
 use Kiener\MolliePayments\Exception\PaymentUrlException;
+use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Helper\PaymentStatusHelper;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\CustomFieldService;
-use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\MollieApi\ApiClientConfigurator;
 use Kiener\MolliePayments\Service\MollieApi\Order as ApiOrderService;
@@ -19,11 +19,9 @@ use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\OrderLine;
-use Mollie\Api\Types\PaymentMethod;
 use Mollie\Api\Types\PaymentStatus;
 use Monolog\Logger;
 use RuntimeException;
-use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
@@ -169,6 +167,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      */
     public function processPaymentMethodSpecificParameters(array $orderData, SalesChannelContext $salesChannelContext, CustomerEntity $customer, LocaleEntity $locale): array
     {
+        return [];
     }
 
     /**
@@ -195,55 +194,27 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
     {
         die('do refactoring first !');
 
-        $paymentUrl = $this->payFacade->preparePayProcessAtMollie($this->paymentMethod, $transaction, $salesChannelContext);
+        try {
+            $paymentUrl = $this->payFacade->preparePayProcessAtMollie($this->paymentMethod, $transaction, $salesChannelContext);
+        } catch (\Throwable $exception) {
+            $this->logger->addEntry(
+                $exception->getMessage(),
+                $salesChannelContext->getContext(),
+                $exception,
+                [
+                    'function' => 'order-prepare',
+                ],
+                Logger::ERROR
+            );
 
-//        $order = $this->orderService->getOrder($transaction->getOrder()->getId(), $salesChannelContext->getContext()) ?? $transaction->getOrder();
-//        $customFields = $order->getCustomFields();
-//        $mollieOrderId = $customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY] ?? null;
-//
-//        if (!empty($mollieOrderId)) {
-//            // we have to cancel order at mollie
-//            try {
-//                $this->apiOrderService->cancelOrder($mollieOrderId, $salesChannelContext);
-//            } catch (MollieOrderCouldNotBeCancelledException $e) {
-//                $this->logger->addEntry(
-//                    $e->getMessage(),
-//                    $salesChannelContext->getContext(),
-//                    $e,
-//                    ['shopwareOrderNumber' => $order->getOrderNumber()],
-//                    Logger::WARNING
-//                );
-//            }
-//
-//            unset($customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY]);
-//        }
-//
-//        $orderData = $this->prepareOrderForMollie(
-//            $this->paymentMethod,
-//            $transaction->getOrderTransaction()->getId(),
-//            $order,
-//            $transaction->getReturnUrl(),
-//            $salesChannelContext
-//        );
-//
-//        // Create an order at Mollie, based on the order data.
-//        $mollieOrder = $this->createOrderAtMollie(
-//            $orderData,
-//            $transaction->getReturnUrl(),
-//            $order,
-//            $salesChannelContext
-//        );
-//
-//
-//        if (!$mollieOrder instanceof Order) {
-//            $this->logErrorAndThrowException('Could not generate or fetch a mollie order! Aborting payment process', $salesChannelContext);
-//        }
-//
-//        $paymentUrl = $mollieOrder->getCheckoutUrl();
+            $transactions = $order->getTransactions();
+            $transactions->sort(function (OrderTransactionEntity $a, OrderTransactionEntity $b) {
+                return $a->getCreatedAt() <=> $b->getCreatedAt();
+            });
+            $lastTransaction = $transactions->last();
 
-//        if (empty($paymentUrl)) {
-//            $this->logErrorAndThrowException('Payment Url for mollie could not be fetched');
-//        }
+            throw new PaymentUrlException($lastTransaction->getId(), $exception->getMessage()));
+        }
 
         if (method_exists($this->transactionStateHandler, 'process')) {
             try {

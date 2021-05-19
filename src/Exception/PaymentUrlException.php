@@ -8,12 +8,18 @@ use Shopware\Core\Checkout\Payment\Exception\PaymentProcessException;
 class PaymentUrlException extends PaymentProcessException
 {
 
-    /**
-     * @return string
-     */
+    public function __construct(string $orderTransactionId, string $errorMessage)
+    {
+        parent::__construct(
+            $orderTransactionId,
+            'Could not create a Mollie payment url due to the following error:' . \PHP_EOL . '{{ errorMessage }}',
+            ['errorMessage' => $errorMessage]
+        );
+    }
+
     public function getErrorCode(): string
     {
-        return (string)parent::getCode();
+        return 'CHECKOUT__MOLLIE_COULD_NOT_CREATE_PAYMENT_URL';
     }
 
 }

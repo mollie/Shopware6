@@ -2,6 +2,8 @@
 
 namespace Kiener\MolliePayments\Service\Order;
 
+use Mollie\Api\Resources\Order;
+use Mollie\Api\Resources\OrderLine;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
@@ -18,7 +20,7 @@ class UpdateOrderLineItems
         $this->orderLineRepository = $orderLineRepository;
     }
 
-    public function updateOrderLineItems(MollieOrder $mollieOrder, SalesChannelContext $context): void
+    public function updateOrderLineItems(Order $mollieOrder, SalesChannelContext $salesChannelContext): void
     {
         /** @var OrderLine $orderLine */
         foreach ($mollieOrder->lines() as $orderLine) {
