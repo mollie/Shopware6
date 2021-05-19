@@ -7,7 +7,9 @@ use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeCancelledException;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Order as MollieOrder;
+use Monolog\Logger;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class Order
@@ -49,6 +51,34 @@ class Order
         }
 
         return $mollieOrder;
+    }
+
+    public function createOrder(array $orderData, SalesChannelContext $salesChannelContext): MollieOrder
+    {
+        $this->configurator->configure($this->apiClient, $salesChannelContext);
+
+        /**
+         * Create an order at Mollie based on the prepared
+         * array of order data.
+         *
+         * @throws ApiException
+         * @var \Mollie\Api\Resources\Order $mollieOrder
+         */
+        try {
+            return $this->apiClient->orders->create($orderData);
+        } catch (ApiException $e) {
+            $this->logger->addEntry(
+                $e->getMessage(),
+                $salesChannelContext->getContext(),
+                $e,
+                [
+                    'function' => 'finalize-payment',
+                ],
+                Logger::CRITICAL
+            );
+
+            throw new RuntimeException(sprintf('Could not create Mollie order, error: %s', $e->getMessage()));
+        }
     }
 
     public function cancelOrder(string $mollieOrderId, SalesChannelContext $salesChannelContext): void

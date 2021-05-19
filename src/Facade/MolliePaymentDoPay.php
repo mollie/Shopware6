@@ -2,18 +2,19 @@
 
 namespace Kiener\MolliePayments\Facade;
 
+use Kiener\MolliePayments\Exception\InvalidMollieOrderException;
 use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeCancelledException;
 use Kiener\MolliePayments\Handler\PaymentHandler;
-use Kiener\MolliePayments\Hydrator\MollieOrderHydrator;
 use Kiener\MolliePayments\Service\LoggerService;
+use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderBuilder;
+use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Service\MollieApi\Order as ApiOrderService;
+use Kiener\MolliePayments\Service\OrderService;
+use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
 use Monolog\Logger;
-use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
-use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class MolliePaymentDoPay
@@ -31,28 +32,48 @@ class MolliePaymentDoPay
      */
     private $logger;
     /**
-     * @var MollieOrderHydrator
+     * @var MollieOrderBuilder
      */
-    private MollieOrderHydrator $orderHydrator;
+    private MollieOrderBuilder $orderBuilder;
+    /**
+     * @var OrderService
+     */
+    private OrderService $orderService;
+    /**
+     * @var ApiOrderService
+     */
+    private ApiOrderService $apiOrder;
+    /**
+     * @var UpdateOrderCustomFields
+     */
+    private UpdateOrderCustomFields $updateOrderCustomFields;
 
     /**
      * @param ApiOrderService $apiOrderService
      * @param EntityRepositoryInterface $orderRepository
-     * @param MollieOrderHydrator $orderHydrator
+     * @param MollieOrderBuilder $orderBuilder
+     * @param OrderService $orderService
+     * @param ApiOrderService $apiOrder
+     * @param UpdateOrderCustomFields $updateOrderCustomFields
      * @param LoggerService $logger
      */
     public function __construct(
         ApiOrderService $apiOrderService,
         EntityRepositoryInterface $orderRepository,
-        MollieOrderHydrator $orderHydrator,
+        MollieOrderBuilder $orderBuilder,
+        OrderService $orderService,
+        Order $apiOrder,
+        UpdateOrderCustomFields $updateOrderCustomFields,
         LoggerService $logger
     )
     {
-
         $this->apiOrderService = $apiOrderService;
         $this->orderRepository = $orderRepository;
         $this->logger = $logger;
-        $this->orderHydrator = $orderHydrator;
+        $this->orderBuilder = $orderBuilder;
+        $this->orderService = $orderService;
+        $this->apiOrder = $apiOrder;
+        $this->updateOrderCustomFields = $updateOrderCustomFields;
     }
 
     public function getPaymentUrl(
@@ -62,7 +83,7 @@ class MolliePaymentDoPay
         PaymentHandler $paymentHandler
     ): string
     {
-        $order = $this->getOrder($transactionStruct->getOrder()->getId(), $salesChannelContext);
+        $order = $this->orderService->getOrder($transactionStruct->getOrder()->getId(), $salesChannelContext->getContext());
         $customFields = new MollieOrderCustomFieldsStruct($order->getCustomFields());
 
         // cancel existing mollie order if we may find one, unfortunately we may not reuse an existing mollie order if we need another payment method
@@ -82,11 +103,12 @@ class MolliePaymentDoPay
                 );
             }
 
+            //@todo save customFields here !
             $customFields->setMollieOrderId(null);
         }
 
-        // create new mollie order
-        $mollieOrderArray = $this->orderHydrator->hydrate(
+        // build new mollie order array
+        $mollieOrderArray = $this->orderBuilder->build(
             $order,
             $transactionStruct->getOrderTransaction()->getId(),
             $paymentMethod,
@@ -95,49 +117,31 @@ class MolliePaymentDoPay
             $paymentHandler
         );
 
-        // create
+        // create new order at mollie
+        $mollieOrder = $this->apiOrder->createOrder($mollieOrderArray, $salesChannelContext);
 
-        $mollieOrderArray=$paymentHandler->processPaymentMethodSpecificParameters($mollieOrderArray,$salesChannelContext,)
+        // save custom fields orderid of mollie
+        $this->updateOrderCustomFields->updateOrder($order, $mollieOrder, $transactionStruct->getReturnUrl(), $salesChannelContext);
 
-    }
+        // return mollie return url
+        $mollieCheckoutUrl = $mollieOrder->getCheckoutUrl();
 
-    /**
-     * returns an order with all necessary associations to create a mollie api order
-     *
-     * @param string $orderId
-     * @return OrderEntity
-     */
-    private function getOrder(string $orderId, SalesChannelContext $salesChannelContext): OrderEntity
-    {
-        $context = $salesChannelContext->getContext();
-        $criteria = new Criteria([$orderId]);
-        $criteria->addAssociation('currency');
-        $criteria->addAssociation('addresses');
-        $criteria->addAssociation('language');
-        $criteria->addAssociation('language.locale');
-        $criteria->addAssociation('lineItems');
-        $criteria->addAssociation('lineItems.product');
-        $criteria->addAssociation('lineItems.product.media');
-        $criteria->addAssociation('deliveries');
-        $criteria->addAssociation('deliveries.shippingOrderAddress');
-        $criteria->addAssociation('transactions');
-        $criteria->addAssociation('transactions.paymentMethod');
+        if (is_null($mollieCheckoutUrl)) {
+            $this->logger->addEntry(
+                sprintf(
+                    'Could not get mollie payment url (Order: %s, MollieOrder: %s)',
+                    $order->getOrderNumber(),
+                    $mollieOrder->id
+                ),
+                $salesChannelContext->getContext(),
+                null,
+                null,
+                Logger::CRITICAL
+            );
 
-        /** @var OrderEntity $order */
-        $order = $this->orderRepository->search($criteria, $context)->first();
-
-        if ($order instanceof OrderEntity) {
-            return $order;
+            throw new InvalidMollieOrderException();
         }
 
-        $this->logger->addEntry(
-            sprintf('Could not find an order with id %s. Payment failed', $orderId),
-            $context,
-            null,
-            null,
-            Logger::CRITICAL
-        );
-
-        throw new OrderNotFoundException($orderId);
+        return $mollieCheckoutUrl;
     }
 }

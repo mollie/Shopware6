@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Service\MollieApi;
+namespace Kiener\MolliePayments\Service\MollieApi\Builder;
 
 
-use Kiener\MolliePayments\Hydrator\MolliePriceHydrator;
 use Kiener\MolliePayments\Struct\LineItemExtraData;
 use Kiener\MolliePayments\Struct\LineItemPriceStruct;
 use Kiener\MolliePayments\Validator\OrderLineItemValidator;
@@ -33,7 +32,7 @@ class MollieOrderLineItemBuilder
     public const LINE_ITEM_TYPE_CUSTOM_PRODUCTS = 'customized-products';
 
     /**
-     * @var MolliePriceHydrator
+     * @var MollieOrderPriceBuilder
      */
     private $priceHydrator;
     /**
@@ -41,7 +40,7 @@ class MollieOrderLineItemBuilder
      */
     private $validator;
 
-    public function __construct(MolliePriceHydrator $priceHydrator, OrderLineItemValidator $validator)
+    public function __construct(MollieOrderPriceBuilder $priceHydrator, OrderLineItemValidator $validator)
     {
 
         $this->priceHydrator = $priceHydrator;
@@ -57,7 +56,7 @@ class MollieOrderLineItemBuilder
             return $lines;
         }
 
-        $currencyCode = $order->getCurrency()->getIsoCode() ?? MolliePriceHydrator::MOLLIE_FALLBACK_CURRENCY_CODE;
+        $currencyCode = $order->getCurrency()->getIsoCode() ?? MollieOrderPriceBuilder::MOLLIE_FALLBACK_CURRENCY_CODE;
 
         /** @var OrderLineItemEntity $item */
         foreach ($lineItems as $item) {
@@ -69,10 +68,10 @@ class MollieOrderLineItemBuilder
                 'type' => $this->getLineItemType($item),
                 'name' => $item->getLabel(),
                 'quantity' => $item->getQuantity(),
-                'unitPrice' => $this->priceHydrator->hydrate($prices->getUnitPrice(), $currencyCode),
-                'totalAmount' => $this->priceHydrator->hydrate($prices->getTotalAmount(), $currencyCode),
+                'unitPrice' => $this->priceHydrator->build($prices->getUnitPrice(), $currencyCode),
+                'totalAmount' => $this->priceHydrator->build($prices->getTotalAmount(), $currencyCode),
                 'vatRate' => number_format($prices->getVatRate(), self::MOLLIE_PRICE_PRECISION, '.', ''),
-                'vatAmount' => $this->priceHydrator->hydrate($prices->getVatAmount(), $currencyCode),
+                'vatAmount' => $this->priceHydrator->build($prices->getVatAmount(), $currencyCode),
                 'sku' => $extraData->getSku(),
                 'imageUrl' => urlencode($extraData->getImageUrl()),
                 'productUrl' => urlencode($extraData->getProductUrl()),

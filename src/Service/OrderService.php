@@ -8,6 +8,7 @@ use Kiener\MolliePayments\Validator\OrderLineItemValidator;
 use Kiener\MolliePayments\Validator\OrderTotalRoundingValidator;
 use Mollie\Api\Types\OrderLineType;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTax;
@@ -102,30 +103,32 @@ class OrderService
      */
     public function getOrder(string $orderId, Context $context): ?OrderEntity
     {
-        $order = null;
+        $criteria = new Criteria([$orderId]);
+        $criteria->addAssociation('currency');
+        $criteria->addAssociation('addresses');
+        $criteria->addAssociation('language');
+        $criteria->addAssociation('language.locale');
+        $criteria->addAssociation('lineItems');
+        $criteria->addAssociation('lineItems.product');
+        $criteria->addAssociation('lineItems.product.media');
+        $criteria->addAssociation('deliveries');
+        $criteria->addAssociation('deliveries.shippingOrderAddress');
+        $criteria->addAssociation('transactions');
+        $criteria->addAssociation('transactions.paymentMethod');
 
-        try {
-            $criteria = new Criteria();
-            $criteria->addFilter(new EqualsFilter('id', $orderId));
-            $criteria->addAssociation('currency');
-            $criteria->addAssociation('addresses');
-            $criteria->addAssociation('language');
-            $criteria->addAssociation('language.locale');
-            $criteria->addAssociation('lineItems');
-            $criteria->addAssociation('lineItems.product');
-            $criteria->addAssociation('lineItems.product.media');
-            $criteria->addAssociation('deliveries');
-            $criteria->addAssociation('deliveries.shippingOrderAddress');
-            $criteria->addAssociation('transactions');
-            $criteria->addAssociation('transactions.paymentMethod');
+        /** @var OrderEntity $order */
+        $order = $this->orderRepository->search($criteria, $context)->first();
 
-            /** @var OrderEntity $order */
-            $order = $this->orderRepository->search($criteria, $context)->first();
-        } catch (Exception $e) {
-            $this->logger->error($e->getMessage(), [$e]);
+        if ($order instanceof OrderEntity) {
+            return $order;
         }
 
-        return $order;
+        $this->logger->critical(
+            sprintf('Could not find an order with id %s. Payment failed', $orderId),
+            $context
+        );
+
+        throw new OrderNotFoundException($orderId);
     }
 
     /**
@@ -343,8 +346,6 @@ class OrderService
             'vatRate' => number_format($vatRate, 2, '.', ''),
             'vatAmount' => $this->getPriceArray($currencyCode, $vatAmount),
             'sku' => null,
-//            'imageUrl' => null,
-//            'productUrl' => null,
         ];
 
         return $shippingLine;
@@ -407,7 +408,6 @@ class OrderService
      * Return an array of price data; currency and value.
      * @param string $currency
      * @param float|null $price
-     * @param int $decimals
      * @return array
      */
     public function getPriceArray(string $currency, ?float $price = null): array
