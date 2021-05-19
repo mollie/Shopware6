@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Service\Order;
 
 use Exception;
 use Kiener\MolliePayments\Service\LoggerService;
+use Kiener\MolliePayments\Service\Transition\OrderTransitionServiceInterface;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\OrderStates;
