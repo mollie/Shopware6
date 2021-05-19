@@ -85,6 +85,22 @@ class MolliePaymentDoPay
         $this->updateOrderLineItems = $updateOrderLineItems;
     }
 
+    /**
+     * function starts the payment process at mollie
+     *
+     * if a mollieOrder has been created before (e.g failed or cancelled result), it will be cancelled first. We do not want any payments
+     * through this mollieOrder
+     * we prepare an order at mollie
+     * we fetch the new order and if we have to lead the customer to mollie payment site we return this url
+     * if we do not get a payment url from mollie (may happen if credit card components are active, payment is successful in this cases), we
+     * lead customer to transaction finalize url
+     *
+     * @param string $paymentMethod
+     * @param AsyncPaymentTransactionStruct $transactionStruct
+     * @param SalesChannelContext $salesChannelContext
+     * @param PaymentHandler $paymentHandler
+     * @return string
+     */
     public function preparePayProcessAtMollie(
         string $paymentMethod,
         AsyncPaymentTransactionStruct $transactionStruct,
@@ -136,7 +152,6 @@ class MolliePaymentDoPay
             $customFields->setMollieOrderId($mollieOrder->getId());
             $customFields->setMolliePaymentUrl($mollieOrder->getCheckoutUrl());
 
-            // save custom fields orderid of mollie
             $this->updateOrderCustomFields->updateOrder($order->getId(), $customFields, $salesChannelContext);
             $this->updateOrderLineItems->updateOrderLineItems($mollieOrder, $salesChannelContext);
         }

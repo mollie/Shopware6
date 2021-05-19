@@ -5,25 +5,24 @@ namespace Kiener\MolliePayments\Handler;
 use Exception;
 use Kiener\MolliePayments\Exception\PaymentUrlException;
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
+use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Helper\PaymentStatusHelper;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\LoggerService;
-use Kiener\MolliePayments\Service\MollieApi\ApiClientConfigurator;
 use Kiener\MolliePayments\Service\MollieApi\Order as ApiOrderService;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
+use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Exceptions\ApiException;
-use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Types\PaymentStatus;
 use Monolog\Logger;
 use RuntimeException;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
@@ -78,9 +77,6 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
     /** @var CustomerService */
     protected $customerService;
 
-    /** @var MollieApiClient */
-    protected $apiClient;
-
     /** @var SettingsService */
     protected $settingsService;
 
@@ -102,11 +98,6 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
     private $webhookBuilder;
 
     /**
-     * @var ApiClientConfigurator
-     */
-    private $configurator;
-
-    /**
      * @var ApiOrderService
      */
     private $apiOrderService;
@@ -114,6 +105,14 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      * @var MolliePaymentDoPay
      */
     private $payFacade;
+    /**
+     * @var TransactionTransitionServiceInterface
+     */
+    private TransactionTransitionServiceInterface $transactionTransitionService;
+    /**
+     * @var MollieApiFactory
+     */
+    private MollieApiFactory $mollieApiFactory;
 
     /**
      * PaymentHandler constructor.
@@ -121,40 +120,42 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      * @param OrderTransactionStateHandler $transactionStateHandler
      * @param OrderService $orderService
      * @param CustomerService $customerService
-     * @param MollieApiClient $apiClient
      * @param SettingsService $settingsService
      * @param PaymentStatusHelper $paymentStatusHelper
      * @param LoggerService $logger
      * @param RouterInterface $router
      * @param string $environment
+     * @param ApiOrderService $apiOrderService
+     * @param MolliePaymentDoPay $payFacade
+     * @param TransactionTransitionServiceInterface $transactionTransitionService
      */
     public function __construct(
         OrderTransactionStateHandler $transactionStateHandler,
         OrderService $orderService,
         CustomerService $customerService,
-        MollieApiClient $apiClient,
         SettingsService $settingsService,
         PaymentStatusHelper $paymentStatusHelper,
         LoggerService $logger,
         RouterInterface $router,
         string $environment,
-        ApiClientConfigurator $configurator,
         ApiOrderService $apiOrderService,
-        MolliePaymentDoPay $payFacade
+        MolliePaymentDoPay $payFacade,
+        TransactionTransitionServiceInterface $transactionTransitionService,
+        MollieApiFactory $mollieApiFactory
     )
     {
         $this->transactionStateHandler = $transactionStateHandler;
         $this->orderService = $orderService;
         $this->customerService = $customerService;
-        $this->apiClient = $apiClient;
         $this->paymentStatusHelper = $paymentStatusHelper;
         $this->logger = $logger;
         $this->router = $router;
         $this->settingsService = $settingsService;
         $this->environment = $environment;
-        $this->configurator = $configurator;
         $this->apiOrderService = $apiOrderService;
         $this->payFacade = $payFacade;
+        $this->transactionTransitionService = $transactionTransitionService;
+        $this->mollieApiFactory = $mollieApiFactory;
     }
 
     /**
@@ -192,10 +193,9 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         SalesChannelContext $salesChannelContext
     ): RedirectResponse
     {
-        die('do refactoring first !');
-
         try {
             $paymentUrl = $this->payFacade->preparePayProcessAtMollie($this->paymentMethod, $transaction, $salesChannelContext);
+
         } catch (\Throwable $exception) {
             $this->logger->addEntry(
                 $exception->getMessage(),
@@ -207,31 +207,22 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
                 Logger::ERROR
             );
 
-            $transactions = $order->getTransactions();
-            $transactions->sort(function (OrderTransactionEntity $a, OrderTransactionEntity $b) {
-                return $a->getCreatedAt() <=> $b->getCreatedAt();
-            });
-            $lastTransaction = $transactions->last();
-
-            throw new PaymentUrlException($lastTransaction->getId(), $exception->getMessage()));
+            throw new PaymentUrlException($transaction->getOrderTransaction()->getId(), $exception->getMessage());
         }
 
-        if (method_exists($this->transactionStateHandler, 'process')) {
-            try {
-                $this->transactionStateHandler->process(
-                    $transaction->getOrderTransaction()->getId(),
-                    $salesChannelContext->getContext()
-                );
-            } catch (Exception $e) {
-                $this->logger->addEntry(
-                    $e->getMessage(),
-                    $salesChannelContext->getContext(),
-                    $e,
-                    [
-                        'function' => 'payment-handler-set-transaction-state'
-                    ]
-                );
-            }
+        try {
+            $this->transactionTransitionService->processTransaction($transaction->getOrderTransaction(), $salesChannelContext->getContext());
+        } catch (\Exception $exception) {
+            // we only log failed transitions
+            $this->logger->addEntry(
+                sprintf('Could not set payment to in progress. Got error %s', $exception->getMessage()),
+                $salesChannelContext->getContext(),
+                $exception,
+                [
+                    'function' => 'order-prepare',
+                ],
+                Logger::WARNING
+            );
         }
 
         /**
@@ -297,17 +288,17 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             );
 
             // Throw the error
-            throw new RuntimeException($errorMessage);
+            throw new PaymentUrlException($transaction->getOrderTransaction()->getId(), $errorMessage);
         }
 
-        $this->configurator->configure($this->apiClient, $salesChannelContext);
+        $apiClient = $this->mollieApiFactory->getClient($salesChannelContext->getSalesChannelId(), $salesChannelContext->getContext());
 
         /**
          * Retrieve the order from Mollie's Orders API, so we can set the status of the order
          * and payment in Shopware.
          */
         try {
-            $mollieOrder = $this->apiClient->orders->get($mollieOrderId, [
+            $mollieOrder = $apiClient->orders->get($mollieOrderId, [
                 'embed' => 'payments'
             ]);
         } catch (ApiException $e) {
@@ -613,6 +604,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         /** @var Order|null $mollieOrder */
         $mollieOrder = null;
 
+        $apiClient = $this->mollieApiFactory->getClient($salesChannelContext->getSalesChannelId(), $salesChannelContext->getContext());
         /**
          * Create an order at Mollie based on the prepared
          * array of order data.
@@ -621,7 +613,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
          * @var Order $mollieOrder
          */
         try {
-            $mollieOrder = $this->apiClient->orders->create($orderData);
+            $mollieOrder = $apiClient->orders->create($orderData);
         } catch (ApiException $e) {
             $this->logger->addEntry(
                 $e->getMessage(),
@@ -680,64 +672,4 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
 
         return $mollieOrder;
     }
-
-    /**
-     * Sets the API keys for Mollie based on the current context.
-     *
-     * @param SalesChannelContext $context
-     *
-     * @throws ApiException
-     */
-    private function setApiKeysBySalesChannelContext(SalesChannelContext $context): void
-    {
-        try {
-            /** @var MollieSettingStruct $settings */
-            $settings = $this->settingsService->getSettings($context->getSalesChannel()->getId());
-
-            /** @var string $apiKey */
-            $apiKey = $settings->isTestMode() === false ? $settings->getLiveApiKey() : $settings->getTestApiKey();
-
-            // Log the used API keys
-            if ($settings->isDebugMode()) {
-                $this->logger->addEntry(
-                    sprintf('Selected API key %s for sales channel %s', $apiKey, $context->getSalesChannel()->getName()),
-                    $context->getContext(),
-                    null,
-                    [
-                        'apiKey' => $apiKey,
-                    ]
-                );
-            }
-
-            // Set the API key
-            $this->apiClient->setApiKey($apiKey);
-        } catch (InconsistentCriteriaIdsException $e) {
-            $this->logger->addEntry(
-                $e->getMessage(),
-                $context->getContext(),
-                $e,
-                [
-                    'function' => 'set-mollie-api-key',
-                ],
-                Logger::ERROR
-            );
-
-            throw new RuntimeException(sprintf('Could not set Mollie Api Key, error: %s', $e->getMessage()));
-        }
-    }
-
-private function logErrorAndThrowException(string $message, SalesChannelContext $salesChannelContext): void
-{
-    $this->logger->addEntry(
-        $message,
-        $salesChannelContext->getContext(),
-        null,
-        [
-            'function' => 'order-prepare',
-        ],
-        Logger::ERROR
-    );
-
-    throw new \Exception($message);
-}
 }
