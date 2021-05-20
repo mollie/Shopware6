@@ -73,28 +73,4 @@
             "labelPreferredIdealIssuer": "Voorkeur iDeal verstrekker"
         }
     }
-  },
-  "sw-order": {
-    "detailExtended": {
-      "columnRefunded": "Terugbetaald",
-      "columnShipped": "Verzonden",
-      "labelMollieOrderId": "Mollie Order ID",
-      "totalRefunds": "Terugbetaald bedrag",
-      "totalShipments": "Verzonden bedrag ({quantity} items)"
-    }
-  },
-  "sw-payment": {
-    "testButton": "Test API sleutels",
-    "testApiKeys": {
-      "title": "Mollie Payments",
-      "apiKey": "API Key",
-      "isValid": "is geldig",
-      "isInvalid": "is geldig"
-    }
-  },
-  "sw-customer": {
-    "extendedInfo": {
-      "labelPreferredIdealIssuer": "Voorkeur iDeal verstrekker"
-    }
-  }
 }
