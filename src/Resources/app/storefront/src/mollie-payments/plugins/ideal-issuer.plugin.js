@@ -19,10 +19,23 @@ export default class MollieIDealIssuer extends Plugin {
 
             // Elements
             const customerId = container.getAttribute('data-customer-id');
-            const paymentForm = document.querySelector('#confirmPaymentForm');
-            const submitButton = document.querySelector('#confirmPaymentForm button[type="submit"]');
-            const radioInputs = document.querySelectorAll('#confirmPaymentForm input[type="radio"]');
-            const iDealRadioInput = document.querySelector('#confirmPaymentForm input[type="radio"].ideal');
+            let paymentForm;
+            let submitButton;
+            let radioInputs;
+            let iDealRadioInput;
+
+            // Form id changed between 6.3 and 6.4
+            if (document.querySelector('#confirmPaymentForm')) {
+                paymentForm = document.querySelector('#confirmPaymentForm');
+                submitButton = document.querySelector('#confirmPaymentForm button[type="submit"]');
+                radioInputs = document.querySelectorAll('#confirmPaymentForm input[type="radio"]');
+                iDealRadioInput = document.querySelector('#confirmPaymentForm input[type="radio"].ideal');
+            } else if (document.querySelector('#changePaymentForm')) {
+                paymentForm = document.querySelector('#changePaymentForm');
+                submitButton = document.querySelector('#changePaymentForm button[type="submit"]');
+                radioInputs = document.querySelectorAll('#changePaymentForm input[type="radio"]');
+                iDealRadioInput = document.querySelector('#changePaymentForm input[type="radio"].ideal');
+            }
 
             // Event helpers
             const showIssuers = () => {
