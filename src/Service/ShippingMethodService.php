@@ -90,6 +90,7 @@ class ShippingMethodService
             $availableShippingMethods !== null
             && $availableShippingMethods->count()
         ) {
+            /** @var ShippingMethodEntity $shippingMethod */
             foreach ($availableShippingMethods as $shippingMethod) {
                 if (
                     $shippingMethod->getPrices()->count()
@@ -116,10 +117,8 @@ class ShippingMethodService
 
                 $detail = '';
 
-                if (
-                    $shippingMethod->getDeliveryTime() !== null
-                ) {
-                    $detail = $shippingMethod->getDeliveryTime()->getName();
+                if ($shippingMethod->getDeliveryTime() !== null) {
+                    $detail = $shippingMethod->getDeliveryTime()->getTranslation('name') ?: $shippingMethod->getDeliveryTime()->getName();
                 }
 
                 $shippingMethods[] = [
