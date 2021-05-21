@@ -2,6 +2,8 @@
 
 namespace Kiener\MolliePayments\Service\Transition;
 
+use Kiener\MolliePayments\Service\LoggerService;
+use Monolog\Logger;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionDefinition;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
@@ -14,10 +16,15 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
      * @var TransitionServiceInterface
      */
     private $transitionService;
+    /**
+     * @var LoggerService
+     */
+    private LoggerService $loggerService;
 
-    public function __construct(TransitionServiceInterface $transitionService)
+    public function __construct(TransitionServiceInterface $transitionService, LoggerService $loggerService)
     {
         $this->transitionService = $transitionService;
+        $this->loggerService = $loggerService;
     }
 
     public function processTransaction(OrderTransactionEntity $transaction, Context $context): void
@@ -34,6 +41,33 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         }
 
         $this->performTransition($entityId, StateMachineTransitionActions::ACTION_PROCESS, $context);
+    }
+
+    public function reOpenTransaction(OrderTransactionEntity $transaction, Context $context): void
+    {
+        if ($transaction->getStateMachineState()->getName() === OrderTransactionStates::STATE_OPEN) {
+            return;
+        }
+
+        $entityId = $transaction->getId();
+        $availableTransitions = $this->getAvailableTransitions($entityId, $context);
+
+        if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_REOPEN, $availableTransitions)) {
+            $this->loggerService->addEntry(
+                sprintf(
+                    'It is not allowed to change status to open from %s. Aborting reopen transition',
+                    $transaction->getStateMachineState()->getName()
+                ),
+                $context,
+                null,
+                null,
+                Logger::ERROR
+            );
+
+            return;
+        }
+
+        $this->performTransition($entityId, StateMachineTransitionActions::ACTION_REOPEN, $context);
     }
 
     private function transitionIsAllowed(string $transition, array $availableTransitions): bool

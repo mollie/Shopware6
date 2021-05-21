@@ -8,4 +8,6 @@ use Shopware\Core\Framework\Context;
 interface TransactionTransitionServiceInterface
 {
     public function processTransaction(OrderTransactionEntity $transaction, Context $context): void;
+
+    public function reOpenTransaction(OrderTransactionEntity $transaction, Context $context): void;
 }

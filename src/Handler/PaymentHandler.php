@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Handler;
 use Exception;
 use Kiener\MolliePayments\Exception\PaymentUrlException;
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
+use Kiener\MolliePayments\Facade\MolliePaymentFinalize;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Helper\PaymentStatusHelper;
 use Kiener\MolliePayments\Service\CustomerService;
@@ -41,6 +42,7 @@ use Shopware\Core\System\StateMachine\Exception\StateMachineNotFoundException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
+use Throwable;
 
 class PaymentHandler implements AsynchronousPaymentHandlerInterface
 {
@@ -93,11 +95,6 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
     protected $environment;
 
     /**
-     * @var WebhookBuilder
-     */
-    private $webhookBuilder;
-
-    /**
      * @var ApiOrderService
      */
     private $apiOrderService;
@@ -113,6 +110,10 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      * @var MollieApiFactory
      */
     private MollieApiFactory $mollieApiFactory;
+    /**
+     * @var MolliePaymentFinalize
+     */
+    private MolliePaymentFinalize $finalizeFacade;
 
     /**
      * PaymentHandler constructor.
@@ -127,7 +128,9 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      * @param string $environment
      * @param ApiOrderService $apiOrderService
      * @param MolliePaymentDoPay $payFacade
+     * @param MolliePaymentFinalize $finalizeFacade
      * @param TransactionTransitionServiceInterface $transactionTransitionService
+     * @param MollieApiFactory $mollieApiFactory
      */
     public function __construct(
         OrderTransactionStateHandler $transactionStateHandler,
@@ -140,6 +143,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         string $environment,
         ApiOrderService $apiOrderService,
         MolliePaymentDoPay $payFacade,
+        MolliePaymentFinalize $finalizeFacade,
         TransactionTransitionServiceInterface $transactionTransitionService,
         MollieApiFactory $mollieApiFactory
     )
@@ -156,6 +160,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         $this->payFacade = $payFacade;
         $this->transactionTransitionService = $transactionTransitionService;
         $this->mollieApiFactory = $mollieApiFactory;
+        $this->finalizeFacade = $finalizeFacade;
     }
 
     /**
@@ -196,7 +201,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         try {
             $paymentUrl = $this->payFacade->preparePayProcessAtMollie($this->paymentMethod, $transaction, $salesChannelContext);
 
-        } catch (\Throwable $exception) {
+        } catch (Throwable $exception) {
             $this->logger->addEntry(
                 $exception->getMessage(),
                 $salesChannelContext->getContext(),
@@ -256,125 +261,20 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      */
     public function finalize(AsyncPaymentTransactionStruct $transaction, Request $request, SalesChannelContext $salesChannelContext): void
     {
-        /**
-         * Retrieve the order from the transaction.
-         */
-        $order = $transaction->getOrder();
-
-        /**
-         * Retrieve the order's custom fields, or set an empty array.
-         */
-        $orderCustomFields = is_array($order->getCustomFields()) ? $order->getCustomFields() : [];
-
-        /**
-         * Retrieve the Mollie Order ID from the order custom fields. We use this
-         * to fetch the order from Mollie's Order API and retrieve it's payment status.
-         */
-        $mollieOrderId = $orderCustomFields['mollie_payments']['order_id'] ?? null;
-
-        if ($mollieOrderId === null) {
-            // Set the error message
-            $errorMessage = sprintf('The Mollie id for order %s could not be found', $order->getOrderNumber());
-
-            // Log the error message in the database
+        try {
+            $this->finalizeFacade->finalize($transaction, $salesChannelContext);
+        } catch (CustomerCanceledAsyncPaymentException $exception) {
+            throw $exception;
+        } catch (Throwable $exception) {
             $this->logger->addEntry(
-                $errorMessage,
+                $exception->getMessage(),
                 $salesChannelContext->getContext(),
+                $exception,
                 null,
-                [
-                    'function' => 'finalize-payment',
-                ],
                 Logger::ERROR
             );
 
-            // Throw the error
-            throw new PaymentUrlException($transaction->getOrderTransaction()->getId(), $errorMessage);
-        }
-
-        $apiClient = $this->mollieApiFactory->getClient($salesChannelContext->getSalesChannelId(), $salesChannelContext->getContext());
-
-        /**
-         * Retrieve the order from Mollie's Orders API, so we can set the status of the order
-         * and payment in Shopware.
-         */
-        try {
-            $mollieOrder = $apiClient->orders->get($mollieOrderId, [
-                'embed' => 'payments'
-            ]);
-        } catch (ApiException $e) {
-            $this->logger->addEntry(
-                $e->getMessage(),
-                $salesChannelContext->getContext(),
-                $e,
-                [
-                    'function' => 'get-mollie-order',
-                ],
-                Logger::ERROR
-            );
-        }
-
-        /**
-         * If the Mollie order can't be fetched, throw an error.
-         */
-        if (!isset($mollieOrder)) {
-            throw new RuntimeException(
-                'We can\'t fetch the order ' . $order->getOrderNumber() . ' (' . $mollieOrderId . ') from the Orders API'
-            );
-        }
-
-        /**
-         * Process the payment status of the order. Returns a PaymentStatus string which
-         * we can use to throw an exception when the payment is cancelled.
-         */
-        try {
-            $paymentStatus = $this->paymentStatusHelper->processPaymentStatus(
-                $transaction->getOrderTransaction(),
-                $order,
-                $mollieOrder,
-                $salesChannelContext->getContext()
-            );
-        } catch (Exception $e) {
-            $this->logger->addEntry(
-                $e->getMessage(),
-                $salesChannelContext->getContext(),
-                $e,
-                [
-                    'function' => 'finalize-payment',
-                ],
-                Logger::ERROR
-            );
-        }
-
-        /**
-         * If the payment was cancelled by the customer, throw an exception
-         * to let the shop handle the cancellation.
-         */
-        if (
-            isset($paymentStatus)
-            && ($paymentStatus === PaymentStatus::STATUS_CANCELED || $paymentStatus === PaymentStatus::STATUS_FAILED)
-        ) {
-            try {
-                $this->transactionStateHandler
-                    ->reopen($transaction->getOrderTransaction()->getId(), $salesChannelContext->getContext());
-            } catch (Exception $e) {
-                $this->logger->addEntry(
-                    $e->getMessage(),
-                    $salesChannelContext->getContext(),
-                    $e,
-                    [
-                        'function' => 'payment-handler-set-transaction-state'
-                    ]
-                );
-            }
-
-            throw new CustomerCanceledAsyncPaymentException(
-                $transaction->getOrderTransaction()->getUniqueIdentifier(),
-                sprintf(
-                    'Payment for order %s (%s) was cancelled by the customer.',
-                    $order->getOrderNumber(),
-                    $mollieOrder->id
-                )
-            );
+            throw new CustomerCanceledAsyncPaymentException($transaction->getOrderTransaction()->getId());
         }
     }
 
