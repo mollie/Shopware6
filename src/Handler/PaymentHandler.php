@@ -15,12 +15,10 @@ use Kiener\MolliePayments\Service\MollieApi\Order as ApiOrderService;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
-use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\OrderLine;
-use Mollie\Api\Types\PaymentStatus;
 use Monolog\Logger;
 use RuntimeException;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
@@ -235,7 +233,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
          * customer is redirected back to Shopware's finish page, which
          * leads to the @finalize function.
          */
-        return RedirectResponse::create($paymentUrl);
+        return new RedirectResponse($paymentUrl);
     }
 
     /**
