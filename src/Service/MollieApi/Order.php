@@ -26,6 +26,27 @@ class Order
         $this->logger = $logger;
     }
 
+    public function getPaymentUrl(string $mollieOrderId, string $salesChannelId): ?string
+    {
+        $apiClient = $this->clientFactory->getClient($salesChannelId);
+
+        try {
+            $mollieOrder = $apiClient->orders->get($mollieOrderId);
+        } catch (ApiException $e) {
+            $this->logger->error(
+                sprintf(
+                    'API error occured when fetching mollie order %s with message %s',
+                    $mollieOrderId,
+                    $e->getMessage()
+                )
+            );
+
+            throw $e;
+        }
+
+        return $mollieOrder->getCheckoutUrl();
+    }
+
     public function setShipment(string $mollieOrderId, string $salesChannelId): bool
     {
         $apiClient = $this->clientFactory->getClient($salesChannelId);
