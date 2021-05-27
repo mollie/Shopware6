@@ -34,6 +34,7 @@
     }
   },
   "sw-payment": {
+    "apiLinkButton": "Erhalten Sie Ihre API Keys vom Mollie Dashboard",
     "testButton": "Prüfe API Keys",
     "testApiKeys": {
       "title": "Mollie Payments",
