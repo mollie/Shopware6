@@ -2,10 +2,8 @@
 
 namespace Kiener\MolliePayments\Service;
 
-use Exception;
-use Kiener\MolliePayments\Exception\MissingPriceLineItemException;
-use Kiener\MolliePayments\Validator\OrderLineItemValidator;
-use Kiener\MolliePayments\Validator\OrderTotalRoundingValidator;
+use Kiener\MolliePayments\Exception\MissingPriceLineItem;
+use Kiener\MolliePayments\Validator\IsOrderTotalRoundingActivated;
 use Mollie\Api\Types\OrderLineType;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
@@ -19,7 +17,6 @@ use Shopware\Core\Checkout\Promotion\Cart\PromotionProcessor;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 
 class OrderService
 {
@@ -43,12 +40,7 @@ class OrderService
     protected $logger;
 
     /**
-     * @var OrderLineItemValidator
-     */
-    private $orderLineItemValidator;
-
-    /**
-     * @var OrderTotalRoundingValidator
+     * @var IsOrderTotalRoundingActivated
      */
     private $validator;
 
@@ -61,15 +53,13 @@ class OrderService
         EntityRepositoryInterface $orderRepository,
         EntityRepositoryInterface $orderLineItemRepository,
         LoggerInterface $logger,
-        OrderLineItemValidator $orderLineItemValidator,
-        OrderTotalRoundingValidator $validator,
+        IsOrderTotalRoundingActivated $validator,
         string $shopwareVersion
     )
     {
         $this->orderRepository = $orderRepository;
         $this->orderLineItemRepository = $orderLineItemRepository;
         $this->logger = $logger;
-        $this->orderLineItemValidator = $orderLineItemValidator;
         $this->validator = $validator;
         $this->shopwareVersion = $shopwareVersion;
     }
@@ -136,86 +126,86 @@ class OrderService
      *
      * @param OrderEntity $order
      * @return array
-     * @throws MissingPriceLineItemException
+     * @throws MissingPriceLineItem
      */
-    public function getOrderLinesArray(OrderEntity $order): array
-    {
-        // Variables
-        $lines = [];
-        $lineItems = $order->getNestedLineItems();
-
-        if ($lineItems === null || $lineItems->count() === 0) {
-            return $lines;
-        }
-
-        // Get currency code
-        $currency = $order->getCurrency();
-        $currencyCode = $currency !== null ? $currency->getIsoCode() : 'EUR';
-
-        /** @var OrderLineItemEntity $item */
-        foreach ($lineItems as $item) {
-            // Get the SKU
-            $sku = null;
-
-            if ($item->getProduct() !== null) {
-                $sku = $item->getProduct()->getProductNumber();
-            }
-
-            $molliePreparedApiPrices = $this->calculateLineItemPriceData($item, $order->getTaxStatus(), $currencyCode);
-
-            // Get the image
-            $imageUrl = null;
-
-            if (
-                $item->getProduct() !== null
-                && $item->getProduct()->getMedia() !== null
-                && $item->getProduct()->getMedia()->count()
-                && $item->getProduct()->getMedia()->first() !== null
-                && $item->getProduct()->getMedia()->first()->getMedia()
-            ) {
-                $imageUrl = $item->getProduct()->getMedia()->first()->getMedia()->getUrl();
-            }
-
-            // Get the product URL
-            $productUrl = null;
-
-            if (
-                $item->getProduct() !== null
-                && $item->getProduct()->getSeoUrls() !== null
-                && $item->getProduct()->getSeoUrls()->count()
-                && $item->getProduct()->getSeoUrls()->first() !== null
-            ) {
-                $productUrl = $item->getProduct()->getSeoUrls()->first()->getUrl();
-            }
-
-            // Build the order lines array
-            $lines[] = [
-                'type' => $this->getLineItemType($item),
-                'name' => $item->getLabel(),
-                'quantity' => $item->getQuantity(),
-                'unitPrice' => $molliePreparedApiPrices['unitPrice'],
-                'totalAmount' => $molliePreparedApiPrices['totalAmount'],
-                'vatRate' => $molliePreparedApiPrices['vatRate'],
-                'vatAmount' => $molliePreparedApiPrices['vatAmount'],
-                'sku' => $sku,
-                'imageUrl' => urlencode($imageUrl),
-                'productUrl' => urlencode($productUrl),
-                'metadata' => [
-                    self::ORDER_LINE_ITEM_ID => $item->getId(),
-                ],
-            ];
-        }
-
-        $roundingLineItem = $this->getRoundingLineItem($order, $currencyCode);
-
-        if (!empty($roundingLineItem)) {
-            $lines[] = $roundingLineItem;
-        }
-
-        $lines[] = $this->getShippingItemArray($order);
-
-        return $lines;
-    }
+//    public function getOrderLinesArray(OrderEntity $order): array
+//    {
+//        // Variables
+//        $lines = [];
+//        $lineItems = $order->getNestedLineItems();
+//
+//        if ($lineItems === null || $lineItems->count() === 0) {
+//            return $lines;
+//        }
+//
+//        // Get currency code
+//        $currency = $order->getCurrency();
+//        $currencyCode = $currency !== null ? $currency->getIsoCode() : 'EUR';
+//
+//        /** @var OrderLineItemEntity $item */
+//        foreach ($lineItems as $item) {
+//            // Get the SKU
+//            $sku = null;
+//
+//            if ($item->getProduct() !== null) {
+//                $sku = $item->getProduct()->getProductNumber();
+//            }
+//
+//            $molliePreparedApiPrices = $this->calculateLineItemPriceData($item, $order->getTaxStatus(), $currencyCode);
+//
+//            // Get the image
+//            $imageUrl = null;
+//
+//            if (
+//                $item->getProduct() !== null
+//                && $item->getProduct()->getMedia() !== null
+//                && $item->getProduct()->getMedia()->count()
+//                && $item->getProduct()->getMedia()->first() !== null
+//                && $item->getProduct()->getMedia()->first()->getMedia()
+//            ) {
+//                $imageUrl = $item->getProduct()->getMedia()->first()->getMedia()->getUrl();
+//            }
+//
+//            // Get the product URL
+//            $productUrl = null;
+//
+//            if (
+//                $item->getProduct() !== null
+//                && $item->getProduct()->getSeoUrls() !== null
+//                && $item->getProduct()->getSeoUrls()->count()
+//                && $item->getProduct()->getSeoUrls()->first() !== null
+//            ) {
+//                $productUrl = $item->getProduct()->getSeoUrls()->first()->getUrl();
+//            }
+//
+//            // Build the order lines array
+//            $lines[] = [
+//                'type' => $this->getLineItemType($item),
+//                'name' => $item->getLabel(),
+//                'quantity' => $item->getQuantity(),
+//                'unitPrice' => $molliePreparedApiPrices['unitPrice'],
+//                'totalAmount' => $molliePreparedApiPrices['totalAmount'],
+//                'vatRate' => $molliePreparedApiPrices['vatRate'],
+//                'vatAmount' => $molliePreparedApiPrices['vatAmount'],
+//                'sku' => $sku,
+//                'imageUrl' => urlencode($imageUrl),
+//                'productUrl' => urlencode($productUrl),
+//                'metadata' => [
+//                    self::ORDER_LINE_ITEM_ID => $item->getId(),
+//                ],
+//            ];
+//        }
+//
+//        $roundingLineItem = $this->getRoundingLineItem($order, $currencyCode);
+//
+//        if (!empty($roundingLineItem)) {
+//            $lines[] = $roundingLineItem;
+//        }
+//
+//        $lines[] = $this->getShippingItemArray($order);
+//
+//        return $lines;
+//    }
 
     /**
      * with version 6.4 there is a rounding on total amount. This could lead to differences
@@ -353,59 +343,61 @@ class OrderService
 
     /**
      * returns an array of totalPrice, unitPrice and vatAmount that is calculated like mollie api does
+     *
      * @param OrderLineItemEntity $item
      * @param string $orderTaxType
      * @param string $currencyCode
      * @return array
      */
-    public function calculateLineItemPriceData(OrderLineItemEntity $item, string $orderTaxType, string $currencyCode): array
-    {
-        $this->orderLineItemValidator->validate($item);
-
-        $price = $item->getPrice();
-        $taxCollection = $price->getCalculatedTaxes();
-
-        $vatRate = 0.0;
-        $itemTax = $this->getLineItemTax($taxCollection);
-        if ($itemTax instanceof CalculatedTax) {
-            $vatRate = $itemTax->getTaxRate();
-        }
-
-        // Remove VAT if the order is tax free
-        if ($orderTaxType === CartPrice::TAX_STATE_FREE) {
-            $vatRate = 0.0;
-        }
-
-        $unitPrice = $price->getUnitPrice();
-        $lineItemTotalPrice = $item->getTotalPrice();
-
-        // If the order is of type TAX_STATE_NET the $lineItemTotalPrice and unit price
-        // is a net price.
-        // For correct mollie api tax calculations we have to calculate the shopware gross
-        // price
-        if ($orderTaxType === CartPrice::TAX_STATE_NET) {
-            $unitPrice *= ((100 + $vatRate) / 100);
-            $lineItemTotalPrice += $taxCollection->getAmount();
-        }
-
-        $unitPrice = round($unitPrice, self::MOLLIE_PRICE_PRECISION);
-
-
-        $roundedLineItemTotalPrice = round($lineItemTotalPrice, self::MOLLIE_PRICE_PRECISION);
-        $roundedVatRate = round($vatRate, self::MOLLIE_PRICE_PRECISION);
-        $vatAmount = $roundedLineItemTotalPrice * ($roundedVatRate / (100 + $roundedVatRate));
-        $roundedVatAmount = round($vatAmount, self::MOLLIE_PRICE_PRECISION);
-
-        return [
-            'unitPrice' => $this->getPriceArray($currencyCode, $unitPrice),
-            'totalAmount' => $this->getPriceArray($currencyCode, $roundedLineItemTotalPrice),
-            'vatAmount' => $this->getPriceArray($currencyCode, $roundedVatAmount),
-            'vatRate' => number_format($roundedVatRate, self::MOLLIE_PRICE_PRECISION, '.', '')
-        ];
-    }
+//    public function calculateLineItemPriceData(OrderLineItemEntity $item, string $orderTaxType, string $currencyCode): array
+//    {
+//        $this->orderLineItemValidator->validate($item);
+//
+//        $price = $item->getPrice();
+//        $taxCollection = $price->getCalculatedTaxes();
+//
+//        $vatRate = 0.0;
+//        $itemTax = $this->getLineItemTax($taxCollection);
+//        if ($itemTax instanceof CalculatedTax) {
+//            $vatRate = $itemTax->getTaxRate();
+//        }
+//
+//        // Remove VAT if the order is tax free
+//        if ($orderTaxType === CartPrice::TAX_STATE_FREE) {
+//            $vatRate = 0.0;
+//        }
+//
+//        $unitPrice = $price->getUnitPrice();
+//        $lineItemTotalPrice = $item->getTotalPrice();
+//
+//        // If the order is of type TAX_STATE_NET the $lineItemTotalPrice and unit price
+//        // is a net price.
+//        // For correct mollie api tax calculations we have to calculate the shopware gross
+//        // price
+//        if ($orderTaxType === CartPrice::TAX_STATE_NET) {
+//            $unitPrice *= ((100 + $vatRate) / 100);
+//            $lineItemTotalPrice += $taxCollection->getAmount();
+//        }
+//
+//        $unitPrice = round($unitPrice, self::MOLLIE_PRICE_PRECISION);
+//
+//
+//        $roundedLineItemTotalPrice = round($lineItemTotalPrice, self::MOLLIE_PRICE_PRECISION);
+//        $roundedVatRate = round($vatRate, self::MOLLIE_PRICE_PRECISION);
+//        $vatAmount = $roundedLineItemTotalPrice * ($roundedVatRate / (100 + $roundedVatRate));
+//        $roundedVatAmount = round($vatAmount, self::MOLLIE_PRICE_PRECISION);
+//
+//        return [
+//            'unitPrice' => $this->getPriceArray($currencyCode, $unitPrice),
+//            'totalAmount' => $this->getPriceArray($currencyCode, $roundedLineItemTotalPrice),
+//            'vatAmount' => $this->getPriceArray($currencyCode, $roundedVatAmount),
+//            'vatRate' => number_format($roundedVatRate, self::MOLLIE_PRICE_PRECISION, '.', '')
+//        ];
+//    }
 
     /**
      * Return an array of price data; currency and value.
+     *
      * @param string $currency
      * @param float|null $price
      * @return array

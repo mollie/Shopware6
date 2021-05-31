@@ -110,11 +110,12 @@ class MolliePaymentDoPay
     {
         // get order with all needed associations
         $order = $this->orderService->getOrder($transactionStruct->getOrder()->getId(), $salesChannelContext->getContext());
-        $customFields = new MollieOrderCustomFieldsStruct($order->getCustomFields());
-        $customFields->setTransactionReturnUrl($transactionStruct->getReturnUrl());
+        $customFields = $order->getCustomFields() ?? [];
+        $customFieldsStruct = new MollieOrderCustomFieldsStruct($customFields);
+        $customFieldsStruct->setTransactionReturnUrl($transactionStruct->getReturnUrl());
 
         // cancel existing mollie order if we may find one, unfortunately we may not reuse an existing mollie order if we need another payment method
-        $mollieOrderId = $customFields->getMollieOrderId();
+        $mollieOrderId = $customFieldsStruct->getMollieOrderId();
 
         if (!empty($mollieOrderId)) {
             // cancel previous payment at mollie
@@ -132,7 +133,7 @@ class MolliePaymentDoPay
             }
 
             // even if cancel previous order has not been successful, we will not use this order again
-            $customFields->setMollieOrderId(null);
+            $customFieldsStruct->setMollieOrderId(null);
         }
 
         // build new mollie order array
@@ -146,16 +147,16 @@ class MolliePaymentDoPay
         );
 
         // create new order at mollie
-        $mollieOrder = $this->apiOrder->createOrder($mollieOrderArray, $salesChannelContext);
+        $mollieOrder = $this->apiOrder->createOrder($mollieOrderArray, $order->getSalesChannelId(), $salesChannelContext);
 
         if ($mollieOrder instanceof MollieOrder) {
-            $customFields->setMollieOrderId($mollieOrder->getId());
-            $customFields->setMolliePaymentUrl($mollieOrder->getCheckoutUrl());
+            $customFieldsStruct->setMollieOrderId($mollieOrder->id);
+            $customFieldsStruct->setMolliePaymentUrl($mollieOrder->getCheckoutUrl());
 
-            $this->updateOrderCustomFields->updateOrder($order->getId(), $customFields, $salesChannelContext);
+            $this->updateOrderCustomFields->updateOrder($order->getId(), $customFieldsStruct, $salesChannelContext);
             $this->updateOrderLineItems->updateOrderLineItems($mollieOrder, $salesChannelContext);
         }
 
-        return $customFields->getMolliePaymentUrl() ?? $customFields->getTransactionReturnUrl() ?? $transactionStruct->getReturnUrl();
+        return $customFieldsStruct->getMolliePaymentUrl() ?? $customFieldsStruct->getTransactionReturnUrl() ?? $transactionStruct->getReturnUrl();
     }
 }

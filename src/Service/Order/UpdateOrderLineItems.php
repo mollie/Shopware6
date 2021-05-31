@@ -39,7 +39,7 @@ class UpdateOrderLineItems
                 ]
             ];
 
-            $this->orderLineRepository->update($data, $salesChannelContext->getContext());
+            $this->orderLineRepository->update([$data], $salesChannelContext->getContext());
         }
     }
 }

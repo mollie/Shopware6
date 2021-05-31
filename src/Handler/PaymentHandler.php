@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Handler;
 
-use Exception;
 use Kiener\MolliePayments\Exception\PaymentUrlException;
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Facade\MolliePaymentFinalize;
@@ -46,19 +45,13 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
 {
     public const PAYMENT_METHOD_NAME = '';
     public const PAYMENT_METHOD_DESCRIPTION = '';
-
-    protected const FIELD_AMOUNT = 'amount';
-    protected const FIELD_REDIRECT_URL = 'redirectUrl';
     protected const FIELD_LOCALE = 'locale';
     protected const FIELD_METHOD = 'method';
     protected const FIELD_ORDER_NUMBER = 'orderNumber';
-    protected const FIELD_LINES = 'lines';
     protected const FIELD_BILLING_ADDRESS = 'billingAddress';
     protected const FIELD_BILLING_EMAIL = 'billingEmail';
     protected const FIELD_SHIPPING_ADDRESS = 'shippingAddress';
     protected const FIELD_PAYMENT = 'payment';
-    protected const FIELD_WEBHOOK_URL = 'webhookUrl';
-    protected const FIELD_DUE_DATE = 'dueDate';
     protected const FIELD_EXPIRES_AT = 'expiresAt';
     protected const ENV_LOCAL_DEVELOPMENT = 'MOLLIE_LOCAL_DEVELOPMENT';
 
@@ -197,17 +190,25 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
     ): RedirectResponse
     {
         try {
-            $paymentUrl = $this->payFacade->preparePayProcessAtMollie($this->paymentMethod, $transaction, $salesChannelContext);
+            $paymentUrl = $this->payFacade->preparePayProcessAtMollie($this->paymentMethod, $transaction, $salesChannelContext, $this);
 
         } catch (Throwable $exception) {
+            $logException = null;
+            $logLevel = Logger::CRITICAL;
+
+            if ($exception instanceof \Exception) {
+                $logException = $exception;
+                $logLevel = Logger::ERROR;
+            }
+
             $this->logger->addEntry(
                 $exception->getMessage(),
                 $salesChannelContext->getContext(),
-                $exception,
+                $logException,
                 [
                     'function' => 'order-prepare',
                 ],
-                Logger::ERROR
+                $logLevel
             );
 
             throw new PaymentUrlException($transaction->getOrderTransaction()->getId(), $exception->getMessage());

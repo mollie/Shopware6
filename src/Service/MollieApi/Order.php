@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Service\MollieApi;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 
 use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeCancelledException;
+use Kiener\MolliePayments\Service\LoggerService;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Order as MollieOrder;
 use Monolog\Logger;
@@ -14,18 +15,17 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class Order
 {
-
     /**
      * @var MollieApiFactory
      */
     private $clientFactory;
 
     /**
-     * @var LoggerInterface
+     * @var LoggerService
      */
     private $logger;
 
-    public function __construct(MollieApiFactory $clientFactory, LoggerInterface $logger)
+    public function __construct(MollieApiFactory $clientFactory, LoggerService $logger)
     {
         $this->clientFactory = $clientFactory;
         $this->logger = $logger;
@@ -53,9 +53,9 @@ class Order
         return $mollieOrder;
     }
 
-    public function createOrder(array $orderData, SalesChannelContext $salesChannelContext): MollieOrder
+    public function createOrder(array $orderData, string $orderSalesChannelContextId, SalesChannelContext $salesChannelContext): MollieOrder
     {
-        $this->configurator->configure($this->apiClient, $salesChannelContext);
+        $apiClient = $this->clientFactory->getClient($orderSalesChannelContextId);
 
         /**
          * Create an order at Mollie based on the prepared
@@ -65,7 +65,7 @@ class Order
          * @var \Mollie\Api\Resources\Order $mollieOrder
          */
         try {
-            return $this->apiClient->orders->create($orderData);
+            return $apiClient->orders->create($orderData);
         } catch (ApiException $e) {
             $this->logger->addEntry(
                 $e->getMessage(),

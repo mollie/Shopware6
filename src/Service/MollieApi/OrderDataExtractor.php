@@ -41,7 +41,7 @@ class OrderDataExtractor
     {
         $orderCustomer = $order->getOrderCustomer();
 
-        if ($orderCustomer instanceof OrderCustomerEntity) {
+        if (!$orderCustomer instanceof OrderCustomerEntity) {
             $this->loggerService->addEntry(
                 sprintf('Could not fetch customer form order with id %s', $order->getId()),
                 $salesChannelContext->getContext(),
@@ -92,12 +92,12 @@ class OrderDataExtractor
         return $currency;
     }
 
-    public function extractLocaleCode(OrderEntity $orderEntity, SalesChannelContext $salesChannelContext): ?string
+    public function extractLocale(OrderEntity $orderEntity, SalesChannelContext $salesChannelContext): ?LocaleEntity
     {
         $orderLocale = $orderEntity->getLanguage()->getLocale();
 
         if ($orderLocale instanceof LocaleEntity) {
-            return $orderLocale->getCode();
+            return $orderLocale;
         }
 
         // try to fetch locale information from saleschannel
@@ -107,12 +107,6 @@ class OrderDataExtractor
             return null;
         }
 
-        $salesChannelLocale = $salesChannelLanguage->getLocale();
-
-        if ($salesChannelLocale instanceof LocaleEntity) {
-            return $salesChannelLocale->getCode();
-        }
-
-        return null;
+        return $salesChannelLanguage->getLocale();
     }
 }

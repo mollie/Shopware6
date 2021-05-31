@@ -10,11 +10,14 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\System\Locale\LocaleEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\Routing\RouterInterface;
 
 class MollieOrderBuilder
 {
+    public const MOLLIE_DEFAULT_LOCALE_CODE = 'en_GB';
+
     /**
      * @var SettingsService
      */
@@ -88,14 +91,15 @@ class MollieOrderBuilder
     {
         $customer = $this->extractor->extractCustomer($order, $salesChannelContext);
         $currency = $this->extractor->extractCurrency($order, $salesChannelContext);
-        $locale = $this->extractor->extractLocaleCode($order, $salesChannelContext);
+        $locale = $this->extractor->extractLocale($order, $salesChannelContext);
+        $localeCode = ($locale instanceof LocaleEntity) ? $locale->getCode() : self::MOLLIE_DEFAULT_LOCALE_CODE;
 
         $orderData = [];
         $orderData['amount'] = $this->priceBuilder->build($order->getAmountTotal(), $currency->getIsoCode());
         if ($order->getTaxStatus() === CartPrice::TAX_STATE_FREE) {
             $orderData['amount'] = $this->priceBuilder->build($order->getAmountNet(), $currency->getIsoCode());
         }
-        $orderData['locale'] = $locale;
+        $orderData['locale'] = $localeCode;
         $orderData['method'] = $paymentMethod;
         $orderData['orderNumber'] = $order->getOrderNumber();
         $orderData['payment'] = $paymentData;
@@ -120,7 +124,6 @@ class MollieOrderBuilder
         $orderData['payment']['webhookUrl'] = $webhookUrl;
 
         $lines = $this->lineItemBuilder->buildLineItems($order);
-
 
         $orderData['lines'] = $lines;
 

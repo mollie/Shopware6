@@ -18,5 +18,22 @@
             <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Facade\MolliePaymentDoPay">
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="Shopware\Core\Content\Media\DataAbstractionLayer\MediaThumbnailRepositoryDecorator"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\UpdateOrderCustomFields"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Order\UpdateOrderLineItems"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Facade\MolliePaymentFinalize">
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
+        </service>
+
     </services>
 </container>

@@ -3,10 +3,10 @@
 namespace Kiener\MolliePayments\Service\MollieApi\Builder;
 
 
-use Kiener\MolliePayments\Exception\MissingPriceLineItemException;
+use Kiener\MolliePayments\Exception\MissingPriceLineItem;
 use Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\PriceCalculator;
-use Kiener\MolliePayments\Validator\OrderLineItemValidator;
+use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
 use Mollie\Api\Types\OrderLineType;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
@@ -29,9 +29,9 @@ class MollieLineItemBuilder
      */
     private $priceHydrator;
     /**
-     * @var OrderLineItemValidator
+     * @var IsOrderLineItemValid
      */
-    private $validator;
+    private $orderLineItemValidator;
     /**
      * @var PriceCalculator
      */
@@ -43,14 +43,14 @@ class MollieLineItemBuilder
 
     public function __construct(
         MollieOrderPriceBuilder $priceHydrator,
-        OrderLineItemValidator $validator,
+        IsOrderLineItemValid $orderLineItemValidator,
         PriceCalculator $priceCalculator,
         LineItemDataExtractor $lineItemDataExtractor
     )
     {
 
         $this->priceHydrator = $priceHydrator;
-        $this->validator = $validator;
+        $this->orderLineItemValidator = $orderLineItemValidator;
         $this->priceCalculator = $priceCalculator;
         $this->lineItemDataExtractor = $lineItemDataExtractor;
     }
@@ -68,12 +68,12 @@ class MollieLineItemBuilder
 
         /** @var OrderLineItemEntity $item */
         foreach ($lineItems as $item) {
-            $this->validator->validate($item);
+            $this->orderLineItemValidator->validate($item);
             $extraData = $this->lineItemDataExtractor->extractExtraData($item);
             $itemPrice = $item->getPrice();
 
             if (!$itemPrice instanceof CalculatedPrice) {
-                throw new MissingPriceLineItemException($item->getProductId());
+                throw new MissingPriceLineItem($item->getProductId());
             }
 
             $prices = $this->priceCalculator->calculateLineItemPrice($item->getPrice(), $item->getTotalPrice(), $order->getTaxStatus());
@@ -87,8 +87,8 @@ class MollieLineItemBuilder
                 'vatRate' => number_format($prices->getVatRate(), self::MOLLIE_PRICE_PRECISION, '.', ''),
                 'vatAmount' => $this->priceHydrator->build($prices->getVatAmount(), $currencyCode),
                 'sku' => $extraData->getSku(),
-                'imageUrl' => urlencode($extraData->getImageUrl()),
-                'productUrl' => urlencode($extraData->getProductUrl()),
+                'imageUrl' => urlencode((string)$extraData->getImageUrl()),
+                'productUrl' => urlencode((string)$extraData->getProductUrl()),
                 'metadata' => [
                     'orderLineItemId' => $item->getId(),
                 ],

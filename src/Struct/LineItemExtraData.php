@@ -5,7 +5,7 @@ namespace Kiener\MolliePayments\Struct;
 class LineItemExtraData
 {
     /**
-     * @var string|null
+     * @var string
      */
     private $sku;
 
@@ -19,10 +19,18 @@ class LineItemExtraData
      */
     private $productUrl;
 
+    public function __construct(string $sku, ?string $imageUrl, ?string $productUrl)
+    {
+
+        $this->sku = $sku;
+        $this->imageUrl = $imageUrl;
+        $this->productUrl = $productUrl;
+    }
+
     /**
      * @return string
      */
-    public function getSku(): ?string
+    public function getSku(): string
     {
         return $this->sku;
     }
@@ -36,7 +44,7 @@ class LineItemExtraData
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getImageUrl(): ?string
     {
@@ -52,7 +60,7 @@ class LineItemExtraData
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getProductUrl(): ?string
     {

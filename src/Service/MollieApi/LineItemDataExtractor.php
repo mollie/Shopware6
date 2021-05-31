@@ -21,9 +21,7 @@ class LineItemDataExtractor
             return new LineItemExtraData();
         }
 
-        $extraData = new LineItemExtraData();
-
-        $extraData->setSku($product->getProductNumber());
+        $extraData = new LineItemExtraData($product->getProductNumber(), null, null);
 
         $medias = $product->getMedia();
         if ($medias instanceof ProductMediaCollection

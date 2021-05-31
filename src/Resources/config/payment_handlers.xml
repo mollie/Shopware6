@@ -11,14 +11,16 @@
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper"/>
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
-            <argument type="service" id="router"/>
+            <argument type="service" id="router.default"/>
             <argument>%kernel.environment%</argument>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\ApiClientConfigurator"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentFinalize"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <tag name="shopware.payment.method.async"/>
         </service>
 
@@ -27,14 +29,16 @@
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper"/>
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
-            <argument type="service" id="router"/>
+            <argument type="service" id="router.default"/>
             <argument>%kernel.environment%</argument>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\ApiClientConfigurator"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentFinalize"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <tag name="shopware.payment.method.async"/>
         </service>
 
@@ -43,14 +47,16 @@
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper"/>
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
-            <argument type="service" id="router"/>
+            <argument type="service" id="router.default"/>
             <argument>%kernel.environment%</argument>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\ApiClientConfigurator"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentFinalize"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <tag name="shopware.payment.method.async"/>
         </service>
 
@@ -59,14 +65,16 @@
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper"/>
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
-            <argument type="service" id="router"/>
+            <argument type="service" id="router.default"/>
             <argument>%kernel.environment%</argument>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\ApiClientConfigurator"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentFinalize"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <tag name="shopware.payment.method.async"/>
         </service>
 
@@ -75,14 +83,16 @@
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper"/>
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
-            <argument type="service" id="router"/>
+            <argument type="service" id="router.default"/>
             <argument>%kernel.environment%</argument>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\ApiClientConfigurator"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentFinalize"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <tag name="shopware.payment.method.async"/>
         </service>
 
@@ -91,14 +101,16 @@
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper"/>
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
-            <argument type="service" id="router"/>
+            <argument type="service" id="router.default"/>
             <argument>%kernel.environment%</argument>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\ApiClientConfigurator"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentFinalize"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <tag name="shopware.payment.method.async"/>
         </service>
 
@@ -107,14 +119,16 @@
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper"/>
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
-            <argument type="service" id="router"/>
+            <argument type="service" id="router.default"/>
             <argument>%kernel.environment%</argument>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\ApiClientConfigurator"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentFinalize"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <tag name="shopware.payment.method.async"/>
         </service>
 
@@ -123,14 +137,16 @@
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper"/>
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
-            <argument type="service" id="router"/>
+            <argument type="service" id="router.default"/>
             <argument>%kernel.environment%</argument>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\ApiClientConfigurator"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentFinalize"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <tag name="shopware.payment.method.async"/>
         </service>
 
@@ -139,14 +155,16 @@
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper"/>
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
-            <argument type="service" id="router"/>
+            <argument type="service" id="router.default"/>
             <argument>%kernel.environment%</argument>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\ApiClientConfigurator"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentFinalize"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <tag name="shopware.payment.method.async"/>
         </service>
 
@@ -155,14 +173,16 @@
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper"/>
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
-            <argument type="service" id="router"/>
+            <argument type="service" id="router.default"/>
             <argument>%kernel.environment%</argument>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\ApiClientConfigurator"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentFinalize"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <tag name="shopware.payment.method.async"/>
         </service>
 
@@ -171,14 +191,16 @@
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper"/>
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
-            <argument type="service" id="router"/>
+            <argument type="service" id="router.default"/>
             <argument>%kernel.environment%</argument>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\ApiClientConfigurator"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentFinalize"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <tag name="shopware.payment.method.async"/>
         </service>
 
@@ -187,14 +209,16 @@
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper"/>
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
-            <argument type="service" id="router"/>
+            <argument type="service" id="router.default"/>
             <argument>%kernel.environment%</argument>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\ApiClientConfigurator"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentFinalize"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <tag name="shopware.payment.method.async"/>
         </service>
 
@@ -203,14 +227,16 @@
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper"/>
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
-            <argument type="service" id="router"/>
+            <argument type="service" id="router.default"/>
             <argument>%kernel.environment%</argument>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\ApiClientConfigurator"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentFinalize"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <tag name="shopware.payment.method.async"/>
         </service>
 
@@ -219,14 +245,16 @@
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper"/>
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
-            <argument type="service" id="router"/>
+            <argument type="service" id="router.default"/>
             <argument>%kernel.environment%</argument>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\ApiClientConfigurator"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentFinalize"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <tag name="shopware.payment.method.async"/>
         </service>
 
@@ -235,14 +263,16 @@
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper"/>
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
-            <argument type="service" id="router"/>
+            <argument type="service" id="router.default"/>
             <argument>%kernel.environment%</argument>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\ApiClientConfigurator"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentFinalize"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <tag name="shopware.payment.method.async"/>
         </service>
 
@@ -251,14 +281,16 @@
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper"/>
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
-            <argument type="service" id="router"/>
+            <argument type="service" id="router.default"/>
             <argument>%kernel.environment%</argument>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\ApiClientConfigurator"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentFinalize"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <tag name="shopware.payment.method.async"/>
         </service>
 
@@ -267,14 +299,16 @@
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper"/>
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
-            <argument type="service" id="router"/>
+            <argument type="service" id="router.default"/>
             <argument>%kernel.environment%</argument>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\ApiClientConfigurator"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentFinalize"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <tag name="shopware.payment.method.async"/>
         </service>
 
@@ -283,14 +317,16 @@
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper"/>
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
-            <argument type="service" id="router"/>
+            <argument type="service" id="router.default"/>
             <argument>%kernel.environment%</argument>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\ApiClientConfigurator"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentFinalize"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <tag name="shopware.payment.method.async"/>
         </service>
 
@@ -299,17 +335,17 @@
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper"/>
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
-            <argument type="service" id="router"/>
+            <argument type="service" id="router.default"/>
             <argument>%kernel.environment%</argument>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\ApiClientConfigurator"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentFinalize"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <tag name="shopware.payment.method.async"/>
         </service>
-
     </services>
-
 </container>
