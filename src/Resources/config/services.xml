@@ -12,6 +12,7 @@
         <import resource="services/subscriber.xml"/>
         <import resource="services/validators.xml"/>
         <import resource="services/builder.xml"/>
+        <import resource="services/controller.xml"/>
     </imports>
 
     <services>

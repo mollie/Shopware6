@@ -2,15 +2,15 @@
 
 namespace Kiener\MolliePayments\Service\MollieApi;
 
-use Kiener\MolliePayments\Factory\MollieApiFactory;
-
 use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeCancelledException;
+use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\LoggerService;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Order as MollieOrder;
+use Mollie\Api\Resources\OrderLine;
 use Monolog\Logger;
-use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class Order
@@ -96,27 +96,35 @@ class Order
         }
     }
 
-    public function setShipment(string $mollieOrderId, SalesChannelContext $salesChannelContext): bool
+    public function setShipment(string $mollieOrderId, string $salesChannelId, Context $context): bool
     {
-        $mollieOrder = $this->getOrder($mollieOrderId, $salesChannelContext);
+        $apiClient = $this->clientFactory->getClient($salesChannelId);
 
-        if (!$mollieOrder instanceof Order) {
-            return false;
+        try {
+            $mollieOrder = $apiClient->orders->get($mollieOrderId);
+        } catch (ApiException $e) {
+            $this->logger->addEntry(
+                sprintf(
+                    'API error occured when fetching mollie order %s with message %s',
+                    $mollieOrderId,
+                    $e->getMessage()
+                ),
+                $context,
+                $e,
+                null,
+                Logger::ERROR
+            );
+
+            throw $e;
         }
 
-        $shouldCreateShipment = false;
+        /** @var OrderLine $orderLine */
+        foreach ($mollieOrder->lines() as $orderLine) {
+            if ($orderLine->shippableQuantity > 0) {
+                $mollieOrder->shipAll();
 
-        foreach ($mollieOrder->lines as $line) {
-            if ($line->shippableQuantity > 0) {
-                $shouldCreateShipment = true;
-                break;
+                return true;
             }
-        }
-
-        if ($shouldCreateShipment) {
-            $mollieOrder->shipAll();
-
-            return true;
         }
 
         return false;
