@@ -113,14 +113,18 @@ class RefundService
                 'id' => $refund->id,
                 'orderId' => $refund->orderId,
                 'paymentId' => $refund->paymentId,
-                'amount' => [
-                    'value' => $refund->amount->value,
-                    'currency' => $refund->amount->currency,
-                ],
-                'settlementAmount' => [
-                    'value' => $refund->settlementAmount->value,
-                    'currency' => $refund->settlementAmount->currency,
-                ],
+                'amount' => !is_null($refund->amount)
+                    ? [
+                        'value' => $refund->amount->value,
+                        'currency' => $refund->amount->currency,
+                    ]
+                    : null,
+                'settlementAmount' => !is_null($refund->settlementAmount)
+                    ? [
+                        'value' => $refund->settlementAmount->value,
+                        'currency' => $refund->settlementAmount->currency,
+                    ]
+                    : null,
                 'description' => $refund->description,
                 'createdAt' => $refund->createdAt,
                 'status' => $refund->status,

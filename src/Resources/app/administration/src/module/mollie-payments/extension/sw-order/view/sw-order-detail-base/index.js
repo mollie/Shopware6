@@ -62,7 +62,7 @@ Component.override('sw-order-detail-base', {
                         this.refundAmountPending = 0.0;
                         refunds.forEach((refund) => {
                             if(refund.isPending || refund.isQueued) {
-                                this.refundAmountPending += refund.amount.value;
+                                this.refundAmountPending += refund.amount.value ?? 0;
                             }
                         });
                     })
