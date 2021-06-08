@@ -82,8 +82,8 @@ Component.override('sw-order-line-items-grid', {
             return (this.order.customFields !== null && 'mollie_payments' in this.order.customFields);
         },
 
-        isRefundable() {
-            return this.remainingAmount > 0;
+        canOpenRefundModal() {
+            return this.remainingAmount > 0 || this.refunds.length > 0;
         },
     },
 

@@ -16,7 +16,7 @@
                     <sw-button class="sw-order-line-items-grid__actions-container-refund-btn"
                                variant="ghost"
                                size="small"
-                               :disabled="!isRefundable"
+                               :disabled="!canOpenRefundModal"
                                v-if="isMollieOrder"
                                @click="onOpenRefundModal">
                         <sw-icon name="default-arrow-360-left" decorative>
