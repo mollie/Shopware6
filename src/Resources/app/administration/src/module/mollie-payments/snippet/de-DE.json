@@ -60,6 +60,7 @@
         }
     },
     "sw-payment": {
+        "apiLinkButton": "Erhalten Sie Ihre API Keys vom Mollie Dashboard",
         "testButton": "Prüfung",
         "testApiKeys": {
             "title": "Mollie Payments",
@@ -73,29 +74,4 @@
             "labelPreferredIdealIssuer": "Bevorzugter iDeal Aussteller"
         }
     }
-  },
-  "sw-order": {
-    "detailExtended": {
-      "columnRefunded": "Rückerstattet",
-      "columnShipped": "Versandt",
-      "labelMollieOrderId": "Mollie Bestell ID",
-      "totalRefunds": "Rückerstattete Menge ({quantity} Stück)",
-      "totalShipments": "Versandte Menge ({quantity} Stück)"
-    }
-  },
-  "sw-payment": {
-    "apiLinkButton": "Erhalten Sie Ihre API Keys vom Mollie Dashboard",
-    "testButton": "Prüfe API Keys",
-    "testApiKeys": {
-      "title": "Mollie Payments",
-      "apiKey": "API Schlüssel",
-      "isValid": "ist gültig",
-      "isInvalid": "ist gültig"
-    }
-  },
-  "sw-customer": {
-    "extendedInfo": {
-      "labelPreferredIdealIssuer": "Bevorzugter iDeal Aussteller"
-    }
-  }
 }
