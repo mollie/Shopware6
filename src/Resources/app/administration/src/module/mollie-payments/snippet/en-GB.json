@@ -73,4 +73,29 @@
             "labelPreferredIdealIssuer": "Preferred iDeal issuer"
         }
     }
+  },
+  "sw-order": {
+    "detailExtended": {
+      "columnRefunded": "Refunded",
+      "columnShipped": "Shipped",
+      "labelMollieOrderId": "Mollie Order ID",
+      "totalRefunds": "Refunded amount ({quantity} items)",
+      "totalShipments": "Shipped amount ({quantity} items)"
+    }
+  },
+  "sw-payment": {
+    "apiLinkButton": "Get your API keys from the Mollie Dashboard",
+    "testButton": "Test API Keys",
+    "testApiKeys": {
+      "title": "Mollie Payments",
+      "apiKey": "API key",
+      "isValid": "is valid",
+      "isInvalid": "is invalid"
+    }
+  },
+  "sw-customer": {
+    "extendedInfo": {
+      "labelPreferredIdealIssuer": "Preferred iDeal issuer"
+    }
+  }
 }
