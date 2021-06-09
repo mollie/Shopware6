@@ -168,7 +168,7 @@ jobs:
 
       - name: Start Docker
         run: |
-          docker run --rm -p 80:80 --name shop -d dockware/play:${{ matrix.shopware }}
+          docker run --rm -p 80:80 --name shop -d dockware/dev:${{ matrix.shopware }}
           sleep 30
           docker logs shop
           # now change the domain of our shop, mollie doesn't work with localhost
