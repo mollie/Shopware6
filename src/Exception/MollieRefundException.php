@@ -3,7 +3,7 @@
 namespace Kiener\MolliePayments\Exception;
 
 
-class CouldNotSetRefundAtMollieException extends \Exception
+class MollieRefundException extends \Exception
 {
 
 }

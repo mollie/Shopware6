@@ -3,7 +3,7 @@
 namespace MolliePayments\Tests\Facade;
 
 
-use Kiener\MolliePayments\Exception\CouldNotSetRefundAtMollieException;
+use Kiener\MolliePayments\Exception\MollieRefundException;
 use Kiener\MolliePayments\Facade\SetMollieOrderRefunded;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\MollieApi\Order;
@@ -57,7 +57,7 @@ class SetMollieOrderRefundedTest extends TestCase
     {
         $this->transactionService->method('getTransactionById')->willReturn(null);
 
-        self::expectException(CouldNotSetRefundAtMollieException::class);
+        self::expectException(MollieRefundException::class);
         $this->setMollieOrderService->setRefunded('foo', $this->context);
     }
 
@@ -65,7 +65,7 @@ class SetMollieOrderRefundedTest extends TestCase
     {
         $this->transactionService->method('getTransactionById')->willReturn($this->getTransaction(Uuid::randomHex()));
 
-        self::expectException(CouldNotSetRefundAtMollieException::class);
+        self::expectException(MollieRefundException::class);
         $this->setMollieOrderService->setRefunded('foo', $this->context);
     }
 
@@ -74,7 +74,7 @@ class SetMollieOrderRefundedTest extends TestCase
         $order = $this->getOrder(Uuid::randomHex(), Uuid::randomHex());
         $this->transactionService->method('getTransactionById')->willReturn($this->getTransaction(Uuid::randomHex(), $order));
 
-        self::expectException(CouldNotSetRefundAtMollieException::class);
+        self::expectException(MollieRefundException::class);
         $this->setMollieOrderService->setRefunded('foo', $this->context);
     }
 
@@ -107,7 +107,7 @@ class SetMollieOrderRefundedTest extends TestCase
 
         $this->apiFactory->expects($this->once())->method('getClient')->with($salesChannelId, $this->context)->willReturn($apiClient);
 
-        self::expectException(CouldNotSetRefundAtMollieException::class);
+        self::expectException(MollieRefundException::class);
         $this->setMollieOrderService->setRefunded('foo', $this->context);
     }
 

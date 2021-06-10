@@ -2,7 +2,7 @@
 
 namespace MolliePayments\Tests\Subscriber;
 
-use Kiener\MolliePayments\Exception\CouldNotSetRefundAtMollieException;
+use Kiener\MolliePayments\Exception\MollieRefundException;
 use Kiener\MolliePayments\Facade\SetMollieOrderRefunded;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Subscriber\PaymentStateSubscriber;
@@ -95,7 +95,7 @@ class PaymentStateSubscriberTest extends TestCase
         $event->method('getTransition')->willReturn($transition);
 
         $fooMessage = 'foo foo';
-        $e = new CouldNotSetRefundAtMollieException($fooMessage);
+        $e = new MollieRefundException($fooMessage);
         $this->setMollieOrderRefunded->method('setRefunded')->willThrowException($e);
 
         $this->setMollieOrderRefunded->expects($this->once())->method('setRefunded')->with($entityId, $context);

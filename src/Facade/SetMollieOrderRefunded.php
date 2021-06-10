@@ -2,7 +2,7 @@
 
 namespace Kiener\MolliePayments\Facade;
 
-use Kiener\MolliePayments\Exception\CouldNotSetRefundAtMollieException;
+use Kiener\MolliePayments\Exception\MollieRefundException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Service\TransactionService;
@@ -36,7 +36,7 @@ class SetMollieOrderRefunded
     /**
      * @param string $orderTransactionId
      * @param Context $context
-     * @throws CouldNotSetRefundAtMollieException
+     * @throws MollieRefundException
      * @throws \Mollie\Api\Exceptions\IncompatiblePlatform
      */
     public function setRefunded(string $orderTransactionId, Context $context): void
@@ -44,7 +44,7 @@ class SetMollieOrderRefunded
         $transaction = $this->transactionService->getTransactionById($orderTransactionId, null, $context);
 
         if (!$transaction instanceof OrderTransactionEntity) {
-            throw new CouldNotSetRefundAtMollieException(
+            throw new MollieRefundException(
                 sprintf('Could not find transaction %s ', $orderTransactionId)
             );
         }
@@ -52,7 +52,7 @@ class SetMollieOrderRefunded
         $order = $transaction->getOrder();
 
         if (!$order instanceof OrderEntity) {
-            throw new CouldNotSetRefundAtMollieException(
+            throw new MollieRefundException(
                 sprintf('Could not find order for transaction %s ', $transaction->getId())
             );
         }
@@ -62,7 +62,7 @@ class SetMollieOrderRefunded
         $mollieOrderId = $customFields['mollie_payments']['order_id'] ?? '';
 
         if (empty($mollieOrderId)) {
-            throw new CouldNotSetRefundAtMollieException(
+            throw new MollieRefundException(
                 sprintf('Could not find a mollie order id in order %s for transaction %s ',
                     $order->getOrderNumber(),
                     $transaction->getId()
@@ -76,7 +76,7 @@ class SetMollieOrderRefunded
             $mollieOrder = $apiClient->orders->get($mollieOrderId);
             $mollieOrder->refundAll();
         } catch (ApiException $e) {
-            throw new CouldNotSetRefundAtMollieException(
+            throw new MollieRefundException(
                 sprintf('Could not refund at mollie for transaction %s with mollieOrderId %s',
                     $orderTransactionId,
                     $mollieOrderId
