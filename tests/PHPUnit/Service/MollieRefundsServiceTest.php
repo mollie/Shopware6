@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Tests\Service;
 
+use Kiener\MolliePayments\Exception\MollieRefundException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\RefundService;
@@ -24,18 +25,25 @@ class MollieRefundsServiceTest extends TestCase
      * @param bool $expected
      * @param bool $isMollieOrder
      * @param string|null $paymentStatus
+     * @param string|null $exceptionClass
+     * @throws MollieRefundException
      * @dataProvider getRefundTestData
      */
     public function testRefunds(
         bool $expected,
         bool $isMollieOrder,
-        ?string $paymentStatus
+        ?string $paymentStatus,
+        ?string $exceptionClass
     ): void
     {
         $orderEntityMock = $this->getOrderEntityMock($isMollieOrder);
         $apiFactoryMock = $this->getApiFactoryMock($isMollieOrder, $paymentStatus, 0);
 
         $refundService = new RefundService($apiFactoryMock);
+
+        if($exceptionClass) {
+            self::expectException($exceptionClass);
+        }
 
         static::assertEquals($expected, $refundService->refund($orderEntityMock, 24.99));
     }
@@ -44,19 +52,27 @@ class MollieRefundsServiceTest extends TestCase
      * @param bool $expected
      * @param bool $isMollieOrder
      * @param string|null $paymentStatus
+     * @param array $refunds
+     * @param string|null $exceptionClass
+     * @throws MollieRefundException
      * @dataProvider getRefundCancelTestData
      */
     public function testCancelRefunds(
         bool $expected,
         bool $isMollieOrder,
         ?string $paymentStatus,
-        array $refunds
+        array $refunds,
+        ?string $exceptionClass
     ): void
     {
         $orderEntityMock = $this->getOrderEntityMock($isMollieOrder);
         $apiFactoryMock = $this->getApiFactoryMock($isMollieOrder, $paymentStatus, 0, $refunds);
 
         $refundService = new RefundService($apiFactoryMock);
+
+        if($exceptionClass) {
+            self::expectException($exceptionClass);
+        }
 
         static::assertEquals($expected, $refundService->cancel($orderEntityMock, 'foo'));
     }
@@ -66,19 +82,26 @@ class MollieRefundsServiceTest extends TestCase
      * @param bool $isMollieOrder
      * @param string|null $paymentStatus
      * @param array $refunds
+     * @param string|null $exceptionClass
+     * @throws MollieRefundException
      * @dataProvider getRefundListTestData
      */
     public function testRefundList(
         int $expected,
         bool $isMollieOrder,
         ?string $paymentStatus,
-        array $refunds
+        array $refunds,
+        ?string $exceptionClass
     ): void
     {
         $orderEntityMock = $this->getOrderEntityMock($isMollieOrder);
         $apiFactoryMock = $this->getApiFactoryMock($isMollieOrder, $paymentStatus, 0, $refunds);
 
         $refundService = new RefundService($apiFactoryMock);
+
+        if($exceptionClass) {
+            self::expectException($exceptionClass);
+        }
 
         static::assertCount($expected, $refundService->getRefunds($orderEntityMock));
     }
@@ -90,19 +113,26 @@ class MollieRefundsServiceTest extends TestCase
      * @param bool $isMollieOrder
      * @param string|null $paymentStatus
      * @param float $remainingAmount
+     * @param string|null $exceptionClass
+     * @throws MollieRefundException
      * @dataProvider getAmountsTestData
      */
     public function testRemainingAmount(
         float $expected,
         bool $isMollieOrder,
         ?string $paymentStatus,
-        float $remainingAmount
+        float $remainingAmount,
+        ?string $exceptionClass
     ): void
     {
         $orderEntityMock = $this->getOrderEntityMock($isMollieOrder);
         $apiFactoryMock = $this->getApiFactoryMock($isMollieOrder, $paymentStatus, $remainingAmount);
 
         $refundService = new RefundService($apiFactoryMock);
+
+        if($exceptionClass) {
+            self::expectException($exceptionClass);
+        }
 
         static::assertEquals($expected, $refundService->getRefundedAmount($orderEntityMock));
     }
@@ -114,19 +144,26 @@ class MollieRefundsServiceTest extends TestCase
      * @param bool $isMollieOrder
      * @param string|null $paymentStatus
      * @param float $refundedAmount
+     * @param string|null $exceptionClass
+     * @throws MollieRefundException
      * @dataProvider getAmountsTestData
      */
     public function testRefundedAmount(
         float $expected,
         bool $isMollieOrder,
         ?string $paymentStatus,
-        float $refundedAmount
+        float $refundedAmount,
+        ?string $exceptionClass
     ): void
     {
         $orderEntityMock = $this->getOrderEntityMock($isMollieOrder);
         $apiFactoryMock = $this->getApiFactoryMock($isMollieOrder, $paymentStatus, $refundedAmount);
 
         $refundService = new RefundService($apiFactoryMock);
+
+        if($exceptionClass) {
+            self::expectException($exceptionClass);
+        }
 
         static::assertEquals($expected, $refundService->getRefundedAmount($orderEntityMock));
     }
@@ -137,22 +174,26 @@ class MollieRefundsServiceTest extends TestCase
             'Not a Mollie order' => [
                 false,
                 false,
-                null
+                null,
+                MollieRefundException::class
             ],
             'Mollie order, payment open' => [
                 false,
                 true,
-                PaymentStatus::STATUS_OPEN
+                PaymentStatus::STATUS_OPEN,
+                MollieRefundException::class
             ],
             'Mollie order, payment paid' => [
                 true,
                 true,
-                PaymentStatus::STATUS_PAID
+                PaymentStatus::STATUS_PAID,
+                null
             ],
             'Mollie order, payment authorized' => [
                 true,
                 true,
-                PaymentStatus::STATUS_AUTHORIZED
+                PaymentStatus::STATUS_AUTHORIZED,
+                null
             ]
         ];
     }
@@ -164,19 +205,22 @@ class MollieRefundsServiceTest extends TestCase
                 false,
                 false,
                 null,
-                []
+                [],
+                MollieRefundException::class
             ],
             'Mollie order, payment open' => [
                 false,
                 true,
                 PaymentStatus::STATUS_OPEN,
-                []
+                [],
+                MollieRefundException::class
             ],
             'Mollie order, payment paid, no refund' => [
                 false,
                 true,
                 PaymentStatus::STATUS_PAID,
-                []
+                [],
+                null
             ],
             'Mollie order, payment paid, refund queued' => [
                 true,
@@ -187,7 +231,8 @@ class MollieRefundsServiceTest extends TestCase
                         'status' => RefundStatus::STATUS_QUEUED,
                         'amount' => 24.99
                     ]
-                ]
+                ],
+                null
             ],
             'Mollie order, payment paid, refund pending' => [
                 true,
@@ -198,7 +243,8 @@ class MollieRefundsServiceTest extends TestCase
                         'status' => RefundStatus::STATUS_PENDING,
                         'amount' => 24.99
                     ]
-                ]
+                ],
+                null
             ],
             'Mollie order, payment paid, refund processing' => [
                 false,
@@ -209,7 +255,8 @@ class MollieRefundsServiceTest extends TestCase
                         'status' => RefundStatus::STATUS_PROCESSING,
                         'amount' => 24.99
                     ]
-                ]
+                ],
+                null
             ],
             'Mollie order, payment paid, refund refunded' => [
                 false,
@@ -220,7 +267,8 @@ class MollieRefundsServiceTest extends TestCase
                         'status' => RefundStatus::STATUS_REFUNDED,
                         'amount' => 24.99
                     ]
-                ]
+                ],
+                null
             ],
             'Mollie order, payment authorized, refund queued' => [
                 true,
@@ -231,7 +279,8 @@ class MollieRefundsServiceTest extends TestCase
                         'status' => RefundStatus::STATUS_QUEUED,
                         'amount' => 24.99
                     ]
-                ]
+                ],
+                null
             ]
         ];
     }
@@ -243,13 +292,15 @@ class MollieRefundsServiceTest extends TestCase
                 0,
                 false,
                 null,
-                []
+                [],
+                MollieRefundException::class
             ],
             'Mollie order, payment open' => [
                 0,
                 true,
                 PaymentStatus::STATUS_OPEN,
-                []
+                [],
+                MollieRefundException::class
             ],
             'Mollie order, payment paid' => [
                 1,
@@ -260,7 +311,8 @@ class MollieRefundsServiceTest extends TestCase
                         'status' => RefundStatus::STATUS_REFUNDED,
                         'amount' => 24.99
                     ]
-                ]
+                ],
+                null
             ],
             'Mollie order, payment authorized' => [
                 1,
@@ -271,7 +323,8 @@ class MollieRefundsServiceTest extends TestCase
                         'status' => RefundStatus::STATUS_REFUNDED,
                         'amount' => 24.99
                     ]
-                ]
+                ],
+                null
             ]
         ];
     }
@@ -283,25 +336,29 @@ class MollieRefundsServiceTest extends TestCase
                 0,
                 false,
                 null,
-                0
+                0,
+                MollieRefundException::class
             ],
             'Mollie order, payment open' => [
                 0,
                 true,
                 PaymentStatus::STATUS_OPEN,
-                24.99
+                24.99,
+                MollieRefundException::class
             ],
             'Mollie order, payment paid' => [
                 24.99,
                 true,
                 PaymentStatus::STATUS_PAID,
-                24.99
+                24.99,
+                null
             ],
             'Mollie order, payment authorized' => [
                 24.99,
                 true,
                 PaymentStatus::STATUS_AUTHORIZED,
-                24.99
+                24.99,
+                null
             ]
         ];
     }
@@ -358,7 +415,7 @@ class MollieRefundsServiceTest extends TestCase
 
         return $this->createConfiguredMock(
             MollieApiFactory::class,
-            ['createClient' => $clientMock]
+            ['createClient' => $clientMock, 'getClient' => $clientMock]
         );
     }
 
