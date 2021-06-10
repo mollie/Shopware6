@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Controller\Api;
 
+use Kiener\MolliePayments\Exception\MollieRefundException;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\RefundService;
 use Kiener\MolliePayments\Service\SettingsService;
@@ -187,7 +188,7 @@ class RefundController extends AbstractController
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
-        } catch (\Throwable $e) {
+        } catch (MollieRefundException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], 500);
         }
@@ -212,7 +213,7 @@ class RefundController extends AbstractController
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
-        } catch (\Throwable $e) {
+        } catch (MollieRefundException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], 500);
         }
@@ -236,7 +237,7 @@ class RefundController extends AbstractController
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
-        } catch (\Throwable $e) {
+        } catch (MollieRefundException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], 500);
         }
@@ -253,17 +254,21 @@ class RefundController extends AbstractController
     {
         try {
             $order = $this->getValidOrder($orderId, $context);
-
-            $this->refundService->getRefunds($order);
-
-            $remaining = $this->refundService->getRemainingAmount($order);
-            $refunded = $this->refundService->getRefundedAmount($order);
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
-        } catch (\Throwable $e) {
-            $this->logger->error($e->getMessage());
-            return $this->json(['message' => $e->getMessage()], 404);
+        }
+
+        try {
+            $remaining = $this->refundService->getRemainingAmount($order);
+        } catch (MollieRefundException $e) {
+            $remaining = 0;
+        }
+
+        try {
+            $refunded = $this->refundService->getRefundedAmount($order);
+        } catch (MollieRefundException $e) {
+            $refunded = 0;
         }
 
         return $this->json(compact('remaining', 'refunded'));
@@ -273,6 +278,8 @@ class RefundController extends AbstractController
      * @param string $orderId
      * @param Context $context
      * @return OrderEntity
+     * @throws InvalidUuidException
+     * @throws InvalidOrderException
      */
     private function getValidOrder(string $orderId, Context $context): OrderEntity
     {
