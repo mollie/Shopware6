@@ -53,7 +53,7 @@ class RefundService
             return $refund instanceof Refund;
         } catch (ApiException $e) {
             throw new MollieRefundException(
-                sprintf("Could not create a refund for order %s (Ordernumber %s)",
+                sprintf("Could not create a refund for order %s (Order number %s)",
                     $payment->orderId,
                     $order->getOrderNumber()
                 )
@@ -88,7 +88,7 @@ class RefundService
             return true;
         } catch (ApiException $e) {
             throw new MollieRefundException(
-                sprintf("Could not cancel the refund for order %s (Ordernumber %s)",
+                sprintf("Could not cancel the refund for order %s (Order number %s)",
                     $payment->orderId,
                     $order->getOrderNumber()
                 )
@@ -109,7 +109,7 @@ class RefundService
             $refunds = $payment->refunds();
         } catch (ApiException $e) {
             throw new MollieRefundException(
-                sprintf("Could not fetch refunds for order %s (Ordernumber %s)",
+                sprintf("Could not fetch refunds for order %s (Order number %s)",
                     $payment->orderId,
                     $order->getOrderNumber()
                 )
@@ -195,7 +195,7 @@ class RefundService
             $mollieOrder = $apiClient->orders->get($mollieOrderId, ["embed" => "payments"]);
         } catch (ApiException $e) {
             throw new MollieRefundException(
-                sprintf('Could not find the mollie order for id %s (Ordernumber %s)',
+                sprintf('Could not find the mollie order for id %s (Order number %s)',
                     $mollieOrderId,
                     $order->getOrderNumber()
                 )
@@ -210,7 +210,7 @@ class RefundService
         if (count($paidPayments) === 0) {
             throw new MollieRefundException(
                 sprintf(
-                    "There is no payment to issue a refund on for order %s (Ordernumber %s)",
+                    "There is no payment to issue a refund on for order %s (Order number %s)",
                     $mollieOrderId,
                     $order->getOrderNumber()
                 )
