@@ -54,6 +54,7 @@
             "columnShipped": "Shipped",
             "labelMollieOrderId": "Mollie Order ID",
             "totalRefunds": "Refunded amount",
+            "totalRefundsPending": "Waiting to be refunded",
             "totalRemaining": "Refundable amount",
             "totalRemainingHelpText": "You can refund up to € 25 extra with Mollie.",
             "totalShipments": "Shipped amount ({quantity} items)"

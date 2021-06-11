@@ -54,6 +54,7 @@
             "columnShipped": "Verzonden",
             "labelMollieOrderId": "Mollie Order ID",
             "totalRefunds": "Terugbetaald bedrag",
+            "totalRefundsPending": "Wachtend op terugbetaling",
             "totalRemaining": "Terug te betalen",
             "totalRemainingHelpText": "Je kunt tot € 25 boven op het totaalbedrag terugbetalen met Mollie.",
             "totalShipments": "Verzonden bedrag ({quantity} items)"
