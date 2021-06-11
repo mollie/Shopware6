@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Facade;
 
 use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeCancelledException;
+use Kiener\MolliePayments\Exception\MollieOrderPaymentCouldNotBeCreated;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderBuilder;
@@ -113,27 +114,13 @@ class MolliePaymentDoPay
         $customFields = $order->getCustomFields() ?? [];
         $customFieldsStruct = new MollieOrderCustomFieldsStruct($customFields);
         $customFieldsStruct->setTransactionReturnUrl($transactionStruct->getReturnUrl());
-
-        // cancel existing mollie order if we may find one, unfortunately we may not reuse an existing mollie order if we need another payment method
         $mollieOrderId = $customFieldsStruct->getMollieOrderId();
 
+        // do another payment if mollie order could be found
         if (!empty($mollieOrderId)) {
-            // cancel previous payment at mollie
-            try {
-                $this->apiOrderService->cancelOrder($mollieOrderId, $salesChannelContext);
-            } catch (MollieOrderCouldNotBeCancelledException $e) {
-                // we do nothing here. This should not happen, but if it happens it will not harm
-                $this->logger->addEntry(
-                    $e->getMessage(),
-                    $salesChannelContext->getContext(),
-                    $e,
-                    ['shopwareOrderNumber' => $order->getOrderNumber()],
-                    Logger::WARNING
-                );
-            }
+            $payment=$this->apiOrderService->createNewPayment($mollieOrderId, $paymentMethod, $salesChannelContext);
 
-            // even if cancel previous order has not been successful, we will not use this order again
-            $customFieldsStruct->setMollieOrderId(null);
+            return $payment->getCheckoutUrl() ?? $transactionStruct->getReturnUrl();
         }
 
         // build new mollie order array

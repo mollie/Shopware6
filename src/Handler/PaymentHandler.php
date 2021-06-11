@@ -191,7 +191,6 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
     {
         try {
             $paymentUrl = $this->payFacade->preparePayProcessAtMollie($this->paymentMethod, $transaction, $salesChannelContext, $this);
-
         } catch (Throwable $exception) {
             $logException = null;
             $logLevel = Logger::CRITICAL;

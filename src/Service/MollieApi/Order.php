@@ -2,12 +2,14 @@
 
 namespace Kiener\MolliePayments\Service\MollieApi;
 
-use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeCancelledException;
+use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeFetched;
+use Kiener\MolliePayments\Exception\MollieOrderPaymentCouldNotBeCreated;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\LoggerService;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Order as MollieOrder;
 use Mollie\Api\Resources\OrderLine;
+use Mollie\Api\Resources\Payment;
 use Monolog\Logger;
 use RuntimeException;
 use Shopware\Core\Framework\Context;
@@ -81,20 +83,40 @@ class Order
         }
     }
 
-    public function cancelOrder(string $mollieOrderId, SalesChannelContext $salesChannelContext): void
+    public function createNewPayment(string $mollieOrderId, string $paymentMethod, SalesChannelContext $salesChannelContext): Payment
     {
         $mollieOrder = $this->getOrder($mollieOrderId, $salesChannelContext);
 
         if (!$mollieOrder instanceof MollieOrder) {
-            throw new MollieOrderCouldNotBeCancelledException($mollieOrderId);
+
+            throw new MollieOrderCouldNotBeFetched($mollieOrderId);
         }
 
         try {
-            $mollieOrder->cancel();
+            /** @var Payment $payment */
+            $payment = $mollieOrder->createPayment(['method' => $paymentMethod]);
+
+            return $payment;
         } catch (ApiException $e) {
-            throw new MollieOrderCouldNotBeCancelledException($mollieOrderId, [], $e);
+
+            throw new MollieOrderPaymentCouldNotBeCreated($mollieOrderId, [], $e);
         }
     }
+//
+//    public function cancelOrder(string $mollieOrderId, SalesChannelContext $salesChannelContext): void
+//    {
+//        $mollieOrder = $this->getOrder($mollieOrderId, $salesChannelContext);
+//
+//        if (!$mollieOrder instanceof MollieOrder) {
+//            throw new MollieOrderCouldNotBeCancelledException($mollieOrderId);
+//        }
+//
+//        try {
+//            $mollieOrder->cancel();
+//        } catch (ApiException $e) {
+//            throw new MollieOrderCouldNotBeCancelledException($mollieOrderId, [], $e);
+//        }
+//    }
 
     public function setShipment(string $mollieOrderId, string $salesChannelId, Context $context): bool
     {

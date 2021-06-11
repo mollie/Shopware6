@@ -15,13 +15,8 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Promotion\Cart\PromotionProcessor;
 
-/**
- * @copyright 2021 dasistweb GmbH (https://www.dasistweb.de)
- */
 class MollieLineItemBuilder
 {
-    public const MOLLIE_PRICE_PRECISION = 2;
-
     public const LINE_ITEM_TYPE_CUSTOM_PRODUCTS = 'customized-products';
 
     /**
@@ -84,7 +79,7 @@ class MollieLineItemBuilder
                 'quantity' => $item->getQuantity(),
                 'unitPrice' => $this->priceHydrator->build($prices->getUnitPrice(), $currencyCode),
                 'totalAmount' => $this->priceHydrator->build($prices->getTotalAmount(), $currencyCode),
-                'vatRate' => number_format($prices->getVatRate(), self::MOLLIE_PRICE_PRECISION, '.', ''),
+                'vatRate' => number_format($prices->getVatRate(), MollieOrderPriceBuilder::MOLLIE_PRICE_PRECISION, '.', ''),
                 'vatAmount' => $this->priceHydrator->build($prices->getVatAmount(), $currencyCode),
                 'sku' => $extraData->getSku(),
                 'imageUrl' => urlencode((string)$extraData->getImageUrl()),

@@ -11,7 +11,8 @@ class TokenAnonymizerTest extends TestCase
     {
         self::assertSame('*', TokenAnonymizer::TOKEN_ANONYMIZER_PLACEHOLDER_SYMBOL);
         self::assertSame(4, TokenAnonymizer::TOKEN_ANONYMIZER_PLACEHOLDER_COUNT);
-        self::assertSame(15, TokenAnonymizer::TOKEN_ANONYMIZER_MAX_LENGTH);
+        self::assertSame(4, TokenAnonymizer::TOKEN_ANONYMIZER_COUNT_LAST_CHARACTERS);
+        self::assertSame(3, TokenAnonymizer::TOKEN_ANONYMIZER_COUNT_FIRST_CHARACTERS);
     }
 
     /**
@@ -32,8 +33,9 @@ class TokenAnonymizerTest extends TestCase
     {
         return [
             'test that empty string returns empty string' => ['', '   '],
-            'anonymize short min char token' => ['t','t****'],
-            'anonymize short min char token' => ['tes','tes****'],
+            'anonymize short min char token' => ['t****', 't'],
+            'anonymize short char token' => ['t****', 'tes'],
+            'anonymize standard way' => ['ord****obar', 'ord_foobar']
         ];
     }
 }

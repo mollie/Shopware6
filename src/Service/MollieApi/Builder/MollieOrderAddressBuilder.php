@@ -11,6 +11,7 @@ use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEnt
  */
 class MollieOrderAddressBuilder
 {
+    public const MOLLIE_DEFAULT_COUNTRY_ISO = 'NL';
 
     public function build(string $email, ?CustomerAddressEntity $address): array
     {
@@ -19,7 +20,7 @@ class MollieOrderAddressBuilder
         }
 
         return [
-            'title' => $address->getSalutation() !== null ? $address->getSalutation()->getDisplayName() . '.' : null,
+            'title' => $address->getSalutation() !== null ? $address->getSalutation()->getDisplayName() : null,
             'givenName' => $address->getFirstName(),
             'familyName' => $address->getLastName(),
             'email' => $email,
@@ -27,7 +28,7 @@ class MollieOrderAddressBuilder
             'streetAdditional' => $address->getAdditionalAddressLine1(),
             'postalCode' => $address->getZipCode(),
             'city' => $address->getCity(),
-            'country' => $address->getCountry() !== null ? $address->getCountry()->getIso() : 'NL',
+            'country' => $address->getCountry() !== null ? $address->getCountry()->getIso() : self::MOLLIE_DEFAULT_COUNTRY_ISO,
         ];
     }
 }
