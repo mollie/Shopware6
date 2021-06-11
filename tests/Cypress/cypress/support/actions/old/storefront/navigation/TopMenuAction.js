@@ -1,4 +1,4 @@
-import NavigationRepository from 'Repositories/storefront/navigation/NavigationRepository';
+import NavigationRepository from 'Repositories/old/storefront/navigation/NavigationRepository';
 
 export default class TopMenuAction {
 

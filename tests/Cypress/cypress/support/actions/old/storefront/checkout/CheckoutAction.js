@@ -1,6 +1,6 @@
-import OffCanvasRepository from 'Repositories/storefront/checkout/OffCanvasRepository';
-import ConfirmRepository from 'Repositories/storefront/checkout/ConfirmRepository';
-import PaymentsRepository from 'Repositories/storefront/checkout/PaymentsRepository';
+import OffCanvasRepository from 'Repositories/old/storefront/checkout/OffCanvasRepository';
+import ConfirmRepository from 'Repositories/old/storefront/checkout/ConfirmRepository';
+import PaymentsRepository from 'Repositories/old/storefront/checkout/PaymentsRepository';
 
 
 const repoOffCanvas = new OffCanvasRepository();
@@ -8,7 +8,7 @@ const repoConfirm = new ConfirmRepository();
 const repoPayments = new PaymentsRepository();
 
 
-class CheckoutAction {
+export default class CheckoutAction {
 
     /**
      *
@@ -62,4 +62,3 @@ class CheckoutAction {
 
 }
 
-export default CheckoutAction;

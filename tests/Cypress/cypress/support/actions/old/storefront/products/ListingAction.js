@@ -1,4 +1,4 @@
-import ListingRepository from 'Repositories/storefront/products/ListingRepository';
+import ListingRepository from 'Repositories/old/storefront/products/ListingRepository';
 
 export default class ListingAction {
 
