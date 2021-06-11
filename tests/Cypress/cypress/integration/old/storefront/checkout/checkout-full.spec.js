@@ -1,16 +1,17 @@
 import Devices from "Services/Devices";
 import Session from "Actions/utils/Session"
-// ------------------------------------------------------
-import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
-// ------------------------------------------------------
-import TopMenuAction from 'Actions/storefront/navigation/TopMenuAction';
-import LoginAction from 'Actions/storefront/account/LoginAction';
-import RegisterAction from 'Actions/storefront/account/RegisterAction';
-import ListingAction from 'Actions/storefront/products/ListingAction';
-import PDPAction from 'Actions/storefront/products/PDPAction';
-import CheckoutAction from 'Actions/storefront/checkout/CheckoutAction';
 import PaymentScreenAction from 'Actions/mollie/PaymentScreenAction';
 import IssuerScreenAction from 'Actions/mollie/IssuerScreenAction';
+// ------------------------------------------------------
+import ShopConfigurationAction from "Actions/old/admin/ShopConfigurationAction";
+// ------------------------------------------------------
+import TopMenuAction from 'Actions/old/storefront/navigation/TopMenuAction';
+import LoginAction from 'Actions/old/storefront/account/LoginAction';
+import RegisterAction from 'Actions/old/storefront/account/RegisterAction';
+import ListingAction from 'Actions/old/storefront/products/ListingAction';
+import PDPAction from 'Actions/old/storefront/products/PDPAction';
+import CheckoutAction from 'Actions/old/storefront/checkout/CheckoutAction';
+
 
 
 const devices = new Devices();

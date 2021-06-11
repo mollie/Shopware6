@@ -1,4 +1,4 @@
-import RegisterRepository from 'Repositories/storefront/account/RegisterRepository';
+import RegisterRepository from 'Repositories/old/storefront/account/RegisterRepository';
 
 const repo = new RegisterRepository();
 
