@@ -1,16 +1,16 @@
 import Devices from "Services/Devices";
 import Session from "Actions/utils/Session"
-// ------------------------------------------------------
-import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
-// ------------------------------------------------------
-import TopMenuAction from 'Actions/storefront/navigation/TopMenuAction';
-import LoginAction from 'Actions/storefront/account/LoginAction';
-import RegisterAction from 'Actions/storefront/account/RegisterAction';
-import ListingAction from 'Actions/storefront/products/ListingAction';
-import PDPAction from 'Actions/storefront/products/PDPAction';
-import CheckoutAction from 'Actions/storefront/checkout/CheckoutAction';
 import PaymentScreenAction from 'Actions/mollie/PaymentScreenAction';
 import IssuerScreenAction from 'Actions/mollie/IssuerScreenAction';
+// ------------------------------------------------------
+import ShopConfigurationAction from "Actions/6.4/admin/ShopConfigurationAction";
+// ------------------------------------------------------
+import TopMenuAction from 'Actions/6.4/storefront/navigation/TopMenuAction';
+import LoginAction from 'Actions/6.4/storefront/account/LoginAction';
+import RegisterAction from 'Actions/6.4/storefront/account/RegisterAction';
+import ListingAction from 'Actions/6.4/storefront/products/ListingAction';
+import PDPAction from 'Actions/6.4/storefront/products/PDPAction';
+import CheckoutAction from 'Actions/6.4/storefront/checkout/CheckoutAction';
 
 
 const devices = new Devices();
@@ -104,7 +104,16 @@ context("Checkout Tests", () => {
                         molliePayment.selectAuthorized();
 
                     } else {
-                        
+
+                        // this was not necessary in shopware < 6.4
+                        // in 6.4 the built in issuer dropdown doesnt yet work
+                        // that's why an issuer list is displayed in mollie.
+                        // once repaired in Shopware, the "payment" screen should be
+                        // opened immediately
+                        if (payment.key === 'ideal') {
+                            mollieIssuer.selectIDEAL();
+                        }
+
                         if (payment.key === 'kbc') {
                             mollieIssuer.selectKBC();
                         }

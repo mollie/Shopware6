@@ -1,4 +1,4 @@
-import PDPRepository from 'Repositories/storefront/products/PDPRepository';
+import PDPRepository from 'Repositories/6.4/storefront/products/PDPRepository';
 
 export default class PDPAction {
 
