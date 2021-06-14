@@ -2,8 +2,7 @@
 
 namespace Kiener\MolliePayments\Facade;
 
-use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeCancelledException;
-use Kiener\MolliePayments\Exception\MollieOrderPaymentCouldNotBeCreated;
+use Kiener\MolliePayments\Exception\PaymentUrlException;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderBuilder;
@@ -14,7 +13,6 @@ use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
 use Mollie\Api\Resources\Order as MollieOrder;
-use Monolog\Logger;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -118,9 +116,23 @@ class MolliePaymentDoPay
 
         // do another payment if mollie order could be found
         if (!empty($mollieOrderId)) {
-            $payment=$this->apiOrderService->createNewPayment($mollieOrderId, $paymentMethod, $salesChannelContext);
+            $payment = $this->apiOrderService->createOrReusePayment($mollieOrderId, $paymentMethod, $salesChannelContext);
 
-            return $payment->getCheckoutUrl() ?? $transactionStruct->getReturnUrl();
+            // if direct payment return to success page
+            if ($payment->isPaid()) {
+                return $transactionStruct->getReturnUrl();
+            }
+
+            $url = $payment->getCheckoutUrl();
+
+            if (empty($url)) {
+                throw new PaymentUrlException(
+                    $transactionStruct->getOrderTransaction()->getId(),
+                    "Couldn't get mollie payment checkout url"
+                );
+            }
+
+            return $url;
         }
 
         // build new mollie order array
