@@ -2,13 +2,9 @@
 
 namespace Kiener\MolliePayments\Exception;
 
-
 use Shopware\Core\Framework\ShopwareHttpException;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * @copyright 2021 dasistweb GmbH (https://www.dasistweb.de)
- */
 class OrderCustomerNotFound extends ShopwareHttpException
 {
     public function __construct(string $id, array $parameters = [], \Throwable $previous = null)

@@ -85,7 +85,7 @@ class MollieOrderBuilder
         string $paymentMethod,
         string $returnUrl,
         SalesChannelContext $salesChannelContext,
-        PaymentHandler $handler,
+        ?PaymentHandler $handler,
         array $paymentData = []
     ): array
     {
@@ -144,7 +144,9 @@ class MollieOrderBuilder
         }
 
         // add payment specific data
-        $orderData = $handler->processPaymentMethodSpecificParameters($orderData, $salesChannelContext, $customer, $locale);
+        if ($handler instanceof PaymentHandler) {
+            $orderData = $handler->processPaymentMethodSpecificParameters($orderData, $salesChannelContext, $customer, $locale);
+        }
 
         // enrich data with create customer at mollie
         $orderData = $this->customerEnricher->enrich($orderData, $customer, $settings);

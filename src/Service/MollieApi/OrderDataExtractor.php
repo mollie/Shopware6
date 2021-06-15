@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Service\MollieApi;
 
-
 use Kiener\MolliePayments\Exception\OrderCurrencyNotFound;
 use Kiener\MolliePayments\Exception\OrderCustomerNotFound;
 use Kiener\MolliePayments\Service\CustomerService;
@@ -16,9 +15,6 @@ use Shopware\Core\System\Language\LanguageEntity;
 use Shopware\Core\System\Locale\LocaleEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
-/**
- * @copyright 2021 dasistweb GmbH (https://www.dasistweb.de)
- */
 class OrderDataExtractor
 {
     /**
@@ -28,7 +24,7 @@ class OrderDataExtractor
     /**
      * @var CustomerService
      */
-    private CustomerService $customerService;
+    private $customerService;
 
     public function __construct(LoggerService $loggerService, CustomerService $customerService)
     {

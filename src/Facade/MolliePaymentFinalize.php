@@ -23,11 +23,11 @@ class MolliePaymentFinalize
     /**
      * @var PaymentStatusHelper
      */
-    private PaymentStatusHelper $paymentStatusHelper;
+    private $paymentStatusHelper;
     /**
      * @var TransactionTransitionServiceInterface
      */
-    private TransactionTransitionServiceInterface $transactionTransitionService;
+    private $transactionTransitionService;
 
     public function __construct(
         MollieApiFactory $mollieApiFactory,
@@ -46,11 +46,12 @@ class MolliePaymentFinalize
      * @throws MissingMollieOrderId
      * @throws ApiException|IncompatiblePlatform|MissingMollieOrderId|CustomerCanceledAsyncPaymentException
      */
-    public function finalize(AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext)
+    public function finalize(AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext): void
     {
         $order = $transactionStruct->getOrder();
-        $customFields = new MollieOrderCustomFieldsStruct($order->getCustomFields());
-        $mollieOrderId = $customFields->getMollieOrderId();
+        $customFields = $order->getCustomFields() ?? [];
+        $customFieldsStruct = new MollieOrderCustomFieldsStruct($customFields);
+        $mollieOrderId = $customFieldsStruct->getMollieOrderId();
 
         if (empty($mollieOrderId)) {
             // Set the error message

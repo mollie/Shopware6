@@ -115,7 +115,7 @@ class OrderTransitionService implements OrderTransitionServiceInterface
      * @param Context $context
      * @return array<string>
      */
-    private function getAvailableTransitions(OrderEntity $order, Context $context): array
+    public function getAvailableTransitions(OrderEntity $order, Context $context): array
     {
         return $this->transitionService->getAvailableTransitions(OrderDefinition::ENTITY_NAME, $order->getId(), $context);
     }

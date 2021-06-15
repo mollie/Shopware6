@@ -27,6 +27,6 @@ class ShopwareReturnUrlExtractor
 
         $token = $this->tokenFactory->parseToken($queryResult['_sw_payment_token']);
 
-        $token->getFinishUrl();
+        return $token->getFinishUrl();
     }
 }

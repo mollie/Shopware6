@@ -2,10 +2,6 @@
 
 namespace Kiener\MolliePayments\Exception;
 
-
-/**
- * @copyright 2021 dasistweb GmbH (https://www.dasistweb.de)
- */
 class MissingMollieOrderId extends \Exception
 {
 

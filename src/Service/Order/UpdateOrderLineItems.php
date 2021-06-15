@@ -12,7 +12,7 @@ class UpdateOrderLineItems
     /**
      * @var EntityRepositoryInterface
      */
-    private EntityRepositoryInterface $orderLineRepository;
+    private $orderLineRepository;
 
     public function __construct(EntityRepositoryInterface $orderLineRepository)
     {

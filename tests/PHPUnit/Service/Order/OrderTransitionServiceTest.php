@@ -2,8 +2,8 @@
 
 namespace MolliePayments\Tests\Service\Order;
 
-use Kiener\MolliePayments\Service\LoggerService;
-use Kiener\MolliePayments\Service\Order\OrderTransitionService;
+use Kiener\MolliePayments\Service\Transition\OrderTransitionService;
+use Kiener\MolliePayments\Service\Transition\TransitionService;
 use MolliePayments\Tests\Fakes\FakeEntityRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -23,9 +23,6 @@ class OrderTransitionServiceTest extends TestCase
     /** @var FakeEntityRepository */
     private $loggerRepository;
 
-    /** @var LoggerService */
-    private $logger;
-
     /** @var MockObject|StateMachineRegistry */
     private $stateMachineRegistry;
 
@@ -35,10 +32,9 @@ class OrderTransitionServiceTest extends TestCase
     public function setUp(): void
     {
         $this->loggerRepository = new FakeEntityRepository(new LogEntryDefinition());
-        $this->logger = new LoggerService($this->loggerRepository);
         $this->stateMachineRegistry = $this->createMock(StateMachineRegistry::class);
-
-        $this->orderTransitionService = new OrderTransitionService($this->logger, $this->stateMachineRegistry);
+        $this->transitionService = new TransitionService($this->stateMachineRegistry);
+        $this->orderTransitionService = new OrderTransitionService($this->transitionService);
     }
 
     /**

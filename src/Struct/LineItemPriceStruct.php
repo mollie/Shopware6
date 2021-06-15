@@ -2,10 +2,6 @@
 
 namespace Kiener\MolliePayments\Struct;
 
-
-/**
- * @copyright 2021 dasistweb GmbH (https://www.dasistweb.de)
- */
 class LineItemPriceStruct
 {
     /**

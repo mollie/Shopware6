@@ -5,7 +5,7 @@ namespace Kiener\MolliePayments\Exception;
 use Shopware\Core\Framework\ShopwareHttpException;
 use Symfony\Component\HttpFoundation\Response;
 
-class MollieOrderCouldNotBeCancelledException extends ShopwareHttpException
+class MollieOrderCouldNotBeCancelled extends ShopwareHttpException
 {
     public function __construct(string $id, array $parameters = [], \Throwable $previous = null)
     {

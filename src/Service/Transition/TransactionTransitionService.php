@@ -19,7 +19,7 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
     /**
      * @var LoggerService
      */
-    private LoggerService $loggerService;
+    private $loggerService;
 
     public function __construct(TransitionServiceInterface $transitionService, LoggerService $loggerService)
     {

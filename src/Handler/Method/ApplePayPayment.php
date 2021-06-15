@@ -14,7 +14,6 @@ class ApplePayPayment extends PaymentHandler
     public const PAYMENT_METHOD_DESCRIPTION = 'Apple Pay';
     protected const FIELD_APPLE_PAY_PAYMENT_TOKEN = 'applePayPaymentToken';
 
-
     /** @var string */
     protected $paymentMethod = self::PAYMENT_METHOD_NAME;
 

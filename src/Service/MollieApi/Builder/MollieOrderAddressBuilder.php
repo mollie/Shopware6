@@ -2,13 +2,8 @@
 
 namespace Kiener\MolliePayments\Service\MollieApi\Builder;
 
-
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 
-
-/**
- * @copyright 2021 dasistweb GmbH (https://www.dasistweb.de)
- */
 class MollieOrderAddressBuilder
 {
     public const MOLLIE_DEFAULT_COUNTRY_ISO = 'NL';

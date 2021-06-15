@@ -30,11 +30,11 @@ class MollieLineItemBuilder
     /**
      * @var PriceCalculator
      */
-    private PriceCalculator $priceCalculator;
+    private $priceCalculator;
     /**
      * @var LineItemDataExtractor
      */
-    private LineItemDataExtractor $lineItemDataExtractor;
+    private $lineItemDataExtractor;
 
     public function __construct(
         MollieOrderPriceBuilder $priceHydrator,
@@ -109,7 +109,7 @@ class MollieLineItemBuilder
             return OrderLineType::TYPE_STORE_CREDIT;
         }
 
-        if ($item->getType() === PromotionProcessor::LINE_ITEM_TYPE ||
+        if ($item->getType() === LineItem::PROMOTION_LINE_ITEM_TYPE ||
             $item->getTotalPrice() < 0) {
             return OrderLineType::TYPE_DISCOUNT;
         }

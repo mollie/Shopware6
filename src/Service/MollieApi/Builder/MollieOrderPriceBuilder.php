@@ -2,10 +2,6 @@
 
 namespace Kiener\MolliePayments\Service\MollieApi\Builder;
 
-
-/**
- * @copyright 2021 dasistweb GmbH (https://www.dasistweb.de)
- */
 class MollieOrderPriceBuilder
 {
     public const MOLLIE_FALLBACK_CURRENCY_CODE = 'EUR';

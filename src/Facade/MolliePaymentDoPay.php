@@ -13,6 +13,8 @@ use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
 use Mollie\Api\Resources\Order as MollieOrder;
+use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -34,23 +36,23 @@ class MolliePaymentDoPay
     /**
      * @var MollieOrderBuilder
      */
-    private MollieOrderBuilder $orderBuilder;
+    private $orderBuilder;
     /**
      * @var OrderService
      */
-    private OrderService $orderService;
+    private $orderService;
     /**
      * @var ApiOrderService
      */
-    private ApiOrderService $apiOrder;
+    private $apiOrder;
     /**
      * @var UpdateOrderCustomFields
      */
-    private UpdateOrderCustomFields $updateOrderCustomFields;
+    private $updateOrderCustomFields;
     /**
      * @var UpdateOrderLineItems
      */
-    private UpdateOrderLineItems $updateOrderLineItems;
+    private $updateOrderLineItems;
 
 
     /**
@@ -109,6 +111,11 @@ class MolliePaymentDoPay
     {
         // get order with all needed associations
         $order = $this->orderService->getOrder($transactionStruct->getOrder()->getId(), $salesChannelContext->getContext());
+
+        if (!$order instanceof OrderEntity) {
+            throw new OrderNotFoundException($transactionStruct->getOrder()->getOrderNumber() ?? $transactionStruct->getOrder()->getId());
+        }
+
         $customFields = $order->getCustomFields() ?? [];
         $customFieldsStruct = new MollieOrderCustomFieldsStruct($customFields);
         $customFieldsStruct->setTransactionReturnUrl($transactionStruct->getReturnUrl());

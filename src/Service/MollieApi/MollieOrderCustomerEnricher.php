@@ -2,16 +2,11 @@
 
 namespace Kiener\MolliePayments\Service\MollieApi;
 
-
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 
-/**
- * @copyright 2021 dasistweb GmbH (https://www.dasistweb.de)
- */
 class MollieOrderCustomerEnricher
 {
-
     public function enrich(array $orderData, CustomerEntity $customer, MollieSettingStruct $settings): array
     {
         if ($settings->createNoCustomersAtMollie()) {
