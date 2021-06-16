@@ -1,6 +1,8 @@
 import Plugin from 'src/plugin-system/plugin.class';
 
 export default class MollieApplePayPaymentMethod extends Plugin {
+
+
     getClosest(elem, selector) {
         // Element.matches() polyfill
         if (!Element.prototype.matches) {
@@ -10,10 +12,11 @@ export default class MollieApplePayPaymentMethod extends Plugin {
                 Element.prototype.msMatchesSelector ||
                 Element.prototype.oMatchesSelector ||
                 Element.prototype.webkitMatchesSelector ||
-                function(s) {
+                function (s) {
                     let matches = (this.document || this.ownerDocument).querySelectorAll(s), i = matches.length;
                     // eslint-disable-next-line no-empty
-                    while (--i >= 0 && matches.item(i) !== this) {}
+                    while (--i >= 0 && matches.item(i) !== this) {
+                    }
                     return i > -1;
                 };
         }
@@ -28,18 +31,43 @@ export default class MollieApplePayPaymentMethod extends Plugin {
         return null;
     }
 
+    /**
+     *
+     */
     init() {
-        const element = document.querySelector('.payment-method-input.applepay');
+
+        if (window.ApplePaySession && window.ApplePaySession.canMakePayments()) {
+            // apple pay is active
+            return;
+        }
+
+        let me = this;
+
+
+        // support for < Shopware 6.4
+        this.hideApplePay('.payment-method-input.applepay');
+
+        // support for >= Shopware 6.4
+        // we have to find the dynamic ID and use that
+        // one as a selector to hide it
+        fetch('/mollie/apple-pay/applepay-id')
+            .then(response => response.json())
+            .then(function (data) {
+                me.hideApplePay('#paymentMethod' + data.id);
+            });
+    }
+
+    /**
+     *
+     * @param innerIdentifier
+     */
+    hideApplePay(innerIdentifier) {
+        const element = document.querySelector(innerIdentifier);
         const rootElement = this.getClosest(element, '.payment-method');
 
-        if (
-            !!rootElement
-            && !!rootElement.classList
-        ) {
-            // eslint-disable-next-line no-undef
-            if (!window.ApplePaySession || !window.ApplePaySession.canMakePayments()) {
-                rootElement.classList.add('d-none');
-            }
+        if (!!rootElement && !!rootElement.classList) {
+            rootElement.remove();
         }
     }
+
 }
