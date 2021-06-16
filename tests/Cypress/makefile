@@ -25,9 +25,16 @@ endif
 
 # ---------------------------------------------------------------------------------------------
 
-run: ## Runs all E2E tests
+run: ## Runs all E2E tests for Shopware >= 6.4
 ifndef url
 	$(warning Please provide the URL argument to Start Cypress!)
 	@exit 1
 endif
-	CYPRESS_BASE_URL=$(url) ./node_modules/.bin/cypress run --env conf=dev --headless
+	CYPRESS_BASE_URL=$(url) ./node_modules/.bin/cypress run --env conf=dev --headless --spec 'cypress/integration/6.4/**/*'
+
+run-old: ## Runs all E2E tests for Shopware < 6.4
+ifndef url
+	$(warning Please provide the URL argument to Start Cypress!)
+	@exit 1
+endif
+	CYPRESS_BASE_URL=$(url) ./node_modules/.bin/cypress run --env conf=dev --headless --spec 'cypress/integration/old/**/*'
