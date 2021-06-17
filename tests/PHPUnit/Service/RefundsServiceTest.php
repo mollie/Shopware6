@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\Currency\CurrencyEntity;
 
-class MollieRefundsServiceTest extends TestCase
+class RefundsServiceTest extends TestCase
 {
     /**
      * @param bool $expected
