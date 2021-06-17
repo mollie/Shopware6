@@ -119,23 +119,29 @@ class RefundService
         // Apparently Refund::amount and Refund::settlementAmount don't json encode very well, resulting in an empty
         // array, so we build an array manually.
         return array_map(function ($refund) {
+            $amount = null;
+            if(!is_null($refund->amount)) {
+                $amount = [
+                    'value' => $refund->amount->value,
+                    'currency' => $refund->amount->currency,
+                ];
+            }
+
+            $settlementAmount = null;
+            if(!is_null($refund->settlementAmount)) {
+                $settlementAmount = [
+                    'value' => $refund->settlementAmount->value,
+                    'currency' => $refund->settlementAmount->currency,
+                ];
+            }
+
             /** @var Refund $refund */
             return [
                 'id' => $refund->id,
                 'orderId' => $refund->orderId,
                 'paymentId' => $refund->paymentId,
-                'amount' => !is_null($refund->amount)
-                    ? [
-                        'value' => $refund->amount->value,
-                        'currency' => $refund->amount->currency,
-                    ]
-                    : null,
-                'settlementAmount' => !is_null($refund->settlementAmount)
-                    ? [
-                        'value' => $refund->settlementAmount->value,
-                        'currency' => $refund->settlementAmount->currency,
-                    ]
-                    : null,
+                'amount' => $amount,
+                'settlementAmount' => $settlementAmount,
                 'description' => $refund->description,
                 'createdAt' => $refund->createdAt,
                 'status' => $refund->status,
