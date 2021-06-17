@@ -2,7 +2,11 @@
 
 namespace Kiener\MolliePayments\Controller\Api;
 
+use Kiener\MolliePayments\Exception\CouldNotCancelMollieRefundException;
+use Kiener\MolliePayments\Exception\CouldNotCreateMollieRefundException;
+use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
 use Kiener\MolliePayments\Exception\MollieRefundException;
+use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\RefundService;
 use Kiener\MolliePayments\Service\SettingsService;
@@ -188,7 +192,7 @@ class RefundController extends AbstractController
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
-        } catch (MollieRefundException $e) {
+        } catch (CouldNotCreateMollieRefundException | CouldNotExtractMollieOrderIdException | PaymentNotFoundException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], 500);
         }
@@ -213,7 +217,7 @@ class RefundController extends AbstractController
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
-        } catch (MollieRefundException $e) {
+        } catch (CouldNotCancelMollieRefundException | CouldNotExtractMollieOrderIdException | PaymentNotFoundException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], 500);
         }
@@ -237,9 +241,6 @@ class RefundController extends AbstractController
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
-        } catch (MollieRefundException $e) {
-            $this->logger->error($e->getMessage());
-            return $this->json(['message' => $e->getMessage()], 500);
         }
 
         return $this->json($refunds ?? []);
@@ -259,17 +260,8 @@ class RefundController extends AbstractController
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
         }
 
-        try {
-            $remaining = $this->refundService->getRemainingAmount($order);
-        } catch (MollieRefundException $e) {
-            $remaining = 0;
-        }
-
-        try {
-            $refunded = $this->refundService->getRefundedAmount($order);
-        } catch (MollieRefundException $e) {
-            $refunded = 0;
-        }
+        $remaining = $this->refundService->getRemainingAmount($order);
+        $refunded = $this->refundService->getRefundedAmount($order);
 
         return $this->json(compact('remaining', 'refunded'));
     }

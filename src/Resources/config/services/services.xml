@@ -20,10 +20,10 @@
             <argument>%kernel.shopware_version%</argument>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\RefundService" class="Kiener\MolliePayments\Service\RefundService">
-            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
+        <service id="Kiener\MolliePayments\Service\RefundService">
+            <argument type="service" id="monolog.logger"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
         </service>
     </services>
 </container>

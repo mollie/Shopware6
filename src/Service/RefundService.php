@@ -2,31 +2,44 @@
 
 namespace Kiener\MolliePayments\Service;
 
-use Kiener\MolliePayments\Exception\MollieRefundException;
-use Kiener\MolliePayments\Factory\MollieApiFactory;
+use Kiener\MolliePayments\Exception\CouldNotCancelMollieRefundException;
+use Kiener\MolliePayments\Exception\CouldNotCreateMollieRefundException;
+use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
+use Kiener\MolliePayments\Exception\CouldNotFetchMollieRefundsException;
+use Kiener\MolliePayments\Exception\PaymentNotFoundException;
+use Kiener\MolliePayments\Service\MollieApi\Order;
 use Mollie\Api\Exceptions\ApiException;
-use Mollie\Api\Exceptions\IncompatiblePlatform;
-use Mollie\Api\MollieApiClient;
-use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\Refund;
-use Mollie\Api\Types\PaymentStatus;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\OrderEntity;
 
 class RefundService
 {
-    /** @var MollieApiFactory */
-    private $apiFactory;
+    /** @var LoggerInterface */
+    private $logger;
+
+    /** @var Order */
+    private $mollieOrderApi;
+
+    /** @var OrderService */
+    private $orderService;
 
     /**
      * CustomFieldService constructor.
      *
-     * @param MollieApiFactory $apiFactory
+     * @param LoggerInterface $logger
+     * @param Order $mollieOrderApi
+     * @param OrderService $orderService
      */
     public function __construct(
-        MollieApiFactory $apiFactory
+        LoggerInterface $logger,
+        Order $mollieOrderApi,
+        OrderService $orderService
     )
     {
-        $this->apiFactory = $apiFactory;
+        $this->logger = $logger;
+        $this->mollieOrderApi = $mollieOrderApi;
+        $this->orderService = $orderService;
     }
 
     /**
@@ -34,11 +47,38 @@ class RefundService
      * @param float $amount
      * @param string|null $description
      * @return bool
-     * @throws MollieRefundException
+     * @throws CouldNotCreateMollieRefundException
+     * @throws CouldNotExtractMollieOrderIdException
+     * @throws PaymentNotFoundException
      */
     public function refund(OrderEntity $order, float $amount, ?string $description = null): bool
     {
-        $payment = $this->getPaymentForOrder($order);
+        try {
+            $mollieOrderId = $this->orderService->getMollieOrderId($order);
+        } catch (CouldNotExtractMollieOrderIdException $e) {
+            $this->logger->error(
+                sprintf(
+                    "Refund called on a non-Mollie order (Order number %s)",
+                    $order->getOrderNumber()
+                )
+            );
+
+            throw $e;
+        }
+
+        try {
+            $payment = $this->mollieOrderApi->getCompletedPayment($mollieOrderId, $order->getSalesChannelId());
+        } catch (PaymentNotFoundException $e) {
+            $this->logger->error(
+                sprintf(
+                    "Refund called on a Mollie order without a completed payment (Order number %s, Mollie Order ID %s)",
+                    $order->getOrderNumber(),
+                    $mollieOrderId
+                )
+            );
+
+            throw $e;
+        }
 
         try {
             $refund = $payment->refund([
@@ -52,12 +92,7 @@ class RefundService
 
             return $refund instanceof Refund;
         } catch (ApiException $e) {
-            throw new MollieRefundException(
-                sprintf("Could not create a refund for order %s (Order number %s)",
-                    $payment->orderId,
-                    $order->getOrderNumber()
-                )
-            );
+            throw new CouldNotCreateMollieRefundException($mollieOrderId, $order->getOrderNumber());
         }
     }
 
@@ -65,13 +100,46 @@ class RefundService
      * @param OrderEntity $order
      * @param string $refundId
      * @return bool
-     * @throws MollieRefundException
+     * @throws CouldNotCancelMollieRefundException
+     * @throws CouldNotExtractMollieOrderIdException
+     * @throws PaymentNotFoundException
      */
     public function cancel(OrderEntity $order, string $refundId): bool
     {
-        $payment = $this->getPaymentForOrder($order);
+        try {
+            $mollieOrderId = $this->orderService->getMollieOrderId($order);
+        } catch (CouldNotExtractMollieOrderIdException $e) {
+            $this->logger->error(
+                sprintf(
+                    "Cancel refund called on a non-Mollie order (Order number %s)",
+                    $order->getOrderNumber()
+                )
+            );
 
-        $refund = $payment->getRefund($refundId);
+            throw $e;
+        }
+
+        try {
+            $payment = $this->mollieOrderApi->getCompletedPayment($mollieOrderId, $order->getSalesChannelId());
+        } catch (PaymentNotFoundException $e) {
+            $this->logger->error(
+                sprintf(
+                    "Cancel refund called on a Mollie order without a completed payment (Order number %s, Mollie Order ID %s)",
+                    $order->getOrderNumber(),
+                    $mollieOrderId
+                )
+            );
+
+            throw $e;
+        }
+
+        try {
+            // getRefund doesn't contain all necessary @throws tags.
+            // It is possible for it to throw an ApiException here if $refundId is incorrect.
+            $refund = $payment->getRefund($refundId);
+        } catch (ApiException $e) { // Invalid resource id
+            return false;
+        }
 
         // This payment does not have a refund with $refundId, so we cannot cancel it.
         if (!($refund instanceof Refund)) {
@@ -87,40 +155,41 @@ class RefundService
             $refund->cancel();
             return true;
         } catch (ApiException $e) {
-            throw new MollieRefundException(
-                sprintf("Could not cancel the refund for order %s (Order number %s)",
-                    $payment->orderId,
-                    $order->getOrderNumber()
-                )
-            );
+            throw new CouldNotCancelMollieRefundException($mollieOrderId, $order->getOrderNumber(), $refundId);
         }
     }
 
     /**
      * @param OrderEntity $order
      * @return array
-     * @throws MollieRefundException
      */
     public function getRefunds(OrderEntity $order): array
     {
-        $payment = $this->getPaymentForOrder($order);
+        try {
+            $mollieOrderId = $this->orderService->getMollieOrderId($order);
+        } catch (CouldNotExtractMollieOrderIdException $e) {
+            // This may not be a Mollie order.
+            return [];
+        }
+
+        try {
+            $payment = $this->mollieOrderApi->getCompletedPayment($mollieOrderId, $order->getSalesChannelId());
+        } catch (PaymentNotFoundException $e) {
+            // This mollie order may not be paid yet, so there can't be any refunds.
+            return [];
+        }
 
         try {
             $refunds = $payment->refunds();
         } catch (ApiException $e) {
-            throw new MollieRefundException(
-                sprintf("Could not fetch refunds for order %s (Order number %s)",
-                    $payment->orderId,
-                    $order->getOrderNumber()
-                )
-            );
+            throw new CouldNotFetchMollieRefundsException($mollieOrderId, $order->getOrderNumber());
         }
 
         // Apparently Refund::amount and Refund::settlementAmount don't json encode very well, resulting in an empty
         // array, so we build an array manually.
         return array_map(function ($refund) {
             $amount = null;
-            if(!is_null($refund->amount)) {
+            if (!is_null($refund->amount)) {
                 $amount = [
                     'value' => $refund->amount->value,
                     'currency' => $refund->amount->currency,
@@ -128,7 +197,7 @@ class RefundService
             }
 
             $settlementAmount = null;
-            if(!is_null($refund->settlementAmount)) {
+            if (!is_null($refund->settlementAmount)) {
                 $settlementAmount = [
                     'value' => $refund->settlementAmount->value,
                     'currency' => $refund->settlementAmount->currency,
@@ -157,86 +226,46 @@ class RefundService
     /**
      * @param OrderEntity $order
      * @return float
-     * @throws MollieRefundException
      */
     public function getRemainingAmount(OrderEntity $order): float
     {
-        return $this->getPaymentForOrder($order)->getAmountRemaining();
+        try {
+            $mollieOrderId = $this->orderService->getMollieOrderId($order);
+        } catch (CouldNotExtractMollieOrderIdException $e) {
+            // This may not be a Mollie order.
+            return 0;
+        }
+
+        try {
+            $payment = $this->mollieOrderApi->getCompletedPayment($mollieOrderId, $order->getSalesChannelId());
+        } catch (PaymentNotFoundException $e) {
+            // This mollie order may not be paid yet, so theres nothing to be refunded
+            return 0;
+        }
+
+        return $payment->getAmountRemaining();
     }
 
     /**
      * @param OrderEntity $order
      * @return float
-     * @throws MollieRefundException
      */
     public function getRefundedAmount(OrderEntity $order): float
     {
-        return $this->getPaymentForOrder($order)->getAmountRefunded();
-    }
-
-    /**
-     * @param OrderEntity $order
-     * @return Payment
-     * @throws MollieRefundException
-     */
-    private function getPaymentForOrder(OrderEntity $order): Payment
-    {
-        $apiClient = $this->getApiClientForOrder($order);
-
-        if (!($apiClient instanceof MollieApiClient)) {
-            throw new MollieRefundException("Could not create a Mollie Api Client");
-        }
-
-        $mollieOrderId = $order->getCustomFields()['mollie_payments']['order_id'] ?? '';
-
-        if (empty($mollieOrderId)) {
-            throw new MollieRefundException(
-                sprintf('Could not find a mollie order id for order %s',
-                    $order->getOrderNumber()
-                )
-            );
+        try {
+            $mollieOrderId = $this->orderService->getMollieOrderId($order);
+        } catch (CouldNotExtractMollieOrderIdException $e) {
+            // This may not be a Mollie order.
+            return 0;
         }
 
         try {
-            $mollieOrder = $apiClient->orders->get($mollieOrderId, ["embed" => "payments"]);
-        } catch (ApiException $e) {
-            throw new MollieRefundException(
-                sprintf('Could not find the mollie order for id %s (Order number %s)',
-                    $mollieOrderId,
-                    $order->getOrderNumber()
-                )
-            );
+            $payment = $this->mollieOrderApi->getCompletedPayment($mollieOrderId, $order->getSalesChannelId());
+        } catch (PaymentNotFoundException $e) {
+            // This mollie order may not be paid yet, so theres nothing to be refunded
+            return 0;
         }
 
-        // Filter for paid/authorized payments only.
-        $paidPayments = array_filter($mollieOrder->payments()->getArrayCopy(), function ($payment) {
-            return in_array($payment->status, [PaymentStatus::STATUS_PAID, PaymentStatus::STATUS_AUTHORIZED]);
-        });
-
-        if (count($paidPayments) === 0) {
-            throw new MollieRefundException(
-                sprintf(
-                    "There is no payment to issue a refund on for order %s (Order number %s)",
-                    $mollieOrderId,
-                    $order->getOrderNumber()
-                )
-            );
-        }
-
-        // Return first found paid/authorized payment.
-        return $paidPayments[0];
-    }
-
-    /**
-     * @param OrderEntity $order
-     * @return MollieApiClient
-     */
-    private function getApiClientForOrder(OrderEntity $order): ?MollieApiClient
-    {
-        try {
-            return $this->apiFactory->getClient($order->getSalesChannelId());
-        } catch (IncompatiblePlatform $e) {
-            return null;
-        }
+        return $payment->getAmountRefunded();
     }
 }
