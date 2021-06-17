@@ -54,15 +54,17 @@ class SetMollieOrderRefunded
         $refunded = $this->refundService->getRefundedAmount($order);
         $toRefund = $order->getAmountTotal() - $refunded;
 
-        if ($toRefund > 0) {
-            $this->refundService->refund(
-                $order,
-                $toRefund,
-                sprintf(
-                    "Refunded entire order through Shopware Administration. Order number %s",
-                    $order->getOrderNumber()
-                )
-            );
+        if ($toRefund <= 0.0) {
+            return;
         }
+
+        $this->refundService->refund(
+            $order,
+            $toRefund,
+            sprintf(
+                "Refunded entire order through Shopware Administration. Order number %s",
+                $order->getOrderNumber()
+            )
+        );
     }
 }
