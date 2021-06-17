@@ -1,90 +1,185 @@
 import Plugin from 'src/plugin-system/plugin.class';
 
 export default class MollieIDealIssuer extends Plugin {
+
+    _shopUrl = '';
+    _customerId = '';
+
+    _isModalForm = false;
+
+    _container = null;
+    _paymentForm = null;
+    _issuersDropdown = null;
+    _radioInputs = null;
+    _iDealRadioInput = null;
+
+
+    /**
+     *
+     */
     init() {
-        // get container
-        const container = document.querySelector('div.mollie-ideal-issuer');
 
-        if (
-            container !== undefined
-            && container !== null
-        ) {
-            let shopUrl = container.getAttribute('data-shop-url');
-            //let issuer = container.getAttribute('data-issuer');
-            const iDealIssuer = document.querySelector('#iDealIssuer');
+        this._container = document.querySelector('div.mollie-ideal-issuer');
 
-            if (shopUrl.substr(-1) === '/') {
-                shopUrl = shopUrl.substr(0, shopUrl.length - 1);
-            }
+        if (this._container === undefined || this._container === null) {
+            return;
+        }
 
-            // Elements
-            const customerId = container.getAttribute('data-customer-id');
-            const paymentForm = document.querySelector('#confirmPaymentForm');
-            const submitButton = document.querySelector('#confirmPaymentForm button[type="submit"]');
-            const radioInputs = document.querySelectorAll('#confirmPaymentForm input[type="radio"]');
-            const iDealRadioInput = document.querySelector('#confirmPaymentForm input[type="radio"].ideal');
+        // load our controls
+        // and register the necessary events
+        this.initControls();
+        this.registerEvents();
 
-            // Event helpers
-            const showIssuers = () => {
-                if (
-                    iDealRadioInput === undefined
-                    || iDealRadioInput.checked === false
-                ) {
-                    container.classList.add('d-none');
-                } else {
-                    container.classList.remove('d-none');
-                }
-            };
+        // update the visibility of our
+        // issuer dropdown list
+        this.updateIssuerVisibility(this._iDealRadioInput, this._container)
 
-            const disableForm = () => {
-                if (submitButton !== null) {
-                    submitButton.disabled = true;
-                }
-            };
-
-            showIssuers();
-
-            radioInputs.forEach((element) => {
-                element.addEventListener('change', () => {
-                    showIssuers();
-                });
-            });
-
-            // Submit handler
-            paymentForm.addEventListener('submit', async event => {
-                event.preventDefault();
-                disableForm();
-
-                // Fallback for submitting the form
-                setTimeout(function () {
-                    paymentForm.submit();
-                }, 2000);
-
-                if (
-                    iDealRadioInput === undefined
-                    || iDealRadioInput === null
-                    || iDealRadioInput.checked === false
-                    || iDealIssuer === undefined
-                    || iDealIssuer === null
-                ) {
-                    paymentForm.submit();
-                }
-
-                if (
-                    iDealRadioInput !== undefined
-                    && iDealRadioInput !== null
-                    && iDealRadioInput.checked === true
-                    && iDealIssuer !== undefined
-                    && iDealIssuer !== null
-                ) {
-                    const fetchUrl = shopUrl + '/mollie/ideal/store-issuer/' + customerId + '/' + iDealIssuer.value;
-
-                    // Store the token on the customer
-                    fetch(fetchUrl, { headers: { 'Content-Type': 'application/json; charset=utf-8' } })
-                        .then(paymentForm.submit())
-                        .catch(paymentForm.submit());
-                }
+        // if we do not have the old modal form, but
+        // the new inline form, then automatically set the
+        // currently selected issuer as the selected on of the customer.
+        // this is for consistency.
+        if (!this._isModalForm) {
+            this.updateIssuer(this._shopUrl, this._customerId, this._iDealRadioInput, this._issuersDropdown, function (msg) {
             });
         }
     }
+
+    /**
+     *
+     */
+    initControls() {
+        this._shopUrl = this._container.getAttribute('data-shop-url');
+
+        if (this._shopUrl.substr(-1) === '/') {
+            this._shopUrl = this._shopUrl.substr(0, this._shopUrl.length - 1);
+        }
+
+        this._customerId = this._container.getAttribute('data-customer-id');
+        this._issuersDropdown = document.querySelector('#iDealIssuer');
+
+        // Shopware < 6.4
+        let oldPaymentForm = document.querySelector('#confirmPaymentForm');
+        // Shopware >= 6.4
+        let newPaymentForm = document.querySelector('#changePaymentForm');
+
+        if (newPaymentForm) {
+            this._paymentForm = newPaymentForm;
+        } else {
+            this._isModalForm = true;
+            this._paymentForm = oldPaymentForm;
+        }
+
+        this._radioInputs = this._paymentForm.querySelectorAll('input[type="radio"]');
+        this._iDealRadioInput = this._paymentForm.querySelector('input[type="radio"].ideal');
+    }
+
+    /**
+     *
+     */
+    registerEvents() {
+
+        // create locally scoped variables
+        // for async functions. this is required
+        const shopUrl = this._shopUrl;
+        const customerId = this._customerId;
+        const container = this._container;
+        const paymentForm = this._paymentForm;
+        const allRadioInputs = this._radioInputs;
+        const iDealRadioInput = this._iDealRadioInput;
+        const issuersDropdown = this._issuersDropdown;
+
+
+        // add event to toggle the dropdown visibility
+        // when switching payment methods
+        allRadioInputs.forEach((element) => {
+            element.addEventListener('change', () => {
+                this.updateIssuerVisibility(iDealRadioInput, container)
+            });
+        });
+
+
+        // if we have the old modal form, then we have a
+        // dedicated "submit" button that we use to trigger
+        // the change of our selected issuer for our user.
+        // if we have the new form directly on the confirm, then we do this immediately
+        // while the user switches the values in the dropdown
+        if (!this._isModalForm) {
+
+            issuersDropdown.addEventListener('change', async event => {
+                this.updateIssuer(shopUrl, customerId, iDealRadioInput, issuersDropdown, function (msg) {
+                });
+            });
+
+        } else {
+
+            const submitButton = paymentForm.querySelector('button[type="submit"]');
+
+            submitButton.addEventListener("click", async event => {
+                this.updateIssuer(shopUrl, customerId, iDealRadioInput, issuersDropdown, function (msg) {
+                });
+            });
+        }
+    }
+
+    /**
+     *
+     */
+    updateIssuerVisibility(iDealRadio, container) {
+        if (iDealRadio === undefined || iDealRadio.checked === false) {
+            container.classList.add('d-none');
+        } else {
+            container.classList.remove('d-none');
+        }
+    };
+
+    /**
+     *
+     * @param shopUrl
+     * @param customerId
+     * @param iDealRadio
+     * @param issuersDropdown
+     * @param onCompleted
+     */
+    updateIssuer(shopUrl, customerId, iDealRadio, issuersDropdown, onCompleted) {
+
+        if (iDealRadio === undefined) {
+            onCompleted('iDEAL Radio Input not defined');
+            return;
+        }
+
+        if (iDealRadio === null) {
+            onCompleted('iDEAL Radio Input not found');
+            return;
+        }
+
+        if (iDealRadio.checked === false) {
+            onCompleted('iDEAL payment not active');
+            return;
+        }
+
+        if (issuersDropdown === undefined) {
+            onCompleted('iDEAL issuers not defined');
+            return;
+        }
+
+        if (issuersDropdown === null) {
+            onCompleted('iDEAL issuers not found');
+            return;
+        }
+
+        const fetchUrl = shopUrl + '/mollie/ideal/store-issuer/' + customerId + '/' + issuersDropdown.value;
+
+        fetch(
+            fetchUrl,
+            {
+                headers: {'Content-Type': 'application/json; charset=utf-8'}
+            })
+            .then(() => {
+                onCompleted('issuer updated successfully');
+            })
+            .catch(() => {
+                onCompleted('error when updating issuer');
+            });
+    }
+
 }
