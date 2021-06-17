@@ -9,7 +9,6 @@
         "modals": {
             "refund": {
                 "title": "Terugbetaling via Mollie",
-                "content": "Vul de hoeveelheid van dit item in ({refundableQuantity} van {quantity} over voor terugbetaling) die aan de klant moet worden terugbetaald.",
                 "success": "Er is een terugbetaling aangemaakt bij Mollie. Het kan 2 uur duren voordat de terugbetaling is voltooid. Tot deze tijd kunt u de terugbetaling annuleren in uw Mollie Dashboard.",
                 "error": "Er is iets mis gegaan bij het aanmaken van een terugbetaling.",
                 "confirmButton": "Terugbetalen",
@@ -67,7 +66,7 @@
             "title": "Mollie Payments",
             "apiKey": "API Key",
             "isValid": "is geldig",
-            "isInvalid": "is geldig"
+            "isInvalid": "is ongeldig"
         }
     },
     "sw-customer": {
