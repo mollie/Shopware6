@@ -49,9 +49,11 @@
   },
   "sw-order": {
     "detailExtended": {
+      "buttonMolliePaymentLink": "Copy to Clipboard",
       "columnRefunded": "Refunded",
       "columnShipped": "Shipped",
       "labelMollieOrderId": "Mollie Order ID",
+      "labelMolliePaymentLink": "Mollie Checkout URL",
       "totalRefunds": "Refunded amount",
       "totalRefundsPending": "Waiting to be refunded",
       "totalRemaining": "Refundable amount",

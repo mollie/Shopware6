@@ -49,9 +49,11 @@
   },
   "sw-order": {
     "detailExtended": {
+      "buttonMolliePaymentLink": "In die Zwischenablage kopieren",
       "columnRefunded": "Rückerstattet",
       "columnShipped": "Versandt",
       "labelMollieOrderId": "Mollie Bestell ID",
+      "labelMolliePaymentLink": "Mollie Checkout URL",
       "totalRefunds": "Rückerstattete Menge",
       "totalRefundsPending": "Warten auf Rückerstattung",
       "totalRemaining": "Rückerstattbar",
