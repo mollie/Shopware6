@@ -39,7 +39,6 @@ class RefundsServiceTest extends TestCase
         $logger = new NullLogger();
 
         $this->clientMock = $this->createMock(MollieApiClient::class);
-        //$this->orderService = $this->createMock(OrderService::class);
 
         $this->orderService = new OrderService(
             $this->createMock(EntityRepositoryInterface::class),

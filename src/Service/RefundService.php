@@ -183,7 +183,7 @@ class RefundService
         try {
             $refundsArray = [];
 
-            foreach ($payment->refunds() as $refund) {
+            foreach ($payment->refunds()->getArrayCopy() as $refund) {
                 $refundsArray[] = RefundHydrator::hydrate($refund);
             }
 
