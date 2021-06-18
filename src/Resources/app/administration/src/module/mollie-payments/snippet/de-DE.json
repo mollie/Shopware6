@@ -57,7 +57,6 @@
       "totalRefunds": "Rückerstattete Menge",
       "totalRefundsPending": "Warten auf Rückerstattung",
       "totalRemaining": "Rückerstattbar",
-      "totalRemainingHelpText": "Sie können mit Mollie bis zu 25 € auf den Totalbetrag zurückzahlen.",
       "totalShipments": "Versandte Menge ({quantity} Stück)"
     }
   },
