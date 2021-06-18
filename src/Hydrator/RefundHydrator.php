@@ -6,6 +6,10 @@ use Mollie\Api\Resources\Refund;
 
 class RefundHydrator
 {
+    /**
+     * @param Refund $refund
+     * @return array
+     */
     public static function hydrate(Refund $refund): array
     {
         $amount = null;
