@@ -88,13 +88,13 @@ class Order
             throw new CouldNotFetchMollieOrderException($mollieOrderId);
         }
 
-        if($mollieOrder->payments()->count() === 0) {
+        if ($mollieOrder->payments()->count() === 0) {
             throw new PaymentNotFoundException($mollieOrderId);
         }
 
         /** @var Payment $payment */
-        foreach($mollieOrder->payments() as $payment) {
-            if(in_array($payment->status, [
+        foreach ($mollieOrder->payments()->getArrayCopy() as $payment) {
+            if (in_array($payment->status, [
                 PaymentStatus::STATUS_PAID,
                 PaymentStatus::STATUS_AUTHORIZED // Klarna
             ])) {

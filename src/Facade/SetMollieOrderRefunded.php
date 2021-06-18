@@ -2,7 +2,7 @@
 
 namespace Kiener\MolliePayments\Facade;
 
-use Kiener\MolliePayments\Exception\MollieRefundException;
+use Kiener\MolliePayments\Exception\CouldNotSetRefundAtMollieException;
 use Kiener\MolliePayments\Service\RefundService;
 use Kiener\MolliePayments\Service\TransactionService;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
@@ -30,7 +30,7 @@ class SetMollieOrderRefunded
     /**
      * @param string $orderTransactionId
      * @param Context $context
-     * @throws MollieRefundException
+     * @throws CouldNotSetRefundAtMollieException
      * @throws \Mollie\Api\Exceptions\IncompatiblePlatform
      */
     public function setRefunded(string $orderTransactionId, Context $context): void
@@ -38,7 +38,7 @@ class SetMollieOrderRefunded
         $transaction = $this->transactionService->getTransactionById($orderTransactionId, null, $context);
 
         if (!$transaction instanceof OrderTransactionEntity) {
-            throw new MollieRefundException(
+            throw new CouldNotSetRefundAtMollieException(
                 sprintf('Could not find transaction %s ', $orderTransactionId)
             );
         }
@@ -46,7 +46,7 @@ class SetMollieOrderRefunded
         $order = $transaction->getOrder();
 
         if (!$order instanceof OrderEntity) {
-            throw new MollieRefundException(
+            throw new CouldNotSetRefundAtMollieException(
                 sprintf('Could not find order for transaction %s ', $transaction->getId())
             );
         }

@@ -354,14 +354,17 @@ class OrderService
     /**
      * @param OrderEntity $order
      * @return string
+     * @throws CouldNotExtractMollieOrderIdException
      */
     public function getMollieOrderId(OrderEntity $order): string
     {
-        try {
-            return $order->getCustomFields()['mollie_payments']['order_id'];
-        } catch (\Exception $e) {
+        $mollieOrderId = $order->getCustomFields()['mollie_payments']['order_id'] ?? '';
+
+        if (empty($mollieOrderId)) {
             throw new CouldNotExtractMollieOrderIdException($order->getOrderNumber());
         }
+
+        return $mollieOrderId;
     }
 
     /**

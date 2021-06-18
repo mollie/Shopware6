@@ -2,7 +2,7 @@
 
 namespace Kiener\MolliePayments\Subscriber;
 
-use Kiener\MolliePayments\Exception\MollieRefundException;
+use Kiener\MolliePayments\Exception\CouldNotSetRefundAtMollieException;
 use Kiener\MolliePayments\Facade\SetMollieOrderRefunded;
 use Kiener\MolliePayments\Service\LoggerService;
 use Monolog\Logger;
@@ -58,7 +58,7 @@ class PaymentStateSubscriber implements EventSubscriberInterface
 
         try {
             $this->setMollieOrderRefunded->setRefunded($event->getTransition()->getEntityId(), $event->getContext());
-        } catch (MollieRefundException $e) {
+        } catch (CouldNotSetRefundAtMollieException $e) {
             $this->loggerService->addEntry(
                 $e->getMessage(),
                 $event->getContext(),

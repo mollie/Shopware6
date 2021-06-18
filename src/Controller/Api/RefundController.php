@@ -5,7 +5,6 @@ namespace Kiener\MolliePayments\Controller\Api;
 use Kiener\MolliePayments\Exception\CouldNotCancelMollieRefundException;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieRefundException;
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
-use Kiener\MolliePayments\Exception\MollieRefundException;
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\RefundService;
