@@ -22,6 +22,8 @@ use Shopware\Core\Content\Seo\SeoUrl\SeoUrlEntity;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Country\CountryEntity;
 use Shopware\Core\System\Currency\CurrencyEntity;
+use Shopware\Core\System\Language\LanguageEntity;
+use Shopware\Core\System\Locale\LocaleEntity;
 use Shopware\Core\System\Salutation\SalutationEntity;
 
 trait OrderTrait
@@ -66,47 +68,6 @@ trait OrderTrait
         return $customerAddress;
     }
 
-//    public function getDummyAddress(): OrderAddressEntity
-//    {
-//        $firstName = 'firstName';
-//        $lastName = 'lastName';
-//        $street = 'street';
-//        $zipCode = 'zipCode';
-//        $city = 'city';
-//        $salutation = 'salutation';
-//        $iso = 'DE';
-//        $additional = 'additional';
-//
-//        $address=new OrderAddressEntity();
-//
-//        return $this->getCustomerAddressEntity(
-//            $firstName,
-//            $lastName,
-//            $street,
-//            $zipCode,
-//            $city,
-//            $salutation,
-//            $iso,
-//            $additional
-//        );
-//    }
-
-    public function getOrder(string $isoCode, OrderLineItemCollection $lineItems, string $taxStatus = CartPrice::TAX_STATE_GROSS): OrderEntity
-    {
-        $currency = new CurrencyEntity();
-        $currency->setId(Uuid::randomHex());
-        $currency->setIsoCode($isoCode);
-
-        $orderId = Uuid::randomHex();
-        $order = new OrderEntity();
-        $order->setId(Uuid::randomHex());
-        $order->setLineItems($lineItems);
-        $order->setCurrency($currency);
-        $order->setTaxStatus($taxStatus);
-
-        return $order;
-    }
-
     public function getOrderLineItem(
         string $lineItemId,
         string $productNumber,
@@ -117,7 +78,8 @@ trait OrderTrait
         float $taxAmount,
         string $lineItemType = LineItem::PRODUCT_LINE_ITEM_TYPE,
         string $seoUrl = '',
-        string $imageUrl = ''
+        string $imageUrl = '',
+        int $position = 1
     ): OrderLineItemEntity
     {
         $productId = Uuid::randomHex();
@@ -134,6 +96,7 @@ trait OrderTrait
         $lineItem->setLabel($label);
         $lineItem->setQuantity($unit);
         $lineItem->setType($lineItemType);
+        $lineItem->setPosition($position);
 
         $product = new ProductEntity();
         $product->setId($productId);
@@ -161,32 +124,15 @@ trait OrderTrait
         return $lineItem;
     }
 
-    public function getExpectedTestAddress(CustomerAddressEntity $address, string $email): array
+    public function getLanguage(string $localeCode): LanguageEntity
     {
-        return [
-            'title' => $address->getSalutation()->getDisplayName(),
-            'givenName' => $address->getFirstName(),
-            'familyName' => $address->getLastName(),
-            'email' => $email,
-            'streetAndNumber' => $address->getStreet(),
-            'streetAdditional' => $address->getAdditionalAddressLine1(),
-            'postalCode' => $address->getZipcode(),
-            'city' => $address->getCity(),
-            'country' => $address->getCountry()->getIso(),
-        ];
-    }
+        $locale = new LocaleEntity();
+        $locale->setId(Uuid::randomHex());
+        $locale->setCode($localeCode);
+        $language = new LanguageEntity();
+        $language->setId(Uuid::randomHex());
+        $language->setLocale($locale);
 
-    public function getDummyAddress(): CustomerAddressEntity
-    {
-        $salutation = 'Mr';
-        $firstName = 'foo';
-        $lastName = 'bar';
-        $street = 'foostreet';
-        $additional = 'additional';
-        $zip = '12345';
-        $city = 'city';
-        $country = 'DE';
-
-        return $this->getCustomerAddressEntity($firstName, $lastName, $street, $zip, $city, $salutation, $country, $additional);
+        return $language;
     }
 }

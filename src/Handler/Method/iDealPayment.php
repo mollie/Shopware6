@@ -5,7 +5,6 @@ namespace Kiener\MolliePayments\Handler\Method;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Mollie\Api\Types\PaymentMethod;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\System\Locale\LocaleEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class iDealPayment extends PaymentHandler
@@ -20,19 +19,19 @@ class iDealPayment extends PaymentHandler
     public function processPaymentMethodSpecificParameters(
         array $orderData,
         SalesChannelContext $salesChannelContext,
-        CustomerEntity $customer,
-        LocaleEntity $locale
+        CustomerEntity $customer
     ): array
     {
         $customFields = $customer->getCustomFields() ?? [];
 
         $issuer = $customFields['mollie_payments']['preferred_ideal_issuer'] ?? '';
+        $paymentIssuer = $orderData['payment']['issuer'] ?? '';
 
         if (empty($issuer)) {
             return $orderData;
         }
 
-        if (!isset($orderData['payment']['issuer']) || empty($orderData['payment']['issuer'])) {
+        if (empty($paymentIssuer)) {
             $orderData['payment']['issuer'] = $issuer;
         }
 

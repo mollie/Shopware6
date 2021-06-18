@@ -19,8 +19,7 @@ class SofortPayment extends PaymentHandler
     public function processPaymentMethodSpecificParameters(
         array $orderData,
         SalesChannelContext $salesChannelContext,
-        CustomerEntity $customer,
-        LocaleEntity $locale
+        CustomerEntity $customer
     ): array
     {
         return $orderData;

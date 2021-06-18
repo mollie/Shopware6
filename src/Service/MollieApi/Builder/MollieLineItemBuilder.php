@@ -12,8 +12,7 @@ use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
-use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Checkout\Promotion\Cart\PromotionProcessor;
+use Shopware\Core\System\Currency\CurrencyEntity;
 
 class MollieLineItemBuilder
 {
@@ -50,16 +49,18 @@ class MollieLineItemBuilder
         $this->lineItemDataExtractor = $lineItemDataExtractor;
     }
 
-    public function buildLineItems(OrderEntity $order): array
+    public function buildLineItems(string $taxStatus, ?OrderLineItemCollection $lineItems, ?CurrencyEntity $currency): array
     {
         $lines = [];
-        $lineItems = $order->getNestedLineItems();
 
         if (!$lineItems instanceof OrderLineItemCollection || $lineItems->count() === 0) {
             return $lines;
         }
 
-        $currencyCode = $order->getCurrency()->getIsoCode() ?? MollieOrderPriceBuilder::MOLLIE_FALLBACK_CURRENCY_CODE;
+        $currencyCode = MollieOrderPriceBuilder::MOLLIE_FALLBACK_CURRENCY_CODE;
+        if ($currency instanceof CurrencyEntity) {
+            $currencyCode = $currency->getIsoCode();
+        }
 
         /** @var OrderLineItemEntity $item */
         foreach ($lineItems as $item) {
@@ -71,7 +72,7 @@ class MollieLineItemBuilder
                 throw new MissingPriceLineItem($item->getProductId());
             }
 
-            $prices = $this->priceCalculator->calculateLineItemPrice($item->getPrice(), $item->getTotalPrice(), $order->getTaxStatus());
+            $prices = $this->priceCalculator->calculateLineItemPrice($item->getPrice(), $item->getTotalPrice(), $taxStatus);
 
             $lines[] = [
                 'type' => $this->getLineItemType($item),

@@ -42,15 +42,13 @@ class BankTransferPayment extends PaymentHandler
      * @param array $orderData
      * @param SalesChannelContext $salesChannelContext
      * @param CustomerEntity $customer
-     * @param LocaleEntity $locale
      *
      * @return array
      */
     public function processPaymentMethodSpecificParameters(
         array $orderData,
         SalesChannelContext $salesChannelContext,
-        CustomerEntity $customer,
-        LocaleEntity $locale
+        CustomerEntity $customer
     ): array
     {
         $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());

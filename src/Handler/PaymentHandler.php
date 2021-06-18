@@ -58,7 +58,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         LoggerService $logger,
         MolliePaymentDoPay $payFacade,
         MolliePaymentFinalize $finalizeFacade,
-        TransactionTransitionServiceInterface $transactionTransitionService,
+        TransactionTransitionServiceInterface $transactionTransitionService
     )
     {
         $this->logger = $logger;
@@ -75,9 +75,9 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      *
      * @return array
      */
-    public function processPaymentMethodSpecificParameters(array $orderData, SalesChannelContext $salesChannelContext, CustomerEntity $customer, LocaleEntity $locale): array
+    public function processPaymentMethodSpecificParameters(array $orderData, SalesChannelContext $salesChannelContext, CustomerEntity $customer): array
     {
-        return [];
+        return $orderData;
     }
 
     /**

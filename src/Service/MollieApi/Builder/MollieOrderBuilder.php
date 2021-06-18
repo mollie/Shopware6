@@ -123,7 +123,7 @@ class MollieOrderBuilder
         $orderData['webhookUrl'] = $webhookUrl;
         $orderData['payment']['webhookUrl'] = $webhookUrl;
 
-        $lines = $this->lineItemBuilder->buildLineItems($order);
+        $lines = $this->lineItemBuilder->buildLineItems($order->getTaxStatus(), $order->getNestedLineItems(), $order->getCurrency());
 
         $orderData['lines'] = $lines;
 
@@ -145,7 +145,7 @@ class MollieOrderBuilder
 
         // add payment specific data
         if ($handler instanceof PaymentHandler) {
-            $orderData = $handler->processPaymentMethodSpecificParameters($orderData, $salesChannelContext, $customer, $locale);
+            $orderData = $handler->processPaymentMethodSpecificParameters($orderData, $salesChannelContext, $customer);
         }
 
         // enrich data with create customer at mollie

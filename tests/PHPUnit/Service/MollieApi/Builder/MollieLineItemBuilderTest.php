@@ -11,8 +11,10 @@ use Mollie\Api\Types\OrderLineType;
 use MolliePayments\Tests\Traits\OrderTrait;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
+use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Framework\Uuid\Uuid;
+use Shopware\Core\System\Currency\CurrencyEntity;
 
 class MollieLineItemBuilderTest extends TestCase
 {
@@ -39,12 +41,24 @@ class MollieLineItemBuilderTest extends TestCase
     public function testBuildLineItemsWithEmptyLineItems(): void
     {
         $lineItems = new OrderLineItemCollection();
-        $isoCode = 'DE';
-        $order = $this->getOrder($isoCode, $lineItems);
+        $currency = new CurrencyEntity();
+        $currency->setId(Uuid::randomHex());
+        $currency->setIsoCode('EUR');
 
         $expected = [];
 
-        self::assertSame($expected, $this->builder->buildLineItems($order));
+        self::assertSame($expected, $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, $lineItems, $currency));
+    }
+
+    public function testBuildLineItemsWithNullLineItemCollection(): void
+    {
+        $currency = new CurrencyEntity();
+        $currency->setId(Uuid::randomHex());
+        $currency->setIsoCode('EUR');
+
+        $expected = [];
+
+        self::assertSame($expected, $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, null, $currency));
     }
 
     public function testWithOneLineItem(): void
@@ -59,6 +73,11 @@ class MollieLineItemBuilderTest extends TestCase
         $seoUrl = 'http://seoUrl';
         $imageUrl = 'http://imageUrl';
 
+        $isoCode = 'EUR';
+        $currency = new CurrencyEntity();
+        $currency->setId(Uuid::randomHex());
+        $currency->setIsoCode($isoCode);
+
         $lineItem = $this->getOrderLineItem(
             $lineItemId,
             $productNumber,
@@ -73,24 +92,22 @@ class MollieLineItemBuilderTest extends TestCase
         );
 
         $lineItems->add($lineItem);
-        $isoCode = 'DE';
-        $order = $this->getOrder($isoCode, $lineItems);
 
         $expected = [[
             'type' => OrderLineType::TYPE_PHYSICAL,
             'name' => $labelName,
             'quantity' => $quantity,
             'unitPrice' => [
-                'currency' => 'DE',
+                'currency' => $isoCode,
                 'value' => '15.00'
             ],
             'totalAmount' => [
-                'currency' => 'DE',
+                'currency' => $isoCode,
                 'value' => '15.00'
             ],
             'vatRate' => '50.00',
             'vatAmount' => [
-                'currency' => 'DE',
+                'currency' => $isoCode,
                 'value' => '5.00'
             ],
             'sku' => $productNumber,
@@ -101,7 +118,7 @@ class MollieLineItemBuilderTest extends TestCase
             ]
         ]];
 
-        self::assertSame($expected, $this->builder->buildLineItems($order));
+        self::assertSame($expected, $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, $lineItems, $currency));
     }
 
     public function testEmptySeoUrlAndImageUrl(): void
@@ -116,6 +133,11 @@ class MollieLineItemBuilderTest extends TestCase
         $seoUrl = '';
         $imageUrl = '';
 
+        $isoCode = 'USD';
+        $currency = new CurrencyEntity();
+        $currency->setId(Uuid::randomHex());
+        $currency->setIsoCode($isoCode);
+
         $lineItem = $this->getOrderLineItem(
             $lineItemId,
             $productNumber,
@@ -130,24 +152,22 @@ class MollieLineItemBuilderTest extends TestCase
         );
 
         $lineItems->add($lineItem);
-        $isoCode = 'DE';
-        $order = $this->getOrder($isoCode, $lineItems);
 
         $expected = [[
             'type' => OrderLineType::TYPE_PHYSICAL,
             'name' => $labelName,
             'quantity' => $quantity,
             'unitPrice' => [
-                'currency' => 'DE',
+                'currency' => $isoCode,
                 'value' => '15.00'
             ],
             'totalAmount' => [
-                'currency' => 'DE',
+                'currency' => $isoCode,
                 'value' => '15.00'
             ],
             'vatRate' => '50.00',
             'vatAmount' => [
-                'currency' => 'DE',
+                'currency' => $isoCode,
                 'value' => '5.00'
             ],
             'sku' => $productNumber,
@@ -158,7 +178,7 @@ class MollieLineItemBuilderTest extends TestCase
             ]
         ]];
 
-        self::assertSame($expected, $this->builder->buildLineItems($order));
+        self::assertSame($expected, $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, $lineItems, $currency));
     }
 
     public function testCreditLineItemType(): void
@@ -187,24 +207,26 @@ class MollieLineItemBuilderTest extends TestCase
         );
 
         $lineItems->add($lineItem);
-        $isoCode = 'DE';
-        $order = $this->getOrder($isoCode, $lineItems);
+        $isoCode = 'USD';
+        $currency = new CurrencyEntity();
+        $currency->setId(Uuid::randomHex());
+        $currency->setIsoCode($isoCode);
 
         $expected = [[
             'type' => OrderLineType::TYPE_STORE_CREDIT,
             'name' => $labelName,
             'quantity' => $quantity,
             'unitPrice' => [
-                'currency' => 'DE',
+                'currency' => $isoCode,
                 'value' => '15.00'
             ],
             'totalAmount' => [
-                'currency' => 'DE',
+                'currency' => $isoCode,
                 'value' => '15.00'
             ],
             'vatRate' => '50.00',
             'vatAmount' => [
-                'currency' => 'DE',
+                'currency' => $isoCode,
                 'value' => '5.00'
             ],
             'sku' => $productNumber,
@@ -215,7 +237,7 @@ class MollieLineItemBuilderTest extends TestCase
             ]
         ]];
 
-        self::assertSame($expected, $this->builder->buildLineItems($order));
+        self::assertSame($expected, $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, $lineItems, $currency));
     }
 
     public function testPromotionLineItemType(): void
@@ -244,24 +266,26 @@ class MollieLineItemBuilderTest extends TestCase
         );
 
         $lineItems->add($lineItem);
-        $isoCode = 'DE';
-        $order = $this->getOrder($isoCode, $lineItems);
+        $isoCode = 'USD';
+        $currency = new CurrencyEntity();
+        $currency->setId(Uuid::randomHex());
+        $currency->setIsoCode($isoCode);
 
         $expected = [[
             'type' => OrderLineType::TYPE_DISCOUNT,
             'name' => $labelName,
             'quantity' => $quantity,
             'unitPrice' => [
-                'currency' => 'DE',
+                'currency' => $isoCode,
                 'value' => '15.00'
             ],
             'totalAmount' => [
-                'currency' => 'DE',
+                'currency' => $isoCode,
                 'value' => '15.00'
             ],
             'vatRate' => '50.00',
             'vatAmount' => [
-                'currency' => 'DE',
+                'currency' => $isoCode,
                 'value' => '5.00'
             ],
             'sku' => $productNumber,
@@ -272,7 +296,7 @@ class MollieLineItemBuilderTest extends TestCase
             ]
         ]];
 
-        self::assertSame($expected, $this->builder->buildLineItems($order));
+        self::assertSame($expected, $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, $lineItems, $currency));
     }
 
     public function testCustomProductsLineItemType(): void
@@ -301,24 +325,26 @@ class MollieLineItemBuilderTest extends TestCase
         );
 
         $lineItems->add($lineItem);
-        $isoCode = 'DE';
-        $order = $this->getOrder($isoCode, $lineItems);
+        $isoCode = 'USD';
+        $currency = new CurrencyEntity();
+        $currency->setId(Uuid::randomHex());
+        $currency->setIsoCode($isoCode);
 
         $expected = [[
             'type' => OrderLineType::TYPE_PHYSICAL,
             'name' => $labelName,
             'quantity' => $quantity,
             'unitPrice' => [
-                'currency' => 'DE',
+                'currency' => $isoCode,
                 'value' => '15.00'
             ],
             'totalAmount' => [
-                'currency' => 'DE',
+                'currency' => $isoCode,
                 'value' => '15.00'
             ],
             'vatRate' => '50.00',
             'vatAmount' => [
-                'currency' => 'DE',
+                'currency' => $isoCode,
                 'value' => '5.00'
             ],
             'sku' => $productNumber,
@@ -329,7 +355,7 @@ class MollieLineItemBuilderTest extends TestCase
             ]
         ]];
 
-        self::assertSame($expected, $this->builder->buildLineItems($order));
+        self::assertSame($expected, $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, $lineItems, $currency));
     }
 
     public function testFallbackLineItemType(): void
@@ -358,24 +384,26 @@ class MollieLineItemBuilderTest extends TestCase
         );
 
         $lineItems->add($lineItem);
-        $isoCode = 'DE';
-        $order = $this->getOrder($isoCode, $lineItems);
+        $isoCode = 'USD';
+        $currency = new CurrencyEntity();
+        $currency->setId(Uuid::randomHex());
+        $currency->setIsoCode($isoCode);
 
         $expected = [[
             'type' => OrderLineType::TYPE_DIGITAL,
             'name' => $labelName,
             'quantity' => $quantity,
             'unitPrice' => [
-                'currency' => 'DE',
+                'currency' => $isoCode,
                 'value' => '15.00'
             ],
             'totalAmount' => [
-                'currency' => 'DE',
+                'currency' => $isoCode,
                 'value' => '15.00'
             ],
             'vatRate' => '50.00',
             'vatAmount' => [
-                'currency' => 'DE',
+                'currency' => $isoCode,
                 'value' => '5.00'
             ],
             'sku' => $productNumber,
@@ -386,13 +414,6 @@ class MollieLineItemBuilderTest extends TestCase
             ]
         ]];
 
-        self::assertSame($expected, $this->builder->buildLineItems($order));
+        self::assertSame($expected, $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, $lineItems, $currency));
     }
-
-    public function testImplementation(): void
-    {
-        self::assertFalse(true);
-    }
-
-
 }

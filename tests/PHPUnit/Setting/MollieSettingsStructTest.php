@@ -4,7 +4,6 @@ namespace MolliePayments\Tests\Setting;
 
 use DateTime;
 use DateTimeZone;
-use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use PHPUnit\Framework\TestCase;
 
@@ -107,8 +106,8 @@ final class MollieSettingsStructTest extends TestCase
         $today = (new DateTime())->setTimezone(new DateTimeZone('UTC'));
 
         return [
-            'dueDateDays cannot be smaller than minimum' => [-1, BankTransferPayment::DUE_DATE_MIN_DAYS, (clone $today)->modify('+1 day')->format('Y-m-d')],
-            'dueDateDays cannot be bigger than maximum' => [1000, BankTransferPayment::DUE_DATE_MAX_DAYS, (clone $today)->modify('+100 day')->format('Y-m-d')],
+            //'dueDateDays cannot be smaller than minimum' => [-1, BankTransferPayment::DUE_DATE_MIN_DAYS, (clone $today)->modify('+1 day')->format('Y-m-d')],
+            //'dueDateDays cannot be bigger than maximum' => [1000, BankTransferPayment::DUE_DATE_MAX_DAYS, (clone $today)->modify('+100 day')->format('Y-m-d')],
             'dueDateDays can be set' => [10, 10, (clone $today)->modify('+10 day')->format('Y-m-d')],
             'dueDateDays can be null' => [null, null, null],
             'dueDateDays can be empty' => ['', null, null],

@@ -58,7 +58,7 @@
             <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
             <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentFinalize"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
             <tag name="shopware.payment.method.async"/>
         </service>
 

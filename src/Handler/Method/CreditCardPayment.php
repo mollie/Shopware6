@@ -5,12 +5,11 @@ namespace Kiener\MolliePayments\Handler\Method;
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Facade\MolliePaymentFinalize;
 use Kiener\MolliePayments\Handler\PaymentHandler;
+use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\LoggerService;
-use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Mollie\Api\Types\PaymentMethod;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\System\Locale\LocaleEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class CreditCardPayment extends PaymentHandler
@@ -22,38 +21,38 @@ class CreditCardPayment extends PaymentHandler
     /** @var string */
     protected $paymentMethod = self::PAYMENT_METHOD_NAME;
     /**
-     * @var SettingsService
+     * @var CustomerService
      */
-    private $settingsService;
+    private $customerService;
 
     public function __construct(
         LoggerService $logger,
         MolliePaymentDoPay $payFacade,
         MolliePaymentFinalize $finalizeFacade,
         TransactionTransitionServiceInterface $transactionTransitionService,
-        SettingsService $settingsService
+        CustomerService $customerService
     )
     {
         parent::__construct($logger, $payFacade, $finalizeFacade, $transactionTransitionService);
-        $this->settingsService = $settingsService;
+        $this->customerService = $customerService;
     }
 
     public function processPaymentMethodSpecificParameters(
         array $orderData,
         SalesChannelContext $salesChannelContext,
-        CustomerEntity $customer,
-        LocaleEntity $locale
+        CustomerEntity $customer
     ): array
     {
         $customFields = $customer->getCustomFields() ?? [];
-
         $cardToken = $customFields['mollie_payments']['credit_card_token'] ?? '';
 
         if (empty($cardToken)) {
             return $orderData;
         }
 
-        if (!isset($orderData['payment']['cardToken']) || empty($orderData['payment']['cardToken'])) {
+        $orderCardToken = $orderData['payment']['cardToken'] ?? '';
+
+        if (empty($orderCardToken)) {
             $orderData['payment']['cardToken'] = $cardToken;
             $this->customerService->setCardToken($customer, '', $salesChannelContext->getContext());
         }
