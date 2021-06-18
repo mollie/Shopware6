@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Exception\CouldNotCreateMollieRefundException;
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieRefundsException;
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
+use Kiener\MolliePayments\Hydrator\RefundHydrator;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Refund;
@@ -180,47 +181,16 @@ class RefundService
         }
 
         try {
-            $refunds = $payment->refunds();
+            $refundsArray = [];
+
+            foreach ($payment->refunds() as $refund) {
+                $refundsArray[] = RefundHydrator::hydrate($refund);
+            }
+
+            return $refundsArray;
         } catch (ApiException $e) {
             throw new CouldNotFetchMollieRefundsException($mollieOrderId, $order->getOrderNumber());
         }
-
-        // Apparently Refund::amount and Refund::settlementAmount don't json encode very well, resulting in an empty
-        // array, so we build an array manually.
-        return array_map(function ($refund) {
-            $amount = null;
-            if (!is_null($refund->amount)) {
-                $amount = [
-                    'value' => $refund->amount->value,
-                    'currency' => $refund->amount->currency,
-                ];
-            }
-
-            $settlementAmount = null;
-            if (!is_null($refund->settlementAmount)) {
-                $settlementAmount = [
-                    'value' => $refund->settlementAmount->value,
-                    'currency' => $refund->settlementAmount->currency,
-                ];
-            }
-
-            /** @var Refund $refund */
-            return [
-                'id' => $refund->id,
-                'orderId' => $refund->orderId,
-                'paymentId' => $refund->paymentId,
-                'amount' => $amount,
-                'settlementAmount' => $settlementAmount,
-                'description' => $refund->description,
-                'createdAt' => $refund->createdAt,
-                'status' => $refund->status,
-                'isFailed' => $refund->isFailed(),
-                'isPending' => $refund->isPending(),
-                'isProcessing' => $refund->isProcessing(),
-                'isQueued' => $refund->isQueued(),
-                'isTransferred' => $refund->isTransferred(),
-            ];
-        }, $refunds->getArrayCopy());
     }
 
     /**
