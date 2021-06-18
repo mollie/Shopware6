@@ -13,6 +13,15 @@
             </call>
         </service>
 
+        <service id="Kiener\MolliePayments\Controller\Api\OrderController" public="true">
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+
         <service id="Kiener\MolliePayments\Controller\Api\RefundController" public="true">
             <argument type="service" id="monolog.logger"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>

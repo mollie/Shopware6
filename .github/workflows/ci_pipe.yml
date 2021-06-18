@@ -116,7 +116,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        shopware: [ '6.4.0.0', '6.3.0', '6.2.0', '6.1.0' ]
+        shopware: [ '6.3.0', '6.2.0', '6.1.0' ]
     steps:
 
       - name: Clone Code
@@ -152,7 +152,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        shopware: [ '6.3.5.4', '6.3.5.2' ]
+        shopware: [ '6.4.1.0', '6.4.0.0', '6.3.5.4', '6.3.5.2' ]
     steps:
 
       - name: Clone Code
@@ -168,21 +168,35 @@ jobs:
 
       - name: Start Docker
         run: |
-          docker run --rm -p 80:80 --name shop -d dockware/play:${{ matrix.shopware }}
+          docker run --rm -p 80:80 --name shop -d dockware/dev:${{ matrix.shopware }}
           sleep 30
           docker logs shop
           # now change the domain of our shop, mollie doesn't work with localhost
           sudo echo "127.0.0.1 local.mollie.shop" | sudo tee -a /etc/hosts
-          docker exec shop bash -c "mysql -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='http://local.mollie.shop';\""
+          docker exec shop bash -c "mysql -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='http://local.mollie.shop' WHERE url NOT LIKE 'default.%';\""
 
       - name: Upload into Docker
         run: |
           docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
+          docker exec shop bash -c 'sudo chown www-data:www-data /var/www/html/custom/plugins -R'
 
       - name: Install Plugin
         run: |
           docker exec shop bash -c 'php bin/console plugin:refresh'
           docker exec shop bash -c 'php bin/console plugin:install MolliePayments --activate'
+
+      - name: Build artifacts
+        run: |
+          docker exec shop bash -c './bin/build-js.sh'
+          docker exec shop bash -c 'php bin/console theme:refresh'
+          docker exec shop bash -c 'php bin/console theme:compile'
+          docker exec shop bash -c 'php bin/console theme:refresh'
+
+      - name: Reinstall Plugin
+        run: |
+          docker exec shop bash -c 'php bin/console plugin:refresh'
+          docker exec shop bash -c 'php bin/console plugin:deactivate MolliePayments'
+          docker exec shop bash -c 'php bin/console plugin:activate MolliePayments'
           docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.liveApiKey ${{ secrets.MOLLIE_APIKEY_TEST }}'
           docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.testApiKey ${{ secrets.MOLLIE_APIKEY_TEST }}'
           docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.testMode true'
@@ -192,7 +206,16 @@ jobs:
         run: cd tests/Cypress && make install -B
 
       - name: Start Cypress
-        run: cd tests/Cypress && make run url=http://local.mollie.shop
+        run: |
+          if [[ $SW_VERSION == 6.3.5.4 ]]; then
+            cd tests/Cypress && make run-old url=http://local.mollie.shop
+          elif [[ $SW_VERSION == 6.3.5.2 ]]; then
+            cd tests/Cypress && make run-old url=http://local.mollie.shop
+          else
+            cd tests/Cypress && make run url=http://local.mollie.shop
+          fi
+        env:
+          SW_VERSION: ${{ matrix.shopware }}
 
       - name: Download Logs
         if: ${{ always() }}

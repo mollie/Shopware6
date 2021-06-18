@@ -1,9 +1,20 @@
 import template from './sw-order-user-card.html.twig';
+import MolliePaymentsOrderService from "../../../../../../core/service/api/mollie-payments-order.service";
 
 const { Component } = Shopware;
 
 Component.override('sw-order-user-card', {
     template,
+
+    inject: ['MolliePaymentsOrderService'],
+
+    data() {
+        return {
+            isMolliePaymentUrlLoading: false,
+            molliePaymentUrl: null,
+            molliePaymentUrlCopied: false,
+        };
+    },
 
     computed: {
         mollieOrderId() {
@@ -17,6 +28,38 @@ Component.override('sw-order-user-card', {
             }
 
             return null;
+        },
+
+    },
+
+    created() {
+        this.createdComponent();
+    },
+
+    methods: {
+        createdComponent() {
+            this.$super('createdComponent');
+
+            if(this.mollieOrderId) {
+                this.isMolliePaymentUrlLoading = true;
+
+                this.MolliePaymentsOrderService.getPaymentUrl({orderId: this.currentOrder.id})
+                    .then(response => {
+                        this.molliePaymentUrl = response.url;
+                    })
+                    .finally(() => {
+                        this.isMolliePaymentUrlLoading = false;
+                    });
+            }
+        },
+
+        copyPaymentUrlToClipboard() {
+            Shopware.Utils.dom.copyToClipboard(this.molliePaymentUrl);
+            this.molliePaymentUrlCopied = true;
+        },
+
+        onMolliePaymentUrlProcessFinished(value) {
+            this.molliePaymentUrlCopied = value;
         }
-    }
+    },
 });

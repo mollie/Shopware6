@@ -15,7 +15,6 @@ use Psr\Log\LoggerInterface;
 
 class Order
 {
-
     /**
      * @var MollieApiFactory
      */
@@ -57,6 +56,13 @@ class Order
 
             throw $e;
         }
+    }
+
+    public function getPaymentUrl(string $mollieOrderId, string $salesChannelId): ?string
+    {
+        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId);
+
+        return $mollieOrder->status === 'created' ? $mollieOrder->getCheckoutUrl() : null;
     }
 
     public function setShipment(string $mollieOrderId, string $salesChannelId): bool
