@@ -39,7 +39,7 @@ class Order
      * @throws ApiException
      * @throws IncompatiblePlatform
      */
-    public function getOrder(string $mollieOrderId, string $salesChannelId, array $parameters = []): MollieOrder
+    public function getMollieOrder(string $mollieOrderId, string $salesChannelId, array $parameters = []): MollieOrder
     {
         $apiClient = $this->clientFactory->getClient($salesChannelId);
 
@@ -67,7 +67,7 @@ class Order
 
     public function setShipment(string $mollieOrderId, string $salesChannelId): bool
     {
-        $mollieOrder = $this->getOrder($mollieOrderId, $salesChannelId);
+        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId);
 
         /** @var OrderLine $orderLine */
         foreach ($mollieOrder->lines() as $orderLine) {
@@ -89,7 +89,7 @@ class Order
     public function getCompletedPayment(string $mollieOrderId, string $salesChannelId): Payment
     {
         try {
-            $mollieOrder = $this->getOrder($mollieOrderId, $salesChannelId, ['embed' => 'payments']);
+            $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId, ['embed' => 'payments']);
         } catch (ApiException $e) {
             throw new CouldNotFetchMollieOrderException($mollieOrderId);
         }
