@@ -123,6 +123,12 @@ class MolliePaymentDoPay
 
         // do another payment if mollie order could be found
         if (!empty($mollieOrderId)) {
+            $this->logger->addDebugEntry(
+                'Found an existing mollie order with id %s.',
+                $salesChannelContext->getSalesChannelId(),
+                $salesChannelContext->getContext()
+            );
+
             $payment = $this->apiOrderService->createOrReusePayment($mollieOrderId, $paymentMethod, $salesChannelContext);
 
             // if direct payment return to success page
@@ -150,6 +156,13 @@ class MolliePaymentDoPay
             $transactionStruct->getReturnUrl(),
             $salesChannelContext,
             $paymentHandler
+        );
+
+        $this->logger->addDebugEntry(
+            'Created order array for mollie',
+            $salesChannelContext->getSalesChannelId(),
+            $salesChannelContext->getContext(),
+            $mollieOrderArray
         );
 
         // create new order at mollie

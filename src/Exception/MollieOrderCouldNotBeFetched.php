@@ -7,6 +7,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class MollieOrderCouldNotBeFetched extends ShopwareHttpException
 {
+    /**
+     * @param string $mollieOrderID
+     * @param array<string,mixed> $parameters
+     * @param \Throwable|null $previous
+     */
     public function __construct(string $mollieOrderID, array $parameters = [], \Throwable $previous = null)
     {
         $message = sprintf('Mollie order (%s) could not be fetched', $mollieOrderID);

@@ -7,6 +7,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PaymentCouldNotBeCancelled extends ShopwareHttpException
 {
+    /**
+     * @param string $molliePaymentId
+     * @param array<string,mixed> $parameters
+     * @param \Throwable|null $previous
+     */
     public function __construct(string $molliePaymentId, array $parameters = [], \Throwable $previous = null)
     {
         parent::__construct(

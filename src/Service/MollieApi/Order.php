@@ -110,21 +110,42 @@ class Order
         $payment = $this->getOpenPayment($mollieOrder);
 
         if (!$payment instanceof Payment) {
+            $this->logger->addDebugEntry(
+                'Didn\'t find an open payment. Creating a new payment at mollie',
+                $salesChannelContext->getSalesChannelId(),
+                $salesChannelContext->getContext()
+            );
 
             return $mollieOrder->createPayment(['method' => $paymentMethod]);
         }
 
         if ($payment->method === $paymentMethod) {
+            $this->logger->addDebugEntry(
+                'Found an open payment and payment methods are same. Reusing this payment',
+                $salesChannelContext->getSalesChannelId(),
+                $salesChannelContext->getContext()
+            );
 
             return $payment;
         }
 
         if (!$payment->isCancelable) {
+            $this->logger->addDebugEntry(
+                'Found an open payment but it isn\'t cancelable. Reusing this payment, otherwise we could never complete payment',
+                $salesChannelContext->getSalesChannelId(),
+                $salesChannelContext->getContext()
+            );
 
             return $payment;
         }
 
         try {
+            $this->logger->addDebugEntry(
+                'Found an open payment and cancel it. Create new payment with new payment method',
+                $salesChannelContext->getSalesChannelId(),
+                $salesChannelContext->getContext()
+            );
+
             $this->paymentApiService->delete($payment->id, $salesChannelContext->getSalesChannelId());
 
             /** @var Payment $payment */

@@ -7,6 +7,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class OrderCurrencyNotFound extends ShopwareHttpException
 {
+    /**
+     * @param string $id
+     * @param array<string,mixed> $parameters
+     * @param \Throwable|null $previous
+     */
     public function __construct(string $id, array $parameters = [], \Throwable $previous = null)
     {
         $message = sprintf('Currency of order %s could not be fetched', $id);

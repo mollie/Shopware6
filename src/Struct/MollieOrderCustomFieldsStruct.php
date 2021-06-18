@@ -13,6 +13,9 @@ class MollieOrderCustomFieldsStruct
     /** @var string|null */
     private $molliePaymentUrl;
 
+    /**
+     * @param array<string,mixed> $orderCustomFields
+     */
     public function __construct(array $orderCustomFields = [])
     {
         if (!empty($orderCustomFields)) {
@@ -68,6 +71,9 @@ class MollieOrderCustomFieldsStruct
         $this->molliePaymentUrl = $molliePaymentUrl;
     }
 
+    /**
+     * @return array<string,mixed>
+     */
     public function getMollieCustomFields(): array
     {
         if (empty($this->mollieOrderId)) {
@@ -83,6 +89,9 @@ class MollieOrderCustomFieldsStruct
         ];
     }
 
+    /**
+     * @param array<string,mixed> $customFields
+     */
     private function setCustomFields(array $customFields): void
     {
         if (!isset($customFields['mollie_payments'])) {
