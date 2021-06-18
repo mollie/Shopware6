@@ -9,7 +9,7 @@
     "modals": {
       "refund": {
         "title": "Rückerstattung über Mollie",
-        "success": "Es wurde eine Rückerstattung bei Mollie erstellt. Es kann bis zu 2 Stunden dauern, bis die Rückerstattung abgeschlossen ist. Bis dahin können Sie die Rückerstattung in Ihrem Mollie Dashboard stornieren.",
+        "success": "Es wurde eine Rückerstattung bei Mollie erstellt. Es kann bis zu 2 Stunden dauern, bis die Rückerstattung abgeschlossen ist. Bis dahin können Sie die Rückerstattung stornieren.",
         "error": "Beim Erstellen einer Rückerstattung ist etwas schief gelaufen.",
         "confirmButton": "Rückerstatten",
         "cancelButton": "Abbrechen",

@@ -9,7 +9,7 @@
     "modals": {
       "refund": {
         "title": "Refund through Mollie",
-        "success": "A refund has been created in Mollie. It may take 2 hours for the refund to complete. Until this time, you can cancel the refund in your Mollie Dashboard.",
+        "success": "A refund has been created in Mollie. It may take 2 hours for the refund to complete. Until this time, you can cancel the refund.",
         "error": "Something went wrong creating a refund.",
         "confirmButton": "Refund",
         "cancelButton": "Do not refund",
