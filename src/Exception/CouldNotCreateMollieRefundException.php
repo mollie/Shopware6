@@ -4,7 +4,7 @@ namespace Kiener\MolliePayments\Exception;
 
 class CouldNotCreateMollieRefundException extends \RuntimeException
 {
-    public function __construct($mollieOrderId, $orderNumber)
+    public function __construct(string $mollieOrderId, string $orderNumber)
     {
         $message = sprintf("Could not create a refund for order %s (Order number %s)",
             $mollieOrderId,
