@@ -98,8 +98,7 @@
                     v-model="refundAmount"
                     numberType="float"
                     size="medium"
-                    :step="1"
-                    :placeholder="$tc('mollie-payments.modals.refund.quantityPlaceholder')">
+                    :step="1">
                     <template #suffix>
                         {{ order.currency.symbol }}
                     </template>
@@ -111,7 +110,7 @@
             <sw-button @click="onCloseRefundModal" size="small">
                 {{ $tc('mollie-payments.modals.refund.cancelButton') }}
             </sw-button>
-            <sw-button @click="onConfirmRefund()" variant="primary" size="small" :disabled="refundAmount == 0">
+            <sw-button @click="onConfirmRefund()" variant="primary" size="small">
                 {{ $tc('mollie-payments.modals.refund.confirmButton') }}
             </sw-button>
         </template>

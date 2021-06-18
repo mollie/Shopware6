@@ -11,6 +11,9 @@
         "title": "Rückerstattung über Mollie",
         "success": "Es wurde eine Rückerstattung bei Mollie erstellt. Es kann bis zu 2 Stunden dauern, bis die Rückerstattung abgeschlossen ist. Bis dahin können Sie die Rückerstattung stornieren.",
         "error": "Beim Erstellen einer Rückerstattung ist etwas schief gelaufen.",
+        "warning": {
+          "low-amount": "Bitte geben Sie einen zu erstattenden Betrag ein."
+        },
         "confirmButton": "Rückerstatten",
         "cancelButton": "Abbrechen",
         "list": {

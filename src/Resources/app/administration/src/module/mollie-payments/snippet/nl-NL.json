@@ -11,6 +11,9 @@
         "title": "Terugbetaling via Mollie",
         "success": "Er is een terugbetaling aangemaakt bij Mollie. Het kan 2 uur duren voordat de terugbetaling is voltooid. Tot deze tijd kunt u de terugbetaling annuleren.",
         "error": "Er is iets mis gegaan bij het aanmaken van een terugbetaling.",
+        "warning": {
+          "low-amount": "Voer een terug te betalen bedrag in."
+        },
         "confirmButton": "Terugbetalen",
         "cancelButton": "Niet terugbetalen",
         "list": {

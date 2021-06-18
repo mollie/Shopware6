@@ -104,6 +104,14 @@ Component.override('sw-order-line-items-grid', {
         },
 
         onConfirmRefund() {
+            if(this.refundAmount === 0.0) {
+                this.createNotificationWarning({
+                    message: this.$tc('mollie-payments.modals.refund.warning.low-amount')
+                });
+
+                return;
+            }
+
             this.MolliePaymentsRefundService
                 .refund({
                     orderId: this.order.id,
