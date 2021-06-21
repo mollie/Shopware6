@@ -151,17 +151,16 @@ class MollieOrderBuilder
         // enrich data with create customer at mollie
         $orderData = $this->customerEnricher->enrich($orderData, $customer, $settings);
 
-        // Log the builded order data
-        if ($settings->isDebugMode()) {
-            $this->loggerService->addEntry(
-                sprintf('Order %s is prepared to be paid through Mollie', $order->getOrderNumber()),
-                $salesChannelContext->getContext(),
-                null,
-                [
-                    'orderData' => $orderData,
-                ]
-            );
-        }
+        // Log the built order data
+        $this->loggerService->addDebugEntry(
+            sprintf('Order %s is prepared to be paid through Mollie', $order->getOrderNumber()),
+            $salesChannelContext->getSalesChannelId(),
+            $salesChannelContext->getContext(),
+            [
+                'orderData' => $orderData,
+            ]
+        );
+
 
         return $orderData;
     }
