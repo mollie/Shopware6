@@ -26,14 +26,17 @@
   },
   "sw-order": {
     "detailExtended": {
+      "buttonMolliePaymentLink": "Copy to Clipboard",
       "columnRefunded": "Refunded",
       "columnShipped": "Shipped",
       "labelMollieOrderId": "Mollie Order ID",
+      "labelMolliePaymentLink": "Mollie Checkout URL",
       "totalRefunds": "Refunded amount ({quantity} items)",
       "totalShipments": "Shipped amount ({quantity} items)"
     }
   },
   "sw-payment": {
+    "apiLinkButton": "Get your API keys from the Mollie Dashboard",
     "testButton": "Test API Keys",
     "testApiKeys": {
       "title": "Mollie Payments",

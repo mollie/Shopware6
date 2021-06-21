@@ -35,6 +35,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\Uuid\Uuid;
+use Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
@@ -82,6 +83,12 @@ class ApplePayDirectController extends StorefrontController
     /** @var string */
     private $shopwareVersion;
 
+    /** @var SalesChannelContextFactory */
+    private $salesChannelContextFactory;
+
+    /**
+     * @param SalesChannelContextFactory $salesChannelContextFactory
+     */
     public function __construct(
         MollieApiClient $apiClient,
         CartService $cartService,
@@ -95,7 +102,8 @@ class ApplePayDirectController extends StorefrontController
         SettingsService $settingsService,
         ShippingMethodService $shippingMethodService,
         ContainerInterface $container,
-        string $shopwareVersion
+        string $shopwareVersion,
+        $salesChannelContextfactory
     )
     {
         $this->apiClient = $apiClient;
@@ -111,6 +119,39 @@ class ApplePayDirectController extends StorefrontController
         $this->shippingMethodService = $shippingMethodService;
         $this->container = $container;
         $this->shopwareVersion = $shopwareVersion;
+        $this->salesChannelContextFactory = $salesChannelContextfactory;
+    }
+
+
+    /**
+     * Gets the ID of the ApplePay payment method.
+     * We need this in the storefront for some selectors in use cases like
+     * hiding the payment method if its not available in the browser.
+     *
+     * ATTENTION:
+     * this is not about Apple Pay Direct - but the namespace of the URL is a good one (/apple-pay)
+     * and I don't want to create all kinds of new controllers
+     *
+     * @RouteScope(scopes={"storefront"})
+     * @Route("/mollie/apple-pay/applepay-id", defaults={"csrf_protected"=true}, name="frontend.mollie.apple-pay.id", options={"seo"="false"}, methods={"GET"})
+     *
+     * @param SalesChannelContext $context
+     * @return JsonResponse
+     */
+    public function getApplePayID(SalesChannelContext $context): JsonResponse
+    {
+        $id = 'not-found';
+
+        /** @var array|null $paymentMethodIds */
+        $paymentMethodIds = $context->getSalesChannel()->getPaymentMethodIds();
+
+        if (is_array($paymentMethodIds) && !empty($paymentMethodIds)) {
+            $id = $this->getPaymentMethodId(ApplePayPayment::class, $context->getContext());
+        }
+
+        return new JsonResponse([
+            'id' => $id
+        ]);
     }
 
     /**
@@ -138,7 +179,7 @@ class ApplePayDirectController extends StorefrontController
         if (is_array($paymentMethodIds) && !empty($paymentMethodIds) && $settings->isEnableApplePayDirect()) {
             $applePayMethodId = $this->getPaymentMethodId(ApplePayPayment::class, $context->getContext());
 
-            if ((string) $applePayMethodId !== '') {
+            if ((string)$applePayMethodId !== '') {
                 foreach ($paymentMethodIds as $paymentMethodId) {
                     if ($paymentMethodId === $applePayMethodId) {
                         $available = true;
@@ -158,7 +199,7 @@ class ApplePayDirectController extends StorefrontController
      *                                                     options={"seo"="false"}, methods={"GET"})
      *
      * @param SalesChannelContext $context
-     * @param string              $validationUrl
+     * @param string $validationUrl
      *
      * @return JsonResponse
      */
@@ -201,7 +242,7 @@ class ApplePayDirectController extends StorefrontController
      *
      * @param SalesChannelContext $context
      *
-     * @param string              $productId
+     * @param string $productId
      *
      * @return JsonResponse
      */
@@ -233,7 +274,7 @@ class ApplePayDirectController extends StorefrontController
      *
      * @param SalesChannelContext $context
      *
-     * @param string              $productId
+     * @param string $productId
      *
      * @return JsonResponse
      */
@@ -275,7 +316,7 @@ class ApplePayDirectController extends StorefrontController
      *
      * @param SalesChannelContext $context
      *
-     * @param Request             $request
+     * @param Request $request
      *
      * @return JsonResponse
      * @throws ApiException
@@ -311,7 +352,7 @@ class ApplePayDirectController extends StorefrontController
      *
      * @param SalesChannelContext $context
      *
-     * @param Request             $request
+     * @param Request $request
      *
      * @return JsonResponse
      * @throws Exception
@@ -343,7 +384,7 @@ class ApplePayDirectController extends StorefrontController
         $shippingContact = json_decode($request->get('shippingContact'), true);
 
         // Check if the cart token is set
-        if ((string) $cartToken === '') {
+        if ((string)$cartToken === '') {
             $errors[] = 'The cart token for Apple Pay is unavailable.';
         }
 
@@ -373,13 +414,13 @@ class ApplePayDirectController extends StorefrontController
         // Convert the cart to an order
         if (
             $customer !== null
-            && (string) $cartToken !== ''
+            && (string)$cartToken !== ''
         ) {
             try {
                 $order = $this->process(
                     $customer,
                     $cartToken,
-                    (string) $shippingMethodId,
+                    (string)$shippingMethodId,
                     $context
                 );
             } catch (Exception $e) {
@@ -455,14 +496,15 @@ class ApplePayDirectController extends StorefrontController
         $countryCode = $request->get('countryCode');
 
         // Create a new sales channel context
-        if ((string) $countryCode !== '') {
+        if ((string)$countryCode !== '') {
             $newSalesChannelContext = $this->createSalesChannelContext(
                 Uuid::randomHex(),
                 $context,
                 $this->customerService->getCountryId($countryCode, $context->getContext()),
                 null,
                 null,
-                null
+                null,
+                $context->getContext()->getLanguageId()
             );
         } else {
             $newSalesChannelContext = $context;
@@ -483,8 +525,8 @@ class ApplePayDirectController extends StorefrontController
      *                                                                           options={"seo"="false"}, methods={"GET"})
      *
      * @param SalesChannelContext $context
-     * @param string              $shippingMethodId
-     * @param string              $productId
+     * @param string $shippingMethodId
+     * @param string $productId
      *
      * @return JsonResponse
      */
@@ -521,10 +563,10 @@ class ApplePayDirectController extends StorefrontController
 
     /**
      *
-     * @param CustomerEntity      $customer
-     * @param string              $cartToken
+     * @param CustomerEntity $customer
+     * @param string $cartToken
      *
-     * @param string              $shippingMethodId
+     * @param string $shippingMethodId
      * @param SalesChannelContext $context
      *
      * @return OrderEntity|null
@@ -560,7 +602,8 @@ class ApplePayDirectController extends StorefrontController
                 $customer->getDefaultShippingAddress() !== null ? $customer->getDefaultShippingAddress()->getCountryId() : null,
                 $customer->getId(),
                 $customer->getDefaultPaymentMethod() !== null ? $customer->getDefaultPaymentMethod()->getId() : null,
-                $shippingMethodId
+                $shippingMethodId,
+                $context->getContext()->getLanguageId()
             );
 
             // Persist the order
@@ -578,12 +621,12 @@ class ApplePayDirectController extends StorefrontController
     /**
      * Returns an order that is created through the Mollie API.
      *
-     * @param string                 $applePaymentToken
-     * @param OrderEntity            $order
-     * @param string                 $returnUrl
+     * @param string $applePaymentToken
+     * @param OrderEntity $order
+     * @param string $returnUrl
      * @param OrderTransactionEntity $transaction
      *
-     * @param SalesChannelContext    $salesChannelContext
+     * @param SalesChannelContext $salesChannelContext
      *
      * @return Order|null
      * @throws RuntimeException
@@ -604,7 +647,7 @@ class ApplePayDirectController extends StorefrontController
             ApplePayPayment::PAYMENT_METHOD_NAME,
             $transaction->getId(),
             $order,
-            (string) $returnUrl,
+            (string)$returnUrl,
             $salesChannelContext,
             [
                 'applePayPaymentToken' => $applePaymentToken,
@@ -630,7 +673,7 @@ class ApplePayDirectController extends StorefrontController
     /**
      * Returns a payment method by it's handler.
      *
-     * @param string       $handlerIdentifier
+     * @param string $handlerIdentifier
      * @param Context|null $context
      *
      * @return PaymentMethodEntity|null
@@ -662,7 +705,7 @@ class ApplePayDirectController extends StorefrontController
     /**
      * Returns a payment method id by it's handler.
      *
-     * @param string       $handlerIdentifier
+     * @param string $handlerIdentifier
      * @param Context|null $context
      *
      * @return array|mixed|string|null
@@ -686,13 +729,13 @@ class ApplePayDirectController extends StorefrontController
      * but this doesn't effect the context given as parameter.
      * Because of that, a new context for the following operations is created
      *
-     * @param string              $newToken
+     * @param string $newToken
      * @param SalesChannelContext $context
      *
-     * @param string|null         $countryId
-     * @param string              $customerId
-     * @param string              $paymentMethodId
-     * @param string|null         $shippingMethodId
+     * @param string|null $countryId
+     * @param string $customerId
+     * @param string $paymentMethodId
+     * @param string|null $shippingMethodId
      *
      * @return SalesChannelContext
      */
@@ -702,19 +745,20 @@ class ApplePayDirectController extends StorefrontController
         ?string $countryId,
         ?string $customerId,
         ?string $paymentMethodId = null,
-        ?string $shippingMethodId = null
+        ?string $shippingMethodId = null,
+        ?string $languageId = null
     ): SalesChannelContext
     {
         /** @var array $options */
         $options = [];
 
         // Add country to options
-        if ((string) $countryId !== '') {
+        if ((string)$countryId !== '') {
             $options[SalesChannelContextService::COUNTRY_ID] = $countryId;
         }
 
         // Add customer to options
-        if ((string) $customerId !== '') {
+        if ((string)$customerId !== '') {
             $options[SalesChannelContextService::CUSTOMER_ID] = $customerId;
         }
 
@@ -728,14 +772,12 @@ class ApplePayDirectController extends StorefrontController
             $options[SalesChannelContextService::SHIPPING_METHOD_ID] = $shippingMethodId;
         }
 
-        $salesChannelFactory = null;
-        if (version_compare($this->shopwareVersion,'6.4','>=')) {
-            $salesChannelFactory=$this->container->get('Shopware\Core\System\SalesChannel\Context\CachedSalesChannelContextFactory');
-        } else {
-            $salesChannelFactory=$this->container->get('Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory');
+        // Add language to options
+        if ((string)$languageId !== '') {
+            $options[SalesChannelContextService::LANGUAGE_ID] = $languageId;
         }
 
-        $salesChannelContext = $salesChannelFactory->create(
+        $salesChannelContext = $this->salesChannelContextFactory->create(
             $newToken,
             $context->getSalesChannel()->getId(),
             $options
@@ -752,7 +794,7 @@ class ApplePayDirectController extends StorefrontController
      *
      * @param SalesChannelContext $context
      *
-     * @param string|null         $mode
+     * @param string|null $mode
      *
      * @throws ApiException
      */

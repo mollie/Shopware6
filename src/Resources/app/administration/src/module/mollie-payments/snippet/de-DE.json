@@ -26,14 +26,17 @@
   },
   "sw-order": {
     "detailExtended": {
+      "buttonMolliePaymentLink": "In die Zwischenablage kopieren",
       "columnRefunded": "Rückerstattet",
       "columnShipped": "Versandt",
       "labelMollieOrderId": "Mollie Bestell ID",
+      "labelMolliePaymentLink": "Mollie Checkout URL",
       "totalRefunds": "Rückerstattete Menge ({quantity} Stück)",
       "totalShipments": "Versandte Menge ({quantity} Stück)"
     }
   },
   "sw-payment": {
+    "apiLinkButton": "Erhalten Sie Ihre API Keys vom Mollie Dashboard",
     "testButton": "Prüfe API Keys",
     "testApiKeys": {
       "title": "Mollie Payments",
