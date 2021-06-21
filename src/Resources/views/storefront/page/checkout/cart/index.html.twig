@@ -1,0 +1,19 @@
+{% sw_extends '@Storefront/storefront/page/checkout/cart/index.html.twig' %}
+
+{% block page_checkout_cart_shipping_costs_form_group_payment_method %}
+    <div class="form-group">
+        <label for="paymentMethodId">{{ "checkout.paymentMethod"|trans|sw_sanitize }}</label>
+        <select class="custom-select" type="text" id="paymentMethodId" name="paymentMethodId">
+            {% for payment in page.paymentMethods %}
+                <option value="{{ payment.id }}"
+                    {% if payment.id == context.paymentMethod.id %} selected="selected"{% endif %}>
+                    {{ payment.translated.name }}
+
+                    {% if "MolliePayments" in payment.handlerIdentifier and context.isMollieTestMode == true %}
+                        {{ "molliePayments.testMode.label"|trans }}
+                    {% endif %}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+{% endblock %}
