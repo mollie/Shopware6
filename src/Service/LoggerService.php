@@ -24,7 +24,7 @@ class LoggerService
     /**
      * @var SettingsService
      */
-    private SettingsService $settingsService;
+    private $settingsService;
 
     public function __construct(
         EntityRepositoryInterface $logEntryRepository,
