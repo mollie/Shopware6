@@ -26,13 +26,20 @@ export default class CheckoutAction {
 
     /**
      *
+     */
+    showAllPaymentMethods() {
+        repoConfirm.getShowMorePaymentButtonsLabel().click();
+    }
+
+    /**
+     *
      * @param paymentName
      */
     switchPaymentMethod(paymentName) {
 
         // expand our collapsed view of payment methods
         // then we see the full list afterwards
-        repoConfirm.getShowMorePaymentButtonsLabel().click();
+        this.showAllPaymentMethods();
 
         // click on the name of the payment
         cy.contains(paymentName).click({force: true});

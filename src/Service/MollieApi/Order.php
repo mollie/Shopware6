@@ -42,26 +42,27 @@ class Order
         $this->paymentApiService = $paymentApiService;
     }
 
-    public function getOrder(string $mollieOrderId, SalesChannelContext $salesChannelContext, array $parameters = []): ?MollieOrder
+    public function getMollieOrder(string $mollieOrderId, string $salesChannelId, Context $context, array $parameters = []): MollieOrder
     {
-        $apiClient = $this->clientFactory->getClient($salesChannelContext->getSalesChannelId());
+        $apiClient = $this->clientFactory->getClient($salesChannelId, $context);
 
         try {
-            $mollieOrder = $apiClient->orders->get($mollieOrderId, $parameters);
+            return $apiClient->orders->get($mollieOrderId, $parameters);
         } catch (ApiException $e) {
-            $this->logger->error(
+            $this->logger->addEntry(
                 sprintf(
                     'API error occured when fetching mollie order %s with message %s',
                     $mollieOrderId,
                     $e->getMessage()
                 ),
-                $e->getTrace()
+                $context,
+                $e,
+                null,
+                Logger::ERROR
             );
 
-            return null;
+            throw $e;
         }
-
-        return $mollieOrder;
     }
 
     public function createOrder(array $orderData, string $orderSalesChannelContextId, SalesChannelContext $salesChannelContext): MollieOrder
@@ -100,7 +101,7 @@ class Order
      */
     public function createOrReusePayment(string $mollieOrderId, string $paymentMethod, SalesChannelContext $salesChannelContext): Payment
     {
-        $mollieOrder = $this->getOrder($mollieOrderId, $salesChannelContext, ['embed' => 'payments']);
+        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelContext->getSalesChannelId(), $salesChannelContext->getContext(), ['embed' => 'payments']);
 
         if (!$mollieOrder instanceof MollieOrder) {
 
@@ -177,27 +178,16 @@ class Order
         return null;
     }
 
+    public function getPaymentUrl(string $mollieOrderId, string $salesChannelId, Context $context): ?string
+    {
+        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId, $context);
+
+        return $mollieOrder->status === 'created' ? $mollieOrder->getCheckoutUrl() : null;
+    }
+
     public function setShipment(string $mollieOrderId, string $salesChannelId, Context $context): bool
     {
-        $apiClient = $this->clientFactory->getClient($salesChannelId);
-
-        try {
-            $mollieOrder = $apiClient->orders->get($mollieOrderId);
-        } catch (ApiException $e) {
-            $this->logger->addEntry(
-                sprintf(
-                    'API error occured when fetching mollie order %s with message %s',
-                    $mollieOrderId,
-                    $e->getMessage()
-                ),
-                $context,
-                $e,
-                null,
-                Logger::ERROR
-            );
-
-            throw $e;
-        }
+        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId, $context);
 
         /** @var OrderLine $orderLine */
         foreach ($mollieOrder->lines() as $orderLine) {
