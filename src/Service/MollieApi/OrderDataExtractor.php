@@ -56,7 +56,7 @@ class OrderDataExtractor
 
         if (!$enrichedCustomer instanceof CustomerEntity) {
             $this->loggerService->addEntry(
-                sprintf('Could not fetch customer form order with id %s', $order->getId()),
+                sprintf('Could not find customer with id %s in database', $order->getId()),
                 $salesChannelContext->getContext(),
                 null,
                 [],
