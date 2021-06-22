@@ -1,6 +1,16 @@
 {# compatible with >= sw6.4 #}
 {% sw_extends '@Storefront/storefront/component/payment/payment-method.html.twig' %}
 
+{% block component_payment_method_input %}
+    <input type="radio"
+           id="paymentMethod{{ payment.id }}"
+           name="paymentMethodId"
+           value="{{ payment.id }}"
+           {% if payment.id is same as(selectedPaymentMethodId) %}checked="checked"{% endif %}
+           class="custom-control-input payment-method-input {{ payment.translated.customFields.mollie_payment_method_name }}">
+{% endblock %}
+
+
 {% block component_payment_method_description %}
     {{ parent() }}
 
