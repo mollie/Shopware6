@@ -1,7 +1,7 @@
 {
   "molliePayments": {
       "testMode": {
-          "label": "(Testmodus)"
+          "label": "(testmodus)"
       },
       "messages": {
       "payment": {
