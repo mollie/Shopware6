@@ -14,7 +14,7 @@ class MollieOrderPaymentCouldNotBeCreated extends ShopwareHttpException
      */
     public function __construct(string $id, array $parameters = [], \Throwable $previous = null)
     {
-        $message = sprintf('Could not create a new payment for mollie order(%s)', $id);
+        $message = sprintf('Could not create a new payment for mollie order (%s)', $id);
         parent::__construct($message, $parameters, $previous);
     }
 

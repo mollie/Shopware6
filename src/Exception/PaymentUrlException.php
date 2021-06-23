@@ -12,7 +12,7 @@ class PaymentUrlException extends PaymentProcessException
     {
         parent::__construct(
             $orderTransactionId,
-            'Could not create a Mollie payment url due to the following error:' . \PHP_EOL . '{{ errorMessage }}',
+            'Could not create a Mollie payment url due to the following error: {{ errorMessage }}',
             ['errorMessage' => $errorMessage]
         );
     }
