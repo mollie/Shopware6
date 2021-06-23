@@ -23,11 +23,5 @@
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
             <tag name="kernel.event_subscriber"/>
         </service>
-
-        <service  id="Kiener\MolliePayments\Subscriber\SalesChannelContextResolvedSubscriber">
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-
-            <tag name="kernel.event_subscriber"/>
-        </service>
     </services>
 </container>

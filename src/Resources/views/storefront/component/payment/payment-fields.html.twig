@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block component_payment_method_description %}
-    {% if "MolliePayments" in payment.handlerIdentifier and context.isMollieTestMode == true %}
+    {% if "MolliePayments" in payment.handlerIdentifier and page.isMollieTestMode == true %}
         <div class="payment-method-description">
             <strong>{{ payment.translated.name }} {{ "molliePayments.testMode.label"|trans }}</strong>
             {% if payment.translated.description %}

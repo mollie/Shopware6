@@ -173,7 +173,7 @@
 
         <service id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter" public="false">
         </service>
-        
+
         <service id="Kiener\MolliePayments\Facade\Notifications\NotificationFacade" public="false">
             <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
@@ -208,7 +208,6 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-
         <service id="Kiener\MolliePayments\Subscriber\OrderStateSubscriber" class="Kiener\MolliePayments\Subscriber\OrderStateSubscriber">
             <argument type="service" id="Mollie\Api\MollieApiClient"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
@@ -219,6 +218,7 @@
         <service id="Kiener\MolliePayments\Subscriber\PaymentMethodSubscriber" class="Kiener\MolliePayments\Subscriber\PaymentMethodSubscriber">
             <argument type="service" id="Mollie\Api\MollieApiClient"/>
             <argument type="service" id="payment_method.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <tag name="kernel.event_subscriber"/>
         </service>
     </services>

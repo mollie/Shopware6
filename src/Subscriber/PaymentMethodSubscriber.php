@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Subscriber;
 
+use Kiener\MolliePayments\Service\SettingsService;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Profile;
@@ -13,6 +14,11 @@ use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Storefront\Page\Account\Overview\AccountOverviewPageLoadedEvent;
+use Shopware\Storefront\Page\Account\PaymentMethod\AccountPaymentMethodPageLoadedEvent;
+use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
+use Shopware\Storefront\Page\Checkout\Finish\CheckoutFinishPageLoadedEvent;
+use Shopware\Storefront\Page\PageLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PaymentMethodSubscriber implements EventSubscriberInterface
@@ -22,6 +28,9 @@ class PaymentMethodSubscriber implements EventSubscriberInterface
 
     /** @var EntityRepositoryInterface $paymentRepository */
     private $paymentRepository;
+
+    /** @var SettingsService */
+    private $settingsService;
 
     /**
      * Returns an array of event names this subscriber wants to listen to.
@@ -44,7 +53,11 @@ class PaymentMethodSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            PaymentEvents::PAYMENT_METHOD_WRITTEN_EVENT => 'onPaymentMethodChanged'
+            PaymentEvents::PAYMENT_METHOD_WRITTEN_EVENT => 'onPaymentMethodChanged',
+            AccountOverviewPageLoadedEvent::class => 'addTestModeInformationToPages',
+            AccountPaymentMethodPageLoadedEvent::class => 'addTestModeInformationToPages',
+            CheckoutConfirmPageLoadedEvent::class => 'addTestModeInformationToPages',
+            CheckoutFinishPageLoadedEvent::class => 'addTestModeInformationToPages'
         ];
     }
 
@@ -56,11 +69,13 @@ class PaymentMethodSubscriber implements EventSubscriberInterface
      */
     public function __construct(
         MollieApiClient $apiClient,
-        EntityRepositoryInterface $paymentRepository
+        EntityRepositoryInterface $paymentRepository,
+        SettingsService $settingsService
     )
     {
         $this->apiClient = $apiClient;
         $this->paymentRepository = $paymentRepository;
+        $this->settingsService = $settingsService;
     }
 
     /**
@@ -120,6 +135,15 @@ class PaymentMethodSubscriber implements EventSubscriberInterface
                     }
                 }
             }
+        }
+    }
+
+    public function addTestModeInformationToPages(PageLoadedEvent $event): void
+    {
+        $settings = $this->settingsService->getSettings($event->getSalesChannelContext()->getSalesChannelId());
+
+        if($settings->isTestMode() === true) {
+            $event->getPage()->assign([ 'isMollieTestMode' => true ]);
         }
     }
 
