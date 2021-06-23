@@ -14,6 +14,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Storefront\Page\Account\Order\AccountEditOrderPageLoadedEvent;
 use Shopware\Storefront\Page\Account\Overview\AccountOverviewPageLoadedEvent;
 use Shopware\Storefront\Page\Account\PaymentMethod\AccountPaymentMethodPageLoadedEvent;
 use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
@@ -56,6 +57,7 @@ class PaymentMethodSubscriber implements EventSubscriberInterface
             PaymentEvents::PAYMENT_METHOD_WRITTEN_EVENT => 'onPaymentMethodChanged',
             AccountOverviewPageLoadedEvent::class => 'addTestModeInformationToPages',
             AccountPaymentMethodPageLoadedEvent::class => 'addTestModeInformationToPages',
+            AccountEditOrderPageLoadedEvent::class => 'addTestModeInformationToPages',
             CheckoutConfirmPageLoadedEvent::class => 'addTestModeInformationToPages',
             CheckoutFinishPageLoadedEvent::class => 'addTestModeInformationToPages'
         ];
