@@ -19,8 +19,6 @@ use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPage;
 use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
 use Shopware\Storefront\Page\Checkout\Finish\CheckoutFinishPage;
 use Shopware\Storefront\Page\Checkout\Finish\CheckoutFinishPageLoadedEvent;
-use Shopware\Storefront\Page\Page;
-use Shopware\Storefront\Page\PageLoadedEvent;
 use Symfony\Component\HttpFoundation\Request;
 
 class TestModeNotificationSubscriberTest extends TestCase
@@ -48,8 +46,8 @@ class TestModeNotificationSubscriberTest extends TestCase
         $this->settingsServiceMock->method('getSettings')->willReturn($settings);
         $this->subscriber->addTestModeInformationToPages($event);
 
-        self::assertTrue($event->getPage()->isMollieTestMode);
-        self::assertTrue(property_exists($event->getPage(), 'isMollieTestMode'));
+        self::assertTrue($event->getPage()->hasExtension('MollieTestModePageExtension'));
+        self::assertTrue($event->getPage()->getExtension('MollieTestModePageExtension')->isTestMode());
     }
 
     public function testAccountPaymentMethodPageDoesContainTestModeInformation(): void
@@ -66,8 +64,8 @@ class TestModeNotificationSubscriberTest extends TestCase
         $this->settingsServiceMock->method('getSettings')->willReturn($settings);
         $this->subscriber->addTestModeInformationToPages($event);
 
-        self::assertTrue($event->getPage()->isMollieTestMode);
-        self::assertTrue(property_exists($event->getPage(), 'isMollieTestMode'));
+        self::assertTrue($event->getPage()->hasExtension('MollieTestModePageExtension'));
+        self::assertTrue($event->getPage()->getExtension('MollieTestModePageExtension')->isTestMode());
     }
 
     public function testAccountEditOrderPageDoesContainTestModeInformation(): void
@@ -84,8 +82,8 @@ class TestModeNotificationSubscriberTest extends TestCase
         $this->settingsServiceMock->method('getSettings')->willReturn($settings);
         $this->subscriber->addTestModeInformationToPages($event);
 
-        self::assertTrue($event->getPage()->isMollieTestMode);
-        self::assertTrue(property_exists($event->getPage(), 'isMollieTestMode'));
+        self::assertTrue($event->getPage()->hasExtension('MollieTestModePageExtension'));
+        self::assertTrue($event->getPage()->getExtension('MollieTestModePageExtension')->isTestMode());
     }
 
     public function testCheckoutConfirmPageDoesContainTestModeInformation(): void
@@ -102,8 +100,8 @@ class TestModeNotificationSubscriberTest extends TestCase
         $this->settingsServiceMock->method('getSettings')->willReturn($settings);
         $this->subscriber->addTestModeInformationToPages($event);
 
-        self::assertTrue($event->getPage()->isMollieTestMode);
-        self::assertTrue(property_exists($event->getPage(), 'isMollieTestMode'));
+        self::assertTrue($event->getPage()->hasExtension('MollieTestModePageExtension'));
+        self::assertTrue($event->getPage()->getExtension('MollieTestModePageExtension')->isTestMode());
     }
 
     public function testCheckoutFinishPageDoesContainTestModeInformation(): void
@@ -120,11 +118,11 @@ class TestModeNotificationSubscriberTest extends TestCase
         $this->settingsServiceMock->method('getSettings')->willReturn($settings);
         $this->subscriber->addTestModeInformationToPages($event);
 
-        self::assertTrue($event->getPage()->isMollieTestMode);
-        self::assertTrue(property_exists($event->getPage(), 'isMollieTestMode'));
+        self::assertTrue($event->getPage()->hasExtension('MollieTestModePageExtension'));
+        self::assertTrue($event->getPage()->getExtension('MollieTestModePageExtension')->isTestMode());
     }
 
-    public function testPagesDoNotContainTestModeInformationIfTestModeIsDisabled(): void
+    public function testExtensionTestModeValueIsFalseIfTestModeIsDisabled(): void
     {
         $event = new CheckoutFinishPageLoadedEvent(
             new CheckoutFinishPage(),
@@ -138,6 +136,7 @@ class TestModeNotificationSubscriberTest extends TestCase
         $this->settingsServiceMock->method('getSettings')->willReturn($settings);
         $this->subscriber->addTestModeInformationToPages($event);
 
-        self::assertFalse(property_exists($event->getPage(), 'isMollieTestMode'));
+        self::assertTrue($event->getPage()->hasExtension('MollieTestModePageExtension'));
+        self::assertFalse($event->getPage()->getExtension('MollieTestModePageExtension')->isTestMode());
     }
 }

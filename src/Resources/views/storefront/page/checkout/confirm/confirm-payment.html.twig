@@ -3,7 +3,7 @@
 {% block page_checkout_confirm_payment_current_text %}
     {{ parent() }}
 
-    {% if "MolliePayments" in context.paymentMethod.handlerIdentifier and page.isMollieTestMode == true %}
+    {% if "MolliePayments" in context.paymentMethod.handlerIdentifier and page.extensions.MollieTestModePageExtension.testMode == true %}
          {{ "molliePayments.testMode.label"|trans }}
     {% endif %}
 {% endblock %}

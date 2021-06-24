@@ -2,7 +2,7 @@
 {% sw_extends '@Storefront/storefront/component/payment/payment-method.html.twig' %}
 
 {% block component_payment_method_description %}
-    {% if "MolliePayments" in payment.handlerIdentifier and page.isMollieTestMode == true %}
+    {% if "MolliePayments" in payment.handlerIdentifier and page.extensions.MollieTestModePageExtension.testMode == true %}
         <div class="payment-method-description">
             <strong>{{ payment.translated.name }} {{ "molliePayments.testMode.label"|trans }}</strong>
             {% if payment.translated.description %}

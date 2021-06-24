@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Subscriber;
 
 use Kiener\MolliePayments\Service\SettingsService;
+use Kiener\MolliePayments\Storefront\Struct\TestModePageExtensionStruct;
 use Shopware\Storefront\Page\Account\Order\AccountEditOrderPageLoadedEvent;
 use Shopware\Storefront\Page\Account\Overview\AccountOverviewPageLoadedEvent;
 use Shopware\Storefront\Page\Account\PaymentMethod\AccountPaymentMethodPageLoadedEvent;
@@ -42,9 +43,6 @@ class TestModeNotificationSubscriber implements EventSubscriberInterface
     public function addTestModeInformationToPages(PageLoadedEvent $event): void
     {
         $settings = $this->settingsService->getSettings($event->getSalesChannelContext()->getSalesChannelId());
-
-        if($settings->isTestMode() === true) {
-            $event->getPage()->assign([ 'isMollieTestMode' => true ]);
-        }
+        $event->getPage()->addExtension('MollieTestModePageExtension', new TestModePageExtensionStruct($settings->isTestMode()));
     }
 }

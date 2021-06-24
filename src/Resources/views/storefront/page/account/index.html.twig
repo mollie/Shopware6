@@ -1,7 +1,7 @@
 {% sw_extends '@Storefront/storefront/page/account/index.html.twig' %}
 
 {% block page_account_overview_payment_content %}
-    {% if "MolliePayments" in context.customer.defaultPaymentMethod.handlerIdentifier and page.isMollieTestMode == true %}
+    {% if "MolliePayments" in context.customer.defaultPaymentMethod.handlerIdentifier and page.extensions.MollieTestModePageExtension.testMode == true %}
         <strong>{{ context.customer.defaultPaymentMethod.translated.name }} {{ "molliePayments.testMode.label"|trans }}</strong>
         <p>{{ context.customer.defaultPaymentMethod.description }}</p>
     {% else %}
