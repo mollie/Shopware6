@@ -40,7 +40,7 @@ class MollieApiFactory
 
     /**
      * Create a new instance of the Mollie API client.
-     *
+     * @deprecated Use getClient
      * @param string|null $salesChannelId
      *
      * @return MollieApiClient
