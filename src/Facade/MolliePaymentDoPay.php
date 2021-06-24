@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Facade;
 use Kiener\MolliePayments\Exception\PaymentUrlException;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\LoggerService;
+use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Service\MollieApi\Order as ApiOrderService;
@@ -132,7 +133,8 @@ class MolliePaymentDoPay
             $payment = $this->apiOrderService->createOrReusePayment($mollieOrderId, $paymentMethod, $salesChannelContext);
 
             // if direct payment return to success page
-            if ($payment->isPaid()) {
+            if (MolliePaymentStatus::isApprovedStatus($payment->status) && empty($payment->getCheckoutUrl())) {
+
                 return $transactionStruct->getReturnUrl();
             }
 

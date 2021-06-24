@@ -31,7 +31,6 @@ class MolliePayments extends Plugin
 
         try {
             $loader->load('services.xml');
-            $loader->load('payment_handlers.xml');
         } catch (Exception $e) {
             // @todo Handle Exception
         }
