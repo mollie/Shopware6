@@ -2,14 +2,14 @@ import Devices from "Services/Devices";
 import Session from "Actions/utils/Session"
 import PaymentScreenAction from 'Actions/mollie/PaymentScreenAction';
 // ------------------------------------------------------
-import ShopConfigurationAction from "Actions/6.4/admin/ShopConfigurationAction";
+import ShopConfigurationAction from "Actions/old/admin/ShopConfigurationAction";
 // ------------------------------------------------------
-import TopMenuAction from 'Actions/6.4/storefront/navigation/TopMenuAction';
-import LoginAction from 'Actions/6.4/storefront/account/LoginAction';
-import RegisterAction from 'Actions/6.4/storefront/account/RegisterAction';
-import ListingAction from 'Actions/6.4/storefront/products/ListingAction';
-import PDPAction from 'Actions/6.4/storefront/products/PDPAction';
-import CheckoutAction from 'Actions/6.4/storefront/checkout/CheckoutAction';
+import TopMenuAction from 'Actions/old/storefront/navigation/TopMenuAction';
+import LoginAction from 'Actions/old/storefront/account/LoginAction';
+import RegisterAction from 'Actions/old/storefront/account/RegisterAction';
+import ListingAction from 'Actions/old/storefront/products/ListingAction';
+import PDPAction from 'Actions/old/storefront/products/PDPAction';
+import CheckoutAction from 'Actions/old/storefront/checkout/CheckoutAction';
 
 
 const devices = new Devices();
@@ -38,7 +38,9 @@ context("Checkout Failure Tests", () => {
 
         before(function () {
             devices.setDevice(device);
+
             configAction.setupShop(true);
+
             register.doRegister(user_email, user_pwd);
         })
 
@@ -169,5 +171,5 @@ context("Checkout Failure Tests", () => {
         })
 
     })
-
 })
+

@@ -70,6 +70,13 @@ export default class CheckoutAction {
     /**
      *
      */
+    placeOrderOnEdit() {
+        cy.get('#confirmOrderForm > .btn').click();
+    }
+
+    /**
+     *
+     */
     mollieFailureModeRetryPayment() {
         cy.get(':nth-child(3) > .btn-primary').click();
     }

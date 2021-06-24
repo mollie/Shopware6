@@ -54,7 +54,7 @@ context("Checkout Tests", () => {
 
     before(function () {
         devices.setDevice(device);
-        configAction.setupShop();
+        configAction.setupShop(true);
         register.doRegister(user_email, user_pwd);
     })
 
