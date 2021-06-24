@@ -31,6 +31,16 @@ class MollieSettingStruct extends Struct
     protected $profileId;
 
     /**
+     * @var string
+     */
+    protected $liveProfileId;
+
+    /**
+     * @var string
+     */
+    protected $testProfileId;
+
+    /**
      * @var bool
      */
     protected $testMode = true;
@@ -133,7 +143,7 @@ class MollieSettingStruct extends Struct
      */
     public function getProfileId(): ?string
     {
-        return $this->profileId;
+        return $this->profileId ?? ($this->isTestMode() ? $this->testProfileId : $this->liveProfileId);
     }
 
     /**
