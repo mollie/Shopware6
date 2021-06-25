@@ -67,5 +67,26 @@ export default class CheckoutAction {
         repoConfirm.getSubmitButton().click();
     }
 
+    /**
+     *
+     */
+    placeOrderOnEdit() {
+        cy.get('#confirmOrderForm > .btn').click();
+    }
+
+    /**
+     *
+     */
+    mollieFailureModeRetryPayment() {
+        cy.get(':nth-child(3) > .btn-primary').click();
+    }
+
+    /**
+     *
+     */
+    mollieFailureModeContinueShopping() {
+        cy.get(':nth-child(3) > .btn-secondary').click();
+    }
+
 }
 
