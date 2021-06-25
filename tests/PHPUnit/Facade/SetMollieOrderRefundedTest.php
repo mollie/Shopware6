@@ -67,7 +67,8 @@ class SetMollieOrderRefundedTest extends TestCase
     }
 
     /**
-     * Test refunds
+     * Test whether the setMollieOrderRefunded facade creates a refund at Mollie, with the given total and refunded amounts
+     * When refunded is higher than or equal to, it should not create a refund.
      *
      * @param float $amountTotal
      * @param float $amountRefunded
