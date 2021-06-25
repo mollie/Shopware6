@@ -10,6 +10,14 @@ use Shopware\Core\Framework\Util\Random;
 
 class RefundHydratorTest extends TestCase
 {
+    /** @var RefundHydrator */
+    private $refundHydrator;
+
+    public function setUp(): void
+    {
+        $this->refundHydrator = new RefundHydrator();
+    }
+
     /**
      * @param array $expected
      * @param Refund $refund
@@ -20,8 +28,8 @@ class RefundHydratorTest extends TestCase
         Refund $refund
     )
     {
-        self::assertIsArray(RefundHydrator::hydrate($refund));
-        self::assertEquals($expected, RefundHydrator::hydrate($refund));
+        self::assertIsArray($this->refundHydrator->hydrate($refund));
+        self::assertEquals($expected, $this->refundHydrator->hydrate($refund));
     }
 
     public function getHydratorTestData()

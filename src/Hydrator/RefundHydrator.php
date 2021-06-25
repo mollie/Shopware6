@@ -10,7 +10,7 @@ class RefundHydrator
      * @param Refund $refund
      * @return array
      */
-    public static function hydrate(Refund $refund): array
+    public function hydrate(Refund $refund): array
     {
         $amount = null;
         if (!is_null($refund->amount)) {

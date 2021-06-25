@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Tests\Service;
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
+use Kiener\MolliePayments\Hydrator\RefundHydrator;
 use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\MollieApi\Order as MollieOrderApi;
 use Kiener\MolliePayments\Service\OrderService;
@@ -56,7 +57,12 @@ class RefundsServiceTest extends TestCase
 
         $mollieOrderApiMock = new MollieOrderApi($apiFactoryMock, $logger);
 
-        $this->refundService = new RefundService($logger, $mollieOrderApiMock, $this->orderService);
+        $this->refundService = new RefundService(
+            $logger,
+            $mollieOrderApiMock,
+            $this->orderService,
+            new RefundHydrator()
+        );
     }
 
     /**

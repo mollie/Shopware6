@@ -25,22 +25,28 @@ class RefundService
     /** @var OrderService */
     private $orderService;
 
+    /** @var RefundHydrator */
+    private $refundHydrator;
+
     /**
      * CustomFieldService constructor.
      *
      * @param LoggerInterface $logger
      * @param Order $mollieOrderApi
      * @param OrderService $orderService
+     * @param RefundHydrator $refundHydrator
      */
     public function __construct(
         LoggerInterface $logger,
         Order $mollieOrderApi,
-        OrderService $orderService
+        OrderService $orderService,
+        RefundHydrator $refundHydrator
     )
     {
         $this->logger = $logger;
         $this->mollieOrderApi = $mollieOrderApi;
         $this->orderService = $orderService;
+        $this->refundHydrator = $refundHydrator;
     }
 
     /**
@@ -184,7 +190,7 @@ class RefundService
             $refundsArray = [];
 
             foreach ($payment->refunds()->getArrayCopy() as $refund) {
-                $refundsArray[] = RefundHydrator::hydrate($refund);
+                $refundsArray[] = $this->refundHydrator->hydrate($refund);
             }
 
             return $refundsArray;
