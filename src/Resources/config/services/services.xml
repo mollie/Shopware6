@@ -24,6 +24,7 @@
             <argument type="service" id="monolog.logger"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
+            <argument type="service" id="Kiener\MolliePayments\Hydrator\RefundHydrator"/>
         </service>
     </services>
 </container>

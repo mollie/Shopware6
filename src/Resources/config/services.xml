@@ -9,6 +9,7 @@
         <import resource="services/controller.xml"/>
         <import resource="services/facades.xml"/>
         <import resource="services/gateways.xml"/>
+        <import resource="services/hydrators.xml"/>
         <import resource="services/services.xml"/>
         <import resource="services/snippets.xml"/>
         <import resource="services/subscriber.xml"/>
@@ -175,7 +176,7 @@
 
         <service id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter" public="false">
         </service>
-        
+
         <service id="Kiener\MolliePayments\Facade\Notifications\NotificationFacade" public="false">
             <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
