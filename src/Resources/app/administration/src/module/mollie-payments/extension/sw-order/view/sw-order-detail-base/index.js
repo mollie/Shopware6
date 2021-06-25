@@ -25,6 +25,12 @@ Component.override('sw-order-detail-base', {
         'MolliePaymentsShippingService',
     ],
 
+    computed: {
+        isMollieOrder() {
+            return (this.order.customFields !== null && 'mollie_payments' in this.order.customFields);
+        },
+    },
+
     watch: {
         order() {
             this.getMollieData();
@@ -33,7 +39,7 @@ Component.override('sw-order-detail-base', {
 
     methods: {
         getMollieData() {
-            if (this.order.id !== '') {
+            if (this.isMollieOrder) {
                 this.MolliePaymentsRefundService
                     .total({orderId: this.order.id})
                     .then((response) => {
