@@ -78,7 +78,7 @@ class OrderTransitionServiceTest extends TestCase
 
         $stateMachineState = new StateMachineStateEntity();
         $stateMachineState->setId('stateId');
-        $stateMachineState->setName(OrderStates::STATE_COMPLETED);
+        $stateMachineState->setTechnicalName(OrderStates::STATE_COMPLETED);
 
         $order = new OrderEntity();
         $order->setId('orderId');
@@ -118,7 +118,7 @@ class OrderTransitionServiceTest extends TestCase
 
         $stateMachineState = new StateMachineStateEntity();
         $stateMachineState->setId('stateId');
-        $stateMachineState->setName(OrderStates::STATE_IN_PROGRESS);
+        $stateMachineState->setTechnicalName(OrderStates::STATE_IN_PROGRESS);
 
         $order = new OrderEntity();
         $order->setId('orderId');
@@ -164,7 +164,7 @@ class OrderTransitionServiceTest extends TestCase
 
         $stateMachineState = new StateMachineStateEntity();
         $stateMachineState->setId('stateId');
-        $stateMachineState->setName(OrderStates::STATE_OPEN);
+        $stateMachineState->setTechnicalName(OrderStates::STATE_OPEN);
 
         $order = new OrderEntity();
         $order->setId('orderId');
@@ -193,7 +193,7 @@ class OrderTransitionServiceTest extends TestCase
 
         $stateMachineState = new StateMachineStateEntity();
         $stateMachineState->setId('stateId');
-        $stateMachineState->setName(OrderStates::STATE_OPEN);
+        $stateMachineState->setTechnicalName(OrderStates::STATE_OPEN);
 
         $order = new OrderEntity();
         $order->setId('orderId');
@@ -233,7 +233,7 @@ class OrderTransitionServiceTest extends TestCase
 
         $stateMachineState = new StateMachineStateEntity();
         $stateMachineState->setId('stateId');
-        $stateMachineState->setName(OrderStates::STATE_COMPLETED);
+        $stateMachineState->setTechnicalName(OrderStates::STATE_COMPLETED);
 
         $order = new OrderEntity();
         $order->setId('orderId');
@@ -279,7 +279,7 @@ class OrderTransitionServiceTest extends TestCase
 
         $stateMachineState = new StateMachineStateEntity();
         $stateMachineState->setId('stateId');
-        $stateMachineState->setName(OrderStates::STATE_IN_PROGRESS);
+        $stateMachineState->setTechnicalName(OrderStates::STATE_IN_PROGRESS);
 
         $order = new OrderEntity();
         $order->setId('orderId');
@@ -308,7 +308,7 @@ class OrderTransitionServiceTest extends TestCase
 
         $stateMachineState = new StateMachineStateEntity();
         $stateMachineState->setId('stateId');
-        $stateMachineState->setName(OrderStates::STATE_IN_PROGRESS);
+        $stateMachineState->setTechnicalName(OrderStates::STATE_IN_PROGRESS);
 
         $order = new OrderEntity();
         $order->setId('orderId');
@@ -348,7 +348,7 @@ class OrderTransitionServiceTest extends TestCase
 
         $stateMachineState = new StateMachineStateEntity();
         $stateMachineState->setId('stateId');
-        $stateMachineState->setName(OrderStates::STATE_OPEN);
+        $stateMachineState->setTechnicalName(OrderStates::STATE_OPEN);
 
         $order = new OrderEntity();
         $order->setId('orderId');
@@ -395,7 +395,7 @@ class OrderTransitionServiceTest extends TestCase
 
         $stateMachineState = new StateMachineStateEntity();
         $stateMachineState->setId('stateId');
-        $stateMachineState->setName(OrderStates::STATE_CANCELLED);
+        $stateMachineState->setTechnicalName(OrderStates::STATE_CANCELLED);
 
         $order = new OrderEntity();
         $order->setId('orderId');
@@ -448,7 +448,7 @@ class OrderTransitionServiceTest extends TestCase
 
         $stateMachineState = new StateMachineStateEntity();
         $stateMachineState->setId('stateId');
-        $stateMachineState->setName(OrderStates::STATE_COMPLETED);
+        $stateMachineState->setTechnicalName(OrderStates::STATE_COMPLETED);
 
         $order = new OrderEntity();
         $order->setId('orderId');
@@ -477,7 +477,7 @@ class OrderTransitionServiceTest extends TestCase
 
         $stateMachineState = new StateMachineStateEntity();
         $stateMachineState->setId('stateId');
-        $stateMachineState->setName(OrderStates::STATE_OPEN);
+        $stateMachineState->setTechnicalName(OrderStates::STATE_OPEN);
 
         $order = new OrderEntity();
         $order->setId('orderId');
@@ -517,7 +517,7 @@ class OrderTransitionServiceTest extends TestCase
 
         $stateMachineState = new StateMachineStateEntity();
         $stateMachineState->setId('stateId');
-        $stateMachineState->setName(OrderStates::STATE_COMPLETED);
+        $stateMachineState->setTechnicalName(OrderStates::STATE_COMPLETED);
 
         $order = new OrderEntity();
         $order->setId('orderId');
@@ -563,7 +563,7 @@ class OrderTransitionServiceTest extends TestCase
 
         $stateMachineState = new StateMachineStateEntity();
         $stateMachineState->setId('stateId');
-        $stateMachineState->setName(OrderStates::STATE_CANCELLED);
+        $stateMachineState->setTechnicalName(OrderStates::STATE_CANCELLED);
 
         $order = new OrderEntity();
         $order->setId('orderId');

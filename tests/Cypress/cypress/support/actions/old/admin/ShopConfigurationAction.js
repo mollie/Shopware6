@@ -13,17 +13,39 @@ export default class ShopConfigurationAction {
 
     /**
      *
-     * @returns {Promise<*>}
+     * @param mollieFailureMode
      */
-    setupShop() {
+    setupShop(mollieFailureMode) {
 
+        // activate all payment methods
         this._activatePaymentMethods();
 
+        // assign all payment methods to
+        // all available sales channels
         this.apiClient.get('/sales-channel').then(channels => {
             channels.forEach(channel => {
                 this._configureSalesChannel(channel.id);
             });
         });
+
+        // configure mollie plugin
+        this._configureMolliePlugin(mollieFailureMode);
+    }
+
+    /**
+     *
+     * @param mollieFailureMode
+     * @private
+     */
+    _configureMolliePlugin(mollieFailureMode) {
+        const data = {
+            "null": {
+                "MolliePayments.config.testMode": true,
+                "MolliePayments.config.shopwareFailedPayment": !mollieFailureMode
+            }
+        };
+
+        this.apiClient.post('/_action/system-config/batch', data);
     }
 
     /**

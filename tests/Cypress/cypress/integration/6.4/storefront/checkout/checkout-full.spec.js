@@ -54,7 +54,7 @@ context("Checkout Tests", () => {
 
     before(function () {
         devices.setDevice(device);
-        configAction.setupShop();
+        configAction.setupShop(true);
         register.doRegister(user_email, user_pwd);
     })
 
@@ -105,15 +105,6 @@ context("Checkout Tests", () => {
 
                     } else {
 
-                        // this was not necessary in shopware < 6.4
-                        // in 6.4 the built in issuer dropdown doesnt yet work
-                        // that's why an issuer list is displayed in mollie.
-                        // once repaired in Shopware, the "payment" screen should be
-                        // opened immediately
-                        if (payment.key === 'ideal') {
-                            mollieIssuer.selectIDEAL();
-                        }
-
                         if (payment.key === 'kbc') {
                             mollieIssuer.selectKBC();
                         }
@@ -128,35 +119,6 @@ context("Checkout Tests", () => {
                 })
 
             })
-        })
-    })
-
-    describe('Failed Checkout', () => {
-        context(devices.getDescription(device), () => {
-
-            it('Failed payment with PayPal', () => {
-
-                cy.visit('/');
-
-                login.doLogin(user_email, user_pwd);
-
-                topMenu.clickOnHome();
-                listing.clickOnFirstProduct();
-                pdp.addToCart(1);
-                checkout.goToCheckoutInOffCanvas();
-
-                checkout.switchPaymentMethod('PayPal');
-                checkout.placeOrderOnConfirm();
-
-                molliePayment.selectFailed();
-
-                // verify that we are back in our shop
-                // if the payment fails, the order is finished but
-                // we still have the option to change the payment method
-                cy.url().should('include', '/mollie/payment/');
-                cy.contains('The payment is failed or was canceled.');
-            })
-
         })
     })
 
