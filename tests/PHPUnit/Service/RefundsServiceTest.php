@@ -133,13 +133,18 @@ class RefundsServiceTest extends TestCase
         int $expected,
         bool $isMollieOrder,
         ?string $paymentStatus,
-        array $refunds
+        array $refunds,
+        ?string $exceptionClass
     ): void
     {
         $orderEntityMock = $this->getOrderEntityMock($isMollieOrder);
 
         if ($isMollieOrder) {
             $this->clientMock->orders = $this->getOrderEndpointMock($paymentStatus, 0, $refunds);
+        }
+
+        if($exceptionClass) {
+            self::expectException($exceptionClass);
         }
 
         static::assertCount($expected, $this->refundService->getRefunds($orderEntityMock));
@@ -159,13 +164,18 @@ class RefundsServiceTest extends TestCase
         float $expected,
         bool $isMollieOrder,
         ?string $paymentStatus,
-        float $remainingAmount
+        float $remainingAmount,
+        ?string $exceptionClass
     ): void
     {
         $orderEntityMock = $this->getOrderEntityMock($isMollieOrder);
 
         if ($isMollieOrder) {
             $this->clientMock->orders = $this->getOrderEndpointMock($paymentStatus, $remainingAmount);
+        }
+
+        if($exceptionClass) {
+            self::expectException($exceptionClass);
         }
 
         static::assertEquals($expected, $this->refundService->getRefundedAmount($orderEntityMock));
@@ -185,13 +195,18 @@ class RefundsServiceTest extends TestCase
         float $expected,
         bool $isMollieOrder,
         ?string $paymentStatus,
-        float $refundedAmount
+        float $refundedAmount,
+        ?string $exceptionClass
     ): void
     {
         $orderEntityMock = $this->getOrderEntityMock($isMollieOrder);
 
         if ($isMollieOrder) {
             $this->clientMock->orders = $this->getOrderEndpointMock($paymentStatus, $refundedAmount);
+        }
+
+        if($exceptionClass) {
+            self::expectException($exceptionClass);
         }
 
         static::assertEquals($expected, $this->refundService->getRefundedAmount($orderEntityMock));
@@ -321,13 +336,15 @@ class RefundsServiceTest extends TestCase
                 0,
                 false,
                 null,
-                []
+                [],
+                CouldNotExtractMollieOrderIdException::class
             ],
             'Mollie order, payment open' => [
                 0,
                 true,
                 PaymentStatus::STATUS_OPEN,
-                []
+                [],
+                null
             ],
             'Mollie order, payment paid' => [
                 1,
@@ -338,7 +355,8 @@ class RefundsServiceTest extends TestCase
                         'status' => RefundStatus::STATUS_REFUNDED,
                         'amount' => 24.99
                     ]
-                ]
+                ],
+                null
             ],
             'Mollie order, payment authorized' => [
                 1,
@@ -349,7 +367,8 @@ class RefundsServiceTest extends TestCase
                         'status' => RefundStatus::STATUS_REFUNDED,
                         'amount' => 24.99
                     ]
-                ]
+                ],
+                null
             ]
         ];
     }
@@ -361,25 +380,29 @@ class RefundsServiceTest extends TestCase
                 0,
                 false,
                 null,
-                0
+                0,
+                CouldNotExtractMollieOrderIdException::class
             ],
             'Mollie order, payment open' => [
                 0,
                 true,
                 PaymentStatus::STATUS_OPEN,
-                24.99
+                24.99,
+                null
             ],
             'Mollie order, payment paid' => [
                 24.99,
                 true,
                 PaymentStatus::STATUS_PAID,
-                24.99
+                24.99,
+                null
             ],
             'Mollie order, payment authorized' => [
                 24.99,
                 true,
                 PaymentStatus::STATUS_AUTHORIZED,
-                24.99
+                24.99,
+                null
             ]
         ];
     }

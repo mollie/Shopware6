@@ -60,18 +60,7 @@ class RefundService
      */
     public function refund(OrderEntity $order, float $amount, ?string $description = null): bool
     {
-        try {
-            $mollieOrderId = $this->orderService->getMollieOrderId($order);
-        } catch (CouldNotExtractMollieOrderIdException $e) {
-            $this->logger->error(
-                sprintf(
-                    "Refund called on a non-Mollie order (Order number %s)",
-                    $order->getOrderNumber()
-                )
-            );
-
-            throw $e;
-        }
+        $mollieOrderId = $this->tryGetMollieOrderId($order);
 
         try {
             $payment = $this->mollieOrderApi->getCompletedPayment($mollieOrderId, $order->getSalesChannelId());
@@ -113,18 +102,7 @@ class RefundService
      */
     public function cancel(OrderEntity $order, string $refundId): bool
     {
-        try {
-            $mollieOrderId = $this->orderService->getMollieOrderId($order);
-        } catch (CouldNotExtractMollieOrderIdException $e) {
-            $this->logger->error(
-                sprintf(
-                    "Cancel refund called on a non-Mollie order (Order number %s)",
-                    $order->getOrderNumber()
-                )
-            );
-
-            throw $e;
-        }
+        $mollieOrderId = $this->tryGetMollieOrderId($order);
 
         try {
             $payment = $this->mollieOrderApi->getCompletedPayment($mollieOrderId, $order->getSalesChannelId());
@@ -169,15 +147,11 @@ class RefundService
     /**
      * @param OrderEntity $order
      * @return array
+     * @throws CouldNotExtractMollieOrderIdException
      */
     public function getRefunds(OrderEntity $order): array
     {
-        try {
-            $mollieOrderId = $this->orderService->getMollieOrderId($order);
-        } catch (CouldNotExtractMollieOrderIdException $e) {
-            // This may not be a Mollie order.
-            return [];
-        }
+        $mollieOrderId = $this->tryGetMollieOrderId($order);
 
         try {
             $payment = $this->mollieOrderApi->getCompletedPayment($mollieOrderId, $order->getSalesChannelId());
@@ -202,18 +176,15 @@ class RefundService
     /**
      * @param OrderEntity $order
      * @return float
+     * @throws CouldNotExtractMollieOrderIdException
      */
     public function getRemainingAmount(OrderEntity $order): float
     {
         try {
-            $mollieOrderId = $this->orderService->getMollieOrderId($order);
-        } catch (CouldNotExtractMollieOrderIdException $e) {
-            // This may not be a Mollie order.
-            return 0;
-        }
-
-        try {
-            $payment = $this->mollieOrderApi->getCompletedPayment($mollieOrderId, $order->getSalesChannelId());
+            $payment = $this->mollieOrderApi->getCompletedPayment(
+                $this->tryGetMollieOrderId($order),
+                $order->getSalesChannelId()
+            );
         } catch (PaymentNotFoundException $e) {
             // This mollie order may not be paid yet, so theres nothing to be refunded
             return 0;
@@ -225,23 +196,35 @@ class RefundService
     /**
      * @param OrderEntity $order
      * @return float
+     * @throws CouldNotExtractMollieOrderIdException
      */
     public function getRefundedAmount(OrderEntity $order): float
     {
         try {
-            $mollieOrderId = $this->orderService->getMollieOrderId($order);
-        } catch (CouldNotExtractMollieOrderIdException $e) {
-            // This may not be a Mollie order.
-            return 0;
-        }
-
-        try {
-            $payment = $this->mollieOrderApi->getCompletedPayment($mollieOrderId, $order->getSalesChannelId());
+            $payment = $this->mollieOrderApi->getCompletedPayment(
+                $this->tryGetMollieOrderId($order),
+                $order->getSalesChannelId()
+            );
         } catch (PaymentNotFoundException $e) {
             // This mollie order may not be paid yet, so theres nothing to be refunded
             return 0;
         }
 
         return $payment->getAmountRefunded();
+    }
+
+    /**
+     * @param OrderEntity $order
+     * @return string
+     * @throws CouldNotExtractMollieOrderIdException
+     */
+    private function tryGetMollieOrderId(OrderEntity $order): string
+    {
+        try {
+            return $this->orderService->getMollieOrderId($order);
+        } catch (CouldNotExtractMollieOrderIdException $e) {
+            $this->logger->warning($e->getMessage());
+            throw $e;
+        }
     }
 }
