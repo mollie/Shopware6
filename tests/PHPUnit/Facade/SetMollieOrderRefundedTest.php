@@ -74,7 +74,7 @@ class SetMollieOrderRefundedTest extends TestCase
      * @param float|null $expectedRefund
      * @dataProvider getRefundsTestData
      */
-    public function atestThatRefundIsDone(
+    public function testThatRefundIsDone(
         float $amountTotal,
         float $amountRefunded,
         ?float $expectedRefund
