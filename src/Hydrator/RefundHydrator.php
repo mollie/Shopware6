@@ -8,12 +8,12 @@ class RefundHydrator
 {
     /**
      * @param Refund $refund
-     * @return array
+     * @return array<string, mixed>
      */
     public function hydrate(Refund $refund): array
     {
         $amount = null;
-        if (!is_null($refund->amount)) {
+        if ($refund->amount instanceof \stdClass) {
             $amount = [
                 'value' => $refund->amount->value,
                 'currency' => $refund->amount->currency,
@@ -21,7 +21,7 @@ class RefundHydrator
         }
 
         $settlementAmount = null;
-        if (!is_null($refund->settlementAmount)) {
+        if ($refund->settlementAmount instanceof \stdClass) {
             $settlementAmount = [
                 'value' => $refund->settlementAmount->value,
                 'currency' => $refund->settlementAmount->currency,
