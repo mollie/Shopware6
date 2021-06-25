@@ -5,11 +5,11 @@ namespace Kiener\MolliePayments\Facade;
 use Kiener\MolliePayments\Exception\MissingMollieOrderId;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Helper\PaymentStatusHelper;
+use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Exceptions\IncompatiblePlatform;
-use Mollie\Api\Types\PaymentStatus;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\Exception\CustomerCanceledAsyncPaymentException;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -70,7 +70,7 @@ class MolliePaymentFinalize
             $salesChannelContext->getContext()
         );
 
-        if ($paymentStatus === PaymentStatus::STATUS_CANCELED || $paymentStatus === PaymentStatus::STATUS_FAILED) {
+        if (MolliePaymentStatus::isFailedStatus($paymentStatus)) {
             $this->transactionTransitionService->reOpenTransaction(
                 $transactionStruct->getOrderTransaction(),
                 $salesChannelContext->getContext()

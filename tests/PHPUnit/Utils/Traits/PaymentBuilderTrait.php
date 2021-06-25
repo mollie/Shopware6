@@ -138,7 +138,7 @@ trait PaymentBuilderTrait
         return new OrderLineItemCollection([$lineItemOne, $lineItemTwo]);
     }
 
-    private function getOrderEntity(
+    public function getOrderEntity(
         float $amountTotal,
         string $taxStatus,
         CurrencyEntity $currency,

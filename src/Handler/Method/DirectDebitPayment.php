@@ -21,11 +21,7 @@ class DirectDebitPayment extends PaymentHandler
         CustomerEntity $customer
     ): array
     {
-        $consumerName = $orderData['payment']['consumerName'] ?? '';
-
-        if (empty($consumerName)) {
-            $orderData['payment']['consumerName'] = sprintf('%s %s', $customer->getFirstName(), $customer->getLastName());
-        }
+        $orderData['payment']['consumerName'] = sprintf('%s %s', $customer->getFirstName(), $customer->getLastName());
 
         return $orderData;
     }

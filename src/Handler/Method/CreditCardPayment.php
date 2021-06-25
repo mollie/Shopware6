@@ -50,12 +50,8 @@ class CreditCardPayment extends PaymentHandler
             return $orderData;
         }
 
-        $orderCardToken = $orderData['payment']['cardToken'] ?? '';
-
-        if (empty($orderCardToken)) {
-            $orderData['payment']['cardToken'] = $cardToken;
-            $this->customerService->setCardToken($customer, '', $salesChannelContext->getContext());
-        }
+        $orderData['payment']['cardToken'] = $cardToken;
+        $this->customerService->setCardToken($customer, '', $salesChannelContext->getContext());
 
         return $orderData;
     }

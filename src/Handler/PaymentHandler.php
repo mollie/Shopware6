@@ -104,23 +104,27 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
     {
         try {
             $paymentUrl = $this->payFacade->preparePayProcessAtMollie($this->paymentMethod, $transaction, $salesChannelContext, $this);
-        } catch (Throwable $exception) {
-            $logException = null;
-            $logLevel = Logger::CRITICAL;
-
-            if ($exception instanceof \Exception) {
-                $logException = $exception;
-                $logLevel = Logger::ERROR;
-            }
-
+        } catch (\Exception $exception) {
             $this->logger->addEntry(
                 $exception->getMessage(),
                 $salesChannelContext->getContext(),
-                $logException,
+                $exception,
                 [
                     'function' => 'order-prepare',
                 ],
-                $logLevel
+                Logger::ERROR
+            );
+
+            throw new PaymentUrlException($transaction->getOrderTransaction()->getId(), $exception->getMessage());
+        } catch (Throwable $exception) {
+            $this->logger->addEntry(
+                $exception->getMessage(),
+                $salesChannelContext->getContext(),
+                null,
+                [
+                    'function' => 'order-prepare',
+                ],
+                Logger::CRITICAL
             );
 
             throw new PaymentUrlException($transaction->getOrderTransaction()->getId(), $exception->getMessage());

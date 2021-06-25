@@ -463,6 +463,11 @@ class ApplePayDirectController extends StorefrontController
         ) {
             try {
                 $asyncTransactionStruct = new AsyncPaymentTransactionStruct($transaction, $order, $returnUrl);
+
+                if ($this->paymentHandler instanceof ApplePayPayment) {
+                    $this->paymentHandler->setToken($request->get('paymentToken'));
+                }
+
                 $mollieOrder = $this->molliePaymentDoPay->preparePayProcessAtMollie(
                     ApplePayPayment::PAYMENT_METHOD_NAME,
                     $asyncTransactionStruct,
