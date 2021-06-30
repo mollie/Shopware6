@@ -556,6 +556,14 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
          */
         $locale = $order->getLanguage() !== null ? $order->getLanguage()->getLocale() : null;
 
+        $mollieRedirectURL = $this->router->generate(
+            'frontend.mollie.payment',
+            [
+                'transactionId' => $transactionId,
+            ],
+            $this->router::ABSOLUTE_URL
+        );
+
         /**
          * Build an array of order data to send in the request
          * to Mollie's Orders API to create an order payment.
@@ -565,10 +573,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
                 $currency !== null ? $currency->getIsoCode() : 'EUR',
                 $order->getAmountTotal()
             ),
-            self::FIELD_REDIRECT_URL => $this->router->generate('frontend.mollie.payment', [
-                'transactionId' => $transactionId,
-                'returnUrl' => urlencode($returnUrl),
-            ], $this->router::ABSOLUTE_URL),
+            self::FIELD_REDIRECT_URL => $mollieRedirectURL,
             self::FIELD_LOCALE => $locale !== null ? $locale->getCode() : null,
             self::FIELD_METHOD => $paymentMethod,
             self::FIELD_ORDER_NUMBER => $order->getOrderNumber(),
