@@ -46,8 +46,7 @@ class Przelewy24OrderBuilderTest extends AbstractMollieOrderBuilder
             'method' => $paymentMethod,
             'orderNumber' => $orderNumber,
             'payment' => [
-                'webhookUrl' => $redirectWebhookUrl,
-                'billingEmail' => $this->email
+                'webhookUrl' => $redirectWebhookUrl
             ],
             'redirectUrl' => $redirectWebhookUrl,
             'webhookUrl' => $redirectWebhookUrl,

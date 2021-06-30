@@ -46,8 +46,7 @@ class KbcOrderBuilderTest extends AbstractMollieOrderBuilder
             'method' => $paymentMethod,
             'orderNumber' => $orderNumber,
             'payment' => [
-                'webhookUrl' => $redirectWebhookUrl,
-                'description' => substr($orderNumber, -(KbcPayment::KBC_DESCRIPTION_LENGTH))
+                'webhookUrl' => $redirectWebhookUrl
             ],
             'redirectUrl' => $redirectWebhookUrl,
             'webhookUrl' => $redirectWebhookUrl,
