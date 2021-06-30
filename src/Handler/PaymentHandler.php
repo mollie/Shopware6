@@ -31,7 +31,6 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
     protected const FIELD_ORDER_NUMBER = 'orderNumber';
     protected const FIELD_BILLING_ADDRESS = 'billingAddress';
     protected const FIELD_BILLING_EMAIL = 'billingEmail';
-    protected const FIELD_PAYMENT = 'payment';
 
     /** @var string */
     protected $paymentMethod;
