@@ -28,12 +28,6 @@ class Przelewy24Payment extends PaymentHandler
         CustomerEntity $customer
     ): array
     {
-        $billingmail = $orderData['payment']['billingEmail'] ?? '';
-
-        if (empty($billingmail)) {
-            $orderData['payment']['billingEmail'] = $customer->getEmail();
-        }
-
         return $orderData;
     }
 }

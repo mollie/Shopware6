@@ -22,16 +22,6 @@ class KbcPayment extends PaymentHandler
         CustomerEntity $customer
     ): array
     {
-        $description = $orderData['payment']['description'] ?? '';
-        $issuer = $orderData['payment']['issuer'] ?? '';
-        if (empty($description)) {
-            $orderData['payment']['description'] = substr($orderData['orderNumber'], -static::KBC_DESCRIPTION_LENGTH);
-        }
-
-        if (empty($issuer)) {
-            // ToDo: Pas zodra ingebouwd in frontent, gebeurt voorlopig niet
-        }
-
         return $orderData;
     }
 }
