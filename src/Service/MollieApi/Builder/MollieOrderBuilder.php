@@ -108,8 +108,7 @@ class MollieOrderBuilder
         $redirectUrl = $this->router->generate(
             'frontend.mollie.payment',
             [
-                'transactionId' => $transactionId,
-                'returnUrl' => urlencode($returnUrl),
+                'transactionId' => $transactionId
             ],
             $this->router::ABSOLUTE_URL
         );
