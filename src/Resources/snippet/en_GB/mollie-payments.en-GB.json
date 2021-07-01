@@ -1,6 +1,9 @@
 {
   "molliePayments": {
-    "messages": {
+      "testMode": {
+          "label": "(Test mode)"
+      },
+      "messages": {
       "payment": {
         "error": "Payment failed",
         "failed": "The payment is failed or was canceled. You will be redirected to Mollie, where you can finish your payment with the method of your choice. ",

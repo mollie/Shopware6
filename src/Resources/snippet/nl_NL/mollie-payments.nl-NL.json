@@ -1,6 +1,9 @@
 {
   "molliePayments": {
-    "messages": {
+      "testMode": {
+          "label": "(testmodus)"
+      },
+      "messages": {
       "payment": {
         "error": "Betaling mislukt",
         "failed": "De betaling is mislukt of geannuleerd. U wordt doorgestuurd naar Mollie waar u uw betaling kunt afronden met de methode naar keuze. ",
