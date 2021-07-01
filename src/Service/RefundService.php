@@ -79,7 +79,7 @@ class RefundService
 
             return $refund instanceof Refund;
         } catch (ApiException $e) {
-            throw new CouldNotCreateMollieRefundException($mollieOrderId, $order->getOrderNumber());
+            throw new CouldNotCreateMollieRefundException($mollieOrderId, $order->getOrderNumber(), $e);
         }
     }
 
