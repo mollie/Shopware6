@@ -147,6 +147,11 @@ class MolliePaymentDoPay
                 );
             }
 
+            $customFieldsStruct->setMolliePaymentUrl($url);
+            // save customfields because shopware return url could have changed
+            // e.g. if changedPayment Parameter has to be added the shopware payment token changes
+            $this->updateOrderCustomFields->updateOrder($order->getId(), $customFieldsStruct, $salesChannelContext);
+
             return $url;
         }
 
