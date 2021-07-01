@@ -344,7 +344,7 @@ class RefundsServiceTest extends TestCase
                 true,
                 PaymentStatus::STATUS_OPEN,
                 [],
-                null
+                PaymentNotFoundException::class
             ],
             'Mollie order, payment paid' => [
                 1,
@@ -388,7 +388,7 @@ class RefundsServiceTest extends TestCase
                 true,
                 PaymentStatus::STATUS_OPEN,
                 24.99,
-                null
+                PaymentNotFoundException::class
             ],
             'Mollie order, payment paid' => [
                 24.99,
