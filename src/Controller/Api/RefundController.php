@@ -5,6 +5,8 @@ namespace Kiener\MolliePayments\Controller\Api;
 use Kiener\MolliePayments\Exception\CouldNotCancelMollieRefundException;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieRefundException;
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
+use Kiener\MolliePayments\Exception\CouldNotFetchMollieOrderException;
+use Kiener\MolliePayments\Exception\CouldNotFetchMollieRefundsException;
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\RefundService;
@@ -191,7 +193,7 @@ class RefundController extends AbstractController
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
-        } catch (CouldNotCreateMollieRefundException | CouldNotExtractMollieOrderIdException | PaymentNotFoundException $e) {
+        } catch (CouldNotCreateMollieRefundException | CouldNotExtractMollieOrderIdException | CouldNotFetchMollieOrderException | PaymentNotFoundException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], 500);
         }
@@ -216,7 +218,7 @@ class RefundController extends AbstractController
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
-        } catch (CouldNotCancelMollieRefundException | CouldNotExtractMollieOrderIdException | PaymentNotFoundException $e) {
+        } catch (CouldNotCancelMollieRefundException | CouldNotExtractMollieOrderIdException | CouldNotFetchMollieOrderException | PaymentNotFoundException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], 500);
         }
@@ -240,6 +242,12 @@ class RefundController extends AbstractController
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
+        } catch (CouldNotExtractMollieOrderIdException | CouldNotFetchMollieOrderException | CouldNotFetchMollieRefundsException $e) {
+            $this->logger->error($e->getMessage());
+            return $this->json(['message' => $e->getMessage()], 500);
+        } catch (PaymentNotFoundException $e) {
+            // This indicates there is no completed payment for this order, so there are no refunds yet.
+            $refunds = [];
         }
 
         return $this->json($refunds ?? []);
@@ -254,13 +262,20 @@ class RefundController extends AbstractController
     {
         try {
             $order = $this->getValidOrder($orderId, $context);
+
+            $remaining = $this->refundService->getRemainingAmount($order);
+            $refunded = $this->refundService->getRefundedAmount($order);
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
+        } catch (CouldNotExtractMollieOrderIdException | CouldNotFetchMollieOrderException $e) {
+            $this->logger->error($e->getMessage());
+            return $this->json(['message' => $e->getMessage()], 500);
+        } catch (PaymentNotFoundException $e) {
+            // This indicates there is no completed payment for this order, so there are no refunds yet.
+            $remaining = 0;
+            $refunded = 0;
         }
-
-        $remaining = $this->refundService->getRemainingAmount($order);
-        $refunded = $this->refundService->getRefundedAmount($order);
 
         return $this->json(compact('remaining', 'refunded'));
     }

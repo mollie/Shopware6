@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Service;
 use Kiener\MolliePayments\Exception\CouldNotCancelMollieRefundException;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieRefundException;
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
+use Kiener\MolliePayments\Exception\CouldNotFetchMollieOrderException;
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieRefundsException;
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Hydrator\RefundHydrator;
@@ -57,6 +58,7 @@ class RefundService
      * @return bool
      * @throws CouldNotCreateMollieRefundException
      * @throws CouldNotExtractMollieOrderIdException
+     * @throws CouldNotFetchMollieOrderException
      * @throws PaymentNotFoundException
      */
     public function refund(OrderEntity $order, float $amount, ?string $description = null): bool
@@ -87,6 +89,7 @@ class RefundService
      * @return bool
      * @throws CouldNotCancelMollieRefundException
      * @throws CouldNotExtractMollieOrderIdException
+     * @throws CouldNotFetchMollieOrderException
      * @throws PaymentNotFoundException
      */
     public function cancel(OrderEntity $order, string $refundId): bool
@@ -125,17 +128,15 @@ class RefundService
      * @param OrderEntity $order
      * @return array
      * @throws CouldNotExtractMollieOrderIdException
+     * @throws CouldNotFetchMollieOrderException
+     * @throws CouldNotFetchMollieRefundsException
+     * @throws PaymentNotFoundException
      */
     public function getRefunds(OrderEntity $order): array
     {
         $mollieOrderId = $this->tryGetMollieOrderId($order);
 
-        try {
-            $payment = $this->mollieOrderApi->getCompletedPayment($mollieOrderId, $order->getSalesChannelId());
-        } catch (PaymentNotFoundException $e) {
-            // This mollie order may not be paid yet, so there can't be any refunds.
-            return [];
-        }
+        $payment = $this->mollieOrderApi->getCompletedPayment($mollieOrderId, $order->getSalesChannelId());
 
         try {
             $refundsArray = [];
@@ -154,18 +155,15 @@ class RefundService
      * @param OrderEntity $order
      * @return float
      * @throws CouldNotExtractMollieOrderIdException
+     * @throws CouldNotFetchMollieOrderException
+     * @throws PaymentNotFoundException
      */
     public function getRemainingAmount(OrderEntity $order): float
     {
-        try {
-            $payment = $this->mollieOrderApi->getCompletedPayment(
-                $this->tryGetMollieOrderId($order),
-                $order->getSalesChannelId()
-            );
-        } catch (PaymentNotFoundException $e) {
-            // This mollie order may not be paid yet, so theres nothing to be refunded
-            return 0;
-        }
+        $payment = $this->mollieOrderApi->getCompletedPayment(
+            $this->tryGetMollieOrderId($order),
+            $order->getSalesChannelId()
+        );
 
         return $payment->getAmountRemaining();
     }
@@ -174,18 +172,15 @@ class RefundService
      * @param OrderEntity $order
      * @return float
      * @throws CouldNotExtractMollieOrderIdException
+     * @throws CouldNotFetchMollieOrderException
+     * @throws PaymentNotFoundException
      */
     public function getRefundedAmount(OrderEntity $order): float
     {
-        try {
-            $payment = $this->mollieOrderApi->getCompletedPayment(
-                $this->tryGetMollieOrderId($order),
-                $order->getSalesChannelId()
-            );
-        } catch (PaymentNotFoundException $e) {
-            // This mollie order may not be paid yet, so theres nothing to be refunded
-            return 0;
-        }
+        $payment = $this->mollieOrderApi->getCompletedPayment(
+            $this->tryGetMollieOrderId($order),
+            $order->getSalesChannelId()
+        );
 
         return $payment->getAmountRefunded();
     }
