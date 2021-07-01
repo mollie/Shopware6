@@ -36,14 +36,13 @@ class Order
      * @param string $salesChannelId
      * @param array $parameters
      * @return MollieOrder
-     * @throws ApiException
-     * @throws IncompatiblePlatform
+     * @throws CouldNotFetchMollieOrderException
      */
     public function getMollieOrder(string $mollieOrderId, string $salesChannelId, array $parameters = []): MollieOrder
     {
-        $apiClient = $this->clientFactory->getClient($salesChannelId);
-
         try {
+            $apiClient = $this->clientFactory->getClient($salesChannelId);
+
             return $apiClient->orders->get($mollieOrderId, $parameters);
         } catch (ApiException $e) {
             $this->logger->error(
@@ -54,7 +53,7 @@ class Order
                 )
             );
 
-            throw $e;
+            throw new CouldNotFetchMollieOrderException($mollieOrderId, $e);
         }
     }
 
@@ -85,14 +84,12 @@ class Order
      * @param string $mollieOrderId
      * @param string $salesChannelId
      * @return Payment
+     * @throws CouldNotFetchMollieOrderException
+     * @throws PaymentNotFoundException
      */
     public function getCompletedPayment(string $mollieOrderId, string $salesChannelId): Payment
     {
-        try {
-            $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId, ['embed' => 'payments']);
-        } catch (ApiException $e) {
-            throw new CouldNotFetchMollieOrderException($mollieOrderId);
-        }
+        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId, ['embed' => 'payments']);
 
         if ($mollieOrder->payments()->count() === 0) {
             throw new PaymentNotFoundException($mollieOrderId);

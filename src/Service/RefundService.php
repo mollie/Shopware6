@@ -10,6 +10,7 @@ use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Hydrator\RefundHydrator;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Mollie\Api\Exceptions\ApiException;
+use Mollie\Api\Exceptions\IncompatiblePlatform;
 use Mollie\Api\Resources\Refund;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -62,19 +63,7 @@ class RefundService
     {
         $mollieOrderId = $this->tryGetMollieOrderId($order);
 
-        try {
-            $payment = $this->mollieOrderApi->getCompletedPayment($mollieOrderId, $order->getSalesChannelId());
-        } catch (PaymentNotFoundException $e) {
-            $this->logger->error(
-                sprintf(
-                    "Refund called on a Mollie order without a completed payment (Order number %s, Mollie Order ID %s)",
-                    $order->getOrderNumber(),
-                    $mollieOrderId
-                )
-            );
-
-            throw $e;
-        }
+        $payment = $this->mollieOrderApi->getCompletedPayment($mollieOrderId, $order->getSalesChannelId());
 
         try {
             $refund = $payment->refund([
@@ -104,26 +93,14 @@ class RefundService
     {
         $mollieOrderId = $this->tryGetMollieOrderId($order);
 
-        try {
-            $payment = $this->mollieOrderApi->getCompletedPayment($mollieOrderId, $order->getSalesChannelId());
-        } catch (PaymentNotFoundException $e) {
-            $this->logger->error(
-                sprintf(
-                    "Cancel refund called on a Mollie order without a completed payment (Order number %s, Mollie Order ID %s)",
-                    $order->getOrderNumber(),
-                    $mollieOrderId
-                )
-            );
-
-            throw $e;
-        }
+        $payment = $this->mollieOrderApi->getCompletedPayment($mollieOrderId, $order->getSalesChannelId());
 
         try {
             // getRefund doesn't contain all necessary @throws tags.
             // It is possible for it to throw an ApiException here if $refundId is incorrect.
             $refund = $payment->getRefund($refundId);
         } catch (ApiException $e) { // Invalid resource id
-            return false;
+            throw new CouldNotCancelMollieRefundException($mollieOrderId, $order->getOrderNumber(), $refundId, $e);
         }
 
         // This payment does not have a refund with $refundId, so we cannot cancel it.
@@ -140,7 +117,7 @@ class RefundService
             $refund->cancel();
             return true;
         } catch (ApiException $e) {
-            throw new CouldNotCancelMollieRefundException($mollieOrderId, $order->getOrderNumber(), $refundId);
+            throw new CouldNotCancelMollieRefundException($mollieOrderId, $order->getOrderNumber(), $refundId, $e);
         }
     }
 
@@ -169,7 +146,7 @@ class RefundService
 
             return $refundsArray;
         } catch (ApiException $e) {
-            throw new CouldNotFetchMollieRefundsException($mollieOrderId, $order->getOrderNumber());
+            throw new CouldNotFetchMollieRefundsException($mollieOrderId, $order->getOrderNumber(), $e);
         }
     }
 
