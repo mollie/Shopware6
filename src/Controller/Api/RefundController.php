@@ -33,12 +33,6 @@ class RefundController extends AbstractController
     /** @var OrderService */
     private $orderService;
 
-    /** @var OrderTransactionStateHandler */
-    private $orderTransactionStateHandler;
-
-    /** @var SettingsService */
-    private $settingsService;
-
     /** @var RefundService */
     private $refundService;
 
@@ -47,22 +41,16 @@ class RefundController extends AbstractController
      *
      * @param LoggerInterface $logger
      * @param OrderService $orderService
-     * @param OrderTransactionStateHandler $orderTransactionStateHandler
-     * @param SettingsService $settingsService
      * @param RefundService $refundService
      */
     public function __construct(
         LoggerInterface $logger,
         OrderService $orderService,
-        OrderTransactionStateHandler $orderTransactionStateHandler,
-        SettingsService $settingsService,
         RefundService $refundService
     )
     {
         $this->logger = $logger;
         $this->orderService = $orderService;
-        $this->orderTransactionStateHandler = $orderTransactionStateHandler;
-        $this->settingsService = $settingsService;
         $this->refundService = $refundService;
     }
 
