@@ -6,7 +6,6 @@ parameters:
         - ./src/Controller/*
         - ./src/Handler/*
         - ./src/Helper/*
-        - ./src/Hydrator/*
         - ./src/Resources/*
         - ./src/Service/*
         - ./src/Storefront/*
