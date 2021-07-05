@@ -13,7 +13,7 @@ export default class AdminOrdersAction {
     openOrders() {
         cy.get('.sw-order').click();
 
-        if (shopware.getVersion() >= 6.4) {
+        if (shopware.isVersionGreaterEqual(6.4)) {
             cy.wait(500);
             cy.get('.sw-order > .sw-admin-menu__sub-navigation-list > .sw-admin-menu__navigation-list-item > .sw-admin-menu__navigation-link').click();
             cy.wait(500);

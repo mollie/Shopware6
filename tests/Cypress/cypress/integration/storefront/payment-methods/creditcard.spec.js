@@ -48,7 +48,7 @@ describe('Credit Card Components', () => {
 
                 // we are still in our modal, so we
                 // have to close it in older versions
-                if (shopware.getVersion() < 6.4) {
+                if (shopware.isVersionLower(6.4)) {
                     payment.closePaymentsModal();
                 }
 
@@ -72,7 +72,7 @@ describe('Credit Card Components', () => {
 
                 payment.fillCreditCardComponents(' ', validCardNumber, '1228', '1234');
 
-                if (shopware.getVersion() >= 6.4) {
+                if (shopware.isVersionGreaterEqual(6.4)) {
                     checkout.placeOrderOnConfirm();
                 } else {
                     payment.closePaymentsModal();
@@ -89,7 +89,7 @@ describe('Credit Card Components', () => {
 
                 payment.fillCreditCardComponents('Mollie Tester', '3782', '1228', '1234');
 
-                if (shopware.getVersion() >= 6.4) {
+                if (shopware.isVersionGreaterEqual(6.4)) {
                     checkout.placeOrderOnConfirm();
                 } else {
                     payment.closePaymentsModal();
@@ -106,7 +106,7 @@ describe('Credit Card Components', () => {
 
                 payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '12', '1234');
 
-                if (shopware.getVersion() >= 6.4) {
+                if (shopware.isVersionGreaterEqual(6.4)) {
                     checkout.placeOrderOnConfirm();
                 } else {
                     payment.closePaymentsModal();
@@ -123,7 +123,7 @@ describe('Credit Card Components', () => {
 
                 payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '1228', '124');
 
-                if (shopware.getVersion() >= 6.4) {
+                if (shopware.isVersionGreaterEqual(6.4)) {
                     checkout.placeOrderOnConfirm();
                 } else {
                     payment.closePaymentsModal();
@@ -152,7 +152,7 @@ function setUp() {
     // before switching back to credit card
     payment.switchPaymentMethod('PayPal');
 
-    if (shopware.getVersion() >= 6.4) {
+    if (shopware.isVersionGreaterEqual(6.4)) {
         payment.switchPaymentMethod('Credit card');
     } else {
         payment.openPaymentsModal();
