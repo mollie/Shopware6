@@ -48,7 +48,7 @@ export default class PaymentAction {
      * @version All Shopware versions.
      */
     switchPaymentMethod(paymentName) {
-        if (shopware.getVersion() >= 6.4) {
+        if (shopware.isVersionGreaterEqual(6.4)) {
             // this version has all payment methods
             // directly on the confirm page.
             // but we need to expand the whole list

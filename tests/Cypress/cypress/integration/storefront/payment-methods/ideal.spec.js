@@ -37,7 +37,7 @@ describe('iDEAL Issuers', () => {
 
                 scenarioDummyBasket.execute();
 
-                if (shopware.getVersion() >= 6.4) {
+                if (shopware.isVersionGreaterEqual(6.4)) {
                     paymentAction.showAllPaymentMethods();
                 } else {
                     paymentAction.openPaymentsModal();
