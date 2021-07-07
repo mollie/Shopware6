@@ -29,7 +29,7 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
 
     public function processTransaction(OrderTransactionEntity $transaction, Context $context): void
     {
-        if ($transaction->getStateMachineState()->getName() === OrderTransactionStates::STATE_IN_PROGRESS) {
+        if ($transaction->getStateMachineState()->getTechnicalName() === OrderTransactionStates::STATE_IN_PROGRESS) {
             return;
         }
 
@@ -45,7 +45,7 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
 
     public function reOpenTransaction(OrderTransactionEntity $transaction, Context $context): void
     {
-        if ($transaction->getStateMachineState()->getName() === OrderTransactionStates::STATE_OPEN) {
+        if ($transaction->getStateMachineState()->getTechnicalName() === OrderTransactionStates::STATE_OPEN) {
             return;
         }
 
