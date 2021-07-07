@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Facade;
 
 use Kiener\MolliePayments\Exception\CouldNotSetRefundAtMollieException;
+use Kiener\MolliePayments\Exception\MissingSalesChannelInOrder;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Service\TransactionService;
@@ -10,6 +11,7 @@ use Mollie\Api\Exceptions\ApiException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class SetMollieOrderRefunded
 {
@@ -70,7 +72,13 @@ class SetMollieOrderRefunded
             );
         }
 
-        $apiClient = $this->apiFactory->getClient($order->getSalesChannelId(), $context);
+        $salesChannel = $order->getSalesChannel();
+
+        if (!$salesChannel instanceof SalesChannelEntity) {
+            throw new MissingSalesChannelInOrder($order->getOrderNumber() ?? $order->getId());
+        }
+
+        $apiClient = $this->apiFactory->getClient($salesChannel->getId(), $context);
 
         try {
             $mollieOrder = $apiClient->orders->get($mollieOrderId);

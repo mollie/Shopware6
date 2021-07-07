@@ -26,7 +26,7 @@ class Order
         $this->logger = $logger;
     }
 
-    public function getMollieOrder(string $mollieOrderId, string $salesChannelId): MollieOrder
+    public function getMollieOrder(string $mollieOrderId, ?string $salesChannelId): MollieOrder
     {
         $apiClient = $this->clientFactory->getClient($salesChannelId);
 
@@ -52,7 +52,7 @@ class Order
         return $mollieOrder->status === 'created' ? $mollieOrder->getCheckoutUrl() : null;
     }
 
-    public function setShipment(string $mollieOrderId, string $salesChannelId): bool
+    public function setShipment(string $mollieOrderId, ?string $salesChannelId): bool
     {
         $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId);
 

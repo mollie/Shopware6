@@ -95,7 +95,7 @@ class NotificationFacade
 
         # --------------------------------------------------------------------------------------------
 
-        $this->gatewayMollie->switchClient($contextSC->getSalesChannelId());
+        $this->gatewayMollie->switchClient($contextSC->getSalesChannel()->getId());
 
         # fetch the order of our mollie ID
         # from our sales channel mollie profile
