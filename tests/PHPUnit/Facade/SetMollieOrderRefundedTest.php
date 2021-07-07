@@ -16,6 +16,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEnti
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Uuid\Uuid;
+use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class SetMollieOrderRefundedTest extends TestCase
 {
@@ -148,7 +149,9 @@ class SetMollieOrderRefundedTest extends TestCase
     {
         $order = new OrderEntity();
         $order->setId($orderId);
-        $order->setSalesChannelId($salesChannelId);
+        $salesChannel = $this->getMockBuilder(SalesChannelEntity::class)->disableOriginalConstructor()->getMock();
+        $salesChannel->method('getId')->willReturn($salesChannelId);
+        $order->setSalesChannel($salesChannel);
 
         if (!empty($customFields)) {
             $order->setCustomFields($customFields);

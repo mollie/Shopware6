@@ -42,7 +42,7 @@ class TestModeNotificationSubscriber implements EventSubscriberInterface
 
     public function addTestModeInformationToPages(PageLoadedEvent $event): void
     {
-        $settings = $this->settingsService->getSettings($event->getSalesChannelContext()->getSalesChannelId());
+        $settings = $this->settingsService->getSettings($event->getSalesChannelContext()->getSalesChannel()->getId());
         $event->getPage()->addExtension('MollieTestModePageExtension', new TestModePageExtensionStruct($settings->isTestMode()));
     }
 }

@@ -156,14 +156,14 @@ class ShippingController extends AbstractController
             && $quantity > 0
         ) {
             $apiClient = $this->apiFactory->createClient(
-                $orderLineItem->getOrder()->getSalesChannelId()
+                $orderLineItem->getOrder()->getSalesChannel()->getId()
             );
         }
 
         if ($apiClient !== null) {
             /** @var MollieSettingStruct $settings */
             $settings = $this->settingsService->getSettings(
-                $orderLineItem->getOrder()->getSalesChannelId()
+                $orderLineItem->getOrder()->getSalesChannel()->getId()
             );
 
             /** @var array $orderParameters */
@@ -310,14 +310,14 @@ class ShippingController extends AbstractController
             && $quantity > 0
         ) {
             $apiClient = $this->apiFactory->createClient(
-                $orderLineItem->getOrder()->getSalesChannelId()
+                $orderLineItem->getOrder()->getSalesChannel()->getId()
             );
         }
 
         if ($apiClient !== null) {
             /** @var MollieSettingStruct $settings */
             $settings = $this->settingsService->getSettings(
-                $orderLineItem->getOrder()->getSalesChannelId()
+                $orderLineItem->getOrder()->getSalesChannel()->getId()
             );
 
             /** @var array $orderParameters */

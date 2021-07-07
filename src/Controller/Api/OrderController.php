@@ -74,7 +74,7 @@ class OrderController extends AbstractController
         }
 
         return new JsonResponse([
-            'url' => $this->mollieOrderService->getPaymentUrl($mollieOrderId, $order->getSalesChannelId()),
+            'url' => $this->mollieOrderService->getPaymentUrl($mollieOrderId, $order->getSalesChannel()->getId()),
         ]);
     }
 }
