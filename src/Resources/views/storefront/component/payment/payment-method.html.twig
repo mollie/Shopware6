@@ -1,8 +1,33 @@
 {# compatible with >= sw6.4 #}
 {% sw_extends '@Storefront/storefront/component/payment/payment-method.html.twig' %}
 
+{% block component_payment_method_input %}
+    <input type="radio"
+           id="paymentMethod{{ payment.id }}"
+           name="paymentMethodId"
+           value="{{ payment.id }}"
+           {% if payment.id is same as(selectedPaymentMethodId) %}checked="checked"{% endif %}
+           class="custom-control-input payment-method-input {{ payment.translated.customFields.mollie_payment_method_name }}">
+{% endblock %}
+
+
 {% block component_payment_method_description %}
-    {{ parent() }}
+    {% if "MolliePayments" in payment.handlerIdentifier and page.extensions.MollieTestModePageExtension.testMode == true %}
+        <div class="payment-method-description">
+            <strong>{{ payment.translated.name }} {{ "molliePayments.testMode.label"|trans }}</strong>
+            {% if payment.translated.description %}
+                {% set paymentDescription = payment.translated.description|raw %}
+
+                {% if not payment.id is same as(selectedPaymentMethodId) %}
+                    {% set paymentDescription = (paymentDescription|length > 75 ? paymentDescription[:75] ~ ' ...' : paymentDescription) %}
+                {% endif %}
+
+                <p title="{{ payment.translated.description|raw }}">{{ paymentDescription }}</p>
+            {% endif %}
+        </div>
+    {% else %}
+        {{ parent() }}
+    {% endif %}
 
     {# load mollie creditcard components #}
     {% if payment.translated.customFields.mollie_payment_method_name == 'creditcard' %}

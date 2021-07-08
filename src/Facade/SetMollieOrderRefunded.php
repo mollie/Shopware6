@@ -8,6 +8,7 @@ use Kiener\MolliePayments\Service\TransactionService;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class SetMollieOrderRefunded
 {

@@ -9,10 +9,15 @@ help:
 
 install: ## Installs all dependencies
 	npm install cypress --save-dev --save .
-	npm install webpack --save-dev --save .
+	npm install webpack@4.18.1 --save-dev --save .
 	npm install @cypress/webpack-preprocessor --save-dev --save .
 	npm install @cucumber/tag-expressions --save-dev --save .
 	npm install axios --save-dev --save .
+
+clean: ## Clean all dependencies
+	rm -rf node_modules 
+	rm -rf package.json
+	rm -rf package-lock.json
 
 # ---------------------------------------------------------------------------------------------
 
@@ -21,20 +26,21 @@ ifndef url
 	$(warning Please provide the URL argument to Start Cypress!)
 	@exit 1
 endif
-	CYPRESS_BASE_URL=$(url) ./node_modules/.bin/cypress open --env conf=dev
+ifndef shopware
+	CYPRESS_BASE_URL=$(url) CYPRESS_SHOPWARE=6.4 ./node_modules/.bin/cypress open --env conf=dev
+else
+	CYPRESS_BASE_URL=$(url) CYPRESS_SHOPWARE=$(shopware) ./node_modules/.bin/cypress open --env conf=dev
+endif
 
 # ---------------------------------------------------------------------------------------------
 
-run: ## Runs all E2E tests for Shopware >= 6.4
+run: ## Runs all E2E tests for Shopware
 ifndef url
 	$(warning Please provide the URL argument to Start Cypress!)
 	@exit 1
 endif
-	CYPRESS_BASE_URL=$(url) ./node_modules/.bin/cypress run --env conf=dev --headless --spec 'cypress/integration/6.4/**/*'
-
-run-old: ## Runs all E2E tests for Shopware < 6.4
-ifndef url
-	$(warning Please provide the URL argument to Start Cypress!)
+ifndef shopware
+	$(warning Please provide the Shopware Version as argument to Start Cypress!)
 	@exit 1
 endif
-	CYPRESS_BASE_URL=$(url) ./node_modules/.bin/cypress run --env conf=dev --headless --spec 'cypress/integration/old/**/*'
+	CYPRESS_BASE_URL=$(url) CYPRESS_SHOPWARE=$(shopware) ./node_modules/.bin/cypress run --env conf=dev --headless --spec 'cypress/integration/**/*'

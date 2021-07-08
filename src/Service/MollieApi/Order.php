@@ -64,7 +64,7 @@ class Order
         return $mollieOrder->status === 'created' ? $mollieOrder->getCheckoutUrl() : null;
     }
 
-    public function setShipment(string $mollieOrderId, string $salesChannelId): bool
+    public function setShipment(string $mollieOrderId, ?string $salesChannelId): bool
     {
         $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId);
 
