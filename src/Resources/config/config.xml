@@ -78,7 +78,7 @@
         </input-field>
         <input-field type="bool">
             <name>createCustomersAtMollie</name>
-            <label>Do create customers at Mollie.</label>
+            <label>Create customers at Mollie.</label>
             <label lang="de-DE">Kunden bei Mollie anlegen.</label>
             <label lang="nl-NL">Klanten creëren bij Mollie.</label>
             <defaultValue>true</defaultValue>
