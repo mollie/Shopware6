@@ -13,7 +13,7 @@ export default class PDPRepository {
      * @returns {*}
      */
     getQuantity() {
-        return cy.get('.custom-select');
+        return cy.get('.col-4 > .custom-select');
     }
 
 }

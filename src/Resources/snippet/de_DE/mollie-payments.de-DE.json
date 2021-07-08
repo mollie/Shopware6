@@ -1,5 +1,8 @@
 {
   "molliePayments": {
+    "testMode": {
+        "label": "(Testmodus)"
+    },
     "messages": {
       "payment": {
         "error": "Zahlung fehlgeschlagen",

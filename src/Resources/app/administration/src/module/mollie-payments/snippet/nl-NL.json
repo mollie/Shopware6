@@ -26,9 +26,11 @@
   },
   "sw-order": {
     "detailExtended": {
+      "buttonMolliePaymentLink": "Kopieer naar Klembord",
       "columnRefunded": "Terugbetaald",
       "columnShipped": "Verzonden",
       "labelMollieOrderId": "Mollie Order ID",
+      "labelMolliePaymentLink": "Mollie Checkout URL",
       "totalRefunds": "Terugbetaald bedrag ({quantity} items)",
       "totalShipments": "Verzonden bedrag ({quantity} items)"
     }

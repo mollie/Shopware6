@@ -3,11 +3,10 @@
 namespace Kiener\MolliePayments\Subscriber;
 
 use Kiener\MolliePayments\Facade\MollieShipment;
-use Kiener\MolliePayments\Service\SettingsService;
-use Mollie\Api\MollieApiClient;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Shopware\Core\System\StateMachine\Event\StateMachineStateChangeEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Throwable;
 
 class OrderDeliverySubscriber implements EventSubscriberInterface
 {

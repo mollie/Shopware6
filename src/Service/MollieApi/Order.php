@@ -4,12 +4,12 @@ namespace Kiener\MolliePayments\Service\MollieApi;
 
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Mollie\Api\Exceptions\ApiException;
+use Mollie\Api\Resources\Order as MollieOrder;
 use Mollie\Api\Resources\OrderLine;
 use Psr\Log\LoggerInterface;
 
 class Order
 {
-
     /**
      * @var MollieApiFactory
      */
@@ -26,12 +26,12 @@ class Order
         $this->logger = $logger;
     }
 
-    public function setShipment(string $mollieOrderId, string $salesChannelId): bool
+    public function getMollieOrder(string $mollieOrderId, ?string $salesChannelId): MollieOrder
     {
         $apiClient = $this->clientFactory->getClient($salesChannelId);
 
         try {
-            $mollieOrder = $apiClient->orders->get($mollieOrderId);
+            return $apiClient->orders->get($mollieOrderId);
         } catch (ApiException $e) {
             $this->logger->error(
                 sprintf(
@@ -43,6 +43,18 @@ class Order
 
             throw $e;
         }
+    }
+
+    public function getPaymentUrl(string $mollieOrderId, string $salesChannelId): ?string
+    {
+        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId);
+
+        return $mollieOrder->status === 'created' ? $mollieOrder->getCheckoutUrl() : null;
+    }
+
+    public function setShipment(string $mollieOrderId, ?string $salesChannelId): bool
+    {
+        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId);
 
         /** @var OrderLine $orderLine */
         foreach ($mollieOrder->lines() as $orderLine) {

@@ -58,7 +58,7 @@ class OrderTransitionService implements OrderTransitionServiceInterface
      */
     public function openOrder(OrderEntity $order, Context $context): void
     {
-        if ($order->getStateMachineState()->getName() === OrderStates::STATE_OPEN) {
+        if ($order->getStateMachineState()->getTechnicalName() === OrderStates::STATE_OPEN) {
             return;
         }
 
@@ -80,7 +80,7 @@ class OrderTransitionService implements OrderTransitionServiceInterface
      */
     public function processOrder(OrderEntity $order, Context $context): void
     {
-        if ($order->getStateMachineState()->getName() === OrderStates::STATE_IN_PROGRESS) {
+        if ($order->getStateMachineState()->getTechnicalName() === OrderStates::STATE_IN_PROGRESS) {
             return;
         }
 
@@ -102,7 +102,7 @@ class OrderTransitionService implements OrderTransitionServiceInterface
      */
     public function completeOrder(OrderEntity $order, Context $context): void
     {
-        if ($order->getStateMachineState()->getName() === OrderStates::STATE_COMPLETED) {
+        if ($order->getStateMachineState()->getTechnicalName() === OrderStates::STATE_COMPLETED) {
             return;
         }
 
@@ -124,7 +124,7 @@ class OrderTransitionService implements OrderTransitionServiceInterface
      */
     public function cancelOrder(OrderEntity $order, Context $context): void
     {
-        if ($order->getStateMachineState()->getName() === OrderStates::STATE_CANCELLED) {
+        if ($order->getStateMachineState()->getTechnicalName() === OrderStates::STATE_CANCELLED) {
             return;
         }
 

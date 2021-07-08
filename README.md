@@ -13,6 +13,7 @@ Mollie offers various payment methods which can be easily integrated into your S
 2.  Go to  [Mollie](https://www.mollie.com/signup/)  to create a Mollie account
 3.  Download our plugin in the Shopware store or in the Plugin Manager in your Shopware Backend
 4.  Activate the plugin and enter your Mollie API key
+5.  Assign the payment methods to your sales channels as necessary 
 
 Once the onboarding process in your Mollie account is completed, start accepting payments. You’ll usually be up and running within one working day.
 
@@ -26,6 +27,8 @@ There are two ways of installing this plugin manually: You can either checkout t
 
 ## Finalizing steps
 To finalize the installation you need to enter your API key in the corresponding box. You can find yours in the [Mollie Dashboard](https://www.mollie.com/dashboard/payments). Click save and then enable the plugin. Your payment methods are now being installed.
+
+Also make sure to assign the payment methods to your sales channels, or they won't show up.
 
 ## Wiki
 Read more about the plugin configuration on [our Wiki](https://github.com/mollie/Shopware6/wiki).

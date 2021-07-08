@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Factory;
 
 use Exception;
+use Kiener\MolliePayments\MolliePayments;
 use Kiener\MolliePayments\Service\ConfigService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
@@ -84,7 +85,7 @@ class MollieApiFactory
 
             // @todo Add plugin version variable
             $this->apiClient->addVersionString(
-                'MollieShopware6/1.4.1'
+                'MollieShopware6/1.4.3'
             );
         } catch (Exception $e) {
             $this->logger->error($e->getMessage(), [$e]);

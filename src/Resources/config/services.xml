@@ -8,6 +8,7 @@
         <import resource="services/api.xml"/>
         <import resource="services/controller.xml"/>
         <import resource="services/facades.xml"/>
+        <import resource="services/gateways.xml"/>
         <import resource="services/services.xml"/>
         <import resource="services/snippets.xml"/>
         <import resource="services/subscriber.xml"/>
@@ -35,6 +36,12 @@
         <service id="Kiener\MolliePayments\Service\Order\OrderStateService" class="Kiener\MolliePayments\Service\Order\OrderStateService">
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderTransitionService"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater">
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStateService"/>
+            <argument type="service" id="Shopware\Core\System\StateMachine\StateMachineRegistry"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\Order\OrderTransitionService" class="Kiener\MolliePayments\Service\Order\OrderTransitionService">
@@ -164,13 +171,21 @@
             </call>
         </service>
 
-        <service id="Kiener\MolliePayments\Storefront\Controller\WebhookController" public="true">
-            <argument type="service" id="order_transaction.repository"/>
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
-            <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
+        <service id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter" public="false">
+        </service>
 
+        <service id="Kiener\MolliePayments\Facade\Notifications\NotificationFacade" public="false">
+            <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater"/>
+            <argument type="service" id="payment_method.repository"/>
+            <argument type="service" id="order_transaction.repository"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Storefront\Controller\WebhookController" public="true">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\Notifications\NotificationFacade"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
@@ -185,7 +200,6 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-
         <service id="Kiener\MolliePayments\Subscriber\OrderStateSubscriber" class="Kiener\MolliePayments\Subscriber\OrderStateSubscriber">
             <argument type="service" id="Mollie\Api\MollieApiClient"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
@@ -196,6 +210,11 @@
         <service id="Kiener\MolliePayments\Subscriber\PaymentMethodSubscriber" class="Kiener\MolliePayments\Subscriber\PaymentMethodSubscriber">
             <argument type="service" id="Mollie\Api\MollieApiClient"/>
             <argument type="service" id="payment_method.repository"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Subscriber\TestModeNotificationSubscriber" >
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <tag name="kernel.event_subscriber"/>
         </service>
     </services>

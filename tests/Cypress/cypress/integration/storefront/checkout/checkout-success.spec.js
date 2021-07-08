@@ -1,40 +1,32 @@
 import Devices from "Services/Devices";
 import Session from "Actions/utils/Session"
+import PaymentScreenAction from 'Actions/mollie/PaymentScreenAction';
+import IssuerScreenAction from 'Actions/mollie/IssuerScreenAction';
 // ------------------------------------------------------
 import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
 // ------------------------------------------------------
-import TopMenuAction from 'Actions/storefront/navigation/TopMenuAction';
-import LoginAction from 'Actions/storefront/account/LoginAction';
-import RegisterAction from 'Actions/storefront/account/RegisterAction';
-import ListingAction from 'Actions/storefront/products/ListingAction';
-import PDPAction from 'Actions/storefront/products/PDPAction';
 import CheckoutAction from 'Actions/storefront/checkout/CheckoutAction';
-import PaymentScreenAction from 'Actions/mollie/PaymentScreenAction';
-import IssuerScreenAction from 'Actions/mollie/IssuerScreenAction';
+import PaymentAction from "Actions/storefront/checkout/PaymentAction";
+import DummyBasketScenario from "Scenarios/DummyBasketScenario";
 
 
 const devices = new Devices();
 const session = new Session();
 
 const configAction = new ShopConfigurationAction();
-
-const topMenu = new TopMenuAction();
-const register = new RegisterAction();
-const login = new LoginAction();
-const listing = new ListingAction();
-const pdp = new PDPAction();
 const checkout = new CheckoutAction();
+const paymentAction = new PaymentAction();
 const molliePayment = new PaymentScreenAction();
 const mollieIssuer = new IssuerScreenAction();
 
+const scenarioDummyBasket = new DummyBasketScenario(3);
 
-const user_email = "dev@localhost.de";
-const user_pwd = "MollieMollie111";
 
 const device = devices.getFirstDevice();
 
 
 const payments = [
+    {key: 'card', name: 'Credit card'},
     {key: 'paypal', name: 'PayPal'},
     {key: 'klarnapaylater', name: 'Pay later'},
     {key: 'klarnasliceit', name: 'Slice it'},
@@ -54,8 +46,7 @@ context("Checkout Tests", () => {
 
     before(function () {
         devices.setDevice(device);
-        configAction.setupShop();
-        register.doRegister(user_email, user_pwd);
+        configAction.setupShop(true, false);
     })
 
     beforeEach(() => {
@@ -69,17 +60,9 @@ context("Checkout Tests", () => {
 
                 it('Pay with ' + payment.name, () => {
 
-                    cy.visit('/');
+                    scenarioDummyBasket.execute();
 
-                    login.doLogin(user_email, user_pwd);
-
-                    topMenu.clickOnHome();
-                    listing.clickOnFirstProduct();
-                    pdp.addToCart(3);
-
-                    checkout.goToCheckoutInOffCanvas();
-
-                    checkout.switchPaymentMethod(payment.name);
+                    paymentAction.switchPaymentMethod(payment.name);
 
                     let totalSum = 0;
                     // grab the total sum of our order from the confirm page.
@@ -104,7 +87,7 @@ context("Checkout Tests", () => {
                         molliePayment.selectAuthorized();
 
                     } else {
-                        
+
                         if (payment.key === 'kbc') {
                             mollieIssuer.selectKBC();
                         }
@@ -119,35 +102,6 @@ context("Checkout Tests", () => {
                 })
 
             })
-        })
-    })
-
-    describe('Failed Checkout', () => {
-        context(devices.getDescription(device), () => {
-
-            it('Failed payment with PayPal', () => {
-
-                cy.visit('/');
-
-                login.doLogin(user_email, user_pwd);
-
-                topMenu.clickOnHome();
-                listing.clickOnFirstProduct();
-                pdp.addToCart(1);
-                checkout.goToCheckoutInOffCanvas();
-
-                checkout.switchPaymentMethod('PayPal');
-                checkout.placeOrderOnConfirm();
-
-                molliePayment.selectFailed();
-
-                // verify that we are back in our shop
-                // if the payment fails, the order is finished but
-                // we still have the option to change the payment method
-                cy.url().should('include', '/mollie/payment/');
-                cy.contains('The payment is failed or was canceled.');
-            })
-
         })
     })
 

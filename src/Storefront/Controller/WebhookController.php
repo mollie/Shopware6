@@ -2,21 +2,9 @@
 
 namespace Kiener\MolliePayments\Storefront\Controller;
 
-use Exception;
-use Kiener\MolliePayments\Helper\PaymentStatusHelper;
+use Kiener\MolliePayments\Facade\Notifications\NotificationFacade;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\SettingsService;
-use Kiener\MolliePayments\Setting\MollieSettingStruct;
-use Mollie\Api\Exceptions\ApiException;
-use Mollie\Api\MollieApiClient;
-use Mollie\Api\Resources\Order;
-use RuntimeException;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
-use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
@@ -25,34 +13,33 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class WebhookController extends StorefrontController
 {
-    /** @var EntityRepositoryInterface */
-    private $orderTransactionRepository;
 
-    /** @var MollieApiClient */
-    private $apiClient;
-
-    /** @var PaymentStatusHelper */
-    private $paymentStatusHelper;
-
-    /** @var SettingsService */
+    /**
+     * @var SettingsService
+     */
     private $settingsService;
 
-    /** @var LoggerService */
+    /**
+     * @var NotificationFacade
+     */
+    private $notificationFacade;
+
+    /**
+     * @var LoggerService
+     */
     private $logger;
 
-    public function __construct(
-        EntityRepositoryInterface $orderTransactionRepository,
-        MollieApiClient $apiClient,
-        PaymentStatusHelper $paymentStatusHelper,
-        SettingsService $settingsService,
-        LoggerService $logger
-    )
+
+    /**
+     * @param SettingsService $settingsService
+     * @param NotificationFacade $notificationFacade
+     * @param LoggerService $logger
+     */
+    public function __construct(SettingsService $settingsService, NotificationFacade $notificationFacade, LoggerService $logger)
     {
-        $this->orderTransactionRepository = $orderTransactionRepository;
-        $this->apiClient = $apiClient;
-        $this->paymentStatusHelper = $paymentStatusHelper;
         $this->settingsService = $settingsService;
         $this->logger = $logger;
+        $this->notificationFacade = $notificationFacade;
     }
 
     /**
@@ -67,165 +54,31 @@ class WebhookController extends StorefrontController
      */
     public function webhookCall(SalesChannelContext $context, $transactionId): JsonResponse
     {
-        $criteria = null;
-        $transaction = null;
-        $order = null;
-        $customFields = null;
-        $mollieOrder = null;
-        $mollieOrderId = null;
-        $paymentStatus = null;
-        $errorMessage = null;
-
-        /** @var MollieSettingStruct $settings */
-        $settings = $this->settingsService->getSettings(
-            $context->getSalesChannel()->getId(),
-            $context->getContext()
-        );
-
-        // Add a message to the log that the webhook has been triggered.
-        if ($settings->isDebugMode()) {
-            $this->logger->addEntry(
-                sprintf('Webhook for transaction %s is triggered.', $transactionId),
-                $context->getContext(),
-                null,
-                [
-                    'transactionId' => $transactionId,
-                ]
-            );
-        }
-
-        /**
-         * Create a search criteria to find the transaction by it's ID in the
-         * transaction repository.
-         *
-         * @var $criteria
-         */
         try {
-            $criteria = new Criteria();
-            $criteria->addFilter(new EqualsFilter('id', $transactionId));
-            $criteria->addAssociation('order');
-            $criteria->addAssociation('paymentMethod');
-        } catch (InconsistentCriteriaIdsException $e) {
-            $errorMessage = $errorMessage ?? $e->getMessage();
-        }
 
-        /**
-         * Get the transaction from the order transaction repository. With the
-         * transaction we can fetch the order from the database.
-         *
-         * @var OrderTransactionEntity $transaction
-         */
-        if ($criteria !== null) {
-            try {
-                $transaction = $this->orderTransactionRepository->search($criteria, $context->getContext())->first();
-            } catch (Exception $e) {
-                $errorMessage = $errorMessage ?? $e->getMessage();
-            }
-        }
+            $settings = $this->settingsService->getSettings($context->getSalesChannel()->getId(), $context->getContext());
 
-        /**
-         * Get the order entity from the transaction. With the order entity, we can
-         * retrieve the Mollie ID from it's custom fields and fetch the payment
-         * status from Mollie's Orders API.
-         *
-         * @var OrderEntity $order
-         */
-        if ($transaction !== null) {
-            $order = $transaction->getOrder();
-        }
+            if ($settings->isDebugMode()) {
 
-        /**
-         * Get the custom fields from the order. These custom fields are used to
-         * retrieve the order ID of Mollie's order. With this ID, we can fetch the
-         * order from Mollie's Orders API.
-         *
-         * @var $customFields
-         */
-        if ($order !== null) {
-            $customFields = $order->getCustomFields();
-        } else {
-            $errorMessage = $errorMessage ?? 'No order found for transaction with ID ' . $transactionId . '.';
-        }
-
-        /**
-         * Set the API keys at Mollie based on the current context.
-         */
-        try {
-            $this->setApiKeysBySalesChannelContext($context);
-        } catch (Exception $e) {
-            $this->logger->addEntry(
-                $e->getMessage(),
-                $context->getContext(),
-                $e,
-                [
-                    'function' => 'webhook-set-api-keys'
-                ]
-            );
-        }
-
-        /**
-         * With the order ID from the custom fields, we fetch the order from Mollie's
-         * Orders API.
-         *
-         * @var $mollieOrder
-         */
-        if (is_array($customFields) && isset($customFields['mollie_payments']['order_id'])) {
-            /** @var string $mollieOrderId */
-            $mollieOrderId = $customFields['mollie_payments']['order_id'];
-
-            /** @var Order $mollieOrder */
-            try {
-                $mollieOrder = $this->apiClient->orders->get($mollieOrderId, [
-                    'embed' => 'payments'
-                ]);
-            } catch (ApiException $e) {
-                $errorMessage = $errorMessage ?? $e->getMessage();
-            }
-        }
-
-        /**
-         * The payment status of the order is fetched from Mollie's Orders API. We
-         * use this payment status to set the status in Shopware.
-         */
-        if ($mollieOrder !== null) {
-            try {
-                $paymentStatus = $this->paymentStatusHelper->processPaymentStatus(
-                    $transaction,
-                    $order,
-                    $mollieOrder,
-                    $context->getContext()
+                $this->logger->addEntry(
+                    sprintf('Webhook for transaction %s is triggered.', $transactionId),
+                    $context->getContext(),
+                    null,
+                    [
+                        'transactionId' => $transactionId,
+                    ]
                 );
-            } catch (Exception $e) {
-                $errorMessage = $errorMessage ?? $e->getMessage();
             }
 
-            // @todo Handle partial shipments better and make shipping status configurable
-//            try {
-//                $this->deliveryStateHelper->shipDelivery(
-//                    $order,
-//                    $mollieOrder,
-//                    $context->getContext()
-//                );
-//            } catch (Exception $e) {
-//                $errorMessage = $errorMessage ?? $e->getMessage();
-//            }
-        } else {
-            $errorMessage = $errorMessage ?? 'No order found in the Orders API with ID ' . $mollieOrderId ?? '<unknown>';
-        }
 
-        /**
-         * If the payment status is null, no status could be set.
-         */
-        if ($paymentStatus === null) {
-            $errorMessage = $errorMessage ?? 'The payment status has not been set for order with ID ' . $mollieOrderId ?? '<unknown>';
-        }
+            $this->notificationFacade->onNotify($transactionId, $settings, $context);
 
-        /**
-         * If any errors occurred during the webhook call, we return an error message.
-         */
-        if ($errorMessage !== null) {
+            return new JsonResponse(['success' => true]);
+
+        } catch (\Throwable $ex) {
+
             $this->logger->addEntry(
-                $errorMessage,
+                $ex->getMessage(),
                 $context->getContext(),
                 null,
                 [
@@ -233,61 +86,15 @@ class WebhookController extends StorefrontController
                 ]
             );
 
-            return new JsonResponse([
-                'success' => false,
-                'error' => $errorMessage
-            ], 422);
-        }
-
-        /**
-         * If no errors occurred during the webhook call, we return a success message.
-         */
-        return new JsonResponse([
-            'success' => true
-        ]);
-    }
-
-    /**
-     * Sets the API keys for Mollie based on the current context.
-     *
-     * @param SalesChannelContext $context
-     *
-     * @throws ApiException
-     */
-    private function setApiKeysBySalesChannelContext(SalesChannelContext $context): void
-    {
-        try {
-            /** @var MollieSettingStruct $settings */
-            $settings = $this->settingsService->getSettings($context->getSalesChannel()->getId());
-
-            /** @var string $apiKey */
-            $apiKey = $settings->isTestMode() === false ? $settings->getLiveApiKey() : $settings->getTestApiKey();
-
-            // Log the used API keys
-            if ($settings->isDebugMode()) {
-                $this->logger->addEntry(
-                    sprintf('Selected API key %s for sales channel %s', $apiKey, $context->getSalesChannel()->getName()),
-                    $context->getContext(),
-                    null,
-                    [
-                        'apiKey' => $apiKey,
-                    ]
-                );
-            }
-
-            // Set the API key
-            $this->apiClient->setApiKey($apiKey);
-        } catch (InconsistentCriteriaIdsException $e) {
-            $this->logger->addEntry(
-                $e->getMessage(),
-                $context->getContext(),
-                $e,
+            return new JsonResponse(
                 [
-                    'function' => 'set-mollie-api-key',
-                ]
+                    'success' => false,
+                    'error' => $ex->getMessage()
+                ],
+                422
             );
-
-            throw new RuntimeException(sprintf('Could not set Mollie Api Key, error: %s', $e->getMessage()));
         }
     }
+
+
 }

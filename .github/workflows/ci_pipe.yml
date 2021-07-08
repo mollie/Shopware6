@@ -116,7 +116,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        shopware: [ '6.4.0.0', '6.3.0', '6.2.0', '6.1.0' ]
+        shopware: [ '6.3.0', '6.2.0', '6.1.0' ]
     steps:
 
       - name: Clone Code
@@ -152,7 +152,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        shopware: [ '6.3.5.4', '6.3.5.2' ]
+        shopware: [ '6.4.1.0', '6.4.0.0', '6.3.5.4', '6.3.5.2' ]
     steps:
 
       - name: Clone Code
@@ -173,7 +173,7 @@ jobs:
           docker logs shop
           # now change the domain of our shop, mollie doesn't work with localhost
           sudo echo "127.0.0.1 local.mollie.shop" | sudo tee -a /etc/hosts
-          docker exec shop bash -c "mysql -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='http://local.mollie.shop';\""
+          docker exec shop bash -c "mysql -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='http://local.mollie.shop' WHERE url NOT LIKE 'default.%';\""
 
       - name: Upload into Docker
         run: |
@@ -206,7 +206,9 @@ jobs:
         run: cd tests/Cypress && make install -B
 
       - name: Start Cypress
-        run: cd tests/Cypress && make run url=http://local.mollie.shop
+        run: cd tests/Cypress && make run shopware=$SW_VERSION url=http://local.mollie.shop
+        env:
+          SW_VERSION: ${{ matrix.shopware }}
 
       - name: Download Logs
         if: ${{ always() }}

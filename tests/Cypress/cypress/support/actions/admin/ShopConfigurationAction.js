@@ -13,17 +13,52 @@ export default class ShopConfigurationAction {
 
     /**
      *
-     * @returns {Promise<*>}
+     * @param mollieFailureMode
+     * @param creditCardComponents
      */
-    setupShop() {
+    setupShop(mollieFailureMode, creditCardComponents) {
 
+        // activate all payment methods
         this._activatePaymentMethods();
 
+        // assign all payment methods to
+        // all available sales channels
         this.apiClient.get('/sales-channel').then(channels => {
             channels.forEach(channel => {
                 this._configureSalesChannel(channel.id);
             });
         });
+
+        // configure mollie plugin
+        this._configureMolliePlugin(mollieFailureMode, creditCardComponents);
+    }
+
+    /**
+     *
+     * @param mollieFailureMode
+     * @param creditCardComponents
+     * @private
+     */
+    _configureMolliePlugin(mollieFailureMode, creditCardComponents) {
+        const data = {
+            "null": {
+                "MolliePayments.config.testMode": true,
+                "MolliePayments.config.debugMode": true,
+                // ------------------------------------------------------------------
+                "MolliePayments.config.shopwareFailedPayment": !mollieFailureMode,
+                "MolliePayments.config.enableCreditCardComponents": creditCardComponents,
+                "MolliePayments.config.enableApplePayDirect": true,
+                "MolliePayments.config.paymentMethodBankTransferDueDateDays": 2,
+                "MolliePayments.config.orderLifetimeDays": 4,
+                // ------------------------------------------------------------------
+                "MolliePayments.config.orderStateWithAAuthorizedTransaction": 'in_progress',
+                "MolliePayments.config.orderStateWithAPaidTransaction": 'completed',
+                "MolliePayments.config.orderStateWithAFailedTransaction": 'open',
+                "MolliePayments.config.orderStateWithACancelledTransaction": 'cancelled',
+            }
+        };
+
+        this.apiClient.post('/_action/system-config/batch', data);
     }
 
     /**
