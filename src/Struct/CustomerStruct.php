@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Struct;
 
 use Shopware\Core\Framework\Struct\Struct;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 class CustomerStruct extends Struct
 {
@@ -10,8 +11,17 @@ class CustomerStruct extends Struct
     private $legacyCustomerId;
 
     /** @var array */
-    private $customerIds;
+    private $customerIds = [];
 
+    /** @var ?string */
+    private $preferredIdealIssuer;
+
+    public function __set($key, $value)
+    {
+        $camelKey = (new CamelCaseToSnakeCaseNameConverter())->denormalize($key);
+        $this->$camelKey = $value;
+    }
+    
     /**
      * @return string|null
      */
@@ -31,11 +41,11 @@ class CustomerStruct extends Struct
     /**
      * @param string $profileId
      * @param bool $testMode
-     * @return string|null
+     * @return string
      */
-    public function getCustomerId(string $profileId, bool $testMode = false): ?string
+    public function getCustomerId(string $profileId, bool $testMode = false): string
     {
-        return $this->customerIds[$profileId][$testMode ? 'test' : 'live'];
+        return $this->customerIds[$profileId][$testMode ? 'test' : 'live'] ?? '';
     }
 
     /**
@@ -46,5 +56,37 @@ class CustomerStruct extends Struct
     public function setCustomerId(string $customerId, string $profileId, bool $testMode = false): void
     {
         $this->customerIds[$profileId][$testMode ? 'test' : 'live'] = $customerId;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCustomerIds(): array
+    {
+        return $this->customerIds;
+    }
+
+    /**
+     * @param array $customerIds
+     */
+    public function setCustomerIds(array $customerIds): void
+    {
+        $this->customerIds = $customerIds;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPreferredIdealIssuer(): ?string
+    {
+        return $this->preferredIdealIssuer;
+    }
+
+    /**
+     * @param string|null $preferredIdealIssuer
+     */
+    public function setPreferredIdealIssuer(?string $preferredIdealIssuer): void
+    {
+        $this->preferredIdealIssuer = $preferredIdealIssuer;
     }
 }
