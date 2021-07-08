@@ -81,7 +81,7 @@ class CustomerService
     /**
      * Login the customer.
      *
-     * @param CustomerEntity      $customer
+     * @param CustomerEntity $customer
      * @param SalesChannelContext $context
      *
      * @return string|null
@@ -101,7 +101,7 @@ class CustomerService
         $newToken = $this->salesChannelContextPersister->replace($context->getToken(), $context);
 
         // Persist the new token
-        if(version_compare($this->shopwareVersion, '6.3.3', '<')) {
+        if (version_compare($this->shopwareVersion, '6.3.3', '<')) {
             // Shopware 6.3.2.x and lower
             $this->salesChannelContextPersister->save(
                 $newToken,
@@ -198,8 +198,8 @@ class CustomerService
      * Stores the ideal issuer in the custom fields of the customer.
      *
      * @param CustomerEntity $customer
-     * @param string         $issuerId
-     * @param Context        $context
+     * @param string $issuerId
+     * @param Context $context
      *
      * @return EntityWrittenContainerEvent
      */
@@ -223,6 +223,30 @@ class CustomerService
         ]], $context);
     }
 
+    public function setMollieCustomerId(
+        string $customerId,
+        string $mollieCustomerId,
+        string $profileId,
+        bool $testMode,
+        Context $context
+    )
+    {
+        $this->saveCustomerCustomFields(
+            $customerId,
+            [
+                'customer_id' => null,
+                'mollie_payments' => [
+                    'customer_ids' => [
+                        $profileId => [
+                            ($testMode ? 'test' : 'live') => $mollieCustomerId
+                        ]
+                    ]
+                ]
+            ],
+            $context
+        );
+    }
+
     /**
      * Return a customer entity with address associations.
      *
@@ -230,7 +254,7 @@ class CustomerService
      * @param Context $context
      * @return CustomerEntity|null
      */
-    public function getCustomer(string $customerId, Context $context) : ?CustomerEntity
+    public function getCustomer(string $customerId, Context $context): ?CustomerEntity
     {
         $customer = null;
 
@@ -259,7 +283,7 @@ class CustomerService
         $customFields = $customer->getCustomFields();
         $struct = new CustomerStruct();
 
-        if(array_key_exists('customer_id', $customFields)) {
+        if (array_key_exists('customer_id', $customFields)) {
             $struct->setLegacyCustomerId($customFields['customer_id']);
         }
 
@@ -297,8 +321,8 @@ class CustomerService
     /**
      * Returns a customer for a given array of customer data.
      *
-     * @param array               $customerData
-     * @param string              $paymentMethodId
+     * @param array $customerData
+     * @param string $paymentMethodId
      * @param SalesChannelContext $context
      *
      * @return CustomerEntity|null|false
@@ -364,13 +388,13 @@ class CustomerService
 
         // Create a new customer
         if (
-            (string) $countryId !== ''
+            (string)$countryId !== ''
             && $emailAddress !== null
             && $familyName !== null
             && $givenName !== null
             && $locality !== null
             && $postalCode !== null
-            && (string) $salutationId !== ''
+            && (string)$salutationId !== ''
             && $street !== null
         ) {
             $customer = [
@@ -415,7 +439,7 @@ class CustomerService
     /**
      * Returns a country id by it's iso code.
      *
-     * @param string  $countryCode
+     * @param string $countryCode
      * @param Context $context
      *
      * @return string|null
