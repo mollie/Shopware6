@@ -33,12 +33,12 @@ class Order
 
     /**
      * @param string $mollieOrderId
-     * @param string $salesChannelId
+     * @param string|null $salesChannelId
      * @param array $parameters
      * @return MollieOrder
      * @throws CouldNotFetchMollieOrderException
      */
-    public function getMollieOrder(string $mollieOrderId, string $salesChannelId, array $parameters = []): MollieOrder
+    public function getMollieOrder(string $mollieOrderId, ?string $salesChannelId, array $parameters = []): MollieOrder
     {
         try {
             $apiClient = $this->clientFactory->getClient($salesChannelId);
@@ -57,7 +57,7 @@ class Order
         }
     }
 
-    public function getPaymentUrl(string $mollieOrderId, string $salesChannelId): ?string
+    public function getPaymentUrl(string $mollieOrderId, ?string $salesChannelId): ?string
     {
         $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId);
 
@@ -82,12 +82,12 @@ class Order
 
     /**
      * @param string $mollieOrderId
-     * @param string $salesChannelId
+     * @param string|null $salesChannelId
      * @return Payment
      * @throws CouldNotFetchMollieOrderException
      * @throws PaymentNotFoundException
      */
-    public function getCompletedPayment(string $mollieOrderId, string $salesChannelId): Payment
+    public function getCompletedPayment(string $mollieOrderId, ?string $salesChannelId): Payment
     {
         $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId, ['embed' => 'payments']);
 
