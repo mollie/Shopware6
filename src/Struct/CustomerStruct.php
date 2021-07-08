@@ -2,7 +2,9 @@
 
 namespace Kiener\MolliePayments\Struct;
 
-class CustomerStruct
+use Shopware\Core\Framework\Struct\Struct;
+
+class CustomerStruct extends Struct
 {
     /** @var ?string */
     private $legacyCustomerId;

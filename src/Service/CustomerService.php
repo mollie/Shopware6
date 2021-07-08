@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Service;
 
 use Exception;
+use Kiener\MolliePayments\Struct\CustomerStruct;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
@@ -250,6 +251,21 @@ class CustomerService
         }
 
         return $customer;
+    }
+
+    public function getCustomerStruct(string $customerId, Context $context): CustomerStruct
+    {
+        $customer = $this->getCustomer($customerId, $context);
+        $customFields = $customer->getCustomFields();
+        $struct = new CustomerStruct();
+
+        if(array_key_exists('customer_id', $customFields)) {
+            $struct->setLegacyCustomerId($customFields['customer_id']);
+        }
+
+        $struct->assign($customFields['mollie_payments'] ?? []);
+
+        return $struct;
     }
 
     /**
