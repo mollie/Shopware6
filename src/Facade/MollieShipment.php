@@ -94,7 +94,7 @@ class MollieShipment
             return false;
         }
 
-        $addedMollieShipment = $this->mollieApiOrderService->setShipment($mollieOrderId, $order->getSalesChannelId(), $context);
+        $addedMollieShipment = $this->mollieApiOrderService->setShipment($mollieOrderId, $order->getSalesChannelId(),$context);
 
         if ($addedMollieShipment) {
             $values = [CustomFieldsInterface::DELIVERY_SHIPPED => true];

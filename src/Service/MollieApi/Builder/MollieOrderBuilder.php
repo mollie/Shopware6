@@ -153,7 +153,7 @@ class MollieOrderBuilder
         // Log the built order data
         $this->loggerService->addDebugEntry(
             sprintf('Order %s is prepared to be paid through Mollie', $order->getOrderNumber()),
-            $salesChannelContext->getSalesChannelId(),
+            $salesChannelContext->getSalesChannel()->getId(),
             $salesChannelContext->getContext(),
             [
                 'orderData' => $orderData,

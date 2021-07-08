@@ -60,7 +60,7 @@ class MolliePaymentFinalize
             throw new MissingMollieOrderId($errorMessage);
         }
 
-        $apiClient = $this->mollieApiFactory->getClient($salesChannelContext->getSalesChannelId(), $salesChannelContext->getContext());
+        $apiClient = $this->mollieApiFactory->getClient($salesChannelContext->getSalesChannel()->getId(), $salesChannelContext->getContext());
         $mollieOrder = $apiClient->orders->get($mollieOrderId, ['embed' => 'payments']);
 
         $paymentStatus = $this->paymentStatusHelper->processPaymentStatus(

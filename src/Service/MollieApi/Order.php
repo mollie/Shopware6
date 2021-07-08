@@ -101,7 +101,7 @@ class Order
      */
     public function createOrReusePayment(string $mollieOrderId, string $paymentMethod, SalesChannelContext $salesChannelContext): Payment
     {
-        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelContext->getSalesChannelId(), $salesChannelContext->getContext(), ['embed' => 'payments']);
+        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelContext->getSalesChannel()->getId(), $salesChannelContext->getContext(), ['embed' => 'payments']);
 
         if (!$mollieOrder instanceof MollieOrder) {
 
@@ -113,7 +113,7 @@ class Order
         if (!$payment instanceof Payment) {
             $this->logger->addDebugEntry(
                 'Didn\'t find an open payment. Creating a new payment at mollie',
-                $salesChannelContext->getSalesChannelId(),
+                $salesChannelContext->getSalesChannel()->getId(),
                 $salesChannelContext->getContext()
             );
 
@@ -123,7 +123,7 @@ class Order
         if ($payment->method === $paymentMethod) {
             $this->logger->addDebugEntry(
                 'Found an open payment and payment methods are same. Reusing this payment',
-                $salesChannelContext->getSalesChannelId(),
+                $salesChannelContext->getSalesChannel()->getId(),
                 $salesChannelContext->getContext()
             );
 
@@ -133,7 +133,7 @@ class Order
         if (!$payment->isCancelable) {
             $this->logger->addDebugEntry(
                 'Found an open payment but it isn\'t cancelable. Reusing this payment, otherwise we could never complete payment',
-                $salesChannelContext->getSalesChannelId(),
+                $salesChannelContext->getSalesChannel()->getId(),
                 $salesChannelContext->getContext()
             );
 
@@ -143,11 +143,11 @@ class Order
         try {
             $this->logger->addDebugEntry(
                 'Found an open payment and cancel it. Create new payment with new payment method',
-                $salesChannelContext->getSalesChannelId(),
+                $salesChannelContext->getSalesChannel()->getId(),
                 $salesChannelContext->getContext()
             );
 
-            $this->paymentApiService->delete($payment->id, $salesChannelContext->getSalesChannelId());
+            $this->paymentApiService->delete($payment->id, $salesChannelContext->getSalesChannel()->getId());
 
             /** @var Payment $payment */
             $payment = $mollieOrder->createPayment(['method' => $paymentMethod]);

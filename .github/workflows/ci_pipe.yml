@@ -206,14 +206,7 @@ jobs:
         run: cd tests/Cypress && make install -B
 
       - name: Start Cypress
-        run: |
-          if [[ $SW_VERSION == 6.3.5.4 ]]; then
-            cd tests/Cypress && make run-old url=http://local.mollie.shop
-          elif [[ $SW_VERSION == 6.3.5.2 ]]; then
-            cd tests/Cypress && make run-old url=http://local.mollie.shop
-          else
-            cd tests/Cypress && make run url=http://local.mollie.shop
-          fi
+        run: cd tests/Cypress && make run shopware=$SW_VERSION url=http://local.mollie.shop
         env:
           SW_VERSION: ${{ matrix.shopware }}
 

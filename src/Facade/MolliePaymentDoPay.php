@@ -126,7 +126,7 @@ class MolliePaymentDoPay
         if (!empty($mollieOrderId)) {
             $this->logger->addDebugEntry(
                 'Found an existing mollie order with id %s.',
-                $salesChannelContext->getSalesChannelId(),
+                $salesChannelContext->getSalesChannel()->getId(),
                 $salesChannelContext->getContext()
             );
 
@@ -167,7 +167,7 @@ class MolliePaymentDoPay
 
         $this->logger->addDebugEntry(
             'Created order array for mollie',
-            $salesChannelContext->getSalesChannelId(),
+            $salesChannelContext->getSalesChannel()->getId(),
             $salesChannelContext->getContext(),
             $mollieOrderArray
         );

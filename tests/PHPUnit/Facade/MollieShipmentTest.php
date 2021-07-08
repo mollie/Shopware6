@@ -16,6 +16,7 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Uuid\Uuid;
+use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class MollieShipmentTest extends TestCase
 {
@@ -155,7 +156,10 @@ class MollieShipmentTest extends TestCase
         $mollieOrderId = 'foo';
         $customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY] = $mollieOrderId;
         $order->setCustomFields($customFields);
+        $salesChannel = $this->getMockBuilder(SalesChannelEntity::class)->disableOriginalConstructor()->getMock();
         $salesChannelId = 'bar';
+        $salesChannel->method('getId')->willReturn($salesChannelId);
+        $order->setSalesChannel($salesChannel);
         $order->setSalesChannelId($salesChannelId);
         $delivery = $this->createDelivery($order);
         $deliveryId = $delivery->getId();
@@ -182,6 +186,9 @@ class MollieShipmentTest extends TestCase
         $customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY] = $mollieOrderId;
         $order->setCustomFields($customFields);
         $salesChannelId = 'bar';
+        $salesChannel = $this->getMockBuilder(SalesChannelEntity::class)->disableOriginalConstructor()->getMock();
+        $salesChannel->method('getId')->willReturn($salesChannelId);
+        $order->setSalesChannel($salesChannel);
         $order->setSalesChannelId($salesChannelId);
         $delivery = $this->createDelivery($order);
         $deliveryId = $delivery->getId();
