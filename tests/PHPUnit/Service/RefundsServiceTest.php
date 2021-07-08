@@ -58,7 +58,6 @@ class RefundsServiceTest extends TestCase
         $mollieOrderApiMock = new MollieOrderApi($apiFactoryMock, $logger);
 
         $this->refundService = new RefundService(
-            $logger,
             $mollieOrderApiMock,
             $this->orderService,
             new RefundHydrator()

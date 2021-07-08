@@ -18,9 +18,6 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 
 class RefundService
 {
-    /** @var LoggerInterface */
-    private $logger;
-
     /** @var Order */
     private $mollieOrderApi;
 
@@ -33,19 +30,16 @@ class RefundService
     /**
      * CustomFieldService constructor.
      *
-     * @param LoggerInterface $logger
      * @param Order $mollieOrderApi
      * @param OrderService $orderService
      * @param RefundHydrator $refundHydrator
      */
     public function __construct(
-        LoggerInterface $logger,
         Order $mollieOrderApi,
         OrderService $orderService,
         RefundHydrator $refundHydrator
     )
     {
-        $this->logger = $logger;
         $this->mollieOrderApi = $mollieOrderApi;
         $this->orderService = $orderService;
         $this->refundHydrator = $refundHydrator;
