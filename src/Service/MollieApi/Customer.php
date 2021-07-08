@@ -2,6 +2,8 @@
 
 namespace Kiener\MolliePayments\Service\MollieApi;
 
+use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
+use Kiener\MolliePayments\Exception\CouldNotFetchMollieCustomerException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Customer as MollieCustomer;
@@ -19,14 +21,14 @@ class Customer
         $this->clientFactory = $clientFactory;
     }
 
-    public function getMollieCustomerById(string $customerId, ?string $salesChannelId = null): MollieCustomer
+    public function getMollieCustomerById(string $customerId, string $salesChannelId): MollieCustomer
     {
         try {
             $apiClient = $this->clientFactory->getClient($salesChannelId);
 
             return $apiClient->customers->get($customerId);
         } catch (ApiException $e) {
-            throw $e; // TODO throw custom exception
+            throw new CouldNotFetchMollieCustomerException($customerId, $salesChannelId, $e);
         }
     }
 
@@ -43,7 +45,11 @@ class Customer
                 ]
             ]);
         } catch (ApiException $e) {
-            throw $e; // TODO throw custom exception
+            throw new CouldNotCreateMollieCustomerException(
+                $customer->getCustomerNumber(),
+                $customer->getFirstName() . ' ' . $customer->getLastName(),
+                $e
+            );
         }
     }
 }
