@@ -1,0 +1,11 @@
+.modal-content {
+    .payment-method-label {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .payment-method-description {
+        order: -1;
+    }
+}
