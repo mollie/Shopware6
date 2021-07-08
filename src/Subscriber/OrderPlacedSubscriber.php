@@ -2,25 +2,45 @@
 
 namespace Kiener\MolliePayments\Subscriber;
 
+use Kiener\MolliePayments\Service\CustomerService;
+use Kiener\MolliePayments\Service\MollieApi\Customer;
 use Kiener\MolliePayments\Service\MolliePaymentExtractor;
 use Kiener\MolliePayments\Service\SettingsService;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Event\CheckoutOrderPlacedEvent;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class OrderPlacedSubscriber implements EventSubscriberInterface
 {
+    /** @var CustomerService */
+    protected $customerService;
+
+    /** @var Customer */
+    protected $customerApiService;
+
+    /** @var MolliePaymentExtractor */
     protected $extractor;
 
+    /** @var SettingsService */
     protected $settingsService;
 
+    /** @var LoggerInterface */
+    protected $logger;
+
     public function __construct(
+        CustomerService $customerService,
+        Customer $customerApiService,
         MolliePaymentExtractor $extractor,
-        SettingsService $settingsService
+        SettingsService $settingsService,
+        LoggerInterface $logger
     )
     {
+        $this->customerService = $customerService;
+        $this->customerApiService = $customerApiService;
         $this->extractor = $extractor;
         $this->settingsService = $settingsService;
+        $this->logger = $logger;
     }
 
     public static function getSubscribedEvents()

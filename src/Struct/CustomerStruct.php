@@ -21,7 +21,7 @@ class CustomerStruct extends Struct
         $camelKey = (new CamelCaseToSnakeCaseNameConverter())->denormalize($key);
         $this->$camelKey = $value;
     }
-    
+
     /**
      * @return string|null
      */
