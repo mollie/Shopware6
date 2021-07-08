@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Service;
 
 use Exception;
+use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
 use Kiener\MolliePayments\Exception\MissingPriceLineItemException;
 use Kiener\MolliePayments\Validator\OrderLineItemValidator;
 use Kiener\MolliePayments\Validator\OrderTotalRoundingValidator;
@@ -348,6 +349,22 @@ class OrderService
         ];
 
         return $shippingLine;
+    }
+
+    /**
+     * @param OrderEntity $order
+     * @return string
+     * @throws CouldNotExtractMollieOrderIdException
+     */
+    public function getMollieOrderId(OrderEntity $order): string
+    {
+        $mollieOrderId = $order->getCustomFields()['mollie_payments']['order_id'] ?? '';
+
+        if (empty($mollieOrderId)) {
+            throw new CouldNotExtractMollieOrderIdException($order->getOrderNumber());
+        }
+
+        return $mollieOrderId;
     }
 
     /**

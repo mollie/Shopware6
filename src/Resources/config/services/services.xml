@@ -19,5 +19,11 @@
             <argument type="service" id="Kiener\MolliePayments\Validator\OrderTotalRoundingValidator"/>
             <argument>%kernel.shopware_version%</argument>
         </service>
+
+        <service id="Kiener\MolliePayments\Service\RefundService">
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
+            <argument type="service" id="Kiener\MolliePayments\Hydrator\RefundHydrator"/>
+        </service>
     </services>
 </container>

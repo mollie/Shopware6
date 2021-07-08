@@ -1,21 +1,20 @@
 import template from './sw-order-detail-base.html.twig';
 
-const { Component } = Shopware;
+const {Component, Mixin} = Shopware;
 
 Component.override('sw-order-detail-base', {
     template,
 
-    props: {
-        orderId: {
-            type: String,
-            required: true
-        },
-    },
+    mixins: [
+        Mixin.getByName('notification')
+    ],
 
     data() {
         return {
+            remainingAmount: 0.0,
             refundedAmount: 0.0,
-            refundedItems: 0,
+            refundAmountPending: 0.0,
+            refunds: [],
             shippedAmount: 0,
             shippedItems: 0,
         }
@@ -26,23 +25,59 @@ Component.override('sw-order-detail-base', {
         'MolliePaymentsShippingService',
     ],
 
-    mounted() {
-        if (this.orderId !== '') {
-            this.MolliePaymentsRefundService.total({
-                orderId: this.orderId
-            })
-                .then((response) => {
-                    this.refundedAmount = response.amount;
-                    this.refundedItems = response.items;
-                });
+    computed: {
+        isMollieOrder() {
+            return (this.order.customFields !== null && 'mollie_payments' in this.order.customFields);
+        },
+    },
 
-            this.MolliePaymentsShippingService.total({
-                orderId: this.orderId
-            })
-                .then((response) => {
-                    this.shippedAmount = response.amount;
-                    this.shippedItems = response.items;
-                });
+    watch: {
+        order() {
+            this.getMollieData();
+        }
+    },
+
+    methods: {
+        getMollieData() {
+            if (this.isMollieOrder) {
+                this.MolliePaymentsRefundService
+                    .total({orderId: this.order.id})
+                    .then((response) => {
+                        this.remainingAmount = response.remaining;
+                        this.refundedAmount = response.refunded;
+                    })
+                    .catch((response) => {
+                        this.createNotificationError({
+                            message: response.message
+                        });
+                    });
+
+                this.MolliePaymentsShippingService
+                    .total({orderId: this.order.id})
+                    .then((response) => {
+                        this.shippedAmount = response.amount;
+                        this.shippedItems = response.items;
+                    });
+
+                this.MolliePaymentsRefundService
+                    .list({orderId: this.order.id})
+                    .then((response) => {
+                        return this.refunds = response;
+                    })
+                    .then((refunds) => {
+                        this.refundAmountPending = 0.0;
+                        refunds.forEach((refund) => {
+                            if(refund.isPending || refund.isQueued) {
+                                this.refundAmountPending += (refund.amount.value || 0);
+                            }
+                        });
+                    })
+                    .catch((response) => {
+                        this.createNotificationError({
+                            message: response.message
+                        });
+                    });
+            }
         }
     }
 });

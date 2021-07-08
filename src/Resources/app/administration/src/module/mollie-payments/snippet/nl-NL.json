@@ -8,14 +8,40 @@
     },
     "modals": {
       "refund": {
-        "title": "Terugbetaling van een order line item via Mollie",
-        "content": "Vul de hoeveelheid van dit item in ({refundableQuantity} van {quantity} over voor terugbetaling) die aan de klant moet worden terugbetaald.",
-        "quantityPlaceholder": "De terug te betalen hoeveelheid...",
-        "createCreditText": "Creëer een credit-item voor deze terugbetaling.",
-        "confirmButton": "Terugbetaling",
-        "cancelButton": "Niet terugbetalen"
+        "title": "Terugbetaling via Mollie",
+        "success": "Er is een terugbetaling aangemaakt bij Mollie. Het kan 2 uur duren voordat de terugbetaling is voltooid. Tot deze tijd kunt u de terugbetaling annuleren.",
+        "error": "Er is iets mis gegaan bij het aanmaken van een terugbetaling.",
+        "warning": {
+          "low-amount": "Voer een terug te betalen bedrag in."
+        },
+        "confirmButton": "Terugbetalen",
+        "cancelButton": "Niet terugbetalen",
+        "list": {
+          "column": {
+            "amount": "Bedrag",
+            "status": "Status",
+            "date": "Datum"
+          },
+          "context": {
+            "cancel": "Annuleer deze terugbetaling\n"
+          },
+          "status": {
+            "queued": "In wachtrij",
+            "pending": "In afwachting",
+            "processing": "In behandeling",
+            "refunded": "Terugbetaald",
+            "failed": "Mislukt"
+          },
+          "status-description": {
+            "queued": "De terugbetaling wordt in de wachtrij geplaatst totdat er voldoende saldo is om de terugbetaling te verwerken. U kunt de terugbetaling nog steeds annuleren.",
+            "pending": "De terugbetaling wordt de volgende werkdag naar de bank gestuurd. U kunt de terugbetaling nog annuleren.",
+            "processing": "De terugbetaling is naar de bank gestuurd. Het bedrag wordt zo spoedig mogelijk overgemaakt op de rekening van de klant.",
+            "refunded": "Het restitutiebedrag is overgemaakt naar de klant.",
+            "failed": "De terugbetaling is mislukt na verwerking. De klant heeft bijvoorbeeld zijn/haar bankrekening opgeheven. Het geld zal worden teruggestort op de rekening."
+          }
+        }
       },
-      "verzending": {
+      "shipping": {
         "title": "Verzend een order line item via Mollie",
         "content": "Vul de hoeveelheid van dit item in ({shippableQuantity} van {quantity} over voor verzending) om naar de klant te verzenden.",
         "quantityPlaceholder": "De te verzenden hoeveelheid...",
@@ -31,18 +57,20 @@
       "columnShipped": "Verzonden",
       "labelMollieOrderId": "Mollie Order ID",
       "labelMolliePaymentLink": "Mollie Checkout URL",
-      "totalRefunds": "Terugbetaald bedrag ({quantity} items)",
+      "totalRefunds": "Terugbetaald bedrag",
+      "totalRefundsPending": "Wachtend op terugbetaling",
+      "totalRemaining": "Terug te betalen",
       "totalShipments": "Verzonden bedrag ({quantity} items)"
     }
   },
   "sw-payment": {
     "apiLinkButton": "Haal uw API sleutels van het Mollie Dashboard",
-    "testButton": "Test API sleutels",
+    "testButton": "Controlle",
     "testApiKeys": {
       "title": "Mollie Payments",
       "apiKey": "API Key",
       "isValid": "is geldig",
-      "isInvalid": "is geldig"
+      "isInvalid": "is ongeldig"
     }
   },
   "sw-customer": {

@@ -2,10 +2,15 @@
 
 namespace Kiener\MolliePayments\Service\MollieApi;
 
+use Kiener\MolliePayments\Exception\CouldNotFetchMollieOrderException;
+use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Mollie\Api\Exceptions\ApiException;
+use Mollie\Api\Exceptions\IncompatiblePlatform;
 use Mollie\Api\Resources\Order as MollieOrder;
 use Mollie\Api\Resources\OrderLine;
+use Mollie\Api\Resources\Payment;
+use Mollie\Api\Types\PaymentStatus;
 use Psr\Log\LoggerInterface;
 
 class Order
@@ -26,26 +31,33 @@ class Order
         $this->logger = $logger;
     }
 
-    public function getMollieOrder(string $mollieOrderId, ?string $salesChannelId): MollieOrder
+    /**
+     * @param string $mollieOrderId
+     * @param string|null $salesChannelId
+     * @param array $parameters
+     * @return MollieOrder
+     * @throws CouldNotFetchMollieOrderException
+     */
+    public function getMollieOrder(string $mollieOrderId, ?string $salesChannelId, array $parameters = []): MollieOrder
     {
-        $apiClient = $this->clientFactory->getClient($salesChannelId);
-
         try {
-            return $apiClient->orders->get($mollieOrderId);
+            $apiClient = $this->clientFactory->getClient($salesChannelId);
+
+            return $apiClient->orders->get($mollieOrderId, $parameters);
         } catch (ApiException $e) {
             $this->logger->error(
                 sprintf(
-                    'API error occured when fetching mollie order %s with message %s',
+                    'API error occurred when fetching mollie order %s with message %s',
                     $mollieOrderId,
                     $e->getMessage()
                 )
             );
 
-            throw $e;
+            throw new CouldNotFetchMollieOrderException($mollieOrderId, $e);
         }
     }
 
-    public function getPaymentUrl(string $mollieOrderId, string $salesChannelId): ?string
+    public function getPaymentUrl(string $mollieOrderId, ?string $salesChannelId): ?string
     {
         $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId);
 
@@ -66,5 +78,33 @@ class Order
         }
 
         return false;
+    }
+
+    /**
+     * @param string $mollieOrderId
+     * @param string|null $salesChannelId
+     * @return Payment
+     * @throws CouldNotFetchMollieOrderException
+     * @throws PaymentNotFoundException
+     */
+    public function getCompletedPayment(string $mollieOrderId, ?string $salesChannelId): Payment
+    {
+        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId, ['embed' => 'payments']);
+
+        if ($mollieOrder->payments()->count() === 0) {
+            throw new PaymentNotFoundException($mollieOrderId);
+        }
+
+        /** @var Payment $payment */
+        foreach ($mollieOrder->payments()->getArrayCopy() as $payment) {
+            if (in_array($payment->status, [
+                PaymentStatus::STATUS_PAID,
+                PaymentStatus::STATUS_AUTHORIZED // Klarna
+            ])) {
+                return $payment;
+            }
+        }
+
+        throw new PaymentNotFoundException($mollieOrderId);
     }
 }
