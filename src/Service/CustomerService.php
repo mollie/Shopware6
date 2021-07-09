@@ -45,6 +45,9 @@ class CustomerService
     /** @var EntityRepositoryInterface */
     private $salutationRepository;
 
+    /** @var SettingsService */
+    private $settingsService;
+
     /** @var string */
     private $shopwareVersion;
 
@@ -66,6 +69,7 @@ class CustomerService
         LoggerInterface $logger,
         SalesChannelContextPersister $salesChannelContextPersister,
         EntityRepositoryInterface $salutationRepository,
+        SettingsService $settingsService,
         string $shopwareVersion
     )
     {
@@ -75,6 +79,7 @@ class CustomerService
         $this->logger = $logger;
         $this->salesChannelContextPersister = $salesChannelContextPersister;
         $this->salutationRepository = $salutationRepository;
+        $this->settingsService = $settingsService;
         $this->shopwareVersion = $shopwareVersion;
     }
 
