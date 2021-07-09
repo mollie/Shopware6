@@ -7,10 +7,16 @@
 
     .mollie-ideal-issuer {
         margin-top: 15px;
-        width: 200px;
     }
 
     .payment-method-description {
         order: -1;
     }
 }
+
+.confirm-payment {
+    .mollie-ideal-issuer {
+        margin-top: 15px;
+    }
+}
+
