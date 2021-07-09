@@ -228,6 +228,14 @@ class CustomerService
         ]], $context);
     }
 
+    public function getMollieCustomerId(string $customerId, string $salesChannelId, Context $context): string
+    {
+        $settings = $this->settingsService->getSettings($salesChannelId);
+        $struct = $this->getCustomerStruct($customerId, $context);
+
+        return $struct->getCustomerId($settings->getProfileId(), $settings->isTestMode());
+    }
+
     public function setMollieCustomerId(
         string $customerId,
         string $mollieCustomerId,
