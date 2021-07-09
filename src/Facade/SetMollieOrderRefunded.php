@@ -78,7 +78,7 @@ class SetMollieOrderRefunded
             throw new MissingSalesChannelInOrder($order->getOrderNumber() ?? $order->getId());
         }
 
-        $apiClient = $this->apiFactory->getClient($salesChannel->getId(), $context);
+        $apiClient = $this->apiFactory->getClient($salesChannel->getId());
 
         try {
             $mollieOrder = $apiClient->orders->get($mollieOrderId);

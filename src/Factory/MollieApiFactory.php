@@ -60,12 +60,11 @@ class MollieApiFactory
      * Returns a new instance of the Mollie API client.
      *
      * @param string|null $salesChannelId
-     * @param Context|null $context
      *
      * @return MollieApiClient
      * @throws IncompatiblePlatform
      */
-    public function getClient(?string $salesChannelId = null, ?Context $context = null): MollieApiClient
+    public function getClient(?string $salesChannelId = null): MollieApiClient
     {
         $this->apiClient = new MollieApiClient();
 
