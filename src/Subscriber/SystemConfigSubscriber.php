@@ -13,8 +13,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SystemConfigSubscriber implements EventSubscriberInterface
 {
-    /** @var SystemConfigService */
-    private $configService;
+    /** @var SettingsService  */
+    private $settingsService;
 
     /** @var MollieApiClient */
     private $apiClient;
@@ -23,9 +23,9 @@ class SystemConfigSubscriber implements EventSubscriberInterface
     private $profileIdStorage = [];
 
 
-    public function __construct(SystemConfigService $configService)
+    public function __construct(SettingsService $settingsService)
     {
-        $this->configService = $configService;
+        $this->settingsService = $settingsService;
         $this->apiClient = new MollieApiClient();
     }
 
@@ -68,8 +68,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface
 
         if (is_null($value)) {
             // If this api key has been "deleted", also remove the profile ID.
-            $this->configService->delete($profileKey, $salesChannelId);
-
+            $this->settingsService->setProfileId(null, $salesChannelId, $testMode);
             return;
         }
 
@@ -77,16 +76,24 @@ class SystemConfigSubscriber implements EventSubscriberInterface
 
         $profile = ProfileHelper::getProfile($this->apiClient, new MollieSettingStruct());
 
-        $this->profileIdStorage[$salesChannelId . $profileKey] = $profile->id;
+        $this->settingsService->setProfileId($profile->id, $salesChannelId, $testMode);
 
-        $this->configService->set(
-            $profileKey,
-            $profile->id,
-            $salesChannelId
-        );
+        $this->profileIdStorage[$salesChannelId . $profileKey] = $profile->id;
     }
 
-    private function fixProfileIdAfterChange(string $key, $value, ?string $salesChannelId)
+    /**
+     * Why do we need to fix the profile ID?
+     * When adding a key to the system config programmatically, even if there is no field for it in config.xml,
+     * when saving the configuration in the administration, Shopware will also save those keys.
+     * We need to fix the profile ID, because we fetch the new profile ID from Mollie and save it to the system config,
+     * and then Shopware overwrites it with the old one afterwards.
+     *
+     * @param string $key
+     * @param $value
+     * @param string|null $salesChannelId
+     * @param bool $testMode
+     */
+    private function fixProfileIdAfterChange(string $key, $value, ?string $salesChannelId, bool $testMode = false)
     {
         if(isset($this->profileIdStorage[$salesChannelId . $key])) {
             // If the old $value is the same as the new profile ID in storage, then dont set it again
@@ -95,16 +102,12 @@ class SystemConfigSubscriber implements EventSubscriberInterface
                 return;
             }
 
-            $this->configService->set(
-                $key,
-                $this->profileIdStorage[$salesChannelId . $key],
-                $salesChannelId
-            );
+            $this->settingsService->setProfileId($this->profileIdStorage[$salesChannelId . $key], $salesChannelId, $testMode);
         } else {
             // If we haven't stored the profile ID from Mollie, but we are getting a value here from the admin,
             // then we no longer need to store this key, so delete it.
             if($value) {
-                $this->configService->delete($key, $salesChannelId);
+                $this->settingsService->setProfileId(null, $salesChannelId, $testMode);
             }
         }
     }

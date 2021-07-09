@@ -43,4 +43,25 @@ class SettingsService
 
         return (new MollieSettingStruct())->assign($structData);
     }
+
+    public function set(string $key, $value, ?string $salesChannelId = null): void
+    {
+        $this->systemConfigService->set(self::SYSTEM_CONFIG_DOMAIN . $key, $value, $salesChannelId);
+    }
+
+    public function delete(string $key, ?string $salesChannelId = null): void
+    {
+        $this->systemConfigService->delete(self::SYSTEM_CONFIG_DOMAIN . $key, $salesChannelId);
+    }
+
+    public function setProfileId(?string $profileId, ?string $salesChannelId = null, bool $testMode = false): void
+    {
+        $key = ($testMode ? 'test' : 'live') . 'ProfileId';
+
+        if(!is_null($profileId)) {
+            $this->set($key, $profileId, $salesChannelId);
+        } else {
+            $this->delete($key, $salesChannelId);
+        }
+    }
 }
