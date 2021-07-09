@@ -228,6 +228,12 @@ class CustomerService
         ]], $context);
     }
 
+    /**
+     * @param string $customerId
+     * @param string $salesChannelId
+     * @param Context $context
+     * @return string
+     */
     public function getMollieCustomerId(string $customerId, string $salesChannelId, Context $context): string
     {
         $settings = $this->settingsService->getSettings($salesChannelId);
@@ -236,6 +242,13 @@ class CustomerService
         return $struct->getCustomerId($settings->getProfileId(), $settings->isTestMode());
     }
 
+    /**
+     * @param string $customerId
+     * @param string $mollieCustomerId
+     * @param string $profileId
+     * @param bool $testMode
+     * @param Context $context
+     */
     public function setMollieCustomerId(
         string $customerId,
         string $mollieCustomerId,
