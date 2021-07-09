@@ -236,20 +236,23 @@ class CustomerService
         Context $context
     )
     {
-        $this->saveCustomerCustomFields(
-            $customerId,
-            [
-                'customer_id' => null,
-                'mollie_payments' => [
-                    'customer_ids' => [
-                        $profileId => [
-                            ($testMode ? 'test' : 'live') => $mollieCustomerId
-                        ]
+        $customFields = [
+            'mollie_payments' => [
+                'customer_ids' => [
+                    $profileId => [
+                        ($testMode ? 'test' : 'live') => $mollieCustomerId
                     ]
                 ]
-            ],
-            $context
-        );
+            ]
+        ];
+
+        // If 
+        $struct = $this->getCustomerStruct($customerId, $context);
+        if(!empty($struct->getLegacyCustomerId()) && $struct->getLegacyCustomerId() === $mollieCustomerId)) {
+            $customFields['customer_id'] = null;
+        }
+
+        $this->saveCustomerCustomFields($customerId, $customFields, $context);
     }
 
     /**
