@@ -2,18 +2,16 @@
 
 namespace Kiener\MolliePayments\Subscriber;
 
-use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Helper\ProfileHelper;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\MollieApiClient;
 use Shopware\Core\System\SystemConfig\Event\SystemConfigChangedEvent;
-use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SystemConfigSubscriber implements EventSubscriberInterface
 {
-    /** @var SettingsService  */
+    /** @var SettingsService */
     private $settingsService;
 
     /** @var MollieApiClient */
@@ -21,7 +19,6 @@ class SystemConfigSubscriber implements EventSubscriberInterface
 
     /** @var array */
     private $profileIdStorage = [];
-
 
     public function __construct(SettingsService $settingsService)
     {
@@ -95,10 +92,10 @@ class SystemConfigSubscriber implements EventSubscriberInterface
      */
     private function fixProfileIdAfterChange(string $key, $value, ?string $salesChannelId, bool $testMode = false)
     {
-        if(isset($this->profileIdStorage[$salesChannelId . $key])) {
+        if (isset($this->profileIdStorage[$salesChannelId . $key])) {
             // If the old $value is the same as the new profile ID in storage, then dont set it again
             // Will end up in an endless loop otherwise.
-            if($this->profileIdStorage[$salesChannelId . $key] === $value) {
+            if ($this->profileIdStorage[$salesChannelId . $key] === $value) {
                 return;
             }
 
@@ -106,7 +103,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface
         } else {
             // If we haven't stored the profile ID from Mollie, but we are getting a value here from the admin,
             // then we no longer need to store this key, so delete it.
-            if($value) {
+            if ($value) {
                 $this->settingsService->setProfileId(null, $salesChannelId, $testMode);
             }
         }
