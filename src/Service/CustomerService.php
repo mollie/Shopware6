@@ -3,7 +3,10 @@
 namespace Kiener\MolliePayments\Service;
 
 use Exception;
+use Kiener\MolliePayments\Exception\CouldNotFetchMollieCustomerException;
+use Kiener\MolliePayments\Service\MollieApi\Customer;
 use Kiener\MolliePayments\Struct\CustomerStruct;
+use Mollie\Api\Resources\Customer as MollieCustomer;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
@@ -33,6 +36,9 @@ class CustomerService
     /** @var EntityRepositoryInterface */
     private $customerRepository;
 
+    /** @var Customer */
+    private $customerApiService;
+
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
@@ -56,15 +62,18 @@ class CustomerService
      *
      * @param EntityRepositoryInterface $countryRepository
      * @param EntityRepositoryInterface $customerRepository
+     * @param Customer $customerApiService
      * @param EventDispatcherInterface $eventDispatcher
      * @param LoggerInterface $logger
      * @param SalesChannelContextPersister $salesChannelContextPersister
      * @param EntityRepositoryInterface $salutationRepository
+     * @param SettingsService $settingsService
      * @param string $shopwareVersion
      */
     public function __construct(
         EntityRepositoryInterface $countryRepository,
         EntityRepositoryInterface $customerRepository,
+        Customer $customerApiService,
         EventDispatcherInterface $eventDispatcher,
         LoggerInterface $logger,
         SalesChannelContextPersister $salesChannelContextPersister,
@@ -75,6 +84,7 @@ class CustomerService
     {
         $this->countryRepository = $countryRepository;
         $this->customerRepository = $customerRepository;
+        $this->customerApiService = $customerApiService;
         $this->eventDispatcher = $eventDispatcher;
         $this->logger = $logger;
         $this->salesChannelContextPersister = $salesChannelContextPersister;
@@ -506,6 +516,55 @@ class CustomerService
 
             return !empty($salutations) ? $salutations[0] : null;
         } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    public function createMollieCustomer(string $customerId, string $salesChannelId, Context $context)
+    {
+        $settings = $this->settingsService->getSettings($salesChannelId);
+        $struct = $this->getCustomerStruct($customerId, $context);
+
+        if (!empty($struct->getLegacyCustomerId())) {
+            $mollieCustomer = $this->tryAssociatingLegacyCustomerId($customerId, $salesChannelId, $context);
+
+            if ($mollieCustomer instanceof MollieCustomer) {
+                $struct->setLegacyCustomerId(null);
+                $struct->setCustomerId($mollieCustomer->id, $settings->getProfileId(), $settings->isTestMode());
+            }
+        }
+
+        if (empty($struct->getCustomerId($settings->getProfileId(), $settings->isTestMode()))) {
+            return;
+        }
+
+        $this->customerApiService->createCustomerAtMollie($this->getCustomer($customerId, $context));
+    }
+
+    private function tryAssociatingLegacyCustomerId(string $customerId, string $salesChannelId, Context $context): ?MollieCustomer
+    {
+        $settings = $this->settingsService->getSettings($salesChannelId);
+        $struct = $this->getCustomerStruct($customerId, $context);
+
+        try {
+            $mollieCustomer = $this->customerApiService->getMollieCustomerById(
+                $struct->getLegacyCustomerId(),
+                $salesChannelId
+            );
+
+            // At this point the legacy customer ID belongs to the active profile,
+            // we can remove the old customer ID and assign it to the profile.
+            $this->setMollieCustomerId(
+                $customerId,
+                $mollieCustomer->id,
+                $settings->getProfileId(),
+                $settings->isTestMode(),
+                $context
+            );
+
+            return $mollieCustomer;
+        } catch (CouldNotFetchMollieCustomerException $e) {
+            // Couldn't associate the legacy id with this saleschannel
             return null;
         }
     }

@@ -68,6 +68,7 @@
         <service id="Kiener\MolliePayments\Service\CustomerService" class="Kiener\MolliePayments\Service\CustomerService">
             <argument type="service" id="country.repository"/>
             <argument type="service" id="customer.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Customer"/>
             <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="monolog.logger"/>
             <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister"/>

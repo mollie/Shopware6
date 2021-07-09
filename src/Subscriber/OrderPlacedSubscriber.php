@@ -3,12 +3,10 @@
 namespace Kiener\MolliePayments\Subscriber;
 
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
-use Kiener\MolliePayments\Exception\CouldNotFetchMollieCustomerException;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
 use Kiener\MolliePayments\Service\MolliePaymentExtractor;
 use Kiener\MolliePayments\Service\SettingsService;
-use Mollie\Api\Resources\Customer as MollieCustomer;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Event\CheckoutOrderPlacedEvent;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
@@ -73,52 +71,8 @@ class OrderPlacedSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $customerStruct = $this->customerService->getCustomerStruct($customer->getId(), $event->getContext());
-
-        if ($customerStruct->getLegacyCustomerId()) {
-            try {
-                $mollieCustomer = $this->customerApiService->getMollieCustomerById(
-                    $customerStruct->getLegacyCustomerId(),
-                    $event->getSalesChannelId()
-                );
-
-                // At this point the legacy customer ID belongs to the active profile,
-                // we can remove the old customer ID and assign it to the profile.
-                $this->customerService->saveCustomerCustomFields(
-                    $customer->getId(),
-                    [
-                        'customer_id' => null,
-                    ],
-                    $event->getContext()
-                );
-
-                $this->customerService->setMollieCustomerId(
-                    $customer->getId(),
-                    $mollieCustomer->id,
-                    $settings->getProfileId(),
-                    $settings->isTestMode(),
-                    $event->getContext()
-                );
-
-                // Update the customer struct
-                $customerStruct->setLegacyCustomerId(null);
-                $customerStruct->setCustomerId($mollieCustomer->id, $settings->getProfileId(), $settings->isTestMode());
-            } catch (CouldNotFetchMollieCustomerException $e) {
-                // Customer with the legacy customer ID does not exist in Mollie for the active profile, skip
-                $mollieCustomer = null;
-            }
-        }
-
-        if ($mollieCustomer instanceof MollieCustomer
-            || $customerStruct->getCustomerId($settings->getProfileId(), $settings->isTestMode())) {
-            // If we have a $mollieCustomer object from the legacy profile id,
-            // or a customerId is available in the struct, then we can exit at this point.
-            return;
-        }
-
-        //Otherwise, create a customer at Mollie
         try {
-            $mollieCustomer = $this->customerApiService->createCustomerAtMollie($customer);
+            $this->customerService->createMollieCustomer($customer->getId(), $event->getSalesChannelId(), $event->getContext());
         } catch (CouldNotCreateMollieCustomerException $e) {
             $this->logger->error($e->getMessage(), $e->getTrace());
         }
