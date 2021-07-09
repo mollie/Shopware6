@@ -41,7 +41,7 @@ class MollieApiFactory
 
     /**
      * Create a new instance of the Mollie API client.
-     *
+     * @deprecated
      * @param string|null $salesChannelId
      *
      * @return MollieApiClient
@@ -49,7 +49,6 @@ class MollieApiFactory
      */
     public function createClient(?string $salesChannelId = null): MollieApiClient
     {
-        # TODO Refactor into getClient() below
         # the singleton approach here was too risky,
         # everyone who used this was never able to switch api keys through sales channels.
         # now its the same as getClient() -> should be combined one day
