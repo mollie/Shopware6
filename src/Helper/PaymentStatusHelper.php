@@ -123,10 +123,7 @@ class PaymentStatusHelper
         $transactionState = $transaction->getStateMachineState();
 
         /** @var MollieSettingStruct $settings */
-        $settings = $this->settingsService->getSettings(
-            $salesChannelId,
-            $context
-        );
+        $settings = $this->settingsService->getSettings($salesChannelId);
 
         /**
          * We gather the states for all payments in order to handle

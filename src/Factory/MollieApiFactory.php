@@ -69,7 +69,7 @@ class MollieApiFactory
     {
         $this->apiClient = new MollieApiClient();
 
-        $settings = $this->settingsService->getSettings($salesChannelId, $context);
+        $settings = $this->settingsService->getSettings($salesChannelId);
 
         try {
             // Set the API key

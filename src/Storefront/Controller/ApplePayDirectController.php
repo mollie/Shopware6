@@ -168,10 +168,7 @@ class ApplePayDirectController extends StorefrontController
         $available = false;
 
         /** @var MollieSettingStruct $settings */
-        $settings = $this->settingsService->getSettings(
-            $context->getSalesChannel()->getId(),
-            $context->getContext()
-        );
+        $settings = $this->settingsService->getSettings($context->getSalesChannel()->getId());
 
         /** @var array|null $paymentMethodIds */
         $paymentMethodIds = $context->getSalesChannel()->getPaymentMethodIds();
@@ -206,10 +203,7 @@ class ApplePayDirectController extends StorefrontController
     public function applePaySession(SalesChannelContext $context, string $validationUrl): JsonResponse
     {
         /** @var MollieSettingStruct $settings */
-        $settings = $this->settingsService->getSettings(
-            $context->getSalesChannel()->getId(),
-            $context->getContext()
-        );
+        $settings = $this->settingsService->getSettings($context->getSalesChannel()->getId());
 
         /** @var Profile|null $profile */
         $profile = ProfileHelper::getProfile(
