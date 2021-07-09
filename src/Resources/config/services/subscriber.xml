@@ -34,7 +34,7 @@
         </service>
 
         <service id="Kiener\MolliePayments\Subscriber\SystemConfigSubscriber">
-            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService" />
             <tag name="kernel.event_subscriber"/>
         </service>
     </services>
