@@ -246,9 +246,9 @@ class CustomerService
             ]
         ];
 
-        // If 
+        // If there's a legacy customer ID, and it's the same as the one we're saving, remove the legacy id.
         $struct = $this->getCustomerStruct($customerId, $context);
-        if(!empty($struct->getLegacyCustomerId()) && $struct->getLegacyCustomerId() === $mollieCustomerId)) {
+        if (!empty($struct->getLegacyCustomerId()) && $struct->getLegacyCustomerId() === $mollieCustomerId) {
             $customFields['customer_id'] = null;
         }
 
