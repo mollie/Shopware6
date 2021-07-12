@@ -105,10 +105,7 @@ class PaymentController extends StorefrontController
         $transaction = null;
 
         /** @var MollieSettingStruct $settings */
-        $settings = $this->settingsService->getSettings(
-            $context->getSalesChannel()->getId(),
-            $context->getContext()
-        );
+        $settings = $this->settingsService->getSettings($context->getSalesChannel()->getId());
 
         // Add a message to the log that the webhook has been triggered.
         if ($settings->isDebugMode()) {

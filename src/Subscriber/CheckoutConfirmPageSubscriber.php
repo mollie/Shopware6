@@ -104,14 +104,11 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     {
         # load our settings for the
         # current request
-        $this->settings = $this->settingsService->getSettings(
-            $args->getSalesChannelContext()->getSalesChannel()->getId(),
-            $args->getContext()
-        );
+        $this->settings = $this->settingsService->getSettings($args->getSalesChannelContext()->getSalesChannel()->getId());
 
         # now use our factory to get the correct
         # client with the correct sales channel settings
-        $this->apiClient = $this->apiFactory->createClient(
+        $this->apiClient = $this->apiFactory->getClient(
             $args->getSalesChannelContext()->getSalesChannel()->getId()
         );
 

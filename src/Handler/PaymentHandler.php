@@ -497,10 +497,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
     ): array
     {
         /** @var MollieSettingStruct $settings */
-        $settings = $this->settingsService->getSettings(
-            $salesChannelContext->getSalesChannel()->getId(),
-            $salesChannelContext->getContext()
-        );
+        $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
 
         /**
          * Retrieve the customer from the customer service in order to

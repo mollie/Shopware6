@@ -56,7 +56,7 @@ class WebhookController extends StorefrontController
     {
         try {
 
-            $settings = $this->settingsService->getSettings($context->getSalesChannel()->getId(), $context->getContext());
+            $settings = $this->settingsService->getSettings($context->getSalesChannel()->getId());
 
             if ($settings->isDebugMode()) {
 

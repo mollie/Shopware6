@@ -91,7 +91,7 @@ class SetMollieOrderRefundedTest extends TestCase
         $orderEndpoint->method('get')->with($mollieOrderId)->willReturn($mollieOrder);
         $apiClient->orders = $orderEndpoint;
 
-        $this->apiFactory->expects($this->once())->method('getClient')->with($salesChannelId, $this->context)->willReturn($apiClient);
+        $this->apiFactory->expects($this->once())->method('getClient')->with($salesChannelId)->willReturn($apiClient);
         $this->setMollieOrderService->setRefunded('foo', $this->context);
     }
 
@@ -106,7 +106,7 @@ class SetMollieOrderRefundedTest extends TestCase
         $orderEndpoint->expects($this->once())->method('get')->willThrowException(new ApiException());
         $apiClient->orders = $orderEndpoint;
 
-        $this->apiFactory->expects($this->once())->method('getClient')->with($salesChannelId, $this->context)->willReturn($apiClient);
+        $this->apiFactory->expects($this->once())->method('getClient')->with($salesChannelId)->willReturn($apiClient);
 
         self::expectException(CouldNotSetRefundAtMollieException::class);
         $this->setMollieOrderService->setRefunded('foo', $this->context);
@@ -125,7 +125,7 @@ class SetMollieOrderRefundedTest extends TestCase
         $orderEndpoint->method('get')->with($mollieOrderId)->willReturn($mollieOrder);
         $apiClient->orders = $orderEndpoint;
 
-        $this->apiFactory->expects($this->once())->method('getClient')->with($salesChannelId, $this->context)->willReturn($apiClient);
+        $this->apiFactory->expects($this->once())->method('getClient')->with($salesChannelId)->willReturn($apiClient);
 
         $mollieOrder->expects($this->once())->method('refundAll');
 
