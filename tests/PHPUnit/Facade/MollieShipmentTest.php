@@ -160,6 +160,7 @@ class MollieShipmentTest extends TestCase
         $salesChannelId = 'bar';
         $salesChannel->method('getId')->willReturn($salesChannelId);
         $order->setSalesChannel($salesChannel);
+        $order->setSalesChannelId($salesChannelId);
         $delivery = $this->createDelivery($order);
         $deliveryId = $delivery->getId();
         $this->orderDeliveryService->method('getDelivery')->willReturn($delivery);
@@ -188,6 +189,7 @@ class MollieShipmentTest extends TestCase
         $salesChannel = $this->getMockBuilder(SalesChannelEntity::class)->disableOriginalConstructor()->getMock();
         $salesChannel->method('getId')->willReturn($salesChannelId);
         $order->setSalesChannel($salesChannel);
+        $order->setSalesChannelId($salesChannelId);
         $delivery = $this->createDelivery($order);
         $deliveryId = $delivery->getId();
         $this->orderDeliveryService->method('getDelivery')->willReturn($delivery);

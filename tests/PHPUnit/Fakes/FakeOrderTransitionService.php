@@ -4,7 +4,7 @@ namespace MolliePayments\Tests\Fakes;
 
 
 use Exception;
-use Kiener\MolliePayments\Service\Order\OrderTransitionServiceInterface;
+use Kiener\MolliePayments\Service\Transition\OrderTransitionServiceInterface;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 

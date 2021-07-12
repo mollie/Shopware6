@@ -1,52 +1,23 @@
 <?php declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Service\Order;
+namespace Kiener\MolliePayments\Service\Transition;
 
-
-use Kiener\MolliePayments\Service\LoggerService;
 use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\OrderStates;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
-use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionEntity;
-use Shopware\Core\System\StateMachine\StateMachineRegistry;
-use Shopware\Core\System\StateMachine\Transition;
 
 class OrderTransitionService implements OrderTransitionServiceInterface
 {
-    /** @var LoggerService */
-    private $logger;
-
-    /** @var StateMachineRegistry */
-    private $stateMachineRegistry;
-
-    public function __construct(LoggerService $logger, StateMachineRegistry $stateMachineRegistry)
-    {
-        $this->logger = $logger;
-        $this->stateMachineRegistry = $stateMachineRegistry;
-    }
-
     /**
-     * Gets the currently available transitions for the order entity
-     *
-     * @param OrderEntity $order
-     * @param Context $context
-     * @return array<string>
+     * @var TransitionServiceInterface
      */
-    public function getAvailableTransitions(OrderEntity $order, Context $context): array
-    {
-        /** @var array<StateMachineTransitionEntity> $availableTransitions */
-        $availableTransitions = $this->stateMachineRegistry->getAvailableTransitions(
-            OrderDefinition::ENTITY_NAME,
-            $order->getId(),
-            'stateId',
-            $context
-        );
+    private $transitionService;
 
-        return array_map(function(StateMachineTransitionEntity $transition) {
-            return $transition->getActionName();
-        }, $availableTransitions);
+    public function __construct(TransitionServiceInterface $transitionService)
+    {
+        $this->transitionService = $transitionService;
     }
 
     /**
@@ -138,6 +109,18 @@ class OrderTransitionService implements OrderTransitionServiceInterface
     }
 
     /**
+     * Gets the currently available transitions for the order entity
+     *
+     * @param OrderEntity $order
+     * @param Context $context
+     * @return array<string>
+     */
+    public function getAvailableTransitions(OrderEntity $order, Context $context): array
+    {
+        return $this->transitionService->getAvailableTransitions(OrderDefinition::ENTITY_NAME, $order->getId(), $context);
+    }
+
+    /**
      * Checks if the requested transition is allowed for the current order state
      *
      * @param string $transition
@@ -146,7 +129,7 @@ class OrderTransitionService implements OrderTransitionServiceInterface
      */
     private function transitionIsAllowed(string $transition, array $availableTransitions): bool
     {
-        return in_array($transition, $availableTransitions);
+        return $this->transitionService->transitionIsAllowed($transition, $availableTransitions);
     }
 
     /**
@@ -158,14 +141,6 @@ class OrderTransitionService implements OrderTransitionServiceInterface
      */
     private function performTransition(OrderEntity $order, string $transitionName, Context $context): void
     {
-        $this->stateMachineRegistry->transition(
-            new Transition(
-                OrderDefinition::ENTITY_NAME,
-                $order->getId(),
-                $transitionName,
-                'stateId'
-            ),
-            $context
-        );
+        $this->transitionService->performTransition(OrderDefinition::ENTITY_NAME, $order->getId(), $transitionName, $context);
     }
 }

@@ -5,7 +5,6 @@ namespace Kiener\MolliePayments\Handler\Method;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Mollie\Api\Types\PaymentMethod;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\System\Locale\LocaleEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class iDealPayment extends PaymentHandler
@@ -17,15 +16,23 @@ class iDealPayment extends PaymentHandler
     /** @var string */
     protected $paymentMethod = self::PAYMENT_METHOD_NAME;
 
-    protected function processPaymentMethodSpecificParameters(
+    public function processPaymentMethodSpecificParameters(
         array $orderData,
         SalesChannelContext $salesChannelContext,
-        CustomerEntity $customer,
-        LocaleEntity $locale
+        CustomerEntity $customer
     ): array
     {
-        if (!array_key_exists(self::FIELD_IDEAL_ISSUER, $orderData[PaymentHandler::FIELD_PAYMENT]) || in_array($orderData[PaymentHandler::FIELD_PAYMENT][self::FIELD_IDEAL_ISSUER], [null, ''], true)) {
-            //ToDo: Dropdown met banken in checkout, daarna deze vullen
+        $customFields = $customer->getCustomFields() ?? [];
+
+        $issuer = $customFields['mollie_payments']['preferred_ideal_issuer'] ?? '';
+        $paymentIssuer = $orderData['payment']['issuer'] ?? '';
+
+        if (empty($issuer)) {
+            return $orderData;
+        }
+
+        if (empty($paymentIssuer)) {
+            $orderData['payment']['issuer'] = $issuer;
         }
 
         return $orderData;

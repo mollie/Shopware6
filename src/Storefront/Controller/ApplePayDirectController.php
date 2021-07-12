@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Storefront\Controller;
 
 use Exception;
+use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Helper\ProfileHelper;
@@ -24,6 +25,7 @@ use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Content\Product\ProductEntity;
@@ -86,9 +88,9 @@ class ApplePayDirectController extends StorefrontController
     /** @var SalesChannelContextFactory */
     private $salesChannelContextFactory;
 
-    /**
-     * @param SalesChannelContextFactory $salesChannelContextFactory
-     */
+    /** @var MolliePaymentDoPay */
+    private $molliePaymentDoPay;
+
     public function __construct(
         MollieApiClient $apiClient,
         CartService $cartService,
@@ -103,7 +105,8 @@ class ApplePayDirectController extends StorefrontController
         ShippingMethodService $shippingMethodService,
         ContainerInterface $container,
         string $shopwareVersion,
-        $salesChannelContextfactory
+        $salesChannelContextfactory,
+        MolliePaymentDoPay $molliePaymentDoPay
     )
     {
         $this->apiClient = $apiClient;
@@ -120,6 +123,7 @@ class ApplePayDirectController extends StorefrontController
         $this->container = $container;
         $this->shopwareVersion = $shopwareVersion;
         $this->salesChannelContextFactory = $salesChannelContextfactory;
+        $this->molliePaymentDoPay = $molliePaymentDoPay;
     }
 
 
@@ -458,12 +462,17 @@ class ApplePayDirectController extends StorefrontController
             && $transaction !== null
         ) {
             try {
-                $this->createOrderAtMollie(
-                    $request->get('paymentToken'),
-                    $order,
-                    $returnUrl,
-                    $transaction,
-                    $context
+                $asyncTransactionStruct = new AsyncPaymentTransactionStruct($transaction, $order, $returnUrl);
+
+                if ($this->paymentHandler instanceof ApplePayPayment) {
+                    $this->paymentHandler->setToken($request->get('paymentToken'));
+                }
+
+                $mollieOrder = $this->molliePaymentDoPay->preparePayProcessAtMollie(
+                    ApplePayPayment::PAYMENT_METHOD_NAME,
+                    $asyncTransactionStruct,
+                    $context,
+                    $this->paymentHandler
                 );
             } catch (Exception $e) {
                 $errors[] = $e->getMessage();
@@ -616,58 +625,6 @@ class ApplePayDirectController extends StorefrontController
         }
 
         return $order;
-    }
-
-    /**
-     * Returns an order that is created through the Mollie API.
-     *
-     * @param string $applePaymentToken
-     * @param OrderEntity $order
-     * @param string $returnUrl
-     * @param OrderTransactionEntity $transaction
-     *
-     * @param SalesChannelContext $salesChannelContext
-     *
-     * @return Order|null
-     * @throws RuntimeException
-     */
-    private function createOrderAtMollie(
-        string $applePaymentToken,
-        OrderEntity $order,
-        string $returnUrl,
-        OrderTransactionEntity $transaction,
-        SalesChannelContext $salesChannelContext
-    ): ?Order
-    {
-        /** @var Order $mollieOrder */
-        $mollieOrder = null;
-
-        /** @var array $orderData */
-        $orderData = $this->paymentHandler->prepareOrderForMollie(
-            ApplePayPayment::PAYMENT_METHOD_NAME,
-            $transaction->getId(),
-            $order,
-            (string)$returnUrl,
-            $salesChannelContext,
-            [
-                'applePayPaymentToken' => $applePaymentToken,
-            ]
-        );
-
-        // Create the order at Mollie
-        if (
-            is_array($orderData)
-            && !empty($orderData)
-        ) {
-            $mollieOrder = $this->paymentHandler->createOrderAtMollie(
-                $orderData,
-                (string)$returnUrl,
-                $order,
-                $salesChannelContext
-            );
-        }
-
-        return $mollieOrder;
     }
 
     /**
