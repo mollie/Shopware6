@@ -218,9 +218,9 @@ class Order
      * @throws CouldNotFetchMollieOrderException
      * @throws PaymentNotFoundException
      */
-    public function getCompletedPayment(string $mollieOrderId, ?string $salesChannelId): Payment
+    public function getCompletedPayment(string $mollieOrderId, ?string $salesChannelId, Context $context): Payment
     {
-        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId, ['embed' => 'payments']);
+        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId, $context, ['embed' => 'payments']);
 
         if ($mollieOrder->payments()->count() === 0) {
             throw new PaymentNotFoundException($mollieOrderId);

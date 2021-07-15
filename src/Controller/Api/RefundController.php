@@ -177,7 +177,7 @@ class RefundController extends AbstractController
         try {
             $order = $this->getValidOrder($orderId, $context);
 
-            $success = $this->refundService->refund($order, $amount);
+            $success = $this->refundService->refund($order, $amount, null, $context);
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
@@ -202,7 +202,7 @@ class RefundController extends AbstractController
         try {
             $order = $this->getValidOrder($orderId, $context);
 
-            $success = $this->refundService->cancel($order, $refundId);
+            $success = $this->refundService->cancel($order, $refundId, $context);
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
@@ -226,7 +226,7 @@ class RefundController extends AbstractController
         try {
             $order = $this->getValidOrder($orderId, $context);
 
-            $refunds = $this->refundService->getRefunds($order);
+            $refunds = $this->refundService->getRefunds($order, $context);
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
@@ -251,8 +251,8 @@ class RefundController extends AbstractController
         try {
             $order = $this->getValidOrder($orderId, $context);
 
-            $remaining = $this->refundService->getRemainingAmount($order);
-            $refunded = $this->refundService->getRefundedAmount($order);
+            $remaining = $this->refundService->getRemainingAmount($order, $context);
+            $refunded = $this->refundService->getRefundedAmount($order, $context);
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());

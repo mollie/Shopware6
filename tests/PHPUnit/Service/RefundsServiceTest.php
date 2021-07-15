@@ -7,11 +7,11 @@ use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Hydrator\RefundHydrator;
 use Kiener\MolliePayments\Service\CustomFieldService;
+use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\MollieApi\Order as MollieOrderApi;
+use Kiener\MolliePayments\Service\MollieApi\Payment as MolliePaymentApi;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\RefundService;
-use Kiener\MolliePayments\Validator\OrderLineItemValidator;
-use Kiener\MolliePayments\Validator\OrderTotalRoundingValidator;
 use Mollie\Api\Endpoints\OrderEndpoint;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order;
@@ -24,6 +24,7 @@ use Mollie\Api\Types\RefundStatus;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\System\Currency\CurrencyEntity;
 
@@ -44,10 +45,7 @@ class RefundsServiceTest extends TestCase
         $this->orderService = new OrderService(
             $this->createMock(EntityRepositoryInterface::class),
             $this->createMock(EntityRepositoryInterface::class),
-            $logger,
-            new OrderLineItemValidator($logger),
-            new OrderTotalRoundingValidator(),
-            '6.3.5.4'
+            $logger
         );
 
         $apiFactoryMock = $this->createConfiguredMock(
@@ -55,7 +53,9 @@ class RefundsServiceTest extends TestCase
             ['createClient' => $this->clientMock, 'getClient' => $this->clientMock]
         );
 
-        $mollieOrderApiMock = new MollieOrderApi($apiFactoryMock, $logger);
+        $loggerServiceMock = $this->createMock(LoggerService::class);
+        $paymentApiService = new MolliePaymentApi($apiFactoryMock);
+        $mollieOrderApiMock = new MollieOrderApi($apiFactoryMock, $paymentApiService, $loggerServiceMock);
 
         $this->refundService = new RefundService(
             $mollieOrderApiMock,
@@ -88,7 +88,12 @@ class RefundsServiceTest extends TestCase
             self::expectException($exceptionClass);
         }
 
-        static::assertEquals($expected, $this->refundService->refund($orderEntityMock, 24.99));
+        static::assertEquals($expected, $this->refundService->refund(
+            $orderEntityMock,
+            24.99,
+            'test refund',
+            Context::createDefaultContext()
+        ));
     }
 
     /**
@@ -117,7 +122,11 @@ class RefundsServiceTest extends TestCase
             self::expectException($exceptionClass);
         }
 
-        static::assertEquals($expected, $this->refundService->cancel($orderEntityMock, 'foo'));
+        static::assertEquals($expected, $this->refundService->cancel(
+            $orderEntityMock,
+            'foo',
+            Context::createDefaultContext()
+        ));
     }
 
     /**
@@ -146,7 +155,7 @@ class RefundsServiceTest extends TestCase
             self::expectException($exceptionClass);
         }
 
-        static::assertCount($expected, $this->refundService->getRefunds($orderEntityMock));
+        static::assertCount($expected, $this->refundService->getRefunds($orderEntityMock, Context::createDefaultContext()));
     }
 
     /**
@@ -177,7 +186,7 @@ class RefundsServiceTest extends TestCase
             self::expectException($exceptionClass);
         }
 
-        static::assertEquals($expected, $this->refundService->getRefundedAmount($orderEntityMock));
+        static::assertEquals($expected, $this->refundService->getRefundedAmount($orderEntityMock, Context::createDefaultContext()));
     }
 
     /**
@@ -208,7 +217,7 @@ class RefundsServiceTest extends TestCase
             self::expectException($exceptionClass);
         }
 
-        static::assertEquals($expected, $this->refundService->getRefundedAmount($orderEntityMock));
+        static::assertEquals($expected, $this->refundService->getRefundedAmount($orderEntityMock, Context::createDefaultContext()));
     }
 
     public function getRefundTestData(): array
