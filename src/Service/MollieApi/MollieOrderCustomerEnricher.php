@@ -9,7 +9,7 @@ class MollieOrderCustomerEnricher
 {
     public function enrich(array $orderData, CustomerEntity $customer, MollieSettingStruct $settings): array
     {
-        if ($settings->createNoCustomersAtMollie()) {
+        if (!$settings->createCustomersAtMollie()) {
             return $orderData;
         }
 
