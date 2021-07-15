@@ -44,7 +44,7 @@ class Order
 
     public function getMollieOrder(string $mollieOrderId, string $salesChannelId, Context $context, array $parameters = []): MollieOrder
     {
-        $apiClient = $this->clientFactory->getClient($salesChannelId, $context);
+        $apiClient = $this->clientFactory->getClient($salesChannelId);
 
         try {
             return $apiClient->orders->get($mollieOrderId, $parameters);
