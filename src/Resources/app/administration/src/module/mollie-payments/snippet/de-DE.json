@@ -8,12 +8,38 @@
     },
     "modals": {
       "refund": {
-        "title": "Bestellposition über Mollie rückerstatten",
-        "content": "Menge dieser Bestellposition ({refundableQuantity} von {quantity} für Rückerstattung möglich) für die Rückerstattung an den Kunden.",
-        "quantityPlaceholder": "Menge für Rückerstattung...",
-        "createCreditText": "Create a credit item for this refund.",
+        "title": "Rückerstattung über Mollie",
+        "success": "Es wurde eine Rückerstattung bei Mollie erstellt. Es kann bis zu 2 Stunden dauern, bis die Rückerstattung abgeschlossen ist. Bis dahin können Sie die Rückerstattung stornieren.",
+        "error": "Beim Erstellen einer Rückerstattung ist etwas schief gelaufen.",
+        "warning": {
+          "low-amount": "Bitte geben Sie einen zu erstattenden Betrag ein."
+        },
         "confirmButton": "Rückerstatten",
-        "cancelButton": "Abbrechen"
+        "cancelButton": "Abbrechen",
+        "list": {
+          "column": {
+            "amount": "Betrag",
+            "status": "Status",
+            "date": "Datum"
+          },
+          "context": {
+            "cancel": "Diese Rückerstattung stornieren"
+          },
+          "status": {
+            "queued": "Warteschlange",
+            "pending": "Ausstehend",
+            "processing": "Processing",
+            "refunded": "Erstattet",
+            "failed": "Gescheitert"
+          },
+          "status-description": {
+            "queued": "Die Rückerstattung steht in der Warteschlange, bis genügend Guthaben vorhanden ist, um die Rückerstattung zu verarbeiten. Sie können die Rückerstattung noch stornieren.",
+            "pending": "Die Rückerstattung wird am nächsten Werktag an die Bank gesendet. Sie können die Rückerstattung immer noch stornieren.",
+            "processing": "Die Rückerstattung wurde an die Bank gesendet. Der Rückerstattungsbetrag wird so schnell wie möglich auf das Kundenkonto überwiesen.",
+            "refunded": "Der Rückerstattungsbetrag wurde an den Kunden überwiesen.",
+            "failed": "Die Rückerstattung ist nach der Bearbeitung fehlgeschlagen. Zum Beispiel hat der Kunde sein Bankkonto geschlossen. Das Geld wird auf das Konto zurücküberwiesen."
+          }
+        }
       },
       "shipping": {
         "title": "Versand der Bestellposition an Mollie melden",
@@ -31,18 +57,20 @@
       "columnShipped": "Versandt",
       "labelMollieOrderId": "Mollie Bestell ID",
       "labelMolliePaymentLink": "Mollie Checkout URL",
-      "totalRefunds": "Rückerstattete Menge ({quantity} Stück)",
+      "totalRefunds": "Rückerstattete Menge",
+      "totalRefundsPending": "Warten auf Rückerstattung",
+      "totalRemaining": "Rückerstattbar",
       "totalShipments": "Versandte Menge ({quantity} Stück)"
     }
   },
   "sw-payment": {
     "apiLinkButton": "Erhalten Sie Ihre API Keys vom Mollie Dashboard",
-    "testButton": "Prüfe API Keys",
+    "testButton": "Prüfung",
     "testApiKeys": {
       "title": "Mollie Payments",
       "apiKey": "API Schlüssel",
       "isValid": "ist gültig",
-      "isInvalid": "ist gültig"
+      "isInvalid": "ist ungültig"
     }
   },
   "sw-customer": {

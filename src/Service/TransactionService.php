@@ -60,7 +60,7 @@ class TransactionService
             $transactionCriteria->addFilter(new EqualsFilter('versionId', $versionId));
         }
 
-        $transactionCriteria->addAssociation('order');
+        $transactionCriteria->addAssociation('order.currency');
 
         /** @var OrderTransactionCollection $transactions */
         $transactions = $this->getRepository()->search(

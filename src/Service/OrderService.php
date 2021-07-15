@@ -2,7 +2,7 @@
 
 namespace Kiener\MolliePayments\Service;
 
-use Kiener\MolliePayments\Validator\IsOrderTotalRoundingActivated;
+use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -12,8 +12,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 
 class OrderService
 {
-    public const ORDER_LINE_ITEM_ID = 'orderLineItemId';
-
     /** @var EntityRepositoryInterface */
     protected $orderRepository;
 
@@ -23,29 +21,15 @@ class OrderService
     /** @var LoggerInterface */
     protected $logger;
 
-    /**
-     * @var IsOrderTotalRoundingActivated
-     */
-    private $validator;
-
-    /**
-     * @var string
-     */
-    private $shopwareVersion;
-
     public function __construct(
         EntityRepositoryInterface $orderRepository,
         EntityRepositoryInterface $orderLineItemRepository,
-        LoggerInterface $logger,
-        IsOrderTotalRoundingActivated $validator,
-        string $shopwareVersion
+        LoggerInterface $logger
     )
     {
         $this->orderRepository = $orderRepository;
         $this->orderLineItemRepository = $orderLineItemRepository;
         $this->logger = $logger;
-        $this->validator = $validator;
-        $this->shopwareVersion = $shopwareVersion;
     }
 
     /**
@@ -98,10 +82,26 @@ class OrderService
         }
 
         $this->logger->critical(
-            sprintf('Could not find an order with id %s. Payment failed', $orderId),
-            $context
+            sprintf('Could not find an order with id %s. Payment failed', $orderId)
         );
 
         throw new OrderNotFoundException($orderId);
     }
+
+    /**
+     * @param OrderEntity $order
+     * @return string
+     * @throws CouldNotExtractMollieOrderIdException
+     */
+    public function getMollieOrderId(OrderEntity $order): string
+    {
+        $mollieOrderId = $order->getCustomFields()['mollie_payments']['order_id'] ?? '';
+
+        if (empty($mollieOrderId)) {
+            throw new CouldNotExtractMollieOrderIdException($order->getOrderNumber());
+        }
+
+        return $mollieOrderId;
+    }
+
 }
