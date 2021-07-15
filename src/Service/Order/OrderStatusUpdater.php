@@ -2,9 +2,7 @@
 
 namespace Kiener\MolliePayments\Service\Order;
 
-
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
-use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Types\PaymentStatus;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionDefinition;

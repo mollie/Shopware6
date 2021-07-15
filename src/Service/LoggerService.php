@@ -21,12 +21,18 @@ class LoggerService
     public const LOG_ENTRY_KEY_SOURCE = 'source';
 
     private $logEntryRepository;
+    /**
+     * @var SettingsService
+     */
+    private $settingsService;
 
     public function __construct(
-        EntityRepositoryInterface $logEntryRepository
+        EntityRepositoryInterface $logEntryRepository,
+        SettingsService $settingsService
     )
     {
         $this->logEntryRepository = $logEntryRepository;
+        $this->settingsService = $settingsService;
     }
 
     public function addEntry(
@@ -63,5 +69,26 @@ class LoggerService
 
         // Insert the log entry in the database
         $this->logEntryRepository->create([$logEntry], $context);
+    }
+
+    public function addDebugEntry(
+        $message,
+        string $salesChannelId,
+        Context $context,
+        ?array $additionalData = null
+    ): void
+    {
+        $settings = $this->settingsService->getSettings($salesChannelId, $context);
+
+        if (!$settings->isDebugMode()) {
+            return;
+        }
+
+        $this->addEntry(
+            $message,
+            $context,
+            null,
+            $additionalData
+        );
     }
 }

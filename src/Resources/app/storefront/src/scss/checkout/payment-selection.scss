@@ -1,0 +1,22 @@
+.modal-content {
+    .payment-method-label {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .mollie-ideal-issuer {
+        margin-top: 15px;
+    }
+
+    .payment-method-description {
+        order: -1;
+    }
+}
+
+.confirm-payment {
+    .mollie-ideal-issuer {
+        margin-top: 15px;
+    }
+}
+

@@ -18,21 +18,23 @@ class PayPalPayment extends PaymentHandler
     /** @var string */
     protected $paymentMethod = self::PAYMENT_METHOD_NAME;
 
-    protected function processPaymentMethodSpecificParameters(
+    public function processPaymentMethodSpecificParameters(
         array $orderData,
         SalesChannelContext $salesChannelContext,
-        CustomerEntity $customer,
-        LocaleEntity $locale
+        CustomerEntity $customer
     ): array
     {
-        if (!array_key_exists(static::FIELD_PAYPAL_DESCRIPTION, $orderData[static::FIELD_PAYMENT]) || in_array($orderData[static::FIELD_PAYMENT][static::FIELD_PAYPAL_DESCRIPTION], [null, ''], true)) {
-            $orderData[static::FIELD_PAYMENT][static::FIELD_PAYPAL_DESCRIPTION] = sprintf('Order %s', $orderData[PaymentHandler::FIELD_ORDER_NUMBER]);
-        }
-
-        if (!array_key_exists(static::FIELD_PAYPAL_DIGITAL_GOODS, $orderData[static::FIELD_PAYMENT]) || in_array($orderData[static::FIELD_PAYMENT][static::FIELD_PAYPAL_DIGITAL_GOODS], [null, ''], true)) {
-            // ToDo: Digital downloads zitten nog niet in Shopware 6
-        }
-
         return $orderData;
+
+        // @todo find error and fix it
+//        if (!array_key_exists(static::FIELD_PAYPAL_DESCRIPTION, $orderData[static::FIELD_PAYMENT]) || in_array($orderData[static::FIELD_PAYMENT][static::FIELD_PAYPAL_DESCRIPTION], [null, ''], true)) {
+//            $orderData[static::FIELD_PAYMENT][static::FIELD_PAYPAL_DESCRIPTION] = sprintf('Order %s', $orderData[PaymentHandler::FIELD_ORDER_NUMBER]);
+//        }
+//
+//        if (!array_key_exists(static::FIELD_PAYPAL_DIGITAL_GOODS, $orderData[static::FIELD_PAYMENT]) || in_array($orderData[static::FIELD_PAYMENT][static::FIELD_PAYPAL_DIGITAL_GOODS], [null, ''], true)) {
+//            // ToDo: Digital downloads zitten nog niet in Shopware 6
+//        }
+//
+//        return $orderData;
     }
 }

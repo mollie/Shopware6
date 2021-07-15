@@ -11,6 +11,7 @@ export default class AdminOrdersAction {
      *
      */
     openOrders() {
+        cy.wait(200);
         cy.get('.sw-order').click();
 
         if (shopware.isVersionGreaterEqual(6.4)) {

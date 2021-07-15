@@ -21,6 +21,10 @@
     {% else %}
         {{ parent() }}
     {% endif %}
+{% endblock %}
+
+{% block component_payment_method_control %}
+    {{ parent() }}
 
     {# load mollie creditcard components #}
     {% if payment.translated.customFields.mollie_payment_method_name == 'creditcard' %}

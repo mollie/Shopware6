@@ -4,7 +4,7 @@ namespace Kiener\MolliePayments\Validator;
 
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 
-class OrderTotalRoundingValidator
+class IsOrderTotalRoundingActivated
 {
     /**
      * function validates to true if we have to consider new 6.4 rounding feature

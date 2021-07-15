@@ -2,11 +2,8 @@
 
 namespace Kiener\MolliePayments\Controller\Api;
 
-use Exception;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Service\OrderService;
-use Mollie\Api\MollieApiClient;
-use Mollie\Api\Resources\Profile;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -69,12 +66,12 @@ class OrderController extends AbstractController
 
         $mollieOrderId = $order->getCustomFields()['mollie_payments']['order_id'] ?? null;
 
-        if(is_null($mollieOrderId)) {
+        if (is_null($mollieOrderId)) {
             return $this->json([], 404);
         }
 
         return new JsonResponse([
-            'url' => $this->mollieOrderService->getPaymentUrl($mollieOrderId, $order->getSalesChannel()->getId()),
+            'url' => $this->mollieOrderService->getPaymentUrl($mollieOrderId, $order->getSalesChannelId(), $context),
         ]);
     }
 }

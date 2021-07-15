@@ -2,20 +2,8 @@
 
 namespace MolliePayments\Tests\Service\Order;
 
-use Exception;
-use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
-use Kiener\MolliePayments\Service\Order\OrderStateService;
-use Kiener\MolliePayments\Setting\MollieSettingStruct;
-use MolliePayments\Tests\Fakes\FakeEntityRepository;
-use MolliePayments\Tests\Fakes\FakeOrderTransitionService;
 use PHPUnit\Framework\TestCase;
-use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Checkout\Order\OrderStates;
-use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
-use Shopware\Core\Framework\Log\LogEntryDefinition;
-use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity;
 
 class MolliePaymentStatusTest extends TestCase
 {
@@ -28,9 +16,9 @@ class MolliePaymentStatusTest extends TestCase
     {
         return array(
             [true, MolliePaymentStatus::MOLLIE_PAYMENT_AUTHORIZED],
-            [true, MolliePaymentStatus::MOLLIE_PAYMENT_OPEN],
             [true, MolliePaymentStatus::MOLLIE_PAYMENT_PENDING],
             [true, MolliePaymentStatus::MOLLIE_PAYMENT_PAID],
+            [false, MolliePaymentStatus::MOLLIE_PAYMENT_OPEN],
             [false, MolliePaymentStatus::MOLLIE_PAYMENT_COMPLETED],
             [false, MolliePaymentStatus::MOLLIE_PAYMENT_CANCELED],
             [false, MolliePaymentStatus::MOLLIE_PAYMENT_FAILED],
