@@ -3,19 +3,19 @@
 namespace Kiener\MolliePayments\Service\MollieApi;
 
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieOrderException;
-use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeFetched;
 use Kiener\MolliePayments\Exception\MollieOrderPaymentCouldNotBeCreated;
+use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\MollieApi\Payment as PaymentApiService;
 use Mollie\Api\Exceptions\ApiException;
-use Mollie\Api\Exceptions\IncompatiblePlatform;
 use Mollie\Api\Resources\Order as MollieOrder;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\PaymentCollection;
 use Mollie\Api\Types\PaymentStatus;
+use Monolog\Logger;
 use RuntimeException;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
