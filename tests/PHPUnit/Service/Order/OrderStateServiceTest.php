@@ -5,6 +5,7 @@ namespace MolliePayments\Tests\Service\Order;
 use Exception;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\Order\OrderStateService;
+use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use MolliePayments\Tests\Fakes\FakeEntityRepository;
 use MolliePayments\Tests\Fakes\FakeOrderTransitionService;
@@ -30,10 +31,14 @@ class OrderStateServiceTest extends TestCase
     /** @var OrderStateService */
     private $orderStateHelper;
 
+    /** @var SettingsService|\PHPUnit\Framework\MockObject\MockObject */
+    private $settingsService;
+
     public function setUp(): void
     {
+        $this->settingsService = $this->getMockBuilder(SettingsService::class)->disableOriginalConstructor()->getMock();
         $this->loggerRepository = new FakeEntityRepository(new LogEntryDefinition());
-        $this->loggerService = new LoggerService($this->loggerRepository);
+        $this->loggerService = new LoggerService($this->loggerRepository, $this->settingsService);
         $this->orderTransitionService = new FakeOrderTransitionService();
         $this->orderStateHelper = new OrderStateService($this->loggerService, $this->orderTransitionService);
     }

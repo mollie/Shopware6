@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderBuilder">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor"/>
+            <argument type="service" id="router.default"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieLineItemBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderAddressBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder"/>
+
+        <service id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieLineItemBuilder">
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Validator\IsOrderLineItemValid"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\PriceCalculator"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderAddressBuilder"/>
+
+    </services>
+</container>

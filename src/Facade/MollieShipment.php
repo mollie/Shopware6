@@ -11,7 +11,6 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class MollieShipment
 {
@@ -95,20 +94,7 @@ class MollieShipment
             return false;
         }
 
-        $salesChannel = $order->getSalesChannel();
-
-        if (!$salesChannel instanceof SalesChannelEntity) {
-            $this->logger->warning(
-                sprintf(
-                    'Could not extract SalesChannel from order (%s)',
-                    (string)$order->getOrderNumber()
-                )
-            );
-
-            return false;
-        }
-
-        $addedMollieShipment = $this->mollieApiOrderService->setShipment($mollieOrderId, $salesChannel->getId());
+        $addedMollieShipment = $this->mollieApiOrderService->setShipment($mollieOrderId, $order->getSalesChannelId(),$context);
 
         if ($addedMollieShipment) {
             $values = [CustomFieldsInterface::DELIVERY_SHIPPED => true];

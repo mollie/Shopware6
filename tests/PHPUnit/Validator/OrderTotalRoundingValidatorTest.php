@@ -2,7 +2,7 @@
 
 namespace MolliePayments\Tests\Validator;
 
-use Kiener\MolliePayments\Validator\OrderTotalRoundingValidator;
+use Kiener\MolliePayments\Validator\IsOrderTotalRoundingActivated;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 
@@ -18,7 +18,7 @@ class OrderTotalRoundingValidatorTest extends TestCase
         $roundForNet = true;
         $orderTaxState = CartPrice::TAX_STATE_NET;
 
-        $this->assertFalse((new OrderTotalRoundingValidator())->isNewRoundingActive($decimals, $roundForNet, $interval, $orderTaxState));
+        $this->assertFalse((new IsOrderTotalRoundingActivated())->isNewRoundingActive($decimals, $roundForNet, $interval, $orderTaxState));
     }
 
     /**
@@ -33,7 +33,7 @@ class OrderTotalRoundingValidatorTest extends TestCase
         $roundForNet = true;
         $orderTaxState = CartPrice::TAX_STATE_NET;
 
-        $this->assertFalse((new OrderTotalRoundingValidator())->isNewRoundingActive($decimals, $roundForNet, $interval, $orderTaxState));
+        $this->assertFalse((new IsOrderTotalRoundingActivated())->isNewRoundingActive($decimals, $roundForNet, $interval, $orderTaxState));
     }
 
     /**
@@ -49,7 +49,7 @@ class OrderTotalRoundingValidatorTest extends TestCase
         $roundForNet = false;
         $orderTaxState = CartPrice::TAX_STATE_NET;
 
-        $this->assertFalse((new OrderTotalRoundingValidator())->isNewRoundingActive($decimals, $roundForNet, $interval, $orderTaxState));
+        $this->assertFalse((new IsOrderTotalRoundingActivated())->isNewRoundingActive($decimals, $roundForNet, $interval, $orderTaxState));
     }
 
     /**
@@ -65,7 +65,7 @@ class OrderTotalRoundingValidatorTest extends TestCase
         $roundForNet = true;
         $orderTaxState = CartPrice::TAX_STATE_NET;
 
-        $this->assertTrue((new OrderTotalRoundingValidator())->isNewRoundingActive($decimals, $roundForNet, $interval, $orderTaxState));
+        $this->assertTrue((new IsOrderTotalRoundingActivated())->isNewRoundingActive($decimals, $roundForNet, $interval, $orderTaxState));
     }
 
     /**
@@ -81,6 +81,6 @@ class OrderTotalRoundingValidatorTest extends TestCase
         $roundForNet = false;
         $orderTaxState = CartPrice::TAX_STATE_GROSS;
 
-        $this->assertTrue((new OrderTotalRoundingValidator())->isNewRoundingActive($decimals, $roundForNet, $interval, $orderTaxState));
+        $this->assertTrue((new IsOrderTotalRoundingActivated())->isNewRoundingActive($decimals, $roundForNet, $interval, $orderTaxState));
     }
 }

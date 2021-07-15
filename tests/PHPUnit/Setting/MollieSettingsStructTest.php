@@ -82,7 +82,8 @@ final class MollieSettingsStructTest extends TestCase
         $settingsStruct = new MollieSettingStruct();
 
         $settingsStruct->assign([
-            'paymentMethodBankTransferDueDateDays' => $lifeTimeDays
+            'orderLifetimeDays' => $lifeTimeDays,
+            'paymentMethodBankTransferDueDateDays' => $realLifeTimeDays
         ]);
         $actualValue = $settingsStruct->getPaymentMethodBankTransferDueDate();
         $this->assertSame($expectedDateString, $actualValue);

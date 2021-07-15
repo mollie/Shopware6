@@ -2,10 +2,14 @@
 
 namespace Kiener\MolliePayments\Handler\Method;
 
+use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
+use Kiener\MolliePayments\Facade\MolliePaymentFinalize;
 use Kiener\MolliePayments\Handler\PaymentHandler;
+use Kiener\MolliePayments\Service\CustomerService;
+use Kiener\MolliePayments\Service\LoggerService;
+use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Mollie\Api\Types\PaymentMethod;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\System\Locale\LocaleEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class CreditCardPayment extends PaymentHandler
@@ -16,20 +20,38 @@ class CreditCardPayment extends PaymentHandler
 
     /** @var string */
     protected $paymentMethod = self::PAYMENT_METHOD_NAME;
+    /**
+     * @var CustomerService
+     */
+    private $customerService;
 
-    protected function processPaymentMethodSpecificParameters(
+    public function __construct(
+        LoggerService $logger,
+        MolliePaymentDoPay $payFacade,
+        MolliePaymentFinalize $finalizeFacade,
+        TransactionTransitionServiceInterface $transactionTransitionService,
+        CustomerService $customerService
+    )
+    {
+        parent::__construct($logger, $payFacade, $finalizeFacade, $transactionTransitionService);
+        $this->customerService = $customerService;
+    }
+
+    public function processPaymentMethodSpecificParameters(
         array $orderData,
         SalesChannelContext $salesChannelContext,
-        CustomerEntity $customer,
-        LocaleEntity $locale
+        CustomerEntity $customer
     ): array
     {
-        $customFields = $customer->getCustomFields();
+        $customFields = $customer->getCustomFields() ?? [];
+        $cardToken = $customFields['mollie_payments']['credit_card_token'] ?? '';
 
-        if (!array_key_exists(static::FIELD_CREDIT_CARD_TOKEN, $orderData[static::FIELD_PAYMENT]) || in_array($orderData[static::FIELD_PAYMENT][static::FIELD_CREDIT_CARD_TOKEN], [null, ''], true)) {
-            $orderData[static::FIELD_PAYMENT][static::FIELD_CREDIT_CARD_TOKEN] = $customFields['mollie_payments']['credit_card_token'];
-            $this->customerService->setCardToken($customer, '', $salesChannelContext->getContext());
+        if (empty($cardToken)) {
+            return $orderData;
         }
+
+        $orderData['payment']['cardToken'] = $cardToken;
+        $this->customerService->setCardToken($customer, '', $salesChannelContext->getContext());
 
         return $orderData;
     }

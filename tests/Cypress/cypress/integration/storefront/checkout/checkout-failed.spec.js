@@ -25,10 +25,14 @@ const device = devices.getFirstDevice();
 
 context("Checkout Failure Tests", () => {
 
+    before(function () {
+        molliePayment.initSandboxCookie();
+        devices.setDevice(device);
+    })
+
     describe('Mollie Failure Mode', () => {
 
         before(function () {
-            devices.setDevice(device);
             configAction.setupShop(true, false);
         })
 
@@ -95,7 +99,6 @@ context("Checkout Failure Tests", () => {
     describe('Shopware Failure Mode', () => {
 
         before(function () {
-            devices.setDevice(device);
             configAction.setupShop(false, false);
         })
 

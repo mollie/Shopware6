@@ -4,34 +4,21 @@ namespace Kiener\MolliePayments\Service;
 
 use Exception;
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
+use Kiener\MolliePayments\Validator\IsOrderTotalRoundingActivated;
 use Kiener\MolliePayments\Exception\MissingPriceLineItemException;
 use Kiener\MolliePayments\Validator\OrderLineItemValidator;
 use Kiener\MolliePayments\Validator\OrderTotalRoundingValidator;
 use Mollie\Api\Types\OrderLineType;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Cart\LineItem\LineItem;
-use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
-use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTax;
-use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
-use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
+use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Checkout\Promotion\Cart\PromotionProcessor;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 
 class OrderService
 {
     public const ORDER_LINE_ITEM_ID = 'orderLineItemId';
-
-    private const LINE_ITEM_TYPE_CUSTOM_PRODUCTS = 'customized-products';
-
-    private const TAX_ARRAY_KEY_TAX = 'tax';
-    private const TAX_ARRAY_KEY_TAX_RATE = 'taxRate';
-    private const TAX_ARRAY_KEY_PRICE = 'price';
-
-    private const MOLLIE_PRICE_PRECISION = 2;
 
     /** @var EntityRepositoryInterface */
     protected $orderRepository;
@@ -43,12 +30,7 @@ class OrderService
     protected $logger;
 
     /**
-     * @var OrderLineItemValidator
-     */
-    private $orderLineItemValidator;
-
-    /**
-     * @var OrderTotalRoundingValidator
+     * @var IsOrderTotalRoundingActivated
      */
     private $validator;
 
@@ -61,15 +43,13 @@ class OrderService
         EntityRepositoryInterface $orderRepository,
         EntityRepositoryInterface $orderLineItemRepository,
         LoggerInterface $logger,
-        OrderLineItemValidator $orderLineItemValidator,
-        OrderTotalRoundingValidator $validator,
+        IsOrderTotalRoundingActivated $validator,
         string $shopwareVersion
     )
     {
         $this->orderRepository = $orderRepository;
         $this->orderLineItemRepository = $orderLineItemRepository;
         $this->logger = $logger;
-        $this->orderLineItemValidator = $orderLineItemValidator;
         $this->validator = $validator;
         $this->shopwareVersion = $shopwareVersion;
     }
@@ -103,116 +83,32 @@ class OrderService
      */
     public function getOrder(string $orderId, Context $context): ?OrderEntity
     {
-        $order = null;
+        $criteria = new Criteria([$orderId]);
+        $criteria->addAssociation('currency');
+        $criteria->addAssociation('addresses');
+        $criteria->addAssociation('language');
+        $criteria->addAssociation('language.locale');
+        $criteria->addAssociation('lineItems');
+        $criteria->addAssociation('lineItems.product');
+        $criteria->addAssociation('lineItems.product.media');
+        $criteria->addAssociation('deliveries');
+        $criteria->addAssociation('deliveries.shippingOrderAddress');
+        $criteria->addAssociation('transactions');
+        $criteria->addAssociation('transactions.paymentMethod');
 
-        try {
-            $criteria = new Criteria();
-            $criteria->addFilter(new EqualsFilter('id', $orderId));
-            $criteria->addAssociation('currency');
-            $criteria->addAssociation('addresses');
-            $criteria->addAssociation('language');
-            $criteria->addAssociation('language.locale');
-            $criteria->addAssociation('lineItems');
-            $criteria->addAssociation('lineItems.product');
-            $criteria->addAssociation('lineItems.product.media');
-            $criteria->addAssociation('deliveries');
-            $criteria->addAssociation('deliveries.shippingOrderAddress');
-            $criteria->addAssociation('transactions');
-            $criteria->addAssociation('transactions.paymentMethod');
+        /** @var OrderEntity $order */
+        $order = $this->orderRepository->search($criteria, $context)->first();
 
-            /** @var OrderEntity $order */
-            $order = $this->orderRepository->search($criteria, $context)->first();
-        } catch (Exception $e) {
-            $this->logger->error($e->getMessage(), [$e]);
+        if ($order instanceof OrderEntity) {
+            return $order;
         }
 
-        return $order;
-    }
+        $this->logger->critical(
+            sprintf('Could not find an order with id %s. Payment failed', $orderId),
+            $context
+        );
 
-    /**
-     * Return an array of order lines.
-     *
-     * @param OrderEntity $order
-     * @return array
-     * @throws MissingPriceLineItemException
-     */
-    public function getOrderLinesArray(OrderEntity $order): array
-    {
-        // Variables
-        $lines = [];
-        $lineItems = $order->getNestedLineItems();
-
-        if ($lineItems === null || $lineItems->count() === 0) {
-            return $lines;
-        }
-
-        // Get currency code
-        $currency = $order->getCurrency();
-        $currencyCode = $currency !== null ? $currency->getIsoCode() : 'EUR';
-
-        /** @var OrderLineItemEntity $item */
-        foreach ($lineItems as $item) {
-            // Get the SKU
-            $sku = null;
-
-            if ($item->getProduct() !== null) {
-                $sku = $item->getProduct()->getProductNumber();
-            }
-
-            $molliePreparedApiPrices = $this->calculateLineItemPriceData($item, $order->getTaxStatus(), $currencyCode);
-
-            // Get the image
-            $imageUrl = null;
-
-            if (
-                $item->getProduct() !== null
-                && $item->getProduct()->getMedia() !== null
-                && $item->getProduct()->getMedia()->count()
-                && $item->getProduct()->getMedia()->first() !== null
-                && $item->getProduct()->getMedia()->first()->getMedia()
-            ) {
-                $imageUrl = $item->getProduct()->getMedia()->first()->getMedia()->getUrl();
-            }
-
-            // Get the product URL
-            $productUrl = null;
-
-            if (
-                $item->getProduct() !== null
-                && $item->getProduct()->getSeoUrls() !== null
-                && $item->getProduct()->getSeoUrls()->count()
-                && $item->getProduct()->getSeoUrls()->first() !== null
-            ) {
-                $productUrl = $item->getProduct()->getSeoUrls()->first()->getUrl();
-            }
-
-            // Build the order lines array
-            $lines[] = [
-                'type' => $this->getLineItemType($item),
-                'name' => $item->getLabel(),
-                'quantity' => $item->getQuantity(),
-                'unitPrice' => $molliePreparedApiPrices['unitPrice'],
-                'totalAmount' => $molliePreparedApiPrices['totalAmount'],
-                'vatRate' => $molliePreparedApiPrices['vatRate'],
-                'vatAmount' => $molliePreparedApiPrices['vatAmount'],
-                'sku' => $sku,
-                'imageUrl' => urlencode($imageUrl),
-                'productUrl' => urlencode($productUrl),
-                'metadata' => [
-                    self::ORDER_LINE_ITEM_ID => $item->getId(),
-                ],
-            ];
-        }
-
-        $roundingLineItem = $this->getRoundingLineItem($order, $currencyCode);
-
-        if (!empty($roundingLineItem)) {
-            $lines[] = $roundingLineItem;
-        }
-
-        $lines[] = $this->getShippingItemArray($order);
-
-        return $lines;
+        throw new OrderNotFoundException($orderId);
     }
 
     /**
