@@ -2,13 +2,7 @@
 
 namespace Kiener\MolliePayments\Service;
 
-use Exception;
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
-use Kiener\MolliePayments\Validator\IsOrderTotalRoundingActivated;
-use Kiener\MolliePayments\Exception\MissingPriceLineItemException;
-use Kiener\MolliePayments\Validator\OrderLineItemValidator;
-use Kiener\MolliePayments\Validator\OrderTotalRoundingValidator;
-use Mollie\Api\Types\OrderLineType;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -18,8 +12,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 
 class OrderService
 {
-    public const ORDER_LINE_ITEM_ID = 'orderLineItemId';
-
     /** @var EntityRepositoryInterface */
     protected $orderRepository;
 
@@ -29,29 +21,15 @@ class OrderService
     /** @var LoggerInterface */
     protected $logger;
 
-    /**
-     * @var IsOrderTotalRoundingActivated
-     */
-    private $validator;
-
-    /**
-     * @var string
-     */
-    private $shopwareVersion;
-
     public function __construct(
         EntityRepositoryInterface $orderRepository,
         EntityRepositoryInterface $orderLineItemRepository,
-        LoggerInterface $logger,
-        IsOrderTotalRoundingActivated $validator,
-        string $shopwareVersion
+        LoggerInterface $logger
     )
     {
         $this->orderRepository = $orderRepository;
         $this->orderLineItemRepository = $orderLineItemRepository;
         $this->logger = $logger;
-        $this->validator = $validator;
-        $this->shopwareVersion = $shopwareVersion;
     }
 
     /**
@@ -104,147 +82,10 @@ class OrderService
         }
 
         $this->logger->critical(
-            sprintf('Could not find an order with id %s. Payment failed', $orderId),
-            $context
+            sprintf('Could not find an order with id %s. Payment failed', $orderId)
         );
 
         throw new OrderNotFoundException($orderId);
-    }
-
-    /**
-     * with version 6.4 there is a rounding on total amount. This could lead to differences
-     * between order total amount and the sum of all lineitems (including shipping)
-     *
-     * The mollie api checks if both are equal and will reject payment if they are not equal
-     * Shopware isn't calculating any taxes for this discount/surcharge
-     * Because of this we are adding a discount lineitem to the lineitems and are calculating
-     * it with 0% tax like shopware does
-     *
-     * The function will only return a lineItem if
-     * - shopware version >= 6.4
-     * - total amount rounding is active and configured that differences could exist
-     * - and if discrepances do exist at all
-     *
-     * @param OrderEntity $order
-     * @param string $currencyCode
-     * @return array
-     */
-    public function getRoundingLineItem(OrderEntity $order, string $currencyCode): array
-    {
-        // is shopware version >= 6.4
-        if (version_compare($this->shopwareVersion, '6.4', '<')) {
-            // if not return
-            return [];
-        }
-
-        $rounding = $order->getTotalRounding();
-
-        // is there a configuration that could lead to a unexpected rounding ( > 0.01 interval )
-        if (!$this->validator->isNewRoundingActive(
-            $rounding->getDecimals(),
-            $rounding->roundForNet(),
-            $rounding->getInterval(),
-            $order->getTaxStatus())
-        ) {
-            // if not return
-            return [];
-        }
-
-        $amountTotal = $order->getAmountTotal();
-        $positionPrice = $order->getPositionPrice();
-        $shippingTotal = $order->getShippingTotal();
-
-        // are there price differences between total amount and all lineitems (including shipping)
-        if ($amountTotal === $positionPrice + $shippingTotal) {
-            // if not return
-            return [];
-        }
-
-        $price = $amountTotal - ($positionPrice + $shippingTotal);
-        $roundedLineItemTotalPrice = round($price, self::MOLLIE_PRICE_PRECISION);
-        $itemName = ($price < 0) ? 'Shopware Rounding Discount' : 'Shopware Rounding Surcharge';
-
-        // Build the order lines array
-        return [
-            'type' => OrderLineType::TYPE_DISCOUNT,
-            'name' => $itemName,
-            'quantity' => 1,
-            'unitPrice' => $this->getPriceArray($currencyCode, $roundedLineItemTotalPrice),
-            'totalAmount' => $this->getPriceArray($currencyCode, $roundedLineItemTotalPrice),
-            'vatRate' => number_format(0.0, self::MOLLIE_PRICE_PRECISION, '.', ''),
-            'vatAmount' => $this->getPriceArray($currencyCode, 0.00),
-            'sku' => 'SHOPWARE-ROUNDING-ITEM'
-        ];
-    }
-
-    /**
-     * Return an array of shipping data.
-     *
-     * @param OrderEntity $order
-     * @return array
-     */
-    public function getShippingItemArray(OrderEntity $order): array
-    {
-        // Variables
-        $line = [];
-        $shipping = $order->getShippingCosts();
-
-        if ($shipping === null) {
-            return $line;
-        }
-
-        // Get currency code
-        $currency = $order->getCurrency();
-        $currencyCode = $currency !== null ? $currency->getIsoCode() : 'EUR';
-
-        // Get shipping tax
-        $shippingTax = null;
-
-        if ($shipping->getCalculatedTaxes() !== null) {
-            $shippingTax = $this->getLineItemTax($shipping->getCalculatedTaxes());
-        }
-
-        // Get VAT rate
-        $vatRate = $shippingTax !== null ? $shippingTax->getTaxRate() : 0.0;
-
-        // Remove VAT if the order is tax free
-        if ($order->getTaxStatus() === CartPrice::TAX_STATE_FREE) {
-            $vatRate = 0.0;
-        }
-
-        // Get the prices
-        $unitPrice = $shipping->getUnitPrice();
-        $totalAmount = $totalAmountTemp = $shipping->getTotalPrice();
-        $vatAmount = $shipping->getCalculatedTaxes()->getAmount();
-        $vatRateTemp = $vatRate;
-
-        // Add tax when order is net
-        if ($order->getTaxStatus() === CartPrice::TAX_STATE_NET) {
-            $unitPrice *= ((100 + $vatRate) / 100);
-            $totalAmount += $vatAmount;
-            //Check if Vat is still correct by recalculating different Vat users
-            $multiShipVatAmount = ($totalAmountTemp / 100) * $vatRateTemp;
-            //if Vat Amount is off because of multiple Vat's reset it.
-            if ($multiShipVatAmount !== $vatRate) {
-                $vatAmount = $multiShipVatAmount;
-            }
-        }
-
-        // Build the order line array
-        $shippingLine = [
-            'type' => OrderLineType::TYPE_SHIPPING_FEE,
-            'name' => 'Shipping',
-            'quantity' => $shipping->getQuantity(),
-            'unitPrice' => $this->getPriceArray($currencyCode, $unitPrice),
-            'totalAmount' => $this->getPriceArray($currencyCode, $totalAmount),
-            'vatRate' => number_format($vatRate, 2, '.', ''),
-            'vatAmount' => $this->getPriceArray($currencyCode, $vatAmount),
-            'sku' => null,
-//            'imageUrl' => null,
-//            'productUrl' => null,
-        ];
-
-        return $shippingLine;
     }
 
     /**
@@ -263,139 +104,4 @@ class OrderService
         return $mollieOrderId;
     }
 
-    /**
-     * returns an array of totalPrice, unitPrice and vatAmount that is calculated like mollie api does
-     * @param OrderLineItemEntity $item
-     * @param string $orderTaxType
-     * @param string $currencyCode
-     * @return array
-     */
-    public function calculateLineItemPriceData(OrderLineItemEntity $item, string $orderTaxType, string $currencyCode): array
-    {
-        $this->orderLineItemValidator->validate($item);
-
-        $price = $item->getPrice();
-        $taxCollection = $price->getCalculatedTaxes();
-
-        $vatRate = 0.0;
-        $itemTax = $this->getLineItemTax($taxCollection);
-        if ($itemTax instanceof CalculatedTax) {
-            $vatRate = $itemTax->getTaxRate();
-        }
-
-        // Remove VAT if the order is tax free
-        if ($orderTaxType === CartPrice::TAX_STATE_FREE) {
-            $vatRate = 0.0;
-        }
-
-        $unitPrice = $price->getUnitPrice();
-        $lineItemTotalPrice = $item->getTotalPrice();
-
-        // If the order is of type TAX_STATE_NET the $lineItemTotalPrice and unit price
-        // is a net price.
-        // For correct mollie api tax calculations we have to calculate the shopware gross
-        // price
-        if ($orderTaxType === CartPrice::TAX_STATE_NET) {
-            $unitPrice *= ((100 + $vatRate) / 100);
-            $lineItemTotalPrice += $taxCollection->getAmount();
-        }
-
-        $unitPrice = round($unitPrice, self::MOLLIE_PRICE_PRECISION);
-
-
-        $roundedLineItemTotalPrice = round($lineItemTotalPrice, self::MOLLIE_PRICE_PRECISION);
-        $roundedVatRate = round($vatRate, self::MOLLIE_PRICE_PRECISION);
-        $vatAmount = $roundedLineItemTotalPrice * ($roundedVatRate / (100 + $roundedVatRate));
-        $roundedVatAmount = round($vatAmount, self::MOLLIE_PRICE_PRECISION);
-
-        return [
-            'unitPrice' => $this->getPriceArray($currencyCode, $unitPrice),
-            'totalAmount' => $this->getPriceArray($currencyCode, $roundedLineItemTotalPrice),
-            'vatAmount' => $this->getPriceArray($currencyCode, $roundedVatAmount),
-            'vatRate' => number_format($roundedVatRate, self::MOLLIE_PRICE_PRECISION, '.', '')
-        ];
-    }
-
-    /**
-     * Return an array of price data; currency and value.
-     * @param string $currency
-     * @param float|null $price
-     * @param int $decimals
-     * @return array
-     */
-    public function getPriceArray(string $currency, ?float $price = null): array
-    {
-        if ($price === null) {
-            $price = 0.0;
-        }
-
-        return [
-            'currency' => $currency,
-            'value' => number_format(round($price, self::MOLLIE_PRICE_PRECISION), self::MOLLIE_PRICE_PRECISION, '.', '')
-        ];
-    }
-
-    /**
-     * Return the type of the line item.
-     *
-     * @param OrderLineItemEntity $item
-     * @return string|null
-     */
-    public function getLineItemType(OrderLineItemEntity $item): ?string
-    {
-        if ($item->getType() === LineItem::PRODUCT_LINE_ITEM_TYPE) {
-            return OrderLineType::TYPE_PHYSICAL;
-        }
-
-        if ($item->getType() === LineItem::CREDIT_LINE_ITEM_TYPE) {
-            return OrderLineType::TYPE_STORE_CREDIT;
-        }
-
-        if ($item->getType() === PromotionProcessor::LINE_ITEM_TYPE ||
-            $item->getTotalPrice() < 0) {
-            return OrderLineType::TYPE_DISCOUNT;
-        }
-
-        if ($item->getType() === self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS) {
-            return OrderLineType::TYPE_PHYSICAL;
-        }
-
-        return OrderLineType::TYPE_DIGITAL;
-    }
-
-    /**
-     * Return a calculated tax struct for a line item.
-     *
-     * @param CalculatedTaxCollection $taxCollection
-     * @return CalculatedTax|null
-     */
-    public function getLineItemTax(CalculatedTaxCollection $taxCollection): ?CalculatedTax
-    {
-        if ($taxCollection->count() === 0) {
-            return null;
-        } elseif ($taxCollection->count() === 1) {
-            return $taxCollection->first();
-        } else {
-            $tax = [
-                self::TAX_ARRAY_KEY_TAX => 0,
-                self::TAX_ARRAY_KEY_TAX_RATE => 0,
-                self::TAX_ARRAY_KEY_PRICE => 0,
-            ];
-
-            $taxCollection->map(static function (CalculatedTax $calculatedTax) use (&$tax) {
-                $tax[self::TAX_ARRAY_KEY_TAX] += $calculatedTax->getTax();
-                $tax[self::TAX_ARRAY_KEY_PRICE] += $calculatedTax->getPrice();
-            });
-
-            if ($tax[self::TAX_ARRAY_KEY_PRICE] !== $tax[self::TAX_ARRAY_KEY_TAX]) {
-                $tax[self::TAX_ARRAY_KEY_TAX_RATE] = $tax[self::TAX_ARRAY_KEY_TAX] / ($tax[self::TAX_ARRAY_KEY_PRICE] - $tax[self::TAX_ARRAY_KEY_TAX]);
-            }
-
-            return new CalculatedTax(
-                $tax[self::TAX_ARRAY_KEY_TAX],
-                round($tax[self::TAX_ARRAY_KEY_TAX_RATE], 4) * 100,
-                $tax[self::TAX_ARRAY_KEY_PRICE]
-            );
-        }
-    }
 }

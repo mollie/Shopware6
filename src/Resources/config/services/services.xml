@@ -35,8 +35,6 @@
             <argument type="service" id="order.repository"/>
             <argument type="service" id="order_line_item.repository"/>
             <argument type="service" id="monolog.logger"/>
-            <argument type="service" id="Kiener\MolliePayments\Validator\IsOrderTotalRoundingActivated"/>
-            <argument>%kernel.shopware_version%</argument>
         </service>
 
         <service id="Kiener\MolliePayments\Service\RefundService">
