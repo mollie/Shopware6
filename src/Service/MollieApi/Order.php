@@ -55,7 +55,7 @@ class Order
     public function getMollieOrder(string $mollieOrderId, string $salesChannelId, Context $context, array $parameters = []): MollieOrder
     {
         try {
-        $apiClient = $this->clientFactory->getClient($salesChannelId, $context);
+            $apiClient = $this->clientFactory->getClient($salesChannelId);
 
             return $apiClient->orders->get($mollieOrderId, $parameters);
         } catch (ApiException $e) {
@@ -111,7 +111,7 @@ class Order
      */
     public function createOrReusePayment(string $mollieOrderId, string $paymentMethod, SalesChannelContext $salesChannelContext): Payment
     {
-        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelContext->getSalesChannel()->getId(), $salesChannelContext->getContext(), ['embed' => 'payments']);
+        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelContext->getSalesChannel()->getId(), ['embed' => 'payments']);
 
         if (!$mollieOrder instanceof MollieOrder) {
 
