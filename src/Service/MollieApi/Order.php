@@ -2,8 +2,10 @@
 
 namespace Kiener\MolliePayments\Service\MollieApi;
 
+use Kiener\MolliePayments\Exception\CouldNotFetchMollieOrderException;
 use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeFetched;
 use Kiener\MolliePayments\Exception\MollieOrderPaymentCouldNotBeCreated;
+use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\MollieApi\Payment as PaymentApiService;
@@ -12,6 +14,7 @@ use Mollie\Api\Resources\Order as MollieOrder;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\PaymentCollection;
+use Mollie\Api\Types\PaymentStatus;
 use Monolog\Logger;
 use RuntimeException;
 use Shopware\Core\Framework\Context;
@@ -42,16 +45,23 @@ class Order
         $this->paymentApiService = $paymentApiService;
     }
 
+    /**
+     * @param string $mollieOrderId
+     * @param string|null $salesChannelId
+     * @param array $parameters
+     * @return MollieOrder
+     * @throws CouldNotFetchMollieOrderException
+     */
     public function getMollieOrder(string $mollieOrderId, string $salesChannelId, Context $context, array $parameters = []): MollieOrder
     {
-        $apiClient = $this->clientFactory->getClient($salesChannelId);
-
         try {
+            $apiClient = $this->clientFactory->getClient($salesChannelId);
+
             return $apiClient->orders->get($mollieOrderId, $parameters);
         } catch (ApiException $e) {
             $this->logger->addEntry(
                 sprintf(
-                    'API error occured when fetching mollie order %s with message %s',
+                    'API error occurred when fetching mollie order %s with message %s',
                     $mollieOrderId,
                     $e->getMessage()
                 ),
@@ -61,7 +71,7 @@ class Order
                 Logger::ERROR
             );
 
-            throw $e;
+            throw new CouldNotFetchMollieOrderException($mollieOrderId, $e);
         }
     }
 
@@ -199,5 +209,33 @@ class Order
         }
 
         return false;
+    }
+
+    /**
+     * @param string $mollieOrderId
+     * @param string|null $salesChannelId
+     * @return Payment
+     * @throws CouldNotFetchMollieOrderException
+     * @throws PaymentNotFoundException
+     */
+    public function getCompletedPayment(string $mollieOrderId, ?string $salesChannelId, Context $context): Payment
+    {
+        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId, $context, ['embed' => 'payments']);
+
+        if ($mollieOrder->payments()->count() === 0) {
+            throw new PaymentNotFoundException($mollieOrderId);
+        }
+
+        /** @var Payment $payment */
+        foreach ($mollieOrder->payments()->getArrayCopy() as $payment) {
+            if (in_array($payment->status, [
+                PaymentStatus::STATUS_PAID,
+                PaymentStatus::STATUS_AUTHORIZED // Klarna
+            ])) {
+                return $payment;
+            }
+        }
+
+        throw new PaymentNotFoundException($mollieOrderId);
     }
 }

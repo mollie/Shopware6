@@ -3,36 +3,28 @@
 namespace Kiener\MolliePayments\Facade;
 
 use Kiener\MolliePayments\Exception\CouldNotSetRefundAtMollieException;
-use Kiener\MolliePayments\Exception\MissingSalesChannelInOrder;
-use Kiener\MolliePayments\Factory\MollieApiFactory;
-use Kiener\MolliePayments\Service\MollieApi\Order;
+use Kiener\MolliePayments\Service\RefundService;
 use Kiener\MolliePayments\Service\TransactionService;
-use Mollie\Api\Exceptions\ApiException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class SetMollieOrderRefunded
 {
     /**
-     * @var Order
+     * @var RefundService
      */
-    private $mollieOrderService;
-    /**
-     * @var MollieApiFactory
-     */
-    private $apiFactory;
+    private $refundService;
+
     /**
      * @var TransactionService
      */
     private $transactionService;
 
-    public function __construct(TransactionService $transactionService, Order $mollieOrderService, MollieApiFactory $apiFactory)
+    public function __construct(TransactionService $transactionService, RefundService $refundService)
     {
         $this->transactionService = $transactionService;
-        $this->mollieOrderService = $mollieOrderService;
-        $this->apiFactory = $apiFactory;
+        $this->refundService = $refundService;
     }
 
     /**
@@ -59,41 +51,21 @@ class SetMollieOrderRefunded
             );
         }
 
-        $customFields = $order->getCustomFields() ?? [];
+        $refunded = $this->refundService->getRefundedAmount($order, $context);
+        $toRefund = $order->getAmountTotal() - $refunded;
 
-        $mollieOrderId = $customFields['mollie_payments']['order_id'] ?? '';
-
-        if (empty($mollieOrderId)) {
-            throw new CouldNotSetRefundAtMollieException(
-                sprintf('Could not find a mollie order id in order %s for transaction %s ',
-                    $order->getOrderNumber(),
-                    $transaction->getId()
-                )
-            );
+        if ($toRefund <= 0.0) {
+            return;
         }
 
-        $salesChannel = $order->getSalesChannel();
-
-        if (!$salesChannel instanceof SalesChannelEntity) {
-            throw new MissingSalesChannelInOrder($order->getOrderNumber() ?? $order->getId());
-        }
-
-        $apiClient = $this->apiFactory->getClient($salesChannel->getId());
-
-        try {
-            $mollieOrder = $apiClient->orders->get($mollieOrderId);
-            $mollieOrder->refundAll();
-        } catch (ApiException $e) {
-            throw new CouldNotSetRefundAtMollieException(
-                sprintf('Could not refund at mollie for transaction %s with mollieOrderId %s',
-                    $orderTransactionId,
-                    $mollieOrderId
-                ),
-                0,
-                $e
-            );
-        }
+        $this->refundService->refund(
+            $order,
+            $toRefund,
+            sprintf(
+                "Refunded entire order through Shopware Administration. Order number %s",
+                $order->getOrderNumber()
+            ),
+            $context
+        );
     }
-
-
 }
