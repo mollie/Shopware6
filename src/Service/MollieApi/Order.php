@@ -111,7 +111,7 @@ class Order
      */
     public function createOrReusePayment(string $mollieOrderId, string $paymentMethod, SalesChannelContext $salesChannelContext): Payment
     {
-        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelContext->getSalesChannel()->getId(), ['embed' => 'payments']);
+        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelContext->getSalesChannel()->getId(), $salesChannelContext->getContext(), ['embed' => 'payments']);
 
         if (!$mollieOrder instanceof MollieOrder) {
 
