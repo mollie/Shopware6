@@ -13,6 +13,9 @@
         <import resource="services/snippets.xml"/>
         <import resource="services/subscriber.xml"/>
         <import resource="services/validators.xml"/>
+        <import resource="services/builder.xml"/>
+        <import resource="services/controller.xml"/>
+        <import resource="services/handlers.xml"/>
     </imports>
 
     <services>
@@ -35,17 +38,12 @@
 
         <service id="Kiener\MolliePayments\Service\Order\OrderStateService" class="Kiener\MolliePayments\Service\Order\OrderStateService">
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderTransitionService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Transition\OrderTransitionService"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater">
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStateService"/>
-            <argument type="service" id="Shopware\Core\System\StateMachine\StateMachineRegistry"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Service\Order\OrderTransitionService" class="Kiener\MolliePayments\Service\Order\OrderTransitionService">
-            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
             <argument type="service" id="Shopware\Core\System\StateMachine\StateMachineRegistry"/>
         </service>
 
@@ -92,6 +90,7 @@
 
         <service id="Kiener\MolliePayments\Service\LoggerService" class="Kiener\MolliePayments\Service\LoggerService">
             <argument type="service" id="log_entry.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\PaymentMethodService" class="Kiener\MolliePayments\Service\PaymentMethodService" public="true">
@@ -137,6 +136,7 @@
             <argument type="service" id="service_container"/>
             <argument>%kernel.shopware_version%</argument>
             <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>

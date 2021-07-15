@@ -26,7 +26,6 @@ const device = devices.getFirstDevice();
 
 
 const payments = [
-    {key: 'card', name: 'Credit card'},
     {key: 'paypal', name: 'PayPal'},
     {key: 'klarnapaylater', name: 'Pay later'},
     {key: 'klarnasliceit', name: 'Slice it'},
@@ -45,6 +44,7 @@ const payments = [
 context("Checkout Tests", () => {
 
     before(function () {
+        molliePayment.initSandboxCookie();
         devices.setDevice(device);
         configAction.setupShop(true, false);
     })

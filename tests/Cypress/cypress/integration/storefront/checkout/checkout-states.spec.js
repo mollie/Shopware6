@@ -30,6 +30,7 @@ const device = devices.getFirstDevice();
 context("Order Status Mapping Tests", () => {
 
     before(function () {
+        molliePayment.initSandboxCookie();
         devices.setDevice(device);
         configAction.setupShop(false, false);
     })

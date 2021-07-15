@@ -1,23 +1,20 @@
 <?php declare(strict_types=1);
 
-
 namespace Kiener\MolliePayments\Exception;
-
 
 use Shopware\Core\Framework\ShopwareHttpException;
 use Symfony\Component\HttpFoundation\Response;
 
-class MissingPriceLineItemException extends ShopwareHttpException
+class InvalidMollieOrderException extends ShopwareHttpException
 {
-    public function __construct(string $id)
+    public function __construct()
     {
-        $message = sprintf('The OrderLineItemEntity with id (%s) has no price set', $id);
-        parent::__construct($message);
+        parent::__construct('Mollie order is invalid.');
     }
 
     public function getErrorCode(): string
     {
-        return 'MOLLIE_PAYMENTS__LINE_ITEM_MISSING_PRICE_COLLECTION';
+        return 'MOLLIE_PAYMENTS__MOLLIE_ORDER_INVALID';
     }
 
     public function getStatusCode(): int
