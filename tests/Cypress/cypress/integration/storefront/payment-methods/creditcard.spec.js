@@ -40,7 +40,8 @@ describe('Credit Card Components', () => {
                 session.resetBrowserSession();
             });
 
-            it('Successful card payment', () => {
+            // skip this test until risk management for credit card max amount is set higher by mollie
+            it.skip('Successful card payment', () => {
 
                 setUp();
 
@@ -59,6 +60,8 @@ describe('Credit Card Components', () => {
                 // verify that our component card is really
                 // been used by comparing the last 4 digits
                 cy.contains('**** ' + validCardNumber.substr(validCardNumber.length - 4));
+
+                molliePayment.initSandboxCookie();
 
                 molliePayment.selectPaid();
 
