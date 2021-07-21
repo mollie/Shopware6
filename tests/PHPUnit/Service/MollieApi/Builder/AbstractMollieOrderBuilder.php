@@ -10,6 +10,7 @@ use Kiener\MolliePayments\Service\MollieApi\Builder\MollieLineItemBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderAddressBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
+use Kiener\MolliePayments\Service\MollieApi\Builder\MollieShippingLineItemBuilder;
 use Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher;
 use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
@@ -145,7 +146,8 @@ abstract class AbstractMollieOrderBuilder extends TestCase
             new MollieLineItemBuilder(new MollieOrderPriceBuilder(), new IsOrderLineItemValid(), new PriceCalculator(), new LineItemDataExtractor()),
             new MollieOrderAddressBuilder(),
             new MollieOrderCustomerEnricher(),
-            $this->loggerService
+            $this->loggerService,
+            new MollieShippingLineItemBuilder(new PriceCalculator(), new MollieOrderPriceBuilder())
         );
     }
 

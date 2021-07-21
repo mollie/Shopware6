@@ -9,6 +9,7 @@ use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\Locale\LocaleEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -58,6 +59,11 @@ class MollieOrderBuilder
      */
     private $customerEnricher;
 
+    /**
+     * @var MollieShippingLineItemBuilder
+     */
+    private $shippingLineItemBuilder;
+
     public function __construct(
         SettingsService $settingsService,
         OrderDataExtractor $extractor,
@@ -66,7 +72,8 @@ class MollieOrderBuilder
         MollieLineItemBuilder $lineItemBuilder,
         MollieOrderAddressBuilder $addressBuilder,
         MollieOrderCustomerEnricher $customerEnricher,
-        LoggerService $loggerService
+        LoggerService $loggerService,
+        MollieShippingLineItemBuilder $shippingLineItemBuilder
     )
     {
         $this->settingsService = $settingsService;
@@ -77,6 +84,7 @@ class MollieOrderBuilder
         $this->lineItemBuilder = $lineItemBuilder;
         $this->addressBuilder = $addressBuilder;
         $this->customerEnricher = $customerEnricher;
+        $this->shippingLineItemBuilder = $shippingLineItemBuilder;
     }
 
     public function build(
@@ -124,7 +132,14 @@ class MollieOrderBuilder
 
         $lines = $this->lineItemBuilder->buildLineItems($order->getTaxStatus(), $order->getNestedLineItems(), $order->getCurrency());
 
-        $orderData['lines'] = $lines;
+        $deliveries = $order->getDeliveries();
+        $shippingLineItems = [];
+
+        if ($deliveries instanceof OrderDeliveryCollection) {
+            $shippingLineItems = $this->shippingLineItemBuilder->buildShippingLineItems($order->getTaxStatus(), $deliveries, $order->getCurrency());
+        }
+
+        $orderData['lines'] = array_merge($lines, $shippingLineItems);
 
         $orderData['billingAddress'] = $this->addressBuilder->build($customer->getEmail(), $customer->getDefaultBillingAddress());
         $orderData['shippingAddress'] = $this->addressBuilder->build($customer->getEmail(), $customer->getActiveShippingAddress());
