@@ -47,7 +47,7 @@ class MollieShippingLineItemBuilder
             $prices = $this->priceCalculator->calculateLineItemPrice($shippingPrice, $totalPrice, $taxStatus);
 
             $lineItems[] = [
-                'type' => OrderLineType::TYPE_PHYSICAL,
+                'type' => OrderLineType::TYPE_SHIPPING_FEE,
                 'name' => 'Delivery costs ' . $i,
                 'quantity' => 1,
                 'unitPrice' => $this->priceHydrator->build($prices->getUnitPrice(), $currencyCode),
