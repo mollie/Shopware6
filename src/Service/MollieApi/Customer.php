@@ -21,6 +21,12 @@ class Customer
         $this->clientFactory = $clientFactory;
     }
 
+    /**
+     * @param string $customerId
+     * @param string $salesChannelId
+     * @return MollieCustomer
+     * @throws CouldNotFetchMollieCustomerException
+     */
     public function getMollieCustomerById(string $customerId, string $salesChannelId): MollieCustomer
     {
         try {
@@ -32,6 +38,11 @@ class Customer
         }
     }
 
+    /**
+     * @param CustomerEntity $customer
+     * @return MollieCustomer
+     * @throws CouldNotCreateMollieCustomerException
+     */
     public function createCustomerAtMollie(CustomerEntity $customer): MollieCustomer
     {
         try {
