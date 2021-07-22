@@ -4,12 +4,14 @@ namespace MolliePayments\Tests\Utils\Traits;
 
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieLineItemBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
+use Kiener\MolliePayments\Service\MollieApi\Builder\MollieShippingLineItemBuilder;
 use Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\PriceCalculator;
 use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -81,6 +83,13 @@ trait PaymentBuilderTrait
         }
 
         return $expectedLineItems;
+    }
+
+    public function getExpectedDeliveries(string $taxStatus, ?OrderDeliveryCollection $deliveries = null, ?CurrencyEntity $currency = null): array
+    {
+        $mollieShippingLineItemBuilder = new MollieShippingLineItemBuilder(new PriceCalculator(), new MollieOrderPriceBuilder());
+
+        return $mollieShippingLineItemBuilder->buildShippingLineItems($taxStatus, $deliveries, $currency);
     }
 
     public function getDummyLineItems(): OrderLineItemCollection

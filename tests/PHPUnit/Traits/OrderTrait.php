@@ -9,6 +9,7 @@ use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTax;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Content\Media\MediaEntity;
 use Shopware\Core\Content\Product\Aggregate\ProductMedia\ProductMediaCollection;
@@ -118,6 +119,21 @@ trait OrderTrait
         $lineItem->setProduct($product);
 
         return $lineItem;
+    }
+
+    public function getOrderDelivery(float $taxAmount, float $taxRate, float $totalPrice): OrderDeliveryEntity
+    {
+        $delivery = new OrderDeliveryEntity();
+        $delivery->setId(Uuid::randomHex());
+
+        $calculatedTax = new CalculatedTax($taxAmount, $taxRate, $totalPrice);
+        $taxes = new CalculatedTaxCollection([$calculatedTax]);
+        $rules = new TaxRuleCollection([]);
+        $price = new CalculatedPrice($totalPrice, $totalPrice, $taxes, $rules, 1);
+
+        $delivery->setShippingCosts($price);
+
+        return $delivery;
     }
 
     public function getLanguage(string $localeCode): LanguageEntity
