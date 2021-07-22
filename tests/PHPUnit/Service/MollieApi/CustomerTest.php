@@ -2,6 +2,7 @@
 
 namespace MolliePayments\Tests\Service\MollieApi;
 
+use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieCustomerException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\MollieApi\Customer as CustomerApi;
@@ -10,6 +11,7 @@ use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Customer;
 use PHPUnit\Framework\TestCase;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
 
 class CustomerTest extends TestCase
 {
@@ -24,6 +26,15 @@ class CustomerTest extends TestCase
         $customerEndpoint->method('get')->will(
             $this->returnCallback(function ($arg) {
                 if ($arg == 'bar') {
+                    throw new ApiException();
+                } else {
+                    return $this->createMock(Customer::class);
+                }
+            })
+        );
+        $customerEndpoint->method('create')->will(
+            $this->returnCallback(function ($arg) {
+                if ($arg['email'] == 'existing.email@ddress.com') {
                     throw new ApiException();
                 } else {
                     return $this->createMock(Customer::class);
@@ -45,7 +56,7 @@ class CustomerTest extends TestCase
      * @param string|null $expectedReturnClass
      * @param string|null $expectedException
      * @throws CouldNotFetchMollieCustomerException
-     * @dataProvider getMollieCustomerByIdTestData
+     * @dataProvider mollieCustomerByIdTestData
      */
     public function testGetMollieCustomerById(
         string $mollieCustomerId,
@@ -53,18 +64,51 @@ class CustomerTest extends TestCase
         ?string $expectedException = null
     )
     {
-        if(!is_null($expectedException)) {
+        if (!is_null($expectedException)) {
             $this->expectException($expectedException);
         }
 
         $result = $this->customerApiService->getMollieCustomerById($mollieCustomerId, '');
 
-        if(!is_null($expectedReturnClass)) {
+        if (!is_null($expectedReturnClass)) {
             $this->assertInstanceOf($expectedReturnClass, $result);
         }
     }
 
-    public function getMollieCustomerByIdTestData(): array
+    /**
+     * @param string $email
+     * @param string|null $expectedReturnClass
+     * @param string|null $expectedException
+     * @throws CouldNotCreateMollieCustomerException
+     * @dataProvider createCustomerAtMollieTestData
+     */
+    public function testCreateCustomersAtMollie(
+        string $email,
+        ?string $expectedReturnClass = null,
+        ?string $expectedException = null
+    )
+    {
+        if (!is_null($expectedException)) {
+            $this->expectException($expectedException);
+        }
+
+        $customerMock = $this->createConfiguredMock(CustomerEntity::class, [
+            'getFirstName' => 'Foo',
+            'getLastName' => 'Bar',
+            'getEmail' => $email,
+            'getCustomerNumber' => '12345',
+            'getId' => 'fizz',
+            'getSalesChannelId' => 'buzz',
+        ]);
+
+        $result = $this->customerApiService->createCustomerAtMollie($customerMock);
+
+        if (!is_null($expectedReturnClass)) {
+            $this->assertInstanceOf($expectedReturnClass, $result);
+        }
+    }
+
+    public function mollieCustomerByIdTestData(): array
     {
         return [
             'Customer exists in Mollie' => [
@@ -76,6 +120,22 @@ class CustomerTest extends TestCase
                 'bar',
                 null,
                 CouldNotFetchMollieCustomerException::class
+            ]
+        ];
+    }
+
+    public function createCustomerAtMollieTestData(): array
+    {
+        return [
+            'Customer does not exist yet' => [
+                'new.email@ddress.com',
+                Customer::class,
+                null
+            ],
+            'Customer already exists in Mollie' => [
+                'existing.email@ddress.com',
+                null,
+                CouldNotCreateMollieCustomerException::class
             ]
         ];
     }
