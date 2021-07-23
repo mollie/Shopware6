@@ -6,6 +6,7 @@ use Kiener\MolliePayments\Helper\ProfileHelper;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\MollieApiClient;
+use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
 use Shopware\Core\System\SystemConfig\Event\SystemConfigChangedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -29,32 +30,50 @@ class SystemConfigSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            SystemConfigChangedEvent::class => 'onSystemConfigChanged',
+            'system_config.written' => 'onSystemConfigWritten',
+//            SystemConfigChangedEvent::class => 'onSystemConfigChanged',
         ];
+    }
+
+
+    public function onSystemConfigWritten(EntityWrittenEvent $event)
+    {
+        foreach($event->getPayloads() as $payload) {
+            $this->checkSystemConfigChange(
+                $payload['configurationKey'],
+                $payload['configurationValue'],
+                $payload['salesChannelId']
+            );
+        }
     }
 
     public function onSystemConfigChanged(SystemConfigChangedEvent $event)
     {
-        if (in_array($event->getKey(), [
+        $this->checkSystemConfigChange($event->getKey(), $event->getValue(), $event->getSalesChannelId());
+    }
+
+    private function checkSystemConfigChange(string $key, $value, ?string $salesChannelId = null)
+    {
+        if (in_array($key, [
             SettingsService::SYSTEM_CONFIG_DOMAIN . "liveProfileId",
             SettingsService::SYSTEM_CONFIG_DOMAIN . "testProfileId",
         ])) {
             $this->fixProfileIdAfterChange(
-                $event->getKey(),
-                $event->getValue(),
-                $event->getSalesChannelId(),
-                strpos($event->getKey(), 'testProfileId') !== false
+                $key,
+                $value,
+                $salesChannelId,
+                strpos($key, 'testProfileId') !== false
             );
         }
 
-        if (in_array($event->getKey(), [
+        if (in_array($key, [
             SettingsService::SYSTEM_CONFIG_DOMAIN . "liveApiKey",
             SettingsService::SYSTEM_CONFIG_DOMAIN . "testApiKey",
         ])) {
             $this->fetchProfileIdForApiKey(
-                $event->getValue(),
-                $event->getSalesChannelId(),
-                strpos($event->getKey(), 'testApiKey') !== false
+                $value,
+                $salesChannelId,
+                strpos($key, 'testApiKey') !== false
             );
         }
     }
@@ -63,7 +82,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface
     {
         $profileKey = SettingsService::SYSTEM_CONFIG_DOMAIN . ($testMode ? 'test' : 'live') . 'ProfileId';
 
-        if (is_null($value)) {
+        if (empty($value)) {
             // If this api key has been "deleted", also remove the profile ID.
             $this->settingsService->setProfileId(null, $salesChannelId, $testMode);
             return;
