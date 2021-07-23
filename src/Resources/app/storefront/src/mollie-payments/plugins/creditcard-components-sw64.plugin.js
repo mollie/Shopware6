@@ -15,6 +15,7 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
         try {
             this._paymentForm = DomAccess.querySelector(document, this.getSelectors().paymentForm);
             this._confirmForm = DomAccess.querySelector(document, this.getSelectors().confirmForm);
+            this._confirmFormButton = DomAccess.querySelector(this._confirmForm, this.getSelectors().confirmFormButton);
         } catch (e) {
             return;
         }
@@ -69,6 +70,16 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
         this._confirmForm.addEventListener('submit', this.submitForm.bind(this));
     }
 
+    _reactivateFormSubmit() {
+        this._confirmFormButton.disabled = false;
+
+        const loader = DomAccess.querySelector(this._confirmFormButton, '.loader', false);
+
+        if (loader) {
+            loader.remove();
+        }
+    }
+
     getSelectors() {
         return {
             cardHolder: '#cardHolder',
@@ -76,7 +87,8 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
             creditCardRadioInput: '#changePaymentForm input[type="radio"]',
             mollieController: 'div.mollie-components-controller',
             paymentForm: '#changePaymentForm',
-            confirmForm: '#confirmOrderForm'
+            confirmForm: '#confirmOrderForm',
+            confirmFormButton: '#confirmFormSubmit'
         };
     }
 
@@ -198,6 +210,7 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
 
             if (error) {
                 verificationErrors.textContent = error.message;
+                this._reactivateFormSubmit();
                 return;
             }
 
