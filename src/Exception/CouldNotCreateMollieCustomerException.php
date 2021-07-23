@@ -13,7 +13,7 @@ class CouldNotCreateMollieCustomerException extends \Exception
         $message = sprintf(
             "Could not create a customer at Mollie for customer %s (%s)",
             $customerNumber,
-            $customerName,
+            $customerName
         );
         parent::__construct($message, 0, $previous);
     }

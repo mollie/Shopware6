@@ -13,7 +13,7 @@ class CouldNotFetchMollieCustomerException extends \Exception
         $message = sprintf(
             "Could not fetch the Mollie customer ID %s for sales channel %s",
             $mollieCustomerId,
-            $salesChannelId,
+            $salesChannelId
         );
         parent::__construct($message, 0, $previous);
     }
