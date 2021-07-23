@@ -7,7 +7,6 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\MollieApiClient;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
-use Shopware\Core\System\SystemConfig\Event\SystemConfigChangedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SystemConfigSubscriber implements EventSubscriberInterface
@@ -31,25 +30,19 @@ class SystemConfigSubscriber implements EventSubscriberInterface
     {
         return [
             'system_config.written' => 'onSystemConfigWritten',
-//            SystemConfigChangedEvent::class => 'onSystemConfigChanged',
         ];
     }
 
 
     public function onSystemConfigWritten(EntityWrittenEvent $event)
     {
-        foreach($event->getPayloads() as $payload) {
+        foreach ($event->getPayloads() as $payload) {
             $this->checkSystemConfigChange(
                 $payload['configurationKey'],
                 $payload['configurationValue'],
                 $payload['salesChannelId']
             );
         }
-    }
-
-    public function onSystemConfigChanged(SystemConfigChangedEvent $event)
-    {
-        $this->checkSystemConfigChange($event->getKey(), $event->getValue(), $event->getSalesChannelId());
     }
 
     private function checkSystemConfigChange(string $key, $value, ?string $salesChannelId = null)
