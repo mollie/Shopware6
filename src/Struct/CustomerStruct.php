@@ -10,13 +10,17 @@ class CustomerStruct extends Struct
     /** @var ?string */
     private $legacyCustomerId;
 
-    /** @var array */
+    /** @var array<mixed> */
     private $customerIds = [];
 
     /** @var ?string */
     private $preferredIdealIssuer;
 
-    public function __set($key, $value)
+    /**
+     * @param string $key
+     * @param mixed $value
+     */
+    public function __set(string $key, $value): void
     {
         $camelKey = (new CamelCaseToSnakeCaseNameConverter())->denormalize($key);
         $this->$camelKey = $value;
@@ -59,7 +63,7 @@ class CustomerStruct extends Struct
     }
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public function getCustomerIds(): array
     {
@@ -67,7 +71,7 @@ class CustomerStruct extends Struct
     }
 
     /**
-     * @param array $customerIds
+     * @param array<mixed> $customerIds
      */
     public function setCustomerIds(array $customerIds): void
     {
