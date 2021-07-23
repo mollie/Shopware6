@@ -41,6 +41,26 @@ class CustomerStructTest extends TestCase
     }
 
 
+    /**
+     * @param $testData
+     * @param string $profileId
+     * @param bool $testMode
+     * @param string $expectedCustomerId
+     * @dataProvider mollieCustomerIdsTestData
+     */
+    public function testGetCustomerId(
+        $testData,
+        string $profileId,
+        bool $testMode,
+        string $expectedCustomerId
+    )
+    {
+        $struct = new CustomerStruct();
+        $struct->assign($testData);
+
+        $actualValue = $struct->getCustomerId($profileId, $testMode);
+        $this->assertSame($expectedCustomerId, $actualValue);
+    }
 
     public function legacyCustomerIdTestData()
     {
@@ -57,6 +77,80 @@ class CustomerStructTest extends TestCase
             'ideal issuer can be set' => ['ideal_INGBNL2A', 'ideal_INGBNL2A'],
             'ideal issuer id can be null' => [null, null],
             'ideal issuer id can be empty' => ['', ''],
+        ];
+    }
+
+    public function mollieCustomerIdsTestData()
+    {
+        return [
+            'profileId foo, live' => [
+                $this->customerIds(),
+                'foo',
+                false,
+                'cst_123'
+            ],
+            'profileId foo, test' => [
+                $this->customerIds(),
+                'foo',
+                true,
+                'cst_321'
+            ],
+            'profileId bar, live' => [
+                $this->customerIds(),
+                'bar',
+                false,
+                'cst_789'
+            ],
+            'profileId bar, test' => [
+                $this->customerIds(),
+                'bar',
+                true,
+                'cst_987'
+            ],
+            'profileId baz, live' => [
+                $this->customerIds(),
+                'baz',
+                false,
+                'cst_456'
+            ],
+            'profileId baz, test' => [
+                $this->customerIds(),
+                'baz',
+                true,
+                'cst_654'
+            ],
+            'profileId doesn\'t exist, live' => [
+                $this->customerIds(),
+                'fizz',
+                false,
+                ''
+            ],
+            'profileId doesn\'t exist, test' => [
+                $this->customerIds(),
+                'fizz',
+                true,
+                ''
+            ],
+        ];
+    }
+
+    private function customerIds()
+    {
+        return [
+            'customer_ids' => [
+                'foo' => [
+                    'live' => 'cst_123',
+                    'test' => 'cst_321',
+                ],
+                'bar' => [
+                    'live' => 'cst_789',
+                    'test' => 'cst_987',
+                ],
+                'baz' => [
+                    'live' => 'cst_456',
+                    'test' => 'cst_654',
+                ]
+            ]
         ];
     }
 }
