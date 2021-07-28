@@ -3,17 +3,14 @@
 namespace Kiener\MolliePayments\Service\Order;
 
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
+use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
-use Mollie\Api\Types\PaymentStatus;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionDefinition;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity;
-use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Shopware\Core\System\StateMachine\StateMachineRegistry;
-use Shopware\Core\System\StateMachine\Transition;
 
 class OrderStatusUpdater
 {
@@ -44,17 +41,22 @@ class OrderStatusUpdater
      */
     private const STATE_REFUNDED_PARTIALLY = 'refunded_partially';
 
+    /** @var TransactionTransitionServiceInterface */
+    private TransactionTransitionServiceInterface $transactionTransitionService;
+
 
     /**
      * @param OrderTransactionStateHandler $transitionHandler
      * @param OrderStateService $orderHandler
      * @param StateMachineRegistry $stateMachineRegistry
+     * @param TransactionTransitionServiceInterface $transactionTransitionService
      */
-    public function __construct(OrderTransactionStateHandler $transitionHandler, OrderStateService $orderHandler, StateMachineRegistry $stateMachineRegistry)
+    public function __construct(OrderTransactionStateHandler $transitionHandler, OrderStateService $orderHandler, StateMachineRegistry $stateMachineRegistry, TransactionTransitionServiceInterface $transactionTransitionService)
     {
         $this->transitionHandler = $transitionHandler;
         $this->orderHandler = $orderHandler;
         $this->stateMachineRegistry = $stateMachineRegistry;
+        $this->transactionTransitionService = $transactionTransitionService;
     }
 
 
@@ -72,85 +74,40 @@ class OrderStatusUpdater
             return;
         }
 
-        $currentStatus = $transactionState->getTechnicalName();
-
         switch ($status) {
-
             case MolliePaymentStatus::MOLLIE_PAYMENT_OPEN:
-                if ($currentStatus !== PaymentStatus::STATUS_OPEN) {
-                    $this->transitionHandler->reopen($transaction->getId(), $context);
-                }
-                break;
+                $this->transactionTransitionService->reOpenTransaction($transaction, $context);
 
+                break;
             case MolliePaymentStatus::MOLLIE_PAYMENT_AUTHORIZED:
-                {
-                    if (defined('Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions::ACTION_AUTHORIZE')) {
-                        $transitionTarget = PaymentStatus::STATUS_AUTHORIZED;
-                        $transitionAction = StateMachineTransitionActions::ACTION_AUTHORIZE;
-                    } else {
-                        $transitionTarget = PaymentStatus::STATUS_PAID;
-                        $transitionAction = StateMachineTransitionActions::ACTION_PAY;
-                    }
+                $this->transactionTransitionService->authorizeTransaction($transaction, $context);
 
-                    if ($currentStatus !== $transitionTarget) {
-                        $transition = new Transition(OrderTransactionDefinition::ENTITY_NAME, $transaction->getId(), $transitionAction, 'stateId');
-
-                        $this->stateMachineRegistry->transition($transition, $context);
-                    }
-                }
                 break;
-
             case MolliePaymentStatus::MOLLIE_PAYMENT_PENDING:
-                break;
 
+                break;
             case MolliePaymentStatus::MOLLIE_PAYMENT_PAID:
             case MolliePaymentStatus::MOLLIE_PAYMENT_COMPLETED:
-                {
-                    if ($currentStatus !== PaymentStatus::STATUS_PAID) {
-                        if (method_exists($this->transitionHandler, 'paid')) {
-                            $this->transitionHandler->paid($transaction->getId(), $context);
-                        } else {
-                            $this->transitionHandler->pay($transaction->getId(), $context);
-                        }
-                    }
-                }
-                break;
+                $this->transactionTransitionService->payTransaction($transaction, $context);
 
+                break;
             case MolliePaymentStatus::MOLLIE_PAYMENT_EXPIRED:
-                if ($currentStatus !== PaymentStatus::STATUS_CANCELED) {
-                    $this->transitionHandler->cancel($transaction->getId(), $context);
-                }
-                break;
+                $this->transactionTransitionService->cancelTransaction($transaction, $context);
 
+                break;
             case MolliePaymentStatus::MOLLIE_PAYMENT_FAILED:
             case MolliePaymentStatus::MOLLIE_PAYMENT_CANCELED:
-                {
-                    if (method_exists($this->transitionHandler, 'fail')) {
-                        if ($currentStatus !== PaymentStatus::STATUS_FAILED) {
-                            $this->transitionHandler->fail($transaction->getId(), $context);
-                        }
-                    } else {
-                        if ($currentStatus !== PaymentStatus::STATUS_CANCELED) {
-                            $this->transitionHandler->cancel($transaction->getId(), $context);
-                        }
-                    }
-                }
-                break;
+                $this->transactionTransitionService->failTransaction($transaction, $context);
 
+                break;
             case MolliePaymentStatus::MOLLIE_PAYMENT_REFUNDED:
-                $transitionTarget = self::STATE_REFUNDED;
-                if ($currentStatus !== $transitionTarget) {
-                    $this->transitionHandler->refund($transaction->getId(), $context);
-                }
-                break;
+                $this->transactionTransitionService->refundTransaction($transaction, $context);
 
+                break;
             case MolliePaymentStatus::MOLLIE_PAYMENT_PARTIALLY_REFUNDED:
-                $transitionTarget = self::STATE_REFUNDED_PARTIALLY;
-                if ($currentStatus !== $transitionTarget) {
-                    $this->transitionHandler->refundPartially($transaction->getId(), $context);
-                }
-                break;
+                $this->transitionHandler->refundPartially($transaction->getId(), $context);
 
+                break;
             default:
                 throw new \Exception('Updating Payment Status of Order not possible for status: ' . $status);
         }
