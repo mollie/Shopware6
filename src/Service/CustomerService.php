@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Service;
 
 use Exception;
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieCustomerException;
+use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
 use Kiener\MolliePayments\Struct\CustomerStruct;
 use Mollie\Api\Resources\Customer as MollieCustomer;
@@ -12,6 +13,7 @@ use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEnt
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Customer\Event\CustomerBeforeLoginEvent;
 use Shopware\Core\Checkout\Customer\Event\CustomerLoginEvent;
+use Shopware\Core\Checkout\Customer\Exception\CustomerNotFoundException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
@@ -311,6 +313,7 @@ class CustomerService
             $customer = $this->customerRepository->search($criteria, $context)->first();
         } catch (\Exception $e) {
             $this->logger->error($e->getMessage(), [$e]);
+            // Should error be (re)thrown here, instead of returning null?
         }
 
         return $customer;
@@ -318,11 +321,17 @@ class CustomerService
 
     public function getCustomerStruct(string $customerId, Context $context): CustomerStruct
     {
-        $customer = $this->getCustomer($customerId, $context);
-        $customFields = $customer->getCustomFields();
         $struct = new CustomerStruct();
 
-        if (array_key_exists('customer_id', $customFields)) {
+        $customer = $this->getCustomer($customerId, $context);
+
+        if(!($customer instanceof CustomerEntity)) {
+            return $struct;
+        }
+
+        $customFields = $customer->getCustomFields() ?? [];
+
+        if (isset($customFields['customer_id'])) {
             $struct->setLegacyCustomerId($customFields['customer_id']);
         }
 
@@ -520,52 +529,47 @@ class CustomerService
         }
     }
 
-    public function createMollieCustomer(string $customerId, string $salesChannelId, Context $context)
+    /**
+     * @param string $customerId
+     * @param string $salesChannelId
+     * @param Context $context
+     * @throws CustomerCouldNotBeFoundException
+     * @throws \Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException
+     */
+    public function createMollieCustomer(string $customerId, string $salesChannelId, Context $context): void
     {
         $settings = $this->settingsService->getSettings($salesChannelId);
         $struct = $this->getCustomerStruct($customerId, $context);
 
-        if (!empty($struct->getLegacyCustomerId())) {
-            $mollieCustomer = $this->tryAssociatingLegacyCustomerId($customerId, $salesChannelId, $context);
-
-            if ($mollieCustomer instanceof MollieCustomer) {
-                $struct->setLegacyCustomerId(null);
-                $struct->setCustomerId($mollieCustomer->id, $settings->getProfileId(), $settings->isTestMode());
-            }
-        }
-
-        if (empty($struct->getCustomerId($settings->getProfileId(), $settings->isTestMode()))) {
-            return;
-        }
-
-        $this->customerApiService->createCustomerAtMollie($this->getCustomer($customerId, $context));
-    }
-
-    private function tryAssociatingLegacyCustomerId(string $customerId, string $salesChannelId, Context $context): ?MollieCustomer
-    {
-        $settings = $this->settingsService->getSettings($salesChannelId);
-        $struct = $this->getCustomerStruct($customerId, $context);
-
-        try {
-            $mollieCustomer = $this->customerApiService->getMollieCustomerById(
-                $struct->getLegacyCustomerId(),
-                $salesChannelId
-            );
-
-            // At this point the legacy customer ID belongs to the active profile,
-            // we can remove the old customer ID and assign it to the profile.
+        if ($this->customerApiService->isLegacyCustomerValid($struct->getLegacyCustomerId(), $salesChannelId)) {
             $this->setMollieCustomerId(
                 $customerId,
-                $mollieCustomer->id,
+                $struct->getLegacyCustomerId(),
                 $settings->getProfileId(),
                 $settings->isTestMode(),
                 $context
             );
 
-            return $mollieCustomer;
-        } catch (CouldNotFetchMollieCustomerException $e) {
-            // Couldn't associate the legacy id with this saleschannel
-            return null;
+            $struct->setLegacyCustomerId(null);
+            $struct->setCustomerId(
+                $struct->getLegacyCustomerId(),
+                $settings->getProfileId(),
+                $settings->isTestMode()
+            );
+
+            return;
         }
+
+        if (!empty($struct->getCustomerId($settings->getProfileId(), $settings->isTestMode()))) {
+            return;
+        }
+
+        $customer = $this->getCustomer($customerId, $context);
+
+        if(!($customer instanceof CustomerEntity)) {
+            throw new CustomerCouldNotBeFoundException($customerId);
+        }
+
+        $this->customerApiService->createCustomerAtMollie($customer);
     }
 }

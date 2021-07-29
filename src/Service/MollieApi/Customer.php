@@ -63,4 +63,22 @@ class Customer
             );
         }
     }
+
+    public function isLegacyCustomerValid(?string $legacyCustomerId, string $salesChannelId): bool
+    {
+        if(empty($legacyCustomerId)) {
+            return false;
+        }
+
+        try {
+            $mollieCustomer = $this->getMollieCustomerById(
+                $legacyCustomerId,
+                $salesChannelId
+            );
+
+            return $mollieCustomer instanceof MollieCustomer;
+        } catch (CouldNotFetchMollieCustomerException $e) {
+            return false;
+        }
+    }
 }

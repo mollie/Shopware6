@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Subscriber;
 
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
+use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
 use Kiener\MolliePayments\Service\MolliePaymentExtractor;
@@ -73,7 +74,7 @@ class OrderPlacedSubscriber implements EventSubscriberInterface
 
         try {
             $this->customerService->createMollieCustomer($customer->getId(), $event->getSalesChannelId(), $event->getContext());
-        } catch (CouldNotCreateMollieCustomerException $e) {
+        } catch (CouldNotCreateMollieCustomerException | CustomerCouldNotBeFoundException $e) {
             $this->logger->error($e->getMessage(), $e->getTrace());
         }
     }
