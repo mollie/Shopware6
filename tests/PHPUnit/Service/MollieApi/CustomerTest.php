@@ -53,14 +53,14 @@ class CustomerTest extends TestCase
 
     /**
      * @param string $mollieCustomerId
-     * @param string|null $expectedReturnClass
+     * @param string|null $expectedInstance
      * @param string|null $expectedException
      * @throws CouldNotFetchMollieCustomerException
      * @dataProvider mollieCustomerByIdTestData
      */
     public function testGetMollieCustomerById(
         string $mollieCustomerId,
-        ?string $expectedReturnClass = null,
+        ?string $expectedInstance = null,
         ?string $expectedException = null
     )
     {
@@ -68,23 +68,23 @@ class CustomerTest extends TestCase
             $this->expectException($expectedException);
         }
 
-        $result = $this->customerApiService->getMollieCustomerById($mollieCustomerId, '');
+        $actualInstance = $this->customerApiService->getMollieCustomerById($mollieCustomerId, '');
 
-        if (!is_null($expectedReturnClass)) {
-            $this->assertInstanceOf($expectedReturnClass, $result);
+        if (!is_null($expectedInstance)) {
+            $this->assertInstanceOf($expectedInstance, $actualInstance);
         }
     }
 
     /**
      * @param string $email
-     * @param string|null $expectedReturnClass
+     * @param string|null $expectedInstance
      * @param string|null $expectedException
      * @throws CouldNotCreateMollieCustomerException
      * @dataProvider createCustomerAtMollieTestData
      */
     public function testCreateCustomersAtMollie(
         string $email,
-        ?string $expectedReturnClass = null,
+        ?string $expectedInstance = null,
         ?string $expectedException = null
     )
     {
@@ -101,11 +101,27 @@ class CustomerTest extends TestCase
             'getSalesChannelId' => 'buzz',
         ]);
 
-        $result = $this->customerApiService->createCustomerAtMollie($customerMock);
+        $actualInstance = $this->customerApiService->createCustomerAtMollie($customerMock);
 
-        if (!is_null($expectedReturnClass)) {
-            $this->assertInstanceOf($expectedReturnClass, $result);
+        if (!is_null($expectedInstance)) {
+            $this->assertInstanceOf($expectedInstance, $actualInstance);
         }
+    }
+
+    /**
+     * @param string|null $mollieCustomerId
+     * @param bool $expectedValue
+     * @dataProvider isLegacyCustomerValidTestData
+     */
+    public function testIsLegacyCustomerValid(
+        ?string $mollieCustomerId,
+        bool $expectedValue
+    )
+    {
+        $actualValue = $this->customerApiService->isLegacyCustomerValid($mollieCustomerId, '');
+
+        $this->assertIsBool($actualValue);
+        $this->assertSame($expectedValue, $actualValue);
     }
 
     public function mollieCustomerByIdTestData(): array
@@ -137,6 +153,16 @@ class CustomerTest extends TestCase
                 null,
                 CouldNotCreateMollieCustomerException::class
             ]
+        ];
+    }
+
+
+    public function isLegacyCustomerValidTestData(): array
+    {
+        return [
+            'Customer exists in Mollie' => ['foo', true],
+            'Customer does not exist in Mollie' => ['bar', false],
+            'Customer Id is null' => [null, false],
         ];
     }
 }
