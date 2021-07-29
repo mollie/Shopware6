@@ -3,10 +3,7 @@
 namespace Kiener\MolliePayments\Factory;
 
 use Exception;
-use Kiener\MolliePayments\MolliePayments;
-use Kiener\MolliePayments\Service\ConfigService;
 use Kiener\MolliePayments\Service\SettingsService;
-use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Exceptions\IncompatiblePlatform;
 use Mollie\Api\MollieApiClient;
 use Psr\Log\LoggerInterface;
@@ -41,11 +38,11 @@ class MollieApiFactory
 
     /**
      * Create a new instance of the Mollie API client.
-     * @deprecated Use getClient
      * @param string|null $salesChannelId
      *
      * @return MollieApiClient
      * @throws IncompatiblePlatform
+     * @deprecated Use getClient
      */
     public function createClient(?string $salesChannelId = null): MollieApiClient
     {
