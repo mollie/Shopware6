@@ -3,17 +3,15 @@
 namespace Kiener\MolliePayments\Service;
 
 use Exception;
-use Kiener\MolliePayments\Exception\CouldNotFetchMollieCustomerException;
+use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
 use Kiener\MolliePayments\Struct\CustomerStruct;
-use Mollie\Api\Resources\Customer as MollieCustomer;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Customer\Event\CustomerBeforeLoginEvent;
 use Shopware\Core\Checkout\Customer\Event\CustomerLoginEvent;
-use Shopware\Core\Checkout\Customer\Exception\CustomerNotFoundException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
@@ -325,7 +323,7 @@ class CustomerService
 
         $customer = $this->getCustomer($customerId, $context);
 
-        if(!($customer instanceof CustomerEntity)) {
+        if (!($customer instanceof CustomerEntity)) {
             return $struct;
         }
 
@@ -534,7 +532,7 @@ class CustomerService
      * @param string $salesChannelId
      * @param Context $context
      * @throws CustomerCouldNotBeFoundException
-     * @throws \Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException
+     * @throws CouldNotCreateMollieCustomerException
      */
     public function createMollieCustomer(string $customerId, string $salesChannelId, Context $context): void
     {
@@ -566,7 +564,7 @@ class CustomerService
 
         $customer = $this->getCustomer($customerId, $context);
 
-        if(!($customer instanceof CustomerEntity)) {
+        if (!($customer instanceof CustomerEntity)) {
             throw new CustomerCouldNotBeFoundException($customerId);
         }
 
