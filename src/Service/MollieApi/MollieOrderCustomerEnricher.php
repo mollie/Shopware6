@@ -13,6 +13,8 @@ class MollieOrderCustomerEnricher
             return $orderData;
         }
 
+        //  TODO: Refactor for new Mollie customer implementation
+
         $customFields = $customer->getCustomFields() ?? [];
 
         $customerId = $customFields['customer_id'] ?? '';
