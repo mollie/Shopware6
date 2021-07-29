@@ -12,7 +12,7 @@ class CustomerCouldNotBeFoundException extends \Exception
     )
     {
         $message = sprintf("Could not find a customer with id %s",
-            $customerId,
+            $customerId
         );
 
         parent::__construct($message, 0, $previous);
