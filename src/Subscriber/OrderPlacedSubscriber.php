@@ -73,7 +73,11 @@ class OrderPlacedSubscriber implements EventSubscriberInterface
         }
 
         try {
-            $this->customerService->createMollieCustomer($customer->getId(), $event->getSalesChannelId(), $event->getContext());
+            $this->customerService->createMollieCustomer(
+                $customer->getId(),
+                $event->getSalesChannelId(),
+                $event->getContext()
+            );
         } catch (CouldNotCreateMollieCustomerException | CustomerCouldNotBeFoundException $e) {
             $this->logger->error($e->getMessage(), $e->getTrace());
         }
