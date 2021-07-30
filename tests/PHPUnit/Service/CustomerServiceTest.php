@@ -91,6 +91,11 @@ class CustomerServiceTest extends TestCase
         $this->assertSame($expectedCustomFields, $savedCustomerData['customFields']);
     }
 
+    /**
+     * Please be aware that the expected customFields is only what is expected to be passed to
+     * customerRepository::update, and this does mean it is consolidated with the existing customFields.
+     * Normally, this is something the EntityRepository takes care of.
+     */
     public function setMollieCustomerIdTestData() {
         return [
             'New Mollie customer, live' => [
