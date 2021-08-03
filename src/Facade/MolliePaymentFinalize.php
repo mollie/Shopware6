@@ -24,10 +24,6 @@ class MolliePaymentFinalize
      */
     private $mollieApiFactory;
     /**
-     * @var PaymentStatusHelper
-     */
-    private $paymentStatusHelper;
-    /**
      * @var TransactionTransitionServiceInterface
      */
     private $transactionTransitionService;
@@ -46,7 +42,6 @@ class MolliePaymentFinalize
 
     public function __construct(
         MollieApiFactory $mollieApiFactory,
-        PaymentStatusHelper $paymentStatusHelper,
         TransactionTransitionServiceInterface $transactionTransitionService,
         OrderStatusConverter $orderStatusConverter,
         OrderStatusUpdater $orderStatusUpdater,
@@ -54,7 +49,6 @@ class MolliePaymentFinalize
     )
     {
         $this->mollieApiFactory = $mollieApiFactory;
-        $this->paymentStatusHelper = $paymentStatusHelper;
         $this->transactionTransitionService = $transactionTransitionService;
         $this->orderStatusConverter = $orderStatusConverter;
         $this->orderStatusUpdater = $orderStatusUpdater;

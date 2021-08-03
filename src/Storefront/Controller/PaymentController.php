@@ -71,7 +71,7 @@ class PaymentController extends StorefrontController
         TransactionService $transactionService,
         LoggerService $logger,
         TransactionTransitionServiceInterface $transactionTransitionService,
-        MollieOrderPaymentFlow $molliePaymentFlow,
+        MollieOrderPaymentFlow $molliePaymentFlow
     )
     {
         $this->router = $router;

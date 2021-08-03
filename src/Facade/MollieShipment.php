@@ -3,14 +3,15 @@
 namespace Kiener\MolliePayments\Facade;
 
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
+use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Service\MolliePaymentExtractor;
 use Kiener\MolliePayments\Service\OrderDeliveryService;
-use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Symfony\Bridge\Monolog\Logger;
 
 class MollieShipment
 {
@@ -30,7 +31,7 @@ class MollieShipment
     private $orderDeliveryService;
 
     /**
-     * @var LoggerInterface
+     * @var LoggerService
      */
     private $logger;
 
@@ -38,7 +39,7 @@ class MollieShipment
         MolliePaymentExtractor $extractor,
         Order $mollieApiOrderService,
         OrderDeliveryService $orderDeliveryService,
-        LoggerInterface $logger
+        LoggerService $logger
     )
     {
         $this->extractor = $extractor;
@@ -52,8 +53,11 @@ class MollieShipment
         $delivery = $this->orderDeliveryService->getDelivery($orderDeliveryId, $context);
 
         if (!$delivery instanceof OrderDeliveryEntity) {
-            $this->logger->warning(
-                sprintf('Order delivery with id %s could not be found in database', $orderDeliveryId)
+            $this->logger->addEntry(
+                sprintf('Order delivery with id %s could not be found in database', $orderDeliveryId),
+                null,
+                null,
+                Logger::WARNING
             );
 
             return false;
@@ -62,8 +66,11 @@ class MollieShipment
         $order = $delivery->getOrder();
 
         if (!$order instanceof OrderEntity) {
-            $this->logger->warning(
-                sprintf('Loaded delivery with id %s does not have an order in database', $orderDeliveryId)
+            $this->logger->addEntry(
+                sprintf('Loaded delivery with id %s does not have an order in database', $orderDeliveryId),
+                null,
+                null,
+                Logger::WARNING
             );
 
             return false;
@@ -73,8 +80,11 @@ class MollieShipment
         $mollieOrderId = $customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY] ?? null;
 
         if (!$mollieOrderId) {
-            $this->logger->warning(
-                sprintf('Mollie orderId does not exist in shopware order (%s)', (string)$order->getOrderNumber())
+            $this->logger->addEntry(
+                sprintf('Mollie orderId does not exist in shopware order (%s)', (string)$order->getOrderNumber()),
+                null,
+                null,
+                Logger::WARNING
             );
 
             return false;
@@ -84,11 +94,14 @@ class MollieShipment
         $lastTransaction = $this->extractor->extractLast($order->getTransactions());
 
         if (!$lastTransaction instanceof OrderTransactionEntity) {
-            $this->logger->info(
+            $this->logger->addEntry(
                 sprintf(
                     'The last transaction of the order (%s) is not a mollie payment! No shipment will be sent to mollie',
                     (string)$order->getOrderNumber()
-                )
+                ),
+                null,
+                null,
+                Logger::INFO
             );
 
             return false;
