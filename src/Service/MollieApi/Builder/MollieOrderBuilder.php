@@ -145,10 +145,7 @@ class MollieOrderBuilder
         $orderData['shippingAddress'] = $this->addressBuilder->build($customer->getEmail(), $customer->getActiveShippingAddress());
 
         /** @var MollieSettingStruct $settings */
-        $settings = $this->settingsService->getSettings(
-            $salesChannelContext->getSalesChannel()->getId(),
-            $salesChannelContext->getContext()
-        );
+        $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId() );
 
         // set order lifetime like configured
         $dueDate = $settings->getOrderLifetimeDate();

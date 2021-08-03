@@ -78,7 +78,7 @@ class LoggerService
         ?array $additionalData = null
     ): void
     {
-        $settings = $this->settingsService->getSettings($salesChannelId, $context);
+        $settings = $this->settingsService->getSettings($salesChannelId);
 
         if (!$settings->isDebugMode()) {
             return;
