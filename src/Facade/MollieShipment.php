@@ -55,6 +55,7 @@ class MollieShipment
         if (!$delivery instanceof OrderDeliveryEntity) {
             $this->logger->addEntry(
                 sprintf('Order delivery with id %s could not be found in database', $orderDeliveryId),
+                $context,
                 null,
                 null,
                 Logger::WARNING
@@ -68,6 +69,7 @@ class MollieShipment
         if (!$order instanceof OrderEntity) {
             $this->logger->addEntry(
                 sprintf('Loaded delivery with id %s does not have an order in database', $orderDeliveryId),
+                $context,
                 null,
                 null,
                 Logger::WARNING
@@ -82,6 +84,7 @@ class MollieShipment
         if (!$mollieOrderId) {
             $this->logger->addEntry(
                 sprintf('Mollie orderId does not exist in shopware order (%s)', (string)$order->getOrderNumber()),
+                $context,
                 null,
                 null,
                 Logger::WARNING
@@ -99,6 +102,7 @@ class MollieShipment
                     'The last transaction of the order (%s) is not a mollie payment! No shipment will be sent to mollie',
                     (string)$order->getOrderNumber()
                 ),
+                $context,
                 null,
                 null,
                 Logger::INFO

@@ -145,7 +145,7 @@ class OrderStatusUpdater
 
             case MolliePaymentStatus::MOLLIE_PAYMENT_FAILED:
             case MolliePaymentStatus::MOLLIE_PAYMENT_CANCELED:
-                $this->orderHandler->setOrderState($order, $settings->getOrderStateWithAFailedTransaction(), $context);
+                $this->orderHandler->setOrderState($order, $settings->getOrderStateWithACancelledTransaction(), $context);
                 break;
 
             default:
