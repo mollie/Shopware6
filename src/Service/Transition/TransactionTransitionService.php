@@ -29,8 +29,9 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
 
     public function processTransaction(OrderTransactionEntity $transaction, Context $context): void
     {
-        // Shopware added failed status with version 6.2, so this ensures backward compatibility
+        // Shopware added in_progress status with version 6.2, so this ensures backward compatibility
         if (!defined('Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates::STATE_IN_PROGRESS')) {
+            // set open status in < sw6.2
             $this->reOpenTransaction($transaction, $context);
 
             return;
@@ -46,11 +47,11 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         $entityId = $transaction->getId();
         $availableTransitions = $this->getAvailableTransitions($entityId, $context);
 
-        if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_PROCESS, $availableTransitions)) {
+        if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_DO_PAY, $availableTransitions)) {
             $this->reOpenTransaction($transaction, $context);
         }
 
-        $this->performTransition($entityId, StateMachineTransitionActions::ACTION_PROCESS, $context);
+        $this->performTransition($entityId, StateMachineTransitionActions::ACTION_DO_PAY, $context);
     }
 
     public function reOpenTransaction(OrderTransactionEntity $transaction, Context $context): void

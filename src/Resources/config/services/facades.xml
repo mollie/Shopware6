@@ -32,7 +32,18 @@
             <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Facade\MollieOrderPaymentFlow">
+            <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\PaymentMethodService"/>
+            <argument type="service" id="payment_method.repository"/>
+            <argument type="service" id="order_transaction.repository"/>
+        </service>
     </services>
 </container>

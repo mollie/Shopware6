@@ -42,22 +42,6 @@
             <argument type="service" id="Kiener\MolliePayments\Service\Transition\OrderTransitionService"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater">
-            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStateService"/>
-            <argument type="service" id="Shopware\Core\System\StateMachine\StateMachineRegistry"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Helper\PaymentStatusHelper" class="Kiener\MolliePayments\Helper\PaymentStatusHelper">
-            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStateService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="payment_method.repository"/>
-            <argument type="service" id="order_transaction.repository"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\PaymentMethodService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
-        </service>
-
         <!-- Services -->
         <service id="Kiener\MolliePayments\Service\CartService" class="Kiener\MolliePayments\Service\CartService">
             <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
@@ -157,18 +141,16 @@
             </call>
         </service>
 
-
         <service id="Kiener\MolliePayments\Storefront\Controller\PaymentController" public="true">
-            <argument type="service" id="router"/>
+            <argument type="service" id="router.default"/>
             <argument type="service" id="Mollie\Api\MollieApiClient"/>
             <argument type="service" id="Shopware\Core\Framework\Event\BusinessEventDispatcher"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStateService"/>
-            <argument type="service" id="Kiener\MolliePayments\Helper\PaymentStatusHelper"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\TransactionService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
-
+            <argument type="service" id="Kiener\MolliePayments\Facade\MollieOrderPaymentFlow"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>

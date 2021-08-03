@@ -91,13 +91,13 @@ class OrderStatusUpdater
                 $this->transactionTransitionService->payTransaction($transaction, $context);
 
                 break;
+            case MolliePaymentStatus::MOLLIE_PAYMENT_FAILED:
             case MolliePaymentStatus::MOLLIE_PAYMENT_EXPIRED:
-                $this->transactionTransitionService->cancelTransaction($transaction, $context);
+                $this->transactionTransitionService->failTransaction($transaction, $context);
 
                 break;
-            case MolliePaymentStatus::MOLLIE_PAYMENT_FAILED:
             case MolliePaymentStatus::MOLLIE_PAYMENT_CANCELED:
-                $this->transactionTransitionService->failTransaction($transaction, $context);
+                $this->transactionTransitionService->cancelTransaction($transaction, $context);
 
                 break;
             case MolliePaymentStatus::MOLLIE_PAYMENT_REFUNDED:

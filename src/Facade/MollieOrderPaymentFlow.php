@@ -2,87 +2,112 @@
 
 namespace Kiener\MolliePayments\Facade;
 
-use Exception;
-use Kiener\MolliePayments\Event\PaymentPageFailEvent;
-use Kiener\MolliePayments\Helper\PaymentStatusHelper;
-use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
-use Kiener\MolliePayments\Validator\DoesOpenPaymentExist;
+use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
+use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
+use Kiener\MolliePayments\Service\Order\OrderStatusUpdater;
+use Kiener\MolliePayments\Service\PaymentMethodService;
+use Kiener\MolliePayments\Service\SettingsService;
 use Mollie\Api\Resources\Order;
-use Mollie\Api\Types\PaymentStatus;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Response;
+
+
 
 /**
  * @copyright 2021 dasistweb GmbH (https://www.dasistweb.de)
  */
 class MollieOrderPaymentFlow
 {
-    /**
-     * @var PaymentStatusHelper
-     */
-    private PaymentStatusHelper $paymentStatusHelper;
-    /**
-     * @var EventDispatcherInterface
-     */
-    private EventDispatcherInterface $eventDispatcher;
+    /** @var OrderStatusConverter */
+    private OrderStatusConverter $orderStatusConverter;
 
-    public function __construct(PaymentStatusHelper $paymentStatusHelper, EventDispatcherInterface $eventDispatcher)
+    /** @var OrderStatusUpdater */
+    private OrderStatusUpdater $orderStatusUpdater;
+
+    /** @var SettingsService */
+    private SettingsService $settingsService;
+
+    /** @var PaymentMethodService */
+    private PaymentMethodService $paymentMethodService;
+
+    /** @var EntityRepositoryInterface */
+    private EntityRepositoryInterface $paymentMethodRepository;
+
+    /** @var EntityRepositoryInterface */
+    private EntityRepositoryInterface $orderTransactionRepository;
+
+    public function __construct(
+        OrderStatusConverter $orderStatusConverter,
+        OrderStatusUpdater $orderStatusUpdater,
+        SettingsService $settingsService,
+        PaymentMethodService $paymentMethodService,
+        EntityRepositoryInterface $paymentMethodRepository,
+        EntityRepositoryInterface $orderTransactionRepository
+    )
     {
-
-        $this->paymentStatusHelper = $paymentStatusHelper;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->orderStatusConverter = $orderStatusConverter;
+        $this->orderStatusUpdater = $orderStatusUpdater;
+        $this->settingsService = $settingsService;
+        $this->paymentMethodService = $paymentMethodService;
+        $this->paymentMethodRepository = $paymentMethodRepository;
+        $this->orderTransactionRepository = $orderTransactionRepository;
     }
 
     public function process(OrderTransactionEntity $transaction, OrderEntity $order, Order $mollieOrder, SalesChannelContext $salesChannelContext): bool
     {
+        $paymentStatus = $this->orderStatusConverter->getMollieStatus($mollieOrder);
+        $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannelId(), $salesChannelContext->getContext());
 
         // this is only mollie payment flow here we are doing failed management here
-        try {
-            $paymentStatus = $this->paymentStatusHelper->processPaymentStatus(
-                $transaction,
-                $order,
-                $mollieOrder,
+        $this->orderStatusUpdater->updatePaymentStatus($transaction, $paymentStatus, $salesChannelContext->getContext());
+        $this->orderStatusUpdater->updateOrderStatus($order, $paymentStatus, $settings, $salesChannelContext->getContext());
+
+        //now check if payment method has changed, but only in case that it is no paid apple pay (apple pay returns credit card as method)
+        if (!$this->paymentMethodService->isPaidApplePayTransaction($transaction, $mollieOrder)) {
+            $currentCustomerSelectedPaymentMethod = $mollieOrder->method;
+
+            // check if it is mollie payment method
+            // ensure that we may only fetch mollie payment methods
+            $molliePaymentMethodId = $this->paymentMethodRepository->searchIds(
+                (new Criteria())
+                    ->addFilter(
+                        new MultiFilter('AND', [
+                                new ContainsFilter('handlerIdentifier', 'Kiener\MolliePayments\Handler\Method'),
+                                new EqualsFilter('customFields.mollie_payment_method_name', $currentCustomerSelectedPaymentMethod)
+                            ]
+                        )
+                    ),
                 $salesChannelContext->getContext()
-            );
-        } catch (Exception $e) {
-            //@todo do something here, log and throw an error
+            )->firstId();
+
+            // if payment method has changed, update it
+            if (!is_null($molliePaymentMethodId) && $molliePaymentMethodId !== $transaction->getPaymentMethodId()) {
+                $transaction->setPaymentMethodId($molliePaymentMethodId);
+
+                $this->orderTransactionRepository->update(
+                    [
+                        [
+                            'id' => $transaction->getUniqueIdentifier(),
+                            'paymentMethodId' => $molliePaymentMethodId
+                        ]
+                    ],
+
+                    $salesChannelContext->getContext()
+                );
+            }
         }
 
-        $failedStates = [PaymentStatus::STATUS_CANCELED, PaymentStatus::STATUS_FAILED];
+        if (MolliePaymentStatus::isFailedStatus($paymentStatus)) {
+            $mollieOrder->createPayment([]);
 
-        // if order hasn't failed just lead user to normal checkout url
-        if (!in_array($paymentStatus, $failedStates)) {
-
-            //return $this->returnRedirect($salesChannelContext, $returnUrl, $order, $mollieOrder);
             return false;
         }
-
-        if (!DoesOpenPaymentExist::validate($mollieOrder->payments()->getArrayCopy())) {
-            $mollieOrder->createPayment([]);
-        }
-
-        $redirectUrl = '';
-
-        if (!empty($mollieOrder->getCheckoutUrl())) {
-            $redirectUrl = $mollieOrder->getCheckoutUrl();
-        }
-
-        if (empty($redirectUrl)) {
-            //@todo do something here, log and throw an error
-        }
-
-        $paymentPageFailEvent = new PaymentPageFailEvent(
-            $salesChannelContext->getContext(),
-            $order,
-            $mollieOrder,
-            $salesChannelContext->getSalesChannel()->getId(),
-            $redirectUrl
-        );
-
-        $this->eventDispatcher->dispatch($paymentPageFailEvent, $paymentPageFailEvent::EVENT_NAME);
 
         return true;
     }
