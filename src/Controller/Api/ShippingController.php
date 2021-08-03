@@ -155,7 +155,7 @@ class ShippingController extends AbstractController
             && (string)$orderLineId !== ''
             && $quantity > 0
         ) {
-            $apiClient = $this->apiFactory->createClient(
+            $apiClient = $this->apiFactory->getClient(
                 $orderLineItem->getOrder()->getSalesChannelId()
             );
         }
@@ -309,7 +309,7 @@ class ShippingController extends AbstractController
             && (string)$orderLineId !== ''
             && $quantity > 0
         ) {
-            $apiClient = $this->apiFactory->createClient(
+            $apiClient = $this->apiFactory->getClient(
                 $orderLineItem->getOrder()->getSalesChannelId()
             );
         }
