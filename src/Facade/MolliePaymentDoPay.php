@@ -125,7 +125,7 @@ class MolliePaymentDoPay
         // do another payment if mollie order could be found
         if (!empty($mollieOrderId)) {
             $this->logger->addDebugEntry(
-                'Found an existing mollie order with id %s.',
+                sprintf('Found an existing mollie order with id %s.', $mollieOrderId),
                 $salesChannelContext->getSalesChannel()->getId(),
                 $salesChannelContext->getContext()
             );

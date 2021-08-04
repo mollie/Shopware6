@@ -10,4 +10,16 @@ interface TransactionTransitionServiceInterface
     public function processTransaction(OrderTransactionEntity $transaction, Context $context): void;
 
     public function reOpenTransaction(OrderTransactionEntity $transaction, Context $context): void;
+
+    public function payTransaction(OrderTransactionEntity $transaction, Context $context): void;
+
+    public function cancelTransaction(OrderTransactionEntity $transaction, Context $context): void;
+
+    public function failTransaction(OrderTransactionEntity $transaction, Context $context): void;
+
+    public function authorizeTransaction(OrderTransactionEntity $transaction, Context $context): void;
+
+    public function refundTransaction(OrderTransactionEntity $transaction, Context $context): void;
+
+    public function partialRefundTransaction(OrderTransactionEntity $transaction, Context $context): void;
 }
