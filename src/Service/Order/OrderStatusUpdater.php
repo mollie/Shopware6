@@ -42,7 +42,7 @@ class OrderStatusUpdater
     private const STATE_REFUNDED_PARTIALLY = 'refunded_partially';
 
     /** @var TransactionTransitionServiceInterface */
-    private TransactionTransitionServiceInterface $transactionTransitionService;
+    private $transactionTransitionService;
 
 
     /**
@@ -140,10 +140,9 @@ class OrderStatusUpdater
                 break;
 
             case MolliePaymentStatus::MOLLIE_PAYMENT_EXPIRED:
-                $this->orderHandler->setOrderState($order, $settings->getOrderStateWithACancelledTransaction(), $context);
-                break;
-
             case MolliePaymentStatus::MOLLIE_PAYMENT_FAILED:
+                $this->orderHandler->setOrderState($order, $settings->getOrderStateWithAFailedTransaction(), $context);
+                break;
             case MolliePaymentStatus::MOLLIE_PAYMENT_CANCELED:
                 $this->orderHandler->setOrderState($order, $settings->getOrderStateWithACancelledTransaction(), $context);
                 break;

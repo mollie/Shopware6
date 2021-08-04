@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Storefront\Controller;
 use Exception;
 use Kiener\MolliePayments\Event\PaymentPageFailEvent;
 use Kiener\MolliePayments\Event\PaymentPageRedirectEvent;
+use Kiener\MolliePayments\Exception\CouldNotFetchTransaction;
 use Kiener\MolliePayments\Exception\MissingMollieOrderId;
 use Kiener\MolliePayments\Exception\MissingOrderInTransactionException;
 use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeFetched;
@@ -57,10 +58,10 @@ class PaymentController extends StorefrontController
     private $logger;
 
     /** @var TransactionTransitionServiceInterface */
-    private TransactionTransitionServiceInterface $transactionTransitionService;
+    private $transactionTransitionService;
 
     /** @var MollieOrderPaymentFlow */
-    private MollieOrderPaymentFlow $molliePaymentFlow;
+    private $molliePaymentFlow;
 
     public function __construct(
         RouterInterface $router,

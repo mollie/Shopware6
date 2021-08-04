@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Facade;
 
 use Kiener\MolliePayments\Exception\MissingMollieOrderId;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
-use Kiener\MolliePayments\Helper\PaymentStatusHelper;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
 use Kiener\MolliePayments\Service\Order\OrderStatusUpdater;
@@ -30,15 +29,15 @@ class MolliePaymentFinalize
     /**
      * @var OrderStatusConverter
      */
-    private OrderStatusConverter $orderStatusConverter;
+    private $orderStatusConverter;
     /**
      * @var OrderStatusUpdater
      */
-    private OrderStatusUpdater $orderStatusUpdater;
+    private $orderStatusUpdater;
     /**
      * @var SettingsService
      */
-    private SettingsService $settingsService;
+    private $settingsService;
 
     public function __construct(
         MollieApiFactory $mollieApiFactory,
@@ -69,8 +68,9 @@ class MolliePaymentFinalize
         $mollieOrderId = $customFieldsStruct->getMollieOrderId();
 
         if (empty($mollieOrderId)) {
+            $orderNumber = $order->getOrderNumber() ?? '-';
 
-            throw new MissingMollieOrderId($order->getOrderNumber());
+            throw new MissingMollieOrderId($orderNumber);
         }
 
         $apiClient = $this->mollieApiFactory->getClient($salesChannelContext->getSalesChannel()->getId());

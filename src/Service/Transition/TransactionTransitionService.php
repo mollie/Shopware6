@@ -164,9 +164,11 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
             return;
         }
 
+        $authorizedState = OrderTransactionStates::STATE_AUTHORIZED;
+
         $currentStatus = $transaction->getStateMachineState()->getTechnicalName();
 
-        if ($this->isFinalOrTargetStatus($currentStatus, [OrderTransactionStates::STATE_AUTHORIZED, OrderTransactionStates::STATE_PAID])) {
+        if ($this->isFinalOrTargetStatus($currentStatus, [$authorizedState, OrderTransactionStates::STATE_PAID])) {
 
             return;
         }

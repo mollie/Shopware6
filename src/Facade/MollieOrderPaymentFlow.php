@@ -17,30 +17,25 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
-
-
-/**
- * @copyright 2021 dasistweb GmbH (https://www.dasistweb.de)
- */
 class MollieOrderPaymentFlow
 {
     /** @var OrderStatusConverter */
-    private OrderStatusConverter $orderStatusConverter;
+    private $orderStatusConverter;
 
     /** @var OrderStatusUpdater */
-    private OrderStatusUpdater $orderStatusUpdater;
+    private $orderStatusUpdater;
 
     /** @var SettingsService */
-    private SettingsService $settingsService;
+    private $settingsService;
 
     /** @var PaymentMethodService */
-    private PaymentMethodService $paymentMethodService;
+    private $paymentMethodService;
 
     /** @var EntityRepositoryInterface */
-    private EntityRepositoryInterface $paymentMethodRepository;
+    private $paymentMethodRepository;
 
     /** @var EntityRepositoryInterface */
-    private EntityRepositoryInterface $orderTransactionRepository;
+    private $orderTransactionRepository;
 
     public function __construct(
         OrderStatusConverter $orderStatusConverter,
