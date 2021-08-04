@@ -10,7 +10,7 @@
     }
   ],
   "require": {
-    "mollie/mollie-api-php": "~2.25"
+    "mollie/mollie-api-php": "v2.30.2"
   },
   "extra": {
     "shopware-plugin-class": "Kiener\\MolliePayments\\MolliePayments",
@@ -66,7 +66,6 @@
     "phpunit/phpunit": "^9.5",
     "phpstan/phpstan": "^0.12.82",
     "friendsofphp/php-cs-fixer": "^2.18",
-    "nunomaduro/phpinsights": "^1.14",
     "phpcompatibility/php-compatibility": "^9.3",
     "squizlabs/php_codesniffer": "^3.6"
   },
