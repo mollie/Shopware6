@@ -77,7 +77,7 @@ context("Order Status Mapping Tests", () => {
             molliePayment.selectFailed();
 
             adminLogin.login();
-            adminOrders.assertLatestOrderStatus('Cancelled');
+            adminOrders.assertLatestOrderStatus('Open');
             adminOrders.assertLatestPaymentStatus('Cancelled');
         })
 
