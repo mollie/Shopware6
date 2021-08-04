@@ -7,7 +7,6 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Content\Media\MediaEntity;
 use Shopware\Core\Content\Product\Aggregate\ProductMedia\ProductMediaCollection;
 use Shopware\Core\Content\Product\Aggregate\ProductMedia\ProductMediaEntity;
-use Shopware\Core\Content\Product\Exception\ProductNotFoundException;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Content\Seo\SeoUrl\SeoUrlCollection;
 use Shopware\Core\Content\Seo\SeoUrl\SeoUrlEntity;
@@ -18,9 +17,10 @@ class LineItemDataExtractor
     {
         $product = $lineItem->getProduct();
 
+        // extra data is not needed for successful orders
         if (!$product instanceof ProductEntity) {
 
-            throw new ProductNotFoundException((string)$lineItem->getProductId());
+            return new LineItemExtraData($lineItem->getId(), null, null);
         }
 
         $extraData = new LineItemExtraData($product->getProductNumber(), null, null);
