@@ -8,7 +8,6 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Content\Media\MediaEntity;
 use Shopware\Core\Content\Product\Aggregate\ProductMedia\ProductMediaCollection;
 use Shopware\Core\Content\Product\Aggregate\ProductMedia\ProductMediaEntity;
-use Shopware\Core\Content\Product\Exception\ProductNotFoundException;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Content\Seo\SeoUrl\SeoUrlCollection;
 use Shopware\Core\Content\Seo\SeoUrl\SeoUrlEntity;
@@ -20,10 +19,14 @@ class LineItemDataExtractorTest extends TestCase
     public function testWithMissingProduct(): void
     {
         $extractor = new LineItemDataExtractor();
+        $lineItemId = Uuid::randomHex();
         $lineItem = new OrderLineItemEntity();
+        $lineItem->setId($lineItemId);
+        $actual = $extractor->extractExtraData($lineItem);
 
-        self::expectException(ProductNotFoundException::class);
-        $extractor->extractExtraData($lineItem);
+        self::assertSame($lineItemId, $actual->getSku());
+        self::assertNull($actual->getProductUrl());
+        self::assertNull($actual->getImageUrl());
     }
 
     public function testNoMediaNoSeo(): void
