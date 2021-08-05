@@ -9,6 +9,7 @@ import PaymentAction from "Actions/storefront/checkout/PaymentAction";
 import DummyBasketScenario from "Scenarios/DummyBasketScenario";
 import AdminOrdersAction from "Actions/admin/AdminOrdersAction";
 import AdminLoginAction from "Actions/admin/AdminLoginAction";
+import Shopware from "Services/Shopware";
 
 
 const devices = new Devices();
@@ -25,6 +26,7 @@ const scenarioDummyBasket = new DummyBasketScenario(1);
 
 
 const device = devices.getFirstDevice();
+const shopware = new Shopware();
 
 
 context("Order Status Mapping Tests", () => {
@@ -64,8 +66,12 @@ context("Order Status Mapping Tests", () => {
             molliePayment.selectAuthorized();
 
             adminLogin.login();
+            let expectedPaymentStatus = 'Authorized';
+            if (shopware.isVersionLower('6.4.1')) {
+                expectedPaymentStatus = 'Paid';
+            }
             adminOrders.assertLatestOrderStatus('In progress');
-            adminOrders.assertLatestPaymentStatus('Authorized');
+            adminOrders.assertLatestPaymentStatus(expectedPaymentStatus);
         })
 
         it('Test Status Failed', () => {
