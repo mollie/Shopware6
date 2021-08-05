@@ -175,13 +175,13 @@ class MolliePaymentDoPay
         }
 
         // Create a Mollie customer if settings allow it and the customer is not a guest.
-        if ($this->settingsService->getSettings($salesChannelContext->getSalesChannelId())->createCustomersAtMollie() &&
+        if ($this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId())->createCustomersAtMollie() &&
             !$order->getOrderCustomer()->getCustomer()->getGuest()) {
 
             try {
                 $this->customerService->createMollieCustomer(
                     $order->getOrderCustomer()->getCustomer()->getId(),
-                    $salesChannelContext->getSalesChannelId(),
+                    $salesChannelContext->getSalesChannel()->getId(),
                     $salesChannelContext->getContext()
                 );
             } catch (CouldNotCreateMollieCustomerException | CustomerCouldNotBeFoundException $e) {
