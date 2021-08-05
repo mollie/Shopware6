@@ -46,7 +46,6 @@ class MollieApiFactory
      */
     public function createClient(?string $salesChannelId = null): MollieApiClient
     {
-        # TODO Refactor into getClient() below
         # the singleton approach here was too risky,
         # everyone who used this was never able to switch api keys through sales channels.
         # now its the same as getClient() -> should be combined one day
@@ -57,16 +56,15 @@ class MollieApiFactory
      * Returns a new instance of the Mollie API client.
      *
      * @param string|null $salesChannelId
-     * @param Context|null $context
      *
      * @return MollieApiClient
      * @throws IncompatiblePlatform
      */
-    public function getClient(?string $salesChannelId = null, ?Context $context = null): MollieApiClient
+    public function getClient(?string $salesChannelId = null): MollieApiClient
     {
         $this->apiClient = new MollieApiClient();
 
-        $settings = $this->settingsService->getSettings($salesChannelId, $context);
+        $settings = $this->settingsService->getSettings($salesChannelId);
 
         try {
             // Set the API key

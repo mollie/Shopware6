@@ -24,11 +24,10 @@ class SettingsService
      * Get Mollie settings from configuration.
      *
      * @param string|null  $salesChannelId
-     * @param Context|null $context
      *
      * @return MollieSettingStruct
      */
-    public function getSettings(?string $salesChannelId = null, ?Context $context = null): MollieSettingStruct
+    public function getSettings(?string $salesChannelId = null): MollieSettingStruct
     {
         $structData = [];
         $systemConfigData = $this->systemConfigService->getDomain(self::SYSTEM_CONFIG_DOMAIN, $salesChannelId, true);

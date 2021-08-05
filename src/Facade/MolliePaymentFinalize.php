@@ -4,8 +4,10 @@ namespace Kiener\MolliePayments\Facade;
 
 use Kiener\MolliePayments\Exception\MissingMollieOrderId;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
-use Kiener\MolliePayments\Helper\PaymentStatusHelper;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
+use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
+use Kiener\MolliePayments\Service\Order\OrderStatusUpdater;
+use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
 use Mollie\Api\Exceptions\ApiException;
@@ -21,23 +23,35 @@ class MolliePaymentFinalize
      */
     private $mollieApiFactory;
     /**
-     * @var PaymentStatusHelper
-     */
-    private $paymentStatusHelper;
-    /**
      * @var TransactionTransitionServiceInterface
      */
     private $transactionTransitionService;
+    /**
+     * @var OrderStatusConverter
+     */
+    private $orderStatusConverter;
+    /**
+     * @var OrderStatusUpdater
+     */
+    private $orderStatusUpdater;
+    /**
+     * @var SettingsService
+     */
+    private $settingsService;
 
     public function __construct(
         MollieApiFactory $mollieApiFactory,
-        PaymentStatusHelper $paymentStatusHelper,
-        TransactionTransitionServiceInterface $transactionTransitionService
+        TransactionTransitionServiceInterface $transactionTransitionService,
+        OrderStatusConverter $orderStatusConverter,
+        OrderStatusUpdater $orderStatusUpdater,
+        SettingsService $settingsService
     )
     {
         $this->mollieApiFactory = $mollieApiFactory;
-        $this->paymentStatusHelper = $paymentStatusHelper;
         $this->transactionTransitionService = $transactionTransitionService;
+        $this->orderStatusConverter = $orderStatusConverter;
+        $this->orderStatusUpdater = $orderStatusUpdater;
+        $this->settingsService = $settingsService;
     }
 
     /**
@@ -54,27 +68,20 @@ class MolliePaymentFinalize
         $mollieOrderId = $customFieldsStruct->getMollieOrderId();
 
         if (empty($mollieOrderId)) {
-            // Set the error message
-            $errorMessage = sprintf('The Mollie id for order %s could not be found', $order->getOrderNumber());
+            $orderNumber = $order->getOrderNumber() ?? '-';
 
-            throw new MissingMollieOrderId($errorMessage);
+            throw new MissingMollieOrderId($orderNumber);
         }
 
-        $apiClient = $this->mollieApiFactory->getClient($salesChannelContext->getSalesChannel()->getId(), $salesChannelContext->getContext());
+        $apiClient = $this->mollieApiFactory->getClient($salesChannelContext->getSalesChannel()->getId());
         $mollieOrder = $apiClient->orders->get($mollieOrderId, ['embed' => 'payments']);
 
-        $paymentStatus = $this->paymentStatusHelper->processPaymentStatus(
-            $transactionStruct->getOrderTransaction(),
-            $order,
-            $mollieOrder,
-            $salesChannelContext->getContext()
-        );
+        $paymentStatus = $this->orderStatusConverter->getMollieStatus($mollieOrder);
+        $this->orderStatusUpdater->updatePaymentStatus($transactionStruct->getOrderTransaction(), $paymentStatus, $salesChannelContext->getContext());
+        $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannelId());
+        $this->orderStatusUpdater->updateOrderStatus($order, $paymentStatus, $settings, $salesChannelContext->getContext());
 
         if (MolliePaymentStatus::isFailedStatus($paymentStatus)) {
-            $this->transactionTransitionService->reOpenTransaction(
-                $transactionStruct->getOrderTransaction(),
-                $salesChannelContext->getContext()
-            );
 
             throw new CustomerCanceledAsyncPaymentException(
                 $transactionStruct->getOrderTransaction()->getUniqueIdentifier(),

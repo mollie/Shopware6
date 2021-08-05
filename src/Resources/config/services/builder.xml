@@ -8,7 +8,7 @@
         <service id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderBuilder">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor"/>
-            <argument type="service" id="router.default"/>
+            <argument type="service" id="router"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieLineItemBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderAddressBuilder"/>

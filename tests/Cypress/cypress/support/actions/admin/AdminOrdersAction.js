@@ -28,7 +28,7 @@ export default class AdminOrdersAction {
     assertLatestOrderStatus(status) {
 
         this.openOrders();
-
+        cy.wait(500);
         cy.contains(repoOrdersList.getLatestOrderStatusLabelSelector(), status);
     }
 
@@ -39,7 +39,7 @@ export default class AdminOrdersAction {
     assertLatestPaymentStatus(status) {
 
         this.openOrders();
-
+        cy.wait(500);
         cy.contains(repoOrdersList.getLatestPaymentStatusLabelSelector(), status);
     }
 

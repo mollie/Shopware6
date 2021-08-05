@@ -6,7 +6,7 @@
 
     <services>
         <service id="Mollie\Api\MollieApiClient" class="Mollie\Api\MollieApiClient">
-            <factory service="Kiener\MolliePayments\Factory\MollieApiFactory" method="createClient"/>
+            <factory service="Kiener\MolliePayments\Factory\MollieApiFactory" method="getClient"/>
         </service>
 
         <service id="Kiener\MolliePayments\Factory\MollieApiFactory" class="Kiener\MolliePayments\Factory\MollieApiFactory">
