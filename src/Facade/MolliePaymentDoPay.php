@@ -2,8 +2,11 @@
 
 namespace Kiener\MolliePayments\Facade;
 
+use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
+use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Exception\PaymentUrlException;
 use Kiener\MolliePayments\Handler\PaymentHandler;
+use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderBuilder;
@@ -11,9 +14,11 @@ use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Service\MollieApi\Order as ApiOrderService;
 use Kiener\MolliePayments\Service\Order\UpdateOrderLineItems;
 use Kiener\MolliePayments\Service\OrderService;
+use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
 use Mollie\Api\Resources\Order as MollieOrder;
+use Monolog\Logger;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
@@ -47,6 +52,14 @@ class MolliePaymentDoPay
      */
     private $apiOrder;
     /**
+     * @var CustomerService
+     */
+    private $customerService;
+    /**
+     * @var SettingsService
+     */
+    private $settingsService;
+    /**
      * @var UpdateOrderCustomFields
      */
     private $updateOrderCustomFields;
@@ -62,19 +75,23 @@ class MolliePaymentDoPay
      * @param MollieOrderBuilder $orderBuilder
      * @param OrderService $orderService
      * @param ApiOrderService $apiOrder
+     * @param CustomerService $customerService
+     * @param SettingsService $settingsService
      * @param UpdateOrderCustomFields $updateOrderCustomFields
      * @param UpdateOrderLineItems $updateOrderLineItems
      * @param LoggerService $logger
      */
     public function __construct(
-        ApiOrderService $apiOrderService,
+        ApiOrderService           $apiOrderService,
         EntityRepositoryInterface $orderRepository,
-        MollieOrderBuilder $orderBuilder,
-        OrderService $orderService,
-        Order $apiOrder,
-        UpdateOrderCustomFields $updateOrderCustomFields,
-        UpdateOrderLineItems $updateOrderLineItems,
-        LoggerService $logger
+        MollieOrderBuilder        $orderBuilder,
+        OrderService              $orderService,
+        Order                     $apiOrder,
+        CustomerService           $customerService,
+        SettingsService           $settingsService,
+        UpdateOrderCustomFields   $updateOrderCustomFields,
+        UpdateOrderLineItems      $updateOrderLineItems,
+        LoggerService             $logger
     )
     {
         $this->apiOrderService = $apiOrderService;
@@ -82,6 +99,8 @@ class MolliePaymentDoPay
         $this->logger = $logger;
         $this->orderBuilder = $orderBuilder;
         $this->orderService = $orderService;
+        $this->customerService = $customerService;
+        $this->settingsService = $settingsService;
         $this->apiOrder = $apiOrder;
         $this->updateOrderCustomFields = $updateOrderCustomFields;
         $this->updateOrderLineItems = $updateOrderLineItems;
@@ -104,10 +123,10 @@ class MolliePaymentDoPay
      * @return string
      */
     public function preparePayProcessAtMollie(
-        string $paymentMethod,
+        string                        $paymentMethod,
         AsyncPaymentTransactionStruct $transactionStruct,
-        SalesChannelContext $salesChannelContext,
-        PaymentHandler $paymentHandler
+        SalesChannelContext           $salesChannelContext,
+        PaymentHandler                $paymentHandler
     ): string
     {
         // get order with all needed associations
@@ -153,6 +172,27 @@ class MolliePaymentDoPay
             $this->updateOrderCustomFields->updateOrder($order->getId(), $customFieldsStruct, $salesChannelContext);
 
             return $url;
+        }
+
+        // Create a Mollie customer if settings allow it and the customer is not a guest.
+        if ($this->settingsService->getSettings($salesChannelContext->getSalesChannelId())->createCustomersAtMollie() &&
+            !$order->getOrderCustomer()->getCustomer()->getGuest()) {
+
+            try {
+                $this->customerService->createMollieCustomer(
+                    $order->getOrderCustomer()->getCustomer()->getId(),
+                    $salesChannelContext->getSalesChannelId(),
+                    $salesChannelContext->getContext()
+                );
+            } catch (CouldNotCreateMollieCustomerException | CustomerCouldNotBeFoundException $e) {
+                $this->logger->addEntry(
+                    $e->getMessage(),
+                    $salesChannelContext->getContext(),
+                    $e,
+                    [],
+                    Logger::ERROR
+                );
+            }
         }
 
         // build new mollie order array

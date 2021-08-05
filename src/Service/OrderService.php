@@ -64,14 +64,10 @@ class OrderService
         $criteria = new Criteria([$orderId]);
         $criteria->addAssociation('currency');
         $criteria->addAssociation('addresses');
-        $criteria->addAssociation('language');
+        $criteria->addAssociation('orderCustomer.customer');
         $criteria->addAssociation('language.locale');
-        $criteria->addAssociation('lineItems');
-        $criteria->addAssociation('lineItems.product');
         $criteria->addAssociation('lineItems.product.media');
-        $criteria->addAssociation('deliveries');
         $criteria->addAssociation('deliveries.shippingOrderAddress');
-        $criteria->addAssociation('transactions');
         $criteria->addAssociation('transactions.paymentMethod');
 
         /** @var OrderEntity $order */
