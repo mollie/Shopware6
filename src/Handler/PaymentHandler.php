@@ -180,10 +180,14 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         } catch (CustomerCanceledAsyncPaymentException $exception) {
             throw $exception;
         } catch (Throwable $exception) {
+            $e=null;
+            if ($exception instanceof \Exception) {
+                $e=$exception;
+            }
             $this->logger->addEntry(
                 $exception->getMessage(),
                 $salesChannelContext->getContext(),
-                $exception,
+                $e,
                 null,
                 Logger::ERROR
             );
