@@ -2,23 +2,45 @@
 
 namespace Kiener\MolliePayments\Service\MollieApi;
 
+use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class MollieOrderCustomerEnricher
 {
-    public function enrich(array $orderData, CustomerEntity $customer, MollieSettingStruct $settings): array
+    /**
+     * @var CustomerService
+     */
+    private $customerService;
+
+    public function __construct(CustomerService $customerService)
+    {
+        $this->customerService = $customerService;
+    }
+
+    /**
+     * @param array $orderData
+     * @param CustomerEntity $customer
+     * @param MollieSettingStruct $settings
+     * @param SalesChannelContext $salesChannelContext
+     * @return array
+     */
+    public function enrich(
+        array $orderData,
+        CustomerEntity $customer,
+        MollieSettingStruct $settings,
+        SalesChannelContext $salesChannelContext
+    ): array
     {
         if (!$settings->createCustomersAtMollie()) {
             return $orderData;
         }
 
-        //  TODO: Refactor for new Mollie customer implementation
+        $customerStruct = $this->customerService->getCustomerStruct($customer->getId(), $salesChannelContext->getContext());
+        $customerId = $customerStruct->getCustomerId($settings->getProfileId(), $settings->isTestMode());
 
-        $customFields = $customer->getCustomFields() ?? [];
-
-        $customerId = $customFields['customer_id'] ?? '';
-        if (empty($customerId)) {
+        if(empty($customerId)) {
             return $orderData;
         }
 
