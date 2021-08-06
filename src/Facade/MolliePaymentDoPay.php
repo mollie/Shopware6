@@ -11,14 +11,12 @@ use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Order;
-use Kiener\MolliePayments\Service\MollieApi\Order as ApiOrderService;
 use Kiener\MolliePayments\Service\Order\UpdateOrderLineItems;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
 use Mollie\Api\Resources\Order as MollieOrder;
-use Monolog\Logger;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
@@ -30,18 +28,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 class MolliePaymentDoPay
 {
     /**
-     * @var ApiOrderService
-     */
-    private $apiOrderService;
-    /**
-     * @var EntityRepositoryInterface
-     */
-    private $orderRepository;
-    /**
-     * @var LoggerService
-     */
-    private $logger;
-    /**
      * @var MollieOrderBuilder
      */
     private $orderBuilder;
@@ -50,9 +36,9 @@ class MolliePaymentDoPay
      */
     private $orderService;
     /**
-     * @var ApiOrderService
+     * @var Order
      */
-    private $apiOrder;
+    private $orderApiService;
     /**
      * @var CustomerService
      */
@@ -69,14 +55,17 @@ class MolliePaymentDoPay
      * @var UpdateOrderLineItems
      */
     private $updateOrderLineItems;
+    /**
+     * @var LoggerService
+     */
+    private $logger;
 
 
     /**
-     * @param ApiOrderService $apiOrderService
+     * @param Order $apiOrderService
      * @param EntityRepositoryInterface $orderRepository
      * @param MollieOrderBuilder $orderBuilder
      * @param OrderService $orderService
-     * @param ApiOrderService $apiOrder
      * @param CustomerService $customerService
      * @param SettingsService $settingsService
      * @param UpdateOrderCustomFields $updateOrderCustomFields
@@ -84,28 +73,24 @@ class MolliePaymentDoPay
      * @param LoggerService $logger
      */
     public function __construct(
-        ApiOrderService           $apiOrderService,
-        EntityRepositoryInterface $orderRepository,
-        MollieOrderBuilder        $orderBuilder,
-        OrderService              $orderService,
-        Order                     $apiOrder,
-        CustomerService           $customerService,
-        SettingsService           $settingsService,
-        UpdateOrderCustomFields   $updateOrderCustomFields,
-        UpdateOrderLineItems      $updateOrderLineItems,
-        LoggerService             $logger
+        MollieOrderBuilder      $orderBuilder,
+        OrderService            $orderService,
+        Order                   $orderApiService,
+        CustomerService         $customerService,
+        SettingsService         $settingsService,
+        UpdateOrderCustomFields $updateOrderCustomFields,
+        UpdateOrderLineItems    $updateOrderLineItems,
+        LoggerService           $logger
     )
     {
-        $this->apiOrderService = $apiOrderService;
-        $this->orderRepository = $orderRepository;
-        $this->logger = $logger;
         $this->orderBuilder = $orderBuilder;
         $this->orderService = $orderService;
+        $this->orderApiService = $orderApiService;
         $this->customerService = $customerService;
         $this->settingsService = $settingsService;
-        $this->apiOrder = $apiOrder;
         $this->updateOrderCustomFields = $updateOrderCustomFields;
         $this->updateOrderLineItems = $updateOrderLineItems;
+        $this->logger = $logger;
     }
 
     /**
@@ -151,7 +136,7 @@ class MolliePaymentDoPay
                 $salesChannelContext->getContext()
             );
 
-            $payment = $this->apiOrderService->createOrReusePayment($mollieOrderId, $paymentMethod, $salesChannelContext);
+            $payment = $this->orderApiService->createOrReusePayment($mollieOrderId, $paymentMethod, $salesChannelContext);
 
             // if direct payment return to success page
             if (MolliePaymentStatus::isApprovedStatus($payment->status) && empty($payment->getCheckoutUrl())) {
@@ -196,7 +181,7 @@ class MolliePaymentDoPay
         );
 
         // create new order at mollie
-        $mollieOrder = $this->apiOrder->createOrder($mollieOrderArray, $order->getSalesChannelId(), $salesChannelContext);
+        $mollieOrder = $this->orderApiService->createOrder($mollieOrderArray, $order->getSalesChannelId(), $salesChannelContext);
 
         if ($mollieOrder instanceof MollieOrder) {
             $customFieldsStruct->setMollieOrderId($mollieOrder->id);

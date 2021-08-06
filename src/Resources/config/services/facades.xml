@@ -18,8 +18,6 @@
         </service>
 
         <service id="Kiener\MolliePayments\Facade\MolliePaymentDoPay">
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
-            <argument type="service" id="Shopware\Core\Content\Media\DataAbstractionLayer\MediaThumbnailRepositoryDecorator"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
