@@ -20,6 +20,8 @@ use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
 use Mollie\Api\Resources\Order as MollieOrder;
 use Monolog\Logger;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -174,26 +176,43 @@ class MolliePaymentDoPay
             return $url;
         }
 
-        // Create a Mollie customer if settings allow it and the customer is not a guest.
-        if ($this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId())->createCustomersAtMollie() &&
-            !$order->getOrderCustomer()->getCustomer()->getGuest()) {
 
-            try {
+        try{
+            $orderCustomer = $order->getOrderCustomer();
+
+            if(!($orderCustomer instanceof OrderCustomerEntity)) {
+                throw new \Exception(sprintf("Order %s does not have an order customer entity", $order->getId()));
+            }
+
+            $customer = $orderCustomer->getCustomer();
+
+            if(!($customer instanceof CustomerEntity)) {
+                throw new CustomerCouldNotBeFoundException(
+                    $orderCustomer->getCustomerId() ?? 'Order ID: '. $order->getId()
+                );
+            }
+
+            // Create a Mollie customer if settings allow it and the customer is not a guest.
+            if (!$customer->getGuest() && $this->settingsService->getSettings(
+                $salesChannelContext->getSalesChannel()->getId()
+                )->createCustomersAtMollie()) {
+
                 $this->customerService->createMollieCustomer(
-                    $order->getOrderCustomer()->getCustomer()->getId(),
+                    $customer->getId(),
                     $salesChannelContext->getSalesChannel()->getId(),
                     $salesChannelContext->getContext()
                 );
-            } catch (CouldNotCreateMollieCustomerException | CustomerCouldNotBeFoundException $e) {
-                $this->logger->addEntry(
-                    $e->getMessage(),
-                    $salesChannelContext->getContext(),
-                    $e,
-                    [],
-                    Logger::ERROR
-                );
             }
+        } catch (CouldNotCreateMollieCustomerException | CustomerCouldNotBeFoundException | \Exception $e) {
+            $this->logger->addEntry(
+                $e->getMessage(),
+                $salesChannelContext->getContext(),
+                $e,
+                [],
+                Logger::ERROR
+            );
         }
+
 
         // build new mollie order array
         $mollieOrderArray = $this->orderBuilder->build(
