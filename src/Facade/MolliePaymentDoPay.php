@@ -200,7 +200,7 @@ class MolliePaymentDoPay
      * @throws CouldNotCreateMollieCustomerException
      * @throws CustomerCouldNotBeFoundException
      */
-    public function createCustomer(OrderEntity $order, SalesChannelContext $salesChannelContext): void
+    public function createCustomerAtMollie(OrderEntity $order, SalesChannelContext $salesChannelContext): void
     {
         $orderCustomer = $order->getOrderCustomer();
 
