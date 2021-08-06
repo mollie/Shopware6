@@ -62,10 +62,9 @@ class MolliePaymentDoPay
 
 
     /**
-     * @param Order $apiOrderService
-     * @param EntityRepositoryInterface $orderRepository
      * @param MollieOrderBuilder $orderBuilder
      * @param OrderService $orderService
+     * @param Order $orderApiService
      * @param CustomerService $customerService
      * @param SettingsService $settingsService
      * @param UpdateOrderCustomFields $updateOrderCustomFields
@@ -161,7 +160,7 @@ class MolliePaymentDoPay
             return $url;
         }
 
-        $this->createCustomer($order, $salesChannelContext);
+        $this->createCustomerAtMollie($order, $salesChannelContext);
 
         // build new mollie order array
         $mollieOrderArray = $this->orderBuilder->build(
