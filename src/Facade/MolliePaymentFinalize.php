@@ -78,7 +78,7 @@ class MolliePaymentFinalize
 
         $paymentStatus = $this->orderStatusConverter->getMollieStatus($mollieOrder);
         $this->orderStatusUpdater->updatePaymentStatus($transactionStruct->getOrderTransaction(), $paymentStatus, $salesChannelContext->getContext());
-        $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannelId());
+        $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
         $this->orderStatusUpdater->updateOrderStatus($order, $paymentStatus, $settings, $salesChannelContext->getContext());
 
         if (MolliePaymentStatus::isFailedStatus($paymentStatus)) {
