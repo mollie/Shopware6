@@ -176,43 +176,7 @@ class MolliePaymentDoPay
             return $url;
         }
 
-
-        try{
-            $orderCustomer = $order->getOrderCustomer();
-
-            if(!($orderCustomer instanceof OrderCustomerEntity)) {
-                throw new \Exception(sprintf("Order %s does not have an order customer entity", $order->getId()));
-            }
-
-            $customer = $orderCustomer->getCustomer();
-
-            if(!($customer instanceof CustomerEntity)) {
-                throw new CustomerCouldNotBeFoundException(
-                    $orderCustomer->getCustomerId() ?? 'Order ID: '. $order->getId()
-                );
-            }
-
-            // Create a Mollie customer if settings allow it and the customer is not a guest.
-            if (!$customer->getGuest() && $this->settingsService->getSettings(
-                $salesChannelContext->getSalesChannel()->getId()
-                )->createCustomersAtMollie()) {
-
-                $this->customerService->createMollieCustomer(
-                    $customer->getId(),
-                    $salesChannelContext->getSalesChannel()->getId(),
-                    $salesChannelContext->getContext()
-                );
-            }
-        } catch (CouldNotCreateMollieCustomerException | CustomerCouldNotBeFoundException | \Exception $e) {
-            $this->logger->addEntry(
-                $e->getMessage(),
-                $salesChannelContext->getContext(),
-                $e,
-                [],
-                Logger::ERROR
-            );
-        }
-
+        $this->createCustomer($order, $salesChannelContext);
 
         // build new mollie order array
         $mollieOrderArray = $this->orderBuilder->build(
@@ -243,5 +207,40 @@ class MolliePaymentDoPay
         }
 
         return $customFieldsStruct->getMolliePaymentUrl() ?? $customFieldsStruct->getTransactionReturnUrl() ?? $transactionStruct->getReturnUrl();
+    }
+
+    /**
+     * @param OrderEntity $order
+     * @param SalesChannelContext $salesChannelContext
+     * @throws CouldNotCreateMollieCustomerException
+     * @throws CustomerCouldNotBeFoundException
+     */
+    public function createCustomer(OrderEntity $order, SalesChannelContext $salesChannelContext): void
+    {
+        $orderCustomer = $order->getOrderCustomer();
+
+        if (!($orderCustomer instanceof OrderCustomerEntity)) {
+            throw new \Exception(sprintf("Order %s does not have an order customer entity", $order->getId()));
+        }
+
+        $customer = $orderCustomer->getCustomer();
+
+        if (!($customer instanceof CustomerEntity)) {
+            throw new CustomerCouldNotBeFoundException(
+                $orderCustomer->getCustomerId() ?? 'Order ID: ' . $order->getId()
+            );
+        }
+
+        // Create a Mollie customer if settings allow it and the customer is not a guest.
+        if (!$customer->getGuest() && $this->settingsService->getSettings(
+                $salesChannelContext->getSalesChannel()->getId()
+            )->createCustomersAtMollie()) {
+
+            $this->customerService->createMollieCustomer(
+                $customer->getId(),
+                $salesChannelContext->getSalesChannel()->getId(),
+                $salesChannelContext->getContext()
+            );
+        }
     }
 }
