@@ -11,6 +11,7 @@ use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Order;
+use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
 use Kiener\MolliePayments\Service\Order\UpdateOrderLineItems;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
@@ -18,15 +19,16 @@ use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
 use Mollie\Api\Resources\Order as MollieOrder;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
-use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class MolliePaymentDoPay
 {
+    /**
+     * @var OrderDataExtractor
+     */
+    private $extractor;
     /**
      * @var MollieOrderBuilder
      */
@@ -62,6 +64,7 @@ class MolliePaymentDoPay
 
 
     /**
+     * @param OrderDataExtractor $extractor
      * @param MollieOrderBuilder $orderBuilder
      * @param OrderService $orderService
      * @param Order $orderApiService
@@ -72,6 +75,7 @@ class MolliePaymentDoPay
      * @param LoggerService $logger
      */
     public function __construct(
+        OrderDataExtractor      $extractor,
         MollieOrderBuilder      $orderBuilder,
         OrderService            $orderService,
         Order                   $orderApiService,
@@ -82,6 +86,7 @@ class MolliePaymentDoPay
         LoggerService           $logger
     )
     {
+        $this->extractor = $extractor;
         $this->orderBuilder = $orderBuilder;
         $this->orderService = $orderService;
         $this->orderApiService = $orderApiService;
@@ -201,19 +206,7 @@ class MolliePaymentDoPay
      */
     public function createCustomerAtMollie(OrderEntity $order, SalesChannelContext $salesChannelContext): void
     {
-        $orderCustomer = $order->getOrderCustomer();
-
-        if (!($orderCustomer instanceof OrderCustomerEntity)) {
-            throw new \Exception(sprintf("Order %s does not have an order customer entity", $order->getId()));
-        }
-
-        $customer = $orderCustomer->getCustomer();
-
-        if (!($customer instanceof CustomerEntity)) {
-            throw new CustomerCouldNotBeFoundException(
-                $orderCustomer->getCustomerId() ?? 'Order ID: ' . $order->getId()
-            );
-        }
+        $customer = $this->extractor->extractCustomer($order, $salesChannelContext);
 
         // Create a Mollie customer if settings allow it and the customer is not a guest.
         if (!$customer->getGuest() && $this->settingsService->getSettings(

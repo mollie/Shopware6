@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Order;
+use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
 use Kiener\MolliePayments\Service\Order\UpdateOrderLineItems;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
@@ -42,8 +43,6 @@ class MolliePaymentDoPayTest extends TestCase
 
     public function setUp(): void
     {
-        $this->customerService = $this->createMock(CustomerService::class);
-
         $this->settings = new MollieSettingStruct();
 
         $settingsService = $this->createConfiguredMock(SettingsService::class, [
@@ -53,14 +52,21 @@ class MolliePaymentDoPayTest extends TestCase
         $this->customer = $this->createConfiguredMock(CustomerEntity::class, [
             'getId' => 'foo',
         ]);
-
-        $orderCustomer = $this->createConfiguredMock(OrderCustomerEntity::class, [
-            'getCustomer' => $this->customer,
+        $this->customerService = $this->createConfiguredMock(CustomerService::class, [
+            'getCustomer' => $this->customer
         ]);
 
+        $orderCustomer = $this->createConfiguredMock(OrderCustomerEntity::class, [
+            'getCustomerId' => 'foo',
+        ]);
         $this->order = $this->createConfiguredMock(OrderEntity::class, [
             'getOrderCustomer' => $orderCustomer,
         ]);
+
+        $orderDataExtractor = new OrderDataExtractor(
+            $this->createMock(LoggerService::class),
+            $this->customerService
+        );
 
         $salesChannel = $this->createConfiguredMock(SalesChannelEntity::class, [
             'getId' => 'bar',
@@ -74,6 +80,7 @@ class MolliePaymentDoPayTest extends TestCase
         ]);
 
         $this->payFacade = new MolliePaymentDoPay(
+            $orderDataExtractor,
             $this->createMock(MollieOrderBuilder::class),
             $this->createMock(OrderService::class),
             $this->createMock(Order::class),
