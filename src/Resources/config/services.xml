@@ -43,9 +43,6 @@
         </service>
 
         <!-- Services -->
-        <service id="Kiener\MolliePayments\Service\CartService" class="Kiener\MolliePayments\Service\CartService">
-            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
-        </service>
 
         <service id="Kiener\MolliePayments\Service\CustomerService" class="Kiener\MolliePayments\Service\CustomerService">
             <argument type="service" id="country.repository"/>
