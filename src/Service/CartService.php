@@ -22,7 +22,7 @@ class CartService
     /**
      * @var ContainerInterface
      */
-    private ContainerInterface $container;
+    private $container;
 
     public function __construct(
         SalesChannelCartService $salesChannelCartService,
