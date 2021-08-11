@@ -33,6 +33,7 @@
             <label>Test Mode</label>
             <label lang="de-DE">Test Modus</label>
             <label lang="nl-NL">Test Modus</label>
+            <defaultValue>true</defaultValue>
         </input-field>
         <input-field type="bool">
             <name>debugMode</name>
@@ -40,6 +41,7 @@
             <label>Debug Mode</label>
             <label lang="de-DE">Debug Modus</label>
             <label lang="nl-NL">Debug Modus</label>
+            <defaultValue>false</defaultValue>
         </input-field>
     </card>
     <card>
@@ -51,12 +53,14 @@
             <label>Credit Card Components</label>
             <label lang="de-DE">Kreditkarten Komponenten</label>
             <label lang="nl-NL">Credit Card componenten</label>
+            <defaultValue>false</defaultValue>
         </input-field>
         <input-field type="bool">
             <name>enableApplePayDirect</name>
             <label>Enable Apple Pay Direct</label>
             <label lang="de-DE">Apple Pay Direct aktivieren</label>
             <label lang="nl-NL">Apple Pay Direct activeren</label>
+            <defaultValue>false</defaultValue>
         </input-field>
         <input-field type="int">
             <name>paymentMethodBankTransferDueDateDays</name>
@@ -75,6 +79,7 @@
             <label>Use standard failed payment redirect.</label>
             <label lang="de-DE">Standard Shopware Verhalten bei fehlgeschlagenen Bestellungen benutzen</label>
             <label lang="nl-NL">Gebruik standaard Shopware redirect voor mislukte bestellingen.</label>
+            <defaultValue>false</defaultValue>
         </input-field>
 <!--        <input-field type="bool">-->
 <!--            <name>noCustomersAtMollie</name>-->
