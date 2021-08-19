@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher;
 use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
 use Kiener\MolliePayments\Service\SettingsService;
+use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
@@ -64,17 +65,23 @@ class MollieOrderBuilder
      */
     private $shippingLineItemBuilder;
 
-    public function __construct(
-        SettingsService $settingsService,
-        OrderDataExtractor $extractor,
-        RouterInterface $router,
-        MollieOrderPriceBuilder $priceBuilder,
-        MollieLineItemBuilder $lineItemBuilder,
-        MollieOrderAddressBuilder $addressBuilder,
-        MollieOrderCustomerEnricher $customerEnricher,
-        LoggerService $loggerService,
-        MollieShippingLineItemBuilder $shippingLineItemBuilder
-    )
+    /**
+     * @var WebhookBuilder
+     */
+    private $webhookBuilder;
+
+    /**
+     * @param SettingsService $settingsService
+     * @param OrderDataExtractor $extractor
+     * @param RouterInterface $router
+     * @param MollieOrderPriceBuilder $priceBuilder
+     * @param MollieLineItemBuilder $lineItemBuilder
+     * @param MollieOrderAddressBuilder $addressBuilder
+     * @param MollieOrderCustomerEnricher $customerEnricher
+     * @param LoggerService $loggerService
+     * @param MollieShippingLineItemBuilder $shippingLineItemBuilder
+     */
+    public function __construct(SettingsService $settingsService, OrderDataExtractor $extractor, RouterInterface $router, MollieOrderPriceBuilder $priceBuilder, MollieLineItemBuilder $lineItemBuilder, MollieOrderAddressBuilder $addressBuilder, MollieOrderCustomerEnricher $customerEnricher, LoggerService $loggerService, MollieShippingLineItemBuilder $shippingLineItemBuilder)
     {
         $this->settingsService = $settingsService;
         $this->loggerService = $loggerService;
@@ -85,17 +92,11 @@ class MollieOrderBuilder
         $this->addressBuilder = $addressBuilder;
         $this->customerEnricher = $customerEnricher;
         $this->shippingLineItemBuilder = $shippingLineItemBuilder;
+
+        $this->webhookBuilder = new WebhookBuilder($router);
     }
 
-    public function build(
-        OrderEntity $order,
-        string $transactionId,
-        string $paymentMethod,
-        string $returnUrl,
-        SalesChannelContext $salesChannelContext,
-        ?PaymentHandler $handler,
-        array $paymentData = []
-    ): array
+    public function build(OrderEntity $order, string $transactionId, string $paymentMethod, string $returnUrl, SalesChannelContext $salesChannelContext, ?PaymentHandler $handler, array $paymentData = []): array
     {
         $customer = $this->extractor->extractCustomer($order, $salesChannelContext);
         $currency = $this->extractor->extractCurrency($order, $salesChannelContext);
@@ -120,13 +121,12 @@ class MollieOrderBuilder
             ],
             $this->router::ABSOLUTE_URL
         );
-        $webhookUrl = $this->router->generate(
-            'frontend.mollie.webhook',
-            ['transactionId' => $transactionId],
-            $this->router::ABSOLUTE_URL
-        );
+
 
         $orderData['redirectUrl'] = $redirectUrl;
+
+        
+        $webhookUrl = $this->webhookBuilder->buildWebhook($transactionId);
         $orderData['webhookUrl'] = $webhookUrl;
         $orderData['payment']['webhookUrl'] = $webhookUrl;
 
@@ -145,7 +145,7 @@ class MollieOrderBuilder
         $orderData['shippingAddress'] = $this->addressBuilder->build($customer->getEmail(), $customer->getActiveShippingAddress());
 
         /** @var MollieSettingStruct $settings */
-        $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId() );
+        $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
 
         // set order lifetime like configured
         $dueDate = $settings->getOrderLifetimeDate();
