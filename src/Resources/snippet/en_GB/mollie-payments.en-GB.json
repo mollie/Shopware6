@@ -1,9 +1,9 @@
 {
   "molliePayments": {
-      "testMode": {
-          "label": "(Test mode)"
-      },
-      "messages": {
+    "testMode": {
+      "label": "Test mode"
+    },
+    "messages": {
       "payment": {
         "error": "Payment failed",
         "failed": "The payment is failed or was canceled. You will be redirected to Mollie, where you can finish your payment with the method of your choice. ",
@@ -20,9 +20,13 @@
         "cardExpiryDateLabel": "Expiration date",
         "cardVerificationCodeLabel": "CVC",
         "creditCardTagLine": "Payment secured and powered by"
-      },
-      "applePayDirectButton": {
-        "label": "Buy with Apple Pay"
+      }
+    },
+    "payments": {
+      "applePayDirect": {
+        "captionSubtotal": "Subtotal",
+        "captionTaxes": "Taxes",
+        "paymentError": "The payment with Apple Pay failed."
       }
     }
   }

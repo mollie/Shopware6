@@ -59,13 +59,13 @@ class CustomerService
      * @param string $shopwareVersion
      */
     public function __construct(
-        EntityRepositoryInterface $countryRepository,
-        EntityRepositoryInterface $customerRepository,
-        EventDispatcherInterface $eventDispatcher,
-        LoggerInterface $logger,
+        EntityRepositoryInterface    $countryRepository,
+        EntityRepositoryInterface    $customerRepository,
+        EventDispatcherInterface     $eventDispatcher,
+        LoggerInterface              $logger,
         SalesChannelContextPersister $salesChannelContextPersister,
-        EntityRepositoryInterface $salutationRepository,
-        string $shopwareVersion
+        EntityRepositoryInterface    $salutationRepository,
+        string                       $shopwareVersion
     )
     {
         $this->countryRepository = $countryRepository;
@@ -80,7 +80,7 @@ class CustomerService
     /**
      * Login the customer.
      *
-     * @param CustomerEntity      $customer
+     * @param CustomerEntity $customer
      * @param SalesChannelContext $context
      *
      * @return string|null
@@ -100,7 +100,7 @@ class CustomerService
         $newToken = $this->salesChannelContextPersister->replace($context->getToken(), $context);
 
         // Persist the new token
-        if(version_compare($this->shopwareVersion, '6.3.3', '<')) {
+        if (version_compare($this->shopwareVersion, '6.3.3', '<')) {
             // Shopware 6.3.2.x and lower
             $this->salesChannelContextPersister->save(
                 $newToken,
@@ -143,6 +143,15 @@ class CustomerService
         $this->eventDispatcher->dispatch($event);
 
         return $newToken;
+    }
+
+    /**
+     * @param SalesChannelContext $context
+     * @return bool
+     */
+    public function isCustomerLoggedIn(SalesChannelContext $context): bool
+    {
+        return ($context->getCustomer() instanceof CustomerEntity);
     }
 
     /**
@@ -197,8 +206,8 @@ class CustomerService
      * Stores the ideal issuer in the custom fields of the customer.
      *
      * @param CustomerEntity $customer
-     * @param string         $issuerId
-     * @param Context        $context
+     * @param string $issuerId
+     * @param Context $context
      *
      * @return EntityWrittenContainerEvent
      */
@@ -229,7 +238,7 @@ class CustomerService
      * @param Context $context
      * @return CustomerEntity|null
      */
-    public function getCustomer(string $customerId, Context $context) : ?CustomerEntity
+    public function getCustomer(string $customerId, Context $context): ?CustomerEntity
     {
         $customer = null;
 
@@ -283,15 +292,19 @@ class CustomerService
     }
 
     /**
-     * Returns a customer for a given array of customer data.
-     *
-     * @param array               $customerData
-     * @param string              $paymentMethodId
+     * @param string $firstname
+     * @param string $lastname
+     * @param string $email
+     * @param string $phone
+     * @param string $street
+     * @param string $zipCode
+     * @param string $city
+     * @param string $countryISO2
+     * @param string $paymentMethodId
      * @param SalesChannelContext $context
-     *
-     * @return CustomerEntity|null|false
+     * @return CustomerEntity|null
      */
-    public function createCustomerForApplePayDirect(array $customerData, string $paymentMethodId, SalesChannelContext $context)
+    public function createApplePayDirectCustomer(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, string $paymentMethodId, SalesChannelContext $context)
     {
         /** @var string $customerId */
         $customerId = Uuid::randomHex();
@@ -299,111 +312,50 @@ class CustomerService
         /** @var string $addressId */
         $addressId = Uuid::randomHex();
 
-        // Apple Pay Direct variables
-        $countryId = null;
-        $emailAddress = null;
-        $familyName = null;
-        $givenName = null;
-        $locality = null;
-        $phoneNumber = null;
-        $postalCode = null;
+
         $salutationId = $this->getSalutationId($context->getContext());
-        $street = null;
+        $countryId = $this->getCountryId($countryISO2, $context->getContext());
 
-        // Get the country based on the country code
-        if (isset($customerData['countryCode'])) {
-            $countryId = $this->getCountryId($customerData['countryCode'], $context->getContext());
-        }
-
-        // Get the e-mail address
-        if (isset($customerData['emailAddress'])) {
-            $emailAddress = $customerData['emailAddress'];
-        }
-
-        // Get the family name
-        if (isset($customerData['familyName'])) {
-            $familyName = $customerData['familyName'];
-        }
-
-        // Get the given name
-        if (isset($customerData['givenName'])) {
-            $givenName = $customerData['givenName'];
-        }
-
-        // Get the locality
-        if (isset($customerData['locality'])) {
-            $locality = $customerData['locality'];
-        }
-
-        // Get the phone number
-        if (isset($customerData['phoneNumber'])) {
-            $phoneNumber = $customerData['phoneNumber'];
-        }
-
-        // Get the postal code
-        if (isset($customerData['postalCode'])) {
-            $postalCode = $customerData['postalCode'];
-        }
-
-        // Get the street from the address lines
-        if (isset($customerData['addressLines'])) {
-            $street = implode(', ', $customerData['addressLines']);
-        }
-
-        // Create a new customer
-        if (
-            (string) $countryId !== ''
-            && $emailAddress !== null
-            && $familyName !== null
-            && $givenName !== null
-            && $locality !== null
-            && $postalCode !== null
-            && (string) $salutationId !== ''
-            && $street !== null
-        ) {
-            $customer = [
-                'id' => $customerId,
-                'salutationId' => $salutationId,
-                'firstName' => $givenName,
-                'lastName' => $familyName,
-                'customerNumber' => 'ApplePay.' . time(),
-                'guest' => true,
-                'email' => $emailAddress,
-                'password' => Uuid::randomHex(),
-                'defaultPaymentMethodId' => $paymentMethodId,
-                'groupId' => Defaults::FALLBACK_CUSTOMER_GROUP,
-                'salesChannelId' => $context->getSalesChannel()->getId(),
-                'defaultBillingAddressId' => $addressId,
-                'defaultShippingAddressId' => $addressId,
-                'addresses' => [
-                    [
-                        'id' => $addressId,
-                        'customerId' => $customerId,
-                        'countryId' => $countryId,
-                        'salutationId' => $salutationId,
-                        'firstName' => $givenName,
-                        'lastName' => $familyName,
-                        'street' => $street,
-                        'zipcode' => $postalCode,
-                        'city' => $locality,
-                        'phoneNumber' => $phoneNumber,
-                    ],
+        $customer = [
+            'id' => $customerId,
+            'salutationId' => $salutationId,
+            'firstName' => $firstname,
+            'lastName' => $lastname,
+            'customerNumber' => 'ApplePay.' . time(),
+            'guest' => true,
+            'email' => $email,
+            'password' => Uuid::randomHex(),
+            'defaultPaymentMethodId' => $paymentMethodId,
+            'groupId' => Defaults::FALLBACK_CUSTOMER_GROUP,
+            'salesChannelId' => $context->getSalesChannel()->getId(),
+            'defaultBillingAddressId' => $addressId,
+            'defaultShippingAddressId' => $addressId,
+            'addresses' => [
+                [
+                    'id' => $addressId,
+                    'customerId' => $customerId,
+                    'countryId' => $countryId,
+                    'salutationId' => $salutationId,
+                    'firstName' => $firstname,
+                    'lastName' => $lastname,
+                    'street' => $street,
+                    'zipcode' => $zipCode,
+                    'city' => $city,
+                    'phoneNumber' => $phone,
                 ],
-            ];
+            ],
+        ];
 
-            // Add the customer to the database
-            $this->customerRepository->upsert([$customer], $context->getContext());
+        // Add the customer to the database
+        $this->customerRepository->upsert([$customer], $context->getContext());
 
-            return $this->getCustomer($customerId, $context->getContext());
-        }
-
-        return false;
+        return $this->getCustomer($customerId, $context->getContext());
     }
 
     /**
      * Returns a country id by it's iso code.
      *
-     * @param string  $countryCode
+     * @param string $countryCode
      * @param Context $context
      *
      * @return string|null

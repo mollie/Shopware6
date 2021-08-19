@@ -34,6 +34,7 @@
         <service id="Kiener\MolliePayments\Service\OrderService" class="Kiener\MolliePayments\Service\OrderService">
             <argument type="service" id="order.repository"/>
             <argument type="service" id="order_line_item.repository"/>
+            <argument type="service" id="Shopware\Core\Checkout\Order\SalesChannel\OrderService"/>
             <argument type="service" id="monolog.logger"/>
         </service>
 
@@ -56,9 +57,10 @@
             <argument type="service" id="order_line_item.repository"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor">
-            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+        <service id="Kiener\MolliePayments\Service\ApplePayDirect\ApplePayDirect">
+            <argument type="service" id="Kiener\MolliePayments\Service\CartService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\ShippingMethodService"/>
+            <argument type="service" id="translator"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher"/>
@@ -76,7 +78,10 @@
 
         <service id="Kiener\MolliePayments\Service\CartService" class="Kiener\MolliePayments\Service\CartService" public="true">
             <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
-            <argument type="service" id="service_container"/>
+            <argument type="service" id="Shopware\Core\System\SalesChannel\SalesChannel\SalesChannelContextSwitcher"/>
+            <argument type="service" id="Shopware\Core\Content\Product\Cart\ProductLineItemFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\CompatibilityGatewayFactory"/>
         </service>
+
     </services>
 </container>

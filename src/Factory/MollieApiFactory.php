@@ -15,25 +15,28 @@ use Shopware\Core\Kernel;
 
 class MollieApiFactory
 {
-    /** @var MollieApiClient */
-    private $apiClient;
-
-    /** @var SettingsService */
-    private $settingsService;
-
-    /** @var LoggerInterface */
-    private $logger;
 
     /**
-     * Create a new instance of MollieApiFactory.
-     *
+     * @var MollieApiClient
+     */
+    private $apiClient;
+
+    /**
+     * @var SettingsService
+     */
+    private $settingsService;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+
+    /**
      * @param SettingsService $settingsService
      * @param LoggerInterface $logger
      */
-    public function __construct(
-        SettingsService $settingsService,
-        LoggerInterface $logger
-    )
+    public function __construct(SettingsService $settingsService, LoggerInterface $logger)
     {
         $this->settingsService = $settingsService;
         $this->logger = $logger;
@@ -41,11 +44,11 @@ class MollieApiFactory
 
     /**
      * Create a new instance of the Mollie API client.
-     * @deprecated
      * @param string|null $salesChannelId
      *
      * @return MollieApiClient
      * @throws IncompatiblePlatform
+     * @deprecated please use the getClient option in the future
      */
     public function createClient(?string $salesChannelId = null): MollieApiClient
     {
@@ -53,6 +56,24 @@ class MollieApiFactory
         # everyone who used this was never able to switch api keys through sales channels.
         # now its the same as getClient() -> should be combined one day
         return $this->getClient($salesChannelId);
+    }
+
+    /**
+     * @param string $salesChannelId
+     * @return MollieApiClient
+     */
+    public function getLiveClient(string $salesChannelId): MollieApiClient
+    {
+        return $this->buildClient($salesChannelId, false);
+    }
+
+    /**
+     * @param string $salesChannelId
+     * @return MollieApiClient
+     */
+    public function getTextClient(string $salesChannelId): MollieApiClient
+    {
+        return $this->buildClient($salesChannelId, true);
     }
 
     /**
@@ -91,4 +112,36 @@ class MollieApiFactory
 
         return $this->apiClient;
     }
+
+
+    /**
+     * @param string $salesChannelId
+     * @param bool $testMode
+     * @return MollieApiClient
+     */
+    private function buildClient(string $salesChannelId, bool $testMode): MollieApiClient
+    {
+        $this->apiClient = new MollieApiClient();
+
+        $settings = $this->settingsService->getSettings($salesChannelId);
+
+        try {
+
+            $apiKey = ($testMode) ? $settings->getTestApiKey() : $settings->getLiveApiKey();
+
+            $this->apiClient->setApiKey($apiKey);
+
+            // Add platform data
+            $this->apiClient->addVersionString('Shopware/' . Kernel::SHOPWARE_FALLBACK_VERSION);
+
+            // @todo Add plugin version variable
+            $this->apiClient->addVersionString('MollieShopware6/1.5.3');
+
+        } catch (Exception $e) {
+            $this->logger->error($e->getMessage(), [$e]);
+        }
+
+        return $this->apiClient;
+    }
+
 }

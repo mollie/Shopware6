@@ -2,6 +2,9 @@ parameters:
     level: 1
     paths:
         - ./src
+    excludes_analyse:
+        # already in phpstan lvl8
+        - ./src/Gateway
 
 services:
     - class: MolliePayments\PHPStan\Rules\NoManufacturerRule

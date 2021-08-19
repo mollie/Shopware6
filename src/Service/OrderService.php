@@ -3,34 +3,55 @@
 namespace Kiener\MolliePayments\Service;
 
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
+use Kiener\MolliePayments\Service\MollieApi\Order;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\Validation\DataBag\DataBag;
+use Shopware\Core\Framework\Validation\Exception\ConstraintViolationException;
+use Shopware\Core\System\SalesChannel\SalesChannelContext;
+
 
 class OrderService
 {
-    /** @var EntityRepositoryInterface */
+    /**
+     * @var EntityRepositoryInterface
+     */
     protected $orderRepository;
 
-    /** @var EntityRepositoryInterface */
+    /**
+     * @var EntityRepositoryInterface
+     */
     protected $orderLineItemRepository;
 
-    /** @var LoggerInterface */
+    /**
+     * @var \Shopware\Core\Checkout\Order\SalesChannel\OrderService
+     */
+    private $swOrderService;
+
+    /**
+     * @var LoggerInterface
+     */
     protected $logger;
 
-    public function __construct(
-        EntityRepositoryInterface $orderRepository,
-        EntityRepositoryInterface $orderLineItemRepository,
-        LoggerInterface $logger
-    )
+
+    /**
+     * @param EntityRepositoryInterface $orderRepository
+     * @param EntityRepositoryInterface $orderLineItemRepository
+     * @param \Shopware\Core\Checkout\Order\SalesChannel\OrderService $swOrderService
+     * @param LoggerInterface $logger
+     */
+    public function __construct(EntityRepositoryInterface $orderRepository, EntityRepositoryInterface $orderLineItemRepository, \Shopware\Core\Checkout\Order\SalesChannel\OrderService $swOrderService, LoggerInterface $logger)
     {
         $this->orderRepository = $orderRepository;
         $this->orderLineItemRepository = $orderLineItemRepository;
+        $this->swOrderService = $swOrderService;
         $this->logger = $logger;
     }
+
 
     /**
      * Returns the order repository.
@@ -50,6 +71,25 @@ class OrderService
     public function getOrderLineItemRepository()
     {
         return $this->orderLineItemRepository;
+    }
+
+
+    /**
+     * @param DataBag $data
+     * @param SalesChannelContext $context
+     * @return OrderEntity
+     */
+    public function createOrder(DataBag $data, SalesChannelContext $context): OrderEntity
+    {
+        $orderId = $this->swOrderService->createOrder($data, $context);
+
+        $order = $this->getOrder($orderId, $context->getContext());
+
+        if (!$order instanceof OrderEntity) {
+            throw new OrderNotFoundException($orderId);
+        }
+
+        return $order;
     }
 
     /**

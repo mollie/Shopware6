@@ -45,6 +45,7 @@ class RefundsServiceTest extends TestCase
         $this->orderService = new OrderService(
             $this->createMock(EntityRepositoryInterface::class),
             $this->createMock(EntityRepositoryInterface::class),
+            $this->createMock(\Shopware\Core\Checkout\Order\SalesChannel\OrderService::class),
             $logger
         );
 
