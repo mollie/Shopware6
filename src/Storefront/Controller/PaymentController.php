@@ -127,6 +127,7 @@ class PaymentController extends StorefrontController
         if (!$transaction instanceof OrderTransactionEntity) {
             $this->logger->addEntry(
                 sprintf('Transaction with id %s could not be read from database', $transactionId),
+                $salesChannelContext->getContext(),
                 null,
                 null,
                 Logger::CRITICAL
@@ -140,6 +141,7 @@ class PaymentController extends StorefrontController
         if (!$order instanceof OrderEntity) {
             $this->logger->addEntry(
                 sprintf('Could not fetch order from transaction with id %s', $transactionId),
+                $salesChannelContext->getContext(),
                 null,
                 null,
                 Logger::CRITICAL
@@ -157,13 +159,13 @@ class PaymentController extends StorefrontController
         if (empty($mollieOrderId)) {
             $this->logger->addEntry(
                 sprintf('Could not fetch mollie order id from order with number %s', $order->getOrderNumber()),
+                $salesChannelContext->getContext(),
                 null,
                 null,
                 Logger::CRITICAL
             );
 
             throw new MissingMollieOrderId($order->getOrderNumber());
-
         }
 
         /** @var Order $mollieOrder */
@@ -174,6 +176,7 @@ class PaymentController extends StorefrontController
         } catch (ApiException $e) {
             $this->logger->addEntry(
                 sprintf('Could not fetch order at mollie with id %s', $mollieOrderId),
+                $salesChannelContext->getContext(),
                 null,
                 null,
                 Logger::CRITICAL
