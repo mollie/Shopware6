@@ -3,18 +3,20 @@
 namespace Kiener\MolliePayments\Service\MollieApi\Builder;
 
 use Kiener\MolliePayments\Handler\PaymentHandler;
+use Kiener\MolliePayments\Hydrator\MollieLineItemHydrator;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher;
 use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
+use Kiener\MolliePayments\Service\MollieApi\VerticalTaxLineItemFixer;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
+use Kiener\MolliePayments\Struct\MollieLineItem;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\Locale\LocaleEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\SalesChannel\SalesChannelDefinition;
-use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Symfony\Component\Routing\RouterInterface;
 
 class MollieOrderBuilder
@@ -67,21 +69,27 @@ class MollieOrderBuilder
     private $shippingLineItemBuilder;
 
     /**
-     * @var SystemConfigService
+     * @var VerticalTaxLineItemFixer
      */
-    private $systemConfigService;
+    private $verticalTaxLineItemFixer;
+
+    /**
+     * @var MollieLineItemHydrator
+     */
+    private $mollieLineItemHydrator;
 
     public function __construct(
-        SettingsService $settingsService,
-        OrderDataExtractor $extractor,
-        RouterInterface $router,
-        MollieOrderPriceBuilder $priceBuilder,
-        MollieLineItemBuilder $lineItemBuilder,
-        MollieOrderAddressBuilder $addressBuilder,
-        MollieOrderCustomerEnricher $customerEnricher,
-        LoggerService $loggerService,
+        SettingsService               $settingsService,
+        OrderDataExtractor            $extractor,
+        RouterInterface               $router,
+        MollieOrderPriceBuilder       $priceBuilder,
+        MollieLineItemBuilder         $lineItemBuilder,
+        MollieOrderAddressBuilder     $addressBuilder,
+        MollieOrderCustomerEnricher   $customerEnricher,
+        LoggerService                 $loggerService,
         MollieShippingLineItemBuilder $shippingLineItemBuilder,
-        SystemConfigService $systemConfigService
+        VerticalTaxLineItemFixer      $verticalTaxLineItemFixer,
+        MollieLineItemHydrator        $mollieLineItemHydrator
     )
     {
         $this->settingsService = $settingsService;
@@ -93,7 +101,8 @@ class MollieOrderBuilder
         $this->addressBuilder = $addressBuilder;
         $this->customerEnricher = $customerEnricher;
         $this->shippingLineItemBuilder = $shippingLineItemBuilder;
-        $this->systemConfigService = $systemConfigService;
+        $this->verticalTaxLineItemFixer = $verticalTaxLineItemFixer;
+        $this->mollieLineItemHydrator = $mollieLineItemHydrator;
     }
 
     public function build(
@@ -141,22 +150,30 @@ class MollieOrderBuilder
 
         $isVerticalTaxCalculation = $this->isVerticalTaxCalculation($salesChannelContext);
 
-        $lines = $this->lineItemBuilder->buildLineItems($order->getTaxStatus(), $order->getNestedLineItems(), $order->getCurrency(), $isVerticalTaxCalculation);
+        $lines = $this->lineItemBuilder->buildLineItems($order->getTaxStatus(), $order->getNestedLineItems(), $isVerticalTaxCalculation);
 
         $deliveries = $order->getDeliveries();
-        $shippingLineItems = [];
 
         if ($deliveries instanceof OrderDeliveryCollection) {
-            $shippingLineItems = $this->shippingLineItemBuilder->buildShippingLineItems($order->getTaxStatus(), $deliveries, $order->getCurrency(), $isVerticalTaxCalculation);
+            $shippingLineItems = $this->shippingLineItemBuilder->buildShippingLineItems($order->getTaxStatus(), $deliveries, $isVerticalTaxCalculation);
+
+            /** @var MollieLineItem $shipping */
+            foreach ($shippingLineItems as $shipping) {
+                $lines->add($shipping);
+            }
         }
 
-        $orderData['lines'] = array_merge($lines, $shippingLineItems);
+        if ($isVerticalTaxCalculation) {
+            $this->verticalTaxLineItemFixer->fixLineItems($lines, $salesChannelContext);
+        }
+
+        $orderData['lines'] = $this->mollieLineItemHydrator->hydrate($lines, $currency->getIsoCode());
 
         $orderData['billingAddress'] = $this->addressBuilder->build($customer->getEmail(), $customer->getDefaultBillingAddress());
         $orderData['shippingAddress'] = $this->addressBuilder->build($customer->getEmail(), $customer->getActiveShippingAddress());
 
         /** @var MollieSettingStruct $settings */
-        $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId() );
+        $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
 
         // set order lifetime like configured
         $dueDate = $settings->getOrderLifetimeDate();
@@ -182,7 +199,6 @@ class MollieOrderBuilder
                 'orderData' => $orderData,
             ]
         );
-
 
         return $orderData;
     }

@@ -78,5 +78,10 @@
             <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
             <argument type="service" id="service_container"/>
         </service>
+
+        <service id="Kiener\MolliePayments\Hydrator\MollieLineItemHydrator">
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder"/>
+        </service>
+
     </services>
 </container>

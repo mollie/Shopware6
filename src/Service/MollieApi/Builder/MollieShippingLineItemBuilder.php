@@ -3,10 +3,11 @@
 namespace Kiener\MolliePayments\Service\MollieApi\Builder;
 
 use Kiener\MolliePayments\Service\MollieApi\PriceCalculator;
+use Kiener\MolliePayments\Struct\MollieLineItem;
+use Kiener\MolliePayments\Struct\MollieLineItemCollection;
 use Mollie\Api\Types\OrderLineType;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
-use Shopware\Core\System\Currency\CurrencyEntity;
 
 class MollieShippingLineItemBuilder
 {
@@ -16,26 +17,15 @@ class MollieShippingLineItemBuilder
      */
     private $priceCalculator;
 
-    /**
-     * @var MollieOrderPriceBuilder
-     */
-    private $priceHydrator;
-
-    public function __construct(PriceCalculator $priceCalculator, MollieOrderPriceBuilder $priceHydrator)
+    public function __construct(PriceCalculator $priceCalculator)
     {
 
         $this->priceCalculator = $priceCalculator;
-        $this->priceHydrator = $priceHydrator;
     }
 
-    public function buildShippingLineItems(string $taxStatus, OrderDeliveryCollection $deliveries, ?CurrencyEntity $currency, bool $isVerticalTaxCalculation): array
+    public function buildShippingLineItems(string $taxStatus, OrderDeliveryCollection $deliveries, bool $isVerticalTaxCalculation = false): MollieLineItemCollection
     {
-        $lineItems = [];
-
-        $currencyCode = MollieOrderPriceBuilder::MOLLIE_FALLBACK_CURRENCY_CODE;
-        if ($currency instanceof CurrencyEntity) {
-            $currencyCode = $currency->getIsoCode();
-        }
+        $lines = new MollieLineItemCollection();
 
         $i = 0;
 
@@ -44,25 +34,27 @@ class MollieShippingLineItemBuilder
             $i++;
             $shippingPrice = $delivery->getShippingCosts();
             $totalPrice = $shippingPrice->getTotalPrice();
-            $prices = $this->priceCalculator->calculateLineItemPrice($shippingPrice, $totalPrice, $taxStatus, $isVerticalTaxCalculation);
 
-            $lineItems[] = [
-                'type' => OrderLineType::TYPE_SHIPPING_FEE,
-                'name' => 'Delivery costs ' . $i,
-                'quantity' => 1,
-                'unitPrice' => $this->priceHydrator->build($prices->getUnitPrice(), $currencyCode),
-                'totalAmount' => $this->priceHydrator->build($prices->getTotalAmount(), $currencyCode),
-                'vatRate' => number_format($prices->getVatRate(), MollieOrderPriceBuilder::MOLLIE_PRICE_PRECISION, '.', ''),
-                'vatAmount' => $this->priceHydrator->build($prices->getVatAmount(), $currencyCode),
-                'sku' => 'mol-delivery-' . $i,
-                'imageUrl' => '',
-                'productUrl' => '',
-                'metadata' => [
-                    'orderLineItemId' => '',
-                ],
-            ];
+            if ($totalPrice === 0.0) {
+                continue;
+            }
+
+            $price = $this->priceCalculator->calculateLineItemPrice($shippingPrice, $totalPrice, $taxStatus, $isVerticalTaxCalculation);
+
+            $mollieLineItem = new MollieLineItem(
+                OrderLineType::TYPE_SHIPPING_FEE,
+                sprintf('Delivery costs %s', $i),
+                1,
+                $price,
+                $delivery->getId(),
+                sprintf('mol-delivery-%s', $i),
+                '',
+                ''
+            );
+
+            $lines->add($mollieLineItem);
         }
 
-        return $lineItems;
+        return $lines;
     }
 }

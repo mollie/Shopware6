@@ -2,69 +2,56 @@
 
 namespace Kiener\MolliePayments\Service\MollieApi\Builder;
 
-
 use Kiener\MolliePayments\Exception\MissingPriceLineItem;
 use Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\PriceCalculator;
+use Kiener\MolliePayments\Struct\MollieLineItem;
+use Kiener\MolliePayments\Struct\MollieLineItemCollection;
 use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
 use Mollie\Api\Types\OrderLineType;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
-use Shopware\Core\System\Currency\CurrencyEntity;
-use Shopware\Core\System\SystemConfig\SystemConfigService;
 
 class MollieLineItemBuilder
 {
     public const LINE_ITEM_TYPE_CUSTOM_PRODUCTS = 'customized-products';
 
     /**
-     * @var MollieOrderPriceBuilder
-     */
-    private $priceHydrator;
-    /**
      * @var IsOrderLineItemValid
      */
     private $orderLineItemValidator;
+
     /**
      * @var PriceCalculator
      */
     private $priceCalculator;
+
     /**
      * @var LineItemDataExtractor
      */
     private $lineItemDataExtractor;
-    /**
-     * @var SystemConfigService
-     */
-    private $systemConfigService;
+
 
     public function __construct(
-        MollieOrderPriceBuilder $priceHydrator,
         IsOrderLineItemValid $orderLineItemValidator,
         PriceCalculator $priceCalculator,
         LineItemDataExtractor $lineItemDataExtractor
     )
     {
-        $this->priceHydrator = $priceHydrator;
         $this->orderLineItemValidator = $orderLineItemValidator;
         $this->priceCalculator = $priceCalculator;
         $this->lineItemDataExtractor = $lineItemDataExtractor;
-
     }
 
-    public function buildLineItems(string $taxStatus, ?OrderLineItemCollection $lineItems, ?CurrencyEntity $currency, bool $isVerticalTaxCalculation): array
+    public function buildLineItems(string $taxStatus, ?OrderLineItemCollection $lineItems, bool $isVerticalTaxCalculation = false): MollieLineItemCollection
     {
-        $lines = [];
+        $lines = new MollieLineItemCollection();
 
         if (!$lineItems instanceof OrderLineItemCollection || $lineItems->count() === 0) {
-            return $lines;
-        }
 
-        $currencyCode = MollieOrderPriceBuilder::MOLLIE_FALLBACK_CURRENCY_CODE;
-        if ($currency instanceof CurrencyEntity) {
-            $currencyCode = $currency->getIsoCode();
+            return $lines;
         }
 
         /** @var OrderLineItemEntity $item */
@@ -77,31 +64,23 @@ class MollieLineItemBuilder
                 throw new MissingPriceLineItem($item->getProductId());
             }
 
-            $prices = $this->priceCalculator->calculateLineItemPrice($item->getPrice(), $item->getTotalPrice(), $taxStatus, $isVerticalTaxCalculation);
+            $price = $this->priceCalculator->calculateLineItemPrice($item->getPrice(), $item->getTotalPrice(), $taxStatus, $isVerticalTaxCalculation);
 
-            $lines[] = [
-                'type' => $this->getLineItemType($item),
-                'name' => $item->getLabel(),
-                'quantity' => $item->getQuantity(),
-                'unitPrice' => $this->priceHydrator->build($prices->getUnitPrice(), $currencyCode),
-                'totalAmount' => $this->priceHydrator->build($prices->getTotalAmount(), $currencyCode),
-                'vatRate' => number_format($prices->getVatRate(), MollieOrderPriceBuilder::MOLLIE_PRICE_PRECISION, '.', ''),
-                'vatAmount' => $this->priceHydrator->build($prices->getVatAmount(), $currencyCode),
-                'sku' => $extraData->getSku(),
-                'imageUrl' => urlencode((string)$extraData->getImageUrl()),
-                'productUrl' => urlencode((string)$extraData->getProductUrl()),
-                'metadata' => [
-                    'orderLineItemId' => $item->getId(),
-                ],
-            ];
+            $mollieLineItem = new MollieLineItem(
+                $this->getLineItemType($item),
+                $item->getLabel(),
+                $item->getQuantity(),
+                $price,
+                $item->getId(),
+                $extraData->getSku(),
+                urlencode((string)$extraData->getImageUrl()),
+                urlencode((string)$extraData->getProductUrl())
+            );
+
+            $lines->add($mollieLineItem);
         }
 
         return $lines;
-    }
-
-    private function isVerticalPriceCalculation(): bool
-    {
-
     }
 
     /**
