@@ -6,12 +6,12 @@ namespace Kiener\MolliePayments\Hydrator;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Kiener\MolliePayments\Struct\MollieLineItemCollection;
 
-/**
- * @copyright 2021 dasistweb GmbH (https://www.dasistweb.de)
- */
 class MollieLineItemHydrator
 {
-    private MollieOrderPriceBuilder $priceBuilder;
+    /**
+     * @var MollieOrderPriceBuilder
+     */
+    private $priceBuilder;
 
     public function __construct(MollieOrderPriceBuilder $priceBuilder)
     {
@@ -19,6 +19,11 @@ class MollieLineItemHydrator
         $this->priceBuilder = $priceBuilder;
     }
 
+    /**
+     * @param MollieLineItemCollection $lineItems
+     * @param string $currencyCode
+     * @return array<int,array<string,mixed>>
+     */
     public function hydrate(MollieLineItemCollection $lineItems, string $currencyCode): array
     {
         $lines = [];
