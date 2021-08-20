@@ -28,7 +28,7 @@ class MollieShippingLineItemBuilder
         $this->priceHydrator = $priceHydrator;
     }
 
-    public function buildShippingLineItems(string $taxStatus, OrderDeliveryCollection $deliveries, ?CurrencyEntity $currency): array
+    public function buildShippingLineItems(string $taxStatus, OrderDeliveryCollection $deliveries, ?CurrencyEntity $currency, bool $isVerticalTaxCalculation): array
     {
         $lineItems = [];
 
@@ -44,7 +44,7 @@ class MollieShippingLineItemBuilder
             $i++;
             $shippingPrice = $delivery->getShippingCosts();
             $totalPrice = $shippingPrice->getTotalPrice();
-            $prices = $this->priceCalculator->calculateLineItemPrice($shippingPrice, $totalPrice, $taxStatus);
+            $prices = $this->priceCalculator->calculateLineItemPrice($shippingPrice, $totalPrice, $taxStatus, $isVerticalTaxCalculation);
 
             $lineItems[] = [
                 'type' => OrderLineType::TYPE_SHIPPING_FEE,

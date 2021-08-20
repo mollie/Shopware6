@@ -12,7 +12,7 @@ class PriceCalculator
 {
     public const MOLLIE_PRICE_PRECISION = 2;
 
-    public function calculateLineItemPrice(CalculatedPrice $price, float $lineItemTotalPrice, string $orderTaxType): LineItemPriceStruct
+    public function calculateLineItemPrice(CalculatedPrice $price, float $lineItemTotalPrice, string $orderTaxType, bool $isVerticalTaxCalculation): LineItemPriceStruct
     {
         $taxCollection = $price->getCalculatedTaxes();
 
@@ -35,8 +35,17 @@ class PriceCalculator
         // For correct mollie api tax calculations we have to calculate the shopware gross
         // price
         if ($orderTaxType === CartPrice::TAX_STATE_NET) {
+
             $unitPrice *= ((100 + $vatRate) / 100);
-            $lineItemTotalPrice += $taxCollection->getAmount();
+
+            if ($isVerticalTaxCalculation) {
+                // multiple taxes ???
+                $taxAmount = $taxCollection->getAmount();
+                $fixedNetPrice = $price->getTotalPrice() - $taxAmount;
+                $lineItemTotalPrice = $fixedNetPrice * ((100 + $vatRate) / 100);
+            } else {
+                $lineItemTotalPrice += $taxCollection->getAmount();
+            }
         }
 
         $unitPrice = round($unitPrice, self::MOLLIE_PRICE_PRECISION);

@@ -15,6 +15,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher"/>
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieShippingLineItemBuilder"/>
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieShippingLineItemBuilder">

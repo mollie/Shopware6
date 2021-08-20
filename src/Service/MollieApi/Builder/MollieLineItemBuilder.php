@@ -13,6 +13,7 @@ use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\System\Currency\CurrencyEntity;
+use Shopware\Core\System\SystemConfig\SystemConfigService;
 
 class MollieLineItemBuilder
 {
@@ -34,6 +35,10 @@ class MollieLineItemBuilder
      * @var LineItemDataExtractor
      */
     private $lineItemDataExtractor;
+    /**
+     * @var SystemConfigService
+     */
+    private $systemConfigService;
 
     public function __construct(
         MollieOrderPriceBuilder $priceHydrator,
@@ -42,14 +47,14 @@ class MollieLineItemBuilder
         LineItemDataExtractor $lineItemDataExtractor
     )
     {
-
         $this->priceHydrator = $priceHydrator;
         $this->orderLineItemValidator = $orderLineItemValidator;
         $this->priceCalculator = $priceCalculator;
         $this->lineItemDataExtractor = $lineItemDataExtractor;
+
     }
 
-    public function buildLineItems(string $taxStatus, ?OrderLineItemCollection $lineItems, ?CurrencyEntity $currency): array
+    public function buildLineItems(string $taxStatus, ?OrderLineItemCollection $lineItems, ?CurrencyEntity $currency, bool $isVerticalTaxCalculation): array
     {
         $lines = [];
 
@@ -72,7 +77,7 @@ class MollieLineItemBuilder
                 throw new MissingPriceLineItem($item->getProductId());
             }
 
-            $prices = $this->priceCalculator->calculateLineItemPrice($item->getPrice(), $item->getTotalPrice(), $taxStatus);
+            $prices = $this->priceCalculator->calculateLineItemPrice($item->getPrice(), $item->getTotalPrice(), $taxStatus, $isVerticalTaxCalculation);
 
             $lines[] = [
                 'type' => $this->getLineItemType($item),
@@ -92,6 +97,11 @@ class MollieLineItemBuilder
         }
 
         return $lines;
+    }
+
+    private function isVerticalPriceCalculation(): bool
+    {
+
     }
 
     /**

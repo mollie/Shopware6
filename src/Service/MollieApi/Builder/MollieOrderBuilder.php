@@ -13,6 +13,8 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\Locale\LocaleEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Shopware\Core\System\SalesChannel\SalesChannelDefinition;
+use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Symfony\Component\Routing\RouterInterface;
 
 class MollieOrderBuilder
@@ -64,6 +66,11 @@ class MollieOrderBuilder
      */
     private $shippingLineItemBuilder;
 
+    /**
+     * @var SystemConfigService
+     */
+    private $systemConfigService;
+
     public function __construct(
         SettingsService $settingsService,
         OrderDataExtractor $extractor,
@@ -73,7 +80,8 @@ class MollieOrderBuilder
         MollieOrderAddressBuilder $addressBuilder,
         MollieOrderCustomerEnricher $customerEnricher,
         LoggerService $loggerService,
-        MollieShippingLineItemBuilder $shippingLineItemBuilder
+        MollieShippingLineItemBuilder $shippingLineItemBuilder,
+        SystemConfigService $systemConfigService
     )
     {
         $this->settingsService = $settingsService;
@@ -85,6 +93,7 @@ class MollieOrderBuilder
         $this->addressBuilder = $addressBuilder;
         $this->customerEnricher = $customerEnricher;
         $this->shippingLineItemBuilder = $shippingLineItemBuilder;
+        $this->systemConfigService = $systemConfigService;
     }
 
     public function build(
@@ -130,13 +139,15 @@ class MollieOrderBuilder
         $orderData['webhookUrl'] = $webhookUrl;
         $orderData['payment']['webhookUrl'] = $webhookUrl;
 
-        $lines = $this->lineItemBuilder->buildLineItems($order->getTaxStatus(), $order->getNestedLineItems(), $order->getCurrency());
+        $isVerticalTaxCalculation = $this->isVerticalTaxCalculation($salesChannelContext);
+
+        $lines = $this->lineItemBuilder->buildLineItems($order->getTaxStatus(), $order->getNestedLineItems(), $order->getCurrency(), $isVerticalTaxCalculation);
 
         $deliveries = $order->getDeliveries();
         $shippingLineItems = [];
 
         if ($deliveries instanceof OrderDeliveryCollection) {
-            $shippingLineItems = $this->shippingLineItemBuilder->buildShippingLineItems($order->getTaxStatus(), $deliveries, $order->getCurrency());
+            $shippingLineItems = $this->shippingLineItemBuilder->buildShippingLineItems($order->getTaxStatus(), $deliveries, $order->getCurrency(), $isVerticalTaxCalculation);
         }
 
         $orderData['lines'] = array_merge($lines, $shippingLineItems);
@@ -174,5 +185,16 @@ class MollieOrderBuilder
 
 
         return $orderData;
+    }
+
+    private function isVerticalTaxCalculation(SalesChannelContext $salesChannelContext): bool
+    {
+        $salesChannel = $salesChannelContext->getSalesChannel();
+
+        if (!method_exists($salesChannel, 'getTaxCalculationType')) {
+            return false;
+        }
+
+        return $salesChannel->getTaxCalculationType() === SalesChannelDefinition::CALCULATION_TYPE_VERTICAL;
     }
 }
