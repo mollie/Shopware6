@@ -22,11 +22,6 @@
     <services>
 
         <!-- Configuration -->
-        <service id="Kiener\MolliePayments\Config\Config" class="Kiener\MolliePayments\Config\Config">
-            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
-        </service>
-
-        <!-- Configuration -->
         <service id="Kiener\MolliePayments\Service\ConfigService" class="Kiener\MolliePayments\Service\ConfigService">
             <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
         </service>

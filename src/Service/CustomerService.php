@@ -71,15 +71,15 @@ class CustomerService
      * @param string $shopwareVersion
      */
     public function __construct(
-        EntityRepositoryInterface $countryRepository,
-        EntityRepositoryInterface $customerRepository,
-        Customer $customerApiService,
-        EventDispatcherInterface $eventDispatcher,
-        LoggerInterface $logger,
+        EntityRepositoryInterface    $countryRepository,
+        EntityRepositoryInterface    $customerRepository,
+        Customer                     $customerApiService,
+        EventDispatcherInterface     $eventDispatcher,
+        LoggerInterface              $logger,
         SalesChannelContextPersister $salesChannelContextPersister,
-        EntityRepositoryInterface $salutationRepository,
-        SettingsService $settingsService,
-        string $shopwareVersion
+        EntityRepositoryInterface    $salutationRepository,
+        SettingsService              $settingsService,
+        string                       $shopwareVersion
     )
     {
         $this->countryRepository = $countryRepository;
@@ -260,10 +260,10 @@ class CustomerService
      * @param Context $context
      */
     public function setMollieCustomerId(
-        string $customerId,
-        string $mollieCustomerId,
-        string $profileId,
-        bool $testMode,
+        string  $customerId,
+        string  $mollieCustomerId,
+        string  $profileId,
+        bool    $testMode,
         Context $context
     )
     {
@@ -538,6 +538,15 @@ class CustomerService
     {
         $settings = $this->settingsService->getSettings($salesChannelId);
         $struct = $this->getCustomerStruct($customerId, $context);
+
+        if (empty($settings->getProfileId())) {
+            $this->logger->warning('No profile ID available, cannot create customer.', [
+                'saleschannel' => $salesChannelId,
+                'customerId' => $customerId,
+            ]);
+
+            return;
+        }
 
         if ($this->customerApiService->isLegacyCustomerValid($struct->getLegacyCustomerId(), $salesChannelId)) {
             $this->setMollieCustomerId(
