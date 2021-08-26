@@ -3,9 +3,11 @@
 namespace Kiener\MolliePayments\Subscriber;
 
 use Kiener\MolliePayments\Helper\ProfileHelper;
+use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\MollieApiClient;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -14,15 +16,22 @@ class SystemConfigSubscriber implements EventSubscriberInterface
     /** @var SettingsService */
     private $settingsService;
 
+    /** @var LoggerService */
+    private $logger;
+
     /** @var MollieApiClient */
     private $apiClient;
 
     /** @var array */
     private $profileIdStorage = [];
 
-    public function __construct(SettingsService $settingsService)
+    public function __construct(
+        SettingsService $settingsService,
+        LoggerService   $logger
+    )
     {
         $this->settingsService = $settingsService;
+        $this->logger = $logger;
         $this->apiClient = new MollieApiClient();
     }
 
@@ -40,12 +49,19 @@ class SystemConfigSubscriber implements EventSubscriberInterface
             $this->checkSystemConfigChange(
                 $payload['configurationKey'],
                 $payload['configurationValue'],
-                $payload['salesChannelId']
+                $payload['salesChannelId'],
+                $event->getContext()
             );
         }
     }
 
-    private function checkSystemConfigChange(string $key, $value, ?string $salesChannelId = null)
+    /**
+     * @param string $key
+     * @param $value
+     * @param string|null $salesChannelId
+     * @param Context $context
+     */
+    private function checkSystemConfigChange(string $key, $value, ?string $salesChannelId, Context $context)
     {
         if (in_array($key, [
             SettingsService::SYSTEM_CONFIG_DOMAIN . "liveProfileId",
@@ -55,7 +71,8 @@ class SystemConfigSubscriber implements EventSubscriberInterface
                 $key,
                 $value,
                 $salesChannelId,
-                strpos($key, 'testProfileId') !== false
+                strpos($key, 'testProfileId') !== false,
+                $context
             );
         }
 
@@ -66,25 +83,67 @@ class SystemConfigSubscriber implements EventSubscriberInterface
             $this->fetchProfileIdForApiKey(
                 $value,
                 $salesChannelId,
-                strpos($key, 'testApiKey') !== false
+                strpos($key, 'testApiKey') !== false,
+                $context
             );
         }
     }
 
-    private function fetchProfileIdForApiKey($value, ?string $salesChannelId, bool $testMode = false)
+    /**
+     * @param $value
+     * @param string|null $salesChannelId
+     * @param bool $testMode
+     * @param Context $context
+     */
+    private function fetchProfileIdForApiKey($value, ?string $salesChannelId, bool $testMode, Context $context)
     {
         $profileKey = SettingsService::SYSTEM_CONFIG_DOMAIN . ($testMode ? 'test' : 'live') . 'ProfileId';
 
         if (empty($value)) {
             // If this api key has been "deleted", also remove the profile ID.
+
+            $this->logger->addDebugEntry(
+                "API key has been removed, removing associated profile ID",
+                $salesChannelId,
+                $context,
+                [
+                    'apiKey' => $value,
+                    'salesChannelId' => $salesChannelId ?? 'null',
+                    'mode' => $testMode ? 'test' : 'live',
+                ]
+            );
+
             $this->settingsService->setProfileId(null, $salesChannelId, $testMode);
             return;
         }
+
+        $this->logger->addDebugEntry(
+            "Fetching profile ID",
+            $salesChannelId,
+            $context,
+            [
+                'apiKey' => $value,
+                'salesChannelId' => $salesChannelId ?? 'null',
+                'mode' => $testMode ? 'test' : 'live',
+            ]
+        );
 
         $this->apiClient->setApiKey($value);
 
         $profile = ProfileHelper::getProfile($this->apiClient, new MollieSettingStruct());
         $this->profileIdStorage[$salesChannelId . $profileKey] = $profile->id;
+
+        $this->logger->addDebugEntry(
+            "Saving profile ID",
+            $salesChannelId,
+            $context,
+            [
+                'apiKey' => $value,
+                'salesChannelId' => $salesChannelId ?? 'null',
+                'mode' => $testMode ? 'test' : 'live',
+                'profileId' => $profile->id
+            ]
+        );
 
         $this->settingsService->setProfileId($profile->id, $salesChannelId, $testMode);
     }
@@ -100,8 +159,9 @@ class SystemConfigSubscriber implements EventSubscriberInterface
      * @param $value
      * @param string|null $salesChannelId
      * @param bool $testMode
+     * @param Context $context
      */
-    private function fixProfileIdAfterChange(string $key, $value, ?string $salesChannelId, bool $testMode = false)
+    private function fixProfileIdAfterChange(string $key, $value, ?string $salesChannelId, bool $testMode, Context $context)
     {
         if (isset($this->profileIdStorage[$salesChannelId . $key])) {
             // If the old $value is the same as the new profile ID in storage, then dont set it again
@@ -110,11 +170,32 @@ class SystemConfigSubscriber implements EventSubscriberInterface
                 return;
             }
 
+            $this->logger->addDebugEntry(
+                "A new profile ID was fetched, but the admin saved the old one again, correcting mistake.",
+                $salesChannelId,
+                $context,
+                [
+                    'salesChannelId' => $salesChannelId ?? 'null',
+                    'mode' => $testMode ? 'test' : 'live',
+                    'profileId' => $value
+                ]
+            );
+
             $this->settingsService->setProfileId($this->profileIdStorage[$salesChannelId . $key], $salesChannelId, $testMode);
         } else {
             // If we haven't stored the profile ID from Mollie, but we are getting a value here from the admin,
             // then we no longer need to store this key, so delete it.
             if ($value) {
+                $this->logger->addDebugEntry(
+                    "Removing profile ID",
+                    $salesChannelId,
+                    $context,
+                    [
+                        'salesChannelId' => $salesChannelId ?? 'null',
+                        'mode' => $testMode ? 'test' : 'live',
+                    ]
+                );
+
                 $this->settingsService->setProfileId(null, $salesChannelId, $testMode);
             }
         }
