@@ -577,6 +577,14 @@ class CustomerService
             throw new CustomerCouldNotBeFoundException($customerId);
         }
 
-        $this->customerApiService->createCustomerAtMollie($customer);
+        $mollieCustomer = $this->customerApiService->createCustomerAtMollie($customer);
+
+        $this->setMollieCustomerId(
+            $customerId,
+            $mollieCustomer->id,
+            $settings->getProfileId(),
+            $settings->isTestMode(),
+            $context
+        );
     }
 }
