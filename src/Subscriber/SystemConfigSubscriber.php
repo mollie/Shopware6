@@ -84,10 +84,9 @@ class SystemConfigSubscriber implements EventSubscriberInterface
         $this->apiClient->setApiKey($value);
 
         $profile = ProfileHelper::getProfile($this->apiClient, new MollieSettingStruct());
+        $this->profileIdStorage[$salesChannelId . $profileKey] = $profile->id;
 
         $this->settingsService->setProfileId($profile->id, $salesChannelId, $testMode);
-
-        $this->profileIdStorage[$salesChannelId . $profileKey] = $profile->id;
     }
 
     /**
