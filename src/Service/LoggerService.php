@@ -73,7 +73,7 @@ class LoggerService
 
     public function addDebugEntry(
         $message,
-        string $salesChannelId,
+        ?string $salesChannelId,
         Context $context,
         ?array $additionalData = null
     ): void
