@@ -45,7 +45,7 @@ export default class DummyBasketScenario {
 
         login.doLogin(user_email, user_pwd);
 
-        topMenu.clickOnHome();
+        topMenu.clickOnClothing();
 
         listing.clickOnFirstProduct();
 
