@@ -3,10 +3,7 @@
 namespace Kiener\MolliePayments\Factory;
 
 use Exception;
-use Kiener\MolliePayments\MolliePayments;
-use Kiener\MolliePayments\Service\ConfigService;
 use Kiener\MolliePayments\Service\SettingsService;
-use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Exceptions\IncompatiblePlatform;
 use Mollie\Api\MollieApiClient;
 use Psr\Log\LoggerInterface;

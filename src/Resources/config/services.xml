@@ -23,11 +23,6 @@
     <services>
 
         <!-- Configuration -->
-        <service id="Kiener\MolliePayments\Config\Config" class="Kiener\MolliePayments\Config\Config">
-            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
-        </service>
-
-        <!-- Configuration -->
         <service id="Kiener\MolliePayments\Service\ConfigService" class="Kiener\MolliePayments\Service\ConfigService">
             <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
         </service>
@@ -48,10 +43,12 @@
         <service id="Kiener\MolliePayments\Service\CustomerService" class="Kiener\MolliePayments\Service\CustomerService">
             <argument type="service" id="country.repository"/>
             <argument type="service" id="customer.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Customer"/>
             <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="monolog.logger"/>
             <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister"/>
             <argument type="service" id="salutation.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument>%kernel.shopware_version%</argument>
         </service>
 
@@ -157,14 +154,6 @@
         </service>
 
         <!-- Subscribers -->
-        <service id="Kiener\MolliePayments\Subscriber\CustomerRegistrationSubscriber" class="Kiener\MolliePayments\Subscriber\CustomerRegistrationSubscriber">
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
         <service id="Kiener\MolliePayments\Subscriber\CheckoutConfirmPageSubscriber" class="Kiener\MolliePayments\Subscriber\CheckoutConfirmPageSubscriber">
             <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>

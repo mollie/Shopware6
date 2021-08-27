@@ -81,12 +81,13 @@
             <label lang="nl-NL">Gebruik standaard Shopware redirect voor mislukte bestellingen.</label>
             <defaultValue>false</defaultValue>
         </input-field>
-<!--        <input-field type="bool">-->
-<!--            <name>noCustomersAtMollie</name>-->
-<!--            <label>Do not create customers at Mollie.</label>-->
-<!--            <label lang="de-DE">Kunden nicht bei Mollie anlegen.</label>-->
-<!--            <label lang="nl-NL">Geen klanten creëren bij Mollie.</label>-->
-<!--        </input-field>-->
+        <input-field type="bool">
+            <name>createCustomersAtMollie</name>
+            <label>Create customers at Mollie.</label>
+            <label lang="de-DE">Kunden bei Mollie anlegen.</label>
+            <label lang="nl-NL">Klanten creëren bij Mollie.</label>
+            <defaultValue>true</defaultValue>
+        </input-field>
     </card>
     <card>
         <title>Order State Automation</title>

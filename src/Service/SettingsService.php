@@ -10,6 +10,11 @@ class SettingsService
 {
     public const SYSTEM_CONFIG_DOMAIN = 'MolliePayments.config.';
 
+    const LIVE_API_KEY = 'liveApiKey';
+    const TEST_API_KEY = 'testApiKey';
+    const LIVE_PROFILE_ID = 'liveProfileId';
+    const TEST_PROFILE_ID = 'testProfileId';
+
     /** @var SystemConfigService */
     protected $systemConfigService;
 
@@ -41,5 +46,26 @@ class SettingsService
         }
 
         return (new MollieSettingStruct())->assign($structData);
+    }
+
+    public function set(string $key, $value, ?string $salesChannelId = null): void
+    {
+        $this->systemConfigService->set(self::SYSTEM_CONFIG_DOMAIN . $key, $value, $salesChannelId);
+    }
+
+    public function delete(string $key, ?string $salesChannelId = null): void
+    {
+        $this->systemConfigService->delete(self::SYSTEM_CONFIG_DOMAIN . $key, $salesChannelId);
+    }
+
+    public function setProfileId(?string $profileId, ?string $salesChannelId = null, bool $testMode = false): void
+    {
+        $key = $testMode ? self::TEST_PROFILE_ID : self::LIVE_PROFILE_ID;
+
+        if(!is_null($profileId)) {
+            $this->set($key, $profileId, $salesChannelId);
+        } else {
+            $this->delete($key, $salesChannelId);
+        }
     }
 }

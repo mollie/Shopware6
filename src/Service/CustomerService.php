@@ -3,6 +3,10 @@
 namespace Kiener\MolliePayments\Service;
 
 use Exception;
+use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
+use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
+use Kiener\MolliePayments\Service\MollieApi\Customer;
+use Kiener\MolliePayments\Struct\CustomerStruct;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
@@ -32,6 +36,9 @@ class CustomerService
     /** @var EntityRepositoryInterface */
     private $customerRepository;
 
+    /** @var Customer */
+    private $customerApiService;
+
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
@@ -44,6 +51,9 @@ class CustomerService
     /** @var EntityRepositoryInterface */
     private $salutationRepository;
 
+    /** @var SettingsService */
+    private $settingsService;
+
     /** @var string */
     private $shopwareVersion;
 
@@ -52,28 +62,34 @@ class CustomerService
      *
      * @param EntityRepositoryInterface $countryRepository
      * @param EntityRepositoryInterface $customerRepository
+     * @param Customer $customerApiService
      * @param EventDispatcherInterface $eventDispatcher
      * @param LoggerInterface $logger
      * @param SalesChannelContextPersister $salesChannelContextPersister
      * @param EntityRepositoryInterface $salutationRepository
+     * @param SettingsService $settingsService
      * @param string $shopwareVersion
      */
     public function __construct(
         EntityRepositoryInterface    $countryRepository,
         EntityRepositoryInterface    $customerRepository,
+        Customer                     $customerApiService,
         EventDispatcherInterface     $eventDispatcher,
         LoggerInterface              $logger,
         SalesChannelContextPersister $salesChannelContextPersister,
         EntityRepositoryInterface    $salutationRepository,
+        SettingsService              $settingsService,
         string                       $shopwareVersion
     )
     {
         $this->countryRepository = $countryRepository;
         $this->customerRepository = $customerRepository;
+        $this->customerApiService = $customerApiService;
         $this->eventDispatcher = $eventDispatcher;
         $this->logger = $logger;
         $this->salesChannelContextPersister = $salesChannelContextPersister;
         $this->salutationRepository = $salutationRepository;
+        $this->settingsService = $settingsService;
         $this->shopwareVersion = $shopwareVersion;
     }
 
@@ -232,6 +248,54 @@ class CustomerService
     }
 
     /**
+     * @param string $customerId
+     * @param string $salesChannelId
+     * @param Context $context
+     * @return string
+     */
+    public function getMollieCustomerId(string $customerId, string $salesChannelId, Context $context): string
+    {
+        $settings = $this->settingsService->getSettings($salesChannelId);
+        $struct = $this->getCustomerStruct($customerId, $context);
+
+        return $struct->getCustomerId($settings->getProfileId(), $settings->isTestMode());
+    }
+
+    /**
+     * @param string $customerId
+     * @param string $mollieCustomerId
+     * @param string $profileId
+     * @param bool $testMode
+     * @param Context $context
+     */
+    public function setMollieCustomerId(
+        string  $customerId,
+        string  $mollieCustomerId,
+        string  $profileId,
+        bool    $testMode,
+        Context $context
+    )
+    {
+        $customFields = [
+            'mollie_payments' => [
+                'customer_ids' => [
+                    $profileId => [
+                        ($testMode ? 'test' : 'live') => $mollieCustomerId
+                    ]
+                ]
+            ]
+        ];
+
+        // If there's a legacy customer ID, and it's the same as the one we're saving, remove the legacy id.
+        $struct = $this->getCustomerStruct($customerId, $context);
+        if (!empty($struct->getLegacyCustomerId()) && $struct->getLegacyCustomerId() === $mollieCustomerId) {
+            $customFields[self::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID] = null;
+        }
+
+        $this->saveCustomerCustomFields($customerId, $customFields, $context);
+    }
+
+    /**
      * Return a customer entity with address associations.
      *
      * @param string $customerId
@@ -260,9 +324,39 @@ class CustomerService
             $customer = $this->customerRepository->search($criteria, $context)->first();
         } catch (\Exception $e) {
             $this->logger->error($e->getMessage(), [$e]);
+            // Should error be (re)thrown here, instead of returning null?
         }
 
         return $customer;
+    }
+
+    /**
+     * @param string $customerId
+     * @param Context $context
+     * @return CustomerStruct
+     * @throws CustomerCouldNotBeFoundException
+     */
+    public function getCustomerStruct(string $customerId, Context $context): CustomerStruct
+    {
+        $struct = new CustomerStruct();
+
+        $customer = $this->getCustomer($customerId, $context);
+
+        if (!($customer instanceof CustomerEntity)) {
+            throw new CustomerCouldNotBeFoundException($customerId);
+        }
+
+        $customFields = $customer->getCustomFields() ?? [];
+
+        // If there is a legacy customer id, set it separately
+        if (isset($customFields[self::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID])) {
+            $struct->setLegacyCustomerId($customFields[self::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID]);
+        }
+
+        // Then assign all custom fields under the mollie_payments key
+        $struct->assign($customFields['mollie_payments'] ?? []);
+
+        return $struct;
     }
 
     /**
@@ -353,7 +447,7 @@ class CustomerService
     }
 
     /**
-     * Returns a country id by it's iso code.
+     * Returns a country id by its iso code.
      *
      * @param string $countryCode
      * @param Context $context
@@ -376,7 +470,7 @@ class CustomerService
     }
 
     /**
-     * Returns a salutation id by it's key.
+     * Returns a salutation id by its key.
      *
      * @param Context $context
      *
@@ -395,5 +489,66 @@ class CustomerService
         } catch (Exception $e) {
             return null;
         }
+    }
+
+    /**
+     * @param string $customerId
+     * @param string $salesChannelId
+     * @param Context $context
+     * @throws CustomerCouldNotBeFoundException
+     * @throws CouldNotCreateMollieCustomerException
+     */
+    public function createMollieCustomer(string $customerId, string $salesChannelId, Context $context): void
+    {
+        $settings = $this->settingsService->getSettings($salesChannelId);
+        $struct = $this->getCustomerStruct($customerId, $context);
+
+        if (empty($settings->getProfileId())) {
+            $this->logger->warning('No profile ID available, cannot create customer.', [
+                'saleschannel' => $salesChannelId,
+                'customerId' => $customerId,
+            ]);
+
+            return;
+        }
+
+        if ($this->customerApiService->isLegacyCustomerValid($struct->getLegacyCustomerId(), $salesChannelId)) {
+            $this->setMollieCustomerId(
+                $customerId,
+                $struct->getLegacyCustomerId(),
+                $settings->getProfileId(),
+                $settings->isTestMode(),
+                $context
+            );
+
+            $struct->setLegacyCustomerId(null);
+            $struct->setCustomerId(
+                $struct->getLegacyCustomerId(),
+                $settings->getProfileId(),
+                $settings->isTestMode()
+            );
+
+            return;
+        }
+
+        if (!empty($struct->getCustomerId($settings->getProfileId(), $settings->isTestMode()))) {
+            return;
+        }
+
+        $customer = $this->getCustomer($customerId, $context);
+
+        if (!($customer instanceof CustomerEntity)) {
+            throw new CustomerCouldNotBeFoundException($customerId);
+        }
+
+        $mollieCustomer = $this->customerApiService->createCustomerAtMollie($customer);
+
+        $this->setMollieCustomerId(
+            $customerId,
+            $mollieCustomer->id,
+            $settings->getProfileId(),
+            $settings->isTestMode(),
+            $context
+        );
     }
 }

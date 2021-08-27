@@ -31,6 +31,16 @@ class MollieSettingStruct extends Struct
     protected $profileId;
 
     /**
+     * @var string
+     */
+    protected $liveProfileId;
+
+    /**
+     * @var string
+     */
+    protected $testProfileId;
+
+    /**
      * @var bool
      */
     protected $testMode = true;
@@ -48,7 +58,7 @@ class MollieSettingStruct extends Struct
     /**
      * @var bool
      */
-    protected $noCustomersAtMollie = false;
+    protected $createCustomersAtMollie = true;
 
     /**
      * @var bool
@@ -133,7 +143,7 @@ class MollieSettingStruct extends Struct
      */
     public function getProfileId(): ?string
     {
-        return $this->profileId;
+        return $this->profileId ?? ($this->isTestMode() ? $this->testProfileId : $this->liveProfileId);
     }
 
     /**
@@ -188,23 +198,19 @@ class MollieSettingStruct extends Struct
     /**
      * @return bool
      */
-    public function createNoCustomersAtMollie(): bool
+    public function createCustomersAtMollie(): bool
     {
-        // this feature is deactivated at the moment. The existing implementation is not taking care of the mollie profile id
-        // that has been used when creating the mollie customer.
-        // The whole feature needs refactoring, at the meantime it is deactivated
-        return true;
-        //return (bool)$this->noCustomersAtMollie;
+        return $this->createCustomersAtMollie;
     }
 
     /**
-     * @param bool $noCustomersAtMollie
+     * @param bool $createCustomersAtMollie
      *
      * @return self
      */
-    public function setCreateNoCustomersAtMollie(bool $noCustomersAtMollie): self
+    public function setCreateCustomersAtMollie(bool $createCustomersAtMollie): self
     {
-        $this->noCustomersAtMollie = $noCustomersAtMollie;
+        $this->createCustomersAtMollie = $createCustomersAtMollie;
         return $this;
     }
 
