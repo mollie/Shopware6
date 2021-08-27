@@ -10,5 +10,10 @@
             <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Factory\CompatibilityGatewayFactory" class="Kiener\MolliePayments\Factory\CompatibilityGatewayFactory">
+            <argument>%kernel.shopware_version%</argument>
+            <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextService"/>
+        </service>
+
     </services>
 </container>

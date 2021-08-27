@@ -10,6 +10,7 @@
         <import resource="services/facades.xml"/>
         <import resource="services/gateways.xml"/>
         <import resource="services/hydrators.xml"/>
+        <import resource="services/repositories.xml"/>
         <import resource="services/services.xml"/>
         <import resource="services/snippets.xml"/>
         <import resource="services/subscriber.xml"/>
@@ -59,7 +60,7 @@
             <argument type="service" id="custom_field_set.repository"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\ApplePayDomainVerificationService" public="true">
+        <service id="Kiener\MolliePayments\Service\ApplePayDirect\ApplePayDomainVerificationService" public="true">
             <argument type="service" id="shopware.filesystem.public"/>
         </service>
 
@@ -100,26 +101,8 @@
             <argument type="service" id="order_transaction.repository"/>
         </service>
 
-        <!-- Controllers -->
-        <service id="Kiener\MolliePayments\Storefront\Controller\ApplePayDirectController" public="true">
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\CartService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\ShopService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
-            <argument type="service" id="Kiener\MolliePayments\Handler\PaymentHandler"/>
-            <argument type="service" id="payment_method.repository"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\ProductService"/>
-            <argument type="service" id="router"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\ShippingMethodService"/>
-            <argument type="service" id="service_container"/>
-            <argument>%kernel.shopware_version%</argument>
-            <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory"/>
-            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
+        <service id="Kiener\MolliePayments\Service\Cart\CartBackupService" class="Kiener\MolliePayments\Service\Cart\CartBackupService">
+            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
         </service>
 
         <service id="Kiener\MolliePayments\Storefront\Controller\ComponentsController" public="true">
@@ -203,7 +186,7 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Subscriber\TestModeNotificationSubscriber" >
+        <service id="Kiener\MolliePayments\Subscriber\TestModeNotificationSubscriber">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <tag name="kernel.event_subscriber"/>
         </service>
