@@ -10,7 +10,7 @@
                     {{ payment.translated.name }}
 
                     {% if "MolliePayments" in payment.handlerIdentifier and page.isMollieTestMode == true %}
-                        {{ "molliePayments.testMode.label"|trans }}
+                        ({{ "molliePayments.testMode.label"|trans }})
                     {% endif %}
                 </option>
             {% endfor %}

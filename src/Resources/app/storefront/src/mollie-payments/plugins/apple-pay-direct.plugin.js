@@ -1,42 +1,53 @@
 import Plugin from 'src/plugin-system/plugin.class';
-import HttpClient from 'src/service/http-client.service';
 
 export default class MollieApplePayDirect extends Plugin {
-    _data = {
-        form: null,
-        selectedProduct: null,
-        shippingContact: null,
-        shippingMethodId: null,
-        cartAmount: 0.0,
-        cartToken: '',
-        csrfTokenAuthorize: '',
-        csrfTokenShippingMethods: '',
-        currency: '',
-        shippingAmount: 0.0
-    };
 
+    /**
+     *
+     * @type {number}
+     */
+    APPLE_PAY_VERSION = 3;
+
+
+    /**
+     *
+     */
     init() {
         let me = this;
 
-        // eslint-disable-next-line no-undef
-        me._client = new HttpClient(window.accessKey, window.contextToken);
-
-        // eslint-disable-next-line no-undef
-        if (window.ApplePaySession && location.protocol === 'https:') {
-            let applePayAvailablePromise = this.isApplePayAvailable();
-
-            applePayAvailablePromise.then(function (data) {
-                if (data.available !== undefined && data.available === true) {
-                    me.enableApplePayButtons();
-                }
-            });
+        if (!window.ApplePaySession || !window.ApplePaySession.canMakePayments()) {
+            return;
         }
+
+        let applePayAvailablePromise = this.isApplePayAvailable();
+
+        applePayAvailablePromise.then(function (data) {
+
+            if (data.available === undefined || data.available === false) {
+                return;
+            }
+
+            let applePayButtons = document.querySelectorAll('.js-apple-pay');
+
+            if (applePayButtons.length > 0) {
+
+                applePayButtons.forEach(function (button) {
+                    // Remove display none
+                    button.classList.remove('d-none');
+                    // remove previous handlers (just in case)
+                    button.removeEventListener("click", me.onButtonClick.bind(me));
+                    // add click event handlers
+                    button.addEventListener('click', me.onButtonClick.bind(me));
+                });
+            }
+        });
     }
 
-    totalAmount() {
-        return this._data.cartAmount + this._data.shippingAmount;
-    }
 
+    /**
+     *
+     * @returns {Promise<unknown>}
+     */
     isApplePayAvailable() {
         return new Promise(function (resolve, reject) {
             fetch('/mollie/apple-pay/available')
@@ -49,355 +60,263 @@ export default class MollieApplePayDirect extends Plugin {
         });
     }
 
-    enableApplePayButtons() {
+    /**
+     *
+     * @param event
+     * @param me
+     */
+    onButtonClick(event) {
+
+        event.preventDefault();
+
         let me = this;
-        let applePayButtons = document.querySelectorAll('.js-apple-pay');
 
-        if (applePayButtons.length) {
-            applePayButtons.forEach(function (item) {
-                // Remove display none
-                item.classList.remove('d-none');
+        const button = event.target;
+        const form = button.parentNode;
 
-                // Bind payment request
-                item.addEventListener('click', function (e) {
-                    e.preventDefault();
+        let productId = form.querySelector('input[name="id"]').value;
+        let countryCode = form.querySelector('input[name="countryCode"]').value;
+        let currency = form.querySelector('input[name="currency"]').value;
 
-                    me.clearNotification();
+        // our fallback is quantity 1
+        var quantity = 1;
 
-                    me._data.form = item.parentNode;
-
-                    let csrfTokens = me._data.form.querySelectorAll('#mollie-apd-csrf input[name="_mollie_csrf_token"]');
-
-                    if (csrfTokens.length > 1) {
-                        me._data.csrfTokenAuthorize = csrfTokens[0].value;
-                        me._data.csrfTokenShippingMethods = csrfTokens[1].value;
-                    }
-
-                    let productId = me._data.form.querySelector('input[name="id"]').value;
-                    let productName = me._data.form.querySelector('input[name="name"]').value;
-                    let productPrice = me._data.form.querySelector('input[name="price"]').value;
-                    let countryCode = me._data.form.querySelector('input[name="countryCode"]').value;
-                    let currency = me._data.form.querySelector('input[name="currency"]').value;
-
-                    let productPricePromise = me.getProductPrice(productId);
-
-                    me._data.cartAmount = productPrice;
-                    me._data.currency = currency;
-
-                    me.createPaymentRequest(
-                        'product',
-                        countryCode,
-                        currency,
-                        productName
-                    );
-
-                    productPricePromise.then(function (product) {
-                        me._data.selectedProduct = product.data;
-                        me._data.cartAmount = me._data.selectedProduct.price;
-                    });
-                });
-            });
+        // if we have our sQuantity dropdown, use
+        // that quantity when adding the product
+        var quantitySelects = document.getElementsByClassName('product-detail-quantity-select')
+        if (quantitySelects.length > 0) {
+            quantity = quantitySelects[0].value;
         }
-    }
 
-    // eslint-disable-next-line no-unused-vars
-    createPaymentRequest(type, countryCode, currencyCode, label) {
-        let me = this;
+        me.addProductToCart(productId, quantity);
 
-        let request = {
-            countryCode: countryCode,
-            currencyCode: currencyCode,
-            supportedNetworks: ["amex", "maestro", "masterCard", "visa", "vPay"],
-            merchantCapabilities: ['supports3DS'],
-            requiredShippingContactFields: ["name", "postalAddress", "phone", "email"],
-            total: {label: label, amount: this._data.cartAmount}
-        };
-
-        // eslint-disable-next-line no-undef
-        let session = new ApplePaySession(3, request);
-
-        session.onvalidatemerchant = function (event) {
-            let validationPromise = me.performValidation(event.validationURL);
-
-            validationPromise
-                .then(function (merchantSession) {
-                    try {
-                        session.completeMerchantValidation(merchantSession);
-                    } catch (e) {
-                        me.displayNotification(e.message, session);
-                    }
-                })
-                .catch((reason => {
-                    me.displayNotification(reason, session);
-                }));
-        };
-
-        session.onshippingcontactselected = function (event) {
-            // Store the shipping contact for later use
-            me._data.shippingContact = event.shippingContact;
-
-            // Get the country code
-            if (me._data.shippingContact.countryCode !== undefined) {
-                countryCode = me._data.shippingContact.countryCode;
-            }
-
-            // eslint-disable-next-line no-undef
-            let status = ApplePaySession.STATUS_SUCCESS;
-            let shippingMethodsPromise = me.getShippingMethods(countryCode);
-
-            shippingMethodsPromise
-                .then(function (shippingMethods) {
-                    if (
-                        shippingMethods.error !== undefined
-                        && shippingMethods.error !== null
-                    ) {
-                        me.displayNotification(shippingMethods.error, session);
-                    } else {
-                        if (shippingMethods.length) {
-                            me._data.shippingMethodId = shippingMethods[0].identifier;
-                            me._data.shippingAmount = shippingMethods[0].amount;
-                        }
-
-                        let total = {
-                            type: 'final',
-                            label: 'Total amount',
-                            amount: me.totalAmount()
-                        };
-
-                        let lineItems = [
-                            {
-                                type: 'final',
-                                label: 'Subtotal',
-                                amount: me._data.cartAmount
-                            },
-                            {
-                                type: 'final',
-                                label: 'Shipping costs',
-                                amount: me._data.shippingAmount
-                            }
-                        ];
-
-                        // Update shipping amount
-                        let shippingPromise = me.getShippingAmount();
-
-                        shippingPromise.then(function (shippingCosts) {
-                            me._data.cartToken = shippingCosts.cartToken;
-                            me._data.shippingMethodId = shippingCosts.shippingMethod.id;
-                            me._data.shippingAmount = shippingCosts.totalPrice;
-                        }).catch((reason => {
-                            me.displayNotification(reason, session);
-                        }));
-
-                        try {
-                            session.completeShippingContactSelection(status, shippingMethods, total, lineItems);
-                        } catch (e) {
-                            me.displayNotification(e.message, session);
-                        }
-                    }
-                })
-                .catch((reason => {
-                    me.displayNotification(reason, session);
-                }));
-        };
-
-        session.onshippingmethodselected = function (event) {
-            // Get the shipping method id
-            me._data.shippingMethodId = event.shippingMethod.identifier;
-
-            // Get shipping amount
-            let shippingPromise = me.getShippingAmount();
-
-            shippingPromise
-                .then(function (shippingCosts) {
-                    me._data.cartToken = shippingCosts.cartToken;
-                    me._data.shippingAmount = shippingCosts.totalPrice;
-
-                    // eslint-disable-next-line no-undef
-                    let status = ApplePaySession.STATUS_SUCCESS;
-
-                    let total = {
-                        type: 'final',
-                        label: 'Total amount',
-                        amount: me.totalAmount()
-                    };
-
-                    let lineItems = [
-                        {
-                            type: 'final',
-                            label: 'Subtotal',
-                            amount: me._data.cartAmount
-                        },
-                        {
-                            type: 'final',
-                            label: 'Shipping costs',
-                            amount: me._data.shippingAmount
-                        }
-                    ];
-
-                    try {
-                        session.completeShippingMethodSelection(status, total, lineItems);
-                    } catch (e) {
-                        me.displayNotification(e.message, session);
-                    }
-                })
-                .catch((reason => {
-                    me.displayNotification(reason, session);
-                }));
-        };
-
-        session.onpaymentmethodselected = function () {
-            let total = {
-                type: 'final',
-                label: 'Total amount',
-                amount: me.totalAmount()
-            };
-
-            let lineItems = [
-                {
-                    type: 'final',
-                    label: 'Subtotal',
-                    amount: me._data.cartAmount
-                },
-                {
-                    type: 'final',
-                    label: 'Shipping costs',
-                    amount: me._data.shippingAmount
-                }
-            ];
-
-            try {
-                session.completePaymentMethodSelection(total, lineItems);
-            } catch (e) {
-                me.displayNotification(e.message, session);
-            }
-        };
-
-        session.onpaymentauthorized = function (event) {
-            let paymentPromise = me.sendPaymentToken(event.payment);
-
-            paymentPromise
-                .then(function (data) {
-                    let status;
-                    let redirectUrl;
-
-                    if (
-                        data.errors !== undefined
-                        && data.errors !== null
-                        && data.errors.length > 0
-                    ) {
-                        // eslint-disable-next-line no-undef
-                        status = ApplePaySession.STATUS_FAILURE;
-
-                        // Display the error message
-                        let message = '';
-
-                        data.errors.forEach(function (error) {
-                            message += error + '<br />';
-                        });
-
-                        me.displayNotification(message, session);
-                    } else if (
-                        data.redirectUrl !== undefined
-                        && data.redirectUrl !== null
-                        && data.redirectUrl !== ''
-                    ) {
-                        // eslint-disable-next-line no-undef
-                        status = ApplePaySession.STATUS_SUCCESS;
-                        redirectUrl = data.redirectUrl;
-                    }
-
-                    try {
-                        session.completePayment(status);
-                    } catch (e) {
-                        me.displayNotification(e.message, session);
-                    }
-
-                    if (!!redirectUrl) {
-                        document.location = redirectUrl;
-                    }
-                })
-                .catch((reason => {
-                    me.displayNotification(reason, session);
-                }));
-        };
-
-        session.oncancel = function () {
-            // session is cancled
-        };
-
+        var session = me.createApplePaySession(countryCode, currency);
         session.begin();
     }
 
-    performValidation(validationUrl) {
-        return new Promise(function (resolve, reject) {
-            fetch('/mollie/apple-pay/validate?validationUrl=' + validationUrl)
-                .then(response => response.json())
-                .then(data => resolve(data))
-                // eslint-disable-next-line no-unused-vars
-                .catch((error) => {
-                    reject();
-                });
-        });
+    /**
+     *
+     * @param id
+     * @param quantity
+     */
+    addProductToCart(id, quantity) {
+        fetch('/mollie/apple-pay/add-product',
+            {
+                method: 'POST',
+                body: JSON.stringify({
+                    'id': id,
+                    'quantity': quantity,
+                })
+            }
+        );
     }
 
-    sendPaymentToken(payment) {
+    /**
+     *
+     * @param label
+     * @param amount
+     * @param country
+     * @param currency
+     * @returns {ApplePaySession}
+     */
+    createApplePaySession(country, currency) {
+
         let me = this;
-        let postData = {
-            paymentToken: JSON.stringify(payment.token),
-            shippingContact: JSON.stringify(payment.shippingContact),
-            currency: me._data.currency,
-            customer: me._data.shippingContact,
-            productId: me._data.selectedProduct.id,
-            shippingMethodId: me._data.shippingMethodId,
-            cartAmount: me._data.cartAmount,
-            cartToken: me._data.cartToken,
-            shippingAmount: me._data.shippingAmount,
-            totalAmount: me.totalAmount(),
-            _csrf_token: me._data.csrfTokenAuthorize
+
+        var request = {
+            countryCode: country,
+            currencyCode: currency,
+            requiredShippingContactFields: [
+                "name",
+                "email",
+                "postalAddress"
+            ],
+            supportedNetworks: [
+                'amex',
+                'maestro',
+                'masterCard',
+                'visa',
+                'vPay'
+            ],
+            merchantCapabilities: ['supports3DS', 'supportsEMV', 'supportsCredit', 'supportsDebit'],
+            total: {
+                label: '',
+                amount: 0
+            }
         };
 
-        return new Promise(function (resolve) {
-            me._client.post('/mollie/apple-pay/authorize', JSON.stringify(postData), response => resolve(JSON.parse(response)));
-        });
-    }
+        // eslint-disable-next-line no-undef
+        const session = new ApplePaySession(this.APPLE_PAY_VERSION, request);
 
-    getProductPrice(productId) {
-        return new Promise(function (resolve, reject) {
-            fetch('/mollie/apple-pay/product/' + productId + '/price')
-                .then(response => response.json())
-                .then(data => resolve(data))
-                // eslint-disable-next-line no-unused-vars
-                .catch((error) => {
-                    reject();
+        session.onvalidatemerchant = function (event) {
+
+            fetch('/mollie/apple-pay/validate',
+                {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        validationUrl: event.validationURL
+                    })
+                })
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (validationData) {
+                    const data = JSON.parse(validationData.session);
+                    session.completeMerchantValidation(data);
+                })
+                .catch(() => {
+                    session.abort();
                 });
-        });
-    }
-
-    getShippingAmount() {
-        let me = this;
-        return new Promise(function (resolve, reject) {
-            fetch('/mollie/apple-pay/shipping-costs/' + me._data.shippingMethodId + '/' + me._data.selectedProduct.id)
-                .then(response => response.json())
-                .then(data => resolve(data))
-                // eslint-disable-next-line no-unused-vars
-                .catch((error) => {
-                    reject();
-                });
-        })
-    }
-
-    getShippingMethods(countryCode) {
-        let me = this;
-        let postData = {
-            countryCode: countryCode,
-            _csrf_token: me._data.csrfTokenShippingMethods
         };
 
-        return new Promise(function (resolve) {
-            me._client.post('/mollie/apple-pay/shipping-methods', JSON.stringify(postData), response => resolve(JSON.parse(response)));
-        });
+        session.onshippingcontactselected = function (event) {
+
+            var countryCode = '';
+
+            if (event.shippingContact.countryCode !== undefined) {
+                countryCode = event.shippingContact.countryCode;
+            }
+
+            fetch('/mollie/apple-pay/shipping-methods',
+                {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        countryCode: countryCode,
+                    })
+                })
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data) {
+                    if (data.success) {
+                        session.completeShippingContactSelection(
+                            // eslint-disable-next-line no-undef
+                            ApplePaySession.STATUS_SUCCESS,
+                            data.shippingmethods,
+                            data.cart.total,
+                            data.cart.items
+                        );
+                    } else {
+                        session.completeShippingContactSelection(
+                            // eslint-disable-next-line no-undef
+                            ApplePaySession.STATUS_FAILURE,
+                            [],
+                            {
+                                label: "",
+                                amount: 0,
+                                pending: true
+                            },
+                            []
+                        );
+                    }
+                })
+                .catch(() => {
+                    session.abort();
+                });
+        };
+
+        session.onshippingmethodselected = function (event) {
+
+            fetch('/mollie/apple-pay/set-shipping',
+                {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        identifier: event.shippingMethod.identifier
+                    })
+                })
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data) {
+                    if (data.success) {
+                        session.completeShippingMethodSelection(
+                            // eslint-disable-next-line no-undef
+                            ApplePaySession.STATUS_SUCCESS,
+                            data.cart.total,
+                            data.cart.items
+                        );
+                    } else {
+                        session.completeShippingMethodSelection(
+                            // eslint-disable-next-line no-undef
+                            ApplePaySession.STATUS_FAILURE,
+                            {
+                                label: "",
+                                amount: 0,
+                                pending: true
+                            },
+                            []
+                        );
+                    }
+                })
+                .catch(() => {
+                    session.abort();
+                });
+        };
+
+        session.onpaymentauthorized = function (event) {
+            var paymentToken = event.payment.token;
+            paymentToken = JSON.stringify(paymentToken);
+
+            // complete the session and notify the
+            // devices and the system that everything worked
+            // eslint-disable-next-line no-undef
+            session.completePayment(ApplePaySession.STATUS_SUCCESS);
+
+            // now finish our payment by filling a form
+            // and submitting it along with our payment token
+            me.finishPayment('/mollie/apple-pay/start-payment', paymentToken, event.payment);
+        };
+
+        session.oncancel = function () {
+            fetch('/mollie/apple-pay/restore-cart', {method: 'POST'});
+        };
+
+        return session;
     }
 
+    /**
+     *
+     * @param checkoutURL
+     * @param paymentToken
+     * @param payment
+     */
+    finishPayment(checkoutURL, paymentToken, payment) {
+        var $form;
+        var createField = function (name, val) {
+            return $('<input>', {
+                type: 'hidden',
+                name: name,
+                value: val
+            });
+        };
+
+        $form = $('<form>', {
+            action: checkoutURL,
+            method: 'POST'
+        });
+
+        // add billing data
+        createField('email', payment.shippingContact.emailAddress).appendTo($form);
+        createField('lastname', payment.shippingContact.familyName).appendTo($form);
+        createField('firstname', payment.shippingContact.givenName).appendTo($form);
+        createField('street', payment.shippingContact.addressLines[0]).appendTo($form);
+        createField('postalCode', payment.shippingContact.postalCode).appendTo($form);
+        createField('city', payment.shippingContact.locality).appendTo($form);
+        createField('countryCode', payment.shippingContact.countryCode).appendTo($form);
+        // also add our payment token
+        createField('paymentToken', paymentToken).appendTo($form);
+
+        $form.appendTo($('body'));
+
+        $form.submit();
+    }
+
+    /**
+     *
+     * @param message
+     * @param session
+     * @param type
+     */
     displayNotification(message, session, type) {
         let flashBagsContainer = document.querySelector('div.flashbags.container');
 
@@ -412,6 +331,9 @@ export default class MollieApplePayDirect extends Plugin {
         }
     }
 
+    /**
+     *
+     */
     clearNotification() {
         let flashBagsContainer = document.querySelector('div.flashbags.container');
 
@@ -419,4 +341,5 @@ export default class MollieApplePayDirect extends Plugin {
             flashBagsContainer.innerHTML = '';
         }
     }
+
 }

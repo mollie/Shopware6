@@ -14,6 +14,13 @@ export default class TopMenuAction {
     /**
      *
      */
+    clickOnClothing() {
+        repo.getClothingMenuItem().click();
+    }
+
+    /**
+     *
+     */
     clickAccountWidgetOrders() {
         cy.get('#accountWidget').click();
         cy.wait(500);

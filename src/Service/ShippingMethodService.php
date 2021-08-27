@@ -32,7 +32,7 @@ class ShippingMethodService
     }
 
     /**
-     * @param string              $shippingMethodId
+     * @param string $shippingMethodId
      * @param SalesChannelContext $salesChannelContext
      *
      * @return ShippingMethodEntity|null
@@ -52,7 +52,7 @@ class ShippingMethodService
      *
      * @return ShippingMethodCollection
      */
-    public function getShippingMethods(SalesChannelContext $salesChannelContext): ShippingMethodCollection
+    public function getActiveShippingMethods(SalesChannelContext $salesChannelContext): ShippingMethodCollection
     {
         $criteria = (new Criteria())
             ->addFilter(new EqualsFilter('active', true))
@@ -69,71 +69,4 @@ class ShippingMethodService
         return $shippingMethods->filterByActiveRules($salesChannelContext);
     }
 
-    /**
-     * Returns an array of shipping methods for Apple Pay Direct
-     * @param SalesChannelContext $context
-     *
-     * @return array
-     */
-    public function getShippingMethodsForApplePayDirect(SalesChannelContext $context): array
-    {
-        /** array $shippingMethods */
-        $shippingMethods = [];
-
-        /** @var ShippingMethodCollection $availableShippingMethods */
-        $availableShippingMethods = $this->getShippingMethods($context);
-
-        /** @var float $shippingCost */
-        $shippingCost = 0.0;
-
-        if (
-            $availableShippingMethods !== null
-            && $availableShippingMethods->count()
-        ) {
-            /** @var ShippingMethodEntity $shippingMethod */
-            foreach ($availableShippingMethods as $shippingMethod) {
-                if (
-                    $shippingMethod->getPrices()->count()
-                    && $shippingMethod->getPrices()->first() !== null
-                ) {
-                    /** @var ShippingMethodPriceEntity $price */
-                    $price = $shippingMethod->getPrices()->first();
-
-                    if (method_exists($price, 'getCurrencyPrice')) {
-                        /** @var PriceCollection $priceCollection */
-                        $priceCollection = $price->getCurrencyPrice($context->getCurrency()->getId());
-
-                        if ($priceCollection->count() && $priceCollection->first() !== null) {
-                            if ($context->getTaxState() === CartPrice::TAX_STATE_FREE) {
-                                $shippingCost = $priceCollection->first()->getNet();
-                            } else {
-                                $shippingCost = $priceCollection->first()->getGross();
-                            }
-                        }
-                    } else {
-                        $shippingCost = $price->getPrice();
-                    }
-                }
-
-                $detail = '';
-
-                if ($shippingMethod->getDeliveryTime() !== null) {
-                    $detail = $shippingMethod->getDeliveryTime()->getTranslation('name') ?: $shippingMethod->getDeliveryTime()->getName();
-                }
-
-                $shippingMethods[] = [
-                    'label' => $shippingMethod->getName(),
-                    'amount' => $shippingCost,
-                    'detail' => $shippingMethod->getDescription() . ($detail !== '' ? ' (' . $detail . ')' : ''),
-                    'identifier' => $shippingMethod->getId(),
-                ];
-            }
-        }
-
-        usort($shippingMethods, function($a, $b) {
-            return $a['amount'] - $b['amount'];
-        });
-
-        return $shippingMethods;
-    }
 }

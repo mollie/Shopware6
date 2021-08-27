@@ -39,7 +39,7 @@ export default class MollieIDealIssuer extends Plugin {
         // currently selected issuer as the selected on of the customer.
         // this is for consistency.
         if (!this._isModalForm) {
-            this.updateIssuer(this._shopUrl, this._customerId, this._iDealRadioInput, this._issuersDropdown, function (msg) {
+            this.updateIssuer(this._shopUrl, this._customerId, this._iDealRadioInput, this._issuersDropdown, function () {
             });
         }
     }
@@ -105,8 +105,8 @@ export default class MollieIDealIssuer extends Plugin {
         // while the user switches the values in the dropdown
         if (!this._isModalForm) {
 
-            issuersDropdown.addEventListener('change', async event => {
-                this.updateIssuer(shopUrl, customerId, iDealRadioInput, issuersDropdown, function (msg) {
+            issuersDropdown.addEventListener('change', async () => {
+                this.updateIssuer(shopUrl, customerId, iDealRadioInput, issuersDropdown, function () {
                 });
             });
 
@@ -114,8 +114,8 @@ export default class MollieIDealIssuer extends Plugin {
 
             const submitButton = paymentForm.querySelector('button[type="submit"]');
 
-            submitButton.addEventListener("click", async event => {
-                this.updateIssuer(shopUrl, customerId, iDealRadioInput, issuersDropdown, function (msg) {
+            submitButton.addEventListener("click", async () => {
+                this.updateIssuer(shopUrl, customerId, iDealRadioInput, issuersDropdown, function () {
                 });
             });
         }
