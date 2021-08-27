@@ -4,6 +4,6 @@
     {{ parent() }}
 
     {% if "MolliePayments" in page.order.transactions.last.paymentMethod.handlerIdentifier and page.extensions.MollieTestModePageExtension.testMode == true %}
-        {{ "molliePayments.testMode.label"|trans }}
+        ({{ "molliePayments.testMode.label"|trans }})
     {% endif %}
 {% endblock %}

@@ -2,150 +2,170 @@
 
 namespace Kiener\MolliePayments\Service;
 
+use Kiener\MolliePayments\Factory\CompatibilityGatewayFactory;
+use Kiener\MolliePayments\Gateway\CompatibilityGatewayInterface;
 use Shopware\Core\Checkout\Cart\Cart;
-use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService as SalesChannelCartService;
-use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
-use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
-use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
-use Shopware\Core\Framework\Uuid\Uuid;
-use Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory;
+use Shopware\Core\Content\Product\Cart\ProductLineItemFactory;
+use Shopware\Core\Framework\Validation\DataBag\DataBag;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
+use Shopware\Core\System\SalesChannel\SalesChannel\SalesChannelContextSwitcher;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class CartService
 {
-    /** @var SalesChannelCartService */
-    private $salesChannelCartService;
-
-    /** @var SalesChannelContextFactory */
-    private $salesChannelContextFactory;
+    /**
+     * @var SalesChannelCartService
+     */
+    private $swCartService;
 
     /**
-     * Creates a new instance of the cart service.
-     *
-     * @param SalesChannelCartService $salesChannelCartService
+     * @var SalesChannelContextSwitcher
      */
-    public function __construct(
-        SalesChannelCartService $salesChannelCartService,
-        SalesChannelContextFactory $salesChannelContextFactory
-    )
+    private $contextSwitcher;
+
+    /**
+     * @var ProductLineItemFactory
+     */
+    private $productItemFactory;
+
+    /**
+     * @var CompatibilityGatewayInterface
+     */
+    private $compatibilityGateway;
+
+
+    /**
+     * @param SalesChannelCartService $swCartService
+     * @param SalesChannelContextSwitcher $contextSwitcher
+     * @param ProductLineItemFactory $productItemFactory
+     * @param CompatibilityGatewayFactory $compatibilityGatewayFactory
+     */
+    public function __construct(SalesChannelCartService $swCartService, SalesChannelContextSwitcher $contextSwitcher, ProductLineItemFactory $productItemFactory, CompatibilityGatewayFactory $compatibilityGatewayFactory)
     {
-        $this->salesChannelCartService = $salesChannelCartService;
-        $this->salesChannelContextFactory = $salesChannelContextFactory;
+        $this->swCartService = $swCartService;
+        $this->contextSwitcher = $contextSwitcher;
+        $this->productItemFactory = $productItemFactory;
+
+        $this->compatibilityGateway = $compatibilityGatewayFactory->create();
+    }
+
+
+    /**
+     * @param string $productId
+     * @param int $quantity
+     * @param SalesChannelContext $context
+     * @return Cart
+     */
+    public function addProduct(string $productId, int $quantity, SalesChannelContext $context): Cart
+    {
+        $cart = $this->getCalculatedMainCart($context);
+
+        $productItem = $this->productItemFactory->create($productId, ['quantity' => $quantity]);
+
+        return $this->swCartService->add($cart, $productItem, $context);
     }
 
     /**
-     * Returns a cart by it's token.
-     *
-     * @param string              $cartToken
      * @param SalesChannelContext $salesChannelContext
-     *
      * @return Cart
      */
-    public function getCart(string $cartToken, SalesChannelContext $salesChannelContext): Cart
+    public function getCalculatedMainCart(SalesChannelContext $salesChannelContext): Cart
     {
-        return $this->salesChannelCartService->getCart($cartToken, $salesChannelContext);
+        $cart = $this->swCartService->getCart($salesChannelContext->getToken(), $salesChannelContext);
+
+        return $this->swCartService->recalculate($cart, $salesChannelContext);
+    }
+
+    /**
+     * @param Cart $cart
+     */
+    public function updateCart(Cart $cart): void
+    {
+        $this->swCartService->setCart($cart);
+    }
+
+    /**
+     * @param Cart $cart
+     * @return float
+     */
+    public function getShippingCosts(Cart $cart): float
+    {
+        return $cart->getDeliveries()->getShippingCosts()->sum()->getTotalPrice();
     }
 
     /**
      * Converts a cart to an order.
      *
-     * @param Cart                $cart
+     * @param Cart $cart
      * @param SalesChannelContext $salesChannelContext
      *
      * @return string
      */
     public function order(Cart $cart, SalesChannelContext $salesChannelContext): string
     {
-        return $this->salesChannelCartService->order($cart, $salesChannelContext);
+        return $this->swCartService->order($cart, $salesChannelContext, null);
     }
 
     /**
-     * Returns a cart based on a new sales channel context.
-     *
-     * @param string               $productId
-     * @param PaymentMethodEntity  $paymentMethod
-     * @param ShippingMethodEntity $shippingMethod
-     * @param SalesChannelContext  $salesChannelContext
-     *
-     * @return Cart
+     * @param SalesChannelContext $context
+     * @param string $countryID
+     * @return SalesChannelContext
      */
-    public function createCartForProduct(
-        string $productId,
-        PaymentMethodEntity $paymentMethod,
-        ShippingMethodEntity $shippingMethod,
-        SalesChannelContext $salesChannelContext
-    ): Cart
+    public function updateCountry(SalesChannelContext $context, string $countryID): SalesChannelContext
     {
-        $customerId = '';
-        $customer = $salesChannelContext->getCustomer();
-        $billing = null;
-        $shipping = null;
+        $dataBag = new DataBag();
 
-        if ($customer instanceof CustomerEntity) {
-            $customerId = $customer->getId();
-            $billing = $customer->getDefaultBillingAddress();
-            $shipping = $customer->getDefaultShippingAddress();
-        }
+        $dataBag->add([
+            SalesChannelContextService::COUNTRY_ID => $countryID
+        ]);
 
-        $billingAddressId = '';
+        $this->contextSwitcher->update($dataBag, $context);
 
-        if ($billing instanceof CustomerAddressEntity) {
-            $billingAddressId = $billing->getId();
-        }
+        $scID = $this->compatibilityGateway->getSalesChannelID($context);
 
-        if ($shipping instanceof CustomerAddressEntity) {
-            $shippingAddressId = $shipping->getId();
-        } else {
-            $shippingAddressId = $billingAddressId;
-        }
-
-        $languageIds = $salesChannelContext->getLanguageIdChain();
-
-        $options = [
-            SalesChannelContextService::CURRENCY_ID => $salesChannelContext->getCurrency()->getId(),
-            SalesChannelContextService::LANGUAGE_ID => array_shift($languageIds),
-            SalesChannelContextService::CUSTOMER_GROUP_ID => $salesChannelContext->getCurrentCustomerGroup()->getId(),
-        ];
-
-        if (!empty($customerId)) {
-            $options[SalesChannelContextService::CUSTOMER_ID] = $customerId;
-        }
-
-        if (!empty($billingAddressId)) {
-            $options[SalesChannelContextService::BILLING_ADDRESS_ID] = $billingAddressId;
-        }
-
-        if (!empty($shippingAddressId)) {
-            $options[SalesChannelContextService::SHIPPING_ADDRESS_ID] = $shippingAddressId;
-        }
-
-        $newSalesChannelContext = $this->salesChannelContextFactory->create(
-            $salesChannelContext->getToken(),
-            $salesChannelContext->getSalesChannel()->getId(),
-            $options
-        );
-
-        $newSalesChannelContext->setRuleIds($salesChannelContext->getRuleIds());
-
-        // Get a cart token
-        $cartToken = Uuid::randomHex();
-
-        // Create a cart
-        $cart = new Cart('apple-pay-direct', $cartToken);
-
-        /** @var LineItem $lineItem */
-        $lineItem = new LineItem(
-            $productId,
-            LineItem::PRODUCT_LINE_ITEM_TYPE,
-            $productId,
-            1
-        );
-
-        $lineItem->setStackable(true);
-
-        return $this->salesChannelCartService->add($cart, $lineItem, $newSalesChannelContext);
+        return $this->compatibilityGateway->getSalesChannelContext($scID, $context->getToken());
     }
+
+    /**
+     * @param SalesChannelContext $context
+     * @param string $shippingMethodID
+     * @return SalesChannelContext
+     */
+    public function updateShippingMethod(SalesChannelContext $context, string $shippingMethodID): SalesChannelContext
+    {
+        $dataBag = new DataBag();
+
+        $dataBag->add([
+            SalesChannelContextService::SHIPPING_METHOD_ID => $shippingMethodID
+        ]);
+
+        $this->contextSwitcher->update($dataBag, $context);
+
+        $scID = $this->compatibilityGateway->getSalesChannelID($context);
+
+        return $this->compatibilityGateway->getSalesChannelContext($scID, $context->getToken());
+    }
+
+
+    /**
+     * @param SalesChannelContext $context
+     * @param string $paymentMethodID
+     * @return SalesChannelContext
+     */
+    public function updatePaymentMethod(SalesChannelContext $context, string $paymentMethodID): SalesChannelContext
+    {
+        $dataBag = new DataBag();
+
+        $dataBag->add([
+            SalesChannelContextService::PAYMENT_METHOD_ID => $paymentMethodID
+        ]);
+
+        $this->contextSwitcher->update($dataBag, $context);
+
+        $scID = $this->compatibilityGateway->getSalesChannelID($context);
+
+        return $this->compatibilityGateway->getSalesChannelContext($scID, $context->getToken());
+    }
+
 }

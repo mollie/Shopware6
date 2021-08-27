@@ -2,6 +2,8 @@
 
 namespace MolliePayments\Tests\Subscriber;
 
+use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
+use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\LoggerService;
@@ -93,16 +95,14 @@ class MolliePaymentDoPayTest extends TestCase
     }
 
     /**
-     * @param string $customerId
      * @param bool $customerIsGuest
-     * @param string $salesChannelId
      * @param bool $createCustomersAtMollie
      * @param bool $shouldCreateMollieCustomer
-     * @throws \Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException
-     * @throws \Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException
+     * @throws CouldNotCreateMollieCustomerException
+     * @throws CustomerCouldNotBeFoundException
      * @dataProvider createMollieCustomerIsCalledTestData
      */
-    public function testThatCreateMollieCustomerIsCalled(
+    public function testIfCreateMollieCustomerIsCalled(
         bool $customerIsGuest,
         bool $createCustomersAtMollie,
         bool $shouldCreateMollieCustomer

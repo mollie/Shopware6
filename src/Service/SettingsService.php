@@ -10,6 +10,11 @@ class SettingsService
 {
     public const SYSTEM_CONFIG_DOMAIN = 'MolliePayments.config.';
 
+    const LIVE_API_KEY = 'liveApiKey';
+    const TEST_API_KEY = 'testApiKey';
+    const LIVE_PROFILE_ID = 'liveProfileId';
+    const TEST_PROFILE_ID = 'testProfileId';
+
     /** @var SystemConfigService */
     protected $systemConfigService;
 
@@ -55,7 +60,7 @@ class SettingsService
 
     public function setProfileId(?string $profileId, ?string $salesChannelId = null, bool $testMode = false): void
     {
-        $key = ($testMode ? 'test' : 'live') . 'ProfileId';
+        $key = $testMode ? self::TEST_PROFILE_ID : self::LIVE_PROFILE_ID;
 
         if(!is_null($profileId)) {
             $this->set($key, $profileId, $salesChannelId);

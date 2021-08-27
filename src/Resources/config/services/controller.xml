@@ -42,5 +42,30 @@
                 <argument type="service" id="service_container"/>
             </call>
         </service>
+
+        <!-- Controllers -->
+        <service id="Kiener\MolliePayments\Storefront\Controller\ApplePayDirectController" public="true">
+            <argument type="service" id="Kiener\MolliePayments\Service\ApplePayDirect\ApplePayDirect"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\CartService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\ShopService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
+            <argument type="service" id="Kiener\MolliePayments\Handler\Method\ApplePayPayment"/>
+            <argument type="service" id="payment_method.repository"/>
+            <argument type="service" id="router"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Cart\CartBackupService"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\Order\OrderAddressRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\CompatibilityGatewayFactory"/>
+            <argument type="service" id="session.flash_bag"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+
+
     </services>
 </container>

@@ -64,26 +64,26 @@ class SystemConfigSubscriber implements EventSubscriberInterface
     private function checkSystemConfigChange(string $key, $value, ?string $salesChannelId, Context $context)
     {
         if (in_array($key, [
-            SettingsService::SYSTEM_CONFIG_DOMAIN . "liveProfileId",
-            SettingsService::SYSTEM_CONFIG_DOMAIN . "testProfileId",
+            SettingsService::SYSTEM_CONFIG_DOMAIN . SettingsService::LIVE_PROFILE_ID,
+            SettingsService::SYSTEM_CONFIG_DOMAIN . SettingsService::TEST_PROFILE_ID,
         ])) {
             $this->fixProfileIdAfterChange(
                 $key,
                 $value,
                 $salesChannelId,
-                strpos($key, 'testProfileId') !== false,
+                strpos($key, SettingsService::TEST_PROFILE_ID) !== false,
                 $context
             );
         }
 
         if (in_array($key, [
-            SettingsService::SYSTEM_CONFIG_DOMAIN . "liveApiKey",
-            SettingsService::SYSTEM_CONFIG_DOMAIN . "testApiKey",
+            SettingsService::SYSTEM_CONFIG_DOMAIN . SettingsService::LIVE_API_KEY,
+            SettingsService::SYSTEM_CONFIG_DOMAIN . SettingsService::TEST_API_KEY,
         ])) {
             $this->fetchProfileIdForApiKey(
                 $value,
                 $salesChannelId,
-                strpos($key, 'testApiKey') !== false,
+                strpos($key, SettingsService::TEST_API_KEY) !== false,
                 $context
             );
         }
@@ -97,7 +97,10 @@ class SystemConfigSubscriber implements EventSubscriberInterface
      */
     private function fetchProfileIdForApiKey($value, ?string $salesChannelId, bool $testMode, Context $context)
     {
-        $profileKey = SettingsService::SYSTEM_CONFIG_DOMAIN . ($testMode ? 'test' : 'live') . 'ProfileId';
+        $profileKey = SettingsService::SYSTEM_CONFIG_DOMAIN .
+            ($testMode ?
+                SettingsService::TEST_PROFILE_ID :
+                SettingsService::LIVE_PROFILE_ID);
 
         if (empty($value)) {
             // If this api key has been "deleted", also remove the profile ID.

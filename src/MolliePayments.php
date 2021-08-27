@@ -3,7 +3,7 @@
 namespace Kiener\MolliePayments;
 
 use Exception;
-use Kiener\MolliePayments\Service\ApplePayDomainVerificationService;
+use Kiener\MolliePayments\Service\ApplePayDirect\ApplePayDomainVerificationService;
 use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\PaymentMethodService;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;

@@ -18,6 +18,7 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
 use Mollie\Api\Resources\Order as MollieOrder;
+use Monolog\Logger;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
@@ -165,7 +166,18 @@ class MolliePaymentDoPay
             return $url;
         }
 
-        $this->createCustomerAtMollie($order, $salesChannelContext);
+        try {
+            $this->createCustomerAtMollie($order, $salesChannelContext);
+        } catch (CouldNotCreateMollieCustomerException | CustomerCouldNotBeFoundException $e) {
+            $this->logger->addEntry(
+                $e->getMessage(),
+                $salesChannelContext->getContext(),
+                $e,
+                ['order' => $order],
+                Logger::ERROR
+            );
+        }
+
 
         // build new mollie order array
         $mollieOrderArray = $this->orderBuilder->build(
