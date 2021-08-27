@@ -51,61 +51,47 @@ class CustomerTest extends TestCase
         $this->customerApiService = new CustomerApi($clientFactory);
     }
 
-    /**
-     * @param string $mollieCustomerId
-     * @param string|null $expectedInstance
-     * @param string|null $expectedException
-     * @throws CouldNotFetchMollieCustomerException
-     * @dataProvider mollieCustomerByIdTestData
-     */
-    public function testGetMollieCustomerById(
-        string $mollieCustomerId,
-        ?string $expectedInstance = null,
-        ?string $expectedException = null
-    )
+    public function testThatMollieCustomerExists()
     {
-        if (!is_null($expectedException)) {
-            $this->expectException($expectedException);
-        }
-
-        $actualInstance = $this->customerApiService->getMollieCustomerById($mollieCustomerId, '');
-
-        if (!is_null($expectedInstance)) {
-            $this->assertInstanceOf($expectedInstance, $actualInstance);
-        }
+        $actualInstance = $this->customerApiService->getMollieCustomerById('foo', '');
+        $this->assertInstanceOf(Customer::class, $actualInstance);
     }
 
-    /**
-     * @param string $email
-     * @param string|null $expectedInstance
-     * @param string|null $expectedException
-     * @throws CouldNotCreateMollieCustomerException
-     * @dataProvider createCustomerAtMollieTestData
-     */
-    public function testCreateCustomersAtMollie(
-        string $email,
-        ?string $expectedInstance = null,
-        ?string $expectedException = null
-    )
+    public function testThatExceptionIsThrownIfCustomerDoesNotExist()
     {
-        if (!is_null($expectedException)) {
-            $this->expectException($expectedException);
-        }
+        $this->expectException(CouldNotFetchMollieCustomerException::class);
+        $this->customerApiService->getMollieCustomerById('bar', '');
+    }
 
+    public function testCreatingNewCustomerAtMollie()
+    {
         $customerMock = $this->createConfiguredMock(CustomerEntity::class, [
             'getFirstName' => 'Foo',
             'getLastName' => 'Bar',
-            'getEmail' => $email,
+            'getEmail' => 'new.email@ddress.com',
             'getCustomerNumber' => '12345',
             'getId' => 'fizz',
             'getSalesChannelId' => 'buzz',
         ]);
 
         $actualInstance = $this->customerApiService->createCustomerAtMollie($customerMock);
+        $this->assertInstanceOf(Customer::class, $actualInstance);
+    }
 
-        if (!is_null($expectedInstance)) {
-            $this->assertInstanceOf($expectedInstance, $actualInstance);
-        }
+    public function testCreatingNewCustomerAtMollieWithExistingEmailAddress()
+    {
+        $this->expectException(CouldNotCreateMollieCustomerException::class);
+
+        $customerMock = $this->createConfiguredMock(CustomerEntity::class, [
+            'getFirstName' => 'Foo',
+            'getLastName' => 'Bar',
+            'getEmail' => 'existing.email@ddress.com',
+            'getCustomerNumber' => '12345',
+            'getId' => 'fizz',
+            'getSalesChannelId' => 'buzz',
+        ]);
+
+        $this->customerApiService->createCustomerAtMollie($customerMock);
     }
 
     /**
@@ -123,39 +109,6 @@ class CustomerTest extends TestCase
         $this->assertIsBool($actualValue);
         $this->assertSame($expectedValue, $actualValue);
     }
-
-    public function mollieCustomerByIdTestData(): array
-    {
-        return [
-            'Customer exists in Mollie' => [
-                'foo',
-                Customer::class,
-                null
-            ],
-            'Customer does not exist in Mollie' => [
-                'bar',
-                null,
-                CouldNotFetchMollieCustomerException::class
-            ]
-        ];
-    }
-
-    public function createCustomerAtMollieTestData(): array
-    {
-        return [
-            'Customer does not exist yet' => [
-                'new.email@ddress.com',
-                Customer::class,
-                null
-            ],
-            'Customer already exists in Mollie' => [
-                'existing.email@ddress.com',
-                null,
-                CouldNotCreateMollieCustomerException::class
-            ]
-        ];
-    }
-
 
     public function isLegacyCustomerValidTestData(): array
     {
