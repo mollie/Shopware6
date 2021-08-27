@@ -7,6 +7,9 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 
 class CustomerStruct extends Struct
 {
+    const LIVE_MODE = 'live';
+    const TEST_MODE = 'test';
+
     /** @var ?string */
     private $legacyCustomerId;
 
@@ -49,7 +52,7 @@ class CustomerStruct extends Struct
      */
     public function getCustomerId(string $profileId, bool $testMode = false): string
     {
-        return $this->customerIds[$profileId][$testMode ? 'test' : 'live'] ?? '';
+        return $this->customerIds[$profileId][$testMode ? self::TEST_MODE : self::LIVE_MODE] ?? '';
     }
 
     /**
@@ -59,7 +62,7 @@ class CustomerStruct extends Struct
      */
     public function setCustomerId(string $customerId, string $profileId, bool $testMode = false): void
     {
-        $this->customerIds[$profileId][$testMode ? 'test' : 'live'] = $customerId;
+        $this->customerIds[$profileId][$testMode ? self::TEST_MODE : self::LIVE_MODE] = $customerId;
     }
 
     /**

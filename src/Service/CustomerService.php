@@ -12,7 +12,6 @@ use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEnt
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Customer\Event\CustomerBeforeLoginEvent;
 use Shopware\Core\Checkout\Customer\Event\CustomerLoginEvent;
-use Shopware\Core\Checkout\Customer\Exception\CustomerNotFoundException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
@@ -281,7 +280,7 @@ class CustomerService
         // If there's a legacy customer ID, and it's the same as the one we're saving, remove the legacy id.
         $struct = $this->getCustomerStruct($customerId, $context);
         if (!empty($struct->getLegacyCustomerId()) && $struct->getLegacyCustomerId() === $mollieCustomerId) {
-            $customFields['customer_id'] = null;
+            $customFields[self::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID] = null;
         }
 
         $this->saveCustomerCustomFields($customerId, $customFields, $context);
@@ -337,8 +336,8 @@ class CustomerService
         $customFields = $customer->getCustomFields() ?? [];
 
         // If there is a legacy customer id, set it separately
-        if (isset($customFields['customer_id'])) {
-            $struct->setLegacyCustomerId($customFields['customer_id']);
+        if (isset($customFields[self::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID])) {
+            $struct->setLegacyCustomerId($customFields[self::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID]);
         }
 
         // Then assign all custom fields under the mollie_payments key
@@ -492,7 +491,7 @@ class CustomerService
     }
 
     /**
-     * Returns a country id by it's iso code.
+     * Returns a country id by its iso code.
      *
      * @param string $countryCode
      * @param Context $context
@@ -515,7 +514,7 @@ class CustomerService
     }
 
     /**
-     * Returns a salutation id by it's key.
+     * Returns a salutation id by its key.
      *
      * @param Context $context
      *
