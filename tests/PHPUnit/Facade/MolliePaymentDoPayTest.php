@@ -102,7 +102,7 @@ class MolliePaymentDoPayTest extends TestCase
      * @throws \Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException
      * @dataProvider createMollieCustomerIsCalledTestData
      */
-    public function testThatCreateMollieCustomerIsCalled(
+    public function testIfCreateMollieCustomerIsCalled(
         bool $customerIsGuest,
         bool $createCustomersAtMollie,
         bool $shouldCreateMollieCustomer
