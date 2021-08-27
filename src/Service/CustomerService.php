@@ -12,6 +12,7 @@ use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEnt
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Customer\Event\CustomerBeforeLoginEvent;
 use Shopware\Core\Checkout\Customer\Event\CustomerLoginEvent;
+use Shopware\Core\Checkout\Customer\Exception\CustomerNotFoundException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
@@ -317,6 +318,12 @@ class CustomerService
         return $customer;
     }
 
+    /**
+     * @param string $customerId
+     * @param Context $context
+     * @return CustomerStruct
+     * @throws CustomerCouldNotBeFoundException
+     */
     public function getCustomerStruct(string $customerId, Context $context): CustomerStruct
     {
         $struct = new CustomerStruct();
@@ -324,15 +331,17 @@ class CustomerService
         $customer = $this->getCustomer($customerId, $context);
 
         if (!($customer instanceof CustomerEntity)) {
-            return $struct;
+            throw new CustomerCouldNotBeFoundException($customerId);
         }
 
         $customFields = $customer->getCustomFields() ?? [];
 
+        // If there is a legacy customer id, set it separately
         if (isset($customFields['customer_id'])) {
             $struct->setLegacyCustomerId($customFields['customer_id']);
         }
 
+        // Then assign all custom fields under the mollie_payments key
         $struct->assign($customFields['mollie_payments'] ?? []);
 
         return $struct;
