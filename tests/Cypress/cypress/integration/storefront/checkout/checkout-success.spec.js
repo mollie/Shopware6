@@ -64,13 +64,13 @@ context("Checkout Tests", () => {
 
                     paymentAction.switchPaymentMethod(payment.name);
 
-                    let totalSum = 0;
+
                     // grab the total sum of our order from the confirm page.
                     // we also want to test what the user has to pay in Mollie.
                     // this has to match!
                     checkout.getTotalFromConfirm().then(total => {
                         cy.log("Cart Total: " + total);
-                        totalSum = total;
+                        cy.wrap(total.toString().trim()).as('totalSum')
                     });
 
                     checkout.placeOrderOnConfirm();
@@ -79,7 +79,14 @@ context("Checkout Tests", () => {
                     // and that our payment method is also visible somewhere in that url
                     cy.url().should('include', 'https://www.mollie.com/paymentscreen/');
                     cy.url().should('include', payment.key);
-                    cy.get('.header__amount').contains(totalSum);
+
+                    // verify that the price is really the one
+                    // that was displayed in Shopware
+                    cy.get('.header__amount').then(($headerAmount) => {
+                        cy.get('@totalSum').then(totalSum => {
+                            expect($headerAmount.text()).to.contain(totalSum);
+                        });
+                    })
 
 
                     if (payment.key === 'klarnapaylater' || payment.key === 'klarnasliceit') {
