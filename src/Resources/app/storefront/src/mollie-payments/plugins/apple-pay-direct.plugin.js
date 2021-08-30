@@ -1,4 +1,5 @@
 import Plugin from 'src/plugin-system/plugin.class';
+import DomAccess from 'src/helper/dom-access.helper';
 
 export default class MollieApplePayDirect extends Plugin {
 
@@ -19,7 +20,22 @@ export default class MollieApplePayDirect extends Plugin {
             return;
         }
 
-        let applePayAvailablePromise = this.isApplePayAvailable();
+
+        let applePayButtons = document.querySelectorAll('.js-apple-pay');
+
+        if (applePayButtons.length <= 0) {
+            return;
+        }
+
+        // we start by fetching the shop url from the data attribute.
+        // we need this as prefix for our ajax calls, so that we always
+        // call the correct sales channel and its controllers.
+        const button = applePayButtons[0];
+        const shopUrl = me.getShopUrl(button);
+
+        // verify if apple pay is even allowed
+        // in our current sales channel
+        let applePayAvailablePromise = this.isApplePayAvailable(shopUrl);
 
         applePayAvailablePromise.then(function (data) {
 
@@ -27,30 +43,26 @@ export default class MollieApplePayDirect extends Plugin {
                 return;
             }
 
-            let applePayButtons = document.querySelectorAll('.js-apple-pay');
-
-            if (applePayButtons.length > 0) {
-
-                applePayButtons.forEach(function (button) {
-                    // Remove display none
-                    button.classList.remove('d-none');
-                    // remove previous handlers (just in case)
-                    button.removeEventListener("click", me.onButtonClick.bind(me));
-                    // add click event handlers
-                    button.addEventListener('click', me.onButtonClick.bind(me));
-                });
-            }
+            applePayButtons.forEach(function (button) {
+                // Remove display none
+                button.classList.remove('d-none');
+                // remove previous handlers (just in case)
+                button.removeEventListener("click", me.onButtonClick.bind(me));
+                // add click event handlers
+                button.addEventListener('click', me.onButtonClick.bind(me));
+            });
         });
     }
 
 
     /**
      *
+     * @param shopUrl
      * @returns {Promise<unknown>}
      */
-    isApplePayAvailable() {
+    isApplePayAvailable(shopUrl) {
         return new Promise(function (resolve, reject) {
-            fetch('/mollie/apple-pay/available')
+            fetch(shopUrl + '/mollie/apple-pay/available')
                 .then(response => response.json())
                 .then(data => resolve(data))
                 // eslint-disable-next-line no-unused-vars
@@ -63,7 +75,6 @@ export default class MollieApplePayDirect extends Plugin {
     /**
      *
      * @param event
-     * @param me
      */
     onButtonClick(event) {
 
@@ -73,6 +84,8 @@ export default class MollieApplePayDirect extends Plugin {
 
         const button = event.target;
         const form = button.parentNode;
+
+        const shopUrl = me.getShopUrl(button);
 
         let productId = form.querySelector('input[name="id"]').value;
         let countryCode = form.querySelector('input[name="countryCode"]').value;
@@ -88,9 +101,9 @@ export default class MollieApplePayDirect extends Plugin {
             quantity = quantitySelects[0].value;
         }
 
-        me.addProductToCart(productId, quantity);
+        me.addProductToCart(productId, quantity, shopUrl);
 
-        var session = me.createApplePaySession(countryCode, currency);
+        var session = me.createApplePaySession(countryCode, currency, shopUrl);
         session.begin();
     }
 
@@ -98,9 +111,10 @@ export default class MollieApplePayDirect extends Plugin {
      *
      * @param id
      * @param quantity
+     * @param shopSlug
      */
-    addProductToCart(id, quantity) {
-        fetch('/mollie/apple-pay/add-product',
+    addProductToCart(id, quantity, shopSlug) {
+        fetch(shopSlug + '/mollie/apple-pay/add-product',
             {
                 method: 'POST',
                 body: JSON.stringify({
@@ -113,13 +127,12 @@ export default class MollieApplePayDirect extends Plugin {
 
     /**
      *
-     * @param label
-     * @param amount
      * @param country
      * @param currency
+     * @param shopSlug
      * @returns {ApplePaySession}
      */
-    createApplePaySession(country, currency) {
+    createApplePaySession(country, currency, shopSlug) {
 
         let me = this;
 
@@ -150,7 +163,7 @@ export default class MollieApplePayDirect extends Plugin {
 
         session.onvalidatemerchant = function (event) {
 
-            fetch('/mollie/apple-pay/validate',
+            fetch(shopSlug + '/mollie/apple-pay/validate',
                 {
                     method: 'POST',
                     body: JSON.stringify({
@@ -177,7 +190,7 @@ export default class MollieApplePayDirect extends Plugin {
                 countryCode = event.shippingContact.countryCode;
             }
 
-            fetch('/mollie/apple-pay/shipping-methods',
+            fetch(shopSlug + '/mollie/apple-pay/shipping-methods',
                 {
                     method: 'POST',
                     body: JSON.stringify({
@@ -217,7 +230,7 @@ export default class MollieApplePayDirect extends Plugin {
 
         session.onshippingmethodselected = function (event) {
 
-            fetch('/mollie/apple-pay/set-shipping',
+            fetch(shopSlug + '/mollie/apple-pay/set-shipping',
                 {
                     method: 'POST',
                     body: JSON.stringify({
@@ -264,11 +277,11 @@ export default class MollieApplePayDirect extends Plugin {
 
             // now finish our payment by filling a form
             // and submitting it along with our payment token
-            me.finishPayment('/mollie/apple-pay/start-payment', paymentToken, event.payment);
+            me.finishPayment(shopSlug + '/mollie/apple-pay/start-payment', paymentToken, event.payment);
         };
 
         session.oncancel = function () {
-            fetch('/mollie/apple-pay/restore-cart', {method: 'POST'});
+            fetch(shopSlug + '/mollie/apple-pay/restore-cart', {method: 'POST'});
         };
 
         return session;
@@ -313,33 +326,20 @@ export default class MollieApplePayDirect extends Plugin {
 
     /**
      *
-     * @param message
-     * @param session
-     * @param type
+     * @param button
+     * @returns string
      */
-    displayNotification(message, session, type) {
-        let flashBagsContainer = document.querySelector('div.flashbags.container');
+    getShopUrl(button) {
+        // get sales channel base URL
+        // so that our shop slug is correctly
+        let shopSlug = DomAccess.getDataAttribute(button, 'data-shop-url');
 
-        if (type === undefined || type === null) {
-            type = 'danger';
+        // remove trailing slash if existing
+        if (shopSlug.substr(-1) === '/') {
+            shopSlug = shopSlug.substr(0, shopSlug.length - 1);
         }
 
-        if (flashBagsContainer !== undefined) {
-            let html = `<div role="alert" class="alert alert-${type}"><div class="alert-content-container"><div class="alert-content">${message}</div></div></div>`;
-            flashBagsContainer.innerHTML = html;
-            window.scrollTo(0, 0);
-        }
-    }
-
-    /**
-     *
-     */
-    clearNotification() {
-        let flashBagsContainer = document.querySelector('div.flashbags.container');
-
-        if (flashBagsContainer !== undefined) {
-            flashBagsContainer.innerHTML = '';
-        }
+        return shopSlug;
     }
 
 }

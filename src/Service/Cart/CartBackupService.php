@@ -49,8 +49,11 @@ class CartBackupService
     {
         $originalCart = $this->cartService->getCart($context->getToken(), $context);
 
+        # additional language shops do not have a name, so make sure it has a string cast
+        $salesChannelName = (string)$context->getSalesChannel()->getName();
+
         # create new cart with our backup token
-        $newCart = $this->cartService->createNew(self::BACKUP_TOKEN, $context->getSalesChannel()->getName());
+        $newCart = $this->cartService->createNew(self::BACKUP_TOKEN, $salesChannelName);
 
         # assign our items to the backup
         # this is the only thing we really need to backup at this stage.
