@@ -1,20 +1,25 @@
 import Devices from "Services/Devices";
-import Session from "Actions/utils/Session"
 import Shopware from "Services/Shopware";
+import {ApplePaySessionMockFactory} from "Services/ApplePay/ApplePay.Mock";
 // ------------------------------------------------------
 import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
 // ------------------------------------------------------
 import PaymentAction from "Actions/storefront/checkout/PaymentAction";
 import DummyBasketScenario from "Scenarios/DummyBasketScenario";
+import DummyUserScenario from "Scenarios/DummyUserScenario";
+import AccountAction from "Actions/storefront/account/AccountAction";
 
 
 const devices = new Devices();
-const session = new Session();
 const shopware = new Shopware();
 
 const configAction = new ShopConfigurationAction();
 const paymentAction = new PaymentAction();
+const accountAction = new AccountAction();
 
+const applePayFactory = new ApplePaySessionMockFactory;
+
+const scenarioDummyUser = new DummyUserScenario();
 const scenarioDummyBasket = new DummyBasketScenario(1);
 
 const device = devices.getFirstDevice();
@@ -28,27 +33,66 @@ context("Apple Pay", () => {
     })
 
     beforeEach(() => {
-        session.resetBrowserSession();
         devices.setDevice(device);
     });
 
+    describe('Checkout', () => {
 
-    it('Apple Pay hidden if not available in browser', () => {
+        it('Apple Pay available (Checkout)', () => {
 
-        scenarioDummyBasket.execute();
+            applePayFactory.registerApplePay(true);
 
-        if (shopware.isVersionGreaterEqual(6.4)) {
-            paymentAction.showAllPaymentMethods();
-        } else {
-            paymentAction.openPaymentsModal();
-        }
+            scenarioDummyBasket.execute();
 
-        // wait a bit, because the client side
-        // code for the ApplePay recognition needs to
-        // be executed first
-        cy.wait(2000);
+            if (shopware.isVersionGreaterEqual(6.4)) {
+                paymentAction.showAllPaymentMethods();
+            } else {
+                paymentAction.openPaymentsModal();
+            }
 
-        cy.contains('Apple Pay').should('not.exist');
+            cy.wait(2000);
+            cy.contains('Apple Pay').should('exist');
+        })
+
+        it('Apple Pay hidden (Checkout)', () => {
+
+            applePayFactory.registerApplePay(false);
+
+            scenarioDummyBasket.execute();
+
+            if (shopware.isVersionGreaterEqual(6.4)) {
+                paymentAction.showAllPaymentMethods();
+            } else {
+                paymentAction.openPaymentsModal();
+            }
+
+            cy.wait(2000);
+            cy.contains('Apple Pay').should('not.exist');
+        })
     })
 
+    describe('Account', () => {
+
+        it('Apple Pay hidden if available (Account)', () => {
+
+            applePayFactory.registerApplePay(true);
+
+            scenarioDummyUser.execute();
+            accountAction.openPaymentMethods();
+
+            cy.wait(2000);
+            cy.contains('Apple Pay').should('not.exist');
+        })
+
+        it('Apple Pay hidden if not available (Account)', () => {
+
+            applePayFactory.registerApplePay(false);
+
+            scenarioDummyUser.execute();
+            accountAction.openPaymentMethods();
+
+            cy.wait(2000);
+            cy.contains('Apple Pay').should('not.exist');
+        })
+    })
 })
