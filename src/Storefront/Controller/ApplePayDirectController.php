@@ -12,6 +12,7 @@ use Kiener\MolliePayments\Service\ApplePayDirect\ApplePayDirect;
 use Kiener\MolliePayments\Service\Cart\CartBackupService;
 use Kiener\MolliePayments\Service\CartService;
 use Kiener\MolliePayments\Service\CustomerService;
+use Kiener\MolliePayments\Service\DomainExtractor;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
@@ -318,8 +319,13 @@ class ApplePayDirectController extends StorefrontController
 
             $content = json_decode($request->getContent(), true);
 
-            $domain = $this->shopService->getShopUrl(true);
             $validationURL = (string)$content['validationUrl'];
+
+            # make sure to get rid off any http prefixes or
+            # also any sub shop slugs like /de or anything else
+            # that would NOT work with Mollie and Apple Pay!
+            $domainExtractor = new DomainExtractor();
+            $domain = $domainExtractor->getCleanDomain($this->shopService->getShopUrl(true));
 
             # we always have to use the LIVE api key for
             # our first domain validation for Apple Pay!
