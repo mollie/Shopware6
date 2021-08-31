@@ -1,7 +1,19 @@
-export default class AccountOrdersAction {
+import AccountRepository from "Repositories/storefront/account/AccountRepository";
+
+const repoAccount = new AccountRepository();
+
+export default class AccountAction {
+
 
     /**
      *
+     */
+    openPaymentMethods() {
+        repoAccount.getSideMenuPaymentMethods().click();
+    }
+
+    /**
+     * NOT USED AT THE MOMENT
      * @param status
      */
     assertLatestOrderBadge(status) {
@@ -10,7 +22,7 @@ export default class AccountOrdersAction {
     }
 
     /**
-     *
+     * NOT USED AT THE MOMENT
      * @param status
      */
     assertLatestOrderPaymentStatus(status) {
@@ -19,3 +31,4 @@ export default class AccountOrdersAction {
     }
 
 }
+

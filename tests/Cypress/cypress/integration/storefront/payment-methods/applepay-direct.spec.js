@@ -1,47 +1,63 @@
-import {ApplePaySessionMockFactory} from "Services/stubs/applepay.stub";
+import {ApplePaySessionMockFactory} from "Services/ApplePay/ApplePay.Mock";
 import TopMenuAction from "Actions/storefront/navigation/TopMenuAction";
 import ListingAction from "Actions/storefront/products/ListingAction";
 import Devices from "Services/Devices";
 import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
+import PDPRepository from "Repositories/storefront/products/PDPRepository";
 
 
 const devices = new Devices();
 const configAction = new ShopConfigurationAction();
-const mockFactory = new ApplePaySessionMockFactory();
+const applePayFactory = new ApplePaySessionMockFactory();
 const topMenu = new TopMenuAction();
 const listing = new ListingAction();
 
+const repoPDP = new PDPRepository();
 
-const applePaySessionMock = mockFactory.buildMock();
 
-context("Apple Pay Direct", () => {
+describe('Apple Pay Direct - Functional', () => {
+
+    it('Domain Verification file has been downloaded', () => {
+        cy.request('/.well-known/apple-developer-merchantid-domain-association');
+    })
+})
+
+
+describe('Apple Pay Direct - UI Tests', () => {
 
     before(function () {
         devices.setDevice(devices.getFirstDevice());
         configAction.setupShop(true, false);
     })
 
+    beforeEach(function () {
+        devices.setDevice(devices.getFirstDevice());
+    })
 
-    it('Apple Pay Direct available on PDP', () => {
+    describe('PDP', () => {
 
-        Cypress.on('window:before:load', (win) => {
-            win.ApplePaySession = applePaySessionMock;
+        it('Apple Pay Direct available (PDP)', () => {
+
+            applePayFactory.registerApplePay(true);
+
+            cy.visit('/');
+            topMenu.clickOnClothing();
+            listing.clickOnFirstProduct();
+
+            repoPDP.getApplePayDirectButton().should('not.have.class', 'd-none');
         })
 
-        cy.visit('/');
-        topMenu.clickOnClothing();
-        listing.clickOnFirstProduct();
+        it('Apple Pay Direct hidden (PDP)', () => {
 
-        cy.get('.mollie-apple-pay-direct > .btn').should('not.have.class', 'd-none');
-    })
-    
-    it('Apple Pay Direct hidden on PDP', () => {
+            applePayFactory.registerApplePay(false);
 
-        cy.visit('/');
-        topMenu.clickOnClothing();
-        listing.clickOnFirstProduct();
+            cy.visit('/');
+            topMenu.clickOnClothing();
+            listing.clickOnFirstProduct();
 
-        cy.get('.mollie-apple-pay-direct > .btn').should('have.class', 'd-none');
+            repoPDP.getApplePayDirectButton().should('have.class', 'd-none');
+        })
+
     })
 
 });
