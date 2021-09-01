@@ -250,20 +250,21 @@ class PaymentController extends StorefrontController
 
     /**
      * @RouteScope(scopes={"storefront"})
-     * @Route("/mollie/payment/retry/{transactionId}/{redirectUrl}", defaults={"csrf_protected"=false},
+     * @Route("/mollie/payment/retry/{transactionId}", defaults={"csrf_protected"=false},
      *                                                               name="frontend.mollie.payment.retry",
      *                                                               options={"seo"="false"}, methods={"GET", "POST"})
      *
      * @param SalesChannelContext $context
      * @param                     $transactionId
-     *
-     * @param                     $redirectUrl
-     *
      * @return Response|RedirectResponse
      * @throws Exception
      */
-    public function retry(SalesChannelContext $context, $transactionId, $redirectUrl): RedirectResponse
+    public function retry(SalesChannelContext $context, $transactionId): RedirectResponse
     {
+        # keep compatible to older Shopware versions by avoiding
+        # the Parameter Bag
+        $redirectUrl = (string)$_GET['redirectUrl'];
+
         /** @var string $redirectUrl */
         $redirectUrl = urldecode($redirectUrl);
 
