@@ -74,10 +74,14 @@ export default class PaymentAction {
         // always make sure that the iFrame is loaded
         cy.wait(500);
 
-        cy.get('iframe[name="cardHolder-input"]').then($element => {
-            const $body = $element.contents().find('body')
-            cy.wrap($body).find('#cardHolder').eq(0).click().type(name);
-        })
+        // we can insert nothing
+        // but cypress would throw an error with .type()
+        if (name !== "") {
+            cy.get('iframe[name="cardHolder-input"]').then($element => {
+                const $body = $element.contents().find('body')
+                cy.wrap($body).find('#cardHolder').eq(0).click().type(name);
+            })
+        }
 
         cy.get('iframe[name="cardNumber-input"]').then($element => {
             const $body = $element.contents().find('body')
