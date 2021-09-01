@@ -72,7 +72,7 @@ export default class PaymentAction {
     fillCreditCardComponents(name, number, expiryDate, cvc) {
 
         // always make sure that the iFrame is loaded
-        cy.wait(500);
+        cy.wait(1000);
 
         // we can insert nothing
         // but cypress would throw an error with .type()
