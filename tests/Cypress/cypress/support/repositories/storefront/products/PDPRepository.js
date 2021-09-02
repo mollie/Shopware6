@@ -16,4 +16,12 @@ export default class PDPRepository {
         return cy.get('.col-4 > .custom-select');
     }
 
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getApplePayDirectButton() {
+        return cy.get('.mollie-apple-pay-direct > .btn');
+    }
+
 }

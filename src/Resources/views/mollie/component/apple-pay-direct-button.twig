@@ -13,7 +13,7 @@
     <input type="hidden" name="id" value="{{ productId }}"/>
     <input type="hidden" name="currency" value="{{ context.currency.translated.shortName }}"/>
     <input type="hidden" name="countryCode" value="{{ context.shippingLocation.country.iso }}"/>
-    <button type="submit" class="btn btn-primary btn-block btn-buy apple-pay-button-with-text apple-pay-button-black js-apple-pay w-100 d-none">
+    <button type="submit" class="btn btn-primary btn-block btn-buy apple-pay-button-with-text apple-pay-button-black js-apple-pay w-100 d-none" data-shop-url="{{ seoUrl('frontend.home.page') }}">
         {# space to match height other buttons #}
         &nbsp;
         {# end important spacer #}

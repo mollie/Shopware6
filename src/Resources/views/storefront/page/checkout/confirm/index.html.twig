@@ -1,8 +1,15 @@
 {% sw_extends '@Storefront/storefront/page/checkout/confirm/index.html.twig' %}
 
 {% block page_checkout_main_content %}
+    <div id="mollie_hide_applepay" data-mollie-apple-pay-payment-method-options="{{ {
+        shopUrl: seoUrl('frontend.home.page'),
+        hideAlways: false
+    }
+    |json_encode }}"></div>
+
     {% if page.enable_credit_card_components == true %}
         <script src="https://js.mollie.com/v1/mollie.js"></script>
     {% endif %}
     {{ parent() }}
 {% endblock %}
+

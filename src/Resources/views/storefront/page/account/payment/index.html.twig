@@ -1,0 +1,10 @@
+{% sw_extends '@Storefront/storefront/page/account/payment/index.html.twig' %}
+
+{% block page_account_payment %}
+    <div id="mollie_hide_applepay" data-mollie-apple-pay-payment-method-options="{{ {
+        shopUrl: seoUrl('frontend.home.page'),
+        hideAlways: true
+    }
+    |json_encode }}"></div>
+    {{ parent() }}
+{% endblock %}

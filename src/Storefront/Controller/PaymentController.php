@@ -10,6 +10,9 @@ use Kiener\MolliePayments\Exception\MissingMollieOrderId;
 use Kiener\MolliePayments\Exception\MissingOrderInTransactionException;
 use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeFetched;
 use Kiener\MolliePayments\Facade\MollieOrderPaymentFlow;
+use Kiener\MolliePayments\Factory\CompatibilityGatewayFactory;
+use Kiener\MolliePayments\Factory\MollieApiFactory;
+use Kiener\MolliePayments\Gateway\CompatibilityGatewayInterface;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\Order\OrderStateService;
 use Kiener\MolliePayments\Service\SettingsService;
@@ -39,8 +42,11 @@ class PaymentController extends StorefrontController
     /** @var RouterInterface */
     private $router;
 
-    /** @var MollieApiClient */
-    private $apiClient;
+    /** @var CompatibilityGatewayInterface */
+    private $compatibilityGateway;
+
+    /** @var MollieApiFactory */
+    private $apiFactory;
 
     /** @var BusinessEventDispatcher */
     private $eventDispatcher;
@@ -65,7 +71,8 @@ class PaymentController extends StorefrontController
 
     public function __construct(
         RouterInterface $router,
-        MollieApiClient $apiClient,
+        CompatibilityGatewayFactory $compatibilityGatewayFactory,
+        MollieApiFactory $apiFactory,
         BusinessEventDispatcher $eventDispatcher,
         OrderStateService $orderStateService,
         SettingsService $settingsService,
@@ -76,7 +83,7 @@ class PaymentController extends StorefrontController
     )
     {
         $this->router = $router;
-        $this->apiClient = $apiClient;
+        $this->apiFactory = $apiFactory;
         $this->eventDispatcher = $eventDispatcher;
         $this->orderStateService = $orderStateService;
         $this->settingsService = $settingsService;
@@ -84,6 +91,8 @@ class PaymentController extends StorefrontController
         $this->logger = $logger;
         $this->transactionTransitionService = $transactionTransitionService;
         $this->molliePaymentFlow = $molliePaymentFlow;
+
+        $this->compatibilityGateway = $compatibilityGatewayFactory->create();
     }
 
     /**
@@ -170,9 +179,13 @@ class PaymentController extends StorefrontController
 
         /** @var Order $mollieOrder */
         try {
-            $mollieOrder = $this->apiClient->orders->get($mollieOrderId, [
+
+            $apiClient = $this->apiFactory->getClient($this->compatibilityGateway->getSalesChannelID($salesChannelContext));
+
+            $mollieOrder = $apiClient->orders->get($mollieOrderId, [
                 'embed' => 'payments'
             ]);
+
         } catch (ApiException $e) {
             $this->logger->addEntry(
                 sprintf('Could not fetch order at mollie with id %s', $mollieOrderId),
@@ -237,20 +250,21 @@ class PaymentController extends StorefrontController
 
     /**
      * @RouteScope(scopes={"storefront"})
-     * @Route("/mollie/payment/retry/{transactionId}/{redirectUrl}", defaults={"csrf_protected"=false},
+     * @Route("/mollie/payment/retry/{transactionId}", defaults={"csrf_protected"=false},
      *                                                               name="frontend.mollie.payment.retry",
      *                                                               options={"seo"="false"}, methods={"GET", "POST"})
      *
      * @param SalesChannelContext $context
      * @param                     $transactionId
-     *
-     * @param                     $redirectUrl
-     *
      * @return Response|RedirectResponse
      * @throws Exception
      */
-    public function retry(SalesChannelContext $context, $transactionId, $redirectUrl): RedirectResponse
+    public function retry(SalesChannelContext $context, $transactionId): RedirectResponse
     {
+        # keep compatible to older Shopware versions by avoiding
+        # the Parameter Bag
+        $redirectUrl = (string)$_GET['redirectUrl'];
+
         /** @var string $redirectUrl */
         $redirectUrl = urldecode($redirectUrl);
 

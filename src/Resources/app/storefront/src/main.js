@@ -20,7 +20,7 @@ import MollieApplePayPaymentMethod
 const PluginManager = window.PluginManager;
 PluginManager.register('MollieIDealIssuer', MollieIDealIssuer);
 PluginManager.register('MollieApplePayDirect', MollieApplePayDirect);
-PluginManager.register('MollieApplePayPaymentMethod', MollieApplePayPaymentMethod);
+PluginManager.register('MollieApplePayPaymentMethod', MollieApplePayPaymentMethod, '#mollie_hide_applepay');
 
 // < Sw 6.4 Version
 PluginManager.register('MollieCreditCardComponents', MollieCreditCardComponents, '#mollie_components_credit_card');

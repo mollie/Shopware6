@@ -18,9 +18,10 @@ export default class ShopConfigurationAction {
      */
     setupShop(mollieFailureMode, creditCardComponents) {
 
-        // activate all payment methods
         this._activatePaymentMethods();
 
+        this._activateShippingMethods();
+      
         // assign all payment methods to
         // all available sales channels
         this.apiClient.get('/sales-channel').then(channels => {
@@ -77,6 +78,39 @@ export default class ShopConfigurationAction {
                 };
 
                 this.apiClient.patch('/payment-method/' + element.id, data);
+            });
+        });
+    }
+
+    /**
+     * Make sure no availability rules are set
+     * that could block our shipping method from being used.
+     * @private
+     */
+    _activateShippingMethods() {
+
+        this.apiClient.get('/rule').then(rules => {
+
+            rules.forEach(rule => {
+
+                // get the all customers rule
+                // so we allow our shipping methods to be used by everybody
+                if (rule.attributes.name === 'All customers') {
+
+                    this.apiClient.get('/shipping-method').then(payments => {
+
+                        payments.forEach(element => {
+
+                            const data = {
+                                "id": element.id,
+                                "active": true,
+                                "availabilityRuleId": rule.id,
+                            };
+
+                            this.apiClient.patch('/shipping-method/' + element.id, data);
+                        });
+                    });
+                }
             });
         });
     }

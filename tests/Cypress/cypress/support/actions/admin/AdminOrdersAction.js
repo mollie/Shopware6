@@ -1,7 +1,10 @@
 import Shopware from "Services/Shopware";
 import OrdersListRepository from "Repositories/admin/orders/OrdersListRepository";
+import MainMenuRepository from "Repositories/admin/MainMenuRepository";
 
 const shopware = new Shopware();
+
+const repoMainMenu = new MainMenuRepository();
 const repoOrdersList = new OrdersListRepository();
 
 
@@ -12,12 +15,14 @@ export default class AdminOrdersAction {
      */
     openOrders() {
         cy.wait(200);
-        cy.get('.sw-order').click();
+        repoMainMenu.getOrders().click();
 
         if (shopware.isVersionGreaterEqual(6.4)) {
-            cy.wait(500);
-            cy.get('.sw-order > .sw-admin-menu__sub-navigation-list > .sw-admin-menu__navigation-list-item > .sw-admin-menu__navigation-link').click();
-            cy.wait(500);
+            // starting with Shopware 6.4, we have to click
+            // on the overview sub menu entry
+            cy.wait(1000);
+            repoMainMenu.getOrdersOverview().click();
+            cy.wait(1000);
         }
     }
 
@@ -28,6 +33,7 @@ export default class AdminOrdersAction {
     assertLatestOrderStatus(status) {
 
         this.openOrders();
+
         cy.wait(500);
         cy.contains(repoOrdersList.getLatestOrderStatusLabelSelector(), status);
     }
@@ -39,6 +45,7 @@ export default class AdminOrdersAction {
     assertLatestPaymentStatus(status) {
 
         this.openOrders();
+
         cy.wait(500);
         cy.contains(repoOrdersList.getLatestPaymentStatusLabelSelector(), status);
     }
