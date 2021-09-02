@@ -9,7 +9,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 
 class OrderDeliveryService
 {
-
     /**
      * @var EntityRepositoryInterface
      */
@@ -23,7 +22,7 @@ class OrderDeliveryService
     public function getDelivery(string $orderDeliveryId, Context $context): ?OrderDeliveryEntity
     {
         $criteria = new Criteria([$orderDeliveryId]);
-        $criteria->addAssociations(['order', 'order.transactions', 'order.transactions.paymentMethod']);
+        $criteria->addAssociation('order.transactions.paymentMethod');
         $result = $this->orderDeliveryRepository->search($criteria, $context);
 
         return $result->first();
