@@ -71,6 +71,11 @@
 
         <service id="Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor"/>
 
+        <service id="Kiener\MolliePayments\Service\MollieApi\Shipping">
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
+        </service>
+
         <service id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater">
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStateService"/>
