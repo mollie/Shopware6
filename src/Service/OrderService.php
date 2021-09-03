@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Service;
 
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
+use Kiener\MolliePayments\Exception\OrderNumberNotFoundException;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
@@ -10,6 +11,7 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Validation\DataBag\DataBag;
 use Shopware\Core\Framework\Validation\Exception\ConstraintViolationException;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -122,10 +124,27 @@ class OrderService
         }
 
         $this->logger->critical(
-            sprintf('Could not find an order with id %s. Payment failed', $orderId)
+            sprintf('Could not find an order with id %s.', $orderId)
         );
 
         throw new OrderNotFoundException($orderId);
+    }
+
+    public function getOrderByNumber(string $orderNumber, Context $context): ?OrderEntity
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('orderNumber', $orderNumber));
+        $orderId = $this->orderRepository->searchIds($criteria, $context)->firstId();
+
+        if(is_string($orderId)) {
+            return $this->getOrder($orderId, $context);
+        }
+
+        $this->logger->critical(
+            sprintf('Could not find an order with order number %s.', $orderNumber)
+        );
+
+        throw new OrderNumberNotFoundException($orderNumber);
     }
 
     /**
