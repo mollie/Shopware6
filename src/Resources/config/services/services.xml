@@ -71,7 +71,7 @@
 
         <service id="Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor"/>
 
-        <service id="Kiener\MolliePayments\Service\MollieApi\Shipping">
+        <service id="Kiener\MolliePayments\Service\MollieApi\Shipment">
             <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
         </service>

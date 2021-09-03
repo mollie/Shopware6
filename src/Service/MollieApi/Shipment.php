@@ -5,7 +5,7 @@ namespace Kiener\MolliePayments\Service\MollieApi;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\LoggerService;
 
-class Shipping
+class Shipment
 {
     /**
      * @var MollieApiFactory
