@@ -124,38 +124,7 @@ class ShippingController extends AbstractController
      */
     public function oldTotal(Request $request): JsonResponse
     {
-        /** @var float $amount */
-        $amount = 0.0;
-
-        /** @var int $items */
-        $items = 0;
-
-        /** @var OrderEntity $order */
-        $order = null;
-
-        /** @var string $orderId */
-        $orderId = $request->get('orderId');
-
-        if ($orderId !== '') {
-            $order = $this->orderService->getOrder($orderId, Context::createDefaultContext());
-        }
-
-        if ($order !== null) {
-            foreach ($order->getLineItems() as $lineItem) {
-                if (
-                    !empty($lineItem->getCustomFields())
-                    && isset($lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY])
-                ) {
-                    $amount += ($lineItem->getUnitPrice() * (int)$lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY]);
-                    $items += (int)$lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY];
-                }
-            }
-        }
-
-        return new JsonResponse([
-            self::RESPONSE_KEY_AMOUNT => $amount,
-            self::RESPONSE_KEY_ITEMS => $items,
-        ]);
+        return $this->totalResponse($request);
     }
 
     /**
@@ -169,38 +138,7 @@ class ShippingController extends AbstractController
      */
     public function total64(Request $request): JsonResponse
     {
-        /** @var float $amount */
-        $amount = 0.0;
-
-        /** @var int $items */
-        $items = 0;
-
-        /** @var OrderEntity $order */
-        $order = null;
-
-        /** @var string $orderId */
-        $orderId = $request->get('orderId');
-
-        if ($orderId !== '') {
-            $order = $this->orderService->getOrder($orderId, Context::createDefaultContext());
-        }
-
-        if ($order !== null) {
-            foreach ($order->getLineItems() as $lineItem) {
-                if (
-                    !empty($lineItem->getCustomFields())
-                    && isset($lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY])
-                ) {
-                    $amount += ($lineItem->getUnitPrice() * (int)$lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY]);
-                    $items += (int)$lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY];
-                }
-            }
-        }
-
-        return new JsonResponse([
-            self::RESPONSE_KEY_AMOUNT => $amount,
-            self::RESPONSE_KEY_ITEMS => $items,
-        ]);
+        return $this->totalResponse($request);
     }
 
     private function shipResponse(Request $request): JsonResponse
@@ -345,6 +283,41 @@ class ShippingController extends AbstractController
         ]);
     }
 
+    private function totalResponse(Request $request): JsonResponse
+    {
+        /** @var float $amount */
+        $amount = 0.0;
+
+        /** @var int $items */
+        $items = 0;
+
+        /** @var OrderEntity $order */
+        $order = null;
+
+        /** @var string $orderId */
+        $orderId = $request->get('orderId');
+
+        if ($orderId !== '') {
+            $order = $this->orderService->getOrder($orderId, Context::createDefaultContext());
+        }
+
+        if ($order !== null) {
+            foreach ($order->getLineItems() as $lineItem) {
+                if (
+                    !empty($lineItem->getCustomFields())
+                    && isset($lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY])
+                ) {
+                    $amount += ($lineItem->getUnitPrice() * (int)$lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY]);
+                    $items += (int)$lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY];
+                }
+            }
+        }
+
+        return new JsonResponse([
+            self::RESPONSE_KEY_AMOUNT => $amount,
+            self::RESPONSE_KEY_ITEMS => $items,
+        ]);
+    }
 
     /**
      * Returns an order line item by id.
