@@ -160,7 +160,7 @@ class MollieOrderBuilder
         }
 
         // enrich data with create customer at mollie
-        $orderData = $this->customerEnricher->enrich($orderData, $customer, $settings);
+        $orderData = $this->customerEnricher->enrich($orderData, $customer, $settings, $salesChannelContext);
 
         // Log the built order data
         $this->loggerService->addDebugEntry(

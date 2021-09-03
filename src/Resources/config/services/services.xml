@@ -63,7 +63,9 @@
             <argument type="service" id="translator"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher"/>
+        <service id="Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher">
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+        </service>
 
         <service id="Kiener\MolliePayments\Service\MollieApi\PriceCalculator"/>
 

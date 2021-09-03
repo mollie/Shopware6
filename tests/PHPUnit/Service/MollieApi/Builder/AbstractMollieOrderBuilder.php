@@ -5,6 +5,7 @@ namespace MolliePayments\Tests\Service\MollieApi\Builder;
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Facade\MolliePaymentFinalize;
 use Kiener\MolliePayments\Handler\PaymentHandler;
+use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieLineItemBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderAddressBuilder;
@@ -122,7 +123,10 @@ abstract class AbstractMollieOrderBuilder extends TestCase
         /** @var SettingsService settingsService */
         $this->settingsService = $this->getMockBuilder(SettingsService::class)->disableOriginalConstructor()->getMock();
         $this->settingStruct = new MollieSettingStruct();
-        $this->settingStruct->assign(['orderLifetimeDays' => $this->expiresAt]);
+        $this->settingStruct->assign([
+            'createCustomersAtMollie' => false,
+            'orderLifetimeDays' => $this->expiresAt
+        ]);
         $this->settingsService->method('getSettings')->willReturn($this->settingStruct);
 
         /** @var LoggerService loggerService */
@@ -145,7 +149,7 @@ abstract class AbstractMollieOrderBuilder extends TestCase
             new MollieOrderPriceBuilder(),
             new MollieLineItemBuilder(new MollieOrderPriceBuilder(), new IsOrderLineItemValid(), new PriceCalculator(), new LineItemDataExtractor()),
             new MollieOrderAddressBuilder(),
-            new MollieOrderCustomerEnricher(),
+            new MollieOrderCustomerEnricher($this->createMock(CustomerService::class)),
             $this->loggerService,
             new MollieShippingLineItemBuilder(new PriceCalculator(), new MollieOrderPriceBuilder())
         );
