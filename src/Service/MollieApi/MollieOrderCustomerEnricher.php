@@ -38,7 +38,7 @@ class MollieOrderCustomerEnricher
         }
 
         $customerStruct = $this->customerService->getCustomerStruct($customer->getId(), $salesChannelContext->getContext());
-        $customerId = $customerStruct->getCustomerId($settings->getProfileId(), $settings->isTestMode());
+        $customerId = $customerStruct->getCustomerId((string)$settings->getProfileId(), $settings->isTestMode());
 
         if(empty($customerId)) {
             return $orderData;
