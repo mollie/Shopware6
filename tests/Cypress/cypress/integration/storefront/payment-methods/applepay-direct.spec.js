@@ -1,4 +1,4 @@
-import {ApplePaySessionMockFactory} from "Services/ApplePay/ApplePay.Mock";
+import {ApplePaySessionMockFactory} from "Services/applepay/ApplePay.Mock";
 import TopMenuAction from "Actions/storefront/navigation/TopMenuAction";
 import ListingAction from "Actions/storefront/products/ListingAction";
 import Devices from "Services/utils/Devices";
