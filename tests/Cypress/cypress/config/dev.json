@@ -4,6 +4,7 @@
   "trashAssetsBeforeRuns": true,
   "screenshotOnRunFailure": true,
   "video": false,
+  "retries": 1,
   "devices": [
     {
       "key": "desktop",
