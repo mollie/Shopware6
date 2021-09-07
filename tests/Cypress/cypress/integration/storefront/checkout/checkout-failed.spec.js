@@ -59,7 +59,6 @@ context("Checkout Failure Tests", () => {
 
                 // click on the mollie plugin retry button
                 // which brings us to the mollie payment selection page
-                shopware.prepareDomainChange();
                 checkout.mollieFailureModeRetryPayment();
 
                 cy.url().should('include', '/payscreen/select-method/');
@@ -93,7 +92,6 @@ context("Checkout Failure Tests", () => {
 
                 // click on the continue-shopping button on the failure screen
                 // which aborts our checkout and brings us to the home page
-                shopware.prepareDomainChange();
                 checkout.mollieFailureModeContinueShopping();
 
                 cy.url().should('eq', Cypress.config().baseUrl + '/');
@@ -132,7 +130,6 @@ context("Checkout Failure Tests", () => {
                 cy.url().should('include', '/account/order/edit/');
                 cy.contains('We received your order, but the payment was aborted. Please change your payment method or try again');
 
-                shopware.prepareDomainChange();
                 checkout.placeOrderOnEdit();
 
                 molliePayment.initSandboxCookie();
