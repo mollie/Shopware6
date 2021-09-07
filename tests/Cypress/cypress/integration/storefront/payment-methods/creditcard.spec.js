@@ -1,4 +1,4 @@
-import Devices from "Services/Devices";
+import Devices from "Services/utils/Devices";
 import Session from "Services/utils/Session"
 import Shopware from "Services/shopware/Shopware";
 // ------------------------------------------------------
