@@ -1,5 +1,6 @@
-import Devices from "Services/Devices";
-import Session from "Actions/utils/Session"
+import Devices from "Services/utils/Devices";
+import Shopware from "Services/shopware/Shopware"
+import Session from "Services/utils/Session"
 import PaymentScreenAction from 'Actions/mollie/PaymentScreenAction';
 // ------------------------------------------------------
 import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
@@ -11,6 +12,7 @@ import DummyBasketScenario from "Scenarios/DummyBasketScenario";
 
 const devices = new Devices();
 const session = new Session();
+const shopware = new Shopware();
 
 const configAction = new ShopConfigurationAction();
 const checkout = new CheckoutAction();
@@ -24,11 +26,6 @@ const device = devices.getFirstDevice();
 
 
 context("Checkout Failure Tests", () => {
-
-    before(function () {
-        molliePayment.initSandboxCookie();
-        devices.setDevice(device);
-    })
 
     describe('Mollie Failure Mode', () => {
 
@@ -47,8 +44,11 @@ context("Checkout Failure Tests", () => {
 
                 scenarioDummyBasket.execute();
                 paymentAction.switchPaymentMethod('PayPal');
+
+                shopware.prepareDomainChange();
                 checkout.placeOrderOnConfirm();
 
+                molliePayment.initSandboxCookie();
                 molliePayment.selectFailed();
 
                 // verify that we are back in our shop
@@ -59,11 +59,13 @@ context("Checkout Failure Tests", () => {
 
                 // click on the mollie plugin retry button
                 // which brings us to the mollie payment selection page
+                shopware.prepareDomainChange();
                 checkout.mollieFailureModeRetryPayment();
 
                 cy.url().should('include', '/payscreen/select-method/');
 
-                // select giropay and mark it as "paid"
+                // select giro pay and mark it as "paid"
+                molliePayment.initSandboxCookie();
                 molliePayment.selectGiropay();
                 molliePayment.selectPaid();
 
@@ -75,8 +77,11 @@ context("Checkout Failure Tests", () => {
 
                 scenarioDummyBasket.execute();
                 paymentAction.switchPaymentMethod('PayPal');
+
+                shopware.prepareDomainChange();
                 checkout.placeOrderOnConfirm();
 
+                molliePayment.initSandboxCookie();
                 molliePayment.selectFailed();
 
                 // verify that we are back in our shop
@@ -88,6 +93,7 @@ context("Checkout Failure Tests", () => {
 
                 // click on the continue-shopping button on the failure screen
                 // which aborts our checkout and brings us to the home page
+                shopware.prepareDomainChange();
                 checkout.mollieFailureModeContinueShopping();
 
                 cy.url().should('eq', Cypress.config().baseUrl + '/');
@@ -104,6 +110,7 @@ context("Checkout Failure Tests", () => {
 
         beforeEach(() => {
             session.resetBrowserSession();
+            devices.setDevice(device);
         });
 
         context(devices.getDescription(device), () => {
@@ -112,8 +119,11 @@ context("Checkout Failure Tests", () => {
 
                 scenarioDummyBasket.execute();
                 paymentAction.switchPaymentMethod('PayPal');
+
+                shopware.prepareDomainChange();
                 checkout.placeOrderOnConfirm();
 
+                molliePayment.initSandboxCookie();
                 molliePayment.selectFailed();
 
                 // we are now back in our shop
@@ -122,8 +132,10 @@ context("Checkout Failure Tests", () => {
                 cy.url().should('include', '/account/order/edit/');
                 cy.contains('We received your order, but the payment was aborted. Please change your payment method or try again');
 
+                shopware.prepareDomainChange();
                 checkout.placeOrderOnEdit();
 
+                molliePayment.initSandboxCookie();
                 molliePayment.selectPaid();
 
                 cy.url().should('include', '/checkout/finish');

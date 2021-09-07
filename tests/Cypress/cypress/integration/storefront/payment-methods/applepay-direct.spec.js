@@ -1,7 +1,7 @@
 import {ApplePaySessionMockFactory} from "Services/ApplePay/ApplePay.Mock";
 import TopMenuAction from "Actions/storefront/navigation/TopMenuAction";
 import ListingAction from "Actions/storefront/products/ListingAction";
-import Devices from "Services/Devices";
+import Devices from "Services/utils/Devices";
 import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
 import PDPRepository from "Repositories/storefront/products/PDPRepository";
 

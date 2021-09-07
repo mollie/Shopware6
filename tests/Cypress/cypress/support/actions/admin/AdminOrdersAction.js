@@ -1,4 +1,4 @@
-import Shopware from "Services/Shopware";
+import Shopware from "Services/shopware/Shopware";
 import OrdersListRepository from "Repositories/admin/orders/OrdersListRepository";
 import MainMenuRepository from "Repositories/admin/MainMenuRepository";
 

@@ -1,3 +1,8 @@
+import Cookies from "Services/utils/Cookies";
+
+const cookies = new Cookies();
+
+
 export default class Shopware {
 
     /**
@@ -6,6 +11,16 @@ export default class Shopware {
      */
     getVersion() {
         return Cypress.env().SHOPWARE;
+    }
+
+    /**
+     * This function makes sure to prepare our Shopware session
+     * before leaving our domain for now.
+     * When we get back, our session should still be the same
+     * just as we would have without Cypress and the LAX cookie securities.
+     */
+    prepareDomainChange() {
+        cookies.prepareCrossdomain('session-');
     }
 
     /**

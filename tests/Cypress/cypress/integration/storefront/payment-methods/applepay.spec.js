@@ -1,5 +1,5 @@
-import Devices from "Services/Devices";
-import Shopware from "Services/Shopware";
+import Devices from "Services/utils/Devices";
+import Shopware from "Services/shopware/Shopware";
 import {ApplePaySessionMockFactory} from "Services/ApplePay/ApplePay.Mock";
 // ------------------------------------------------------
 import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";

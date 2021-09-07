@@ -23,6 +23,8 @@ class PaymentScreenAction {
                 httpOnly: true
             }
         );
+
+        cy.reload();
     }
 
     /**

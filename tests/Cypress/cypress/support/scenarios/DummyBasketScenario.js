@@ -3,8 +3,7 @@ import ListingAction from "Actions/storefront/products/ListingAction";
 import PDPAction from "Actions/storefront/products/PDPAction";
 import CheckoutAction from "Actions/storefront/checkout/CheckoutAction";
 import LoginAction from "Actions/storefront/account/LoginAction";
-import Session from "Actions/utils/Session";
-import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
+import Session from "Services/utils/Session";
 import RegisterAction from "Actions/storefront/account/RegisterAction";
 
 
