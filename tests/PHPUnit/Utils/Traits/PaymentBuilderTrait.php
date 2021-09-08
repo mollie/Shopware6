@@ -8,6 +8,7 @@ use Kiener\MolliePayments\Service\MollieApi\Builder\MollieShippingLineItemBuilde
 use Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\PriceCalculator;
 use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
+use MolliePayments\Tests\Fakes\FakeCompatibilityGateway;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
@@ -75,7 +76,13 @@ trait PaymentBuilderTrait
     {
         $expectedLineItems = [];
 
-        $mollieLineItemBuilder = new MollieLineItemBuilder(new MollieOrderPriceBuilder(), new IsOrderLineItemValid(), new PriceCalculator(), new LineItemDataExtractor());
+        $mollieLineItemBuilder = new MollieLineItemBuilder(
+            new MollieOrderPriceBuilder(),
+            new IsOrderLineItemValid(),
+            new PriceCalculator(),
+            new LineItemDataExtractor(),
+            new FakeCompatibilityGateway()
+        );
 
         /** @var OrderLineItemEntity $item */
         foreach ($lineItems as $item) {
@@ -148,11 +155,11 @@ trait PaymentBuilderTrait
     }
 
     public function getOrderEntity(
-        float $amountTotal,
-        string $taxStatus,
-        CurrencyEntity $currency,
+        float                   $amountTotal,
+        string                  $taxStatus,
+        CurrencyEntity          $currency,
         OrderLineItemCollection $lineItems,
-        string $orderNumber
+        string                  $orderNumber
     ): OrderEntity
     {
         $order = new OrderEntity();

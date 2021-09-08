@@ -29,6 +29,7 @@
             <argument type="service" id="Kiener\MolliePayments\Validator\IsOrderLineItemValid"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\PriceCalculator"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor"/>
+            <argument type="service" id="Kiener\MolliePayments\Gateway\Shopware\CompatibilityGateway"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderAddressBuilder"/>

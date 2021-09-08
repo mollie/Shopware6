@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Gateway\Shopware;
 
 use Kiener\MolliePayments\Gateway\CompatibilityGatewayInterface;
+use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextServiceInterface;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextServiceParameters;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -58,6 +59,18 @@ class CompatibilityGateway implements CompatibilityGatewayInterface
         $context = $this->contextService->get($salesChannelID, $token, null);
 
         return $context;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLineItemPromotionType(): string
+    {
+        if (defined('Shopware\Core\Checkout\Cart\LineItem::PROMOTION_LINE_ITEM_TYPE')) {
+            return LineItem::PROMOTION_LINE_ITEM_TYPE;
+        }
+
+        return 'promotion';
     }
 
     /**

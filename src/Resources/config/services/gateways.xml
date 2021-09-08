@@ -15,5 +15,9 @@
             <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextService"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Gateway\Shopware\CompatibilityGateway" class="Kiener\MolliePayments\Gateway\Shopware\CompatibilityGateway">
+            <factory service="Kiener\MolliePayments\Factory\CompatibilityGatewayFactory" method="create"/>
+        </service>
+
     </services>
 </container>
