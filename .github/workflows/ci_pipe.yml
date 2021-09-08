@@ -132,7 +132,7 @@ jobs:
 
       - name: Start Docker
         run: |
-          docker run --rm -p 80:80 --name shop -d dockware/play:${{ matrix.shopware }}
+          docker run --rm --name shop -d dockware/play:${{ matrix.shopware }}
           sleep 30
           docker logs shop
 
@@ -166,14 +166,18 @@ jobs:
       - name: Install Dependencies
         run: make install -B
 
+      - name: Download Docker
+        run: |
+          docker pull dockware/dev:${{ matrix.shopware }}
+
       - name: Start Docker
         run: |
-          docker run --rm -p 80:80 --name shop -d dockware/dev:${{ matrix.shopware }}
+          docker run --rm -p 443:443 --name shop -d dockware/dev:${{ matrix.shopware }}
           sleep 30
           docker logs shop
           # now change the domain of our shop, mollie doesn't work with localhost
           sudo echo "127.0.0.1 local.mollie.shop" | sudo tee -a /etc/hosts
-          docker exec shop bash -c "mysql -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='http://local.mollie.shop' WHERE url NOT LIKE 'default.%';\""
+          docker exec shop bash -c "mysql -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='https://local.mollie.shop' WHERE url NOT LIKE 'default.%';\""
 
       - name: Upload into Docker
         run: |
@@ -206,7 +210,7 @@ jobs:
         run: cd tests/Cypress && make install -B
 
       - name: Start Cypress
-        run: cd tests/Cypress && make run shopware=$SW_VERSION url=http://local.mollie.shop
+        run: cd tests/Cypress && make run shopware=$SW_VERSION url=https://local.mollie.shop
         env:
           SW_VERSION: ${{ matrix.shopware }}
 
