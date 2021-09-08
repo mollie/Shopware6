@@ -25,9 +25,9 @@ So there is an additional parameter to tell Cypress what Shopware version should
 This parameter is optional and its default is always the latest supported Shopware version.
 
 ```ruby 
-make open-ui url=http://my-local-or-remote-domain
+make open-ui url=https://my-local-or-remote-domain
 
-make open-ui url=http://my-local-or-remote-domain shopware=6.3
+make open-ui url=https://my-local-or-remote-domain shopware=6.3
 ```
 
 ### Run in CLI
@@ -35,6 +35,11 @@ You can also use the CLI command to run Cypress on your machine or directly in y
 Cypress will then test your local or remote shop with the tests of the provided Shopware version.
 
 ```ruby 
-make run url=http://my-local-or-remote-domain shopware=6.x
+make run url=https://my-local-or-remote-domain shopware=6.x
 ```
 
+### Troubleshooting
+
+Shopware 6.4.4.0 introduced LAX cookies.
+The tests have been adjusted to work with that change, but you need to use HTTPS!
+Once changed, it should all work as expected.
