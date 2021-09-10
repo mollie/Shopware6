@@ -4,9 +4,11 @@ namespace Kiener\MolliePayments\Controller\Api;
 
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\CustomFieldService;
+use Kiener\MolliePayments\Service\MollieApi\Shipment;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
+use Kiener\MolliePayments\Struct\MollieApi\ShipmentTrackingInfoStruct;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Exceptions\IncompatiblePlatform;
 use Mollie\Api\MollieApiClient;
@@ -17,9 +19,13 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
+use Shopware\Core\Framework\Validation\DataBag\QueryDataBag;
+use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ShippingController extends AbstractController
@@ -54,6 +60,9 @@ class ShippingController extends AbstractController
     /** @var OrderService */
     private $orderService;
 
+    /** @var Shipment */
+    private $shipmentApiService;
+
     /** @var SettingsService */
     private $settingsService;
 
@@ -66,17 +75,62 @@ class ShippingController extends AbstractController
      * @param SettingsService $settingsService
      */
     public function __construct(
-        MollieApiFactory $apiFactory,
+        MollieApiFactory          $apiFactory,
         EntityRepositoryInterface $orderLineItemRepository,
-        OrderService $orderService,
-        SettingsService $settingsService
+        OrderService              $orderService,
+        SettingsService           $settingsService,
+
+        Shipment $shipmentApiService
     )
     {
         $this->apiFactory = $apiFactory;
         $this->orderLineItemRepository = $orderLineItemRepository;
         $this->orderService = $orderService;
         $this->settingsService = $settingsService;
+
+        $this->shipmentApiService = $shipmentApiService;
     }
+
+    /**
+     * @RouteScope(scopes={"api"})
+     * @Route("/api/mollie/ship/order",
+     *         defaults={"auth_enabled"=true}, name="api.mollie.ship.order", methods={"POST"})
+     *
+     * @param Request $request
+     *
+     * @return JsonResponse
+     * @throws ApiException
+     * @throws IncompatiblePlatform
+     */
+    public function ship(QueryDataBag $query, RequestDataBag $post, Context $context): JsonResponse
+    {
+        if (!$query->has('number')) {
+            $this->json([], Response::HTTP_BAD_REQUEST);
+        }
+
+        $orderNumber = $query->get('number');
+        $order = $this->orderService->getOrderByNumber($orderNumber, $context);
+
+        $mollieOrderId = $this->orderService->getMollieOrderId($order);
+
+        $tracking = null;
+        if($post->has('tracking')) {
+            /** @var ParameterBag $trackingData */
+            $trackingData = $post->get('tracking');
+            $tracking = new ShipmentTrackingInfoStruct(
+                $trackingData->get('carrier'),
+                $trackingData->get('code'),
+                $trackingData->get('url', '')
+            );
+        }
+
+        $shipment = $this->shipmentApiService->shipOrder($mollieOrderId, $order->getSalesChannelId(), $tracking);
+
+        dd($shipment);
+    }
+
+
+
 
     /**
      * TODO Refactor Administration routes
