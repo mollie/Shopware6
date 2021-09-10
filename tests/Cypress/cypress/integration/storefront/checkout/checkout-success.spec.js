@@ -1,5 +1,6 @@
-import Devices from "Services/Devices";
-import Session from "Actions/utils/Session"
+import Devices from "Services/utils/Devices";
+import Session from "Services/utils/Session"
+import Shopware from "Services/shopware/Shopware"
 import PaymentScreenAction from 'Actions/mollie/PaymentScreenAction';
 import IssuerScreenAction from 'Actions/mollie/IssuerScreenAction';
 // ------------------------------------------------------
@@ -12,6 +13,7 @@ import DummyBasketScenario from "Scenarios/DummyBasketScenario";
 
 const devices = new Devices();
 const session = new Session();
+const shopware = new Shopware();
 
 const configAction = new ShopConfigurationAction();
 const checkout = new CheckoutAction();
@@ -44,7 +46,6 @@ const payments = [
 context("Checkout Tests", () => {
 
     before(function () {
-        molliePayment.initSandboxCookie();
         devices.setDevice(device);
         configAction.setupShop(true, false);
     })
@@ -64,7 +65,6 @@ context("Checkout Tests", () => {
 
                     paymentAction.switchPaymentMethod(payment.name);
 
-
                     // grab the total sum of our order from the confirm page.
                     // we also want to test what the user has to pay in Mollie.
                     // this has to match!
@@ -73,6 +73,7 @@ context("Checkout Tests", () => {
                         cy.wrap(total.toString().trim()).as('totalSum')
                     });
 
+                    shopware.prepareDomainChange();
                     checkout.placeOrderOnConfirm();
 
                     // verify that we are on the mollie payment screen
@@ -88,6 +89,8 @@ context("Checkout Tests", () => {
                         });
                     })
 
+
+                    molliePayment.initSandboxCookie();
 
                     if (payment.key === 'klarnapaylater' || payment.key === 'klarnasliceit') {
 

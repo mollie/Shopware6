@@ -13,9 +13,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Validation\DataBag\DataBag;
-use Shopware\Core\Framework\Validation\Exception\ConstraintViolationException;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-
 
 class OrderService
 {
@@ -39,7 +37,6 @@ class OrderService
      */
     protected $logger;
 
-
     /**
      * @param EntityRepositoryInterface $orderRepository
      * @param EntityRepositoryInterface $orderLineItemRepository
@@ -53,7 +50,6 @@ class OrderService
         $this->swOrderService = $swOrderService;
         $this->logger = $logger;
     }
-
 
     /**
      * Returns the order repository.
@@ -74,7 +70,6 @@ class OrderService
     {
         return $this->orderLineItemRepository;
     }
-
 
     /**
      * @param DataBag $data
@@ -106,14 +101,9 @@ class OrderService
         $criteria = new Criteria([$orderId]);
         $criteria->addAssociation('currency');
         $criteria->addAssociation('addresses');
-        $criteria->addAssociation('language');
         $criteria->addAssociation('language.locale');
-        $criteria->addAssociation('lineItems');
-        $criteria->addAssociation('lineItems.product');
         $criteria->addAssociation('lineItems.product.media');
-        $criteria->addAssociation('deliveries');
         $criteria->addAssociation('deliveries.shippingOrderAddress');
-        $criteria->addAssociation('transactions');
         $criteria->addAssociation('transactions.paymentMethod');
 
         /** @var OrderEntity $order */
@@ -162,5 +152,4 @@ class OrderService
 
         return $mollieOrderId;
     }
-
 }

@@ -1,5 +1,6 @@
-import Devices from "Services/Devices";
-import Session from "Actions/utils/Session"
+import Devices from "Services/utils/Devices";
+import Shopware from "Services/shopware/Shopware"
+import Session from "Services/utils/Session"
 import PaymentScreenAction from 'Actions/mollie/PaymentScreenAction';
 // ------------------------------------------------------
 import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
@@ -11,6 +12,7 @@ import DummyBasketScenario from "Scenarios/DummyBasketScenario";
 
 const devices = new Devices();
 const session = new Session();
+const shopware = new Shopware();
 
 const configAction = new ShopConfigurationAction();
 const checkout = new CheckoutAction();
@@ -24,11 +26,6 @@ const device = devices.getFirstDevice();
 
 
 context("Checkout Failure Tests", () => {
-
-    before(function () {
-        molliePayment.initSandboxCookie();
-        devices.setDevice(device);
-    })
 
     describe('Mollie Failure Mode', () => {
 
@@ -47,8 +44,11 @@ context("Checkout Failure Tests", () => {
 
                 scenarioDummyBasket.execute();
                 paymentAction.switchPaymentMethod('PayPal');
+
+                shopware.prepareDomainChange();
                 checkout.placeOrderOnConfirm();
 
+                molliePayment.initSandboxCookie();
                 molliePayment.selectFailed();
 
                 // verify that we are back in our shop
@@ -63,7 +63,8 @@ context("Checkout Failure Tests", () => {
 
                 cy.url().should('include', '/payscreen/select-method/');
 
-                // select giropay and mark it as "paid"
+                // select giro pay and mark it as "paid"
+                molliePayment.initSandboxCookie();
                 molliePayment.selectGiropay();
                 molliePayment.selectPaid();
 
@@ -75,8 +76,11 @@ context("Checkout Failure Tests", () => {
 
                 scenarioDummyBasket.execute();
                 paymentAction.switchPaymentMethod('PayPal');
+
+                shopware.prepareDomainChange();
                 checkout.placeOrderOnConfirm();
 
+                molliePayment.initSandboxCookie();
                 molliePayment.selectFailed();
 
                 // verify that we are back in our shop
@@ -104,6 +108,7 @@ context("Checkout Failure Tests", () => {
 
         beforeEach(() => {
             session.resetBrowserSession();
+            devices.setDevice(device);
         });
 
         context(devices.getDescription(device), () => {
@@ -112,8 +117,11 @@ context("Checkout Failure Tests", () => {
 
                 scenarioDummyBasket.execute();
                 paymentAction.switchPaymentMethod('PayPal');
+
+                shopware.prepareDomainChange();
                 checkout.placeOrderOnConfirm();
 
+                molliePayment.initSandboxCookie();
                 molliePayment.selectFailed();
 
                 // we are now back in our shop
@@ -124,6 +132,7 @@ context("Checkout Failure Tests", () => {
 
                 checkout.placeOrderOnEdit();
 
+                molliePayment.initSandboxCookie();
                 molliePayment.selectPaid();
 
                 cy.url().should('include', '/checkout/finish');

@@ -20,6 +20,7 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
+use MolliePayments\Tests\Fakes\FakeCompatibilityGateway;
 use MolliePayments\Tests\Traits\OrderTrait;
 use MolliePayments\Tests\Utils\Traits\PaymentBuilderTrait;
 use PHPUnit\Framework\TestCase;
@@ -147,7 +148,13 @@ abstract class AbstractMollieOrderBuilder extends TestCase
             $this->orderDataExtractor,
             $this->router,
             new MollieOrderPriceBuilder(),
-            new MollieLineItemBuilder(new MollieOrderPriceBuilder(), new IsOrderLineItemValid(), new PriceCalculator(), new LineItemDataExtractor()),
+            new MollieLineItemBuilder(
+                new MollieOrderPriceBuilder(),
+                new IsOrderLineItemValid(),
+                new PriceCalculator(),
+                new LineItemDataExtractor(),
+                new FakeCompatibilityGateway()
+            ),
             new MollieOrderAddressBuilder(),
             new MollieOrderCustomerEnricher($this->createMock(CustomerService::class)),
             $this->loggerService,

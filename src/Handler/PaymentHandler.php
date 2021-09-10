@@ -192,7 +192,9 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
                 Logger::ERROR
             );
 
-            throw new CustomerCanceledAsyncPaymentException($transaction->getOrderTransaction()->getId());
+            # ATTENTION, the second empty parameter is required
+            # in earlier Shopware 6.1.x versions, this was NOT optional!
+            throw new CustomerCanceledAsyncPaymentException($transaction->getOrderTransaction()->getId(), '');
         }
     }
 }

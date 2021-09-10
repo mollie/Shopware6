@@ -2,12 +2,14 @@
 
 namespace MolliePayments\Tests\Service\MollieApi\Builder;
 
+use Kiener\MolliePayments\Factory\CompatibilityGatewayFactory;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieLineItemBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\PriceCalculator;
 use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
 use Mollie\Api\Types\OrderLineType;
+use MolliePayments\Tests\Fakes\FakeCompatibilityGateway;
 use MolliePayments\Tests\Traits\OrderTrait;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
@@ -29,7 +31,8 @@ class MollieLineItemBuilderTest extends TestCase
             (new MollieOrderPriceBuilder()),
             (new IsOrderLineItemValid()),
             (new PriceCalculator()),
-            (new LineItemDataExtractor())
+            (new LineItemDataExtractor()),
+            new FakeCompatibilityGateway()
         );
     }
 

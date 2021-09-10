@@ -20,4 +20,9 @@ interface CompatibilityGatewayInterface
      */
     public function getSalesChannelContext(string $salesChannelID, string $token): SalesChannelContext;
 
+    /**
+     * @return string
+     */
+    public function getLineItemPromotionType(): string;
+
 }

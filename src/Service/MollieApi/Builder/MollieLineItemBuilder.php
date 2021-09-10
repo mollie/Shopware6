@@ -4,6 +4,8 @@ namespace Kiener\MolliePayments\Service\MollieApi\Builder;
 
 
 use Kiener\MolliePayments\Exception\MissingPriceLineItem;
+use Kiener\MolliePayments\Factory\CompatibilityGatewayFactory;
+use Kiener\MolliePayments\Gateway\CompatibilityGatewayInterface;
 use Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\PriceCalculator;
 use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
@@ -35,18 +37,25 @@ class MollieLineItemBuilder
      */
     private $lineItemDataExtractor;
 
-    public function __construct(
-        MollieOrderPriceBuilder $priceHydrator,
-        IsOrderLineItemValid $orderLineItemValidator,
-        PriceCalculator $priceCalculator,
-        LineItemDataExtractor $lineItemDataExtractor
-    )
-    {
+    /**
+     * @var CompatibilityGatewayInterface
+     */
+    private $compatibilityGateway;
 
+    /**
+     * @param MollieOrderPriceBuilder $priceHydrator
+     * @param IsOrderLineItemValid $orderLineItemValidator
+     * @param PriceCalculator $priceCalculator
+     * @param LineItemDataExtractor $lineItemDataExtractor
+     * @param CompatibilityGatewayInterface $compatibilityGateway
+     */
+    public function __construct(MollieOrderPriceBuilder $priceHydrator, IsOrderLineItemValid $orderLineItemValidator, PriceCalculator $priceCalculator, LineItemDataExtractor $lineItemDataExtractor, CompatibilityGatewayInterface $compatibilityGateway)
+    {
         $this->priceHydrator = $priceHydrator;
         $this->orderLineItemValidator = $orderLineItemValidator;
         $this->priceCalculator = $priceCalculator;
         $this->lineItemDataExtractor = $lineItemDataExtractor;
+        $this->compatibilityGateway = $compatibilityGateway;
     }
 
     public function buildLineItems(string $taxStatus, ?OrderLineItemCollection $lineItems, ?CurrencyEntity $currency): array
@@ -110,8 +119,7 @@ class MollieLineItemBuilder
             return OrderLineType::TYPE_STORE_CREDIT;
         }
 
-        if ($item->getType() === LineItem::PROMOTION_LINE_ITEM_TYPE ||
-            $item->getTotalPrice() < 0) {
+        if ($item->getType() === $this->compatibilityGateway->getLineItemPromotionType() || $item->getTotalPrice() < 0) {
             return OrderLineType::TYPE_DISCOUNT;
         }
 

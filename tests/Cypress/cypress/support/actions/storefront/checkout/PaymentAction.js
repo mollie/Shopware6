@@ -1,6 +1,6 @@
 import ConfirmRepository from 'Repositories/storefront/checkout/ConfirmRepository';
 import PaymentsRepository from 'Repositories/storefront/checkout/PaymentsRepository';
-import Shopware from "Services/Shopware";
+import Shopware from "Services/shopware/Shopware";
 
 const shopware = new Shopware();
 

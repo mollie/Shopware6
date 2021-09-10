@@ -1,5 +1,6 @@
-import Devices from "Services/Devices";
-import Session from "Actions/utils/Session"
+import Devices from "Services/utils/Devices";
+import Session from "Services/utils/Session"
+import Shopware from "Services/shopware/Shopware";
 import PaymentScreenAction from 'Actions/mollie/PaymentScreenAction';
 // ------------------------------------------------------
 import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
@@ -9,7 +10,6 @@ import PaymentAction from "Actions/storefront/checkout/PaymentAction";
 import DummyBasketScenario from "Scenarios/DummyBasketScenario";
 import AdminOrdersAction from "Actions/admin/AdminOrdersAction";
 import AdminLoginAction from "Actions/admin/AdminLoginAction";
-import Shopware from "Services/Shopware";
 
 
 const devices = new Devices();
@@ -32,8 +32,6 @@ const shopware = new Shopware();
 context("Order Status Mapping Tests", () => {
 
     before(function () {
-        molliePayment.initSandboxCookie();
-        devices.setDevice(device);
         configAction.setupShop(false, false);
     })
 
@@ -48,8 +46,11 @@ context("Order Status Mapping Tests", () => {
 
             scenarioDummyBasket.execute();
             paymentAction.switchPaymentMethod('PayPal');
+
+            shopware.prepareDomainChange();
             checkout.placeOrderOnConfirm();
 
+            molliePayment.initSandboxCookie();
             molliePayment.selectPaid();
 
             adminLogin.login();
@@ -61,8 +62,11 @@ context("Order Status Mapping Tests", () => {
 
             scenarioDummyBasket.execute();
             paymentAction.switchPaymentMethod('Pay later');
+
+            shopware.prepareDomainChange();
             checkout.placeOrderOnConfirm();
 
+            molliePayment.initSandboxCookie();
             molliePayment.selectAuthorized();
 
             adminLogin.login();
@@ -78,8 +82,11 @@ context("Order Status Mapping Tests", () => {
 
             scenarioDummyBasket.execute();
             paymentAction.switchPaymentMethod('PayPal');
+
+            shopware.prepareDomainChange();
             checkout.placeOrderOnConfirm();
 
+            molliePayment.initSandboxCookie();
             molliePayment.selectFailed();
 
             adminLogin.login();
@@ -91,8 +98,11 @@ context("Order Status Mapping Tests", () => {
 
             scenarioDummyBasket.execute();
             paymentAction.switchPaymentMethod('PayPal');
+
+            shopware.prepareDomainChange();
             checkout.placeOrderOnConfirm();
 
+            molliePayment.initSandboxCookie();
             molliePayment.selectCancelled();
 
             adminLogin.login();
