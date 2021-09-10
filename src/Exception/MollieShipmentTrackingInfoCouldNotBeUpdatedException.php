@@ -2,6 +2,8 @@
 
 namespace Kiener\MolliePayments\Exception;
 
+use Symfony\Component\HttpFoundation\Response;
+
 class MollieShipmentTrackingInfoCouldNotBeUpdatedException extends \Shopware\Core\Framework\ShopwareHttpException
 {
     public function __construct(string $mollieOrderID, string $mollieShipmentId, array $parameters = [], ?\Throwable $e = null)
