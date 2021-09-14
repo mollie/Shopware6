@@ -40,7 +40,7 @@ export default class PaymentAction {
      * @version All Shopware versions.
      */
     selectPaymentMethod(paymentName) {
-        cy.contains(paymentName).click({force: true});
+        cy.get('.payment-methods').contains(paymentName).click({force: true});
     }
 
     /**

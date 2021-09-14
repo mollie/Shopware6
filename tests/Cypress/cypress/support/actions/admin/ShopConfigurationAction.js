@@ -1,5 +1,7 @@
 import AdminAPIClient from "Services/shopware/AdminAPIClient";
+import Shopware from "Services/shopware/Shopware"
 
+const shopware = new Shopware();
 
 export default class ShopConfigurationAction {
 
@@ -20,8 +22,8 @@ export default class ShopConfigurationAction {
 
         this._activatePaymentMethods();
 
-        this._activateShippingMethods();
-      
+        this._prepareShippingMethods();
+
         // assign all payment methods to
         // all available sales channels
         this.apiClient.get('/sales-channel').then(channels => {
@@ -72,9 +74,23 @@ export default class ShopConfigurationAction {
 
             payments.forEach(element => {
 
+                let shouldBeActive = false;
+
+                // starting from Shopware 6.4.3, there is an indicator
+                // if we have the payment method of a mollie plugin.
+                // to avoid other payment methods (another paypal), etc., we try to
+                // only enable mollie payment methods as good as possible
+                if (shopware.isVersionGreaterEqual("6.4.3")) {
+                    if (element.attributes.distinguishableName.includes('Mollie')) {
+                        shouldBeActive = true;
+                    }
+                } else {
+                    shouldBeActive = true;
+                }
+
                 const data = {
                     "id": element.id,
-                    "active": true,
+                    "active": shouldBeActive,
                 };
 
                 this.apiClient.patch('/payment-method/' + element.id, data);
@@ -85,9 +101,10 @@ export default class ShopConfigurationAction {
     /**
      * Make sure no availability rules are set
      * that could block our shipping method from being used.
+     * Also add some shipping costs for better tests.
      * @private
      */
-    _activateShippingMethods() {
+    _prepareShippingMethods() {
 
         this.apiClient.get('/rule').then(rules => {
 
@@ -97,17 +114,33 @@ export default class ShopConfigurationAction {
                 // so we allow our shipping methods to be used by everybody
                 if (rule.attributes.name === 'All customers') {
 
-                    this.apiClient.get('/shipping-method').then(payments => {
+                    this.apiClient.get('/shipping-method').then(shippingMethods => {
 
-                        payments.forEach(element => {
+                        shippingMethods.forEach(element => {
 
-                            const data = {
-                                "id": element.id,
-                                "active": true,
-                                "availabilityRuleId": rule.id,
-                            };
+                            this.apiClient.get('/shipping-method/' + element.id + '/prices').then(price => {
 
-                            this.apiClient.patch('/shipping-method/' + element.id, data);
+                                const shippingData = {
+                                    "id": element.id,
+                                    "active": true,
+                                    "availabilityRuleId": rule.id,
+                                    "prices": [
+                                        {
+                                            "id": price.id,
+                                            "currencyPrice": [
+                                                {
+                                                    "currencyId": price.attributes.currencyPrice[0].currencyId,
+                                                    "net": 4.19,
+                                                    "gross": 4.99,
+                                                    "linked": false
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                };
+
+                                this.apiClient.patch('/shipping-method/' + element.id, shippingData);
+                            });
                         });
                     });
                 }
