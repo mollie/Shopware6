@@ -19,7 +19,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CustomerServiceTest extends TestCase
 {
-    /** @var EntityRepositoryInterface  */
+    /** @var EntityRepositoryInterface */
     private $customerRepository;
 
     /** @var CustomerService */
@@ -58,12 +58,12 @@ class CustomerServiceTest extends TestCase
         string $customerId,
         string $mollieCustomerId,
         string $profileId,
-        bool $testMode,
-        array $existingCustomFields,
-        array $expectedCustomFields
+        bool   $testMode,
+        array  $existingCustomFields,
+        array  $expectedCustomFields
     )
     {
-        $customer  = $this->createConfiguredMock(CustomerEntity::class, [
+        $customer = $this->createConfiguredMock(CustomerEntity::class, [
             'getCustomFields' => $existingCustomFields
         ]);
 
@@ -96,7 +96,8 @@ class CustomerServiceTest extends TestCase
      * customerRepository::update, and this does mean it is consolidated with the existing customFields.
      * Normally, this is something the EntityRepository takes care of.
      */
-    public function setMollieCustomerIdTestData() {
+    public function setMollieCustomerIdTestData()
+    {
         return [
             'New Mollie customer, live' => [
                 'foo', 'cst_123', 'pfl_123', false,
@@ -105,7 +106,8 @@ class CustomerServiceTest extends TestCase
                     'mollie_payments' => [
                         'customer_ids' => [
                             'pfl_123' => [
-                                'live' => 'cst_123'
+                                'live' => 'cst_123',
+                                'test' => '',
                             ]
                         ]
                     ]
@@ -118,6 +120,7 @@ class CustomerServiceTest extends TestCase
                     'mollie_payments' => [
                         'customer_ids' => [
                             'pfl_321' => [
+                                'live' => '',
                                 'test' => 'cst_321'
                             ]
                         ]
@@ -130,7 +133,8 @@ class CustomerServiceTest extends TestCase
                     'mollie_payments' => [
                         'customer_ids' => [
                             'pfl_456' => [
-                                'live' => 'cst_456'
+                                'live' => 'cst_456',
+                                'test' => '',
                             ]
                         ]
                     ]
@@ -139,7 +143,8 @@ class CustomerServiceTest extends TestCase
                     'mollie_payments' => [
                         'customer_ids' => [
                             'pfl_456' => [
-                                'live' => 'cst_456'
+                                'live' => 'cst_456',
+                                'test' => '',
                             ]
                         ]
                     ]
@@ -151,6 +156,7 @@ class CustomerServiceTest extends TestCase
                     'mollie_payments' => [
                         'customer_ids' => [
                             'pfl_654' => [
+                                'live' => '',
                                 'test' => 'cst_654'
                             ]
                         ]
@@ -160,6 +166,7 @@ class CustomerServiceTest extends TestCase
                     'mollie_payments' => [
                         'customer_ids' => [
                             'pfl_654' => [
+                                'live' => '',
                                 'test' => 'cst_654'
                             ]
                         ]
@@ -175,7 +182,8 @@ class CustomerServiceTest extends TestCase
                     'mollie_payments' => [
                         'customer_ids' => [
                             'pfl_789' => [
-                                'live' => 'cst_789'
+                                'live' => 'cst_789',
+                                'test' => '',
                             ]
                         ]
                     ],
@@ -191,10 +199,12 @@ class CustomerServiceTest extends TestCase
                     'mollie_payments' => [
                         'customer_ids' => [
                             'pfl_789' => [
-                                'live' => 'cst_789'
+                                'live' => 'cst_789',
+                                'test' => '',
                             ]
                         ]
-                    ]
+                    ],
+                    'customer_id' => 'cst_987',
                 ]
             ],
         ];

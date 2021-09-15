@@ -267,30 +267,15 @@ class CustomerService
      * @param string $profileId
      * @param bool $testMode
      * @param Context $context
+     * @throws CustomerCouldNotBeFoundException
      */
-    public function setMollieCustomerId(
-        string  $customerId,
-        string  $mollieCustomerId,
-        string  $profileId,
-        bool    $testMode,
-        Context $context
-    )
+    public function setMollieCustomerId(string $customerId, string $mollieCustomerId, string $profileId, bool $testMode, Context $context)
     {
-        $customFields = [
-            'mollie_payments' => [
-                'customer_ids' => [
-                    $profileId => [
-                        ($testMode ? 'test' : 'live') => $mollieCustomerId
-                    ]
-                ]
-            ]
-        ];
+        $existingStruct = $this->getCustomerStruct($customerId, $context);
 
-        // If there's a legacy customer ID, and it's the same as the one we're saving, remove the legacy id.
-        $struct = $this->getCustomerStruct($customerId, $context);
-        if (!empty($struct->getLegacyCustomerId()) && $struct->getLegacyCustomerId() === $mollieCustomerId) {
-            $customFields[self::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID] = null;
-        }
+        $existingStruct->setCustomerId($mollieCustomerId, $profileId,$testMode);
+
+        $customFields = $existingStruct->toCustomFieldsArray();
 
         $this->saveCustomerCustomFields($customerId, $customFields, $context);
     }
@@ -519,8 +504,8 @@ class CustomerService
 
             $struct->setLegacyCustomerId(null);
             $struct->setCustomerId(
-                $struct->getLegacyCustomerId(),
-                $settings->getProfileId(),
+                (string)$struct->getLegacyCustomerId(),
+                (string)$settings->getProfileId(),
                 $settings->isTestMode()
             );
 
