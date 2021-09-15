@@ -101,7 +101,7 @@ class MollieApiFactory
 
             // @todo Add plugin version variable
             $this->apiClient->addVersionString(
-                'MollieShopware6/1.5.3'
+                'MollieShopware6/1.5.4'
             );
         } catch (Exception $e) {
             $this->logger->error($e->getMessage(), [$e]);
@@ -132,7 +132,7 @@ class MollieApiFactory
             $this->apiClient->addVersionString('Shopware/' . Kernel::SHOPWARE_FALLBACK_VERSION);
 
             // @todo Add plugin version variable
-            $this->apiClient->addVersionString('MollieShopware6/1.5.3');
+            $this->apiClient->addVersionString('MollieShopware6/1.5.4');
 
         } catch (Exception $e) {
             $this->logger->error($e->getMessage(), [$e]);
