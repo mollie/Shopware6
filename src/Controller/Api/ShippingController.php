@@ -2,9 +2,9 @@
 
 namespace Kiener\MolliePayments\Controller\Api;
 
+use Kiener\MolliePayments\Facade\MollieShipment;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\CustomFieldService;
-use Kiener\MolliePayments\Service\MollieApi\Shipment;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
@@ -25,7 +25,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ShippingController extends AbstractController
@@ -51,19 +50,29 @@ class ShippingController extends AbstractController
     private const SHIPPING_DATA_KEY_QUANTITY = self::CUSTOM_FIELDS_KEY_QUANTITY;
     private const SHIPPING_DATA_KEY_TEST_MODE = 'testmode';
 
-    /** @var MollieApiFactory */
+    /**
+     * @var MollieApiFactory
+     */
     private $apiFactory;
 
-    /** @var EntityRepositoryInterface */
+    /**
+     * @var EntityRepositoryInterface
+     */
     private $orderLineItemRepository;
 
-    /** @var OrderService */
+    /**
+     * @var OrderService
+     */
     private $orderService;
 
-    /** @var Shipment */
-    private $shipmentApiService;
+    /**
+     * @var MollieShipment
+     */
+    private $shipmentFacade;
 
-    /** @var SettingsService */
+    /**
+     * @var SettingsService
+     */
     private $settingsService;
 
     /**
@@ -80,7 +89,7 @@ class ShippingController extends AbstractController
         OrderService              $orderService,
         SettingsService           $settingsService,
 
-        Shipment $shipmentApiService
+        MollieShipment            $shipmentFacade
     )
     {
         $this->apiFactory = $apiFactory;
@@ -88,7 +97,7 @@ class ShippingController extends AbstractController
         $this->orderService = $orderService;
         $this->settingsService = $settingsService;
 
-        $this->shipmentApiService = $shipmentApiService;
+        $this->shipmentFacade = $shipmentFacade;
     }
 
     /**
@@ -104,17 +113,14 @@ class ShippingController extends AbstractController
      */
     public function ship(QueryDataBag $query, RequestDataBag $post, Context $context): JsonResponse
     {
-        if (!$query->has('number')) {
-            $this->json([], Response::HTTP_BAD_REQUEST);
+        $orderNumber = $query->get('number');
+
+        if ($orderNumber === null) {
+            throw new \InvalidArgumentException('Missing Argument for Order Number!');
         }
 
-        $orderNumber = $query->get('number');
-        $order = $this->orderService->getOrderByNumber($orderNumber, $context);
-
-        $mollieOrderId = $this->orderService->getMollieOrderId($order);
-
         $tracking = null;
-        if($post->has('tracking')) {
+        if ($post->has('tracking')) {
             /** @var ParameterBag $trackingData */
             $trackingData = $post->get('tracking');
             $tracking = new ShipmentTrackingInfoStruct(
@@ -124,7 +130,7 @@ class ShippingController extends AbstractController
             );
         }
 
-        $shipment = $this->shipmentApiService->shipOrder($mollieOrderId, $order->getSalesChannelId(), $tracking);
+        $shipment = $this->shipmentFacade->shipOrder($orderNumber, $context, $tracking);
 
         dd($shipment);
     }

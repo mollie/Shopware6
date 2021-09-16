@@ -8,7 +8,9 @@
         <service id="Kiener\MolliePayments\Facade\MollieShipment">
             <argument type="service" id="Kiener\MolliePayments\Service\MolliePaymentExtractor"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Shipment"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderDeliveryService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
         </service>
 

@@ -5,8 +5,11 @@ namespace Kiener\MolliePayments\Facade;
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\MollieApi\Order;
+use Kiener\MolliePayments\Service\MollieApi\Shipment;
 use Kiener\MolliePayments\Service\MolliePaymentExtractor;
 use Kiener\MolliePayments\Service\OrderDeliveryService;
+use Kiener\MolliePayments\Service\OrderService;
+use Kiener\MolliePayments\Struct\MollieApi\ShipmentTrackingInfoStruct;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -26,9 +29,19 @@ class MollieShipment
     private $mollieApiOrderService;
 
     /**
+     * @var Shipment
+     */
+    private $mollieApiShipmentService;
+
+    /**
      * @var OrderDeliveryService
      */
     private $orderDeliveryService;
+
+    /**
+     * @var OrderService
+     */
+    private $orderService;
 
     /**
      * @var LoggerService
@@ -37,14 +50,18 @@ class MollieShipment
 
     public function __construct(
         MolliePaymentExtractor $extractor,
-        Order $mollieApiOrderService,
-        OrderDeliveryService $orderDeliveryService,
-        LoggerService $logger
+        Order                  $mollieApiOrderService,
+        Shipment               $mollieApiShipmentService,
+        OrderDeliveryService   $orderDeliveryService,
+        OrderService           $orderService,
+        LoggerService          $logger
     )
     {
         $this->extractor = $extractor;
         $this->mollieApiOrderService = $mollieApiOrderService;
+        $this->mollieApiShipmentService = $mollieApiShipmentService;
         $this->orderDeliveryService = $orderDeliveryService;
+        $this->orderService = $orderService;
         $this->logger = $logger;
     }
 
@@ -111,7 +128,7 @@ class MollieShipment
             return false;
         }
 
-        $addedMollieShipment = $this->mollieApiOrderService->setShipment($mollieOrderId, $order->getSalesChannelId(),$context);
+        $addedMollieShipment = $this->mollieApiOrderService->setShipment($mollieOrderId, $order->getSalesChannelId(), $context);
 
         if ($addedMollieShipment) {
             $values = [CustomFieldsInterface::DELIVERY_SHIPPED => true];
@@ -119,5 +136,14 @@ class MollieShipment
         }
 
         return $addedMollieShipment;
+    }
+
+    public function shipOrder(string $orderNumber, Context $context, ShipmentTrackingInfoStruct $tracking = null)
+    {
+        $order = $this->orderService->getOrderByNumber($orderNumber, $context);
+
+        $mollieOrderId = $this->orderService->getMollieOrderId($order);
+
+        return $this->mollieApiShipmentService->shipOrder($mollieOrderId, $order->getSalesChannelId(), $tracking);
     }
 }

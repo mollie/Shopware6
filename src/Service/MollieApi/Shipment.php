@@ -32,13 +32,17 @@ class Shipment
         try {
             $apiClient = $this->clientFactory->getClient($salesChannelId);
 
-            $shipmentOptions = [];
-            if ($tracking instanceof ShipmentTrackingInfoStruct) {
-                $shipmentOptions['tracking'] = $tracking->toArray();
+            $mollieOrder = $apiClient->orders->get($mollieOrderId);
+
+            if (!($tracking instanceof ShipmentTrackingInfoStruct)) {
+                return $mollieOrder->shipAll();
             }
 
-            $mollieOrder = $apiClient->orders->get($mollieOrderId);
-            return $mollieOrder->shipAll($shipmentOptions);
+            $options = [
+                'tracking' => $tracking->toArray()
+            ];
+
+            return $mollieOrder->shipAll($options);
         } catch (ApiException $e) {
             throw new MollieOrderCouldNotBeShippedException(
                 $mollieOrderId,
@@ -52,30 +56,33 @@ class Shipment
     }
 
     public function shipArticle(
-        string $mollieOrderId,
-        string $salesChannelId,
-        string $mollieOrderLineId,
-        ?int $quantity = null,
+        string                      $mollieOrderId,
+        string                      $salesChannelId,
+        string                      $mollieOrderLineId,
+        ?int                        $quantity = null,
         ?ShipmentTrackingInfoStruct $tracking = null
     ): MollieShipment
     {
         try {
             $apiClient = $this->clientFactory->getClient($salesChannelId);
-
-            $shipmentLine = ['id' => $mollieOrderLineId];
-            if(is_int($quantity)) {
-                $shipmentLine['quantity'] = $quantity;
-            }
-
-            $shipmentOptions = [];
-            if ($tracking instanceof ShipmentTrackingInfoStruct) {
-                $shipmentOptions['tracking'] = $tracking->toArray();
-            }
-
-            $shipmentOptions['lines'] = [$shipmentLine];
-
             $mollieOrder = $apiClient->orders->get($mollieOrderId);
-            return $mollieOrder->shipAll($shipmentOptions);
+
+            $lineItem = ['id' => $mollieOrderLineId];
+            if (is_int($quantity)) {
+                $lineItem['quantity'] = $quantity;
+            }
+
+            $options = [
+                'lines' => [
+                    $lineItem
+                ]
+            ];
+
+            if ($tracking instanceof ShipmentTrackingInfoStruct) {
+                $options['tracking'] = $tracking->toArray();
+            }
+
+            return $mollieOrder->shipAll($options);
         } catch (ApiException $e) {
             throw new MollieOrderCouldNotBeShippedException(
                 $mollieOrderId,
@@ -89,9 +96,9 @@ class Shipment
     }
 
     public function updateTracking(
-        string $mollieOrderId,
-        string $salesChannelId,
-        string $mollieShipmentId,
+        string                     $mollieOrderId,
+        string                     $salesChannelId,
+        string                     $mollieShipmentId,
         ShipmentTrackingInfoStruct $tracking
     ): MollieShipment
     {

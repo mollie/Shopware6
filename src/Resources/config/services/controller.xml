@@ -38,7 +38,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
 
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Shipment"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MollieShipment"/>
 
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
