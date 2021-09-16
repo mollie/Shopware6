@@ -119,18 +119,7 @@ class ShippingController extends AbstractController
             throw new \InvalidArgumentException('Missing Argument for Order Number!');
         }
 
-        $tracking = null;
-        if ($post->has('tracking')) {
-            /** @var ParameterBag $trackingData */
-            $trackingData = $post->get('tracking');
-            $tracking = new ShipmentTrackingInfoStruct(
-                $trackingData->get('carrier'),
-                $trackingData->get('code'),
-                $trackingData->get('url', '')
-            );
-        }
-
-        $shipment = $this->shipmentFacade->shipOrder($orderNumber, $context, $tracking);
+        $shipment = $this->shipmentFacade->shipOrder($orderNumber, $context);
 
         dd($shipment);
     }

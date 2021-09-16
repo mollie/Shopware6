@@ -138,12 +138,12 @@ class MollieShipment
         return $addedMollieShipment;
     }
 
-    public function shipOrder(string $orderNumber, Context $context, ShipmentTrackingInfoStruct $tracking = null)
+    public function shipOrder(string $orderNumber, Context $context)
     {
         $order = $this->orderService->getOrderByNumber($orderNumber, $context);
 
         $mollieOrderId = $this->orderService->getMollieOrderId($order);
 
-        return $this->mollieApiShipmentService->shipOrder($mollieOrderId, $order->getSalesChannelId(), $tracking);
+        return $this->mollieApiShipmentService->shipOrder($mollieOrderId, $order->getSalesChannelId());
     }
 }
