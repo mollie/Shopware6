@@ -9,10 +9,13 @@ use Kiener\MolliePayments\Service\MollieApi\Shipment;
 use Kiener\MolliePayments\Service\MolliePaymentExtractor;
 use Kiener\MolliePayments\Service\OrderDeliveryService;
 use Kiener\MolliePayments\Service\OrderService;
-use Kiener\MolliePayments\Struct\MollieApi\ShipmentTrackingInfoStruct;
+use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Content\Product\ProductDefinition;
+use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Framework\Context;
 use Symfony\Bridge\Monolog\Logger;
 
@@ -145,5 +148,28 @@ class MollieShipment
         $mollieOrderId = $this->orderService->getMollieOrderId($order);
 
         return $this->mollieApiShipmentService->shipOrder($mollieOrderId, $order->getSalesChannelId());
+    }
+
+    public function shipItem(string $orderNumber, string $itemIdentifier, int $quantity, Context $context)
+    {
+        $order = $this->orderService->getOrderByNumber($orderNumber, $context);
+
+        $matchedLineItems = $order->getLineItems()->filter(function ($lineItem) use ($itemIdentifier) {
+            /** @var OrderLineItemEntity $lineItem */
+
+            // Default Shopware: If the lineItem has an associated ProductEntity, check if the itemIdentifier
+            // matches the product's product number.
+            if ($lineItem->getType() === LineItem::PRODUCT_LINE_ITEM_TYPE &&
+                $lineItem->getProduct() instanceof ProductEntity &&
+                $lineItem->getProduct()->getProductNumber() === $itemIdentifier) {
+                return true;
+            }
+
+            // Custom lineItem type
+            if (array_key_exists('productNumber', $lineItem->getPayload()) &&
+                $lineItem->getPayload()['productNumber'] === $itemIdentifier) {
+                return true;
+            }
+        });
     }
 }

@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Service\MollieApi;
 
 use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeShippedException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
-use Kiener\MolliePayments\Struct\MollieApi\ShipmentTrackingInfoStruct;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Shipment as MollieShipment;
 
@@ -44,25 +43,23 @@ class Shipment
         }
     }
 
-    public function shipArticle(
+    public function shipItem(
         string $mollieOrderId,
         string $salesChannelId,
         string $mollieOrderLineId,
-        ?int   $quantity = null
+        int    $quantity
     ): MollieShipment
     {
         try {
             $apiClient = $this->clientFactory->getClient($salesChannelId);
             $mollieOrder = $apiClient->orders->get($mollieOrderId);
 
-            $lineItem = ['id' => $mollieOrderLineId];
-            if (is_int($quantity)) {
-                $lineItem['quantity'] = $quantity;
-            }
-
             $options = [
                 'lines' => [
-                    $lineItem
+                    [
+                        'id' => $mollieOrderLineId,
+                        'quantity' => $quantity
+                    ]
                 ]
             ];
 

@@ -8,7 +8,6 @@ use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
-use Kiener\MolliePayments\Struct\MollieApi\ShipmentTrackingInfoStruct;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Exceptions\IncompatiblePlatform;
 use Mollie\Api\MollieApiClient;
@@ -20,10 +19,8 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\Validation\DataBag\QueryDataBag;
-use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -103,15 +100,13 @@ class ShippingController extends AbstractController
     /**
      * @RouteScope(scopes={"api"})
      * @Route("/api/mollie/ship/order",
-     *         defaults={"auth_enabled"=true}, name="api.mollie.ship.order", methods={"POST"})
+     *         defaults={"auth_enabled"=true}, name="api.mollie.ship.order", methods={"GET"})
      *
-     * @param Request $request
-     *
+     * @param QueryDataBag $query
+     * @param Context $context
      * @return JsonResponse
-     * @throws ApiException
-     * @throws IncompatiblePlatform
      */
-    public function ship(QueryDataBag $query, RequestDataBag $post, Context $context): JsonResponse
+    public function shipOrder(QueryDataBag $query, Context $context): JsonResponse
     {
         $orderNumber = $query->get('number');
 
@@ -122,6 +117,37 @@ class ShippingController extends AbstractController
         $shipment = $this->shipmentFacade->shipOrder($orderNumber, $context);
 
         dd($shipment);
+    }
+
+    /**
+     * @RouteScope(scopes={"api"})
+     * @Route("/api/mollie/ship/item",
+     *         defaults={"auth_enabled"=true}, name="api.mollie.ship.item", methods={"GET"})
+     *
+     * @param Request $request
+     *
+     * @return JsonResponse
+     * @throws ApiException
+     * @throws IncompatiblePlatform
+     */
+    public function shipItem(QueryDataBag $query, Context $context): JsonResponse
+    {
+        $orderNumber = $query->get('order');
+
+        if ($orderNumber === null) {
+            throw new \InvalidArgumentException('Missing Argument for Order Number!');
+        }
+
+        $itemIdentifier = $query->get('item');
+
+        if ($itemIdentifier === null) {
+            throw new \InvalidArgumentException('Missing Argument for Item identifier!');
+        }
+
+        $quantity = $query->get('quantity', 0);
+
+        $this->shipmentFacade->shipItem($orderNumber, $itemIdentifier, $quantity, $context);
+        dd($quantity);
     }
 
 
