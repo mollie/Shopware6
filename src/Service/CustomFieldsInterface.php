@@ -19,6 +19,12 @@ interface CustomFieldsInterface
     /**
      *
      */
+    public const ORDER_LINE_KEY = 'order_line_id';
+
+    /**
+     *
+     */
     public const DELIVERY_SHIPPED = 'is_shipped';
+
 
 }

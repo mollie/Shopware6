@@ -4,9 +4,9 @@ namespace Kiener\MolliePayments\Service;
 
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
 use Kiener\MolliePayments\Exception\OrderNumberNotFoundException;
-use Kiener\MolliePayments\Service\MollieApi\Order;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -144,12 +144,23 @@ class OrderService
      */
     public function getMollieOrderId(OrderEntity $order): string
     {
-        $mollieOrderId = $order->getCustomFields()['mollie_payments']['order_id'] ?? '';
+        $mollieOrderId = $order->getCustomFields()[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY] ?? '';
 
         if (empty($mollieOrderId)) {
             throw new CouldNotExtractMollieOrderIdException($order->getOrderNumber());
         }
 
         return $mollieOrderId;
+    }
+
+    public function getMollieOrderLineId(OrderLineItemEntity $lineItem): string
+    {
+        $mollieOrderLineId = $lineItem->getCustomFields()[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_LINE_KEY] ?? '';
+
+        if (empty($mollieOrderLineId)) {
+            throw new CouldNotExtractMollieOrderIdException($lineItem->getId());
+        }
+
+        return $mollieOrderLineId;
     }
 }

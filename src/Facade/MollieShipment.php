@@ -11,12 +11,13 @@ use Kiener\MolliePayments\Service\OrderDeliveryService;
 use Kiener\MolliePayments\Service\OrderService;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\Uuid\Uuid;
 use Symfony\Bridge\Monolog\Logger;
 
 class MollieShipment
@@ -154,22 +155,66 @@ class MollieShipment
     {
         $order = $this->orderService->getOrderByNumber($orderNumber, $context);
 
-        $matchedLineItems = $order->getLineItems()->filter(function ($lineItem) use ($itemIdentifier) {
+        $mollieOrderId = $this->orderService->getMollieOrderId($order);
+
+        $lineItems = $this->searchLineItem($order, $itemIdentifier);
+
+        if ($lineItems->count() < 1) {
+            throw new \Exception('Could not find lineItem');
+        }
+
+        if ($lineItems->count() > 1) {
+            throw new \Exception('Too many lineItems found, please specify a more specific identifier.');
+        }
+
+        $mollieOrderLineId = $this->orderService->getMollieOrderLineId($lineItems->first());
+
+        if ($quantity == 0) {
+            // TODO determine quantity
+        }
+
+        $this->mollieApiShipmentService->shipItem($mollieOrderId, $order->getSalesChannelId(), $mollieOrderLineId, $quantity);
+    }
+
+    public function searchLineItem(OrderEntity $order, string $itemIdentifier): OrderLineItemCollection
+    {
+        return $order->getLineItems()->filter(function ($lineItem) use ($itemIdentifier) {
             /** @var OrderLineItemEntity $lineItem */
 
-            // Default Shopware: If the lineItem has an associated ProductEntity, check if the itemIdentifier
-            // matches the product's product number.
+            // Default Shopware: If the lineItem is of type "product" and has an associated ProductEntity,
+            // check if the itemIdentifier matches the product's product number.
             if ($lineItem->getType() === LineItem::PRODUCT_LINE_ITEM_TYPE &&
                 $lineItem->getProduct() instanceof ProductEntity &&
                 $lineItem->getProduct()->getProductNumber() === $itemIdentifier) {
                 return true;
             }
 
-            // Custom lineItem type
+            // If it's not a "product" type lineItem, for example if it's a completely custom lineItem type,
+            // check if the payload has a productNumber in it that matches the itemIdentifier.
             if (array_key_exists('productNumber', $lineItem->getPayload()) &&
                 $lineItem->getPayload()['productNumber'] === $itemIdentifier) {
                 return true;
             }
+
+            // Check itemIdentifier against the mollie order_line_id custom field
+            $mollieOrderLineId = $lineItem->getCustomFields()[CustomFieldsInterface::MOLLIE_KEY]['order_line_id'] ?? null;
+            if (!is_null($mollieOrderLineId) && $mollieOrderLineId === $itemIdentifier) {
+                return true;
+            }
+
+            // If it hasn't passed any of the above tests, check if the itemIdentifier is a valid Uuid...
+            if (!Uuid::isValid($itemIdentifier)) {
+                return false;
+            }
+
+            // ... and then check if it matches the Id of the entity the lineItem is referencing,
+            // or if it matches the Id of the lineItem itself.
+            if ($lineItem->getReferencedId() === $itemIdentifier || $lineItem->getId() === $itemIdentifier) {
+                return true;
+            }
+
+            // Otherwise this lineItem does not match the itemIdentifier at all.
+            return false;
         });
     }
 }
