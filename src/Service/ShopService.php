@@ -2,15 +2,15 @@
 
 namespace Kiener\MolliePayments\Service;
 
-use Shopware\Storefront\Framework\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 
 class ShopService
 {
-    /** @var Router */
+    /** @var RouterInterface */
     private $router;
 
     public function __construct(
-        Router $router
+        RouterInterface $router
     )
     {
         $this->router = $router;
