@@ -1,6 +1,6 @@
 import template from './sw-order-user-card.html.twig';
-import MolliePaymentsOrderService from "../../../../../../core/service/api/mollie-payments-order.service";
 
+// eslint-disable-next-line no-undef
 const { Component } = Shopware;
 
 Component.override('sw-order-user-card', {
@@ -54,12 +54,13 @@ Component.override('sw-order-user-card', {
         },
 
         copyPaymentUrlToClipboard() {
+            // eslint-disable-next-line no-undef
             Shopware.Utils.dom.copyToClipboard(this.molliePaymentUrl);
             this.molliePaymentUrlCopied = true;
         },
 
         onMolliePaymentUrlProcessFinished(value) {
             this.molliePaymentUrlCopied = value;
-        }
+        },
     },
 });

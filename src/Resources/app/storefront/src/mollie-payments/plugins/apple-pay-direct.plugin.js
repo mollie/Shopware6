@@ -14,14 +14,14 @@ export default class MollieApplePayDirect extends Plugin {
      *
      */
     init() {
-        let me = this;
+        const me = this;
 
         if (!window.ApplePaySession || !window.ApplePaySession.canMakePayments()) {
             return;
         }
 
 
-        let applePayButtons = document.querySelectorAll('.js-apple-pay');
+        const applePayButtons = document.querySelectorAll('.js-apple-pay');
 
         if (applePayButtons.length <= 0) {
             return;
@@ -35,7 +35,7 @@ export default class MollieApplePayDirect extends Plugin {
 
         // verify if apple pay is even allowed
         // in our current sales channel
-        let applePayAvailablePromise = this.isApplePayAvailable(shopUrl);
+        const applePayAvailablePromise = this.isApplePayAvailable(shopUrl);
 
         applePayAvailablePromise.then(function (data) {
 
@@ -47,7 +47,7 @@ export default class MollieApplePayDirect extends Plugin {
                 // Remove display none
                 button.classList.remove('d-none');
                 // remove previous handlers (just in case)
-                button.removeEventListener("click", me.onButtonClick.bind(me));
+                button.removeEventListener('click', me.onButtonClick.bind(me));
                 // add click event handlers
                 button.addEventListener('click', me.onButtonClick.bind(me));
             });
@@ -80,16 +80,16 @@ export default class MollieApplePayDirect extends Plugin {
 
         event.preventDefault();
 
-        let me = this;
+        const me = this;
 
         const button = event.target;
         const form = button.parentNode;
 
         const shopUrl = me.getShopUrl(button);
 
-        let productId = form.querySelector('input[name="id"]').value;
-        let countryCode = form.querySelector('input[name="countryCode"]').value;
-        let currency = form.querySelector('input[name="currency"]').value;
+        const productId = form.querySelector('input[name="id"]').value;
+        const countryCode = form.querySelector('input[name="countryCode"]').value;
+        const currency = form.querySelector('input[name="currency"]').value;
 
         // our fallback is quantity 1
         var quantity = 1;
@@ -120,7 +120,7 @@ export default class MollieApplePayDirect extends Plugin {
                 body: JSON.stringify({
                     'id': id,
                     'quantity': quantity,
-                })
+                }),
             }
         );
     }
@@ -134,28 +134,28 @@ export default class MollieApplePayDirect extends Plugin {
      */
     createApplePaySession(country, currency, shopSlug) {
 
-        let me = this;
+        const me = this;
 
         var request = {
             countryCode: country,
             currencyCode: currency,
             requiredShippingContactFields: [
-                "name",
-                "email",
-                "postalAddress"
+                'name',
+                'email',
+                'postalAddress',
             ],
             supportedNetworks: [
                 'amex',
                 'maestro',
                 'masterCard',
                 'visa',
-                'vPay'
+                'vPay',
             ],
             merchantCapabilities: ['supports3DS', 'supportsEMV', 'supportsCredit', 'supportsDebit'],
             total: {
                 label: '',
-                amount: 0
-            }
+                amount: 0,
+            },
         };
 
         // eslint-disable-next-line no-undef
@@ -167,8 +167,8 @@ export default class MollieApplePayDirect extends Plugin {
                 {
                     method: 'POST',
                     body: JSON.stringify({
-                        validationUrl: event.validationURL
-                    })
+                        validationUrl: event.validationURL,
+                    }),
                 })
                 .then(function (response) {
                     return response.json();
@@ -195,7 +195,7 @@ export default class MollieApplePayDirect extends Plugin {
                     method: 'POST',
                     body: JSON.stringify({
                         countryCode: countryCode,
-                    })
+                    }),
                 })
                 .then(function (response) {
                     return response.json();
@@ -215,9 +215,9 @@ export default class MollieApplePayDirect extends Plugin {
                             ApplePaySession.STATUS_FAILURE,
                             [],
                             {
-                                label: "",
+                                label: '',
                                 amount: 0,
-                                pending: true
+                                pending: true,
                             },
                             []
                         );
@@ -234,8 +234,8 @@ export default class MollieApplePayDirect extends Plugin {
                 {
                     method: 'POST',
                     body: JSON.stringify({
-                        identifier: event.shippingMethod.identifier
-                    })
+                        identifier: event.shippingMethod.identifier,
+                    }),
                 })
                 .then(function (response) {
                     return response.json();
@@ -253,9 +253,9 @@ export default class MollieApplePayDirect extends Plugin {
                             // eslint-disable-next-line no-undef
                             ApplePaySession.STATUS_FAILURE,
                             {
-                                label: "",
+                                label: '',
                                 amount: 0,
-                                pending: true
+                                pending: true,
                             },
                             []
                         );
@@ -299,13 +299,13 @@ export default class MollieApplePayDirect extends Plugin {
             return $('<input>', {
                 type: 'hidden',
                 name: name,
-                value: val
+                value: val,
             });
         };
 
         $form = $('<form>', {
             action: checkoutURL,
-            method: 'POST'
+            method: 'POST',
         });
 
         // add billing data

@@ -10,14 +10,14 @@ export default class MollieCreditCardComponents extends Plugin {
     };
 
     init() {
-        let me = this;
+        const me = this;
         let componentsObject = null;
 
         // Get an existing Mollie controller element
         const mollieController = document.querySelector(this.getSelectors().mollieController);
 
         // Remove the existing Mollie controller element
-        if (!!mollieController) {
+        if (mollieController) {
             mollieController.remove();
         }
 
@@ -52,7 +52,7 @@ export default class MollieCreditCardComponents extends Plugin {
                 this.getInputFields().cardHolder,
                 this.getInputFields().cardNumber,
                 this.getInputFields().expiryDate,
-                this.getInputFields().verificationCode
+                this.getInputFields().verificationCode,
             ]
         );
 
@@ -90,16 +90,16 @@ export default class MollieCreditCardComponents extends Plugin {
                     fontSize: '14px',
                     padding: '10px 10px',
                     '::placeholder': {
-                        color: 'rgba(68, 68, 68, 0.2)'
-                    }
+                        color: 'rgba(68, 68, 68, 0.2)',
+                    },
                 },
                 valid: {
-                    color: '#090'
+                    color: '#090',
                 },
                 invalid: {
-                    backgroundColor: '#fff1f3'
-                }
-            }
+                    backgroundColor: '#fff1f3',
+                },
+            },
         };
     }
 
@@ -108,23 +108,23 @@ export default class MollieCreditCardComponents extends Plugin {
             cardHolder: {
                 name: 'cardHolder',
                 id: '#cardHolder',
-                errors: 'cardHolderError'
+                errors: 'cardHolderError',
             },
             cardNumber: {
                 name: 'cardNumber',
                 id: '#cardNumber',
-                errors: 'cardNumberError'
+                errors: 'cardNumberError',
             },
             expiryDate: {
                 name: 'expiryDate',
                 id: '#expiryDate',
-                errors: 'expiryDateError'
+                errors: 'expiryDateError',
             },
             verificationCode: {
                 name: 'verificationCode',
                 id: '#verificationCode',
-                errors: 'verificationCodeError'
-            }
+                errors: 'verificationCodeError',
+            },
         };
     }
 
@@ -132,7 +132,7 @@ export default class MollieCreditCardComponents extends Plugin {
         const creditCardRadioInput = document.querySelector(this.getSelectors().creditCardRadioInput);
         const componentsContainer = document.querySelector(this.getSelectors().componentsContainer);
 
-        if (!!componentsContainer) {
+        if (componentsContainer) {
             if (
                 creditCardRadioInput === undefined
                 || creditCardRadioInput.checked === false
@@ -145,7 +145,7 @@ export default class MollieCreditCardComponents extends Plugin {
     }
 
     createComponentsInputs(componentsObject, inputs) {
-        let me = this;
+        const me = this;
 
         inputs.forEach((element, index, arr) => {
             const component = componentsObject.createComponent(element.name, me.getDefaultProperties());
@@ -184,7 +184,7 @@ export default class MollieCreditCardComponents extends Plugin {
     disableForm() {
         const submitButton = document.querySelector(this.getSelectors().submitButton);
 
-        if (!!submitButton) {
+        if (submitButton) {
             submitButton.disabled = true;
         }
     }
@@ -192,7 +192,7 @@ export default class MollieCreditCardComponents extends Plugin {
     enableForm() {
         const submitButton = document.querySelector(this.getSelectors().submitButton);
 
-        if (!!submitButton) {
+        if (submitButton) {
             submitButton.disabled = false;
         }
     }

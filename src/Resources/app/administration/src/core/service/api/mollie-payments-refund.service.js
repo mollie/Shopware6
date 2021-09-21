@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 const ApiService = Shopware.Classes.ApiService;
 
 class MolliePaymentsRefundService extends ApiService {
@@ -11,7 +12,7 @@ class MolliePaymentsRefundService extends ApiService {
                 `_action/${this.getApiBasePath()}/refund${endpoint}`,
                 JSON.stringify(data),
                 {
-                    headers: this.getBasicHeaders(headers)
+                    headers: this.getBasicHeaders(headers),
                 }
             )
             .then((response) => {
