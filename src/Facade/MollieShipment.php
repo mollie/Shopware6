@@ -9,6 +9,7 @@ use Kiener\MolliePayments\Service\MollieApi\Shipment;
 use Kiener\MolliePayments\Service\MolliePaymentExtractor;
 use Kiener\MolliePayments\Service\OrderDeliveryService;
 use Kiener\MolliePayments\Service\OrderService;
+use Kiener\MolliePayments\Service\Transition\DeliveryTransitionServiceInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
@@ -26,6 +27,11 @@ class MollieShipment
      * @var MolliePaymentExtractor
      */
     private $extractor;
+
+    /**
+     * @var DeliveryTransitionServiceInterface
+     */
+    private $deliveryTransitionService;
 
     /**
      * @var Order
@@ -53,15 +59,17 @@ class MollieShipment
     private $logger;
 
     public function __construct(
-        MolliePaymentExtractor $extractor,
-        Order                  $mollieApiOrderService,
-        Shipment               $mollieApiShipmentService,
-        OrderDeliveryService   $orderDeliveryService,
-        OrderService           $orderService,
-        LoggerService          $logger
+        MolliePaymentExtractor             $extractor,
+        DeliveryTransitionServiceInterface $deliveryTransitionService,
+        Order                              $mollieApiOrderService,
+        Shipment                           $mollieApiShipmentService,
+        OrderDeliveryService               $orderDeliveryService,
+        OrderService                       $orderService,
+        LoggerService                      $logger
     )
     {
         $this->extractor = $extractor;
+        $this->deliveryTransitionService = $deliveryTransitionService;
         $this->mollieApiOrderService = $mollieApiOrderService;
         $this->mollieApiShipmentService = $mollieApiShipmentService;
         $this->orderDeliveryService = $orderDeliveryService;
@@ -148,7 +156,13 @@ class MollieShipment
 
         $mollieOrderId = $this->orderService->getMollieOrderId($order);
 
-        return $this->mollieApiShipmentService->shipOrder($mollieOrderId, $order->getSalesChannelId());
+        $shipment = $this->mollieApiShipmentService->shipOrder($mollieOrderId, $order->getSalesChannelId());
+
+        $delivery = $order->getDeliveries()->first();
+
+        $this->deliveryTransitionService->shipDelivery($delivery, $context);
+
+        return $shipment;
     }
 
     public function shipItem(string $orderNumber, string $itemIdentifier, int $quantity, Context $context)
@@ -167,7 +181,10 @@ class MollieShipment
             throw new \Exception('Too many lineItems found, please specify a more specific identifier.');
         }
 
-        $mollieOrderLineId = $this->orderService->getMollieOrderLineId($lineItems->first());
+        $lineItem = $lineItems->first();
+        unset($lineItems);
+
+        $mollieOrderLineId = $this->orderService->getMollieOrderLineId($lineItem);
 
         if ($quantity == 0) {
             // TODO determine quantity
@@ -213,7 +230,7 @@ class MollieShipment
                 return true;
             }
 
-            // Otherwise this lineItem does not match the itemIdentifier at all.
+            // Otherwise, this lineItem does not match the itemIdentifier at all.
             return false;
         });
     }
