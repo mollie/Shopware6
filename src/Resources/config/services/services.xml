@@ -21,6 +21,11 @@
             <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransitionService"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Service\Transition\DeliveryTransitionService">
+            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransitionService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
+        </service>
+
         <service id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService">
             <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransitionService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
