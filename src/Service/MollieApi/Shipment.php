@@ -3,34 +3,33 @@
 namespace Kiener\MolliePayments\Service\MollieApi;
 
 use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeShippedException;
-use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Shipment as MollieShipment;
+use Mollie\Api\Resources\ShipmentCollection;
+use Shopware\Core\Framework\Context;
 
 class Shipment
 {
     /**
-     * @var MollieApiFactory
+     * @var Order
      */
-    private $clientFactory;
+    private $orderApiService;
 
     public function __construct(
-        MollieApiFactory $clientFactory
+        Order $orderApiService
     )
     {
-        $this->clientFactory = $clientFactory;
+        $this->orderApiService = $orderApiService;
     }
 
     public function shipOrder(
         string $mollieOrderId,
-        string $salesChannelId
+        string $salesChannelId,
+        Context $context
     ): MollieShipment
     {
         try {
-            $apiClient = $this->clientFactory->getClient($salesChannelId);
-
-            $mollieOrder = $apiClient->orders->get($mollieOrderId);
-
+            $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId, $context);
             return $mollieOrder->shipAll();
         } catch (ApiException $e) {
             throw new MollieOrderCouldNotBeShippedException(
@@ -47,13 +46,11 @@ class Shipment
         string $mollieOrderId,
         string $salesChannelId,
         string $mollieOrderLineId,
-        int    $quantity
+        int    $quantity,
+        Context $context
     ): MollieShipment
     {
         try {
-            $apiClient = $this->clientFactory->getClient($salesChannelId);
-            $mollieOrder = $apiClient->orders->get($mollieOrderId);
-
             $options = [
                 'lines' => [
                     [
@@ -63,6 +60,7 @@ class Shipment
                 ]
             ];
 
+            $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId, $context);
             return $mollieOrder->shipAll($options);
         } catch (ApiException $e) {
             throw new MollieOrderCouldNotBeShippedException(
