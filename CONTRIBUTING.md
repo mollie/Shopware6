@@ -196,11 +196,11 @@ make csfix
 ## Starts the PHPStan Analyzer
 make stan
 
-## Starts the Jest Unit Tests
-make jest
-
-## Starts the ESLint Analyzer
+## Starts the ESLint Analyzer Javacscript
 make eslint
+
+## Starts the Stylelint Analyzer for SCSS
+make stylelint
 ```
 
 
@@ -210,9 +210,9 @@ make eslint
 
 Testing is a must-have for us!
 
-We have provided 2 tools for you.
+We have provided 3 tools for you.
 
-There's a setup for `PHPUnit Tests` as well as a very easy `Cypress E2E Test Suite` that you can just run locally.
+There's a setup for `PHPUnit Tests`, `Jest Javascript Tests`, as well as a very easy `Cypress E2E Test Suite` that you can just run locally.
 
 
 
