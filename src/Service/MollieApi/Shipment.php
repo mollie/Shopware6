@@ -15,16 +15,59 @@ class Shipment
      */
     private $orderApiService;
 
-    public function __construct(
-        Order $orderApiService
-    )
+    public function __construct(Order $orderApiService)
     {
         $this->orderApiService = $orderApiService;
     }
 
+    public function getShipments(
+        string  $mollieOrderId,
+        string  $salesChannelId,
+        Context $context
+    ): ShipmentCollection
+    {
+        $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId, $context, ['embed' => 'shipments']);
+        return $mollieOrder->shipments();
+    }
+
+    public function getShipmentsForLineItem(
+        string  $mollieOrderId,
+        string  $mollieOrderLineId,
+        string  $salesChannelId,
+        Context $context
+    ): ShipmentCollection
+    {
+        $shipments = $this->getShipments($mollieOrderId, $salesChannelId, $context);
+        $filteredShipments = new ShipmentCollection(0, $shipments->_links);
+
+        /** @var MollieShipment $shipment */
+        foreach ($shipments as $shipment) {
+            foreach ($shipment->lines() as $line) {
+                if ($line->id === $mollieOrderLineId) {
+                    $filteredShipments[] = $shipment;
+                    $filteredShipments->count += 1;
+                    break;
+                }
+            }
+        }
+
+        return $filteredShipments;
+    }
+
+    public function getShipment(
+        string  $mollieOrderId,
+        string  $mollieShipmentId,
+        string  $salesChannelId,
+        Context $context
+    ): MollieShipment
+    {
+        $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId, $context);
+        return $mollieOrder->getShipment($mollieShipmentId);
+    }
+
     public function shipOrder(
-        string $mollieOrderId,
-        string $salesChannelId,
+        string  $mollieOrderId,
+        string  $salesChannelId,
         Context $context
     ): MollieShipment
     {
@@ -43,10 +86,10 @@ class Shipment
     }
 
     public function shipItem(
-        string $mollieOrderId,
-        string $salesChannelId,
-        string $mollieOrderLineId,
-        int    $quantity,
+        string  $mollieOrderId,
+        string  $salesChannelId,
+        string  $mollieOrderLineId,
+        int     $quantity,
         Context $context
     ): MollieShipment
     {
