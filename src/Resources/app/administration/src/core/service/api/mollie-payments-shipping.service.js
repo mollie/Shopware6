@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 const ApiService = Shopware.Classes.ApiService;
 
 class MolliePaymentsShippingService extends ApiService {
@@ -13,7 +14,7 @@ class MolliePaymentsShippingService extends ApiService {
                 `_action/${this.getApiBasePath()}/ship`,
                 JSON.stringify(data),
                 {
-                    headers: headers
+                    headers: headers,
                 }
             )
             .then((response) => {
@@ -29,7 +30,7 @@ class MolliePaymentsShippingService extends ApiService {
                 `_action/${this.getApiBasePath()}/ship/total`,
                 JSON.stringify(data),
                 {
-                    headers: headers
+                    headers: headers,
                 }
             )
             .then((response) => {

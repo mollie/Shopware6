@@ -58,9 +58,9 @@ export default class MollieIDealIssuer extends Plugin {
         this._issuersDropdown = document.querySelector('#iDealIssuer');
 
         // Shopware < 6.4
-        let oldPaymentForm = document.querySelector('#confirmPaymentForm');
+        const oldPaymentForm = document.querySelector('#confirmPaymentForm');
         // Shopware >= 6.4
-        let newPaymentForm = document.querySelector('#changePaymentForm');
+        const newPaymentForm = document.querySelector('#changePaymentForm');
 
         if (newPaymentForm) {
             this._paymentForm = newPaymentForm;
@@ -114,7 +114,7 @@ export default class MollieIDealIssuer extends Plugin {
 
             const submitButton = paymentForm.querySelector('button[type="submit"]');
 
-            submitButton.addEventListener("click", async () => {
+            submitButton.addEventListener('click', async () => {
                 this.updateIssuer(shopUrl, customerId, iDealRadioInput, issuersDropdown, function () {
                 });
             });
@@ -130,7 +130,7 @@ export default class MollieIDealIssuer extends Plugin {
         } else {
             container.classList.remove('d-none');
         }
-    };
+    }
 
     /**
      *
@@ -172,7 +172,7 @@ export default class MollieIDealIssuer extends Plugin {
         fetch(
             fetchUrl,
             {
-                headers: {'Content-Type': 'application/json; charset=utf-8'}
+                headers: {'Content-Type': 'application/json; charset=utf-8'},
             })
             .then(() => {
                 onCompleted('issuer updated successfully');

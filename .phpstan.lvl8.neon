@@ -4,6 +4,8 @@ parameters:
         - ./src
         - ./src/Service/ApplePayDirect
     excludes_analyse:
+        - ./src/Resources/app/administration/node_modules/*
+        - ./src/Resources/app/storefront/node_modules/*
         - ./src/Controller/*
         - ./src/Handler/*
         - ./src/Helper/*

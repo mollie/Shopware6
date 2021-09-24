@@ -1,12 +1,13 @@
 import template from './sw-order-detail-base.html.twig';
 
+// eslint-disable-next-line no-undef
 const {Component, Mixin} = Shopware;
 
 Component.override('sw-order-detail-base', {
     template,
 
     mixins: [
-        Mixin.getByName('notification')
+        Mixin.getByName('notification'),
     ],
 
     data() {
@@ -34,7 +35,7 @@ Component.override('sw-order-detail-base', {
     watch: {
         order() {
             this.getMollieData();
-        }
+        },
     },
 
     methods: {
@@ -48,7 +49,7 @@ Component.override('sw-order-detail-base', {
                     })
                     .catch((response) => {
                         this.createNotificationError({
-                            message: response.message
+                            message: response.message,
                         });
                     });
 
@@ -74,10 +75,10 @@ Component.override('sw-order-detail-base', {
                     })
                     .catch((response) => {
                         this.createNotificationError({
-                            message: response.message
+                            message: response.message,
                         });
                     });
             }
-        }
-    }
+        },
+    },
 });

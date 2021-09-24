@@ -1,5 +1,6 @@
 import template from './sw-customer-base-info.html.twig';
 
+// eslint-disable-next-line no-undef
 const { Component } = Shopware;
 
 Component.override('sw-customer-base-info', {
@@ -17,6 +18,6 @@ Component.override('sw-customer-base-info', {
             }
 
             return null;
-        }
-    }
+        },
+    },
 });
