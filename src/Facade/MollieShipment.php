@@ -59,13 +59,13 @@ class MollieShipment
     private $logger;
 
     public function __construct(
-        MolliePaymentExtractor             $extractor,
+        MolliePaymentExtractor $extractor,
         DeliveryTransitionServiceInterface $deliveryTransitionService,
-        Order                              $mollieApiOrderService,
-        Shipment                           $mollieApiShipmentService,
-        OrderDeliveryService               $orderDeliveryService,
-        OrderService                       $orderService,
-        LoggerService                      $logger
+        Order $mollieApiOrderService,
+        Shipment $mollieApiShipmentService,
+        OrderDeliveryService $orderDeliveryService,
+        OrderService $orderService,
+        LoggerService $logger
     )
     {
         $this->extractor = $extractor;
@@ -156,7 +156,7 @@ class MollieShipment
 
         $mollieOrderId = $this->orderService->getMollieOrderId($order);
 
-        $shipment = $this->mollieApiShipmentService->shipOrder($mollieOrderId, $order->getSalesChannelId());
+        $shipment = $this->mollieApiShipmentService->shipOrder($mollieOrderId, $order->getSalesChannelId(), $context);
 
         $delivery = $order->getDeliveries()->first();
 
@@ -173,6 +173,7 @@ class MollieShipment
 
         $lineItems = $this->searchLineItem($order, $itemIdentifier);
 
+        //TODO Refactor exceptions
         if ($lineItems->count() < 1) {
             throw new \Exception('Could not find lineItem');
         }
@@ -186,11 +187,33 @@ class MollieShipment
 
         $mollieOrderLineId = $this->orderService->getMollieOrderLineId($lineItem);
 
-        if ($quantity == 0) {
-            // TODO determine quantity
+        if ($quantity === 0) {
+            $quantity = $lineItem->getQuantity();
+            $shipments = $this->mollieApiShipmentService->getShipmentsForLineItem(
+                $mollieOrderId,
+                $mollieOrderLineId,
+                $order->getSalesChannelId(),
+                $context
+            );
+
+            /** @var \Mollie\Api\Resources\Shipment $shipment */
+            foreach ($shipments as $shipment) {
+                foreach ($shipment->lines() as $shipmentLineItem) {
+                    if ($shipmentLineItem->id === $mollieOrderLineId) {
+                        $quantity -= $shipmentLineItem->quantity;
+                        break;
+                    }
+                }
+            }
         }
 
-        $this->mollieApiShipmentService->shipItem($mollieOrderId, $order->getSalesChannelId(), $mollieOrderLineId, $quantity);
+        return $this->mollieApiShipmentService->shipItem(
+            $mollieOrderId,
+            $order->getSalesChannelId(),
+            $mollieOrderLineId,
+            $quantity,
+            $context
+        );
     }
 
     public function searchLineItem(OrderEntity $order, string $itemIdentifier): OrderLineItemCollection

@@ -81,12 +81,12 @@ class ShippingController extends AbstractController
      * @param SettingsService $settingsService
      */
     public function __construct(
-        MollieApiFactory          $apiFactory,
+        MollieApiFactory $apiFactory,
         EntityRepositoryInterface $orderLineItemRepository,
-        OrderService              $orderService,
-        SettingsService           $settingsService,
+        OrderService $orderService,
+        SettingsService $settingsService,
 
-        MollieShipment            $shipmentFacade
+        MollieShipment $shipmentFacade
     )
     {
         $this->apiFactory = $apiFactory;
@@ -146,8 +146,8 @@ class ShippingController extends AbstractController
 
         $quantity = $query->get('quantity', 0);
 
-        $this->shipmentFacade->shipItem($orderNumber, $itemIdentifier, $quantity, $context);
-        dd($quantity);
+        $shipment = $this->shipmentFacade->shipItem($orderNumber, $itemIdentifier, $quantity, $context);
+        dd($shipment);
     }
 
 

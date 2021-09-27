@@ -15,14 +15,17 @@ class Shipment
      */
     private $orderApiService;
 
+    /**
+     * @param Order $orderApiService
+     */
     public function __construct(Order $orderApiService)
     {
         $this->orderApiService = $orderApiService;
     }
 
     public function getShipments(
-        string  $mollieOrderId,
-        string  $salesChannelId,
+        string $mollieOrderId,
+        string $salesChannelId,
         Context $context
     ): ShipmentCollection
     {
@@ -30,10 +33,17 @@ class Shipment
         return $mollieOrder->shipments();
     }
 
+    /**
+     * @param string $mollieOrderId
+     * @param string $mollieOrderLineId
+     * @param string $salesChannelId
+     * @param Context $context
+     * @return ShipmentCollection
+     */
     public function getShipmentsForLineItem(
-        string  $mollieOrderId,
-        string  $mollieOrderLineId,
-        string  $salesChannelId,
+        string $mollieOrderId,
+        string $mollieOrderLineId,
+        string $salesChannelId,
         Context $context
     ): ShipmentCollection
     {
@@ -54,10 +64,17 @@ class Shipment
         return $filteredShipments;
     }
 
+    /**
+     * @param string $mollieOrderId
+     * @param string $mollieShipmentId
+     * @param string $salesChannelId
+     * @param Context $context
+     * @return MollieShipment
+     */
     public function getShipment(
-        string  $mollieOrderId,
-        string  $mollieShipmentId,
-        string  $salesChannelId,
+        string $mollieOrderId,
+        string $mollieShipmentId,
+        string $salesChannelId,
         Context $context
     ): MollieShipment
     {
@@ -65,9 +82,15 @@ class Shipment
         return $mollieOrder->getShipment($mollieShipmentId);
     }
 
+    /**
+     * @param string $mollieOrderId
+     * @param string $salesChannelId
+     * @param Context $context
+     * @return MollieShipment
+     */
     public function shipOrder(
-        string  $mollieOrderId,
-        string  $salesChannelId,
+        string $mollieOrderId,
+        string $salesChannelId,
         Context $context
     ): MollieShipment
     {
@@ -85,11 +108,19 @@ class Shipment
         }
     }
 
+    /**
+     * @param string $mollieOrderId
+     * @param string $salesChannelId
+     * @param string $mollieOrderLineId
+     * @param int $quantity
+     * @param Context $context
+     * @return MollieShipment
+     */
     public function shipItem(
-        string  $mollieOrderId,
-        string  $salesChannelId,
-        string  $mollieOrderLineId,
-        int     $quantity,
+        string $mollieOrderId,
+        string $salesChannelId,
+        string $mollieOrderLineId,
+        int $quantity,
         Context $context
     ): MollieShipment
     {
@@ -104,7 +135,7 @@ class Shipment
             ];
 
             $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId, $context);
-            return $mollieOrder->shipAll($options);
+            return $mollieOrder->createShipment($options);
         } catch (ApiException $e) {
             throw new MollieOrderCouldNotBeShippedException(
                 $mollieOrderId,
