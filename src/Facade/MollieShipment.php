@@ -196,13 +196,22 @@ class MollieShipment
             )->shippableQuantity;
         }
 
-        return $this->mollieApiShipmentService->shipItem(
+        $shipment = $this->mollieApiShipmentService->shipItem(
             $mollieOrderId,
             $order->getSalesChannelId(),
             $mollieOrderLineId,
             $quantity,
             $context
         );
+
+        $delivery = $order->getDeliveries()->first();
+        if($this->mollieApiOrderService->isCompletelyShipped($mollieOrderId, $order->getSalesChannelId(), $context)) {
+            $this->deliveryTransitionService->shipDelivery($delivery, $context);
+        } else {
+            $this->deliveryTransitionService->partialShipDelivery($delivery, $context);
+        }
+
+        return $shipment;
     }
 
     public function searchLineItem(OrderEntity $order, string $itemIdentifier): OrderLineItemCollection
