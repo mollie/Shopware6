@@ -14,6 +14,7 @@ use Mollie\Api\Resources\Order as MollieOrder;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\PaymentCollection;
+use Mollie\Api\Types\OrderLineType;
 use Mollie\Api\Types\PaymentStatus;
 use Monolog\Logger;
 use RuntimeException;
@@ -219,6 +220,26 @@ class Order
         }
 
         return false;
+    }
+
+
+    public function isCompletelyShipped(string $mollieOrderId, string $salesChannelId, Context $context): bool
+    {
+        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId, $context);
+
+        /** @var OrderLine $mollieOrderLine */
+        foreach ($mollieOrder->lines() as $mollieOrderLine) {
+            if ($mollieOrderLine->shippableQuantity > 0 &&
+                in_array($mollieOrderLine->type, [
+                    OrderLineType::TYPE_PHYSICAL,
+                    OrderLineType::TYPE_DIGITAL,
+                    OrderLineType::TYPE_DISCOUNT,
+                ])) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
