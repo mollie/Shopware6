@@ -124,11 +124,10 @@ class ShippingController extends AbstractController
      * @Route("/api/mollie/ship/item",
      *         defaults={"auth_enabled"=true}, name="api.mollie.ship.item", methods={"GET"})
      *
-     * @param Request $request
-     *
+     * @param QueryDataBag $query
+     * @param Context $context
      * @return JsonResponse
-     * @throws ApiException
-     * @throws IncompatiblePlatform
+     * @throws \Exception
      */
     public function shipItem(QueryDataBag $query, Context $context): JsonResponse
     {
@@ -144,14 +143,11 @@ class ShippingController extends AbstractController
             throw new \InvalidArgumentException('Missing Argument for Item identifier!');
         }
 
-        $quantity = $query->get('quantity', 0);
+        $quantity = $query->getInt('quantity');
 
         $shipment = $this->shipmentFacade->shipItem($orderNumber, $itemIdentifier, $quantity, $context);
         dd($shipment);
     }
-
-
-
 
     /**
      * TODO Refactor Administration routes
