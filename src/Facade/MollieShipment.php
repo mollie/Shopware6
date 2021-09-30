@@ -150,7 +150,7 @@ class MollieShipment
         return $addedMollieShipment;
     }
 
-    public function shipOrder(string $orderNumber, Context $context)
+    public function shipOrder(string $orderNumber, Context $context): \Mollie\Api\Resources\Shipment
     {
         $order = $this->orderService->getOrderByNumber($orderNumber, $context);
 
@@ -165,7 +165,7 @@ class MollieShipment
         return $shipment;
     }
 
-    public function shipItem(string $orderNumber, string $itemIdentifier, int $quantity, Context $context)
+    public function shipItem(string $orderNumber, string $itemIdentifier, int $quantity, Context $context): \Mollie\Api\Resources\Shipment
     {
         $order = $this->orderService->getOrderByNumber($orderNumber, $context);
 
