@@ -75,6 +75,16 @@ class Order
         }
     }
 
+    public function getMollieOrderLine(
+        string $mollieOrderId,
+        string $mollieOrderLineId,
+        string $salesChannelId,
+        Context $context
+    ): OrderLine
+    {
+        return $this->getMollieOrder($mollieOrderId, $salesChannelId, $context)->lines()->get($mollieOrderLineId);
+    }
+
     public function createOrder(array $orderData, string $orderSalesChannelContextId, SalesChannelContext $salesChannelContext): MollieOrder
     {
         $apiClient = $this->clientFactory->getClient($orderSalesChannelContextId);
