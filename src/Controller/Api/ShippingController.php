@@ -5,12 +5,16 @@ namespace Kiener\MolliePayments\Controller\Api;
 use Kiener\MolliePayments\Facade\MollieShipment;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\CustomFieldService;
+use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Exceptions\IncompatiblePlatform;
 use Mollie\Api\MollieApiClient;
+use Mollie\Api\Resources\OrderLine;
+use Mollie\Api\Resources\Shipment;
+use Monolog\Logger;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
@@ -73,6 +77,11 @@ class ShippingController extends AbstractController
     private $settingsService;
 
     /**
+     * @var LoggerService
+     */
+    private $logger;
+
+    /**
      * Creates a new instance of the onboarding controller.
      *
      * @param MollieApiFactory $apiFactory
@@ -86,7 +95,8 @@ class ShippingController extends AbstractController
         OrderService $orderService,
         SettingsService $settingsService,
 
-        MollieShipment $shipmentFacade
+        MollieShipment $shipmentFacade,
+        LoggerService $logger
     )
     {
         $this->apiFactory = $apiFactory;
@@ -95,6 +105,7 @@ class ShippingController extends AbstractController
         $this->settingsService = $settingsService;
 
         $this->shipmentFacade = $shipmentFacade;
+        $this->logger = $logger;
     }
 
     /**
@@ -119,6 +130,18 @@ class ShippingController extends AbstractController
 
             return $this->shipmentToJson($shipment);
         } catch (\Exception $e) {
+            $this->logger->addEntry(
+                $e->getMessage(),
+                $context,
+                $e,
+                [
+                    'orderNumber' => $orderNumber
+                ],
+                Logger::ERROR
+            );
+            return $this->json([
+                'message' => $e->getMessage()
+            ], 400);
         }
     }
 
@@ -153,6 +176,20 @@ class ShippingController extends AbstractController
 
             return $this->shipmentToJson($shipment);
         } catch (\Exception $e) {
+            $this->logger->addEntry(
+                $e->getMessage(),
+                $context,
+                $e,
+                [
+                    'orderNumber' => $orderNumber,
+                    'item' => $itemIdentifier,
+                    'quantity' => $quantity
+                ],
+                Logger::ERROR
+            );
+            return $this->json([
+                'message' => $e->getMessage()
+            ], 400);
         }
     }
 
