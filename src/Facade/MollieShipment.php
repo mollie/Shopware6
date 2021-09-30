@@ -188,23 +188,12 @@ class MollieShipment
         $mollieOrderLineId = $this->orderService->getMollieOrderLineId($lineItem);
 
         if ($quantity === 0) {
-            $quantity = $lineItem->getQuantity();
-            $shipments = $this->mollieApiShipmentService->getShipmentsForLineItem(
+            $quantity = $this->mollieApiOrderService->getMollieOrderLine(
                 $mollieOrderId,
                 $mollieOrderLineId,
                 $order->getSalesChannelId(),
                 $context
-            );
-
-            /** @var \Mollie\Api\Resources\Shipment $shipment */
-            foreach ($shipments as $shipment) {
-                foreach ($shipment->lines() as $shipmentLineItem) {
-                    if ($shipmentLineItem->id === $mollieOrderLineId) {
-                        $quantity -= $shipmentLineItem->quantity;
-                        break;
-                    }
-                }
-            }
+            )->shippableQuantity;
         }
 
         return $this->mollieApiShipmentService->shipItem(
