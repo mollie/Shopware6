@@ -114,9 +114,12 @@ class ShippingController extends AbstractController
             throw new \InvalidArgumentException('Missing Argument for Order Number!');
         }
 
-        $shipment = $this->shipmentFacade->shipOrder($orderNumber, $context);
+        try {
+            $shipment = $this->shipmentFacade->shipOrder($orderNumber, $context);
 
-        dd($shipment);
+            return $this->shipmentToJson($shipment);
+        } catch (\Exception $e) {
+        }
     }
 
     /**
@@ -145,8 +148,43 @@ class ShippingController extends AbstractController
 
         $quantity = $query->getInt('quantity');
 
-        $shipment = $this->shipmentFacade->shipItem($orderNumber, $itemIdentifier, $quantity, $context);
-        dd($shipment);
+        try {
+            $shipment = $this->shipmentFacade->shipItem($orderNumber, $itemIdentifier, $quantity, $context);
+
+            return $this->shipmentToJson($shipment);
+        } catch (\Exception $e) {
+        }
+    }
+
+
+    public function shipmentToJson(Shipment $shipment): JsonResponse
+    {
+        $lines = [];
+        /** @var OrderLine $orderLine */
+        foreach ($shipment->lines() as $orderLine) {
+            $lines[] = [
+                'id' => $orderLine->id,
+                'orderId' => $orderLine->orderId,
+                'name' => $orderLine->name,
+                'sku' => $orderLine->sku,
+                'type' => $orderLine->type,
+                'status' => $orderLine->status,
+                'quantity' => $orderLine->quantity,
+                'unitPrice' => $orderLine->unitPrice,
+                'vatRate' => $orderLine->vatRate,
+                'vatAmount' => $orderLine->vatAmount,
+                'totalAmount' => $orderLine->totalAmount,
+                'createdAt' => $orderLine->createdAt
+            ];
+        }
+
+        return $this->json([
+            'id' => $shipment->id,
+            'orderId' => $shipment->orderId,
+            'createdAt' => $shipment->createdAt,
+            'lines' => $lines,
+            'tracking' => $shipment->tracking
+        ]);
     }
 
     /**
