@@ -234,6 +234,7 @@ class Order
                     OrderLineType::TYPE_PHYSICAL,
                     OrderLineType::TYPE_DIGITAL,
                     OrderLineType::TYPE_DISCOUNT,
+                    OrderLineType::TYPE_STORE_CREDIT,
                 ])) {
                 return false;
             }
