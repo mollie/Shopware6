@@ -119,29 +119,22 @@ class ShippingController extends AbstractController
      */
     public function shipOrder(QueryDataBag $query, Context $context): JsonResponse
     {
-        $orderNumber = $query->get('number');
-
-        if ($orderNumber === null) {
-            throw new \InvalidArgumentException('Missing Argument for Order Number!');
-        }
-
         try {
+            $orderNumber = $query->get('number');
+
+            if ($orderNumber === null) {
+                throw new \InvalidArgumentException('Missing Argument for Order Number!');
+            }
+
             $shipment = $this->shipmentFacade->shipOrder($orderNumber, $context);
 
             return $this->shipmentToJson($shipment);
         } catch (\Exception $e) {
-            $this->logger->addEntry(
-                $e->getMessage(),
-                $context,
-                $e,
-                [
-                    'orderNumber' => $orderNumber
-                ],
-                Logger::ERROR
-            );
-            return $this->json([
-                'message' => $e->getMessage()
-            ], 400);
+            $data = [
+                'orderNumber' => $orderNumber
+            ];
+
+            return $this->exceptionToJson($e, $context, $data);
         }
     }
 
@@ -157,44 +150,34 @@ class ShippingController extends AbstractController
      */
     public function shipItem(QueryDataBag $query, Context $context): JsonResponse
     {
-        $orderNumber = $query->get('order');
-
-        if ($orderNumber === null) {
-            throw new \InvalidArgumentException('Missing Argument for Order Number!');
-        }
-
-        $itemIdentifier = $query->get('item');
-
-        if ($itemIdentifier === null) {
-            throw new \InvalidArgumentException('Missing Argument for Item identifier!');
-        }
-
-        $quantity = $query->getInt('quantity');
-
         try {
+            $orderNumber = $query->get('order');
+            $itemIdentifier = $query->get('item');
+            $quantity = $query->getInt('quantity');
+
+            if ($orderNumber === null) {
+                throw new \InvalidArgumentException('Missing Argument for Order Number!');
+            }
+
+            if ($itemIdentifier === null) {
+                throw new \InvalidArgumentException('Missing Argument for Item identifier!');
+            }
+
             $shipment = $this->shipmentFacade->shipItem($orderNumber, $itemIdentifier, $quantity, $context);
 
             return $this->shipmentToJson($shipment);
         } catch (\Exception $e) {
-            $this->logger->addEntry(
-                $e->getMessage(),
-                $context,
-                $e,
-                [
-                    'orderNumber' => $orderNumber,
-                    'item' => $itemIdentifier,
-                    'quantity' => $quantity
-                ],
-                Logger::ERROR
-            );
-            return $this->json([
-                'message' => $e->getMessage()
-            ], 400);
+            $data = [
+                'orderNumber' => $orderNumber,
+                'item' => $itemIdentifier,
+                'quantity' => $quantity
+            ];
+
+            return $this->exceptionToJson($e, $context, $data);
         }
     }
 
-
-    public function shipmentToJson(Shipment $shipment): JsonResponse
+    private function shipmentToJson(Shipment $shipment): JsonResponse
     {
         $lines = [];
         /** @var OrderLine $orderLine */
@@ -222,6 +205,23 @@ class ShippingController extends AbstractController
             'lines' => $lines,
             'tracking' => $shipment->tracking
         ]);
+    }
+
+    private function exceptionToJson(\Exception $e, Context $context, array $additionalData = []): JsonResponse
+    {
+        $this->logger->addEntry(
+            $e->getMessage(),
+            $context,
+            $e,
+            $additionalData,
+            Logger::ERROR
+        );
+
+        return $this->json([
+            'error' => get_class($e),
+            'message' => $e->getMessage(),
+            'data' => $additionalData
+        ], 400);
     }
 
     /**
