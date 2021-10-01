@@ -35,55 +35,6 @@ class Shipment
 
     /**
      * @param string $mollieOrderId
-     * @param string $mollieOrderLineId
-     * @param string $salesChannelId
-     * @param Context $context
-     * @return ShipmentCollection
-     */
-    public function getShipmentsForLineItem(
-        string $mollieOrderId,
-        string $mollieOrderLineId,
-        string $salesChannelId,
-        Context $context
-    ): ShipmentCollection
-    {
-        $shipments = $this->getShipments($mollieOrderId, $salesChannelId, $context);
-        $filteredShipments = new ShipmentCollection(0, $shipments->_links);
-
-        /** @var MollieShipment $shipment */
-        foreach ($shipments as $shipment) {
-            foreach ($shipment->lines() as $line) {
-                if ($line->id === $mollieOrderLineId) {
-                    $filteredShipments[] = $shipment;
-                    $filteredShipments->count += 1;
-                    break;
-                }
-            }
-        }
-
-        return $filteredShipments;
-    }
-
-    /**
-     * @param string $mollieOrderId
-     * @param string $mollieShipmentId
-     * @param string $salesChannelId
-     * @param Context $context
-     * @return MollieShipment
-     */
-    public function getShipment(
-        string $mollieOrderId,
-        string $mollieShipmentId,
-        string $salesChannelId,
-        Context $context
-    ): MollieShipment
-    {
-        $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId, $context);
-        return $mollieOrder->getShipment($mollieShipmentId);
-    }
-
-    /**
-     * @param string $mollieOrderId
      * @param string $salesChannelId
      * @param Context $context
      * @return MollieShipment
