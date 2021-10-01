@@ -2,6 +2,8 @@
 
 namespace Kiener\MolliePayments\Facade;
 
+use Kiener\MolliePayments\Exception\OrderLineItemFoundManyException;
+use Kiener\MolliePayments\Exception\OrderLineItemNotFoundException;
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\MollieApi\Order;
@@ -173,13 +175,12 @@ class MollieShipment
 
         $lineItems = $this->searchLineItem($order, $itemIdentifier);
 
-        //TODO Refactor exceptions
         if ($lineItems->count() < 1) {
-            throw new \Exception('Could not find lineItem');
+            throw new OrderLineItemNotFoundException($itemIdentifier);
         }
 
         if ($lineItems->count() > 1) {
-            throw new \Exception('Too many lineItems found, please specify a more specific identifier.');
+            throw new OrderLineItemFoundManyException($itemIdentifier);
         }
 
         $lineItem = $lineItems->first();
