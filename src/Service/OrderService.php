@@ -8,6 +8,7 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Checkout\Order\SalesChannel\OrderService as ShopwareOrderService;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -23,12 +24,7 @@ class OrderService
     protected $orderRepository;
 
     /**
-     * @var EntityRepositoryInterface
-     */
-    protected $orderLineItemRepository;
-
-    /**
-     * @var \Shopware\Core\Checkout\Order\SalesChannel\OrderService
+     * @var ShopwareOrderService
      */
     private $swOrderService;
 
@@ -39,36 +35,18 @@ class OrderService
 
     /**
      * @param EntityRepositoryInterface $orderRepository
-     * @param EntityRepositoryInterface $orderLineItemRepository
-     * @param \Shopware\Core\Checkout\Order\SalesChannel\OrderService $swOrderService
+     * @param ShopwareOrderService $swOrderService
      * @param LoggerInterface $logger
      */
-    public function __construct(EntityRepositoryInterface $orderRepository, EntityRepositoryInterface $orderLineItemRepository, \Shopware\Core\Checkout\Order\SalesChannel\OrderService $swOrderService, LoggerInterface $logger)
+    public function __construct(
+        EntityRepositoryInterface $orderRepository,
+        ShopwareOrderService $swOrderService,
+        LoggerInterface $logger
+    )
     {
         $this->orderRepository = $orderRepository;
-        $this->orderLineItemRepository = $orderLineItemRepository;
         $this->swOrderService = $swOrderService;
         $this->logger = $logger;
-    }
-
-    /**
-     * Returns the order repository.
-     *
-     * @return EntityRepositoryInterface
-     */
-    public function getOrderRepository()
-    {
-        return $this->orderRepository;
-    }
-
-    /**
-     * Returns the order line item repository.
-     *
-     * @return EntityRepositoryInterface
-     */
-    public function getOrderLineItemRepository()
-    {
-        return $this->orderLineItemRepository;
     }
 
     /**

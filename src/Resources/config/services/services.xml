@@ -38,7 +38,6 @@
 
         <service id="Kiener\MolliePayments\Service\OrderService" class="Kiener\MolliePayments\Service\OrderService">
             <argument type="service" id="order.repository"/>
-            <argument type="service" id="order_line_item.repository"/>
             <argument type="service" id="Shopware\Core\Checkout\Order\SalesChannel\OrderService"/>
             <argument type="service" id="monolog.logger"/>
         </service>
