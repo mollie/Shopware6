@@ -6,8 +6,11 @@ use Kiener\MolliePayments\Facade\MollieShipment;
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\MollieApi\Order;
+use Kiener\MolliePayments\Service\MollieApi\Shipment;
 use Kiener\MolliePayments\Service\MolliePaymentExtractor;
 use Kiener\MolliePayments\Service\OrderDeliveryService;
+use Kiener\MolliePayments\Service\OrderService;
+use Kiener\MolliePayments\Service\Transition\DeliveryTransitionService;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
@@ -29,7 +32,22 @@ class MollieShipmentTest extends TestCase
     /**
      * @var Order|\PHPUnit\Framework\MockObject\MockObject
      */
+    private $deliveryTransitionService;
+
+    /**
+     * @var Order|\PHPUnit\Framework\MockObject\MockObject
+     */
     private $mollieApiOrderService;
+
+    /**
+     * @var Order|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $mollieApiShipmentService;
+
+    /**
+     * @var OrderService|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $orderService;
 
     /**
      * @var OrderDeliveryService|\PHPUnit\Framework\MockObject\MockObject
@@ -61,13 +79,20 @@ class MollieShipmentTest extends TestCase
         /** @var Context context */
         $this->context = $this->getMockBuilder(Context::class)->disableOriginalConstructor()->getMock();
         $this->extractor = new MolliePaymentExtractor();
+        $this->deliveryTransitionService = $this->createMock(DeliveryTransitionService::class);
         $this->mollieApiOrderService = $this->getMockBuilder(Order::class)->disableOriginalConstructor()->getMock();
+        $this->mollieApiShipmentService = $this->getMockBuilder(Shipment::class)->disableOriginalConstructor()->getMock();
         $this->orderDeliveryService = $this->getMockBuilder(OrderDeliveryService::class)->disableOriginalConstructor()->getMock();
+        $this->orderService = $this->getMockBuilder(OrderService::class)->disableOriginalConstructor()->getMock();
         $this->logger = $this->getMockBuilder(LoggerService::class)->disableOriginalConstructor()->getMock();
+
         $this->mollieShipment = new MollieShipment(
             $this->extractor,
+            $this->deliveryTransitionService,
             $this->mollieApiOrderService,
+            $this->mollieApiShipmentService,
             $this->orderDeliveryService,
+            $this->orderService,
             $this->logger
         );
         $this->orderNumber = 'fooOrderNumber';
