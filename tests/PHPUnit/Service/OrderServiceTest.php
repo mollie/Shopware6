@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Tests\Service;
 
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
+use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderLineIdException;
 use Kiener\MolliePayments\Exception\OrderNumberNotFoundException;
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Service\OrderService;
@@ -148,7 +149,7 @@ class OrderServiceTest extends TestCase
             'getCustomFields' => null
         ]);
 
-        $this->expectException(CouldNotExtractMollieOrderIdException::class);
+        $this->expectException(CouldNotExtractMollieOrderLineIdException::class);
         $this->orderService->getMollieOrderLineId($orderLineItem);
     }
 }
