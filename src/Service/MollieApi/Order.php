@@ -49,6 +49,7 @@ class Order
     /**
      * @param string $mollieOrderId
      * @param string|null $salesChannelId
+     * @param Context $context
      * @param array $parameters
      * @return MollieOrder
      * @throws CouldNotFetchMollieOrderException
@@ -76,6 +77,14 @@ class Order
         }
     }
 
+    /**
+     * @param string $mollieOrderId
+     * @param string $mollieOrderLineId
+     * @param string $salesChannelId
+     * @param Context $context
+     * @return OrderLine
+     * @throws CouldNotFetchMollieOrderException
+     */
     public function getMollieOrderLine(
         string $mollieOrderId,
         string $mollieOrderLineId,
@@ -222,7 +231,13 @@ class Order
         return false;
     }
 
-
+    /**
+     * @param string $mollieOrderId
+     * @param string $salesChannelId
+     * @param Context $context
+     * @return bool
+     * @throws CouldNotFetchMollieOrderException
+     */
     public function isCompletelyShipped(string $mollieOrderId, string $salesChannelId, Context $context): bool
     {
         $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId, $context);
@@ -246,9 +261,8 @@ class Order
     /**
      * @param string $mollieOrderId
      * @param string|null $salesChannelId
+     * @param Context $context
      * @return Payment
-     * @throws CouldNotFetchMollieOrderException
-     * @throws PaymentNotFoundException
      */
     public function getCompletedPayment(string $mollieOrderId, ?string $salesChannelId, Context $context): Payment
     {
