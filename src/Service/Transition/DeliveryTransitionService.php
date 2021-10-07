@@ -17,6 +17,11 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
      */
     private $transitionService;
 
+    /**
+     * @var LoggerService
+     */
+    private $loggerService;
+
     public function __construct(TransitionServiceInterface $transitionService, LoggerService $loggerService)
     {
         $this->transitionService = $transitionService;
@@ -66,7 +71,7 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
         $availableTransitions = $this->getAvailableTransitions($delivery, $context);
 
         if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_CANCEL, $availableTransitions)) {
-            $this->reOpenDelivery($delivery, $context);
+            $this->performTransition($delivery, StateMachineTransitionActions::ACTION_REOPEN, $context);
         }
 
         $this->performTransition($delivery, StateMachineTransitionActions::ACTION_CANCEL, $context);
@@ -85,7 +90,7 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
         $availableTransitions = $this->getAvailableTransitions($delivery, $context);
 
         if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_SHIP, $availableTransitions)) {
-            $this->reOpenDelivery($delivery, $context);
+            $this->performTransition($delivery, StateMachineTransitionActions::ACTION_REOPEN, $context);
         }
 
         $this->performTransition($delivery, StateMachineTransitionActions::ACTION_SHIP, $context);
@@ -104,7 +109,7 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
         $availableTransitions = $this->getAvailableTransitions($delivery, $context);
 
         if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_SHIP_PARTIALLY, $availableTransitions)) {
-            $this->reOpenDelivery($delivery, $context);
+            $this->performTransition($delivery, StateMachineTransitionActions::ACTION_REOPEN, $context);
         }
 
         $this->performTransition($delivery, StateMachineTransitionActions::ACTION_SHIP_PARTIALLY, $context);
@@ -123,7 +128,7 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
         $availableTransitions = $this->getAvailableTransitions($delivery, $context);
 
         if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_RETOUR, $availableTransitions)) {
-            $this->shipDelivery($delivery, $context);
+            $this->performTransition($delivery, StateMachineTransitionActions::ACTION_REOPEN, $context);
         }
 
         $this->performTransition($delivery, StateMachineTransitionActions::ACTION_RETOUR, $context);
@@ -142,7 +147,7 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
         $availableTransitions = $this->getAvailableTransitions($delivery, $context);
 
         if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_RETOUR_PARTIALLY, $availableTransitions)) {
-            $this->partialShipDelivery($delivery, $context);
+            $this->performTransition($delivery, StateMachineTransitionActions::ACTION_REOPEN, $context);
         }
 
         $this->performTransition($delivery, StateMachineTransitionActions::ACTION_RETOUR_PARTIALLY, $context);
