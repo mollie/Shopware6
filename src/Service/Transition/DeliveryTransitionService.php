@@ -129,6 +129,7 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
 
         if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_RETOUR, $availableTransitions)) {
             $this->performTransition($delivery, StateMachineTransitionActions::ACTION_REOPEN, $context);
+            $this->performTransition($delivery, StateMachineTransitionActions::ACTION_SHIP, $context);
         }
 
         $this->performTransition($delivery, StateMachineTransitionActions::ACTION_RETOUR, $context);
@@ -148,6 +149,7 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
 
         if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_RETOUR_PARTIALLY, $availableTransitions)) {
             $this->performTransition($delivery, StateMachineTransitionActions::ACTION_REOPEN, $context);
+            $this->performTransition($delivery, StateMachineTransitionActions::ACTION_SHIP, $context);
         }
 
         $this->performTransition($delivery, StateMachineTransitionActions::ACTION_RETOUR_PARTIALLY, $context);
