@@ -48,7 +48,7 @@ class DeliveryTransitionServiceTest extends TestCase
 
         $this->context = $this->createMock(Context::class);
 
-        // All possible transitions
+        // All possible transitions, current delivery state => possible actions
         $this->availableTransitions = [
             OrderDeliveryStates::STATE_OPEN => [
                 StateMachineTransitionActions::ACTION_CANCEL,
@@ -81,11 +81,234 @@ class DeliveryTransitionServiceTest extends TestCase
         ];
     }
 
+    /**
+     * Tests if the reopen transition is performed directly
+     * if the delivery is in a state at which reopen is allowed
+     * (all, except open itself.)
+     */
     public function testOpenDeliveryOnAllowedState()
     {
         $delivery = $this->createDeliveryWithState(OrderDeliveryStates::STATE_CANCELLED);
 
+        $expectedTransition = $this->createTransitionForAction(StateMachineTransitionActions::ACTION_REOPEN);
+
+        $this->stateMachineRegistry->expects($this->once())->method('getAvailableTransitions');
+        $this->stateMachineRegistry->expects($this->once())->method('transition')
+            ->with($expectedTransition, $this->context);
+
         $this->deliveryTransitionService->reOpenDelivery($delivery, $this->context);
+    }
+
+    /**
+     * Tests if no transition is performed when performing a reopen action on the delivery
+     * if the delivery is already in an open state
+     */
+    public function testOpenDeliveryOnSameState()
+    {
+        $delivery = $this->createDeliveryWithState(OrderDeliveryStates::STATE_OPEN);
+
+        $this->stateMachineRegistry->expects($this->never())->method('getAvailableTransitions');
+        $this->stateMachineRegistry->expects($this->never())->method('transition');
+
+        $this->deliveryTransitionService->reOpenDelivery($delivery, $this->context);
+    }
+
+    /**
+     * Tests if the ship_partially transition is performed directly
+     * if the delivery is in a state at which ship_partially is allowed
+     * (all, except ship_partially itself.)
+     */
+    public function testPartialShipDeliveryOnAllowedState()
+    {
+        $delivery = $this->createDeliveryWithState(OrderDeliveryStates::STATE_OPEN);
+
+        $expectedTransition = $this->createTransitionForAction(StateMachineTransitionActions::ACTION_SHIP_PARTIALLY);
+
+        $this->stateMachineRegistry->expects($this->once())->method('getAvailableTransitions');
+        $this->stateMachineRegistry->expects($this->once())->method('transition')
+            ->with($expectedTransition, $this->context);
+
+        $this->deliveryTransitionService->partialShipDelivery($delivery, $this->context);
+    }
+
+    /**
+     * Tests if no transition is performed when performing a ship_partially action on the delivery
+     * if the delivery is already in a shipped_partially state
+     */
+    public function testPartialShipDeliveryOnSameState()
+    {
+        $delivery = $this->createDeliveryWithState(OrderDeliveryStates::STATE_PARTIALLY_SHIPPED);
+
+        $this->stateMachineRegistry->expects($this->never())->method('getAvailableTransitions');
+        $this->stateMachineRegistry->expects($this->never())->method('transition');
+
+        $this->deliveryTransitionService->partialShipDelivery($delivery, $this->context);
+    }
+
+    /**
+     * Tests if the ship transition is performed directly
+     * if the delivery is in a state at which ship is allowed
+     * (all, except ship_partially and ship itself.)
+     */
+    public function testShipDeliveryOnAllowedState()
+    {
+        $delivery = $this->createDeliveryWithState(OrderDeliveryStates::STATE_OPEN);
+
+        $expectedTransition = $this->createTransitionForAction(StateMachineTransitionActions::ACTION_SHIP);
+
+        $this->stateMachineRegistry->expects($this->once())->method('getAvailableTransitions');
+        $this->stateMachineRegistry->expects($this->once())->method('transition')
+            ->with($expectedTransition, $this->context);
+
+        $this->deliveryTransitionService->shipDelivery($delivery, $this->context);
+    }
+
+    /**
+     * Tests if no transition is performed when performing a ship action on the delivery
+     * if the delivery is already in a shipped state
+     */
+    public function testShipDeliveryOnSameState()
+    {
+        $delivery = $this->createDeliveryWithState(OrderDeliveryStates::STATE_SHIPPED);
+
+        $this->stateMachineRegistry->expects($this->never())->method('getAvailableTransitions');
+        $this->stateMachineRegistry->expects($this->never())->method('transition');
+
+        $this->deliveryTransitionService->shipDelivery($delivery, $this->context);
+    }
+
+    /**
+     * Tests if a reopen transition is performed first when performing a ship action on the delivery
+     * if the delivery is in a state where the ship action is not allowed, excluding shipped.
+     * (returned, returned_partially, cancelled)
+     */
+    public function testShipDeliveryOnNotAllowedState()
+    {
+        $delivery = $this->createDeliveryWithState(OrderDeliveryStates::STATE_CANCELLED);
+
+        $expectedTransition1 = $this->createTransitionForAction(StateMachineTransitionActions::ACTION_REOPEN);
+        $expectedTransition2 = $this->createTransitionForAction(StateMachineTransitionActions::ACTION_SHIP);
+
+        $this->stateMachineRegistry->expects($this->once())->method('getAvailableTransitions');
+        $this->stateMachineRegistry->expects($this->exactly(2))->method('transition')
+            ->withConsecutive(
+                [$expectedTransition1, $this->context],
+                [$expectedTransition2, $this->context]
+            );
+
+        $this->deliveryTransitionService->shipDelivery($delivery, $this->context);
+    }
+
+    /**
+     * Tests if the retour_partially transition is performed directly
+     * if the delivery is in a state at which retour_partially is allowed
+     * (ship_partially and ship)
+     */
+    public function testPartialReturnDeliveryOnAllowedState()
+    {
+        $delivery = $this->createDeliveryWithState(OrderDeliveryStates::STATE_SHIPPED);
+
+        $expectedTransition = $this->createTransitionForAction(StateMachineTransitionActions::ACTION_RETOUR_PARTIALLY);
+
+        $this->stateMachineRegistry->expects($this->once())->method('getAvailableTransitions');
+        $this->stateMachineRegistry->expects($this->once())->method('transition')
+            ->with($expectedTransition, $this->context);
+
+        $this->deliveryTransitionService->partialReturnDelivery($delivery, $this->context);
+    }
+
+    /**
+     * Tests if no transition is performed when performing a ship action on the delivery
+     * if the delivery is already in a returned_partially state
+     */
+    public function testPartialReturnDeliveryOnSameState()
+    {
+        $delivery = $this->createDeliveryWithState(OrderDeliveryStates::STATE_PARTIALLY_RETURNED);
+
+        $this->stateMachineRegistry->expects($this->never())->method('getAvailableTransitions');
+        $this->stateMachineRegistry->expects($this->never())->method('transition');
+
+        $this->deliveryTransitionService->partialReturnDelivery($delivery, $this->context);
+    }
+
+    /**
+     * Tests if reopen and ship transitions are performed first when performing a retour_partially action on the delivery
+     * if the delivery is in a state where the retour_partially action is not allowed, excluding returned_partially.
+     * (returned, open, cancelled)
+     */
+    public function testPartialReturnDeliveryOnNotAllowedState()
+    {
+        $delivery = $this->createDeliveryWithState(OrderDeliveryStates::STATE_CANCELLED);
+
+        $expectedTransition1 = $this->createTransitionForAction(StateMachineTransitionActions::ACTION_REOPEN);
+        $expectedTransition2 = $this->createTransitionForAction(StateMachineTransitionActions::ACTION_SHIP);
+        $expectedTransition3 = $this->createTransitionForAction(StateMachineTransitionActions::ACTION_RETOUR_PARTIALLY);
+
+        $this->stateMachineRegistry->expects($this->once())->method('getAvailableTransitions');
+        $this->stateMachineRegistry->expects($this->exactly(3))->method('transition')
+            ->withConsecutive(
+                [$expectedTransition1, $this->context],
+                [$expectedTransition2, $this->context],
+                [$expectedTransition3, $this->context]
+            );
+
+        $this->deliveryTransitionService->partialReturnDelivery($delivery, $this->context);
+    }
+
+    /**
+     * Tests if the retour transition is performed directly
+     * if the delivery is in a state at which retour is allowed
+     * (return_partially, ship_partially and ship)
+     */
+    public function testReturnDeliveryOnAllowedState()
+    {
+        $delivery = $this->createDeliveryWithState(OrderDeliveryStates::STATE_SHIPPED);
+
+        $expectedTransition = $this->createTransitionForAction(StateMachineTransitionActions::ACTION_RETOUR);
+
+        $this->stateMachineRegistry->expects($this->once())->method('getAvailableTransitions');
+        $this->stateMachineRegistry->expects($this->once())->method('transition')
+            ->with($expectedTransition, $this->context);
+
+        $this->deliveryTransitionService->returnDelivery($delivery, $this->context);
+    }
+
+    /**
+     * Tests if no transition is performed when performing a retour action on the delivery
+     * if the delivery is already in a returned state
+     */
+    public function testReturnDeliveryOnSameState()
+    {
+        $delivery = $this->createDeliveryWithState(OrderDeliveryStates::STATE_RETURNED);
+
+        $this->stateMachineRegistry->expects($this->never())->method('getAvailableTransitions');
+        $this->stateMachineRegistry->expects($this->never())->method('transition');
+
+        $this->deliveryTransitionService->returnDelivery($delivery, $this->context);
+    }
+
+    /**
+     * Tests if reopen and ship transitions are performed first when performing a retour action on the delivery
+     * if the delivery is in a state where the retour action is not allowed, excluding returned.
+     * (open, cancelled)
+     */
+    public function testReturnDeliveryOnNotAllowedState()
+    {
+        $delivery = $this->createDeliveryWithState(OrderDeliveryStates::STATE_CANCELLED);
+
+        $expectedTransition1 = $this->createTransitionForAction(StateMachineTransitionActions::ACTION_REOPEN);
+        $expectedTransition2 = $this->createTransitionForAction(StateMachineTransitionActions::ACTION_SHIP);
+        $expectedTransition3 = $this->createTransitionForAction(StateMachineTransitionActions::ACTION_RETOUR);
+
+        $this->stateMachineRegistry->expects($this->once())->method('getAvailableTransitions');
+        $this->stateMachineRegistry->expects($this->exactly(3))->method('transition')
+            ->withConsecutive(
+                [$expectedTransition1, $this->context],
+                [$expectedTransition2, $this->context],
+                [$expectedTransition3, $this->context]
+            );
+
+        $this->deliveryTransitionService->returnDelivery($delivery, $this->context);
     }
 
 
@@ -115,7 +338,6 @@ class DeliveryTransitionServiceTest extends TestCase
         }
 
         $this->stateMachineRegistry
-            ->expects($this->once())
             ->method('getAvailableTransitions')
             ->with(OrderDeliveryDefinition::ENTITY_NAME, 'deliveryId', 'stateId', $this->context)
             ->willReturn($transitions);
@@ -125,7 +347,7 @@ class DeliveryTransitionServiceTest extends TestCase
         return new Transition(
             OrderDeliveryDefinition::ENTITY_NAME,
             'deliveryId',
-            StateMachineTransitionActions::ACTION_REOPEN,
+            $action,
             'stateId'
         );
     }
