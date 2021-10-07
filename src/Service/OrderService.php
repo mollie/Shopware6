@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Service;
 
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
+use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderLineIdException;
 use Kiener\MolliePayments\Exception\OrderNumberNotFoundException;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
@@ -136,7 +137,7 @@ class OrderService
         $mollieOrderLineId = $lineItem->getCustomFields()[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_LINE_KEY] ?? '';
 
         if (empty($mollieOrderLineId)) {
-            throw new CouldNotExtractMollieOrderIdException($lineItem->getId());
+            throw new CouldNotExtractMollieOrderLineIdException($lineItem->getId());
         }
 
         return $mollieOrderLineId;
