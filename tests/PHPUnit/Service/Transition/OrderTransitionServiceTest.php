@@ -17,7 +17,9 @@ use Shopware\Core\System\StateMachine\Transition;
 
 class OrderTransitionServiceTest extends TestCase
 {
-    /** @var OrderTransitionService */
+    /**
+     * @var OrderTransitionService
+     */
     private $orderTransitionService;
 
     /**
