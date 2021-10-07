@@ -46,8 +46,9 @@ class DeliveryTransitionServiceTest extends TestCase
             $this->createMock(LoggerService::class)
         );
 
-        $this->context = Context::createDefaultContext();
+        $this->context = $this->createMock(Context::class);
 
+        // All possible transitions
         $this->availableTransitions = [
             OrderDeliveryStates::STATE_OPEN => [
                 StateMachineTransitionActions::ACTION_CANCEL,
@@ -84,7 +85,7 @@ class DeliveryTransitionServiceTest extends TestCase
     {
         $delivery = $this->createDeliveryWithState(OrderDeliveryStates::STATE_CANCELLED);
 
-        $this->deliveryTransitionService->reOpenDelivery($delivery, Context::createDefaultContext());
+        $this->deliveryTransitionService->reOpenDelivery($delivery, $this->context);
     }
 
 
