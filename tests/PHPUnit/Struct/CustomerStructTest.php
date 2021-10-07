@@ -117,4 +117,106 @@ class CustomerStructTest extends TestCase
             ]
         ];
     }
+
+    /**
+     * This test verifies that our custom fields array is correctly built
+     * with all its data.
+     */
+    public function testCustomFieldsArray()
+    {
+        $struct = new CustomerStruct();
+
+        $struct->setCustomerId('cst_1test', 'pfl_1', true);
+        $struct->setCustomerId('cst_2live', 'pfl_2', false);
+        $struct->setCustomerId('cst_3live', 'pfl_3', false);
+        $struct->setCustomerId('cst_3test', 'pfl_3', true);
+
+        $struct->setCreditCardToken('cc_123');
+        $struct->setPreferredIdealIssuer('ideal_bunq');
+
+        $customFields = $struct->toCustomFieldsArray();
+
+        $expected = [
+            'mollie_payments' => [
+                'customer_ids' => [
+                    'pfl_1' => [
+                        'live' => '',
+                        'test' => 'cst_1test'
+                    ],
+                    'pfl_2' => [
+                        'live' => 'cst_2live',
+                        'test' => ''
+                    ],
+                    'pfl_3' => [
+                        'live' => 'cst_3live',
+                        'test' => 'cst_3test'
+                    ],
+                ],
+                'preferred_ideal_issuer' => 'ideal_bunq',
+                'credit_card_token' => 'cc_123',
+            ]
+        ];
+
+        $this->assertEquals($expected, $customFields);
+    }
+
+    /**
+     * This test verifies that our legacy customer id is correctly removed
+     * and migrated to the new profile structure if the same id is being used.
+     */
+    public function testCustomFieldsArrayMigrateLegacyCustomerID()
+    {
+        $struct = new CustomerStruct();
+
+        $struct->setLegacyCustomerId('cst_1test');
+
+        $struct->setCustomerId('cst_1test', 'pfl_1', true);
+
+        $customFields = $struct->toCustomFieldsArray();
+
+        $expected = [
+            'mollie_payments' => [
+                'customer_ids' => [
+                    'pfl_1' => [
+                        'live' => '',
+                        'test' => 'cst_1test'
+                    ],
+                ],
+            ],
+            'customer_id' => null,
+        ];
+
+        $this->assertEquals($expected, $customFields);
+    }
+
+    /**
+     * This test verifies that we keep the legacy customer id entry if we
+     * do not have an explicit entry for this id in one of our profiles.
+     * We have to keep this for our history, because one day the correct profile will be used
+     * where we need to ensure to REUSE this old customer id entry.
+     */
+    public function testCustomFieldsArrayKeepLegacyCustomerId()
+    {
+        $struct = new CustomerStruct();
+
+        $struct->setLegacyCustomerId('cst_old_different');
+
+        $struct->setCustomerId('cst_2test', 'pfl_2', true);
+
+        $customFields = $struct->toCustomFieldsArray();
+
+        $expected = [
+            'customer_id' => 'cst_old_different',
+            'mollie_payments' => [
+                'customer_ids' => [
+                    'pfl_2' => [
+                        'live' => '',
+                        'test' => 'cst_2test'
+                    ],
+                ]
+            ]
+        ];
+
+        $this->assertEquals($expected, $customFields);
+    }
 }

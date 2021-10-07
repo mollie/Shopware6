@@ -74,6 +74,12 @@ class OrderStatusUpdater
             return;
         }
 
+        # if we already have the target status then
+        # skip this progress and don't do anything
+        if ($transactionState->getTechnicalName() === $status) {
+            return;
+        }
+
         switch ($status) {
             case MolliePaymentStatus::MOLLIE_PAYMENT_OPEN:
                 $this->transactionTransitionService->reOpenTransaction($transaction, $context);

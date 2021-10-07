@@ -41,7 +41,7 @@ describe('Credit Card Components', () => {
             });
 
             // skip this test until risk management for credit card max amount is set higher by mollie
-            it.skip('Successful card payment', () => {
+            it('Successful card payment', () => {
 
                 setUp();
 
@@ -53,6 +53,7 @@ describe('Credit Card Components', () => {
                     payment.closePaymentsModal();
                 }
 
+                shopware.prepareDomainChange();
                 checkout.placeOrderOnConfirm();
 
                 cy.url().should('include', 'https://www.mollie.com/paymentscreen/');

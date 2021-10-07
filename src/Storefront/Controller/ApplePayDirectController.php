@@ -32,7 +32,6 @@ use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
-use Shopware\Storefront\Framework\Routing\Router;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -141,7 +140,7 @@ class ApplePayDirectController extends StorefrontController
      * @param OrderService $orderService
      * @param ApplePayPayment $paymentHandler
      * @param EntityRepositoryInterface $paymentMethodRepository
-     * @param Router $router
+     * @param RouterInterface $router
      * @param SettingsService $settingsService
      * @param MolliePaymentDoPay $molliePaymentDoPay
      * @param MollieApiFactory $mollieApiFactory
@@ -151,7 +150,7 @@ class ApplePayDirectController extends StorefrontController
      * @param CompatibilityGatewayFactory $compatibilityGatewayFactory
      * @param FlashBag $sessionFlashBag
      */
-    public function __construct(ApplePayDirect $applePay, CartService $cartService, CustomerService $customerService, ShopService $shopService, OrderService $orderService, ApplePayPayment $paymentHandler, EntityRepositoryInterface $paymentMethodRepository, Router $router, SettingsService $settingsService, MolliePaymentDoPay $molliePaymentDoPay, MollieApiFactory $mollieApiFactory, LoggerService $logger, CartBackupService $cartBackup, OrderAddressRepository $repoOrderAdresses, CompatibilityGatewayFactory $compatibilityGatewayFactory, FlashBag $sessionFlashBag)
+    public function __construct(ApplePayDirect $applePay, CartService $cartService, CustomerService $customerService, ShopService $shopService, OrderService $orderService, ApplePayPayment $paymentHandler, EntityRepositoryInterface $paymentMethodRepository, RouterInterface $router, SettingsService $settingsService, MolliePaymentDoPay $molliePaymentDoPay, MollieApiFactory $mollieApiFactory, LoggerService $logger, CartBackupService $cartBackup, OrderAddressRepository $repoOrderAdresses, CompatibilityGatewayFactory $compatibilityGatewayFactory, FlashBag $sessionFlashBag)
     {
         $this->applePay = $applePay;
         $this->cartService = $cartService;

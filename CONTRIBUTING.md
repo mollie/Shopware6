@@ -65,16 +65,16 @@ make install
 ```
 
 
-
 Afterwards, please run these Shopware commands in your DocRoot to build all required artefacts.
 
 ```bash
 php bin/console plugin:refresh
 php bin/console plugin:install MolliePayments --activate
-./bin/build-js.sh
-php bin/console theme:refresh 
-php bin/console theme:compile 
-php bin/console theme:refresh
+
+# now use our internal build command to create all required artifacts.
+# this requires Shopware and is meant as a shorthand option to build the files 
+# simpyl and directly from within the plugin
+cd custom/plugins/MolliePayments && make build -B
 ```
 
 
@@ -92,6 +92,21 @@ Add your Mollie Account API keys in it and make sure to turn on TEST MODE (recom
 Verify that the new Mollie payment methods are enabled in Shopware and also assign them to your Sales Channels.
 
 Once this is done, you can just start with your first checkout in Shopware.
+
+
+
+#### Build Plugin
+
+We've added a small helper tool in the makefile.
+This uses the Shopware default commands to rebuild the plugin and all its required distribution artifacts.
+
+Use this, after modifying anything in the JS or SCSS files, to see those changes in the shop.
+
+Please note, this requires the plugin to be existing and installed in a real Shopware 6 shop.
+
+```bash
+make build
+```
 
 
 
@@ -180,6 +195,12 @@ make csfix
 
 ## Starts the PHPStan Analyzer
 make stan
+
+## Starts the ESLint Analyzer Javacscript
+make eslint
+
+## Starts the Stylelint Analyzer for SCSS
+make stylelint
 ```
 
 
@@ -189,9 +210,9 @@ make stan
 
 Testing is a must-have for us!
 
-We have provided 2 tools for you.
+We have provided 3 tools for you.
 
-There's a setup for `PHPUnit Tests` as well as a very easy `Cypress E2E Test Suite` that you can just run locally.
+There's a setup for `PHPUnit Tests`, `Jest Javascript Tests`, as well as a very easy `Cypress E2E Test Suite` that you can just run locally.
 
 
 
@@ -219,8 +240,19 @@ What are our requirements for PHP Unit Tests?
 * Fakes or Mocks:
   We'd be happy if you already design your code with interfaces, so you can easily create real fake objects for your tests.
   If that's not possible, please use at least Mocks or Stubs for your tests.
-  
-  
+
+
+
+### Jest
+
+Please use this command to run your Jest tests.
+
+It is configured to test everything in the folder Resources/app/storefront/tests
+
+```bash
+make jest
+```
+
 
 
 ### Cypress E2E

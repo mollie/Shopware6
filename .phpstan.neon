@@ -3,6 +3,8 @@ parameters:
     paths:
         - ./src
     excludes_analyse:
+        - ./src/Resources/app/administration/node_modules/*
+        - ./src/Resources/app/storefront/node_modules/*
         # already in phpstan lvl8
         - ./src/Gateway
 

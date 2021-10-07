@@ -7,7 +7,7 @@ export default class MollieApplePayPaymentMethod extends Plugin {
      */
     init() {
 
-        let me = this;
+        const me = this;
 
         const hideAlways = this.options.hideAlways;
         const shopUrl = this.getShopUrl();
@@ -55,7 +55,7 @@ export default class MollieApplePayPaymentMethod extends Plugin {
         let shopSlug = this.options.shopUrl;
 
         if (shopSlug === undefined) {
-            return "";
+            return '';
         }
 
         // remove trailing slash if existing

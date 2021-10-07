@@ -1,12 +1,13 @@
 import template from './sw-order-line-items-grid.html.twig';
 
+// eslint-disable-next-line no-undef
 const {Component, Mixin} = Shopware;
 
 Component.override('sw-order-line-items-grid', {
     template,
 
     mixins: [
-        Mixin.getByName('notification')
+        Mixin.getByName('notification'),
     ],
 
     inject: [
@@ -17,15 +18,15 @@ Component.override('sw-order-line-items-grid', {
     props: {
         remainingAmount: {
             type: Number,
-            required: true
+            required: true,
         },
         refundedAmount: {
             type: Number,
-            required: true
+            required: true,
         },
         refunds: {
             type: Array,
-            required: true
+            required: true,
         },
     },
 
@@ -38,7 +39,7 @@ Component.override('sw-order-line-items-grid', {
             createCredit: false,
             quantityToShip: 1,
             refundAmount: 0.0,
-            shippingQuantity: 0
+            shippingQuantity: 0,
         };
     },
 
@@ -53,7 +54,7 @@ Component.override('sw-order-line-items-grid', {
                     allowResize: false,
                     align: 'right',
                     inlineEdit: false,
-                    width: '100px'
+                    width: '100px',
                 }
             );
 
@@ -64,16 +65,16 @@ Component.override('sw-order-line-items-grid', {
             return [
                 {
                     property: 'amount.value',
-                    label: this.$tc('mollie-payments.modals.refund.list.column.amount')
+                    label: this.$tc('mollie-payments.modals.refund.list.column.amount'),
                 },
                 {
                     property: 'status',
-                    label: this.$tc('mollie-payments.modals.refund.list.column.status')
+                    label: this.$tc('mollie-payments.modals.refund.list.column.status'),
                 },
                 {
                     property: 'createdAt',
                     label: this.$tc('mollie-payments.modals.refund.list.column.date'),
-                    width: '100px'
+                    width: '100px',
                 },
             ];
         },
@@ -106,7 +107,7 @@ Component.override('sw-order-line-items-grid', {
         onConfirmRefund() {
             if(this.refundAmount === 0.0) {
                 this.createNotificationWarning({
-                    message: this.$tc('mollie-payments.modals.refund.warning.low-amount')
+                    message: this.$tc('mollie-payments.modals.refund.warning.low-amount'),
                 });
 
                 return;
@@ -120,12 +121,12 @@ Component.override('sw-order-line-items-grid', {
                 .then((response) => {
                     if (response.success) {
                         this.createNotificationSuccess({
-                            message: this.$tc('mollie-payments.modals.refund.success')
+                            message: this.$tc('mollie-payments.modals.refund.success'),
                         });
                         this.showRefundModal = false;
                     } else {
                         this.createNotificationError({
-                            message: this.$tc('mollie-payments.modals.refund.error')
+                            message: this.$tc('mollie-payments.modals.refund.error'),
                         });
                     }
                 })
@@ -134,7 +135,7 @@ Component.override('sw-order-line-items-grid', {
                 })
                 .catch((response) => {
                     this.createNotificationError({
-                        message: response.message
+                        message: response.message,
                     });
                 });
         },
@@ -147,17 +148,17 @@ Component.override('sw-order-line-items-grid', {
             this.MolliePaymentsRefundService
                 .cancel({
                     orderId: this.order.id,
-                    refundId: item.id
+                    refundId: item.id,
                 })
                 .then((response) => {
                     if (response.success) {
                         this.createNotificationSuccess({
-                            message: this.$tc('mollie-payments.modals.refund.success')
+                            message: this.$tc('mollie-payments.modals.refund.success'),
                         });
                         this.showRefundModal = false;
                     } else {
                         this.createNotificationError({
-                            message: this.$tc('mollie-payments.modals.refund.error')
+                            message: this.$tc('mollie-payments.modals.refund.error'),
                         });
                     }
                 })
@@ -166,7 +167,7 @@ Component.override('sw-order-line-items-grid', {
                 })
                 .catch((response) => {
                     this.createNotificationError({
-                        message: response.message
+                        message: response.message,
                     });
                 });
         },
@@ -194,7 +195,7 @@ Component.override('sw-order-line-items-grid', {
                 this.MolliePaymentsShippingService.ship({
                     itemId: item.id,
                     versionId: item.versionId,
-                    quantity: this.quantityToShip
+                    quantity: this.quantityToShip,
                 })
                     .then(document.location.reload());
             }
@@ -245,5 +246,5 @@ Component.override('sw-order-line-items-grid', {
 
             return item.quantity;
         },
-    }
+    },
 });

@@ -2,7 +2,7 @@ import MolliePaymentsConfigService
     from '../core/service/api/mollie-payments-config.service';
 
 import MolliePaymentsOrderService
-    from "../core/service/api/mollie-payments-order.service";
+    from '../core/service/api/mollie-payments-order.service';
 
 import MolliePaymentsRefundService
     from '../core/service/api/mollie-payments-refund.service';
@@ -10,6 +10,7 @@ import MolliePaymentsRefundService
 import MolliePaymentsShippingService
     from '../core/service/api/mollie-payments-shipping.service';
 
+// eslint-disable-next-line no-undef
 const { Application } = Shopware;
 
 Application.addServiceProvider('MolliePaymentsConfigService', (container) => {
