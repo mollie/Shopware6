@@ -330,7 +330,7 @@ class DeliveryTransitionServiceTest extends TestCase
     private function setUpTransitionsForDeliveryState(string $state): void
     {
         $transitions = [];
-        foreach($this->availableTransitions[$state] as $action) {
+        foreach ($this->availableTransitions[$state] as $action) {
             $transition = new StateMachineTransitionEntity();
             $transition->setId('transitionId1');
             $transition->setActionName($action);
@@ -343,7 +343,8 @@ class DeliveryTransitionServiceTest extends TestCase
             ->willReturn($transitions);
     }
 
-    private function createTransitionForAction($action) {
+    private function createTransitionForAction($action)
+    {
         return new Transition(
             OrderDeliveryDefinition::ENTITY_NAME,
             'deliveryId',

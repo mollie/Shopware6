@@ -91,7 +91,8 @@ class Shipment
             throw new MollieOrderCouldNotBeShippedException(
                 $mollieOrderId,
                 [
-                    'salesChannelId' => $salesChannelId
+                    'salesChannelId' => $salesChannelId,
+                    'options' => $options
                 ],
                 $e
             );
