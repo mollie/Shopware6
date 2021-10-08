@@ -12,6 +12,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Shipment"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderDeliveryService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor"/>
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
         </service>
 
