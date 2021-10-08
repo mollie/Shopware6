@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Exception\OrderLineItemNotFoundException;
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\MollieApi\Order;
+use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\Shipment;
 use Kiener\MolliePayments\Service\MolliePaymentExtractor;
 use Kiener\MolliePayments\Service\OrderDeliveryService;
@@ -56,6 +57,11 @@ class MollieShipment
     private $orderService;
 
     /**
+     * @var OrderDataExtractor
+     */
+    private $orderDataExtractor;
+
+    /**
      * @var LoggerService
      */
     private $logger;
@@ -67,6 +73,7 @@ class MollieShipment
         Shipment $mollieApiShipmentService,
         OrderDeliveryService $orderDeliveryService,
         OrderService $orderService,
+        OrderDataExtractor $orderDataExtractor,
         LoggerService $logger
     )
     {
@@ -76,6 +83,7 @@ class MollieShipment
         $this->mollieApiShipmentService = $mollieApiShipmentService;
         $this->orderDeliveryService = $orderDeliveryService;
         $this->orderService = $orderService;
+        $this->orderDataExtractor = $orderDataExtractor;
         $this->logger = $logger;
     }
 
@@ -160,7 +168,7 @@ class MollieShipment
 
         $shipment = $this->mollieApiShipmentService->shipOrder($mollieOrderId, $order->getSalesChannelId(), $context);
 
-        $delivery = $order->getDeliveries()->first();
+        $delivery = $this->orderDataExtractor->extractDelivery($order, $context);
 
         $this->deliveryTransitionService->shipDelivery($delivery, $context);
 
@@ -173,11 +181,7 @@ class MollieShipment
 
         $mollieOrderId = $this->orderService->getMollieOrderId($order);
 
-        $lineItems = $this->searchLineItem($order, $itemIdentifier);
-
-        if ($lineItems->count() < 1) {
-            throw new OrderLineItemNotFoundException($itemIdentifier);
-        }
+        $lineItems = $this->searchLineItem($order, $itemIdentifier, $context);
 
         if ($lineItems->count() > 1) {
             throw new OrderLineItemFoundManyException($itemIdentifier);
@@ -185,6 +189,10 @@ class MollieShipment
 
         $lineItem = $lineItems->first();
         unset($lineItems);
+
+        if (!$lineItem instanceof OrderLineItemEntity) {
+            throw new OrderLineItemNotFoundException($itemIdentifier);
+        }
 
         $mollieOrderLineId = $this->orderService->getMollieOrderLineId($lineItem);
 
@@ -205,8 +213,9 @@ class MollieShipment
             $context
         );
 
-        $delivery = $order->getDeliveries()->first();
-        if($this->mollieApiOrderService->isCompletelyShipped($mollieOrderId, $order->getSalesChannelId(), $context)) {
+        $delivery = $this->orderDataExtractor->extractDelivery($order, $context);
+
+        if ($this->mollieApiOrderService->isCompletelyShipped($mollieOrderId, $order->getSalesChannelId(), $context)) {
             $this->deliveryTransitionService->shipDelivery($delivery, $context);
         } else {
             $this->deliveryTransitionService->partialShipDelivery($delivery, $context);
@@ -215,9 +224,9 @@ class MollieShipment
         return $shipment;
     }
 
-    public function searchLineItem(OrderEntity $order, string $itemIdentifier): OrderLineItemCollection
+    public function searchLineItem(OrderEntity $order, string $itemIdentifier, Context $context): OrderLineItemCollection
     {
-        return $order->getLineItems()->filter(function ($lineItem) use ($itemIdentifier) {
+        return $this->orderDataExtractor->extractLineItems($order, $context)->filter(function ($lineItem) use ($itemIdentifier) {
             /** @var OrderLineItemEntity $lineItem */
 
             // Default Shopware: If the lineItem is of type "product" and has an associated ProductEntity,
@@ -230,13 +239,15 @@ class MollieShipment
 
             // If it's not a "product" type lineItem, for example if it's a completely custom lineItem type,
             // check if the payload has a productNumber in it that matches the itemIdentifier.
-            if (array_key_exists('productNumber', $lineItem->getPayload()) &&
+            if (!empty($lineItem->getPayload()) &&
+                array_key_exists('productNumber', $lineItem->getPayload()) &&
                 $lineItem->getPayload()['productNumber'] === $itemIdentifier) {
                 return true;
             }
 
             // Check itemIdentifier against the mollie order_line_id custom field
-            $mollieOrderLineId = $lineItem->getCustomFields()[CustomFieldsInterface::MOLLIE_KEY]['order_line_id'] ?? null;
+            $customFields = $lineItem->getCustomFields() ?? [];
+            $mollieOrderLineId = $customFields[CustomFieldsInterface::MOLLIE_KEY]['order_line_id'] ?? null;
             if (!is_null($mollieOrderLineId) && $mollieOrderLineId === $itemIdentifier) {
                 return true;
             }
