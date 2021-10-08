@@ -1,6 +1,6 @@
 <?php
 
-namespace Kiener\MolliePayments\Gateway;
+namespace Kiener\MolliePayments\Compatibility\Gateway;
 
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 

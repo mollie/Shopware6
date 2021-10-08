@@ -82,7 +82,7 @@
             <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
             <argument type="service" id="Shopware\Core\System\SalesChannel\SalesChannel\SalesChannelContextSwitcher"/>
             <argument type="service" id="Shopware\Core\Content\Product\Cart\ProductLineItemFactory"/>
-            <argument type="service" id="Kiener\MolliePayments\Factory\CompatibilityGatewayFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway"/>
         </service>
 
     </services>

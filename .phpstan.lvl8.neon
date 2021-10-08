@@ -13,6 +13,9 @@ parameters:
         - ./src/Service/*
         - ./src/Storefront/*
         - ./src/Subscriber/*
+        # legacy code that is not working with abstract/interface changes
+        - ./src/Compatibility/Storefront/Route/PaymentMethodRoute/HideVoucherPaymentMethodRoute63.php
+        - ./src/Compatibility/Storefront/Route/PaymentMethodRoute/HideVoucherPaymentMethodRoute62.php
 
 services:
     - class: MolliePayments\PHPStan\Rules\NoManufacturerRule

@@ -120,7 +120,7 @@
 
         <service id="Kiener\MolliePayments\Storefront\Controller\PaymentController" public="true">
             <argument type="service" id="router.default"/>
-            <argument type="service" id="Kiener\MolliePayments\Factory\CompatibilityGatewayFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway"/>
             <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <argument type="service" id="Shopware\Core\Framework\Event\BusinessEventDispatcher"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStateService"/>
@@ -180,6 +180,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <tag name="kernel.event_subscriber"/>
         </service>
+
     </services>
 
 </container>

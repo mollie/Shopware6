@@ -1,0 +1,32 @@
+@import "~scss/variables";
+
+.sw-product-detail-mollie-vouchers-form__container {
+    .sw-product-detail-mollie-vouchers__description-title {
+        font-weight: $font-weight-bold;
+        font-size: $font-size-default;
+        text-align: center;
+    }
+
+    .sw-product-detail-mollie-vouchers__image-container {
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        margin-top: 20px;
+
+        .sw-product-detail-mollie-vouchers__image {
+            width: 80px;
+        }
+    }
+
+    .sw-product-feature-set-form__description-body {
+        font-size: $font-size-small;
+        margin-top: 20px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .sw-product-detail-mollie-vouchers__button-readmore {
+        text-align: center;
+    }
+}

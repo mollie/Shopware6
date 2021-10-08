@@ -6,7 +6,10 @@ parameters:
         - ./src/Resources/app/administration/node_modules/*
         - ./src/Resources/app/storefront/node_modules/*
         # already in phpstan lvl8
-        - ./src/Gateway
+        - ./src/Compatibility
+        # legacy code that is not working with abstract/interface changes
+        - ./src/Compatibility/Storefront/Route/PaymentMethodRoute/HideVoucherPaymentMethodRoute63.php
+        - ./src/Compatibility/Storefront/Route/PaymentMethodRoute/HideVoucherPaymentMethodRoute62.php
 
 services:
     - class: MolliePayments\PHPStan\Rules\NoManufacturerRule

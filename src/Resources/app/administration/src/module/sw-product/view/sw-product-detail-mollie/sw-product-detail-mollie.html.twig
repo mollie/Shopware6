@@ -1,0 +1,37 @@
+{% block sw_product_detail_mollie_vouchers %}
+    <sw-card :title="$tc('mollie-payments.vouchers.CARD_TITLE')">
+        <sw-container gap="0px 30px" class="sw-product-detail-mollie-vouchers-form__container">
+
+            <sw-container columns="1fr">
+                <span class="sw-product-detail-mollie-vouchers__description-title">
+                    {{ $tc('mollie-payments.vouchers.VOUCHER_INFO_TITLE') }}
+                </span>
+            </sw-container>
+
+            <sw-container columns="1fr" class="sw-product-detail-mollie-vouchers__image-container">
+                <img class="sw-product-detail-mollie-vouchers__image" src="/bundles/molliepayments/administration/img/payment-voucher.svg">
+            </sw-container>
+
+            <sw-container columns="1fr">
+                <p class="sw-product-feature-set-form__description-body">
+                    {{ $tc('mollie-payments.vouchers.VOUCHER_INFO_DESCRIPTION') }}
+                </p>
+            </sw-container>
+
+            <sw-container columns="6fr 1fr">
+                <div></div>
+                <sw-button class="sw-product-detail-mollie-vouchers__button-readmore" :block="true" variant="primary" size="small" link="https://github.com/mollie/Shopware6/wiki/Voucher">READ MORE</sw-button>
+            </sw-container>
+
+            <sw-select-field
+                    :label="$tc('mollie-payments.vouchers.VOUCHER_TYPE_CAPTION')"
+                    class="mollie-voucher-type"
+                    :value="selectedVoucherType"
+                    @change="onVoucherChanged">
+                <option v-for="type in voucherTypes" :key="type.key" :value="type.key">
+                    {{ type.name }}
+                </option>
+            </sw-select-field>
+        </sw-container>
+    </sw-card>
+{% endblock %}
