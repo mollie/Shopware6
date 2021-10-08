@@ -3,9 +3,11 @@
 namespace MolliePayments\Tests\Facade;
 
 use Kiener\MolliePayments\Facade\MollieShipment;
+use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\MollieApi\Order;
+use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\Shipment;
 use Kiener\MolliePayments\Service\MolliePaymentExtractor;
 use Kiener\MolliePayments\Service\OrderDeliveryService;
@@ -60,6 +62,11 @@ class MollieShipmentTest extends TestCase
     private $logger;
 
     /**
+     * @var OrderDataExtractor
+     */
+    private $orderDataExtractor;
+
+    /**
      * @var MollieShipment
      */
     private $mollieShipment;
@@ -86,6 +93,11 @@ class MollieShipmentTest extends TestCase
         $this->orderService = $this->getMockBuilder(OrderService::class)->disableOriginalConstructor()->getMock();
         $this->logger = $this->getMockBuilder(LoggerService::class)->disableOriginalConstructor()->getMock();
 
+        $this->orderDataExtractor = new OrderDataExtractor(
+            $this->logger,
+            $this->createMock(CustomerService::class)
+        );
+
         $this->mollieShipment = new MollieShipment(
             $this->extractor,
             $this->deliveryTransitionService,
@@ -93,6 +105,7 @@ class MollieShipmentTest extends TestCase
             $this->mollieApiShipmentService,
             $this->orderDeliveryService,
             $this->orderService,
+            $this->orderDataExtractor,
             $this->logger
         );
         $this->orderNumber = 'fooOrderNumber';
