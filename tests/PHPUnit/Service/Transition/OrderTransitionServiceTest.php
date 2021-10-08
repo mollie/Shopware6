@@ -17,7 +17,9 @@ use Shopware\Core\System\StateMachine\Transition;
 
 class OrderTransitionServiceTest extends TestCase
 {
-    /** @var OrderTransitionService */
+    /**
+     * @var OrderTransitionService
+     */
     private $orderTransitionService;
 
     /**
@@ -30,6 +32,35 @@ class OrderTransitionServiceTest extends TestCase
         $this->stateMachineRegistry = $this->getMockBuilder(StateMachineRegistry::class)->disableOriginalConstructor()->getMock();
 
         $this->orderTransitionService = new OrderTransitionService(new TransitionService($this->stateMachineRegistry));
+    }
+
+    /**
+     * Tests if the available transitions for the current state are returned
+     */
+    public function testGetAvailableTransitions(): void
+    {
+        $transition1 = new StateMachineTransitionEntity();
+        $transition1->setId('transitionId1');
+        $transition1->setActionName('transition_1');
+        $transition2 = new StateMachineTransitionEntity();
+        $transition2->setId('transitionId2');
+        $transition2->setActionName('transition_2');
+
+        $order = new OrderEntity();
+        $order->setId('orderId');
+
+        $context = $this->createMock(Context::class);
+
+        $this->stateMachineRegistry->expects($this->once())
+            ->method('getAvailableTransitions')
+            ->with(OrderDefinition::ENTITY_NAME, 'orderId', 'stateId', $context)
+            ->willReturn([$transition1, $transition2]);
+
+        $availableTransitions = $this->orderTransitionService->getAvailableTransitions($order, $context);
+
+        $expectedTransitions = ['transition_1', 'transition_2'];
+
+        $this->assertEquals($expectedTransitions, $availableTransitions);
     }
 
     /**
