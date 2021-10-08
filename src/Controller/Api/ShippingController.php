@@ -190,10 +190,10 @@ class ShippingController extends AbstractController
                 'type' => $orderLine->type,
                 'status' => $orderLine->status,
                 'quantity' => $orderLine->quantity,
-                'unitPrice' => $orderLine->unitPrice,
+                'unitPrice' => (array)$orderLine->unitPrice,
                 'vatRate' => $orderLine->vatRate,
-                'vatAmount' => $orderLine->vatAmount,
-                'totalAmount' => $orderLine->totalAmount,
+                'vatAmount' => (array)$orderLine->vatAmount,
+                'totalAmount' => (array)$orderLine->totalAmount,
                 'createdAt' => $orderLine->createdAt
             ];
         }
