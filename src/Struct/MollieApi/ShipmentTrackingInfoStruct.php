@@ -26,6 +26,9 @@ class ShipmentTrackingInfoStruct extends Struct
         $this->url = $url;
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function toArray() {
         return [
             'carrier' => $this->getCarrier(),

@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 class OrderLineItemFoundManyException extends ShopwareHttpException
 {
     /**
-     * @param string $orderNumber
+     * @param string $identifier
      * @param array<string,mixed> $parameters
      * @param \Throwable|null $previous
      */

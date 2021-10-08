@@ -75,7 +75,7 @@ class OrderService
      * @param Context $context
      * @return OrderEntity|null
      */
-    public function getOrder(string $orderId, Context $context): ?OrderEntity
+    public function getOrder(string $orderId, Context $context): OrderEntity
     {
         $criteria = new Criteria([$orderId]);
         $criteria->addAssociation('currency');
@@ -99,7 +99,7 @@ class OrderService
         throw new OrderNotFoundException($orderId);
     }
 
-    public function getOrderByNumber(string $orderNumber, Context $context): ?OrderEntity
+    public function getOrderByNumber(string $orderNumber, Context $context): OrderEntity
     {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('orderNumber', $orderNumber));

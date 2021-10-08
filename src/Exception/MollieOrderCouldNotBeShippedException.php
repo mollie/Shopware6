@@ -7,6 +7,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class MollieOrderCouldNotBeShippedException extends ShopwareHttpException
 {
+    /**
+     * @param string $mollieOrderID
+     * @param array<string,mixed> $parameters
+     * @param \Throwable|null $e
+     */
     public function __construct(string $mollieOrderID, array $parameters = [], ?\Throwable $e = null)
     {
         $message = sprintf('Mollie order (%s) could not be shipped', $mollieOrderID);
