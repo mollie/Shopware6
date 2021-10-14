@@ -137,7 +137,7 @@ class OrderDataExtractor
         $deliveries = $this->extractDeliveries($orderEntity, $context);
 
         /**
-         * FIXME: In future Shopware versions there might be multiple deliveries. There is support for multiple deliveries
+         * TODO: In future Shopware versions there might be multiple deliveries. There is support for multiple deliveries
          * but as of writing only one delivery is created per order, which is why we use first() here.
          */
         $delivery = $deliveries->first();
