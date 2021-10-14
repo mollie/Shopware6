@@ -6,14 +6,14 @@
         <title lang="de-DE">API</title>
         <title lang="nl-NL">API</title>
 
-        <input-field>
+        <input-field type="password">
             <name>liveApiKey</name>
             <copyable>true</copyable>
             <label>Live Key</label>
             <label lang="de-DE">Live Key</label>
             <label lang="nl-NL">Live-sleutel</label>
         </input-field>
-        <input-field>
+        <input-field type="password">
             <name>testApiKey</name>
             <copyable>true</copyable>
             <label>Test Key</label>
