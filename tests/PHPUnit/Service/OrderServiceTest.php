@@ -16,6 +16,7 @@ use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\SalesChannel\OrderService as ShopwareOrderService;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 
@@ -75,6 +76,12 @@ class OrderServiceTest extends TestCase
 
         $this->assertNotNull($actualResult);
         $this->assertInstanceOf(OrderEntity::class, $actualResult);
+        $this->assertContainsOnlyInstancesOf(Criteria::class, $this->orderRepository->criteria);
+
+        /** @var Criteria $receivedCriteria */
+        $receivedCriteria = $this->orderRepository->criteria[0];
+
+        $this->assertContains('foo', $receivedCriteria->getIds());
     }
 
     public function testGetOrderDoesntExist()
@@ -93,6 +100,12 @@ class OrderServiceTest extends TestCase
 
         $this->assertNotNull($actualResult);
         $this->assertInstanceOf(OrderEntity::class, $actualResult);
+        $this->assertContainsOnlyInstancesOf(Criteria::class, $this->orderRepository->criteria);
+
+        /** @var Criteria $receivedCriteria */
+        $receivedCriteria = $this->orderRepository->criteria[0];
+
+        $this->assertTrue($receivedCriteria->hasEqualsFilter('orderNumber'));
     }
 
     public function testGetOrderByNumberDoesntExist()
