@@ -4,9 +4,9 @@ namespace Kiener\MolliePayments\Service\MollieApi;
 
 use Kiener\MolliePayments\Exception\OrderCurrencyNotFound;
 use Kiener\MolliePayments\Exception\OrderCustomerNotFound;
-use Kiener\MolliePayments\Exception\OrderDeliveriesNotFound;
-use Kiener\MolliePayments\Exception\OrderDeliveryNotFound;
-use Kiener\MolliePayments\Exception\OrderLineItemsNotFound;
+use Kiener\MolliePayments\Exception\OrderDeliveriesNotFoundException;
+use Kiener\MolliePayments\Exception\OrderDeliveryNotFoundException;
+use Kiener\MolliePayments\Exception\OrderLineItemsNotFoundException;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\LoggerService;
 use Monolog\Logger;
@@ -126,7 +126,7 @@ class OrderDataExtractor
                 Logger::CRITICAL
             );
 
-            throw new OrderDeliveriesNotFound($orderEntity->getId());
+            throw new OrderDeliveriesNotFoundException($orderEntity->getId());
         }
 
         return $deliveries;
@@ -151,7 +151,7 @@ class OrderDataExtractor
                 Logger::CRITICAL
             );
 
-            throw new OrderDeliveryNotFound($orderEntity->getId());
+            throw new OrderDeliveryNotFoundException($orderEntity->getId());
         }
 
         return $delivery;
@@ -170,7 +170,7 @@ class OrderDataExtractor
                 Logger::CRITICAL
             );
 
-            throw new OrderLineItemsNotFound($orderEntity->getId());
+            throw new OrderLineItemsNotFoundException($orderEntity->getId());
         }
 
         return $lineItems;

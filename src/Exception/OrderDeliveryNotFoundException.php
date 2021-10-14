@@ -5,7 +5,7 @@ namespace Kiener\MolliePayments\Exception;
 use Shopware\Core\Framework\ShopwareHttpException;
 use Symfony\Component\HttpFoundation\Response;
 
-class OrderLineItemsNotFound extends ShopwareHttpException
+class OrderDeliveryNotFoundException extends ShopwareHttpException
 {
     /**
      * @param string $id
@@ -14,13 +14,13 @@ class OrderLineItemsNotFound extends ShopwareHttpException
      */
     public function __construct(string $id, array $parameters = [], \Throwable $previous = null)
     {
-        $message = sprintf('Line items of order %s could not be fetched', $id);
+        $message = sprintf('Delivery of order %s could not be fetched', $id);
         parent::__construct($message, $parameters, $previous);
     }
 
     public function getErrorCode(): string
     {
-        return 'MOLLIE_PAYMENTS__LINE_ITEMS_NOT_FOUND_IN_ORDER';
+        return 'MOLLIE_PAYMENTS__DELIVERY_NOT_FOUND_IN_ORDER';
     }
 
     public function getStatusCode(): int
