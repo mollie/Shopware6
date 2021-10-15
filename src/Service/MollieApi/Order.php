@@ -14,6 +14,7 @@ use Mollie\Api\Resources\Order as MollieOrder;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\PaymentCollection;
+use Mollie\Api\Types\OrderLineType;
 use Mollie\Api\Types\PaymentStatus;
 use Monolog\Logger;
 use RuntimeException;
@@ -48,6 +49,7 @@ class Order
     /**
      * @param string $mollieOrderId
      * @param string|null $salesChannelId
+     * @param Context $context
      * @param array $parameters
      * @return MollieOrder
      * @throws CouldNotFetchMollieOrderException
@@ -73,6 +75,24 @@ class Order
 
             throw new CouldNotFetchMollieOrderException($mollieOrderId, $e);
         }
+    }
+
+    /**
+     * @param string $mollieOrderId
+     * @param string $mollieOrderLineId
+     * @param string $salesChannelId
+     * @param Context $context
+     * @return OrderLine
+     * @throws CouldNotFetchMollieOrderException
+     */
+    public function getMollieOrderLine(
+        string $mollieOrderId,
+        string $mollieOrderLineId,
+        string $salesChannelId,
+        Context $context
+    ): OrderLine
+    {
+        return $this->getMollieOrder($mollieOrderId, $salesChannelId, $context)->lines()->get($mollieOrderLineId);
     }
 
     public function createOrder(array $orderData, string $orderSalesChannelContextId, SalesChannelContext $salesChannelContext): MollieOrder
@@ -213,10 +233,36 @@ class Order
 
     /**
      * @param string $mollieOrderId
-     * @param string|null $salesChannelId
-     * @return Payment
+     * @param string $salesChannelId
+     * @param Context $context
+     * @return bool
      * @throws CouldNotFetchMollieOrderException
-     * @throws PaymentNotFoundException
+     */
+    public function isCompletelyShipped(string $mollieOrderId, string $salesChannelId, Context $context): bool
+    {
+        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId, $context);
+
+        /** @var OrderLine $mollieOrderLine */
+        foreach ($mollieOrder->lines() as $mollieOrderLine) {
+            if ($mollieOrderLine->shippableQuantity > 0 &&
+                in_array($mollieOrderLine->type, [
+                    OrderLineType::TYPE_PHYSICAL,
+                    OrderLineType::TYPE_DIGITAL,
+                    OrderLineType::TYPE_DISCOUNT,
+                    OrderLineType::TYPE_STORE_CREDIT,
+                ])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $mollieOrderId
+     * @param string|null $salesChannelId
+     * @param Context $context
+     * @return Payment
      */
     public function getCompletedPayment(string $mollieOrderId, ?string $salesChannelId, Context $context): Payment
     {

@@ -21,6 +21,11 @@
             <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransitionService"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Service\Transition\DeliveryTransitionService">
+            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransitionService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
+        </service>
+
         <service id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService">
             <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransitionService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
@@ -33,7 +38,6 @@
 
         <service id="Kiener\MolliePayments\Service\OrderService" class="Kiener\MolliePayments\Service\OrderService">
             <argument type="service" id="order.repository"/>
-            <argument type="service" id="order_line_item.repository"/>
             <argument type="service" id="Shopware\Core\Checkout\Order\SalesChannel\OrderService"/>
             <argument type="service" id="monolog.logger"/>
         </service>
@@ -70,6 +74,7 @@
         <service id="Kiener\MolliePayments\Service\MollieApi\PriceCalculator"/>
 
         <service id="Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor"/>
+
 
         <service id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater">
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>

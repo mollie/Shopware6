@@ -59,7 +59,7 @@ class OrderDataExtractorTest extends TestCase
         $order->setId($orderId);
         $this->expectException(OrderCustomerNotFound::class);
         $this->loggerService->expects($this->once())->method('addEntry')->with(
-            sprintf('Could not fetch customer form order with id %s', $order->getId()),
+            sprintf('Could not fetch customer from order with id %s', $order->getId()),
             $this->context,
             null,
             [],
@@ -136,7 +136,7 @@ class OrderDataExtractorTest extends TestCase
 
         $this->expectException(OrderCurrencyNotFound::class);
         $this->loggerService->expects($this->once())->method('addEntry')->with(
-            sprintf('Could not fetch currency form order with id %s', $orderId),
+            sprintf('Could not fetch currency from order with id %s', $orderId),
             $this->context,
             null,
             [],
