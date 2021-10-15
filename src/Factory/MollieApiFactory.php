@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Factory;
 
 use Exception;
 use Kiener\MolliePayments\MolliePayments;
+use Kiener\MolliePayments\Service\MollieApi\Client\MollieHttpClient;
 use Kiener\MolliePayments\Service\SettingsService;
 use Mollie\Api\Exceptions\IncompatiblePlatform;
 use Mollie\Api\MollieApiClient;
@@ -57,24 +58,6 @@ class MollieApiFactory
     }
 
     /**
-     * @param string $salesChannelId
-     * @return MollieApiClient
-     */
-    public function getLiveClient(string $salesChannelId): MollieApiClient
-    {
-        return $this->buildClient($salesChannelId, false);
-    }
-
-    /**
-     * @param string $salesChannelId
-     * @return MollieApiClient
-     */
-    public function getTextClient(string $salesChannelId): MollieApiClient
-    {
-        return $this->buildClient($salesChannelId, true);
-    }
-
-    /**
      * Returns a new instance of the Mollie API client.
      *
      * @param string|null $salesChannelId
@@ -84,62 +67,64 @@ class MollieApiFactory
      */
     public function getClient(?string $salesChannelId = null): MollieApiClient
     {
-        $this->apiClient = new MollieApiClient();
-
         $settings = $this->settingsService->getSettings($salesChannelId);
+        $apiKey = ($settings->isTestMode()) ? $settings->getTestApiKey() : $settings->getLiveApiKey();
 
-        try {
-            // Set the API key
-            $this->apiClient->setApiKey(
-                $settings->isTestMode() ? $settings->getTestApiKey() : $settings->getLiveApiKey()
-            );
-
-            // Add platform data
-            $this->apiClient->addVersionString(
-                'Shopware/' .
-                Kernel::SHOPWARE_FALLBACK_VERSION
-            );
-
-            // @todo Add plugin version variable
-            $this->apiClient->addVersionString(
-                'MollieShopware6/' . MolliePayments::PLUGIN_VERSION
-            );
-        } catch (Exception $e) {
-            $this->logger->error($e->getMessage(), [$e]);
-        }
-
-        return $this->apiClient;
+        return $this->buildClient($apiKey);
     }
-
 
     /**
      * @param string $salesChannelId
-     * @param bool $testMode
      * @return MollieApiClient
      */
-    private function buildClient(string $salesChannelId, bool $testMode): MollieApiClient
+    public function getLiveClient(string $salesChannelId): MollieApiClient
     {
-        $this->apiClient = new MollieApiClient();
-
         $settings = $this->settingsService->getSettings($salesChannelId);
+        $apiKey = $settings->getLiveApiKey();
 
+        return $this->buildClient($apiKey);
+    }
+
+    /**
+     * @param string $salesChannelId
+     * @return MollieApiClient
+     */
+    public function getTestClient(string $salesChannelId): MollieApiClient
+    {
+        $settings = $this->settingsService->getSettings($salesChannelId);
+        $apiKey = $settings->getTestApiKey();
+
+        return $this->buildClient($apiKey);
+    }
+
+    /**
+     * @param string $apiKey
+     * @return MollieApiClient
+     */
+    private function buildClient(string $apiKey): MollieApiClient
+    {
         try {
 
-            $apiKey = ($testMode) ? $settings->getTestApiKey() : $settings->getLiveApiKey();
+            # in some rare peaks, the Mollie API might take a bit more time.
+            # so we set it a higher connect timeout, and also a high enough response timeout
+            $connectTimeout = 5;
+            $responseTimeout = 10;
+            $httpClient = new MollieHttpClient($connectTimeout, $responseTimeout);
+
+            $this->apiClient = new MollieApiClient($httpClient);
 
             $this->apiClient->setApiKey($apiKey);
 
-            // Add platform data
             $this->apiClient->addVersionString('Shopware/' . Kernel::SHOPWARE_FALLBACK_VERSION);
-
-            // @todo Add plugin version variable
             $this->apiClient->addVersionString('MollieShopware6/' . MolliePayments::PLUGIN_VERSION);
 
         } catch (Exception $e) {
             $this->logger->error($e->getMessage(), [$e]);
         }
 
+        # TODO we should change to fail-fast one day, but not at this time!
         return $this->apiClient;
     }
+
 
 }
