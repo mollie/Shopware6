@@ -61,7 +61,7 @@ context("Checkout Failure Tests", () => {
                 // which brings us to the mollie payment selection page
                 checkout.mollieFailureModeRetryPayment();
 
-                cy.url().should('include', '/payscreen/select-method/');
+                cy.url().should('include', '/checkout/select-method/');
 
                 // select giro pay and mark it as "paid"
                 molliePayment.initSandboxCookie();
