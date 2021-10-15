@@ -5,7 +5,7 @@ namespace Kiener\MolliePayments\Exception;
 use Shopware\Core\Framework\ShopwareHttpException;
 use Symfony\Component\HttpFoundation\Response;
 
-class MollieOrderPaymentCouldNotBeCreated extends ShopwareHttpException
+class MollieOrderPaymentCouldNotBeCreatedException extends ShopwareHttpException
 {
     /**
      * @param string $id

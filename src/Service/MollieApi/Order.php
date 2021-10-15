@@ -4,7 +4,7 @@ namespace Kiener\MolliePayments\Service\MollieApi;
 
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieOrderException;
 use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeFetchedException;
-use Kiener\MolliePayments\Exception\MollieOrderPaymentCouldNotBeCreated;
+use Kiener\MolliePayments\Exception\MollieOrderPaymentCouldNotBeCreatedException;
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\LoggerService;
@@ -185,7 +185,7 @@ class Order
             return $payment;
         } catch (ApiException $e) {
 
-            throw new MollieOrderPaymentCouldNotBeCreated($mollieOrderId, [], $e);
+            throw new MollieOrderPaymentCouldNotBeCreatedException($mollieOrderId, [], $e);
         }
     }
 
