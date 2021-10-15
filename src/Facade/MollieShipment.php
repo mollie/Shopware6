@@ -66,6 +66,16 @@ class MollieShipment
      */
     private $logger;
 
+    /**
+     * @param MolliePaymentExtractor $extractor
+     * @param DeliveryTransitionServiceInterface $deliveryTransitionService
+     * @param Order $mollieApiOrderService
+     * @param Shipment $mollieApiShipmentService
+     * @param OrderDeliveryService $orderDeliveryService
+     * @param OrderService $orderService
+     * @param OrderDataExtractor $orderDataExtractor
+     * @param LoggerService $logger
+     */
     public function __construct(
         MolliePaymentExtractor $extractor,
         DeliveryTransitionServiceInterface $deliveryTransitionService,
@@ -87,6 +97,11 @@ class MollieShipment
         $this->logger = $logger;
     }
 
+    /**
+     * @param string $orderDeliveryId
+     * @param Context $context
+     * @return bool
+     */
     public function setShipment(string $orderDeliveryId, Context $context): bool
     {
         $delivery = $this->orderDeliveryService->getDelivery($orderDeliveryId, $context);
@@ -160,6 +175,11 @@ class MollieShipment
         return $addedMollieShipment;
     }
 
+    /**
+     * @param string $orderNumber
+     * @param Context $context
+     * @return \Mollie\Api\Resources\Shipment
+     */
     public function shipOrder(string $orderNumber, Context $context): \Mollie\Api\Resources\Shipment
     {
         $order = $this->orderService->getOrderByNumber($orderNumber, $context);
@@ -175,13 +195,20 @@ class MollieShipment
         return $shipment;
     }
 
+    /**
+     * @param string $orderNumber
+     * @param string $itemIdentifier
+     * @param int $quantity
+     * @param Context $context
+     * @return \Mollie\Api\Resources\Shipment
+     */
     public function shipItem(string $orderNumber, string $itemIdentifier, int $quantity, Context $context): \Mollie\Api\Resources\Shipment
     {
         $order = $this->orderService->getOrderByNumber($orderNumber, $context);
 
         $mollieOrderId = $this->orderService->getMollieOrderId($order);
 
-        $lineItems = $this->searchLineItem($order, $itemIdentifier, $context);
+        $lineItems = $this->findMatchingLineItems($order, $itemIdentifier, $context);
 
         if ($lineItems->count() > 1) {
             throw new OrderLineItemFoundManyException($itemIdentifier);
@@ -224,7 +251,16 @@ class MollieShipment
         return $shipment;
     }
 
-    public function searchLineItem(OrderEntity $order, string $itemIdentifier, Context $context): OrderLineItemCollection
+    /**
+     * Try to find lineItems matching the $itemIdentifier. Shopware does not have a unique human-readable identifier for
+     * order line items, so we have to check for several fields, like product number or the mollie order line id.
+     *
+     * @param OrderEntity $order
+     * @param string $itemIdentifier
+     * @param Context $context
+     * @return OrderLineItemCollection
+     */
+    private function findMatchingLineItems(OrderEntity $order, string $itemIdentifier, Context $context): OrderLineItemCollection
     {
         return $this->orderDataExtractor->extractLineItems($order, $context)->filter(function ($lineItem) use ($itemIdentifier) {
             /** @var OrderLineItemEntity $lineItem */
