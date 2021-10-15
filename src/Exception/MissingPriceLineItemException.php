@@ -7,7 +7,7 @@ namespace Kiener\MolliePayments\Exception;
 use Shopware\Core\Framework\ShopwareHttpException;
 use Symfony\Component\HttpFoundation\Response;
 
-class MissingPriceLineItem extends ShopwareHttpException
+class MissingPriceLineItemException extends ShopwareHttpException
 {
     public function __construct(string $id)
     {
