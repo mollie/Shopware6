@@ -5,7 +5,7 @@ namespace Kiener\MolliePayments\Exception;
 use Shopware\Core\Framework\ShopwareHttpException;
 use Symfony\Component\HttpFoundation\Response;
 
-class MissingSalesChannelInOrder extends ShopwareHttpException
+class MissingSalesChannelInOrderException extends ShopwareHttpException
 {
     public function __construct(string $orderNumber)
     {
