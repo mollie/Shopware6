@@ -62,6 +62,11 @@ export default class ShopConfigurationAction {
             }
         }
 
+
+        // lets make sure cypress waits until
+        // all our updates have been completely sent
+        cy.intercept('/api/mollie/done').as('apiDone');
+
         this.apiClient.get('/product').then(products => {
             products.forEach(product => {
                 const data = {
@@ -71,8 +76,15 @@ export default class ShopConfigurationAction {
                 this.apiClient.patch('/product/' + product.id, data);
             });
 
-            this._clearCache();
-        });
+        }).then(() => {
+                this.apiClient.get('/mollie/done')
+            }
+        );
+
+        // now wait until our final fake url is called
+        cy.wait('@apiDone', {timeout: 20000});
+
+        this._clearCache();
     }
 
     /**

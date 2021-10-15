@@ -56,7 +56,7 @@ describe('Voucher Payments', () => {
 
             it('Voucher hidden if product is not configured', () => {
 
-                configAction.updateProducts(null);
+                configAction.updateProducts('');
 
                 scenarioDummyBasket.execute();
 
