@@ -5,7 +5,7 @@ namespace Kiener\MolliePayments\Exception;
 use Shopware\Core\Framework\ShopwareHttpException;
 use Symfony\Component\HttpFoundation\Response;
 
-class MollieOrderCouldNotBeFetched extends ShopwareHttpException
+class MollieOrderCouldNotBeFetchedException extends ShopwareHttpException
 {
     /**
      * @param string $mollieOrderID

@@ -8,7 +8,7 @@ use Kiener\MolliePayments\Event\PaymentPageRedirectEvent;
 use Kiener\MolliePayments\Exception\CouldNotFetchTransactionException;
 use Kiener\MolliePayments\Exception\MissingMollieOrderIdException;
 use Kiener\MolliePayments\Exception\MissingOrderInTransactionException;
-use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeFetched;
+use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeFetchedException;
 use Kiener\MolliePayments\Facade\MollieOrderPaymentFlow;
 use Kiener\MolliePayments\Factory\CompatibilityGatewayFactory;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
@@ -195,7 +195,7 @@ class PaymentController extends StorefrontController
                 Logger::CRITICAL
             );
 
-            throw new MollieOrderCouldNotBeFetched($mollieOrderId, [], $e);
+            throw new MollieOrderCouldNotBeFetchedException($mollieOrderId, [], $e);
         }
 
         // if configuration is shopware payment flow we could redirect now
