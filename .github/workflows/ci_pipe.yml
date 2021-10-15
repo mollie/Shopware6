@@ -242,23 +242,14 @@ jobs:
           docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
           docker exec shop bash -c 'sudo chown www-data:www-data /var/www/html/custom/plugins -R'
 
-      - name: Install Plugin
+      - name: Build Artifacts
+        run: |
+          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make build'
+
+      - name: Install/Configure Plugin
         run: |
           docker exec shop bash -c 'php bin/console plugin:refresh'
           docker exec shop bash -c 'php bin/console plugin:install MolliePayments --activate'
-
-      - name: Build artifacts
-        run: |
-          docker exec shop bash -c './bin/build-js.sh'
-          docker exec shop bash -c 'php bin/console theme:refresh'
-          docker exec shop bash -c 'php bin/console theme:compile'
-          docker exec shop bash -c 'php bin/console theme:refresh'
-
-      - name: Reinstall Plugin
-        run: |
-          docker exec shop bash -c 'php bin/console plugin:refresh'
-          docker exec shop bash -c 'php bin/console plugin:deactivate MolliePayments'
-          docker exec shop bash -c 'php bin/console plugin:activate MolliePayments'
           docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.liveApiKey ${{ secrets.MOLLIE_APIKEY_TEST }}'
           docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.testApiKey ${{ secrets.MOLLIE_APIKEY_TEST }}'
           docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.testMode true'

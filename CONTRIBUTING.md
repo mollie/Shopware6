@@ -66,15 +66,11 @@ make install
 
 
 Afterwards, please run these Shopware commands in your DocRoot to build all required artefacts.
+This will also automatically install the plugin before.
+That is a required process within Shopware.
 
 ```bash
-php bin/console plugin:refresh
-php bin/console plugin:install MolliePayments --activate
-
-# now use our internal build command to create all required artifacts.
-# this requires Shopware and is meant as a shorthand option to build the files 
-# simpyl and directly from within the plugin
-cd custom/plugins/MolliePayments && make build -B
+cd custom/plugins/MolliePayments && make build
 ```
 
 
