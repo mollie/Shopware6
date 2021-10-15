@@ -6,7 +6,7 @@ use Shopware\Core\Framework\ShopwareHttpException;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
-class MissingMollieOrderId extends ShopwareHttpException
+class MissingMollieOrderIdException extends ShopwareHttpException
 {
 
     public function __construct(string $orderNumber, Throwable $previous = null)
