@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Factory;
 
 use Exception;
+use Kiener\MolliePayments\MolliePayments;
 use Kiener\MolliePayments\Service\SettingsService;
 use Mollie\Api\Exceptions\IncompatiblePlatform;
 use Mollie\Api\MollieApiClient;
@@ -101,7 +102,7 @@ class MollieApiFactory
 
             // @todo Add plugin version variable
             $this->apiClient->addVersionString(
-                'MollieShopware6/1.5.4'
+                'MollieShopware6/' . MolliePayments::PLUGIN_VERSION
             );
         } catch (Exception $e) {
             $this->logger->error($e->getMessage(), [$e]);
@@ -132,7 +133,7 @@ class MollieApiFactory
             $this->apiClient->addVersionString('Shopware/' . Kernel::SHOPWARE_FALLBACK_VERSION);
 
             // @todo Add plugin version variable
-            $this->apiClient->addVersionString('MollieShopware6/1.5.4');
+            $this->apiClient->addVersionString('MollieShopware6/' . MolliePayments::PLUGIN_VERSION);
 
         } catch (Exception $e) {
             $this->logger->error($e->getMessage(), [$e]);
