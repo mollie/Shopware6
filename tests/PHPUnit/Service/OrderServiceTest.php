@@ -18,6 +18,8 @@ use Shopware\Core\Checkout\Order\SalesChannel\OrderService as ShopwareOrderServi
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\Filter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 
 class OrderServiceTest extends TestCase
@@ -106,6 +108,16 @@ class OrderServiceTest extends TestCase
         $receivedCriteria = $this->orderRepository->criteria[0];
 
         $this->assertTrue($receivedCriteria->hasEqualsFilter('orderNumber'));
+
+        $orderNumberFilters = array_filter($receivedCriteria->getFilters(), static function (Filter $filter) {
+            return $filter instanceof EqualsFilter && $filter->getField() === 'orderNumber';
+        });
+
+        $orderNumberFilterValues = array_map(static function (EqualsFilter $filter) {
+            return $filter->getValue();
+        }, $orderNumberFilters);
+
+        $this->assertContains('bar', $orderNumberFilterValues);
     }
 
     public function testGetOrderByNumberDoesntExist()
