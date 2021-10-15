@@ -5,7 +5,7 @@ namespace Kiener\MolliePayments\Storefront\Controller;
 use Exception;
 use Kiener\MolliePayments\Event\PaymentPageFailEvent;
 use Kiener\MolliePayments\Event\PaymentPageRedirectEvent;
-use Kiener\MolliePayments\Exception\CouldNotFetchTransaction;
+use Kiener\MolliePayments\Exception\CouldNotFetchTransactionException;
 use Kiener\MolliePayments\Exception\MissingMollieOrderId;
 use Kiener\MolliePayments\Exception\MissingOrderInTransactionException;
 use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeFetched;
@@ -142,7 +142,7 @@ class PaymentController extends StorefrontController
                 Logger::CRITICAL
             );
 
-            throw new CouldNotFetchTransaction($transactionId);
+            throw new CouldNotFetchTransactionException($transactionId);
         }
 
         $order = $transaction->getOrder();
