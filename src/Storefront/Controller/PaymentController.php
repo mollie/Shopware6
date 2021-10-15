@@ -147,6 +147,7 @@ class PaymentController extends StorefrontController
 
         $order = $transaction->getOrder();
 
+        // TODO: Refactor to use Service/OrderService::getOrder if $order does not exist.
         if (!$order instanceof OrderEntity) {
             $this->logger->addEntry(
                 sprintf('Could not fetch order from transaction with id %s', $transactionId),
@@ -159,6 +160,7 @@ class PaymentController extends StorefrontController
             throw new MissingOrderInTransactionException($transactionId);
         }
 
+        // TODO: Possibly refactor to use Service/OrderService::getMollieOrderId
         $customFieldArray = $order->getCustomFields() ?? [];
 
         $customFields = new MollieOrderCustomFieldsStruct($customFieldArray);
@@ -177,6 +179,7 @@ class PaymentController extends StorefrontController
             throw new MissingMollieOrderIdException($order->getOrderNumber());
         }
 
+        // TODO: Refactor to use Service/MollieApi/Order::getMollieOrder
         /** @var Order $mollieOrder */
         try {
 
