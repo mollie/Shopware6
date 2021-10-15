@@ -2,7 +2,7 @@
 
 namespace MolliePayments\Tests\Service\MollieApi;
 
-use Kiener\MolliePayments\Exception\OrderCurrencyNotFound;
+use Kiener\MolliePayments\Exception\OrderCurrencyNotFoundException;
 use Kiener\MolliePayments\Exception\OrderCustomerNotFound;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\LoggerService;
@@ -134,7 +134,7 @@ class OrderDataExtractorTest extends TestCase
         $order = new OrderEntity();
         $order->setId($orderId);
 
-        $this->expectException(OrderCurrencyNotFound::class);
+        $this->expectException(OrderCurrencyNotFoundException::class);
         $this->loggerService->expects($this->once())->method('addEntry')->with(
             sprintf('Could not fetch currency from order with id %s', $orderId),
             $this->context,

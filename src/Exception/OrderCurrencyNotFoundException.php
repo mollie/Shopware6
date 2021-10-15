@@ -5,7 +5,7 @@ namespace Kiener\MolliePayments\Exception;
 use Shopware\Core\Framework\ShopwareHttpException;
 use Symfony\Component\HttpFoundation\Response;
 
-class OrderCurrencyNotFound extends ShopwareHttpException
+class OrderCurrencyNotFoundException extends ShopwareHttpException
 {
     /**
      * @param string $id

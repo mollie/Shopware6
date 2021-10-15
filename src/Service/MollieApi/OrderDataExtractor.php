@@ -2,7 +2,7 @@
 
 namespace Kiener\MolliePayments\Service\MollieApi;
 
-use Kiener\MolliePayments\Exception\OrderCurrencyNotFound;
+use Kiener\MolliePayments\Exception\OrderCurrencyNotFoundException;
 use Kiener\MolliePayments\Exception\OrderCustomerNotFound;
 use Kiener\MolliePayments\Exception\OrderDeliveriesNotFoundException;
 use Kiener\MolliePayments\Exception\OrderDeliveryNotFoundException;
@@ -89,7 +89,7 @@ class OrderDataExtractor
                 Logger::CRITICAL
             );
 
-            throw new OrderCurrencyNotFound($orderEntity->getId());
+            throw new OrderCurrencyNotFoundException($orderEntity->getId());
         }
 
         return $currency;
