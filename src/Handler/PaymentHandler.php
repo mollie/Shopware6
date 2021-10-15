@@ -11,6 +11,7 @@ use Mollie\Api\Exceptions\ApiException;
 use Monolog\Logger;
 use RuntimeException;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\AsynchronousPaymentHandlerInterface;
 use Shopware\Core\Checkout\Payment\Exception\CustomerCanceledAsyncPaymentException;
@@ -54,9 +55,9 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      * PaymentHandler constructor.
      */
     public function __construct(
-        LoggerService $logger,
-        MolliePaymentDoPay $payFacade,
-        MolliePaymentFinalize $finalizeFacade,
+        LoggerService                         $logger,
+        MolliePaymentDoPay                    $payFacade,
+        MolliePaymentFinalize                 $finalizeFacade,
         TransactionTransitionServiceInterface $transactionTransitionService
     )
     {
@@ -68,13 +69,14 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
 
     /**
      * @param array $orderData
+     * @param OrderEntity $orderEntity
      * @param SalesChannelContext $salesChannelContext
      * @param CustomerEntity $customer
      * @param LocaleEntity $locale
      *
      * @return array
      */
-    public function processPaymentMethodSpecificParameters(array $orderData, SalesChannelContext $salesChannelContext, CustomerEntity $customer): array
+    public function processPaymentMethodSpecificParameters(array $orderData, OrderEntity $orderEntity, SalesChannelContext $salesChannelContext, CustomerEntity $customer): array
     {
         return $orderData;
     }
@@ -97,8 +99,8 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      */
     public function pay(
         AsyncPaymentTransactionStruct $transaction,
-        RequestDataBag $dataBag,
-        SalesChannelContext $salesChannelContext
+        RequestDataBag                $dataBag,
+        SalesChannelContext           $salesChannelContext
     ): RedirectResponse
     {
         try {
@@ -180,9 +182,9 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         } catch (CustomerCanceledAsyncPaymentException $exception) {
             throw $exception;
         } catch (Throwable $exception) {
-            $e=null;
+            $e = null;
             if ($exception instanceof \Exception) {
-                $e=$exception;
+                $e = $exception;
             }
             $this->logger->addEntry(
                 $exception->getMessage(),

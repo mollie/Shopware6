@@ -66,15 +66,11 @@ make install
 
 
 Afterwards, please run these Shopware commands in your DocRoot to build all required artefacts.
+This will also automatically install the plugin before.
+That is a required process within Shopware.
 
 ```bash
-php bin/console plugin:refresh
-php bin/console plugin:install MolliePayments --activate
-
-# now use our internal build command to create all required artifacts.
-# this requires Shopware and is meant as a shorthand option to build the files 
-# simpyl and directly from within the plugin
-cd custom/plugins/MolliePayments && make build -B
+cd custom/plugins/MolliePayments && make build
 ```
 
 
@@ -166,10 +162,21 @@ If you have questions, don't hesitate to contact us!
 
 
 
-#### Compatibility Gateway
-We are using a CompatibilityGateway class as (proof of concept) approach for all things that differ across these Shopware 6 versions.
+#### Compatibility Gateway 
+
+Unfortunately Shopware 6 is often quite different.
+To somehow handle this, we've introduced a compatibility structure as a proof of concept.
+In the folder `Compatibility` you see all kinds of things that might need some special treatment.
+
+Either different classes, subscribers, ... due to breaking changes in interfaces,
+or just a small gateway class to easily handle access to data that might need to be done in different ways.
+
 
 So if a function is deprecated, not existing or just different in a Shopware version, try to create your own signature for this use-case, add it to the gateway and hide the different usages in that abstraction layer.
+
+If you have problems on a level of Dependency Injection inside your XML file, please create a custom XML file in `Resources/config/compatibility` and only load the versions of your services that work for a specific Shopware version.
+You can adjust what will be loaded in the DependencyLoader.php within the Compatiblity folder.
+
 
 We don't know if this might grow too much in the future, but let's just give it a try!
 

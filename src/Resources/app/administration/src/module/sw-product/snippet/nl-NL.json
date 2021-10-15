@@ -1,0 +1,15 @@
+{
+  "mollie-payments": {
+    "vouchers": {
+      "CARD_TITLE": "Voucher",
+      "VOUCHER_INFO_TITLE": "Voucher Betalingen",
+      "VOUCHER_INFO_DESCRIPTION": "Met Mollie kunt u in uw online winkel eenvoudig betalingen accepteren met Eco-, cadeau- en maaltijdcheques - een slimme keuze om de verkoop te stimuleren en uw klanten tevreden te stellen. De betaalmethode \"voucher\" is alleen zichtbaar als u ten minste 1 product met de toegewezen type \"voucher\", in de winkelwagen heeft.",
+      "VOUCHER_BTN_READMORE": "Lees meer",
+      "VOUCHER_TYPE_CAPTION": "Vouchertype of product",
+      "VOUCHER_TYPE_VALUE_NONE": "Geen vouchertype",
+      "VOUCHER_TYPE_VALUE_ECO": "Eco",
+      "VOUCHER_TYPE_VALUE_MEAL": "Meal",
+      "VOUCHER_TYPE_VALUE_VOUCHER": "Gift"
+    }
+  }
+}

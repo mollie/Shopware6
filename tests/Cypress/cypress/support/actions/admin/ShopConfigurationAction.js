@@ -38,6 +38,57 @@ export default class ShopConfigurationAction {
 
     /**
      *
+     * @param voucherValue
+     */
+    updateProducts(voucherValue) {
+
+        if (voucherValue === 'eco') {
+            voucherValue = '1';
+        } else if (voucherValue === 'meal') {
+            voucherValue = '2';
+        } else if (voucherValue === 'gift') {
+            voucherValue = '3';
+        } else {
+            voucherValue = '';
+        }
+
+        let customFields = null;
+
+        if (voucherValue !== '') {
+            customFields = {
+                'mollie_payments': {
+                    'voucher_type': voucherValue,
+                }
+            }
+        }
+
+
+        // lets make sure cypress waits until
+        // all our updates have been completely sent
+        cy.intercept('/api/mollie/done').as('apiDone');
+
+        this.apiClient.get('/product').then(products => {
+            products.forEach(product => {
+                const data = {
+                    "id": product.id,
+                    "customFields": customFields,
+                };
+                this.apiClient.patch('/product/' + product.id, data);
+            });
+
+        }).then(() => {
+                this.apiClient.get('/mollie/done')
+            }
+        );
+
+        // now wait until our final fake url is called
+        cy.wait('@apiDone', {timeout: 20000});
+
+        this._clearCache();
+    }
+
+    /**
+     *
      * @param mollieFailureMode
      * @param creditCardComponents
      * @private

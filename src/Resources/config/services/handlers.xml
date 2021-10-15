@@ -178,5 +178,15 @@
             <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
             <tag name="shopware.payment.method.async"/>
         </service>
+
+        <!-- Voucher PaymentHandler -->
+        <service id="Kiener\MolliePayments\Handler\Method\VoucherPayment" class="Kiener\MolliePayments\Handler\Method\VoucherPayment">
+            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentFinalize"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+
     </services>
 </container>

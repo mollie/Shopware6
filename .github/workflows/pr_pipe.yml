@@ -100,9 +100,7 @@ jobs:
       - name: PHP Compatibility Checks
         run: make phpmin -B
 
-  # ------------------------------------------------------------------------------------------------------------------------
-
-  unit_tests:
+  phpunit:
     name: Unit Tests | PHP ${{ matrix.php }}
     needs: php_min
     runs-on: ubuntu-latest
@@ -126,7 +124,7 @@ jobs:
 
   phpstan:
     name: Static Analyzers
-    needs: unit_tests
+    needs: phpunit
     runs-on: ubuntu-latest
     steps:
 
@@ -163,3 +161,38 @@ jobs:
 
       - name: Run PHP CS Fixer
         run: make csfix -B
+
+  # ------------------------------------------------------------------------------------------------------------------------
+
+  integration:
+    name: Integration Tests | Shopware ${{ matrix.shopware }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        shopware: [ '6.4.0.0', '6.3.0', '6.2.0', '6.1.0' ]
+    steps:
+
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+
+      - name: Install PROD Dependencies
+        run: make install -B
+
+      - name: Start Docker
+        run: |
+          docker run --rm --name shop -d dockware/play:${{ matrix.shopware }}
+          sleep 30
+          docker logs shop
+
+      - name: Upload into Docker
+        run: docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
+
+      - name: Install Plugin
+        run: |
+          docker exec shop bash -c "php bin/console plugin:refresh"
+          docker exec shop bash -c "php bin/console plugin:install MolliePayments --activate"

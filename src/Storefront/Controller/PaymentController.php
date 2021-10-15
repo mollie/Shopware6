@@ -3,6 +3,8 @@
 namespace Kiener\MolliePayments\Storefront\Controller;
 
 use Exception;
+use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway;
+use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGatewayInterface;
 use Kiener\MolliePayments\Event\PaymentPageFailEvent;
 use Kiener\MolliePayments\Event\PaymentPageRedirectEvent;
 use Kiener\MolliePayments\Exception\CouldNotFetchTransactionException;
@@ -10,9 +12,7 @@ use Kiener\MolliePayments\Exception\MissingMollieOrderIdException;
 use Kiener\MolliePayments\Exception\MissingOrderInTransactionException;
 use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeFetchedException;
 use Kiener\MolliePayments\Facade\MollieOrderPaymentFlow;
-use Kiener\MolliePayments\Factory\CompatibilityGatewayFactory;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
-use Kiener\MolliePayments\Gateway\CompatibilityGatewayInterface;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\Order\OrderStateService;
 use Kiener\MolliePayments\Service\SettingsService;
@@ -21,7 +21,6 @@ use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterfa
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
 use Mollie\Api\Exceptions\ApiException;
-use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order;
 use Monolog\Logger;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
@@ -69,20 +68,23 @@ class PaymentController extends StorefrontController
     /** @var MollieOrderPaymentFlow */
     private $molliePaymentFlow;
 
-    public function __construct(
-        RouterInterface $router,
-        CompatibilityGatewayFactory $compatibilityGatewayFactory,
-        MollieApiFactory $apiFactory,
-        BusinessEventDispatcher $eventDispatcher,
-        OrderStateService $orderStateService,
-        SettingsService $settingsService,
-        TransactionService $transactionService,
-        LoggerService $logger,
-        TransactionTransitionServiceInterface $transactionTransitionService,
-        MollieOrderPaymentFlow $molliePaymentFlow
-    )
+
+    /**
+     * @param RouterInterface $router
+     * @param CompatibilityGatewayInterface $compatibilityGateway
+     * @param MollieApiFactory $apiFactory
+     * @param BusinessEventDispatcher $eventDispatcher
+     * @param OrderStateService $orderStateService
+     * @param SettingsService $settingsService
+     * @param TransactionService $transactionService
+     * @param LoggerService $logger
+     * @param TransactionTransitionServiceInterface $transactionTransitionService
+     * @param MollieOrderPaymentFlow $molliePaymentFlow
+     */
+    public function __construct(RouterInterface $router, CompatibilityGatewayInterface $compatibilityGateway, MollieApiFactory $apiFactory, BusinessEventDispatcher $eventDispatcher, OrderStateService $orderStateService, SettingsService $settingsService, TransactionService $transactionService, LoggerService $logger, TransactionTransitionServiceInterface $transactionTransitionService, MollieOrderPaymentFlow $molliePaymentFlow)
     {
         $this->router = $router;
+        $this->compatibilityGateway = $compatibilityGateway;
         $this->apiFactory = $apiFactory;
         $this->eventDispatcher = $eventDispatcher;
         $this->orderStateService = $orderStateService;
@@ -91,8 +93,6 @@ class PaymentController extends StorefrontController
         $this->logger = $logger;
         $this->transactionTransitionService = $transactionTransitionService;
         $this->molliePaymentFlow = $molliePaymentFlow;
-
-        $this->compatibilityGateway = $compatibilityGatewayFactory->create();
     }
 
     /**

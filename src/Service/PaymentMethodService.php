@@ -19,6 +19,7 @@ use Kiener\MolliePayments\Handler\Method\PayPalPayment;
 use Kiener\MolliePayments\Handler\Method\PaySafeCardPayment;
 use Kiener\MolliePayments\Handler\Method\Przelewy24Payment;
 use Kiener\MolliePayments\Handler\Method\SofortPayment;
+use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Method;
@@ -322,6 +323,7 @@ class PaymentMethodService
             PaySafeCardPayment::class,
             Przelewy24Payment::class,
             SofortPayment::class,
+            VoucherPayment::class,
         ];
     }
 
