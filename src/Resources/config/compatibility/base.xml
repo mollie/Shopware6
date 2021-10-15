@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="Kiener\MolliePayments\Compatibility\CompatibilityFactory" class="Kiener\MolliePayments\Compatibility\CompatibilityFactory">
+            <argument>%kernel.shopware_version%</argument>
+            <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextService"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway" class="Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway">
+            <factory service="Kiener\MolliePayments\Compatibility\CompatibilityFactory" method="createGateway"/>
+        </service>
+
+    </services>
+</container>

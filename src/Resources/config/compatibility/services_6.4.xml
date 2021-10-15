@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\HideVoucherPaymentMethodRoute64"
+                 decorates="Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRoute">
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\HideVoucherPaymentMethodRoute64.inner"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
+        </service>
+
+    </services>
+
+</container>

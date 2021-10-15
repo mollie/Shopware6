@@ -125,7 +125,7 @@ class MollieOrderBuilder
 
         $orderData['redirectUrl'] = $redirectUrl;
 
-        
+
         $webhookUrl = $this->webhookBuilder->buildWebhook($transactionId);
         $orderData['webhookUrl'] = $webhookUrl;
         $orderData['payment']['webhookUrl'] = $webhookUrl;
@@ -154,9 +154,17 @@ class MollieOrderBuilder
             $orderData['expiresAt'] = $dueDate;
         }
 
+
+
         // add payment specific data
         if ($handler instanceof PaymentHandler) {
-            $orderData = $handler->processPaymentMethodSpecificParameters($orderData, $salesChannelContext, $customer);
+
+            $orderData = $handler->processPaymentMethodSpecificParameters(
+                $orderData,
+                $order,
+                $salesChannelContext,
+                $customer
+            );
         }
 
         // enrich data with create customer at mollie

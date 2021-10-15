@@ -2,7 +2,7 @@
 
 namespace MolliePayments\Tests\Service\MollieApi\Builder;
 
-use Kiener\MolliePayments\Factory\CompatibilityGatewayFactory;
+use Kiener\MolliePayments\Factory\CompatibilityFactory;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieLineItemBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor;

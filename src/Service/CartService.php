@@ -2,8 +2,8 @@
 
 namespace Kiener\MolliePayments\Service;
 
-use Kiener\MolliePayments\Factory\CompatibilityGatewayFactory;
-use Kiener\MolliePayments\Gateway\CompatibilityGatewayInterface;
+use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway;
+use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGatewayInterface;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService as SalesChannelCartService;
 use Shopware\Core\Content\Product\Cart\ProductLineItemFactory;
@@ -39,15 +39,14 @@ class CartService
      * @param SalesChannelCartService $swCartService
      * @param SalesChannelContextSwitcher $contextSwitcher
      * @param ProductLineItemFactory $productItemFactory
-     * @param CompatibilityGatewayFactory $compatibilityGatewayFactory
+     * @param CompatibilityGateway $compatibilityGateway
      */
-    public function __construct(SalesChannelCartService $swCartService, SalesChannelContextSwitcher $contextSwitcher, ProductLineItemFactory $productItemFactory, CompatibilityGatewayFactory $compatibilityGatewayFactory)
+    public function __construct(SalesChannelCartService $swCartService, SalesChannelContextSwitcher $contextSwitcher, ProductLineItemFactory $productItemFactory, CompatibilityGatewayInterface $compatibilityGateway)
     {
         $this->swCartService = $swCartService;
         $this->contextSwitcher = $contextSwitcher;
         $this->productItemFactory = $productItemFactory;
-
-        $this->compatibilityGateway = $compatibilityGatewayFactory->create();
+        $this->compatibilityGateway = $compatibilityGateway;
     }
 
 

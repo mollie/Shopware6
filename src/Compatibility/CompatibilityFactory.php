@@ -1,12 +1,13 @@
 <?php
 
-namespace Kiener\MolliePayments\Factory;
+namespace Kiener\MolliePayments\Compatibility;
 
-use Kiener\MolliePayments\Gateway\CompatibilityGatewayInterface;
-use Kiener\MolliePayments\Gateway\Shopware\CompatibilityGateway;
+use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway;
+use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGatewayInterface;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextServiceInterface;
 
-class CompatibilityGatewayFactory
+
+class CompatibilityFactory
 {
 
     /**
@@ -30,11 +31,10 @@ class CompatibilityGatewayFactory
         $this->salesChannelContextService = $salesChannelContextService;
     }
 
-
     /**
      * @return CompatibilityGatewayInterface
      */
-    public function create(): CompatibilityGatewayInterface
+    public function createGateway(): CompatibilityGatewayInterface
     {
         return new CompatibilityGateway(
             $this->shopwareVersion,

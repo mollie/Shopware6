@@ -62,7 +62,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Cart\CartBackupService"/>
             <argument type="service" id="Kiener\MolliePayments\Repository\Order\OrderAddressRepository"/>
-            <argument type="service" id="Kiener\MolliePayments\Factory\CompatibilityGatewayFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway"/>
             <argument type="service" id="session.flash_bag"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>

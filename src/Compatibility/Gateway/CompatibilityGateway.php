@@ -1,8 +1,8 @@
 <?php
 
-namespace Kiener\MolliePayments\Gateway\Shopware;
+namespace Kiener\MolliePayments\Compatibility\Gateway;
 
-use Kiener\MolliePayments\Gateway\CompatibilityGatewayInterface;
+use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGatewayInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextServiceInterface;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextServiceParameters;
@@ -55,7 +55,7 @@ class CompatibilityGateway implements CompatibilityGatewayInterface
             return $this->contextService->get($params);
         }
 
-        /** @phpstan-ignore-next-line */
+        /* @phpstan-ignore-next-line */
         $context = $this->contextService->get($salesChannelID, $token, null);
 
         return $context;

@@ -38,6 +38,45 @@ export default class ShopConfigurationAction {
 
     /**
      *
+     * @param voucherValue
+     */
+    updateProducts(voucherValue) {
+
+        if (voucherValue === 'eco') {
+            voucherValue = '1';
+        } else if (voucherValue === 'meal') {
+            voucherValue = '2';
+        } else if (voucherValue === 'gift') {
+            voucherValue = '3';
+        } else {
+            voucherValue = '';
+        }
+
+        let customFields = null;
+
+        if (voucherValue !== '') {
+            customFields = {
+                'mollie_payments': {
+                    'voucher_type': voucherValue,
+                }
+            }
+        }
+
+        this.apiClient.get('/product').then(products => {
+            products.forEach(product => {
+                const data = {
+                    "id": product.id,
+                    "customFields": customFields,
+                };
+                this.apiClient.patch('/product/' + product.id, data);
+            });
+
+            this._clearCache();
+        });
+    }
+
+    /**
+     *
      * @param mollieFailureMode
      * @param creditCardComponents
      * @private

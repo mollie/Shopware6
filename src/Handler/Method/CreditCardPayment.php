@@ -10,6 +10,7 @@ use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Mollie\Api\Types\PaymentMethod;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class CreditCardPayment extends PaymentHandler
@@ -39,6 +40,7 @@ class CreditCardPayment extends PaymentHandler
 
     public function processPaymentMethodSpecificParameters(
         array $orderData,
+        OrderEntity $orderEntity,
         SalesChannelContext $salesChannelContext,
         CustomerEntity $customer
     ): array

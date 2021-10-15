@@ -1,0 +1,15 @@
+{
+  "mollie-payments": {
+    "vouchers": {
+      "CARD_TITLE": "Voucher",
+      "VOUCHER_INFO_TITLE": "Voucher Payments",
+      "VOUCHER_INFO_DESCRIPTION": "Mollie lets you easily accept payments in your online shop using Eco-, gift- and meal vouchers—a smart choice for boosting sales and satisfying your customers. The payment method \"voucher\" is only visible, if you have at least 1 product with an assigned voucher type in the cart.",
+      "VOUCHER_BTN_READMORE": "Read more",
+      "VOUCHER_TYPE_CAPTION": "Voucher type of product",
+      "VOUCHER_TYPE_VALUE_NONE": "None",
+      "VOUCHER_TYPE_VALUE_ECO": "Eco",
+      "VOUCHER_TYPE_VALUE_MEAL": "Meal",
+      "VOUCHER_TYPE_VALUE_VOUCHER": "Gift"
+    }
+  }
+}

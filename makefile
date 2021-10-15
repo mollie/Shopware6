@@ -66,7 +66,7 @@ eslint: ## Starts the ESLinter
 
 stylelint: ## Starts the Stylelinter
 	cd ./src/Resources/app/administration && ./node_modules/.bin/stylelint --allow-empty-input ./src/**/*.scss
-	cd ./src/Resources/app/storefront && ./node_modules/.bin/stylelint ./src/scss/**/*.scss
+	cd ./src/Resources/app/storefront && ./node_modules/.bin/stylelint --allow-empty-input ./src/**/*.scss
 
 # ------------------------------------------------------------------------------------------------------------
 

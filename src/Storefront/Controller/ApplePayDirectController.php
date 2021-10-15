@@ -2,10 +2,9 @@
 
 namespace Kiener\MolliePayments\Storefront\Controller;
 
+use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGatewayInterface;
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
-use Kiener\MolliePayments\Factory\CompatibilityGatewayFactory;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
-use Kiener\MolliePayments\Gateway\CompatibilityGatewayInterface;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Repository\Order\OrderAddressRepository;
 use Kiener\MolliePayments\Service\ApplePayDirect\ApplePayDirect;
@@ -147,10 +146,10 @@ class ApplePayDirectController extends StorefrontController
      * @param LoggerService $logger
      * @param CartBackupService $cartBackup
      * @param OrderAddressRepository $repoOrderAdresses
-     * @param CompatibilityGatewayFactory $compatibilityGatewayFactory
+     * @param $compatibilityGateway
      * @param FlashBag $sessionFlashBag
      */
-    public function __construct(ApplePayDirect $applePay, CartService $cartService, CustomerService $customerService, ShopService $shopService, OrderService $orderService, ApplePayPayment $paymentHandler, EntityRepositoryInterface $paymentMethodRepository, RouterInterface $router, SettingsService $settingsService, MolliePaymentDoPay $molliePaymentDoPay, MollieApiFactory $mollieApiFactory, LoggerService $logger, CartBackupService $cartBackup, OrderAddressRepository $repoOrderAdresses, CompatibilityGatewayFactory $compatibilityGatewayFactory, FlashBag $sessionFlashBag)
+    public function __construct(ApplePayDirect $applePay, CartService $cartService, CustomerService $customerService, ShopService $shopService, OrderService $orderService, ApplePayPayment $paymentHandler, EntityRepositoryInterface $paymentMethodRepository, RouterInterface $router, SettingsService $settingsService, MolliePaymentDoPay $molliePaymentDoPay, MollieApiFactory $mollieApiFactory, LoggerService $logger, CartBackupService $cartBackup, OrderAddressRepository $repoOrderAdresses, CompatibilityGatewayInterface $compatibilityGateway, FlashBag $sessionFlashBag)
     {
         $this->applePay = $applePay;
         $this->cartService = $cartService;
@@ -167,8 +166,7 @@ class ApplePayDirectController extends StorefrontController
         $this->repoOrderAdresses = $repoOrderAdresses;
         $this->flashBag = $sessionFlashBag;
         $this->cartBackupService = $cartBackup;
-
-        $this->compatibilityGateway = $compatibilityGatewayFactory->create();
+        $this->compatibilityGateway = $compatibilityGateway;
     }
 
 

@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments;
 
 use Exception;
+use Kiener\MolliePayments\Compatibility\DependencyLoader;
 use Kiener\MolliePayments\Service\ApplePayDirect\ApplePayDomainVerificationService;
 use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\PaymentMethodService;
@@ -19,21 +20,21 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
 class MolliePayments extends Plugin
 {
+
+
+    /**
+     * @param ContainerBuilder $container
+     */
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 
-        // Load dependency injection
         $this->container = $container;
 
-        // Load services
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/Resources/config'));
-
-        try {
-            $loader->load('services.xml');
-        } catch (Exception $e) {
-            // @todo Handle Exception
-        }
+        # load the dependencies that are compatible
+        # with our current shopware version
+        $loader = new DependencyLoader($container);
+        $loader->loadServices();
     }
 
     public function boot(): void
@@ -41,7 +42,7 @@ class MolliePayments extends Plugin
         parent::boot();
     }
 
-    public function install(InstallContext $context) : void
+    public function install(InstallContext $context): void
     {
         parent::install($context);
 
@@ -61,7 +62,7 @@ class MolliePayments extends Plugin
     {
         parent::update($context);
 
-        if($context->getPlugin()->isActive() === true) {
+        if ($context->getPlugin()->isActive() === true) {
             // add domain verification
             /** @var ApplePayDomainVerificationService $domainVerificationService */
             $domainVerificationService = $this->container->get(ApplePayDomainVerificationService::class);
@@ -74,12 +75,12 @@ class MolliePayments extends Plugin
         parent::postInstall($context);
     }
 
-    public function uninstall(UninstallContext $context) : void
+    public function uninstall(UninstallContext $context): void
     {
         parent::uninstall($context);
     }
 
-    public function activate(ActivateContext $context) : void
+    public function activate(ActivateContext $context): void
     {
         parent::activate($context);
 
@@ -97,7 +98,7 @@ class MolliePayments extends Plugin
         $domainVerificationService->downloadDomainAssociationFile();
     }
 
-    public function deactivate(DeactivateContext $context) : void
+    public function deactivate(DeactivateContext $context): void
     {
         parent::deactivate($context);
     }

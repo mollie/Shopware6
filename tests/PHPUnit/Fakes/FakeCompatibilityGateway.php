@@ -2,7 +2,7 @@
 
 namespace MolliePayments\Tests\Fakes;
 
-use Kiener\MolliePayments\Gateway\CompatibilityGatewayInterface;
+use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGatewayInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 

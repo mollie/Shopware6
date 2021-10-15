@@ -10,14 +10,5 @@
             <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Factory\CompatibilityGatewayFactory" class="Kiener\MolliePayments\Factory\CompatibilityGatewayFactory">
-            <argument>%kernel.shopware_version%</argument>
-            <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextService"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Gateway\Shopware\CompatibilityGateway" class="Kiener\MolliePayments\Gateway\Shopware\CompatibilityGateway">
-            <factory service="Kiener\MolliePayments\Factory\CompatibilityGatewayFactory" method="create"/>
-        </service>
-
     </services>
 </container>
