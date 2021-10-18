@@ -20,6 +20,8 @@ export default class ShopConfigurationAction {
      */
     setupShop(mollieFailureMode, creditCardComponents) {
 
+        cy.intercept('/api/mollie/setup-done').as('setupDone');
+
         this._activatePaymentMethods();
 
         this._prepareShippingMethods();
@@ -29,11 +31,17 @@ export default class ShopConfigurationAction {
         this.apiClient.get('/sales-channel').then(channels => {
             channels.forEach(channel => {
                 this._configureSalesChannel(channel.id);
+                this._configureMolliePlugin(channel.id, mollieFailureMode, creditCardComponents);
+
             });
+
+            this.apiClient.get('/mollie/setup-done')
         });
 
-        // configure mollie plugin
-        this._configureMolliePlugin(mollieFailureMode, creditCardComponents);
+        // now wait until our final fake url is called
+        cy.wait('@setupDone', {timeout: 20000});
+
+        this._clearCache();
     }
 
     /**
@@ -89,27 +97,28 @@ export default class ShopConfigurationAction {
 
     /**
      *
+     * @param channelId
      * @param mollieFailureMode
      * @param creditCardComponents
      * @private
      */
-    _configureMolliePlugin(mollieFailureMode, creditCardComponents) {
-        const data = {
-            "null": {
-                "MolliePayments.config.testMode": true,
-                "MolliePayments.config.debugMode": true,
-                // ------------------------------------------------------------------
-                "MolliePayments.config.shopwareFailedPayment": !mollieFailureMode,
-                "MolliePayments.config.enableCreditCardComponents": creditCardComponents,
-                "MolliePayments.config.enableApplePayDirect": true,
-                "MolliePayments.config.paymentMethodBankTransferDueDateDays": 2,
-                "MolliePayments.config.orderLifetimeDays": 4,
-                // ------------------------------------------------------------------
-                "MolliePayments.config.orderStateWithAAuthorizedTransaction": 'in_progress',
-                "MolliePayments.config.orderStateWithAPaidTransaction": 'completed',
-                "MolliePayments.config.orderStateWithAFailedTransaction": 'open',
-                "MolliePayments.config.orderStateWithACancelledTransaction": 'cancelled',
-            }
+    _configureMolliePlugin(channelId, mollieFailureMode, creditCardComponents) {
+        const data = {};
+
+        data[channelId] = {
+            "MolliePayments.config.testMode": true,
+            "MolliePayments.config.debugMode": true,
+            // ------------------------------------------------------------------
+            "MolliePayments.config.shopwareFailedPayment": !mollieFailureMode,
+            "MolliePayments.config.enableCreditCardComponents": creditCardComponents,
+            "MolliePayments.config.enableApplePayDirect": true,
+            "MolliePayments.config.paymentMethodBankTransferDueDateDays": 2,
+            "MolliePayments.config.orderLifetimeDays": 4,
+            // ------------------------------------------------------------------
+            "MolliePayments.config.orderStateWithAAuthorizedTransaction": 'in_progress',
+            "MolliePayments.config.orderStateWithAPaidTransaction": 'completed',
+            "MolliePayments.config.orderStateWithAFailedTransaction": 'open',
+            "MolliePayments.config.orderStateWithACancelledTransaction": 'cancelled',
         };
 
         this.apiClient.post('/_action/system-config/batch', data);
