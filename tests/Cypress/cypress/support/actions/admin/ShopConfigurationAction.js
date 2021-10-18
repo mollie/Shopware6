@@ -20,8 +20,6 @@ export default class ShopConfigurationAction {
      */
     setupShop(mollieFailureMode, creditCardComponents) {
 
-        cy.intercept('/api/mollie/setup-done').as('setupDone');
-
         this._activatePaymentMethods();
 
         this._prepareShippingMethods();
@@ -34,12 +32,10 @@ export default class ShopConfigurationAction {
                 this._configureMolliePlugin(channel.id, mollieFailureMode, creditCardComponents);
 
             });
-
-            this.apiClient.get('/mollie/setup-done')
         });
 
-        // now wait until our final fake url is called
-        cy.wait('@setupDone', {timeout: 20000});
+        // let's just wait a bit
+        cy.wait(10000);
 
         this._clearCache();
     }
@@ -57,7 +53,7 @@ export default class ShopConfigurationAction {
         } else if (voucherValue === 'gift') {
             voucherValue = '3';
         } else {
-            voucherValue = '';
+            voucherValue = '0';
         }
 
         let customFields = null;
@@ -71,10 +67,6 @@ export default class ShopConfigurationAction {
         }
 
 
-        // lets make sure cypress waits until
-        // all our updates have been completely sent
-        cy.intercept('/api/mollie/done').as('apiDone');
-
         this.apiClient.get('/product').then(products => {
             products.forEach(product => {
                 const data = {
@@ -83,14 +75,10 @@ export default class ShopConfigurationAction {
                 };
                 this.apiClient.patch('/product/' + product.id, data);
             });
+        });
 
-        }).then(() => {
-                this.apiClient.get('/mollie/done')
-            }
-        );
-
-        // now wait until our final fake url is called
-        cy.wait('@apiDone', {timeout: 20000});
+        // let's just wait a bit
+        cy.wait(3000);
 
         this._clearCache();
     }
