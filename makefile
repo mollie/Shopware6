@@ -31,6 +31,7 @@ clean: ## Cleans all dependencies
 	rm -rf ./src/Resources/app/storefront/package-lock.json
 
 build: ## Installs the plugin, and builds the artifacts using the Shopware build commands (requires Shopware)
+	cd /var/www/html && php bin/console plugin:refresh
 	cd /var/www/html && php bin/console plugin:install MolliePayments --activate | true
 	cd /var/www/html && php bin/console plugin:refresh
 	cd /var/www/html && php bin/console theme:dump
