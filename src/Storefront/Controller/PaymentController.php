@@ -7,10 +7,10 @@ use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway;
 use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGatewayInterface;
 use Kiener\MolliePayments\Event\PaymentPageFailEvent;
 use Kiener\MolliePayments\Event\PaymentPageRedirectEvent;
-use Kiener\MolliePayments\Exception\CouldNotFetchTransaction;
-use Kiener\MolliePayments\Exception\MissingMollieOrderId;
+use Kiener\MolliePayments\Exception\CouldNotFetchTransactionException;
+use Kiener\MolliePayments\Exception\MissingMollieOrderIdException;
 use Kiener\MolliePayments\Exception\MissingOrderInTransactionException;
-use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeFetched;
+use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeFetchedException;
 use Kiener\MolliePayments\Facade\MollieOrderPaymentFlow;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\LoggerService;
@@ -142,11 +142,12 @@ class PaymentController extends StorefrontController
                 Logger::CRITICAL
             );
 
-            throw new CouldNotFetchTransaction($transactionId);
+            throw new CouldNotFetchTransactionException($transactionId);
         }
 
         $order = $transaction->getOrder();
 
+        // TODO: Refactor to use Service/OrderService::getOrder if $order does not exist.
         if (!$order instanceof OrderEntity) {
             $this->logger->addEntry(
                 sprintf('Could not fetch order from transaction with id %s', $transactionId),
@@ -159,6 +160,7 @@ class PaymentController extends StorefrontController
             throw new MissingOrderInTransactionException($transactionId);
         }
 
+        // TODO: Possibly refactor to use Service/OrderService::getMollieOrderId
         $customFieldArray = $order->getCustomFields() ?? [];
 
         $customFields = new MollieOrderCustomFieldsStruct($customFieldArray);
@@ -174,9 +176,10 @@ class PaymentController extends StorefrontController
                 Logger::CRITICAL
             );
 
-            throw new MissingMollieOrderId($order->getOrderNumber());
+            throw new MissingMollieOrderIdException($order->getOrderNumber());
         }
 
+        // TODO: Refactor to use Service/MollieApi/Order::getMollieOrder
         /** @var Order $mollieOrder */
         try {
 
@@ -195,7 +198,7 @@ class PaymentController extends StorefrontController
                 Logger::CRITICAL
             );
 
-            throw new MollieOrderCouldNotBeFetched($mollieOrderId, [], $e);
+            throw new MollieOrderCouldNotBeFetchedException($mollieOrderId, [], $e);
         }
 
         // if configuration is shopware payment flow we could redirect now

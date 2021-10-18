@@ -5,7 +5,7 @@ namespace Kiener\MolliePayments\Exception;
 use Shopware\Core\Framework\ShopwareHttpException;
 use Symfony\Component\HttpFoundation\Response;
 
-class OrderCurrencyNotFound extends ShopwareHttpException
+class MollieOrderPaymentCouldNotBeCreatedException extends ShopwareHttpException
 {
     /**
      * @param string $id
@@ -14,13 +14,13 @@ class OrderCurrencyNotFound extends ShopwareHttpException
      */
     public function __construct(string $id, array $parameters = [], \Throwable $previous = null)
     {
-        $message = sprintf('Currency of order %s could not be fetched', $id);
+        $message = sprintf('Could not create a new payment for mollie order (%s)', $id);
         parent::__construct($message, $parameters, $previous);
     }
 
     public function getErrorCode(): string
     {
-        return 'MOLLIE_PAYMENTS__CURRENCY_NOT_FOUND_IN_ORDER';
+        return 'MOLLIE_PAYMENTS__NEW_PAYMENT_FOR_ORDER_COULD_NOT_BE_CREATED';
     }
 
     public function getStatusCode(): int

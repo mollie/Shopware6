@@ -1,21 +1,23 @@
 <?php declare(strict_types=1);
 
+
 namespace Kiener\MolliePayments\Exception;
+
 
 use Shopware\Core\Framework\ShopwareHttpException;
 use Symfony\Component\HttpFoundation\Response;
 
-class MissingSalesChannelInOrder extends ShopwareHttpException
+class MissingPriceLineItemException extends ShopwareHttpException
 {
-    public function __construct(string $orderNumber)
+    public function __construct(string $id)
     {
-        $message = sprintf('Could not extract SalesChannel from order (%s)', $orderNumber);
+        $message = sprintf('The OrderLineItemEntity with id (%s) has no price set', $id);
         parent::__construct($message);
     }
 
     public function getErrorCode(): string
     {
-        return 'MOLLIE_PAYMENTS__MISSING_SALESCHANNEL_IN_ORDER';
+        return 'MOLLIE_PAYMENTS__LINE_ITEM_MISSING_PRICE_COLLECTION';
     }
 
     public function getStatusCode(): int

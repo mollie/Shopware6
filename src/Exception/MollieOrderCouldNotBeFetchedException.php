@@ -5,22 +5,22 @@ namespace Kiener\MolliePayments\Exception;
 use Shopware\Core\Framework\ShopwareHttpException;
 use Symfony\Component\HttpFoundation\Response;
 
-class OrderCustomerNotFound extends ShopwareHttpException
+class MollieOrderCouldNotBeFetchedException extends ShopwareHttpException
 {
     /**
-     * @param string $id
+     * @param string $mollieOrderID
      * @param array<string,mixed> $parameters
      * @param \Throwable|null $previous
      */
-    public function __construct(string $id, array $parameters = [], \Throwable $previous = null)
+    public function __construct(string $mollieOrderID, array $parameters = [], \Throwable $previous = null)
     {
-        $message = sprintf('Customer of order %s could not be found', $id);
+        $message = sprintf('Mollie order (%s) could not be fetched', $mollieOrderID);
         parent::__construct($message, $parameters, $previous);
     }
 
     public function getErrorCode(): string
     {
-        return 'MOLLIE_PAYMENTS__CUSTOMER_NOT_FOUND_IN_ORDER';
+        return 'MOLLIE_PAYMENTS__ORDER_COULD_NOT_BE_FETCHED';
     }
 
     public function getStatusCode(): int

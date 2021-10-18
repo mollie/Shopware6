@@ -3,7 +3,7 @@
 namespace Kiener\MolliePayments\Subscriber;
 
 use Kiener\MolliePayments\Exception\CouldNotSetRefundAtMollieException;
-use Kiener\MolliePayments\Exception\MissingSalesChannelInOrder;
+use Kiener\MolliePayments\Exception\MissingSalesChannelInOrderException;
 use Kiener\MolliePayments\Facade\SetMollieOrderRefunded;
 use Kiener\MolliePayments\Service\LoggerService;
 use Monolog\Logger;
@@ -59,7 +59,7 @@ class PaymentStateSubscriber implements EventSubscriberInterface
 
         try {
             $this->setMollieOrderRefunded->setRefunded($event->getTransition()->getEntityId(), $event->getContext());
-        } catch (CouldNotSetRefundAtMollieException | MissingSalesChannelInOrder $e) {
+        } catch (CouldNotSetRefundAtMollieException | MissingSalesChannelInOrderException $e) {
             $this->loggerService->addEntry(
                 $e->getMessage(),
                 $event->getContext(),

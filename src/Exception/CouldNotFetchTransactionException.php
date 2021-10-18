@@ -5,7 +5,7 @@ namespace Kiener\MolliePayments\Exception;
 use Shopware\Core\Framework\ShopwareHttpException;
 use Symfony\Component\HttpFoundation\Response;
 
-class CouldNotFetchTransaction extends ShopwareHttpException
+class CouldNotFetchTransactionException extends ShopwareHttpException
 {
     public function __construct(string $id)
     {

@@ -2,7 +2,7 @@
 
 namespace Kiener\MolliePayments\Facade;
 
-use Kiener\MolliePayments\Exception\MissingMollieOrderId;
+use Kiener\MolliePayments\Exception\MissingMollieOrderIdException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
@@ -57,8 +57,8 @@ class MolliePaymentFinalize
     /**
      * @param AsyncPaymentTransactionStruct $transactionStruct
      * @param SalesChannelContext $salesChannelContext
-     * @throws MissingMollieOrderId
-     * @throws ApiException|IncompatiblePlatform|MissingMollieOrderId|CustomerCanceledAsyncPaymentException
+     * @throws MissingMollieOrderIdException
+     * @throws ApiException|IncompatiblePlatform|MissingMollieOrderIdException|CustomerCanceledAsyncPaymentException
      */
     public function finalize(AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext): void
     {
@@ -70,7 +70,7 @@ class MolliePaymentFinalize
         if (empty($mollieOrderId)) {
             $orderNumber = $order->getOrderNumber() ?? '-';
 
-            throw new MissingMollieOrderId($orderNumber);
+            throw new MissingMollieOrderIdException($orderNumber);
         }
 
         $apiClient = $this->mollieApiFactory->getClient($salesChannelContext->getSalesChannel()->getId());

@@ -2,7 +2,7 @@
 
 namespace Kiener\MolliePayments\Service\MollieApi;
 
-use Kiener\MolliePayments\Exception\PaymentCouldNotBeCancelled;
+use Kiener\MolliePayments\Exception\PaymentCouldNotBeCancelledException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\PaymentCollection;
@@ -26,7 +26,7 @@ class Payment
         try {
             $apiClient->payments->delete($molliePaymentId);
         } catch (ApiException $e) {
-            throw new PaymentCouldNotBeCancelled($molliePaymentId, [], $e);
+            throw new PaymentCouldNotBeCancelledException($molliePaymentId, [], $e);
         }
     }
 

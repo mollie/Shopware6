@@ -5,7 +5,7 @@ namespace Kiener\MolliePayments\Exception;
 use Shopware\Core\Framework\ShopwareHttpException;
 use Symfony\Component\HttpFoundation\Response;
 
-class MollieOrderCouldNotBeCancelled extends ShopwareHttpException
+class OrderCurrencyNotFoundException extends ShopwareHttpException
 {
     /**
      * @param string $id
@@ -14,13 +14,13 @@ class MollieOrderCouldNotBeCancelled extends ShopwareHttpException
      */
     public function __construct(string $id, array $parameters = [], \Throwable $previous = null)
     {
-        $message = sprintf('Mollie order with id %s could not be cancelled', $id);
+        $message = sprintf('Currency of order %s could not be fetched', $id);
         parent::__construct($message, $parameters, $previous);
     }
 
     public function getErrorCode(): string
     {
-        return 'MOLLIE_PAYMENTS__ORDER_COULD_NOT_BE_CANCELLED';
+        return 'MOLLIE_PAYMENTS__CURRENCY_NOT_FOUND_IN_ORDER';
     }
 
     public function getStatusCode(): int

@@ -5,7 +5,7 @@ namespace Kiener\MolliePayments\Service\MollieApi\Builder;
 
 use Kiener\MolliePayments\Compatibility\CompatibilityFactory;
 use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGatewayInterface;
-use Kiener\MolliePayments\Exception\MissingPriceLineItem;
+use Kiener\MolliePayments\Exception\MissingPriceLineItemException;
 use Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\PriceCalculator;
 use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
@@ -78,7 +78,7 @@ class MollieLineItemBuilder
             $itemPrice = $item->getPrice();
 
             if (!$itemPrice instanceof CalculatedPrice) {
-                throw new MissingPriceLineItem($item->getProductId());
+                throw new MissingPriceLineItemException($item->getProductId());
             }
 
             $prices = $this->priceCalculator->calculateLineItemPrice($item->getPrice(), $item->getTotalPrice(), $taxStatus);

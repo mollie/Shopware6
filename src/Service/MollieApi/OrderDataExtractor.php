@@ -2,8 +2,8 @@
 
 namespace Kiener\MolliePayments\Service\MollieApi;
 
-use Kiener\MolliePayments\Exception\OrderCurrencyNotFound;
-use Kiener\MolliePayments\Exception\OrderCustomerNotFound;
+use Kiener\MolliePayments\Exception\OrderCurrencyNotFoundException;
+use Kiener\MolliePayments\Exception\OrderCustomerNotFoundException;
 use Kiener\MolliePayments\Exception\OrderDeliveriesNotFoundException;
 use Kiener\MolliePayments\Exception\OrderDeliveryNotFoundException;
 use Kiener\MolliePayments\Exception\OrderLineItemsNotFoundException;
@@ -53,7 +53,7 @@ class OrderDataExtractor
                 Logger::CRITICAL
             );
 
-            throw new OrderCustomerNotFound($order->getId());
+            throw new OrderCustomerNotFoundException($order->getId());
         }
 
         $enrichedCustomer = $this->customerService->getCustomer(
@@ -70,7 +70,7 @@ class OrderDataExtractor
                 Logger::CRITICAL
             );
 
-            throw new OrderCustomerNotFound($order->getId());
+            throw new OrderCustomerNotFoundException($order->getId());
         }
 
         return $enrichedCustomer;
@@ -89,7 +89,7 @@ class OrderDataExtractor
                 Logger::CRITICAL
             );
 
-            throw new OrderCurrencyNotFound($orderEntity->getId());
+            throw new OrderCurrencyNotFoundException($orderEntity->getId());
         }
 
         return $currency;
