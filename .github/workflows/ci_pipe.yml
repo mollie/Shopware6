@@ -245,9 +245,6 @@ jobs:
       - name: Build Artifacts
         run: |
           docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make build'
-          docker exec shop bash -c 'php bin/console theme:refresh'
-          docker exec shop bash -c 'php bin/console theme:compile'
-          docker exec shop bash -c 'php bin/console theme:refresh'
 
       - name: Install/Configure Plugin
         run: |

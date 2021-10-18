@@ -36,6 +36,9 @@ build: ## Installs the plugin, and builds the artifacts using the Shopware build
 	cd /var/www/html && php bin/console plugin:refresh
 	cd /var/www/html && php bin/console theme:dump
 	cd /var/www/html && ./bin/build-js.sh
+	cd /var/www/html && php bin/console theme:refresh
+	cd /var/www/html && php bin/console theme:compile
+	cd /var/www/html && php bin/console theme:refresh
 
 # ------------------------------------------------------------------------------------------------------------
 
