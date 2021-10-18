@@ -18,7 +18,7 @@ export default class AdminProductsAction {
         repoMainMenu.getCatalogues().click();
         cy.wait(1500);
         repoMainMenu.getProductsOverview().click();
-        cy.wait(1500);
+        cy.wait(2000);
     }
 
     /**
