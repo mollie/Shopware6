@@ -189,13 +189,10 @@ class RefundService
 
         /** @var \stdClass $voucher */
         foreach ($payment->details->vouchers as $voucher) {
-            # weird but we need that cast and separate variable
-            $value = (float)$voucher->amount->value;
-            $voucherAmount .= $value;
+            $voucherAmount += (float)$voucher->amount->value;
         }
 
-        # again weird, but we still need that cast
-        return (float)$voucherAmount;
+        return $voucherAmount;
     }
 
     /**
