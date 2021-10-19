@@ -60,6 +60,7 @@
       "totalRefunds": "Terugbetaald bedrag",
       "totalRefundsPending": "Wachtend op terugbetaling",
       "totalRemaining": "Terug te betalen",
+      "totalVouchers": "Voucher",
       "totalShipments": "Verzonden bedrag ({quantity} items)"
     }
   },

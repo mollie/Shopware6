@@ -36,8 +36,8 @@ class RefundService
      * @param RefundHydrator $refundHydrator
      */
     public function __construct(
-        Order $mollieOrderApi,
-        OrderService $orderService,
+        Order          $mollieOrderApi,
+        OrderService   $orderService,
         RefundHydrator $refundHydrator
     )
     {
@@ -162,6 +162,40 @@ class RefundService
         );
 
         return $payment->getAmountRemaining();
+    }
+
+    /**
+     * @param OrderEntity $order
+     * @param Context $context
+     * @return float
+     */
+    public function getVoucherPaidAmount(OrderEntity $order, Context $context): float
+    {
+        $payment = $this->mollieOrderApi->getCompletedPayment(
+            $this->orderService->getMollieOrderId($order),
+            $order->getSalesChannelId(),
+            $context
+        );
+
+        if ($payment->details === null) {
+            return 0;
+        }
+
+        if (!property_exists($payment->details, 'vouchers')) {
+            return 0;
+        }
+
+        $voucherAmount = 0;
+
+        /** @var \stdClass $voucher */
+        foreach ($payment->details->vouchers as $voucher) {
+            # weird but we need that cast and separate variable
+            $value = (float)$voucher->amount->value;
+            $voucherAmount .= $value;
+        }
+
+        # again weird, but we still need that cast
+        return (float)$voucherAmount;
     }
 
     /**
