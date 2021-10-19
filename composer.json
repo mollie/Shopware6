@@ -9,9 +9,6 @@
       "name": "Kiener Digital Commerce"
     }
   ],
-  "require": {
-    "mollie/mollie-api-php": "v2.30.2"
-  },
   "extra": {
     "shopware-plugin-class": "Kiener\\MolliePayments\\MolliePayments",
     "copyright": "(c) by Kiener Digital Commerce",
@@ -58,6 +55,9 @@
   "conflict": {
     "shopware/storefront": "<6,>=7",
     "shopware/administration": "<6,>=7"
+  },
+  "require": {
+    "mollie/mollie-api-php": "^2.37"
   },
   "require-dev": {
     "shopware/core": "*",
