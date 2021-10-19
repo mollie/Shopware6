@@ -56,7 +56,7 @@ describe('Credit Card Components', () => {
                 shopware.prepareDomainChange();
                 checkout.placeOrderOnConfirm();
 
-                cy.url().should('include', 'https://www.mollie.com/paymentscreen/');
+                cy.url().should('include', 'https://www.mollie.com/checkout/');
 
                 // verify that our component card is really
                 // been used by comparing the last 4 digits

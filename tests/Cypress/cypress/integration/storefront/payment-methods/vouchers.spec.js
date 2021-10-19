@@ -102,6 +102,6 @@ function testVoucherPayment() {
 
     // verify that we are on the mollie payment screen
     // and that our payment method is also visible somewhere in that url
-    cy.url().should('include', 'https://www.mollie.com/paymentscreen/');
+    cy.url().should('include', 'https://www.mollie.com/checkout/');
     cy.url().should('include', 'voucher');
 }
