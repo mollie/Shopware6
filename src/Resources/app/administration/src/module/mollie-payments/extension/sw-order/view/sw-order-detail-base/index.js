@@ -14,6 +14,7 @@ Component.override('sw-order-detail-base', {
         return {
             remainingAmount: 0.0,
             refundedAmount: 0.0,
+            voucherAmount: 0.0,
             refundAmountPending: 0.0,
             refunds: [],
             shippedAmount: 0,
@@ -46,6 +47,7 @@ Component.override('sw-order-detail-base', {
                     .then((response) => {
                         this.remainingAmount = response.remaining;
                         this.refundedAmount = response.refunded;
+                        this.voucherAmount = response.voucherAmount;
                     })
                     .catch((response) => {
                         this.createNotificationError({

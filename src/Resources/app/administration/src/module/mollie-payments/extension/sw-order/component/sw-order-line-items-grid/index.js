@@ -24,6 +24,10 @@ Component.override('sw-order-line-items-grid', {
             type: Number,
             required: true,
         },
+        voucherAmount: {
+            type: Number,
+            required: true,
+        },
         refunds: {
             type: Array,
             required: true,

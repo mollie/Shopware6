@@ -60,6 +60,7 @@
       "totalRefunds": "Rückerstattete Menge",
       "totalRefundsPending": "Warten auf Rückerstattung",
       "totalRemaining": "Rückerstattbar",
+      "totalVouchers": "Gutscheine",
       "totalShipments": "Versandte Menge ({quantity} Stück)"
     }
   },

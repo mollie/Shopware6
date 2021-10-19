@@ -80,6 +80,13 @@
                             </template>
                         {% endblock %}
 
+                        {% block sw_order_line_items_grid_refund_summary_amount_voucher %}
+                            <template v-if="voucherAmount > 0">
+                                <dt>{{ $tc('sw-order.detailExtended.totalVouchers') }}</dt>
+                                <dd>{{ voucherAmount | currency(order.currency.shortName) }}</dd>
+                            </template>
+                        {% endblock %}
+
                         {% block sw_order_line_items_grid_refund_summary_amount_refunded %}
                             <dt>{{ $tc('sw-order.detailExtended.totalRefunds') }}</dt>
                             <dd>{{ refundedAmount | currency(order.currency.shortName) }}</dd>

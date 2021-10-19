@@ -60,6 +60,7 @@
       "totalRefunds": "Refunded amount",
       "totalRefundsPending": "Waiting to be refunded",
       "totalRemaining": "Refundable amount",
+      "totalVouchers": "Voucher amount",
       "totalShipments": "Shipped amount ({quantity} items)"
     }
   },

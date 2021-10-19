@@ -45,8 +45,8 @@ class RefundController extends AbstractController
      */
     public function __construct(
         LoggerInterface $logger,
-        OrderService $orderService,
-        RefundService $refundService
+        OrderService    $orderService,
+        RefundService   $refundService
     )
     {
         $this->logger = $logger;
@@ -249,10 +249,13 @@ class RefundController extends AbstractController
     private function totalResponse(string $orderId, Context $context): JsonResponse
     {
         try {
+
             $order = $this->getValidOrder($orderId, $context);
 
             $remaining = $this->refundService->getRemainingAmount($order, $context);
             $refunded = $this->refundService->getRefundedAmount($order, $context);
+            $voucherAmount = $this->refundService->getVoucherPaidAmount($order, $context);
+
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
@@ -260,12 +263,13 @@ class RefundController extends AbstractController
             // This indicates there is no completed payment for this order, so there are no refunds yet.
             $remaining = 0;
             $refunded = 0;
+            $voucherAmount = 0;
         } catch (\Throwable $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], 500);
         }
 
-        return $this->json(compact('remaining', 'refunded'));
+        return $this->json(compact('remaining', 'refunded', 'voucherAmount'));
     }
 
     /**
