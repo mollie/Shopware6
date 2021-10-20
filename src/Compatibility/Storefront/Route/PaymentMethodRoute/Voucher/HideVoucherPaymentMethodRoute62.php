@@ -1,6 +1,6 @@
 <?php
 
-namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute;
+namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\Voucher;
 
 use Kiener\MolliePayments\Service\VoucherService;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
@@ -29,17 +29,16 @@ class HideVoucherPaymentMethodRoute62 extends AbstractPaymentMethodRoute
      */
     private $voucherService;
 
-
     /**
      * @param AbstractPaymentMethodRoute $corePaymentMethodRoute
      * @param CartService $cartService
+     * @param VoucherService $voucherService
      */
-    public function __construct(AbstractPaymentMethodRoute $corePaymentMethodRoute, CartService $cartService)
+    public function __construct(AbstractPaymentMethodRoute $corePaymentMethodRoute, CartService $cartService, VoucherService $voucherService)
     {
         $this->corePaymentMethodRoute = $corePaymentMethodRoute;
         $this->cartService = $cartService;
-
-        $this->voucherService = new VoucherService();
+        $this->voucherService = $voucherService;
     }
 
 
