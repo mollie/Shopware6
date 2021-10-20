@@ -3,7 +3,7 @@
 namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\Cache;
 
 
-use Kiener\MolliePayments\Service\VoucherService;
+use Kiener\MolliePayments\Service\Cart\Voucher\VoucherCartCollector;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Payment\Event\PaymentMethodRouteCacheKeyEvent;
@@ -18,19 +18,13 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
      */
     private $cartService;
 
-    /**
-     * @var VoucherService
-     */
-    private $voucherService;
 
     /**
      * @param CartService $cartService
-     * @param VoucherService $voucherService
      */
-    public function __construct(CartService $cartService, VoucherService $voucherService)
+    public function __construct(CartService $cartService)
     {
         $this->cartService = $cartService;
-        $this->voucherService = $voucherService;
     }
 
 
@@ -65,16 +59,17 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
     /**
      * @param Cart $cart
      * @param array<mixed> $parts
+     *
      * @return array<mixed>
      */
     private function addVoucherKey(Cart $cart, array $parts): array
     {
-        $hasVoucher = $this->voucherService->hasCartVoucherProducts($cart);
+        $voucherPermitted = (bool)$cart->getData()->get(VoucherCartCollector::VOUCHER_PERMITTED);
 
-        if ($hasVoucher) {
-            $parts[] = 'has-voucher';
+        if ($voucherPermitted) {
+            $parts[] = 'with-voucher';
         } else {
-            $parts[] = 'has-no-voucher';
+            $parts[] = 'without-voucher';
         }
 
         return $parts;

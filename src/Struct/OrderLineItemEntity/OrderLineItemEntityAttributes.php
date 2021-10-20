@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Struct\OrderLineItemEntity;
 
 
+use Kiener\MolliePayments\Struct\Voucher\VoucherType;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 
@@ -53,8 +54,15 @@ class OrderLineItemEntityAttributes
      */
     public function getVoucherType()
     {
-        if ($this->voucherType !== '1' && $this->voucherType !== '2' & $this->voucherType !== '3') {
-            return '';
+        $availableTypes = [
+            VoucherType::TYPE_NONE,
+            VoucherType::TYPE_ECO,
+            VoucherType::TYPE_MEAL,
+            VoucherType::TYPE_GIFT
+        ];
+
+        if (!in_array($this->voucherType, $availableTypes)) {
+            return VoucherType::TYPE_NOTSET;
         }
 
         return $this->voucherType;

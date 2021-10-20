@@ -2,6 +2,8 @@
 
 namespace MolliePayments\Tests\Struct\LineItem;
 
+use Kiener\MolliePayments\Handler\Method\PayPalPayment;
+use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
@@ -11,31 +13,31 @@ class PaymentMethodAttributesTest extends TestCase
 {
 
     /**
-     *
+     * This test verifies that our VoucherPayment class is
+     * recognized as "voucher" payment type.
      */
-    public function testEmptyCustomFields()
+    public function testVoucherIsDetected()
     {
         $method = new PaymentMethodEntity();
-        $method->setCustomFields([]);
+        $method->setHandlerIdentifier(VoucherPayment::class);
 
         $attributes = new PaymentMethodAttributes($method);
 
-        $this->assertEquals('', $attributes->getMolliePaymentName());
+        $this->assertEquals(true, $attributes->isVoucherMethod());
     }
 
     /**
-     *
+     * This test verifies that a non-voucher payment, such as
+     * PayPal is not accidentally recognized as "voucher" payment.
      */
-    public function testMolliePaymentName()
+    public function testPaypalIsNoVoucher()
     {
         $method = new PaymentMethodEntity();
-        $method->setCustomFields([
-            'mollie_payment_method_name' => 'voucher',
-        ]);
+        $method->setHandlerIdentifier(PayPalPayment::class);
 
         $attributes = new PaymentMethodAttributes($method);
 
-        $this->assertEquals('voucher', $attributes->getMolliePaymentName());
+        $this->assertEquals(false, $attributes->isVoucherMethod());
     }
 
 }

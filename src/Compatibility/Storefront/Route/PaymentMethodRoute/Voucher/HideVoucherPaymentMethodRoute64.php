@@ -2,7 +2,8 @@
 
 namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\Voucher;
 
-use Kiener\MolliePayments\Service\VoucherService;
+use Kiener\MolliePayments\Service\Cart\Voucher\VoucherCartCollector;
+use Kiener\MolliePayments\Service\Cart\Voucher\VoucherService;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Payment\SalesChannel\AbstractPaymentMethodRoute;
 use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRouteResponse;
@@ -62,12 +63,12 @@ class HideVoucherPaymentMethodRoute64 extends AbstractPaymentMethodRoute
 
         $cart = $this->cartService->getCart($context->getToken(), $context);
 
-        # if cart has a voucher product
-        # then we can simply continue
-        $cartHasVoucher = $this->voucherService->hasCartVoucherProducts($cart);
 
+        $voucherPermitted = (bool)$cart->getData()->get(VoucherCartCollector::VOUCHER_PERMITTED);
 
-        if ($cartHasVoucher) {
+        # if voucher is allowed, then simply continue.
+        # we don't have to remove a payment method in that case
+        if ($voucherPermitted) {
             return $originalData;
         }
 

@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Struct\Product;
 
 
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
+use Kiener\MolliePayments\Struct\Voucher\VoucherType;
 use Shopware\Core\Content\Product\ProductEntity;
 
 class ProductAttributes
@@ -46,13 +47,14 @@ class ProductAttributes
     public function getVoucherType()
     {
         $availableTypes = [
-            VoucherPayment::TYPE_ECO,
-            VoucherPayment::TYPE_MEAL,
-            VoucherPayment::TYPE_GIFT
+            VoucherType::TYPE_NONE,
+            VoucherType::TYPE_ECO,
+            VoucherType::TYPE_MEAL,
+            VoucherType::TYPE_GIFT
         ];
 
         if (!in_array($this->voucherType, $availableTypes)) {
-            return '';
+            return VoucherType::TYPE_NOTSET;
         }
 
         return $this->voucherType;

@@ -11,6 +11,11 @@ class LineItemAttributes
     /**
      * @var string
      */
+    private $productNumber;
+
+    /**
+     * @var string
+     */
     private $voucherType;
 
 
@@ -19,7 +24,15 @@ class LineItemAttributes
      */
     public function __construct(LineItem $lineItem)
     {
+        $this->productNumber = '';
         $this->voucherType = '';
+
+        $payload = $lineItem->getPayload();
+
+        if (array_key_exists('productNumber', $payload)) {
+            $this->productNumber = (string)$payload['productNumber'];
+        }
+
 
         if (!array_key_exists('customFields', $lineItem->getPayload())) {
             return;
@@ -40,19 +53,40 @@ class LineItemAttributes
         if (array_key_exists('voucher_type', $mollieData)) {
             $this->voucherType = (string)$mollieData['voucher_type'];
         }
-
     }
 
     /**
      * @return string
      */
-    public function getVoucherType()
+    public function getProductNumber(): string
     {
-        if ($this->voucherType !== '1' && $this->voucherType !== '2' & $this->voucherType !== '3') {
-            return '';
-        }
+        return $this->productNumber;
+    }
 
+    /**
+     * @return string
+     */
+    public function getVoucherType(): string
+    {
         return $this->voucherType;
+    }
+
+    /**
+     * @param string $voucherType
+     */
+    public function setVoucherType(string $voucherType): void
+    {
+        $this->voucherType = $voucherType;
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function toArray(): array
+    {
+        return [
+            'voucher_type' => $this->voucherType
+        ];
     }
 
 }
