@@ -90,5 +90,8 @@
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Service\VoucherService" class="Kiener\MolliePayments\Service\VoucherService">
+        </service>
+
     </services>
 </container>
