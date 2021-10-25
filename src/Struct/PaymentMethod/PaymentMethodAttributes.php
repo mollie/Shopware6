@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Struct\PaymentMethod;
 
 
+use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 
 class PaymentMethodAttributes
@@ -11,30 +12,23 @@ class PaymentMethodAttributes
     /**
      * @var string
      */
-    private $molliePaymentName;
+    private $handlerIdentifier;
 
 
+    /**
+     * @param PaymentMethodEntity $paymentMethod
+     */
     public function __construct(PaymentMethodEntity $paymentMethod)
     {
-        $this->molliePaymentName = '';
-
-        $customFields = $paymentMethod->getCustomFields();
-
-        if ($customFields === null) {
-            return;
-        }
-
-        if (array_key_exists('mollie_payment_method_name', $customFields)) {
-            $this->molliePaymentName = (string)$customFields['mollie_payment_method_name'];
-        }
+        $this->handlerIdentifier = (string)$paymentMethod->getHandlerIdentifier();
     }
 
     /**
-     * @return string
+     * @return bool
      */
-    public function getMolliePaymentName(): string
+    public function isVoucherMethod(): bool
     {
-        return $this->molliePaymentName;
+        return $this->handlerIdentifier === VoucherPayment::class;
     }
 
 }

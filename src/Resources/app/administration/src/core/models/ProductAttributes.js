@@ -2,18 +2,26 @@ export default class ProductAttributes {
 
     /**
      *
-     * @param customFields
+     * @param productEntity
      */
-    constructor(customFields) {
+    constructor(productEntity) {
 
         this._voucherType = '';
 
 
-        if (!customFields || !customFields.mollie_payments) {
+        if (productEntity === null) {
             return;
         }
 
-        const mollieFields = customFields.mollie_payments;
+        if (!productEntity.customFields) {
+            return;
+        }
+
+        if (!productEntity.customFields.mollie_payments) {
+            return;
+        }
+
+        const mollieFields = productEntity.customFields.mollie_payments;
 
         this._voucherType = mollieFields.voucher_type;
     }
@@ -24,13 +32,15 @@ export default class ProductAttributes {
      */
     getVoucherType() {
 
+        const stringType = this._voucherType + '';
+
         // we only allow values 1, 2, and 3
         // all other values are just empty
-        if (this._voucherType < 1 || this._voucherType > 3) {
+        if (stringType !== '0' && stringType !== '1' && stringType !== '2' && stringType !== '3') {
             return '';
         }
 
-        return this._voucherType;
+        return stringType;
     }
 
     /**
@@ -43,12 +53,36 @@ export default class ProductAttributes {
 
     /**
      *
+     */
+    clearVoucherType() {
+        this._voucherType = '';
+    }
+
+    /**
+     *
      * @returns {string[]}
      */
     toArray() {
-        return {
-            'voucher_type': this._voucherType,
+        const mollie = {};
+
+        if (this._voucherType !== '') {
+            mollie['voucher_type'] = this._voucherType;
         }
+
+        return mollie;
+    }
+
+    /**
+     *
+     * @returns {boolean}
+     */
+    hasData() {
+
+        if (this._voucherType !== '') {
+            return true;
+        }
+
+        return false;
     }
 
 }

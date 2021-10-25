@@ -4,21 +4,14 @@ namespace Kiener\MolliePayments\Handler\Method;
 
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
-use Kiener\MolliePayments\Struct\Product\ProductAttributes;
-use Mollie\Api\Types\PaymentMethod;
-use Shopware\Core\Checkout\Cart\LineItem\LineItem;
+use Kiener\MolliePayments\Struct\Voucher\VoucherType;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class VoucherPayment extends PaymentHandler
 {
-
-    public const TYPE_ECO = "1";
-    public const TYPE_MEAL = "2";
-    public const TYPE_GIFT = "3";
 
     /**
      *
@@ -83,22 +76,16 @@ class VoucherPayment extends PaymentHandler
             $attributes = new OrderLineItemEntityAttributes($lineItem);
             $voucherType = $attributes->getVoucherType();
 
-            # older versions do not have custom fields in the line item.
-            # in that case, try to ask our product, if existing if it has data
-            if (empty($voucherType) && $lineItem->getProduct() instanceof ProductEntity) {
-                $attributes = new ProductAttributes($lineItem->getProduct());
-                $voucherType = $attributes->getVoucherType();
-            }
 
-            if ($voucherType === self::TYPE_ECO) {
+            if ($voucherType === VoucherType::TYPE_ECO) {
                 return 'eco';
             }
 
-            if ($voucherType === self::TYPE_MEAL) {
+            if ($voucherType === VoucherType::TYPE_MEAL) {
                 return 'meal';
             }
 
-            if ($voucherType === self::TYPE_GIFT) {
+            if ($voucherType === VoucherType::TYPE_GIFT) {
                 return 'gift';
             }
         }

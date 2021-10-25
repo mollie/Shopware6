@@ -32,6 +32,11 @@ const scenarioDummyBasket = new DummyBasketScenario(1);
 
 describe('Voucher Payments', () => {
 
+    before(function () {
+        devices.setDevice(devices.getFirstDevice());
+        configAction.setupShop(true, false);
+    })
+
     testDevices.forEach(device => {
 
         context(devices.getDescription(device), () => {
