@@ -20,7 +20,9 @@
 
             <sw-container columns="6fr 1fr">
                 <div></div>
-                <sw-button class="sw-product-detail-mollie-vouchers__button-readmore" :block="true" variant="primary" size="small" link="https://github.com/mollie/Shopware6/wiki/Voucher">READ MORE</sw-button>
+                <sw-button class="sw-product-detail-mollie-vouchers__button-readmore" :block="true" variant="primary" size="small" link="https://github.com/mollie/Shopware6/wiki/Voucher">
+                    {{ $tc('mollie-payments.vouchers.VOUCHER_BTN_READMORE') }}
+                </sw-button>
             </sw-container>
 
             <sw-container columns="1fr" v-if="isDefaultLanguage">
