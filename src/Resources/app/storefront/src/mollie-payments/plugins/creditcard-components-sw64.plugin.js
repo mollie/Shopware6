@@ -147,17 +147,9 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
             this.getInputFields().verificationCode,
         ];
 
-        inputs.forEach((element, index, arr) => {
+        if (this._componentsObject !== null) {
 
-            if (this._componentsObject === null) {
-
-                // this might be to a strong customization of the checkout
-                // but it should not lead to an exception, thus we
-                // show a warning output
-                /* eslint-disable no-console */
-                console.log('Warning, Mollie Component Object is NULL. The feature might not work as expected!');
-
-            } else {
+            inputs.forEach((element, index, arr) => {
 
                 const component = this._componentsObject.createComponent(element.name, me.getDefaultProperties());
                 component.mount(element.id);
@@ -184,8 +176,8 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
                 component.addEventListener('blur', () => {
                     me.setFocus(`${element.id}`, false);
                 });
-            }
-        });
+            });
+        }
     }
 
     setFocus(componentName, isFocused) {
@@ -201,10 +193,10 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
         if (
             (
                 creditCardRadioInput === undefined
-              || creditCardRadioInput === null
-              || creditCardRadioInput.checked === false
+                || creditCardRadioInput === null
+                || creditCardRadioInput.checked === false
             )
-          && !!this._confirmForm
+            && !!this._confirmForm
         ) {
             this._confirmForm.submit();
         }
