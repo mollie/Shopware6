@@ -148,31 +148,43 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
         ];
 
         inputs.forEach((element, index, arr) => {
-            const component = this._componentsObject.createComponent(element.name, me.getDefaultProperties());
-            component.mount(element.id);
-            arr[index][element.name] = component;
 
-            // Handle errors
-            component.addEventListener('change', event => {
-                const componentContainer = document.getElementById(`${element.name}`);
-                const componentError = document.getElementById(`${element.errors}`);
+            if (this._componentsObject === null) {
 
-                if (event.error && event.touched) {
-                    componentContainer.classList.add('error');
-                    componentError.textContent = event.error;
-                } else {
-                    componentContainer.classList.remove('error');
-                    componentError.textContent = '';
-                }
-            });
+                // this might be to a strong customization of the checkout
+                // but it should not lead to an exception, thus we
+                // show a warning output
+                /* eslint-disable no-console */
+                console.log('Warning, Mollie Component Object is NULL. The feature might not work as expected!');
 
-            // Handle labels
-            component.addEventListener('focus', () => {
-                me.setFocus(`${element.id}`, true);
-            });
-            component.addEventListener('blur', () => {
-                me.setFocus(`${element.id}`, false);
-            });
+            } else {
+
+                const component = this._componentsObject.createComponent(element.name, me.getDefaultProperties());
+                component.mount(element.id);
+                arr[index][element.name] = component;
+
+                // Handle errors
+                component.addEventListener('change', event => {
+                    const componentContainer = document.getElementById(`${element.name}`);
+                    const componentError = document.getElementById(`${element.errors}`);
+
+                    if (event.error && event.touched) {
+                        componentContainer.classList.add('error');
+                        componentError.textContent = event.error;
+                    } else {
+                        componentContainer.classList.remove('error');
+                        componentError.textContent = '';
+                    }
+                });
+
+                // Handle labels
+                component.addEventListener('focus', () => {
+                    me.setFocus(`${element.id}`, true);
+                });
+                component.addEventListener('blur', () => {
+                    me.setFocus(`${element.id}`, false);
+                });
+            }
         });
     }
 
