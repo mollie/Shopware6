@@ -7,6 +7,10 @@ use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 
 abstract class EntityAttributeStruct extends AttributeStruct
 {
+    /**
+     * @param Entity $entity
+     * @throws \Exception
+     */
     public function __construct(Entity $entity)
     {
         if(!method_exists($entity, 'getCustomFields')) {
@@ -28,5 +32,13 @@ abstract class EntityAttributeStruct extends AttributeStruct
         $attributes = $customFields[CustomFieldsInterface::MOLLIE_KEY];
 
         parent::__construct($attributes);
+    }
+
+    /**
+     * @return array
+     */
+    public function toMollieCustomFields(): array
+    {
+        return [CustomFieldsInterface::MOLLIE_KEY => $this->toArray()];
     }
 }
