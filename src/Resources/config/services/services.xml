@@ -91,7 +91,7 @@
         </service>
 
         <service id="Kiener\MolliePayments\Service\Voucher\VoucherService" class="Kiener\MolliePayments\Service\Cart\Voucher\VoucherService">
-            <argument type="service" id="product.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\Product\ProductRepository"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\Cart\Voucher\VoucherCartCollector">

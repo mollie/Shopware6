@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Service\Cart\Voucher;
 
+use Kiener\MolliePayments\Repository\Product\ProductRepositoryInterface;
 use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
 use Kiener\MolliePayments\Struct\Product\ProductAttributes;
@@ -11,24 +12,21 @@ use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Content\Product\Exception\ProductNotFoundException;
 use Shopware\Core\Content\Product\Exception\ProductNumberNotFoundException;
 use Shopware\Core\Content\Product\ProductEntity;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class VoucherService
 {
 
     /**
-     * @var EntityRepositoryInterface
+     * @var ProductRepositoryInterface
      */
     private $repoProducts;
 
 
     /**
-     * @param EntityRepositoryInterface $repoProducts
+     * @param ProductRepositoryInterface $repoProducts
      */
-    public function __construct(EntityRepositoryInterface $repoProducts)
+    public function __construct(ProductRepositoryInterface $repoProducts)
     {
         $this->repoProducts = $repoProducts;
     }
@@ -45,6 +43,12 @@ class VoucherService
 
         # verify if we even have a product number
         if (empty($attributes->getProductNumber())) {
+            return VoucherType::TYPE_NOTSET;
+        }
+
+        # also make sure to avoid invalid product numbers
+        # such as with custom products
+        if (trim($attributes->getProductNumber()) === '*') {
             return VoucherType::TYPE_NOTSET;
         }
 
@@ -88,18 +92,13 @@ class VoucherService
      */
     private function getProductByNumber(string $productNumber, SalesChannelContext $context): ProductEntity
     {
-        $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('productNumber', $productNumber));
+        $products = $this->repoProducts->findByNumber($productNumber, $context);
 
-        $products = $this->repoProducts->search($criteria, $context->getContext());
-
-        $productsArray = $products->getElements();
-
-        if (count($productsArray) <= 0) {
+        if (count($products) <= 0) {
             throw new ProductNumberNotFoundException($productNumber);
         }
 
-        return array_shift($productsArray);
+        return array_shift($products);
     }
 
     /**
@@ -109,18 +108,13 @@ class VoucherService
      */
     private function getProductById(string $productId, SalesChannelContext $context): ProductEntity
     {
-        $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('id', $productId));
+        $products = $this->repoProducts->findByID($productId, $context);
 
-        $products = $this->repoProducts->search($criteria, $context->getContext());
-
-        $productsArray = $products->getElements();
-
-        if (count($productsArray) <= 0) {
+        if (count($products) <= 0) {
             throw new ProductNotFoundException($productId);
         }
 
-        return array_shift($productsArray);
+        return array_shift($products);
     }
 
 }
