@@ -3,23 +3,22 @@
 namespace Kiener\MolliePayments\Service\Mollie;
 
 use Mollie\Api\Resources\Order;
-
+use Mollie\Api\Resources\Payment;
 
 class OrderStatusConverter
 {
-
     /**
      * @param Order $order
      * @return string
      */
     public function getMollieStatus(Order $order): string
     {
-        $targetStatus = $this->getLatestPaymentStatus($order);
+        $payment = $this->getLatestPayment($order);
+        $targetStatus = $this->getPaymentStatus($payment);
 
-        # if we do not have a payment status
-        # then try to get a status from the order object of Mollie
+        // if we do not have a payment status
+        // then try to get a status from the order object of Mollie
         if ($targetStatus === MolliePaymentStatus::MOLLIE_PAYMENT_UNKNOWN) {
-
             if ($order->isPaid()) {
                 $targetStatus = MolliePaymentStatus::MOLLIE_PAYMENT_PAID;
             } elseif ($order->isPending()) {
@@ -35,8 +34,8 @@ class OrderStatusConverter
             }
         }
 
-        # i dont know if that can happen in both ways?
-        # but it was definitely necessary to add it
+        // I don't know if that can happen in both ways?
+        // but it was definitely necessary to add it
         if ($this->isOrderFullyRefunded($order)) {
             $targetStatus = MolliePaymentStatus::MOLLIE_PAYMENT_REFUNDED;
         }
@@ -48,22 +47,46 @@ class OrderStatusConverter
         return $targetStatus;
     }
 
-
     /**
-     * @param null $mollieOrder
+     * @param Payment|null $payment
      * @return string
      */
-    private function getLatestPaymentStatus($mollieOrder = null): string
+    public function getPaymentStatus(?Payment $payment = null): string
     {
-        if (!$mollieOrder instanceof Order) {
-            return '';
+        if ($payment === null) {
+            return MolliePaymentStatus::MOLLIE_PAYMENT_UNKNOWN;
         }
 
+        $status = MolliePaymentStatus::MOLLIE_PAYMENT_UNKNOWN;
 
+        if ($payment->isPaid()) {
+            $status = MolliePaymentStatus::MOLLIE_PAYMENT_PAID;
+        } elseif ($payment->isAuthorized()) {
+            $status = MolliePaymentStatus::MOLLIE_PAYMENT_AUTHORIZED;
+        } else if ($payment->isPending()) {
+            $status = MolliePaymentStatus::MOLLIE_PAYMENT_PENDING;
+        } elseif ($payment->isOpen()) {
+            $status = MolliePaymentStatus::MOLLIE_PAYMENT_OPEN;
+        } elseif ($payment->isCanceled()) {
+            $status = MolliePaymentStatus::MOLLIE_PAYMENT_CANCELED;
+        } elseif ($payment->isFailed()) {
+            $status = MolliePaymentStatus::MOLLIE_PAYMENT_FAILED;
+        } elseif ($payment->isExpired()) {
+            $status = MolliePaymentStatus::MOLLIE_PAYMENT_EXPIRED;
+        }
+
+        return $status;
+    }
+
+    /**
+     * @param Order $order
+     * @return Payment|null
+     */
+    private function getLatestPayment(Order $order): ?Payment
+    {
         $latestPayment = null;
 
-        foreach ($mollieOrder->payments() as $payment) {
-
+        foreach ($order->payments() as $payment) {
             $currentCreated = strtotime($payment->createdAt);
 
             if ($latestPayment === null) {
@@ -78,30 +101,7 @@ class OrderStatusConverter
             }
         }
 
-
-        if ($latestPayment === null) {
-            return MolliePaymentStatus::MOLLIE_PAYMENT_UNKNOWN;
-        }
-
-        $status = MolliePaymentStatus::MOLLIE_PAYMENT_UNKNOWN;
-
-        if ($latestPayment->isPaid()) {
-            $status = MolliePaymentStatus::MOLLIE_PAYMENT_PAID;
-        } elseif ($latestPayment->isAuthorized()) {
-            $status = MolliePaymentStatus::MOLLIE_PAYMENT_AUTHORIZED;
-        } else if ($latestPayment->isPending()) {
-            $status = MolliePaymentStatus::MOLLIE_PAYMENT_PENDING;
-        } elseif ($latestPayment->isOpen()) {
-            $status = MolliePaymentStatus::MOLLIE_PAYMENT_OPEN;
-        } elseif ($latestPayment->isCanceled()) {
-            $status = MolliePaymentStatus::MOLLIE_PAYMENT_CANCELED;
-        } elseif ($latestPayment->isFailed()) {
-            $status = MolliePaymentStatus::MOLLIE_PAYMENT_FAILED;
-        } elseif ($latestPayment->isExpired()) {
-            $status = MolliePaymentStatus::MOLLIE_PAYMENT_EXPIRED;
-        }
-
-        return $status;
+        return $latestPayment;
     }
 
     /**
@@ -119,7 +119,7 @@ class OrderStatusConverter
         $orderValue = $order->amount->value;
         $refundedValue = $order->amountRefunded->value;
 
-        # both of them are strings, but that's totally fine
+        // both of them are strings, but that's totally fine
         return ($orderValue === $refundedValue);
     }
 
@@ -138,7 +138,7 @@ class OrderStatusConverter
         $orderValue = $order->amount->value;
         $refundedValue = $order->amountRefunded->value;
 
-        # both of them are strings, but that's totally fine
+        // both of them are strings, but that's totally fine
         return ($orderValue !== $refundedValue);
     }
 
