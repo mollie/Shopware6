@@ -88,7 +88,7 @@ Component.override('sw-order-line-items-grid', {
         },
 
         canOpenRefundModal() {
-            return this.remainingAmount > 0 || (this.refunds && this.refunds.length > 0);
+            return this.remainingAmount > 0 || (this.refunds !== undefined && this.refunds.length > 0);
         },
     },
 
