@@ -103,7 +103,7 @@ class NotificationFacade
 
         # --------------------------------------------------------------------------------------------
 
-        $status = $this->statusConverter->getMollieStatus($mollieOrder);
+        $status = $this->statusConverter->getOrderStatus($mollieOrder);
 
         $this->statusUpdater->updatePaymentStatus($transaction, $status, $contextSC->getContext());
 

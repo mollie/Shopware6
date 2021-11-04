@@ -11,7 +11,7 @@ class OrderStatusConverter
      * @param Order $order
      * @return string
      */
-    public function getMollieStatus(Order $order): string
+    public function getOrderStatus(Order $order): string
     {
         $payment = $this->getLatestPayment($order);
         $targetStatus = $this->getPaymentStatus($payment);

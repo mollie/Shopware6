@@ -76,7 +76,7 @@ class MolliePaymentFinalize
         $apiClient = $this->mollieApiFactory->getClient($salesChannelContext->getSalesChannel()->getId());
         $mollieOrder = $apiClient->orders->get($mollieOrderId, ['embed' => 'payments']);
 
-        $paymentStatus = $this->orderStatusConverter->getMollieStatus($mollieOrder);
+        $paymentStatus = $this->orderStatusConverter->getOrderStatus($mollieOrder);
         $this->orderStatusUpdater->updatePaymentStatus($transactionStruct->getOrderTransaction(), $paymentStatus, $salesChannelContext->getContext());
         $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
         $this->orderStatusUpdater->updateOrderStatus($order, $paymentStatus, $settings, $salesChannelContext->getContext());
