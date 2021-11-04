@@ -82,8 +82,9 @@ class PayPalOrderBuilderTest extends AbstractMollieOrderBuilder
         $taxAmount = 15.0;
         $taxRate = 50.0;
         $totalPrice = 15.0;
+        $deliveryId = Uuid::randomHex();
 
-        $delivery = $this->getOrderDelivery($taxAmount, $taxRate, $totalPrice);
+        $delivery = $this->getOrderDelivery($deliveryId, $taxAmount, $taxRate, $totalPrice);
         $deliveries = new OrderDeliveryCollection([$delivery]);
 
         $order->setDeliveries($deliveries);
@@ -104,7 +105,7 @@ class PayPalOrderBuilderTest extends AbstractMollieOrderBuilder
             'webhookUrl' => $redirectWebhookUrl,
             'lines' => array_merge(
                 $this->getExpectedLineItems($taxStatus, $lineItems, $currency),
-                $this->getExpectedDeliveries($taxStatus, $deliveries)
+                $this->getExpectedDeliveries($taxStatus, $deliveries, $currency)
             ),
             'billingAddress' => $this->getExpectedTestAddress($this->address, $this->email),
             'shippingAddress' => $this->getExpectedTestAddress($this->address, $this->email),

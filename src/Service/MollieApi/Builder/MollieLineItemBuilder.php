@@ -3,18 +3,19 @@
 namespace Kiener\MolliePayments\Service\MollieApi\Builder;
 
 
-use Kiener\MolliePayments\Compatibility\CompatibilityFactory;
 use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGatewayInterface;
+use Kiener\MolliePayments\Exception\MissingPriceLineItem;
 use Kiener\MolliePayments\Exception\MissingPriceLineItemException;
 use Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\PriceCalculator;
+use Kiener\MolliePayments\Struct\MollieLineItem;
+use Kiener\MolliePayments\Struct\MollieLineItemCollection;
 use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
 use Mollie\Api\Types\OrderLineType;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
-use Shopware\Core\System\Currency\CurrencyEntity;
 
 class MollieLineItemBuilder
 {
@@ -24,14 +25,17 @@ class MollieLineItemBuilder
      * @var MollieOrderPriceBuilder
      */
     private $priceHydrator;
+
     /**
      * @var IsOrderLineItemValid
      */
     private $orderLineItemValidator;
+
     /**
      * @var PriceCalculator
      */
     private $priceCalculator;
+
     /**
      * @var LineItemDataExtractor
      */
@@ -58,21 +62,24 @@ class MollieLineItemBuilder
         $this->compatibilityGateway = $compatibilityGateway;
     }
 
-    public function buildLineItems(string $taxStatus, ?OrderLineItemCollection $lineItems, ?CurrencyEntity $currency): array
+
+    /**
+     * @param string $taxStatus
+     * @param OrderLineItemCollection|null $lineItems
+     * @param bool $isVerticalTaxCalculation
+     * @return MollieLineItemCollection
+     */
+    public function buildLineItems(string $taxStatus, ?OrderLineItemCollection $lineItems, bool $isVerticalTaxCalculation = false): MollieLineItemCollection
     {
-        $lines = [];
+        $lines = new MollieLineItemCollection();
 
         if (!$lineItems instanceof OrderLineItemCollection || $lineItems->count() === 0) {
             return $lines;
         }
 
-        $currencyCode = MollieOrderPriceBuilder::MOLLIE_FALLBACK_CURRENCY_CODE;
-        if ($currency instanceof CurrencyEntity) {
-            $currencyCode = $currency->getIsoCode();
-        }
-
         /** @var OrderLineItemEntity $item */
         foreach ($lineItems as $item) {
+
             $this->orderLineItemValidator->validate($item);
             $extraData = $this->lineItemDataExtractor->extractExtraData($item);
             $itemPrice = $item->getPrice();
@@ -81,23 +88,25 @@ class MollieLineItemBuilder
                 throw new MissingPriceLineItemException($item->getProductId());
             }
 
-            $prices = $this->priceCalculator->calculateLineItemPrice($item->getPrice(), $item->getTotalPrice(), $taxStatus);
+            $price = $this->priceCalculator->calculateLineItemPrice(
+                $item->getPrice(),
+                $item->getTotalPrice(),
+                $taxStatus,
+                $isVerticalTaxCalculation
+            );
 
-            $lines[] = [
-                'type' => $this->getLineItemType($item),
-                'name' => $item->getLabel(),
-                'quantity' => $item->getQuantity(),
-                'unitPrice' => $this->priceHydrator->build($prices->getUnitPrice(), $currencyCode),
-                'totalAmount' => $this->priceHydrator->build($prices->getTotalAmount(), $currencyCode),
-                'vatRate' => number_format($prices->getVatRate(), MollieOrderPriceBuilder::MOLLIE_PRICE_PRECISION, '.', ''),
-                'vatAmount' => $this->priceHydrator->build($prices->getVatAmount(), $currencyCode),
-                'sku' => $extraData->getSku(),
-                'imageUrl' => urlencode((string)$extraData->getImageUrl()),
-                'productUrl' => urlencode((string)$extraData->getProductUrl()),
-                'metadata' => [
-                    'orderLineItemId' => $item->getId(),
-                ],
-            ];
+            $mollieLineItem = new MollieLineItem(
+                $this->getLineItemType($item),
+                $item->getLabel(),
+                $item->getQuantity(),
+                $price,
+                $item->getId(),
+                $extraData->getSku(),
+                urlencode((string)$extraData->getImageUrl()),
+                urlencode((string)$extraData->getProductUrl())
+            );
+
+            $lines->add($mollieLineItem);
         }
 
         return $lines;
