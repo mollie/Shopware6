@@ -5,7 +5,10 @@
 .DS_Store
 /tests/Cypress/package-lock.json
 
+src/Resources/app/administration/node_modules
+
 src/Resources/app/storefront/dist/
+src/Resources/app/storefront/node_modules
 
 src/Resources/public/administration/css/
 src/Resources/public/administration/js/
