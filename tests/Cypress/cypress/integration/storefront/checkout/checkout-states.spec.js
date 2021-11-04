@@ -91,7 +91,7 @@ context("Order Status Mapping Tests", () => {
 
             adminLogin.login();
             adminOrders.assertLatestOrderStatus('Open');
-            adminOrders.assertLatestPaymentStatus('Cancelled');
+            adminOrders.assertLatestPaymentStatus('Failed');
         })
 
         it('Test Status Cancelled', () => {
