@@ -113,7 +113,7 @@ context("Checkout Failure Tests", () => {
 
         context(devices.getDescription(device), () => {
 
-            it('Paypal failed and retry with Paypal', () => {
+            it('Paypal failed and retry with Giropay', () => {
 
                 scenarioDummyBasket.execute();
                 paymentAction.switchPaymentMethod('PayPal');
@@ -128,7 +128,35 @@ context("Checkout Failure Tests", () => {
                 // the payment failed, so shopware says the order is complete
                 // but we still need to complete the payment and edit the order
                 cy.url().should('include', '/account/order/edit/');
-                cy.contains('We received your order, but the payment was aborted. Please change your payment method or try again');
+                cy.contains('We received your order, but we were not able to process your payment');
+
+                paymentAction.switchPaymentMethod('Giropay');
+
+                checkout.placeOrderOnEdit();
+
+                molliePayment.initSandboxCookie();
+                molliePayment.selectPaid();
+
+                cy.url().should('include', '/checkout/finish');
+                cy.contains('Thank you for updating your order');
+            })
+
+            it('Paypal cancelled and retry with Paypal', () => {
+
+                scenarioDummyBasket.execute();
+                paymentAction.switchPaymentMethod('PayPal');
+
+                shopware.prepareDomainChange();
+                checkout.placeOrderOnConfirm();
+
+                molliePayment.initSandboxCookie();
+                molliePayment.selectCancelled();
+
+                // we are now back in our shop
+                // the payment failed, so shopware says the order is complete
+                // but we still need to complete the payment and edit the order
+                cy.url().should('include', '/account/order/edit/');
+                cy.contains('We received your order, but the payment was aborted');
 
                 checkout.placeOrderOnEdit();
 
