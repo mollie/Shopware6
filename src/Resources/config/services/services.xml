@@ -100,5 +100,9 @@
             <tag name="shopware.cart.collector" priority="2000"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Hydrator\MollieLineItemHydrator">
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder"/>
+        </service>
+
     </services>
 </container>

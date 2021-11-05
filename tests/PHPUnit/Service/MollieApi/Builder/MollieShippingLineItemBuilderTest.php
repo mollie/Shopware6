@@ -2,6 +2,7 @@
 
 namespace MolliePayments\Tests\Service\MollieApi\Builder;
 
+use Kiener\MolliePayments\Hydrator\MollieLineItemHydrator;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieShippingLineItemBuilder;
 use Kiener\MolliePayments\Service\MollieApi\PriceCalculator;
@@ -37,7 +38,14 @@ class MollieShippingLineItemBuilderTest extends TestCase
 
         $expected = [];
 
-        self::assertSame($expected, $this->builder->buildShippingLineItems(CartPrice::TAX_STATE_GROSS, $lineItems, $currency));
+        $hydrator = new MollieLineItemHydrator(new MollieOrderPriceBuilder());
+
+        $actual = $hydrator->hydrate(
+            $this->builder->buildShippingLineItems(CartPrice::TAX_STATE_GROSS, $lineItems),
+            $currency->getIsoCode()
+        );
+
+        self::assertSame($expected, $actual);
     }
 
     public function testWithOneLineItem(): void
@@ -47,8 +55,9 @@ class MollieShippingLineItemBuilderTest extends TestCase
         $taxAmount = 7.5;
         $taxRate = 50.0;
         $totalPrice = 15.0;
+        $deliveryId = Uuid::randomHex();
 
-        $delivery = $this->getOrderDelivery($taxAmount, $taxRate, $totalPrice);
+        $delivery = $this->getOrderDelivery($deliveryId, $taxAmount, $taxRate, $totalPrice);
         $deliveries->add($delivery);
 
         $isoCode = 'EUR';
@@ -77,10 +86,14 @@ class MollieShippingLineItemBuilderTest extends TestCase
             'imageUrl' => '',
             'productUrl' => '',
             'metadata' => [
-                'orderLineItemId' => ''
+                'orderLineItemId' => $deliveryId
             ]
         ]];
 
-        self::assertSame($expected, $this->builder->buildShippingLineItems(CartPrice::TAX_STATE_GROSS, $deliveries, $currency));
+        $hydrator = new MollieLineItemHydrator(new MollieOrderPriceBuilder());
+
+        $actual = $hydrator->hydrate($this->builder->buildShippingLineItems(CartPrice::TAX_STATE_GROSS, $deliveries), $currency->getIsoCode());
+
+        self::assertSame($expected, $actual);
     }
 }

@@ -3,6 +3,7 @@
 namespace MolliePayments\Tests\Service\MollieApi\Builder;
 
 use Kiener\MolliePayments\Factory\CompatibilityFactory;
+use Kiener\MolliePayments\Hydrator\MollieLineItemHydrator;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieLineItemBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor;
@@ -50,7 +51,14 @@ class MollieLineItemBuilderTest extends TestCase
 
         $expected = [];
 
-        self::assertSame($expected, $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, $lineItems, $currency));
+        $hydrator = new MollieLineItemHydrator(new MollieOrderPriceBuilder());
+
+        $actual = $hydrator->hydrate(
+            $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, $lineItems),
+            $currency->getIsoCode()
+        );
+
+        self::assertSame($expected, $actual);
     }
 
     public function testBuildLineItemsWithNullLineItemCollection(): void
@@ -61,7 +69,14 @@ class MollieLineItemBuilderTest extends TestCase
 
         $expected = [];
 
-        self::assertSame($expected, $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, null, $currency));
+        $hydrator = new MollieLineItemHydrator(new MollieOrderPriceBuilder());
+
+        $actual = $hydrator->hydrate(
+            $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, null),
+            $currency->getIsoCode()
+        );
+
+        self::assertSame($expected, $actual);
     }
 
     public function testWithOneLineItem(): void
@@ -121,7 +136,14 @@ class MollieLineItemBuilderTest extends TestCase
             ]
         ]];
 
-        self::assertSame($expected, $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, $lineItems, $currency));
+        $hydrator = new MollieLineItemHydrator(new MollieOrderPriceBuilder());
+
+        $actual = $hydrator->hydrate(
+            $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, $lineItems),
+            $currency->getIsoCode()
+        );
+
+        self::assertSame($expected, $actual);
     }
 
     public function testEmptySeoUrlAndImageUrl(): void
@@ -181,7 +203,14 @@ class MollieLineItemBuilderTest extends TestCase
             ]
         ]];
 
-        self::assertSame($expected, $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, $lineItems, $currency));
+        $hydrator = new MollieLineItemHydrator(new MollieOrderPriceBuilder());
+
+        $actual = $hydrator->hydrate(
+            $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, $lineItems),
+            $currency->getIsoCode()
+        );
+
+        self::assertSame($expected, $actual);
     }
 
     public function testCreditLineItemType(): void
@@ -240,7 +269,14 @@ class MollieLineItemBuilderTest extends TestCase
             ]
         ]];
 
-        self::assertSame($expected, $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, $lineItems, $currency));
+        $hydrator = new MollieLineItemHydrator(new MollieOrderPriceBuilder());
+
+        $actual = $hydrator->hydrate(
+            $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, $lineItems),
+            $currency->getIsoCode()
+        );
+
+        self::assertSame($expected, $actual);
     }
 
     public function testPromotionLineItemType(): void
@@ -299,7 +335,14 @@ class MollieLineItemBuilderTest extends TestCase
             ]
         ]];
 
-        self::assertSame($expected, $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, $lineItems, $currency));
+        $hydrator = new MollieLineItemHydrator(new MollieOrderPriceBuilder());
+
+        $actual = $hydrator->hydrate(
+            $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, $lineItems),
+            $currency->getIsoCode()
+        );
+
+        self::assertSame($expected, $actual);
     }
 
     public function testCustomProductsLineItemType(): void
@@ -358,7 +401,14 @@ class MollieLineItemBuilderTest extends TestCase
             ]
         ]];
 
-        self::assertSame($expected, $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, $lineItems, $currency));
+        $hydrator = new MollieLineItemHydrator(new MollieOrderPriceBuilder());
+
+        $actual = $hydrator->hydrate(
+            $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, $lineItems),
+            $currency->getIsoCode()
+        );
+
+        self::assertSame($expected, $actual);
     }
 
     public function testFallbackLineItemType(): void
@@ -417,6 +467,13 @@ class MollieLineItemBuilderTest extends TestCase
             ]
         ]];
 
-        self::assertSame($expected, $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, $lineItems, $currency));
+        $hydrator = new MollieLineItemHydrator(new MollieOrderPriceBuilder());
+
+        $actual = $hydrator->hydrate(
+            $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, $lineItems),
+            $currency->getIsoCode()
+        );
+
+        self::assertSame($expected, $actual);
     }
 }
