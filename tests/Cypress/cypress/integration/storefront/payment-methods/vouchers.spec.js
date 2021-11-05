@@ -71,7 +71,7 @@ describe('Voucher Payments', () => {
                     paymentAction.openPaymentsModal();
                 }
 
-                cy.contains('Voucher').should('not.exist');
+                cy.contains('checkout-container', 'Voucher').should('not.exist');
             })
 
             it('Voucher available for ECO products', () => {

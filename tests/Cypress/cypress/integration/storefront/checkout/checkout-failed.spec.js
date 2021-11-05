@@ -158,6 +158,8 @@ context("Checkout Failure Tests", () => {
                 cy.url().should('include', '/account/order/edit/');
                 cy.contains('We received your order, but the payment was aborted');
 
+                paymentAction.switchPaymentMethod('PayPal');
+
                 checkout.placeOrderOnEdit();
 
                 molliePayment.initSandboxCookie();
