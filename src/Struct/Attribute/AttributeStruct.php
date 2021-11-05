@@ -79,8 +79,10 @@ abstract class AttributeStruct extends Struct
     {
         foreach($struct->getVars() as $key => $value) {
             $setMethod = 'set' . ucfirst($key);
-            if(method_exists($this, $setMethod)) {
+            if (method_exists($this, $setMethod)) {
                 $this->$setMethod($value);
+            } elseif (property_exists($this, $key)) {
+                $this->$key = $value;
             }
         }
 
