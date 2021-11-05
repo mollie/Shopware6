@@ -24,7 +24,7 @@ abstract class AttributeStruct extends Struct
         foreach ($attributes as $key => $value) {
             $camelKey = $caseConverter->denormalize($key);
 
-            $assignMethod = 'assign' . ucfirst($camelKey);
+            $assignMethod = 'construct' . ucfirst($camelKey);
             if (method_exists($this, $assignMethod)) {
                 $this->$assignMethod($value);
                 continue;
@@ -97,7 +97,7 @@ abstract class AttributeStruct extends Struct
                 continue;
             }
 
-            if(!str_starts_with($method->getName(), 'assign')) {
+            if(!str_starts_with($method->getName(), 'construct')) {
                 continue;
             }
 
