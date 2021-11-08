@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 class MolliePayments extends Plugin
 {
 
-    const PLUGIN_VERSION = '1.5.5';
+    const PLUGIN_VERSION = '1.5.6';
 
     /**
      * @param ContainerBuilder $container
