@@ -7,6 +7,8 @@ use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 
 abstract class EntityAttributeStruct extends AttributeStruct
 {
+    private const ORIGINAL_ENTITY = 'originalEntity';
+
     /**
      * @param Entity $entity
      * @throws \Exception
@@ -55,10 +57,12 @@ abstract class EntityAttributeStruct extends AttributeStruct
     }
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public function toMollieCustomFields(): array
     {
+        // TODO 002 Use original entity to determine which keys come from the system default language and were not changed
+        // TODO 002 We dont want to return those in the array.
         return [CustomFieldsInterface::MOLLIE_KEY => $this->toArray()];
     }
 }

@@ -11,6 +11,10 @@ abstract class AttributeStruct extends Struct
 {
     const ADDITIONAL = 'additionalAttributes';
 
+    /**
+     * @param array<mixed>|null $attributes
+     * @throws \Exception
+     */
     public function __construct(?array $attributes = [])
     {
         /**
@@ -46,6 +50,8 @@ abstract class AttributeStruct extends Struct
              */
             $camelKey = $caseConverter->denormalize($key);
 
+            // TODO Save keys before/after convert to restore snake_case keys in getVars
+
             /**
              * If a construct method exists for this property, call it to set the value.
              * Construct methods can be used for a one-time setup for the data.
@@ -78,38 +84,45 @@ abstract class AttributeStruct extends Struct
              * If the property doesn't exist in this class at all, store the attribute in the additional attribute struct
              * so we don't lose it.
              */
-            $this->getExtension(self::ADDITIONAL)->set($key, $value);
+            $additional = $this->getExtension(self::ADDITIONAL);
+            if($additional instanceof ArrayStruct) {
+                $additional->set($key, $value);
+            }
         }
     }
 
     /**
      * Returns all the properties of this struct as a key-value array
      *
-     * @return array
+     * @return array<mixed>
      */
-    public function getVars(): array {
+    public function getVars(): array
+    {
         /**
          * If we have an extension with additional attributes, use that as the starting point
          */
-        $data = $this->hasExtension(self::ADDITIONAL)
-            ? $this->getExtension(self::ADDITIONAL)->all()
+        $additional = $this->getExtension(self::ADDITIONAL);
+        $data = ($additional instanceof ArrayStruct)
+            ? $additional->all()
             : [];
 
         /**
          * Loop through all the properties of this class.
          */
-        foreach(parent::getVars() as $key => $value) {
+        foreach (parent::getVars() as $key => $value) {
             /**
              * Ignore these properties, don't add them to the data we return
              */
-            if(in_array($key, ['extensions'])) {
+            if (in_array($key, ['extensions'])) {
                 continue;
             }
+
+            // TODO 001 restore keys to snake_case if needed
 
             /**
              * If $value is a Collection, return the inner elements array
              */
-            if($value instanceof Collection) {
+            if ($value instanceof Collection) {
                 $data[$key] = $value->getElements();
                 continue;
             }
@@ -117,7 +130,7 @@ abstract class AttributeStruct extends Struct
             /**
              * If $value is a Struct, return all the properties of the struct
              */
-            if($value instanceof Struct) {
+            if ($value instanceof Struct) {
                 $data[$key] = $value->getVars();
                 continue;
             }
@@ -133,8 +146,11 @@ abstract class AttributeStruct extends Struct
 
     /**
      * Alias for getVars
+     *
+     * @return array<mixed>
      */
-    public function toArray(): array {
+    public function toArray(): array
+    {
         return $this->getVars();
     }
 
@@ -150,7 +166,7 @@ abstract class AttributeStruct extends Struct
          * Loop through the other struct's properties and set them on this struct,
          * either using the set method for the property, or setting the property directly.
          */
-        foreach($struct->getVars() as $key => $value) {
+        foreach ($struct->getVars() as $key => $value) {
             $setMethod = 'set' . ucfirst($key);
             if (method_exists($this, $setMethod)) {
                 $this->$setMethod($value);
@@ -165,34 +181,36 @@ abstract class AttributeStruct extends Struct
     /**
      * Ensures all construct method are protected, so they can't be called outside this class
      */
-    private function ensureConstructMethodsAreProtected() {
+    private function ensureConstructMethodsAreProtected(): void
+    {
         $reflectionClass = new \ReflectionClass($this);
 
-        foreach($reflectionClass->getMethods() as $method) {
+        foreach ($reflectionClass->getMethods() as $method) {
             /**
              * If the method was not declared in the topmost class, skip it
              */
-            if($method->getDeclaringClass()->getName() !== static::class) {
+            if ($method->getDeclaringClass()->getName() !== static::class) {
                 continue;
             }
 
             /**
              * If this method name does not start with "construct", skip it
              */
-            if(!str_starts_with($method->getName(), 'construct')) {
+            if (!str_starts_with($method->getName(), 'construct')) {
                 continue;
             }
 
             /**
              * If the method is protected, continue to the next
              */
-            if($method->isProtected()) {
+            if ($method->isProtected()) {
                 continue;
             }
 
             /**
              * If it fails all of the above tests, throw an error.
              */
+            // TODO 001 specific exception
             throw new \Exception(sprintf('Assignment method "%s" should be declared protected.', $method->getName()));
         }
     }

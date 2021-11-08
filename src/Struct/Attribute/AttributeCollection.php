@@ -10,7 +10,7 @@ abstract class AttributeCollection extends Collection
     /**
      * Returns all elements of this collection
      *
-     * @return array
+     * @return array<mixed>
      */
     public function getElements(): array
     {
