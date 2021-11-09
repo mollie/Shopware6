@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c6268c94f2c3a25645e7433abf41b3b0",
+    "content-hash": "1b3dd3265f16a8b13d563856c1face77",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -84,20 +84,20 @@
         },
         {
             "name": "mollie/mollie-api-php",
-            "version": "v2.37.1",
+            "version": "v2.39.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mollie/mollie-api-php.git",
-                "reference": "260adf68db65edd82b6c11f8fa58622ff72b717c"
+                "reference": "a47d4449973c83e918db39f860b5e9076aeb367d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mollie/mollie-api-php/zipball/260adf68db65edd82b6c11f8fa58622ff72b717c",
-                "reference": "260adf68db65edd82b6c11f8fa58622ff72b717c",
+                "url": "https://api.github.com/repos/mollie/mollie-api-php/zipball/a47d4449973c83e918db39f860b5e9076aeb367d",
+                "reference": "a47d4449973c83e918db39f860b5e9076aeb367d",
                 "shasum": ""
             },
             "require": {
-                "composer/ca-bundle": "^1.1",
+                "composer/ca-bundle": "^1.2",
                 "ext-curl": "*",
                 "ext-json": "*",
                 "ext-openssl": "*",
@@ -107,7 +107,7 @@
                 "eloquent/liberator": "^2.0",
                 "friendsofphp/php-cs-fixer": "^3.0",
                 "guzzlehttp/guzzle": "^6.3 || ^7.0",
-                "phpunit/phpunit": "^5.7 || ^6.5 || ^7.1 || ^8.5"
+                "phpunit/phpunit": "^5.7 || ^6.5 || ^7.1 || ^8.5 || ^9.5"
             },
             "suggest": {
                 "mollie/oauth2-mollie-php": "Use OAuth to authenticate with the Mollie API. This is needed for some endpoints. Visit https://docs.mollie.com/ for more information."
@@ -169,9 +169,9 @@
             ],
             "support": {
                 "issues": "https://github.com/mollie/mollie-api-php/issues",
-                "source": "https://github.com/mollie/mollie-api-php/tree/v2.37.1"
+                "source": "https://github.com/mollie/mollie-api-php/tree/v2.39.0"
             },
-            "time": "2021-08-09T09:30:47+00:00"
+            "time": "2021-11-01T09:29:49+00:00"
         }
     ],
     "packages-dev": [

@@ -134,6 +134,15 @@
             <tag name="shopware.payment.method.async"/>
         </service>
 
+        <!-- Klarna Pay Now PaymentHandler -->
+        <service id="Kiener\MolliePayments\Handler\Method\KlarnaPayNowPayment" class="Kiener\MolliePayments\Handler\Method\KlarnaPayNowPayment">
+            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentFinalize"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+
         <!-- Klarna Slice It PaymentHandler -->
         <service id="Kiener\MolliePayments\Handler\Method\KlarnaSliceItPayment" class="Kiener\MolliePayments\Handler\Method\KlarnaSliceItPayment">
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
