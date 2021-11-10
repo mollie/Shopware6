@@ -57,7 +57,7 @@
     "shopware/administration": "<6,>=7"
   },
   "require": {
-    "mollie/mollie-api-php": "^2.37"
+    "mollie/mollie-api-php": "^2.39"
   },
   "require-dev": {
     "shopware/core": "*",
