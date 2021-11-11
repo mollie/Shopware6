@@ -9,20 +9,15 @@ use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Mollie\Api\Exceptions\ApiException;
 use Monolog\Logger;
-use RuntimeException;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\AsynchronousPaymentHandlerInterface;
+use Shopware\Core\Checkout\Payment\Exception\AsyncPaymentFinalizeException;
 use Shopware\Core\Checkout\Payment\Exception\CustomerCanceledAsyncPaymentException;
-use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\Locale\LocaleEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Shopware\Core\System\StateMachine\Exception\IllegalTransitionException;
-use Shopware\Core\System\StateMachine\Exception\StateMachineInvalidEntityIdException;
-use Shopware\Core\System\StateMachine\Exception\StateMachineInvalidStateFieldException;
-use Shopware\Core\System\StateMachine\Exception\StateMachineNotFoundException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Throwable;
@@ -155,48 +150,40 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
     }
 
     /**
-     * The finalize function will be called when the user is redirected back to shop from the payment gateway.
      *
-     * Throw a
-     *
-     * @param AsyncPaymentTransactionStruct $transaction
-     * @param Request $request
-     * @param SalesChannelContext $salesChannelContext @see AsyncPaymentFinalizeException exception if an
-     *                                                           error ocurres while calling an external payment API
-     *                                                           Throw a @throws RuntimeException*@throws
-     *                                                           CustomerCanceledAsyncPaymentException
-     *
-     * @throws CustomerCanceledAsyncPaymentException
-     * @throws InconsistentCriteriaIdsException
-     * @throws IllegalTransitionException
-     * @throws StateMachineInvalidEntityIdException
-     * @throws StateMachineInvalidStateFieldException
-     * @throws StateMachineNotFoundException
-     * @see CustomerCanceledAsyncPaymentException exception if the customer canceled the payment process on
-     * payment provider page
      */
     public function finalize(AsyncPaymentTransactionStruct $transaction, Request $request, SalesChannelContext $salesChannelContext): void
     {
         try {
+
             $this->finalizeFacade->finalize($transaction, $salesChannelContext);
-        } catch (CustomerCanceledAsyncPaymentException $exception) {
-            throw $exception;
+
+        } catch (AsyncPaymentFinalizeException | CustomerCanceledAsyncPaymentException $ex) {
+
+            # these are already correct exceptions
+            # that cancel the Shopware order in a coordinated way by Shopware
+            throw $ex;
+
         } catch (Throwable $exception) {
-            $e = null;
-            if ($exception instanceof \Exception) {
-                $e = $exception;
-            }
+
+            # this processes all unhandled exceptions.
+            # we need to log whatever happens in here, and then also
+            # throw an exception that breaks the order in a coordinated way.
+            # Only the 2 exceptions above, lead to a correct failure-behaviour in Shopware.
+            # All other exceptions would lead to a 500 exception in the storefront.
+
             $this->logger->addEntry(
                 $exception->getMessage(),
                 $salesChannelContext->getContext(),
-                $e,
+                ($exception instanceof \Exception) ? $exception : null,
                 null,
                 Logger::ERROR
             );
 
-            # ATTENTION, the second empty parameter is required
-            # in earlier Shopware 6.1.x versions, this was NOT optional!
-            throw new CustomerCanceledAsyncPaymentException($transaction->getOrderTransaction()->getId(), '');
+            throw new AsyncPaymentFinalizeException(
+                $transaction->getOrderTransaction()->getId(),
+                'An unknown error happened when finalizing the order. Please see the Shopware logs for more. It can be that the payment in Mollie was succesful and the Shopware order is now cancelled or failed!'
+            );
         }
     }
 }

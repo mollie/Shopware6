@@ -3,6 +3,7 @@ import Session from "Services/utils/Session"
 import Shopware from "Services/shopware/Shopware"
 import PaymentScreenAction from 'Actions/mollie/PaymentScreenAction';
 import IssuerScreenAction from 'Actions/mollie/IssuerScreenAction';
+import GiftCardsScreenAction from "Actions/mollie/GiftCardsScreenAction";
 // ------------------------------------------------------
 import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
 // ------------------------------------------------------
@@ -24,6 +25,7 @@ const paymentAction = new PaymentAction();
 const molliePayment = new PaymentScreenAction();
 const mollieIssuer = new IssuerScreenAction();
 const mollieVoucher = new VoucherScreenAction();
+const mollieGiftCards = new GiftCardsScreenAction();
 const molliePaymentMethods = new PaymentMethodsScreenAction();
 
 
@@ -34,8 +36,8 @@ const device = devices.getFirstDevice();
 
 
 const payments = [
-    {key: 'voucher', name: 'Voucher'},
     {key: 'paypal', name: 'PayPal'},
+    {key: 'klarnapaynow', name: 'Pay now'},
     {key: 'klarnapaylater', name: 'Pay later'},
     {key: 'klarnasliceit', name: 'Slice it'},
     {key: 'ideal', name: 'iDEAL'},
@@ -47,6 +49,8 @@ const payments = [
     {key: 'kbc', name: 'KBC'},
     {key: 'belfius', name: 'Belfius'},
     {key: 'banktransfer', name: 'Banktransfer'},
+    {key: 'giftcard', name: 'Gift cards'},
+    {key: 'voucher', name: 'Voucher'},
 ];
 
 
@@ -103,7 +107,7 @@ context("Checkout Tests", () => {
 
                     molliePayment.initSandboxCookie();
 
-                    if (payment.key === 'klarnapaylater' || payment.key === 'klarnasliceit') {
+                    if (payment.key === 'klarnapaylater' || payment.key === 'klarnapaynow' || payment.key === 'klarnasliceit') {
 
                         molliePayment.selectAuthorized();
 
@@ -114,6 +118,13 @@ context("Checkout Tests", () => {
                         // so Mollie forces us to select another payment method
                         // to pay the rest of the total amount
                         mollieVoucher.selectMonizze();
+                        molliePayment.selectPaid();
+                        molliePaymentMethods.selectPaypal();
+                        molliePayment.selectPaid();
+
+                    } else if (payment.key === 'giftcard') {
+
+                        mollieGiftCards.selectBeautyCards();
                         molliePayment.selectPaid();
                         molliePaymentMethods.selectPaypal();
                         molliePayment.selectPaid();
