@@ -56,6 +56,9 @@ abstract class AttributeStruct extends Struct
              */
             $camelKey = $caseConverter->denormalize($key);
 
+            /**
+             * Store the original key, so we can revert to it when converting back to an array
+             */
             $keyMapping->set($camelKey, $key);
 
             /**
@@ -201,6 +204,10 @@ abstract class AttributeStruct extends Struct
          * Get the extension
          */
         $extension = $this->getExtension($extensionName);
+
+        if(!$extension instanceof Struct) {
+            return new ArrayStruct();
+        }
 
         /**
          * Return it if it's an ArrayStruct
