@@ -10,6 +10,7 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 abstract class AttributeStruct extends Struct
 {
     const ADDITIONAL = 'additionalAttributes';
+    const KEY_MAPPING = 'keyMapping';
 
     /**
      * @param array<mixed>|null $attributes
@@ -26,7 +27,12 @@ abstract class AttributeStruct extends Struct
         /**
          * Create a struct to store attributes that don't have properties, but whose data still needs to be kept.
          */
-        $this->addExtension(self::ADDITIONAL, new ArrayStruct());
+        $additionalAttributes = $this->getArrayStructExtension(self::ADDITIONAL);
+
+        /**
+         * Create a struct to store our original keys, as they will be converted to camelCase.
+         */
+        $keyMapping = $this->getArrayStructExtension(self::KEY_MAPPING);
 
 
         if (empty($attributes)) {
@@ -50,7 +56,7 @@ abstract class AttributeStruct extends Struct
              */
             $camelKey = $caseConverter->denormalize($key);
 
-            // TODO Save keys before/after convert to restore snake_case keys in getVars
+            $keyMapping->set($camelKey, $key);
 
             /**
              * If a construct method exists for this property, call it to set the value.
@@ -82,12 +88,9 @@ abstract class AttributeStruct extends Struct
 
             /**
              * If the property doesn't exist in this class at all, store the attribute in the additional attribute struct
-             * so we don't lose it.
+             * so we don't lose track of it.
              */
-            $additional = $this->getExtension(self::ADDITIONAL);
-            if($additional instanceof ArrayStruct) {
-                $additional->set($key, $value);
-            }
+            $additionalAttributes->set($key, $value);
         }
     }
 
@@ -101,10 +104,7 @@ abstract class AttributeStruct extends Struct
         /**
          * If we have an extension with additional attributes, use that as the starting point
          */
-        $additional = $this->getExtension(self::ADDITIONAL);
-        $data = ($additional instanceof ArrayStruct)
-            ? $additional->all()
-            : [];
+        $data = $this->getArrayStructExtension(self::ADDITIONAL)->all();
 
         /**
          * Loop through all the properties of this class.
@@ -117,13 +117,18 @@ abstract class AttributeStruct extends Struct
                 continue;
             }
 
-            // TODO 001 restore keys to snake_case if needed
+            $originalKey = $key;
+
+            // Get the original key from the key mapping
+            if($this->getArrayStructExtension(self::KEY_MAPPING)->has($key)) {
+                $originalKey = $this->getArrayStructExtension(self::KEY_MAPPING)->get($key);
+            }
 
             /**
              * If $value is a Collection, return the inner elements array
              */
             if ($value instanceof Collection) {
-                $data[$key] = $value->getElements();
+                $data[$originalKey] = $value->getElements();
                 continue;
             }
 
@@ -131,14 +136,14 @@ abstract class AttributeStruct extends Struct
              * If $value is a Struct, return all the properties of the struct
              */
             if ($value instanceof Struct) {
-                $data[$key] = $value->getVars();
+                $data[$originalKey] = $value->getVars();
                 continue;
             }
 
             /**
              * Otherwise just set the value in our data array.
              */
-            $data[$key] = $value;
+            $data[$originalKey] = $value;
         }
 
         return $data;
@@ -176,6 +181,38 @@ abstract class AttributeStruct extends Struct
         }
 
         return $this;
+    }
+
+    /**
+     * Gets an extension by name, and makes sure it's an ArrayStruct
+     * @param string $extensionName
+     * @return ArrayStruct
+     */
+    protected function getArrayStructExtension(string $extensionName): ArrayStruct
+    {
+        /**
+         * If we don't have an extension with this name, create it.
+         */
+        if (!$this->hasExtension($extensionName)) {
+            $this->addExtension($extensionName, new ArrayStruct());
+        }
+
+        /**
+         * Get the extension
+         */
+        $extension = $this->getExtension($extensionName);
+
+        /**
+         * Return it if it's an ArrayStruct
+         */
+        if ($extension instanceof ArrayStruct) {
+            return $extension;
+        }
+
+        /**
+         * Otherwise, get all the properties of this Struct, create a new ArrayStruct and return it.
+         */
+        return new ArrayStruct($extension->getVars());
     }
 
     /**

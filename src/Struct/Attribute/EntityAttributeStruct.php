@@ -23,7 +23,7 @@ abstract class EntityAttributeStruct extends AttributeStruct
             throw new \Exception('Entity does not contain custom fields');
         }
 
-        /**
+        /** TODO 003: Entities always have getTranslated.
          * If this entity is translatable, for example, product or category, then a method getTranslated is available.
          * Use the custom fields from this translated array instead of the regular ones.
          *
