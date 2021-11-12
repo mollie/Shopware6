@@ -10,6 +10,7 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 abstract class AttributeStruct extends Struct
 {
     const ADDITIONAL = 'additionalAttributes';
+    const CONSTRUCT_KEYS = 'construct_keys';
 
     /**
      * @param array<mixed>|null $attributes
@@ -28,6 +29,11 @@ abstract class AttributeStruct extends Struct
          */
         $additionalAttributes = $this->getArrayStructExtension(self::ADDITIONAL);
 
+        /**
+         * Create a struct to store the keys that were available during construct.
+         */
+        $constructKeys = $this->getArrayStructExtension(self::CONSTRUCT_KEYS);
+
         if (empty($attributes)) {
             return;
         }
@@ -45,7 +51,12 @@ abstract class AttributeStruct extends Struct
          */
         foreach ($attributes as $key => $value) {
             /**
-             * Convert the snake_case property name to camelCase
+             * Save the attributes, so we can determine which properties should be added to the array later
+             */
+            $constructKeys->offsetSet($key, $value);
+
+            /**
+             * Convert the snake_case property name to camelCase for our construct and set methods.
              */
             $camelKey = $caseConverter->denormalize($key);
 
@@ -76,7 +87,7 @@ abstract class AttributeStruct extends Struct
                 $this->$camelKey = $value;
                 continue;
             }
-            
+
             if (property_exists($this, $key)) {
                 $this->$key = $value;
                 continue;
@@ -116,6 +127,13 @@ abstract class AttributeStruct extends Struct
              * Ignore these properties, don't add them to the data we return
              */
             if (in_array($key, ['extensions'])) {
+                continue;
+            }
+
+            /**
+             * If the value was not set during construct, and the value is still null, don't add this to our data
+             */
+            if (!$this->getArrayStructExtension(self::CONSTRUCT_KEYS)->has($key) && is_null($value)) {
                 continue;
             }
 
