@@ -10,7 +10,6 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 abstract class AttributeStruct extends Struct
 {
     const ADDITIONAL = 'additionalAttributes';
-    const KEY_MAPPING = 'keyMapping';
 
     /**
      * @param array<mixed>|null $attributes
@@ -28,12 +27,6 @@ abstract class AttributeStruct extends Struct
          * Create a struct to store attributes that don't have properties, but whose data still needs to be kept.
          */
         $additionalAttributes = $this->getArrayStructExtension(self::ADDITIONAL);
-
-        /**
-         * Create a struct to store our original keys, as they will be converted to camelCase.
-         */
-        $keyMapping = $this->getArrayStructExtension(self::KEY_MAPPING);
-
 
         if (empty($attributes)) {
             return;
@@ -55,17 +48,6 @@ abstract class AttributeStruct extends Struct
              * Convert the snake_case property name to camelCase
              */
             $camelKey = $caseConverter->denormalize($key);
-
-            /**
-             * Store the original key, so we can revert to it when converting back to an array
-             *
-             * Using offsetSet() instead of set() because:
-             * 1) Shopware is dumb
-             * 2) They both have the same functionality
-             * 3) They added dumb type-hinting to set
-             * https://github.com/shopware/platform/commit/9c4cbe415d33419d9a9c5a3070007bf5cdf0a00e#diff-f21dd8cab48e2967baac4b0d4fb97e6107099f658733615947db47490e31b511R55
-             */
-            $keyMapping->offsetSet($camelKey, $key);
 
             /**
              * If a construct method exists for this property, call it to set the value.
@@ -132,18 +114,11 @@ abstract class AttributeStruct extends Struct
                 continue;
             }
 
-            $originalKey = $key;
-
-            // Get the original key from the key mapping
-            if($this->getArrayStructExtension(self::KEY_MAPPING)->has($key)) {
-                $originalKey = $this->getArrayStructExtension(self::KEY_MAPPING)->get($key);
-            }
-
             /**
              * If $value is a Collection, return the inner elements array
              */
             if ($value instanceof Collection) {
-                $data[$originalKey] = $value->getElements();
+                $data[$key] = $value->getElements();
                 continue;
             }
 
@@ -151,14 +126,14 @@ abstract class AttributeStruct extends Struct
              * If $value is a Struct, return all the properties of the struct
              */
             if ($value instanceof Struct) {
-                $data[$originalKey] = $value->getVars();
+                $data[$key] = $value->getVars();
                 continue;
             }
 
             /**
              * Otherwise just set the value in our data array.
              */
-            $data[$originalKey] = $value;
+            $data[$key] = $value;
         }
 
         return $data;
@@ -264,7 +239,7 @@ abstract class AttributeStruct extends Struct
             }
 
             /**
-             * If it fails all of the above tests, throw an error.
+             * If it fails all the above tests, throw an error.
              */
             // TODO 001 specific exception
             throw new \Exception(sprintf('Assignment method "%s" should be declared protected.', $method->getName()));
