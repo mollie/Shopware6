@@ -58,8 +58,14 @@ abstract class AttributeStruct extends Struct
 
             /**
              * Store the original key, so we can revert to it when converting back to an array
+             *
+             * Using offsetSet() instead of set() because:
+             * 1) Shopware is dumb
+             * 2) They both have the same functionality
+             * 3) They added dumb type-hinting to set
+             * https://github.com/shopware/platform/commit/9c4cbe415d33419d9a9c5a3070007bf5cdf0a00e#diff-f21dd8cab48e2967baac4b0d4fb97e6107099f658733615947db47490e31b511R55
              */
-            $keyMapping->set($camelKey, $key);
+            $keyMapping->offsetSet($camelKey, $key);
 
             /**
              * If a construct method exists for this property, call it to set the value.
@@ -92,8 +98,14 @@ abstract class AttributeStruct extends Struct
             /**
              * If the property doesn't exist in this class at all, store the attribute in the additional attribute struct
              * so we don't lose track of it.
+             *
+             * Using offsetSet() instead of set() because:
+             * 1) Shopware is dumb
+             * 2) They both have the same functionality
+             * 3) They added dumb type-hinting to set
+             * https://github.com/shopware/platform/commit/9c4cbe415d33419d9a9c5a3070007bf5cdf0a00e#diff-f21dd8cab48e2967baac4b0d4fb97e6107099f658733615947db47490e31b511R55
              */
-            $additionalAttributes->set($key, $value);
+            $additionalAttributes->offsetSet($key, $value);
         }
     }
 
