@@ -181,14 +181,41 @@ abstract class AttributeStruct extends Struct
     public function merge(AttributeStruct $struct): self
     {
         /**
+         * Our class properties are all in camelCase, but our custom fields are stored as snake_case.
+         * Initialize a NameConverter to convert between the two.
+         *
+         * e.g. molliePayments <=> mollie_payments
+         */
+        $caseConverter = new CamelCaseToSnakeCaseNameConverter();
+
+        /**
          * Loop through the other struct's properties and set them on this struct,
          * either using the set method for the property, or setting the property directly.
          */
         foreach ($struct->getVars() as $key => $value) {
-            $setMethod = 'set' . ucfirst($key);
+            /**
+             * Convert the snake_case property name to camelCase for our construct and set methods.
+             */
+            $camelKey = $caseConverter->denormalize($key);
+
+            /**
+             * If a set method exists for this property, use it
+             */
+            $setMethod = 'set' . ucfirst($camelKey);
             if (method_exists($this, $setMethod)) {
                 $this->$setMethod($value);
-            } elseif (property_exists($this, $key)) {
+                continue;
+            }
+
+            /**
+             * Otherwise try to set the property directly
+             */
+            if (property_exists($this, $camelKey)) {
+                $this->$camelKey = $value;
+                continue;
+            }
+
+            if (property_exists($this, $key)) {
                 $this->$key = $value;
             }
         }
