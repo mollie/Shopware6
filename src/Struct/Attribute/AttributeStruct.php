@@ -76,6 +76,11 @@ abstract class AttributeStruct extends Struct
                 $this->$camelKey = $value;
                 continue;
             }
+            
+            if (property_exists($this, $key)) {
+                $this->$key = $value;
+                continue;
+            }
 
             /**
              * If the property doesn't exist in this class at all, store the attribute in the additional attribute struct

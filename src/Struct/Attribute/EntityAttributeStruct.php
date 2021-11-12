@@ -17,6 +17,7 @@ abstract class EntityAttributeStruct extends AttributeStruct
          * If this entity does not contain getCustomFields, we can't do anything, and we shouldn't even create
          * an attribute struct in the first place.
          */
+        // TODO 001 specific exception
         if(!method_exists($entity, 'getCustomFields')) {
             throw new \Exception('Entity does not contain custom fields');
         }
