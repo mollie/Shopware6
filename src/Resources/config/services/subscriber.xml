@@ -30,5 +30,10 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Subscriber\ApplePayDirectSubscriber">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
     </services>
 </container>

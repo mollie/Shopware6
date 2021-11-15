@@ -35,7 +35,7 @@ describe('Credit Card Components', () => {
 
             beforeEach(() => {
                 devices.setDevice(device);
-                configAction.setupShop(true, true);
+                configAction.setupShop(true, true, false);
                 session.resetSessionData();
                 session.resetBrowserSession();
             });
