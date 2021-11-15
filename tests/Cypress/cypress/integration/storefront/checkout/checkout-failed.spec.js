@@ -30,7 +30,7 @@ context("Checkout Failure Tests", () => {
     describe('Mollie Failure Mode', () => {
 
         before(function () {
-            configAction.setupShop(true, false);
+            configAction.setupShop(true, false, false);
         })
 
         beforeEach(() => {
@@ -103,7 +103,7 @@ context("Checkout Failure Tests", () => {
     describe('Shopware Failure Mode', () => {
 
         before(function () {
-            configAction.setupShop(false, false);
+            configAction.setupShop(false, false, false);
         })
 
         beforeEach(() => {

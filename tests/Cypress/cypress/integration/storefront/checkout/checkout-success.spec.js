@@ -60,7 +60,7 @@ context("Checkout Tests", () => {
         devices.setDevice(device);
 
         // configure our shop
-        configAction.setupShop(true, false);
+        configAction.setupShop(true, false, false);
         // configure our products for vouchers
         configAction.updateProducts('eco');
     })
