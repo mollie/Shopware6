@@ -7,13 +7,36 @@ class VersionCompare
 {
 
     /**
-     * @param string $versionA
+     * @var string
+     */
+    private $swVersion;
+
+
+    /**
+     * @param string $swVersion
+     */
+    public function __construct(string $swVersion)
+    {
+        $this->swVersion = $swVersion;
+    }
+
+
+    /**
      * @param string $versionB
      * @return bool
      */
-    public static function gte(string $versionA, string $versionB): bool
+    public function gte(string $versionB): bool
     {
-        return version_compare($versionA, $versionB, '>=');
+        return version_compare($this->swVersion, $versionB, '>=');
+    }
+
+    /**
+     * @param string $version
+     * @return bool
+     */
+    public function lt(string $version): bool
+    {
+        return version_compare($this->swVersion, $version, '<');
     }
 
 }

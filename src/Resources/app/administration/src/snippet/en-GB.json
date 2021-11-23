@@ -1,4 +1,16 @@
 {
+  "global": {
+    "businessEvents": {
+      "mollie_webhook_received_All": " Mollie Webhook Received (All)",
+      "mollie_webhook_received_status_authorized": " Mollie Webhook Received (Authorized)",
+      "mollie_webhook_received_status_failed": " Mollie Webhook Received (Failed)",
+      "mollie_webhook_received_status_canceled": " Mollie Webhook Received (Canceled)",
+      "mollie_webhook_received_status_expired": " Mollie Webhook Received (Expired)",
+      "mollie_webhook_received_status_pending": " Mollie Webhook Received (Pending)",
+      "mollie_webhook_received_status_paid": " Mollie Webhook Received (Paid)",
+      "mollie_webhook_received_status_completed": " Mollie Webhook Received (Completed)"
+    }
+  },
   "mollie-payments": {
     "general": {
       "mainMenuItemGeneral": "Mollie Payments",
@@ -57,6 +69,31 @@
         "quantityPlaceholder": "The quantity to ship...",
         "confirmButton": "Ship",
         "cancelButton": "Do not ship"
+      }
+    },
+    "sw-flow": {
+      "actions": {
+        "shipOrder": {
+          "editor": {
+            "title": "Ship Order (Mollie)",
+            "description": "Ship order in Mollie."
+          },
+          "modal": {
+            "title": "Ship Order",
+            "description": "This action will automatically ship an order through Mollie. The flow sequence will receive the order number, and pass this on to the Mollie API. Successful shipments and failed shipments will be visible in the Mollie log files."
+          }
+        },
+        "refundOrder": {
+          "editor": {
+            "title": "Refund Order (Mollie)",
+            "description": "Refund order through Mollie."
+          },
+          "modal": {
+            "title": "Refund Order",
+            "description": "This action will automatically start a refund through Mollie. The flow sequence will receive the order number, and pass this on to the Mollie API. Successful refunds and failed refunds will be visible in the Mollie log files.",
+            "warning": "Please keep in mind, that refunds might take up to 2 hours to be finalized and visible in the shop. Until then you can always cancel a pending refund either from the order page in Shopware or from the Mollie Dashboard."
+          }
+        }
       }
     }
   },
