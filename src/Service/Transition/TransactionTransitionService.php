@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Service\Transition;
 
 use Kiener\MolliePayments\Service\LoggerService;
 use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionDefinition;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
@@ -17,14 +18,18 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
      */
     private $transitionService;
     /**
-     * @var LoggerService
+     * @var LoggerInterface
      */
-    private $loggerService;
+    private $logger;
 
-    public function __construct(TransitionServiceInterface $transitionService, LoggerService $loggerService)
+    /**
+     * @param TransitionServiceInterface $transitionService
+     * @param LoggerInterface $loggerService
+     */
+    public function __construct(TransitionServiceInterface $transitionService, LoggerInterface $loggerService)
     {
         $this->transitionService = $transitionService;
-        $this->loggerService = $loggerService;
+        $this->logger = $loggerService;
     }
 
     public function processTransaction(OrderTransactionEntity $transaction, Context $context): void
@@ -67,15 +72,12 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         $availableTransitions = $this->getAvailableTransitions($entityId, $context);
 
         if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_REOPEN, $availableTransitions)) {
-            $this->loggerService->addEntry(
+
+            $this->logger->error(
                 sprintf(
                     'It is not allowed to change status to open from %s. Aborting reopen transition',
                     $transaction->getStateMachineState()->getName()
-                ),
-                $context,
-                null,
-                null,
-                Logger::ERROR
+                )
             );
 
             return;

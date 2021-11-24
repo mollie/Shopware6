@@ -13,7 +13,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieLineItemBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderAddressBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
+            <argument type="service" id="mollie_payments.logger"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieShippingLineItemBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\VerticalTaxLineItemFixer"/>
             <argument type="service" id="Kiener\MolliePayments\Hydrator\MollieLineItemHydrator"/>
@@ -36,7 +36,7 @@
         <service id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderAddressBuilder"/>
 
         <service id="Kiener\MolliePayments\Service\MollieApi\VerticalTaxLineItemFixer">
-            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
+            <argument type="service" id="mollie_payments.logger"/>
         </service>
 
     </services>

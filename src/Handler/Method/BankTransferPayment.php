@@ -9,6 +9,7 @@ use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Mollie\Api\Types\PaymentMethod;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\Locale\LocaleEntity;
@@ -28,7 +29,7 @@ class BankTransferPayment extends PaymentHandler
     private $settingsService;
 
     public function __construct(
-        LoggerService $logger,
+        LoggerInterface $logger,
         MolliePaymentDoPay $payFacade,
         MolliePaymentFinalize $finalizeFacade,
         TransactionTransitionServiceInterface $transactionTransitionService,

@@ -13,6 +13,7 @@ use Kiener\MolliePayments\Service\MolliePaymentExtractor;
 use Kiener\MolliePayments\Service\OrderDeliveryService;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\Transition\DeliveryTransitionServiceInterface;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
@@ -62,7 +63,7 @@ class MollieShipment
     private $orderDataExtractor;
 
     /**
-     * @var LoggerService
+     * @var LoggerInterface
      */
     private $logger;
 
@@ -74,18 +75,9 @@ class MollieShipment
      * @param OrderDeliveryService $orderDeliveryService
      * @param OrderService $orderService
      * @param OrderDataExtractor $orderDataExtractor
-     * @param LoggerService $logger
+     * @param LoggerInterface $logger
      */
-    public function __construct(
-        MolliePaymentExtractor $extractor,
-        DeliveryTransitionServiceInterface $deliveryTransitionService,
-        Order $mollieApiOrderService,
-        Shipment $mollieApiShipmentService,
-        OrderDeliveryService $orderDeliveryService,
-        OrderService $orderService,
-        OrderDataExtractor $orderDataExtractor,
-        LoggerService $logger
-    )
+    public function __construct(MolliePaymentExtractor $extractor, DeliveryTransitionServiceInterface $deliveryTransitionService, Order $mollieApiOrderService, Shipment $mollieApiShipmentService, OrderDeliveryService $orderDeliveryService, OrderService $orderService, OrderDataExtractor $orderDataExtractor, LoggerInterface $logger)
     {
         $this->extractor = $extractor;
         $this->deliveryTransitionService = $deliveryTransitionService;
@@ -107,12 +99,9 @@ class MollieShipment
         $delivery = $this->orderDeliveryService->getDelivery($orderDeliveryId, $context);
 
         if (!$delivery instanceof OrderDeliveryEntity) {
-            $this->logger->addEntry(
-                sprintf('Order delivery with id %s could not be found in database', $orderDeliveryId),
-                $context,
-                null,
-                null,
-                Logger::WARNING
+
+            $this->logger->warning(
+                sprintf('Order delivery with id %s could not be found in database', $orderDeliveryId)
             );
 
             return false;
@@ -121,12 +110,9 @@ class MollieShipment
         $order = $delivery->getOrder();
 
         if (!$order instanceof OrderEntity) {
-            $this->logger->addEntry(
-                sprintf('Loaded delivery with id %s does not have an order in database', $orderDeliveryId),
-                $context,
-                null,
-                null,
-                Logger::WARNING
+
+            $this->logger->warning(
+                sprintf('Loaded delivery with id %s does not have an order in database', $orderDeliveryId)
             );
 
             return false;
@@ -136,12 +122,9 @@ class MollieShipment
         $mollieOrderId = $customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY] ?? null;
 
         if (!$mollieOrderId) {
-            $this->logger->addEntry(
-                sprintf('Mollie orderId does not exist in shopware order (%s)', (string)$order->getOrderNumber()),
-                $context,
-                null,
-                null,
-                Logger::WARNING
+
+            $this->logger->warning(
+                sprintf('Mollie orderId does not exist in shopware order (%s)', (string)$order->getOrderNumber())
             );
 
             return false;
@@ -151,15 +134,12 @@ class MollieShipment
         $lastTransaction = $this->extractor->extractLast($order->getTransactions());
 
         if (!$lastTransaction instanceof OrderTransactionEntity) {
-            $this->logger->addEntry(
+
+            $this->logger->info(
                 sprintf(
                     'The last transaction of the order (%s) is not a mollie payment! No shipment will be sent to mollie',
                     (string)$order->getOrderNumber()
-                ),
-                $context,
-                null,
-                null,
-                Logger::INFO
+                )
             );
 
             return false;

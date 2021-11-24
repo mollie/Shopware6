@@ -8,20 +8,21 @@ use Kiener\MolliePayments\Struct\LineItemPriceStruct;
 use Kiener\MolliePayments\Struct\MollieLineItem;
 use Kiener\MolliePayments\Struct\MollieLineItemCollection;
 use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class VerticalTaxLineItemFixer
 {
     /**
-     * @var LoggerService
+     * @var LoggerInterface
      */
     private $logger;
 
 
     /**
-     * @param LoggerService $logger
+     * @param LoggerInterface $logger
      */
-    public function __construct(LoggerService $logger)
+    public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
     }
@@ -32,10 +33,8 @@ class VerticalTaxLineItemFixer
      */
     public function fixLineItems(MollieLineItemCollection $lineItems, SalesChannelContext $salesChannelContext): void
     {
-        $this->logger->addDebugEntry(
-            sprintf('Entering vertical tax calculation fix algorithm'),
-            $salesChannelContext->getSalesChannelId(),
-            $salesChannelContext->getContext()
+        $this->logger->debug(
+            sprintf('Entering vertical tax calculation fix algorithm')
         );
 
         $roundingRestSum = $lineItems->getRoundingRestSum();
@@ -51,13 +50,8 @@ class VerticalTaxLineItemFixer
         $firstLineItem = $filteredRoundingLineItems->first();
 
         if (!$firstLineItem instanceof MollieLineItem) {
-            $this->logger->addEntry(
-                'Got a rounding rest but cannot filter for items !',
-                $salesChannelContext->getContext(),
-                null,
-                null,
-                Logger::CRITICAL
-            );
+
+            $this->logger->critical('Got a rounding rest but cannot filter for items !');
 
             throw new \RuntimeException('Got a rounding rest but cannot filter for items !');
         }

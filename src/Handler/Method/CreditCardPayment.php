@@ -9,6 +9,7 @@ use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Mollie\Api\Types\PaymentMethod;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -27,7 +28,7 @@ class CreditCardPayment extends PaymentHandler
     private $customerService;
 
     public function __construct(
-        LoggerService $logger,
+        LoggerInterface $logger,
         MolliePaymentDoPay $payFacade,
         MolliePaymentFinalize $finalizeFacade,
         TransactionTransitionServiceInterface $transactionTransitionService,
