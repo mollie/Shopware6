@@ -10,6 +10,7 @@
         </service>
 
         <service id="Kiener\MolliePayments\Factory\MollieApiFactory" class="Kiener\MolliePayments\Factory\MollieApiFactory">
+            <argument>%kernel.shopware_version%</argument>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="monolog.logger"/>
         </service>
