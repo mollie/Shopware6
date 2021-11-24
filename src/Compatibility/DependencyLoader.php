@@ -54,13 +54,10 @@ class DependencyLoader
 
             $loader->load('compatibility/services_6.4.xml');
 
-        } else if (VersionCompare::gte($version, '6.3')) {
+        } else if (VersionCompare::gte($version, '6.3.5.0')) {
 
-            $loader->load('compatibility/services_6.3.xml');
+            $loader->load('compatibility/services_6.3.5.0.xml');
 
-        } else if (VersionCompare::gte($version, '6.2')) {
-
-            $loader->load('compatibility/services_6.2.xml');
         }
     }
 
