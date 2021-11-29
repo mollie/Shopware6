@@ -16,6 +16,11 @@ class MollieApiFactory
 {
 
     /**
+     * @var string
+     */
+    private $shopwareVersion;
+
+    /**
      * @var MollieApiClient
      */
     private $apiClient;
@@ -32,13 +37,19 @@ class MollieApiFactory
 
 
     /**
+     * @param string $shopwareVersion
      * @param SettingsService $settingsService
      * @param LoggerInterface $logger
      */
-    public function __construct(SettingsService $settingsService, LoggerInterface $logger)
+    public function __construct(string $shopwareVersion, SettingsService $settingsService, LoggerInterface $logger)
     {
+        $this->shopwareVersion = $shopwareVersion;
         $this->settingsService = $settingsService;
         $this->logger = $logger;
+
+        if (empty($this->shopwareVersion)) {
+            $this->shopwareVersion = Kernel::SHOPWARE_FALLBACK_VERSION;
+        }
     }
 
     /**
@@ -112,10 +123,10 @@ class MollieApiFactory
             $httpClient = new MollieHttpClient($connectTimeout, $responseTimeout);
 
             $this->apiClient = new MollieApiClient($httpClient);
-
             $this->apiClient->setApiKey($apiKey);
 
-            $this->apiClient->addVersionString('Shopware/' . Kernel::SHOPWARE_FALLBACK_VERSION);
+            $this->apiClient->addVersionString('Shopware/' . $this->shopwareVersion);
+            
             $this->apiClient->addVersionString('MollieShopware6/' . MolliePayments::PLUGIN_VERSION);
 
         } catch (Exception $e) {
