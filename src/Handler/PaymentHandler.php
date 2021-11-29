@@ -7,8 +7,9 @@ use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Facade\MolliePaymentFinalize;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
+use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
 use Mollie\Api\Exceptions\ApiException;
-use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
@@ -34,7 +35,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
     /** @var array */
     protected $paymentMethodData = [];
 
-    /** @var LoggerService */
+    /** @var LoggerInterface */
     protected $logger;
 
     /** @var MolliePaymentDoPay */
@@ -46,15 +47,14 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
     /** @var MolliePaymentFinalize */
     private $finalizeFacade;
 
+
     /**
-     * PaymentHandler constructor.
+     * @param LoggerInterface $logger
+     * @param MolliePaymentDoPay $payFacade
+     * @param MolliePaymentFinalize $finalizeFacade
+     * @param TransactionTransitionServiceInterface $transactionTransitionService
      */
-    public function __construct(
-        LoggerService                         $logger,
-        MolliePaymentDoPay                    $payFacade,
-        MolliePaymentFinalize                 $finalizeFacade,
-        TransactionTransitionServiceInterface $transactionTransitionService
-    )
+    public function __construct(LoggerInterface $logger, MolliePaymentDoPay $payFacade, MolliePaymentFinalize $finalizeFacade, TransactionTransitionServiceInterface $transactionTransitionService)
     {
         $this->logger = $logger;
         $this->payFacade = $payFacade;
@@ -92,52 +92,49 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      *                          payment
      * @throws ApiException
      */
-    public function pay(
-        AsyncPaymentTransactionStruct $transaction,
-        RequestDataBag                $dataBag,
-        SalesChannelContext           $salesChannelContext
-    ): RedirectResponse
+    public function pay(AsyncPaymentTransactionStruct $transaction, RequestDataBag $dataBag, SalesChannelContext $salesChannelContext): RedirectResponse
     {
-        try {
-            $paymentUrl = $this->payFacade->preparePayProcessAtMollie($this->paymentMethod, $transaction, $salesChannelContext, $this);
-        } catch (\Exception $exception) {
-            $this->logger->addEntry(
-                $exception->getMessage(),
-                $salesChannelContext->getContext(),
-                $exception,
-                [
-                    'function' => 'order-prepare',
+
+        $this->logger->info(
+            'Starting Checkout for order ' . $transaction->getOrder()->getOrderNumber() . ' with payment: ' . $this->paymentMethod,
+            [
+                'saleschannel' => $salesChannelContext->getSalesChannel()->getName(),
+                'cart' => [
+                    'amount' => $transaction->getOrder()->getAmountTotal(),
                 ],
-                Logger::ERROR
+            ]
+        );
+
+
+        try {
+
+            $paymentUrl = $this->payFacade->preparePayProcessAtMollie(
+                $this->paymentMethod,
+                $transaction,
+                $salesChannelContext,
+                $this
             );
 
-            throw new PaymentUrlException($transaction->getOrderTransaction()->getId(), $exception->getMessage());
         } catch (Throwable $exception) {
-            $this->logger->addEntry(
-                $exception->getMessage(),
-                $salesChannelContext->getContext(),
-                null,
+
+            $this->logger->error(
+                'Error when starting Mollie payment: ' . $exception->getMessage(),
                 [
                     'function' => 'order-prepare',
-                ],
-                Logger::CRITICAL
+                ]
             );
 
             throw new PaymentUrlException($transaction->getOrderTransaction()->getId(), $exception->getMessage());
         }
 
         try {
+
             $this->transactionTransitionService->processTransaction($transaction->getOrderTransaction(), $salesChannelContext->getContext());
+
         } catch (\Exception $exception) {
-            // we only log failed transitions
-            $this->logger->addEntry(
-                sprintf('Could not set payment to in progress. Got error %s', $exception->getMessage()),
-                $salesChannelContext->getContext(),
-                $exception,
-                [
-                    'function' => 'order-prepare',
-                ],
-                Logger::WARNING
+
+            $this->logger->warning(
+                sprintf('Could not set payment to in progress. Got error %s', $exception->getMessage())
             );
         }
 
@@ -150,34 +147,46 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
     }
 
     /**
-     *
+     * @param AsyncPaymentTransactionStruct $transaction
+     * @param Request $request
+     * @param SalesChannelContext $salesChannelContext
      */
     public function finalize(AsyncPaymentTransactionStruct $transaction, Request $request, SalesChannelContext $salesChannelContext): void
     {
+        $orderAttributes = new MollieOrderCustomFieldsStruct($transaction->getOrder()->getCustomFields());
+        $molliedID = $orderAttributes->getMollieOrderId();
+
+        $this->logger->info(
+            'Finalizing Mollie payment for order ' . $transaction->getOrder()->getOrderNumber() . ' with payment: ' . $this->paymentMethod . ' and Mollie ID' . $molliedID,
+
+            [
+                'saleschannel' => $salesChannelContext->getSalesChannel()->getName(),
+            ]
+        );
+
         try {
 
             $this->finalizeFacade->finalize($transaction, $salesChannelContext);
 
         } catch (AsyncPaymentFinalizeException | CustomerCanceledAsyncPaymentException $ex) {
 
+            $this->logger->error(
+                'Error when finalizing order ' . $transaction->getOrder()->getOrderNumber() . ', Mollie ID: ' . $molliedID . ', ' . $ex->getMessage()
+            );
+
             # these are already correct exceptions
             # that cancel the Shopware order in a coordinated way by Shopware
             throw $ex;
 
-        } catch (Throwable $exception) {
+        } catch (Throwable $ex) {
 
             # this processes all unhandled exceptions.
             # we need to log whatever happens in here, and then also
             # throw an exception that breaks the order in a coordinated way.
             # Only the 2 exceptions above, lead to a correct failure-behaviour in Shopware.
             # All other exceptions would lead to a 500 exception in the storefront.
-
-            $this->logger->addEntry(
-                $exception->getMessage(),
-                $salesChannelContext->getContext(),
-                ($exception instanceof \Exception) ? $exception : null,
-                null,
-                Logger::ERROR
+            $this->logger->error(
+                'Unknown Error when finalizing order ' . $transaction->getOrder()->getOrderNumber() . ', Mollie ID: ' . $molliedID . ', ' . $ex->getMessage()
             );
 
             throw new AsyncPaymentFinalizeException(

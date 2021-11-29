@@ -17,6 +17,7 @@ use Mollie\Api\Resources\PaymentCollection;
 use Mollie\Api\Types\OrderLineType;
 use Mollie\Api\Types\PaymentStatus;
 use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -34,12 +35,12 @@ class Order
     private $paymentApiService;
 
     /**
-     * @var LoggerService
+     * @var LoggerInterface
      */
     private $logger;
 
 
-    public function __construct(MollieApiFactory $clientFactory, PaymentApiService $paymentApiService, LoggerService $logger)
+    public function __construct(MollieApiFactory $clientFactory, PaymentApiService $paymentApiService, LoggerInterface $logger)
     {
         $this->clientFactory = $clientFactory;
         $this->logger = $logger;
@@ -61,16 +62,13 @@ class Order
 
             return $apiClient->orders->get($mollieOrderId, $parameters);
         } catch (ApiException $e) {
-            $this->logger->addEntry(
+
+            $this->logger->error(
                 sprintf(
                     'API error occurred when fetching mollie order %s with message %s',
                     $mollieOrderId,
                     $e->getMessage()
-                ),
-                $context,
-                $e,
-                null,
-                Logger::ERROR
+                )
             );
 
             throw new CouldNotFetchMollieOrderException($mollieOrderId, $e);
@@ -86,9 +84,9 @@ class Order
      * @throws CouldNotFetchMollieOrderException
      */
     public function getMollieOrderLine(
-        string $mollieOrderId,
-        string $mollieOrderLineId,
-        string $salesChannelId,
+        string  $mollieOrderId,
+        string  $mollieOrderLineId,
+        string  $salesChannelId,
         Context $context
     ): OrderLine
     {
@@ -105,14 +103,12 @@ class Order
         try {
             return $apiClient->orders->create($orderData);
         } catch (ApiException $e) {
-            $this->logger->addEntry(
+
+            $this->logger->critical(
                 $e->getMessage(),
-                $salesChannelContext->getContext(),
-                $e,
                 [
                     'function' => 'finalize-payment',
-                ],
-                Logger::CRITICAL
+                ]
             );
 
             throw new RuntimeException(sprintf('Could not create Mollie order, error: %s', $e->getMessage()));
@@ -141,40 +137,48 @@ class Order
         $payment = $this->getOpenPayment($mollieOrder);
 
         if (!$payment instanceof Payment) {
-            $this->logger->addDebugEntry(
+
+            $this->logger->debug(
                 'Didn\'t find an open payment. Creating a new payment at mollie',
-                $salesChannelContext->getSalesChannel()->getId(),
-                $salesChannelContext->getContext()
+                [
+                    'saleschannel' => $salesChannelContext->getSalesChannel()->getName(),
+                ]
             );
 
             return $mollieOrder->createPayment(['method' => $paymentMethod]);
         }
 
         if ($payment->method === $paymentMethod) {
-            $this->logger->addDebugEntry(
+
+            $this->logger->debug(
                 'Found an open payment and payment methods are same. Reusing this payment',
-                $salesChannelContext->getSalesChannel()->getId(),
-                $salesChannelContext->getContext()
+                [
+                    'saleschannel' => $salesChannelContext->getSalesChannel()->getName(),
+                ]
             );
 
             return $payment;
         }
 
         if (!$payment->isCancelable) {
-            $this->logger->addDebugEntry(
+
+            $this->logger->debug(
                 'Found an open payment but it isn\'t cancelable. Reusing this payment, otherwise we could never complete payment',
-                $salesChannelContext->getSalesChannel()->getId(),
-                $salesChannelContext->getContext()
+                [
+                    'saleschannel' => $salesChannelContext->getSalesChannel()->getName(),
+                ]
             );
 
             return $payment;
         }
 
         try {
-            $this->logger->addDebugEntry(
+
+            $this->logger->debug(
                 'Found an open payment and cancel it. Create new payment with new payment method',
-                $salesChannelContext->getSalesChannel()->getId(),
-                $salesChannelContext->getContext()
+                [
+                    'saleschannel' => $salesChannelContext->getSalesChannel()->getName(),
+                ]
             );
 
             $this->paymentApiService->delete($payment->id, $salesChannelContext->getSalesChannel()->getId());

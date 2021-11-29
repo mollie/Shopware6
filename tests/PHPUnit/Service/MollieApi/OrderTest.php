@@ -4,7 +4,6 @@ namespace MolliePayments\Tests\Service\MollieApi;
 
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieOrderException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
-use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\MollieApi\Order as MollieOrderApi;
 use Kiener\MolliePayments\Service\MollieApi\Payment as MolliePaymentApi;
 use Mollie\Api\Endpoints\OrderEndpoint;
@@ -15,6 +14,8 @@ use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\OrderLineCollection;
 use Mollie\Api\Types\OrderLineType;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Shopware\Core\Framework\Context;
 
 class OrderTest extends TestCase
@@ -25,7 +26,7 @@ class OrderTest extends TestCase
     private $clientMock;
 
     /**
-     * @var LoggerService
+     * @var LoggerInterface
      */
     private $loggerServiceMock;
 
@@ -54,7 +55,7 @@ class OrderTest extends TestCase
             ['createClient' => $this->clientMock, 'getClient' => $this->clientMock]
         );
 
-        $this->loggerServiceMock = $this->createMock(LoggerService::class);
+        $this->loggerServiceMock = new NullLogger();
         $this->paymentApiService = new MolliePaymentApi($apiFactoryMock);
         $this->orderApiService = new MollieOrderApi($apiFactoryMock, $this->paymentApiService, $this->loggerServiceMock);
     }

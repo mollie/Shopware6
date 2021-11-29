@@ -10,6 +10,7 @@ use Kiener\MolliePayments\Exception\OrderLineItemsNotFoundException;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\LoggerService;
 use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
@@ -25,18 +26,22 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 class OrderDataExtractor
 {
     /**
-     * @var LoggerService
+     * @var LoggerInterface
      */
-    private $loggerService;
+    private $logger;
     /**
      * @var CustomerService
      */
     private $customerService;
 
-    public function __construct(LoggerService $loggerService, CustomerService $customerService)
-    {
 
-        $this->loggerService = $loggerService;
+    /**
+     * @param LoggerInterface $loggerService
+     * @param CustomerService $customerService
+     */
+    public function __construct(LoggerInterface $loggerService, CustomerService $customerService)
+    {
+        $this->logger = $loggerService;
         $this->customerService = $customerService;
     }
 
@@ -45,12 +50,9 @@ class OrderDataExtractor
         $orderCustomer = $order->getOrderCustomer();
 
         if (!$orderCustomer instanceof OrderCustomerEntity) {
-            $this->loggerService->addEntry(
-                sprintf('Could not fetch customer from order with id %s', $order->getId()),
-                $salesChannelContext->getContext(),
-                null,
-                [],
-                Logger::CRITICAL
+
+            $this->logger->critical(
+                sprintf('Could not fetch customer from order with id %s', $order->getId())
             );
 
             throw new OrderCustomerNotFoundException($order->getId());
@@ -62,12 +64,9 @@ class OrderDataExtractor
         );
 
         if (!$enrichedCustomer instanceof CustomerEntity) {
-            $this->loggerService->addEntry(
-                sprintf('Could not find customer with id %s in database', $order->getId()),
-                $salesChannelContext->getContext(),
-                null,
-                [],
-                Logger::CRITICAL
+
+            $this->logger->critical(
+                sprintf('Could not find customer with id %s in database', $order->getId())
             );
 
             throw new OrderCustomerNotFoundException($order->getId());
@@ -81,12 +80,9 @@ class OrderDataExtractor
         $currency = $orderEntity->getCurrency();
 
         if (!$currency instanceof CurrencyEntity) {
-            $this->loggerService->addEntry(
-                sprintf('Could not fetch currency from order with id %s', $orderEntity->getId()),
-                $salesChannelContext->getContext(),
-                null,
-                [],
-                Logger::CRITICAL
+
+            $this->logger->critical(
+                sprintf('Could not fetch currency from order with id %s', $orderEntity->getId())
             );
 
             throw new OrderCurrencyNotFoundException($orderEntity->getId());
@@ -118,12 +114,9 @@ class OrderDataExtractor
         $deliveries = $orderEntity->getDeliveries();
 
         if (!$deliveries instanceof OrderDeliveryCollection) {
-            $this->loggerService->addEntry(
-                sprintf('Could not fetch deliveries from order with id %s', $orderEntity->getId()),
-                $context,
-                null,
-                [],
-                Logger::CRITICAL
+
+            $this->logger->critical(
+                sprintf('Could not fetch deliveries from order with id %s', $orderEntity->getId())
             );
 
             throw new OrderDeliveriesNotFoundException($orderEntity->getId());
@@ -143,12 +136,9 @@ class OrderDataExtractor
         $delivery = $deliveries->first();
 
         if (!$delivery instanceof OrderDeliveryEntity) {
-            $this->loggerService->addEntry(
-                sprintf('Could not fetch deliveries from order with id %s', $orderEntity->getId()),
-                $context,
-                null,
-                [],
-                Logger::CRITICAL
+
+            $this->logger->critical(
+                sprintf('Could not fetch deliveries from order with id %s', $orderEntity->getId())
             );
 
             throw new OrderDeliveryNotFoundException($orderEntity->getId());
@@ -162,12 +152,9 @@ class OrderDataExtractor
         $lineItems = $orderEntity->getLineItems();
 
         if (!$lineItems instanceof OrderLineItemCollection) {
-            $this->loggerService->addEntry(
-                sprintf('Could not fetch line items from order with id %s', $orderEntity->getId()),
-                $context,
-                null,
-                [],
-                Logger::CRITICAL
+
+            $this->logger->critical(
+                sprintf('Could not fetch line items from order with id %s', $orderEntity->getId())
             );
 
             throw new OrderLineItemsNotFoundException($orderEntity->getId());

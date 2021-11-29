@@ -6,7 +6,6 @@ use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Service\CustomerService;
-use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
@@ -16,6 +15,7 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -66,7 +66,7 @@ class MolliePaymentDoPayTest extends TestCase
         ]);
 
         $orderDataExtractor = new OrderDataExtractor(
-            $this->createMock(LoggerService::class),
+            new NullLogger(),
             $this->customerService
         );
 
@@ -90,7 +90,7 @@ class MolliePaymentDoPayTest extends TestCase
             $settingsService,
             $this->createMock(UpdateOrderCustomFields::class),
             $this->createMock(UpdateOrderLineItems::class),
-            $this->createMock(LoggerService::class)
+            new NullLogger()
         );
     }
 

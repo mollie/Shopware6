@@ -8,6 +8,7 @@ use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
 use Kiener\MolliePayments\Service\Order\OrderStatusUpdater;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Resources\Order;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -49,6 +50,11 @@ class NotificationFacade
      */
     private $repoOrderTransactions;
 
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
 
     /**
      * @param MollieGatewayInterface $gatewayMollie
@@ -56,14 +62,16 @@ class NotificationFacade
      * @param OrderStatusUpdater $statusUpdater
      * @param EntityRepositoryInterface $repoPaymentMethods
      * @param EntityRepositoryInterface $repoOrderTransactions
+     * @param LoggerInterface $logger
      */
-    public function __construct(MollieGatewayInterface $gatewayMollie, OrderStatusConverter $statusConverter, OrderStatusUpdater $statusUpdater, EntityRepositoryInterface $repoPaymentMethods, EntityRepositoryInterface $repoOrderTransactions)
+    public function __construct(MollieGatewayInterface $gatewayMollie, OrderStatusConverter $statusConverter, OrderStatusUpdater $statusUpdater, EntityRepositoryInterface $repoPaymentMethods, EntityRepositoryInterface $repoOrderTransactions, LoggerInterface $logger)
     {
         $this->gatewayMollie = $gatewayMollie;
         $this->statusConverter = $statusConverter;
         $this->statusUpdater = $statusUpdater;
         $this->repoPaymentMethods = $repoPaymentMethods;
         $this->repoOrderTransactions = $repoOrderTransactions;
+        $this->logger = $logger;
     }
 
 
@@ -92,6 +100,8 @@ class NotificationFacade
         }
 
         $mollieOrderId = $this->getMollieId($swOrder);
+
+        $this->logger->info('Webhook for order ' . $swOrder->getOrderNumber() . ' and Mollie ID: ' . $mollieOrderId . ' has been received');
 
         # --------------------------------------------------------------------------------------------
 

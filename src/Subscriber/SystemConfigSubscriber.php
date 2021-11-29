@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\MollieApiClient;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -16,7 +17,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface
     /** @var SettingsService */
     private $settingsService;
 
-    /** @var LoggerService */
+    /** @var LoggerInterface */
     private $logger;
 
     /** @var MollieApiClient */
@@ -25,13 +26,16 @@ class SystemConfigSubscriber implements EventSubscriberInterface
     /** @var array */
     private $profileIdStorage = [];
 
-    public function __construct(
-        SettingsService $settingsService,
-        LoggerService   $logger
-    )
+
+    /**
+     * @param SettingsService $settingsService
+     * @param LoggerInterface $logger
+     */
+    public function __construct(SettingsService $settingsService, LoggerInterface $logger)
     {
         $this->settingsService = $settingsService;
         $this->logger = $logger;
+
         $this->apiClient = new MollieApiClient();
     }
 
@@ -105,10 +109,8 @@ class SystemConfigSubscriber implements EventSubscriberInterface
         if (empty($value)) {
             // If this api key has been "deleted", also remove the profile ID.
 
-            $this->logger->addDebugEntry(
+            $this->logger->debug(
                 "API key has been removed, removing associated profile ID",
-                $salesChannelId,
-                $context,
                 [
                     'apiKey' => $value,
                     'salesChannelId' => $salesChannelId ?? 'null',
@@ -116,14 +118,14 @@ class SystemConfigSubscriber implements EventSubscriberInterface
                 ]
             );
 
+
             $this->settingsService->setProfileId(null, $salesChannelId, $testMode);
             return;
         }
 
-        $this->logger->addDebugEntry(
+
+        $this->logger->debug(
             "Fetching profile ID",
-            $salesChannelId,
-            $context,
             [
                 'apiKey' => $value,
                 'salesChannelId' => $salesChannelId ?? 'null',
@@ -131,15 +133,14 @@ class SystemConfigSubscriber implements EventSubscriberInterface
             ]
         );
 
+
         $this->apiClient->setApiKey($value);
 
         $profile = ProfileHelper::getProfile($this->apiClient, new MollieSettingStruct());
         $this->profileIdStorage[$salesChannelId . $profileKey] = $profile->id;
 
-        $this->logger->addDebugEntry(
+        $this->logger->debug(
             "Saving profile ID",
-            $salesChannelId,
-            $context,
             [
                 'apiKey' => $value,
                 'salesChannelId' => $salesChannelId ?? 'null',
@@ -147,6 +148,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface
                 'profileId' => $profile->id
             ]
         );
+
 
         $this->settingsService->setProfileId($profile->id, $salesChannelId, $testMode);
     }
@@ -173,10 +175,8 @@ class SystemConfigSubscriber implements EventSubscriberInterface
                 return;
             }
 
-            $this->logger->addDebugEntry(
+            $this->logger->debug(
                 "A new profile ID was fetched, but the admin saved the old one again, correcting mistake.",
-                $salesChannelId,
-                $context,
                 [
                     'salesChannelId' => $salesChannelId ?? 'null',
                     'mode' => $testMode ? 'test' : 'live',
@@ -189,16 +189,15 @@ class SystemConfigSubscriber implements EventSubscriberInterface
             // If we haven't stored the profile ID from Mollie, but we are getting a value here from the admin,
             // then we no longer need to store this key, so delete it.
             if ($value) {
-                $this->logger->addDebugEntry(
+
+                $this->logger->debug(
                     "Removing profile ID",
-                    $salesChannelId,
-                    $context,
                     [
                         'salesChannelId' => $salesChannelId ?? 'null',
                         'mode' => $testMode ? 'test' : 'live',
                     ]
                 );
-
+                
                 $this->settingsService->setProfileId(null, $salesChannelId, $testMode);
             }
         }

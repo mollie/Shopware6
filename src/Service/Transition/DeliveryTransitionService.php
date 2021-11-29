@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Service\Transition;
 
 use Kiener\MolliePayments\Service\LoggerService;
 use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryDefinition;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryStates;
@@ -18,11 +19,16 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
     private $transitionService;
 
     /**
-     * @var LoggerService
+     * @var LoggerInterface
      */
     private $loggerService;
 
-    public function __construct(TransitionServiceInterface $transitionService, LoggerService $loggerService)
+
+    /**
+     * @param TransitionServiceInterface $transitionService
+     * @param LoggerInterface $loggerService
+     */
+    public function __construct(TransitionServiceInterface $transitionService, LoggerInterface $loggerService)
     {
         $this->transitionService = $transitionService;
         $this->loggerService = $loggerService;
@@ -41,15 +47,12 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
         $availableTransitions = $this->getAvailableTransitions($delivery, $context);
 
         if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_REOPEN, $availableTransitions)) {
-            $this->loggerService->addEntry(
+
+            $this->loggerService->error(
                 sprintf(
                     'It is not allowed to change status to open from %s. Aborting reopen transition',
                     $delivery->getStateMachineState()->getName()
-                ),
-                $context,
-                null,
-                null,
-                Logger::ERROR
+                )
             );
 
             return;

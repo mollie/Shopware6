@@ -8,6 +8,7 @@ use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Types\OrderStatus;
 use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Shopware\Core\System\StateMachine\Event\StateMachineStateChangeEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -31,22 +32,25 @@ class CancelMollieOrderSubscriber implements EventSubscriberInterface
      * @var OrderService
      */
     private $orderService;
-    /**
-     * @var LoggerService
-     */
-    private $loggerService;
 
-    public function __construct(
-        MollieApiClient $apiClient,
-        OrderService $orderService,
-        LoggerService $loggerService,
-        string $shopwareVersion
-    )
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+
+    /**
+     * @param MollieApiClient $apiClient
+     * @param OrderService $orderService
+     * @param LoggerInterface $loggerService
+     * @param string $shopwareVersion
+     */
+    public function __construct(MollieApiClient $apiClient, OrderService $orderService, LoggerInterface $loggerService, string $shopwareVersion)
     {
         $this->apiClient = $apiClient;
         $this->orderService = $orderService;
         $this->shopwareVersion = $shopwareVersion;
-        $this->loggerService = $loggerService;
+        $this->logger = $loggerService;
     }
 
     public static function getSubscribedEvents()
@@ -91,12 +95,9 @@ class CancelMollieOrderSubscriber implements EventSubscriberInterface
                 $this->apiClient->orders->cancel($mollieOrderId);
             }
         } catch (ApiException $e) {
-            $this->loggerService->addEntry(
-                $e->getMessage(),
-                $event->getContext(),
-                $e,
-                null,
-                Logger::WARNING
+
+            $this->logger->warning(
+                $e->getMessage()
             );
         }
 

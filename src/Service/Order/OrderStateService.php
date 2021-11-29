@@ -3,25 +3,27 @@
 namespace Kiener\MolliePayments\Service\Order;
 
 use Exception;
-use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\Transition\OrderTransitionServiceInterface;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\OrderStates;
 use Shopware\Core\Framework\Context;
 
 class OrderStateService
 {
-    /** @var LoggerService */
+    /** @var LoggerInterface */
     protected $logger;
 
     /** @var OrderTransitionServiceInterface */
     protected $orderTransitionService;
 
-    public function __construct(
-        LoggerService $logger,
-        OrderTransitionServiceInterface $orderTransitionService
-    )
+
+    /**
+     * @param LoggerInterface $logger
+     * @param OrderTransitionServiceInterface $orderTransitionService
+     */
+    public function __construct(LoggerInterface $logger, OrderTransitionServiceInterface $orderTransitionService)
     {
         $this->logger = $logger;
         $this->orderTransitionService = $orderTransitionService;
@@ -70,14 +72,13 @@ class OrderStateService
 
             return true;
         } catch (Exception $e) {
-            $this->logger->addEntry(
-                $e->getMessage(),
-                $context,
-                $e,
-                [
+
+            $this->logger->error(
+                $e->getMessage(), [
                     'function' => 'payment-automate-order-state',
                 ]
             );
+
         }
 
         return false;

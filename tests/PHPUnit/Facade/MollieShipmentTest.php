@@ -5,7 +5,6 @@ namespace MolliePayments\Tests\Facade;
 use Kiener\MolliePayments\Facade\MollieShipment;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
-use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\Shipment;
@@ -15,6 +14,8 @@ use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\Transition\DeliveryTransitionService;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
@@ -57,7 +58,7 @@ class MollieShipmentTest extends TestCase
     private $orderDeliveryService;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
+     * @var LoggerInterface
      */
     private $logger;
 
@@ -91,7 +92,8 @@ class MollieShipmentTest extends TestCase
         $this->mollieApiShipmentService = $this->getMockBuilder(Shipment::class)->disableOriginalConstructor()->getMock();
         $this->orderDeliveryService = $this->getMockBuilder(OrderDeliveryService::class)->disableOriginalConstructor()->getMock();
         $this->orderService = $this->getMockBuilder(OrderService::class)->disableOriginalConstructor()->getMock();
-        $this->logger = $this->getMockBuilder(LoggerService::class)->disableOriginalConstructor()->getMock();
+
+        $this->logger = new NullLogger();
 
         $this->orderDataExtractor = new OrderDataExtractor(
             $this->logger,
@@ -116,14 +118,6 @@ class MollieShipmentTest extends TestCase
         $deliveryId = 'foo';
         $this->orderDeliveryService->method('getDelivery')->willReturn(null);
 
-        // warning is logged
-        $this->logger->expects($this->once())->method('addEntry')->with(
-            sprintf('Order delivery with id %s could not be found in database', $deliveryId),
-            $this->context,
-            null,
-            null,
-            Logger::WARNING
-        );
         // custom fields for shipping are never written
         $this->orderDeliveryService->expects($this->never())->method('updateCustomFields');
         // api call is never done
@@ -138,10 +132,6 @@ class MollieShipmentTest extends TestCase
         $deliveryId = $delivery->getId();
         $this->orderDeliveryService->method('getDelivery')->willReturn($delivery);
 
-        // warning is logged
-        $this->logger->expects($this->once())->method('addEntry')->with(
-            sprintf('Loaded delivery with id %s does not have an order in database', $deliveryId)
-        );
         // custom fields for shipping are never written
         $this->orderDeliveryService->expects($this->never())->method('updateCustomFields');
         // api call is never done
@@ -157,14 +147,6 @@ class MollieShipmentTest extends TestCase
         $deliveryId = $delivery->getId();
         $this->orderDeliveryService->method('getDelivery')->willReturn($delivery);
 
-        // warning is logged
-        $this->logger->expects($this->once())->method('addEntry')->with(
-            sprintf('Mollie orderId does not exist in shopware order (%s)', (string)$order->getOrderNumber()),
-            $this->context,
-            null,
-            null,
-            Logger::WARNING
-        );
         // custom fields for shipping are never written
         $this->orderDeliveryService->expects($this->never())->method('updateCustomFields');
         // api call is never done
@@ -182,17 +164,6 @@ class MollieShipmentTest extends TestCase
         $deliveryId = $delivery->getId();
         $this->orderDeliveryService->method('getDelivery')->willReturn($delivery);
 
-        // warning is logged
-        $this->logger->expects($this->once())->method('addEntry')->with(
-            sprintf(
-                'The last transaction of the order (%s) is not a mollie payment! No shipment will be sent to mollie',
-                (string)$order->getOrderNumber()
-            ),
-            $this->context,
-            null,
-            null,
-            Logger::INFO
-        );
         // custom fields for shipping are never written
         $this->orderDeliveryService->expects($this->never())->method('updateCustomFields');
         // api call is never done
@@ -222,8 +193,7 @@ class MollieShipmentTest extends TestCase
 
         // custom fields for shipping are never written
         $this->orderDeliveryService->expects($this->never())->method('updateCustomFields');
-        // no logs are written
-        $this->logger->expects($this->never())->method('addEntry');
+
         // result value of facade is false
         self::assertFalse($this->mollieShipment->setShipment($deliveryId, $this->context));
     }
@@ -251,8 +221,7 @@ class MollieShipmentTest extends TestCase
         $this->orderDeliveryService->expects($this->once())
             ->method('updateCustomFields')
             ->with($delivery, [CustomFieldsInterface::DELIVERY_SHIPPED => true], $this->context);
-        // no logs are written
-        $this->logger->expects($this->never())->method('addEntry');
+
         // result value of facade is true
         self::assertTrue($this->mollieShipment->setShipment($deliveryId, $this->context));
     }
