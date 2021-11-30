@@ -158,7 +158,7 @@ describe('Credit Card Components', () => {
                 assertComponentErrors(true, true, true, false);
             })
 
-            it('Components are initialized after failed payment', () => {
+            it('Complete payment after failure with components', () => {
                 // We need to test this with Shopware's complete order page.
                 configAction.setupShop(false, true, false);
 
