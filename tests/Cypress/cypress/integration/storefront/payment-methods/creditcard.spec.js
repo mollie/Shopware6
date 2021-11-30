@@ -177,12 +177,7 @@ describe('Credit Card Components', () => {
 
                 cy.url().should('include', 'https://www.mollie.com/checkout/');
 
-                // verify that our component card is really
-                // been used by comparing the last 4 digits
-                cy.contains('**** ' + validCardNumber.substr(validCardNumber.length - 4));
-
                 molliePayment.initSandboxCookie();
-
                 molliePayment.selectFailed();
 
                 cy.url().should('include', '/account/order/edit');
