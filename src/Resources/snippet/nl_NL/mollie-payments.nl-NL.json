@@ -29,5 +29,37 @@
         "paymentError": "De betaling met Apple Pay is mislukt."
       }
     }
+  },
+  "mollie-subscriptions": {
+    "product": {
+      "information": "Abonnement product"
+    },
+    "options": {
+      "everyDay": "Elke dag",
+      "everyDays": "Elke %1% dagen",
+      "everyWeek": "Elke week",
+      "everyWeeks": "Elke %1% weken",
+      "everyMonth": "Elke maand",
+      "everyMonths": "Elke %1% maanden"
+    }
+  },
+  "checkout": {
+    "mollie-subscription-line-item-notice": "Niet alle betaalmethoden zijn beschikbaar bij het bestellen van abonnementsproducten."
+  },
+  "error": {
+    "mollie-subscription-line-item-notice": "Niet alle betaalmethoden zijn beschikbaar bij het bestellen van abonnementsproducten."
+  },
+  "account": {
+    "mollieSubscriptionsLink": "Abonnementen",
+    "mollieSubscriptionsTitle": "Abonnementen",
+    "mollieSubscriptionsWelcome": "Uw recente abonnementen:",
+    "mollieSubscriptionsInfoEmpty": "U heeft nog geen abonnementen.",
+    "mollieSubscriptionsHeadline": "Abonnement:",
+    "mollieSubscriptionId": "Id",
+    "mollieSubscriptionAmount": "Hoeveelheid",
+    "mollieSubscriptionNextPayment": "Volgende betaling bij",
+    "mollieSubscriptionCancel": "Annuleren",
+    "mollieSubscriptionContextMenuReorder": "Herhaal abonnement",
+    "cancelSubscription": "Abonnement met ID \"%1%\" is geannuleerd"
   }
 }

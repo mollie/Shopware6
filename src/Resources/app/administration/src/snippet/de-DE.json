@@ -1,0 +1,12 @@
+{
+    "mollie-subscriptions": {
+        "general": {
+            "menu": {
+                "title": "Mollie-Abonnements"
+            }
+        },
+        "product": {
+            "cardTitle": "Mollie"
+        }
+    }
+}

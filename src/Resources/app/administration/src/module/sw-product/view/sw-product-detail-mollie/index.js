@@ -5,7 +5,7 @@ import StringUtils from '../../../../core/service/utils/string-utils.service';
 import ProductService from '../../../../core/service/product/product.service';
 
 // eslint-disable-next-line no-undef
-const {mapState} = Shopware.Component.getComponentHelper();
+const { mapState, mapGetters } = Shopware.Component.getComponentHelper();
 
 // eslint-disable-next-line no-undef
 Shopware.Component.register('sw-product-detail-mollie', {
@@ -24,6 +24,11 @@ Shopware.Component.register('sw-product-detail-mollie', {
         return {
             parentVoucherType: '',
             productVoucherType: '',
+            mollieSubscriptionProduct: false,
+            mollieSubscriptionIntervalAmount: '',
+            mollieSubscriptionIntervalType: '',
+            mollieSubscriptionRepetitionAmount: '',
+            mollieSubscriptionRepetitionType: '',
         }
     },
 
@@ -35,6 +40,14 @@ Shopware.Component.register('sw-product-detail-mollie', {
 
         ...mapState('swProductDetail', [
             'product',
+        ]),
+
+        ...mapGetters('swProductDetail', [
+            'isLoading',
+        ]),
+
+        ...mapGetters('context', [
+            'isSystemDefaultLanguage',
         ]),
 
         ...mapState('context', {
@@ -52,6 +65,29 @@ Shopware.Component.register('sw-product-detail-mollie', {
                 {key: 1, name: this.$tc('mollie-payments.vouchers.VOUCHER_TYPE_VALUE_ECO')},
                 {key: 2, name: this.$tc('mollie-payments.vouchers.VOUCHER_TYPE_VALUE_MEAL')},
                 {key: 3, name: this.$tc('mollie-payments.vouchers.VOUCHER_TYPE_VALUE_VOUCHER')},
+            ];
+        },
+
+        /**
+         *
+         * @returns {[{name, key: number}, {name, key: number}, {name, key: number}]}
+         */
+        intervalTypes() {
+            return [
+                {key: 'days', name: this.$tc('mollie-subscription.days')},
+                {key: 'weeks', name: this.$tc('mollie-subscription.weeks')},
+                {key: 'months', name: this.$tc('mollie-subscription.months')},
+            ];
+        },
+
+        /**
+         *
+         * @returns {[{name, key: number}, {name, key: number}]}
+         */
+        repetitionTypes() {
+            return [
+                {key: 'times', name: this.$tc('mollie-subscription.times')},
+                {key: 'infinite', name: this.$tc('mollie-subscription.infinite')},
             ];
         },
 
@@ -102,7 +138,6 @@ Shopware.Component.register('sw-product-detail-mollie', {
         isDefaultLanguage() {
             return this.languageId === this.systemLanguageId;
         },
-
     },
 
 
@@ -121,6 +156,14 @@ Shopware.Component.register('sw-product-detail-mollie', {
          */
         onVoucherChanged(newValue) {
             this.updateData(newValue);
+        },
+
+        /**
+         * @param attr
+         * @param newValue
+         */
+        onChanged(newValue, attr) {
+            this.updateSubscriptionData(attr, newValue);
         },
 
         /**
@@ -168,6 +211,11 @@ Shopware.Component.register('sw-product-detail-mollie', {
 
             this.parentVoucherType = '';
             this.productVoucherType = '';
+            this.mollieSubscriptionProduct = '';
+            this.mollieSubscriptionIntervalAmount = '';
+            this.mollieSubscriptionIntervalType = '';
+            this.mollieSubscriptionRepetitionAmount = '';
+            this.mollieSubscriptionRepetitionType = '';
 
             if (!this.product) {
                 return;
@@ -180,11 +228,31 @@ Shopware.Component.register('sw-product-detail-mollie', {
                 this.productRepository.get(this.product.parentId, Shopware.Context.api).then(parent => {
                     const parentAtts = new ProductAttributes(parent);
                     this.parentVoucherType = parentAtts.getVoucherType();
+                    this.mollieSubscriptionProduct = parentAtts.getMollieSubscriptionProduct();
+                    this.mollieSubscriptionIntervalAmount = parentAtts.getMollieSubscriptionIntervalAmount();
+                    this.mollieSubscriptionIntervalType = parentAtts.getMollieSubscriptionIntervalType();
+                    this.mollieSubscriptionRepetitionAmount = parentAtts.getMollieSubscriptionRepetitionAmount();
+                    this.mollieSubscriptionRepetitionType = parentAtts.getMollieSubscriptionRepetitionType();
 
                     // if we have a parent, and its nothing, that it should
                     // at least display NONE
                     if (this.stringUtils.isNullOrEmpty(this.parentVoucherType)) {
                         this.parentVoucherType = this.typeNONE;
+                    }
+                    if (this.stringUtils.isNullOrEmpty(this.mollieSubscriptionProduct)) {
+                        this.mollieSubscriptionProduct = false;
+                    }
+                    if (this.stringUtils.isNullOrEmpty(this.mollieSubscriptionIntervalAmount )) {
+                        this.mollieSubscriptionIntervalAmount = '';
+                    }
+                    if (this.stringUtils.isNullOrEmpty(this.mollieSubscriptionIntervalType)) {
+                        this.mollieSubscriptionIntervalType = '';
+                    }
+                    if (this.stringUtils.isNullOrEmpty(this.mollieSubscriptionRepetitionAmount)) {
+                        this.mollieSubscriptionRepetitionAmount = '';
+                    }
+                    if (this.stringUtils.isNullOrEmpty(this.mollieSubscriptionRepetitionType )) {
+                        this.mollieSubscriptionRepetitionType  = '';
                     }
                 });
             }
@@ -192,12 +260,80 @@ Shopware.Component.register('sw-product-detail-mollie', {
             const mollieAttributes = new ProductAttributes(this.product);
 
             this.productVoucherType = mollieAttributes.getVoucherType();
+            this.mollieSubscriptionProduct = mollieAttributes.getMollieSubscriptionProduct();
+            this.mollieSubscriptionIntervalAmount = mollieAttributes.getMollieSubscriptionIntervalAmount();
+            this.mollieSubscriptionIntervalType = mollieAttributes.getMollieSubscriptionIntervalType();
+            this.mollieSubscriptionRepetitionAmount = mollieAttributes.getMollieSubscriptionRepetitionAmount();
+            this.mollieSubscriptionRepetitionType = mollieAttributes.getMollieSubscriptionRepetitionType();
 
             // if we have no parent, and also not yet something assigned
             // then make sure we have a NONE value
             if (!this.hasParentProduct && this.stringUtils.isNullOrEmpty(this.productVoucherType)) {
                 this.productVoucherType = this.typeNONE;
             }
+            if (!this.hasParentProduct && this.stringUtils.isNullOrEmpty(this.mollieSubscriptionProduct)) {
+                this.mollieSubscriptionProduct = false;
+            }
+            if (!this.hasParentProduct && this.stringUtils.isNullOrEmpty(this.mollieSubscriptionIntervalAmount)) {
+                this.mollieSubscriptionIntervalAmount = '';
+            }
+            if (!this.hasParentProduct && this.stringUtils.isNullOrEmpty(this.mollieSubscriptionIntervalType)) {
+                this.mollieSubscriptionIntervalType = '';
+            }
+            if (!this.hasParentProduct && this.stringUtils.isNullOrEmpty(this.mollieSubscriptionRepetitionAmount)) {
+                this.mollieSubscriptionRepetitionAmount = '';
+            }
+            if (!this.hasParentProduct && this.stringUtils.isNullOrEmpty(this.mollieSubscriptionRepetitionType)) {
+                this.mollieSubscriptionRepetitionType = '';
+            }
+        },
+
+        /**
+         *
+         */
+        updateSubscriptionData(attr, newValue) {
+            if (!this.product) {
+                return;
+            }
+
+            const mollieAttributes = new ProductAttributes(this.product)
+
+            switch (attr) {
+                case 'mollieSubscriptionProduct':
+                    mollieAttributes.setMollieSubscriptionProduct(newValue);
+                    break;
+                case 'intervalAmount':
+                    if (newValue !== '') {
+                        mollieAttributes.setMollieSubscriptionIntervalAmount(newValue);
+                    } else {
+                        mollieAttributes.clearMollieSubscriptionIntervalAmount();
+                    }
+                    break;
+                case 'intervalType':
+                    if (newValue !== '') {
+                        mollieAttributes.setMollieSubscriptionIntervalType(newValue);
+                    } else {
+                        mollieAttributes.clearMollieSubscriptionIntervalType();
+                    }
+                    break;
+                case 'repetitionAmount':
+                    if (newValue !== '') {
+                        mollieAttributes.setMollieSubscriptionRepetitionAmount(newValue);
+                    } else {
+                        mollieAttributes.clearMollieSubscriptionRepetitionAmount();
+                    }
+                    break;
+                case 'repetitionType' :
+                    if (newValue !== '') {
+                        mollieAttributes.setMollieSubscriptionRepetitionType(newValue);
+                    } else {
+                        mollieAttributes.clearMollieSubscriptionRepetitionType();
+                    }
+                    break;
+            }
+
+            // now update our product data
+            this.productService.updateCustomFieldsSubscription(this.product, mollieAttributes);
         },
 
         /**

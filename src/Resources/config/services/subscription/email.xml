@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="Kiener\MolliePayments\Service\Subscription\EmailService"
+                 class="Kiener\MolliePayments\Service\Subscription\EmailService">
+            <argument type="service" id="Shopware\Core\Content\Mail\Service\MailService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Subscription\SalesChannelService"/>
+            <argument type="service" id="customer.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="mail_template.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\ConfigService"/>
+            <argument type="service" id="product.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
+
+        </service>
+    </services>
+</container>

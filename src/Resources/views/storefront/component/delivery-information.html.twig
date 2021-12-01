@@ -1,0 +1,14 @@
+{% sw_extends '@Storefront/storefront/component/delivery-information.html.twig' %}
+
+{% block component_delivery_information %}
+    {{ parent() }}
+
+    {% if(config('MolliePayments.config.enableSubscriptions') and page.product.customFields.mollie_subscription.mollie_subscription_product) %}
+        <div class="product-mollie-subscriptions-information">
+            <p class="delivery-information mollie-subscriptions">
+                <span class="delivery-status-indicator bg-info"></span>
+                {{ "mollie-subscriptions.product.information"|trans|sw_sanitize }}
+            </p>
+        </div>
+    {% endif %}
+{% endblock %}

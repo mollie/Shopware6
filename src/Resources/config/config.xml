@@ -249,4 +249,45 @@
             </options>
         </input-field>
     </card>
+
+    <card>
+        <title>Subscriptions</title>
+        <title lang="de-DE">Abonnements</title>
+        <title lang="nl-NL">Abonnementen</title>
+        <input-field type="bool">
+            <name>enableSubscriptions</name>
+            <label>Enable Subscriptions</label>
+            <label lang="de-DE">Abonnements aktivieren</label>
+            <label lang="nl-NL">Abonnementen inschakelen</label>
+            <defaultValue>false</defaultValue>
+        </input-field>
+        <input-field type="text">
+            <name>addToCartText</name>
+            <label>Add to cart button text</label>
+            <label lang="de-DE">Schaltflächentext zum Warenkorb hinzufügen</label>
+            <label lang="nl-NL">Tekst toevoegen aan winkelwagenknop</label>
+            <defaultValue>Subscribe</defaultValue>
+        </input-field>
+        <input-field type="bool">
+            <name>prePaymentReminderEmail</name>
+            <label>Enable Payment Reminder Email</label>
+            <label lang="de-DE">Zahlungserinnerungs-E-Mail aktivieren</label>
+            <label lang="nl-NL">E-mail voor betalingsherinnering inschakelen</label>
+            <defaultValue>false</defaultValue>
+        </input-field>
+        <component name="sw-entity-single-select">
+            <name>emailTemplate</name>
+            <entity>mail_template_type</entity>
+            <label>Email template</label>
+            <label lang="de-DE">E-Mail-Vorlage</label>
+            <label lang="nl-NL">Email sjabloon</label>
+            <labelProperty>technicalName</labelProperty>
+        </component>
+        <input-field type="text">
+            <name>daysBeforeReminder</name>
+            <label>Days before reminder</label>
+            <label lang="de-DE">Tage vor Erinnerung</label>
+            <label lang="nl-NL">Dagen voor herinnering</label>
+        </input-field>
+    </card>
 </config>
