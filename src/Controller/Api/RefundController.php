@@ -74,7 +74,8 @@ class RefundController extends AbstractController
 
         $order = $this->orderService->getOrderByNumber($orderNumber, $context);
 
-        $amount = $query->get('amount', $order->getAmountTotal());
+        $amount = (float)$query->get('amount', $order->getAmountTotal() - $this->refundService->getRefundedAmount($order, $context));
+
         $description = $query->get('description', sprintf("Refunded through Shopware API. Order number %s",
             $order->getOrderNumber()));
 
