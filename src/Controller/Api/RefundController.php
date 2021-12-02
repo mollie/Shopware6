@@ -21,6 +21,7 @@ use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\ShopwareHttpException;
 use Shopware\Core\Framework\Uuid\Exception\InvalidUuidException;
 use Shopware\Core\Framework\Uuid\Uuid;
+use Shopware\Core\Framework\Validation\DataBag\QueryDataBag;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -53,6 +54,29 @@ class RefundController extends AbstractController
         $this->logger = $logger;
         $this->orderService = $orderService;
         $this->refundService = $refundService;
+    }
+
+    /**
+     * @RouteScope(scopes={"api"})
+     * @Route("/api/mollie/refund/order",
+     *         defaults={"auth_enabled"=true}, name="api.mollie.refund.order", methods={"GET"})
+     * @param QueryDataBag $query
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function refundOrder(QueryDataBag $query, Context $context): JsonResponse
+    {
+        $orderNumber = $query->get('number');
+
+        if ($orderNumber === null) {
+            throw new \InvalidArgumentException('Missing Argument for Order Number!');
+        }
+
+        $order = $this->orderService->getOrderByNumber($orderNumber, $context);
+
+        $amount = $query->get('amount', $order->getAmountTotal());
+
+        return $this->refundResponse($order->getId(), $amount, $context);
     }
 
     /**
