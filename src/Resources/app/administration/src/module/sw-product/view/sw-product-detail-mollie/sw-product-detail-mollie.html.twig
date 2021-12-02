@@ -54,6 +54,7 @@
                     {{ $tc('mollie-payments.vouchers.VOUCHER_INFO_DEFAULTLANGUAGE') }}
                 </sw-alert>
             </sw-container>
+
         </sw-container>
     </sw-card>
 {% endblock %}
@@ -88,6 +89,7 @@
                             v-model="mollieSubscriptionIntervalAmount"
                             :hasParent="hasParentProduct"
                             :label="$tc('mollie-subscription.mollieSubscriptionIntervalAmount')"
+                            :required="mollieSubscriptionProduct"
                             @change="onChanged($event, 'intervalAmount')"/>
 
                     <sw-select-field
@@ -96,8 +98,13 @@
                             :label="$tc('mollie-subscription.mollieSubscriptionIntervalType')"
                             :hasParent="hasParentProduct"
                             class="mollie-subscription-interval-type"
+                            :required="mollieSubscriptionProduct"
+                            :value="mollieSubscriptionIntervalType"
                             @change="onChanged($event, 'intervalType')">
-                        <option v-for="interval in intervalTypes" :key="interval.key" :value="interval.key">
+                        <option
+                                v-for="interval in intervalTypes"
+                                :key="interval.key"
+                                :value="interval.key">
                             {{ interval.name }}
                         </option>
                     </sw-select-field>
@@ -106,6 +113,7 @@
                             name="mollieSubscriptionRepetitionAmount"
                             v-model="mollieSubscriptionRepetitionAmount"
                             :hasParent="hasParentProduct"
+                            :required="mollieSubscriptionProduct"
                             :label="$tc('mollie-subscription.mollieSubscriptionRepetitionAmount')"
                             @change="onChanged($event, 'repetitionAmount')"/>
 
@@ -114,6 +122,8 @@
                             v-model="mollieSubscriptionRepetitionType"
                             :label="$tc('mollie-subscription.mollieSubscriptionRepetitionType')"
                             :hasParent="hasParentProduct"
+                            :required="mollieSubscriptionProduct"
+                            :value="mollieSubscriptionRepetitionType"
                             class="mollie-subscription-repetition-type"
                             @change="onChanged($event, 'repetitionType')">
                         <option v-for="repetition in repetitionTypes" :key="repetition.key" :value="repetition.key">

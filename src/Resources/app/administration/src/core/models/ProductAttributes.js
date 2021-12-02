@@ -5,7 +5,6 @@ export default class ProductAttributes {
      * @param productEntity
      */
     constructor(productEntity) {
-
         this._voucherType = '';
         this._mollieSubscriptionProduct = '';
         this._mollieSubscriptionIntervalAmount = '';

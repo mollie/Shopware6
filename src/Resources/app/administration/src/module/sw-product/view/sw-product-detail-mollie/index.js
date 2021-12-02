@@ -20,8 +20,16 @@ Shopware.Component.register('sw-product-detail-mollie', {
         };
     },
 
+    props: {
+        productId: {
+            required: true,
+            type: String
+        },
+    },
+
     data() {
         return {
+            productEntity: null,
             parentVoucherType: '',
             productVoucherType: '',
             mollieSubscriptionProduct: false,
@@ -30,6 +38,10 @@ Shopware.Component.register('sw-product-detail-mollie', {
             mollieSubscriptionRepetitionAmount: '',
             mollieSubscriptionRepetitionType: '',
         }
+    },
+
+    created() {
+        this.productId = this.$route.params.id
     },
 
     mounted() {
@@ -138,6 +150,7 @@ Shopware.Component.register('sw-product-detail-mollie', {
         isDefaultLanguage() {
             return this.languageId === this.systemLanguageId;
         },
+
     },
 
 
@@ -217,9 +230,9 @@ Shopware.Component.register('sw-product-detail-mollie', {
             this.mollieSubscriptionRepetitionAmount = '';
             this.mollieSubscriptionRepetitionType = '';
 
-            if (!this.product) {
-                return;
-            }
+            // if (!this.product) {
+            //     return;
+            // }
 
             // if we do have a parent, then fetch that product
             // and read its voucher type for our local variable
@@ -257,14 +270,17 @@ Shopware.Component.register('sw-product-detail-mollie', {
                 });
             }
 
-            const mollieAttributes = new ProductAttributes(this.product);
+            this.productRepository.get(this.productId, Shopware.Context.api).then(parent => {
+                const mollieAttributes = new ProductAttributes(parent);
 
-            this.productVoucherType = mollieAttributes.getVoucherType();
-            this.mollieSubscriptionProduct = mollieAttributes.getMollieSubscriptionProduct();
-            this.mollieSubscriptionIntervalAmount = mollieAttributes.getMollieSubscriptionIntervalAmount();
-            this.mollieSubscriptionIntervalType = mollieAttributes.getMollieSubscriptionIntervalType();
-            this.mollieSubscriptionRepetitionAmount = mollieAttributes.getMollieSubscriptionRepetitionAmount();
-            this.mollieSubscriptionRepetitionType = mollieAttributes.getMollieSubscriptionRepetitionType();
+                this.productVoucherType = mollieAttributes.getVoucherType();
+                this.mollieSubscriptionProduct = mollieAttributes.getMollieSubscriptionProduct();
+                this.mollieSubscriptionIntervalAmount = mollieAttributes.getMollieSubscriptionIntervalAmount();
+                this.mollieSubscriptionIntervalType = mollieAttributes.getMollieSubscriptionIntervalType();
+                this.mollieSubscriptionRepetitionAmount = mollieAttributes.getMollieSubscriptionRepetitionAmount();
+                this.mollieSubscriptionRepetitionType = mollieAttributes.getMollieSubscriptionRepetitionType();
+            });
+
 
             // if we have no parent, and also not yet something assigned
             // then make sure we have a NONE value

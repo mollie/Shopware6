@@ -2,10 +2,11 @@
 
 namespace Kiener\MolliePayments\Tests\Service\Transition;
 
-use Kiener\MolliePayments\Service\LoggerService;
+
 use Kiener\MolliePayments\Service\Transition\DeliveryTransitionService;
 use Kiener\MolliePayments\Service\Transition\TransitionService;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryDefinition;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryStates;
@@ -43,7 +44,7 @@ class DeliveryTransitionServiceTest extends TestCase
         $this->stateMachineRegistry = $this->createMock(StateMachineRegistry::class);
         $this->deliveryTransitionService = new DeliveryTransitionService(
             new TransitionService($this->stateMachineRegistry),
-            $this->createMock(LoggerService::class)
+            new NullLogger()
         );
 
         $this->context = $this->createMock(Context::class);

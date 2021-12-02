@@ -160,7 +160,7 @@ class MollieOrderBuilder
         $webhookUrl = $this->webhookBuilder->buildWebhook($transactionId);
         $orderData['webhookUrl'] = $webhookUrl;
         $orderData['payment']['webhookUrl'] = $webhookUrl;
-
+        $orderData['payment']['sequenceType'] = 'first';
 
         $isVerticalTaxCalculation = $this->isVerticalTaxCalculation($salesChannelContext);
 

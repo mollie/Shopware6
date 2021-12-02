@@ -10,7 +10,6 @@ export default class ProductService {
         // as soon as something is in the custom fields, then the inheritance does not work anymore.
         // so we need to make sure to not do anything if not appropriate, or simply
         // add a clean data to our variant.
-
         if (!product.customFields) {
             product.customFields = {};
         }

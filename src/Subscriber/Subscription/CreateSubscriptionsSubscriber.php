@@ -168,7 +168,7 @@ class CreateSubscriptionsSubscriber implements EventSubscriberInterface
 
         $mollieApi = $this->apiFactory->getClient($subscriptionOptions->getSalesChannelId());
         $subscription = $mollieApi->subscriptions->createForId($customerId, $subscriptionOptions->toArray());
-        
+
         $this->mollieSubscriptionToProductRepository->create([
             [
                 'id' => Uuid::randomHex(),

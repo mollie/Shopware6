@@ -21,7 +21,7 @@ use Shopware\Core\Framework\Plugin\Context\UninstallContext;
 use Shopware\Core\Framework\Plugin\Context\UpdateContext;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Kiener\MolliePayments\Service\Subscription\CustomFieldService as SubscriptionsCustomFieldService;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
 class MolliePayments extends Plugin
 {
