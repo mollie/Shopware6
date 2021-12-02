@@ -11,6 +11,7 @@ use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\RefundService;
 use Kiener\MolliePayments\Service\SettingsService;
+use Mollie\Api\Resources\Refund;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -177,7 +178,7 @@ class RefundController extends AbstractController
         try {
             $order = $this->orderService->getOrder($orderId, $context);
 
-            $success = $this->refundService->refund($order, $amount, null, $context);
+            $refund = $this->refundService->refund($order, $amount, null, $context);
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
@@ -187,7 +188,7 @@ class RefundController extends AbstractController
         }
 
         return $this->json([
-            'success' => $success
+            'success' => ($refund instanceof Refund)
         ]);
     }
 

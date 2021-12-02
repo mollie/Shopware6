@@ -11,9 +11,7 @@ use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Hydrator\RefundHydrator;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Mollie\Api\Exceptions\ApiException;
-use Mollie\Api\Exceptions\IncompatiblePlatform;
 use Mollie\Api\Resources\Refund;
-use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 
@@ -50,13 +48,13 @@ class RefundService
      * @param OrderEntity $order
      * @param float $amount
      * @param string|null $description
-     * @return bool
+     * @return Refund
      * @throws CouldNotCreateMollieRefundException
      * @throws CouldNotExtractMollieOrderIdException
      * @throws CouldNotFetchMollieOrderException
      * @throws PaymentNotFoundException
      */
-    public function refund(OrderEntity $order, float $amount, ?string $description, Context $context): bool
+    public function refund(OrderEntity $order, float $amount, ?string $description, Context $context): Refund
     {
         $mollieOrderId = $this->orderService->getMollieOrderId($order);
 
@@ -72,7 +70,11 @@ class RefundService
                         $order->getOrderNumber())
             ]);
 
-            return $refund instanceof Refund;
+            if ($refund instanceof Refund) {
+                return $refund;
+            }
+
+            throw new CouldNotCreateMollieRefundException($mollieOrderId, $order->getOrderNumber());
         } catch (ApiException $e) {
             throw new CouldNotCreateMollieRefundException($mollieOrderId, $order->getOrderNumber(), $e);
         }
