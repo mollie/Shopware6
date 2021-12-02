@@ -175,7 +175,7 @@ class RefundController extends AbstractController
     private function refundResponse(string $orderId, float $amount, Context $context): JsonResponse
     {
         try {
-            $order = $this->getValidOrder($orderId, $context);
+            $order = $this->orderService->getOrder($orderId, $context);
 
             $success = $this->refundService->refund($order, $amount, null, $context);
         } catch (ShopwareHttpException $e) {
@@ -200,7 +200,7 @@ class RefundController extends AbstractController
     private function cancelResponse(string $orderId, ?string $refundId, Context $context): JsonResponse
     {
         try {
-            $order = $this->getValidOrder($orderId, $context);
+            $order = $this->orderService->getOrder($orderId, $context);
 
             $success = $this->refundService->cancel($order, $refundId, $context);
         } catch (ShopwareHttpException $e) {
@@ -224,7 +224,7 @@ class RefundController extends AbstractController
     private function listResponse(string $orderId, Context $context): JsonResponse
     {
         try {
-            $order = $this->getValidOrder($orderId, $context);
+            $order = $this->orderService->getOrder($orderId, $context);
 
             $refunds = $this->refundService->getRefunds($order, $context);
         } catch (ShopwareHttpException $e) {
@@ -250,7 +250,7 @@ class RefundController extends AbstractController
     {
         try {
 
-            $order = $this->getValidOrder($orderId, $context);
+            $order = $this->orderService->getOrder($orderId, $context);
 
             $remaining = $this->refundService->getRemainingAmount($order, $context);
             $refunded = $this->refundService->getRefundedAmount($order, $context);
@@ -270,27 +270,5 @@ class RefundController extends AbstractController
         }
 
         return $this->json(compact('remaining', 'refunded', 'voucherAmount'));
-    }
-
-    /**
-     * @param string $orderId
-     * @param Context $context
-     * @return OrderEntity
-     * @throws InvalidUuidException
-     * @throws InvalidOrderException
-     */
-    private function getValidOrder(string $orderId, Context $context): OrderEntity
-    {
-        if (!Uuid::isValid($orderId)) {
-            throw new InvalidUuidException($orderId);
-        }
-
-        $order = $this->orderService->getOrder($orderId, $context);
-
-        if (!($order instanceof OrderEntity)) {
-            throw new InvalidOrderException($orderId);
-        }
-
-        return $order;
     }
 }
