@@ -230,13 +230,14 @@ Shopware.Component.register('sw-product-detail-mollie', {
             this.mollieSubscriptionRepetitionAmount = '';
             this.mollieSubscriptionRepetitionType = '';
 
-            // if (!this.product) {
-            //     return;
-            // }
-
             // if we do have a parent, then fetch that product
             // and read its voucher type for our local variable
             if (this.hasParentProduct) {
+
+                if (!this.product) {
+                    return;
+                }
+
                 // eslint-disable-next-line no-undef
                 this.productRepository.get(this.product.parentId, Shopware.Context.api).then(parent => {
                     const parentAtts = new ProductAttributes(parent);
