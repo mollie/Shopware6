@@ -18,7 +18,7 @@ class SubscriptionController extends AbstractController
     /**
      * @var CancelSubscriptionsService
      */
-    private CancelSubscriptionsService $cancelSubscriptionsService;
+    private $cancelSubscriptionsService;
 
     /**
      * Creates a new instance of the onboarding controller.

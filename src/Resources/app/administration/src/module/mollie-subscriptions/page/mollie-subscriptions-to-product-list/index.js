@@ -98,7 +98,7 @@ Component.register('mollie-subscriptions-to-product-list', {
             }, {
                 property: 'amount',
                 label: this.$tc('mollie-subscriptions.page.list.columns.amount'),
-                allowResize: true
+                allowResize: true,
             }, {
                 property: 'nextPaymentDate',
                 label: this.$tc('mollie-subscriptions.page.list.columns.nextPaymentAt'),
