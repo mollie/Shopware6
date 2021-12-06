@@ -94,11 +94,7 @@ class MolliePayments extends Plugin
         $connection = $this->container->get(Connection::class);
 
         try {
-            if (method_exists($connection, 'executeStatement')) {
-                $connection->executeStatement('DROP TABLE IF EXISTS `mollie_subscription_to_product`');
-            } else {
-                $connection->exec('DROP TABLE IF EXISTS `mollie_subscription_to_product`');
-            }
+            $connection->exec('DROP TABLE IF EXISTS `mollie_subscription_to_product`');
         } catch (Exception $exception) {
         }
     }
