@@ -16,17 +16,17 @@ class CheckSubscriptionDataTaskHandler extends ScheduledTaskHandler
     /**
      * @var EntityRepositoryInterface
      */
-    private EntityRepositoryInterface $mollieSubscriptionsRepository;
+    private $mollieSubscriptionsRepository;
 
     /**
      * @var MollieApiFactory
      */
-    private MollieApiFactory $apiFactory;
+    private $apiFactory;
 
     /**
      * @var LoggerService
      */
-    private LoggerService $loggerService;
+    private $loggerService;
 
     /**
      * @param EntityRepositoryInterface $scheduledTaskRepository

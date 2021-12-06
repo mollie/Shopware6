@@ -12,43 +12,43 @@ class SubscriptionToProductEntity extends Entity
     /**
      * @var string
      */
-    protected string $mollieCustomerId;
+    protected $mollieCustomerId;
 
     /**
      * @var string
      */
-    protected string $subscriptionId;
+    protected $subscriptionId;
 
     /**
      * @var string
      */
-    protected string $productId;
+    protected $productId;
 
 
     /**
      * @var string
      */
-    protected string $salesChannelId;
+    protected $salesChannelId;
 
     /**
      * @var string
      */
-    protected string $status;
+    protected $status;
 
     /**
      * @var string
      */
-    protected string $description;
+    protected $description;
 
     /**
      * @var float
      */
-    protected float $amount;
+    protected $amount;
 
     /**
      * @var string
      */
-    protected string $currency;
+    protected $currency;
 
 
     /**

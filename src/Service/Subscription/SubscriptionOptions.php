@@ -17,37 +17,37 @@ class SubscriptionOptions
     /**
      * @var OrderEntity
      */
-    private OrderEntity $order;
+    private $order;
 
     /**
      * @var OrderLineItemEntity
      */
-    private OrderLineItemEntity $orderItem;
+    private $orderItem;
 
     /**
      * @var array
      */
-    private array $customFields;
+    private $customFields;
 
     /**
      * @var RouterInterface
      */
-    private RouterInterface $router;
+    private $router;
 
     /**
      * @var TranslatorInterface
      */
-    private TranslatorInterface $translator;
+    private $translator;
 
     /**
      * @var array
      */
-    private array $options = [];
+    private $options = [];
 
     /**
      * @var string
      */
-    private string $transactionsId;
+    private $transactionsId;
 
     /**
      * @param RouterInterface $router

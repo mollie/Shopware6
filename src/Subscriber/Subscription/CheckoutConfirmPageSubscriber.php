@@ -26,7 +26,7 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     /**
      * @var AbstractPaymentMethodRoute
      */
-    private AbstractPaymentMethodRoute $paymentMethodRoute;
+    private $paymentMethodRoute;
 
     /**
      * @param AbstractPaymentMethodRoute $paymentMethodRoute

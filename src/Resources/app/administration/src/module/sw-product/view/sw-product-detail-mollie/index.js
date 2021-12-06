@@ -23,7 +23,7 @@ Shopware.Component.register('sw-product-detail-mollie', {
     props: {
         productId: {
             required: true,
-            type: String
+            type: String,
         },
     },
 

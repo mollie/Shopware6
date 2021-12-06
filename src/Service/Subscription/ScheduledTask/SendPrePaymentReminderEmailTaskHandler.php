@@ -17,22 +17,22 @@ class SendPrePaymentReminderEmailTaskHandler extends ScheduledTaskHandler
     /**
      * @var ConfigService
      */
-    private ConfigService $configService;
+    private $configService;
 
     /**
      * @var EmailService
      */
-    private EmailService $emailService;
+    private $emailService;
 
     /**
      * @var EntityRepositoryInterface
      */
-    private EntityRepositoryInterface $subscriptionToProductRepository;
+    private $subscriptionToProductRepository;
 
     /**
      * @var LoggerService
      */
-    protected LoggerService $logger;
+    protected $logger;
 
     /**
      * @param EntityRepositoryInterface $scheduledTaskRepository

@@ -24,42 +24,42 @@ class EmailService
     /**
      * @var AbstractMailService
      */
-    private AbstractMailService $mailService;
+    private $mailService;
 
     /**
      * @var EntityRepositoryInterface
      */
-    private EntityRepositoryInterface $mailTemplateRepository;
+    private $mailTemplateRepository;
 
     /**
      * @var SalesChannelService
      */
-    private SalesChannelService $salesChannelService;
+    private $salesChannelService;
 
     /**
      * @var ConfigService
      */
-    private ConfigService $configService;
+    private $configService;
 
     /**
      * @var EntityRepositoryInterface
      */
-    private EntityRepositoryInterface $customer;
+    private $customer;
 
     /**
      * @var SettingsService
      */
-    private SettingsService $settingsService;
+    private $settingsService;
 
     /**
      * @var EntityRepositoryInterface
      */
-    private EntityRepositoryInterface $product;
+    private $product;
 
     /**
      * @var LoggerService
      */
-    private LoggerService $logger;
+    private $logger;
 
     /**
      * @param AbstractMailService $mailService

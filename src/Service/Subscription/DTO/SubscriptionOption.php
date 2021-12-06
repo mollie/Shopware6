@@ -9,42 +9,42 @@ class SubscriptionOption
     /**
      * @var string
      */
-    private string $productId;
+    private $productId;
 
     /**
      * @var string
      */
-    private string $salesChannelId;
+    private $salesChannelId;
 
     /**
      * @var array
      */
-    private array $amount;
+    private $amount;
 
     /**
      * @var string
      */
-    private string $interval;
+    private $interval;
 
     /**
      * @var string
      */
-    private string $description;
+    private $description;
 
     /**
      * @var array
      */
-    private array $metadata;
+    private $metadata;
 
     /**
      * @var string
      */
-    private string $webhookUrl;
+    private $webhookUrl;
 
     /**
      * @var DateTimeImmutable
      */
-    private DateTimeImmutable $startDate;
+    private $startDate;
 
     /**
      * @var int|null

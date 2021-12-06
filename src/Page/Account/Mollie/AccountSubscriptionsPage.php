@@ -10,14 +10,14 @@ class AccountSubscriptionsPage extends Page
     /**
      * @var StorefrontSearchResult
      */
-    protected StorefrontSearchResult $subscriptions;
+    protected $subscriptions;
 
     /**
      * @var string|null
      */
-    protected ?string $deepLinkCode;
+    protected $deepLinkCode;
 
-    protected ?int $total;
+    protected $total;
 
     /**
      * @return StorefrontSearchResult

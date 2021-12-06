@@ -21,17 +21,17 @@ class AccountSubscriptionsPageLoader
     /**
      * @var EntityRepositoryInterface
      */
-    private EntityRepositoryInterface $mollieSubscriptionsRepository;
+    private $mollieSubscriptionsRepository;
 
     /**
      * @var GenericPageLoaderInterface
      */
-    private GenericPageLoaderInterface $genericLoader;
+    private $genericLoader;
 
     /**
      * @var CustomerService
      */
-    private CustomerService $customerService;
+    private $customerService;
 
     /**
      * @param EntityRepositoryInterface $mollieSubscriptionsRepository

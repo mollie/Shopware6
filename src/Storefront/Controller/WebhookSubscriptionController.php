@@ -41,52 +41,52 @@ class WebhookSubscriptionController extends StorefrontController
     /**
      * @var TransactionService
      */
-    private TransactionService $transactionService;
+    private $transactionService;
 
     /**
      * @var EntityRepositoryInterface
      */
-    private EntityRepositoryInterface $orderRepository;
+    private $orderRepository;
 
     /**
      * @var NumberRangeValueGeneratorInterface
      */
-    private NumberRangeValueGeneratorInterface $numberRangeValueGenerator;
+    private $numberRangeValueGenerator;
 
     /**
      * @var OrderConverter
      */
-    private OrderConverter $orderConverter;
+    private $orderConverter;
 
     /**
      * @var Processor
      */
-    private Processor $processor;
+    private $processor;
 
     /**
      * @var MollieOrderBuilder
      */
-    private MollieOrderBuilder $orderBuilder;
+    private $orderBuilder;
 
     /**
      * @var LoggerService
      */
-    private LoggerService $logger;
+    private $logger;
 
     /**
      * @var Order
      */
-    private Order $orderApiService;
+    private $orderApiService;
 
     /**
      * @var UpdateOrderCustomFields
      */
-    private UpdateOrderCustomFields $updateOrderCustomFields;
+    private $updateOrderCustomFields;
 
     /**
      * @var UpdateOrderLineItems
      */
-    private UpdateOrderLineItems $updateOrderLineItems;
+    private $updateOrderLineItems;
 
     /**
      * @param TransactionService $transactionService

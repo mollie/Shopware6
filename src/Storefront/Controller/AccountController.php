@@ -20,12 +20,12 @@ class AccountController extends StorefrontController
     /**
      * @var AccountSubscriptionsPageLoader
      */
-    private AccountSubscriptionsPageLoader $subscriptionsPageLoader;
+    private $subscriptionsPageLoader;
 
     /**
      * @var CancelSubscriptionsService
      */
-    private CancelSubscriptionsService $cancelSubscriptionsService;
+    private $cancelSubscriptionsService;
 
     /**
      * @param AccountSubscriptionsPageLoader $subscriptionsPageLoader

@@ -9,7 +9,7 @@ Component.register('mollie-subscriptions-to-product-list', {
     inject: [
         'systemConfigApiService',
         'MolliePaymentsSubscriptionService',
-        'repositoryFactory'
+        'repositoryFactory',
     ],
 
     data() {
@@ -22,20 +22,20 @@ Component.register('mollie-subscriptions-to-product-list', {
             sortDirection: 'DESC',
             naturalSorting: true,
             showHelp: false,
-            systemConfig: null
+            systemConfig: null,
         }
     },
 
     metaInfo() {
         return {
-            title: this.$createTitle()
+            title: this.$createTitle(),
         };
     },
 
     computed: {
         columns() {
             return this.getColumns();
-        }
+        },
     },
 
     created() {
@@ -72,29 +72,29 @@ Component.register('mollie-subscriptions-to-product-list', {
                 property: 'subscriptionId',
                 dataIndex: 'subscriptionId',
                 label: this.$tc('mollie-subscriptions.page.list.columns.subscription_id'),
-                allowResize: true
+                allowResize: true,
             }, {
                 property: 'mollieCustomerId',
                 dataIndex: 'mollieCustomerId',
                 label: this.$tc('mollie-subscriptions.page.list.columns.customer_id'),
-                allowResize: true
+                allowResize: true,
             }, {
                 property: 'salesChannelId',
                 dataIndex: 'salesChannelId',
                 label: this.$tc('mollie-subscriptions.page.list.columns.salesChannelId'),
-                visible: false
+                visible: false,
             }, {
                 property: 'status',
                 label: this.$tc('mollie-subscriptions.page.list.columns.status'),
-                allowResize: true
+                allowResize: true,
             }, {
                 property: 'description',
                 label: this.$tc('mollie-subscriptions.page.list.columns.description'),
-                allowResize: true
+                allowResize: true,
             }, {
                 property: 'createdAt',
                 label: this.$tc('mollie-subscriptions.page.list.columns.createdAt'),
-                allowResize: true
+                allowResize: true,
             }, {
                 property: 'amount',
                 label: this.$tc('mollie-subscriptions.page.list.columns.amount'),
@@ -102,11 +102,11 @@ Component.register('mollie-subscriptions-to-product-list', {
             }, {
                 property: 'nextPaymentDate',
                 label: this.$tc('mollie-subscriptions.page.list.columns.nextPaymentAt'),
-                allowResize: true
+                allowResize: true,
             }, {
                 property: 'prePaymentReminder',
                 label: this.$tc('mollie-subscriptions.page.list.columns.prePaymentReminder'),
-                allowResize: true
+                allowResize: true,
             }];
         },
 

@@ -27,47 +27,47 @@ class CreateSubscriptionsSubscriber implements EventSubscriberInterface
     /**
      * @var EntityRepositoryInterface
      */
-    private EntityRepositoryInterface $stateMachineStateRepository;
+    private $stateMachineStateRepository;
 
     /**
      * @var EntityRepositoryInterface
      */
-    private EntityRepositoryInterface $orderRepository;
+    private $orderRepository;
 
     /**
      * @var EntityRepositoryInterface
      */
-    private EntityRepositoryInterface $orderTransactionRepository;
+    private $orderTransactionRepository;
 
     /**
      * @var SubscriptionOptions
      */
-    private SubscriptionOptions $subscriptionOptions;
+    private $subscriptionOptions;
 
     /**
      * @var MollieApiClient
      */
-    private MollieApiClient $mollieApi;
+    private $mollieApi;
 
     /**
      * @var EntityRepositoryInterface
      */
-    private EntityRepositoryInterface $mollieSubscriptionToProductRepository;
+    private $mollieSubscriptionToProductRepository;
 
     /**
      * @var MollieApiFactory
      */
-    private MollieApiFactory $apiFactory;
+    private $apiFactory;
 
     /**
      * @var CustomerService
      */
-    private CustomerService $customerService;
+    private $customerService;
 
     /**
      * @var LoggerService
      */
-    private LoggerService $loggerService;
+    private $loggerService;
 
     /**
      * @param EntityRepositoryInterface $stateMachineStateRepository

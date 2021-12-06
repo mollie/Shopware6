@@ -15,7 +15,7 @@ class SubscriptionCartValidator implements CartValidatorInterface
     /**
      * @var ConfigService
      */
-    private ConfigService $settings;
+    private $settings;
 
     /**
      * @param ConfigService $settings
