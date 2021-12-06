@@ -275,6 +275,12 @@
             <label lang="nl-NL">E-mail voor betalingsherinnering inschakelen</label>
             <defaultValue>false</defaultValue>
         </input-field>
+        <input-field type="text">
+            <name>daysBeforeReminder</name>
+            <label>Days before reminder</label>
+            <label lang="de-DE">Tage vor Erinnerung</label>
+            <label lang="nl-NL">Dagen voor herinnering</label>
+        </input-field>
         <component name="sw-entity-single-select">
             <name>emailTemplate</name>
             <entity>mail_template_type</entity>
@@ -283,11 +289,5 @@
             <label lang="nl-NL">Email sjabloon</label>
             <labelProperty>technicalName</labelProperty>
         </component>
-        <input-field type="text">
-            <name>daysBeforeReminder</name>
-            <label>Days before reminder</label>
-            <label lang="de-DE">Tage vor Erinnerung</label>
-            <label lang="nl-NL">Dagen voor herinnering</label>
-        </input-field>
     </card>
 </config>
