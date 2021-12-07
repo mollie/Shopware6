@@ -168,7 +168,7 @@ class PaymentMethodService
 
         if ($paymentMethods->count()) {
             /** @var PaymentMethodEntity $paymentMethod */
-            foreach ($paymentMethods as $paymentMethod) {
+            foreach ($paymentMethods->getEntities() as $paymentMethod) {
                 if (!in_array($paymentMethod->getHandlerIdentifier(), $installableHandlers, true)) {
                     continue;
                 }
