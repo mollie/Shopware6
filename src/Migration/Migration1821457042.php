@@ -31,7 +31,7 @@ class Migration1821457042 extends MigrationStep
      */
     public function updateDestructive(Connection $connection): void
     {
-        $connection->executeStatement("DROP TABLE `mollie_subscription_to_product`");
+        $connection->exec("DROP TABLE `mollie_subscription_to_product`");
     }
 
     /**
@@ -40,7 +40,7 @@ class Migration1821457042 extends MigrationStep
      */
     private function createMollieSubscriptionToProductTable(Connection $connection): void
     {
-        $connection->executeStatement("CREATE TABLE IF NOT EXISTS `mollie_subscription_to_product` (
+        $connection->exec("CREATE TABLE IF NOT EXISTS `mollie_subscription_to_product` (
                     `id` BINARY(16) NOT NULL,
                     `mollie_customer_id` VARCHAR(255) NOT NULL,
                     `subscription_id` VARCHAR(255) NOT NULL,

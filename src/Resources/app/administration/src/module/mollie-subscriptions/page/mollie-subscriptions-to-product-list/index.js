@@ -1,6 +1,8 @@
 import template from './mollie-subscriptions-to-product-list.html.twig';
 
+// eslint-disable-next-line no-undef
 const { Component } = Shopware;
+// eslint-disable-next-line no-undef
 const { Criteria } = Shopware.Data;
 
 Component.register('mollie-subscriptions-to-product-list', {
@@ -55,9 +57,9 @@ Component.register('mollie-subscriptions-to-product-list', {
             this.isLoading = true;
             this.naturalSorting = this.sortBy === 'createdAt';
 
-            let criteria = new Criteria();
+            const criteria = new Criteria();
             criteria.addSorting(Criteria.sort(this.sortBy, this.sortDirection, this.naturalSorting));
-
+            // eslint-disable-next-line no-undef
             this.repository.search(criteria, Shopware.Context.api).then((result) => {
                 this.subscriptions = result;
                 this.isLoading = false;

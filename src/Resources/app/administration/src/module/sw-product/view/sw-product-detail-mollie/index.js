@@ -271,6 +271,7 @@ Shopware.Component.register('sw-product-detail-mollie', {
                 });
             }
 
+            // eslint-disable-next-line no-undef
             this.productRepository.get(this.productId, Shopware.Context.api).then(parent => {
                 const mollieAttributes = new ProductAttributes(parent);
 

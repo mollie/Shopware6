@@ -1,5 +1,6 @@
 import './page/mollie-subscriptions-to-product-list';
 
+// eslint-disable-next-line no-undef
 const { Module } = Shopware;
 
 Module.register('mollie-subscriptions', {
