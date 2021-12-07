@@ -135,7 +135,8 @@ class PaymentMethodService
             try {
                 $existingPaymentMethodId = $this->getPaymentMethodId(
                     $paymentMethodData['handlerIdentifier'],
-                    $paymentMethodData['name']
+                    $paymentMethodData['name'],
+                    $context
                 );
             } catch (InconsistentCriteriaIdsException $e) {
                 // On error, we assume the payment method doesn't exist
@@ -156,41 +157,47 @@ class PaymentMethodService
     }
 
     /**
-     * Activate payment methods in Shopware, based on Mollie.
-     *
-     * @param MollieApiClient $apiClient
-     * @param Context         $context
-     *
-     * @throws ApiException
+     * @param Context $context
+     * @return array
      */
-    public function activatePaymentMethods(MollieApiClient $apiClient, Context $context): void
+    public function getInstalledPaymentMethodHandlers(Context $context): array
     {
-        /** @var MethodCollection $methods */
-        $methods = $apiClient->methods->allActive();
-
-        /** @var array $paymentMethods */
-        $paymentMethods = $this->getPaymentMethods();
-
         $handlers = [];
+        $pluginId = $this->pluginIdProvider->getPluginIdByBaseClass($this->className, $context);
 
-        if ($methods->count) {
-            /** @var Method $method */
-            foreach ($methods as $method) {
-                foreach ($paymentMethods as $paymentMethod) {
-                    if ($paymentMethod['name'] === $method->id) {
-                        $handlers[] = [
-                            'class' => $paymentMethod['handler'],
-                            'name' => $paymentMethod['description'],
-                        ];
-                    }
-                }
+        $paymentCriteria = new Criteria();
+        $paymentCriteria->addFilter(new EqualsFilter('pluginId', $pluginId));
+
+        $paymentMethods = $this->paymentRepository->search($paymentCriteria, $context);
+
+        if ($paymentMethods->count()) {
+            /** @var PaymentMethodEntity $paymentMethod */
+            foreach ($paymentMethods as $paymentMethod) {
+                $handlers[] = $paymentMethod->getHandlerIdentifier();
             }
         }
 
-        if (!empty($handlers)) {
-            foreach ($handlers as $handler) {
+        return $handlers;
+    }
+
+    /**
+     * Activate payment methods in Shopware.
+     *
+     * @param array $installedHandlers
+     * @param Context $context
+     */
+    public function activatePaymentMethods(array $installedHandlers, Context $context): void
+    {
+        $paymentMethods = $this->getPaymentMethods($context);
+
+        if (!empty($paymentMethods)) {
+            foreach ($paymentMethods as $paymentMethod) {
+                if (in_array($paymentMethod['handler'], $installedHandlers, true)) {
+                    continue;
+                }
+
                 /** @var string|null $paymentMethodId */
-                $paymentMethodId = $this->getPaymentMethodId($handler['class'], $handler['name']);
+                $paymentMethodId = $this->getPaymentMethodId($paymentMethod['handler'], $paymentMethod['description'], $context);
 
                 if ((string) $paymentMethodId !== '') {
                     $this->activatePaymentMethod($paymentMethodId, true, $context);
@@ -202,16 +209,16 @@ class PaymentMethodService
     /**
      * Activates a payment method in Shopware
      *
-     * @param string       $paymentMethodId
-     * @param bool         $active
-     * @param Context|null $context
+     * @param string $paymentMethodId
+     * @param bool $active
+     * @param Context $context
      *
      * @return EntityWrittenContainerEvent
      */
     public function activatePaymentMethod(
         string $paymentMethodId,
-        bool $active = true,
-        Context $context = null
+        bool $active,
+        Context $context
     ): EntityWrittenContainerEvent
     {
         return $this->paymentRepository->upsert(
@@ -221,7 +228,8 @@ class PaymentMethodService
                     'active' => $active
                 ]
             ],
-            $context ?? Context::createDefaultContext());
+            $context
+        );
     }
 
     /**
@@ -252,10 +260,11 @@ class PaymentMethodService
      *
      * @param $handlerIdentifier
      * @param $name
+     * @param Context $context
      *
      * @return string|null
      */
-    private function getPaymentMethodId($handlerIdentifier, $name) : ?string
+    private function getPaymentMethodId($handlerIdentifier, $name, Context $context) : ?string
     {
         // Fetch ID for update
         $paymentCriteria = new Criteria();
@@ -263,7 +272,7 @@ class PaymentMethodService
         $paymentCriteria->addFilter(new EqualsFilter('name', $name));
 
         // Get payment IDs
-        $paymentIds = $this->paymentRepository->searchIds($paymentCriteria, Context::createDefaultContext());
+        $paymentIds = $this->paymentRepository->searchIds($paymentCriteria, $context);
 
         if ($paymentIds->getTotal() === 0) {
             return null;

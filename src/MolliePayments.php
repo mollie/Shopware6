@@ -4,9 +4,11 @@ namespace Kiener\MolliePayments;
 
 use Exception;
 use Kiener\MolliePayments\Compatibility\DependencyLoader;
+use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\ApplePayDirect\ApplePayDomainVerificationService;
 use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\PaymentMethodService;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\Plugin;
 use Shopware\Core\Framework\Plugin\Context\ActivateContext;
@@ -64,6 +66,9 @@ class MolliePayments extends Plugin
         parent::update($context);
 
         if ($context->getPlugin()->isActive() === true) {
+            // Install and activate payment methods
+            $this->installAndActivatePaymentMethods($context->getContext());
+
             // add domain verification
             /** @var ApplePayDomainVerificationService $domainVerificationService */
             $domainVerificationService = $this->container->get(ApplePayDomainVerificationService::class);
@@ -85,15 +90,10 @@ class MolliePayments extends Plugin
     {
         parent::activate($context);
 
-        /** @var PaymentMethodService $paymentMethodHelper */
-        $paymentMethodHelper = $this->container->get('Kiener\MolliePayments\Service\PaymentMethodService');
+        // Install and activate payment methods
+        $this->installAndActivatePaymentMethods($context->getContext());
 
-        // Add payment methods
-        $paymentMethodHelper
-            ->setClassName(get_class($this))
-            ->addPaymentMethods($context->getContext());
-
-        // add domain verification
+        // Add domain verification
         /** @var ApplePayDomainVerificationService $domainVerificationService */
         $domainVerificationService = $this->container->get(ApplePayDomainVerificationService::class);
         $domainVerificationService->downloadDomainAssociationFile();
@@ -102,5 +102,23 @@ class MolliePayments extends Plugin
     public function deactivate(DeactivateContext $context): void
     {
         parent::deactivate($context);
+    }
+
+    private function installAndActivatePaymentMethods(Context $context): void
+    {
+        /** @var PaymentMethodService $paymentMethodHelper */
+        $paymentMethodHelper = $this->container->get(PaymentMethodService::class);
+        $paymentMethodHelper->setClassName(self::class);
+
+        // Check which payment methods from Mollie are already installed in the shop
+        $installedPaymentMethodHandlers = $paymentMethodHelper->getInstalledPaymentMethodHandlers($context);
+
+        // Add payment methods
+        $paymentMethodHelper
+            ->setClassName(get_class($this))
+            ->addPaymentMethods($context);
+
+        // Activate newly installed payment methods
+        $paymentMethodHelper->activatePaymentMethods($installedPaymentMethodHandlers, $context);
     }
 }
