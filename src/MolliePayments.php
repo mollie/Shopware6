@@ -2,9 +2,7 @@
 
 namespace Kiener\MolliePayments;
 
-use Exception;
 use Kiener\MolliePayments\Compatibility\DependencyLoader;
-use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\ApplePayDirect\ApplePayDomainVerificationService;
 use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\PaymentMethodService;
@@ -16,9 +14,7 @@ use Shopware\Core\Framework\Plugin\Context\DeactivateContext;
 use Shopware\Core\Framework\Plugin\Context\InstallContext;
 use Shopware\Core\Framework\Plugin\Context\UninstallContext;
 use Shopware\Core\Framework\Plugin\Context\UpdateContext;
-use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
 class MolliePayments extends Plugin
 {
@@ -104,21 +100,34 @@ class MolliePayments extends Plugin
         parent::deactivate($context);
     }
 
+    /**
+     * @param Context $context
+     */
     private function installAndActivatePaymentMethods(Context $context): void
     {
         /** @var PaymentMethodService $paymentMethodHelper */
         $paymentMethodHelper = $this->container->get(PaymentMethodService::class);
-        $paymentMethodHelper->setClassName(self::class);
+
+        // Get installable payment methods
+        $installablePaymentMethods = $paymentMethodHelper->getInstallablePaymentMethods();
+
+        if (empty($installablePaymentMethods)) {
+            return;
+        }
 
         // Check which payment methods from Mollie are already installed in the shop
-        $installedPaymentMethodHandlers = $paymentMethodHelper->getInstalledPaymentMethodHandlers($context);
+        $installedPaymentMethodHandlers = $paymentMethodHelper->getInstalledPaymentMethodHandlers($paymentMethodHelper->getPaymentHandlers(), $context);
 
         // Add payment methods
         $paymentMethodHelper
             ->setClassName(get_class($this))
-            ->addPaymentMethods($context);
+            ->addPaymentMethods($installablePaymentMethods, $context);
 
         // Activate newly installed payment methods
-        $paymentMethodHelper->activatePaymentMethods($installedPaymentMethodHandlers, $context);
+        $paymentMethodHelper->activatePaymentMethods(
+            $installablePaymentMethods,
+            $installedPaymentMethodHandlers,
+            $context
+        );
     }
 }
