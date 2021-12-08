@@ -1,11 +1,13 @@
 import Shopware from "Services/shopware/Shopware";
 import OrdersListRepository from "Repositories/admin/orders/OrdersListRepository";
+import OrderDetailsRepository from "Repositories/admin/orders/OrderDetailsRepository";
 import MainMenuRepository from "Repositories/admin/MainMenuRepository";
 
 const shopware = new Shopware();
 
 const repoMainMenu = new MainMenuRepository();
 const repoOrdersList = new OrdersListRepository();
+const repoOrdersDetails = new OrderDetailsRepository();
 
 
 export default class AdminOrdersAction {
@@ -25,6 +27,23 @@ export default class AdminOrdersAction {
             cy.wait(1000);
         }
     }
+
+    /**
+     *
+     * @param amount
+     */
+    refundLatestOrder(amount) {
+        repoOrdersList.getLatestOrderNumber().click();
+
+        repoOrdersDetails.getMollieRefundManagerButton().click();
+        repoOrdersDetails.getMollieRefundInputField().type(amount);
+        repoOrdersDetails.getMollieRefundSubmitButton().click();
+
+        // here are automatic reloads and things as it seems
+        // i really want to test the real UX, so we just wait like a human
+        cy.wait(1000);
+    }
+
 
     /**
      *
