@@ -18,21 +18,38 @@ use Shopware\Core\Content\Media\MediaService;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 use Shopware\Core\Framework\Plugin\Util\PluginIdProvider;
 
 class PaymentMethodServiceTest extends TestCase
 {
-    private EntityRepositoryInterface $mediaRepository;
-    private EntityRepositoryInterface $paymentMethodRepository;
-    private PaymentMethodService $paymentMethodService;
+    /**
+     * @var Context
+     */
+    private $context;
 
-    public function setUp(): void
+    /**
+     * @var EntityRepositoryInterface
+     */
+    private $mediaRepository;
+
+    /**
+     * @var EntityRepositoryInterface
+     */
+    private $paymentMethodRepository;
+
+    /**
+     * @var PaymentMethodService
+     */
+    private $paymentMethodService;
+
+    protected function setUp(): void
     {
         parent::setUp();
 
+        $this->context = $this->createMock(Context::class);;
         $this->mediaRepository = new FakeEntityRepository(new MediaDefinition());
         $this->paymentMethodRepository = new FakeEntityRepository(new PaymentMethodDefinition());
 
@@ -45,7 +62,7 @@ class PaymentMethodServiceTest extends TestCase
         );
     }
 
-    public function setUpInstalledPaymentMethods(array $paymentMethodHandlers): void
+    public function setUpInstalledPaymentMethodsSearchReturn(array $paymentMethodHandlers): void
     {
         $paymentMethodIdentifier = 1;
         $paymentMethods = new EntityCollection();
@@ -68,52 +85,67 @@ class PaymentMethodServiceTest extends TestCase
         $this->paymentMethodRepository->entitySearchResults = [$search];
     }
 
-    public function setUpMedia(): void
+    public function setUpMediaRepositorySearchReturn(): void
     {
-        $media = $this->createConfiguredMock(MediaEntity::class, [
+        $mediaEntity = $this->createConfiguredMock(MediaEntity::class, [
             'getId' => '1',
         ]);
 
         $search = $this->createConfiguredMock(EntitySearchResult::class, [
             'count' => 1,
-            'first' => $media,
+            'first' => $mediaEntity,
         ]);
 
         $this->mediaRepository->entitySearchResults = [$search];
+    }
+
+    public function setUpExistingPaymentMethodsSearchIdsReturn(int $total = 0, array $ids = []): void
+    {
+        $search = $this->createConfiguredMock(IdSearchResult::class, [
+            'getTotal' => $total,
+            'getIds' => $ids,
+        ]);
+
+        $this->paymentMethodRepository->idSearchResults = [$search];
+    }
+
+    public function setUpPaymentMethodUpsertReturn(): void
+    {
+        $entityWritten = $this->createMock(EntityWrittenContainerEvent::class);
+
+        $this->paymentMethodRepository->entityWrittenContainerEvents = [$entityWritten];
     }
 
     public function testHasAnArrayOfInstallableMolliePaymentMethods(): void
     {
         self::assertIsArray(
             $this->paymentMethodService->getInstallablePaymentMethods(),
-            sprintf('The response of method %s is expected to be of type array.', 'getInstallablePaymentMethods')
+            'The response of method getInstallablePaymentMethods is expected to be of type array.'
         );
 
         self::assertNotEmpty(
             $this->paymentMethodService->getInstallablePaymentMethods(),
-            sprintf('The response of method %s is expected to be not empty.', 'getInstallablePaymentMethods')
+            'The response of method getInstallablePaymentMethods is expected to be not empty.'
         );
     }
 
     public function testDoesFindInstalledMolliePaymentMethodsIfPresent(): void
     {
-        $this->setUpInstalledPaymentMethods([
+        $this->setUpInstalledPaymentMethodsSearchReturn([
             CashPayment::class,
             ApplePayPayment::class,
             DebitPayment::class,
             iDealPayment::class,
         ]);
 
-        $context = $this->createMock(Context::class);
-
         $installedPaymentMethodHandlers = $this->paymentMethodService->getInstalledPaymentMethodHandlers(
             $this->paymentMethodService->getPaymentHandlers(),
-            $context
+            $this->context
         );
 
         self::assertNotEmpty(
             $installedPaymentMethodHandlers,
-            sprintf('The response of method %s is expected to be not empty when Mollie payment methods are installed.', 'getInstalledPaymentMethodHandlers')
+            'The response of method getInstalledPaymentMethodHandlers is expected to be not empty when Mollie payment methods are installed.'
         );
 
         $hasNonMolliePaymentMethods = false;
@@ -126,53 +158,80 @@ class PaymentMethodServiceTest extends TestCase
 
         self::assertFalse(
             $hasNonMolliePaymentMethods,
-            sprintf(
-                'The response of method %s is expected not to return non-Mollie payment methods.',
-                'getInstalledPaymentMethodHandlers'
-            )
+            'The response of method getInstalledPaymentMethodHandlers is expected not to return non-Mollie payment methods.'
         );
     }
 
     public function testDoesNotFindInstalledMolliePaymentMethodsIfNotPresent(): void
     {
-        $this->setUpInstalledPaymentMethods([
+        $this->setUpInstalledPaymentMethodsSearchReturn([
             CashPayment::class,
             DebitPayment::class,
         ]);
 
-        $context = $this->createMock(Context::class);
-
         $installedPaymentMethodHandlers = $this->paymentMethodService->getInstalledPaymentMethodHandlers(
             $this->paymentMethodService->getPaymentHandlers(),
-            $context
+            $this->context
         );
 
         self::assertEmpty(
             $installedPaymentMethodHandlers,
-            sprintf(
-                'The response of method %s is expected to be empty when no Mollie payment methods are installed.',
-                'getInstalledPaymentMethodHandlers'
-            )
+            'The response of method getInstalledPaymentMethodHandlers is expected to be empty when no Mollie payment methods are installed.'
         );
     }
 
     public function testDoesAddPaymentMethods(): void
     {
-        $this->setUpMedia();
-
-        $context = $this->createMock(Context::class);
-
-        $this->paymentMethodRepository->idSearchResults = [new IdSearchResult(0, [], new Criteria(), $context)];
+        $this->setUpMediaRepositorySearchReturn();
+        $this->setUpExistingPaymentMethodsSearchIdsReturn();
+        $this->setUpPaymentMethodUpsertReturn();
 
         $installablePaymentMethods = $this->paymentMethodService->getInstallablePaymentMethods();
+        $installablePaymentMethod = array_shift($installablePaymentMethods); // we pick one, so we don't need to fake a large number of results
 
-        $this->paymentMethodService->addPaymentMethods($installablePaymentMethods, $context);
+        $this->paymentMethodService->addPaymentMethods([$installablePaymentMethod], $this->context);
 
         $upsertResult = $this->paymentMethodRepository->data;
 
         self::assertNotEmpty(
             $upsertResult,
-            sprintf('The upserted data from method %s is expected not to be empty when providing installable payment methods.', 'addPaymentMethods')
+            'The upserted data from method addPaymentMethods is expected not to be empty when providing installable payment methods.'
+        );
+
+        self::assertSame(
+            $upsertResult[0][0]['handlerIdentifier'], $installablePaymentMethod['handler'],
+            sprintf('The upserted data from method addPaymentMethods is expected to contain an array with handlerIdentifier "%s"', $installablePaymentMethod['handler'])
+        );
+    }
+
+    public function testDoesActivatePaymentMethods(): void
+    {
+        $paymentMethodId = '112233';
+
+        $this->setUpExistingPaymentMethodsSearchIdsReturn(1, [$paymentMethodId]);
+        $this->setUpPaymentMethodUpsertReturn();
+
+        $installablePaymentMethods = $this->paymentMethodService->getInstallablePaymentMethods();
+        $paymentMethod = $installablePaymentMethods[0];
+
+        $this->paymentMethodService->activatePaymentMethods([$paymentMethod], [], $this->context);
+
+        $upsertResult = $this->paymentMethodRepository->data;
+
+        self::assertNotEmpty(
+            $upsertResult,
+            'The upserted data from method activatePaymentMethods is expected not to be empty when providing payment methods.'
+        );
+
+        self::assertSame(
+            $upsertResult[0][0]['id'],
+            $paymentMethodId,
+            sprintf('The upserted data from method activatePaymentMethods is expected to contain id "%s".', $paymentMethodId)
+        );
+
+        self::assertTrue(
+            $upsertResult[0][0]['active'],
+            'The upserted data from method activatePaymentMethods is expected to contain active with value "true".'
         );
     }
 }
