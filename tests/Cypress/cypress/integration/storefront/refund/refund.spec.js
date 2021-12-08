@@ -1,5 +1,6 @@
 import Devices from "Services/utils/Devices";
 import Session from "Services/utils/Session"
+import Element from "Services/utils/Element";
 import Shopware from "Services/shopware/Shopware";
 import PaymentScreenAction from 'Actions/mollie/PaymentScreenAction';
 // ------------------------------------------------------
@@ -25,6 +26,8 @@ const adminLogin = new AdminLoginAction();
 const repoOrdersDetails = new OrderDetailsRepository();
 
 const scenarioDummyBasket = new DummyBasketScenario(1);
+
+const element = new Element();
 
 
 const device = devices.getFirstDevice();
@@ -66,7 +69,12 @@ context("Order Refunds", () => {
             // the correct 1 EUR value.
             repoOrdersDetails.getMollieRefundManagerButton().click();
             repoOrdersDetails.getMollieRefundManagerFirstRefundStatusLabel().contains('Pending');
-            repoOrdersDetails.getMollieRefundManagerFirstRefundAmountLabel().contains('€1.00');
+            // because of (weird) number formats which might not be the same all the time (even if they should)
+            // we just search within multiple formats
+            element.containsText(
+                repoOrdersDetails.getMollieRefundManagerFirstRefundAmountLabel(),
+                ['1.00', '1,00']
+            )
         })
 
     })
