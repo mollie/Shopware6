@@ -157,6 +157,48 @@ describe('Credit Card Components', () => {
 
                 assertComponentErrors(true, true, true, false);
             })
+
+            it('Complete payment after failure with components', () => {
+                // We need to test this with Shopware's complete order page.
+                configAction.setupShop(false, true, false);
+
+                setUp();
+
+                payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '1228', '1234');
+
+                // we are still in our modal, so we
+                // have to close it in older versions
+                if (shopware.isVersionLower(6.4)) {
+                    payment.closePaymentsModal();
+                }
+
+                shopware.prepareDomainChange();
+                checkout.placeOrderOnConfirm();
+
+                cy.url().should('include', 'https://www.mollie.com/checkout/');
+
+                molliePayment.initSandboxCookie();
+                molliePayment.selectFailed();
+
+                cy.url().should('include', '/account/order/edit');
+                cy.contains('Complete payment');
+
+                // If components are not initialized, Cypress can't find the inputs and will error.
+                payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '1228', '1234');
+
+                // we are still in our modal, so we
+                // have to close it in older versions
+                if (shopware.isVersionLower(6.4)) {
+                    payment.closePaymentsModal();
+                }
+
+                checkout.placeOrderOnEdit();
+
+                // Apparently we are not being sent to Mollie if we failed the first time and enter the same credentials again.
+                // It just immediately redirects to checkout/finish. Probably a bug in Shopware
+                cy.url().should('include', '/checkout/finish');
+                cy.contains('Thank you for updating your order');
+            })
         })
     })
 })

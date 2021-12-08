@@ -88,7 +88,7 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
             mollieController: 'div.mollie-components-controller',
             paymentForm: '#changePaymentForm',
             confirmForm: '#confirmOrderForm',
-            confirmFormButton: '#confirmFormSubmit',
+            confirmFormButton: '#confirmOrderForm > button[type="submit"]',
         };
     }
 
