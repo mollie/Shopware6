@@ -206,9 +206,9 @@ class PaymentMethodServiceTest extends TestCase
 
     public function testDoesActivatePaymentMethods(): void
     {
-        $paymentMethodId = '112233';
+        $paymentMethodIds = ['112233'];
 
-        $this->setUpExistingPaymentMethodsSearchIdsReturn(1, [$paymentMethodId]);
+        $this->setUpExistingPaymentMethodsSearchIdsReturn(count($paymentMethodIds), $paymentMethodIds);
         $this->setUpPaymentMethodUpsertReturn();
 
         $installablePaymentMethods = $this->paymentMethodService->getInstallablePaymentMethods();
@@ -225,13 +225,48 @@ class PaymentMethodServiceTest extends TestCase
 
         self::assertSame(
             $upsertResult[0][0]['id'],
-            $paymentMethodId,
-            sprintf('The upserted data from method activatePaymentMethods is expected to contain id "%s".', $paymentMethodId)
+            $paymentMethodIds[0],
+            sprintf('The upserted data from method activatePaymentMethods is expected to contain id "%s".', $paymentMethodIds[0])
         );
 
         self::assertTrue(
             $upsertResult[0][0]['active'],
             'The upserted data from method activatePaymentMethods is expected to contain active with value "true".'
+        );
+    }
+
+    public function testDoesOnlyActivateNewlyInstalledPaymentMethod(): void
+    {
+        $paymentMethodIds = ['112233', '445566'];
+
+        $this->setUpExistingPaymentMethodsSearchIdsReturn(count($paymentMethodIds), $paymentMethodIds);
+        $this->setUpPaymentMethodUpsertReturn();
+
+        $installablePaymentMethods = $this->paymentMethodService->getInstallablePaymentMethods();
+
+        $paymentMethods = [
+            $installablePaymentMethods[0],
+            $installablePaymentMethods[1],
+        ];
+
+        $installedHandlers = [
+            $installablePaymentMethods[1]['handler'],
+        ];
+
+        $this->paymentMethodService->activatePaymentMethods($paymentMethods, $installedHandlers, $this->context);
+
+        $upsertResult = $this->paymentMethodRepository->data;
+
+        self::assertCount(
+            1,
+            $upsertResult[0],
+            'The upserted data is expected to have only 1 result.'
+        );
+
+        self::assertSame(
+            $upsertResult[0][0]['id'],
+            $paymentMethodIds[0],
+            sprintf('The upserted data from method activatePaymentMethods is expected to contain id "%s".', $paymentMethodIds[0])
         );
     }
 }
