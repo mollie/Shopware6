@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Service;
+namespace Kiener\MolliePayments\Service\Logger;
 
 use Exception;
 use Monolog\Logger;

@@ -17,7 +17,7 @@
             <factory service="Kiener\MolliePayments\Service\Logger\MollieLoggerFactory" method="createLogger"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\MollieEventLogger" class="Kiener\MolliePayments\Service\MollieEventLogger">
+        <service id="Kiener\MolliePayments\Service\Logger\MollieEventLogger" class="Kiener\MolliePayments\Service\Logger\MollieEventLogger">
             <argument type="service" id="log_entry.repository"/>
         </service>
 
@@ -108,6 +108,7 @@
 
         <service id="Kiener\MolliePayments\Service\Voucher\VoucherService" class="Kiener\MolliePayments\Service\Cart\Voucher\VoucherService">
             <argument type="service" id="Kiener\MolliePayments\Repository\Product\ProductRepository"/>
+            <argument type="service" id="mollie_payments.logger"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\Cart\Voucher\VoucherCartCollector">
