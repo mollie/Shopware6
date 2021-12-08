@@ -1,6 +1,6 @@
 <?php
 
-namespace MolliePayments\Tests\Struct\LineItem;
+namespace MolliePayments\Tests\Struct\PaymentMethod;
 
 use Kiener\MolliePayments\Handler\Method\PayPalPayment;
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;

@@ -17,7 +17,7 @@
             <factory service="Kiener\MolliePayments\Service\Logger\MollieLoggerFactory" method="createLogger"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\MollieEventLogger" class="Kiener\MolliePayments\Service\MollieEventLogger">
+        <service id="Kiener\MolliePayments\Service\Logger\MollieEventLogger" class="Kiener\MolliePayments\Service\Logger\MollieEventLogger">
             <argument type="service" id="log_entry.repository"/>
         </service>
 

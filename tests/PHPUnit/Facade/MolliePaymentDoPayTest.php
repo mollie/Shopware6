@@ -1,6 +1,6 @@
 <?php
 
-namespace MolliePayments\Tests\Subscriber;
+namespace MolliePayments\Tests\Facade;
 
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
