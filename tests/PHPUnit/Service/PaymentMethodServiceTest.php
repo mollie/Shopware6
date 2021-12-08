@@ -235,7 +235,7 @@ class PaymentMethodServiceTest extends TestCase
         );
     }
 
-    public function testDoesOnlyActivateNewlyInstalledPaymentMethod(): void
+    public function testDoesOnlyActivateNewlyInstalledPaymentMethods(): void
     {
         $paymentMethodIds = ['112233', '445566'];
 
