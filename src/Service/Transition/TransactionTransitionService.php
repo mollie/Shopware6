@@ -236,6 +236,29 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         $this->performTransition($entityId, StateMachineTransitionActions::ACTION_REFUND_PARTIALLY, $context);
     }
 
+    public function chargebackTransaction(OrderTransactionEntity $transaction, Context $context): void
+    {
+        $compatibilityGateway = $this->compatibilityFactory->createGateway();
+
+        $chargebackState = $compatibilityGateway->getChargebackOrderTransactionState();
+        $currentState = $transaction->getStateMachineState()->getTechnicalName();
+
+        if ($this->isFinalOrTargetStatus($currentState, [$chargebackState])) {
+            return;
+        }
+
+        $chargebackAction = $compatibilityGateway->getChargebackOrderTransactionAction();
+
+        $entityId = $transaction->getId();
+        $availableTransitions = $this->getAvailableTransitions($entityId, $context);
+
+        if (!$this->transitionIsAllowed($chargebackAction, $availableTransitions)) {
+            $this->payTransaction($transaction, $context);
+        }
+
+        $this->performTransition($entityId, $chargebackAction, $context);
+    }
+
     private function isFinalOrTargetStatus(string $currentStatus, array $targetStatus): bool
     {
         if ($this->isFinalStatus($currentStatus)) {
