@@ -11,10 +11,10 @@ class OrderStatusConverter
      * @param Order $order
      * @return string
      */
-    public function getOrderStatus(Order $order): string
+    public function getMollieOrderStatus(Order $order): string
     {
         $payment = $this->getLatestPayment($order);
-        $targetStatus = $this->getPaymentStatus($payment);
+        $targetStatus = $this->getMolliePaymentStatus($payment);
 
         // if we do not have a payment status
         // then try to get a status from the order object of Mollie
@@ -51,7 +51,7 @@ class OrderStatusConverter
      * @param Payment|null $payment
      * @return string
      */
-    public function getPaymentStatus(?Payment $payment = null): string
+    public function getMolliePaymentStatus(?Payment $payment = null): string
     {
         if ($payment === null) {
             return MolliePaymentStatus::MOLLIE_PAYMENT_UNKNOWN;

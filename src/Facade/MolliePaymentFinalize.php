@@ -80,7 +80,7 @@ class MolliePaymentFinalize
         $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
 
 
-        $paymentStatus = $this->orderStatusConverter->getOrderStatus($mollieOrder);
+        $paymentStatus = $this->orderStatusConverter->getMollieOrderStatus($mollieOrder);
 
 
         # Attention

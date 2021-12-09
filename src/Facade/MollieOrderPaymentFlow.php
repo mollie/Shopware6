@@ -56,7 +56,7 @@ class MollieOrderPaymentFlow
 
     public function process(OrderTransactionEntity $transaction, OrderEntity $order, Order $mollieOrder, SalesChannelContext $salesChannelContext): bool
     {
-        $paymentStatus = $this->orderStatusConverter->getOrderStatus($mollieOrder);
+        $paymentStatus = $this->orderStatusConverter->getMollieOrderStatus($mollieOrder);
         $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
         // this is only mollie payment flow here we are doing failed management here
         $this->orderStatusUpdater->updatePaymentStatus($transaction, $paymentStatus, $salesChannelContext->getContext());
