@@ -90,6 +90,9 @@ class OrderStatusUpdater
 
                 break;
             case MolliePaymentStatus::MOLLIE_PAYMENT_CHARGEBACK:
+                $this->transactionTransitionService->chargebackTransaction($transaction, $context);
+
+                break;
             case MolliePaymentStatus::MOLLIE_PAYMENT_PENDING:
 
                 break;
