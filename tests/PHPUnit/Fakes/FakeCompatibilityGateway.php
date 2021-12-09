@@ -36,4 +36,13 @@ class FakeCompatibilityGateway implements CompatibilityGatewayInterface
         return LineItem::PROMOTION_LINE_ITEM_TYPE;
     }
 
+    public function getChargebackOrderTransactionState(): string
+    {
+        return 'chargeback';
+    }
+
+    public function getChargebackOrderTransactionAction(): string
+    {
+        return 'chargeback';
+    }
 }
