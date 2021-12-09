@@ -166,15 +166,17 @@ class PaymentMethodService
 
         $paymentMethods = $this->paymentRepository->search($paymentCriteria, $context);
 
-        if ($paymentMethods->count()) {
-            /** @var PaymentMethodEntity $paymentMethod */
-            foreach ($paymentMethods->getEntities() as $paymentMethod) {
-                if (!in_array($paymentMethod->getHandlerIdentifier(), $installableHandlers, true)) {
-                    continue;
-                }
+        if (!$paymentMethods->count()) {
+            return $installableHandlers;
+        }
 
-                $installedHandlers[] = $paymentMethod->getHandlerIdentifier();
+        /** @var PaymentMethodEntity $paymentMethod */
+        foreach ($paymentMethods->getEntities() as $paymentMethod) {
+            if (!in_array($paymentMethod->getHandlerIdentifier(), $installableHandlers, true)) {
+                continue;
             }
+
+            $installedHandlers[] = $paymentMethod->getHandlerIdentifier();
         }
 
         return $installedHandlers;
@@ -266,14 +268,16 @@ class PaymentMethodService
         $installablePaymentMethods = $this->getPaymentHandlers();
 
         // Add payment methods to array
-        if ($installablePaymentMethods !== null) {
-            foreach ($installablePaymentMethods as $installablePaymentMethod) {
-                $paymentMethods[] = [
-                    'name' => constant($installablePaymentMethod . '::PAYMENT_METHOD_NAME'),
-                    'description' => constant($installablePaymentMethod . '::PAYMENT_METHOD_DESCRIPTION'),
-                    'handler' => $installablePaymentMethod,
-                ];
-            }
+        if ($installablePaymentMethods === null) {
+            return $paymentMethods;
+        }
+
+        foreach ($installablePaymentMethods as $installablePaymentMethod) {
+            $paymentMethods[] = [
+                'name' => constant($installablePaymentMethod . '::PAYMENT_METHOD_NAME'),
+                'description' => constant($installablePaymentMethod . '::PAYMENT_METHOD_DESCRIPTION'),
+                'handler' => $installablePaymentMethod,
+            ];
         }
 
         return $paymentMethods;

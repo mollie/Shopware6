@@ -118,11 +118,6 @@ class PaymentMethodServiceTest extends TestCase
 
     public function testHasAnArrayOfInstallableMolliePaymentMethods(): void
     {
-        self::assertIsArray(
-            $this->paymentMethodService->getInstallablePaymentMethods(),
-            'The response of method getInstallablePaymentMethods is expected to be of type array.'
-        );
-
         self::assertNotEmpty(
             $this->paymentMethodService->getInstallablePaymentMethods(),
             'The response of method getInstallablePaymentMethods is expected to be not empty.'
@@ -191,24 +186,19 @@ class PaymentMethodServiceTest extends TestCase
 
         $this->paymentMethodService->addPaymentMethods([$installablePaymentMethod], $this->context);
 
-        $upsertResult = $this->paymentMethodRepository->data;
-
-        self::assertNotEmpty(
-            $upsertResult,
-            'The upserted data from method addPaymentMethods is expected not to be empty when providing installable payment methods.'
-        );
+        $actualPaymentHandler = $this->paymentMethodRepository->data[0][0]['handlerIdentifier'];
+        $expectedPaymentHandler = $installablePaymentMethod['handler'];
 
         self::assertSame(
-            $upsertResult[0][0]['handlerIdentifier'], $installablePaymentMethod['handler'],
+            $expectedPaymentHandler,
+            $actualPaymentHandler,
             sprintf('The upserted data from method addPaymentMethods is expected to contain an array with handlerIdentifier "%s"', $installablePaymentMethod['handler'])
         );
     }
 
     public function testDoesActivatePaymentMethods(): void
     {
-        $paymentMethodIds = ['112233'];
-
-        $this->setUpExistingPaymentMethodsSearchIdsReturn(count($paymentMethodIds), $paymentMethodIds);
+        $this->setUpExistingPaymentMethodsSearchIdsReturn(1, ['112233']);
         $this->setUpPaymentMethodUpsertReturn();
 
         $installablePaymentMethods = $this->paymentMethodService->getInstallablePaymentMethods();
@@ -216,21 +206,11 @@ class PaymentMethodServiceTest extends TestCase
 
         $this->paymentMethodService->activatePaymentMethods([$paymentMethod], [], $this->context);
 
-        $upsertResult = $this->paymentMethodRepository->data;
-
-        self::assertNotEmpty(
-            $upsertResult,
-            'The upserted data from method activatePaymentMethods is expected not to be empty when providing payment methods.'
-        );
-
-        self::assertSame(
-            $upsertResult[0][0]['id'],
-            $paymentMethodIds[0],
-            sprintf('The upserted data from method activatePaymentMethods is expected to contain id "%s".', $paymentMethodIds[0])
-        );
+        // We expect the upserted data to have an active field that is true
+        $actualPaymentMethodActive = $this->paymentMethodRepository->data[0][0]['active'];
 
         self::assertTrue(
-            $upsertResult[0][0]['active'],
+            $actualPaymentMethodActive,
             'The upserted data from method activatePaymentMethods is expected to contain active with value "true".'
         );
     }
@@ -255,17 +235,23 @@ class PaymentMethodServiceTest extends TestCase
 
         $this->paymentMethodService->activatePaymentMethods($paymentMethods, $installedHandlers, $this->context);
 
-        $upsertResult = $this->paymentMethodRepository->data;
+        // We expect the upserted data to contain 1 item to be activated, since 1 payment handler was already installed
+        $actualNumberOfPaymentMethodsUpserted = count($this->paymentMethodRepository->data[0]);
+        $expectedNumberOfPaymentMethodsUpserted = 1;
 
-        self::assertCount(
-            1,
-            $upsertResult[0],
+        self::assertSame(
+            $expectedNumberOfPaymentMethodsUpserted,
+            $actualNumberOfPaymentMethodsUpserted,
             'The upserted data is expected to have only 1 result.'
         );
 
+        // We expect the id of the payment method in the upserted data to be the same as the handler of the newly installed payment method
+        $actualPaymentMethodId = $this->paymentMethodRepository->data[0][0]['id'];
+        $expectedPaymentMethodId = $paymentMethodIds[0];
+
         self::assertSame(
-            $upsertResult[0][0]['id'],
-            $paymentMethodIds[0],
+            $expectedPaymentMethodId,
+            $actualPaymentMethodId,
             sprintf('The upserted data from method activatePaymentMethods is expected to contain id "%s".', $paymentMethodIds[0])
         );
     }
