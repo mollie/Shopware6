@@ -16,6 +16,12 @@ class OrderStatusConverter
         $payment = $this->getLatestPayment($order);
         $targetStatus = $this->getMolliePaymentStatus($payment);
 
+        // If the payment has been charged back, return immediately
+        // to prevent status from being changed if order has been refunded.
+        if($targetStatus === MolliePaymentStatus::MOLLIE_PAYMENT_CHARGEBACK) {
+            return $targetStatus;
+        }
+
         // if we do not have a payment status
         // then try to get a status from the order object of Mollie
         if ($targetStatus === MolliePaymentStatus::MOLLIE_PAYMENT_UNKNOWN) {
@@ -73,6 +79,10 @@ class OrderStatusConverter
             $status = MolliePaymentStatus::MOLLIE_PAYMENT_FAILED;
         } elseif ($payment->isExpired()) {
             $status = MolliePaymentStatus::MOLLIE_PAYMENT_EXPIRED;
+        }
+
+        if($payment->amountChargedBack && $payment->amountChargedBack->value > 0) {
+            $status = MolliePaymentStatus::MOLLIE_PAYMENT_CHARGEBACK;
         }
 
         return $status;
