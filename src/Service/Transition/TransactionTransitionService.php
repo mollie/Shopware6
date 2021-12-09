@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Service\Transition;
 
+use Kiener\MolliePayments\Compatibility\CompatibilityFactory;
 use Kiener\MolliePayments\Service\LoggerService;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
@@ -17,6 +18,12 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
      * @var TransitionServiceInterface
      */
     private $transitionService;
+
+    /**
+     * @var CompatibilityFactory
+     */
+    private $compatibilityFactory;
+
     /**
      * @var LoggerInterface
      */
@@ -24,11 +31,17 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
 
     /**
      * @param TransitionServiceInterface $transitionService
+     * @param CompatibilityFactory $compatibilityFactory
      * @param LoggerInterface $loggerService
      */
-    public function __construct(TransitionServiceInterface $transitionService, LoggerInterface $loggerService)
+    public function __construct(
+        TransitionServiceInterface $transitionService,
+        CompatibilityFactory $compatibilityFactory,
+        LoggerInterface $loggerService
+    )
     {
         $this->transitionService = $transitionService;
+        $this->compatibilityFactory = $compatibilityFactory;
         $this->logger = $loggerService;
     }
 
