@@ -5,6 +5,22 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+
+        <service id="Kiener\MolliePayments\Service\Logger\MollieLoggerFactory" class="Kiener\MolliePayments\Service\Logger\MollieLoggerFactory">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="session"/>
+            <argument>%kernel.logs_dir%/mollie_%kernel.environment%.log</argument>
+            <argument>14</argument>
+        </service>
+
+        <service id="mollie_payments.logger" class="Monolog\Logger">
+            <factory service="Kiener\MolliePayments\Service\Logger\MollieLoggerFactory" method="createLogger"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Service\Logger\MollieEventLogger" class="Kiener\MolliePayments\Service\Logger\MollieEventLogger">
+            <argument type="service" id="log_entry.repository"/>
+        </service>
+
         <service id="Kiener\MolliePayments\Service\OrderDeliveryService">
             <argument type="service" id="order_delivery.repository"/>
         </service>
@@ -23,23 +39,23 @@
 
         <service id="Kiener\MolliePayments\Service\Transition\DeliveryTransitionService">
             <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransitionService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
+            <argument type="service" id="mollie_payments.logger"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService">
             <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransitionService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
+            <argument type="service" id="mollie_payments.logger"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\Order\OrderStateService" class="Kiener\MolliePayments\Service\Order\OrderStateService">
-            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
+            <argument type="service" id="mollie_payments.logger"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Transition\OrderTransitionService"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\OrderService" class="Kiener\MolliePayments\Service\OrderService">
             <argument type="service" id="order.repository"/>
             <argument type="service" id="Shopware\Core\Checkout\Order\SalesChannel\OrderService"/>
-            <argument type="service" id="monolog.logger"/>
+            <argument type="service" id="mollie_payments.logger"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\RefundService">
@@ -49,7 +65,7 @@
         </service>
 
         <service id="Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor">
-            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
+            <argument type="service" id="mollie_payments.logger"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
         </service>
 
@@ -92,6 +108,7 @@
 
         <service id="Kiener\MolliePayments\Service\Voucher\VoucherService" class="Kiener\MolliePayments\Service\Cart\Voucher\VoucherService">
             <argument type="service" id="Kiener\MolliePayments\Repository\Product\ProductRepository"/>
+            <argument type="service" id="mollie_payments.logger"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\Cart\Voucher\VoucherCartCollector">

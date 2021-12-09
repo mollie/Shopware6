@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Service\MollieApi\Builder;
 
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Hydrator\MollieLineItemHydrator;
-use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher;
 use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\VerticalTaxLineItemFixer;
@@ -12,6 +11,7 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Struct\MollieLineItem;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -30,9 +30,9 @@ class MollieOrderBuilder
     private $settingsService;
 
     /**
-     * @var LoggerService
+     * @var LoggerInterface
      */
-    private $loggerService;
+    private $logger;
 
     /**
      * @var OrderDataExtractor
@@ -93,15 +93,15 @@ class MollieOrderBuilder
      * @param MollieLineItemBuilder $lineItemBuilder
      * @param MollieOrderAddressBuilder $addressBuilder
      * @param MollieOrderCustomerEnricher $customerEnricher
-     * @param LoggerService $loggerService
+     * @param LoggerInterface $loggerService
      * @param MollieShippingLineItemBuilder $shippingLineItemBuilder
      * @param VerticalTaxLineItemFixer $verticalTaxLineItemFixer
      * @param MollieLineItemHydrator $mollieLineItemHydrator
      */
-    public function __construct(SettingsService $settingsService, OrderDataExtractor $extractor, RouterInterface $router, MollieOrderPriceBuilder $priceBuilder, MollieLineItemBuilder $lineItemBuilder, MollieOrderAddressBuilder $addressBuilder, MollieOrderCustomerEnricher $customerEnricher, LoggerService $loggerService, MollieShippingLineItemBuilder $shippingLineItemBuilder, VerticalTaxLineItemFixer $verticalTaxLineItemFixer, MollieLineItemHydrator $mollieLineItemHydrator)
+    public function __construct(SettingsService $settingsService, OrderDataExtractor $extractor, RouterInterface $router, MollieOrderPriceBuilder $priceBuilder, MollieLineItemBuilder $lineItemBuilder, MollieOrderAddressBuilder $addressBuilder, MollieOrderCustomerEnricher $customerEnricher, LoggerInterface $loggerService, MollieShippingLineItemBuilder $shippingLineItemBuilder, VerticalTaxLineItemFixer $verticalTaxLineItemFixer, MollieLineItemHydrator $mollieLineItemHydrator)
     {
         $this->settingsService = $settingsService;
-        $this->loggerService = $loggerService;
+        $this->logger = $loggerService;
         $this->extractor = $extractor;
         $this->router = $router;
         $this->priceBuilder = $priceBuilder;
@@ -223,13 +223,13 @@ class MollieOrderBuilder
         // enrich data with create customer at mollie
         $orderData = $this->customerEnricher->enrich($orderData, $customer, $settings, $salesChannelContext);
 
-        // Log the built order data
-        $this->loggerService->addDebugEntry(
-            sprintf('Order %s is prepared to be paid through Mollie', $order->getOrderNumber()),
-            $salesChannelContext->getSalesChannel()->getId(),
-            $salesChannelContext->getContext(),
+        $this->logger->debug(
+            sprintf('Preparing Shopware Order %s to be sent to Mollie', $order->getOrderNumber()),
             [
-                'orderData' => $orderData,
+                'amount' => $orderData['amount'],
+                'locale' => $orderData['locale'],
+                'method' => $orderData['method'],
+                'lines' => $orderData['lines'],
             ]
         );
 

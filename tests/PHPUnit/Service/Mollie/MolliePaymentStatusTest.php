@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service\Order;
+namespace MolliePayments\Tests\Service\Mollie;
 
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use PHPUnit\Framework\TestCase;

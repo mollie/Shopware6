@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Exception\MissingSalesChannelInOrderException;
 use Kiener\MolliePayments\Facade\SetMollieOrderRefunded;
 use Kiener\MolliePayments\Service\LoggerService;
 use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Shopware\Core\System\StateMachine\Event\StateMachineStateChangeEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -14,27 +15,24 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class PaymentStateSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var LoggerService
+     * @var LoggerInterface
      */
-    private $loggerService;
+    private $logger;
+
     /**
      * @var SetMollieOrderRefunded
      */
     private $setMollieOrderRefunded;
 
+
     /**
-     * Creates a new instance of PaymentMethodSubscriber.
-     *
      * @param SetMollieOrderRefunded $setMollieOrderRefunded
-     * @param LoggerService $loggerService
+     * @param LoggerInterface $loggerService
      */
-    public function __construct(
-        SetMollieOrderRefunded $setMollieOrderRefunded,
-        LoggerService $loggerService
-    )
+    public function __construct(SetMollieOrderRefunded $setMollieOrderRefunded, LoggerInterface $loggerService)
     {
         $this->setMollieOrderRefunded = $setMollieOrderRefunded;
-        $this->loggerService = $loggerService;
+        $this->logger = $loggerService;
     }
 
     public static function getSubscribedEvents()
@@ -60,12 +58,9 @@ class PaymentStateSubscriber implements EventSubscriberInterface
         try {
             $this->setMollieOrderRefunded->setRefunded($event->getTransition()->getEntityId(), $event->getContext());
         } catch (CouldNotSetRefundAtMollieException | MissingSalesChannelInOrderException $e) {
-            $this->loggerService->addEntry(
-                $e->getMessage(),
-                $event->getContext(),
-                $e,
-                [],
-                Logger::ERROR
+
+            $this->logger->error(
+                $e->getMessage()
             );
         }
     }

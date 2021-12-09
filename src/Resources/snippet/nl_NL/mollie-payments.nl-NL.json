@@ -15,10 +15,10 @@
     "components": {
       "creditCard": {
         "headLine": "Credit card gegevens",
-        "cardHolderLabel": "Naam van de houder van de credit card",
-        "cardNumberLabel": "Credit card nummer",
-        "cardExpiryDateLabel": "Vervaldatum",
-        "cardVerificationCodeLabel": "CVC",
+        "cardHolderLabel": "Naam kaarthouder",
+        "cardNumberLabel": "Creditcardnummer",
+        "cardExpiryDateLabel": "MM/JJ",
+        "cardVerificationCodeLabel": "CVV",
         "creditCardTagLine": "Betaling verzekerd en verzorgd door"
       }
     },

@@ -35,7 +35,7 @@ describe('Credit Card Components', () => {
 
             beforeEach(() => {
                 devices.setDevice(device);
-                configAction.setupShop(true, true);
+                configAction.setupShop(true, true, false);
                 session.resetSessionData();
                 session.resetBrowserSession();
             });
@@ -156,6 +156,44 @@ describe('Credit Card Components', () => {
                 cy.wait(1000);
 
                 assertComponentErrors(true, true, true, false);
+            })
+
+            it('Components work on edit order page', () => {
+                // We need to test this with Shopware's complete order page.
+                // So we disable the Mollie failure mode for this test only
+                configAction.setupShop(false, true, false);
+
+                setUp();
+
+                payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '1228', '1234');
+
+                if (shopware.isVersionLower(6.4)) {
+                    payment.closePaymentsModal();
+                }
+
+                shopware.prepareDomainChange();
+                checkout.placeOrderOnConfirm();
+
+                molliePayment.initSandboxCookie();
+                molliePayment.selectFailed();
+
+                cy.url().should('include', '/account/order/edit');
+                cy.contains('Complete payment');
+
+                // If components are not initialized, Cypress can't find the inputs and will error.
+                payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '1228', '1234');
+
+                if (shopware.isVersionLower(6.4)) {
+                    payment.closePaymentsModal();
+                }
+
+                checkout.placeOrderOnEdit();
+
+                molliePayment.initSandboxCookie();
+                molliePayment.selectPaid();
+
+                cy.url().should('include', '/checkout/finish');
+                cy.contains('Thank you for updating your order');
             })
         })
     })

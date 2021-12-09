@@ -10,8 +10,9 @@
         </service>
 
         <service id="Kiener\MolliePayments\Factory\MollieApiFactory" class="Kiener\MolliePayments\Factory\MollieApiFactory">
+            <argument>%kernel.shopware_version%</argument>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="monolog.logger"/>
+            <argument type="service" id="mollie_payments.logger"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\MollieApi\Customer">
@@ -21,7 +22,7 @@
         <service id="Kiener\MolliePayments\Service\MollieApi\Order">
             <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Payment"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
+            <argument type="service" id="mollie_payments.logger"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\MollieApi\Shipment">
@@ -31,7 +32,7 @@
         <service id="Kiener\MolliePayments\Service\MollieApi\ApiClientConfigurator">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\TokenAnonymizer"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
+            <argument type="service" id="mollie_payments.logger"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\MollieApi\Payment">

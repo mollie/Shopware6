@@ -34,7 +34,7 @@ describe('Voucher Payments', () => {
 
     before(function () {
         devices.setDevice(devices.getFirstDevice());
-        configAction.setupShop(true, false);
+        configAction.setupShop(true, false, false);
     })
 
     testDevices.forEach(device => {

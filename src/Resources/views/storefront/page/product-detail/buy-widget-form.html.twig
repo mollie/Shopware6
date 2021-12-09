@@ -22,10 +22,12 @@
             {% endif %}
         {% endif %}
 
-        {% if (buyableLegacy) or (buyable and productPrice) > 0 %}
-            <div class="form-row mt-3 justify-content-end">
-                {% include '@MolliePayments/mollie/component/apple-pay-direct-button.twig' with {cols: 'col-8'} %}
-            </div>
+        {% if mollie_applepaydirect_enabled == true %}
+            {% if (buyableLegacy) or (buyable and productPrice) > 0 %}
+                <div class="form-row mt-3 justify-content-end">
+                    {% include '@MolliePayments/mollie/component/apple-pay-direct-button.twig' with {cols: 'col-8'} %}
+                </div>
+            {% endif %}
         {% endif %}
     {% endblock %}
 

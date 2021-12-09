@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
 use Kiener\MolliePayments\Struct\Product\ProductAttributes;
 use Kiener\MolliePayments\Struct\Voucher\VoucherType;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Content\Product\Exception\ProductNotFoundException;
@@ -22,13 +23,20 @@ class VoucherService
      */
     private $repoProducts;
 
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
 
     /**
      * @param ProductRepositoryInterface $repoProducts
+     * @param LoggerInterface $logger
      */
-    public function __construct(ProductRepositoryInterface $repoProducts)
+    public function __construct(ProductRepositoryInterface $repoProducts, LoggerInterface $logger)
     {
         $this->repoProducts = $repoProducts;
+        $this->logger = $logger;
     }
 
 
@@ -46,13 +54,22 @@ class VoucherService
             return VoucherType::TYPE_NOTSET;
         }
 
-        # also make sure to avoid invalid product numbers
-        # such as with custom products
-        if (trim($attributes->getProductNumber()) === '*') {
+        try {
+            # we might not always be able to find a product
+            # some plugins (custom products, easycoupon) use not-existing product numbers in the line items.
+            # in that case, we just ignore this, and return voucher type NOT_SET (in the exception)
+            $currentProduct = $this->getProductByNumber($attributes->getProductNumber(), $context);
+
+        } catch (ProductNumberNotFoundException $ex) {
+
+            $this->logger->notice(
+                'VoucherService could not find product: ' . $attributes->getProductNumber() . '. This might be a custom product, or voucher. If so, you can just ignore this message! If not, something is going wrong in here!'
+            );
+
             return VoucherType::TYPE_NOTSET;
         }
 
-        $currentProduct = $this->getProductByNumber($attributes->getProductNumber(), $context);
+
         $currentAttributes = new ProductAttributes($currentProduct);
 
         $voucherType = $currentAttributes->getVoucherType();

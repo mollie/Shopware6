@@ -25,37 +25,80 @@ describe('Apple Pay Direct - Functional', () => {
 
 describe('Apple Pay Direct - UI Tests', () => {
 
-    before(function () {
-        devices.setDevice(devices.getFirstDevice());
-        configAction.setupShop(true, false);
-    })
+    context('Config - Disabled', () => {
 
-    beforeEach(function () {
-        devices.setDevice(devices.getFirstDevice());
-    })
-
-    describe('PDP', () => {
-
-        it('Apple Pay Direct available (PDP)', () => {
-
-            applePayFactory.registerApplePay(true);
-
-            cy.visit('/');
-            topMenu.clickOnClothing();
-            listing.clickOnFirstProduct();
-
-            repoPDP.getApplePayDirectButton().should('not.have.class', 'd-none');
+        before(function () {
+            devices.setDevice(devices.getFirstDevice());
+            configAction.setupShop(true, false, false);
         })
 
-        it('Apple Pay Direct hidden (PDP)', () => {
+        beforeEach(function () {
+            devices.setDevice(devices.getFirstDevice());
+        })
 
-            applePayFactory.registerApplePay(false);
+        describe('PDP', () => {
 
-            cy.visit('/');
-            topMenu.clickOnClothing();
-            listing.clickOnFirstProduct();
+            it('Apple Pay Direct not visible if available (PDP)', () => {
 
-            repoPDP.getApplePayDirectButton().should('have.class', 'd-none');
+                applePayFactory.registerApplePay(true);
+
+                cy.visit('/');
+                topMenu.clickOnClothing();
+                listing.clickOnFirstProduct();
+
+                repoPDP.getApplePayDirectButton().should('not.exist');
+            })
+
+            it('Apple Pay Direct not visible if not available (PDP)', () => {
+
+                applePayFactory.registerApplePay(false);
+
+                cy.visit('/');
+                topMenu.clickOnClothing();
+                listing.clickOnFirstProduct();
+
+                repoPDP.getApplePayDirectButton().should('not.exist');
+            })
+
+        })
+
+    })
+
+    context('Config - Enabled', () => {
+
+        before(function () {
+            devices.setDevice(devices.getFirstDevice());
+            configAction.setupShop(true, false, true);
+        })
+
+        beforeEach(function () {
+            devices.setDevice(devices.getFirstDevice());
+        })
+
+        describe('PDP', () => {
+
+            it('Apple Pay Direct visible if available (PDP)', () => {
+
+                applePayFactory.registerApplePay(true);
+
+                cy.visit('/');
+                topMenu.clickOnClothing();
+                listing.clickOnFirstProduct();
+
+                repoPDP.getApplePayDirectButton().should('not.have.class', 'd-none');
+            })
+
+            it('Apple Pay Direct hidden if not available (PDP)', () => {
+
+                applePayFactory.registerApplePay(false);
+
+                cy.visit('/');
+                topMenu.clickOnClothing();
+                listing.clickOnFirstProduct();
+
+                repoPDP.getApplePayDirectButton().should('have.class', 'd-none');
+            })
+
         })
 
     })

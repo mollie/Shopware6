@@ -12,12 +12,13 @@ use Kiener\MolliePayments\Service\Cart\CartBackupService;
 use Kiener\MolliePayments\Service\CartService;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\DomainExtractor;
-use Kiener\MolliePayments\Service\LoggerService;
+use Kiener\MolliePayments\Service\EventLogger;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\ShopService;
 use Kiener\MolliePayments\Traits\Storefront\RedirectTrait;
 use Mollie\Api\Exceptions\ApiException;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
@@ -27,6 +28,7 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\Log\LoggingService;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -126,10 +128,9 @@ class ApplePayDirectController extends StorefrontController
     private $flashBag;
 
     /**
-     * @var LoggerService
+     * @var LoggerInterface
      */
     private $logger;
-
 
     /**
      * @param ApplePayDirect $applePay
@@ -143,13 +144,12 @@ class ApplePayDirectController extends StorefrontController
      * @param SettingsService $settingsService
      * @param MolliePaymentDoPay $molliePaymentDoPay
      * @param MollieApiFactory $mollieApiFactory
-     * @param LoggerService $logger
      * @param CartBackupService $cartBackup
      * @param OrderAddressRepository $repoOrderAdresses
      * @param $compatibilityGateway
      * @param FlashBag $sessionFlashBag
      */
-    public function __construct(ApplePayDirect $applePay, CartService $cartService, CustomerService $customerService, ShopService $shopService, OrderService $orderService, ApplePayPayment $paymentHandler, EntityRepositoryInterface $paymentMethodRepository, RouterInterface $router, SettingsService $settingsService, MolliePaymentDoPay $molliePaymentDoPay, MollieApiFactory $mollieApiFactory, LoggerService $logger, CartBackupService $cartBackup, OrderAddressRepository $repoOrderAdresses, CompatibilityGatewayInterface $compatibilityGateway, FlashBag $sessionFlashBag)
+    public function __construct(ApplePayDirect $applePay, CartService $cartService, CustomerService $customerService, ShopService $shopService, OrderService $orderService, ApplePayPayment $paymentHandler, EntityRepositoryInterface $paymentMethodRepository, RouterInterface $router, SettingsService $settingsService, MolliePaymentDoPay $molliePaymentDoPay, MollieApiFactory $mollieApiFactory, LoggerInterface $logger, CartBackupService $cartBackup, OrderAddressRepository $repoOrderAdresses, CompatibilityGatewayInterface $compatibilityGateway, FlashBag $sessionFlashBag)
     {
         $this->applePay = $applePay;
         $this->cartService = $cartService;
@@ -197,7 +197,7 @@ class ApplePayDirectController extends StorefrontController
 
         } catch (\Throwable $ex) {
 
-            $this->logger->addEntry('Apple Pay Direct ID: ' . $ex->getMessage(), $context->getContext());
+            $this->logger->error('Apple Pay Direct ID: ' . $ex->getMessage());
 
             return new JsonResponse([
                 'id' => 'not-found',
@@ -242,7 +242,7 @@ class ApplePayDirectController extends StorefrontController
 
         } catch (\Throwable $ex) {
 
-            $this->logger->addEntry('Apple Pay Direct available: ' . $ex->getMessage(), $context->getContext());
+            $this->logger->error('Apple Pay Direct available: ' . $ex->getMessage());
 
             return new JsonResponse([
                 'available' => false
@@ -295,7 +295,7 @@ class ApplePayDirectController extends StorefrontController
 
         } catch (\Throwable $ex) {
 
-            $this->logger->addEntry('Apple Pay Direct error when adding product: ' . $ex->getMessage(), $context->getContext());
+            $this->logger->error('Apple Pay Direct error when adding product: ' . $ex->getMessage());
 
             return new JsonResponse(['success' => false,], 500);
         }
@@ -337,7 +337,7 @@ class ApplePayDirectController extends StorefrontController
 
         } catch (\Throwable $ex) {
 
-            $this->logger->addEntry('Apple Pay Direct error when creating payment session: ' . $ex->getMessage(), $context->getContext());
+            $this->logger->error('Apple Pay Direct error when creating payment session: ' . $ex->getMessage());
 
             return new JsonResponse(['success' => false,], 500);
         }
@@ -386,7 +386,7 @@ class ApplePayDirectController extends StorefrontController
 
         } catch (\Throwable $ex) {
 
-            $this->logger->addEntry('Apple Pay Direct error when loading shipping methods: ' . $ex->getMessage(), $context->getContext());
+            $this->logger->error('Apple Pay Direct error when loading shipping methods: ' . $ex->getMessage());
 
             return new JsonResponse(['success' => false,], 500);
         }
@@ -423,7 +423,7 @@ class ApplePayDirectController extends StorefrontController
 
         } catch (\Throwable $ex) {
 
-            $this->logger->addEntry('Apple Pay Direct error when setting shipping method: ' . $ex->getMessage(), $context->getContext());
+            $this->logger->error('Apple Pay Direct error when setting shipping method: ' . $ex->getMessage());
 
             return new JsonResponse(['success' => false,], 500);
         }
@@ -500,7 +500,7 @@ class ApplePayDirectController extends StorefrontController
 
         } catch (\Throwable $ex) {
 
-            $this->logger->addEntry('Apple Pay Direct error when starting payment: ' . $ex->getMessage(), $context->getContext());
+            $this->logger->error('Apple Pay Direct error when starting payment: ' . $ex->getMessage());
 
             # if we have an error here, we have to redirect to the confirm page
             $returnUrl = $this->getCheckoutConfirmPage($this->router);
@@ -559,7 +559,7 @@ class ApplePayDirectController extends StorefrontController
 
         } catch (Throwable $ex) {
 
-            $this->logger->addEntry('Apple Pay Direct error when finishing payment: ' . $ex->getMessage(), $context->getContext());
+            $this->logger->error('Apple Pay Direct error when finishing payment: ' . $ex->getMessage());
 
             # if we have an error here, we have to redirect to the confirm page
             $returnUrl = $this->getCheckoutConfirmPage($this->router);
@@ -621,7 +621,7 @@ class ApplePayDirectController extends StorefrontController
 
         } catch (Throwable $ex) {
 
-            $this->logger->addEntry('Apple Pay Direct error when finishing Mollie payment: ' . $ex->getMessage(), $context->getContext());
+            $this->logger->error('Apple Pay Direct error when finishing Mollie payment: ' . $ex->getMessage());
 
             # we already have a valid Order ID.
             # so we just need to make sure to edit that order
@@ -655,7 +655,7 @@ class ApplePayDirectController extends StorefrontController
 
         } catch (\Throwable $ex) {
 
-            $this->logger->addEntry('Apple Pay Direct restoring cart error: ' . $ex->getMessage(), $context->getContext());
+            $this->logger->error('Apple Pay Direct restoring cart error: ' . $ex->getMessage());
 
             return new JsonResponse(['success' => false,], 500);
         }

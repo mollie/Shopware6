@@ -3,8 +3,8 @@
 namespace Kiener\MolliePayments\Storefront\Controller;
 
 use Kiener\MolliePayments\Facade\Notifications\NotificationFacade;
-use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\SettingsService;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
@@ -25,7 +25,7 @@ class WebhookController extends StorefrontController
     private $notificationFacade;
 
     /**
-     * @var LoggerService
+     * @var LoggerInterface
      */
     private $logger;
 
@@ -33,9 +33,9 @@ class WebhookController extends StorefrontController
     /**
      * @param SettingsService $settingsService
      * @param NotificationFacade $notificationFacade
-     * @param LoggerService $logger
+     * @param LoggerInterface $logger
      */
-    public function __construct(SettingsService $settingsService, NotificationFacade $notificationFacade, LoggerService $logger)
+    public function __construct(SettingsService $settingsService, NotificationFacade $notificationFacade, LoggerInterface $logger)
     {
         $this->settingsService = $settingsService;
         $this->logger = $logger;
@@ -58,31 +58,16 @@ class WebhookController extends StorefrontController
 
             $settings = $this->settingsService->getSettings($context->getSalesChannel()->getId());
 
-            if ($settings->isDebugMode()) {
-
-                $this->logger->addEntry(
-                    sprintf('Webhook for transaction %s is triggered.', $transactionId),
-                    $context->getContext(),
-                    null,
-                    [
-                        'transactionId' => $transactionId,
-                    ]
-                );
-            }
-
-
             $this->notificationFacade->onNotify($transactionId, $settings, $context);
 
             return new JsonResponse(['success' => true]);
 
         } catch (\Throwable $ex) {
 
-            $this->logger->addEntry(
-                $ex->getMessage(),
-                $context->getContext(),
-                null,
+            $this->logger->error(
+                'Error in Mollie Webhook for Transaction ' . $transactionId,
                 [
-                    'function' => 'webhook',
+                    'error' => $ex->getMessage()
                 ]
             );
 

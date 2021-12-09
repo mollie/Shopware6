@@ -5,10 +5,11 @@ namespace MolliePayments\Tests\Service\MollieApi;
 use Kiener\MolliePayments\Exception\OrderCurrencyNotFoundException;
 use Kiener\MolliePayments\Exception\OrderCustomerNotFoundException;
 use Kiener\MolliePayments\Service\CustomerService;
-use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -23,7 +24,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 class OrderDataExtractorTest extends TestCase
 {
 
-    /** @var LoggerService|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var LoggerInterface */
     private $loggerService;
 
     /** @var CustomerService|\PHPUnit\Framework\MockObject\MockObject */
@@ -40,7 +41,7 @@ class OrderDataExtractorTest extends TestCase
 
     public function setUp(): void
     {
-        $this->loggerService = $this->getMockBuilder(LoggerService::class)->disableOriginalConstructor()->getMock();
+        $this->loggerService = new NullLogger();
         $this->customerService = $this->getMockBuilder(CustomerService::class)->disableOriginalConstructor()->getMock();
         $this->extractor = new OrderDataExtractor($this->loggerService, $this->customerService);
         $this->context = $this->getMockBuilder(Context::class)->disableOriginalConstructor()->getMock();
@@ -58,13 +59,7 @@ class OrderDataExtractorTest extends TestCase
         $order = new OrderEntity();
         $order->setId($orderId);
         $this->expectException(OrderCustomerNotFoundException::class);
-        $this->loggerService->expects($this->once())->method('addEntry')->with(
-            sprintf('Could not fetch customer from order with id %s', $order->getId()),
-            $this->context,
-            null,
-            [],
-            Logger::CRITICAL
-        );
+
         $this->extractor->extractCustomer($order, $this->salesChannelContext);
     }
 
@@ -84,13 +79,6 @@ class OrderDataExtractorTest extends TestCase
         $order->setOrderCustomer($orderCustomerEntity);
 
         $this->expectException(OrderCustomerNotFoundException::class);
-        $this->loggerService->expects($this->once())->method('addEntry')->with(
-            sprintf('Could not find customer with id %s in database', $order->getId()),
-            $this->context,
-            null,
-            [],
-            Logger::CRITICAL
-        );
 
         $this->customerService->expects($this->once())->method('getCustomer')->with($customerId, $this->context);
         $this->extractor->extractCustomer($order, $this->salesChannelContext);
@@ -135,13 +123,6 @@ class OrderDataExtractorTest extends TestCase
         $order->setId($orderId);
 
         $this->expectException(OrderCurrencyNotFoundException::class);
-        $this->loggerService->expects($this->once())->method('addEntry')->with(
-            sprintf('Could not fetch currency from order with id %s', $orderId),
-            $this->context,
-            null,
-            [],
-            Logger::CRITICAL
-        );
 
         $this->extractor->extractCurrency($order, $this->salesChannelContext);
     }

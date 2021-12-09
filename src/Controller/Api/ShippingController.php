@@ -15,6 +15,7 @@ use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Shipment;
 use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
@@ -77,27 +78,20 @@ class ShippingController extends AbstractController
     private $settingsService;
 
     /**
-     * @var LoggerService
+     * @var LoggerInterface
      */
     private $logger;
 
+
     /**
-     * Creates a new instance of the onboarding controller.
-     *
      * @param MollieApiFactory $apiFactory
      * @param EntityRepositoryInterface $orderLineItemRepository
      * @param OrderService $orderService
      * @param SettingsService $settingsService
+     * @param MollieShipment $shipmentFacade
+     * @param LoggerInterface $logger
      */
-    public function __construct(
-        MollieApiFactory $apiFactory,
-        EntityRepositoryInterface $orderLineItemRepository,
-        OrderService $orderService,
-        SettingsService $settingsService,
-
-        MollieShipment $shipmentFacade,
-        LoggerService $logger
-    )
+    public function __construct(MollieApiFactory $apiFactory, EntityRepositoryInterface $orderLineItemRepository, OrderService $orderService, SettingsService $settingsService, MollieShipment $shipmentFacade, LoggerInterface $logger)
     {
         $this->apiFactory = $apiFactory;
         $this->orderLineItemRepository = $orderLineItemRepository;
@@ -209,12 +203,9 @@ class ShippingController extends AbstractController
 
     private function exceptionToJson(\Exception $e, Context $context, array $additionalData = []): JsonResponse
     {
-        $this->logger->addEntry(
+        $this->logger->error(
             $e->getMessage(),
-            $context,
-            $e,
-            $additionalData,
-            Logger::ERROR
+            $additionalData
         );
 
         return $this->json([

@@ -15,10 +15,10 @@
     "components": {
       "creditCard": {
         "headLine": "Kreditkarteninformationen",
-        "cardHolderLabel": "Name des Kreditkarteninhabers",
+        "cardHolderLabel": "Name des Karteninhabers",
         "cardNumberLabel": "Kreditkartennummer",
-        "cardExpiryDateLabel": "Ablaufdatum",
-        "cardVerificationCodeLabel": "CVC",
+        "cardExpiryDateLabel": "MM/JJ",
+        "cardVerificationCodeLabel": "CVV",
         "creditCardTagLine": "Zahlung gesichert und zur Verfügung gestellt von"
       }
     },

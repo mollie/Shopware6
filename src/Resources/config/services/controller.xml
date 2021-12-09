@@ -39,7 +39,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
 
             <argument type="service" id="Kiener\MolliePayments\Facade\MollieShipment"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
+            <argument type="service" id="mollie_payments.logger"/>
 
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
@@ -59,7 +59,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
             <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
+            <argument type="service" id="mollie_payments.logger"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Cart\CartBackupService"/>
             <argument type="service" id="Kiener\MolliePayments\Repository\Order\OrderAddressRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway"/>

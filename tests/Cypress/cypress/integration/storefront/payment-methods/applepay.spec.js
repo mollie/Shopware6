@@ -29,7 +29,7 @@ context("Apple Pay", () => {
 
     before(function () {
         devices.setDevice(device);
-        configAction.setupShop(true, false);
+        configAction.setupShop(true, false, false);
     })
 
     beforeEach(() => {

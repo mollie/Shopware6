@@ -3,7 +3,6 @@
 namespace Kiener\MolliePayments\Storefront\Controller;
 
 use Exception;
-use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway;
 use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGatewayInterface;
 use Kiener\MolliePayments\Event\PaymentPageFailEvent;
 use Kiener\MolliePayments\Event\PaymentPageRedirectEvent;
@@ -22,7 +21,7 @@ use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Order;
-use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -59,7 +58,7 @@ class PaymentController extends StorefrontController
     /** @var TransactionService */
     private $transactionService;
 
-    /** @var LoggerService */
+    /** @var LoggerInterface */
     private $logger;
 
     /** @var TransactionTransitionServiceInterface */
@@ -77,11 +76,11 @@ class PaymentController extends StorefrontController
      * @param OrderStateService $orderStateService
      * @param SettingsService $settingsService
      * @param TransactionService $transactionService
-     * @param LoggerService $logger
+     * @param LoggerInterface $logger
      * @param TransactionTransitionServiceInterface $transactionTransitionService
      * @param MollieOrderPaymentFlow $molliePaymentFlow
      */
-    public function __construct(RouterInterface $router, CompatibilityGatewayInterface $compatibilityGateway, MollieApiFactory $apiFactory, BusinessEventDispatcher $eventDispatcher, OrderStateService $orderStateService, SettingsService $settingsService, TransactionService $transactionService, LoggerService $logger, TransactionTransitionServiceInterface $transactionTransitionService, MollieOrderPaymentFlow $molliePaymentFlow)
+    public function __construct(RouterInterface $router, CompatibilityGatewayInterface $compatibilityGateway, MollieApiFactory $apiFactory, BusinessEventDispatcher $eventDispatcher, OrderStateService $orderStateService, SettingsService $settingsService, TransactionService $transactionService, LoggerInterface $logger, TransactionTransitionServiceInterface $transactionTransitionService, MollieOrderPaymentFlow $molliePaymentFlow)
     {
         $this->router = $router;
         $this->compatibilityGateway = $compatibilityGateway;
@@ -111,18 +110,6 @@ class PaymentController extends StorefrontController
         /** @var MollieSettingStruct $settings */
         $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
 
-        // Add a message to the log that the webhook has been triggered.
-        if ($settings->isDebugMode()) {
-            $this->logger->addDebugEntry(
-                sprintf('Payment return for transaction %s is triggered.', $transactionId),
-                $salesChannelContext->getSalesChannel()->getId(),
-                $salesChannelContext->getContext(),
-                [
-                    'transactionId' => $transactionId,
-                ]
-            );
-        }
-
         /**
          * Get the transaction from the order transaction repository. With the
          * transaction we can fetch the order from the database.
@@ -134,12 +121,9 @@ class PaymentController extends StorefrontController
         );
 
         if (!$transaction instanceof OrderTransactionEntity) {
-            $this->logger->addEntry(
-                sprintf('Transaction with id %s could not be read from database', $transactionId),
-                $salesChannelContext->getContext(),
-                null,
-                null,
-                Logger::CRITICAL
+
+            $this->logger->critical(
+                sprintf('Transaction with id %s could not be read from database', $transactionId)
             );
 
             throw new CouldNotFetchTransactionException($transactionId);
@@ -149,16 +133,22 @@ class PaymentController extends StorefrontController
 
         // TODO: Refactor to use Service/OrderService::getOrder if $order does not exist.
         if (!$order instanceof OrderEntity) {
-            $this->logger->addEntry(
-                sprintf('Could not fetch order from transaction with id %s', $transactionId),
-                $salesChannelContext->getContext(),
-                null,
-                null,
-                Logger::CRITICAL
+
+            $this->logger->critical(
+                sprintf('Could not fetch order from transaction with id %s', $transactionId)
             );
 
             throw new MissingOrderInTransactionException($transactionId);
         }
+
+        $orderAttributes = new MollieOrderCustomFieldsStruct($order->getCustomFields());
+
+        $this->logger->debug(
+            'Customer is returning to Shopware for order: ' . $order->getOrderNumber() . ' and Mollie ID: ' . $orderAttributes->getMollieOrderId(),
+            [
+            ]
+        );
+
 
         // TODO: Possibly refactor to use Service/OrderService::getMollieOrderId
         $customFieldArray = $order->getCustomFields() ?? [];
@@ -168,12 +158,9 @@ class PaymentController extends StorefrontController
         $mollieOrderId = $customFields->getMollieOrderId();
 
         if (empty($mollieOrderId)) {
-            $this->logger->addEntry(
-                sprintf('Could not fetch mollie order id from order with number %s', $order->getOrderNumber()),
-                $salesChannelContext->getContext(),
-                null,
-                null,
-                Logger::CRITICAL
+
+            $this->logger->critical(
+                sprintf('Could not fetch mollie order id from order with number %s', $order->getOrderNumber())
             );
 
             throw new MissingMollieOrderIdException($order->getOrderNumber());
@@ -190,12 +177,9 @@ class PaymentController extends StorefrontController
             ]);
 
         } catch (ApiException $e) {
-            $this->logger->addEntry(
-                sprintf('Could not fetch order at mollie with id %s', $mollieOrderId),
-                $salesChannelContext->getContext(),
-                null,
-                null,
-                Logger::CRITICAL
+
+            $this->logger->critical(
+                sprintf('Could not fetch order at mollie with id %s', $mollieOrderId)
             );
 
             throw new MollieOrderCouldNotBeFetchedException($mollieOrderId, [], $e);
@@ -232,6 +216,15 @@ class PaymentController extends StorefrontController
 
     private function returnFailedRedirect(SalesChannelContext $salesChannelContext, string $redirectUrl, OrderEntity $order, Order $mollieOrder, string $transactionId): Response
     {
+        $orderAttributes = new MollieOrderCustomFieldsStruct($order->getCustomFields());
+
+        $this->logger->info(
+            'Payment failed with Mollie failure mode for order ' . $order->getOrderNumber() . ' and Mollie ID: ' . $orderAttributes->getMollieOrderId(),
+            [
+                'saleschannel' => $salesChannelContext->getSalesChannel()->getName(),
+            ]
+        );
+
         $paymentPageFailEvent = new PaymentPageFailEvent(
             $salesChannelContext->getContext(),
             $order,
@@ -302,6 +295,15 @@ class PaymentController extends StorefrontController
         if (!isset($order)) {
             throw new OrderNotFoundException($transaction->getOrderId());
         }
+
+        $orderAttributes = new MollieOrderCustomFieldsStruct($order->getCustomFields());
+
+        $this->logger->info(
+            'Retry failed payment with Mollie failure mode for order ' . $order->getOrderNumber() . ' and Mollie ID: ' . $orderAttributes->getMollieOrderId(),
+            [
+                'saleschannel' => $context->getSalesChannel()->getName(),
+            ]
+        );
 
         // Reopen the order
         $this->orderStateService->setOrderState(

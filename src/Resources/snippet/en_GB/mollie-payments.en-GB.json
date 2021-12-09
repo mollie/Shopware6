@@ -15,10 +15,10 @@
     "components": {
       "creditCard": {
         "headLine": "Enter your card information",
-        "cardHolderLabel": "Card holder name",
-        "cardNumberLabel": "Credit card number",
-        "cardExpiryDateLabel": "Expiration date",
-        "cardVerificationCodeLabel": "CVC",
+        "cardHolderLabel": "Name on card",
+        "cardNumberLabel": "Card number",
+        "cardExpiryDateLabel": "Expiry date",
+        "cardVerificationCodeLabel": "CVC/CVV",
         "creditCardTagLine": "Payment secured and powered by"
       }
     },

@@ -3,13 +3,14 @@
 namespace MolliePayments\Tests\Service\Order;
 
 use Exception;
-use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\Order\OrderStateService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use MolliePayments\Tests\Fakes\FakeEntityRepository;
 use MolliePayments\Tests\Fakes\FakeOrderTransitionService;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\OrderStates;
 use Shopware\Core\Framework\Context;
@@ -22,7 +23,7 @@ class OrderStateServiceTest extends TestCase
     /** @var FakeEntityRepository */
     private $loggerRepository;
 
-    /** @var LoggerService */
+    /** @var LoggerInterface */
     private $loggerService;
 
     /** @var FakeOrderTransitionService */
@@ -38,7 +39,7 @@ class OrderStateServiceTest extends TestCase
     {
         $this->settingsService = $this->getMockBuilder(SettingsService::class)->disableOriginalConstructor()->getMock();
         $this->loggerRepository = new FakeEntityRepository(new LogEntryDefinition());
-        $this->loggerService = new LoggerService($this->loggerRepository, $this->settingsService);
+        $this->loggerService = new NullLogger();
         $this->orderTransitionService = new FakeOrderTransitionService();
         $this->orderStateHelper = new OrderStateService($this->loggerService, $this->orderTransitionService);
     }
@@ -134,12 +135,7 @@ class OrderStateServiceTest extends TestCase
         $exception = new Exception();
         $this->orderTransitionService->exception = $exception;
 
-        $event = $this->createMock(EntityWrittenContainerEvent::class);
-        $this->loggerRepository->entityWrittenContainerEvents = [$event];
-
         $this->assertFalse($this->orderStateHelper->setOrderState($order, OrderStates::STATE_OPEN, $context));
-
-        $this->assertEquals(1, count($this->loggerRepository->data));
     }
 
     public function provideOrderState(): array

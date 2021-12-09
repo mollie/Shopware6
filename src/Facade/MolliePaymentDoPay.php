@@ -19,6 +19,7 @@ use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
 use Mollie\Api\Resources\Order as MollieOrder;
 use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
@@ -58,8 +59,9 @@ class MolliePaymentDoPay
      * @var UpdateOrderLineItems
      */
     private $updateOrderLineItems;
+
     /**
-     * @var LoggerService
+     * @var LoggerInterface
      */
     private $logger;
 
@@ -73,7 +75,7 @@ class MolliePaymentDoPay
      * @param SettingsService $settingsService
      * @param UpdateOrderCustomFields $updateOrderCustomFields
      * @param UpdateOrderLineItems $updateOrderLineItems
-     * @param LoggerService $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         OrderDataExtractor      $extractor,
@@ -84,7 +86,7 @@ class MolliePaymentDoPay
         SettingsService         $settingsService,
         UpdateOrderCustomFields $updateOrderCustomFields,
         UpdateOrderLineItems    $updateOrderLineItems,
-        LoggerService           $logger
+        LoggerInterface         $logger
     )
     {
         $this->extractor = $extractor;
@@ -114,12 +116,7 @@ class MolliePaymentDoPay
      * @param PaymentHandler $paymentHandler
      * @return string
      */
-    public function preparePayProcessAtMollie(
-        string                        $paymentMethod,
-        AsyncPaymentTransactionStruct $transactionStruct,
-        SalesChannelContext           $salesChannelContext,
-        PaymentHandler                $paymentHandler
-    ): string
+    public function preparePayProcessAtMollie(string $paymentMethod, AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext, PaymentHandler $paymentHandler): string
     {
         // get order with all needed associations
         $order = $this->orderService->getOrder($transactionStruct->getOrder()->getId(), $salesChannelContext->getContext());
@@ -135,10 +132,12 @@ class MolliePaymentDoPay
 
         // do another payment if mollie order could be found
         if (!empty($mollieOrderId)) {
-            $this->logger->addDebugEntry(
+
+            $this->logger->debug(
                 sprintf('Found an existing mollie order with id %s.', $mollieOrderId),
-                $salesChannelContext->getSalesChannel()->getId(),
-                $salesChannelContext->getContext()
+                [
+                    'saleschannel' => $salesChannelContext->getSalesChannel()->getName()
+                ]
             );
 
             $payment = $this->orderApiService->createOrReusePayment($mollieOrderId, $paymentMethod, $salesChannelContext);
@@ -167,17 +166,21 @@ class MolliePaymentDoPay
         }
 
         try {
+
             $this->createCustomerAtMollie($order, $salesChannelContext);
+
         } catch (CouldNotCreateMollieCustomerException | CustomerCouldNotBeFoundException $e) {
-            $this->logger->addEntry(
+
+            # TODO do we really need to catch this? shouldnt it fail fast?
+
+            $this->logger->error(
                 $e->getMessage(),
-                $salesChannelContext->getContext(),
-                $e,
-                ['order' => $order],
-                Logger::ERROR
+                [
+                    'saleschannel' => $salesChannelContext->getSalesChannel()->getName(),
+                    'order' => $order->getOrderNumber(),
+                ]
             );
         }
-
 
         // build new mollie order array
         $mollieOrderArray = $this->orderBuilder->build(
@@ -187,13 +190,6 @@ class MolliePaymentDoPay
             $transactionStruct->getReturnUrl(),
             $salesChannelContext,
             $paymentHandler
-        );
-
-        $this->logger->addDebugEntry(
-            'Created order array for mollie',
-            $salesChannelContext->getSalesChannel()->getId(),
-            $salesChannelContext->getContext(),
-            $mollieOrderArray
         );
 
         // create new order at mollie
@@ -232,4 +228,5 @@ class MolliePaymentDoPay
             );
         }
     }
+
 }
