@@ -63,6 +63,10 @@ class OrderStatusConverter
             return MolliePaymentStatus::MOLLIE_PAYMENT_UNKNOWN;
         }
 
+        if($payment->amountChargedBack && $payment->amountChargedBack->value > 0) {
+            return MolliePaymentStatus::MOLLIE_PAYMENT_CHARGEBACK;
+        }
+
         $status = MolliePaymentStatus::MOLLIE_PAYMENT_UNKNOWN;
 
         if ($payment->isPaid()) {
@@ -81,9 +85,6 @@ class OrderStatusConverter
             $status = MolliePaymentStatus::MOLLIE_PAYMENT_EXPIRED;
         }
 
-        if($payment->amountChargedBack && $payment->amountChargedBack->value > 0) {
-            $status = MolliePaymentStatus::MOLLIE_PAYMENT_CHARGEBACK;
-        }
 
         return $status;
     }
