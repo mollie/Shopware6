@@ -89,6 +89,7 @@ class OrderStatusUpdater
                 $this->transactionTransitionService->authorizeTransaction($transaction, $context);
 
                 break;
+            case MolliePaymentStatus::MOLLIE_PAYMENT_CHARGEBACK:
             case MolliePaymentStatus::MOLLIE_PAYMENT_PENDING:
 
                 break;
