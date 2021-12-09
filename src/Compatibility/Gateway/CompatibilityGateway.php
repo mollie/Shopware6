@@ -90,7 +90,7 @@ class CompatibilityGateway implements CompatibilityGatewayInterface
             return 'chargeback';
         }
 
-        // Chargeback state did not exist before 6.2.3, so set to refunded instead.
+        // Chargeback state did not exist before 6.2.3, so set to in progress instead.
         return OrderTransactionStates::STATE_IN_PROGRESS;
     }
 
@@ -100,7 +100,7 @@ class CompatibilityGateway implements CompatibilityGatewayInterface
             return StateMachineTransitionActions::ACTION_CHARGEBACK;
         }
 
-        // Chargeback action did not exist before 6.2.3, so do a refund instead.
+        // Chargeback action did not exist before 6.2.3, so set to in progress instead.
         return StateMachineTransitionActions::ACTION_DO_PAY;
     }
 
