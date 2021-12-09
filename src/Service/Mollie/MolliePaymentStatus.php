@@ -26,6 +26,7 @@ class MolliePaymentStatus
      */
     const MOLLIE_PAYMENT_REFUNDED = 'refunded';
     const MOLLIE_PAYMENT_PARTIALLY_REFUNDED = 'partially_refunded';
+    const MOLLIE_PAYMENT_CHARGEBACK = 'chargeback';
 
 
     /**
