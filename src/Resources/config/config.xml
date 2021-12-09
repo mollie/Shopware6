@@ -251,7 +251,7 @@
         <input-field type="single-select">
             <name>orderStateWithAChargebackTransaction</name>
             <label>Order state with a charged back transaction</label>
-            <label lang="de-DE">Bestellstatus bei einer wiederhergestellten Transaktion</label>
+            <label lang="de-DE">Bestellstatus bei einer zurückgebuchten Transaktion</label>
             <label lang="nl-NL">Bestelstatus bij een teruggevorderde transactie</label>
             <options>
                 <option>
