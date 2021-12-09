@@ -13,11 +13,13 @@ help:
 # ------------------------------------------------------------------------------------------------------------
 
 install: ## Installs all production dependencies
+	@composer validate
 	@composer install --no-dev
 	cd src/Resources/app/administration && npm install --production
 	cd src/Resources/app/storefront && npm install --production
 
 dev: ## Installs all dev dependencies
+	@composer validate
 	@composer install
 	cd src/Resources/app/administration && npm install
 	cd src/Resources/app/storefront && npm install

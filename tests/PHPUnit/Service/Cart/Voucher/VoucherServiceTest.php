@@ -9,9 +9,9 @@ use MolliePayments\Tests\Fakes\Repositories\FakeProductRepository;
 use MolliePayments\Tests\Traits\FakeTrait;
 use MolliePayments\Tests\Traits\MockTrait;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Content\Product\Exception\ProductNotFoundException;
-use Shopware\Core\Content\Product\Exception\ProductNumberNotFoundException;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
@@ -45,27 +45,27 @@ class VoucherServiceTest extends TestCase
         # has no valid product number...
         $item = $this->buildProductLineItem('');
 
-        $vouchers = new VoucherService($fakeRepoProducts);
+        $vouchers = new VoucherService($fakeRepoProducts, new NullLogger());
         $voucherType = $vouchers->getFinalVoucherType($item, $this->salesChannelContext);
 
-        $this->assertEquals('', $voucherType);
+        $this->assertEquals(VoucherType::TYPE_NOTSET, $voucherType);
     }
 
     /**
-     * This test verifies that we do get an exception if the
+     * This test verifies that we do NOT get an exception if the
      * product numbers would be valid, but no product has been found.
      */
-    public function testUnknownProductThrowsException()
+    public function testUnknownProductThrowsNoException()
     {
-        $this->expectException(ProductNumberNotFoundException::class);
-
         # build a repo that would return nothing...just in case ;)
         $fakeRepoProducts = new FakeProductRepository(null, null);
 
         $item = $this->buildProductLineItem('10001');
 
-        $vouchers = new VoucherService($fakeRepoProducts);
-        $vouchers->getFinalVoucherType($item, $this->salesChannelContext);
+        $vouchers = new VoucherService($fakeRepoProducts, new NullLogger());
+        $voucherType = $vouchers->getFinalVoucherType($item, $this->salesChannelContext);
+
+        $this->assertEquals(VoucherType::TYPE_NOTSET, $voucherType);
     }
 
     /**
@@ -87,7 +87,7 @@ class VoucherServiceTest extends TestCase
 
         $item = $this->buildProductLineItem('10001');
 
-        $vouchers = new VoucherService($fakeRepoProducts);
+        $vouchers = new VoucherService($fakeRepoProducts, new NullLogger());
         $voucherType = $vouchers->getFinalVoucherType($item, $this->salesChannelContext);
 
         $this->assertEquals(VoucherType::TYPE_MEAL, $voucherType);
@@ -110,7 +110,7 @@ class VoucherServiceTest extends TestCase
 
         $item = $this->buildProductLineItem('10001');
 
-        $vouchers = new VoucherService($fakeRepoProducts);
+        $vouchers = new VoucherService($fakeRepoProducts, new NullLogger());
         $vouchers->getFinalVoucherType($item, $this->salesChannelContext);
     }
 
@@ -139,7 +139,7 @@ class VoucherServiceTest extends TestCase
 
         $item = $this->buildProductLineItem('10001');
 
-        $vouchers = new VoucherService($fakeRepoProducts);
+        $vouchers = new VoucherService($fakeRepoProducts, new NullLogger());
         $voucherType = $vouchers->getFinalVoucherType($item, $this->salesChannelContext);
 
         $this->assertEquals(VoucherType::TYPE_GIFT, $voucherType);
@@ -159,7 +159,7 @@ class VoucherServiceTest extends TestCase
         # and just to be safe, let's try it with a space ;)
         $item = $this->buildProductLineItem('* ');
 
-        $vouchers = new VoucherService($fakeRepoProducts);
+        $vouchers = new VoucherService($fakeRepoProducts, new NullLogger());
         $voucherType = $vouchers->getFinalVoucherType($item, $this->salesChannelContext);
 
         $this->assertEquals('', $voucherType);

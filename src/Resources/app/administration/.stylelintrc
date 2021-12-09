@@ -8,6 +8,7 @@
     "indentation": 4,
     "color-hex-case": "lower",
     "no-missing-end-of-source-newline": true,
+    "selector-class-pattern" : "",
     "property-no-unknown": [true, {
       "severity": "warning",
       "ignoreProperties": [

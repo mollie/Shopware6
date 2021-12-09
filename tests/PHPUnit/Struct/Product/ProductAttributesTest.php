@@ -1,6 +1,6 @@
 <?php
 
-namespace MolliePayments\Tests\Struct\LineItem;
+namespace MolliePayments\Tests\Struct\Product;
 
 use Kiener\MolliePayments\Struct\Product\ProductAttributes;
 use Kiener\MolliePayments\Struct\Voucher\VoucherType;

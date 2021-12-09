@@ -1,5 +1,14 @@
 export default class OrdersListRepository {
 
+
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getLatestOrderNumber() {
+        return cy.get('.sw-data-grid__row--0 > .sw-data-grid__cell--orderNumber > .sw-data-grid__cell-content > a');
+    }
+
     /**
      *
      * @returns {string}

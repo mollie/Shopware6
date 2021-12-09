@@ -1,0 +1,29 @@
+{% sw_extends '@Storefront/storefront/component/buy-widget/buy-widget-form.html.twig' %}
+
+{% block buy_widget_buy_container %}
+    {{ parent() }}
+    {% block page_product_detail_buy_container_apple_direct %}
+        {# this is for Shopware < 6.4 #}
+        {% set buyableLegacy = (not page.product.isCloseout or (page.product.availableStock >= page.product.minPurchase)) and page.product.childCount <= 0 %}
+        {# this is for Shopware >= 6.4 #}
+        {% set buyable = product.available and product.childCount <= 0 and product.calculatedMaxPurchase > 0 %}
+
+        {% set productPrice = 0 %}
+
+        {% if product.calculatedPrices|length == 1 %}
+            {% set productPrice = product.calculatedPrices.first.unitPrice %}
+        {% else %}
+            {% set productPrice = product.calculatedPrice.unitPrice %}
+            {% if listPrice.percentage > 0 %}
+                {% set productPrice = listPrice.price %}
+            {% endif %}
+        {% endif %}
+
+        {% if (buyableLegacy) or (buyable and productPrice) > 0 %}
+            <div class="form-row mt-3 justify-content-end">
+                {% include '@MolliePayments/mollie/component/apple-pay-direct-button.twig' with {cols: 'col-8'} %}
+            </div>
+        {% endif %}
+    {% endblock %}
+
+{% endblock %}
