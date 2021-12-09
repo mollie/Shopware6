@@ -21,10 +21,6 @@ use Kiener\MolliePayments\Handler\Method\PaySafeCardPayment;
 use Kiener\MolliePayments\Handler\Method\Przelewy24Payment;
 use Kiener\MolliePayments\Handler\Method\SofortPayment;
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
-use Mollie\Api\Exceptions\ApiException;
-use Mollie\Api\MollieApiClient;
-use Mollie\Api\Resources\Method;
-use Mollie\Api\Resources\MethodCollection;
 use Mollie\Api\Resources\Order;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
@@ -35,6 +31,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Plugin\Util\PluginIdProvider;
 
@@ -103,16 +100,16 @@ class PaymentMethodService
     }
 
     /**
+     * @param array $paymentMethods
      * @param Context $context
      */
-    public function addPaymentMethods(Context $context) : void
+    public function addPaymentMethods(array $paymentMethods, Context $context) : void
     {
         // Get the plugin ID
         $pluginId = $this->pluginIdProvider->getPluginIdByBaseClass($this->className, $context);
 
         // Variables
         $paymentData = [];
-        $paymentMethods = $this->getPaymentMethods($context);
 
         foreach ($paymentMethods as $paymentMethod) {
             // Upload icon to the media repository
@@ -135,7 +132,8 @@ class PaymentMethodService
             try {
                 $existingPaymentMethodId = $this->getPaymentMethodId(
                     $paymentMethodData['handlerIdentifier'],
-                    $paymentMethodData['name']
+                    $paymentMethodData['name'],
+                    $context
                 );
             } catch (InconsistentCriteriaIdsException $e) {
                 // On error, we assume the payment method doesn't exist
@@ -156,41 +154,51 @@ class PaymentMethodService
     }
 
     /**
-     * Activate payment methods in Shopware, based on Mollie.
-     *
-     * @param MollieApiClient $apiClient
-     * @param Context         $context
-     *
-     * @throws ApiException
+     * @param array $installableHandlers
+     * @param Context $context
+     * @return array
      */
-    public function activatePaymentMethods(MollieApiClient $apiClient, Context $context): void
+    public function getInstalledPaymentMethodHandlers(array $installableHandlers, Context $context): array
     {
-        /** @var MethodCollection $methods */
-        $methods = $apiClient->methods->allActive();
+        $installedHandlers = [];
+        $paymentCriteria = new Criteria();
+        $paymentCriteria->addFilter(new ContainsFilter('handlerIdentifier', 'MolliePayments'));
 
-        /** @var array $paymentMethods */
-        $paymentMethods = $this->getPaymentMethods();
+        $paymentMethods = $this->paymentRepository->search($paymentCriteria, $context);
 
-        $handlers = [];
-
-        if ($methods->count) {
-            /** @var Method $method */
-            foreach ($methods as $method) {
-                foreach ($paymentMethods as $paymentMethod) {
-                    if ($paymentMethod['name'] === $method->id) {
-                        $handlers[] = [
-                            'class' => $paymentMethod['handler'],
-                            'name' => $paymentMethod['description'],
-                        ];
-                    }
-                }
-            }
+        if (!$paymentMethods->count()) {
+            return $installableHandlers;
         }
 
-        if (!empty($handlers)) {
-            foreach ($handlers as $handler) {
+        /** @var PaymentMethodEntity $paymentMethod */
+        foreach ($paymentMethods->getEntities() as $paymentMethod) {
+            if (!in_array($paymentMethod->getHandlerIdentifier(), $installableHandlers, true)) {
+                continue;
+            }
+
+            $installedHandlers[] = $paymentMethod->getHandlerIdentifier();
+        }
+
+        return $installedHandlers;
+    }
+
+    /**
+     * Activate payment methods in Shopware.
+     *
+     * @param array $paymentMethods
+     * @param array $installedHandlers
+     * @param Context $context
+     */
+    public function activatePaymentMethods(array $paymentMethods, array $installedHandlers, Context $context): void
+    {
+        if (!empty($paymentMethods)) {
+            foreach ($paymentMethods as $paymentMethod) {
+                if (in_array($paymentMethod['handler'], $installedHandlers, true)) {
+                    continue;
+                }
+
                 /** @var string|null $paymentMethodId */
-                $paymentMethodId = $this->getPaymentMethodId($handler['class'], $handler['name']);
+                $paymentMethodId = $this->getPaymentMethodId($paymentMethod['handler'], $paymentMethod['description'], $context);
 
                 if ((string) $paymentMethodId !== '') {
                     $this->activatePaymentMethod($paymentMethodId, true, $context);
@@ -202,16 +210,16 @@ class PaymentMethodService
     /**
      * Activates a payment method in Shopware
      *
-     * @param string       $paymentMethodId
-     * @param bool         $active
-     * @param Context|null $context
+     * @param string $paymentMethodId
+     * @param bool $active
+     * @param Context $context
      *
      * @return EntityWrittenContainerEvent
      */
     public function activatePaymentMethod(
         string $paymentMethodId,
-        bool $active = true,
-        Context $context = null
+        bool $active,
+        Context $context
     ): EntityWrittenContainerEvent
     {
         return $this->paymentRepository->upsert(
@@ -221,7 +229,8 @@ class PaymentMethodService
                     'active' => $active
                 ]
             ],
-            $context ?? Context::createDefaultContext());
+            $context
+        );
     }
 
     /**
@@ -248,14 +257,42 @@ class PaymentMethodService
     }
 
     /**
+     * Get an array of installable payment methods for Mollie.
+     *
+     * @return array
+     */
+    public function getInstallablePaymentMethods() : array
+    {
+        // Variables
+        $paymentMethods = [];
+        $installablePaymentMethods = $this->getPaymentHandlers();
+
+        // Add payment methods to array
+        if ($installablePaymentMethods === null) {
+            return $paymentMethods;
+        }
+
+        foreach ($installablePaymentMethods as $installablePaymentMethod) {
+            $paymentMethods[] = [
+                'name' => constant($installablePaymentMethod . '::PAYMENT_METHOD_NAME'),
+                'description' => constant($installablePaymentMethod . '::PAYMENT_METHOD_DESCRIPTION'),
+                'handler' => $installablePaymentMethod,
+            ];
+        }
+
+        return $paymentMethods;
+    }
+
+    /**
      * Get payment method ID by name.
      *
      * @param $handlerIdentifier
      * @param $name
+     * @param Context $context
      *
      * @return string|null
      */
-    private function getPaymentMethodId($handlerIdentifier, $name) : ?string
+    private function getPaymentMethodId($handlerIdentifier, $name, Context $context) : ?string
     {
         // Fetch ID for update
         $paymentCriteria = new Criteria();
@@ -263,39 +300,13 @@ class PaymentMethodService
         $paymentCriteria->addFilter(new EqualsFilter('name', $name));
 
         // Get payment IDs
-        $paymentIds = $this->paymentRepository->searchIds($paymentCriteria, Context::createDefaultContext());
+        $paymentIds = $this->paymentRepository->searchIds($paymentCriteria, $context);
 
         if ($paymentIds->getTotal() === 0) {
             return null;
         }
 
         return $paymentIds->getIds()[0];
-    }
-
-    /**
-     * Get an array of available payment methods from the Mollie API.
-     *
-     * @param Context|null $context
-     * @return array
-     */
-    private function getPaymentMethods(?Context $context = null) : array
-    {
-        // Variables
-        $paymentMethods = [];
-        $availableMethods = $this->getPaymentHandlers();
-
-        // Add payment methods to array
-        if ($availableMethods !== null) {
-            foreach ($availableMethods as $availableMethod) {
-                $paymentMethods[] = [
-                    'name' => constant($availableMethod . '::PAYMENT_METHOD_NAME'),
-                    'description' => constant($availableMethod . '::PAYMENT_METHOD_DESCRIPTION'),
-                    'handler' => $availableMethod,
-                ];
-            }
-        }
-
-        return $paymentMethods;
     }
 
     /**
