@@ -169,6 +169,7 @@ jobs:
     name: Integration Tests | Shopware ${{ matrix.shopware }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         shopware: [ '6.4.7.0', '6.4.0.0', '6.3.0', '6.2.0', '6.1.0' ]
     steps:
