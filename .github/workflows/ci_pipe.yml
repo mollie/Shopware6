@@ -207,24 +207,36 @@ jobs:
   # ------------------------------------------------------------------------------------------------------------------------
 
   e2e:
-    name: E2E Tests | Shopware ${{ matrix.shopware }}
+    name: E2E Tests | Shopware ${{ matrix.shopware }}, PHP ${{ matrix.php }}
     needs: integration
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        shopware: [ '6.4.7.0', '6.4.6.1', '6.4.5.1', '6.4.4.1', '6.4.4.0', '6.4.3.1', '6.4.3.0', '6.4.2.1', '6.4.1.2', '6.4.0.0', '6.3.5.4', '6.3.5.2' ]
+        include:
+          - shopware: '6.4.7.0'
+            php: '8.0'
+          - shopware: '6.4.6.1'
+            php: '8.0'
+          - shopware: '6.4.5.1'
+            php: '7.4'
+          - shopware: '6.4.4.1'
+            php: '7.4'
+          - shopware: '6.4.3.1'
+            php: '7.4'
+          - shopware: '6.4.2.1'
+            php: '7.4'
+          - shopware: '6.4.1.2'
+            php: '7.4'
+          - shopware: '6.4.0.0'
+            php: '7.4'
+          - shopware: '6.3.5.4'
+            php: '7.2'
+          - shopware: '6.3.5.2'
+            php: '7.2'
     steps:
 
       - name: Clone Code
         uses: actions/checkout@v2
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 7.4
-
-      - name: Install Dependencies
-        run: make install -B
 
       - name: Download Docker
         run: |
@@ -232,7 +244,7 @@ jobs:
 
       - name: Start Docker
         run: |
-          docker run --rm -p 443:443 --name shop -d dockware/dev:${{ matrix.shopware }}
+          docker run --rm -p 443:443 --name shop --env PHP_VERSION=${{ matrix.php }} -d dockware/dev:${{ matrix.shopware }}
           sleep 30
           docker logs shop
           # now change the domain of our shop, mollie doesn't work with localhost
@@ -244,9 +256,10 @@ jobs:
           docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
           docker exec shop bash -c 'sudo chown www-data:www-data /var/www/html/custom/plugins -R'
 
-      - name: Build Artifacts
+      - name: Install and Build Artifacts
         run: |
-          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make build'
+          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make install -B'
+          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make build -B'
 
       - name: Install/Configure Plugin
         run: |
@@ -261,9 +274,7 @@ jobs:
         run: cd tests/Cypress && make install -B
 
       - name: Start Cypress
-        run: cd tests/Cypress && make run shopware=$SW_VERSION url=https://local.mollie.shop
-        env:
-          SW_VERSION: ${{ matrix.shopware }}
+        run: cd tests/Cypress && make run shopware=${{ matrix.shopware }} url=https://local.mollie.shop
 
       - name: Download Logs
         if: ${{ always() }}
