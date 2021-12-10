@@ -247,16 +247,19 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
             return;
         }
 
-        $chargebackAction = $compatibilityGateway->getChargebackOrderTransactionAction();
+        if($chargebackState !== 'chargeback') {
+            $this->processTransaction($transaction, $context);
+            return;
+        }
 
         $entityId = $transaction->getId();
         $availableTransitions = $this->getAvailableTransitions($entityId, $context);
 
-        if (!$this->transitionIsAllowed($chargebackAction, $availableTransitions)) {
+        if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_CHARGEBACK, $availableTransitions)) {
             $this->payTransaction($transaction, $context);
         }
 
-        $this->performTransition($entityId, $chargebackAction, $context);
+        $this->performTransition($entityId, StateMachineTransitionActions::ACTION_CHARGEBACK, $context);
     }
 
     private function isFinalOrTargetStatus(string $currentStatus, array $targetStatus): bool

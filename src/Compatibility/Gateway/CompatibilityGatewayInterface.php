@@ -27,5 +27,4 @@ interface CompatibilityGatewayInterface
 
 
     public function getChargebackOrderTransactionState(): string;
-    public function getChargebackOrderTransactionAction(): string;
 }

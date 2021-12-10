@@ -80,6 +80,11 @@ class CompatibilityGateway implements CompatibilityGatewayInterface
      */
     public function getChargebackOrderTransactionState(): string
     {
+        // In progress state did not exist before 6.2, so set to open instead.
+        if(!$this->versionGTE('6.2')) {
+            return OrderTransactionStates::STATE_OPEN;
+        }
+
         // Chargeback state did not exist before 6.2.3, so set to in progress instead.
         if(!$this->versionGTE('6.2.3')) {
             return OrderTransactionStates::STATE_IN_PROGRESS;
@@ -91,22 +96,6 @@ class CompatibilityGateway implements CompatibilityGatewayInterface
 
         // Chargeback constant did not exist until 6.4.4, but the state exists since 6.2.3,
         // so return it as string instead.
-        return 'chargeback';
-    }
-
-    public function getChargebackOrderTransactionAction(): string
-    {
-        if(!$this->versionGTE('6.2.3')) {
-            // Chargeback action did not exist before 6.2.3, so set to in progress instead.
-            return StateMachineTransitionActions::ACTION_DO_PAY;
-        }
-
-        if(defined('Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions::ACTION_CHARGEBACK')) {
-            return StateMachineTransitionActions::ACTION_CHARGEBACK;
-        }
-
-        // The constant was introduced in 6.2.3, so it should be defined.
-        // This is here in case it somehow is not defined.
         return 'chargeback';
     }
 
