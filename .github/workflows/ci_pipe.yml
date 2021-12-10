@@ -182,14 +182,6 @@ jobs:
       - name: Clone Code
         uses: actions/checkout@v2
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 7.4
-
-      - name: Install PROD Dependencies
-        run: make install -B
-
       - name: Start Docker
         run: |
           docker run --rm --name shop -d dockware/play:${{ matrix.shopware }}
@@ -198,6 +190,11 @@ jobs:
 
       - name: Upload into Docker
         run: docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
+
+      - name: Install and Build Artifacts
+        run: |
+          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make install -B'
+          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make build -B'
 
       - name: Install Plugin
         run: |
