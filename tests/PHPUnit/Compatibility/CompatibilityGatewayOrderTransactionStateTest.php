@@ -34,6 +34,7 @@ class CompatibilityGatewayOrderTransactionStateTest extends TestCase
         return [
             'Chargeback state in Shopware 6.2.3 and higher' => ['6.2.3', 'chargeback'],
             'Chargeback state in Shopware 6.2.2 and lower' => ['6.2.2', 'in_progress'],
+            'Chargeback state in Shopware 6.1.6 and lower' => ['6.1.6', 'open'],
         ];
     }
 }
