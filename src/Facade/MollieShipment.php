@@ -5,7 +5,6 @@ namespace Kiener\MolliePayments\Facade;
 use Kiener\MolliePayments\Exception\OrderLineItemFoundManyException;
 use Kiener\MolliePayments\Exception\OrderLineItemNotFoundException;
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
-use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\Shipment;
@@ -23,7 +22,6 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Uuid\Uuid;
-use Symfony\Bridge\Monolog\Logger;
 
 class MollieShipment
 {
