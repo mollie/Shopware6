@@ -159,17 +159,18 @@ describe('Credit Card Components', () => {
             })
 
             it('Components work on edit order page', () => {
+
                 // We need to test this with Shopware's complete order page.
                 // So we disable the Mollie failure mode for this test only
                 configAction.setupShop(false, true, false);
 
-                setUp();
+                scenarioDummyBasket.execute();
 
-                payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '1228', '1234');
-
-                if (shopware.isVersionLower(6.4)) {
-                    payment.closePaymentsModal();
-                }
+                // we have to use something else than CREDIT CARD
+                // why?! because the way how Shopware behaves in the after-order payment process is, that it
+                // just does NOTHING when no payment method change happens!!! it just shows "payment method updated" :)
+                // but does not process a payment
+                payment.switchPaymentMethod('PayPal');
 
                 shopware.prepareDomainChange();
                 checkout.placeOrderOnConfirm();
@@ -180,21 +181,40 @@ describe('Credit Card Components', () => {
                 cy.url().should('include', '/account/order/edit');
                 cy.contains('Complete payment');
 
-                // If components are not initialized, Cypress can't find the inputs and will error.
+                payment.switchPaymentMethod('Credit card');
+
+
+                if (shopware.isVersionLower(6.4)) {
+                    payment.openPaymentsModal();
+                }
+
+                // there's another bug in Shopware
+                // sometimes the selected payment method is not
+                // visible on top, but in the expand-list below :(
+                payment.showAllPaymentMethods();
+
+
                 payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '1228', '1234');
 
                 if (shopware.isVersionLower(6.4)) {
                     payment.closePaymentsModal();
                 }
 
+                shopware.prepareDomainChange();
                 checkout.placeOrderOnEdit();
 
                 molliePayment.initSandboxCookie();
+
+                // verify that our component card is really
+                // been used by comparing the last 4 digits
+                cy.contains('**** ' + validCardNumber.substr(validCardNumber.length - 4));
+
                 molliePayment.selectPaid();
 
                 cy.url().should('include', '/checkout/finish');
                 cy.contains('Thank you for updating your order');
             })
+
         })
     })
 })
