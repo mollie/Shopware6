@@ -16,11 +16,6 @@
             <argument type="service" id="mollie_payments.logger"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Facade\SetMollieOrderRefunded">
-            <argument type="service" id="Kiener\MolliePayments\Service\TransactionService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\RefundService"/>
-        </service>
-
         <service id="Kiener\MolliePayments\Facade\MolliePaymentDoPay">
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderBuilder"/>
