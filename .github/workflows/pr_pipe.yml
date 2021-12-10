@@ -170,19 +170,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        shopware: [ '6.4.0.0', '6.3.0', '6.2.0', '6.1.0' ]
+        shopware: [ '6.4.7.0', '6.4.0.0', '6.3.0', '6.2.0', '6.1.0' ]
     steps:
 
       - name: Clone Code
         uses: actions/checkout@v2
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 7.4
-
-      - name: Install PROD Dependencies
-        run: make install -B
 
       - name: Start Docker
         run: |
@@ -192,6 +184,11 @@ jobs:
 
       - name: Upload into Docker
         run: docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
+
+      - name: Install and Build Artifacts
+        run: |
+          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make install -B'
+          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make build -B'
 
       - name: Install Plugin
         run: |
