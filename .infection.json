@@ -1,0 +1,18 @@
+{
+  "bootstrap": "./phpunit.autoload.php",
+  "minMsi": 20,
+  "minCoveredMsi": 20,
+  "source": {
+    "directories": [
+      "src"
+    ],
+    "excludes": [
+      "Resources",
+      "Compatibility/Storefront/Route/PaymentMethodRoute/Voucher"
+    ]
+  },
+  "mutators": {
+    "@default": true
+  },
+  "$schema": "vendor/infection/infection/resources/schema.json"
+}
