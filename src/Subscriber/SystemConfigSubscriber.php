@@ -3,7 +3,6 @@
 namespace Kiener\MolliePayments\Subscriber;
 
 use Kiener\MolliePayments\Helper\ProfileHelper;
-use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\MollieApiClient;
@@ -197,7 +196,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface
                         'mode' => $testMode ? 'test' : 'live',
                     ]
                 );
-                
+
                 $this->settingsService->setProfileId(null, $salesChannelId, $testMode);
             }
         }
