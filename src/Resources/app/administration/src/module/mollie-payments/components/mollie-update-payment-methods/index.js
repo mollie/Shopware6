@@ -16,7 +16,7 @@ Component.register('mollie-update-payment-methods', {
 
     data() {
         return {
-            updatePaymentMethodsIsLoading: false
+            updatePaymentMethodsIsLoading: false,
         };
     },
 
@@ -30,7 +30,7 @@ Component.register('mollie-update-payment-methods', {
                 .then((response) => {
                     const messageData = {
                         title: me.$tc('sw-payment.updatePaymentMethods.title'),
-                        message: me.$tc('sw-payment.updatePaymentMethods.succeeded')
+                        message: me.$tc('sw-payment.updatePaymentMethods.succeeded'),
                     };
 
                     if (response.success === true) {
@@ -68,6 +68,6 @@ Component.register('mollie-update-payment-methods', {
             }
 
             button.disabled = false;
-        }
+        },
     },
 });
