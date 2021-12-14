@@ -44,9 +44,6 @@ build: ## Installs the plugin, and builds the artifacts using the Shopware build
 
 # ------------------------------------------------------------------------------------------------------------
 
-phpunit: ## Starts all PHPUnit Tests
-	@XDEBUG_MODE=coverage php vendor/bin/phpunit --configuration=phpunit.xml --coverage-html ../../../public/.reports/mollie/coverage
-
 phpcheck: ## Starts the PHP syntax checks
 	@find . -name '*.php' -not -path "./vendor/*" -not -path "./tests/*" | xargs -n 1 -P4 php -l
 
@@ -59,6 +56,12 @@ csfix: ## Starts the PHP CS Fixer
 stan: ## Starts the PHPStan Analyser
 	@php vendor/bin/phpstan analyse -c ./.phpstan.neon
 	@php vendor/bin/phpstan analyse -c ./.phpstan.lvl8.neon
+
+phpunit: ## Starts all PHPUnit Tests
+	@XDEBUG_MODE=coverage php vendor/bin/phpunit --configuration=phpunit.xml --coverage-html ../../../public/.reports/mollie/coverage
+
+infection: ## Starts all Infection/Mutation tests
+	@XDEBUG_MODE=coverage php vendor/bin/infection --configuration=./.infection.json
 
 insights: ## Starts the PHPInsights Analyser
 	@php vendor/bin/phpinsights analyse --no-interaction
@@ -83,6 +86,7 @@ pr: ## Prepares everything for a Pull Request
 	@make phpmin -B
 	@make stan -B
 	@make phpunit -B
+	@make infection -B
 	@make jest -B
 	@make eslint -B
 	@make stylelint -B

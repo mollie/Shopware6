@@ -5,6 +5,7 @@
          cacheResult="false"
          colors="true"
          executionOrder="random"
+         resolveDependencies="true"
 >
 
     <testsuites>
