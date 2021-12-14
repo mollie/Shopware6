@@ -107,6 +107,7 @@ class MolliePayments extends Plugin
     {
         /** @var PaymentMethodService $paymentMethodService */
         $paymentMethodService = $this->container->get(PaymentMethodService::class);
+
         $paymentMethodService->installAndActivatePaymentMethods($context);
     }
 }
