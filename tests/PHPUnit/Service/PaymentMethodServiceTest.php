@@ -57,8 +57,7 @@ class PaymentMethodServiceTest extends TestCase
             $this->createMock(MediaService::class),
             $this->mediaRepository,
             $this->paymentMethodRepository,
-            $this->createMock(PluginIdProvider::class),
-            MolliePayments::class
+            $this->createMock(PluginIdProvider::class)
         );
     }
 

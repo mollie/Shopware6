@@ -14,9 +14,19 @@ Component.register('mollie-update-payment-methods', {
         Mixin.getByName('notification'),
     ],
 
+    data() {
+        return {
+            updatePaymentMethodsIsLoading: false
+        };
+    },
+
     methods: {
         onUpdatePaymentMethodsButtonClicked() {
             const me = this;
+            const button = this.$refs.updatePaymentMethodsButton;
+
+            button.disabled = true;
+            me.updatePaymentMethodsIsLoading = true;
 
             this.MolliePaymentsPaymentMethodService.updatePaymentMethods()
                 .then((response) => {
@@ -31,6 +41,12 @@ Component.register('mollie-update-payment-methods', {
                         messageData.message = me.$tc('sw-payment.updatePaymentMethods.failed');
                         me.createNotificationError(messageData);
                     }
+
+                    button.disabled = false;
+                    me.updatePaymentMethodsIsLoading = false;
+                }).catch(() => {
+                    button.disabled = false;
+                    me.updatePaymentMethodsIsLoading = false;
                 });
         },
     },

@@ -50,31 +50,25 @@ class PaymentMethodService
     /** @var EntityRepositoryInterface */
     private $mediaRepository;
 
-    /** @var string */
-    private $className;
-
     /**
-     * PaymentMethodHelper constructor.
+     * PaymentMethodService constructor.
      *
      * @param MediaService              $mediaService
      * @param EntityRepositoryInterface $mediaRepository
      * @param EntityRepositoryInterface $paymentRepository
      * @param PluginIdProvider          $pluginIdProvider
-     * @param null                      $className
      */
     public function __construct(
         MediaService $mediaService,
         EntityRepositoryInterface $mediaRepository,
         EntityRepositoryInterface $paymentRepository,
-        PluginIdProvider $pluginIdProvider,
-        $className = null
+        PluginIdProvider $pluginIdProvider
     )
     {
         $this->mediaService = $mediaService;
         $this->mediaRepository = $mediaRepository;
         $this->paymentRepository = $paymentRepository;
         $this->pluginIdProvider = $pluginIdProvider;
-        $this->className = $className ?? MolliePayments::class;
     }
 
     /**
@@ -85,19 +79,6 @@ class PaymentMethodService
     public function getRepository(): EntityRepositoryInterface
     {
         return $this->paymentRepository;
-    }
-
-    /**
-     * Sets the classname.
-     *
-     * @param string $className
-     *
-     * @return PaymentMethodService
-     */
-    public function setClassName(string $className): self
-    {
-        $this->className = $className;
-        return $this;
     }
 
     /**
@@ -116,9 +97,7 @@ class PaymentMethodService
         $installedPaymentMethodHandlers = $this->getInstalledPaymentMethodHandlers($this->getPaymentHandlers(), $context);
 
         // Add payment methods
-        $this
-            ->setClassName(get_class($this))
-            ->addPaymentMethods($installablePaymentMethods, $context);
+        $this->addPaymentMethods($installablePaymentMethods, $context);
 
         // Activate newly installed payment methods
         $this->activatePaymentMethods(
@@ -135,7 +114,7 @@ class PaymentMethodService
     public function addPaymentMethods(array $paymentMethods, Context $context) : void
     {
         // Get the plugin ID
-        $pluginId = $this->pluginIdProvider->getPluginIdByBaseClass($this->className, $context);
+        $pluginId = $this->pluginIdProvider->getPluginIdByBaseClass(MolliePayments::class, $context);
 
         // Variables
         $paymentData = [];
@@ -343,7 +322,7 @@ class PaymentMethodService
      *
      * @return array
      */
-    public function getPaymentHandlers()
+    public function getPaymentHandlers(): array
     {
         return [
             ApplePayPayment::class,

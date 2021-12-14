@@ -12,7 +12,6 @@ class MolliePaymentsPaymentMethodService extends ApiService {
         return this.httpClient
             .get(
                 `_action/${this.getApiBasePath()}/payment-method/update-methods`,
-                JSON.stringify(data),
                 {
                     headers: headers,
                 }

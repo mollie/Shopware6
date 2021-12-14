@@ -28,7 +28,7 @@ class PaymentMethodController extends AbstractController
 
     /**
      * @RouteScope(scopes={"api"})
-     * @Route("/api/mollie/payment-method/update-methods",
+     * @Route("/api/_action/mollie/payment-method/update-methods",
      *         defaults={"auth_enabled"=true}, name="api.mollie.payment-method.update-methods", methods={"GET"})
      *
      * @param Context $context
