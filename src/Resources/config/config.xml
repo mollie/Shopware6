@@ -25,18 +25,9 @@
         </component>
     </card>
     <card>
-        <title>Payment Methods</title>
-        <title lang="de-DE">Zahlungsarten</title>
-        <title lang="nl-NL">Betaalmethoden</title>
-
-        <component name="mollie-update-payment-methods">
-            <name>mollieUpdatePaymentMethodsButton</name>
-        </component>
-    </card>
-    <card>
-        <title>Modes</title>
-        <title lang="de-DE">Modi</title>
-        <title lang="nl-NL">Modi</title>
+        <title>Payments</title>
+        <title lang="de-DE">Zahlungen</title>
+        <title lang="nl-NL">Betalingen</title>
         <input-field type="bool">
             <name>testMode</name>
             <label>Test Mode</label>
@@ -52,6 +43,9 @@
             <label lang="nl-NL">Debug Modus</label>
             <defaultValue>false</defaultValue>
         </input-field>
+        <component name="mollie-update-payment-methods">
+            <name>mollieUpdatePaymentMethodsButton</name>
+        </component>
     </card>
     <card>
         <title>Components</title>
