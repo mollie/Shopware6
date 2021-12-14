@@ -23,10 +23,8 @@ Component.register('mollie-update-payment-methods', {
     methods: {
         onUpdatePaymentMethodsButtonClicked() {
             const me = this;
-            const button = this.$refs.updatePaymentMethodsButton;
 
-            button.disabled = true;
-            me.updatePaymentMethodsIsLoading = true;
+            this.startUpdatePaymentMethod();
 
             this.MolliePaymentsPaymentMethodService.updatePaymentMethods()
                 .then((response) => {
@@ -42,12 +40,34 @@ Component.register('mollie-update-payment-methods', {
                         me.createNotificationError(messageData);
                     }
 
-                    button.disabled = false;
-                    me.updatePaymentMethodsIsLoading = false;
+                    this.updatePaymentMethodsIsDone();
                 }).catch(() => {
-                    button.disabled = false;
-                    me.updatePaymentMethodsIsLoading = false;
+                    this.updatePaymentMethodsIsDone();
                 });
         },
+
+        startUpdatePaymentMethod() {
+            this.updatePaymentMethodsIsLoading = true;
+
+            const button = this.$refs.updatePaymentMethodsButton;
+
+            if (!button) {
+                return;
+            }
+
+            button.disabled = true;
+        },
+
+        updatePaymentMethodsIsDone() {
+            this.updatePaymentMethodsIsLoading = false;
+
+            const button = this.$refs.updatePaymentMethodsButton;
+
+            if (!button) {
+                return;
+            }
+
+            button.disabled = false;
+        }
     },
 });
