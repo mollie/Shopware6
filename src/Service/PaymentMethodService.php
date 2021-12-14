@@ -100,6 +100,34 @@ class PaymentMethodService
     }
 
     /**
+     * @param Context $context
+     */
+    public function installAndActivatePaymentMethods(Context $context): void
+    {
+        // Get installable payment methods
+        $installablePaymentMethods = $this->getInstallablePaymentMethods();
+
+        if (empty($installablePaymentMethods)) {
+            return;
+        }
+
+        // Check which payment methods from Mollie are already installed in the shop
+        $installedPaymentMethodHandlers = $this->getInstalledPaymentMethodHandlers($this->getPaymentHandlers(), $context);
+
+        // Add payment methods
+        $this
+            ->setClassName(get_class($this))
+            ->addPaymentMethods($installablePaymentMethods, $context);
+
+        // Activate newly installed payment methods
+        $this->activatePaymentMethods(
+            $installablePaymentMethods,
+            $installedPaymentMethodHandlers,
+            $context
+        );
+    }
+
+    /**
      * @param array $paymentMethods
      * @param Context $context
      */
