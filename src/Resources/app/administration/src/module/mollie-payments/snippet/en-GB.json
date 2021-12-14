@@ -72,6 +72,12 @@
       "apiKey": "API key",
       "isValid": "is valid",
       "isInvalid": "is invalid"
+    },
+    "updatePaymentMethods": {
+      "title": "Mollie Payments",
+      "button": "Update payment methods",
+      "succeeded": "The payment methods are successfully updated.",
+      "failed": "The payment methods couldn't be updated."
     }
   },
   "sw-customer": {

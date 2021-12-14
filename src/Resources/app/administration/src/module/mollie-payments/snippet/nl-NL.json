@@ -72,6 +72,12 @@
       "apiKey": "API Key",
       "isValid": "is geldig",
       "isInvalid": "is ongeldig"
+    },
+    "updatePaymentMethods": {
+      "title": "Mollie Payments",
+      "button": "Betaalmethoden updaten",
+      "succeeded": "De betaalmethoden zijn succesvol geüpdated.",
+      "failed": "De betaalmethoden konden niet worden geüpdated."
     }
   },
   "sw-customer": {

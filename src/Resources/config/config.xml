@@ -25,6 +25,15 @@
         </component>
     </card>
     <card>
+        <title>Payment Methods</title>
+        <title lang="de-DE">Zahlungsarten</title>
+        <title lang="nl-NL">Betaalmethoden</title>
+
+        <component name="mollie-update-payment-methods">
+            <name>mollieUpdatePaymentMethodsButton</name>
+        </component>
+    </card>
+    <card>
         <title>Modes</title>
         <title lang="de-DE">Modi</title>
         <title lang="nl-NL">Modi</title>
