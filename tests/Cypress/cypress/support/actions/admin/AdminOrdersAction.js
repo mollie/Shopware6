@@ -50,7 +50,7 @@ export default class AdminOrdersAction {
 
         // here are automatic reloads and things as it seems
         // I really want to test the real UX, so we just wait like a human
-        cy.wait(1000);
+        cy.wait(4000);
     }
 
     /**
@@ -66,6 +66,10 @@ export default class AdminOrdersAction {
         // click on more and CANCEL it
         repoRefundManager.getFirstRefundMoreButton().click();
         repoRefundManager.getFirstRefundCancelButton().click();
+
+        // here are automatic reloads and things as it seems
+        // I really want to test the real UX, so we just wait like a human
+        cy.wait(4000);
     }
 
     /**
