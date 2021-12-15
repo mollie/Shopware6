@@ -124,6 +124,7 @@ context("Order Refunds", () => {
 
             // let's open the refund manager, and verify
             // that the pending refund is NOT existing anymore
+            cy.wait(500);
             repoOrdersDetails.getMollieRefundManagerButton().click();
             cy.contains('Pending').should('not.exist');
         })
