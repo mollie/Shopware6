@@ -87,6 +87,7 @@ context("Order Refunds", () => {
             // after refunded, open the refund manager
             // and verify that we see a PENDING refund in it as well as
             // the correct 1 EUR value.
+            cy.wait(500);
             repoOrdersDetails.getMollieRefundManagerButton().click();
             repoRefundManager.getFirstRefundStatusLabel().contains('Pending');
 
