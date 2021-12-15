@@ -87,7 +87,7 @@ context("Order Refunds", () => {
             // after refunded, open the refund manager
             // and verify that we see a PENDING refund in it as well as
             // the correct 1 EUR value.
-            cy.wait(500);
+            cy.wait(1000);
             repoOrdersDetails.getMollieRefundManagerButton().click();
             repoRefundManager.getFirstRefundStatusLabel().contains('Pending');
 
@@ -124,7 +124,7 @@ context("Order Refunds", () => {
 
             // let's open the refund manager, and verify
             // that the pending refund is NOT existing anymore
-            cy.wait(500);
+            cy.wait(1000);
             repoOrdersDetails.getMollieRefundManagerButton().click();
             cy.contains('Pending').should('not.exist');
         })
