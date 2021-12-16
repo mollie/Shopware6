@@ -4,8 +4,6 @@ namespace Kiener\MolliePayments\Controller\Api;
 
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Facade\MollieRefundFacade;
-use Kiener\MolliePayments\Service\OrderService;
-use Kiener\MolliePayments\Service\RefundService;
 use Mollie\Api\Resources\Refund;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
@@ -33,7 +31,7 @@ class RefundController extends AbstractController
      */
     public function __construct(
         MollieRefundFacade $refundFacade,
-        LoggerInterface $logger
+        LoggerInterface    $logger
     )
     {
         $this->refundFacade = $refundFacade;
