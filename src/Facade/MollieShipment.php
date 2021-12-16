@@ -154,14 +154,34 @@ class MollieShipment
     }
 
     /**
+     * @param string $orderId
+     * @param Context $context
+     * @return \Mollie\Api\Resources\Shipment
+     */
+    public function shipOrderByOrderId(string $orderId, Context $context): \Mollie\Api\Resources\Shipment
+    {
+        $order = $this->orderService->getOrder($orderId, $context);
+        return $this->shipOrder($order, $context);
+    }
+
+    /**
      * @param string $orderNumber
      * @param Context $context
      * @return \Mollie\Api\Resources\Shipment
      */
-    public function shipOrder(string $orderNumber, Context $context): \Mollie\Api\Resources\Shipment
+    public function shipOrderByOrderNumber(string $orderNumber, Context $context): \Mollie\Api\Resources\Shipment
     {
         $order = $this->orderService->getOrderByNumber($orderNumber, $context);
+        return $this->shipOrder($order, $context);
+    }
 
+    /**
+     * @param OrderEntity $order
+     * @param Context $context
+     * @return \Mollie\Api\Resources\Shipment
+     */
+    public function shipOrder(OrderEntity $order, Context $context): \Mollie\Api\Resources\Shipment
+    {
         $mollieOrderId = $this->orderService->getMollieOrderId($order);
 
         $shipment = $this->mollieApiShipmentService->shipOrder($mollieOrderId, $order->getSalesChannelId(), $context);
@@ -174,15 +194,40 @@ class MollieShipment
     }
 
     /**
+     * @param string $orderId
+     * @param string $itemIdentifier
+     * @param int $quantity
+     * @param Context $context
+     * @return \Mollie\Api\Resources\Shipment
+     */
+    public function shipItemByOrderId(string $orderId, string $itemIdentifier, int $quantity, Context $context): \Mollie\Api\Resources\Shipment
+    {
+        $order = $this->orderService->getOrder($orderId, $context);
+        return $this->shipItem($order, $itemIdentifier, $quantity, $context);
+    }
+
+    /**
      * @param string $orderNumber
      * @param string $itemIdentifier
      * @param int $quantity
      * @param Context $context
      * @return \Mollie\Api\Resources\Shipment
      */
-    public function shipItem(string $orderNumber, string $itemIdentifier, int $quantity, Context $context): \Mollie\Api\Resources\Shipment
+    public function shipItemByOrderNumber(string $orderNumber, string $itemIdentifier, int $quantity, Context $context): \Mollie\Api\Resources\Shipment
     {
         $order = $this->orderService->getOrderByNumber($orderNumber, $context);
+        return $this->shipItem($order, $itemIdentifier, $quantity, $context);
+    }
+
+    /**
+     * @param OrderEntity $order
+     * @param string $itemIdentifier
+     * @param int $quantity
+     * @param Context $context
+     * @return \Mollie\Api\Resources\Shipment
+     */
+    public function shipItem(OrderEntity $order, string $itemIdentifier, int $quantity, Context $context): \Mollie\Api\Resources\Shipment
+    {
 
         $mollieOrderId = $this->orderService->getMollieOrderId($order);
 

@@ -118,7 +118,7 @@ class ShippingController extends AbstractController
                 throw new \InvalidArgumentException('Missing Argument for Order Number!');
             }
 
-            $shipment = $this->shipmentFacade->shipOrder($orderNumber, $context);
+            $shipment = $this->shipmentFacade->shipOrderByOrderNumber($orderNumber, $context);
 
             return $this->shipmentToJson($shipment);
         } catch (\Exception $e) {
@@ -155,7 +155,7 @@ class ShippingController extends AbstractController
                 throw new \InvalidArgumentException('Missing Argument for Item identifier!');
             }
 
-            $shipment = $this->shipmentFacade->shipItem($orderNumber, $itemIdentifier, $quantity, $context);
+            $shipment = $this->shipmentFacade->shipItemByOrderNumber($orderNumber, $itemIdentifier, $quantity, $context);
 
             return $this->shipmentToJson($shipment);
         } catch (\Exception $e) {
