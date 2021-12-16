@@ -2,12 +2,10 @@
 
 namespace Kiener\MolliePayments\Service\MollieApi;
 
-use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Kiener\MolliePayments\Struct\LineItemPriceStruct;
 use Kiener\MolliePayments\Struct\MollieLineItem;
 use Kiener\MolliePayments\Struct\MollieLineItemCollection;
-use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 

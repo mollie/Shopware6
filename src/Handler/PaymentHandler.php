@@ -5,7 +5,6 @@ namespace Kiener\MolliePayments\Handler;
 use Kiener\MolliePayments\Exception\PaymentUrlException;
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Facade\MolliePaymentFinalize;
-use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
 use Mollie\Api\Exceptions\ApiException;

@@ -2,12 +2,9 @@
 
 namespace Kiener\MolliePayments\Subscriber;
 
-use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\SettingsService;
-use Mollie\Api\MollieApiClient;
 use Shopware\Storefront\Event\StorefrontRenderEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 
 class ApplePayDirectSubscriber implements EventSubscriberInterface
 {
