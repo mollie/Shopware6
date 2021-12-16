@@ -2,8 +2,6 @@
 
 namespace Kiener\MolliePayments\Service\Transition;
 
-use Kiener\MolliePayments\Service\LoggerService;
-use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionDefinition;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;

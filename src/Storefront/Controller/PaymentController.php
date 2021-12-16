@@ -12,7 +12,6 @@ use Kiener\MolliePayments\Exception\MissingOrderInTransactionException;
 use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeFetchedException;
 use Kiener\MolliePayments\Facade\MollieOrderPaymentFlow;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
-use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\Order\OrderStateService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\TransactionService;
