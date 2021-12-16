@@ -54,7 +54,7 @@ class RefundService
      * @throws CouldNotFetchMollieOrderException
      * @throws PaymentNotFoundException
      */
-    public function refund(OrderEntity $order, float $amount, ?string $description, Context $context): Refund
+    public function refund(OrderEntity $order, float $amount, string $description, Context $context): Refund
     {
         $mollieOrderId = $this->orderService->getMollieOrderId($order);
 
@@ -66,8 +66,7 @@ class RefundService
                     'value' => number_format($amount, 2, '.', ''),
                     'currency' => $order->getCurrency()->getIsoCode()
                 ],
-                'description' => $description ?? sprintf("Refunded through Shopware administration. Order number %s",
-                        $order->getOrderNumber())
+                'description' => $description
             ]);
 
             if ($refund instanceof Refund) {

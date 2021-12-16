@@ -23,9 +23,9 @@
         </service>
 
         <service id="Kiener\MolliePayments\Controller\Api\RefundController" public="true">
-            <argument type="service" id="monolog.logger"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\RefundService"/>
+            <argument type="service" id="mollie_payments.logger"/>
 
             <call method="setContainer">
                 <argument type="service" id="service_container"/>

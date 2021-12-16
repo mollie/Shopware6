@@ -2,25 +2,14 @@
 
 namespace Kiener\MolliePayments\Controller\Api;
 
-use Kiener\MolliePayments\Exception\CouldNotCancelMollieRefundException;
-use Kiener\MolliePayments\Exception\CouldNotCreateMollieRefundException;
-use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
-use Kiener\MolliePayments\Exception\CouldNotFetchMollieOrderException;
-use Kiener\MolliePayments\Exception\CouldNotFetchMollieRefundsException;
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\RefundService;
-use Kiener\MolliePayments\Service\SettingsService;
 use Mollie\Api\Resources\Refund;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
-use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Checkout\Payment\Exception\InvalidOrderException;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\ShopwareHttpException;
-use Shopware\Core\Framework\Uuid\Exception\InvalidUuidException;
-use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\Framework\Validation\DataBag\QueryDataBag;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,14 +18,14 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class RefundController extends AbstractController
 {
-    /** @var LoggerInterface */
-    private $logger;
-
     /** @var OrderService */
     private $orderService;
 
     /** @var RefundService */
     private $refundService;
+
+    /** @var LoggerInterface */
+    private $logger;
 
     /**
      * Creates a new instance of the onboarding controller.
@@ -46,14 +35,14 @@ class RefundController extends AbstractController
      * @param RefundService $refundService
      */
     public function __construct(
-        LoggerInterface $logger,
         OrderService    $orderService,
-        RefundService   $refundService
+        RefundService   $refundService,
+        LoggerInterface $logger
     )
     {
-        $this->logger = $logger;
         $this->orderService = $orderService;
         $this->refundService = $refundService;
+        $this->logger = $logger;
     }
 
     /**
@@ -66,20 +55,36 @@ class RefundController extends AbstractController
      */
     public function refundOrder(QueryDataBag $query, Context $context): JsonResponse
     {
-        $orderNumber = $query->get('number');
+        try {
+            $orderNumber = $query->get('number');
 
-        if ($orderNumber === null) {
-            throw new \InvalidArgumentException('Missing Argument for Order Number!');
-        }
+            if ($orderNumber === null) {
+                throw new \InvalidArgumentException('Missing Argument for Order Number!');
+            }
 
-        $order = $this->orderService->getOrderByNumber($orderNumber, $context);
+            $order = $this->orderService->getOrderByNumber($orderNumber, $context);
 
-        $amount = (float)$query->get('amount', $order->getAmountTotal() - $this->refundService->getRefundedAmount($order, $context));
 
-        $description = $query->get('description', sprintf("Refunded through Shopware API. Order number %s",
+
+            $amount = (float)$query->get('amount', $order->getAmountTotal() - $this->refundService->getRefundedAmount($order, $context));
+
+            $description = $query->get('description', sprintf("Refunded through Shopware API. Order number %s",
             $order->getOrderNumber()));
 
-        return $this->refundResponse($order->getId(), $amount, $description, $context);
+            $this->logger->info(sprintf('Refund for order %s with amount %s is triggered through the Shopware API.', $order->getOrderNumber(), $amount));
+
+            $refund = $this->refundService->refund($order, $amount, $description, $context);
+        } catch (ShopwareHttpException $e) {
+            $this->logger->error($e->getMessage());
+            return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
+        } catch (\Throwable $e) {
+            $this->logger->error($e->getMessage());
+            return $this->json(['message' => $e->getMessage()], 500);
+        }
+
+        return $this->json([
+            'success' => ($refund instanceof Refund)
+        ]);
     }
 
     /**
@@ -93,7 +98,7 @@ class RefundController extends AbstractController
      */
     public function refund(RequestDataBag $data, Context $context): JsonResponse
     {
-        return $this->refundResponse($data->getAlnum('orderId'), $data->get('amount', 0.0), null, $context);
+        return $this->refundResponse($data->getAlnum('orderId'), $data->get('amount', 0.0), $context);
     }
 
     /**
@@ -107,7 +112,7 @@ class RefundController extends AbstractController
      */
     public function refundLegacy(RequestDataBag $data, Context $context): JsonResponse
     {
-        return $this->refundResponse($data->getAlnum('orderId'), $data->get('amount', 0.0), null, $context);
+        return $this->refundResponse($data->getAlnum('orderId'), $data->get('amount', 0.0), $context);
     }
 
     /**
@@ -197,13 +202,19 @@ class RefundController extends AbstractController
     /**
      * @param string $orderId
      * @param float $amount
+     * @param string|null $description
      * @param Context $context
      * @return JsonResponse
      */
-    private function refundResponse(string $orderId, float $amount, ?string $description, Context $context): JsonResponse
+    private function refundResponse(string $orderId, float $amount, Context $context): JsonResponse
     {
         try {
             $order = $this->orderService->getOrder($orderId, $context);
+
+            $this->logger->info(sprintf('Refund for order %s with amount %s is triggered through the Shopware administration.', $order->getOrderNumber(), $amount));
+
+            $description = sprintf("Refunded through Shopware administration. Order number %s",
+                $order->getOrderNumber());
 
             $refund = $this->refundService->refund($order, $amount, $description, $context);
         } catch (ShopwareHttpException $e) {
