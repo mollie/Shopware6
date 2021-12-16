@@ -87,12 +87,14 @@ class RefundsServiceTest extends TestCase
             self::expectException($exceptionClass);
         }
 
-        static::assertEquals($expected, $this->refundService->refund(
+        $result = $this->refundService->refund(
             $orderEntityMock,
             24.99,
             'test refund',
             Context::createDefaultContext()
-        ));
+        );
+
+        static::assertEquals($expected, ($result instanceof Refund));
     }
 
     /**

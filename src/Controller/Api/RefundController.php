@@ -2,24 +2,14 @@
 
 namespace Kiener\MolliePayments\Controller\Api;
 
-use Kiener\MolliePayments\Exception\CouldNotCancelMollieRefundException;
-use Kiener\MolliePayments\Exception\CouldNotCreateMollieRefundException;
-use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
-use Kiener\MolliePayments\Exception\CouldNotFetchMollieOrderException;
-use Kiener\MolliePayments\Exception\CouldNotFetchMollieRefundsException;
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
-use Kiener\MolliePayments\Service\OrderService;
-use Kiener\MolliePayments\Service\RefundService;
-use Kiener\MolliePayments\Service\SettingsService;
+use Kiener\MolliePayments\Facade\MollieRefundFacade;
+use Mollie\Api\Resources\Refund;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
-use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Checkout\Payment\Exception\InvalidOrderException;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\ShopwareHttpException;
-use Shopware\Core\Framework\Uuid\Exception\InvalidUuidException;
-use Shopware\Core\Framework\Uuid\Uuid;
+use Shopware\Core\Framework\Validation\DataBag\QueryDataBag;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -27,31 +17,59 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class RefundController extends AbstractController
 {
+    /** @var MollieRefundFacade */
+    private $refundFacade;
+
     /** @var LoggerInterface */
     private $logger;
-
-    /** @var OrderService */
-    private $orderService;
-
-    /** @var RefundService */
-    private $refundService;
 
     /**
      * Creates a new instance of the onboarding controller.
      *
+     * @param MollieRefundFacade $refundFacade
      * @param LoggerInterface $logger
-     * @param OrderService $orderService
-     * @param RefundService $refundService
      */
     public function __construct(
-        LoggerInterface $logger,
-        OrderService    $orderService,
-        RefundService   $refundService
+        MollieRefundFacade $refundFacade,
+        LoggerInterface    $logger
     )
     {
+        $this->refundFacade = $refundFacade;
         $this->logger = $logger;
-        $this->orderService = $orderService;
-        $this->refundService = $refundService;
+    }
+
+    /**
+     * @RouteScope(scopes={"api"})
+     * @Route("/api/mollie/refund/order",
+     *         defaults={"auth_enabled"=true}, name="api.mollie.refund.order", methods={"GET"})
+     * @param QueryDataBag $query
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function refundOrder(QueryDataBag $query, Context $context): JsonResponse
+    {
+        try {
+            $orderNumber = $query->get('number');
+
+            if ($orderNumber === null) {
+                throw new \InvalidArgumentException('Missing Argument for Order Number!');
+            }
+
+            $amount = (float)$query->get('amount', 0);
+            $description = $query->get('description', '');
+
+            $refund = $this->refundFacade->refundUsingOrderNumber($orderNumber, $amount, $description, $context);
+        } catch (ShopwareHttpException $e) {
+            $this->logger->error($e->getMessage());
+            return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
+        } catch (\Throwable $e) {
+            $this->logger->error($e->getMessage());
+            return $this->json(['message' => $e->getMessage()], 500);
+        }
+
+        return $this->json([
+            'success' => ($refund instanceof Refund)
+        ]);
     }
 
     /**
@@ -169,15 +187,14 @@ class RefundController extends AbstractController
     /**
      * @param string $orderId
      * @param float $amount
+     * @param string|null $description
      * @param Context $context
      * @return JsonResponse
      */
     private function refundResponse(string $orderId, float $amount, Context $context): JsonResponse
     {
         try {
-            $order = $this->getValidOrder($orderId, $context);
-
-            $success = $this->refundService->refund($order, $amount, null, $context);
+            $refund = $this->refundFacade->refundUsingOrderId($orderId, $amount, '', $context);
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
@@ -187,22 +204,20 @@ class RefundController extends AbstractController
         }
 
         return $this->json([
-            'success' => $success
+            'success' => ($refund instanceof Refund)
         ]);
     }
 
     /**
      * @param string $orderId
-     * @param string|null $refundId
+     * @param string $refundId
      * @param Context $context
      * @return JsonResponse
      */
-    private function cancelResponse(string $orderId, ?string $refundId, Context $context): JsonResponse
+    private function cancelResponse(string $orderId, string $refundId, Context $context): JsonResponse
     {
         try {
-            $order = $this->getValidOrder($orderId, $context);
-
-            $success = $this->refundService->cancel($order, $refundId, $context);
+            $success = $this->refundFacade->cancelUsingOrderId($orderId, $refundId, $context);
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
@@ -224,9 +239,7 @@ class RefundController extends AbstractController
     private function listResponse(string $orderId, Context $context): JsonResponse
     {
         try {
-            $order = $this->getValidOrder($orderId, $context);
-
-            $refunds = $this->refundService->getRefunds($order, $context);
+            $this->refundFacade->getRefundListUsingOrderId($orderId, $context);
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
@@ -249,48 +262,22 @@ class RefundController extends AbstractController
     private function totalResponse(string $orderId, Context $context): JsonResponse
     {
         try {
-
-            $order = $this->getValidOrder($orderId, $context);
-
-            $remaining = $this->refundService->getRemainingAmount($order, $context);
-            $refunded = $this->refundService->getRefundedAmount($order, $context);
-            $voucherAmount = $this->refundService->getVoucherPaidAmount($order, $context);
-
+            $totals = $this->refundFacade->getRefundTotalsUsingOrderId($orderId, $context);
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
         } catch (PaymentNotFoundException $e) {
             // This indicates there is no completed payment for this order, so there are no refunds yet.
-            $remaining = 0;
-            $refunded = 0;
-            $voucherAmount = 0;
+            $totals = [
+                'remaining' => 0,
+                'refunded' => 0,
+                'voucherAmount' => 0,
+            ];
         } catch (\Throwable $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], 500);
         }
 
-        return $this->json(compact('remaining', 'refunded', 'voucherAmount'));
-    }
-
-    /**
-     * @param string $orderId
-     * @param Context $context
-     * @return OrderEntity
-     * @throws InvalidUuidException
-     * @throws InvalidOrderException
-     */
-    private function getValidOrder(string $orderId, Context $context): OrderEntity
-    {
-        if (!Uuid::isValid($orderId)) {
-            throw new InvalidUuidException($orderId);
-        }
-
-        $order = $this->orderService->getOrder($orderId, $context);
-
-        if (!($order instanceof OrderEntity)) {
-            throw new InvalidOrderException($orderId);
-        }
-
-        return $order;
+        return $this->json($totals);
     }
 }
