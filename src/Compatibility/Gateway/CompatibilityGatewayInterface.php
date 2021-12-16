@@ -25,4 +25,6 @@ interface CompatibilityGatewayInterface
      */
     public function getLineItemPromotionType(): string;
 
+
+    public function getChargebackOrderTransactionState(): string;
 }

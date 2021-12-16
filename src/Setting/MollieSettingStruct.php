@@ -101,6 +101,11 @@ class MollieSettingStruct extends Struct
     protected $orderStateWithAAuthorizedTransaction = self::ORDER_STATE_SKIP;
 
     /**
+     * @var string
+     */
+    protected $orderStateWithAChargebackTransaction = self::ORDER_STATE_SKIP;
+
+    /**
      * @return string
      */
     public function getLiveApiKey(): string
@@ -356,6 +361,23 @@ class MollieSettingStruct extends Struct
     {
         return (string)$this->orderStateWithAAuthorizedTransaction;
     }
+
+    /**
+     * @return string
+     */
+    public function getOrderStateWithAChargebackTransaction(): string
+    {
+        return $this->orderStateWithAChargebackTransaction;
+    }
+
+    /**
+     * @param string $orderStateWithAChargebackTransaction
+     */
+    public function setOrderStateWithAChargebackTransaction(string $orderStateWithAChargebackTransaction): void
+    {
+        $this->orderStateWithAChargebackTransaction = $orderStateWithAChargebackTransaction;
+    }
+
 
     /**
      * @return bool
