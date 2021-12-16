@@ -1,25 +1,28 @@
 {% sw_extends '@Storefront/storefront/component/product/card/action.html.twig' %}
 
 {% block component_product_box_action_buy %}
-    {% set productPrice = 0 %}
 
-    {% if product.calculatedPrices|length == 1 %}
-        {% set productPrice = product.calculatedPrices.first.unitPrice %}
-    {% else %}
-        {% set productPrice = product.calculatedPrice.unitPrice %}
+    {% block component_product_box_action_buy_apple_direct %}
+        {% set productPrice = 0 %}
 
-        {% if listPrice.percentage > 0 %}
-            {% set productPrice = listPrice.price %}
+        {% if product.calculatedPrices|length == 1 %}
+            {% set productPrice = product.calculatedPrices.first.unitPrice %}
+        {% else %}
+            {% set productPrice = product.calculatedPrice.unitPrice %}
+
+            {% if listPrice.percentage > 0 %}
+                {% set productPrice = listPrice.price %}
+            {% endif %}
         {% endif %}
-    {% endif %}
 
-    {% if mollie_applepaydirect_enabled == true %}
-        {% if productPrice > 0 %}
-            <div class="mb-2 d-none only-support-apple-pay">
-                {% include '@MolliePayments/mollie/component/apple-pay-direct-button.twig' %}
-            </div>
+        {% if mollie_applepaydirect_enabled and productPrice > 0 %}
+            {% block component_product_box_action_buy_apple_direct_component %}
+                <div class="mb-2 d-none only-support-apple-pay">
+                    {% include '@MolliePayments/mollie/component/apple-pay-direct-button.twig' %}
+                </div>
+            {% endblock %}
         {% endif %}
-    {% endif %}
+    {% endblock %}
 
     {{ parent() }}
 {% endblock %}

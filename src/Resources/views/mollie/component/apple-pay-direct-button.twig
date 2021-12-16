@@ -1,21 +1,28 @@
-<div class="mollie-apple-pay-direct {{ cols }}">
-    {% if page.product %}
-        {# this is for older shopware versions #}
-        {% set productId = page.product.id %}
-    {% else %}
-        {# this is for Shopware >= 6.4 #}
-        {% set productId = product.id %}
-    {% endif %}
-    <div id="mollie-apd-csrf" class="d-none">
-        <input type="hidden" name="_mollie_csrf_token" value="{{ sw_csrf('frontend.mollie.apple-pay.authorize', {"mode": "token"}) }}">
-        <input type="hidden" name="_mollie_csrf_token" value="{{ sw_csrf('frontend.mollie.apple-pay.shipping-methods', {"mode": "token"}) }}">
+{% block mollie_apple_pay_direct %}
+    <div class="mollie-apple-pay-direct {{ cols }}">
+        {% if page.product %}
+            {# this is for older shopware versions #}
+            {% set productId = page.product.id %}
+        {% else %}
+            {# this is for Shopware >= 6.4 #}
+            {% set productId = product.id %}
+        {% endif %}
+        <div id="mollie-apd-csrf" class="d-none">
+            <input type="hidden" name="_mollie_csrf_token"
+                   value="{{ sw_csrf('frontend.mollie.apple-pay.authorize', {"mode": "token"}) }}">
+            <input type="hidden" name="_mollie_csrf_token"
+                   value="{{ sw_csrf('frontend.mollie.apple-pay.shipping-methods', {"mode": "token"}) }}">
+        </div>
+        <input type="hidden" name="id" value="{{ productId }}"/>
+        <input type="hidden" name="currency" value="{{ context.currency.translated.shortName }}"/>
+        <input type="hidden" name="countryCode" value="{{ context.shippingLocation.country.iso }}"/>
+        {% block mollie_apple_pay_direct_button %}
+            <button type="submit" data-shop-url="{{ seoUrl('frontend.home.page') }}"
+                    class="btn btn-primary btn-block btn-buy apple-pay-button-with-text apple-pay-button-black js-apple-pay w-100 d-none">
+                {# space to match height other buttons #}
+                &nbsp;
+                {# end important spacer #}
+            </button>
+        {% endblock %}
     </div>
-    <input type="hidden" name="id" value="{{ productId }}"/>
-    <input type="hidden" name="currency" value="{{ context.currency.translated.shortName }}"/>
-    <input type="hidden" name="countryCode" value="{{ context.shippingLocation.country.iso }}"/>
-    <button type="submit" class="btn btn-primary btn-block btn-buy apple-pay-button-with-text apple-pay-button-black js-apple-pay w-100 d-none" data-shop-url="{{ seoUrl('frontend.home.page') }}">
-        {# space to match height other buttons #}
-        &nbsp;
-        {# end important spacer #}
-    </button>
-</div>
+{% endblock %}

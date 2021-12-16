@@ -2,6 +2,7 @@
 
 {% block buy_widget_buy_container %}
     {{ parent() }}
+
     {% block page_product_detail_buy_container_apple_direct %}
         {# this is for Shopware < 6.4 #}
         {% set buyableLegacy = (not page.product.isCloseout or (page.product.availableStock >= page.product.minPurchase)) and page.product.childCount <= 0 %}
@@ -20,9 +21,11 @@
         {% endif %}
 
         {% if (buyableLegacy) or (buyable and productPrice) > 0 %}
-            <div class="form-row mt-3 justify-content-end">
-                {% include '@MolliePayments/mollie/component/apple-pay-direct-button.twig' with {cols: 'col-8'} %}
-            </div>
+            {% block page_product_detail_buy_container_apple_direct_component %}
+                <div class="form-row mt-3 justify-content-end">
+                    {% include '@MolliePayments/mollie/component/apple-pay-direct-button.twig' with {cols: 'col-8'} %}
+                </div>
+            {% endblock %}
         {% endif %}
     {% endblock %}
 
