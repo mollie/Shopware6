@@ -122,7 +122,7 @@ class RefundService
 
     /**
      * @param OrderEntity $order
-     * @return array
+     * @return array<mixed>
      * @throws CouldNotExtractMollieOrderIdException
      * @throws CouldNotFetchMollieOrderException
      * @throws CouldNotFetchMollieRefundsException
