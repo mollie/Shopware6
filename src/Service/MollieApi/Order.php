@@ -76,15 +76,13 @@ class Order
      * @param string $mollieOrderId
      * @param string $mollieOrderLineId
      * @param string $salesChannelId
-     * @param Context $context
      * @return OrderLine
      * @throws CouldNotFetchMollieOrderException
      */
     public function getMollieOrderLine(
         string  $mollieOrderId,
         string  $mollieOrderLineId,
-        string  $salesChannelId,
-        Context $context
+        string  $salesChannelId
     ): OrderLine
     {
         return $this->getMollieOrder($mollieOrderId, $salesChannelId)->lines()->get($mollieOrderLineId);
@@ -121,6 +119,7 @@ class Order
      * @param string $paymentMethod
      * @param SalesChannelContext $salesChannelContext
      * @return Payment
+     * @throws ApiException
      */
     public function createOrReusePayment(string $mollieOrderId, string $paymentMethod, SalesChannelContext $salesChannelContext): Payment
     {

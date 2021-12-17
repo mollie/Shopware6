@@ -250,8 +250,7 @@ class MollieShipment
             $quantity = $this->mollieApiOrderService->getMollieOrderLine(
                 $mollieOrderId,
                 $mollieOrderLineId,
-                $order->getSalesChannelId(),
-                $context
+                $order->getSalesChannelId()
             )->shippableQuantity;
         }
 
