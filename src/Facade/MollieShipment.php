@@ -258,8 +258,7 @@ class MollieShipment
             $mollieOrderId,
             $order->getSalesChannelId(),
             $mollieOrderLineId,
-            $quantity,
-            $context
+            $quantity
         );
 
         $delivery = $this->orderDataExtractor->extractDelivery($order, $context);

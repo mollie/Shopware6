@@ -8,7 +8,6 @@ use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Shipment as MollieShipment;
 use Mollie\Api\Resources\ShipmentCollection;
 use Mollie\Api\Types\OrderLineType;
-use Shopware\Core\Framework\Context;
 
 class Shipment
 {
@@ -69,7 +68,7 @@ class Shipment
         string $mollieOrderId,
         string $salesChannelId,
         string $mollieOrderLineId,
-        int $quantity
+        int    $quantity
     ): MollieShipment
     {
         try {
@@ -132,14 +131,13 @@ class Shipment
         $totalAmount = 0.0;
         $totalQuantity = 0;
 
-        foreach($mollieOrder->lines() as $mollieOrderLine) {
+        foreach ($mollieOrder->lines() as $mollieOrderLine) {
             /** @var OrderLine $mollieOrderLine */
-            if($mollieOrderLine->type === OrderLineType::TYPE_SHIPPING_FEE) {
+            if ($mollieOrderLine->type === OrderLineType::TYPE_SHIPPING_FEE) {
                 continue;
             }
 
-            if($mollieOrderLine->amountShipped)
-            {
+            if ($mollieOrderLine->amountShipped) {
                 $totalAmount += floatval($mollieOrderLine->amountShipped->value);
             }
 
