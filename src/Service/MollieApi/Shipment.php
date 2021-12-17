@@ -25,8 +25,7 @@ class Shipment
 
     public function getShipments(
         string $mollieOrderId,
-        string $salesChannelId,
-        Context $context
+        string $salesChannelId
     ): ShipmentCollection
     {
         $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId, ['embed' => 'shipments']);
@@ -36,13 +35,11 @@ class Shipment
     /**
      * @param string $mollieOrderId
      * @param string $salesChannelId
-     * @param Context $context
      * @return MollieShipment
      */
     public function shipOrder(
         string $mollieOrderId,
-        string $salesChannelId,
-        Context $context
+        string $salesChannelId
     ): MollieShipment
     {
         try {
@@ -64,15 +61,13 @@ class Shipment
      * @param string $salesChannelId
      * @param string $mollieOrderLineId
      * @param int $quantity
-     * @param Context $context
      * @return MollieShipment
      */
     public function shipItem(
         string $mollieOrderId,
         string $salesChannelId,
         string $mollieOrderLineId,
-        int $quantity,
-        Context $context
+        int $quantity
     ): MollieShipment
     {
         try {

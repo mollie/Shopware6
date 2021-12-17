@@ -54,7 +54,7 @@ class ShipmentTest extends TestCase
             ->method('shipAll')
             ->willReturn($this->createMock(MollieShipment::class));
 
-        $this->shipmentApiService->shipOrder('mollieOrderId', 'salesChannelId', $this->context);
+        $this->shipmentApiService->shipOrder('mollieOrderId', 'salesChannelId');
     }
 
     /**
@@ -69,7 +69,7 @@ class ShipmentTest extends TestCase
 
         $this->expectException(MollieOrderCouldNotBeShippedException::class);
 
-        $this->shipmentApiService->shipOrder('mollieOrderId', 'salesChannelId', $this->context);
+        $this->shipmentApiService->shipOrder('mollieOrderId', 'salesChannelId');
     }
 
     /**

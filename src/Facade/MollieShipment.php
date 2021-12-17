@@ -184,7 +184,7 @@ class MollieShipment
     {
         $mollieOrderId = $this->orderService->getMollieOrderId($order);
 
-        $shipment = $this->mollieApiShipmentService->shipOrder($mollieOrderId, $order->getSalesChannelId(), $context);
+        $shipment = $this->mollieApiShipmentService->shipOrder($mollieOrderId, $order->getSalesChannelId());
 
         $delivery = $this->orderDataExtractor->extractDelivery($order, $context);
 
