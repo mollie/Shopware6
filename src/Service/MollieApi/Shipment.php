@@ -29,7 +29,7 @@ class Shipment
         Context $context
     ): ShipmentCollection
     {
-        $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId, $context, ['embed' => 'shipments']);
+        $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId, ['embed' => 'shipments']);
         return $mollieOrder->shipments();
     }
 
@@ -46,7 +46,7 @@ class Shipment
     ): MollieShipment
     {
         try {
-            $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId, $context);
+            $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId);
             return $mollieOrder->shipAll();
         } catch (ApiException $e) {
             throw new MollieOrderCouldNotBeShippedException(
@@ -85,7 +85,7 @@ class Shipment
                 ]
             ];
 
-            $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId, $context);
+            $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId);
             return $mollieOrder->createShipment($options);
         } catch (ApiException $e) {
             throw new MollieOrderCouldNotBeShippedException(

@@ -74,7 +74,7 @@ class OrderTest extends TestCase
 
         $this->clientMock->orders = $orderEndpoint;
 
-        $order = $this->orderApiService->getMollieOrder('foo', 'bar', $this->context);
+        $order = $this->orderApiService->getMollieOrder('foo', 'bar');
 
         $this->assertSame($mollieOrder, $order);
     }
@@ -93,7 +93,7 @@ class OrderTest extends TestCase
 
         $this->expectException(CouldNotFetchMollieOrderException::class);
 
-        $this->orderApiService->getMollieOrder('foo', 'bar', $this->context);
+        $this->orderApiService->getMollieOrder('foo', 'bar');
     }
 
     /**
