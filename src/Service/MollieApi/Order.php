@@ -208,14 +208,14 @@ class Order
         return null;
     }
 
-    public function getPaymentUrl(string $mollieOrderId, string $salesChannelId, Context $context): ?string
+    public function getPaymentUrl(string $mollieOrderId, string $salesChannelId): ?string
     {
         $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId);
 
         return $mollieOrder->status === 'created' ? $mollieOrder->getCheckoutUrl() : null;
     }
 
-    public function setShipment(string $mollieOrderId, string $salesChannelId, Context $context): bool
+    public function setShipment(string $mollieOrderId, string $salesChannelId): bool
     {
         $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId);
 
