@@ -274,6 +274,19 @@ class MollieShipment
     }
 
     /**
+     * @param string $orderId
+     * @param Context $context
+     * @return array
+     */
+    public function getTotals(string $orderId, Context $context): array
+    {
+        $order = $this->orderService->getOrder($orderId, $context);
+        $mollieOrderId = $this->orderService->getMollieOrderId($order);
+
+        return $this->mollieApiShipmentService->getTotals($mollieOrderId, $order->getSalesChannelId());
+    }
+
+    /**
      * Try to find lineItems matching the $itemIdentifier. Shopware does not have a unique human-readable identifier for
      * order line items, so we have to check for several fields, like product number or the mollie order line id.
      *

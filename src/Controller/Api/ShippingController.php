@@ -21,7 +21,9 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
+use Shopware\Core\Framework\ShopwareHttpException;
 use Shopware\Core\Framework\Validation\DataBag\QueryDataBag;
+use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -213,6 +215,56 @@ class ShippingController extends AbstractController
         ], 400);
     }
 
+    // Admin routes
+
+    /**
+     * @RouteScope(scopes={"api"})
+     * @Route("/api/_action/mollie/ship/total",
+     *         defaults={"auth_enabled"=true}, name="api.action.mollie.ship.total", methods={"POST"})
+     *
+     * @param RequestDataBag $data
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function total(RequestDataBag $data, Context $context): JsonResponse
+    {
+        return $this->getTotalResponse($data->get('orderId'), $context);
+    }
+
+    /**
+     * @RouteScope(scopes={"api"})
+     * @Route("/api/v{version}/_action/mollie/ship/total",
+     *         defaults={"auth_enabled"=true}, name="api.action.mollie.ship.total.legacy", methods={"POST"})
+     *
+     * @param RequestDataBag $data
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function totalLegacy(RequestDataBag $data, Context $context): JsonResponse
+    {
+        return $this->getTotalResponse($data->get('orderId'), $context);
+    }
+
+    /**
+     * @param string $orderId
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function getTotalResponse(string $orderId, Context $context): JsonResponse
+    {
+        try {
+            $totals = $this->shipmentFacade->getTotals($orderId, $context);
+        } catch (ShopwareHttpException $e) {
+            $this->logger->error($e->getMessage());
+            return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
+        } catch (\Throwable $e) {
+            $this->logger->error($e->getMessage());
+            return $this->json(['message' => $e->getMessage()], 500);
+        }
+
+        return $this->json($totals);
+    }
+
     /**
      * TODO Refactor Administration routes
      */
@@ -248,33 +300,6 @@ class ShippingController extends AbstractController
         return $this->shipResponse($request);
     }
 
-    /**
-     * @RouteScope(scopes={"api"})
-     * @Route("/api/v{version}/_action/mollie/ship/total",
-     *         defaults={"auth_enabled"=true}, name="api.action.pre64.mollie.ship.total", methods={"POST"})
-     *
-     * @param Request $request
-     *
-     * @return JsonResponse
-     */
-    public function oldTotal(Request $request): JsonResponse
-    {
-        return $this->totalResponse($request);
-    }
-
-    /**
-     * @RouteScope(scopes={"api"})
-     * @Route("/api/_action/mollie/ship/total",
-     *         defaults={"auth_enabled"=true}, name="api.action.mollie.ship.total", methods={"POST"})
-     *
-     * @param Request $request
-     *
-     * @return JsonResponse
-     */
-    public function total64(Request $request): JsonResponse
-    {
-        return $this->totalResponse($request);
-    }
 
     private function shipResponse(Request $request): JsonResponse
     {
@@ -415,42 +440,6 @@ class ShippingController extends AbstractController
 
         return new JsonResponse([
             self::RESPONSE_KEY_SUCCESS => $success,
-        ]);
-    }
-
-    private function totalResponse(Request $request): JsonResponse
-    {
-        /** @var float $amount */
-        $amount = 0.0;
-
-        /** @var int $items */
-        $items = 0;
-
-        /** @var OrderEntity $order */
-        $order = null;
-
-        /** @var string $orderId */
-        $orderId = $request->get('orderId');
-
-        if ($orderId !== '') {
-            $order = $this->orderService->getOrder($orderId, Context::createDefaultContext());
-        }
-
-        if ($order !== null) {
-            foreach ($order->getLineItems() as $lineItem) {
-                if (
-                    !empty($lineItem->getCustomFields())
-                    && isset($lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY])
-                ) {
-                    $amount += ($lineItem->getUnitPrice() * (int)$lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY]);
-                    $items += (int)$lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY];
-                }
-            }
-        }
-
-        return new JsonResponse([
-            self::RESPONSE_KEY_AMOUNT => $amount,
-            self::RESPONSE_KEY_ITEMS => $items,
         ]);
     }
 

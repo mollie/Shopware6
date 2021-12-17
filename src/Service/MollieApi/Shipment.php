@@ -4,8 +4,10 @@ namespace Kiener\MolliePayments\Service\MollieApi;
 
 use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeShippedException;
 use Mollie\Api\Exceptions\ApiException;
+use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Shipment as MollieShipment;
 use Mollie\Api\Resources\ShipmentCollection;
+use Mollie\Api\Types\OrderLineType;
 use Shopware\Core\Framework\Context;
 
 class Shipment
@@ -92,5 +94,32 @@ class Shipment
                 $e
             );
         }
+    }
+
+    public function getTotals(string $mollieOrderId, string $salesChannelId): array
+    {
+        $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId);
+
+        $totalAmount = 0.0;
+        $totalQuantity = 0;
+
+        foreach($mollieOrder->lines() as $mollieOrderLine) {
+            /** @var OrderLine $mollieOrderLine */
+            if($mollieOrderLine->type === OrderLineType::TYPE_SHIPPING_FEE) {
+                continue;
+            }
+
+            if($mollieOrderLine->amountShipped)
+            {
+                $totalAmount += floatval($mollieOrderLine->amountShipped->value);
+            }
+
+            $totalQuantity += $mollieOrderLine->quantityShipped;
+        }
+
+        return [
+            'amount' => $totalAmount,
+            'quantity' => $totalQuantity,
+        ];
     }
 }

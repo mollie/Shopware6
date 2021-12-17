@@ -25,7 +25,7 @@
     <dt v-if="refundAmountPending > 0"><strong>{{ $tc('sw-order.detailExtended.totalRefundsPending') }}</strong></dt>
     <dd v-if="refundAmountPending > 0"><strong>{{ refundAmountPending | currency(order.currency.shortName) }}</strong></dd>
 
-    <dt v-if="shippedItems > 0"><strong>{{ $tc('sw-order.detailExtended.totalShipments', 0, { quantity: shippedItems }) }}</strong></dt>
-    <dd v-if="shippedItems > 0"><strong>{{ shippedAmount | currency(order.currency.shortName) }}</strong></dd>
+    <dt v-if="shippedQuantity > 0"><strong>{{ $tc('sw-order.detailExtended.totalShipments', 0, { quantity: shippedQuantity }) }}</strong></dt>
+    <dd v-if="shippedQuantity > 0"><strong>{{ shippedAmount | currency(order.currency.shortName) }}</strong></dd>
 {% endblock %}
 
