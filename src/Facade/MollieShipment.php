@@ -278,6 +278,19 @@ class MollieShipment
      * @param Context $context
      * @return array
      */
+    public function getStatus(string $orderId, Context $context): array
+    {
+        $order = $this->orderService->getOrder($orderId, $context);
+        $mollieOrderId = $this->orderService->getMollieOrderId($order);
+
+        return $this->mollieApiShipmentService->getStatus($mollieOrderId, $order->getSalesChannelId());
+    }
+
+    /**
+     * @param string $orderId
+     * @param Context $context
+     * @return array
+     */
     public function getTotals(string $orderId, Context $context): array
     {
         $order = $this->orderService->getOrder($orderId, $context);

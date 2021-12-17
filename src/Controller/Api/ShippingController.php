@@ -219,6 +219,54 @@ class ShippingController extends AbstractController
 
     /**
      * @RouteScope(scopes={"api"})
+     * @Route("/api/_action/mollie/ship/status",
+     *         defaults={"auth_enabled"=true}, name="api.action.mollie.ship.status", methods={"POST"})
+     *
+     * @param RequestDataBag $data
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function status(RequestDataBag $data, Context $context): JsonResponse
+    {
+        return $this->getStatusResponse($data->get('orderId'), $context);
+    }
+
+    /**
+     * @RouteScope(scopes={"api"})
+     * @Route("/api/v{version}/_action/mollie/ship/status",
+     *         defaults={"auth_enabled"=true}, name="api.action.mollie.ship.status.legacy", methods={"POST"})
+     *
+     * @param RequestDataBag $data
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function statusLegacy(RequestDataBag $data, Context $context): JsonResponse
+    {
+        return $this->getStatusResponse($data->get('orderId'), $context);
+    }
+
+    /**
+     * @param string $orderId
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function getStatusResponse(string $orderId, Context $context): JsonResponse
+    {
+        try {
+            $status = $this->shipmentFacade->getStatus($orderId, $context);
+        } catch (ShopwareHttpException $e) {
+            $this->logger->error($e->getMessage());
+            return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
+        } catch (\Throwable $e) {
+            $this->logger->error($e->getMessage());
+            return $this->json(['message' => $e->getMessage()], 500);
+        }
+
+        return $this->json($status);
+    }
+
+    /**
+     * @RouteScope(scopes={"api"})
      * @Route("/api/_action/mollie/ship/total",
      *         defaults={"auth_enabled"=true}, name="api.action.mollie.ship.total", methods={"POST"})
      *

@@ -96,6 +96,35 @@ class Shipment
         }
     }
 
+    public function getStatus(string $mollieOrderId, string $salesChannelId): array
+    {
+        $lineItems = [];
+
+        $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId);
+
+        foreach ($mollieOrder->lines() as $mollieOrderLine) {
+            /** @var OrderLine $mollieOrderLine */
+            if ($mollieOrderLine->type === OrderLineType::TYPE_SHIPPING_FEE) {
+                continue;
+            }
+
+            $orderLineItemId = $mollieOrderLine->metadata->orderLineItemId ?? null;
+            if (empty($orderLineItemId)) {
+                continue;
+            }
+
+            $lineItems[$orderLineItemId] = [
+                'id' => $orderLineItemId,
+                'mollieOrderLineId' => $mollieOrderLine->id,
+                'quantity' => $mollieOrderLine->quantity,
+                'quantityShippable' => $mollieOrderLine->shippableQuantity,
+                'quantityShipped' => $mollieOrderLine->quantityShipped,
+            ];
+        }
+
+        return $lineItems;
+    }
+
     public function getTotals(string $mollieOrderId, string $salesChannelId): array
     {
         $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId);

@@ -6,15 +6,13 @@ class MolliePaymentsShippingService extends ApiService {
         super(httpClient, loginService, apiEndpoint);
     }
 
-    ship(data = {itemId: null, versionId: null, quantity: null}) {
-        const headers = this.getBasicHeaders();
-
+    __post(endpoint = '', data = {}, headers = {}) {
         return this.httpClient
             .post(
-                `_action/${this.getApiBasePath()}/ship`,
+                `_action/${this.getApiBasePath()}/ship${endpoint}`,
                 JSON.stringify(data),
                 {
-                    headers: headers,
+                    headers: this.getBasicHeaders(headers),
                 }
             )
             .then((response) => {
@@ -22,20 +20,16 @@ class MolliePaymentsShippingService extends ApiService {
             });
     }
 
-    total(data = {orderId: null}) {
-        const headers = this.getBasicHeaders();
+    ship(data = {itemId: null, quantity: null}) {
+        return this.__post('', data);
+    }
 
-        return this.httpClient
-            .post(
-                `_action/${this.getApiBasePath()}/ship/total`,
-                JSON.stringify(data),
-                {
-                    headers: headers,
-                }
-            )
-            .then((response) => {
-                return ApiService.handleResponse(response);
-            });
+    status(data = {orderId: null}) {
+        return this.__post('/status', data);
+    }
+
+    total(data = {orderId: null}) {
+        return this.__post('/total', data);
     }
 }
 

@@ -37,13 +37,12 @@ Component.override('sw-order-line-items-grid', {
     data() {
         return {
             isLoading: false,
-            selectedItems: {},
-            showRefundModal: false,
-            showShippingModal: false,
-            createCredit: false,
-            quantityToShip: 1,
             refundAmount: 0.0,
-            shippingQuantity: 0,
+            shipQuantity: 0,
+            showRefundModal: false,
+            showShipOrderModal: false,
+            showShipItemModal: null,
+            shippingStatus: null,
         };
     },
 
@@ -53,7 +52,7 @@ Component.override('sw-order-line-items-grid', {
 
             columnDefinitions.push(
                 {
-                    property: 'customFields.shippedQuantity',
+                    property: 'shippedQuantity',
                     label: this.$tc('sw-order.detailExtended.columnShipped'),
                     allowResize: false,
                     align: 'right',
@@ -98,7 +97,10 @@ Component.override('sw-order-line-items-grid', {
 
     methods: {
         createdComponent() {
+            this.getShippingStatus();
         },
+
+        //==== Refunds ==============================================================================================//
 
         onOpenRefundModal() {
             this.showRefundModal = true;
@@ -184,71 +186,66 @@ Component.override('sw-order-line-items-grid', {
             return this.$tc('mollie-payments.modals.refund.list.status-description.' + status);
         },
 
-        onShipItem(item) {
-            this.showShippingModal = item.id;
+        //==== Shipping =============================================================================================//
+
+        async getShippingStatus() {
+            await this.MolliePaymentsShippingService
+                .status({
+                    orderId: this.order.id
+                })
+                .then((response) => {
+                    this.shippingStatus = response;
+                });
         },
 
-        onCloseShippingModal() {
-            this.showShippingModal = false;
+        onOpenShipOrderModal() {
+            this.showShipOrderModal = true;
+        },
+
+        onCloseShipOrderModal() {
+            this.showShipOrderModal = false;
+        },
+
+        onOpenShipItemModal(item) {
+            this.showShipItemModal = item.id;
+        },
+
+        onCloseShipItemModal() {
+            this.showShipItemModal = false;
+            this.shipQuantity = 0;
         },
 
         onConfirmShipping(item) {
-            this.showShippingModal = false;
-
             if (this.quantityToShip > 0) {
-                this.MolliePaymentsShippingService.ship({
-                    itemId: item.id,
-                    versionId: item.versionId,
-                    quantity: this.quantityToShip,
-                })
+                this.MolliePaymentsShippingService
+                    .ship({
+                        itemId: item.id,
+                        quantity: this.shipQuantity,
+                    })
                     .then(document.location.reload());
             }
 
-            this.quantityToShip = 0;
+            this.onCloseShipItemModal();
         },
 
         isShippable(item) {
-            let shippable = false;
-
-            if (
-                item.type === 'product'
-                && (
-                    item.customFields !== undefined
-                    && item.customFields !== null
-                    && item.customFields.mollie_payments !== undefined
-                    && item.customFields.mollie_payments !== null
-                    && item.customFields.mollie_payments.order_line_id !== undefined
-                    && item.customFields.mollie_payments.order_line_id !== null
-                )
-                && (
-                    item.customFields.shippedQuantity === undefined
-                    || parseInt(item.customFields.shippedQuantity, 10) < item.quantity
-                )
-            ) {
-                shippable = true;
-            }
-
-            return shippable;
+            return this.shippableQuantity(item) > 0;
         },
 
         shippableQuantity(item) {
-            if (
-                item.customFields !== undefined
-                && item.customFields.shippedQuantity !== undefined
-                && item.customFields.refundedQuantity !== undefined
-            ) {
-                return item.quantity - parseInt(item.customFields.shippedQuantity, 10) - parseInt(item.customFields.refundedQuantity, 10);
+            if(this.shippingStatus === null) {
+                return 0;
             }
 
-            if (
-                item.customFields !== undefined
-                && item.customFields.shippedQuantity === undefined
-                && item.customFields.refundedQuantity !== undefined
-            ) {
-                return item.quantity - parseInt(item.customFields.refundedQuantity, 10);
+            return this.shippingStatus[item.id].quantityShippable;
+        },
+
+        shippedQuantity(item) {
+            if(this.shippingStatus === null) {
+                return 0;
             }
 
-            return item.quantity;
+            return this.shippingStatus[item.id].quantityShipped;
         },
     },
 });
