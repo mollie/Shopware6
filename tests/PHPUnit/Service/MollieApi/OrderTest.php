@@ -123,7 +123,7 @@ class OrderTest extends TestCase
 
         $this->clientMock->orders = $orderEndpoint;
 
-        $actualValue = $this->orderApiService->isCompletelyShipped('foo', 'bar', $this->context);
+        $actualValue = $this->orderApiService->isCompletelyShipped('foo', 'bar');
 
         $this->assertIsBool($actualValue);
         $this->assertEquals($expectedValue, $actualValue);

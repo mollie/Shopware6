@@ -234,11 +234,10 @@ class Order
     /**
      * @param string $mollieOrderId
      * @param string $salesChannelId
-     * @param Context $context
      * @return bool
      * @throws CouldNotFetchMollieOrderException
      */
-    public function isCompletelyShipped(string $mollieOrderId, string $salesChannelId, Context $context): bool
+    public function isCompletelyShipped(string $mollieOrderId, string $salesChannelId): bool
     {
         $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId);
 

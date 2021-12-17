@@ -264,7 +264,7 @@ class MollieShipment
 
         $delivery = $this->orderDataExtractor->extractDelivery($order, $context);
 
-        if ($this->mollieApiOrderService->isCompletelyShipped($mollieOrderId, $order->getSalesChannelId(), $context)) {
+        if ($this->mollieApiOrderService->isCompletelyShipped($mollieOrderId, $order->getSalesChannelId())) {
             $this->deliveryTransitionService->shipDelivery($delivery, $context);
         } else {
             $this->deliveryTransitionService->partialShipDelivery($delivery, $context);
