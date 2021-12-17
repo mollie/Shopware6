@@ -40,14 +40,8 @@ class OrderTest extends TestCase
      */
     private $paymentApiService;
 
-    /**
-     * @var Context
-     */
-    private $context;
-
     protected function setUp(): void
     {
-        $this->context = $this->createMock(Context::class);
         $this->clientMock = $this->createMock(MollieApiClient::class);
 
         $apiFactoryMock = $this->createConfiguredMock(

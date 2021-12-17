@@ -28,14 +28,8 @@ class ShipmentTest extends TestCase
      */
     private $mollieOrder;
 
-    /**
-     * @var Context
-     */
-    private $context;
-
     protected function setUp(): void
     {
-        $this->context = $this->createMock(Context::class);
         $this->mollieOrder = $this->createMock(MollieOrder::class);
 
         $this->orderApiService = $this->createMock(Order::class);
@@ -82,7 +76,7 @@ class ShipmentTest extends TestCase
             ->method('createShipment')
             ->willReturn($this->createMock(MollieShipment::class));
 
-        $this->shipmentApiService->shipItem('mollieOrderId', 'salesChannelId', 'mollieOrderLineId', 1, $this->context);
+        $this->shipmentApiService->shipItem('mollieOrderId', 'salesChannelId', 'mollieOrderLineId', 1);
     }
 
     /**
@@ -97,6 +91,6 @@ class ShipmentTest extends TestCase
 
         $this->expectException(MollieOrderCouldNotBeShippedException::class);
 
-        $this->shipmentApiService->shipItem('mollieOrderId', 'salesChannelId', 'mollieOrderLineId', 1, $this->context);
+        $this->shipmentApiService->shipItem('mollieOrderId', 'salesChannelId', 'mollieOrderLineId', 1);
     }
 }
