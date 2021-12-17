@@ -177,7 +177,7 @@ class RefundController extends AbstractController
         try {
             $order = $this->getValidOrder($orderId, $context);
 
-            $success = $this->refundService->refund($order, $amount, null, $context);
+            $success = $this->refundService->refund($order, $amount, null);
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
@@ -202,7 +202,7 @@ class RefundController extends AbstractController
         try {
             $order = $this->getValidOrder($orderId, $context);
 
-            $success = $this->refundService->cancel($order, $refundId, $context);
+            $success = $this->refundService->cancel($order, $refundId);
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
@@ -226,7 +226,7 @@ class RefundController extends AbstractController
         try {
             $order = $this->getValidOrder($orderId, $context);
 
-            $refunds = $this->refundService->getRefunds($order, $context);
+            $refunds = $this->refundService->getRefunds($order);
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
@@ -252,9 +252,9 @@ class RefundController extends AbstractController
 
             $order = $this->getValidOrder($orderId, $context);
 
-            $remaining = $this->refundService->getRemainingAmount($order, $context);
-            $refunded = $this->refundService->getRefundedAmount($order, $context);
-            $voucherAmount = $this->refundService->getVoucherPaidAmount($order, $context);
+            $remaining = $this->refundService->getRemainingAmount($order);
+            $refunded = $this->refundService->getRefundedAmount($order);
+            $voucherAmount = $this->refundService->getVoucherPaidAmount($order);
 
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());

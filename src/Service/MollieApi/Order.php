@@ -260,10 +260,9 @@ class Order
     /**
      * @param string $mollieOrderId
      * @param string|null $salesChannelId
-     * @param Context $context
      * @return Payment
      */
-    public function getCompletedPayment(string $mollieOrderId, ?string $salesChannelId, Context $context): Payment
+    public function getCompletedPayment(string $mollieOrderId, ?string $salesChannelId): Payment
     {
         $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId, ['embed' => 'payments']);
 

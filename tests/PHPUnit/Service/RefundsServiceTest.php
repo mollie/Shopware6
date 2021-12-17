@@ -90,8 +90,7 @@ class RefundsServiceTest extends TestCase
         static::assertEquals($expected, $this->refundService->refund(
             $orderEntityMock,
             24.99,
-            'test refund',
-            Context::createDefaultContext()
+            'test refund'
         ));
     }
 
@@ -123,8 +122,7 @@ class RefundsServiceTest extends TestCase
 
         static::assertEquals($expected, $this->refundService->cancel(
             $orderEntityMock,
-            'foo',
-            Context::createDefaultContext()
+            'foo'
         ));
     }
 
