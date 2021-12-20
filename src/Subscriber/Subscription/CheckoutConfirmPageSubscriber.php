@@ -25,7 +25,7 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     ];
 
     /**
-     * @var EntityRepositoryInterface 
+     * @var EntityRepositoryInterface
      */
     private $paymentMethodRepository;
 

@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Hydrator\RefundHydrator;
 use Kiener\MolliePayments\Service\CustomFieldService;
+use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\MollieApi\Order as MollieOrderApi;
 use Kiener\MolliePayments\Service\MollieApi\Payment as MolliePaymentApi;
 use Kiener\MolliePayments\Service\OrderService;
@@ -52,7 +53,7 @@ class RefundsServiceTest extends TestCase
             ['createClient' => $this->clientMock, 'getClient' => $this->clientMock]
         );
 
-        $loggerServiceMock = new NullLogger();
+        $loggerServiceMock = $this->createMock(LoggerService::class);
         $paymentApiService = new MolliePaymentApi($apiFactoryMock);
         $mollieOrderApiMock = new MollieOrderApi($apiFactoryMock, $paymentApiService, $loggerServiceMock);
 

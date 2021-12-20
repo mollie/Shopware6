@@ -4,11 +4,10 @@ namespace MolliePayments\Tests\Subscriber;
 
 use Kiener\MolliePayments\Exception\CouldNotSetRefundAtMollieException;
 use Kiener\MolliePayments\Facade\SetMollieOrderRefunded;
+use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Subscriber\PaymentStateSubscriber;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
@@ -22,7 +21,7 @@ class PaymentStateSubscriberTest extends TestCase
      */
     private $setMollieOrderRefunded;
     /**
-     * @var LoggerInterface
+     * @var LoggerService|\PHPUnit\Framework\MockObject\MockObject
      */
     private $loggerService;
     /**
@@ -33,7 +32,7 @@ class PaymentStateSubscriberTest extends TestCase
     public function setUp(): void
     {
         $this->setMollieOrderRefunded = $this->getMockBuilder(SetMollieOrderRefunded::class)->disableOriginalConstructor()->getMock();
-        $this->loggerService = new NullLogger();
+        $this->loggerService = $this->getMockBuilder(LoggerService::class)->disableOriginalConstructor()->getMock();
         $this->subscriber = new PaymentStateSubscriber($this->setMollieOrderRefunded, $this->loggerService);
     }
 
@@ -48,6 +47,7 @@ class PaymentStateSubscriberTest extends TestCase
         $event->method('getTransitionSide')->willReturn(StateMachineStateChangeEvent::STATE_MACHINE_TRANSITION_SIDE_LEAVE);
         $event->expects($this->never())->method('getTransition');
         $this->setMollieOrderRefunded->expects($this->never())->method('setRefunded');
+        $this->loggerService->expects($this->never())->method('addEntry');
 
         $this->subscriber->onOrderTransactionChanged($event);
     }
@@ -59,6 +59,7 @@ class PaymentStateSubscriberTest extends TestCase
         $event->method('getTransitionSide')->willReturn(StateMachineStateChangeEvent::STATE_MACHINE_TRANSITION_SIDE_ENTER);
         $event->expects($this->once())->method('getTransition')->willReturn($transition);
         $this->setMollieOrderRefunded->expects($this->never())->method('setRefunded');
+        $this->loggerService->expects($this->never())->method('addEntry');
 
         $this->subscriber->onOrderTransactionChanged($event);
     }
@@ -76,6 +77,7 @@ class PaymentStateSubscriberTest extends TestCase
         $event->method('getTransition')->willReturn($transition);
 
         $this->setMollieOrderRefunded->expects($this->once())->method('setRefunded')->with($entityId, $context);
+        $this->loggerService->expects($this->never())->method('addEntry');
 
         $this->subscriber->onOrderTransactionChanged($event);
     }
@@ -97,6 +99,13 @@ class PaymentStateSubscriberTest extends TestCase
         $this->setMollieOrderRefunded->method('setRefunded')->willThrowException($e);
 
         $this->setMollieOrderRefunded->expects($this->once())->method('setRefunded')->with($entityId, $context);
+        $this->loggerService->expects($this->once())->method('addEntry')->with(
+            $fooMessage,
+            $context,
+            $e,
+            [],
+            Logger::ERROR
+        );
 
         $this->subscriber->onOrderTransactionChanged($event);
     }
