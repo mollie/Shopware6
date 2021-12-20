@@ -5,10 +5,7 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="Kiener\MolliePayments\Service\Subscription\DTO\SubscriptionOption"
-                 class="Kiener\MolliePayments\Service\Subscription\DTO\SubscriptionOption">
-            <argument type="service" id="Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRoute"/>
-        </service>
+        <service id="Kiener\MolliePayments\Service\Subscription\DTO\SubscriptionOption" />
 
         <service id="Kiener\MolliePayments\Service\Subscription\DTO\SubscriptionResponse"
                  class="Kiener\MolliePayments\Service\Subscription\DTO\SubscriptionResponse">

@@ -1,10 +1,12 @@
 <?php declare(strict_types=1);
 namespace Kiener\MolliePayments\Service\Subscription;
 
+use Shopware\Core\System\SalesChannel\SalesChannelEntity;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mime\Email;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\Subscription\SalesChannelService;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\Content\Mail\Service\AbstractMailService;
 use Shopware\Core\Content\MailTemplate\MailTemplateEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -22,9 +24,9 @@ class EmailService
     const TEST_MODE = 'test';
 
     /**
-     * @var AbstractMailService
+     * @var Mailer
      */
-    private $mailService;
+    private $mailer;
 
     /**
      * @var EntityRepositoryInterface
@@ -32,9 +34,9 @@ class EmailService
     private $mailTemplateRepository;
 
     /**
-     * @var SalesChannelService
+     * @var EntityRepositoryInterface
      */
-    private $salesChannelService;
+    private $salesChannelRepository;
 
     /**
      * @var ConfigService
@@ -62,8 +64,8 @@ class EmailService
     private $logger;
 
     /**
-     * @param AbstractMailService $mailService
-     * @param SalesChannelService $salesChannelService
+     * @param Mailer $mailer
+     * @param EntityRepositoryInterface $salesChannelRepository
      * @param EntityRepositoryInterface $customer
      * @param SettingsService $settingsService
      * @param EntityRepositoryInterface $mailTemplateRepository
@@ -72,8 +74,8 @@ class EmailService
      * @param LoggerService $logger
      */
     public function __construct(
-        AbstractMailService       $mailService,
-        SalesChannelService       $salesChannelService,
+        Mailer $mailer,
+        EntityRepositoryInterface $salesChannelRepository,
         EntityRepositoryInterface $customer,
         SettingsService           $settingsService,
         EntityRepositoryInterface $mailTemplateRepository,
@@ -82,9 +84,9 @@ class EmailService
         LoggerService             $logger
     )
     {
-        $this->mailService = $mailService;
+        $this->mailer = $mailer;
         $this->mailTemplateRepository = $mailTemplateRepository;
-        $this->salesChannelService = $salesChannelService;
+        $this->salesChannelRepository = $salesChannelRepository;
         $this->configService = $configService;
         $this->customer = $customer;
         $this->settingsService = $settingsService;
@@ -92,7 +94,11 @@ class EmailService
         $this->logger = $logger;
     }
 
-
+    /**
+     * @param $subscription
+     * @return bool
+     * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
+     */
     public function sendMail($subscription): bool
     {
         $customer = $this->getCustomer($subscription);
@@ -113,26 +119,32 @@ class EmailService
         $data->set('mediaIds', []);
 
         $templateData = [
-            'subscription' => [
-                'customer' => [
-                    'salutation' => $customer->getSalutation()->getDisplayName(),
-                    'name' => $customer->getFirstName() . ' ' . $customer->getLastName()
-                ],
-                'productName' => $this->getProductName($subscription->getProductId()),
-                'nextPaymentDate' => $subscription->get('nextPaymentDate')->format('d/m/Y'),
-                'amount' => $subscription->getAmount()
-            ]
+            '%salutation%' => $customer->getSalutation()->getDisplayName(),
+            '%customer_name%' => $customer->getFirstName() . ' ' . $customer->getLastName(),
+            '%subscriptions_productName%' => $this->getProductName($subscription->getProductId()),
+            '%subscriptions_nextPaymentDate%' => $subscription->get('nextPaymentDate')->format('d/m/Y'),
+            '%subscriptions_amount%' => $subscription->getAmount()
         ];
 
-        if (!isset($salesChannelContext)) {
-            $salesChannelContext = $this->salesChannelService->createSalesChannelContext();
-        }
-        $data->set('salesChannelId', $salesChannelContext->getSalesChannel()->getId());
-
+        $data->set('salesChannelId', $subscription->getSalesChannelId());
         $data->set('templateId', $mailTemplate->getId());
 
+        $senderEmail = $this->getSender($data, $data['salesChannelId']);
+
         try {
-            $result = $this->mailService->send($data->all(), $salesChannelContext->getContext(), $templateData);
+            $mail = $this->create(
+                $data['subject'],
+                [$senderEmail => $data['senderName']],
+                $data['recipients'],
+                $this->buildContents($data, $templateData),
+                [],
+                $data,
+                null
+            );
+
+            $this->mailer->send($mail, null);
+
+            return true;
         } catch (\Exception $e) {
             $this->logger->addEntry(
                 "Could not send mail:\n"
@@ -142,7 +154,8 @@ class EmailService
                 . json_encode($data->all()) . "\n"
             );
         }
-        return (bool)$result;
+
+        return false;
     }
 
     /**
@@ -195,5 +208,162 @@ class EmailService
         $criteria->addFilter(new EqualsFilter('id', $id));
         $product = $this->product->search($criteria, Context::createDefaultContext())->first();
         return $product->getName();
+    }
+
+    /**
+     * @param string $subject
+     * @param array $sender
+     * @param array $recipients
+     * @param array $contents
+     * @param array $attachments
+     * @param array $additionalData
+     * @param array|null $binAttachments
+     * @return Email
+     */
+    public function create(
+        string $subject,
+        array $sender,
+        array $recipients,
+        array $contents,
+        array $attachments,
+        array $additionalData,
+        ?array $binAttachments = null
+    ): Email {
+
+        $mail = (new Email())
+            ->subject($subject)
+            ->from(...$this->formatMailAddresses($sender))
+            ->to(...$this->formatMailAddresses($recipients));
+
+        foreach ($contents as $contentType => $data) {
+            if ($contentType === 'text/html') {
+                $mail->html($data);
+            } else {
+                $mail->text($data);
+            }
+        }
+
+        foreach ($attachments as $url) {
+            $mail->embed($this->filesystem->read($url) ?: '', basename($url), $this->filesystem->getMimetype($url) ?: null);
+        }
+
+        if (isset($binAttachments)) {
+            foreach ($binAttachments as $binAttachment) {
+                $mail->embed(
+                    $binAttachment['content'],
+                    $binAttachment['fileName'],
+                    $binAttachment['mimeType']
+                );
+            }
+        }
+
+        foreach ($additionalData as $key => $value) {
+            switch ($key) {
+                case 'recipientsCc':
+                    $mail->addCc(...$this->formatMailAddresses([$value => $value]));
+
+                    break;
+                case 'recipientsBcc':
+                    $mail->addBcc(...$this->formatMailAddresses([$value => $value]));
+
+                    break;
+                case 'replyTo':
+                    $mail->addReplyTo(...$this->formatMailAddresses([$value => $value]));
+
+                    break;
+                case 'returnPath':
+                    $mail->returnPath(...$this->formatMailAddresses([$value => $value]));
+            }
+        }
+
+        return $mail;
+    }
+
+    /**
+     * Attaches header and footer to given email bodies
+     *
+     * @param array $data e.g. ['contentHtml' => 'foobar', 'contentPlain' => '<h1>foobar</h1>']
+     *
+     * @return array e.g. ['text/plain' => '{{foobar}}', 'text/html' => '<h1>{{foobar}}</h1>']
+     *
+     * @internal
+     */
+    private function buildContents(array $templateData, array $data): array
+    {
+        $contentPlain = $this->strReplaceAssoc($templateData, $data['contentPlain']);
+        $contentHtml = $this->strReplaceAssoc($templateData, $data['contentHtml']);
+
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('salesChannelId', $data['salesChannelId']));
+
+        /** @var SalesChannelEntity $salesChannel */
+        $salesChannel = $this->salesChannelRepository->search($criteria, Context::createDefaultContext())->first();
+        if ($salesChannel && $mailHeaderFooter = $salesChannel->getMailHeaderFooter()) {
+            $headerPlain = $mailHeaderFooter->getTranslation('headerPlain') ?? '';
+            $footerPlain = $mailHeaderFooter->getTranslation('footerPlain') ?? '';
+            $headerHtml = $mailHeaderFooter->getTranslation('headerHtml') ?? '';
+            $footerHtml = $mailHeaderFooter->getTranslation('footerHtml') ?? '';
+
+            return [
+                'text/plain' => sprintf('%s%s%s', $headerPlain, $contentPlain, $footerPlain),
+                'text/html' => sprintf('%s%s%s', $headerHtml, $contentHtml, $footerHtml),
+            ];
+        }
+
+        return [
+            'text/html' => $contentHtml,
+            'text/plain' => $contentPlain,
+        ];
+    }
+
+    /**
+     * @param array $replace
+     * @param $subject
+     * @return mixed
+     */
+    function strReplaceAssoc(array $replace, $subject) {
+        return str_replace(array_keys($replace), array_values($replace), $subject);
+    }
+
+    /**
+     * @param array $data
+     * @param string|null $salesChannelId
+     * @return string|null
+     */
+    private function getSender(array $data, ?string $salesChannelId): ?string
+    {
+        $senderEmail = $data['senderEmail'] ?? null;
+
+        if ($senderEmail === null || trim($senderEmail) === '') {
+            $senderEmail = $this->systemConfigService->get('core.basicInformation.email', $salesChannelId);
+        }
+
+        if ($senderEmail === null || trim($senderEmail) === '') {
+            $senderEmail = $this->systemConfigService->get('core.mailerSettings.senderAddress', $salesChannelId);
+        }
+
+        if ($senderEmail === null || trim($senderEmail) === '') {
+            $this->logger->error('senderMail not configured for salesChannel: '
+                . $salesChannelId
+                . '. Please check system_config \'core.basicInformation.email\'');
+
+            return null;
+        }
+
+        return $senderEmail;
+    }
+
+    /**
+     * @param array $addresses
+     * @return array
+     */
+    private function formatMailAddresses(array $addresses): array
+    {
+        $formattedAddresses = [];
+        foreach ($addresses as $mail => $name) {
+            $formattedAddresses[] = $name . ' <' . $mail . '>';
+        }
+
+        return $formattedAddresses;
     }
 }

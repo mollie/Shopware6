@@ -7,8 +7,7 @@
     <services>
         <service id="Kiener\MolliePayments\Service\Subscription\EmailService"
                  class="Kiener\MolliePayments\Service\Subscription\EmailService">
-            <argument type="service" id="Shopware\Core\Content\Mail\Service\MailService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Subscription\SalesChannelService"/>
+            <argument type="service" id="sales_channel.repository"/>
             <argument type="service" id="customer.repository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="mail_template.repository"/>

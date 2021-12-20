@@ -3,10 +3,11 @@
 namespace Kiener\MolliePayments\Subscriber\Subscription;
 
 use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
-use Shopware\Core\Checkout\Payment\SalesChannel\AbstractPaymentMethodRoute;
+use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
-use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,17 +24,12 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
         'eps',
     ];
 
-    /**
-     * @var AbstractPaymentMethodRoute
-     */
-    private $paymentMethodRoute;
+    private EntityRepositoryInterface $paymentMethodRepository;
 
-    /**
-     * @param AbstractPaymentMethodRoute $paymentMethodRoute
-     */
-    public function __construct(AbstractPaymentMethodRoute $paymentMethodRoute)
-    {
-        $this->paymentMethodRoute = $paymentMethodRoute;
+    public function __construct(
+        EntityRepositoryInterface $paymentMethodRepository
+    ) {
+        $this->paymentMethodRepository = $paymentMethodRepository;
     }
 
     /**
@@ -63,22 +59,19 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
         }
 
         if ($mollieSubscriptions) {
-            $args->getPage()->setPaymentMethods($this->getPaymentMethods($args->getSalesChannelContext()));
+            $args->getPage()->setPaymentMethods($this->getPaymentMethods());
         }
     }
 
     /**
-     * @param SalesChannelContext $context
      * @return PaymentMethodCollection
      */
-    private function getPaymentMethods(SalesChannelContext $context): PaymentMethodCollection
+    private function getPaymentMethods(): PaymentMethodCollection
     {
-        $request = new Request();
-        $request->query->set('onlyAvailable', '1');
-
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsAnyFilter('customFields.mollie_payment_method_name', self::ALLOWED_METHODS));
+        $criteria->addFilter(new EqualsFilter('active', true));
 
-        return $this->paymentMethodRoute->load($request, $context, $criteria)->getPaymentMethods();
+        return $this->paymentMethodRepository->search($criteria, Context::createDefaultContext())->getEntities();
     }
 }
