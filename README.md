@@ -3,7 +3,6 @@
 </p>
 <h1 align="center">Mollie for Shopware 6</h1>
 
-
 ![Build Status](https://github.com/mollie/Shopware6/actions/workflows/ci_pipe.yml/badge.svg) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/mollie/Shopware6) ![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/mollie/Shopware6/latest)
 
 ## Introduction
