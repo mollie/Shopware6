@@ -4,8 +4,6 @@ namespace Kiener\MolliePayments\Page\Account\Mollie;
 
 use Kiener\MolliePayments\Service\CustomerService;
 use Shopware\Core\Checkout\Cart\Exception\CustomerNotLoggedInException;
-use Shopware\Core\Checkout\Order\Exception\GuestNotAuthenticatedException;
-use Shopware\Core\Checkout\Order\Exception\WrongGuestCredentialsException;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -87,13 +85,14 @@ class AccountSubscriptionsPageLoader
     private function getSubscriptions(Request $request, SalesChannelContext $context): EntitySearchResult
     {
         $customerId = $this->customerService->getMollieCustomerId(
-            $context->getCustomer()->getId(),
+            $context->getCustomer()->get('_uniqueIdentifier'),
             $context->getSalesChannelId(),
             $context->getContext()
         );
 
         $criteria = $this->createCriteria($request, $customerId);
 
+        /** @var StorefrontSearchResult<SubscriptionToProductEntity> */
         return $this->mollieSubscriptionsRepository->search($criteria, $context->getContext());
     }
 
