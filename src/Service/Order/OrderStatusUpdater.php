@@ -89,6 +89,10 @@ class OrderStatusUpdater
                 $this->transactionTransitionService->authorizeTransaction($transaction, $context);
 
                 break;
+            case MolliePaymentStatus::MOLLIE_PAYMENT_CHARGEBACK:
+                $this->transactionTransitionService->chargebackTransaction($transaction, $context);
+
+                break;
             case MolliePaymentStatus::MOLLIE_PAYMENT_PENDING:
 
                 break;
@@ -151,6 +155,9 @@ class OrderStatusUpdater
                 break;
             case MolliePaymentStatus::MOLLIE_PAYMENT_CANCELED:
                 $this->orderHandler->setOrderState($order, $settings->getOrderStateWithACancelledTransaction(), $context);
+                break;
+            case MolliePaymentStatus::MOLLIE_PAYMENT_CHARGEBACK:
+                $this->orderHandler->setOrderState($order, $settings->getOrderStateWithAChargebackTransaction(), $context);
                 break;
 
             default:

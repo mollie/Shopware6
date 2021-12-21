@@ -119,8 +119,6 @@ context("Order Refunds", () => {
             // afterwards, try to cancel our refund again
             adminOrders.cancelOrderRefund();
 
-            cy.reload();
-
             // let's open the refund manager, and verify
             // that the pending refund is NOT existing anymore
             repoOrdersDetails.getMollieRefundManagerButton().click();

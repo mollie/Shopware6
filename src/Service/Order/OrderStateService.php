@@ -47,7 +47,7 @@ class OrderStateService
 
         $currentStatus = $order->getStateMachineState()->getTechnicalName();
 
-        // if current state is same as status that shoould be set, we don't need to do a transition
+        // if current state is same as status that should be set, we don't need to do a transition
         if ($currentStatus === $orderState) {
             return false;
         }

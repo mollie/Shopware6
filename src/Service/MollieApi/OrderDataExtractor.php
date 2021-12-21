@@ -8,8 +8,6 @@ use Kiener\MolliePayments\Exception\OrderDeliveriesNotFoundException;
 use Kiener\MolliePayments\Exception\OrderDeliveryNotFoundException;
 use Kiener\MolliePayments\Exception\OrderLineItemsNotFoundException;
 use Kiener\MolliePayments\Service\CustomerService;
-use Kiener\MolliePayments\Service\LoggerService;
-use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;

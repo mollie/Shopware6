@@ -4,9 +4,11 @@ namespace Kiener\MolliePayments\Compatibility\Gateway;
 
 use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGatewayInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextServiceInterface;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextServiceParameters;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 
 
 class CompatibilityGateway implements CompatibilityGatewayInterface
@@ -71,6 +73,30 @@ class CompatibilityGateway implements CompatibilityGatewayInterface
         }
 
         return 'promotion';
+    }
+
+    /**
+     * @return string
+     */
+    public function getChargebackOrderTransactionState(): string
+    {
+        // In progress state did not exist before 6.2, so set to open instead.
+        if(!$this->versionGTE('6.2')) {
+            return OrderTransactionStates::STATE_OPEN;
+        }
+
+        // Chargeback state did not exist before 6.2.3, so set to in progress instead.
+        if(!$this->versionGTE('6.2.3')) {
+            return OrderTransactionStates::STATE_IN_PROGRESS;
+        }
+
+        if (defined('Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates::STATE_CHARGEBACK')) {
+            return OrderTransactionStates::STATE_CHARGEBACK;
+        }
+
+        // Chargeback constant did not exist until 6.4.4, but the state exists since 6.2.3,
+        // so return it as string instead.
+        return 'chargeback';
     }
 
     /**
