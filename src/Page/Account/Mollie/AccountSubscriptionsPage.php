@@ -8,7 +8,7 @@ use Shopware\Storefront\Page\Page;
 class AccountSubscriptionsPage extends Page
 {
     /**
-     * @var StorefrontSearchResult
+     * @var StorefrontSearchResult<SubscriptionToProductEntity>
      */
     protected $subscriptions;
 
@@ -17,19 +17,16 @@ class AccountSubscriptionsPage extends Page
      */
     protected $deepLinkCode;
 
+    /**
+     * @var int|null
+     */
     protected $total;
 
-    /**
-     * @return StorefrontSearchResult
-     */
     public function getSubscriptions(): StorefrontSearchResult
     {
         return $this->subscriptions;
     }
 
-    /**
-     * @param StorefrontSearchResult $subscriptions
-     */
     public function setSubscriptions(StorefrontSearchResult $subscriptions): void
     {
         $this->subscriptions = $subscriptions;

@@ -79,9 +79,9 @@ class AccountSubscriptionsPageLoader
     }
 
     /**
-     * @throws CustomerNotLoggedInException
-     * @throws GuestNotAuthenticatedException
-     * @throws WrongGuestCredentialsException
+     * @param Request $request
+     * @param SalesChannelContext $context
+     * @return EntitySearchResult
      */
     private function getSubscriptions(Request $request, SalesChannelContext $context): EntitySearchResult
     {
@@ -93,7 +93,6 @@ class AccountSubscriptionsPageLoader
 
         $criteria = $this->createCriteria($request, $customerId);
 
-        /** @var EntitySearchResult $subscriptions */
         return $this->mollieSubscriptionsRepository->search($criteria, $context->getContext());
     }
 

@@ -123,9 +123,9 @@ class MolliePayments extends Plugin
     }
 
     /**
-     * @param $context
+     * @param InstallContext $context
      */
-    private function addReminderEmailTemplate($context)
+    private function addReminderEmailTemplate(InstallContext $context): void
     {
         /** @var EntityRepositoryInterface $mailTemplateTypeRepository */
         $mailTemplateTypeRepository = $this->container->get('mail_template_type.repository');
@@ -179,9 +179,9 @@ class MolliePayments extends Plugin
     }
 
     /**
-     * @param $context
+     * @param UninstallContext $context
      */
-    private function deleteReminderEmailTemplate($context)
+    private function deleteReminderEmailTemplate(UninstallContext $context): void
     {
         /** @var EntityRepositoryInterface $mailTemplateTypeRepository */
         $mailTemplateTypeRepository = $this->container->get('mail_template_type.repository');
