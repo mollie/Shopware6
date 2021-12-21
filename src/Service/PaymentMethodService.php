@@ -138,17 +138,17 @@ class PaymentMethodService
 
             // Get existing payment method so we can update it by it's ID
             try {
-                $existingPaymentMethodId = $this->getPaymentMethodId(
+                $existingPaymentMethod = $this->getPaymentMethod(
                     $paymentMethodData['handlerIdentifier'],
-                    $paymentMethodData['name'],
                     $context
                 );
             } catch (InconsistentCriteriaIdsException $e) {
                 // On error, we assume the payment method doesn't exist
             }
 
-            if (isset($existingPaymentMethodId) && $existingPaymentMethodId !== null) {
-                $paymentMethodData['id'] = $existingPaymentMethodId;
+            if (isset($existingPaymentMethod)) {
+                $paymentMethodData['id'] = $existingPaymentMethod->getId();
+                $paymentMethodData['name'] = $existingPaymentMethod->getName();
             }
 
             // Add payment method data to array of payment data
@@ -201,15 +201,17 @@ class PaymentMethodService
     {
         if (!empty($paymentMethods)) {
             foreach ($paymentMethods as $paymentMethod) {
-                if (in_array($paymentMethod['handler'], $installedHandlers, true)) {
+                if (
+                    !isset($paymentMethod['handler']) ||
+                    in_array($paymentMethod['handler'], $installedHandlers, true)
+                ) {
                     continue;
                 }
 
-                /** @var string|null $paymentMethodId */
-                $paymentMethodId = $this->getPaymentMethodId($paymentMethod['handler'], $paymentMethod['description'], $context);
+                $existingPaymentMethod = $this->getPaymentMethod($paymentMethod['handler'], $context);
 
-                if ((string) $paymentMethodId !== '') {
-                    $this->activatePaymentMethod($paymentMethodId, true, $context);
+                if (isset($existingPaymentMethod)) {
+                    $this->activatePaymentMethod($existingPaymentMethod->getId(), true, $context);
                 }
             }
         }
@@ -295,26 +297,24 @@ class PaymentMethodService
      * Get payment method ID by name.
      *
      * @param $handlerIdentifier
-     * @param $name
      * @param Context $context
      *
-     * @return string|null
+     * @return PaymentMethodEntity|null
      */
-    private function getPaymentMethodId($handlerIdentifier, $name, Context $context) : ?string
+    private function getPaymentMethod($handlerIdentifier, Context $context) : ?PaymentMethodEntity
     {
         // Fetch ID for update
         $paymentCriteria = new Criteria();
         $paymentCriteria->addFilter(new EqualsFilter('handlerIdentifier', $handlerIdentifier));
-        $paymentCriteria->addFilter(new EqualsFilter('name', $name));
 
         // Get payment IDs
-        $paymentIds = $this->paymentRepository->searchIds($paymentCriteria, $context);
+        $paymentMethods = $this->paymentRepository->search($paymentCriteria, $context);
 
-        if ($paymentIds->getTotal() === 0) {
+        if ($paymentMethods->getTotal() === 0) {
             return null;
         }
 
-        return $paymentIds->getIds()[0];
+        return $paymentMethods->first();
     }
 
     /**

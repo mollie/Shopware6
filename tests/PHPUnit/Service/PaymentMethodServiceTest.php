@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Tests\Service;
 
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Handler\Method\iDealPayment;
-use Kiener\MolliePayments\MolliePayments;
 use Kiener\MolliePayments\Service\PaymentMethodService;
 use MolliePayments\Tests\Fakes\FakeEntityRepository;
 use PHPUnit\Framework\TestCase;
@@ -20,7 +19,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 use Shopware\Core\Framework\Plugin\Util\PluginIdProvider;
 
 class PaymentMethodServiceTest extends TestCase
@@ -98,14 +96,27 @@ class PaymentMethodServiceTest extends TestCase
         $this->mediaRepository->entitySearchResults = [$search];
     }
 
-    public function setUpExistingPaymentMethodsSearchIdsReturn(int $total = 0, array $ids = []): void
+    public function setUpExistingPaymentMethodsSearchReturn(int $total = 0, array $ids = []): void
     {
-        $search = $this->createConfiguredMock(IdSearchResult::class, [
+        $num = 1;
+        $methods = [];
+
+        foreach ($ids as $id) {
+            $methods[] = $this->createConfiguredMock(PaymentMethodEntity::class, [
+                'getId' => $id,
+                'getName' => 'Test ' . $num,
+            ]);
+
+            $num++;
+        }
+
+        $search = $this->createConfiguredMock(EntitySearchResult::class, [
             'getTotal' => $total,
-            'getIds' => $ids,
+            'first' => reset($methods),
+            'last' => end($methods)
         ]);
 
-        $this->paymentMethodRepository->idSearchResults = [$search];
+        $this->paymentMethodRepository->entitySearchResults = [$search];
     }
 
     public function setUpPaymentMethodUpsertReturn(): void
@@ -177,7 +188,7 @@ class PaymentMethodServiceTest extends TestCase
     public function testDoesAddPaymentMethods(): void
     {
         $this->setUpMediaRepositorySearchReturn();
-        $this->setUpExistingPaymentMethodsSearchIdsReturn();
+        $this->setUpExistingPaymentMethodsSearchReturn();
         $this->setUpPaymentMethodUpsertReturn();
 
         $installablePaymentMethods = $this->paymentMethodService->getInstallablePaymentMethods();
@@ -197,7 +208,7 @@ class PaymentMethodServiceTest extends TestCase
 
     public function testDoesActivatePaymentMethods(): void
     {
-        $this->setUpExistingPaymentMethodsSearchIdsReturn(1, ['112233']);
+        $this->setUpExistingPaymentMethodsSearchReturn(1, ['112233']);
         $this->setUpPaymentMethodUpsertReturn();
 
         $installablePaymentMethods = $this->paymentMethodService->getInstallablePaymentMethods();
@@ -218,7 +229,7 @@ class PaymentMethodServiceTest extends TestCase
     {
         $paymentMethodIds = ['112233', '445566'];
 
-        $this->setUpExistingPaymentMethodsSearchIdsReturn(count($paymentMethodIds), $paymentMethodIds);
+        $this->setUpExistingPaymentMethodsSearchReturn(count($paymentMethodIds), $paymentMethodIds);
         $this->setUpPaymentMethodUpsertReturn();
 
         $installablePaymentMethods = $this->paymentMethodService->getInstallablePaymentMethods();
