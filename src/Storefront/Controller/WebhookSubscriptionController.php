@@ -198,7 +198,7 @@ class WebhookSubscriptionController extends StorefrontController
     private function molliePaymentDoPay(string $newOrderId, $transactionData, $salesChannelContext): string
     {
         // get order with all needed associations
-        $order = $this->getOrder($newOrderId, null);
+        $order = $this->getOrder($newOrderId);
 
         if (!$order instanceof OrderEntity) {
             throw new OrderNotFoundException($newOrderId);

@@ -5,7 +5,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mime\Email;
 use Kiener\MolliePayments\Service\SettingsService;
-use Kiener\MolliePayments\Service\Subscription\SalesChannelService;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Content\MailTemplate\MailTemplateEntity;
 use Shopware\Core\Framework\Context;
@@ -169,17 +168,12 @@ class EmailService
             return null;
         }
 
-        if (!isset($context)) {
-            $salesChannelContext = $this->salesChannelService->createSalesChannelContext();
-            $context = $salesChannelContext->getContext();
-        }
-
         $criteria = new Criteria();
         $criteria->addAssociation('media.media');
         $criteria->setLimit(1);
         $criteria->addFilter(new EqualsFilter('mailTemplateTypeId', $templateTypeId));
 
-        return $this->mailTemplateRepository->search($criteria, $context)->first();
+        return $this->mailTemplateRepository->search($criteria, Context::createDefaultContext())->first();
     }
 
     /**
@@ -241,10 +235,6 @@ class EmailService
             } else {
                 $mail->text($data);
             }
-        }
-
-        foreach ($attachments as $url) {
-            $mail->embed($this->filesystem->read($url) ?: '', basename($url), $this->filesystem->getMimetype($url) ?: null);
         }
 
         if (isset($binAttachments)) {
@@ -335,11 +325,11 @@ class EmailService
         $senderEmail = $data['senderEmail'] ?? null;
 
         if ($senderEmail === null || trim($senderEmail) === '') {
-            $senderEmail = $this->systemConfigService->get('core.basicInformation.email', $salesChannelId);
+            $senderEmail = $this->configService->get('core.basicInformation.email', $salesChannelId);
         }
 
         if ($senderEmail === null || trim($senderEmail) === '') {
-            $senderEmail = $this->systemConfigService->get('core.mailerSettings.senderAddress', $salesChannelId);
+            $senderEmail = $this->configService->get('core.mailerSettings.senderAddress', $salesChannelId);
         }
 
         if ($senderEmail === null || trim($senderEmail) === '') {

@@ -88,7 +88,7 @@ class SendPrePaymentReminderEmailTaskHandler extends ScheduledTaskHandler
 
                 if (!$result) {
                     $this->logger->addEntry(
-                        date() . ': Prepayment reminder email was not sent. Subscription_id: ' . $subscription->getId(),
+                        date("Y-m-d H:i:s") . ': Prepayment reminder email was not sent. Subscription_id: ' . $subscription->getId(),
                         Context::createDefaultContext()
                     );
                 }
