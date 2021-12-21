@@ -29,14 +29,14 @@ Component.register('mollie-update-payment-methods', {
             this.MolliePaymentsPaymentMethodService.updatePaymentMethods()
                 .then((response) => {
                     const messageData = {
-                        title: me.$tc('sw-payment.updatePaymentMethods.title'),
-                        message: me.$tc('sw-payment.updatePaymentMethods.succeeded'),
+                        title: me.$tc('mollie-payments.config.payments.updatePaymentMethods.title'),
+                        message: me.$tc('mollie-payments.config.payments.updatePaymentMethods.succeeded'),
                     };
 
                     if (response.success === true) {
                         me.createNotificationSuccess(messageData);
                     } else {
-                        messageData.message = me.$tc('sw-payment.updatePaymentMethods.failed');
+                        messageData.message = me.$tc('mollie-payments.config.payments.updatePaymentMethods.failed');
                         me.createNotificationError(messageData);
                     }
 

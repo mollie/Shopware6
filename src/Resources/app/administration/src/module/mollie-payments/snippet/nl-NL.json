@@ -6,6 +6,16 @@
       "refundThroughMollie": "Terugbetaling via Mollie",
       "shipThroughMollie": "Verzending door Mollie"
     },
+    "config": {
+      "payments": {
+        "updatePaymentMethods": {
+          "title": "Mollie Payments",
+          "button": "Betaalmethoden updaten",
+          "succeeded": "De betaalmethoden zijn succesvol geüpdated.",
+          "failed": "De betaalmethoden konden niet worden geüpdated."
+        }
+      }
+    },
     "modals": {
       "refund": {
         "title": "Terugbetaling via Mollie",
@@ -72,12 +82,6 @@
       "apiKey": "API Key",
       "isValid": "is geldig",
       "isInvalid": "is ongeldig"
-    },
-    "updatePaymentMethods": {
-      "title": "Mollie Payments",
-      "button": "Betaalmethoden updaten",
-      "succeeded": "De betaalmethoden zijn succesvol geüpdated.",
-      "failed": "De betaalmethoden konden niet worden geüpdated."
     }
   },
   "sw-customer": {

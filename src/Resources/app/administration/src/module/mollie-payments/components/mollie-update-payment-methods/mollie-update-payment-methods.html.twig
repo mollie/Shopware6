@@ -1,6 +1,6 @@
 <sw-container gap="16px" columns="1fr" justify="start">
     <sw-button @click="onUpdatePaymentMethodsButtonClicked" ref="updatePaymentMethodsButton">
         <sw-loader v-if="updatePaymentMethodsIsLoading" size="16px"></sw-loader>
-        {{ $tc('sw-payment.updatePaymentMethods.button') }}
+        {{ $tc('mollie-payments.config.payments.updatePaymentMethods.button') }}
     </sw-button>
 </sw-container>

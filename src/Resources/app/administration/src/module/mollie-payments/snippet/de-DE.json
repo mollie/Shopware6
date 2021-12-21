@@ -6,6 +6,16 @@
       "refundThroughMollie": "Rückerstattung über Mollie",
       "shipThroughMollie": "Versand bei Mollie melden"
     },
+    "config": {
+      "payments": {
+        "updatePaymentMethods": {
+          "title": "Mollie Payments",
+          "button": "Zahlungsarten aktualisieren",
+          "succeeded": "Die Zahlungsarten wurden erfolgreich aktualisiert.",
+          "failed": "Die Zahlungsarten konnten nicht aktualisiert werden."
+        }
+      }
+    },
     "modals": {
       "refund": {
         "title": "Rückerstattung über Mollie",
@@ -72,12 +82,6 @@
       "apiKey": "API Schlüssel",
       "isValid": "ist gültig",
       "isInvalid": "ist ungültig"
-    },
-    "updatePaymentMethods": {
-      "title": "Mollie Payments",
-      "button": "Zahlungsarten aktualisieren",
-      "succeeded": "Die Zahlungsarten wurden erfolgreich aktualisiert.",
-      "failed": "Die Zahlungsarten konnten nicht aktualisiert werden."
     }
   },
   "sw-customer": {
