@@ -15,6 +15,7 @@ use Shopware\Storefront\Framework\Page\StorefrontSearchResult;
 use Shopware\Storefront\Page\GenericPageLoaderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Kiener\MolliePayments\Core\Content\SubscriptionToProduct\SubscriptionToProductEntity;
 
 class AccountSubscriptionsPageLoader
 {
@@ -81,7 +82,7 @@ class AccountSubscriptionsPageLoader
     /**
      * @param Request $request
      * @param SalesChannelContext $context
-     * @return EntitySearchResult
+     * @return StorefrontSearchResult<SubscriptionToProductEntity>
      */
     private function getSubscriptions(Request $request, SalesChannelContext $context): EntitySearchResult
     {

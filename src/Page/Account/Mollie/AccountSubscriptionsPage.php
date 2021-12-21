@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Page\Account\Mollie;
 
 use Shopware\Storefront\Framework\Page\StorefrontSearchResult;
 use Shopware\Storefront\Page\Page;
+use Kiener\MolliePayments\Core\Content\SubscriptionToProduct\SubscriptionToProductEntity;
 
 class AccountSubscriptionsPage extends Page
 {
@@ -22,11 +23,17 @@ class AccountSubscriptionsPage extends Page
      */
     protected $total;
 
+    /**
+     * @return StorefrontSearchResult<SubscriptionToProductEntity>
+     */
     public function getSubscriptions(): StorefrontSearchResult
     {
         return $this->subscriptions;
     }
 
+    /**
+     * @param StorefrontSearchResult<SubscriptionToProductEntity> $subscriptions
+     */
     public function setSubscriptions(StorefrontSearchResult $subscriptions): void
     {
         $this->subscriptions = $subscriptions;
