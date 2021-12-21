@@ -160,17 +160,17 @@ class MollieOrderBuilder
         $webhookUrl = $this->webhookBuilder->buildWebhook($transactionId);
         $orderData['webhookUrl'] = $webhookUrl;
         $orderData['payment']['webhookUrl'] = $webhookUrl;
-        $orderData['payment']['sequenceType'] = 'first';
+        if ($this->isSubscriptions($order->getLineItems())) {
+            $orderData['payment']['sequenceType'] = 'first';
+        }
 
         $isVerticalTaxCalculation = $this->isVerticalTaxCalculation($salesChannelContext);
-
 
         $lines = $this->lineItemBuilder->buildLineItems(
             $order->getTaxStatus(),
             $order->getNestedLineItems(),
             $isVerticalTaxCalculation
         );
-
 
         $deliveries = $order->getDeliveries();
 
@@ -249,6 +249,22 @@ class MollieOrderBuilder
         }
 
         return $salesChannel->getTaxCalculationType() === SalesChannelDefinition::CALCULATION_TYPE_VERTICAL;
+    }
+
+    /**
+     * @param $lines
+     * @return bool
+     */
+    private function isSubscriptions($lines): bool
+    {
+        foreach ($lines as $line) {
+            $customFields = $line->getPayload()['customFields'];
+            if (isset($customFields["mollie_subscription"]['mollie_subscription_product'])
+                && $customFields["mollie_subscription"]['mollie_subscription_product']) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
