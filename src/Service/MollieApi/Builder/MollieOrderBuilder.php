@@ -258,8 +258,10 @@ class MollieOrderBuilder
     private function isSubscriptions($lines): bool
     {
         foreach ($lines as $line) {
-            $customFields = $line->getPayload()['customFields'];
-            if (isset($customFields["mollie_subscription"]['mollie_subscription_product'])
+            $customFields = !is_null($line->getPayload()) && !is_null($line->getPayload()['customFields'])
+                ? $line->getPayload()['customFields'] : [];
+            if (isset($customFields["mollie_subscription"])
+                && isset($customFields["mollie_subscription"]['mollie_subscription_product'])
                 && $customFields["mollie_subscription"]['mollie_subscription_product']) {
                 return true;
             }
