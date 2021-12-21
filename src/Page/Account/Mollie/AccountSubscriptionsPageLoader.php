@@ -85,8 +85,10 @@ class AccountSubscriptionsPageLoader
     private function getSubscriptions(Request $request, SalesChannelContext $context): EntitySearchResult
     {
         /* @phpstan-ignore-next-line */
+        $currentCustomerId = $context->getCustomer()->getId();
+
         $customerId = $this->customerService->getMollieCustomerId(
-            $context->getCustomer()->getId(),
+            $currentCustomerId,
             $context->getSalesChannelId(),
             $context->getContext()
         );
