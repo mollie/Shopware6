@@ -67,7 +67,8 @@ class AccountSubscriptionsPageLoader
             $page->getMetaInformation()->setRobots('noindex,follow');
         }
 
-        if ($subscriptions = $this->getSubscriptions($request, $salesChannelContext)) {
+        $subscriptions = $this->getSubscriptions($request, $salesChannelContext);
+        if (!is_null($subscriptions)) {
             $page->setSubscriptions(StorefrontSearchResult::createFrom($subscriptions));
             $page->setDeepLinkCode($request->get('deepLinkCode'));
             $page->setTotal($subscriptions->getTotal());
@@ -78,14 +79,14 @@ class AccountSubscriptionsPageLoader
     /**
      * @param Request $request
      * @param SalesChannelContext $context
-     * @return bool|StorefrontSearchResult<SubscriptionToProductEntity>
+     * @return null|StorefrontSearchResult<SubscriptionToProductEntity>
      */
     private function getSubscriptions(Request $request, SalesChannelContext $context): ?EntitySearchResult
     {
         $customer = $context->getCustomer();
 
         if (!$customer instanceof CustomerEntity) {
-            return false;
+            return null;
         }
 
         $customerId = $this->customerService->getMollieCustomerId(
