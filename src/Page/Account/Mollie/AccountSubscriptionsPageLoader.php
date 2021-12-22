@@ -14,6 +14,7 @@ use Shopware\Storefront\Page\GenericPageLoaderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Kiener\MolliePayments\Core\Content\SubscriptionToProduct\SubscriptionToProductEntity;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
 
 class AccountSubscriptionsPageLoader
 {
@@ -66,33 +67,32 @@ class AccountSubscriptionsPageLoader
             $page->getMetaInformation()->setRobots('noindex,follow');
         }
 
-        $subscriptions = $this->getSubscriptions($request, $salesChannelContext);
-
-        $page->setSubscriptions(StorefrontSearchResult::createFrom($subscriptions));
-
-        $page->setDeepLinkCode($request->get('deepLinkCode'));
-
-        $page->setTotal($subscriptions->getTotal());
-
+        if ($subscriptions = $this->getSubscriptions($request, $salesChannelContext)) {
+            $page->setSubscriptions(StorefrontSearchResult::createFrom($subscriptions));
+            $page->setDeepLinkCode($request->get('deepLinkCode'));
+            $page->setTotal($subscriptions->getTotal());
+        }
         return $page;
     }
 
     /**
      * @param Request $request
      * @param SalesChannelContext $context
-     * @return StorefrontSearchResult<SubscriptionToProductEntity>
+     * @return bool|StorefrontSearchResult<SubscriptionToProductEntity>
      */
-    private function getSubscriptions(Request $request, SalesChannelContext $context): EntitySearchResult
+    private function getSubscriptions(Request $request, SalesChannelContext $context): ?EntitySearchResult
     {
-        $customerId = null;
-        if ($customer = $context->getCustomer()) {
-            $customerId = $this->customerService->getMollieCustomerId(
-                $customer->getId(),
-                $context->getSalesChannelId(),
-                $context->getContext()
-            );
+        $customer = $context->getCustomer();
+
+        if (!$customer instanceof CustomerEntity) {
+            return false;
         }
 
+        $customerId = $this->customerService->getMollieCustomerId(
+            $customer->getId(),
+            $context->getSalesChannelId(),
+            $context->getContext()
+        );
         $criteria = $this->createCriteria($request, $customerId);
 
         /** @var StorefrontSearchResult<SubscriptionToProductEntity> */
