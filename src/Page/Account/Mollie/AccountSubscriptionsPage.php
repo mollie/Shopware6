@@ -2,9 +2,9 @@
 
 namespace Kiener\MolliePayments\Page\Account\Mollie;
 
+use Kiener\MolliePayments\Core\Content\SubscriptionToProduct\SubscriptionToProductEntity;
 use Shopware\Storefront\Framework\Page\StorefrontSearchResult;
 use Shopware\Storefront\Page\Page;
-use Kiener\MolliePayments\Core\Content\SubscriptionToProduct\SubscriptionToProductEntity;
 
 class AccountSubscriptionsPage extends Page
 {

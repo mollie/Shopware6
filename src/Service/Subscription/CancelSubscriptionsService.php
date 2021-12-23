@@ -3,8 +3,8 @@
 namespace Kiener\MolliePayments\Service\Subscription;
 
 use Kiener\MolliePayments\Factory\MollieApiFactory;
-use Mollie\Api\Exceptions\IncompatiblePlatform;
 use Kiener\MolliePayments\Service\LoggerService;
+use Mollie\Api\Exceptions\IncompatiblePlatform;
 use Monolog\Logger;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;

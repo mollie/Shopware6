@@ -3,14 +3,14 @@
 namespace Kiener\MolliePayments\Storefront\Controller;
 
 use Kiener\MolliePayments\Page\Account\Mollie\AccountSubscriptionsPageLoader;
+use Kiener\MolliePayments\Service\Subscription\CancelSubscriptionsService;
+use Shopware\Core\Framework\Routing\Annotation\LoginRequired;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Shopware\Core\Framework\Routing\Annotation\LoginRequired;
-use Kiener\MolliePayments\Service\Subscription\CancelSubscriptionsService;
 
 /**
  * @RouteScope(scopes={"storefront"})
