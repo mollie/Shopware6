@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Service\MollieApi;
 
 use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeShippedException;
+use Kiener\MolliePayments\Struct\MollieApi\ShipmentTrackingInfoStruct;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Shipment as MollieShipment;
@@ -36,16 +37,23 @@ class Shipment
     /**
      * @param string $mollieOrderId
      * @param string $salesChannelId
+     * @param ShipmentTrackingInfoStruct|null $tracking
      * @return MollieShipment
      */
     public function shipOrder(
-        string $mollieOrderId,
-        string $salesChannelId
+        string                      $mollieOrderId,
+        string                      $salesChannelId,
+        ?ShipmentTrackingInfoStruct $tracking = null
     ): MollieShipment
     {
         try {
+            $options = [];
+            if ($tracking instanceof ShipmentTrackingInfoStruct) {
+                $options['tracking'] = $tracking->toArray();
+            }
+
             $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId);
-            return $mollieOrder->shipAll();
+            return $mollieOrder->shipAll($options);
         } catch (ApiException $e) {
             throw new MollieOrderCouldNotBeShippedException(
                 $mollieOrderId,
@@ -62,13 +70,15 @@ class Shipment
      * @param string $salesChannelId
      * @param string $mollieOrderLineId
      * @param int $quantity
+     * @param ShipmentTrackingInfoStruct|null $tracking
      * @return MollieShipment
      */
     public function shipItem(
-        string $mollieOrderId,
-        string $salesChannelId,
-        string $mollieOrderLineId,
-        int    $quantity
+        string                      $mollieOrderId,
+        string                      $salesChannelId,
+        string                      $mollieOrderLineId,
+        int                         $quantity,
+        ?ShipmentTrackingInfoStruct $tracking = null
     ): MollieShipment
     {
         try {
@@ -80,6 +90,10 @@ class Shipment
                     ]
                 ]
             ];
+
+            if ($tracking instanceof ShipmentTrackingInfoStruct) {
+                $options['tracking'] = $tracking->toArray();
+            }
 
             $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId);
             return $mollieOrder->createShipment($options);

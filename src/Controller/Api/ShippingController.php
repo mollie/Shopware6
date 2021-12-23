@@ -56,12 +56,25 @@ class ShippingController extends AbstractController
                 throw new \InvalidArgumentException('Missing Argument for Order Number!');
             }
 
-            $shipment = $this->shipmentFacade->shipOrderByOrderNumber($orderNumber, $context);
+            $trackingCarrier = $query->get('trackingCarrier', '');
+            $trackingCode = $query->get('trackingCode', '');
+            $trackingUrl = $query->get('trackingUrl', '');
+
+            $shipment = $this->shipmentFacade->shipOrderByOrderNumber(
+                $orderNumber,
+                $trackingCarrier,
+                $trackingCode,
+                $trackingUrl,
+                $context
+            );
 
             return $this->shipmentToJson($shipment);
         } catch (\Exception $e) {
             $data = [
-                'orderNumber' => $orderNumber
+                'orderNumber' => $orderNumber,
+                'trackingCarrier' => $trackingCarrier,
+                'trackingCode' => $trackingCode,
+                'trackingUrl' => $trackingUrl,
             ];
 
             return $this->exceptionToJson($e, $data);
@@ -93,14 +106,29 @@ class ShippingController extends AbstractController
                 throw new \InvalidArgumentException('Missing Argument for Item identifier!');
             }
 
-            $shipment = $this->shipmentFacade->shipItemByOrderNumber($orderNumber, $itemIdentifier, $quantity, $context);
+            $trackingCarrier = $query->get('trackingCarrier', '');
+            $trackingCode = $query->get('trackingCode', '');
+            $trackingUrl = $query->get('trackingUrl', '');
+
+            $shipment = $this->shipmentFacade->shipItemByOrderNumber(
+                $orderNumber,
+                $itemIdentifier,
+                $quantity,
+                $trackingCarrier,
+                $trackingCode,
+                $trackingUrl,
+                $context
+            );
 
             return $this->shipmentToJson($shipment);
         } catch (\Exception $e) {
             $data = [
                 'orderNumber' => $orderNumber,
                 'item' => $itemIdentifier,
-                'quantity' => $quantity
+                'quantity' => $quantity,
+                'trackingCarrier' => $trackingCarrier,
+                'trackingCode' => $trackingCode,
+                'trackingUrl' => $trackingUrl,
             ];
 
             return $this->exceptionToJson($e, $data);
@@ -166,6 +194,9 @@ class ShippingController extends AbstractController
     {
         return $this->getShipOrderResponse(
             $data->getAlnum('orderId'),
+            $data->get('trackingCarrier', ''),
+            $data->get('trackingCode', ''),
+            $data->get('trackingUrl', ''),
             $context
         );
     }
@@ -183,30 +214,49 @@ class ShippingController extends AbstractController
     {
         return $this->getShipOrderResponse(
             $data->getAlnum('orderId'),
+            $data->get('trackingCarrier', ''),
+            $data->get('trackingCode', ''),
+            $data->get('trackingUrl', ''),
             $context
         );
     }
 
     /**
      * @param string $orderId
-     * @param string $itemId
-     * @param int $quantity
+     * @param string $trackingCarrier
+     * @param string $trackingCode
+     * @param string $trackingUrl
      * @param Context $context
      * @return JsonResponse
      */
-    public function getShipOrderResponse(string $orderId, Context $context): JsonResponse
+    public function getShipOrderResponse(
+        string  $orderId,
+        string  $trackingCarrier,
+        string  $trackingCode,
+        string  $trackingUrl,
+        Context $context
+    ): JsonResponse
     {
         try {
             if (empty($orderId)) {
                 throw new \InvalidArgumentException('Missing Argument for Order ID!');
             }
 
-            $shipment = $this->shipmentFacade->shipOrderByOrderId($orderId, $context);
+            $shipment = $this->shipmentFacade->shipOrderByOrderId(
+                $orderId,
+                $trackingCarrier,
+                $trackingCode,
+                $trackingUrl,
+                $context
+            );
 
             return $this->shipmentToJson($shipment);
         } catch (\Exception $e) {
             $data = [
                 'orderId' => $orderId,
+                'trackingCarrier' => $trackingCarrier,
+                'trackingCode' => $trackingCode,
+                'trackingUrl' => $trackingUrl,
             ];
 
             return $this->exceptionToJson($e, $data);
@@ -228,6 +278,9 @@ class ShippingController extends AbstractController
             $data->getAlnum('orderId'),
             $data->getAlnum('itemId'),
             $data->getInt('quantity'),
+            $data->get('trackingCarrier', ''),
+            $data->get('trackingCode', ''),
+            $data->get('trackingUrl', ''),
             $context
         );
     }
@@ -247,6 +300,9 @@ class ShippingController extends AbstractController
             $data->getAlnum('orderId'),
             $data->getAlnum('itemId'),
             $data->getInt('quantity'),
+            $data->get('trackingCarrier', ''),
+            $data->get('trackingCode', ''),
+            $data->get('trackingUrl', ''),
             $context
         );
     }
@@ -255,10 +311,21 @@ class ShippingController extends AbstractController
      * @param string $orderId
      * @param string $itemId
      * @param int $quantity
+     * @param string $trackingCarrier
+     * @param string $trackingCode
+     * @param string $trackingUrl
      * @param Context $context
      * @return JsonResponse
      */
-    public function getShipItemResponse(string $orderId, string $itemId, int $quantity, Context $context): JsonResponse
+    public function getShipItemResponse(
+        string  $orderId,
+        string  $itemId,
+        int     $quantity,
+        string  $trackingCarrier,
+        string  $trackingCode,
+        string  $trackingUrl,
+        Context $context
+    ): JsonResponse
     {
         try {
             if (empty($orderId)) {
@@ -269,14 +336,25 @@ class ShippingController extends AbstractController
                 throw new \InvalidArgumentException('Missing Argument for Item ID!');
             }
 
-            $shipment = $this->shipmentFacade->shipItemByOrderId($orderId, $itemId, $quantity, $context);
+            $shipment = $this->shipmentFacade->shipItemByOrderId(
+                $orderId,
+                $itemId,
+                $quantity,
+                $trackingCarrier,
+                $trackingCode,
+                $trackingUrl,
+                $context
+            );
 
             return $this->shipmentToJson($shipment);
         } catch (\Exception $e) {
             $data = [
                 'orderId' => $orderId,
                 'itemId' => $itemId,
-                'quantity' => $quantity
+                'quantity' => $quantity,
+                'trackingCarrier' => $trackingCarrier,
+                'trackingCode' => $trackingCode,
+                'trackingUrl' => $trackingUrl,
             ];
 
             return $this->exceptionToJson($e, $data);
