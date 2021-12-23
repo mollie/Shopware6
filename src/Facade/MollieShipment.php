@@ -369,7 +369,7 @@ class MollieShipment
     /**
      * @param string $orderId
      * @param Context $context
-     * @return array
+     * @return array<mixed>
      */
     public function getStatus(string $orderId, Context $context): array
     {
@@ -382,7 +382,7 @@ class MollieShipment
     /**
      * @param string $orderId
      * @param Context $context
-     * @return array
+     * @return array<string, numeric>
      */
     public function getTotals(string $orderId, Context $context): array
     {

@@ -109,6 +109,11 @@ class Shipment
         }
     }
 
+    /**
+     * @param string $mollieOrderId
+     * @param string $salesChannelId
+     * @return array<mixed>
+     */
     public function getStatus(string $mollieOrderId, string $salesChannelId): array
     {
         $lineItems = [];
@@ -138,6 +143,11 @@ class Shipment
         return $lineItems;
     }
 
+    /**
+     * @param string $mollieOrderId
+     * @param string $salesChannelId
+     * @return array<string, numeric>
+     */
     public function getTotals(string $mollieOrderId, string $salesChannelId): array
     {
         $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId);

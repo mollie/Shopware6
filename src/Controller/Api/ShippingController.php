@@ -51,14 +51,13 @@ class ShippingController extends AbstractController
     {
         try {
             $orderNumber = $query->get('number');
+            $trackingCarrier = $query->get('trackingCarrier', '');
+            $trackingCode = $query->get('trackingCode', '');
+            $trackingUrl = $query->get('trackingUrl', '');
 
             if ($orderNumber === null) {
                 throw new \InvalidArgumentException('Missing Argument for Order Number!');
             }
-
-            $trackingCarrier = $query->get('trackingCarrier', '');
-            $trackingCode = $query->get('trackingCode', '');
-            $trackingUrl = $query->get('trackingUrl', '');
 
             $shipment = $this->shipmentFacade->shipOrderByOrderNumber(
                 $orderNumber,
@@ -97,6 +96,10 @@ class ShippingController extends AbstractController
             $orderNumber = $query->get('order');
             $itemIdentifier = $query->get('item');
             $quantity = $query->getInt('quantity');
+            $trackingCarrier = $query->get('trackingCarrier', '');
+            $trackingCode = $query->get('trackingCode', '');
+            $trackingUrl = $query->get('trackingUrl', '');
+
 
             if ($orderNumber === null) {
                 throw new \InvalidArgumentException('Missing Argument for Order Number!');
@@ -105,10 +108,6 @@ class ShippingController extends AbstractController
             if ($itemIdentifier === null) {
                 throw new \InvalidArgumentException('Missing Argument for Item identifier!');
             }
-
-            $trackingCarrier = $query->get('trackingCarrier', '');
-            $trackingCode = $query->get('trackingCode', '');
-            $trackingUrl = $query->get('trackingUrl', '');
 
             $shipment = $this->shipmentFacade->shipItemByOrderNumber(
                 $orderNumber,
