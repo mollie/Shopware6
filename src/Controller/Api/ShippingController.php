@@ -127,7 +127,7 @@ class ShippingController extends AbstractController
                 'orderNumber' => $orderNumber
             ];
 
-            return $this->exceptionToJson($e, $context, $data);
+            return $this->exceptionToJson($e, $data);
         }
     }
 
@@ -166,7 +166,7 @@ class ShippingController extends AbstractController
                 'quantity' => $quantity
             ];
 
-            return $this->exceptionToJson($e, $context, $data);
+            return $this->exceptionToJson($e, $data);
         }
     }
 
@@ -200,7 +200,7 @@ class ShippingController extends AbstractController
         ]);
     }
 
-    private function exceptionToJson(\Exception $e, Context $context, array $additionalData = []): JsonResponse
+    private function exceptionToJson(\Exception $e, array $additionalData = []): JsonResponse
     {
         $this->logger->error(
             $e->getMessage(),
@@ -272,7 +272,7 @@ class ShippingController extends AbstractController
                 'orderId' => $orderId,
             ];
 
-            return $this->exceptionToJson($e, $context, $data);
+            return $this->exceptionToJson($e, $data);
         }
     }
 
@@ -342,7 +342,7 @@ class ShippingController extends AbstractController
                 'quantity' => $quantity
             ];
 
-            return $this->exceptionToJson($e, $context, $data);
+            return $this->exceptionToJson($e, $data);
         }
     }
 
