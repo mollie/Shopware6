@@ -1,7 +1,7 @@
 import template from './sw-order-line-items-grid.html.twig';
 
 // eslint-disable-next-line no-undef
-const {Component, Mixin} = Shopware;
+const { Component, Mixin } = Shopware;
 
 Component.override('sw-order-line-items-grid', {
     template,
@@ -111,7 +111,7 @@ Component.override('sw-order-line-items-grid', {
         },
 
         onConfirmRefund() {
-            if(this.refundAmount === 0.0) {
+            if (this.refundAmount === 0.0) {
                 this.createNotificationWarning({
                     message: this.$tc('mollie-payments.modals.refund.warning.low-amount'),
                 });
@@ -206,6 +206,24 @@ Component.override('sw-order-line-items-grid', {
             this.showShipOrderModal = false;
         },
 
+        onConfirmShipOrder() {
+            this.MolliePaymentsShippingService
+                .ship({
+                    orderId: this.order.id
+                })
+                .then(() => {
+                    this.onCloseShipOrderModal();
+                })
+                .then(() => {
+                    this.$emit('ship-item-success');
+                })
+                .catch((response) => {
+                    this.createNotificationError({
+                        message: response.message,
+                    });
+                });
+        },
+
         onOpenShipItemModal(item) {
             this.showShipItemModal = item.id;
         },
@@ -215,17 +233,38 @@ Component.override('sw-order-line-items-grid', {
             this.shipQuantity = 0;
         },
 
-        onConfirmShipping(item) {
-            if (this.quantityToShip > 0) {
-                this.MolliePaymentsShippingService
-                    .ship({
-                        itemId: item.id,
-                        quantity: this.shipQuantity,
-                    })
-                    .then(document.location.reload());
+        onConfirmShipItem(item) {
+            if (this.shipQuantity === 0) {
+                this.createNotificationError({
+                    message: this.$tc('mollie-payments.modals.shipping.item.noQuantity'),
+                });
+                return;
             }
 
-            this.onCloseShipItemModal();
+            this.MolliePaymentsShippingService
+                .shipItem({
+                    orderId: this.order.id,
+                    itemId: item.id,
+                    quantity: this.shipQuantity,
+                })
+                .then((response) => {
+                    this.createNotificationError({
+                        message: this.$tc('mollie-payments.modals.shipping.item.success'),
+                    });
+                    this.onCloseShipItemModal();
+                })
+                .then(() => {
+                    this.$emit('ship-item-success');
+                })
+                .catch((response) => {
+                    this.createNotificationError({
+                        message: response.message,
+                    });
+                });
+        },
+
+        setMaxQuantity(item) {
+            this.shipQuantity = this.shippableQuantity(item);
         },
 
         isShippable(item) {
@@ -233,19 +272,19 @@ Component.override('sw-order-line-items-grid', {
         },
 
         shippableQuantity(item) {
-            if(this.shippingStatus === null) {
-                return 0;
+            if (this.shippingStatus === null) {
+                return '~';
             }
 
             return this.shippingStatus[item.id].quantityShippable;
         },
 
         shippedQuantity(item) {
-            if(this.shippingStatus === null) {
-                return 0;
+            if (this.shippingStatus === null) {
+                return '~';
             }
 
             return this.shippingStatus[item.id].quantityShipped;
         },
-    },
+    }
 });

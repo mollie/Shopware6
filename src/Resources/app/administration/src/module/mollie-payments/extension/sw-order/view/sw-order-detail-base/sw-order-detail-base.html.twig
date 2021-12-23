@@ -9,6 +9,7 @@
                               :refunds="refunds"
                               @refund-success="saveAndReload"
                               @refund-cancelled="saveAndReload"
+                              @ship-item-success="saveAndReload"
                               @item-delete="saveAndRecalculate"
                               @item-edit="recalculateAndReload"
                               @existing-item-edit="saveAndRecalculate"

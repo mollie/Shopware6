@@ -110,7 +110,7 @@ class ShippingController extends AbstractController
      * @param Context $context
      * @return JsonResponse
      */
-    public function shipOrder(QueryDataBag $query, Context $context): JsonResponse
+    public function shipOrderApi(QueryDataBag $query, Context $context): JsonResponse
     {
         try {
             $orderNumber = $query->get('number');
@@ -141,7 +141,7 @@ class ShippingController extends AbstractController
      * @return JsonResponse
      * @throws \Exception
      */
-    public function shipItem(QueryDataBag $query, Context $context): JsonResponse
+    public function shipItemApi(QueryDataBag $query, Context $context): JsonResponse
     {
         try {
             $orderNumber = $query->get('order');
@@ -215,6 +215,76 @@ class ShippingController extends AbstractController
     }
 
     // Admin routes
+
+    /**
+     * @RouteScope(scopes={"api"})
+     * @Route("/api/_action/mollie/ship/item",
+     *         defaults={"auth_enabled"=true}, name="api.action.mollie.ship.item", methods={"POST"})
+     *
+     * @param RequestDataBag $data
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function shipItem(RequestDataBag $data, Context $context): JsonResponse
+    {
+        return $this->getShipItemResponse(
+            $data->getAlnum('orderId'),
+            $data->getAlnum('itemId'),
+            $data->getInt('quantity'),
+            $context
+        );
+    }
+
+    /**
+     * @RouteScope(scopes={"api"})
+     * @Route("/api/v{version}/_action/mollie/ship/item",
+     *         defaults={"auth_enabled"=true}, name="api.action.mollie.ship.item.legacy", methods={"POST"})
+     *
+     * @param RequestDataBag $data
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function shipItemLegacy(RequestDataBag $data, Context $context): JsonResponse
+    {
+        return $this->getShipItemResponse(
+            $data->getAlnum('orderId'),
+            $data->getAlnum('itemId'),
+            $data->getInt('quantity'),
+            $context
+        );
+    }
+
+    /**
+     * @param string $orderId
+     * @param string $itemId
+     * @param int $quantity
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function getShipItemResponse(string $orderId, string $itemId, int $quantity, Context $context): JsonResponse
+    {
+        try {
+            if (empty($orderId)) {
+                throw new \InvalidArgumentException('Missing Argument for Order ID!');
+            }
+
+            if (empty($itemId)) {
+                throw new \InvalidArgumentException('Missing Argument for Item ID!');
+            }
+
+            $shipment = $this->shipmentFacade->shipItemByOrderId($orderId, $itemId, $quantity, $context);
+
+            return $this->shipmentToJson($shipment);
+        } catch (\Exception $e) {
+            $data = [
+                'orderId' => $orderId,
+                'itemId' => $itemId,
+                'quantity' => $quantity
+            ];
+
+            return $this->exceptionToJson($e, $context, $data);
+        }
+    }
 
     /**
      * @RouteScope(scopes={"api"})
@@ -310,212 +380,5 @@ class ShippingController extends AbstractController
         }
 
         return $this->json($totals);
-    }
-
-    /**
-     * TODO Refactor Administration routes
-     */
-    /**
-     * @RouteScope(scopes={"api"})
-     * @Route("/api/_action/mollie/ship",
-     *         defaults={"auth_enabled"=true}, name="api.action.mollie.ship", methods={"POST"})
-     *
-     * @param Request $request
-     *
-     * @return JsonResponse
-     * @throws ApiException
-     * @throws IncompatiblePlatform
-     */
-    public function ship64(Request $request): JsonResponse
-    {
-        return $this->shipResponse($request);
-    }
-
-    /**
-     * @RouteScope(scopes={"api"})
-     * @Route("/api/v{version}/_action/mollie/ship",
-     *         defaults={"auth_enabled"=true}, name="api.action.pre64.mollie.ship", methods={"POST"})
-     *
-     * @param Request $request
-     *
-     * @return JsonResponse
-     * @throws ApiException
-     * @throws IncompatiblePlatform
-     */
-    public function oldShip(Request $request): JsonResponse
-    {
-        return $this->shipResponse($request);
-    }
-
-
-    private function shipResponse(Request $request): JsonResponse
-    {
-        /** @var MollieApiClient|null $apiClient */
-        $apiClient = null;
-
-        /** @var array|null $customFields */
-        $customFields = null;
-
-        /** @var string|null $orderId */
-        $orderId = null;
-
-        /** @var string|null $orderLineId */
-        $orderLineId = null;
-
-        /** @var OrderLineItemEntity $orderLineItem */
-        $orderLineItem = null;
-
-        /** @var bool $success */
-        $success = false;
-
-        /** @var int $quantity */
-        $quantity = 0;
-
-        if (
-            (string)$request->get(self::REQUEST_KEY_ORDER_LINE_ITEM_ID) !== ''
-            && (string)$request->get(self::REQUEST_KEY_ORDER_LINE_ITEM_VERSION_ID) !== ''
-        ) {
-            $orderLineItem = $this->getOrderLineItemById(
-                $request->get(self::REQUEST_KEY_ORDER_LINE_ITEM_ID),
-                $request->get(self::REQUEST_KEY_ORDER_LINE_ITEM_VERSION_ID)
-            );
-        }
-
-        if ((int)$request->get(self::REQUEST_KEY_ORDER_LINE_QUANTITY) > 0) {
-            $quantity = (int)$request->get(self::REQUEST_KEY_ORDER_LINE_QUANTITY);
-        }
-
-        if (
-            $orderLineItem !== null
-            && !empty($orderLineItem->getCustomFields())
-        ) {
-            $customFields = $orderLineItem->getCustomFields();
-        }
-
-        if (
-            $orderLineItem !== null
-            && !empty($customFields)
-            && isset($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_ORDER_LINE_ID])
-        ) {
-            $orderLineId = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_ORDER_LINE_ID];
-        }
-
-        if (
-            $orderLineItem !== null
-            && $orderLineItem->getOrder() !== null
-            && !empty($orderLineItem->getOrder()->getCustomFields())
-            && isset($orderLineItem->getOrder()->getCustomFields()[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_ORDER_ID])
-        ) {
-            $orderId = $orderLineItem->getOrder()->getCustomFields()[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_ORDER_ID];
-        }
-
-        if (
-            (string)$orderId !== ''
-            && (string)$orderLineId !== ''
-            && $quantity > 0
-        ) {
-            $apiClient = $this->apiFactory->getClient(
-                $orderLineItem->getOrder()->getSalesChannelId()
-            );
-        }
-
-        if ($apiClient !== null) {
-            /** @var MollieSettingStruct $settings */
-            $settings = $this->settingsService->getSettings(
-                $orderLineItem->getOrder()->getSalesChannelId()
-            );
-
-            /** @var array $orderParameters */
-            $orderParameters = [];
-
-            if ($settings->isTestMode() && $apiClient->usesOAuth()) {
-                $orderParameters = [
-                    self::SHIPPING_DATA_KEY_TEST_MODE => true
-                ];
-            }
-
-            $order = $apiClient->orders->get($orderId, $orderParameters);
-
-            if ($order !== null && isset($order->id)) {
-                $shipmentData = [
-                    self::SHIPPING_DATA_KEY_LINES => [
-                        [
-                            self::SHIPPING_DATA_KEY_ID => $orderLineId,
-                            self::SHIPPING_DATA_KEY_QUANTITY => $quantity,
-                        ],
-                    ],
-                ];
-
-                if ($settings->isTestMode() && $apiClient->usesOAuth()) {
-                    $shipmentData[self::SHIPPING_DATA_KEY_TEST_MODE] = true;
-                }
-
-                $shipment = $apiClient->shipments->createFor($order, $shipmentData);
-
-                if (isset($shipment->id)) {
-                    $success = true;
-
-                    if (!isset($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_SHIPMENTS])) {
-                        $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_SHIPMENTS] = [];
-                    }
-
-                    if (!is_array($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_SHIPMENTS])) {
-                        $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_SHIPMENTS] = [];
-                    }
-
-                    $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_SHIPMENTS][] = [
-                        self::CUSTOM_FIELDS_KEY_SHIPMENT_ID => $shipment->id,
-                        self::CUSTOM_FIELDS_KEY_QUANTITY => $quantity,
-                    ];
-
-                    if (isset($customFields[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY])) {
-                        $customFields[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY] += $quantity;
-                    } else {
-                        $customFields[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY] = $quantity;
-                    }
-                }
-            }
-
-            // Update the custom fields of the order line item
-            $this->orderLineItemRepository->update([
-                [
-                    self::SHIPPING_DATA_KEY_ID => $orderLineItem->getId(),
-                    CustomFieldService::CUSTOM_FIELDS_KEY => $customFields,
-                ]
-            ], Context::createDefaultContext());
-        }
-
-        return new JsonResponse([
-            self::RESPONSE_KEY_SUCCESS => $success,
-        ]);
-    }
-
-    /**
-     * Returns an order line item by id.
-     *
-     * @param              $lineItemId
-     * @param null $versionId
-     * @param Context|null $context
-     *
-     * @return OrderLineItemEntity|null
-     */
-    public function getOrderLineItemById(
-        $lineItemId,
-        $versionId = null,
-        Context $context = null
-    ): ?OrderLineItemEntity
-    {
-        $orderLineCriteria = new Criteria([$lineItemId]);
-
-        if ($versionId !== null) {
-            $orderLineCriteria->addFilter(new EqualsFilter('versionId', $versionId));
-        }
-
-        $orderLineCriteria->addAssociation('order');
-
-        return $this->orderLineItemRepository->search(
-            $orderLineCriteria,
-            $context ?? Context::createDefaultContext()
-        )->get($lineItemId);
     }
 }
