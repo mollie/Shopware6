@@ -4,8 +4,8 @@ namespace Kiener\MolliePayments\Service\Subscription\ScheduledTask;
 
 use Exception;
 use Kiener\MolliePayments\Service\ConfigService;
-use Kiener\MolliePayments\Service\Subscription\EmailService;
 use Kiener\MolliePayments\Service\LoggerService;
+use Kiener\MolliePayments\Service\Subscription\EmailService;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;

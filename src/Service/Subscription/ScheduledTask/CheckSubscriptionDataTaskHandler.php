@@ -3,8 +3,8 @@
 namespace Kiener\MolliePayments\Service\Subscription\ScheduledTask;
 
 use Exception;
-use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
+use Kiener\MolliePayments\Service\LoggerService;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
