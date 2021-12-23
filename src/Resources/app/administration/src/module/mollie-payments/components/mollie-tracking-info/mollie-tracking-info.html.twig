@@ -1,0 +1,10 @@
+<sw-container columns="1fr" justify="start">
+    <sw-text-field v-model="tracking.carrier"
+                   :label="$tc('mollie-payments.modals.shipping.tracking.carrier')"
+                   required />
+    <sw-text-field v-model="tracking.code"
+                   :label="$tc('mollie-payments.modals.shipping.tracking.code')"
+                   required />
+    <sw-text-field v-model="tracking.url"
+                   :label="$tc('mollie-payments.modals.shipping.tracking.url')" />
+</sw-container>
