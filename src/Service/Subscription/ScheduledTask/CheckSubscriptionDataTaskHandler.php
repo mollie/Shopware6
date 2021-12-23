@@ -3,13 +3,14 @@
 namespace Kiener\MolliePayments\Service\Subscription\ScheduledTask;
 
 use Exception;
+use Kiener\MolliePayments\Service\LoggerService;
+use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
-use Kiener\MolliePayments\Service\LoggerService;
-use Kiener\MolliePayments\Factory\MollieApiFactory;
+
 
 class CheckSubscriptionDataTaskHandler extends ScheduledTaskHandler
 {

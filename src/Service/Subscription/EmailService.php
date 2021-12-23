@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
 namespace Kiener\MolliePayments\Service\Subscription;
 
-use Shopware\Core\System\SalesChannel\SalesChannelEntity;
-use Symfony\Component\Mailer\Mailer;
-use Symfony\Component\Mime\Email;
+use Kiener\MolliePayments\Service\ConfigService;
+use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Content\MailTemplate\MailTemplateEntity;
@@ -14,8 +13,9 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Validation\DataBag\DataBag;
-use Kiener\MolliePayments\Service\ConfigService;
-use Kiener\MolliePayments\Service\LoggerService;
+use Shopware\Core\System\SalesChannel\SalesChannelEntity;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mime\Email;
 
 class EmailService
 {

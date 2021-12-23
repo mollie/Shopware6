@@ -2,13 +2,13 @@
 
 namespace Kiener\MolliePayments\Controller\Api;
 
+use Kiener\MolliePayments\Service\Subscription\CancelSubscriptionsService;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
-use Shopware\Core\Framework\Context;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
-use Kiener\MolliePayments\Service\Subscription\CancelSubscriptionsService;
 
 /**
  * @RouteScope(scopes={"api"})

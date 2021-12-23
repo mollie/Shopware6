@@ -3,10 +3,13 @@
 namespace Kiener\MolliePayments\Subscriber\Subscription;
 
 use Exception;
-use Mollie\Api\Exceptions\ApiException;
-use Mollie\Api\Exceptions\IncompatiblePlatform;
+use Kiener\MolliePayments\Factory\MollieApiFactory;
+use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\Subscription\SubscriptionOptions;
+use Mollie\Api\Exceptions\ApiException;
+use Mollie\Api\Exceptions\IncompatiblePlatform;
+use Mollie\Api\MollieApiClient;
 use Monolog\Logger;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionDefinition;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
@@ -18,9 +21,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\StateMachine\Event\StateMachineTransitionEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Kiener\MolliePayments\Factory\MollieApiFactory;
-use Mollie\Api\MollieApiClient;
-use Kiener\MolliePayments\Service\CustomerService;
 
 class CreateSubscriptionsSubscriber implements EventSubscriberInterface
 {

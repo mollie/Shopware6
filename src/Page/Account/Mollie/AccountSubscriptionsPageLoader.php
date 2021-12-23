@@ -2,8 +2,11 @@
 
 namespace Kiener\MolliePayments\Page\Account\Mollie;
 
+use Kiener\MolliePayments\Core\Content\SubscriptionToProduct\SubscriptionToProductEntity;
 use Kiener\MolliePayments\Service\CustomerService;
 use Shopware\Core\Checkout\Cart\Exception\CustomerNotLoggedInException;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -12,9 +15,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Framework\Page\StorefrontSearchResult;
 use Shopware\Storefront\Page\GenericPageLoaderInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Kiener\MolliePayments\Core\Content\SubscriptionToProduct\SubscriptionToProductEntity;
-use Shopware\Core\Checkout\Customer\CustomerEntity;
 
 class AccountSubscriptionsPageLoader
 {

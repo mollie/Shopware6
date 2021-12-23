@@ -3,11 +3,11 @@
 namespace Kiener\MolliePayments\Subscriptions\DTO;
 
 use DateTimeInterface;
-use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Mollie\Api\Resources\Subscription;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 
 class SubscriptionResponse
 {

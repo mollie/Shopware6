@@ -2,13 +2,13 @@
 
 namespace Kiener\MolliePayments\Validator;
 
+use Kiener\MolliePayments\Exception\SubscriptionCartNotice;
+use Kiener\MolliePayments\Service\ConfigService;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\CartValidatorInterface;
 use Shopware\Core\Checkout\Cart\Error\ErrorCollection;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Kiener\MolliePayments\Exception\SubscriptionCartNotice;
-use Kiener\MolliePayments\Service\ConfigService;
 
 class SubscriptionCartValidator implements CartValidatorInterface
 {

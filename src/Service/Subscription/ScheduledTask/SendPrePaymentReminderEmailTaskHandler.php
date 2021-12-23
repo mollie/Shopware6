@@ -3,14 +3,14 @@
 namespace Kiener\MolliePayments\Service\Subscription\ScheduledTask;
 
 use Exception;
+use Kiener\MolliePayments\Service\ConfigService;
+use Kiener\MolliePayments\Service\Subscription\EmailService;
+use Kiener\MolliePayments\Service\LoggerService;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
-use Kiener\MolliePayments\Service\ConfigService;
-use Kiener\MolliePayments\Service\Subscription\EmailService;
-use Kiener\MolliePayments\Service\LoggerService;
 
 class SendPrePaymentReminderEmailTaskHandler extends ScheduledTaskHandler
 {
