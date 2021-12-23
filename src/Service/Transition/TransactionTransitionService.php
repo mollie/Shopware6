@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Service\Transition;
 
+use Kiener\MolliePayments\Compatibility\CompatibilityFactory;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionDefinition;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
@@ -15,6 +16,12 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
      * @var TransitionServiceInterface
      */
     private $transitionService;
+
+    /**
+     * @var CompatibilityFactory
+     */
+    private $compatibilityFactory;
+
     /**
      * @var LoggerInterface
      */
@@ -22,11 +29,17 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
 
     /**
      * @param TransitionServiceInterface $transitionService
+     * @param CompatibilityFactory $compatibilityFactory
      * @param LoggerInterface $loggerService
      */
-    public function __construct(TransitionServiceInterface $transitionService, LoggerInterface $loggerService)
+    public function __construct(
+        TransitionServiceInterface $transitionService,
+        CompatibilityFactory $compatibilityFactory,
+        LoggerInterface $loggerService
+    )
     {
         $this->transitionService = $transitionService;
+        $this->compatibilityFactory = $compatibilityFactory;
         $this->logger = $loggerService;
     }
 
@@ -219,6 +232,32 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         }
 
         $this->performTransition($entityId, StateMachineTransitionActions::ACTION_REFUND_PARTIALLY, $context);
+    }
+
+    public function chargebackTransaction(OrderTransactionEntity $transaction, Context $context): void
+    {
+        $compatibilityGateway = $this->compatibilityFactory->createGateway();
+
+        $chargebackState = $compatibilityGateway->getChargebackOrderTransactionState();
+        $currentState = $transaction->getStateMachineState()->getTechnicalName();
+
+        if ($this->isFinalOrTargetStatus($currentState, [$chargebackState])) {
+            return;
+        }
+
+        if($chargebackState !== 'chargeback') {
+            $this->processTransaction($transaction, $context);
+            return;
+        }
+
+        $entityId = $transaction->getId();
+        $availableTransitions = $this->getAvailableTransitions($entityId, $context);
+
+        if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_CHARGEBACK, $availableTransitions)) {
+            $this->payTransaction($transaction, $context);
+        }
+
+        $this->performTransition($entityId, StateMachineTransitionActions::ACTION_CHARGEBACK, $context);
     }
 
     private function isFinalOrTargetStatus(string $currentStatus, array $targetStatus): bool

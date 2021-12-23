@@ -22,4 +22,6 @@ interface TransactionTransitionServiceInterface
     public function refundTransaction(OrderTransactionEntity $transaction, Context $context): void;
 
     public function partialRefundTransaction(OrderTransactionEntity $transaction, Context $context): void;
+
+    public function chargebackTransaction(OrderTransactionEntity $transaction, Context $context): void;
 }
