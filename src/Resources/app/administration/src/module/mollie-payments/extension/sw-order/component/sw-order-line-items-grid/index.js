@@ -1,4 +1,5 @@
 import template from './sw-order-line-items-grid.html.twig';
+import './sw-order-line-items-grid.scss';
 
 // eslint-disable-next-line no-undef
 const { Component, Mixin } = Shopware;
@@ -37,6 +38,8 @@ Component.override('sw-order-line-items-grid', {
     data() {
         return {
             isLoading: false,
+            isShipOrderLoading: false,
+            isShipItemLoading: false,
             refundAmount: 0.0,
             shipQuantity: 0,
             showRefundModal: false,
@@ -80,6 +83,30 @@ Component.override('sw-order-line-items-grid', {
                     width: '100px',
                 },
             ];
+        },
+
+        getShipOrderColumns() {
+            return [
+                {
+                    property: 'label',
+                    label: this.$tc('mollie-payments.modals.shipping.order.itemHeader'),
+                },
+                {
+                    property: 'quantity',
+                    label: this.$tc('mollie-payments.modals.shipping.order.quantityHeader'),
+                }
+            ];
+        },
+
+        shippableLineItems() {
+            return this.orderLineItems
+                .filter((item) => this.shippableQuantity(item))
+                .map((item) => {
+                    return {
+                        label: item.label,
+                        quantity: this.shippableQuantity(item),
+                    }
+                });
         },
 
         isMollieOrder() {
@@ -203,12 +230,14 @@ Component.override('sw-order-line-items-grid', {
         },
 
         onCloseShipOrderModal() {
+            this.isShipOrderLoading = false;
             this.showShipOrderModal = false;
         },
 
         onConfirmShipOrder() {
+            this.isShipOrderLoading = true;
             this.MolliePaymentsShippingService
-                .ship({
+                .shipOrder({
                     orderId: this.order.id
                 })
                 .then(() => {
@@ -229,6 +258,7 @@ Component.override('sw-order-line-items-grid', {
         },
 
         onCloseShipItemModal() {
+            this.isShipItemLoading = false;
             this.showShipItemModal = false;
             this.shipQuantity = 0;
         },
@@ -241,14 +271,16 @@ Component.override('sw-order-line-items-grid', {
                 return;
             }
 
+            this.isShipItemLoading = true;
+
             this.MolliePaymentsShippingService
                 .shipItem({
                     orderId: this.order.id,
                     itemId: item.id,
                     quantity: this.shipQuantity,
                 })
-                .then((response) => {
-                    this.createNotificationError({
+                .then(() => {
+                    this.createNotificationSuccess({
                         message: this.$tc('mollie-payments.modals.shipping.item.success'),
                     });
                     this.onCloseShipItemModal();

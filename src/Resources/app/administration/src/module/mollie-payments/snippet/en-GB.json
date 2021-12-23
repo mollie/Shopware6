@@ -44,13 +44,19 @@
       "shipping": {
         "title": "Ship through Mollie",
         "item": {
+          "label": "Item:",
           "noQuantity": "Please enter a quantity to ship.",
-          "shipAll": "Ship all"
+          "shipAll": "Ship all",
+          "summary": {
+            "quantity": "Quantity to ship",
+            "shipped": "Quantity shipped",
+            "shippable": "Quantity shippable"
+          }
         },
-        "summary": {
-          "quantity": "Quantity to ship",
-          "shipped": "Quantity shipped",
-          "shippable": "Quantity shippable"
+        "order": {
+          "description": "The following item quantities will be shipped.",
+          "itemHeader": "Item",
+          "quantityHeader": "Quantity"
         },
         "confirmButton": "Ship",
         "cancelButton": "Do not ship"

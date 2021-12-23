@@ -218,6 +218,66 @@ class ShippingController extends AbstractController
 
     /**
      * @RouteScope(scopes={"api"})
+     * @Route("/api/_action/mollie/ship",
+     *         defaults={"auth_enabled"=true}, name="api.action.mollie.ship.order", methods={"POST"})
+     *
+     * @param RequestDataBag $data
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function shipOrder(RequestDataBag $data, Context $context): JsonResponse
+    {
+        return $this->getShipOrderResponse(
+            $data->getAlnum('orderId'),
+            $context
+        );
+    }
+
+    /**
+     * @RouteScope(scopes={"api"})
+     * @Route("/api/v{version}/_action/mollie/ship",
+     *         defaults={"auth_enabled"=true}, name="api.action.mollie.ship.order.legacy", methods={"POST"})
+     *
+     * @param RequestDataBag $data
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function shipOrderLegacy(RequestDataBag $data, Context $context): JsonResponse
+    {
+        return $this->getShipOrderResponse(
+            $data->getAlnum('orderId'),
+            $context
+        );
+    }
+
+    /**
+     * @param string $orderId
+     * @param string $itemId
+     * @param int $quantity
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function getShipOrderResponse(string $orderId, Context $context): JsonResponse
+    {
+        try {
+            if (empty($orderId)) {
+                throw new \InvalidArgumentException('Missing Argument for Order ID!');
+            }
+
+            $shipment = $this->shipmentFacade->shipOrderByOrderId($orderId, $context);
+
+            return $this->shipmentToJson($shipment);
+        } catch (\Exception $e) {
+            $data = [
+                'orderId' => $orderId,
+            ];
+
+            return $this->exceptionToJson($e, $context, $data);
+        }
+    }
+
+    /**
+     * @RouteScope(scopes={"api"})
      * @Route("/api/_action/mollie/ship/item",
      *         defaults={"auth_enabled"=true}, name="api.action.mollie.ship.item", methods={"POST"})
      *
