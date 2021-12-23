@@ -48,7 +48,8 @@ class ShippingSubscriber implements EventSubscriberInterface
             );
         } catch (CouldNotExtractMollieOrderIdException $e) {
             // We need to catch CouldNotExtractMollieOrderIdException, because if it's not a Mollie Order
-            // it obviously cannot get shipped with Mollie. But if we don't catch it, the rest of the proces breaks.
+            // it obviously cannot get shipped with Mollie. We also don't have to log this.
+            // But if we don't catch it, the rest of the process might break.
         } catch (\Exception $e) {
             // We log the error, but don't rethrow so the rest of the proces can continue.
             $this->logger->error($e->getMessage(), [
