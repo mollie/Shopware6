@@ -51,7 +51,12 @@ class ShippingSubscriber implements EventSubscriberInterface
             // it obviously cannot get shipped with Mollie. But if we don't catch it, the rest of the proces breaks.
         } catch (\Exception $e) {
             // We log the error, but don't rethrow so the rest of the proces can continue.
-            $this->logger->error($e->getMessage());
+            $this->logger->error($e->getMessage(), [
+                'orderId' => $event->getOrderId(),
+                'trackingCarrier' => $event->getTrackingCarrier(),
+                'trackingCode' => $event->getTrackingCode(),
+                'trackingUrl' => $event->getTrackingUrl(),
+            ]);
         }
     }
 }
