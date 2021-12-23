@@ -3,99 +3,36 @@
 namespace Kiener\MolliePayments\Controller\Api;
 
 use Kiener\MolliePayments\Facade\MollieShipment;
-use Kiener\MolliePayments\Factory\MollieApiFactory;
-use Kiener\MolliePayments\Service\CustomFieldService;
-use Kiener\MolliePayments\Service\OrderService;
-use Kiener\MolliePayments\Service\SettingsService;
-use Kiener\MolliePayments\Setting\MollieSettingStruct;
-use Mollie\Api\Exceptions\ApiException;
-use Mollie\Api\Exceptions\IncompatiblePlatform;
-use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Shipment;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\ShopwareHttpException;
 use Shopware\Core\Framework\Validation\DataBag\QueryDataBag;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ShippingController extends AbstractController
 {
-    public const CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY = 'shippedQuantity';
-
-    private const CUSTOM_FIELDS_KEY_ORDER_ID = 'order_id';
-    private const CUSTOM_FIELDS_KEY_ORDER_LINE_ID = 'order_line_id';
-    private const CUSTOM_FIELDS_KEY_QUANTITY = 'quantity';
-    private const CUSTOM_FIELDS_KEY_SHIPMENT_ID = 'shipment_id';
-    private const CUSTOM_FIELDS_KEY_SHIPMENTS = 'shipments';
-
-    private const REQUEST_KEY_ORDER_LINE_ITEM_ID = 'itemId';
-    private const REQUEST_KEY_ORDER_LINE_ITEM_VERSION_ID = 'versionId';
-    private const REQUEST_KEY_ORDER_LINE_QUANTITY = self::CUSTOM_FIELDS_KEY_QUANTITY;
-
-    private const RESPONSE_KEY_AMOUNT = 'amount';
-    private const RESPONSE_KEY_ITEMS = 'items';
-    private const RESPONSE_KEY_SUCCESS = 'success';
-
-    private const SHIPPING_DATA_KEY_ID = 'id';
-    private const SHIPPING_DATA_KEY_LINES = 'lines';
-    private const SHIPPING_DATA_KEY_QUANTITY = self::CUSTOM_FIELDS_KEY_QUANTITY;
-    private const SHIPPING_DATA_KEY_TEST_MODE = 'testmode';
-
-    /**
-     * @var MollieApiFactory
-     */
-    private $apiFactory;
-
-    /**
-     * @var EntityRepositoryInterface
-     */
-    private $orderLineItemRepository;
-
-    /**
-     * @var OrderService
-     */
-    private $orderService;
-
     /**
      * @var MollieShipment
      */
     private $shipmentFacade;
 
     /**
-     * @var SettingsService
-     */
-    private $settingsService;
-
-    /**
      * @var LoggerInterface
      */
     private $logger;
 
-
     /**
-     * @param MollieApiFactory $apiFactory
-     * @param EntityRepositoryInterface $orderLineItemRepository
-     * @param OrderService $orderService
-     * @param SettingsService $settingsService
      * @param MollieShipment $shipmentFacade
      * @param LoggerInterface $logger
      */
-    public function __construct(MollieApiFactory $apiFactory, EntityRepositoryInterface $orderLineItemRepository, OrderService $orderService, SettingsService $settingsService, MollieShipment $shipmentFacade, LoggerInterface $logger)
+    public function __construct(MollieShipment $shipmentFacade, LoggerInterface $logger)
     {
-        $this->apiFactory = $apiFactory;
-        $this->orderLineItemRepository = $orderLineItemRepository;
-        $this->orderService = $orderService;
-        $this->settingsService = $settingsService;
 
         $this->shipmentFacade = $shipmentFacade;
         $this->logger = $logger;
