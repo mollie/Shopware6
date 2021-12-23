@@ -58,6 +58,13 @@
           "itemHeader": "Item",
           "quantityHeader": "Quantity"
         },
+        "showTracking": "Add tracking info for this shipment",
+        "tracking": {
+          "carrier": "Carrier",
+          "code": "Code",
+          "url": "Url",
+          "invalid": "Please enter both Carrier and Code"
+        },
         "confirmButton": "Ship",
         "cancelButton": "Do not ship"
       }

@@ -20,11 +20,23 @@ class MolliePaymentsShippingService extends ApiService {
             });
     }
 
-    shipOrder(data = {orderId: null}) {
+    shipOrder(data = {
+        orderId: null,
+        trackingCarrier: null,
+        trackingCode: null,
+        trackingUrl: null
+    }) {
         return this.__post('', data);
     }
 
-    shipItem(data = {orderId: null, itemId: null, quantity: null}) {
+    shipItem(data = {
+        orderId: null,
+        itemId: null,
+        quantity: null,
+        trackingCarrier: null,
+        trackingCode: null,
+        trackingUrl: null
+    }) {
         return this.__post('/item', data);
     }
 

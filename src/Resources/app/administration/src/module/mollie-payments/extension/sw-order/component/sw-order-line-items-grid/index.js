@@ -1,5 +1,6 @@
 import template from './sw-order-line-items-grid.html.twig';
 import './sw-order-line-items-grid.scss';
+import { string } from 'src/core/service/util.service';
 
 // eslint-disable-next-line no-undef
 const { Component, Mixin } = Shopware;
@@ -45,7 +46,13 @@ Component.override('sw-order-line-items-grid', {
             showRefundModal: false,
             showShipOrderModal: false,
             showShipItemModal: null,
+            showTrackingInfo: false,
             shippingStatus: null,
+            tracking: {
+                carrier: '',
+                code: '',
+                url: ''
+            }
         };
     },
 
@@ -232,13 +239,25 @@ Component.override('sw-order-line-items-grid', {
         onCloseShipOrderModal() {
             this.isShipOrderLoading = false;
             this.showShipOrderModal = false;
+            this.resetTracking();
         },
 
         onConfirmShipOrder() {
+            if(this.showTrackingInfo && !this.validateTracking()) {
+                this.createNotificationError({
+                    message: this.$tc('mollie-payments.modals.shipping.tracking.invalid'),
+                });
+                return;
+            }
+
             this.isShipOrderLoading = true;
+
             this.MolliePaymentsShippingService
                 .shipOrder({
-                    orderId: this.order.id
+                    orderId: this.order.id,
+                    trackingCarrier: this.tracking.carrier,
+                    trackingCode: this.tracking.code,
+                    trackingUrl: this.tracking.url
                 })
                 .then(() => {
                     this.onCloseShipOrderModal();
@@ -261,12 +280,20 @@ Component.override('sw-order-line-items-grid', {
             this.isShipItemLoading = false;
             this.showShipItemModal = false;
             this.shipQuantity = 0;
+            this.resetTracking();
         },
 
         onConfirmShipItem(item) {
             if (this.shipQuantity === 0) {
                 this.createNotificationError({
                     message: this.$tc('mollie-payments.modals.shipping.item.noQuantity'),
+                });
+                return;
+            }
+
+            if(this.showTrackingInfo && !this.validateTracking()) {
+                this.createNotificationError({
+                    message: this.$tc('mollie-payments.modals.shipping.tracking.invalid'),
                 });
                 return;
             }
@@ -278,6 +305,9 @@ Component.override('sw-order-line-items-grid', {
                     orderId: this.order.id,
                     itemId: item.id,
                     quantity: this.shipQuantity,
+                    trackingCarrier: this.tracking.carrier,
+                    trackingCode: this.tracking.code,
+                    trackingUrl: this.tracking.url
                 })
                 .then(() => {
                     this.createNotificationSuccess({
@@ -318,5 +348,21 @@ Component.override('sw-order-line-items-grid', {
 
             return this.shippingStatus[item.id].quantityShipped;
         },
+
+        //==== Tracking =============================================================================================//
+
+        resetTracking() {
+            this.showTrackingInfo = false;
+            this.tracking = {
+                carrier: '',
+                code: '',
+                url: ''
+            };
+        },
+
+        validateTracking() {
+            return !string.isEmptyOrSpaces(this.tracking.carrier)
+                && !string.isEmptyOrSpaces(this.tracking.code)
+        }
     }
 });
