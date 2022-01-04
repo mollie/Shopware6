@@ -74,6 +74,10 @@
             <argument type="service" id="order.repository"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Service\UpdateOrderTransactionCustomFields">
+            <argument type="service" id="order_transaction.repository"/>
+        </service>
+
         <service id="Kiener\MolliePayments\Service\Order\UpdateOrderLineItems">
             <argument type="service" id="order_line_item.repository"/>
         </service>

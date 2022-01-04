@@ -10,7 +10,9 @@ use Kiener\MolliePayments\Service\Order\OrderStatusUpdater;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
+use Kiener\MolliePayments\Service\UpdateOrderTransactionCustomFields;
 use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
+use Kiener\MolliePayments\Struct\MollieOrderTransactionCustomFieldsStruct;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Exceptions\IncompatiblePlatform;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
@@ -44,6 +46,10 @@ class MolliePaymentFinalize
      * @var UpdateOrderCustomFields
      */
     private $updateOrderCustomFields;
+    /**
+     * @var UpdateOrderTransactionCustomFields
+     */
+    private $updateOrderTransactionCustomFields;
 
     public function __construct(
         MollieApiFactory                      $mollieApiFactory,
@@ -51,7 +57,8 @@ class MolliePaymentFinalize
         OrderStatusConverter                  $orderStatusConverter,
         OrderStatusUpdater                    $orderStatusUpdater,
         SettingsService                       $settingsService,
-        UpdateOrderCustomFields               $updateOrderCustomFields
+        UpdateOrderCustomFields               $updateOrderCustomFields,
+        UpdateOrderTransactionCustomFields    $updateOrderTransactionCustomFields
     )
     {
         $this->mollieApiFactory = $mollieApiFactory;
@@ -60,6 +67,7 @@ class MolliePaymentFinalize
         $this->orderStatusUpdater = $orderStatusUpdater;
         $this->settingsService = $settingsService;
         $this->updateOrderCustomFields = $updateOrderCustomFields;
+        $this->updateOrderTransactionCustomFields = $updateOrderTransactionCustomFields;
     }
 
     /**
@@ -83,12 +91,27 @@ class MolliePaymentFinalize
 
         $apiClient = $this->mollieApiFactory->getClient($salesChannelContext->getSalesChannel()->getId());
         $mollieOrder = $apiClient->orders->get($mollieOrderId, ['embed' => 'payments']);
+        $molliePaymentId = $mollieOrder->_embedded->payments[0]->id;
 
         // Add the transaction ID to the order's custom fields
         // We might need this later on for reconciliation
-        $molliePaymentId = $mollieOrder->_embedded->payments[0]->id;
         $customFieldsStruct->setMolliePaymentId($molliePaymentId);
         $this->updateOrderCustomFields->updateOrder($order->getId(), $customFieldsStruct, $salesChannelContext);
+
+        // Add the transaction and order IDs to the order's transaction custom fields
+        $orderTransactionCustomFields = new MollieOrderTransactionCustomFieldsStruct(
+            [
+                'mollie_payments' => [
+                    'order_id' => $customFieldsStruct->getMollieOrderId(),
+                    'payment_id' => $molliePaymentId
+                ]
+            ]
+        );
+        $this->updateOrderTransactionCustomFields->updateOrderTransaction(
+            $transactionStruct->getOrderTransaction()->getId(),
+            $orderTransactionCustomFields,
+            $salesChannelContext
+        );
 
         $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
 
