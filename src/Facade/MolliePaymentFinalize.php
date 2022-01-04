@@ -9,6 +9,7 @@ use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
 use Kiener\MolliePayments\Service\Order\OrderStatusUpdater;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
+use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Exceptions\IncompatiblePlatform;
@@ -39,13 +40,18 @@ class MolliePaymentFinalize
      * @var SettingsService
      */
     private $settingsService;
+    /**
+     * @var UpdateOrderCustomFields
+     */
+    private $updateOrderCustomFields;
 
     public function __construct(
         MollieApiFactory                      $mollieApiFactory,
         TransactionTransitionServiceInterface $transactionTransitionService,
         OrderStatusConverter                  $orderStatusConverter,
         OrderStatusUpdater                    $orderStatusUpdater,
-        SettingsService                       $settingsService
+        SettingsService                       $settingsService,
+        UpdateOrderCustomFields               $updateOrderCustomFields
     )
     {
         $this->mollieApiFactory = $mollieApiFactory;
@@ -53,6 +59,7 @@ class MolliePaymentFinalize
         $this->orderStatusConverter = $orderStatusConverter;
         $this->orderStatusUpdater = $orderStatusUpdater;
         $this->settingsService = $settingsService;
+        $this->updateOrderCustomFields = $updateOrderCustomFields;
     }
 
     /**
@@ -76,6 +83,12 @@ class MolliePaymentFinalize
 
         $apiClient = $this->mollieApiFactory->getClient($salesChannelContext->getSalesChannel()->getId());
         $mollieOrder = $apiClient->orders->get($mollieOrderId, ['embed' => 'payments']);
+
+        // Add the transaction ID to the order's custom fields
+        // We might need this later on for reconciliation
+        $mollieTransactionId = $mollieOrder->_embedded->payments[0]->id;
+        $customFieldsStruct->setMollieTransactionId($mollieTransactionId);
+        $this->updateOrderCustomFields->updateOrder($order->getId(), $customFieldsStruct, $salesChannelContext);
 
         $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
 

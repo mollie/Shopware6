@@ -34,6 +34,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\UpdateOrderCustomFields"/>
         </service>
 
         <service id="Kiener\MolliePayments\Facade\MollieOrderPaymentFlow">
