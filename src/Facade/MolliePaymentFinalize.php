@@ -91,7 +91,7 @@ class MolliePaymentFinalize
 
         $apiClient = $this->mollieApiFactory->getClient($salesChannelContext->getSalesChannel()->getId());
         $mollieOrder = $apiClient->orders->get($mollieOrderId, ['embed' => 'payments']);
-        $molliePaymentId = $mollieOrder->_embedded->payments[0]->id;
+        $molliePaymentId = end($mollieOrder->_embedded->payments)->id;
 
         // Add the transaction ID to the order's custom fields
         // We might need this later on for reconciliation
