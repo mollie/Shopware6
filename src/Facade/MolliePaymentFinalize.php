@@ -86,8 +86,8 @@ class MolliePaymentFinalize
 
         // Add the transaction ID to the order's custom fields
         // We might need this later on for reconciliation
-        $mollieTransactionId = $mollieOrder->_embedded->payments[0]->id;
-        $customFieldsStruct->setMollieTransactionId($mollieTransactionId);
+        $molliePaymentId = $mollieOrder->_embedded->payments[0]->id;
+        $customFieldsStruct->setMolliePaymentId($molliePaymentId);
         $this->updateOrderCustomFields->updateOrder($order->getId(), $customFieldsStruct, $salesChannelContext);
 
         $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());

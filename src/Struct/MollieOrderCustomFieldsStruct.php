@@ -8,7 +8,7 @@ class MollieOrderCustomFieldsStruct
     private $mollieOrderId;
 
     /** @var string|null */
-    private $mollieTransactionId;
+    private $molliePaymentId;
 
     /** @var string|null */
     private $transactionReturnUrl;
@@ -45,17 +45,17 @@ class MollieOrderCustomFieldsStruct
     /**
      * @return string|null
      */
-    public function getMollieTransactionId(): ?string
+    public function getMolliePaymentId(): ?string
     {
-        return $this->mollieTransactionId;
+        return $this->molliePaymentId;
     }
 
     /**
-     * @param string|null $mollieTransactionId
+     * @param string|null $molliePaymentId
      */
-    public function setMollieTransactionId(?string $mollieTransactionId): void
+    public function setMolliePaymentId(?string $molliePaymentId): void
     {
-        $this->mollieTransactionId = $mollieTransactionId;
+        $this->molliePaymentId = $molliePaymentId;
     }
 
     /**
@@ -102,7 +102,7 @@ class MollieOrderCustomFieldsStruct
         return [
             'mollie_payments' => [
                 'order_id' => $this->mollieOrderId,
-                'transaction_id' => $this->mollieTransactionId,
+                'payment_id' => $this->molliePaymentId,
                 'transactionReturnUrl' => (string)$this->transactionReturnUrl,
                 'molliePaymentUrl' => (string)$this->molliePaymentUrl
             ]
@@ -122,8 +122,8 @@ class MollieOrderCustomFieldsStruct
             $this->setMollieOrderId((string)$customFields['mollie_payments']['order_id']);
         }
 
-        if (isset($customFields['mollie_payments']['transaction_id'])) {
-            $this->setMollieTransactionId((string)$customFields['mollie_payments']['transaction_id']);
+        if (isset($customFields['mollie_payments']['payment_id'])) {
+            $this->setMolliePaymentId((string)$customFields['mollie_payments']['payment_id']);
         }
 
         if (isset($customFields['mollie_payments']['transactionReturnUrl'])) {
