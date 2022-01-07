@@ -10,6 +10,9 @@ class MollieOrderTransactionCustomFieldsStruct
     /** @var string|null */
     private $molliePaymentId;
 
+    /** @var string|null */
+    private $thirdPartyPaymentId;
+
     /**
      * @param array<string,mixed> $orderCustomFields
      */
@@ -53,6 +56,22 @@ class MollieOrderTransactionCustomFieldsStruct
     }
 
     /**
+     * @return string|null
+     */
+    public function getThirdPartyPaymentId(): ?string
+    {
+        return $this->thirdPartyPaymentId;
+    }
+
+    /**
+     * @param string|null $thirdPartyPaymentId
+     */
+    public function setThirdPartyPaymentId(?string $thirdPartyPaymentId): void
+    {
+        $this->thirdPartyPaymentId = $thirdPartyPaymentId;
+    }
+
+    /**
      * @return array<string,mixed>
      */
     public function getMollieCustomFields(): array
@@ -65,6 +84,7 @@ class MollieOrderTransactionCustomFieldsStruct
             'mollie_payments' => [
                 'order_id' => $this->mollieOrderId,
                 'payment_id' => $this->molliePaymentId,
+                'third_party_payment_id' => $this->thirdPartyPaymentId,
             ]
         ];
     }
@@ -84,6 +104,10 @@ class MollieOrderTransactionCustomFieldsStruct
 
         if (isset($customFields['mollie_payments']['payment_id'])) {
             $this->setMolliePaymentId((string)$customFields['mollie_payments']['payment_id']);
+        }
+
+        if (isset($customFields['mollie_payments']['third_party_payment_id'])) {
+            $this->setThirdPartyPaymentId((string)$customFields['mollie_payments']['third_party_payment_id']);
         }
     }
 }

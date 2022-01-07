@@ -17,6 +17,7 @@ class MollieOrderTransactionCustomFieldsStructTest extends TestCase
         $this->assertEquals(['mollie_payments' => []], $struct->getMollieCustomFields());
         $this->assertEquals('', $struct->getMollieOrderId());
         $this->assertEquals('', $struct->getMolliePaymentId());
+        $this->assertEquals('', $struct->getThirdPartyPaymentId());
     }
 
     /**
@@ -29,15 +30,18 @@ class MollieOrderTransactionCustomFieldsStructTest extends TestCase
             'mollie_payments' => [
                 'order_id' => 'order_id',
                 'payment_id' => 'payment_id',
+                'third_party_payment_id' => 'third_party_payment_id'
             ],
         ]);
 
         $this->assertEquals(['mollie_payments' => [
             'order_id' => 'order_id',
             'payment_id' => 'payment_id',
+            'third_party_payment_id' => 'third_party_payment_id'
         ]], $struct->getMollieCustomFields());
         $this->assertEquals('order_id', $struct->getMollieOrderId());
         $this->assertEquals('payment_id', $struct->getMolliePaymentId());
+        $this->assertEquals('third_party_payment_id', $struct->getThirdPartyPaymentId());
     }
 
     /**

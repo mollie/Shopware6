@@ -148,18 +148,29 @@ class MolliePaymentFinalize
 
         // Add the transaction ID to the order's custom fields
         // We might need this later on for reconciliation
-        $molliePaymentId = $this->mollieOrderService->getCompletedPayment(
+        $molliePayment = $this->mollieOrderService->getCompletedPayment(
             $mollieOrderId,
             $salesChannelContext->getSalesChannel()->getId(),
             $salesChannelContext->getContext()
-        )->id;
-        $customFieldsStruct->setMolliePaymentId($molliePaymentId);
+        );
+        // Additionally, we might have third party IDs we can add as well
+        $thirdPartyPaymentId = null;
+        if (isset($molliePayment->details, $molliePayment->details->paypalReference)) {
+            $thirdPartyPaymentId = $molliePayment->details->paypalReference;
+        }
+        if (isset($molliePayment->details, $molliePayment->details->transferReference)) {
+            $thirdPartyPaymentId = $molliePayment->details->transferReference;
+        }
+
+        $customFieldsStruct->setMolliePaymentId($molliePayment->id);
+        $customFieldsStruct->setThirdPartyPaymentId($thirdPartyPaymentId);
         $this->updateOrderCustomFields->updateOrder($order->getId(), $customFieldsStruct, $salesChannelContext);
 
         // Add the transaction and order IDs to the order's transaction custom fields
         $orderTransactionCustomFields = new MollieOrderTransactionCustomFieldsStruct();
         $orderTransactionCustomFields->setMollieOrderId($customFieldsStruct->getMollieOrderId());
-        $orderTransactionCustomFields->setMolliePaymentId($molliePaymentId);
+        $orderTransactionCustomFields->setMolliePaymentId($molliePayment->id);
+        $orderTransactionCustomFields->setThirdPartyPaymentId($thirdPartyPaymentId);
         $this->updateOrderTransactionCustomFields->updateOrderTransaction(
             $transactionStruct->getOrderTransaction()->getId(),
             $orderTransactionCustomFields,
