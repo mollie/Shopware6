@@ -95,7 +95,7 @@ class PaymentScreenAction {
      *
      */
     selectGiropay() {
-        cy.contains('Giropay').click();
+        cy.contains('giropay').click();
     }
 
     /**
