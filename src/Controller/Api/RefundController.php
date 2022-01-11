@@ -239,19 +239,30 @@ class RefundController extends AbstractController
     private function listResponse(string $orderId, Context $context): JsonResponse
     {
         try {
-            $this->refundFacade->getRefundListUsingOrderId($orderId, $context);
-        } catch (ShopwareHttpException $e) {
-            $this->logger->error($e->getMessage());
-            return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
+
+            $refunds = $this->refundFacade->getRefundListUsingOrderId($orderId, $context);
+
+            return $this->json($refunds);
+
         } catch (PaymentNotFoundException $e) {
-            // This indicates there is no completed payment for this order, so there are no refunds yet.
-            $refunds = [];
-        } catch (\Throwable $e) {
+
+            // This indicates there is no completed payment for this order,
+            // so there are no refunds yet.
+            return $this->json([]);
+
+        } catch (ShopwareHttpException $e) {
+
             $this->logger->error($e->getMessage());
+
+            return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
+
+        } catch (\Throwable $e) {
+
+            $this->logger->error($e->getMessage());
+
             return $this->json(['message' => $e->getMessage()], 500);
         }
 
-        return $this->json($refunds ?? []);
     }
 
     /**
