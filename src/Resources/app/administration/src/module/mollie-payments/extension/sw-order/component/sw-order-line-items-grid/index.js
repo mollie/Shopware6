@@ -51,8 +51,8 @@ Component.override('sw-order-line-items-grid', {
             tracking: {
                 carrier: '',
                 code: '',
-                url: ''
-            }
+                url: '',
+            },
         };
     },
 
@@ -101,7 +101,7 @@ Component.override('sw-order-line-items-grid', {
                 {
                     property: 'quantity',
                     label: this.$tc('mollie-payments.modals.shipping.order.quantityHeader'),
-                }
+                },
             ];
         },
 
@@ -225,7 +225,7 @@ Component.override('sw-order-line-items-grid', {
         async getShippingStatus() {
             await this.MolliePaymentsShippingService
                 .status({
-                    orderId: this.order.id
+                    orderId: this.order.id,
                 })
                 .then((response) => {
                     this.shippingStatus = response;
@@ -257,7 +257,7 @@ Component.override('sw-order-line-items-grid', {
                     orderId: this.order.id,
                     trackingCarrier: this.tracking.carrier,
                     trackingCode: this.tracking.code,
-                    trackingUrl: this.tracking.url
+                    trackingUrl: this.tracking.url,
                 })
                 .then(() => {
                     this.onCloseShipOrderModal();
@@ -307,7 +307,7 @@ Component.override('sw-order-line-items-grid', {
                     quantity: this.shipQuantity,
                     trackingCarrier: this.tracking.carrier,
                     trackingCode: this.tracking.code,
-                    trackingUrl: this.tracking.url
+                    trackingUrl: this.tracking.url,
                 })
                 .then(() => {
                     this.createNotificationSuccess({
@@ -356,13 +356,13 @@ Component.override('sw-order-line-items-grid', {
             this.tracking = {
                 carrier: '',
                 code: '',
-                url: ''
+                url: '',
             };
         },
 
         validateTracking() {
             return !string.isEmptyOrSpaces(this.tracking.carrier)
                 && !string.isEmptyOrSpaces(this.tracking.code)
-        }
-    }
+        },
+    },
 });

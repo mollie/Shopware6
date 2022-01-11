@@ -24,7 +24,7 @@ class MolliePaymentsShippingService extends ApiService {
         orderId: null,
         trackingCarrier: null,
         trackingCode: null,
-        trackingUrl: null
+        trackingUrl: null,
     }) {
         return this.__post('', data);
     }
@@ -35,7 +35,7 @@ class MolliePaymentsShippingService extends ApiService {
         quantity: null,
         trackingCarrier: null,
         trackingCode: null,
-        trackingUrl: null
+        trackingUrl: null,
     }) {
         return this.__post('/item', data);
     }

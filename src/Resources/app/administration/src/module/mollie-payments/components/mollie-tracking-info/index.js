@@ -16,7 +16,7 @@ Component.register('mollie-tracking-info', {
                     code: '',
                     url: '',
                 }
-            }
+            },
         },
-    }
+    },
 });
