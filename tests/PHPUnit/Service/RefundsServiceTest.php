@@ -91,7 +91,9 @@ class RefundsServiceTest extends TestCase
             $orderEntityMock,
             24.99,
             'test refund'
-        ));
+        );
+
+        static::assertEquals($expected, $result instanceof Refund);
     }
 
     /**
