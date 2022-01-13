@@ -255,7 +255,7 @@ class Order
         return $mollieOrder->createPayment($fakeOrder['payment']);
     }
 
-    public function getPaymentUrl(string $mollieOrderId, string $salesChannelId): ?string
+    public function getPaymentUrl(string $mollieOrderId, string $salesChannelId, Context $context): ?string
     {
         $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId, $context);
 
