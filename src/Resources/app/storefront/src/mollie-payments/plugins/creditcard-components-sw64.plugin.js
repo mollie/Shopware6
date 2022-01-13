@@ -1,6 +1,7 @@
 import Plugin from 'src/plugin-system/plugin.class';
 import DomAccess from 'src/helper/dom-access.helper';
 
+
 export default class MollieCreditCardComponentsSw64 extends Plugin {
     static options = {
         paymentId: null,
@@ -12,6 +13,7 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
     };
 
     init() {
+
         try {
             this._paymentForm = DomAccess.querySelector(document, this.getSelectors().paymentForm);
             this._confirmForm = DomAccess.querySelector(document, this.getSelectors().confirmForm);
@@ -190,55 +192,56 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
 
         const creditCardRadioInput = document.querySelector(`${this.getSelectors().creditCardRadioInput}[value="${this.options.paymentId}"]`);
 
-        if (
-            (
-                creditCardRadioInput === undefined
-                || creditCardRadioInput === null
-                || creditCardRadioInput.checked === false
-            )
-            && !!this._confirmForm
-        ) {
+        // check if we have any credit card forms or elements visible
+        // if not, we just continue with standard
+        if ((creditCardRadioInput === undefined || creditCardRadioInput === null || creditCardRadioInput.checked === false) && !!this._confirmForm) {
             this._confirmForm.submit();
+            return;
         }
 
-        if (
-            !!creditCardRadioInput
-            && creditCardRadioInput.checked === true
-        ) {
-            // Reset possible form errors
-            const verificationErrors = document.getElementById(`${this.getInputFields().verificationCode.errors}`);
-            verificationErrors.textContent = '';
-
-            // Get a payment token
-            const {token, error} = await this._componentsObject.createToken();
-
-            if (error) {
-                verificationErrors.textContent = error.message;
-                this._reactivateFormSubmit();
-                return;
-            }
-
-            if (!error) {
-                const fetchUrl = this.options.shopUrl + '/mollie/components/store-card-token/' + this.options.customerId + '/' + token;
-
-                // Store the token on the customer
-                if (
-                    !!fetchUrl
-                    && !!this._confirmForm
-                ) {
-                    fetch(fetchUrl, {headers: {'Content-Type': 'application/json; charset=utf-8'}})
-                        .then(() => {
-                            // Add token to the form
-                            const tokenInput = document.getElementById('cardToken');
-                            tokenInput.setAttribute('value', token);
-
-                            this._confirmForm.submit();
-                        })
-                        .catch(() => {
-                            this._confirmForm.submit()
-                        });
-                }
-            }
+        // check if we have existing forms, but if we do not have
+        // activated the credit card payment method
+        // then also continue with standard
+        if (!!creditCardRadioInput && creditCardRadioInput.checked === false) {
+            this._confirmForm.submit();
+            return;
         }
+
+
+        // Reset possible form errors
+        const verificationErrors = document.getElementById(`${this.getInputFields().verificationCode.errors}`);
+        verificationErrors.textContent = '';
+
+        // Get a payment token
+        const {token, error} = await this._componentsObject.createToken();
+
+        if (error) {
+            verificationErrors.textContent = error.message;
+            this._reactivateFormSubmit();
+            return;
+        }
+
+        
+        const paymentForm = this._confirmForm;
+
+        // now we finish by first calling our URL to store
+        // the credit card token for the user and the current checkout
+        // and then we continue by submitting our original payment form.
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', this.options.shopUrl + '/mollie/components/store-card-token/' + this.options.customerId + '/' + token);
+        xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+
+        xhr.onload = function () {
+            const tokenInput = document.getElementById('cardToken');
+            tokenInput.setAttribute('value', token);
+            paymentForm.submit();
+        };
+
+        xhr.onerror = function () {
+            paymentForm.submit();
+        };
+
+        xhr.send();
     }
+
 }

@@ -16,12 +16,25 @@ export default class MollieApplePayDirect extends Plugin {
     init() {
         const me = this;
 
+
+        // we might have wrapping containers
+        // that also need to be hidden -> they might have different margins or other things
+        const applePayContainers = document.querySelectorAll('.js-apple-pay-container');
+        // of course, also grab our real buttons
+        const applePayButtons = document.querySelectorAll('.js-apple-pay');
+
+
         if (!window.ApplePaySession || !window.ApplePaySession.canMakePayments()) {
+            // hide our wrapping Apple Pay containers
+            // to avoid any wrong margins being displayed
+            if (applePayContainers) {
+                for (let i = 0; i < applePayContainers.length; i++) {
+                    applePayContainers[i].style.display = 'none';
+                }
+            }
             return;
         }
 
-
-        const applePayButtons = document.querySelectorAll('.js-apple-pay');
 
         if (applePayButtons.length <= 0) {
             return;

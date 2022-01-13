@@ -232,22 +232,25 @@ export default class MollieCreditCardComponents extends Plugin {
             }
 
             if (!error) {
-                const fetchUrl = this.options.shopUrl + '/mollie/components/store-card-token/' + this.options.customerId + '/' + token;
 
-                // Store the token on the customer
-                if (
-                    !!fetchUrl
-                    && !!paymentForm
-                ) {
-                    fetch(fetchUrl, {headers: {'Content-Type': 'application/json; charset=utf-8'}})
-                        .then(() => {
-                            // Add token to the form
-                            const tokenInput = document.getElementById('cardToken');
-                            tokenInput.setAttribute('value', token);
-                            paymentForm.submit();
-                        })
-                        .catch(paymentForm.submit());
-                }
+                // now we finish by first calling our URL to store
+                // the credit card token for the user and the current checkout
+                // and then we continue by submitting our original payment form.
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', this.options.shopUrl + '/mollie/components/store-card-token/' + this.options.customerId + '/' + token);
+                xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+
+                xhr.onload = function () {
+                    const tokenInput = document.getElementById('cardToken');
+                    tokenInput.setAttribute('value', token);
+                    paymentForm.submit();
+                };
+
+                xhr.onerror = function () {
+                    paymentForm.submit();
+                };
+
+                xhr.send();
             }
         }
     }

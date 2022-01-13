@@ -98,6 +98,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStateService"/>
             <argument type="service" id="Shopware\Core\System\StateMachine\StateMachineRegistry"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\Order\OrderRepository"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\CartService" class="Kiener\MolliePayments\Service\CartService" public="true">
