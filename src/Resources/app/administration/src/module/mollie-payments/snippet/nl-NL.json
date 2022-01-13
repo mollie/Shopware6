@@ -42,9 +42,29 @@
         }
       },
       "shipping": {
-        "title": "Verzend een order line item via Mollie",
-        "content": "Vul de hoeveelheid van dit item in ({shippableQuantity} van {quantity} over voor verzending) om naar de klant te verzenden.",
-        "quantityPlaceholder": "De te verzenden hoeveelheid...",
+        "title": "Verzenden bij Mollie",
+        "item": {
+          "label": "Product:",
+          "noQuantity": "Voer een hoeveelheid in om te verzenden.",
+          "shipAll": "Verzend alles",
+          "summary": {
+            "quantity": "Te verzenden hoeveelheid",
+            "shipped": "Verzonden hoeveelheid",
+            "shippable": "Verzendbare hoeveelheid"
+          }
+        },
+        "order": {
+          "description": "De volgende product aantallen zullen worden verzonden.",
+          "itemHeader": "Product",
+          "quantityHeader": "Aantal"
+        },
+        "showTracking": "Voeg tracking info toe aan deze zending",
+        "tracking": {
+          "carrier": "Carrier",
+          "code": "Code",
+          "url": "Url",
+          "invalid": "Voer zowel Carrier als Code in"
+        },
         "confirmButton": "Verzenden",
         "cancelButton": "Niet verzenden"
       }
