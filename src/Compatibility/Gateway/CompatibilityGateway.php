@@ -91,7 +91,7 @@ class CompatibilityGateway implements CompatibilityGatewayInterface
         }
 
         if (defined('Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates::STATE_CHARGEBACK')) {
-            return OrderTransactionStates::STATE_CHARGEBACK; /** @phpstan-ignore-line */
+            return OrderTransactionStates::STATE_CHARGEBACK;
         }
 
         // Chargeback constant did not exist until 6.4.4, but the state exists since 6.2.3,
