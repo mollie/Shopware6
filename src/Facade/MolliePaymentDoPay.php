@@ -138,7 +138,19 @@ class MolliePaymentDoPay
                 ]
             );
 
-            $payment = $this->orderApiService->createOrReusePayment($mollieOrderId, $paymentMethod, $salesChannelContext);
+            $customer = $this->customerService->getCustomer(
+                $order->getOrderCustomer()->getCustomerId(),
+                $salesChannelContext->getContext()
+            );
+
+            $payment = $this->orderApiService->createOrReusePayment(
+                $mollieOrderId,
+                $paymentMethod,
+                $paymentHandler,
+                $order,
+                $customer,
+                $salesChannelContext
+            );
 
             // if direct payment return to success page
             if (MolliePaymentStatus::isApprovedStatus($payment->status) && empty($payment->getCheckoutUrl())) {

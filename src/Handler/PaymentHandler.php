@@ -66,8 +66,6 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      * @param OrderEntity $orderEntity
      * @param SalesChannelContext $salesChannelContext
      * @param CustomerEntity $customer
-     * @param LocaleEntity $locale
-     *
      * @return array
      */
     public function processPaymentMethodSpecificParameters(array $orderData, OrderEntity $orderEntity, SalesChannelContext $salesChannelContext, CustomerEntity $customer): array

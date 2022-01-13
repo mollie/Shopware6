@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeFetchedException;
 use Kiener\MolliePayments\Exception\MollieOrderPaymentCouldNotBeCreatedException;
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
+use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\MollieApi\Payment as PaymentApiService;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Order as MollieOrder;
@@ -17,6 +18,8 @@ use Mollie\Api\Types\OrderLineType;
 use Mollie\Api\Types\PaymentStatus;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
@@ -120,10 +123,19 @@ class Order
      *
      * @param string $mollieOrderId
      * @param string $paymentMethod
+     * @param PaymentHandler $paymentHandler
+     * @param CustomerEntity $customer
      * @param SalesChannelContext $salesChannelContext
      * @return Payment
      */
-    public function createOrReusePayment(string $mollieOrderId, string $paymentMethod, SalesChannelContext $salesChannelContext): Payment
+    public function createOrReusePayment(
+        string $mollieOrderId,
+        string $paymentMethod,
+        PaymentHandler $paymentHandler,
+        OrderEntity $order,
+        CustomerEntity $customer,
+        SalesChannelContext $salesChannelContext
+    ): Payment
     {
         $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelContext->getSalesChannel()->getId(), $salesChannelContext->getContext(), ['embed' => 'payments']);
 
@@ -143,7 +155,7 @@ class Order
                 ]
             );
 
-            return $mollieOrder->createPayment(['method' => $paymentMethod]);
+            return $this->prepareNewPayment($mollieOrder, $paymentMethod, $paymentHandler, $order, $customer, $salesChannelContext);
         }
 
         if ($payment->method === $paymentMethod) {
@@ -182,9 +194,7 @@ class Order
             $this->paymentApiService->delete($payment->id, $salesChannelContext->getSalesChannel()->getId());
 
             /** @var Payment $payment */
-            $payment = $mollieOrder->createPayment(['method' => $paymentMethod]);
-
-            return $payment;
+            return $this->prepareNewPayment($mollieOrder, $paymentMethod, $paymentHandler, $order, $customer, $salesChannelContext);
         } catch (ApiException $e) {
 
             throw new MollieOrderPaymentCouldNotBeCreatedException($mollieOrderId, [], $e);
@@ -210,7 +220,42 @@ class Order
         return null;
     }
 
-    public function getPaymentUrl(string $mollieOrderId, string $salesChannelId, Context $context): ?string
+    /**
+     * @param MollieOrder $mollieOrder
+     * @param string $paymentMethod
+     * @param PaymentHandler $paymentHandler
+     * @param OrderEntity $order
+     * @param CustomerEntity $customer
+     * @param SalesChannelContext $salesChannelContext
+     * @return Payment
+     * @throws ApiException
+     */
+    private function prepareNewPayment(
+        MollieOrder    $mollieOrder,
+        string         $paymentMethod,
+        PaymentHandler $paymentHandler,
+        OrderEntity    $order,
+        CustomerEntity $customer,
+        SalesChannelContext $salesChannelContext
+    ): Payment
+    {
+        $fakeOrder = [
+            'payment' => [
+                'method' => $paymentMethod
+            ]
+        ];
+
+        $fakeOrder = $paymentHandler->processPaymentMethodSpecificParameters(
+            $fakeOrder,
+            $order,
+            $salesChannelContext,
+            $customer
+        );
+
+        return $mollieOrder->createPayment($fakeOrder['payment']);
+    }
+
+    public function getPaymentUrl(string $mollieOrderId, string $salesChannelId): ?string
     {
         $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId, $context);
 
