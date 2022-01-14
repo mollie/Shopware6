@@ -239,6 +239,9 @@ class Order
         SalesChannelContext $salesChannelContext
     ): Payment
     {
+        // To add payment method specific parameters to our payment data, the method requires an array named orderData
+        // We have no interest in order data, just the payment data that is inside it, but we still need to pass
+        // along an array with a key 'payment'. This is our fake order data array.
         $fakeOrder = [
             'payment' => [
                 'method' => $paymentMethod
