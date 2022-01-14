@@ -29,7 +29,7 @@ class MollieOrderShipmentTrackingEvent
     /**
      * @var string
      */
-    protected $trackingUrl = '';
+    protected $trackingUrl;
 
 
     public function __construct(
@@ -37,7 +37,7 @@ class MollieOrderShipmentTrackingEvent
         Context $context,
         string  $trackingCarrier,
         string  $trackingCode,
-        string  $trackingUrl = ''
+        string  $trackingUrl
     )
     {
         $this->orderId = $orderId;
