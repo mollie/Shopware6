@@ -55,7 +55,7 @@ class PaymentMethodController extends AbstractController
             );
         }
 
-        return new JsonResponse([
+        return $this->json([
             'success' => true,
         ]);
     }
