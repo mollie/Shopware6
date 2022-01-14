@@ -138,10 +138,7 @@ class MolliePaymentDoPay
                 ]
             );
 
-            $customer = $this->customerService->getCustomer(
-                $order->getOrderCustomer()->getCustomerId(),
-                $salesChannelContext->getContext()
-            );
+            $customer = $this->extractor->extractCustomer($order, $salesChannelContext);
 
             $payment = $this->orderApiService->createOrReusePayment(
                 $mollieOrderId,
@@ -179,7 +176,7 @@ class MolliePaymentDoPay
 
             $this->createCustomerAtMollie($order, $salesChannelContext);
 
-        } catch (CouldNotCreateMollieCustomerException | CustomerCouldNotBeFoundException $e) {
+        } catch (CouldNotCreateMollieCustomerException|CustomerCouldNotBeFoundException $e) {
 
             # TODO do we really need to catch this? shouldnt it fail fast?
 
