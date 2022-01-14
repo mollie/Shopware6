@@ -214,7 +214,9 @@ jobs:
           docker logs shop
 
       - name: Upload into Docker
-        run: docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
+        run: |
+          docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
+          docker exec shop bash -c 'sudo chown www-data:www-data /var/www/html/custom/plugins -R'
 
       - name: Install and Build Plugin
         run: |
