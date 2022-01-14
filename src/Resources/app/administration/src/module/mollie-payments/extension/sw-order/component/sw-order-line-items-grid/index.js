@@ -1,9 +1,10 @@
 import template from './sw-order-line-items-grid.html.twig';
 import './sw-order-line-items-grid.scss';
-import { string } from 'src/core/service/util.service';
 
 // eslint-disable-next-line no-undef
 const { Component, Mixin } = Shopware;
+// eslint-disable-next-line no-undef
+const { string } = Shopware.Utils;
 
 Component.override('sw-order-line-items-grid', {
     template,
