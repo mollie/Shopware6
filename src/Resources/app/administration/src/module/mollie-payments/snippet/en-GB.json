@@ -6,6 +6,16 @@
       "refundThroughMollie": "Refund through Mollie",
       "shipThroughMollie": "Ship through Mollie"
     },
+    "config": {
+      "payments": {
+        "updatePaymentMethods": {
+          "title": "Mollie Payments",
+          "button": "Update payment methods",
+          "succeeded": "The payment methods are successfully updated.",
+          "failed": "The payment methods couldn't be updated."
+        }
+      }
+    },
     "modals": {
       "refund": {
         "title": "Refund through Mollie",

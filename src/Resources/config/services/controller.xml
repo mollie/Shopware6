@@ -45,6 +45,15 @@
             </call>
         </service>
 
+        <service id="Kiener\MolliePayments\Controller\Api\PaymentMethodController" public="true">
+            <argument type="service" id="Kiener\MolliePayments\Service\PaymentMethodService"/>
+            <argument type="service" id="mollie_payments.logger"/>
+
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+
         <!-- Controllers -->
         <service id="Kiener\MolliePayments\Storefront\Controller\ApplePayDirectController" public="true">
             <argument type="service" id="Kiener\MolliePayments\Service\ApplePayDirect\ApplePayDirect"/>
