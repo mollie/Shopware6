@@ -21,6 +21,7 @@ use Kiener\MolliePayments\Handler\Method\PaySafeCardPayment;
 use Kiener\MolliePayments\Handler\Method\Przelewy24Payment;
 use Kiener\MolliePayments\Handler\Method\SofortPayment;
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
+use Kiener\MolliePayments\MolliePayments;
 use Mollie\Api\Resources\Order;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
@@ -49,31 +50,25 @@ class PaymentMethodService
     /** @var EntityRepositoryInterface */
     private $mediaRepository;
 
-    /** @var string */
-    private $className;
-
     /**
-     * PaymentMethodHelper constructor.
+     * PaymentMethodService constructor.
      *
      * @param MediaService              $mediaService
      * @param EntityRepositoryInterface $mediaRepository
      * @param EntityRepositoryInterface $paymentRepository
      * @param PluginIdProvider          $pluginIdProvider
-     * @param null                      $className
      */
     public function __construct(
         MediaService $mediaService,
         EntityRepositoryInterface $mediaRepository,
         EntityRepositoryInterface $paymentRepository,
-        PluginIdProvider $pluginIdProvider,
-        $className = null
+        PluginIdProvider $pluginIdProvider
     )
     {
         $this->mediaService = $mediaService;
         $this->mediaRepository = $mediaRepository;
         $this->paymentRepository = $paymentRepository;
         $this->pluginIdProvider = $pluginIdProvider;
-        $this->className = $className;
     }
 
     /**
@@ -87,16 +82,29 @@ class PaymentMethodService
     }
 
     /**
-     * Sets the classname.
-     *
-     * @param string $className
-     *
-     * @return PaymentMethodService
+     * @param Context $context
      */
-    public function setClassName(string $className): self
+    public function installAndActivatePaymentMethods(Context $context): void
     {
-        $this->className = $className;
-        return $this;
+        // Get installable payment methods
+        $installablePaymentMethods = $this->getInstallablePaymentMethods();
+
+        if (empty($installablePaymentMethods)) {
+            return;
+        }
+
+        // Check which payment methods from Mollie are already installed in the shop
+        $installedPaymentMethodHandlers = $this->getInstalledPaymentMethodHandlers($this->getPaymentHandlers(), $context);
+
+        // Add payment methods
+        $this->addPaymentMethods($installablePaymentMethods, $context);
+
+        // Activate newly installed payment methods
+        $this->activatePaymentMethods(
+            $installablePaymentMethods,
+            $installedPaymentMethodHandlers,
+            $context
+        );
     }
 
     /**
@@ -106,7 +114,7 @@ class PaymentMethodService
     public function addPaymentMethods(array $paymentMethods, Context $context) : void
     {
         // Get the plugin ID
-        $pluginId = $this->pluginIdProvider->getPluginIdByBaseClass($this->className, $context);
+        $pluginId = $this->pluginIdProvider->getPluginIdByBaseClass(MolliePayments::class, $context);
 
         // Variables
         $paymentData = [];
@@ -130,17 +138,17 @@ class PaymentMethodService
 
             // Get existing payment method so we can update it by it's ID
             try {
-                $existingPaymentMethodId = $this->getPaymentMethodId(
+                $existingPaymentMethod = $this->getPaymentMethod(
                     $paymentMethodData['handlerIdentifier'],
-                    $paymentMethodData['name'],
                     $context
                 );
             } catch (InconsistentCriteriaIdsException $e) {
                 // On error, we assume the payment method doesn't exist
             }
 
-            if (isset($existingPaymentMethodId) && $existingPaymentMethodId !== null) {
-                $paymentMethodData['id'] = $existingPaymentMethodId;
+            if (isset($existingPaymentMethod)) {
+                $paymentMethodData['id'] = $existingPaymentMethod->getId();
+                $paymentMethodData['name'] = $existingPaymentMethod->getName();
             }
 
             // Add payment method data to array of payment data
@@ -193,15 +201,17 @@ class PaymentMethodService
     {
         if (!empty($paymentMethods)) {
             foreach ($paymentMethods as $paymentMethod) {
-                if (in_array($paymentMethod['handler'], $installedHandlers, true)) {
+                if (
+                    !isset($paymentMethod['handler']) ||
+                    in_array($paymentMethod['handler'], $installedHandlers, true)
+                ) {
                     continue;
                 }
 
-                /** @var string|null $paymentMethodId */
-                $paymentMethodId = $this->getPaymentMethodId($paymentMethod['handler'], $paymentMethod['description'], $context);
+                $existingPaymentMethod = $this->getPaymentMethod($paymentMethod['handler'], $context);
 
-                if ((string) $paymentMethodId !== '') {
-                    $this->activatePaymentMethod($paymentMethodId, true, $context);
+                if (isset($existingPaymentMethod)) {
+                    $this->activatePaymentMethod($existingPaymentMethod->getId(), true, $context);
                 }
             }
         }
@@ -287,26 +297,24 @@ class PaymentMethodService
      * Get payment method ID by name.
      *
      * @param $handlerIdentifier
-     * @param $name
      * @param Context $context
      *
-     * @return string|null
+     * @return PaymentMethodEntity|null
      */
-    private function getPaymentMethodId($handlerIdentifier, $name, Context $context) : ?string
+    private function getPaymentMethod($handlerIdentifier, Context $context) : ?PaymentMethodEntity
     {
         // Fetch ID for update
         $paymentCriteria = new Criteria();
         $paymentCriteria->addFilter(new EqualsFilter('handlerIdentifier', $handlerIdentifier));
-        $paymentCriteria->addFilter(new EqualsFilter('name', $name));
 
         // Get payment IDs
-        $paymentIds = $this->paymentRepository->searchIds($paymentCriteria, $context);
+        $paymentMethods = $this->paymentRepository->search($paymentCriteria, $context);
 
-        if ($paymentIds->getTotal() === 0) {
+        if ($paymentMethods->getTotal() === 0) {
             return null;
         }
 
-        return $paymentIds->getIds()[0];
+        return $paymentMethods->first();
     }
 
     /**
@@ -314,7 +322,7 @@ class PaymentMethodService
      *
      * @return array
      */
-    public function getPaymentHandlers()
+    public function getPaymentHandlers(): array
     {
         return [
             ApplePayPayment::class,

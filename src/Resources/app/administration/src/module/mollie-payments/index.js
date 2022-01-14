@@ -2,6 +2,7 @@ import './extension/sw-customer';
 import './extension/sw-order';
 import './components/mollie-test-api-key';
 import './components/mollie-tracking-info';
+import './components/mollie-update-payment-methods';
 
 import deDE from './snippet/de-DE.json';
 import enGB from './snippet/en-GB.json';

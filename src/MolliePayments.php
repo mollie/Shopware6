@@ -105,29 +105,9 @@ class MolliePayments extends Plugin
      */
     private function installAndActivatePaymentMethods(Context $context): void
     {
-        /** @var PaymentMethodService $paymentMethodHelper */
-        $paymentMethodHelper = $this->container->get(PaymentMethodService::class);
+        /** @var PaymentMethodService $paymentMethodService */
+        $paymentMethodService = $this->container->get(PaymentMethodService::class);
 
-        // Get installable payment methods
-        $installablePaymentMethods = $paymentMethodHelper->getInstallablePaymentMethods();
-
-        if (empty($installablePaymentMethods)) {
-            return;
-        }
-
-        // Check which payment methods from Mollie are already installed in the shop
-        $installedPaymentMethodHandlers = $paymentMethodHelper->getInstalledPaymentMethodHandlers($paymentMethodHelper->getPaymentHandlers(), $context);
-
-        // Add payment methods
-        $paymentMethodHelper
-            ->setClassName(get_class($this))
-            ->addPaymentMethods($installablePaymentMethods, $context);
-
-        // Activate newly installed payment methods
-        $paymentMethodHelper->activatePaymentMethods(
-            $installablePaymentMethods,
-            $installedPaymentMethodHandlers,
-            $context
-        );
+        $paymentMethodService->installAndActivatePaymentMethods($context);
     }
 }
