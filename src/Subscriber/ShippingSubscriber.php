@@ -58,12 +58,20 @@ class ShippingSubscriber implements EventSubscriberInterface
             ]);
         } catch (\Exception $e) {
             // We log the error, but don't rethrow so the rest of the proces can continue.
-            $this->logger->error($e->getMessage(), [
-                'orderId' => $event->getOrderId(),
-                'trackingCarrier' => $event->getTrackingCarrier(),
-                'trackingCode' => $event->getTrackingCode(),
-                'trackingUrl' => $event->getTrackingUrl(),
-            ]);
+            $this->logger->error(
+                sprintf(
+                    "Error when shipping order from Mollie Event: \"%s\" in \"%s\" on line %s",
+                    $e->getMessage(),
+                    $e->getFile(),
+                    $e->getLine(),
+                ),
+                [
+                    'orderId' => $event->getOrderId(),
+                    'trackingCarrier' => $event->getTrackingCarrier(),
+                    'trackingCode' => $event->getTrackingCode(),
+                    'trackingUrl' => $event->getTrackingUrl(),
+                ]
+            );
         }
     }
 }
