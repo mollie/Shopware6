@@ -21,6 +21,7 @@ use Kiener\MolliePayments\Handler\Method\PaySafeCardPayment;
 use Kiener\MolliePayments\Handler\Method\Przelewy24Payment;
 use Kiener\MolliePayments\Handler\Method\SofortPayment;
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
+use Kiener\MolliePayments\MolliePayments;
 use Mollie\Api\Resources\Order;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
@@ -49,31 +50,25 @@ class PaymentMethodService
     /** @var EntityRepositoryInterface */
     private $mediaRepository;
 
-    /** @var string */
-    private $className;
-
     /**
-     * PaymentMethodHelper constructor.
+     * PaymentMethodService constructor.
      *
      * @param MediaService              $mediaService
      * @param EntityRepositoryInterface $mediaRepository
      * @param EntityRepositoryInterface $paymentRepository
      * @param PluginIdProvider          $pluginIdProvider
-     * @param null                      $className
      */
     public function __construct(
         MediaService $mediaService,
         EntityRepositoryInterface $mediaRepository,
         EntityRepositoryInterface $paymentRepository,
-        PluginIdProvider $pluginIdProvider,
-        $className = null
+        PluginIdProvider $pluginIdProvider
     )
     {
         $this->mediaService = $mediaService;
         $this->mediaRepository = $mediaRepository;
         $this->paymentRepository = $paymentRepository;
         $this->pluginIdProvider = $pluginIdProvider;
-        $this->className = $className;
     }
 
     /**
@@ -87,16 +82,29 @@ class PaymentMethodService
     }
 
     /**
-     * Sets the classname.
-     *
-     * @param string $className
-     *
-     * @return PaymentMethodService
+     * @param Context $context
      */
-    public function setClassName(string $className): self
+    public function installAndActivatePaymentMethods(Context $context): void
     {
-        $this->className = $className;
-        return $this;
+        // Get installable payment methods
+        $installablePaymentMethods = $this->getInstallablePaymentMethods();
+
+        if (empty($installablePaymentMethods)) {
+            return;
+        }
+
+        // Check which payment methods from Mollie are already installed in the shop
+        $installedPaymentMethodHandlers = $this->getInstalledPaymentMethodHandlers($this->getPaymentHandlers(), $context);
+
+        // Add payment methods
+        $this->addPaymentMethods($installablePaymentMethods, $context);
+
+        // Activate newly installed payment methods
+        $this->activatePaymentMethods(
+            $installablePaymentMethods,
+            $installedPaymentMethodHandlers,
+            $context
+        );
     }
 
     /**
@@ -106,7 +114,7 @@ class PaymentMethodService
     public function addPaymentMethods(array $paymentMethods, Context $context) : void
     {
         // Get the plugin ID
-        $pluginId = $this->pluginIdProvider->getPluginIdByBaseClass($this->className, $context);
+        $pluginId = $this->pluginIdProvider->getPluginIdByBaseClass(MolliePayments::class, $context);
 
         // Variables
         $paymentData = [];
@@ -314,7 +322,7 @@ class PaymentMethodService
      *
      * @return array
      */
-    public function getPaymentHandlers()
+    public function getPaymentHandlers(): array
     {
         return [
             ApplePayPayment::class,
