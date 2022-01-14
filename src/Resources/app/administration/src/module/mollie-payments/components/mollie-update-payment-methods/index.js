@@ -36,7 +36,7 @@ Component.register('mollie-update-payment-methods', {
                     if (response.success === true) {
                         me.createNotificationSuccess(messageData);
                     } else {
-                        messageData.message = me.$tc('mollie-payments.config.payments.updatePaymentMethods.failed');
+                        messageData.message = me.$tc('mollie-payments.config.payments.updatePaymentMethods.failed') + '\n\nException:\n' + response.message;
                         me.createNotificationError(messageData);
                     }
 
