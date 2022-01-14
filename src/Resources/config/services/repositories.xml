@@ -10,6 +10,10 @@
             <argument type="service" id="order_address.repository"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Repository\Order\OrderRepository" class="Kiener\MolliePayments\Repository\Order\OrderRepository">
+            <argument type="service" id="order.repository"/>
+        </service>
+
         <service id="Kiener\MolliePayments\Repository\Product\ProductRepository" class="Kiener\MolliePayments\Repository\Product\ProductRepository">
             <argument type="service" id="product.repository"/>
         </service>

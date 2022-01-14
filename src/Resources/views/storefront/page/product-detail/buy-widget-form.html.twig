@@ -24,7 +24,7 @@
 
         {% if mollie_applepaydirect_enabled and ((buyableLegacy) or (buyable and productPrice) > 0) %}
             {% block page_product_detail_buy_container_apple_direct_component %}
-                <div class="form-row mt-3 justify-content-end">
+                <div class="form-row mt-3 justify-content-end js-apple-pay-container">
                     {% include '@MolliePayments/mollie/component/apple-pay-direct-button.twig' with {cols: 'col-8'} %}
                 </div>
             {% endblock %}

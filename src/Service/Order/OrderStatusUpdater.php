@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Service\Order;
 
+use Kiener\MolliePayments\Repository\Order\OrderRepository;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
@@ -30,6 +31,11 @@ class OrderStatusUpdater
      */
     private $stateMachineRegistry;
 
+    /**
+     * @var OrderRepository
+     */
+    private $repoOrders;
+
 
     /**
      *
@@ -50,13 +56,15 @@ class OrderStatusUpdater
      * @param OrderStateService $orderHandler
      * @param StateMachineRegistry $stateMachineRegistry
      * @param TransactionTransitionServiceInterface $transactionTransitionService
+     * @param OrderRepository $repoOrders
      */
-    public function __construct(OrderTransactionStateHandler $transitionHandler, OrderStateService $orderHandler, StateMachineRegistry $stateMachineRegistry, TransactionTransitionServiceInterface $transactionTransitionService)
+    public function __construct(OrderTransactionStateHandler $transitionHandler, OrderStateService $orderHandler, StateMachineRegistry $stateMachineRegistry, TransactionTransitionServiceInterface $transactionTransitionService, OrderRepository $repoOrders)
     {
         $this->transitionHandler = $transitionHandler;
         $this->orderHandler = $orderHandler;
         $this->stateMachineRegistry = $stateMachineRegistry;
         $this->transactionTransitionService = $transactionTransitionService;
+        $this->repoOrders = $repoOrders;
     }
 
 
@@ -121,6 +129,14 @@ class OrderStatusUpdater
             default:
                 throw new \Exception('Updating Payment Status of Order not possible for status: ' . $status);
         }
+
+        # last but not least,
+        # also update the lastUpdated of the order itself
+        # this is required for ERP systems and more (so they know something has changed).
+        $this->repoOrders->updateOrderLastUpdated(
+            $transaction->getOrder()->getId(),
+            $context
+        );
     }
 
     /**
