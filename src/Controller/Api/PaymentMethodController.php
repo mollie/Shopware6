@@ -2,13 +2,15 @@
 
 namespace Kiener\MolliePayments\Controller\Api;
 
-use Exception;
 use Kiener\MolliePayments\Service\PaymentMethodService;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
+use Shopware\Core\Framework\ShopwareHttpException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Throwable;
 
 class PaymentMethodController extends AbstractController
 {
@@ -17,13 +19,19 @@ class PaymentMethodController extends AbstractController
      */
     private $paymentMethodService;
 
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
      * @param PaymentMethodService $paymentMethodService
+     * @param LoggerInterface $logger
      */
-    public function __construct(PaymentMethodService $paymentMethodService)
+    public function __construct(PaymentMethodService $paymentMethodService, LoggerInterface $logger)
     {
         $this->paymentMethodService = $paymentMethodService;
+        $this->logger = $logger;
     }
 
     /**
@@ -36,16 +44,19 @@ class PaymentMethodController extends AbstractController
      */
     public function updatePaymentMethods(Context $context): JsonResponse
     {
-        $success = true;
-
         try {
             $this->paymentMethodService->installAndActivatePaymentMethods($context);
-        } catch (Exception $e) {
-            $success = false;
+        } catch (Throwable $exception) {
+            $this->logger->error($exception->getMessage());
+
+            return $this->json(
+                ['message' => $exception->getMessage(), 'success' => 'false'],
+                $exception instanceof ShopwareHttpException ? $exception->getStatusCode() : 500
+            );
         }
 
         return new JsonResponse([
-            'success' => $success,
+            'success' => true,
         ]);
     }
 }
