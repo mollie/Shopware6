@@ -148,8 +148,11 @@ export default class AdminAPIClient {
                 return response.data.data;
             });
         }).catch(({response}) => {
-            if (response.data && response.data.errors) {
+            if (response && response.data && response.data.errors) {
                 console.log(response.data.errors);
+            } else {
+                console.log('problem with response?!');
+                console.log(response);
             }
         });
     }
