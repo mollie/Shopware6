@@ -192,6 +192,11 @@ class CustomerService
         // Store the card token in the custom fields
         $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_CREDIT_CARD_TOKEN] = $cardToken;
 
+        $this->logger->debug("Setting Credit Card Token", [
+            'customerId' => $customer->getId(),
+            'customFields' => $customFields,
+        ]);
+
         // Store the custom fields on the customer
         return $this->customerRepository->update([[
             'id' => $customer->getId(),
