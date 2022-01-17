@@ -63,7 +63,7 @@ class ShippingSubscriber implements EventSubscriberInterface
                     "Error when shipping order from Mollie Event: \"%s\" in \"%s\" on line %s",
                     $e->getMessage(),
                     $e->getFile(),
-                    $e->getLine(),
+                    $e->getLine()
                 ),
                 [
                     'orderId' => $event->getOrderId(),
