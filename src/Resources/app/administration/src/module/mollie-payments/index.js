@@ -3,9 +3,9 @@ import './extension/sw-order';
 import './components/mollie-test-api-key';
 import './components/mollie-update-payment-methods';
 
-import deDE from './snippet/de-DE.json';
-import enGB from './snippet/en-GB.json';
-import nlNL from './snippet/nl-NL.json'
+import deDE from '../../snippet/de-DE.json';
+import enGB from '../../snippet/en-GB.json';
+import nlNL from '../../snippet/nl-NL.json'
 
 // eslint-disable-next-line no-undef
 const { Module } = Shopware;

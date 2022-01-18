@@ -35,6 +35,9 @@ class DependencyLoader
         /** @var string $version */
         $version = $this->container->getParameter('kernel.shopware_version');
 
+        $versionCompare = new VersionCompare($version);
+
+
         /** @var ContainerBuilder $containerBuilder */
         $containerBuilder = $this->container;
 
@@ -48,13 +51,21 @@ class DependencyLoader
         # that already wrap our functions for different shopware versions
         $loader->load('compatibility/base.xml');
 
-        # now load our xml files that only work in specific shopware versions
 
-        if (VersionCompare::gte($version, '6.4')) {
+        # load Flow Builder
+        $loader->load('compatibility/flowbuilder/all_versions.xml');
+
+        if ($versionCompare->gte('6.4.6.0')) {
+            $loader->load('compatibility/flowbuilder/6.4.6.0.xml');
+        }
+
+
+        # load other data
+        if ($versionCompare->gte('6.4')) {
 
             $loader->load('compatibility/services_6.4.xml');
 
-        } else if (VersionCompare::gte($version, '6.3.5.0')) {
+        } else if ($versionCompare->gte('6.3.5.0')) {
 
             $loader->load('compatibility/services_6.3.5.0.xml');
 

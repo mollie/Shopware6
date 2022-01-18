@@ -1,0 +1,21 @@
+@import "~scss/variables";
+
+.mollie-payments-flowsequence-action-order-refund-modal {
+    .mollie-payments-flowsequence-action-order-refund-modal__description-title {
+        font-weight: $font-weight-bold;
+        font-size: $font-size-default;
+        text-align: center;
+    }
+
+    .mollie-payments-flowsequence-action-order-refund-modal__image-container {
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        margin-top: 20px;
+
+        .mollie-payments-flowsequence-action-order-refund-modal__image {
+            width: 80px;
+        }
+    }
+}

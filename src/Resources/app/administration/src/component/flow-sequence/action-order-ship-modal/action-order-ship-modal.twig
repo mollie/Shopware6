@@ -1,0 +1,26 @@
+<sw-modal class="mollie-payments-flowsequence-action-order-ship-modal"
+          :title="$tc('mollie-payments.sw-flow.actions.shipOrder.modal.title')"
+          @modal-close="onClose">
+    <div>
+        <sw-container columns="1fr">
+                <span class="mollie-payments-flowsequence-action-order-ship-modal__description-title">
+                     {{ $tc('mollie-payments.sw-flow.actions.shipOrder.modal.title') }}
+                </span>
+        </sw-container>
+        <sw-container columns="1fr" class="mollie-payments-flowsequence-action-order-ship-modal__image-container">
+            <img class="mollie-payments-flowsequence-action-order-ship-modal__image" src="/bundles/molliepayments/administration/img/mollie-logo-round.svg">
+        </sw-container>
+        <br/>
+        <br/>
+        {{ $tc('mollie-payments.sw-flow.actions.shipOrder.modal.description') }}
+        <br/>
+    </div>
+    <template #modal-footer>
+        <sw-button size="small" @click="onClose">
+            {{ $tc('global.default.cancel') }}
+        </sw-button>
+        <sw-button variant="primary" size="small" @click="onAddAction">
+            {{ $tc('global.default.save') }}
+        </sw-button>
+    </template>
+</sw-modal>

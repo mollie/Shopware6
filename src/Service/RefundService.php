@@ -15,7 +15,7 @@ use Mollie\Api\Resources\Refund;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 
-class RefundService
+class RefundService implements RefundServiceInterface
 {
     /** @var Order */
     private $mollieOrderApi;
@@ -48,13 +48,10 @@ class RefundService
      * @param OrderEntity $order
      * @param float $amount
      * @param string|null $description
+     * @param Context $context
      * @return Refund
-     * @throws CouldNotCreateMollieRefundException
-     * @throws CouldNotExtractMollieOrderIdException
-     * @throws CouldNotFetchMollieOrderException
-     * @throws PaymentNotFoundException
      */
-    public function refund(OrderEntity $order, float $amount, string $description, Context $context): Refund
+    public function refund(OrderEntity $order, float $amount, ?string $description, Context $context): Refund
     {
         $mollieOrderId = $this->orderService->getMollieOrderId($order);
 
@@ -77,6 +74,32 @@ class RefundService
         } catch (ApiException $e) {
             throw new CouldNotCreateMollieRefundException($mollieOrderId, $order->getOrderNumber(), $e);
         }
+    }
+
+    /**
+     * @param OrderEntity $order
+     * @param string $description
+     * @param Context $context
+     * @return Refund
+     * @throws ApiException
+     */
+    public function refundFullOrder(OrderEntity $order, string $description, Context $context): Refund
+    {
+        $mollieOrderId = $this->orderService->getMollieOrderId($order);
+
+        $payment = $this->mollieOrderApi->getCompletedPayment($mollieOrderId, $order->getSalesChannelId(), $context);
+
+        $refund = $payment->refund(
+            [
+                'amount' => [
+                    'value' => number_format($order->getAmountTotal(), 2, '.', ''),
+                    'currency' => $order->getCurrency()->getIsoCode()
+                ],
+                'description' => $description
+            ]
+        );
+
+        return $refund;
     }
 
     /**

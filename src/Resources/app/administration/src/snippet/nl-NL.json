@@ -1,4 +1,16 @@
 {
+  "global": {
+    "businessEvents": {
+      "mollie_webhook_received_All": " Mollie Webhook Ontvangen (Alle)",
+      "mollie_webhook_received_status_authorized": " Mollie Webhook Ontvangen (Geautoriseerd)",
+      "mollie_webhook_received_status_failed": " Mollie Webhook Ontvangen (Mislukt)",
+      "mollie_webhook_received_status_canceled": " Mollie Webhook Ontvangen (Geannuleerd)",
+      "mollie_webhook_received_status_expired": " Mollie Webhook Ontvangen (Vervallen)",
+      "mollie_webhook_received_status_pending": " Mollie Webhook Ontvangen (In Afwachting)",
+      "mollie_webhook_received_status_paid": " Mollie Webhook Ontvangen (Betaald)",
+      "mollie_webhook_received_status_completed": " Mollie Webhook Ontvangen (Voltooid)"
+    }
+  },
   "mollie-payments": {
     "general": {
       "mainMenuItemGeneral": "Mollie betalingen",
@@ -57,6 +69,31 @@
         "quantityPlaceholder": "De te verzenden hoeveelheid...",
         "confirmButton": "Verzenden",
         "cancelButton": "Niet verzenden"
+      }
+    },
+    "sw-flow": {
+      "actions": {
+        "shipOrder": {
+          "editor": {
+            "title": "Bestelling verzenden (Mollie)",
+            "description": "Bestelling is gemarkeerd als verzonden in Mollie."
+          },
+          "modal": {
+            "title": "Bestelling verzenden",
+            "description": "Deze actie zal automatisch een bestelling verzenden via Mollie. De flow sequence ontvangt het ordernummer, en geeft dit door aan de Mollie API. Succesvolle verzendingen en mislukte verzendingen zullen zichtbaar zijn in de Mollie logbestanden."
+          }
+        },
+        "refundOrder": {
+          "editor": {
+            "title": "Bestelling terugbetalen (Mollie)",
+            "description": "Bestelling zal worden terugbetaald via Mollie."
+          },
+          "modal": {
+            "title": "Bestelling terugbetalen",
+            "description": "Deze actie zal automatisch een terugbetaling starten via Mollie. De flow sequence ontvangt het ordernummer, en geeft dit door aan de Mollie API. Succesvolle refunds en mislukte refunds zullen zichtbaar zijn in de Mollie logbestanden.",
+            "Waarschuwing": "Houd er rekening mee, dat het tot 2 uur kan duren voordat terugbetalingen zijn afgerond en zichtbaar zijn in de shop. Tot die tijd kunt u een in behandeling zijnde terugbetaling altijd annuleren vanuit de bestelpagina in Shopware of vanuit het Mollie Dashboard."
+          }
+        }
       }
     }
   },
