@@ -26,7 +26,11 @@ Component.register('mollie-payments-flowsequence-action-order-ship-modal', {
 
     methods: {
         createdComponent() {
-            this.tags = this.sequence?.config?.tags || [];
+            if (this.sequence && this.sequence.config) {
+                this.tags = this.sequence.config.tags;
+            } else {
+                this.tags = [];
+            }
         },
 
         onClose() {
