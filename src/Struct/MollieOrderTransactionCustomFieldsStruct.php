@@ -2,7 +2,7 @@
 
 namespace Kiener\MolliePayments\Struct;
 
-class MollieOrderCustomFieldsStruct
+class MollieOrderTransactionCustomFieldsStruct
 {
     /** @var string|null */
     private $mollieOrderId;
@@ -12,12 +12,6 @@ class MollieOrderCustomFieldsStruct
 
     /** @var string|null */
     private $thirdPartyPaymentId;
-
-    /** @var string|null */
-    private $transactionReturnUrl;
-
-    /** @var string|null */
-    private $molliePaymentUrl;
 
     /**
      * @param array<string,mixed> $orderCustomFields
@@ -78,38 +72,6 @@ class MollieOrderCustomFieldsStruct
     }
 
     /**
-     * @return string|null
-     */
-    public function getTransactionReturnUrl(): ?string
-    {
-        return $this->transactionReturnUrl;
-    }
-
-    /**
-     * @param string|null $transactionReturnUrl
-     */
-    public function setTransactionReturnUrl(?string $transactionReturnUrl): void
-    {
-        $this->transactionReturnUrl = $transactionReturnUrl;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getMolliePaymentUrl(): ?string
-    {
-        return $this->molliePaymentUrl;
-    }
-
-    /**
-     * @param string|null $molliePaymentUrl
-     */
-    public function setMolliePaymentUrl(?string $molliePaymentUrl): void
-    {
-        $this->molliePaymentUrl = $molliePaymentUrl;
-    }
-
-    /**
      * @return array<string,mixed>
      */
     public function getMollieCustomFields(): array
@@ -123,8 +85,6 @@ class MollieOrderCustomFieldsStruct
                 'order_id' => $this->mollieOrderId,
                 'payment_id' => $this->molliePaymentId,
                 'third_party_payment_id' => $this->thirdPartyPaymentId,
-                'transactionReturnUrl' => (string)$this->transactionReturnUrl,
-                'molliePaymentUrl' => (string)$this->molliePaymentUrl
             ]
         ];
     }
@@ -148,14 +108,6 @@ class MollieOrderCustomFieldsStruct
 
         if (isset($customFields['mollie_payments']['third_party_payment_id'])) {
             $this->setThirdPartyPaymentId((string)$customFields['mollie_payments']['third_party_payment_id']);
-        }
-
-        if (isset($customFields['mollie_payments']['transactionReturnUrl'])) {
-            $this->setTransactionReturnUrl((string)$customFields['mollie_payments']['transactionReturnUrl']);
-        }
-
-        if (isset($customFields['mollie_payments']['molliePaymentUrl'])) {
-            $this->setMolliePaymentUrl((string)$customFields['mollie_payments']['molliePaymentUrl']);
         }
     }
 }
