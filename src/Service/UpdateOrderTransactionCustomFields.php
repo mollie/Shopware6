@@ -3,7 +3,7 @@
 namespace Kiener\MolliePayments\Service;
 
 
-use Kiener\MolliePayments\Struct\MollieOrderTransactionCustomFieldsStruct;
+use Kiener\MolliePayments\Struct\OrderTransaction\OrderTransactionAttributes;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
@@ -12,21 +12,33 @@ class UpdateOrderTransactionCustomFields
     /**
      * @var EntityRepositoryInterface
      */
-    private $orderTransactionRepository;
+    private $repoTransactions;
 
-    public function __construct(EntityRepositoryInterface $orderTransactionRepository)
+
+    /**
+     * @param EntityRepositoryInterface $repoTransactions
+     */
+    public function __construct(EntityRepositoryInterface $repoTransactions)
     {
-
-        $this->orderTransactionRepository = $orderTransactionRepository;
+        $this->repoTransactions = $repoTransactions;
     }
 
-    public function updateOrderTransaction(string $shopwareOrderTransactionId, MollieOrderTransactionCustomFieldsStruct $struct, SalesChannelContext $salesChannelContext): void
+    /**
+     * @param string $shopwareOrderTransactionId
+     * @param OrderTransactionAttributes $struct
+     * @param SalesChannelContext $salesChannelContext
+     * @return void
+     */
+    public function updateOrderTransaction(string $shopwareOrderTransactionId, OrderTransactionAttributes $struct, SalesChannelContext $salesChannelContext): void
     {
         $data = [
             'id' => $shopwareOrderTransactionId,
-            'customFields' => $struct->getMollieCustomFields()
+            'customFields' => [
+                'mollie_payments' => $struct->toArray(),
+            ]
         ];
 
-        $this->orderTransactionRepository->update([$data], $salesChannelContext->getContext());
+        $this->repoTransactions->update([$data], $salesChannelContext->getContext());
     }
+
 }

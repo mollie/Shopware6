@@ -1,17 +1,26 @@
 <?php declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Struct;
+namespace Kiener\MolliePayments\Struct\OrderTransaction;
 
-class MollieOrderTransactionCustomFieldsStruct
+
+class OrderTransactionAttributes
 {
-    /** @var string|null */
+
+    /**
+     * @var string|null
+     */
     private $mollieOrderId;
 
-    /** @var string|null */
+    /**
+     * @var string|null
+     */
     private $molliePaymentId;
 
-    /** @var string|null */
+    /**
+     * @var string|null
+     */
     private $thirdPartyPaymentId;
+
 
     /**
      * @param array<string,mixed> $orderCustomFields
@@ -72,20 +81,18 @@ class MollieOrderTransactionCustomFieldsStruct
     }
 
     /**
-     * @return array<string,mixed>
+     * @return array<mixed>
      */
-    public function getMollieCustomFields(): array
+    public function toArray(): array
     {
         if (empty($this->mollieOrderId)) {
-            return ['mollie_payments' => []];
+            return [];
         }
 
         return [
-            'mollie_payments' => [
-                'order_id' => $this->mollieOrderId,
-                'payment_id' => $this->molliePaymentId,
-                'third_party_payment_id' => $this->thirdPartyPaymentId,
-            ]
+            'order_id' => $this->mollieOrderId,
+            'payment_id' => $this->molliePaymentId,
+            'third_party_payment_id' => $this->thirdPartyPaymentId,
         ];
     }
 
