@@ -47,8 +47,7 @@ class RefundService implements RefundServiceInterface
     /**
      * @param OrderEntity $order
      * @param float $amount
-     * @param string|null $description
-     * @param Context $context
+     * @param string $description
      * @return Refund
      */
     public function refund(OrderEntity $order, float $amount, string $description): Refund
@@ -79,27 +78,11 @@ class RefundService implements RefundServiceInterface
     /**
      * @param OrderEntity $order
      * @param string $description
-     * @param Context $context
      * @return Refund
-     * @throws ApiException
      */
-    public function refundFullOrder(OrderEntity $order, string $description, Context $context): Refund
+    public function refundFullOrder(OrderEntity $order, string $description): Refund
     {
-        $mollieOrderId = $this->orderService->getMollieOrderId($order);
-
-        $payment = $this->mollieOrderApi->getCompletedPayment($mollieOrderId, $order->getSalesChannelId(), $context);
-
-        $refund = $payment->refund(
-            [
-                'amount' => [
-                    'value' => number_format($order->getAmountTotal(), 2, '.', ''),
-                    'currency' => $order->getCurrency()->getIsoCode()
-                ],
-                'description' => $description
-            ]
-        );
-
-        return $refund;
+        return $this->refund($order, $order->getAmountTotal(), $description);
     }
 
     /**
