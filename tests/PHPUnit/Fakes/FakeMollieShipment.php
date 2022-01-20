@@ -5,6 +5,7 @@ namespace MolliePayments\Tests\Fakes;
 use Kiener\MolliePayments\Facade\MollieShipmentInterface;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Shipment;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 
 class FakeMollieShipment implements MollieShipmentInterface
@@ -59,28 +60,74 @@ class FakeMollieShipment implements MollieShipmentInterface
     }
 
     /**
-     * @param string $orderNumber
+     * @param string $orderId
+     * @param string $trackingCarrier
+     * @param string $trackingCode
+     * @param string $trackingUrl
      * @param Context $context
      * @return Shipment
      */
-    public function shipOrder(string $orderNumber, Context $context): \Mollie\Api\Resources\Shipment
+    public function shipOrderByOrderId(string $orderId, string $trackingCarrier, string $trackingCode, string $trackingUrl, Context $context): Shipment
     {
         $this->isFullyShipped = true;
-        $this->shippedOrderNumber = $orderNumber;
-
-        return new \Mollie\Api\Resources\Shipment(new MollieApiClient());
+        return new Shipment(new MollieApiClient());
     }
 
     /**
      * @param string $orderNumber
-     * @param string $itemIdentifier
-     * @param int $quantity
+     * @param string $trackingCarrier
+     * @param string $trackingCode
+     * @param string $trackingUrl
      * @param Context $context
      * @return Shipment
      */
-    public function shipItem(string $orderNumber, string $itemIdentifier, int $quantity, Context $context): \Mollie\Api\Resources\Shipment
+    public function shipOrderByOrderNumber(string $orderNumber, string $trackingCarrier, string $trackingCode, string $trackingUrl, Context $context): Shipment
     {
-        return new \Mollie\Api\Resources\Shipment(new MollieApiClient());
+        $this->isFullyShipped = true;
+        $this->shippedOrderNumber = $orderNumber;
+        return new Shipment(new MollieApiClient());
+    }
+
+    /**
+     * @param OrderEntity $order
+     * @param string $trackingCarrier
+     * @param string $trackingCode
+     * @param string $trackingUrl
+     * @param Context $context
+     * @return Shipment
+     */
+    public function shipOrder(OrderEntity $order, string $trackingCarrier, string $trackingCode, string $trackingUrl, Context $context): Shipment
+    {
+        $this->isFullyShipped = true;
+        $this->shippedOrderNumber = $order->getOrderNumber();
+
+        return new Shipment(new MollieApiClient());
+    }
+
+    public function shipItemByOrderId(string $orderId, string $itemIdentifier, int $quantity, string $trackingCarrier, string $trackingCode, string $trackingUrl, Context $context): Shipment
+    {
+        return new Shipment(new MollieApiClient());
+    }
+
+    public function shipItemByOrderNumber(string $orderNumber, string $itemIdentifier, int $quantity, string $trackingCarrier, string $trackingCode, string $trackingUrl, Context $context): Shipment
+    {
+        return new Shipment(new MollieApiClient());
+    }
+
+
+    /**
+     * @param OrderEntity $order
+     * @param string $itemIdentifier
+     * @param int $quantity
+     * @param string $trackingCarrier
+     * @param string $trackingCode
+     * @param string $trackingUrl
+     * @param Context $context
+     * @return Shipment
+     */
+    public function shipItem(OrderEntity $order, string $itemIdentifier, int $quantity, string $trackingCarrier, string $trackingCode, string $trackingUrl, Context $context): Shipment
+    {
+        return new Shipment(new MollieApiClient());
     }
 
 }
