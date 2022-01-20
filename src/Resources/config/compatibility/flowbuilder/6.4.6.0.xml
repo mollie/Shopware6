@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Subscriber\BusinessEventCollectorSubscriber">
+            <argument type="service" id="Shopware\Core\Framework\Event\BusinessEventCollector"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Actions\ShipOrderAction">
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MollieShipment"/>
+            <argument type="service" id="mollie_payments.logger"/>
+            <tag name="kernel.event_subscriber"/>
+            <tag name="flow.action" priority="900"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Actions\RefundOrderAction">
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\RefundService"/>
+            <argument type="service" id="mollie_payments.logger"/>
+            <tag name="kernel.event_subscriber"/>
+            <tag name="flow.action" priority="900"/>
+        </service>
+
+    </services>
+
+</container>

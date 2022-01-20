@@ -181,24 +181,25 @@ describe('Credit Card Components', () => {
                 cy.url().should('include', '/account/order/edit');
                 cy.contains('Complete payment');
 
-                payment.switchPaymentMethod('Credit card');
 
+                if (shopware.isVersionGreaterEqual(6.4)) {
 
-                if (shopware.isVersionLower(6.4)) {
+                    payment.showAllPaymentMethods();
+                    payment.selectPaymentMethod('Credit card');
+                    payment.showAllPaymentMethods();
+
+                    payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '1228', '1234');
+
+                } else {
+
                     payment.openPaymentsModal();
-                }
+                    payment.selectPaymentMethod('Credit card');
 
-                // there's another bug in Shopware
-                // sometimes the selected payment method is not
-                // visible on top, but in the expand-list below :(
-                payment.showAllPaymentMethods();
+                    payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '1228', '1234');
 
-
-                payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '1228', '1234');
-
-                if (shopware.isVersionLower(6.4)) {
                     payment.closePaymentsModal();
                 }
+
 
                 shopware.prepareDomainChange();
                 checkout.placeOrderOnEdit();

@@ -138,7 +138,16 @@ class MolliePaymentDoPay
                 ]
             );
 
-            $payment = $this->orderApiService->createOrReusePayment($mollieOrderId, $paymentMethod, $salesChannelContext);
+            $customer = $this->extractor->extractCustomer($order, $salesChannelContext);
+
+            $payment = $this->orderApiService->createOrReusePayment(
+                $mollieOrderId,
+                $paymentMethod,
+                $paymentHandler,
+                $order,
+                $customer,
+                $salesChannelContext
+            );
 
             // if direct payment return to success page
             if (MolliePaymentStatus::isApprovedStatus($payment->status) && empty($payment->getCheckoutUrl())) {
@@ -167,7 +176,7 @@ class MolliePaymentDoPay
 
             $this->createCustomerAtMollie($order, $salesChannelContext);
 
-        } catch (CouldNotCreateMollieCustomerException | CustomerCouldNotBeFoundException $e) {
+        } catch (CouldNotCreateMollieCustomerException|CustomerCouldNotBeFoundException $e) {
 
             # TODO do we really need to catch this? shouldnt it fail fast?
 

@@ -2,8 +2,13 @@
 
 namespace Kiener\MolliePayments\Facade\Notifications;
 
+
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatcherAdapterInterface;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
+use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
 use Kiener\MolliePayments\Service\Order\OrderStatusUpdater;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
@@ -55,6 +60,16 @@ class NotificationFacade
      */
     private $logger;
 
+    /**
+     * @var FlowBuilderDispatcherAdapterInterface
+     */
+    private $flowBuilderDispatcher;
+
+    /**
+     * @var FlowBuilderEventFactory
+     */
+    private $flowBuilderEventFactory;
+
 
     /**
      * @param MollieGatewayInterface $gatewayMollie
@@ -62,16 +77,22 @@ class NotificationFacade
      * @param OrderStatusUpdater $statusUpdater
      * @param EntityRepositoryInterface $repoPaymentMethods
      * @param EntityRepositoryInterface $repoOrderTransactions
+     * @param FlowBuilderFactory $flowBuilderFactory
+     * @param FlowBuilderEventFactory $flowBuilderEventFactory
      * @param LoggerInterface $logger
+     * @throws \Exception
      */
-    public function __construct(MollieGatewayInterface $gatewayMollie, OrderStatusConverter $statusConverter, OrderStatusUpdater $statusUpdater, EntityRepositoryInterface $repoPaymentMethods, EntityRepositoryInterface $repoOrderTransactions, LoggerInterface $logger)
+    public function __construct(MollieGatewayInterface $gatewayMollie, OrderStatusConverter $statusConverter, OrderStatusUpdater $statusUpdater, EntityRepositoryInterface $repoPaymentMethods, EntityRepositoryInterface $repoOrderTransactions, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, LoggerInterface $logger)
     {
         $this->gatewayMollie = $gatewayMollie;
         $this->statusConverter = $statusConverter;
         $this->statusUpdater = $statusUpdater;
         $this->repoPaymentMethods = $repoPaymentMethods;
         $this->repoOrderTransactions = $repoOrderTransactions;
+        $this->flowBuilderEventFactory = $flowBuilderEventFactory;
         $this->logger = $logger;
+
+        $this->flowBuilderDispatcher = $flowBuilderFactory->createDispatcher();
     }
 
 
@@ -129,6 +150,13 @@ class NotificationFacade
         if ($transaction->getPaymentMethod() instanceof PaymentMethodEntity && $transaction->getPaymentMethod()->getHandlerIdentifier() !== ApplePayPayment::class) {
             $this->updatePaymentMethod($transaction, $mollieOrder, $contextSC->getContext());
         }
+
+        # --------------------------------------------------------------------------------------------
+        # FIRE FLOW BUILDER TRIGGER EVENT
+        # we have an adapter setup anyway here, so if flow builder is
+        # not yet supported in this shopware version, then
+        # this only triggers a dummy dispatcher ;)
+        $this->fireFlowBuilderEvents($swOrder, $status, $contextSC->getContext());
 
     }
 
@@ -204,5 +232,59 @@ class NotificationFacade
         );
     }
 
+    /**
+     * @param OrderEntity $swOrder
+     * @param string $status
+     * @param Context $context
+     * @return void
+     */
+    private function fireFlowBuilderEvents(OrderEntity $swOrder, string $status, Context $context): void
+    {
+        $this->flowBuilderDispatcher->dispatch(
+            $this->flowBuilderEventFactory->buildWebhookReceivedAll($swOrder, $status, $context)
+        );
+
+        $paymentEvent = null;
+
+        switch ($status) {
+
+            case MolliePaymentStatus::MOLLIE_PAYMENT_FAILED:
+                $paymentEvent = $this->flowBuilderEventFactory->buildWebhookReceivedFailedEvent($swOrder, $context);
+                break;
+
+            case MolliePaymentStatus::MOLLIE_PAYMENT_CANCELED:
+                $paymentEvent = $this->flowBuilderEventFactory->buildWebhookReceivedCancelledEvent($swOrder, $context);
+                break;
+
+            case MolliePaymentStatus::MOLLIE_PAYMENT_EXPIRED:
+                $paymentEvent = $this->flowBuilderEventFactory->buildWebhookReceivedExpiredEvent($swOrder, $context);
+                break;
+
+            case MolliePaymentStatus::MOLLIE_PAYMENT_PENDING;
+                $paymentEvent = $this->flowBuilderEventFactory->buildWebhookReceivedPendingEvent($swOrder, $context);
+                break;
+
+            case MolliePaymentStatus::MOLLIE_PAYMENT_AUTHORIZED:
+                $paymentEvent = $this->flowBuilderEventFactory->buildWebhookReceivedAuthorizedEvent($swOrder, $context);
+                break;
+
+            case MolliePaymentStatus::MOLLIE_PAYMENT_PAID:
+                $paymentEvent = $this->flowBuilderEventFactory->buildWebhookReceivedPaidEvent($swOrder, $context);
+                break;
+
+            case MolliePaymentStatus::MOLLIE_PAYMENT_COMPLETED:
+                $paymentEvent = $this->flowBuilderEventFactory->buildWebhookReceivedCompletedEvent($swOrder, $context);
+                break;
+
+            case MolliePaymentStatus::MOLLIE_PAYMENT_CHARGEBACK:
+                $paymentEvent = $this->flowBuilderEventFactory->buildWebhookReceivedChargebackEvent($swOrder, $context);
+                break;
+        }
+
+        if ($paymentEvent !== null) {
+            $this->flowBuilderDispatcher->dispatch($paymentEvent);
+        }
+
+    }
 
 }

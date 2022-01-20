@@ -1,4 +1,16 @@
 {
+  "global": {
+    "businessEvents": {
+      "mollie_webhook_received_All": " Mollie Webhook empfangen (Alle)",
+      "mollie_webhook_received_status_authorized": " Mollie Webhook empfangen (Authorisiert)",
+      "mollie_webhook_received_status_failed": " Mollie Webhook empfangen (Fehler)",
+      "mollie_webhook_received_status_canceled": " Mollie Webhook empfangen (Abgebrochen)",
+      "mollie_webhook_received_status_expired": " Mollie Webhook empfangen (Abgelaufen)",
+      "mollie_webhook_received_status_pending": " Mollie Webhook empfangen (Wartend)",
+      "mollie_webhook_received_status_paid": " Mollie Webhook empfangen (Bezahlt)",
+      "mollie_webhook_received_status_completed": " Mollie Webhook empfangen (Komplett)"
+    }
+  },
   "mollie-payments": {
     "general": {
       "mainMenuItemGeneral": "Mollie Payments Zahlungen",
@@ -77,6 +89,31 @@
         },
         "confirmButton": "Versenden",
         "cancelButton": "Nicht versenden"
+      }
+    },
+    "sw-flow": {
+      "actions": {
+        "shipOrder": {
+          "editor": {
+            "title": "Bestellung verschicken (Mollie)",
+            "description": "Bestellung wird in Mollie als verschickt markiert."
+          },
+          "modal": {
+            "title": "Bestellung verschicken",
+            "description": "Diese Aktion markiert automatisch eine Bestellung in Mollie als 'versendet'. Dabei wird aus der Sequenz die Bestellnummer gelesen und an die Mollie API übergeben. Erfolgreiche sowie fehlgeschlagene Aktionen sind dabei in den Mollie Logs einsehbar."
+          }
+        },
+        "refundOrder": {
+          "editor": {
+            "title": "Bestellung erstatten (Mollie)",
+            "description": "Bestellung wird via Mollie zurückerstattet."
+          },
+          "modal": {
+            "title": "Bestellung erstatten",
+            "description": "Diese Aktion startet eine Rückerstattung via Mollie. Dabei wird aus der Sequenz die Bestellnummer gelesen und an die Mollie API übergeben. Erfolgreiche sowie fehlgeschlagene Aktionen sind dabei in den Mollie Logs einsehbar.",
+            "warning": "Bitte beachten Sie, dass eine Rückerstattung bis zu 2 Stunden dauern kann, bis diese im Shop sichtbar ist. Bis dahin können sie eingeleitete Erstattungen jederzeit auf der Bestellseite im Shop, oder direkt im Mollie Dashboard abbrechen."
+          }
+        }
       }
     }
   },

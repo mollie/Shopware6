@@ -24,7 +24,7 @@ use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Uuid\Uuid;
 
-class MollieShipment
+class MollieShipment implements MollieShipmentInterface
 {
     /**
      * @var MolliePaymentExtractor

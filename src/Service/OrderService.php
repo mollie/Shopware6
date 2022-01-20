@@ -17,7 +17,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Validation\DataBag\DataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
-class OrderService
+class OrderService implements OrderServiceInterface
 {
     /**
      * @var EntityRepositoryInterface
