@@ -1,7 +1,10 @@
 import template from './sw-order-line-items-grid.html.twig';
+import './sw-order-line-items-grid.scss';
 
 // eslint-disable-next-line no-undef
-const {Component, Mixin} = Shopware;
+const { Component, Mixin } = Shopware;
+// eslint-disable-next-line no-undef
+const { string } = Shopware.Utils;
 
 Component.override('sw-order-line-items-grid', {
     template,
@@ -37,13 +40,20 @@ Component.override('sw-order-line-items-grid', {
     data() {
         return {
             isLoading: false,
-            selectedItems: {},
-            showRefundModal: false,
-            showShippingModal: false,
-            createCredit: false,
-            quantityToShip: 1,
+            isShipOrderLoading: false,
+            isShipItemLoading: false,
             refundAmount: 0.0,
-            shippingQuantity: 0,
+            shipQuantity: 0,
+            showRefundModal: false,
+            showShipOrderModal: false,
+            showShipItemModal: null,
+            showTrackingInfo: false,
+            shippingStatus: null,
+            tracking: {
+                carrier: '',
+                code: '',
+                url: '',
+            },
         };
     },
 
@@ -53,7 +63,7 @@ Component.override('sw-order-line-items-grid', {
 
             columnDefinitions.push(
                 {
-                    property: 'customFields.shippedQuantity',
+                    property: 'shippedQuantity',
                     label: this.$tc('sw-order.detailExtended.columnShipped'),
                     allowResize: false,
                     align: 'right',
@@ -83,6 +93,30 @@ Component.override('sw-order-line-items-grid', {
             ];
         },
 
+        getShipOrderColumns() {
+            return [
+                {
+                    property: 'label',
+                    label: this.$tc('mollie-payments.modals.shipping.order.itemHeader'),
+                },
+                {
+                    property: 'quantity',
+                    label: this.$tc('mollie-payments.modals.shipping.order.quantityHeader'),
+                },
+            ];
+        },
+
+        shippableLineItems() {
+            return this.orderLineItems
+                .filter((item) => this.shippableQuantity(item))
+                .map((item) => {
+                    return {
+                        label: item.label,
+                        quantity: this.shippableQuantity(item),
+                    }
+                });
+        },
+
         isMollieOrder() {
             return (this.order.customFields !== null && 'mollie_payments' in this.order.customFields);
         },
@@ -98,7 +132,10 @@ Component.override('sw-order-line-items-grid', {
 
     methods: {
         createdComponent() {
+            this.getShippingStatus();
         },
+
+        //==== Refunds ==============================================================================================//
 
         onOpenRefundModal() {
             this.showRefundModal = true;
@@ -109,7 +146,7 @@ Component.override('sw-order-line-items-grid', {
         },
 
         onConfirmRefund() {
-            if(this.refundAmount === 0.0) {
+            if (this.refundAmount === 0.0) {
                 this.createNotificationWarning({
                     message: this.$tc('mollie-payments.modals.refund.warning.low-amount'),
                 });
@@ -184,71 +221,149 @@ Component.override('sw-order-line-items-grid', {
             return this.$tc('mollie-payments.modals.refund.list.status-description.' + status);
         },
 
-        onShipItem(item) {
-            this.showShippingModal = item.id;
-        },
+        //==== Shipping =============================================================================================//
 
-        onCloseShippingModal() {
-            this.showShippingModal = false;
-        },
-
-        onConfirmShipping(item) {
-            this.showShippingModal = false;
-
-            if (this.quantityToShip > 0) {
-                this.MolliePaymentsShippingService.ship({
-                    itemId: item.id,
-                    versionId: item.versionId,
-                    quantity: this.quantityToShip,
+        async getShippingStatus() {
+            await this.MolliePaymentsShippingService
+                .status({
+                    orderId: this.order.id,
                 })
-                    .then(document.location.reload());
+                .then((response) => {
+                    this.shippingStatus = response;
+                });
+        },
+
+        onOpenShipOrderModal() {
+            this.showShipOrderModal = true;
+        },
+
+        onCloseShipOrderModal() {
+            this.isShipOrderLoading = false;
+            this.showShipOrderModal = false;
+            this.resetTracking();
+        },
+
+        onConfirmShipOrder() {
+            if(this.showTrackingInfo && !this.validateTracking()) {
+                this.createNotificationError({
+                    message: this.$tc('mollie-payments.modals.shipping.tracking.invalid'),
+                });
+                return;
             }
 
-            this.quantityToShip = 0;
+            this.isShipOrderLoading = true;
+
+            this.MolliePaymentsShippingService
+                .shipOrder({
+                    orderId: this.order.id,
+                    trackingCarrier: this.tracking.carrier,
+                    trackingCode: this.tracking.code,
+                    trackingUrl: this.tracking.url,
+                })
+                .then(() => {
+                    this.onCloseShipOrderModal();
+                })
+                .then(() => {
+                    this.$emit('ship-item-success');
+                })
+                .catch((response) => {
+                    this.createNotificationError({
+                        message: response.message,
+                    });
+                });
+        },
+
+        onOpenShipItemModal(item) {
+            this.showShipItemModal = item.id;
+        },
+
+        onCloseShipItemModal() {
+            this.isShipItemLoading = false;
+            this.showShipItemModal = false;
+            this.shipQuantity = 0;
+            this.resetTracking();
+        },
+
+        onConfirmShipItem(item) {
+            if (this.shipQuantity === 0) {
+                this.createNotificationError({
+                    message: this.$tc('mollie-payments.modals.shipping.item.noQuantity'),
+                });
+                return;
+            }
+
+            if(this.showTrackingInfo && !this.validateTracking()) {
+                this.createNotificationError({
+                    message: this.$tc('mollie-payments.modals.shipping.tracking.invalid'),
+                });
+                return;
+            }
+
+            this.isShipItemLoading = true;
+
+            this.MolliePaymentsShippingService
+                .shipItem({
+                    orderId: this.order.id,
+                    itemId: item.id,
+                    quantity: this.shipQuantity,
+                    trackingCarrier: this.tracking.carrier,
+                    trackingCode: this.tracking.code,
+                    trackingUrl: this.tracking.url,
+                })
+                .then(() => {
+                    this.createNotificationSuccess({
+                        message: this.$tc('mollie-payments.modals.shipping.item.success'),
+                    });
+                    this.onCloseShipItemModal();
+                })
+                .then(() => {
+                    this.$emit('ship-item-success');
+                })
+                .catch((response) => {
+                    this.createNotificationError({
+                        message: response.message,
+                    });
+                });
+        },
+
+        setMaxQuantity(item) {
+            this.shipQuantity = this.shippableQuantity(item);
         },
 
         isShippable(item) {
-            let shippable = false;
-
-            if (
-                item.type === 'product'
-                && (
-                    item.customFields !== undefined
-                    && item.customFields !== null
-                    && item.customFields.mollie_payments !== undefined
-                    && item.customFields.mollie_payments !== null
-                    && item.customFields.mollie_payments.order_line_id !== undefined
-                    && item.customFields.mollie_payments.order_line_id !== null
-                )
-                && (
-                    item.customFields.shippedQuantity === undefined
-                    || parseInt(item.customFields.shippedQuantity, 10) < item.quantity
-                )
-            ) {
-                shippable = true;
-            }
-
-            return shippable;
+            return this.shippableQuantity(item) > 0;
         },
 
         shippableQuantity(item) {
-            if (
-                item.customFields !== undefined
-                && item.customFields.shippedQuantity !== undefined
-                && item.customFields.refundedQuantity !== undefined
-            ) {
-                return item.quantity - parseInt(item.customFields.shippedQuantity, 10) - parseInt(item.customFields.refundedQuantity, 10);
+            if (this.shippingStatus === null) {
+                return '~';
             }
 
-            if (
-                item.customFields !== undefined
-                && item.customFields.shippedQuantity === undefined
-                && item.customFields.refundedQuantity !== undefined
-            ) {
-                return item.quantity - parseInt(item.customFields.refundedQuantity, 10);
+            return this.shippingStatus[item.id].quantityShippable;
+        },
+
+        shippedQuantity(item) {
+            if (this.shippingStatus === null) {
+                return '~';
             }
 
-            return item.quantity;
+            return this.shippingStatus[item.id].quantityShipped;
+        },
+
+        //==== Tracking =============================================================================================//
+
+        resetTracking() {
+            this.showTrackingInfo = false;
+            this.tracking = {
+                carrier: '',
+                code: '',
+                url: '',
+            };
+        },
+
+        validateTracking() {
+            return !string.isEmptyOrSpaces(this.tracking.carrier)
+                && !string.isEmptyOrSpaces(this.tracking.code)
         },
     },
 });

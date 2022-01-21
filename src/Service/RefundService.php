@@ -47,15 +47,14 @@ class RefundService implements RefundServiceInterface
     /**
      * @param OrderEntity $order
      * @param float $amount
-     * @param string|null $description
-     * @param Context $context
+     * @param string $description
      * @return Refund
      */
-    public function refund(OrderEntity $order, float $amount, ?string $description, Context $context): Refund
+    public function refund(OrderEntity $order, float $amount, string $description): Refund
     {
         $mollieOrderId = $this->orderService->getMollieOrderId($order);
 
-        $payment = $this->mollieOrderApi->getCompletedPayment($mollieOrderId, $order->getSalesChannelId(), $context);
+        $payment = $this->mollieOrderApi->getCompletedPayment($mollieOrderId, $order->getSalesChannelId());
 
         try {
             $refund = $payment->refund([
@@ -79,27 +78,11 @@ class RefundService implements RefundServiceInterface
     /**
      * @param OrderEntity $order
      * @param string $description
-     * @param Context $context
      * @return Refund
-     * @throws ApiException
      */
-    public function refundFullOrder(OrderEntity $order, string $description, Context $context): Refund
+    public function refundFullOrder(OrderEntity $order, string $description): Refund
     {
-        $mollieOrderId = $this->orderService->getMollieOrderId($order);
-
-        $payment = $this->mollieOrderApi->getCompletedPayment($mollieOrderId, $order->getSalesChannelId(), $context);
-
-        $refund = $payment->refund(
-            [
-                'amount' => [
-                    'value' => number_format($order->getAmountTotal(), 2, '.', ''),
-                    'currency' => $order->getCurrency()->getIsoCode()
-                ],
-                'description' => $description
-            ]
-        );
-
-        return $refund;
+        return $this->refund($order, $order->getAmountTotal(), $description);
     }
 
     /**
@@ -111,11 +94,11 @@ class RefundService implements RefundServiceInterface
      * @throws CouldNotFetchMollieOrderException
      * @throws PaymentNotFoundException
      */
-    public function cancel(OrderEntity $order, string $refundId, Context $context): bool
+    public function cancel(OrderEntity $order, string $refundId): bool
     {
         $mollieOrderId = $this->orderService->getMollieOrderId($order);
 
-        $payment = $this->mollieOrderApi->getCompletedPayment($mollieOrderId, $order->getSalesChannelId(), $context);
+        $payment = $this->mollieOrderApi->getCompletedPayment($mollieOrderId, $order->getSalesChannelId());
 
         try {
             // getRefund doesn't contain all necessary @throws tags.
@@ -151,11 +134,11 @@ class RefundService implements RefundServiceInterface
      * @throws CouldNotFetchMollieRefundsException
      * @throws PaymentNotFoundException
      */
-    public function getRefunds(OrderEntity $order, Context $context): array
+    public function getRefunds(OrderEntity $order): array
     {
         $mollieOrderId = $this->orderService->getMollieOrderId($order);
 
-        $payment = $this->mollieOrderApi->getCompletedPayment($mollieOrderId, $order->getSalesChannelId(), $context);
+        $payment = $this->mollieOrderApi->getCompletedPayment($mollieOrderId, $order->getSalesChannelId());
 
         try {
             $refundsArray = [];
@@ -177,12 +160,11 @@ class RefundService implements RefundServiceInterface
      * @throws CouldNotFetchMollieOrderException
      * @throws PaymentNotFoundException
      */
-    public function getRemainingAmount(OrderEntity $order, Context $context): float
+    public function getRemainingAmount(OrderEntity $order): float
     {
         $payment = $this->mollieOrderApi->getCompletedPayment(
             $this->orderService->getMollieOrderId($order),
-            $order->getSalesChannelId(),
-            $context
+            $order->getSalesChannelId()
         );
 
         return $payment->getAmountRemaining();
@@ -193,12 +175,11 @@ class RefundService implements RefundServiceInterface
      * @param Context $context
      * @return float
      */
-    public function getVoucherPaidAmount(OrderEntity $order, Context $context): float
+    public function getVoucherPaidAmount(OrderEntity $order): float
     {
         $payment = $this->mollieOrderApi->getCompletedPayment(
             $this->orderService->getMollieOrderId($order),
-            $order->getSalesChannelId(),
-            $context
+            $order->getSalesChannelId()
         );
 
         if ($payment->details === null) {
@@ -226,12 +207,11 @@ class RefundService implements RefundServiceInterface
      * @throws CouldNotFetchMollieOrderException
      * @throws PaymentNotFoundException
      */
-    public function getRefundedAmount(OrderEntity $order, Context $context): float
+    public function getRefundedAmount(OrderEntity $order): float
     {
         $payment = $this->mollieOrderApi->getCompletedPayment(
             $this->orderService->getMollieOrderId($order),
-            $order->getSalesChannelId(),
-            $context
+            $order->getSalesChannelId()
         );
 
         return $payment->getAmountRefunded();

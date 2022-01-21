@@ -12,6 +12,7 @@ use Kiener\MolliePayments\Service\MolliePaymentExtractor;
 use Kiener\MolliePayments\Service\OrderDeliveryService;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\Transition\DeliveryTransitionServiceInterface;
+use Kiener\MolliePayments\Struct\MollieApi\ShipmentTrackingInfoStruct;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
@@ -143,7 +144,7 @@ class MollieShipment implements MollieShipmentInterface
             return false;
         }
 
-        $addedMollieShipment = $this->mollieApiOrderService->setShipment($mollieOrderId, $order->getSalesChannelId(), $context);
+        $addedMollieShipment = $this->mollieApiOrderService->setShipment($mollieOrderId, $order->getSalesChannelId());
 
         if ($addedMollieShipment) {
             $values = [CustomFieldsInterface::DELIVERY_SHIPPED => true];
@@ -154,17 +155,80 @@ class MollieShipment implements MollieShipmentInterface
     }
 
     /**
-     * @param string $orderNumber
+     * @param string $orderId
+     * @param string $trackingCarrier
+     * @param string $trackingCode
+     * @param string $trackingUrl
      * @param Context $context
      * @return \Mollie\Api\Resources\Shipment
      */
-    public function shipOrder(string $orderNumber, Context $context): \Mollie\Api\Resources\Shipment
+    public function shipOrderByOrderId(
+        string $orderId,
+        string $trackingCarrier,
+        string $trackingCode,
+        string $trackingUrl,
+        Context $context
+    ): \Mollie\Api\Resources\Shipment
+    {
+        $order = $this->orderService->getOrder($orderId, $context);
+        return $this->shipOrder(
+            $order,
+            $trackingCarrier,
+            $trackingCode,
+            $trackingUrl,
+            $context
+        );
+    }
+
+    /**
+     * @param string $orderNumber
+     * @param string $trackingCarrier
+     * @param string $trackingCode
+     * @param string $trackingUrl
+     * @param Context $context
+     * @return \Mollie\Api\Resources\Shipment
+     */
+    public function shipOrderByOrderNumber(
+        string $orderNumber,
+        string $trackingCarrier,
+        string $trackingCode,
+        string $trackingUrl,
+        Context $context
+    ): \Mollie\Api\Resources\Shipment
     {
         $order = $this->orderService->getOrderByNumber($orderNumber, $context);
+        return $this->shipOrder(
+            $order,
+            $trackingCarrier,
+            $trackingCode,
+            $trackingUrl,
+            $context
+        );
+    }
 
+    /**
+     * @param OrderEntity $order
+     * @param string $trackingCarrier
+     * @param string $trackingCode
+     * @param string $trackingUrl
+     * @param Context $context
+     * @return \Mollie\Api\Resources\Shipment
+     */
+    public function shipOrder(
+        OrderEntity $order,
+        string $trackingCarrier,
+        string $trackingCode,
+        string $trackingUrl,
+        Context $context
+    ): \Mollie\Api\Resources\Shipment
+    {
         $mollieOrderId = $this->orderService->getMollieOrderId($order);
 
-        $shipment = $this->mollieApiShipmentService->shipOrder($mollieOrderId, $order->getSalesChannelId(), $context);
+        $shipment = $this->mollieApiShipmentService->shipOrder(
+            $mollieOrderId,
+            $order->getSalesChannelId(),
+            $this->createTrackingInfoStruct($trackingCarrier, $trackingCode, $trackingUrl)
+        );
 
         $delivery = $this->orderDataExtractor->extractDelivery($order, $context);
 
@@ -174,15 +238,89 @@ class MollieShipment implements MollieShipmentInterface
     }
 
     /**
-     * @param string $orderNumber
+     * @param string $orderId
      * @param string $itemIdentifier
      * @param int $quantity
+     * @param string $trackingCarrier
+     * @param string $trackingCode
+     * @param string $trackingUrl
      * @param Context $context
      * @return \Mollie\Api\Resources\Shipment
      */
-    public function shipItem(string $orderNumber, string $itemIdentifier, int $quantity, Context $context): \Mollie\Api\Resources\Shipment
+    public function shipItemByOrderId(
+        string $orderId,
+        string $itemIdentifier,
+        int $quantity,
+        string $trackingCarrier,
+        string $trackingCode,
+        string $trackingUrl,
+        Context $context
+    ): \Mollie\Api\Resources\Shipment
+    {
+        $order = $this->orderService->getOrder($orderId, $context);
+        return $this->shipItem(
+            $order,
+            $itemIdentifier,
+            $quantity,
+            $trackingCarrier,
+            $trackingCode,
+            $trackingUrl,
+            $context
+        );
+    }
+
+    /**
+     * @param string $orderNumber
+     * @param string $itemIdentifier
+     * @param int $quantity
+     * @param string $trackingCarrier
+     * @param string $trackingCode
+     * @param string $trackingUrl
+     * @param Context $context
+     * @return \Mollie\Api\Resources\Shipment
+     */
+    public function shipItemByOrderNumber(
+        string $orderNumber,
+        string $itemIdentifier,
+        int $quantity,
+        string $trackingCarrier,
+        string $trackingCode,
+        string $trackingUrl,
+        Context $context
+    ): \Mollie\Api\Resources\Shipment
     {
         $order = $this->orderService->getOrderByNumber($orderNumber, $context);
+        return $this->shipItem(
+            $order,
+            $itemIdentifier,
+            $quantity,
+            $trackingCarrier,
+            $trackingCode,
+            $trackingUrl,
+            $context
+        );
+    }
+
+    /**
+     * @param OrderEntity $order
+     * @param string $itemIdentifier
+     * @param int $quantity
+     * @param string $trackingCarrier
+     * @param string $trackingCode
+     * @param string $trackingUrl
+     * @param Context $context
+     * @return \Mollie\Api\Resources\Shipment
+     */
+    public function shipItem(
+        OrderEntity $order,
+        string $itemIdentifier,
+        int $quantity,
+        string $trackingCarrier,
+        string $trackingCode,
+        string $trackingUrl,
+        Context $context
+    ): \Mollie\Api\Resources\Shipment
+    {
 
         $mollieOrderId = $this->orderService->getMollieOrderId($order);
 
@@ -205,8 +343,7 @@ class MollieShipment implements MollieShipmentInterface
             $quantity = $this->mollieApiOrderService->getMollieOrderLine(
                 $mollieOrderId,
                 $mollieOrderLineId,
-                $order->getSalesChannelId(),
-                $context
+                $order->getSalesChannelId()
             )->shippableQuantity;
         }
 
@@ -215,18 +352,44 @@ class MollieShipment implements MollieShipmentInterface
             $order->getSalesChannelId(),
             $mollieOrderLineId,
             $quantity,
-            $context
+            $this->createTrackingInfoStruct($trackingCarrier, $trackingCode, $trackingUrl)
         );
 
         $delivery = $this->orderDataExtractor->extractDelivery($order, $context);
 
-        if ($this->mollieApiOrderService->isCompletelyShipped($mollieOrderId, $order->getSalesChannelId(), $context)) {
+        if ($this->mollieApiOrderService->isCompletelyShipped($mollieOrderId, $order->getSalesChannelId())) {
             $this->deliveryTransitionService->shipDelivery($delivery, $context);
         } else {
             $this->deliveryTransitionService->partialShipDelivery($delivery, $context);
         }
 
         return $shipment;
+    }
+
+    /**
+     * @param string $orderId
+     * @param Context $context
+     * @return array<mixed>
+     */
+    public function getStatus(string $orderId, Context $context): array
+    {
+        $order = $this->orderService->getOrder($orderId, $context);
+        $mollieOrderId = $this->orderService->getMollieOrderId($order);
+
+        return $this->mollieApiShipmentService->getStatus($mollieOrderId, $order->getSalesChannelId());
+    }
+
+    /**
+     * @param string $orderId
+     * @param Context $context
+     * @return array<string, numeric>
+     */
+    public function getTotals(string $orderId, Context $context): array
+    {
+        $order = $this->orderService->getOrder($orderId, $context);
+        $mollieOrderId = $this->orderService->getMollieOrderId($order);
+
+        return $this->mollieApiShipmentService->getTotals($mollieOrderId, $order->getSalesChannelId());
     }
 
     /**
@@ -280,5 +443,26 @@ class MollieShipment implements MollieShipmentInterface
             // Otherwise, this lineItem does not match the itemIdentifier at all.
             return false;
         });
+    }
+
+    private function createTrackingInfoStruct(
+        string $trackingCarrier,
+        string $trackingCode,
+        string $trackingUrl
+    ): ?ShipmentTrackingInfoStruct
+    {
+        if(empty($trackingCarrier) && empty($trackingCode)) {
+            return null;
+        }
+
+        if(empty($trackingCarrier) && !empty($trackingCode)) {
+            throw new \InvalidArgumentException('Missing Argument for Tracking Carrier!');
+        }
+
+        if(!empty($trackingCarrier) && empty($trackingCode)) {
+            throw new \InvalidArgumentException('Missing Argument for Tracking Code!');
+        }
+
+        return new ShipmentTrackingInfoStruct($trackingCarrier, $trackingCode, $trackingUrl);
     }
 }

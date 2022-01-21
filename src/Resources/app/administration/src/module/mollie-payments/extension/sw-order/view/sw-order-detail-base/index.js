@@ -18,7 +18,7 @@ Component.override('sw-order-detail-base', {
             refundAmountPending: 0.0,
             refunds: [],
             shippedAmount: 0,
-            shippedItems: 0,
+            shippedQuantity: 0,
         }
     },
 
@@ -59,7 +59,7 @@ Component.override('sw-order-detail-base', {
                     .total({orderId: this.order.id})
                     .then((response) => {
                         this.shippedAmount = response.amount;
-                        this.shippedItems = response.items;
+                        this.shippedQuantity = response.quantity;
                     });
 
                 this.MolliePaymentsRefundService

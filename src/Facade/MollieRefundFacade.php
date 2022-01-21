@@ -48,7 +48,7 @@ class MollieRefundFacade
 
         $this->logger->info(sprintf('Refund for order %s with amount %s is triggered through the Shopware administration.', $order->getOrderNumber(), $amount));
 
-        return $this->refund($order, $amount, $description, $context);
+        return $this->refund($order, $amount, $description);
     }
 
     /**
@@ -68,23 +68,22 @@ class MollieRefundFacade
 
         $this->logger->info(sprintf('Refund for order %s with amount %s is triggered through the Shopware API.', $order->getOrderNumber(), $amount));
 
-        return $this->refund($order, $amount, $description, $context);
+        return $this->refund($order, $amount, $description);
     }
 
     /**
      * @param OrderEntity $order
      * @param float $amount
      * @param string $description
-     * @param Context $context
      * @return Refund
      */
-    private function refund(OrderEntity $order, float $amount, string $description, Context $context): Refund
+    private function refund(OrderEntity $order, float $amount, string $description): Refund
     {
         if ($amount === 0.0) {
-            $amount = $order->getAmountTotal() - $this->refundService->getRefundedAmount($order, $context);
+            $amount = $order->getAmountTotal() - $this->refundService->getRefundedAmount($order);
         }
 
-        return $this->refundService->refund($order, $amount, $description, $context);
+        return $this->refundService->refund($order, $amount, $description);
     }
 
     /**
@@ -99,7 +98,7 @@ class MollieRefundFacade
 
         $this->logger->info(sprintf('Refund with id %s for order %s was cancelled through the Shopware administration.', $refundId, $order->getOrderNumber()));
 
-        return $this->refundService->cancel($order, $refundId, $context);
+        return $this->refundService->cancel($order, $refundId);
     }
 
     /**
@@ -111,7 +110,7 @@ class MollieRefundFacade
     {
         $order = $this->orderService->getOrder($orderId, $context);
 
-        return $this->refundService->getRefunds($order, $context);
+        return $this->refundService->getRefunds($order);
     }
 
     /**
@@ -123,9 +122,9 @@ class MollieRefundFacade
     {
         $order = $this->orderService->getOrder($orderId, $context);
 
-        $remaining = $this->refundService->getRemainingAmount($order, $context);
-        $refunded = $this->refundService->getRefundedAmount($order, $context);
-        $voucherAmount = $this->refundService->getVoucherPaidAmount($order, $context);
+        $remaining = $this->refundService->getRemainingAmount($order);
+        $refunded = $this->refundService->getRefundedAmount($order);
+        $voucherAmount = $this->refundService->getVoucherPaidAmount($order);
 
         return [
             'remaining' => $remaining,

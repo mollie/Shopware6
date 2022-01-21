@@ -51,12 +51,11 @@ class Order
     /**
      * @param string $mollieOrderId
      * @param string|null $salesChannelId
-     * @param Context $context
      * @param array $parameters
      * @return MollieOrder
      * @throws CouldNotFetchMollieOrderException
      */
-    public function getMollieOrder(string $mollieOrderId, string $salesChannelId, Context $context, array $parameters = []): MollieOrder
+    public function getMollieOrder(string $mollieOrderId, string $salesChannelId, array $parameters = []): MollieOrder
     {
         try {
             $apiClient = $this->clientFactory->getClient($salesChannelId);
@@ -80,18 +79,16 @@ class Order
      * @param string $mollieOrderId
      * @param string $mollieOrderLineId
      * @param string $salesChannelId
-     * @param Context $context
      * @return OrderLine
      * @throws CouldNotFetchMollieOrderException
      */
     public function getMollieOrderLine(
         string  $mollieOrderId,
         string  $mollieOrderLineId,
-        string  $salesChannelId,
-        Context $context
+        string  $salesChannelId
     ): OrderLine
     {
-        return $this->getMollieOrder($mollieOrderId, $salesChannelId, $context)->lines()->get($mollieOrderLineId);
+        return $this->getMollieOrder($mollieOrderId, $salesChannelId)->lines()->get($mollieOrderLineId);
     }
 
     public function createOrder(array $orderData, string $orderSalesChannelContextId, SalesChannelContext $salesChannelContext): MollieOrder
@@ -127,6 +124,7 @@ class Order
      * @param CustomerEntity $customer
      * @param SalesChannelContext $salesChannelContext
      * @return Payment
+     * @throws ApiException
      */
     public function createOrReusePayment(
         string $mollieOrderId,
@@ -137,7 +135,7 @@ class Order
         SalesChannelContext $salesChannelContext
     ): Payment
     {
-        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelContext->getSalesChannel()->getId(), $salesChannelContext->getContext(), ['embed' => 'payments']);
+        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelContext->getSalesChannel()->getId(), ['embed' => 'payments']);
 
         if (!$mollieOrder instanceof MollieOrder) {
 
@@ -258,16 +256,16 @@ class Order
         return $mollieOrder->createPayment($fakeOrder['payment']);
     }
 
-    public function getPaymentUrl(string $mollieOrderId, string $salesChannelId, Context $context): ?string
+    public function getPaymentUrl(string $mollieOrderId, string $salesChannelId): ?string
     {
-        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId, $context);
+        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId);
 
         return $mollieOrder->status === 'created' ? $mollieOrder->getCheckoutUrl() : null;
     }
 
-    public function setShipment(string $mollieOrderId, string $salesChannelId, Context $context): bool
+    public function setShipment(string $mollieOrderId, string $salesChannelId): bool
     {
-        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId, $context);
+        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId);
 
         /** @var OrderLine $orderLine */
         foreach ($mollieOrder->lines() as $orderLine) {
@@ -284,13 +282,12 @@ class Order
     /**
      * @param string $mollieOrderId
      * @param string $salesChannelId
-     * @param Context $context
      * @return bool
      * @throws CouldNotFetchMollieOrderException
      */
-    public function isCompletelyShipped(string $mollieOrderId, string $salesChannelId, Context $context): bool
+    public function isCompletelyShipped(string $mollieOrderId, string $salesChannelId): bool
     {
-        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId, $context);
+        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId);
 
         /** @var OrderLine $mollieOrderLine */
         foreach ($mollieOrder->lines() as $mollieOrderLine) {
@@ -311,12 +308,11 @@ class Order
     /**
      * @param string $mollieOrderId
      * @param string|null $salesChannelId
-     * @param Context $context
      * @return Payment
      */
-    public function getCompletedPayment(string $mollieOrderId, ?string $salesChannelId, Context $context): Payment
+    public function getCompletedPayment(string $mollieOrderId, ?string $salesChannelId): Payment
     {
-        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId, $context, ['embed' => 'payments']);
+        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId, ['embed' => 'payments']);
 
         if ($mollieOrder->payments()->count() === 0) {
             throw new PaymentNotFoundException($mollieOrderId);

@@ -40,14 +40,8 @@ class OrderTest extends TestCase
      */
     private $paymentApiService;
 
-    /**
-     * @var Context
-     */
-    private $context;
-
     protected function setUp(): void
     {
-        $this->context = $this->createMock(Context::class);
         $this->clientMock = $this->createMock(MollieApiClient::class);
 
         $apiFactoryMock = $this->createConfiguredMock(
@@ -74,7 +68,7 @@ class OrderTest extends TestCase
 
         $this->clientMock->orders = $orderEndpoint;
 
-        $order = $this->orderApiService->getMollieOrder('foo', 'bar', $this->context);
+        $order = $this->orderApiService->getMollieOrder('foo', 'bar');
 
         $this->assertSame($mollieOrder, $order);
     }
@@ -93,7 +87,7 @@ class OrderTest extends TestCase
 
         $this->expectException(CouldNotFetchMollieOrderException::class);
 
-        $this->orderApiService->getMollieOrder('foo', 'bar', $this->context);
+        $this->orderApiService->getMollieOrder('foo', 'bar');
     }
 
     /**
@@ -123,7 +117,7 @@ class OrderTest extends TestCase
 
         $this->clientMock->orders = $orderEndpoint;
 
-        $actualValue = $this->orderApiService->isCompletelyShipped('foo', 'bar', $this->context);
+        $actualValue = $this->orderApiService->isCompletelyShipped('foo', 'bar');
 
         $this->assertIsBool($actualValue);
         $this->assertEquals($expectedValue, $actualValue);

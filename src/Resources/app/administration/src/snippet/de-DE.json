@@ -64,11 +64,31 @@
         }
       },
       "shipping": {
-        "title": "Versand der Bestellposition an Mollie melden",
-        "content": "Menge dieser Bestellposition ({shippableQuantity} von {quantity} für Versand noch möglich), die an den Kunden versandt wurden.",
-        "quantityPlaceholder": "Menge der versendeten Ware...",
-        "confirmButton": "Versandmeldung bei Mollie",
-        "cancelButton": "Abbrechen"
+        "title": "Versand an Mollie melden",
+        "item": {
+          "label": "Artikel:",
+          "noQuantity": "Bitte geben Sie eine Menge für den Versand ein.",
+          "shipAll": "Alles versenden",
+          "summary": {
+            "quantity": "Zu versendende Menge",
+            "shipped": "Versendete Menge",
+            "shippable": "Zu versendende Menge"
+          }
+        },
+        "order": {
+          "description": "Die folgenden Artikelmengen werden versandt.",
+          "itemHeader": "Artikel",
+          "quantityHeader": "Menge"
+        },
+        "showTracking": "Tracking-Informationen für diese Sendung hinzufügen",
+        "tracking": {
+          "carrier": "Spediteur",
+          "code": "Code",
+          "url": "Url",
+          "invalid": "Bitte geben Sie sowohl Spediteur als auch Code ein"
+        },
+        "confirmButton": "Versenden",
+        "cancelButton": "Nicht versenden"
       }
     },
     "sw-flow": {

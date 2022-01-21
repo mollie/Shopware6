@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace MolliePayments\Tests\Facade;
+namespace MolliePayments\Tests\Facade\MollieShipment;
 
 use Kiener\MolliePayments\Facade\MollieShipment;
 use Kiener\MolliePayments\Service\CustomerService;
@@ -25,7 +25,7 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
-class MollieShipmentTest extends TestCase
+class SetShipmentTest extends TestCase
 {
     /**
      * @var MolliePaymentExtractor

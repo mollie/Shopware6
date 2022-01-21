@@ -3,98 +3,36 @@
 namespace Kiener\MolliePayments\Controller\Api;
 
 use Kiener\MolliePayments\Facade\MollieShipment;
-use Kiener\MolliePayments\Factory\MollieApiFactory;
-use Kiener\MolliePayments\Service\CustomFieldService;
-use Kiener\MolliePayments\Service\OrderService;
-use Kiener\MolliePayments\Service\SettingsService;
-use Kiener\MolliePayments\Setting\MollieSettingStruct;
-use Mollie\Api\Exceptions\ApiException;
-use Mollie\Api\Exceptions\IncompatiblePlatform;
-use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Shipment;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
-use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
+use Shopware\Core\Framework\ShopwareHttpException;
 use Shopware\Core\Framework\Validation\DataBag\QueryDataBag;
+use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ShippingController extends AbstractController
 {
-    public const CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY = 'shippedQuantity';
-
-    private const CUSTOM_FIELDS_KEY_ORDER_ID = 'order_id';
-    private const CUSTOM_FIELDS_KEY_ORDER_LINE_ID = 'order_line_id';
-    private const CUSTOM_FIELDS_KEY_QUANTITY = 'quantity';
-    private const CUSTOM_FIELDS_KEY_SHIPMENT_ID = 'shipment_id';
-    private const CUSTOM_FIELDS_KEY_SHIPMENTS = 'shipments';
-
-    private const REQUEST_KEY_ORDER_LINE_ITEM_ID = 'itemId';
-    private const REQUEST_KEY_ORDER_LINE_ITEM_VERSION_ID = 'versionId';
-    private const REQUEST_KEY_ORDER_LINE_QUANTITY = self::CUSTOM_FIELDS_KEY_QUANTITY;
-
-    private const RESPONSE_KEY_AMOUNT = 'amount';
-    private const RESPONSE_KEY_ITEMS = 'items';
-    private const RESPONSE_KEY_SUCCESS = 'success';
-
-    private const SHIPPING_DATA_KEY_ID = 'id';
-    private const SHIPPING_DATA_KEY_LINES = 'lines';
-    private const SHIPPING_DATA_KEY_QUANTITY = self::CUSTOM_FIELDS_KEY_QUANTITY;
-    private const SHIPPING_DATA_KEY_TEST_MODE = 'testmode';
-
-    /**
-     * @var MollieApiFactory
-     */
-    private $apiFactory;
-
-    /**
-     * @var EntityRepositoryInterface
-     */
-    private $orderLineItemRepository;
-
-    /**
-     * @var OrderService
-     */
-    private $orderService;
-
     /**
      * @var MollieShipment
      */
     private $shipmentFacade;
 
     /**
-     * @var SettingsService
-     */
-    private $settingsService;
-
-    /**
      * @var LoggerInterface
      */
     private $logger;
 
-
     /**
-     * @param MollieApiFactory $apiFactory
-     * @param EntityRepositoryInterface $orderLineItemRepository
-     * @param OrderService $orderService
-     * @param SettingsService $settingsService
      * @param MollieShipment $shipmentFacade
      * @param LoggerInterface $logger
      */
-    public function __construct(MollieApiFactory $apiFactory, EntityRepositoryInterface $orderLineItemRepository, OrderService $orderService, SettingsService $settingsService, MollieShipment $shipmentFacade, LoggerInterface $logger)
+    public function __construct(MollieShipment $shipmentFacade, LoggerInterface $logger)
     {
-        $this->apiFactory = $apiFactory;
-        $this->orderLineItemRepository = $orderLineItemRepository;
-        $this->orderService = $orderService;
-        $this->settingsService = $settingsService;
 
         $this->shipmentFacade = $shipmentFacade;
         $this->logger = $logger;
@@ -109,24 +47,36 @@ class ShippingController extends AbstractController
      * @param Context $context
      * @return JsonResponse
      */
-    public function shipOrder(QueryDataBag $query, Context $context): JsonResponse
+    public function shipOrderApi(QueryDataBag $query, Context $context): JsonResponse
     {
         try {
             $orderNumber = $query->get('number');
+            $trackingCarrier = $query->get('trackingCarrier', '');
+            $trackingCode = $query->get('trackingCode', '');
+            $trackingUrl = $query->get('trackingUrl', '');
 
             if ($orderNumber === null) {
                 throw new \InvalidArgumentException('Missing Argument for Order Number!');
             }
 
-            $shipment = $this->shipmentFacade->shipOrder($orderNumber, $context);
+            $shipment = $this->shipmentFacade->shipOrderByOrderNumber(
+                $orderNumber,
+                $trackingCarrier,
+                $trackingCode,
+                $trackingUrl,
+                $context
+            );
 
             return $this->shipmentToJson($shipment);
         } catch (\Exception $e) {
             $data = [
-                'orderNumber' => $orderNumber
+                'orderNumber' => $orderNumber,
+                'trackingCarrier' => $trackingCarrier,
+                'trackingCode' => $trackingCode,
+                'trackingUrl' => $trackingUrl,
             ];
 
-            return $this->exceptionToJson($e, $context, $data);
+            return $this->exceptionToJson($e, $data);
         }
     }
 
@@ -140,12 +90,16 @@ class ShippingController extends AbstractController
      * @return JsonResponse
      * @throws \Exception
      */
-    public function shipItem(QueryDataBag $query, Context $context): JsonResponse
+    public function shipItemApi(QueryDataBag $query, Context $context): JsonResponse
     {
         try {
             $orderNumber = $query->get('order');
             $itemIdentifier = $query->get('item');
             $quantity = $query->getInt('quantity');
+            $trackingCarrier = $query->get('trackingCarrier', '');
+            $trackingCode = $query->get('trackingCode', '');
+            $trackingUrl = $query->get('trackingUrl', '');
+
 
             if ($orderNumber === null) {
                 throw new \InvalidArgumentException('Missing Argument for Order Number!');
@@ -155,17 +109,28 @@ class ShippingController extends AbstractController
                 throw new \InvalidArgumentException('Missing Argument for Item identifier!');
             }
 
-            $shipment = $this->shipmentFacade->shipItem($orderNumber, $itemIdentifier, $quantity, $context);
+            $shipment = $this->shipmentFacade->shipItemByOrderNumber(
+                $orderNumber,
+                $itemIdentifier,
+                $quantity,
+                $trackingCarrier,
+                $trackingCode,
+                $trackingUrl,
+                $context
+            );
 
             return $this->shipmentToJson($shipment);
         } catch (\Exception $e) {
             $data = [
                 'orderNumber' => $orderNumber,
                 'item' => $itemIdentifier,
-                'quantity' => $quantity
+                'quantity' => $quantity,
+                'trackingCarrier' => $trackingCarrier,
+                'trackingCode' => $trackingCode,
+                'trackingUrl' => $trackingUrl,
             ];
 
-            return $this->exceptionToJson($e, $context, $data);
+            return $this->exceptionToJson($e, $data);
         }
     }
 
@@ -199,7 +164,7 @@ class ShippingController extends AbstractController
         ]);
     }
 
-    private function exceptionToJson(\Exception $e, Context $context, array $additionalData = []): JsonResponse
+    private function exceptionToJson(\Exception $e, array $additionalData = []): JsonResponse
     {
         $this->logger->error(
             $e->getMessage(),
@@ -213,53 +178,234 @@ class ShippingController extends AbstractController
         ], 400);
     }
 
-    /**
-     * TODO Refactor Administration routes
-     */
+    // Admin routes
+
     /**
      * @RouteScope(scopes={"api"})
      * @Route("/api/_action/mollie/ship",
-     *         defaults={"auth_enabled"=true}, name="api.action.mollie.ship", methods={"POST"})
+     *         defaults={"auth_enabled"=true}, name="api.action.mollie.ship.order", methods={"POST"})
      *
-     * @param Request $request
-     *
+     * @param RequestDataBag $data
+     * @param Context $context
      * @return JsonResponse
-     * @throws ApiException
-     * @throws IncompatiblePlatform
      */
-    public function ship64(Request $request): JsonResponse
+    public function shipOrder(RequestDataBag $data, Context $context): JsonResponse
     {
-        return $this->shipResponse($request);
+        return $this->getShipOrderResponse(
+            $data->getAlnum('orderId'),
+            $data->get('trackingCarrier', ''),
+            $data->get('trackingCode', ''),
+            $data->get('trackingUrl', ''),
+            $context
+        );
     }
 
     /**
      * @RouteScope(scopes={"api"})
      * @Route("/api/v{version}/_action/mollie/ship",
-     *         defaults={"auth_enabled"=true}, name="api.action.pre64.mollie.ship", methods={"POST"})
+     *         defaults={"auth_enabled"=true}, name="api.action.mollie.ship.order.legacy", methods={"POST"})
      *
-     * @param Request $request
-     *
+     * @param RequestDataBag $data
+     * @param Context $context
      * @return JsonResponse
-     * @throws ApiException
-     * @throws IncompatiblePlatform
      */
-    public function oldShip(Request $request): JsonResponse
+    public function shipOrderLegacy(RequestDataBag $data, Context $context): JsonResponse
     {
-        return $this->shipResponse($request);
+        return $this->getShipOrderResponse(
+            $data->getAlnum('orderId'),
+            $data->get('trackingCarrier', ''),
+            $data->get('trackingCode', ''),
+            $data->get('trackingUrl', ''),
+            $context
+        );
+    }
+
+    /**
+     * @param string $orderId
+     * @param string $trackingCarrier
+     * @param string $trackingCode
+     * @param string $trackingUrl
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function getShipOrderResponse(
+        string  $orderId,
+        string  $trackingCarrier,
+        string  $trackingCode,
+        string  $trackingUrl,
+        Context $context
+    ): JsonResponse
+    {
+        try {
+            if (empty($orderId)) {
+                throw new \InvalidArgumentException('Missing Argument for Order ID!');
+            }
+
+            $shipment = $this->shipmentFacade->shipOrderByOrderId(
+                $orderId,
+                $trackingCarrier,
+                $trackingCode,
+                $trackingUrl,
+                $context
+            );
+
+            return $this->shipmentToJson($shipment);
+        } catch (\Exception $e) {
+            $data = [
+                'orderId' => $orderId,
+                'trackingCarrier' => $trackingCarrier,
+                'trackingCode' => $trackingCode,
+                'trackingUrl' => $trackingUrl,
+            ];
+
+            return $this->exceptionToJson($e, $data);
+        }
     }
 
     /**
      * @RouteScope(scopes={"api"})
-     * @Route("/api/v{version}/_action/mollie/ship/total",
-     *         defaults={"auth_enabled"=true}, name="api.action.pre64.mollie.ship.total", methods={"POST"})
+     * @Route("/api/_action/mollie/ship/item",
+     *         defaults={"auth_enabled"=true}, name="api.action.mollie.ship.item", methods={"POST"})
      *
-     * @param Request $request
-     *
+     * @param RequestDataBag $data
+     * @param Context $context
      * @return JsonResponse
      */
-    public function oldTotal(Request $request): JsonResponse
+    public function shipItem(RequestDataBag $data, Context $context): JsonResponse
     {
-        return $this->totalResponse($request);
+        return $this->getShipItemResponse(
+            $data->getAlnum('orderId'),
+            $data->getAlnum('itemId'),
+            $data->getInt('quantity'),
+            $data->get('trackingCarrier', ''),
+            $data->get('trackingCode', ''),
+            $data->get('trackingUrl', ''),
+            $context
+        );
+    }
+
+    /**
+     * @RouteScope(scopes={"api"})
+     * @Route("/api/v{version}/_action/mollie/ship/item",
+     *         defaults={"auth_enabled"=true}, name="api.action.mollie.ship.item.legacy", methods={"POST"})
+     *
+     * @param RequestDataBag $data
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function shipItemLegacy(RequestDataBag $data, Context $context): JsonResponse
+    {
+        return $this->getShipItemResponse(
+            $data->getAlnum('orderId'),
+            $data->getAlnum('itemId'),
+            $data->getInt('quantity'),
+            $data->get('trackingCarrier', ''),
+            $data->get('trackingCode', ''),
+            $data->get('trackingUrl', ''),
+            $context
+        );
+    }
+
+    /**
+     * @param string $orderId
+     * @param string $itemId
+     * @param int $quantity
+     * @param string $trackingCarrier
+     * @param string $trackingCode
+     * @param string $trackingUrl
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function getShipItemResponse(
+        string  $orderId,
+        string  $itemId,
+        int     $quantity,
+        string  $trackingCarrier,
+        string  $trackingCode,
+        string  $trackingUrl,
+        Context $context
+    ): JsonResponse
+    {
+        try {
+            if (empty($orderId)) {
+                throw new \InvalidArgumentException('Missing Argument for Order ID!');
+            }
+
+            if (empty($itemId)) {
+                throw new \InvalidArgumentException('Missing Argument for Item ID!');
+            }
+
+            $shipment = $this->shipmentFacade->shipItemByOrderId(
+                $orderId,
+                $itemId,
+                $quantity,
+                $trackingCarrier,
+                $trackingCode,
+                $trackingUrl,
+                $context
+            );
+
+            return $this->shipmentToJson($shipment);
+        } catch (\Exception $e) {
+            $data = [
+                'orderId' => $orderId,
+                'itemId' => $itemId,
+                'quantity' => $quantity,
+                'trackingCarrier' => $trackingCarrier,
+                'trackingCode' => $trackingCode,
+                'trackingUrl' => $trackingUrl,
+            ];
+
+            return $this->exceptionToJson($e, $data);
+        }
+    }
+
+    /**
+     * @RouteScope(scopes={"api"})
+     * @Route("/api/_action/mollie/ship/status",
+     *         defaults={"auth_enabled"=true}, name="api.action.mollie.ship.status", methods={"POST"})
+     *
+     * @param RequestDataBag $data
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function status(RequestDataBag $data, Context $context): JsonResponse
+    {
+        return $this->getStatusResponse($data->get('orderId'), $context);
+    }
+
+    /**
+     * @RouteScope(scopes={"api"})
+     * @Route("/api/v{version}/_action/mollie/ship/status",
+     *         defaults={"auth_enabled"=true}, name="api.action.mollie.ship.status.legacy", methods={"POST"})
+     *
+     * @param RequestDataBag $data
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function statusLegacy(RequestDataBag $data, Context $context): JsonResponse
+    {
+        return $this->getStatusResponse($data->get('orderId'), $context);
+    }
+
+    /**
+     * @param string $orderId
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function getStatusResponse(string $orderId, Context $context): JsonResponse
+    {
+        try {
+            $status = $this->shipmentFacade->getStatus($orderId, $context);
+        } catch (ShopwareHttpException $e) {
+            $this->logger->error($e->getMessage());
+            return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
+        } catch (\Throwable $e) {
+            $this->logger->error($e->getMessage());
+            return $this->json(['message' => $e->getMessage()], 500);
+        }
+
+        return $this->json($status);
     }
 
     /**
@@ -267,219 +413,46 @@ class ShippingController extends AbstractController
      * @Route("/api/_action/mollie/ship/total",
      *         defaults={"auth_enabled"=true}, name="api.action.mollie.ship.total", methods={"POST"})
      *
-     * @param Request $request
-     *
+     * @param RequestDataBag $data
+     * @param Context $context
      * @return JsonResponse
      */
-    public function total64(Request $request): JsonResponse
+    public function total(RequestDataBag $data, Context $context): JsonResponse
     {
-        return $this->totalResponse($request);
-    }
-
-    private function shipResponse(Request $request): JsonResponse
-    {
-        /** @var MollieApiClient|null $apiClient */
-        $apiClient = null;
-
-        /** @var array|null $customFields */
-        $customFields = null;
-
-        /** @var string|null $orderId */
-        $orderId = null;
-
-        /** @var string|null $orderLineId */
-        $orderLineId = null;
-
-        /** @var OrderLineItemEntity $orderLineItem */
-        $orderLineItem = null;
-
-        /** @var bool $success */
-        $success = false;
-
-        /** @var int $quantity */
-        $quantity = 0;
-
-        if (
-            (string)$request->get(self::REQUEST_KEY_ORDER_LINE_ITEM_ID) !== ''
-            && (string)$request->get(self::REQUEST_KEY_ORDER_LINE_ITEM_VERSION_ID) !== ''
-        ) {
-            $orderLineItem = $this->getOrderLineItemById(
-                $request->get(self::REQUEST_KEY_ORDER_LINE_ITEM_ID),
-                $request->get(self::REQUEST_KEY_ORDER_LINE_ITEM_VERSION_ID)
-            );
-        }
-
-        if ((int)$request->get(self::REQUEST_KEY_ORDER_LINE_QUANTITY) > 0) {
-            $quantity = (int)$request->get(self::REQUEST_KEY_ORDER_LINE_QUANTITY);
-        }
-
-        if (
-            $orderLineItem !== null
-            && !empty($orderLineItem->getCustomFields())
-        ) {
-            $customFields = $orderLineItem->getCustomFields();
-        }
-
-        if (
-            $orderLineItem !== null
-            && !empty($customFields)
-            && isset($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_ORDER_LINE_ID])
-        ) {
-            $orderLineId = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_ORDER_LINE_ID];
-        }
-
-        if (
-            $orderLineItem !== null
-            && $orderLineItem->getOrder() !== null
-            && !empty($orderLineItem->getOrder()->getCustomFields())
-            && isset($orderLineItem->getOrder()->getCustomFields()[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_ORDER_ID])
-        ) {
-            $orderId = $orderLineItem->getOrder()->getCustomFields()[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_ORDER_ID];
-        }
-
-        if (
-            (string)$orderId !== ''
-            && (string)$orderLineId !== ''
-            && $quantity > 0
-        ) {
-            $apiClient = $this->apiFactory->getClient(
-                $orderLineItem->getOrder()->getSalesChannelId()
-            );
-        }
-
-        if ($apiClient !== null) {
-            /** @var MollieSettingStruct $settings */
-            $settings = $this->settingsService->getSettings(
-                $orderLineItem->getOrder()->getSalesChannelId()
-            );
-
-            /** @var array $orderParameters */
-            $orderParameters = [];
-
-            if ($settings->isTestMode() && $apiClient->usesOAuth()) {
-                $orderParameters = [
-                    self::SHIPPING_DATA_KEY_TEST_MODE => true
-                ];
-            }
-
-            $order = $apiClient->orders->get($orderId, $orderParameters);
-
-            if ($order !== null && isset($order->id)) {
-                $shipmentData = [
-                    self::SHIPPING_DATA_KEY_LINES => [
-                        [
-                            self::SHIPPING_DATA_KEY_ID => $orderLineId,
-                            self::SHIPPING_DATA_KEY_QUANTITY => $quantity,
-                        ],
-                    ],
-                ];
-
-                if ($settings->isTestMode() && $apiClient->usesOAuth()) {
-                    $shipmentData[self::SHIPPING_DATA_KEY_TEST_MODE] = true;
-                }
-
-                $shipment = $apiClient->shipments->createFor($order, $shipmentData);
-
-                if (isset($shipment->id)) {
-                    $success = true;
-
-                    if (!isset($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_SHIPMENTS])) {
-                        $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_SHIPMENTS] = [];
-                    }
-
-                    if (!is_array($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_SHIPMENTS])) {
-                        $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_SHIPMENTS] = [];
-                    }
-
-                    $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_SHIPMENTS][] = [
-                        self::CUSTOM_FIELDS_KEY_SHIPMENT_ID => $shipment->id,
-                        self::CUSTOM_FIELDS_KEY_QUANTITY => $quantity,
-                    ];
-
-                    if (isset($customFields[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY])) {
-                        $customFields[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY] += $quantity;
-                    } else {
-                        $customFields[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY] = $quantity;
-                    }
-                }
-            }
-
-            // Update the custom fields of the order line item
-            $this->orderLineItemRepository->update([
-                [
-                    self::SHIPPING_DATA_KEY_ID => $orderLineItem->getId(),
-                    CustomFieldService::CUSTOM_FIELDS_KEY => $customFields,
-                ]
-            ], Context::createDefaultContext());
-        }
-
-        return new JsonResponse([
-            self::RESPONSE_KEY_SUCCESS => $success,
-        ]);
-    }
-
-    private function totalResponse(Request $request): JsonResponse
-    {
-        /** @var float $amount */
-        $amount = 0.0;
-
-        /** @var int $items */
-        $items = 0;
-
-        /** @var OrderEntity $order */
-        $order = null;
-
-        /** @var string $orderId */
-        $orderId = $request->get('orderId');
-
-        if ($orderId !== '') {
-            $order = $this->orderService->getOrder($orderId, Context::createDefaultContext());
-        }
-
-        if ($order !== null) {
-            foreach ($order->getLineItems() as $lineItem) {
-                if (
-                    !empty($lineItem->getCustomFields())
-                    && isset($lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY])
-                ) {
-                    $amount += ($lineItem->getUnitPrice() * (int)$lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY]);
-                    $items += (int)$lineItem->getCustomFields()[self::CUSTOM_FIELDS_KEY_SHIPPED_QUANTITY];
-                }
-            }
-        }
-
-        return new JsonResponse([
-            self::RESPONSE_KEY_AMOUNT => $amount,
-            self::RESPONSE_KEY_ITEMS => $items,
-        ]);
+        return $this->getTotalResponse($data->get('orderId'), $context);
     }
 
     /**
-     * Returns an order line item by id.
+     * @RouteScope(scopes={"api"})
+     * @Route("/api/v{version}/_action/mollie/ship/total",
+     *         defaults={"auth_enabled"=true}, name="api.action.mollie.ship.total.legacy", methods={"POST"})
      *
-     * @param              $lineItemId
-     * @param null $versionId
-     * @param Context|null $context
-     *
-     * @return OrderLineItemEntity|null
+     * @param RequestDataBag $data
+     * @param Context $context
+     * @return JsonResponse
      */
-    public function getOrderLineItemById(
-        $lineItemId,
-        $versionId = null,
-        Context $context = null
-    ): ?OrderLineItemEntity
+    public function totalLegacy(RequestDataBag $data, Context $context): JsonResponse
     {
-        $orderLineCriteria = new Criteria([$lineItemId]);
+        return $this->getTotalResponse($data->get('orderId'), $context);
+    }
 
-        if ($versionId !== null) {
-            $orderLineCriteria->addFilter(new EqualsFilter('versionId', $versionId));
+    /**
+     * @param string $orderId
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function getTotalResponse(string $orderId, Context $context): JsonResponse
+    {
+        try {
+            $totals = $this->shipmentFacade->getTotals($orderId, $context);
+        } catch (ShopwareHttpException $e) {
+            $this->logger->error($e->getMessage());
+            return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
+        } catch (\Throwable $e) {
+            $this->logger->error($e->getMessage());
+            return $this->json(['message' => $e->getMessage()], 500);
         }
 
-        $orderLineCriteria->addAssociation('order');
-
-        return $this->orderLineItemRepository->search(
-            $orderLineCriteria,
-            $context ?? Context::createDefaultContext()
-        )->get($lineItemId);
+        return $this->json($totals);
     }
 }

@@ -90,7 +90,6 @@ class MolliePaymentFinalize
         $mollieOrder = $this->mollieOrderService->getMollieOrder(
             $mollieOrderId,
             $salesChannelContext->getSalesChannel()->getId(),
-            $salesChannelContext->getContext(),
             ['embed' => 'payments']
         );
         $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
@@ -163,8 +162,7 @@ class MolliePaymentFinalize
         // We might need this later on for reconciliation
         $molliePayment = $this->mollieOrderService->getCompletedPayment(
             $mollieOrderID,
-            $scContext->getSalesChannel()->getId(),
-            $scContext->getContext()
+            $scContext->getSalesChannel()->getId()
         );
 
 

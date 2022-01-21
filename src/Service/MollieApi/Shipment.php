@@ -3,10 +3,12 @@
 namespace Kiener\MolliePayments\Service\MollieApi;
 
 use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeShippedException;
+use Kiener\MolliePayments\Struct\MollieApi\ShipmentTrackingInfoStruct;
 use Mollie\Api\Exceptions\ApiException;
+use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Shipment as MollieShipment;
 use Mollie\Api\Resources\ShipmentCollection;
-use Shopware\Core\Framework\Context;
+use Mollie\Api\Types\OrderLineType;
 
 class Shipment
 {
@@ -25,29 +27,33 @@ class Shipment
 
     public function getShipments(
         string $mollieOrderId,
-        string $salesChannelId,
-        Context $context
+        string $salesChannelId
     ): ShipmentCollection
     {
-        $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId, $context, ['embed' => 'shipments']);
+        $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId, ['embed' => 'shipments']);
         return $mollieOrder->shipments();
     }
 
     /**
      * @param string $mollieOrderId
      * @param string $salesChannelId
-     * @param Context $context
+     * @param ShipmentTrackingInfoStruct|null $tracking
      * @return MollieShipment
      */
     public function shipOrder(
-        string $mollieOrderId,
-        string $salesChannelId,
-        Context $context
+        string                      $mollieOrderId,
+        string                      $salesChannelId,
+        ?ShipmentTrackingInfoStruct $tracking = null
     ): MollieShipment
     {
         try {
-            $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId, $context);
-            return $mollieOrder->shipAll();
+            $options = [];
+            if ($tracking instanceof ShipmentTrackingInfoStruct) {
+                $options['tracking'] = $tracking->toArray();
+            }
+
+            $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId);
+            return $mollieOrder->shipAll($options);
         } catch (ApiException $e) {
             throw new MollieOrderCouldNotBeShippedException(
                 $mollieOrderId,
@@ -64,15 +70,15 @@ class Shipment
      * @param string $salesChannelId
      * @param string $mollieOrderLineId
      * @param int $quantity
-     * @param Context $context
+     * @param ShipmentTrackingInfoStruct|null $tracking
      * @return MollieShipment
      */
     public function shipItem(
-        string $mollieOrderId,
-        string $salesChannelId,
-        string $mollieOrderLineId,
-        int $quantity,
-        Context $context
+        string                      $mollieOrderId,
+        string                      $salesChannelId,
+        string                      $mollieOrderLineId,
+        int                         $quantity,
+        ?ShipmentTrackingInfoStruct $tracking = null
     ): MollieShipment
     {
         try {
@@ -85,7 +91,11 @@ class Shipment
                 ]
             ];
 
-            $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId, $context);
+            if ($tracking instanceof ShipmentTrackingInfoStruct) {
+                $options['tracking'] = $tracking->toArray();
+            }
+
+            $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId);
             return $mollieOrder->createShipment($options);
         } catch (ApiException $e) {
             throw new MollieOrderCouldNotBeShippedException(
@@ -97,5 +107,70 @@ class Shipment
                 $e
             );
         }
+    }
+
+    /**
+     * @param string $mollieOrderId
+     * @param string $salesChannelId
+     * @return array<mixed>
+     */
+    public function getStatus(string $mollieOrderId, string $salesChannelId): array
+    {
+        $lineItems = [];
+
+        $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId);
+
+        foreach ($mollieOrder->lines() as $mollieOrderLine) {
+            /** @var OrderLine $mollieOrderLine */
+            if ($mollieOrderLine->type === OrderLineType::TYPE_SHIPPING_FEE) {
+                continue;
+            }
+
+            $orderLineItemId = $mollieOrderLine->metadata->orderLineItemId ?? null;
+            if (empty($orderLineItemId)) {
+                continue;
+            }
+
+            $lineItems[$orderLineItemId] = [
+                'id' => $orderLineItemId,
+                'mollieOrderLineId' => $mollieOrderLine->id,
+                'quantity' => $mollieOrderLine->quantity,
+                'quantityShippable' => $mollieOrderLine->shippableQuantity,
+                'quantityShipped' => $mollieOrderLine->quantityShipped,
+            ];
+        }
+
+        return $lineItems;
+    }
+
+    /**
+     * @param string $mollieOrderId
+     * @param string $salesChannelId
+     * @return array<string, numeric>
+     */
+    public function getTotals(string $mollieOrderId, string $salesChannelId): array
+    {
+        $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId);
+
+        $totalAmount = 0.0;
+        $totalQuantity = 0;
+
+        foreach ($mollieOrder->lines() as $mollieOrderLine) {
+            /** @var OrderLine $mollieOrderLine */
+            if ($mollieOrderLine->type === OrderLineType::TYPE_SHIPPING_FEE) {
+                continue;
+            }
+
+            if ($mollieOrderLine->amountShipped) {
+                $totalAmount += floatval($mollieOrderLine->amountShipped->value);
+            }
+
+            $totalQuantity += $mollieOrderLine->quantityShipped;
+        }
+
+        return [
+            'amount' => $totalAmount,
+            'quantity' => $totalQuantity,
+        ];
     }
 }

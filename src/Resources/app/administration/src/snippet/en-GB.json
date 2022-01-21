@@ -64,9 +64,29 @@
         }
       },
       "shipping": {
-        "title": "Ship an order line item through Mollie",
-        "content": "Fill out the quantity of this item ({shippableQuantity} out of {quantity} left to ship) to be shipped to the customer.",
-        "quantityPlaceholder": "The quantity to ship...",
+        "title": "Ship through Mollie",
+        "item": {
+          "label": "Item:",
+          "noQuantity": "Please enter a quantity to ship.",
+          "shipAll": "Ship all",
+          "summary": {
+            "quantity": "Quantity to ship",
+            "shipped": "Quantity shipped",
+            "shippable": "Quantity shippable"
+          }
+        },
+        "order": {
+          "description": "The following item quantities will be shipped.",
+          "itemHeader": "Item",
+          "quantityHeader": "Quantity"
+        },
+        "showTracking": "Add tracking info for this shipment",
+        "tracking": {
+          "carrier": "Carrier",
+          "code": "Code",
+          "url": "Url",
+          "invalid": "Please enter both Carrier and Code"
+        },
         "confirmButton": "Ship",
         "cancelButton": "Do not ship"
       }

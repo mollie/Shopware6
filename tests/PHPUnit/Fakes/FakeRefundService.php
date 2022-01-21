@@ -55,10 +55,9 @@ class FakeRefundService implements RefundServiceInterface
      * @param OrderEntity $order
      * @param float $amount
      * @param string|null $description
-     * @param Context $context
      * @return Refund
      */
-    public function refund(OrderEntity $order, float $amount, ?string $description, Context $context): Refund
+    public function refund(OrderEntity $order, float $amount, ?string $description): Refund
     {
         // TODO: Implement refund() method.
     }
@@ -66,10 +65,9 @@ class FakeRefundService implements RefundServiceInterface
     /**
      * @param OrderEntity $order
      * @param string $description
-     * @param Context $context
      * @return Refund
      */
-    public function refundFullOrder(OrderEntity $order, string $description, Context $context): Refund
+    public function refundFullOrder(OrderEntity $order, string $description): Refund
     {
         $this->fullyRefunded = true;
         $this->refundedOrder = $order;
@@ -80,50 +78,45 @@ class FakeRefundService implements RefundServiceInterface
     /**
      * @param OrderEntity $order
      * @param string $refundId
-     * @param Context $context
      * @return bool
      */
-    public function cancel(OrderEntity $order, string $refundId, Context $context): bool
+    public function cancel(OrderEntity $order, string $refundId): bool
     {
         // TODO: Implement cancel() method.
     }
 
     /**
      * @param OrderEntity $order
-     * @param Context $context
      * @return array
      */
-    public function getRefunds(OrderEntity $order, Context $context): array
+    public function getRefunds(OrderEntity $order): array
     {
         // TODO: Implement getRefunds() method.
     }
 
     /**
      * @param OrderEntity $order
-     * @param Context $context
      * @return float
      */
-    public function getRemainingAmount(OrderEntity $order, Context $context): float
+    public function getRemainingAmount(OrderEntity $order): float
     {
         // TODO: Implement getRemainingAmount() method.
     }
 
     /**
      * @param OrderEntity $order
-     * @param Context $context
      * @return float
      */
-    public function getVoucherPaidAmount(OrderEntity $order, Context $context): float
+    public function getVoucherPaidAmount(OrderEntity $order): float
     {
         // TODO: Implement getVoucherPaidAmount() method.
     }
 
     /**
      * @param OrderEntity $order
-     * @param Context $context
      * @return float
      */
-    public function getRefundedAmount(OrderEntity $order, Context $context): float
+    public function getRefundedAmount(OrderEntity $order): float
     {
         // TODO: Implement getRefundedAmount() method.
     }

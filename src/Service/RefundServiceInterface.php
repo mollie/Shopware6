@@ -8,58 +8,49 @@ use Shopware\Core\Framework\Context;
 
 interface RefundServiceInterface
 {
-
     /**
      * @param OrderEntity $order
      * @param float $amount
-     * @param string|null $description
-     * @param Context $context
+     * @param string $description
      * @return Refund
      */
-    public function refund(OrderEntity $order, float $amount, ?string $description, Context $context): Refund;
+    public function refund(OrderEntity $order, float $amount, string $description): Refund;
 
     /**
      * @param OrderEntity $order
      * @param string $description
-     * @param Context $context
      * @return Refund
      */
-    public function refundFullOrder(OrderEntity $order, string $description, Context $context): Refund;
+    public function refundFullOrder(OrderEntity $order, string $description): Refund;
 
     /**
      * @param OrderEntity $order
      * @param string $refundId
-     * @param Context $context
      * @return bool
      */
-    public function cancel(OrderEntity $order, string $refundId, Context $context): bool;
+    public function cancel(OrderEntity $order, string $refundId): bool;
 
     /**
      * @param OrderEntity $order
-     * @param Context $context
      * @return array
      */
-    public function getRefunds(OrderEntity $order, Context $context): array;
+    public function getRefunds(OrderEntity $order): array;
 
     /**
      * @param OrderEntity $order
-     * @param Context $context
      * @return float
      */
-    public function getRemainingAmount(OrderEntity $order, Context $context): float;
+    public function getRemainingAmount(OrderEntity $order): float;
 
     /**
      * @param OrderEntity $order
-     * @param Context $context
      * @return float
      */
-    public function getVoucherPaidAmount(OrderEntity $order, Context $context): float;
+    public function getVoucherPaidAmount(OrderEntity $order): float;
 
     /**
      * @param OrderEntity $order
-     * @param Context $context
      * @return float
      */
-    public function getRefundedAmount(OrderEntity $order, Context $context): float;
-
+    public function getRefundedAmount(OrderEntity $order): float;
 }
