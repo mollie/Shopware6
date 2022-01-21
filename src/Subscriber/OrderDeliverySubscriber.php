@@ -26,7 +26,7 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            'state_machine.order_delivery.state_changed' => 'onOrderDeliveryChanged',
+           // 'state_machine.order_delivery.state_changed' => 'onOrderDeliveryChanged',
         ];
     }
 
