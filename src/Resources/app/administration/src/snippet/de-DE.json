@@ -101,7 +101,9 @@
           },
           "modal": {
             "title": "Bestellung verschicken",
-            "description": "Diese Aktion markiert automatisch eine Bestellung in Mollie als 'versendet'. Dabei wird aus der Sequenz die Bestellnummer gelesen und an die Mollie API übergeben. Erfolgreiche sowie fehlgeschlagene Aktionen sind dabei in den Mollie Logs einsehbar."
+            "description": "Diese Aktion markiert automatisch eine Bestellung in Mollie als 'versendet'. Dabei wird aus der Sequenz die Bestellnummer gelesen und an die Mollie API übergeben. Erfolgreiche sowie fehlgeschlagene Aktionen sind dabei in den Mollie Logs einsehbar.",
+            "warningConfig": "Bitte deaktivieren Sie alle zusätzlichen Automatisierungen, die mit dieser Flow Builder Aktion kolidieren können.\nDie folgenden aktivierten Features dieses Plugins können sich mit dieser Aktion überschneiden:",
+            "noWarnings": "Keine Warnungen"
           }
         },
         "refundOrder": {
@@ -112,8 +114,12 @@
           "modal": {
             "title": "Bestellung erstatten",
             "description": "Diese Aktion startet eine Rückerstattung via Mollie. Dabei wird aus der Sequenz die Bestellnummer gelesen und an die Mollie API übergeben. Erfolgreiche sowie fehlgeschlagene Aktionen sind dabei in den Mollie Logs einsehbar.",
-            "warning": "Bitte beachten Sie, dass eine Rückerstattung bis zu 2 Stunden dauern kann, bis diese im Shop sichtbar ist. Bis dahin können sie eingeleitete Erstattungen jederzeit auf der Bestellseite im Shop, oder direkt im Mollie Dashboard abbrechen."
+            "warning": "Bitte beachten Sie, dass eine Rückerstattung bis zu 2 Stunden dauern kann, bis diese im Shop sichtbar ist. Bis dahin können sie eingeleitete Erstattungen jederzeit auf der Bestellseite im Shop, oder direkt im Mollie Dashboard abbrechen.",
+            "warningConfig": "Bitte deaktivieren Sie alle zusätzlichen Automatisierungen, die mit dieser Flow Builder Aktion kolidieren können."
           }
+        },
+        "warnings": {
+          "automaticShipping": "Automatischer Versand in Plugin Konfiguration"
         }
       }
     }

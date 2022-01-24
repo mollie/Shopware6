@@ -18,6 +18,9 @@
         <sw-alert variant="warning" :showIcon="true" :closable="false">
             {{ $tc('mollie-payments.sw-flow.actions.refundOrder.modal.warning') }}
         </sw-alert>
+        <sw-alert variant="info" appearance="notification" :showIcon="true" :closable="false">
+            {{ $tc('mollie-payments.sw-flow.actions.refundOrder.modal.warningConfig') }}
+        </sw-alert>
     </div>
     <template #modal-footer>
         <sw-button size="small" @click="onClose">

@@ -6,6 +6,7 @@
 
     <services>
         <service id="Kiener\MolliePayments\Subscriber\OrderDeliverySubscriber">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Facade\MollieShipment"/>
             <tag name="kernel.event_subscriber"/>
         </service>

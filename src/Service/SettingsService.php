@@ -4,6 +4,8 @@ namespace Kiener\MolliePayments\Service;
 
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 
 class SettingsService
@@ -18,17 +20,26 @@ class SettingsService
     /** @var SystemConfigService */
     protected $systemConfigService;
 
-    public function __construct(
-        SystemConfigService $systemConfigService
-    )
+    /**
+     * @var EntityRepositoryInterface
+     */
+    private $repoSalesChannels;
+
+
+    /**
+     * @param SystemConfigService $systemConfigService
+     * @param EntityRepositoryInterface $repoSalesChannels
+     */
+    public function __construct(SystemConfigService $systemConfigService, EntityRepositoryInterface $repoSalesChannels)
     {
         $this->systemConfigService = $systemConfigService;
+        $this->repoSalesChannels = $repoSalesChannels;
     }
 
     /**
      * Get Mollie settings from configuration.
      *
-     * @param string|null  $salesChannelId
+     * @param string|null $salesChannelId
      *
      * @return MollieSettingStruct
      */
@@ -48,6 +59,26 @@ class SettingsService
         return (new MollieSettingStruct())->assign($structData);
     }
 
+    /**
+     * Gets all configurations of all sales channels.
+     * Every sales channel will be a separate entry in the array.
+     *
+     * @param Context $context
+     * @return array<string, MollieSettingStruct>
+     */
+    public function getAllSalesChannelSettings(Context $context): array
+    {
+        $allConfigs = [];
+
+        $result = $this->repoSalesChannels->searchIds(new Criteria(), $context);
+
+        foreach ($result->getIds() as $scID) {
+            $allConfigs[$scID] = $this->getSettings($scID);
+        }
+
+        return $allConfigs;
+    }
+
     public function set(string $key, $value, ?string $salesChannelId = null): void
     {
         $this->systemConfigService->set(self::SYSTEM_CONFIG_DOMAIN . $key, $value, $salesChannelId);
@@ -62,7 +93,7 @@ class SettingsService
     {
         $key = $testMode ? self::TEST_PROFILE_ID : self::LIVE_PROFILE_ID;
 
-        if(!is_null($profileId)) {
+        if (!is_null($profileId)) {
             $this->set($key, $profileId, $salesChannelId);
         } else {
             $this->delete($key, $salesChannelId);

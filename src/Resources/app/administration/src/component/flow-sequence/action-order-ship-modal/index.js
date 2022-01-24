@@ -7,6 +7,10 @@ const {Component} = Shopware;
 Component.register('mollie-payments-flowsequence-action-order-ship-modal', {
     template,
 
+    inject: [
+        'MolliePaymentsConfigService',
+    ],
+
     props: {
         sequence: {
             type: Object,
@@ -17,11 +21,16 @@ Component.register('mollie-payments-flowsequence-action-order-ship-modal', {
     data() {
         return {
             tags: [],
+            warnings: [],
         };
     },
 
     created() {
         this.createdComponent();
+
+        this.MolliePaymentsConfigService.validateFlowBuilder().then((response) => {
+            this.warnings = response.actions.shipping.warnings;
+        });
     },
 
     methods: {

@@ -101,7 +101,9 @@
           },
           "modal": {
             "title": "Bestelling verzenden",
-            "description": "Deze actie zal automatisch een bestelling verzenden via Mollie. De flow sequence ontvangt het ordernummer, en geeft dit door aan de Mollie API. Succesvolle verzendingen en mislukte verzendingen zullen zichtbaar zijn in de Mollie logbestanden."
+            "description": "Deze actie zal automatisch een bestelling verzenden via Mollie. De flow sequence ontvangt het ordernummer, en geeft dit door aan de Mollie API. Succesvolle verzendingen en mislukte verzendingen zullen zichtbaar zijn in de Mollie logbestanden.",
+            "warningConfig": "Schakel alle extra automatiseringen uit die eventueel in conflict komen met deze Flow Builder actie. De volgende geactiveerde features in deze plugin kunnen elkaar kruisen met deze actie:",
+            "noWarnings": "Geen waarschuwingen"
           }
         },
         "refundOrder": {
@@ -112,8 +114,12 @@
           "modal": {
             "title": "Bestelling terugbetalen",
             "description": "Deze actie zal automatisch een terugbetaling starten via Mollie. De flow sequence ontvangt het ordernummer, en geeft dit door aan de Mollie API. Succesvolle refunds en mislukte refunds zullen zichtbaar zijn in de Mollie logbestanden.",
-            "Waarschuwing": "Houd er rekening mee, dat het tot 2 uur kan duren voordat terugbetalingen zijn afgerond en zichtbaar zijn in de shop. Tot die tijd kunt u een in behandeling zijnde terugbetaling altijd annuleren vanuit de bestelpagina in Shopware of vanuit het Mollie Dashboard."
+            "warning": "Houd er rekening mee dat het tot 2 uur kan duren voordat een terugbetaling zichtbaar is in de shop. Tot die tijd kunt u geïnitieerde terugbetalingen op elk moment annuleren op de bestelpagina in de shop, of direct in het Mollie Dashboard.",
+            "warningConfig": "Deactiveer alle extra automatiseringen die kunnen collideren met deze Flow Builder actie."
           }
+        },
+        "warnings": {
+          "automaticShipping": "Automatische verzending in plugin configuratie"
         }
       }
     }
