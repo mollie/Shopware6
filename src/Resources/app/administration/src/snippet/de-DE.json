@@ -15,6 +15,7 @@
     "general": {
       "mainMenuItemGeneral": "Mollie Payments Zahlungen",
       "descriptionTextModule": "Mollie Payments Zahlungen",
+      "btnMollieActions" : "Mollie Aktionen",
       "refundThroughMollie": "Rückerstattung über Mollie",
       "shipThroughMollie": "Versand bei Mollie melden"
     },

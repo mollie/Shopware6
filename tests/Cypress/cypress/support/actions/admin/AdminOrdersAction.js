@@ -43,7 +43,9 @@ export default class AdminOrdersAction {
      */
     refundOrder(amount) {
 
-        repoOrdersDetails.getMollieRefundManagerButton().click();
+        repoOrdersDetails.getMollieActionsButton().click();
+        cy.wait(2000);
+        repoOrdersDetails.getMollieActionButtonRefundOrder().click();
 
         repoRefundManager.getAmountField().type(amount);
         repoRefundManager.getSubmitButton().click();
@@ -58,7 +60,9 @@ export default class AdminOrdersAction {
      */
     cancelOrderRefund() {
 
-        repoOrdersDetails.getMollieRefundManagerButton().click();
+        repoOrdersDetails.getMollieActionsButton().click();
+        cy.wait(2000);
+        repoOrdersDetails.getMollieActionButtonRefundOrder().click();
 
         // there must be a pending refund
         repoRefundManager.getFirstRefundStatusLabel().contains('Pending');
