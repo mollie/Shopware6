@@ -2,9 +2,9 @@ import template from './sw-order-line-items-grid.html.twig';
 import './sw-order-line-items-grid.scss';
 
 // eslint-disable-next-line no-undef
-const { Component, Mixin } = Shopware;
+const {Component, Mixin} = Shopware;
 // eslint-disable-next-line no-undef
-const { string } = Shopware.Utils;
+const {string} = Shopware.Utils;
 
 Component.override('sw-order-line-items-grid', {
     template,
@@ -123,6 +123,24 @@ Component.override('sw-order-line-items-grid', {
 
         canOpenRefundModal() {
             return this.remainingAmount > 0 || (this.refunds !== undefined && this.refunds.length > 0);
+        },
+
+        isShippingPossible() {
+            return this.shippableLineItems.length > 0;
+        },
+
+        possibleActionsCount() {
+            let count = 0;
+
+            if (this.isShippingPossible) {
+                count += 1;
+            }
+
+            if (this.canOpenRefundModal) {
+                count += 1;
+            }
+
+            return count;
         },
     },
 
@@ -244,7 +262,7 @@ Component.override('sw-order-line-items-grid', {
         },
 
         onConfirmShipOrder() {
-            if(this.showTrackingInfo && !this.validateTracking()) {
+            if (this.showTrackingInfo && !this.validateTracking()) {
                 this.createNotificationError({
                     message: this.$tc('mollie-payments.modals.shipping.tracking.invalid'),
                 });
@@ -292,7 +310,7 @@ Component.override('sw-order-line-items-grid', {
                 return;
             }
 
-            if(this.showTrackingInfo && !this.validateTracking()) {
+            if (this.showTrackingInfo && !this.validateTracking()) {
                 this.createNotificationError({
                     message: this.$tc('mollie-payments.modals.shipping.tracking.invalid'),
                 });

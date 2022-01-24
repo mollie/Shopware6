@@ -15,6 +15,7 @@
     "general": {
       "mainMenuItemGeneral": "Mollie Payments",
       "descriptionTextModule": "Mollie Payments",
+      "btnMollieActions" : "Mollie Actions",
       "refundThroughMollie": "Refund through Mollie",
       "shipThroughMollie": "Ship through Mollie"
     },

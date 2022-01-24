@@ -11,41 +11,53 @@
         {% endblock %}
 
         {% block sw_order_line_items_grid_mollie_actions %}
-            <div align="right"
-                 v-if="isMollieOrder">
+            <div align="right" v-if="isMollieOrder">
                 <sw-button-group :disabled="isLoading">
+
                     {% block sw_order_line_items_grid_mollie_actions_button %}
-                        <sw-button class="sw-order-line-items-grid__actions-refund-btn"
-                                   variant="ghost"
-                                   size="small"
-                                   :disabled="!canOpenRefundModal"
-                                   @click="onOpenRefundModal">
-                            <sw-icon name="default-arrow-360-left" decorative></sw-icon>
-                            {{ $tc('mollie-payments.general.refundThroughMollie') }}
+                        <sw-button class="sw-order-line-items-grid__actions-btn" variant="ghost" size="small"
+                                   :block="true"
+                                   v-if="possibleActionsCount >= 1">
+                            <sw-icon name="default-badge-info" decorative></sw-icon>
+                            {{ $tc('mollie-payments.general.btnMollieActions') }}&nbsp;({{ possibleActionsCount }})
+                        </sw-button>
+                        <sw-button class="sw-order-line-items-grid__actions-btn" variant="ghost" size="small"
+                                   v-if="possibleActionsCount < 1"
+                                   disabled="true">
+                            {{ $tc('mollie-payments.general.btnMollieActions') }}
                         </sw-button>
                     {% endblock %}
 
                     {% block sw_order_line_items_grid_mollie_actions_context_button %}
                         <sw-context-button>
                             <template #button>
-                                <sw-button
-                                    variant="ghost"
-                                    size="small"
-                                    square>
-                                    <sw-icon name="small-arrow-small-down"
-                                             decorative>
+                                <sw-button variant="ghost" size="small" square>
+                                    <sw-icon name="small-arrow-small-down" decorative>
                                     </sw-icon>
                                 </sw-button>
                             </template>
 
                             {% block sw_order_line_items_grid_mollie_actions_dropdown %}
-                                <sw-context-menu-item
-                                    class="sw-order-line-items-grid__actions-ship-button"
-                                    icon="default-object-paperplane"
-                                    :disabled="shippableLineItems.length === 0"
-                                    @click="onOpenShipOrderModal">
-                                    {{ $tc('mollie-payments.general.shipThroughMollie') }}
-                                </sw-context-menu-item>
+                                {% block sw_order_line_items_grid_mollie_actions_dropdown_ship %}
+                                    <sw-context-menu-item
+                                            class="sw-order-line-items-grid__actions-ship-button"
+                                            icon="default-package-open"
+                                            :disabled="!isShippingPossible"
+                                            @click="onOpenShipOrderModal">
+                                        {{ $tc('mollie-payments.general.shipThroughMollie') }}
+                                    </sw-context-menu-item>
+                                {% endblock %}
+                                {% block sw_order_line_items_grid_mollie_actions_dropdown_refund %}
+                                    <sw-context-menu-item
+                                            class="sw-order-line-items-grid__actions-refund-btn"
+                                            icon="default-money-cash"
+                                            variant="ghost"
+                                            size="small"
+                                            :disabled="!canOpenRefundModal"
+                                            @click="onOpenRefundModal">
+                                        {{ $tc('mollie-payments.general.refundThroughMollie') }}
+                                    </sw-context-menu-item>
+                                {% endblock %}
                             {% endblock %}
 
                         </sw-context-button>
@@ -61,10 +73,10 @@
               :variant="refunds.length > 0 ? 'large' : 'small'">
         <sw-container columns="1fr auto" :gap="refunds.length > 0 ? '16px' : '0'">
             <sw-data-grid
-                :dataSource="refunds"
-                :columns="getRefundListColumns"
-                :showSelection="false"
-                v-if="refunds.length > 0">
+                    :dataSource="refunds"
+                    :columns="getRefundListColumns"
+                    :showSelection="false"
+                    v-if="refunds.length > 0">
                 <template #column-amount.value="{ item }">
                     <sw-container columns="1fr auto" gap="8px" align="center">
                         {{ item.amount.value | currency(item.amount.currency) }}
@@ -127,12 +139,12 @@
                 </sw-description-list>
 
                 <sw-number-field
-                    :min="0"
-                    :max="remainingAmount"
-                    v-model="refundAmount"
-                    numberType="float"
-                    size="medium"
-                    :step="1">
+                        :min="0"
+                        :max="remainingAmount"
+                        v-model="refundAmount"
+                        numberType="float"
+                        size="medium"
+                        :step="1">
                     <template #suffix>
                         {{ order.currency.symbol }}
                     </template>
@@ -179,9 +191,9 @@
     </sw-modal>
 {% endblock %}
 
+
 {% block sw_order_line_items_grid_grid_columns %}
     {% parent %}
-
     <template #column-shippedQuantity="{ item }">
         {{ shippedQuantity(item) }}
     </template>
@@ -189,7 +201,6 @@
 
 {% block sw_order_line_items_grid_grid_actions %}
     {% parent %}
-
     <template #action-modals="{ item }">
         {% block sw_order_line_items_grid_grid_actions_modals_items %}{% endblock %}
     </template>
@@ -197,7 +208,6 @@
 
 {% block sw_order_line_items_grid_grid_actions_modals_items %}
     {% parent %}
-
     {% block sw_order_line_items_grid_grid_mollie_ship_item_modal %}
         <sw-modal v-if="showShipItemModal === item.id"
                   @modal-close="onCloseShipItemModal"
@@ -265,11 +275,7 @@
 
 {% block sw_order_line_items_grid_grid_actions_show %}
     {% parent %}
-
-    <sw-context-menu-item :disabled="!isShippable(item)"
-                          icon="default-object-paperplane"
-                          @click="onOpenShipItemModal(item)">
+    <sw-context-menu-item :disabled="!isShippable(item)" icon="default-package-open" @click="onOpenShipItemModal(item)">
         {{ $tc('mollie-payments.general.shipThroughMollie') }}
     </sw-context-menu-item>
 {% endblock %}
-

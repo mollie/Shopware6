@@ -63,7 +63,8 @@ context("Order Refunds", () => {
             adminOrders.openOrders();
             adminOrders.openLastOrder();
 
-            repoOrdersDetails.getMollieRefundManagerButton().should('be.disabled');
+            repoOrdersDetails.getMollieActionsButton().click();
+            repoOrdersDetails.getMollieActionButtonRefundOrder().should('have.class', 'is--disabled');
         })
 
         it('Refund Order in Admin', () => {
@@ -87,7 +88,8 @@ context("Order Refunds", () => {
             // after refunded, open the refund manager
             // and verify that we see a PENDING refund in it as well as
             // the correct 1 EUR value.
-            repoOrdersDetails.getMollieRefundManagerButton().click();
+            repoOrdersDetails.getMollieActionsButton().click();
+            repoOrdersDetails.getMollieActionButtonRefundOrder().click();
             repoRefundManager.getFirstRefundStatusLabel().contains('Pending');
 
             // because of (weird) number formats which might not be the same all the time (even if they should)
@@ -121,7 +123,8 @@ context("Order Refunds", () => {
 
             // let's open the refund manager, and verify
             // that the pending refund is NOT existing anymore
-            repoOrdersDetails.getMollieRefundManagerButton().click();
+            repoOrdersDetails.getMollieActionsButton().click();
+            repoOrdersDetails.getMollieActionButtonRefundOrder().click();
             cy.contains('Pending').should('not.exist');
         })
 
