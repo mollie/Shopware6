@@ -74,7 +74,6 @@ class MollieApiFactory
      * @param string|null $salesChannelId
      *
      * @return MollieApiClient
-     * @throws IncompatiblePlatform
      */
     public function getClient(?string $salesChannelId = null): MollieApiClient
     {
