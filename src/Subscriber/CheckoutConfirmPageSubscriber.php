@@ -22,6 +22,7 @@ use Shopware\Storefront\Page\Account\Order\AccountEditOrderPageLoadedEvent;
 use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
 use Shopware\Storefront\Page\PageLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Throwable;
 
 
 class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
@@ -130,16 +131,19 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
             [$salesChannel]
         );
 
-        $activeMethodIds = array_filter($activeMethods, static function(Method $method) {
-            return $method->id;
-        });
+        $activeMethodIds = [];
 
-        file_put_contents(__DIR__ . '/active-ids.txt', print_r($activeMethodIds, true));
+        foreach ($activeMethods as $activeMethod) {
+            if (!in_array($activeMethod->id, $activeMethodIds, true)) {
+                $activeMethodIds[] = $activeMethod->id;
+            }
+        }
 
         $filteredPaymentMethods = $paymentMethods->filter(static function(PaymentMethodEntity $paymentMethod) use ($activeMethodIds) {
-            $id = constant($paymentMethod->getHandlerIdentifier() . '::PAYMENT_METHOD_NAME') ?? '';
-
-            file_put_contents(__DIR__ . '/method-id.txt', $id . "\n", FILE_APPEND);
+            try {
+                $id = constant($paymentMethod->getHandlerIdentifier() . '::PAYMENT_METHOD_NAME') ?? '';
+            } catch (Throwable $exception) {
+            }
 
             return empty($id) || in_array($id, $activeMethodIds, true);
         });
@@ -386,3 +390,7 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     }
 
 }
+
+
+
+
