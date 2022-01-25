@@ -74,7 +74,8 @@
             "quantity": "Quantity to ship",
             "shipped": "Quantity shipped",
             "shippable": "Quantity shippable"
-          }
+          },
+          "success": "The order has been successfully shipped."
         },
         "order": {
           "description": "The following item quantities will be shipped.",

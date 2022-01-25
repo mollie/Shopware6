@@ -74,7 +74,8 @@
             "quantity": "Te verzenden hoeveelheid",
             "shipped": "Verzonden hoeveelheid",
             "shippable": "Verzendbare hoeveelheid"
-          }
+          },
+          "success": "De bestelling is succesvol verzonden."
         },
         "order": {
           "description": "De volgende product aantallen zullen worden verzonden.",

@@ -74,7 +74,8 @@
             "quantity": "Zu versendende Menge",
             "shipped": "Versendete Menge",
             "shippable": "Zu versendende Menge"
-          }
+          },
+          "success": "Die Bestellung wurde erfolgreich als versendet markiert."
         },
         "order": {
           "description": "Die folgenden Artikelmengen werden versandt.",
