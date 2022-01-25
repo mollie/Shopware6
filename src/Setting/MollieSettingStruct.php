@@ -81,6 +81,11 @@ class MollieSettingStruct extends Struct
     protected $orderLifetimeDays;
 
     /**
+     * @var bool
+     */
+    protected $automaticShipping;
+
+    /**
      * @var string
      */
     protected $orderStateWithAPaidTransaction = self::ORDER_STATE_SKIP;
@@ -394,4 +399,21 @@ class MollieSettingStruct extends Struct
     {
         $this->enableApplePayDirect = $enableApplePayDirect;
     }
+
+    /**
+     * @return bool
+     */
+    public function getAutomaticShipping(): bool
+    {
+        return (bool)$this->automaticShipping;
+    }
+
+    /**
+     * @param bool $automaticShipping
+     */
+    public function setAutomaticShipping(bool $automaticShipping): void
+    {
+        $this->automaticShipping = $automaticShipping;
+    }
+
 }

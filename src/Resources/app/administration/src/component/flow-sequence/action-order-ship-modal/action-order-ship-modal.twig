@@ -14,6 +14,18 @@
         <br/>
         {{ $tc('mollie-payments.sw-flow.actions.shipOrder.modal.description') }}
         <br/>
+        <br/>
+        <sw-alert variant="info" appearance="notification" :showIcon="true" :closable="false">
+            {{ $tc('mollie-payments.sw-flow.actions.shipOrder.modal.warningConfig') }}
+            <ul v-if="warnings.length <= 0">
+                <li>
+                    {{ $tc('mollie-payments.sw-flow.actions.shipOrder.modal.noWarnings') }}
+                </li>
+            </ul>
+            <ul v-for="warning in warnings">
+                <li> {{ warning }}</li>
+            </ul>
+        </sw-alert>
     </div>
     <template #modal-footer>
         <sw-button size="small" @click="onClose">

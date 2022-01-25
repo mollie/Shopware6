@@ -16,7 +16,7 @@ class MolliePaymentExtractor
      * @param OrderTransactionCollection|null $collection
      * @return OrderTransactionEntity|null
      */
-    public function extractLast(?OrderTransactionCollection $collection): ?OrderTransactionEntity
+    public function extractLastMolliePayment(?OrderTransactionCollection $collection): ?OrderTransactionEntity
     {
         if (!$collection instanceof OrderTransactionCollection) {
             return null;

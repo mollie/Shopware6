@@ -89,6 +89,36 @@ class MollieShipment implements MollieShipmentInterface
     }
 
     /**
+     * TODO: this is here just for now, because I cannot change it all right now, but we need to make sure someone can verify if the shipment should even be triggered to avoid logs being written when shipping other PSP orders
+     *
+     * @param string $orderDeliveryId
+     * @param Context $context
+     * @return bool
+     */
+    public function isMolliePayment(string $orderDeliveryId, Context $context): bool
+    {
+        $delivery = $this->orderDeliveryService->getDelivery($orderDeliveryId, $context);
+
+        if (!$delivery instanceof OrderDeliveryEntity) {
+            return false;
+        }
+
+        $order = $delivery->getOrder();
+
+        if (!$order instanceof OrderEntity) {
+            return false;
+        }
+
+        $lastTransaction = $this->extractor->extractLastMolliePayment($order->getTransactions());
+
+        if (!$lastTransaction instanceof OrderTransactionEntity) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * @param string $orderDeliveryId
      * @param Context $context
      * @return bool
@@ -130,7 +160,7 @@ class MollieShipment implements MollieShipmentInterface
         }
 
         // get last transaction if it is a mollie transaction
-        $lastTransaction = $this->extractor->extractLast($order->getTransactions());
+        $lastTransaction = $this->extractor->extractLastMolliePayment($order->getTransactions());
 
         if (!$lastTransaction instanceof OrderTransactionEntity) {
 

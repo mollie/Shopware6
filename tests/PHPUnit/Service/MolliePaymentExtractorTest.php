@@ -16,13 +16,13 @@ class MolliePaymentExtractorTest extends TestCase
     public function testExtractWithNullCollection(): void
     {
         $extractor = new MolliePaymentExtractor();
-        self::assertNull($extractor->extractLast(null));
+        self::assertNull($extractor->extractLastMolliePayment(null));
     }
 
     public function testExtractWithEmptyCollection(): void
     {
         $extractor = new MolliePaymentExtractor();
-        self::assertNull($extractor->extractLast(new OrderTransactionCollection([])));
+        self::assertNull($extractor->extractLastMolliePayment(new OrderTransactionCollection([])));
     }
 
     public function testExtractWithSingleMollieTransactionCollection(): void
@@ -30,7 +30,7 @@ class MolliePaymentExtractorTest extends TestCase
         $transaction = $this->createTransaction(new \DateTime(), self::MOLLIE_PAYMENT_METHOD);
         $collection = new OrderTransactionCollection([$transaction]);
         $extractor = new MolliePaymentExtractor();
-        self::assertSame($transaction, $extractor->extractLast($collection));
+        self::assertSame($transaction, $extractor->extractLastMolliePayment($collection));
     }
 
     public function testExtractWithOtherTransactionCollection(): void
@@ -38,7 +38,7 @@ class MolliePaymentExtractorTest extends TestCase
         $transaction = $this->createTransaction(new \DateTime(), 'FooMethod');
         $collection = new OrderTransactionCollection([$transaction]);
         $extractor = new MolliePaymentExtractor();
-        self::assertNull($extractor->extractLast($collection));
+        self::assertNull($extractor->extractLastMolliePayment($collection));
     }
 
     public function testExtractWithMultiTransactionCollection(): void
@@ -52,7 +52,7 @@ class MolliePaymentExtractorTest extends TestCase
         $collection = new OrderTransactionCollection([$transactionTwo, $transactionOne, $transactionThree]);
         $extractor = new MolliePaymentExtractor();
 
-        self::assertSame($transactionOne, $extractor->extractLast($collection));
+        self::assertSame($transactionOne, $extractor->extractLastMolliePayment($collection));
     }
 
     public function testExtractWithMultiLastNotMollieTransactionCollection(): void
@@ -65,7 +65,7 @@ class MolliePaymentExtractorTest extends TestCase
         $transactionOne = $this->createTransaction($yesterday, 'foo');
         $collection = new OrderTransactionCollection([$transactionTwo, $transactionOne, $transactionThree]);
         $extractor = new MolliePaymentExtractor();
-        self::assertNull($extractor->extractLast($collection));
+        self::assertNull($extractor->extractLastMolliePayment($collection));
     }
 
     private function createTransaction(\DateTime $createdAt, ?string $paymentMethodName): OrderTransactionEntity

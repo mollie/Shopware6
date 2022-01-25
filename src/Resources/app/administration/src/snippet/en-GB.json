@@ -15,7 +15,7 @@
     "general": {
       "mainMenuItemGeneral": "Mollie Payments",
       "descriptionTextModule": "Mollie Payments",
-      "btnMollieActions" : "Mollie Actions",
+      "btnMollieActions": "Mollie Actions",
       "refundThroughMollie": "Refund through Mollie",
       "shipThroughMollie": "Ship through Mollie"
     },
@@ -101,7 +101,9 @@
           },
           "modal": {
             "title": "Ship Order",
-            "description": "This action will automatically ship an order through Mollie. The flow sequence will receive the order number, and pass this on to the Mollie API. Successful shipments and failed shipments will be visible in the Mollie log files."
+            "description": "This action will automatically ship an order through Mollie. The flow sequence will receive the order number, and pass this on to the Mollie API. Successful shipments and failed shipments will be visible in the Mollie log files.",
+            "warningConfig": "Please make sure to turn off any additional automation for this type of action to avoid any interferences.\nThe following activated features of this plugin might interfere with this action:",
+            "noWarnings": "No warnings"
           }
         },
         "refundOrder": {
@@ -112,8 +114,12 @@
           "modal": {
             "title": "Refund Order",
             "description": "This action will automatically start a refund through Mollie. The flow sequence will receive the order number, and pass this on to the Mollie API. Successful refunds and failed refunds will be visible in the Mollie log files.",
-            "warning": "Please keep in mind, that refunds might take up to 2 hours to be finalized and visible in the shop. Until then you can always cancel a pending refund either from the order page in Shopware or from the Mollie Dashboard."
+            "warning": "Please keep in mind, that refunds might take up to 2 hours to be finalized and visible in the shop. Until then you can always cancel a pending refund either from the order page in Shopware or from the Mollie Dashboard.",
+            "warningConfig": "Please make sure to turn off any additional automation for this type of action to avoid any interferences."
           }
+        },
+        "warnings": {
+          "automaticShipping": "Automatic shipping in plugin configuration"
         }
       }
     }

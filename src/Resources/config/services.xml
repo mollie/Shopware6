@@ -79,6 +79,7 @@
 
         <service id="Kiener\MolliePayments\Service\SettingsService" class="Kiener\MolliePayments\Service\SettingsService">
             <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
+            <argument type="service" id="sales_channel.repository"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\ShippingMethodService" class="Kiener\MolliePayments\Service\ShippingMethodService">

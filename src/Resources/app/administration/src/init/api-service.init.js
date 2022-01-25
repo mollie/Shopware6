@@ -9,12 +9,16 @@ import MolliePaymentsShippingService from '../core/service/api/mollie-payments-s
 import MolliePaymentsPaymentMethodService from '../core/service/api/mollie-payments-payment-method.service';
 
 // eslint-disable-next-line no-undef
-const { Application } = Shopware;
+const {Application} = Shopware;
 
 Application.addServiceProvider('MolliePaymentsConfigService', (container) => {
     const initContainer = Application.getContainer('init');
 
-    return new MolliePaymentsConfigService(initContainer.httpClient, container.loginService);
+    // get the current locale for our config requests
+    // this is e.g. de-DE, en-GB, ...
+    const currentLocale = Application.getContainer('factory').locale.getLastKnownLocale();
+
+    return new MolliePaymentsConfigService(initContainer.httpClient, container.loginService, currentLocale);
 });
 
 Application.addServiceProvider('MolliePaymentsOrderService', (container) => {

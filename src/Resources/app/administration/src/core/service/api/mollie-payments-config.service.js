@@ -1,11 +1,26 @@
 // eslint-disable-next-line no-undef
 const ApiService = Shopware.Classes.ApiService;
 
-class MolliePaymentsConfigService extends ApiService {
-    constructor(httpClient, loginService, apiEndpoint = 'mollie') {
-        super(httpClient, loginService, apiEndpoint);
+export default class MolliePaymentsConfigService extends ApiService {
+
+
+    /**
+     *
+     * @param httpClient
+     * @param loginService
+     * @param currentLocale
+     */
+    constructor(httpClient, loginService, currentLocale) {
+        super(httpClient, loginService, 'mollie');
+
+        this.currentLocale = currentLocale;
     }
 
+    /**
+     *
+     * @param data
+     * @returns {*}
+     */
     testApiKeys(data = {liveApiKey: null, testApiKey: null}) {
         const headers = this.getBasicHeaders();
 
@@ -21,6 +36,24 @@ class MolliePaymentsConfigService extends ApiService {
                 return ApiService.handleResponse(response);
             });
     }
-}
 
-export default MolliePaymentsConfigService;
+    /**
+     *
+     * @returns {*}
+     */
+    validateFlowBuilder() {
+        return this.httpClient
+            .post(
+                `_action/${this.getApiBasePath()}/config/validate/flowbuilder`,
+                {
+                    locale: this.currentLocale,
+                },
+                {
+                    headers: this.getBasicHeaders(),
+                }
+            ).then((response) => {
+                return ApiService.handleResponse(response);
+            });
+    }
+
+}

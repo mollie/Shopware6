@@ -7,6 +7,10 @@ const {Component} = Shopware;
 Component.register('mollie-payments-flowsequence-action-order-refund-modal', {
     template,
 
+    inject: [
+        'MolliePaymentsConfigService',
+    ],
+
     props: {
         sequence: {
             type: Object,

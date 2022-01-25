@@ -91,6 +91,16 @@
             <label lang="nl-NL">Klanten creëren bij Mollie.</label>
             <defaultValue>true</defaultValue>
         </input-field>
+        <input-field type="bool">
+            <name>automaticShipping</name>
+            <defaultValue>true</defaultValue>
+            <label>Automatic Shipping</label>
+            <label lang="de-DE">Automatischer Versand</label>
+            <label lang="nl-NL">Automatische Verzending</label>
+            <helpText>If enabled, the plugin will automatically trigger a shipment at Mollie when the delivery status transitions to 'shipped'.</helpText>
+            <helpText lang="de-DE">Sofern aktiv, schickt das Plugin automatisch eine Versand Mitteilung an Mollie, sobald der Lieferstatus auf 'verschickt' übergeleitet wird.</helpText>
+            <helpText lang="nl-NL">Indien ingeschakeld, zal de plugin automatisch een verzending activeren bij Mollie wanneer de leveringstatus overgaat naar ‘verzonden’.</helpText>
+        </input-field>
     </card>
     <card>
         <title>Order State Automation</title>
