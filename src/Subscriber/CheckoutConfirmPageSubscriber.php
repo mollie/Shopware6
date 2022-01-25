@@ -6,12 +6,15 @@ use Exception;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\CustomFieldService;
+use Kiener\MolliePayments\Service\Payment\Provider\ActivePaymentMethodsProvider;
+use Kiener\MolliePayments\Service\PaymentMethodService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Method;
 use Mollie\Api\Types\PaymentMethod;
+use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -54,6 +57,10 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
      */
     private $localeRepositoryInterface;
 
+    /**
+     * @var ActivePaymentMethodsProvider
+     */
+    private $activePaymentMethodsProvider;
 
     /**
      * Returns an array of event names this subscriber wants to listen to.
@@ -76,8 +83,11 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CheckoutConfirmPageLoadedEvent::class => 'addDataToPage',
-            AccountEditOrderPageLoadedEvent::class => 'addDataToPage',
+            CheckoutConfirmPageLoadedEvent::class => [
+                ['addDataToPage', 10],
+                ['filterAvailablePaymentMethodsForCheckout', 0],
+            ],
+            AccountEditOrderPageLoadedEvent::class => ['addDataToPage', 10],
         ];
     }
 
@@ -87,13 +97,54 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
      * @param SettingsService $settingsService
      * @param EntityRepositoryInterface $languageRepositoryInterface
      * @param EntityRepositoryInterface $localeRepositoryInterface
+     * @param ActivePaymentMethodsProvider $activePaymentMethodsProvider
      */
-    public function __construct(MollieApiFactory $apiFactory, SettingsService $settingsService, EntityRepositoryInterface $languageRepositoryInterface, EntityRepositoryInterface $localeRepositoryInterface)
-    {
+    public function __construct(
+        MollieApiFactory $apiFactory,
+        SettingsService $settingsService,
+        EntityRepositoryInterface $languageRepositoryInterface,
+        EntityRepositoryInterface $localeRepositoryInterface,
+        ActivePaymentMethodsProvider $activePaymentMethodsProvider
+    ) {
         $this->apiFactory = $apiFactory;
         $this->settingsService = $settingsService;
         $this->languageRepositoryInterface = $languageRepositoryInterface;
         $this->localeRepositoryInterface = $localeRepositoryInterface;
+        $this->activePaymentMethodsProvider = $activePaymentMethodsProvider;
+    }
+
+    /**
+     * @param CheckoutConfirmPageLoadedEvent $args
+     * @return void
+     */
+    public function filterAvailablePaymentMethodsForCheckout(CheckoutConfirmPageLoadedEvent $args): void
+    {
+        $cart = $args->getPage()->getCart();
+        $currency = $args->getSalesChannelContext()->getCurrency()->getIsoCode();
+        $salesChannel = $args->getSalesChannelContext()->getSalesChannel();
+        $paymentMethods = $args->getPage()->getPaymentMethods();
+
+        $activeMethods = $this->activePaymentMethodsProvider->getActivePaymentMethodsForAmount(
+            $cart,
+            $currency,
+            [$salesChannel]
+        );
+
+        $activeMethodIds = array_filter($activeMethods, static function(Method $method) {
+            return $method->id;
+        });
+
+        file_put_contents(__DIR__ . '/active-ids.txt', print_r($activeMethodIds, true));
+
+        $filteredPaymentMethods = $paymentMethods->filter(static function(PaymentMethodEntity $paymentMethod) use ($activeMethodIds) {
+            $id = constant($paymentMethod->getHandlerIdentifier() . '::PAYMENT_METHOD_NAME') ?? '';
+
+            file_put_contents(__DIR__ . '/method-id.txt', $id . "\n", FILE_APPEND);
+
+            return empty($id) || in_array($id, $activeMethodIds, true);
+        });
+
+        $args->getPage()->setPaymentMethods($filteredPaymentMethods);
     }
 
     /**
