@@ -43,6 +43,14 @@
             <label lang="nl-NL">Debug Modus</label>
             <defaultValue>false</defaultValue>
         </input-field>
+        <input-field type="bool">
+            <name>useMolliePaymentMethodLimits</name>
+
+            <label>Use Mollie's Payment Method Limits</label>
+            <label lang="de-DE">Mollies Limits für Zahlungsarten verwenden</label>
+            <label lang="nl-NL">Mollie's limieten voor betaalmethoden gebruiken</label>
+            <defaultValue>false</defaultValue>
+        </input-field>
         <component name="mollie-update-payment-methods">
             <name>mollieUpdatePaymentMethodsButton</name>
         </component>

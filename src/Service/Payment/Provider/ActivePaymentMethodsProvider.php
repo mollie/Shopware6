@@ -19,6 +19,8 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
     private $logger;
 
     /**
+     * Creates a new instance of this class.
+     *
      * @param MollieApiFactory $mollieApiFactory
      * @param MollieLogger $logger
      */
@@ -29,6 +31,8 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
     }
 
     /**
+     * Returns an array of active payment methods.
+     *
      * @param array<array|scalar> $parameters
      * @param array<SalesChannelEntity> $salesChannels
      * @return array<Method>
@@ -64,12 +68,13 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
             }
 
             $handledIds[] = $method->id;
-
             return true;
         });
     }
 
     /**
+     * Returns an array of active payment methods for a given amount in a specific sales channel.
+     *
      * @param Cart $cart
      * @param string $currency
      * @param array<SalesChannelEntity> $salesChannels
@@ -86,6 +91,8 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
     }
 
     /**
+     * Returns an array of active payment methods for a specific sales channel.
+     *
      * @param SalesChannelEntity $salesChannel
      * @param array $parameters
      * @return array<Method>

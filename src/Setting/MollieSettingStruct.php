@@ -53,6 +53,11 @@ class MollieSettingStruct extends Struct
     /**
      * @var bool
      */
+    protected $useMolliePaymentMethodLimits = false;
+
+    /**
+     * @var bool
+     */
     protected $shopwareFailedPayment = false;
 
     /**
@@ -236,6 +241,24 @@ class MollieSettingStruct extends Struct
     public function setDebugMode(bool $debugMode): self
     {
         $this->debugMode = $debugMode;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getUseMolliePaymentMethodLimits(): bool
+    {
+        return (bool) $this->useMolliePaymentMethodLimits;
+    }
+
+    /**
+     * @param bool $useMolliePaymentMethodLimits
+     * @return self
+     */
+    public function setUseMolliePaymentMethodLimits(bool $useMolliePaymentMethodLimits): self
+    {
+        $this->useMolliePaymentMethodLimits = $useMolliePaymentMethodLimits;
         return $this;
     }
 

@@ -120,26 +120,35 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
      */
     public function filterAvailablePaymentMethodsForCheckout(CheckoutConfirmPageLoadedEvent $args): void
     {
+        $settings = $this->settingsService->getSettings($args->getSalesChannelContext()->getSalesChannelId());
+
+        if (!$settings->getUseMolliePaymentMethodLimits()) {
+            return;
+        }
+
         $cart = $args->getPage()->getCart();
         $currency = $args->getSalesChannelContext()->getCurrency()->getIsoCode();
         $salesChannel = $args->getSalesChannelContext()->getSalesChannel();
         $paymentMethods = $args->getPage()->getPaymentMethods();
 
+        # get the active and available payment methods for the current checkout conditions
         $activeMethods = $this->activePaymentMethodsProvider->getActivePaymentMethodsForAmount(
             $cart,
             $currency,
             [$salesChannel]
         );
 
-        $activeMethodIds = [];
+        # get the ids for all active and available payment methods
+        $activeMethodIds = array_map(static function ($method) {
+            return $method->id;
+        }, $activeMethods);
 
-        foreach ($activeMethods as $activeMethod) {
-            if (!in_array($activeMethod->id, $activeMethodIds, true)) {
-                $activeMethodIds[] = $activeMethod->id;
-            }
-        }
-
+        # filter payment methods on the checkout page based on the ids of the active and available payment methods
         $filteredPaymentMethods = $paymentMethods->filter(static function(PaymentMethodEntity $paymentMethod) use ($activeMethodIds) {
+            if (stripos($paymentMethod->getHandlerIdentifier(), 'MolliePayments') === false) {
+                return true;
+            }
+
             try {
                 $id = constant($paymentMethod->getHandlerIdentifier() . '::PAYMENT_METHOD_NAME') ?? '';
             } catch (Throwable $exception) {
