@@ -33,7 +33,7 @@ class OrderRepository
         $this->repoOrders->update([
             [
                 'id' => $orderId,
-                'lastUpdated' => new \DateTime(),
+                'updatedAt' => new \DateTime(),
             ]
         ], $context);
     }
