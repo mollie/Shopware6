@@ -286,6 +286,20 @@ But please stick with the used `Keyword-Driven` Design Pattern with Actions and 
 We try to avoid selectors and unstable click-routes directly within a test!
 
 
+### Swagger API
+If you want to use or test the API, then we have provided an easy to use Swagger setup for you.
+Just use the integrated Swagger configuration.
+The file contains all important requests that might be used and tested with the Mollie plugin.
+
+You can simply start the Docker containers using the makefile in the folder tests/Swagger.
+This creates a Docker container that can be reached with `http://localhost:8080`.
+
+Additional instructions are available on this Swagger page that should be available now.
+
+```ruby 
+make run
+```
+
 
 ## Pull Requests
 

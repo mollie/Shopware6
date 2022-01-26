@@ -1,0 +1,143 @@
+openapi: "3.0.0"
+
+info:
+  title: "Mollie Shopware Plugin API"
+  description: "This is a Swagger Template for all uses cases of the Mollie plugin.<br /><br />Instructions:<ol><li>Configure the correct server domain, where your Shopware API ist available.</li><li>Then use the authorize request for Shopware to retrieve an Access-Token. Use the default credentials or just enter your custom credentials.</li><li>Just copy the Access-Token and use it in the global authorize section above the request list.</li></ol><br />Congratulations, you can now use the API requests."
+
+servers:
+  - url: /
+  - url: '{custom}'
+  - url: http://localhost
+  - url: https://localhost
+    variables:
+      custom:
+        default: https://localhost
+
+externalDocs:
+  description: "Find out more about Mollie Shopware"
+  url: "https://github.com/mollie/Shopware6/wiki"
+
+paths:
+
+  /api/oauth/token:
+    post:
+      tags:
+        - "Authorization"
+      summary: "Shopware API Authorization"
+      requestBody:
+          content:
+            application/json:
+              schema:
+                  type: object
+                  properties:
+                    grant_type:
+                      default: "password"
+                    client_id:
+                      default: "administration"
+                    scopes:
+                      default: "write"
+                    username:
+                      default: "admin"
+                    password:
+                      default: "shopware"
+      responses:
+        "200":
+          description: "successful operation"
+
+  /api/mollie/ship/order?number={number}:
+    get:
+      tags:
+        - "Shipping"
+      summary: "Full shipment"
+      security:
+        - AdminAPI: []
+      parameters:
+        - name: "number"
+          in: "path"
+          description: "Shopware order number"
+          required: true
+      responses:
+          "200":
+            description: "successful operation"
+
+  /api/mollie/ship/item?order={order}&item={item}&quantity={quantity}:
+      get:
+        tags:
+          - "Shipping"
+        summary: "Partial shipment"
+        security:
+          - AdminAPI: []
+        parameters:
+          - name: "order"
+            in: "path"
+            description: "Shopware order number"
+            required: true
+          - name: "item"
+            in: "path"
+            description: "product number"
+          - name: "quantity"
+            in: "path"
+            description: "quantity"
+        responses:
+          "200":
+            description: "successful operation"
+
+  /api/mollie/refund/order?number={number}&amount={amount}&description={description}:
+    get:
+      tags:
+        - "Refunds"
+      summary: "Full and partial refund"
+      security:
+        - AdminAPI: []
+      parameters:
+        - name: "number"
+          in: "path"
+          description: "Shopware order number"
+          required: true
+        - name: "amount"
+          in: "path"
+          description: "(optional) partial amount"
+        - name: "description"
+          in: "path"
+          description: "(optional) custom description"
+      responses:
+        "200":
+          description: "successful operation"
+
+
+  /api/search/order:
+    post:
+      tags:
+        - "Shopware Order"
+      summary: "Search for an order number"
+      description: "Please insert your order number in the POST body."
+      security:
+        - AdminAPI: []
+      requestBody:
+          content:
+            application/json:
+              schema:
+                  type: object
+                  properties:
+                    filter:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                            field:
+                              default: "orderNumber"
+                            type:
+                              default: "equals"
+                            value:
+                              default: "##insert-number##"
+
+      responses:
+        "200":
+          description: "successful operation"
+
+components:
+  securitySchemes:
+    AdminAPI:
+      type: apiKey
+      in: header
+      name: Authorization
