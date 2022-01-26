@@ -6,9 +6,9 @@ info:
 
 servers:
   - url: /
-  - url: '{custom}'
-  - url: http://localhost
   - url: https://localhost
+  - url: http://localhost
+  - url: '{custom}'
     variables:
       custom:
         default: https://localhost
