@@ -48,26 +48,10 @@ Component.register('mollie-update-payment-methods', {
 
         startUpdatePaymentMethod() {
             this.updatePaymentMethodsIsLoading = true;
-
-            const button = this.$refs.updatePaymentMethodsButton;
-
-            if (!button) {
-                return;
-            }
-
-            button.disabled = true;
         },
 
         updatePaymentMethodsIsDone() {
             this.updatePaymentMethodsIsLoading = false;
-
-            const button = this.$refs.updatePaymentMethodsButton;
-
-            if (!button) {
-                return;
-            }
-
-            button.disabled = false;
         },
     },
 });
