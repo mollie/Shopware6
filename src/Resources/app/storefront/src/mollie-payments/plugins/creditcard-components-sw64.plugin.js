@@ -1,5 +1,7 @@
 import Plugin from 'src/plugin-system/plugin.class';
 import DomAccess from 'src/helper/dom-access.helper';
+import HttpClient from '../services/HttpClient'
+import DeviceDetection from 'src/helper/device-detection.helper';
 
 
 export default class MollieCreditCardComponentsSw64 extends Plugin {
@@ -21,6 +23,8 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
         } catch (e) {
             return;
         }
+
+        this.client = new HttpClient();
 
         this._cleanUpExistingElement();
         this._fixShopUrl();
@@ -187,15 +191,24 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
         element.classList.toggle('is-focused', isFocused);
     }
 
+    /**
+     *
+     * @param event
+     * @returns {Promise<void>}
+     */
     async submitForm(event) {
+
         event.preventDefault();
+
+        const me = this;
+        const paymentForm = this._confirmForm;
 
         const creditCardRadioInput = document.querySelector(`${this.getSelectors().creditCardRadioInput}[value="${this.options.paymentId}"]`);
 
         // check if we have any credit card forms or elements visible
         // if not, we just continue with standard
         if ((creditCardRadioInput === undefined || creditCardRadioInput === null || creditCardRadioInput.checked === false) && !!this._confirmForm) {
-            this._confirmForm.submit();
+            this.continueCheckout(paymentForm);
             return;
         }
 
@@ -203,7 +216,7 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
         // activated the credit card payment method
         // then also continue with standard
         if (!!creditCardRadioInput && creditCardRadioInput.checked === false) {
-            this._confirmForm.submit();
+            this.continueCheckout(paymentForm);
             return;
         }
 
@@ -221,27 +234,47 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
             return;
         }
 
-        
-        const paymentForm = this._confirmForm;
 
         // now we finish by first calling our URL to store
         // the credit card token for the user and the current checkout
         // and then we continue by submitting our original payment form.
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', this.options.shopUrl + '/mollie/components/store-card-token/' + this.options.customerId + '/' + token);
-        xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+        this.client.get(
+            me.options.shopUrl + '/mollie/components/store-card-token/' + me.options.customerId + '/' + token,
+            function () {
+                me.continueCheckout(paymentForm);
+            },
+            function () {
+                me.continueCheckout(paymentForm);
+            },
+            'application/json; charset=utf-8'
+        );
+    }
 
-        xhr.onload = function () {
-            const tokenInput = document.getElementById('cardToken');
-            tokenInput.setAttribute('value', token);
-            paymentForm.submit();
-        };
+    /**
+     * In IE we have to add the TOS checkbox to the form
+     * when starting it from Javascript.
+     * the original TOS is based on form-associations which do not work in IE.
+     * So we just grab the value and pass it as hidden form so that
+     * Shopware will receive it.
+     *
+     * @param form
+     */
+    continueCheckout(form) {
 
-        xhr.onerror = function () {
-            paymentForm.submit();
-        };
+        if (DeviceDetection.isIEBrowser()) {
+            const createField = function (name, val) {
+                return $('<input>', {
+                    type: 'checkbox',
+                    name: name,
+                    checked: val,
+                    style: 'display: none;',
+                });
+            };
 
-        xhr.send();
+            createField('tos', document.getElementById('tos').checked).appendTo(form);
+        }
+
+        form.submit();
     }
 
 }
