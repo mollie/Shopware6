@@ -1,10 +1,34 @@
-<sw-container columns="1fr" justify="start">
-    <sw-text-field v-model="tracking.carrier"
-                   :label="$tc('mollie-payments.modals.shipping.tracking.carrier')"
-                   required />
-    <sw-text-field v-model="tracking.code"
-                   :label="$tc('mollie-payments.modals.shipping.tracking.code')"
-                   required />
-    <sw-text-field v-model="tracking.url"
-                   :label="$tc('mollie-payments.modals.shipping.tracking.url')" />
-</sw-container>
+{% block mollie_tracking_info %}
+    <sw-container>
+        <sw-base-field v-if="delivery.trackingCodes.length > 0"
+                       :label="$tc('mollie-payments.modals.shipping.availableTracking.label')">
+            <template #sw-field-input>
+                <sw-button
+                    v-for="trackingCode in delivery.trackingCodes"
+                    :key="trackingCode"
+                    class="mollie-tracking-info__tracking-code-button"
+                    size="x-small"
+                    @click="prefillTrackingInfo(trackingCode, delivery.shippingMethod)"
+                >{{ trackingCode }}</sw-button>
+            </template>
+
+            <template #hint>
+                {{ $tc('mollie-payments.modals.shipping.availableTracking.hint') }}
+            </template>
+        </sw-base-field>
+
+        <sw-container columns="1fr" justify="start" gap="16px">
+            <sw-text-field v-model="tracking.carrier"
+                           :label="$tc('mollie-payments.modals.shipping.tracking.carrier')"
+                           size="medium"
+                           required/>
+            <sw-text-field v-model="tracking.code"
+                           :label="$tc('mollie-payments.modals.shipping.tracking.code')"
+                           size="medium"
+                           required/>
+            <sw-text-field v-model="tracking.url"
+                           size="medium"
+                           :label="$tc('mollie-payments.modals.shipping.tracking.url')"/>
+        </sw-container>
+    </sw-container>
+{% endblock %}

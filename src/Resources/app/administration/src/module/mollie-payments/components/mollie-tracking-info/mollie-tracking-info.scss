@@ -1,0 +1,9 @@
+.mollie-tracking-info {
+    &__tracking-code-button {
+        margin-bottom: 0.25rem;
+
+        &:not(:last-child) {
+            margin-right: 0.25rem;
+        }
+    }
+}
