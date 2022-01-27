@@ -82,6 +82,10 @@
           "itemHeader": "Artikel",
           "quantityHeader": "Menge"
         },
+        "availableTracking": {
+          "label": "Verfügbare Tracking-Codes",
+          "hint": "Klicken Sie auf einen dieser Tracking-Codes, um alle Daten automatisch auszufüllen."
+        },
         "showTracking": "Tracking-Informationen für diese Sendung hinzufügen",
         "tracking": {
           "carrier": "Spediteur",
