@@ -82,6 +82,10 @@
           "itemHeader": "Item",
           "quantityHeader": "Quantity"
         },
+        "availableTracking": {
+          "label": "Available tracking codes",
+          "hint": "Click one of these tracking codes to automatically fill in all data."
+        },
         "showTracking": "Add tracking info for this shipment",
         "tracking": {
           "carrier": "Carrier",

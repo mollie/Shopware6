@@ -82,6 +82,10 @@
           "itemHeader": "Product",
           "quantityHeader": "Aantal"
         },
+        "availableTracking": {
+          "label": "Beschikbare tracking codes",
+          "hint": "Klik op een van deze tracking codes om automatisch alle gegevens in te vullen."
+        },
         "showTracking": "Voeg tracking info toe aan deze zending",
         "tracking": {
           "carrier": "Carrier",
