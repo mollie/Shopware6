@@ -150,7 +150,11 @@ Component.override('sw-order-line-items-grid', {
 
     methods: {
         createdComponent() {
-            this.getShippingStatus();
+            // Do not attempt to load the shipping status if this isn't a Mollie order,
+            // or it will trigger an exception in the API.
+            if(this.isMollieOrder){
+                this.getShippingStatus();
+            }
         },
 
         //==== Refunds ==============================================================================================//
