@@ -1,6 +1,10 @@
 import Plugin from 'src/plugin-system/plugin.class';
+import HttpClient from '../services/HttpClient'
+
 
 export default class MollieIDealIssuer extends Plugin {
+
+    _client = null;
 
     _shopUrl = '';
     _customerId = '';
@@ -24,6 +28,8 @@ export default class MollieIDealIssuer extends Plugin {
         if (this._container === undefined || this._container === null) {
             return;
         }
+
+        this._client = new HttpClient();
 
         // load our controls
         // and register the necessary events
@@ -167,19 +173,16 @@ export default class MollieIDealIssuer extends Plugin {
             return;
         }
 
-        const fetchUrl = shopUrl + '/mollie/ideal/store-issuer/' + customerId + '/' + issuersDropdown.value;
-
-        fetch(
-            fetchUrl,
-            {
-                headers: {'Content-Type': 'application/json; charset=utf-8'},
-            })
-            .then(() => {
+        this._client.get(
+            shopUrl + '/mollie/ideal/store-issuer/' + customerId + '/' + issuersDropdown.value,
+            function () {
                 onCompleted('issuer updated successfully');
-            })
-            .catch(() => {
+            },
+            function () {
                 onCompleted('error when updating issuer');
-            });
+            },
+            'application/json; charset=utf-8'
+        );
     }
 
 }
