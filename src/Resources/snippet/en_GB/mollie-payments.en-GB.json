@@ -32,7 +32,8 @@
   },
   "mollie-subscriptions": {
     "product": {
-      "information": "Subscription product"
+      "information": "Subscription product",
+      "addToCartText": "Subscribe"
     },
     "options": {
       "everyDay": "Every day",

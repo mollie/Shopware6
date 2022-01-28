@@ -81,6 +81,7 @@
                                 <button class="btn btn-block btn-buy"
                                         title="{{ config('MolliePayments.config.addToCartText') }}">
                                     {{ config('MolliePayments.config.addToCartText') }}
+                                    {% if config('MolliePayments.config.addToCartText') is empty %} {{ "mollie-subscriptions.product.addToCartText"|trans|sw_sanitize }} {% endif %}
                                 </button>
                             {% else %}
                                 <button class="btn btn-block btn-buy"

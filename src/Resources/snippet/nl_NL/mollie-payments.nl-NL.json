@@ -32,7 +32,8 @@
   },
   "mollie-subscriptions": {
     "product": {
-      "information": "Abonnement product"
+      "information": "Abonnement product",
+      "addToCartText": "Abonneren"
     },
     "options": {
       "everyDay": "Elke dag",

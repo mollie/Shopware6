@@ -76,7 +76,7 @@ class SubscriptionOptions
             $this->customFields = $payload['customFields'];
 
             if (!isset($this->customFields["mollie_subscription"])
-                && !$this->customFields["mollie_subscription"]['mollie_subscription_product']) {
+                || !$this->customFields["mollie_subscription"]['mollie_subscription_product']) {
                 continue;
             }
 

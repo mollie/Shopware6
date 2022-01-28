@@ -15,13 +15,14 @@ use Symfony\Component\HttpFoundation\Request;
 class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
 {
     public const ALLOWED_METHODS = [
-        'bancontact',
         'ideal',
+        'bancontact',
         'sofort',
-        'belfius',
-        'kbc',
-        'giropay',
         'eps',
+        'giropay',
+        'belfius',
+        'creditcard',
+        'paypal',
     ];
 
     /**
