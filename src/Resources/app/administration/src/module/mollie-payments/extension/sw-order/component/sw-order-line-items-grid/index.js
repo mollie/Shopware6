@@ -152,7 +152,7 @@ Component.override('sw-order-line-items-grid', {
         createdComponent() {
             // Do not attempt to load the shipping status if this isn't a Mollie order,
             // or it will trigger an exception in the API.
-            if(this.isMollieOrder){
+            if (this.isMollieOrder) {
                 this.getShippingStatus();
             }
         },
@@ -257,6 +257,8 @@ Component.override('sw-order-line-items-grid', {
 
         onOpenShipOrderModal() {
             this.showShipOrderModal = true;
+
+            this.updateTrackingPrefilling();
         },
 
         onCloseShipOrderModal() {
@@ -297,6 +299,8 @@ Component.override('sw-order-line-items-grid', {
 
         onOpenShipItemModal(item) {
             this.showShipItemModal = item.id;
+
+            this.updateTrackingPrefilling();
         },
 
         onCloseShipItemModal() {
@@ -373,6 +377,18 @@ Component.override('sw-order-line-items-grid', {
         },
 
         //==== Tracking =============================================================================================//
+
+        updateTrackingPrefilling() {
+            // if we have at least 1 tracking code in the order
+            // then try to prefill our tracking information
+            // also automatically enable the tracking data (it can be turned off again by the merchant)
+            if (this.order.deliveries.length) {
+                const delivery = this.order.deliveries.first();
+                this.showTrackingInfo = (delivery.trackingCodes.length >= 1);
+            } else {
+                this.showTrackingInfo = false;
+            }
+        },
 
         resetTracking() {
             this.showTrackingInfo = false;
