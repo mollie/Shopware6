@@ -198,17 +198,15 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
      */
     async submitForm(event) {
 
-        event.preventDefault();
-
         const me = this;
         const paymentForm = this._confirmForm;
+
 
         const creditCardRadioInput = document.querySelector(`${this.getSelectors().creditCardRadioInput}[value="${this.options.paymentId}"]`);
 
         // check if we have any credit card forms or elements visible
         // if not, we just continue with standard
         if ((creditCardRadioInput === undefined || creditCardRadioInput === null || creditCardRadioInput.checked === false) && !!this._confirmForm) {
-            this.continueCheckout(paymentForm);
             return;
         }
 
@@ -216,9 +214,16 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
         // activated the credit card payment method
         // then also continue with standard
         if (!!creditCardRadioInput && creditCardRadioInput.checked === false) {
-            this.continueCheckout(paymentForm);
             return;
         }
+
+        // MOLLIE CREDIT CARD IS USED
+        // ---------------------------------------------------------------------------------------------
+
+        // as soon as we know that it's just "us"
+        // then we prevent the default behaviour and
+        // inject our own flow
+        event.preventDefault();
 
 
         // Reset possible form errors
@@ -231,9 +236,9 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
         if (error) {
             verificationErrors.textContent = error.message;
             this._reactivateFormSubmit();
+            verificationErrors.scrollIntoView();
             return;
         }
-
 
         // now we finish by first calling our URL to store
         // the credit card token for the user and the current checkout
@@ -241,14 +246,15 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
         this.client.get(
             me.options.shopUrl + '/mollie/components/store-card-token/' + me.options.customerId + '/' + token,
             function () {
-                me.continueCheckout(paymentForm);
+                me.continueShopwareCheckout(paymentForm);
             },
             function () {
-                me.continueCheckout(paymentForm);
+                me.continueShopwareCheckout(paymentForm);
             },
             'application/json; charset=utf-8'
         );
     }
+
 
     /**
      * In IE we have to add the TOS checkbox to the form
@@ -259,7 +265,7 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
      *
      * @param form
      */
-    continueCheckout(form) {
+    continueShopwareCheckout(form) {
 
         if (DeviceDetection.isIEBrowser()) {
             const createField = function (name, val) {
