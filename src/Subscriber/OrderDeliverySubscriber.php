@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Subscriber;
 
 use Kiener\MolliePayments\Facade\MollieShipment;
 use Kiener\MolliePayments\Service\SettingsService;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Shopware\Core\System\StateMachine\Event\StateMachineStateChangeEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -22,13 +23,21 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
     private $mollieShipment;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+
+    /**
      * @param SettingsService $settings
      * @param MollieShipment $mollieShipment
+     * @param LoggerInterface $logger
      */
-    public function __construct(SettingsService $settings, MollieShipment $mollieShipment)
+    public function __construct(SettingsService $settings, MollieShipment $mollieShipment, LoggerInterface $logger)
     {
         $this->settings = $settings;
         $this->mollieShipment = $mollieShipment;
+        $this->logger = $logger;
     }
 
     /**
@@ -58,12 +67,16 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
 
         # get the configuration of the sales channel from the order
         $configSalesChannel = $this->settings->getSettings($event->getSalesChannelId());
+        
 
         # if we don't even configure automatic shipping
         # then don't even look into our order to find out if we should actually starts
         if (!$configSalesChannel->getAutomaticShipping()) {
+            $this->logger->info('skipping automatic shipping');
             return;
         }
+
+        $this->logger->info('automatic shipping ON');
 
         $isMolliePayment = $this->mollieShipment->isMolliePayment($event->getTransition()->getEntityId(), $event->getContext());
 
