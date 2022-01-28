@@ -93,29 +93,29 @@ class MollieShipment implements MollieShipmentInterface
      *
      * @param string $orderDeliveryId
      * @param Context $context
-     * @return bool
+     * @return OrderEntity|null
      */
-    public function isMolliePayment(string $orderDeliveryId, Context $context): bool
+    public function isMollieOrder(string $orderDeliveryId, Context $context): ?OrderEntity
     {
         $delivery = $this->orderDeliveryService->getDelivery($orderDeliveryId, $context);
 
         if (!$delivery instanceof OrderDeliveryEntity) {
-            return false;
+            return null;
         }
 
         $order = $delivery->getOrder();
 
         if (!$order instanceof OrderEntity) {
-            return false;
+            return null;
         }
 
         $lastTransaction = $this->extractor->extractLastMolliePayment($order->getTransactions());
 
         if (!$lastTransaction instanceof OrderTransactionEntity) {
-            return false;
+            return null;
         }
 
-        return true;
+        return $order;
     }
 
     /**

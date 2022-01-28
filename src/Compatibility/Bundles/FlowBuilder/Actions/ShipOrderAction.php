@@ -108,7 +108,7 @@ class ShipOrderAction extends FlowAction
 
             $orderNumber = $order->getOrderNumber();
 
-            $this->logger->debug('Starting Shipment through Flow Builder Action for order: ' . $orderNumber);
+            $this->logger->info('Starting Shipment through Flow Builder Action for order: ' . $orderNumber);
 
             $this->shipmentFacade->shipOrder(
                 $order,

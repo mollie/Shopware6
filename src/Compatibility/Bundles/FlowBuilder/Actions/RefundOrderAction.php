@@ -106,7 +106,7 @@ class RefundOrderAction extends FlowAction
 
             $orderNumber = $order->getOrderNumber();
 
-            $this->logger->debug('Starting Refund through Flow Builder Action for order: ' . $orderNumber);
+            $this->logger->info('Starting Refund through Flow Builder Action for order: ' . $orderNumber);
 
             $this->refundService->refundFullOrder(
                 $order,
