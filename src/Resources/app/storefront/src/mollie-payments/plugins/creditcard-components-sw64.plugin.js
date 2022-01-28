@@ -271,7 +271,13 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
                 });
             };
 
-            createField('tos', document.getElementById('tos').checked).appendTo(form);
+            const checkTOS = document.getElementById('tos');
+
+            // we might not always have the TOS checkbox (editOrder)
+            // but if we have it, we have to add it again
+            if (checkTOS !== undefined && checkTOS !== null) {
+                createField('tos', checkTOS.checked).appendTo(form);
+            }
         }
 
         form.submit();
