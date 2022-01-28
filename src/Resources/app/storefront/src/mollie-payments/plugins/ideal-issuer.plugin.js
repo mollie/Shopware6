@@ -4,8 +4,6 @@ import HttpClient from '../services/HttpClient'
 
 export default class MollieIDealIssuer extends Plugin {
 
-    _client = null;
-
     _shopUrl = '';
     _customerId = '';
 
@@ -29,7 +27,6 @@ export default class MollieIDealIssuer extends Plugin {
             return;
         }
 
-        this._client = new HttpClient();
 
         // load our controls
         // and register the necessary events
@@ -173,7 +170,9 @@ export default class MollieIDealIssuer extends Plugin {
             return;
         }
 
-        this._client.get(
+        const client = new HttpClient();
+
+        client.get(
             shopUrl + '/mollie/ideal/store-issuer/' + customerId + '/' + issuersDropdown.value,
             function () {
                 onCompleted('issuer updated successfully');
