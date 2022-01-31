@@ -1,17 +1,20 @@
 {
   "name": "kiener/mollie-payments-plugin",
   "description": "Mollie Payments",
-  "version": "v1.5.8",
+  "version": "v2.0.0",
   "type": "shopware-platform-plugin",
   "license": "MIT",
   "authors": [
+    {
+      "name": "dasistweb GmbH"
+    },
     {
       "name": "Kiener Digital Commerce"
     }
   ],
   "extra": {
     "shopware-plugin-class": "Kiener\\MolliePayments\\MolliePayments",
-    "copyright": "(c) by Kiener Digital Commerce",
+    "copyright": "(c) by Mollie B.V.",
     "label": {
       "de-DE": "Mollie Zahlungen",
       "en-GB": "Mollie Payments",
@@ -57,7 +60,7 @@
     "shopware/administration": "<6,>=7"
   },
   "require": {
-    "mollie/mollie-api-php": "^2.39"
+    "mollie/mollie-api-php": "2.40.1"
   },
   "require-dev": {
     "shopware/core": "*",
