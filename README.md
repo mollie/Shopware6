@@ -28,5 +28,5 @@ To finalize the installation you need to enter your API key in the corresponding
 
 Also make sure to assign the payment methods to your sales channels, or they won't show up.
 
-## Wiki
+## Wiki Documentation
 Read more about the plugin configuration on [our Wiki](https://github.com/mollie/Shopware6/wiki).
