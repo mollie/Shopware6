@@ -140,17 +140,53 @@
 
                 <sw-number-field
                         :min="0"
-                        :max="remainingAmount"
                         v-model="refundAmount"
                         numberType="float"
                         size="medium"
-                        :step="1">
+                        :step="1"
+                        :isInvalid="refundAmountHigherThanMollieThreshold">
                     <template #suffix>
                         {{ order.currency.symbol }}
                     </template>
                 </sw-number-field>
             </sw-container>
         </sw-container>
+
+        <sw-alert variant="warning" v-if="refundAmountHigherThanOrderThreshold">
+            {{ $tc('mollie-payments.modals.refund.warning.orderThreshold', 0, {
+                orderMaximum : currency(orderRefundAmount, order.currency.shortName),
+                mollieMaximum : currency(remainingAmount, order.currency.shortName),
+                refundAmount : currency(refundAmount, order.currency.shortName),
+            }) }}
+            <template #actions>
+                <sw-button @click="setRefundAmount(orderRefundAmount)">
+                    {{ $tc('mollie-payments.modals.refund.warning.refundAmountButton', 0, {
+                        amount: currency(orderRefundAmount, order.currency.shortName)
+                    }) }}
+                </sw-button>
+            </template>
+        </sw-alert>
+
+        <sw-alert variant="error" v-if="refundAmountHigherThanMollieThreshold">
+            {{ $tc('mollie-payments.modals.refund.warning.mollieThreshold', 0, {
+                orderMaximum : currency(orderRefundAmount, order.currency.shortName),
+                mollieMaximum : currency(remainingAmount, order.currency.shortName),
+                refundAmount : currency(refundAmount, order.currency.shortName),
+            }) }}
+            <template #actions>
+                <sw-button @click="setRefundAmount(orderRefundAmount)">
+                    {{ $tc('mollie-payments.modals.refund.warning.refundAmountButton', 0, {
+                        amount: currency(orderRefundAmount, order.currency.shortName)
+                    }) }}
+                </sw-button>
+                <sw-button v-if="remainingAmount > orderRefundAmount"
+                           @click="setRefundAmount(remainingAmount)">
+                    {{ $tc('mollie-payments.modals.refund.warning.refundAmountButton', 0, {
+                        amount: currency(remainingAmount, order.currency.shortName)
+                    }) }}
+                </sw-button>
+            </template>
+        </sw-alert>
 
         <template #modal-footer>
             <sw-button @click="onCloseRefundModal"
