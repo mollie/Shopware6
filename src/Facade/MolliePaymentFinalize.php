@@ -15,6 +15,7 @@ use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
 use Kiener\MolliePayments\Struct\OrderTransaction\OrderTransactionAttributes;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Exceptions\IncompatiblePlatform;
+use Mollie\Api\Resources\Payment;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\Exception\AsyncPaymentFinalizeException;
@@ -158,31 +159,41 @@ class MolliePaymentFinalize
      */
     private function updateCustomField(OrderEntity $order, string $mollieOrderID, MollieOrderCustomFieldsStruct $customFieldsStruct, AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $scContext)
     {
-        // Add the transaction ID to the order's custom fields
-        // We might need this later on for reconciliation
-        $molliePayment = $this->mollieOrderService->getCompletedPayment(
-            $mollieOrderID,
-            $scContext->getSalesChannel()->getId()
-        );
+        $molliePayment = null;
 
+        try {
+
+            // Add the transaction ID to the order's custom fields
+            // We might need this later on for reconciliation
+            $molliePayment = $this->mollieOrderService->getCompletedPayment($mollieOrderID, $scContext->getSalesChannel()->getId());
+
+        } catch (PaymentNotFoundException $ex) {
+            # some orders like OPEN bank transfer have no completed payments
+            # so this is a usual case, where we just need to skip this process
+        }
 
         $thirdPartyPaymentId = '';
+        $molliePaymentID = '';
 
-        # check if we have a PayPal reference
-        if (isset($molliePayment->details, $molliePayment->details->paypalReference)) {
-            $thirdPartyPaymentId = $molliePayment->details->paypalReference;
+        if ($molliePayment instanceof Payment) {
+
+            $molliePaymentID = $molliePayment->id;
+
+            # check if we have a PayPal reference
+            if (isset($molliePayment->details, $molliePayment->details->paypalReference)) {
+                $thirdPartyPaymentId = $molliePayment->details->paypalReference;
+            }
+
+            # check if we have a Bank Transfer reference
+            if (isset($molliePayment->details, $molliePayment->details->transferReference)) {
+                $thirdPartyPaymentId = $molliePayment->details->transferReference;
+            }
         }
-
-        # check if we have a Bank Transfer reference
-        if (isset($molliePayment->details, $molliePayment->details->transferReference)) {
-            $thirdPartyPaymentId = $molliePayment->details->transferReference;
-        }
-
 
         # ----------------------------------
         # Update Order Custom Fields
 
-        $customFieldsStruct->setMolliePaymentId($molliePayment->id);
+        $customFieldsStruct->setMolliePaymentId($molliePaymentID);
         $customFieldsStruct->setThirdPartyPaymentId($thirdPartyPaymentId);
 
         $this->updateOrderCustomFields->updateOrder(
@@ -196,7 +207,7 @@ class MolliePaymentFinalize
         // Add the transaction and order IDs to the order's transaction custom fields
         $orderTransactionCustomFields = new OrderTransactionAttributes();
         $orderTransactionCustomFields->setMollieOrderId($customFieldsStruct->getMollieOrderId());
-        $orderTransactionCustomFields->setMolliePaymentId($molliePayment->id);
+        $orderTransactionCustomFields->setMolliePaymentId($molliePaymentID);
         $orderTransactionCustomFields->setThirdPartyPaymentId($thirdPartyPaymentId);
 
         $this->updateOrderTransactionCustomFields->updateOrderTransaction(

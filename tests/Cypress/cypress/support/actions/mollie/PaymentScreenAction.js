@@ -30,6 +30,15 @@ class PaymentScreenAction {
     /**
      *
      */
+    selectOpen() {
+        cy.get('input[value="open"]').click();
+
+        this._clickSubmit();
+    }
+
+    /**
+     *
+     */
     selectPaid() {
 
         cy.get('input[value="paid"]').click();
