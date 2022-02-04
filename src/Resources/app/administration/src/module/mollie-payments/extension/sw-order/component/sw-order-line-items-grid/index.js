@@ -40,6 +40,8 @@ Component.override('sw-order-line-items-grid', {
     data() {
         return {
             isLoading: false,
+            isRefundLoading: false,
+            isRefundCancelLoading: false,
             isShipOrderLoading: false,
             isShipItemLoading: false,
             refundAmount: 0.0,
@@ -176,6 +178,8 @@ Component.override('sw-order-line-items-grid', {
                 return;
             }
 
+            this.isRefundLoading = true;
+
             this.MolliePaymentsRefundService
                 .refund({
                     orderId: this.order.id,
@@ -200,6 +204,8 @@ Component.override('sw-order-line-items-grid', {
                     this.createNotificationError({
                         message: response.message,
                     });
+                }).finally(() => {
+                    this.isRefundLoading = false;
                 });
         },
 
@@ -208,6 +214,8 @@ Component.override('sw-order-line-items-grid', {
         },
 
         cancelRefund(item) {
+            this.isRefundCancelLoading = true;
+
             this.MolliePaymentsRefundService
                 .cancel({
                     orderId: this.order.id,
@@ -232,6 +240,9 @@ Component.override('sw-order-line-items-grid', {
                     this.createNotificationError({
                         message: response.message,
                     });
+                })
+                .finally(() => {
+                    this.isRefundCancelLoading = false;
                 });
         },
 

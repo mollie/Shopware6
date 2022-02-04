@@ -69,11 +69,12 @@
               @modal-close="onCloseRefundModal"
               :title="$tc('mollie-payments.modals.refund.title')"
               :variant="refunds.length > 0 ? 'large' : 'small'">
-        <sw-container columns="1fr auto" :gap="refunds.length > 0 ? '16px' : '0'">
+        <sw-container columns="3fr 2fr" :gap="refunds.length > 0 ? '16px' : '0'">
             <sw-data-grid
                     :dataSource="refunds"
                     :columns="getRefundListColumns"
                     :showSelection="false"
+                    :isLoading="isRefundCancelLoading"
                     v-if="refunds.length > 0">
                 <template #column-amount.value="{ item }">
                     <sw-container columns="1fr auto" gap="8px" align="center">
@@ -98,7 +99,8 @@
                     </sw-context-menu-item>
                 </template>
             </sw-data-grid>
-            <div>
+
+            <sw-container columns="1fr" gap="16px">
                 <sw-description-list grid="225px 1fr"
                                      v-if="!isLoading"
                                      class="sw-order-detail__summary-data">
@@ -147,14 +149,20 @@
                         {{ order.currency.symbol }}
                     </template>
                 </sw-number-field>
-            </div>
+            </sw-container>
         </sw-container>
 
         <template #modal-footer>
-            <sw-button @click="onCloseRefundModal" size="small">
+            <sw-button @click="onCloseRefundModal"
+                       size="small"
+                       :disabled="isRefundLoading || isRefundCancelLoading">
                 {{ $tc('mollie-payments.modals.refund.cancelButton') }}
             </sw-button>
-            <sw-button @click="onConfirmRefund()" variant="primary" size="small">
+            <sw-button @click="onConfirmRefund()"
+                       variant="primary"
+                       size="small"
+                       :isLoading="isRefundLoading"
+                       :disabled="isRefundCancelLoading">
                 {{ $tc('mollie-payments.modals.refund.confirmButton') }}
             </sw-button>
         </template>
