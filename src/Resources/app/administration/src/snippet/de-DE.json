@@ -35,7 +35,10 @@
         "success": "Es wurde eine Rückerstattung bei Mollie erstellt. Es kann bis zu 2 Stunden dauern, bis die Rückerstattung abgeschlossen ist. Bis dahin können Sie die Rückerstattung stornieren.",
         "error": "Beim Erstellen einer Rückerstattung ist etwas schief gelaufen.",
         "warning": {
-          "low-amount": "Bitte geben Sie einen zu erstattenden Betrag ein."
+          "low-amount": "Bitte geben Sie einen zu erstattenden Betrag ein.",
+          "orderThreshold": "Achtung, Sie versuchen, mehr als den Gesamtbetrag dieser Bestellung zu erstatten ({orderMaximum}.)",
+          "mollieThreshold": "Der Betrag, den Sie zu erstatten versuchen, übersteigt den von Mollie erlaubten Höchstbetrag ({mollieMaximum}.)",
+          "refundAmountButton": "{Betrag} zurückerstatten"
         },
         "confirmButton": "Rückerstatten",
         "cancelButton": "Abbrechen",
