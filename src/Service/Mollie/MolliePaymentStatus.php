@@ -58,6 +58,7 @@ class MolliePaymentStatus
     public static function isApprovedStatus($status)
     {
         $list = [
+            MolliePaymentStatus::MOLLIE_PAYMENT_OPEN,
             MolliePaymentStatus::MOLLIE_PAYMENT_PAID,
             MolliePaymentStatus::MOLLIE_PAYMENT_AUTHORIZED,
             MolliePaymentStatus::MOLLIE_PAYMENT_PENDING

@@ -18,7 +18,7 @@ class MolliePaymentStatusTest extends TestCase
             [true, MolliePaymentStatus::MOLLIE_PAYMENT_AUTHORIZED],
             [true, MolliePaymentStatus::MOLLIE_PAYMENT_PENDING],
             [true, MolliePaymentStatus::MOLLIE_PAYMENT_PAID],
-            [false, MolliePaymentStatus::MOLLIE_PAYMENT_OPEN],
+            [true, MolliePaymentStatus::MOLLIE_PAYMENT_OPEN],
             [false, MolliePaymentStatus::MOLLIE_PAYMENT_COMPLETED],
             [false, MolliePaymentStatus::MOLLIE_PAYMENT_CANCELED],
             [false, MolliePaymentStatus::MOLLIE_PAYMENT_FAILED],
