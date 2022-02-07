@@ -1,7 +1,7 @@
 import template from './mollie-subscriptions-to-product-list.html.twig';
 
 // eslint-disable-next-line no-undef
-const { Component } = Shopware;
+const { Component, Mixin } = Shopware;
 // eslint-disable-next-line no-undef
 const { Criteria } = Shopware.Data;
 
@@ -12,6 +12,10 @@ Component.register('mollie-subscriptions-to-product-list', {
         'systemConfigApiService',
         'MolliePaymentsSubscriptionService',
         'repositoryFactory',
+    ],
+
+    mixins: [
+        Mixin.getByName('notification'),
     ],
 
     data() {
@@ -137,20 +141,19 @@ Component.register('mollie-subscriptions-to-product-list', {
                     salesChannelId: item.salesChannelId,
                 })
                 .then((response) => {
+                    console.log(response);
+                    console.log(response.success);
                     if (response.success) {
                         this.createNotificationSuccess({
                             message: this.$tc('mollie-subscriptions.page.list.columns.action.success'),
                         });
-                        this.showRefundModal = false;
+                        this.showRefundModal = true;
                         this.getSubscriptions();
                     } else {
                         this.createNotificationError({
                             message: this.$tc('mollie-subscriptions.page.list.columns.action.error'),
                         });
                     }
-                })
-                .then(() => {
-                    this.$emit('refund-cancelled');
                 })
                 .catch((response) => {
                     this.createNotificationError({

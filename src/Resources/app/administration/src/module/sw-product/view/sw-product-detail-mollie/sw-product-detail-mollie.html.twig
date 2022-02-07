@@ -84,53 +84,58 @@
                             :label="$tc('mollie-subscription.mollieSubscriptionProduct')"
                             @change="onChanged($event, 'mollieSubscriptionProduct')"/>
 
-                    <sw-text-field
-                            name="mollieSubscriptionIntervalAmount"
-                            v-model="mollieSubscriptionIntervalAmount"
-                            :hasParent="hasParentProduct"
-                            :label="$tc('mollie-subscription.mollieSubscriptionIntervalAmount')"
-                            :required="mollieSubscriptionProduct"
-                            @change="onChanged($event, 'intervalAmount')"/>
+                    <sw-container class="sw-product-detail-mollie-subscription-form__subscriptionInterval">
+                        <sw-text-field
+                                class="subscription-form-field"
+                                name="mollieSubscriptionIntervalAmount"
+                                v-model="mollieSubscriptionIntervalAmount"
+                                :hasParent="hasParentProduct"
+                                :label="$tc('mollie-subscription.mollieSubscriptionIntervalAmount')"
+                                :required="mollieSubscriptionProduct"
+                                @change="onChanged($event, 'intervalAmount')"/>
 
-                    <sw-select-field
-                            name="mollieSubscriptionIntervalType"
-                            v-model="mollieSubscriptionIntervalType"
-                            :label="$tc('mollie-subscription.mollieSubscriptionIntervalType')"
-                            :hasParent="hasParentProduct"
-                            class="mollie-subscription-interval-type"
-                            :required="mollieSubscriptionProduct"
-                            :value="mollieSubscriptionIntervalType"
-                            @change="onChanged($event, 'intervalType')">
-                        <option
-                                v-for="interval in intervalTypes"
-                                :key="interval.key"
-                                :value="interval.key">
-                            {{ interval.name }}
-                        </option>
-                    </sw-select-field>
+                        <sw-select-field
+                                name="mollieSubscriptionIntervalType"
+                                v-model="mollieSubscriptionIntervalType"
+                                :label="$tc('mollie-subscription.mollieSubscriptionIntervalType')"
+                                :hasParent="hasParentProduct"
+                                class="subscription-form-field"
+                                :required="mollieSubscriptionProduct"
+                                :value="mollieSubscriptionIntervalType"
+                                @change="onChanged($event, 'intervalType')">
+                            <option
+                                    v-for="interval in intervalTypes"
+                                    :key="interval.key"
+                                    :value="interval.key">
+                                {{ interval.name }}
+                            </option>
+                        </sw-select-field>
+                    </sw-container>
 
-                    <sw-text-field
-                            name="mollieSubscriptionRepetitionAmount"
-                            v-model="mollieSubscriptionRepetitionAmount"
-                            :hasParent="hasParentProduct"
-                            :required="mollieSubscriptionProduct"
-                            :label="$tc('mollie-subscription.mollieSubscriptionRepetitionAmount')"
-                            @change="onChanged($event, 'repetitionAmount')"/>
+                    <sw-container class="sw-product-detail-mollie-subscription-form__subscriptionRepetition">
+                        <sw-text-field
+                                class="subscription-form-field"
+                                name="mollieSubscriptionRepetitionAmount"
+                                v-model="mollieSubscriptionRepetitionAmount"
+                                :hasParent="hasParentProduct"
+                                :required="mollieSubscriptionProduct"
+                                :label="$tc('mollie-subscription.mollieSubscriptionRepetitionAmount')"
+                                @change="onChanged($event, 'repetitionAmount')"/>
 
-                    <sw-select-field
-                            name="mollieSubscriptionRepetitionType"
-                            v-model="mollieSubscriptionRepetitionType"
-                            :label="$tc('mollie-subscription.mollieSubscriptionRepetitionType')"
-                            :hasParent="hasParentProduct"
-                            :required="mollieSubscriptionProduct"
-                            :value="mollieSubscriptionRepetitionType"
-                            class="mollie-subscription-repetition-type"
-                            @change="onChanged($event, 'repetitionType')">
-                        <option v-for="repetition in repetitionTypes" :key="repetition.key" :value="repetition.key">
-                            {{ repetition.name }}
-                        </option>
-                    </sw-select-field>
-
+                        <sw-select-field
+                                class="subscription-form-field"
+                                name="mollieSubscriptionRepetitionType"
+                                v-model="mollieSubscriptionRepetitionType"
+                                :label="$tc('mollie-subscription.mollieSubscriptionRepetitionType')"
+                                :hasParent="hasParentProduct"
+                                :required="mollieSubscriptionProduct"
+                                :value="mollieSubscriptionRepetitionType"
+                                @change="onChanged($event, 'repetitionType')">
+                            <option v-for="repetition in repetitionTypes" :key="repetition.key" :value="repetition.key">
+                                {{ repetition.name }}
+                            </option>
+                        </sw-select-field>
+                    </sw-container>
                 </sw-container>
             </sw-container>
 

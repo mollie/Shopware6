@@ -41,10 +41,12 @@ class SubscriptionController extends AbstractController
      */
     public function cancel(RequestDataBag $data, Context $context): JsonResponse
     {
-        return $this->cancelSubscriptionsService->cancelSubscriptions(
+        $response = $this->cancelSubscriptionsService->cancelSubscriptions(
             $data->get('id'),
             $data->get('customerId'),
             $data->get('salesChannelId')
         );
+
+        return new JsonResponse(['success' => $response]);
     }
 }

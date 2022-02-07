@@ -269,6 +269,13 @@
             <defaultValue>Subscribe</defaultValue>
         </input-field>
         <input-field type="bool">
+            <name>showSubscriptionLabel</name>
+            <label>Show Subscriptions label on PDP</label>
+            <label lang="de-DE">Abonnementetikett auf PDP anzeigen</label>
+            <label lang="nl-NL">Label Abonnementen weergeven op PDP</label>
+            <defaultValue>true</defaultValue>
+        </input-field>
+        <input-field type="bool">
             <name>prePaymentReminderEmail</name>
             <label>Enable Payment Reminder Email</label>
             <label lang="de-DE">Zahlungserinnerungs-E-Mail aktivieren</label>
