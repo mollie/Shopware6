@@ -86,7 +86,6 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
         return [
             CheckoutConfirmPageLoadedEvent::class => [
                 ['addDataToPage', 10],
-                ['filterAvailablePaymentMethodsForCheckout', 0],
             ],
             AccountEditOrderPageLoadedEvent::class => ['addDataToPage', 10],
         ];
@@ -100,13 +99,8 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
      * @param EntityRepositoryInterface $localeRepositoryInterface
      * @param ActivePaymentMethodsProvider $activePaymentMethodsProvider
      */
-    public function __construct(
-        MollieApiFactory $apiFactory,
-        SettingsService $settingsService,
-        EntityRepositoryInterface $languageRepositoryInterface,
-        EntityRepositoryInterface $localeRepositoryInterface,
-        ActivePaymentMethodsProvider $activePaymentMethodsProvider
-    ) {
+    public function __construct(MollieApiFactory $apiFactory, SettingsService $settingsService, EntityRepositoryInterface $languageRepositoryInterface, EntityRepositoryInterface $localeRepositoryInterface, ActivePaymentMethodsProvider $activePaymentMethodsProvider)
+    {
         $this->apiFactory = $apiFactory;
         $this->settingsService = $settingsService;
         $this->languageRepositoryInterface = $languageRepositoryInterface;
@@ -114,51 +108,6 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
         $this->activePaymentMethodsProvider = $activePaymentMethodsProvider;
     }
 
-    /**
-     * @param CheckoutConfirmPageLoadedEvent $args
-     * @return void
-     */
-    public function filterAvailablePaymentMethodsForCheckout(CheckoutConfirmPageLoadedEvent $args): void
-    {
-        $settings = $this->settingsService->getSettings($args->getSalesChannelContext()->getSalesChannelId());
-
-        if (!$settings->getUseMolliePaymentMethodLimits()) {
-            return;
-        }
-
-        $cart = $args->getPage()->getCart();
-        $currency = $args->getSalesChannelContext()->getCurrency()->getIsoCode();
-        $salesChannel = $args->getSalesChannelContext()->getSalesChannel();
-        $paymentMethods = $args->getPage()->getPaymentMethods();
-
-        # get the active and available payment methods for the current checkout conditions
-        $activeMethods = $this->activePaymentMethodsProvider->getActivePaymentMethodsForAmount(
-            $cart,
-            $currency,
-            [$salesChannel]
-        );
-
-        # get the ids for all active and available payment methods
-        $activeMethodIds = array_map(static function ($method) {
-            return $method->id;
-        }, $activeMethods);
-
-        # filter payment methods on the checkout page based on the ids of the active and available payment methods
-        $filteredPaymentMethods = $paymentMethods->filter(static function(PaymentMethodEntity $paymentMethod) use ($activeMethodIds) {
-            if (stripos($paymentMethod->getHandlerIdentifier(), 'MolliePayments') === false) {
-                return true;
-            }
-
-            try {
-                $id = constant($paymentMethod->getHandlerIdentifier() . '::PAYMENT_METHOD_NAME') ?? '';
-            } catch (Throwable $exception) {
-            }
-
-            return empty($id) || in_array($id, $activeMethodIds, true);
-        });
-
-        $args->getPage()->setPaymentMethods($filteredPaymentMethods);
-    }
 
     /**
      * @param CheckoutConfirmPageLoadedEvent|AccountEditOrderPageLoadedEvent $args

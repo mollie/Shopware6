@@ -1,9 +1,11 @@
-import template from './mollie-update-payment-methods.html.twig';
+import template from './mollie-pluginconfig-section-payments.html.twig';
+import './mollie-pluginconfig-section-payments.scss';
+
 
 // eslint-disable-next-line no-undef
 const {Component, Mixin} = Shopware;
 
-Component.register('mollie-update-payment-methods', {
+Component.register('mollie-pluginconfig-section-payments', {
     template,
 
     inject: [
@@ -21,6 +23,10 @@ Component.register('mollie-update-payment-methods', {
     },
 
     methods: {
+
+        /**
+         *
+         */
         onUpdatePaymentMethodsButtonClicked() {
             const me = this;
 

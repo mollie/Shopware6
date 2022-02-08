@@ -26,6 +26,9 @@
           "button": "Update payment methods",
           "succeeded": "The payment methods are successfully updated.",
           "failed": "The payment methods couldn't be updated."
+        },
+        "mollieLimits": {
+          "link": "Open Mollie Payment Limits"
         }
       }
     },

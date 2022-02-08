@@ -5,52 +5,108 @@ namespace Kiener\MolliePayments\Service\Payment\Provider;
 use Exception;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\Logger\MollieLogger;
+use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Method;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterface
 {
-    /** @var MollieApiFactory */
-    private $mollieApiFactory;
-
-    /** @var MollieLogger */
-    private $logger;
 
     /**
-     * Creates a new instance of this class.
-     *
-     * @param MollieApiFactory $mollieApiFactory
-     * @param MollieLogger $logger
+     * @var MollieApiFactory
      */
-    public function __construct(MollieApiFactory $mollieApiFactory, MollieLogger $logger)
+    private $mollieApiFactory;
+
+    /**
+     * @var MollieOrderPriceBuilder
+     */
+    private $priceFormatter;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+
+
+    /**
+     * @param MollieApiFactory $mollieApiFactory
+     * @param MollieOrderPriceBuilder $priceFormatter
+     * @param LoggerInterface $logger
+     */
+    public function __construct(MollieApiFactory $mollieApiFactory, MollieOrderPriceBuilder $priceFormatter, LoggerInterface $logger)
     {
         $this->mollieApiFactory = $mollieApiFactory;
+        $this->priceFormatter = $priceFormatter;
         $this->logger = $logger;
+    }
+
+
+    /**
+     * Returns an array of active payment methods for a given amount in a specific sales channel.
+     *
+     * @param Cart $cart
+     * @param string $currency
+     * @param array<string> $salesChannelIDs
+     * @return array<Method>
+     */
+    public function getActivePaymentMethodsForAmount(Cart $cart, string $currency, array $salesChannelIDs): array
+    {
+        $params = [
+            'amount' => [
+                'value' => $this->priceFormatter->formatValue($cart->getPrice()->getTotalPrice()),
+                'currency' => strtoupper($currency),
+            ]
+        ];
+
+        return $this->getActivePaymentMethods($params, $salesChannelIDs);
     }
 
     /**
      * Returns an array of active payment methods.
      *
-     * @param array<array|scalar> $parameters
-     * @param array<SalesChannelEntity> $salesChannels
+     * @param array<mixed> $parameters
+     * @param array<string> $salesChannelIDs
      * @return array<Method>
      */
-    public function getActivePaymentMethods(array $parameters = [], array $salesChannels = []): array
+    private function getActivePaymentMethods(array $parameters, array $salesChannelIDs): array
     {
-        $methods = [];
+        $allFoundMethods = [];
 
-        if (empty($salesChannels)) {
+        if (empty($salesChannelIDs)) {
             return [];
         }
 
-        foreach ($salesChannels as $storefront) {
+        foreach ($salesChannelIDs as $channelId) {
+
             try {
-                $methods = $this->getActivePaymentMethodsForSalesChannel($storefront, $parameters);
+
+                $shopMethods = $this->requestMollieMethods($channelId, $parameters);
+
+                /** @var Method $shopMethod */
+                foreach ($shopMethods as $shopMethod) {
+
+                    $found = false;
+
+                    /** @var Method $method */
+                    foreach ($allFoundMethods as $method) {
+                        if ($method->id === $shopMethod->id) {
+                            $found = true;
+                            break;
+                        }
+                    }
+
+                    if (!$found) {
+                        $allFoundMethods[] = $shopMethod;
+                    }
+                }
+
             } catch (Exception $e) {
                 $this->logger->error(
-                    sprintf('Error when loading active payment methods from Mollie for storefront %s', $storefront->getName()),
+                    'Error when loading active payment methods from Mollie for storefront: ' . $channelId,
                     [
                         'error' => $e->getMessage(),
                     ]
@@ -58,49 +114,20 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
             }
         }
 
-        $handledIds = [];
-
-        return array_filter($methods, static function($method) use ($handledIds) {
-            $isHandled = in_array($method->id, $handledIds, true);
-
-            if ($isHandled) {
-                return false;
-            }
-
-            $handledIds[] = $method->id;
-            return true;
-        });
-    }
-
-    /**
-     * Returns an array of active payment methods for a given amount in a specific sales channel.
-     *
-     * @param Cart $cart
-     * @param string $currency
-     * @param array<SalesChannelEntity> $salesChannels
-     * @return array<Method>
-     */
-    public function getActivePaymentMethodsForAmount(Cart $cart, string $currency, array $salesChannels = []): array
-    {
-        return $this->getActivePaymentMethods([
-            'amount' => [
-                'value' => number_format($cart->getPrice()->getTotalPrice(), 2, '.', ''),
-                'currency' => strtoupper($currency),
-            ]
-        ], $salesChannels);
+        return $allFoundMethods;
     }
 
     /**
      * Returns an array of active payment methods for a specific sales channel.
      *
-     * @param SalesChannelEntity $salesChannel
+     * @param string $salesChannelId
      * @param array $parameters
      * @return array<Method>
      * @throws ApiException
      */
-    private function getActivePaymentMethodsForSalesChannel(SalesChannelEntity $salesChannel, array $parameters = []): array
+    private function requestMollieMethods(string $salesChannelId, array $parameters): array
     {
-        $mollieApiClient = $this->mollieApiFactory->getClient($salesChannel->getId());
+        $mollieApiClient = $this->mollieApiFactory->getClient($salesChannelId);
 
         if (!in_array('resource', $parameters, true)) {
             $parameters['resource'] = 'orders';
@@ -114,4 +141,5 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
             ->allActive($parameters)
             ->getArrayCopy();
     }
+
 }
