@@ -26,6 +26,9 @@
           "button": "Betaalmethoden updaten",
           "succeeded": "De betaalmethoden zijn succesvol geüpdated.",
           "failed": "De betaalmethoden konden niet worden geüpdated."
+        },
+        "mollieLimits": {
+          "link": "Open betalingslimieten van Mollie"
         }
       }
     },

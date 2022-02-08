@@ -8,7 +8,8 @@
     ],
     "excludes": [
       "Resources",
-      "Compatibility/Storefront/Route/PaymentMethodRoute/Voucher"
+      "Compatibility/Storefront/Route/PaymentMethodRoute/Voucher",
+      "Compatibility/Storefront/Route/PaymentMethodRoute/MollieLimits"
     ]
   },
   "mutators": {

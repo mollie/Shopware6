@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRout
 
 
 use Kiener\MolliePayments\Service\Cart\Voucher\VoucherCartCollector;
+use Kiener\MolliePayments\Service\SettingsService;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Payment\Event\PaymentMethodRouteCacheKeyEvent;
@@ -18,12 +19,19 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
      */
     private $cartService;
 
+    /**
+     * @var SettingsService
+     */
+    private $pluginSettings;
+
 
     /**
+     * @param SettingsService $pluginSettings
      * @param CartService $cartService
      */
-    public function __construct(CartService $cartService)
+    public function __construct(SettingsService $pluginSettings, CartService $cartService)
     {
+        $this->pluginSettings = $pluginSettings;
         $this->cartService = $cartService;
     }
 
@@ -52,6 +60,7 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
         $parts = $event->getParts();
 
         $parts = $this->addVoucherKey($cart, $parts);
+        $parts = $this->addMollieLimitsKey($parts);
 
         $event->setParts($parts);
     }
@@ -70,6 +79,23 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
             $parts[] = 'with-voucher';
         } else {
             $parts[] = 'without-voucher';
+        }
+
+        return $parts;
+    }
+
+    /**
+     * @param array<mixed> $parts
+     * @return array<mixed>
+     */
+    private function addMollieLimitsKey(array $parts): array
+    {
+        $settings = $this->pluginSettings->getSettings();
+
+        if ($settings->getUseMolliePaymentMethodLimits()) {
+            $parts[] = 'with-limits';
+        } else {
+            $parts[] = 'without-limits';
         }
 
         return $parts;

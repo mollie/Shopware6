@@ -26,6 +26,9 @@
           "button": "Zahlungsarten aktualisieren",
           "succeeded": "Die Zahlungsarten wurden erfolgreich aktualisiert.",
           "failed": "Die Zahlungsarten konnten nicht aktualisiert werden."
+        },
+        "mollieLimits": {
+          "link": "Öffne Mollie Zahlungs Limits"
         }
       }
     },

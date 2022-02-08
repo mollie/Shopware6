@@ -13,7 +13,16 @@
             <argument type="service" id="Kiener\MolliePayments\Service\Voucher\VoucherService"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\MollieLimits\MollieLimitsPaymentMethodRoute64"
+                 decorates="Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRoute">
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\Voucher\HideVoucherPaymentMethodRoute64.inner"/>
+            <argument type="service" id="service_container"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Payment\Provider\ActivePaymentMethodsProvider"/>
+        </service>
+
         <service id="Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\Cache\CachedPaymentMethodRoute64">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
             <tag name="kernel.event_subscriber"/>
         </service>
