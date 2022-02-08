@@ -1,0 +1,94 @@
+openapi: "3.0.0"
+
+info:
+  title: "Mollie Headless API"
+  description: "This is a Swagger Template for all Headless cases of the Mollie plugin.<br /><br />Instructions:<ol><li>Configure the correct server domain, where your Shopware Store API ist available.</li><li>Click on Authorize and fill in the Access Key from your Sales Channel.</li><li>Then use the Cart request for Shopware to retrieve an Access-Token</li><li>Just copy the Access-Token and use it in the global authorize section too.</li></ol><br />Congratulations, you can now use the API requests."
+
+servers:
+  - url: /
+  - url: https://localhost
+  - url: http://localhost
+  - url: '{custom}'
+    variables:
+      custom:
+        default: https://localhost
+
+externalDocs:
+  description: "Find out more about Mollie Shopware"
+  url: "https://github.com/mollie/Shopware6/wiki"
+
+paths:
+
+  /store-api/checkout/cart:
+    get:
+      tags:
+        - "Cart"
+      summary: "Get your current cart"
+      security:
+        - AccessKey: []
+        - AccessToken: []
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/checkout/cart/line-item:
+    post:
+      tags:
+        - "Cart"
+      summary: "Add a line item to your cart"
+      security:
+        - AccessKey: []
+        - AccessToken: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        default: "product"
+                      referencedId:
+                        default: "#"
+                      quantity:
+                        default: "1"
+      responses:
+          "200":
+            description: "successful operation"
+
+  /store-api/payment-method:
+    post:
+      tags:
+        - "Payment Methods"
+      summary: "Loads all available payment methods"
+      security:
+        - AccessKey: []
+        - AccessToken: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                onlyAvailable:
+                  default: "true"
+                associations:
+                  type: array
+      responses:
+        "200":
+          description: "successful operation"
+
+components:
+  securitySchemes:
+    AccessKey:
+      type: apiKey
+      in: header
+      name: sw-access-key
+    AccessToken:
+      type: apiKey
+      in: header
+      name: sw-context-token
