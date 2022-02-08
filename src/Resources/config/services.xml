@@ -160,6 +160,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="language.repository"/>
             <argument type="service" id="locale.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Payment\Provider\ActivePaymentMethodsProvider"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
