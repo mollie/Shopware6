@@ -7,6 +7,8 @@ use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderLineIdException;
 use Kiener\MolliePayments\Exception\OrderNumberNotFoundException;
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Service\OrderService;
+use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
+use Kiener\MolliePayments\Service\UpdateOrderTransactionCustomFields;
 use MolliePayments\Tests\Fakes\FakeEntityRepository;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
@@ -34,6 +36,9 @@ class OrderServiceTest extends TestCase
         $this->orderService = new OrderService(
             $this->orderRepository,
             $this->createMock(ShopwareOrderService::class),
+            $this->createMock(\Kiener\MolliePayments\Service\MollieApi\Order::class),
+            $this->createMock(UpdateOrderCustomFields::class),
+            $this->createMock(UpdateOrderTransactionCustomFields::class),
             new NullLogger()
         );
     }

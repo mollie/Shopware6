@@ -11,6 +11,8 @@ use Kiener\MolliePayments\Service\MollieApi\Order as MollieOrderApi;
 use Kiener\MolliePayments\Service\MollieApi\Payment as MolliePaymentApi;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\RefundService;
+use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
+use Kiener\MolliePayments\Service\UpdateOrderTransactionCustomFields;
 use Mollie\Api\Endpoints\OrderEndpoint;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order;
@@ -44,6 +46,9 @@ class RefundsServiceTest extends TestCase
         $this->orderService = new OrderService(
             $this->createMock(EntityRepositoryInterface::class),
             $this->createMock(\Shopware\Core\Checkout\Order\SalesChannel\OrderService::class),
+            $this->createMock(\Kiener\MolliePayments\Service\MollieApi\Order::class),
+            $this->createMock(UpdateOrderCustomFields::class),
+            $this->createMock(UpdateOrderTransactionCustomFields::class),
             $logger
         );
 
@@ -71,8 +76,8 @@ class RefundsServiceTest extends TestCase
      * @dataProvider getRefundTestData
      */
     public function testRefunds(
-        bool $expected,
-        bool $isMollieOrder,
+        bool    $expected,
+        bool    $isMollieOrder,
         ?string $paymentStatus,
         ?string $exceptionClass
     ): void
@@ -105,10 +110,10 @@ class RefundsServiceTest extends TestCase
      * @dataProvider getRefundCancelTestData
      */
     public function testCancelRefunds(
-        bool $expected,
-        bool $isMollieOrder,
+        bool    $expected,
+        bool    $isMollieOrder,
         ?string $paymentStatus,
-        array $refunds,
+        array   $refunds,
         ?string $exceptionClass
     ): void
     {
@@ -118,7 +123,7 @@ class RefundsServiceTest extends TestCase
             $this->clientMock->orders = $this->getOrderEndpointMock($paymentStatus, 0, $refunds);
         }
 
-        if($exceptionClass) {
+        if ($exceptionClass) {
             self::expectException($exceptionClass);
         }
 
@@ -137,10 +142,10 @@ class RefundsServiceTest extends TestCase
      * @dataProvider getRefundListTestData
      */
     public function testRefundList(
-        int $expected,
-        bool $isMollieOrder,
+        int     $expected,
+        bool    $isMollieOrder,
         ?string $paymentStatus,
-        array $refunds,
+        array   $refunds,
         ?string $exceptionClass
     ): void
     {
@@ -150,7 +155,7 @@ class RefundsServiceTest extends TestCase
             $this->clientMock->orders = $this->getOrderEndpointMock($paymentStatus, 0, $refunds);
         }
 
-        if($exceptionClass) {
+        if ($exceptionClass) {
             self::expectException($exceptionClass);
         }
 
@@ -168,10 +173,10 @@ class RefundsServiceTest extends TestCase
      * @dataProvider getAmountsTestData
      */
     public function testRemainingAmount(
-        float $expected,
-        bool $isMollieOrder,
+        float   $expected,
+        bool    $isMollieOrder,
         ?string $paymentStatus,
-        float $remainingAmount,
+        float   $remainingAmount,
         ?string $exceptionClass
     ): void
     {
@@ -181,7 +186,7 @@ class RefundsServiceTest extends TestCase
             $this->clientMock->orders = $this->getOrderEndpointMock($paymentStatus, $remainingAmount);
         }
 
-        if($exceptionClass) {
+        if ($exceptionClass) {
             self::expectException($exceptionClass);
         }
 
@@ -199,10 +204,10 @@ class RefundsServiceTest extends TestCase
      * @dataProvider getAmountsTestData
      */
     public function testRefundedAmount(
-        float $expected,
-        bool $isMollieOrder,
+        float   $expected,
+        bool    $isMollieOrder,
         ?string $paymentStatus,
-        float $refundedAmount,
+        float   $refundedAmount,
         ?string $exceptionClass
     ): void
     {
@@ -212,7 +217,7 @@ class RefundsServiceTest extends TestCase
             $this->clientMock->orders = $this->getOrderEndpointMock($paymentStatus, $refundedAmount);
         }
 
-        if($exceptionClass) {
+        if ($exceptionClass) {
             self::expectException($exceptionClass);
         }
 
@@ -423,8 +428,8 @@ class RefundsServiceTest extends TestCase
      */
     private function getOrderEndpointMock(
         ?string $paymentStatus,
-        float $amount,
-        array $refunds = []
+        float   $amount,
+        array   $refunds = []
     ): OrderEndpoint
     {
         $paymentMock = $this->createConfiguredMock(
