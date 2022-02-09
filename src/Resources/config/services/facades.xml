@@ -35,6 +35,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\UpdateOrderCustomFields"/>
             <argument type="service" id="Kiener\MolliePayments\Service\UpdateOrderTransactionCustomFields"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
         </service>
 
         <service id="Kiener\MolliePayments\Facade\MollieOrderPaymentFlow">

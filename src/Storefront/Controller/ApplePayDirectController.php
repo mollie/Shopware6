@@ -22,13 +22,13 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
-use Shopware\Core\Framework\Log\LoggingService;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -597,27 +597,33 @@ class ApplePayDirectController extends StorefrontController
             $transactions = $order->getTransactions();
             $transaction = $transactions->last();
 
+            if (!$transaction instanceof OrderTransactionEntity) {
+                throw new \Exception('Created Apple Pay Direct order has not OrderTransaction!');
+            }
+
             # generate the finish URL for our shopware page.
             # This is required, because we will immediately bring the user to this page.
-            $returnUrl = $this->getCheckoutFinishPage($order->getId(), $this->router);
+            $shopwareReturnUrl = $this->getCheckoutFinishPage($order->getId(), $this->router);
+            $asyncPaymentTransition = new AsyncPaymentTransactionStruct($transaction, $order, $shopwareReturnUrl);
 
             # now set the Apple Pay payment token for our payment handler.
             # This is required for a smooth checkout with our already validated Apple Pay transaction.
             $this->paymentHandler->setToken($paymentToken);
 
-            $mollieOrderID = $this->molliePayments->preparePayProcessAtMollie(
-                ApplePayPayment::PAYMENT_METHOD_NAME,
-                new AsyncPaymentTransactionStruct($transaction, $order, $returnUrl),
-                $context,
-                $this->paymentHandler
-            );
+            $paymentData = $this->molliePayments->preparePayProcessAtMollie(ApplePayPayment::PAYMENT_METHOD_NAME, $asyncPaymentTransition, $context, $this->paymentHandler);
 
-
-            if (empty($mollieOrderID)) {
+            if (empty($paymentData->getCheckoutURL())) {
                 throw new \Exception('Error when creating Apple Pay order in Mollie');
             }
 
-            return new RedirectResponse($returnUrl);
+
+            # now also update the custom fields of our order
+            # we want to have the mollie meta data in the
+            # custom fields in Shopware too
+            $this->orderService->updateMollieDataCustomFields($order, $paymentData->getMollieID(), $transaction->getId(), $context);
+
+
+            return new RedirectResponse($shopwareReturnUrl);
 
         } catch (Throwable $ex) {
 

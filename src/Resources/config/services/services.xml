@@ -56,6 +56,9 @@
         <service id="Kiener\MolliePayments\Service\OrderService" class="Kiener\MolliePayments\Service\OrderService">
             <argument type="service" id="order.repository"/>
             <argument type="service" id="Shopware\Core\Checkout\Order\SalesChannel\OrderService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\UpdateOrderCustomFields"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\UpdateOrderTransactionCustomFields"/>
             <argument type="service" id="mollie_payments.logger"/>
         </service>
 

@@ -16,6 +16,7 @@ use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
+use Kiener\MolliePayments\Struct\MolliePaymentPrepareData;
 use Mollie\Api\Resources\Order as MollieOrder;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
@@ -112,9 +113,9 @@ class MolliePaymentDoPay
      * @param AsyncPaymentTransactionStruct $transactionStruct
      * @param SalesChannelContext $salesChannelContext
      * @param PaymentHandler $paymentHandler
-     * @return string
+     * @return MolliePaymentPrepareData
      */
-    public function preparePayProcessAtMollie(string $paymentMethod, AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext, PaymentHandler $paymentHandler): string
+    public function preparePayProcessAtMollie(string $paymentMethod, AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext, PaymentHandler $paymentHandler): MolliePaymentPrepareData
     {
         // get order with all needed associations
         $order = $this->orderService->getOrder($transactionStruct->getOrder()->getId(), $salesChannelContext->getContext());
@@ -152,7 +153,10 @@ class MolliePaymentDoPay
             // if direct payment return to success page
             if (MolliePaymentStatus::isApprovedStatus($payment->status) && empty($payment->getCheckoutUrl())) {
 
-                return $transactionStruct->getReturnUrl();
+                return new MolliePaymentPrepareData(
+                    (string)$transactionStruct->getReturnUrl(),
+                    (string)$mollieOrderId
+                );
             }
 
             $url = $payment->getCheckoutUrl();
@@ -169,7 +173,10 @@ class MolliePaymentDoPay
             // e.g. if changedPayment Parameter has to be added the shopware payment token changes
             $this->updateOrderCustomFields->updateOrder($order->getId(), $customFieldsStruct, $salesChannelContext);
 
-            return $url;
+            return new MolliePaymentPrepareData(
+                (string)$url,
+                (string)$mollieOrderId
+            );
         }
 
         try {
@@ -208,9 +215,17 @@ class MolliePaymentDoPay
 
             $this->updateOrderCustomFields->updateOrder($order->getId(), $customFieldsStruct, $salesChannelContext);
             $this->updateOrderLineItems->updateOrderLineItems($mollieOrder, $salesChannelContext);
+
+            $mollieOrderId = $mollieOrder->id;
         }
 
-        return $customFieldsStruct->getMolliePaymentUrl() ?? $customFieldsStruct->getTransactionReturnUrl() ?? $transactionStruct->getReturnUrl();
+
+        $checkoutURL = $customFieldsStruct->getMolliePaymentUrl() ?? $customFieldsStruct->getTransactionReturnUrl() ?? $transactionStruct->getReturnUrl();
+
+        return new MolliePaymentPrepareData(
+            (string)$checkoutURL,
+            (string)$mollieOrderId
+        );
     }
 
     /**

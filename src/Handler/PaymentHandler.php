@@ -105,12 +105,14 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
 
         try {
 
-            $paymentUrl = $this->payFacade->preparePayProcessAtMollie(
+            $paymentData = $this->payFacade->preparePayProcessAtMollie(
                 $this->paymentMethod,
                 $transaction,
                 $salesChannelContext,
                 $this
             );
+
+            $paymentUrl = $paymentData->getCheckoutURL();
 
         } catch (Throwable $exception) {
 
@@ -165,7 +167,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
 
             $this->finalizeFacade->finalize($transaction, $salesChannelContext);
 
-        } catch (AsyncPaymentFinalizeException | CustomerCanceledAsyncPaymentException $ex) {
+        } catch (AsyncPaymentFinalizeException|CustomerCanceledAsyncPaymentException $ex) {
 
             $this->logger->error(
                 'Error when finalizing order ' . $transaction->getOrder()->getOrderNumber() . ', Mollie ID: ' . $molliedID . ', ' . $ex->getMessage()
