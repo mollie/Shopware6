@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Service\Subscription;
 use DateInterval;
 use Exception;
 use Kiener\MolliePayments\Service\Subscription\DTO\SubscriptionOption;
+use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
 use Kiener\MolliePayments\Setting\Source\IntervalType;
 use Kiener\MolliePayments\Setting\Source\RepetitionType;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
@@ -75,8 +76,9 @@ class SubscriptionOptions
             $payload = $orderItem->getPayload();
             $this->customFields = $payload['customFields'];
 
-            if (!isset($this->customFields["mollie_subscription"])
-                || !$this->customFields["mollie_subscription"]['mollie_subscription_product']) {
+            if (!array_key_exists('mollie_subscription', $this->customFields)
+                || !array_key_exists('mollie_subscription_product', $this->customFields['mollie_subscription'])
+                || !$this->customFields['mollie_subscription']['mollie_subscription_product']) {
                 continue;
             }
 
@@ -157,11 +159,23 @@ class SubscriptionOptions
 
     private function addWebhookUrl()
     {
-        $this->options['webhookUrl'] = $this->router->generate(
+        $webhookUrl = $this->router->generate(
             'frontend.mollie.subscriptions.webhook',
             ['transactionId' => $this->transactionsId],
             $this->router::ABSOLUTE_URL
         );
+
+        $customDomain = trim((string)getenv(WebhookBuilder::CUSTOM_DOMAIN_ENV_KEY));
+
+        if ($customDomain !== '') {
+
+            $components = parse_url($webhookUrl);
+
+            # replace old domain with new custom domain
+            $webhookUrl = str_replace((string)$components['host'], $customDomain, $webhookUrl);
+        }
+
+        return $webhookUrl;
     }
 
     /**

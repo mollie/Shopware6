@@ -129,6 +129,7 @@ class CreateSubscriptionsSubscriber implements EventSubscriberInterface
         }
 
         if ($event->getToPlace()->getId() !== $orderTransactionsStatePaidId) {
+
             return;
         }
 

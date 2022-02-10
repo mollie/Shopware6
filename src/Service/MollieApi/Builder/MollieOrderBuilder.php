@@ -156,7 +156,6 @@ class MollieOrderBuilder
 
         $orderData['redirectUrl'] = $redirectUrl;
 
-
         $webhookUrl = $this->webhookBuilder->buildWebhook($transactionId);
         $orderData['webhookUrl'] = $webhookUrl;
         $orderData['payment']['webhookUrl'] = $webhookUrl;
