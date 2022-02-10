@@ -199,6 +199,7 @@ export default class MollieCreditCardComponents extends Plugin {
 
     async submitForm(event, componentsObject, paymentForm) {
         event.preventDefault();
+        const me = this;
         this.disableForm();
 
         const creditCardRadioInput = document.querySelector(this.getSelectors().creditCardRadioInput);
@@ -232,25 +233,21 @@ export default class MollieCreditCardComponents extends Plugin {
             }
 
             if (!error) {
-
                 // now we finish by first calling our URL to store
                 // the credit card token for the user and the current checkout
                 // and then we continue by submitting our original payment form.
-                const xhr = new XMLHttpRequest();
-                xhr.open('GET', this.options.shopUrl + '/mollie/components/store-card-token/' + this.options.customerId + '/' + token);
-                xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-
-                xhr.onload = function () {
-                    const tokenInput = document.getElementById('cardToken');
-                    tokenInput.setAttribute('value', token);
-                    paymentForm.submit();
-                };
-
-                xhr.onerror = function () {
-                    paymentForm.submit();
-                };
-
-                xhr.send();
+                this.client.get(
+                    me.options.shopUrl + '/mollie/components/store-card-token/' + me.options.customerId + '/' + token,
+                    () => {
+                        const tokenInput = document.getElementById('cardToken');
+                        tokenInput.setAttribute('value', token);
+                        paymentForm.submit();
+                    },
+                    () => {
+                        paymentForm.submit();
+                    },
+                    'application/json; charset=utf-8'
+                );
             }
         }
     }
