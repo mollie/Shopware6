@@ -1,5 +1,6 @@
 import Plugin from 'src/plugin-system/plugin.class';
 import DomAccess from 'src/helper/dom-access.helper';
+import HttpClient from '../services/HttpClient';
 
 export default class MollieApplePayDirect extends Plugin {
 
@@ -16,6 +17,7 @@ export default class MollieApplePayDirect extends Plugin {
     init() {
         const me = this;
 
+        me.client = new HttpClient();
 
         // we might have wrapping containers
         // that also need to be hidden -> they might have different margins or other things
@@ -48,6 +50,8 @@ export default class MollieApplePayDirect extends Plugin {
 
         // verify if apple pay is even allowed
         // in our current sales channel
+
+        // TODO Promises dont work in IE either
         const applePayAvailablePromise = this.isApplePayAvailable(shopUrl);
 
         applePayAvailablePromise.then(function (data) {
@@ -74,14 +78,13 @@ export default class MollieApplePayDirect extends Plugin {
      * @returns {Promise<unknown>}
      */
     isApplePayAvailable(shopUrl) {
+        const me = this;
         return new Promise(function (resolve, reject) {
-            fetch(shopUrl + '/mollie/apple-pay/available')
-                .then(response => response.json())
-                .then(data => resolve(data))
-                // eslint-disable-next-line no-unused-vars
-                .catch((error) => {
-                    reject();
-                });
+            me.client.get(
+                shopUrl + '/mollie/apple-pay/available',
+                data => resolve(data),
+                () => reject()
+            );
         });
     }
 
@@ -127,15 +130,13 @@ export default class MollieApplePayDirect extends Plugin {
      * @param shopSlug
      */
     addProductToCart(id, quantity, shopSlug) {
-        fetch(shopSlug + '/mollie/apple-pay/add-product',
-            {
-                method: 'POST',
-                body: JSON.stringify({
-                    'id': id,
-                    'quantity': quantity,
-                }),
-            }
-        );
+        this.client.post(
+            shopSlug + '/mollie/apple-pay/add-product',
+            JSON.stringify({
+                'id': id,
+                'quantity': quantity,
+            })
+        )
     }
 
     /**
@@ -175,24 +176,19 @@ export default class MollieApplePayDirect extends Plugin {
         const session = new ApplePaySession(this.APPLE_PAY_VERSION, request);
 
         session.onvalidatemerchant = function (event) {
-
-            fetch(shopSlug + '/mollie/apple-pay/validate',
-                {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        validationUrl: event.validationURL,
-                    }),
-                })
-                .then(function (response) {
-                    return response.json();
-                })
-                .then(function (validationData) {
+            me.client.post(
+                shopSlug + '/mollie/apple-pay/validate',
+                JSON.stringify({
+                    validationUrl: event.validationURL,
+                }),
+                (validationData) => {
                     const data = JSON.parse(validationData.session);
                     session.completeMerchantValidation(data);
-                })
-                .catch(() => {
+                },
+                () => {
                     session.abort();
-                });
+                }
+            );
         };
 
         session.onshippingcontactselected = function (event) {
@@ -203,17 +199,12 @@ export default class MollieApplePayDirect extends Plugin {
                 countryCode = event.shippingContact.countryCode;
             }
 
-            fetch(shopSlug + '/mollie/apple-pay/shipping-methods',
-                {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        countryCode: countryCode,
-                    }),
-                })
-                .then(function (response) {
-                    return response.json();
-                })
-                .then(function (data) {
+            me.client.post(
+                shopSlug + '/mollie/apple-pay/shipping-methods',
+                JSON.stringify({
+                    countryCode: countryCode,
+                }),
+                (data) => {
                     if (data.success) {
                         session.completeShippingContactSelection(
                             // eslint-disable-next-line no-undef
@@ -235,25 +226,21 @@ export default class MollieApplePayDirect extends Plugin {
                             []
                         );
                     }
-                })
-                .catch(() => {
+                },
+                () => {
                     session.abort();
-                });
+                }
+            );
         };
 
         session.onshippingmethodselected = function (event) {
 
-            fetch(shopSlug + '/mollie/apple-pay/set-shipping',
-                {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        identifier: event.shippingMethod.identifier,
-                    }),
-                })
-                .then(function (response) {
-                    return response.json();
-                })
-                .then(function (data) {
+            me.client.post(
+                shopSlug + '/mollie/apple-pay/set-shipping',
+                JSON.stringify({
+                    identifier: event.shippingMethod.identifier,
+                }),
+                (data) => {
                     if (data.success) {
                         session.completeShippingMethodSelection(
                             // eslint-disable-next-line no-undef
@@ -273,10 +260,11 @@ export default class MollieApplePayDirect extends Plugin {
                             []
                         );
                     }
-                })
-                .catch(() => {
+                },
+                () => {
                     session.abort();
-                });
+                }
+            );
         };
 
         session.onpaymentauthorized = function (event) {
@@ -294,7 +282,8 @@ export default class MollieApplePayDirect extends Plugin {
         };
 
         session.oncancel = function () {
-            fetch(shopSlug + '/mollie/apple-pay/restore-cart', {method: 'POST'});
+
+            me.client.post(shopSlug + '/mollie/apple-pay/restore-cart');
         };
 
         return session;
