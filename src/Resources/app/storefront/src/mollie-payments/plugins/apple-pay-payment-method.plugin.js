@@ -1,4 +1,5 @@
 import Plugin from 'src/plugin-system/plugin.class';
+import HttpClient from '../services/HttpClient';
 
 export default class MollieApplePayPaymentMethod extends Plugin {
 
@@ -25,11 +26,17 @@ export default class MollieApplePayPaymentMethod extends Plugin {
         // support for >= Shopware 6.4
         // we have to find the dynamic ID and use that
         // one as a selector to hide it
-        fetch(shopUrl + '/mollie/apple-pay/applepay-id')
-            .then(response => response.json())
-            .then(function (data) {
+        const client = new HttpClient();
+        client.get(
+            shopUrl + '/mollie/apple-pay/applepay-id',
+            (data) => {
                 me.hideApplePay('#paymentMethod' + data.id);
-            });
+            },
+            () => {
+            }
+        );
+
+
     }
 
     /**
