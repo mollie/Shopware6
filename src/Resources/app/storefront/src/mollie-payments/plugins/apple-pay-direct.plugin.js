@@ -51,41 +51,23 @@ export default class MollieApplePayDirect extends Plugin {
         // verify if apple pay is even allowed
         // in our current sales channel
 
-        // TODO Promises dont work in IE either
-        const applePayAvailablePromise = this.isApplePayAvailable(shopUrl);
+        me.client.get(
+            shopUrl + '/mollie/apple-pay/available',
+            data => {
+                if (data.available === undefined || data.available === false) {
+                    return;
+                }
 
-        applePayAvailablePromise.then(function (data) {
-
-            if (data.available === undefined || data.available === false) {
-                return;
+                applePayButtons.forEach(function (button) {
+                    // Remove display none
+                    button.classList.remove('d-none');
+                    // remove previous handlers (just in case)
+                    button.removeEventListener('click', me.onButtonClick.bind(me));
+                    // add click event handlers
+                    button.addEventListener('click', me.onButtonClick.bind(me));
+                });
             }
-
-            applePayButtons.forEach(function (button) {
-                // Remove display none
-                button.classList.remove('d-none');
-                // remove previous handlers (just in case)
-                button.removeEventListener('click', me.onButtonClick.bind(me));
-                // add click event handlers
-                button.addEventListener('click', me.onButtonClick.bind(me));
-            });
-        });
-    }
-
-
-    /**
-     *
-     * @param shopUrl
-     * @returns {Promise<unknown>}
-     */
-    isApplePayAvailable(shopUrl) {
-        const me = this;
-        return new Promise(function (resolve, reject) {
-            me.client.get(
-                shopUrl + '/mollie/apple-pay/available',
-                data => resolve(data),
-                () => reject()
-            );
-        });
+        );
     }
 
     /**
