@@ -36,12 +36,6 @@
         </service>
 
         <!-- Subscriptions -->
-        <service id="Kiener\MolliePayments\Subscriber\Subscription\CheckoutConfirmPageSubscriber"
-                 class="Kiener\MolliePayments\Subscriber\Subscription\CheckoutConfirmPageSubscriber">
-            <argument type="service" id="payment_method.repository"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
         <service id="Kiener\MolliePayments\Subscriber\Subscription\CreateSubscriptionsSubscriber">
             <argument type="service" id="state_machine_state.repository"/>
             <argument type="service" id="order.repository"/>

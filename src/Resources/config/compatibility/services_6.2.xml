@@ -13,6 +13,12 @@
             <argument type="service" id="Kiener\MolliePayments\Service\Voucher\VoucherService"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\Subscription\SubscriptionPaymentMethodRoute62"
+                 decorates="Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRoute">
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\Voucher\HideVoucherPaymentMethodRoute62.inner"/>
+            <argument type="service" id="container"/>
+        </service>
+
     </services>
 
 </container>
