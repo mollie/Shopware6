@@ -1,0 +1,47 @@
+<sw-container class="mollie-pluginconfig-info" gap="16px" columns="3fr 1fr">
+    <div>
+        <div class="title">
+            {{ title }}
+        </div>
+        <div class="description">
+            {{ $tc('mollie-payments.config.info.descriptionTop') }}<br/>
+            <br/>
+            <ol class="list">
+                <li class="list-item">
+                    {{ $tc('mollie-payments.config.info.onboardingStep1') }}<br/>
+                    <a target="_blank" href="https://www.mollie.com/signup/">https://www.mollie.com/signup</a>
+                </li>
+                <li class="list-item">
+                    {{ $tc('mollie-payments.config.info.onboardingStep2') }}<br/>
+                    {{ $tc('mollie-payments.config.info.onboardingStep2TestMode') }}
+                </li>
+                <li class="list-item">
+                    {{ $tc('mollie-payments.config.info.onboardingStep3') }}<br/>
+                    <a target="_blank" href="/admin/#/sw/sales/channel/list">
+                        {{ $tc('mollie-payments.config.info.onboardingStep3Link') }}
+                    </a>
+                </li>
+            </ol>
+            <br/>
+            {{ $tc('mollie-payments.config.info.descriptionBottom') }}
+        </div>
+        <div class="description-footer">
+            {{ $tc('mollie-payments.config.info.descriptionFooter') }}
+        </div>
+    </div>
+    <div class="col-right">
+        <sw-button class="btn-action" link="https://github.com/mollie/Shopware6/wiki">
+            <sw-icon name="default-documentation-file"></sw-icon>
+            {{ $tc('mollie-payments.config.info.btnDocumentation') }}
+        </sw-button>
+        <sw-button class="btn-action" link="https://github.com/mollie/Shopware6/wiki/Support">
+            <sw-icon name="default-communication-speech-bubbles"></sw-icon>
+            {{ $tc('mollie-payments.config.info.btnSupport') }}
+        </sw-button>
+        <sw-external-link class="link-troubleshooting"
+                          :small="false" icon="small-arrow-small-external" rel="noopener"
+                          target="_blank" href="https://github.com/mollie/Shopware6/wiki/Troubleshooting">
+            {{ $tc('mollie-payments.config.info.btnTroubleshooting') }}
+        </sw-external-link>
+    </div>
+</sw-container>

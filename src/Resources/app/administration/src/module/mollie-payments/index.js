@@ -1,7 +1,8 @@
 import './extension/sw-customer';
 import './extension/sw-order';
-import './components/mollie-test-api-key';
 import './components/mollie-tracking-info';
+import './components/mollie-pluginconfig-section-info';
+import './components/mollie-pluginconfig-section-api';
 import './components/mollie-pluginconfig-section-payments';
 
 

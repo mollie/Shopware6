@@ -1,0 +1,42 @@
+@import "~scss/variables";
+
+.mollie-pluginconfig-info {
+    .title {
+        font-size: $font-size-large;
+        font-weight: $font-weight-bold;
+    }
+
+    .description {
+        margin-top: 20px;
+    }
+
+    .description-footer {
+        margin-top: 10px;
+        font-size: $font-size-small;
+    }
+
+    .list {
+        margin-left: 30px;
+
+        .list-item {
+            margin-bottom: 15px;
+        }
+    }
+
+    .btn-action {
+        width: 100%;
+        margin-bottom: 10px;
+        text-align: left;
+    }
+
+    .link-troubleshooting {
+        margin-top: 10px;
+    }
+
+    .col-right {
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+        justify-content: flex-end;
+    }
+}
