@@ -31,8 +31,6 @@ export default class MollieApplePayPaymentMethod extends Plugin {
             shopUrl + '/mollie/apple-pay/applepay-id',
             (data) => {
                 me.hideApplePay('#paymentMethod' + data.id);
-            },
-            () => {
             }
         );
 

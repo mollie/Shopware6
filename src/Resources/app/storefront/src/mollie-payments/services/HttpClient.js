@@ -8,7 +8,7 @@ export default class HttpClient {
      * @param {function} callbackError
      * @param {string} contentType
      */
-    get(url, callbackSuccess, callbackError, contentType = DEFAULT_CONTENT_TYPE) {
+    get(url, callbackSuccess = null, callbackError = null, contentType = DEFAULT_CONTENT_TYPE) {
         this.send('GET', url, null, callbackSuccess, callbackError, contentType);
     }
 
@@ -20,7 +20,7 @@ export default class HttpClient {
      * @param {function} callbackError
      * @param {string} contentType
      */
-    post(url, data, callbackSuccess, callbackError, contentType = DEFAULT_CONTENT_TYPE) {
+    post(url, data, callbackSuccess = null, callbackError = null, contentType = DEFAULT_CONTENT_TYPE) {
         this.send('POST', url, data, callbackSuccess, callbackError, contentType);
     }
 
@@ -33,13 +33,17 @@ export default class HttpClient {
      * @param {function} callbackError
      * @param {string} contentType
      */
-    send(type, url, data, callbackSuccess, callbackError, contentType = DEFAULT_CONTENT_TYPE)
+    send(type, url, data, callbackSuccess = null, callbackError = null, contentType = DEFAULT_CONTENT_TYPE)
     {
         const xhr = new XMLHttpRequest();
         xhr.open(type, url);
         xhr.setRequestHeader('Content-Type', contentType);
 
         xhr.onload = function () {
+            if(!callbackSuccess || typeof callbackSuccess !== 'function') {
+                return;
+            }
+
             const responseType = xhr.getResponseHeader('content-type');
             const body = 'response' in xhr ? xhr.response : xhr.responseText
 
@@ -51,6 +55,10 @@ export default class HttpClient {
         };
 
         xhr.onerror = function () {
+            if(!callbackError || typeof callbackSuccess !== 'function') {
+                return;
+            }
+
             callbackError();
         };
 
