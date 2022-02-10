@@ -20,7 +20,7 @@ export default class HttpClient {
      * @param {function} callbackError
      * @param {string} contentType
      */
-    post(url, data, callbackSuccess = null, callbackError = null, contentType = DEFAULT_CONTENT_TYPE) {
+    post(url, data = null, callbackSuccess = null, callbackError = null, contentType = DEFAULT_CONTENT_TYPE) {
         this.send('POST', url, data, callbackSuccess, callbackError, contentType);
     }
 
@@ -33,7 +33,7 @@ export default class HttpClient {
      * @param {function} callbackError
      * @param {string} contentType
      */
-    send(type, url, data, callbackSuccess = null, callbackError = null, contentType = DEFAULT_CONTENT_TYPE)
+    send(type, url, data = null, callbackSuccess = null, callbackError = null, contentType = DEFAULT_CONTENT_TYPE)
     {
         const xhr = new XMLHttpRequest();
         xhr.open(type, url);
