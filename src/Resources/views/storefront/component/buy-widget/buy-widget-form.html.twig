@@ -1,0 +1,14 @@
+{% sw_extends '@Storefront/storefront/component/buy-widget/buy-widget-form.html.twig' %}
+
+{% block buy_widget_buy_button %}
+    {% if(config('MolliePayments.config.enableSubscriptions') and page.product.customFields.mollie_subscription.mollie_subscription_product) %}
+        <button class="btn btn-primary btn-block btn-buy"
+                title="{{ config('MolliePayments.config.addToCartText') }}"
+                aria-label="{{ config('MolliePayments.config.addToCartText') }}">
+            {{ config('MolliePayments.config.addToCartText') }}
+            {% if config('MolliePayments.config.addToCartText') is empty %} {{ "mollie-subscriptions.product.addToCartText"|trans|sw_sanitize }} {% endif %}
+        </button>
+    {% else %}
+        {{ parent() }}
+    {% endif %}
+{% endblock %}
