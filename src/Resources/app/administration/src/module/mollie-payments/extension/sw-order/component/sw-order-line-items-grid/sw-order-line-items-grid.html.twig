@@ -67,7 +67,7 @@
               @modal-close="onCloseRefundModal"
               :title="$tc('mollie-payments.modals.refund.title')"
               :variant="refunds.length > 0 ? 'large' : 'small'">
-        <sw-container columns="3fr 2fr" :gap="refunds.length > 0 ? '16px' : '0'">
+        <sw-container columns="1fr auto" :gap="refunds.length > 0 ? '16px' : '0'">
             <sw-data-grid
                     :dataSource="refunds"
                     :columns="getRefundListColumns"
