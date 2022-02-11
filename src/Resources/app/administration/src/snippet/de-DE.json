@@ -15,11 +15,35 @@
     "general": {
       "mainMenuItemGeneral": "Mollie Payments Zahlungen",
       "descriptionTextModule": "Mollie Payments Zahlungen",
-      "btnMollieActions" : "Mollie Aktionen",
+      "btnMollieActions": "Mollie Aktionen",
       "refundThroughMollie": "Rückerstattung über Mollie",
       "shipThroughMollie": "Versand bei Mollie melden"
     },
     "config": {
+      "info": {
+        "title": "Hallo ##userName##, Willkommen bei Mollie!",
+        "descriptionTop": "Starten mit Mollie ist einfach!",
+        "descriptionBottom": "Das ist alles!",
+        "descriptionFooter": "Wenn du mehr über unser Plugin lernen möchtest, besuche bitte unsere offizielle Dokumentation.",
+        "onboardingStep1": "Registriere dich für ein Mollie Konto.",
+        "onboardingStep2": "Gib deine API Schlüssel weiter unten ein.",
+        "onboardingStep2TestMode": "Aktiviere den 'Testmodus' wenn du Zahlungen nur testen möchtest.",
+        "onboardingStep3": "Weise die Zahlungsarten deinen Verkaufskanälen zu.",
+        "onboardingStep3Link": "Verkaufskanäle öffnen",
+        "btnDocumentation": "Dokumentation",
+        "btnSupport": "Support",
+        "btnTroubleshooting": "zu den Fehlerbehebungen"
+      },
+      "api": {
+        "apiLinkButton": "Erhalten Sie Ihre API Keys vom Mollie Dashboard",
+        "testButton": "Teste API Keys",
+        "testApiKeys": {
+          "title": "Mollie Payments",
+          "apiKey": "API Schlüssel",
+          "isValid": "ist gültig",
+          "isInvalid": "ist ungültig"
+        }
+      },
       "payments": {
         "updatePaymentMethods": {
           "title": "Mollie Payments",
@@ -147,16 +171,6 @@
       "totalRemaining": "Rückerstattbar",
       "totalVouchers": "Gutscheine",
       "totalShipments": "Versandte Menge ({quantity} Stück)"
-    }
-  },
-  "sw-payment": {
-    "apiLinkButton": "Erhalten Sie Ihre API Keys vom Mollie Dashboard",
-    "testButton": "Prüfung",
-    "testApiKeys": {
-      "title": "Mollie Payments",
-      "apiKey": "API Schlüssel",
-      "isValid": "ist gültig",
-      "isInvalid": "ist ungültig"
     }
   },
   "sw-customer": {

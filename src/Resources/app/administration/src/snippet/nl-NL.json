@@ -15,11 +15,35 @@
     "general": {
       "mainMenuItemGeneral": "Mollie betalingen",
       "descriptionTextModule": "Mollie betalingen",
-      "btnMollieActions" : "Mollie acties",
+      "btnMollieActions": "Mollie acties",
       "refundThroughMollie": "Terugbetaling via Mollie",
       "shipThroughMollie": "Verzending door Mollie"
     },
     "config": {
+      "info": {
+        "title": "Hi ##userName##, Welkom bij Mollie!",
+        "descriptionTop": "Onboarding is eenvoudig bij Mollie!",
+        "descriptionBottom": "Dat is alles!",
+        "descriptionFooter": "Als je meer wilt weten over onze plugin, bezoek dan onze officiële documentatie pagina.",
+        "onboardingStep1": "Meld je aan voor een Mollie Account.",
+        "onboardingStep2": "Voer je API sleutels in de sectie hieronder in.",
+        "onboardingStep2TestMode": "Zet 'Test Mode' aan als je alleen betalingen wilt testen.",
+        "onboardingStep3": "Wijs betaalmethoden toe aan je verkoopkanaal.",
+        "onboardingStep3Link": "naar je verkoopkanalen",
+        "btnDocumentation": "Documentatie",
+        "btnSupport": "Support",
+        "btnTroubleshooting": "Troubleshooting Gids"
+      },
+      "api": {
+        "apiLinkButton": "Haal jouw API sleutels van het Mollie Dashboard",
+        "testButton": "Controlle API Keys",
+        "testApiKeys": {
+          "title": "Mollie Payments",
+          "apiKey": "API Key",
+          "isValid": "is geldig",
+          "isInvalid": "is ongeldig"
+        }
+      },
       "payments": {
         "updatePaymentMethods": {
           "title": "Mollie Payments",
@@ -147,16 +171,6 @@
       "totalRemaining": "Terug te betalen",
       "totalVouchers": "Voucher",
       "totalShipments": "Verzonden bedrag ({quantity} items)"
-    }
-  },
-  "sw-payment": {
-    "apiLinkButton": "Haal uw API sleutels van het Mollie Dashboard",
-    "testButton": "Controlle",
-    "testApiKeys": {
-      "title": "Mollie Payments",
-      "apiKey": "API Key",
-      "isValid": "is geldig",
-      "isInvalid": "is ongeldig"
     }
   },
   "sw-customer": {

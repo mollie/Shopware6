@@ -1,9 +1,11 @@
-import template from './mollie-test-api-key.html.twig';
+import template from './mollie-pluginconfig-section-api.html.twig';
+import './mollie-pluginconfig-section-api.scss';
+
 
 // eslint-disable-next-line no-undef
 const {Component, Mixin} = Shopware;
 
-Component.register('mollie-test-api-key', {
+Component.register('mollie-pluginconfig-section-api', {
     template,
 
     inject: [
@@ -30,8 +32,8 @@ Component.register('mollie-test-api-key', {
 
                     response.results.forEach(function (result) {
                         const messageData = {
-                            title: me.$tc('sw-payment.testApiKeys.title'),
-                            message: `${me.$tc('sw-payment.testApiKeys.apiKey')} "${result.key}" (${result.mode}) ${(result.valid === true ? me.$tc('sw-payment.testApiKeys.isValid') : me.$tc('sw-payment.testApiKeys.isInvalid'))}.`,
+                            title: me.$tc('mollie-payments.config.api.testApiKeys.title'),
+                            message: `${me.$tc('mollie-payments.config.api.testApiKeys.apiKey')} "${result.key}" (${result.mode}) ${(result.valid === true ? me.$tc('mollie-payments.config.api.testApiKeys.isValid') : me.$tc('mollie-payments.config.api.testApiKeys.isInvalid'))}.`,
                         };
 
                         const input = result.mode === 'live' ? liveApiKeyInput : testApiKeyInput;
