@@ -40,8 +40,16 @@ class PaymentScreenAction {
      *
      */
     selectPaid() {
-
         cy.get('input[value="paid"]').click();
+
+        this._clickSubmit();
+    }
+
+    /**
+     *
+     */
+    selectPending() {
+        cy.get('input[value="pending"]').click();
 
         this._clickSubmit();
     }
