@@ -17,21 +17,19 @@
                     {% block sw_order_line_items_grid_mollie_actions_button %}
                         <sw-button class="sw-order-line-items-grid__actions-btn" variant="ghost" size="small"
                                    :block="true"
-                                   v-if="possibleActionsCount >= 1">
+                                   :disabled="possibleActionsCount < 1">
                             <sw-icon name="default-badge-info" decorative></sw-icon>
-                            {{ $tc('mollie-payments.general.btnMollieActions') }}&nbsp;({{ possibleActionsCount }})
-                        </sw-button>
-                        <sw-button class="sw-order-line-items-grid__actions-btn" variant="ghost" size="small"
-                                   v-if="possibleActionsCount < 1"
-                                   disabled="true">
-                            {{ $tc('mollie-payments.general.btnMollieActions') }}
+                            {{ $tc('mollie-payments.general.btnMollieActions') }}&nbsp;
+                            <template v-if="possibleActionsCount >= 1">
+                                ({{ possibleActionsCount }})
+                            </template>
                         </sw-button>
                     {% endblock %}
 
                     {% block sw_order_line_items_grid_mollie_actions_context_button %}
-                        <sw-context-button>
+                        <sw-context-button :disabled="possibleActionsCount < 1">
                             <template #button>
-                                <sw-button variant="ghost" size="small" square>
+                                <sw-button variant="ghost" size="small" square :disabled="possibleActionsCount < 1">
                                     <sw-icon name="small-arrow-small-down" decorative>
                                     </sw-icon>
                                 </sw-button>
