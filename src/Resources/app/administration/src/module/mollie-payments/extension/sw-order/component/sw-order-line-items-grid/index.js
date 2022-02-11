@@ -152,7 +152,7 @@ Component.override('sw-order-line-items-grid', {
                     total += (refund.amount.value * 100 || 0);
                 }
             });
-            return total / 100;
+            return Math.max(0, total / 100);
         },
 
         orderRefundAmount() {
