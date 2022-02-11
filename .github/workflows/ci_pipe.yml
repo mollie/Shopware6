@@ -215,7 +215,7 @@ jobs:
 
       - name: Start Docker
         run: |
-          docker run --rm --name shop -d dockware/play:${{ matrix.shopware }}
+          docker run --rm --name shop -d dockware/dev:${{ matrix.shopware }}
           sleep 30
           docker logs shop
 
