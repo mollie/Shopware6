@@ -1,0 +1,12 @@
+<sw-container gap="16px" columns="1fr 2fr">
+    <sw-button @click="onTestButtonClicked" ref="testApiButton">
+        {{ $tc('mollie-payments.config.api.testButton') }}
+    </sw-button>
+    <sw-external-link
+            :small="false" icon="small-arrow-small-external" rel="noopener"
+            class="mollie-pluginconfig-payments-link-limits"
+            href="https://www.mollie.com/dashboard/developers/api-keys"
+            target="_blank">
+        {{ $tc('mollie-payments.config.api.apiLinkButton') }}
+    </sw-external-link>
+</sw-container>

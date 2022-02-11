@@ -215,17 +215,20 @@ jobs:
 
       - name: Start Docker
         run: |
-          docker run --rm --name shop -d dockware/play:${{ matrix.shopware }}
+          docker run --rm --name shop -d dockware/dev:${{ matrix.shopware }}
           sleep 30
           docker logs shop
 
       - name: Upload into Docker
-        run: docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
-
-      - name: Install Plugin
         run: |
-          docker exec shop bash -c "php bin/console plugin:refresh"
-          docker exec shop bash -c "php bin/console plugin:install MolliePayments --activate"
+          docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
+          docker exec shop bash -c 'sudo chown www-data:www-data /var/www/html/custom/plugins -R'
+
+      - name: Install and Build Plugin
+        run: |
+          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make clean'
+          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make install'
+          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make build'
 
   # ------------------------------------------------------------------------------------------------------------------------
 

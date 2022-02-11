@@ -20,6 +20,30 @@
       "shipThroughMollie": "Ship through Mollie"
     },
     "config": {
+      "info": {
+        "title": "Hi ##userName##, Welcome to Mollie!",
+        "descriptionTop": "Onboarding is easy with Mollie!",
+        "descriptionBottom": "That's it!",
+        "descriptionFooter": "If you want to learn more about our plugin, please visit our official documentation page.",
+        "onboardingStep1": "Sign up for a Mollie Account.",
+        "onboardingStep2": "Enter your API keys in the section below.",
+        "onboardingStep2TestMode": "Turn on 'Test Mode' if you want to only test payments.",
+        "onboardingStep3": "Assign payment methods to your sales channel.",
+        "onboardingStep3Link": "to your sales channels",
+        "btnDocumentation": "Documentation",
+        "btnSupport": "Support",
+        "btnTroubleshooting": "Troubleshooting Guide"
+      },
+      "api": {
+        "apiLinkButton": "Get your API keys from the Mollie Dashboard",
+        "testButton": "Test API Keys",
+        "testApiKeys": {
+          "title": "Mollie Payments",
+          "apiKey": "API key",
+          "isValid": "is valid",
+          "isInvalid": "is invalid"
+        }
+      },
       "payments": {
         "updatePaymentMethods": {
           "title": "Mollie Payments",
@@ -147,16 +171,6 @@
       "totalRemaining": "Refundable amount",
       "totalVouchers": "Voucher amount",
       "totalShipments": "Shipped amount ({quantity} items)"
-    }
-  },
-  "sw-payment": {
-    "apiLinkButton": "Get your API keys from the Mollie Dashboard",
-    "testButton": "Test",
-    "testApiKeys": {
-      "title": "Mollie Payments",
-      "apiKey": "API key",
-      "isValid": "is valid",
-      "isInvalid": "is invalid"
     }
   },
   "sw-customer": {
