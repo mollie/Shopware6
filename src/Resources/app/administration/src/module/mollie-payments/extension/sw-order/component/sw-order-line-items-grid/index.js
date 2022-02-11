@@ -146,17 +146,17 @@ Component.override('sw-order-line-items-grid', {
         },
 
         refundAmountPending() {
-            let total = 0.0;
+            let total = 0;
             this.refunds.forEach((refund) => {
                 if(refund.isPending || refund.isQueued) {
-                    total += (refund.amount.value || 0);
+                    total += (refund.amount.value * 100 || 0);
                 }
             });
-            return total;
+            return total / 100;
         },
 
         orderRefundAmount() {
-            return this.order.amountTotal - this.refundedAmount - this.refundAmountPending;
+            return Math.max(0, ((this.order.amountTotal * 100) - (this.refundedAmount * 100) - (this.refundAmountPending * 100)) / 100);
         },
 
         refundAmountHigherThanOrderThreshold() {
