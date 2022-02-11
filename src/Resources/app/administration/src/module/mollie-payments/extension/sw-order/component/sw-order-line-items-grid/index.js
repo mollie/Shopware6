@@ -247,12 +247,12 @@ Component.override('sw-order-line-items-grid', {
                 .then((response) => {
                     if (response.success) {
                         this.createNotificationSuccess({
-                            message: this.$tc('mollie-payments.modals.refund.success'),
+                            message: this.$tc('mollie-payments.modals.refund.cancelSuccess'),
                         });
                         this.showRefundModal = false;
                     } else {
                         this.createNotificationError({
-                            message: this.$tc('mollie-payments.modals.refund.error'),
+                            message: this.$tc('mollie-payments.modals.refund.cancelError'),
                         });
                     }
                 })
