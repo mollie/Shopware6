@@ -14,7 +14,8 @@
                         {% block page_account_mollie_subscriptions_item_status %}
                             <div class="order-table-header-order-status">
                                 {% block page_account_mollie_subscriptions_item_status_badge %}
-                                    <span class="badge badge-lg order-item-status-badge order-item-status-badge-{{ subscription.status }}">
+                                    <span
+                                        class="badge badge-lg order-item-status-badge order-item-status-badge-{{ subscription.status }}">
                                             {{ subscription.status }}
                                         </span>
                                 {% endblock %}
@@ -66,33 +67,77 @@
                                             {% endblock %}
 
                                             {% block page_account_subscriptions_item_context_menu_reorder_form_line_items_input %}
-                                                    {% block page_account_subscriptions_item_context_menu_reorder_form_line_item_input %}
-                                                        <input type="hidden"
-                                                               name="lineItems[{{ subscription.productId }}][id]"
-                                                               value="{{ subscription.productId }}">
-                                                        <input type="hidden"
-                                                               name="lineItems[{{ subscription.productId }}][referencedId]"
-                                                               value="{{ subscription.productId }}">
-                                                        <input type="hidden"
-                                                               name="lineItems[{{ subscription.productId }}][type]"
-                                                               value="product">
-                                                        <input type="hidden"
-                                                               name="lineItems[{{ subscription.productId }}][stackable]"
-                                                               value="1">
-                                                        <input type="hidden"
-                                                               name="lineItems[{{ subscription.productId }}][removable]"
-                                                               value="1">
-                                                        <input type="hidden"
-                                                               name="lineItems[{{ subscription.productId }}][quantity]"
-                                                               value="1">
-                                                    {% endblock %}
+                                                {% block page_account_subscriptions_item_context_menu_reorder_form_line_item_input %}
+                                                    <input type="hidden"
+                                                           name="lineItems[{{ subscription.productId }}][id]"
+                                                           value="{{ subscription.productId }}">
+                                                    <input type="hidden"
+                                                           name="lineItems[{{ subscription.productId }}][referencedId]"
+                                                           value="{{ subscription.productId }}">
+                                                    <input type="hidden"
+                                                           name="lineItems[{{ subscription.productId }}][type]"
+                                                           value="product">
+                                                    <input type="hidden"
+                                                           name="lineItems[{{ subscription.productId }}][stackable]"
+                                                           value="1">
+                                                    <input type="hidden"
+                                                           name="lineItems[{{ subscription.productId }}][removable]"
+                                                           value="1">
+                                                    <input type="hidden"
+                                                           name="lineItems[{{ subscription.productId }}][quantity]"
+                                                           value="1">
+                                                {% endblock %}
                                             {% endblock %}
 
                                             {% block page_account_subscriptions_item_context_menu_reorder_form_button %}
-                                                <button class="order-table-header-context-menu-content-link" type="submit">{{ "account.mollieSubscriptionContextMenuReorder"|trans|sw_sanitize }}</button>
+                                                <button class="order-table-header-context-menu-content-link"
+                                                        type="submit">{{ "account.mollieSubscriptionContextMenuReorder"|trans|sw_sanitize }}</button>
                                             {% endblock %}
                                         </form>
                                     {% endblock %}
+                                {% endblock %}
+
+                                {% block page_account_subscriptions_item_context_menu_cancel %}
+                                    {% set cancelAction %}
+                                        {% block page_account_subscriptions_item_context_menu_cancel_form_action %}
+                                            {{ path('frontend.account.mollie.cancel',
+                                                {
+                                                    'subscriptionId': subscription.subscriptionId,
+                                                    'mollieCustomerId': subscription.mollieCustomerId,
+                                                    'salesChannelId': subscription.salesChannelId
+                                                }
+                                            ) }}
+                                        {% endblock %}
+                                    {% endset %}
+
+                                    {% if(subscription.status != 'canceled') %}
+                                        {% block page_account_subscriptions_item_context_menu_cancel_form %}
+                                            <form action="{{ cancelAction }}"
+                                                  id="subscriptionsDetailForm-{{ subscriptions.Id }}"
+                                                  method="post">
+
+                                                {% block page_account_subscriptions_item_context_menu_cancel_form_csrf %}
+                                                    {{ sw_csrf('frontend.account.mollie.cancel') }}
+                                                {% endblock %}
+
+                                                {% block page_account_subscriptions_item_context_menu_cancel_form_line_items_input %}
+                                                    {% block page_account_subscriptions_item_context_menu_cancel_form_line_item_input %}
+                                                        <input type="hidden"
+                                                               name="mollie[subscription_id]"
+                                                               value="{{ subscription.subscriptionId }}">
+                                                        <input type="hidden"
+                                                               name="mollie[customer_id]"
+                                                               value="{{ subscription.mollieCustomerId }}">
+                                                    {% endblock %}
+                                                {% endblock %}
+
+                                                {% block page_account_mollie_subscriptions_item_order_table_body_cell_toggle_subscription_details_button %}
+                                                    <button class="order-table-header-context-menu-content-link"
+                                                            type="submit">{{ "account.mollieSubscriptionCancel"|trans|sw_sanitize }}</button>
+                                                {% endblock %}
+                                            </form>
+                                        {% endblock %}
+                                    {% endif %}
                                 {% endblock %}
                             {% endblock %}
                             </div>
@@ -101,116 +146,20 @@
                 {% endblock %}
 
                 {% block page_account_mollie_subscriptions_item_description_col %}
-                    <div class="col-12 order-table-header-description">
+                    <div class="col-12 order-table-header-description mb-2">
                         {% block page_account_mollie_subscriptions_item_description %}
-                            <span class="order-table-body-value">{{ subscription.description }}</span>
+                            <span class="order-table-body-value d-block">{{ subscription.description }}</span>
+                        {% endblock %}
+                        {% block page_account_mollie_subscriptions_item_price %}
+                            <span class="order-table-body-value d-block">{{ "account.mollieSubscriptionAmount"|trans|sw_sanitize }}: {{ subscription.amount|currency(currencyIsoCode) }}</span>
+                        {% endblock %}
+                        {% block page_account_mollie_subscriptions_item_next_payment %}
+                            <span class="order-table-body-value d-block">{{ "account.mollieSubscriptionNextPayment"|trans|sw_sanitize }} {{ subscription.nextPaymentDate| format_date('short', locale=app.request.locale) }}</span>
                         {% endblock %}
                     </div>
                 {% endblock %}
             </div>
 
-            {% block page_account_mollie_subscriptions_item_subscriptions_table_header_col %}
-                {% block page_account_mollie_subscriptions_item_subscriptions_table_header %}
-                    <div class="col-12 row order-table-header-order-table-header">
-
-                        {% block page_account_mollie_subscriptions_item_subscriptions_table_header_cell_id %}
-                            <div class="col-12 col-sm order-table-header-order-table-header-cell">{{ "account.mollieSubscriptionId"|trans|sw_sanitize }}</div>
-                        {% endblock %}
-
-                        {% block page_account_mollie_subscriptions_item_subscriptions_table_header_cell_amount %}
-                            <div class="col-12 col-sm order-table-header-order-table-header-cell">{{ "account.mollieSubscriptionAmount"|trans|sw_sanitize }}</div>
-                        {% endblock %}
-
-                        {% block page_account_mollie_subscriptions_item_subscriptions_table_header_cell_next %}
-                            <div class="col-12 col-sm order-table-header-order-table-header-cell">{{ "account.mollieSubscriptionNextPayment"|trans|sw_sanitize }}</div>
-                        {% endblock %}
-
-                        {% block page_account_mollie_subscriptions_item_subscriptions_table_header_cell_action %}
-                            <div class="col-12 col-sm order-table-header-order-table-header-cell"></div>
-                        {% endblock %}
-                    </div>
-                {% endblock %}
-            {% endblock %}
-
-            {% block page_account_mollie_subscriptions_item_subscription_table_body_col %}
-            {% block page_account_mollie_subscriptions_item_subscription_table_body %}
-                <div class="col-12 row order-table-header-order-table-body">
-
-                    {% block page_account_mollie_subscriptions_item_subscription_table_body_cell_id %}
-                        <div class="col-12 col-sm order-table-header-order-table-body-cell">
-                            <span class="order-table-body-value">{{ subscription.subscriptionId }}</span>
-                        </div>
-                    {% endblock %}
-
-                    {% block page_account_mollie_subscriptions_item_subscription_table_body_cell_amount %}
-                        <div class="col-12 col-sm order-table-header-order-table-body-cell">
-                            <span class="order-table-body-value">{{ subscription.amount|currency(currencyIsoCode) }}</span>
-                        </div>
-                    {% endblock %}
-
-                    {% block page_account_mollie_subscriptions_item_subscription_table_body_cell_next %}
-                        <div class="col-12 col-sm order-table-header-order-table-body-cell">
-                            <span class="order-table-body-value">{{ subscription.nextPaymentDate| format_date('short', locale=app.request.locale) }}</span>
-                        </div>
-                    {% endblock %}
-
-                    {% block page_account_mollie_subscriptions_item_subscription_table_body_cell_toggle_subscription_details %}
-                        <div class="col-12 col-sm-2 order-item order-item-actions order-table-header-order-table-body-cell">
-
-                            {% block page_account_subscriptions_item_context_menu_cancel %}
-                                {% set cancel %}
-                                    {% block page_account_subscriptions_item_context_menu_cancel_form_action %}
-                                        {{ path('frontend.account.mollie.cancel',
-                                            {
-                                                'subscriptionId': subscription.subscriptionId,
-                                                'mollieCustomerId': subscription.mollieCustomerId,
-                                                'salesChannelId': subscription.salesChannelId
-                                            }
-                                        ) }}
-                                    {% endblock %}
-                                {% endset %}
-
-                                {% if(subscription.status != 'canceled') %}
-                                    {% block page_account_subscriptions_item_context_menu_cancel_form %}
-                                    <form action="{{ cancel }}"
-                                          id="subscriptionsDetailForm-{{ subscriptions.Id }}"
-                                          method="post">
-
-                                        {% block page_account_subscriptions_item_context_menu_cancel_form_csrf %}
-                                            {{ sw_csrf('frontend.account.mollie.cancel') }}
-                                        {% endblock %}
-
-                                        {% block page_account_subscriptions_item_context_menu_cancel_form_line_items_input %}
-                                            {% block page_account_subscriptions_item_context_menu_cancel_form_line_item_input %}
-                                                <input type="hidden"
-                                                       name="mollie[subscription_id]"
-                                                       value="{{ subscription.subscriptionId }}">
-                                                <input type="hidden"
-                                                       name="mollie[customer_id]"
-                                                       value="{{ subscription.mollieCustomerId }}">
-                                            {% endblock %}
-                                        {% endblock %}
-
-                                        {% block page_account_mollie_subscriptions_item_order_table_body_cell_toggle_subscription_details_button %}
-                                            <button class="btn btn-light btn-sm order-hide-btn"
-                                                    type="submit"
-                                                    data-target="{{ subscription.subscriptionId }}"
-                                                    aria-expanded="false">
-
-                                                {% block page_account_mollie_subscriptions_item_order_table_body_cell_toggle_subscription_details_button_text %}
-                                                    <span class="order-hide-btn-text">{{ "account.mollieSubscriptionCancel"|trans|sw_sanitize }}</span>
-                                                {% endblock %}
-                                            </button>
-                                        {% endblock %}
-                                    </form>
-                                {% endblock %}
-                                {% endif %}
-                            {% endblock %}
-                        </div>
-                    {% endblock %}
-                </div>
-            {% endblock %}
         </div>
-        {% endblock %}
     </div>
 {% endblock %}
