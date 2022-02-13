@@ -6,14 +6,14 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Shopware\Core\Framework\Migration\MigrationStep;
 
-class Migration1821457042 extends MigrationStep
+class Migration1644753635CreateSubscriptionTable extends MigrationStep
 {
     /**
      * @return int
      */
     public function getCreationTimestamp(): int
     {
-        return 1821457042;
+        return 1644753635;
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Core\Content\SubscriptionToProduct;
 
+use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\CreatedAtField;
@@ -56,8 +57,8 @@ class SubscriptionToProductDefinition extends EntityDefinition
             (new StringField('mollie_customer_id', 'mollieCustomerId')),
             (new StringField('subscription_id', 'subscriptionId')),
             (new FkField('product_id', 'productId', ProductDefinition::class))->addFlags(new ApiAware()),
-            (new FkField('sales_channel_id', 'salesChannelId', SalesChannelDefinition::class))
-                ->addFlags(new ApiAware()),
+            (new FkField('original_order_id', 'originalOrderId', OrderDefinition::class))->addFlags(new ApiAware()),
+            (new FkField('sales_channel_id', 'salesChannelId', SalesChannelDefinition::class))->addFlags(new ApiAware()),
             new DateTimeField('next_payment_date', 'nextPaymentDate'),
             new StringField('status', 'status'),
             new StringField('description', 'description'),
@@ -65,7 +66,7 @@ class SubscriptionToProductDefinition extends EntityDefinition
             new FloatField('amount', 'amount'),
 
             new CreatedAtField(),
-            new UpdatedAtField()
+            new UpdatedAtField(),
         ]);
     }
 }

@@ -3,9 +3,15 @@
 namespace Kiener\MolliePayments\Service\Subscription\DTO;
 
 use DateTimeImmutable;
+use Shopware\Core\Framework\Uuid\Uuid;
 
 class SubscriptionOption
 {
+    /**
+     * @var string
+     */
+    private $subscriptionId;
+
     /**
      * @var string
      */
@@ -53,6 +59,7 @@ class SubscriptionOption
 
 
     /**
+     * @param string $subscriptionId
      * @param string $productId
      * @param string $salesChannelId
      * @param array $amount
@@ -64,6 +71,7 @@ class SubscriptionOption
      * @param $times
      */
     public function __construct(
+        string $subscriptionId,
         string $productId,
         string $salesChannelId,
         array $amount,
@@ -74,6 +82,7 @@ class SubscriptionOption
         DateTimeImmutable $startDate,
         $times = null
     ) {
+        $this->subscriptionId = $subscriptionId;
         $this->productId = $productId;
         $this->salesChannelId = $salesChannelId;
         $this->amount = $amount;
@@ -83,6 +92,11 @@ class SubscriptionOption
         $this->webhookUrl = $webhookUrl;
         $this->startDate = $startDate;
         $this->times = $times;
+    }
+
+    public function getSubscriptionId(): string
+    {
+        return $this->subscriptionId;
     }
 
     /**
@@ -100,8 +114,6 @@ class SubscriptionOption
     {
         return $this->salesChannelId;
     }
-
-
 
     public function toArray(): array
     {

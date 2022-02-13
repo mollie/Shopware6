@@ -10,26 +10,12 @@ use Kiener\MolliePayments\Setting\Source\IntervalType;
 use Kiener\MolliePayments\Setting\Source\RepetitionType;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Framework\Uuid\Uuid;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SubscriptionOptions
 {
-    /**
-     * @var OrderEntity
-     */
-    private $order;
-
-    /**
-     * @var OrderLineItemEntity
-     */
-    private $orderItem;
-
-    /**
-     * @var array
-     */
-    private $customFields;
-
     /**
      * @var RouterInterface
      */
@@ -41,16 +27,6 @@ class SubscriptionOptions
     private $translator;
 
     /**
-     * @var array
-     */
-    private $options = [];
-
-    /**
-     * @var string
-     */
-    private $transactionsId;
-
-    /**
      * @param RouterInterface $router
      * @param TranslatorInterface $translator
      */
@@ -60,108 +36,114 @@ class SubscriptionOptions
         $this->translator = $translator;
     }
 
-    /**
-     * @param OrderEntity $order
-     * @param $transactionsId
-     * @return SubscriptionOption[]
-     * @throws Exception
-     */
-    public function forOrder(OrderEntity $order, $transactionsId): array
+    public function forOrder(OrderEntity $order, string $transactionsId): array
     {
         $options = [];
-        $this->order = $order;
-        $this->transactionsId = $transactionsId;
 
         foreach ($order->getLineItems() as $orderItem) {
             $payload = $orderItem->getPayload();
-            $this->customFields = $payload['customFields'];
+            $customFields = $payload['customFields'];
 
-            if (!array_key_exists('mollie_subscription', $this->customFields)
-                || !array_key_exists('mollie_subscription_product', $this->customFields['mollie_subscription'])
-                || !$this->customFields['mollie_subscription']['mollie_subscription_product']) {
+            if (!array_key_exists('mollie_subscription', $customFields)
+                || !array_key_exists('mollie_subscription_product', $customFields['mollie_subscription'])
+                || !$customFields['mollie_subscription']['mollie_subscription_product']) {
                 continue;
             }
 
-            $options[] = $this->createSubscriptionFor($orderItem);
+            $options[] = $this->createSubscriptionFor($orderItem, $order, $transactionsId);
         }
 
         return $options;
     }
 
-    /**
-     * @param OrderLineItemEntity $orderItem
-     * @return SubscriptionOption
-     */
-    private function createSubscriptionFor(OrderLineItemEntity $orderItem): SubscriptionOption
-    {
-        $this->options = [];
-        $this->orderItem = $orderItem;
+    private function createSubscriptionFor(
+        OrderLineItemEntity $lineItem,
+        OrderEntity $order,
+        string $transactionId
+    ): SubscriptionOption {
+        $options = [];
 
-        $this->addAmount();
-        $this->addTimes();
-        $this->addInterval();
-        $this->addDescription();
-        $this->addMetadata();
-        $this->addWebhookUrl();
-        $this->addStartDate();
+        $payload = $lineItem->getPayload();
+        $customFields = $payload['customFields'];
+
+        $subscriptionId = Uuid::randomHex();
+
+        $options = $this->addAmount($options, $order, $lineItem);
+        $options = $this->addTimes($options, $customFields);
+        $options = $this->addInterval($options, $customFields);
+        $options = $this->addDescription($options, $order, $lineItem);
+        $options = $this->addMetadata($options, $lineItem);
+        $options = $this->addWebhookUrl($options, $subscriptionId);
+        $options = $this->addStartDate($options, $customFields);
 
         return new SubscriptionOption(
-            $orderItem->getProductId(),
-            $this->order->getSalesChannelId(),
-            $this->options['amount'] ?? [],
-            $this->options['interval'] ?? '',
-            $this->options['description'] ?? '',
-            $this->options['metadata'] ?? [],
-            $this->options['webhookUrl'] ?? '',
-            $this->options['startDate'],
-            $this->options['times'] ?? null
+            $subscriptionId,
+            $lineItem->getProductId(),
+            $order->getSalesChannelId(),
+            $options['amount'] ?? [],
+            $options['interval'] ?? '',
+            $options['description'] ?? '',
+            $options['metadata'] ?? [],
+            $options['webhookUrl'] ?? '',
+            $options['startDate'],
+            $options['times'] ?? null
         );
     }
 
-    private function addAmount()
+    private function addAmount(array $options, OrderEntity $order, OrderLineItemEntity $lineItem): array
     {
-        $this->options['amount'] = [
-            'currency' => $this->order->getCurrency()->getIsoCode(),
-            'value' => number_format($this->orderItem->getPrice()->getTotalPrice(), 2, '.', '')
+        $options['amount'] = [
+            'currency' => $order->getCurrency()->getIsoCode(),
+            'value' => number_format($lineItem->getPrice()->getTotalPrice(), 2, '.', '')
         ];
+
+        return $options;
     }
 
-    private function addTimes()
+    private function addTimes(array $options, array $customFields): array
     {
-        $type = $this->customFields["mollie_subscription"]['mollie_subscription_repetition_amount'];
-        if (!$type || $type == RepetitionType::INFINITE) {
-            return;
+        $type = $customFields["mollie_subscription"]['mollie_subscription_repetition_type'];
+        if ($type && $type !== RepetitionType::INFINITE) {
+            $options['times'] = $customFields["mollie_subscription"]['mollie_subscription_repetition_amount'];
         }
 
-        $this->options['times'] = $this->customFields["mollie_subscription"]['mollie_subscription_repetition_amount'];
+        return $options;
     }
 
-    private function addInterval()
+    private function addInterval(array $options, array $customFields): array
     {
-        $intervalType = $this->customFields["mollie_subscription"]['mollie_subscription_interval_type'];
-        $intervalAmount = (int)$this->customFields["mollie_subscription"]['mollie_subscription_interval_amount'];
+        $intervalType = $customFields["mollie_subscription"]['mollie_subscription_interval_type'];
+        $intervalAmount = (int)$customFields["mollie_subscription"]['mollie_subscription_interval_amount'];
 
-        $this->options['interval'] = $intervalAmount . ' ' . $intervalType;
+        $options['interval'] = $intervalAmount . ' ' . $intervalType;
+
+        return $options;
     }
 
-    private function addDescription()
+    private function addDescription(array $options, OrderEntity $order, OrderLineItemEntity $lineItem): array
     {
-        $this->options['description'] = $this->order->getOrderNumber() . ': '
-            . $this->orderItem->getLabel() . ' - '
-            . $this->getIntervalDescription();
+        $options['description'] = $order->getOrderNumber() . ': '
+            . $lineItem->getPayload()['productNumber'] . ' - '
+            . $lineItem->getLabel() . ' - '
+            . $this->getIntervalDescription($lineItem->getPayload()['customFields']);
+
+        return $options;
     }
 
-    private function addMetadata()
+    private function addMetadata(array $options, OrderLineItemEntity $lineItem): array
     {
-        $payload = $this->orderItem->getPayload();
-        $this->options['metadata'] = ['product_number' => $payload['productNumber']];
+        $options['metadata'] = [
+            'product_number' => $lineItem->getPayload()['productNumber'],
+        ];
+
+        return $options;
     }
 
-    private function addWebhookUrl()
+    private function addWebhookUrl(array $options, string $subscriptionId): array
     {
         $webhookUrl = $this->router->generate(
             'frontend.mollie.subscriptions.webhook',
-            ['transactionId' => $this->transactionsId],
+            ['subscriptionId' => $subscriptionId],
             $this->router::ABSOLUTE_URL
         );
 
@@ -175,16 +157,20 @@ class SubscriptionOptions
             $webhookUrl = str_replace((string)$components['host'], $customDomain, $webhookUrl);
         }
 
-        return $webhookUrl;
+        $options['webhookUrl'] = $webhookUrl;
+
+        return $options;
     }
 
     /**
      * @throws Exception
      */
-    private function addStartDate()
+    private function addStartDate(array $options, array $customFields): array
     {
         $now = new \DateTimeImmutable();
-        $this->options['startDate'] = $now->add(new DateInterval('P' . $this->getDateInterval()));
+        $options['startDate'] = $now->add(new DateInterval('P' . $this->getDateInterval($customFields)));
+
+        return $options;
     }
 
     /**
@@ -195,14 +181,14 @@ class SubscriptionOptions
      *
      * @return string
      */
-    private function getDateInterval(): string
+    private function getDateInterval(array $customFields): string
     {
-        if (!isset($this->customFields["mollie_subscription"])){
+        if (!isset($customFields["mollie_subscription"])){
             return '';
         }
 
-        $interval = $this->customFields["mollie_subscription"]['mollie_subscription_interval_type'];
-        $intervalAmount = (int)$this->customFields["mollie_subscription"]['mollie_subscription_interval_amount'];
+        $interval = $customFields["mollie_subscription"]['mollie_subscription_interval_type'];
+        $intervalAmount = (int)$customFields["mollie_subscription"]['mollie_subscription_interval_amount'];
 
         if ($interval == IntervalType::DAYS) {
             return $intervalAmount . 'D';
@@ -218,10 +204,10 @@ class SubscriptionOptions
     /**
      * @return string
      */
-    private function getIntervalDescription(): string
+    private function getIntervalDescription(array $customFields): string
     {
-        $intervalType = $this->customFields["mollie_subscription"]['mollie_subscription_interval_type'];
-        $intervalAmount = (int)$this->customFields["mollie_subscription"]['mollie_subscription_interval_amount'];
+        $intervalType = $customFields["mollie_subscription"]['mollie_subscription_interval_type'];
+        $intervalAmount = (int)$customFields["mollie_subscription"]['mollie_subscription_interval_amount'];
 
         if ($intervalType == IntervalType::DAYS) {
             if ($intervalAmount == 1) {

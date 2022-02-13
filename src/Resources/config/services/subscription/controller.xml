@@ -16,6 +16,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
             <argument type="service" id="Kiener\MolliePayments\Service\UpdateOrderCustomFields"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Order\UpdateOrderLineItems"/>
+            <argument type="service" id="mollie_subscription_to_product.repository"/>
 
             <call method="setContainer">
                 <argument type="service" id="service_container"/>

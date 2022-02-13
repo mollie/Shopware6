@@ -24,6 +24,10 @@ class SubscriptionToProductEntity extends Entity
      */
     protected $productId;
 
+    /**
+     * @var string
+     */
+    protected $originalOrderId;
 
     /**
      * @var string
@@ -97,6 +101,16 @@ class SubscriptionToProductEntity extends Entity
     public function setProductId(string $productId): void
     {
         $this->productId = $productId;
+    }
+
+    public function getOriginalOrderId(): string
+    {
+        return $this->originalOrderId;
+    }
+
+    public function setOriginalOrderId(string $originalOrderId): void
+    {
+        $this->originalOrderId = $originalOrderId;
     }
 
     /**

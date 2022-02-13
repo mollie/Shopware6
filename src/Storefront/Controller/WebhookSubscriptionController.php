@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Storefront\Controller;
 
 use Exception;
+use Kiener\MolliePayments\Core\Content\SubscriptionToProduct\SubscriptionToProductEntity;
 use Kiener\MolliePayments\Exception\PaymentUrlException;
 use Kiener\MolliePayments\Service\LoggerService;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
@@ -15,14 +16,21 @@ use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
 use Mollie\Api\Resources\Order as MollieOrder;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\CartBehavior;
+use Shopware\Core\Checkout\Cart\Delivery\Struct\Delivery;
+use Shopware\Core\Checkout\Cart\Delivery\Struct\DeliveryPosition;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
+use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\Order\OrderConversionContext;
 use Shopware\Core\Checkout\Cart\Order\OrderConverter;
 use Shopware\Core\Checkout\Cart\Processor;
+use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\Exception\EntityNotFoundException;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -87,6 +95,7 @@ class WebhookSubscriptionController extends StorefrontController
      * @var UpdateOrderLineItems
      */
     private $updateOrderLineItems;
+    private EntityRepositoryInterface $subscriptionRepository;
 
     /**
      * @param TransactionService $transactionService
@@ -110,7 +119,8 @@ class WebhookSubscriptionController extends StorefrontController
         LoggerService $logger,
         Order $orderApiService,
         UpdateOrderCustomFields $updateOrderCustomFields,
-        UpdateOrderLineItems $updateOrderLineItems
+        UpdateOrderLineItems $updateOrderLineItems,
+        EntityRepositoryInterface $subscriptionRepository
     ) {
         $this->transactionService = $transactionService;
         $this->orderRepository = $repository;
@@ -122,36 +132,51 @@ class WebhookSubscriptionController extends StorefrontController
         $this->orderApiService = $orderApiService;
         $this->updateOrderCustomFields = $updateOrderCustomFields;
         $this->updateOrderLineItems = $updateOrderLineItems;
+        $this->subscriptionRepository = $subscriptionRepository;
     }
 
     /**
      * @RouteScope(scopes={"storefront"})
-     * @Route("/mollie-subscriptions/webhook/{transactionId}", defaults={"csrf_protected"=false},
+     * @Route("/mollie-subscriptions/webhook/{subscriptionId}", defaults={"csrf_protected"=false},
      *                                           name="frontend.mollie.subscriptions.webhook",
      *                                           options={"seo"="false"}, methods={"GET", "POST"})
      *
      * @param SalesChannelContext $context
-     * @param                     $transactionId
+     * @param                     $subscriptionId
      *
      * @return JsonResponse
      * @throws Exception
      */
-    public function webhookCall(SalesChannelContext $context, $transactionId): JsonResponse
+    public function webhookCall(SalesChannelContext $context, $subscriptionId): JsonResponse
     {
-        $transaction = $this->getTransaction($transactionId, $context->getContext());
+        $subscription = $this->getSubscription($subscriptionId, $context->getContext());
+        if (!$subscription instanceof SubscriptionToProductEntity) {
+            throw new EntityNotFoundException('mollie_subscription_to_product', $subscriptionId);
+        }
 
-        $order = $this->getOrder($transaction->getOrder()->getId());
+        $order = $this->getOrder($subscription->getOriginalOrderId());
+        if (!$order instanceof OrderEntity) {
+            throw new EntityNotFoundException('order', $subscription->getOriginalOrderId());
+        }
+
         $newOrderNumber = $this->numberRangeValueGenerator->getValue(
             'order',
             $context->getContext(),
             $context->getSalesChannel()->getId()
         );
-        $newOrderId = $this->createOrder($newOrderNumber, $order, Context::createDefaultContext());
-        if(isset($transaction->getOrder()->getCustomFields()['mollie_payments'])) {
-            $this->molliePaymentDoPay($newOrderId, $transaction, $context);
+        $newOrderId = $this->createOrder($newOrderNumber, $subscription, $order, Context::createDefaultContext());
+        if (isset($order->getCustomFields()['mollie_payments'])) {
+            $this->molliePaymentDoPay($newOrderId, $order, $context);
         }
 
         return new JsonResponse(['newOrderId' => $newOrderId]);
+    }
+
+    private function getSubscription(string $id, Context $context): ?SubscriptionToProductEntity
+    {
+        $criteria = new Criteria([$id]);
+
+        return $this->subscriptionRepository->search($criteria, $context)->first();
     }
 
     /**
@@ -160,10 +185,20 @@ class WebhookSubscriptionController extends StorefrontController
      * @param Context $context
      * @return string
      */
-    private function createOrder(string $newOrderNumber, OrderEntity $order, Context $context)
-    {
+    private function createOrder(
+        string $newOrderNumber,
+        SubscriptionToProductEntity $subscription,
+        OrderEntity $order,
+        Context $context
+    ): string {
         $salesChannelContext = $this->orderConverter->assembleSalesChannelContext($order, $context);
+
         $cart = $this->orderConverter->convertToCart($order, $context);
+
+        $cart->setLineItems($cart->getLineItems()->filter(function (LineItem $lineItem) use ($subscription) {
+            return $subscription->getProductId() === $lineItem->getReferencedId();
+        }));
+
         $recalculatedCart = $this->refresh($cart, $salesChannelContext);
 
         $conversionContext = (new OrderConversionContext())
@@ -173,14 +208,45 @@ class WebhookSubscriptionController extends StorefrontController
             ->setIncludeTransactions(false)
             ->setIncludeOrderDate(false);
 
+        /** @var Delivery $delivery */
+        foreach ($recalculatedCart->getDeliveries() as $delivery) {
+            /** @var DeliveryPosition $position */
+            foreach ($delivery->getPositions() as $key => $position) {
+                if ($position->getIdentifier() !== $subscription->getProductId()) {
+                    $delivery->getPositions()->remove($key);
+                }
+            }
+        }
+
         $orderData = $this->orderConverter->convertToOrder($recalculatedCart, $salesChannelContext, $conversionContext);
-        $orderData['id'] =  Uuid::randomHex();
+
+        foreach ($orderData['lineItems'] as $key => $lineitem) {
+            $orderData['lineItems'][$key]['id'] = Uuid::randomHex();
+        }
+        foreach ($orderData['deliveries'] as $key => $delivery) {
+            $orderData['deliveries'][$key]['id'] = Uuid::randomHex();
+            $orderData['deliveries'][$key]['shippingOrderAddressId'] = $order->getDeliveries()->get($delivery['id'])->getShippingOrderAddressId();
+        }
+
+        $orderData['id'] = Uuid::randomHex();
         $orderData['orderNumber'] = $newOrderNumber;
         $orderData['billingAddressId'] = $order->getBillingAddressId();
-        $orderData['orderDateTime'] = $order->getOrderDateTime();
+        $orderData['orderDateTime'] = new \DateTime();
         $orderData['orderCustomer'] = $this->getOrderCustomer($order->getOrderCustomer());
-        $orderData['price'] = $order->getPrice();
+        $orderData['addresses'] = $this->getOrderAddresses($order->getAddresses());
+        $orderData['price'] = $recalculatedCart->getPrice();
         $orderData['shippingCosts'] = $order->getShippingCosts();
+
+        foreach ($orderData['addresses'] as $key => $address) {
+            if ($orderData['addresses'][$key]['id'] === $order->getBillingAddressId()) {
+                $orderData['addresses'][$key]['id'] = Uuid::randomHex();
+                $orderData['billingAddressId'] =  $orderData['addresses'][$key]['id'];
+
+                continue;
+            }
+
+            $orderData['addresses'][$key]['id'] = Uuid::randomHex();
+        }
 
         $context->scope(Context::SYSTEM_SCOPE, function (Context $context) use ($orderData): void {
             $this->orderRepository->create([$orderData], $context);
@@ -191,11 +257,11 @@ class WebhookSubscriptionController extends StorefrontController
 
     /**
      * @param string $newOrderId
-     * @param $transactionData
+     * @param OrderEntity $originalOrder
      * @param $salesChannelContext
      * @throws Exception
      */
-    private function molliePaymentDoPay(string $newOrderId, $transactionData, $salesChannelContext): string
+    private function molliePaymentDoPay(string $newOrderId, OrderEntity $originalOrder, $salesChannelContext): string
     {
         // get order with all needed associations
         $order = $this->getOrder($newOrderId);
@@ -204,8 +270,10 @@ class WebhookSubscriptionController extends StorefrontController
             throw new OrderNotFoundException($newOrderId);
         }
 
+        $transactionData = $originalOrder->getTransactions()->first();
+
         $paymentMethod = $transactionData->getPaymentMethod()->getCustomFields()['mollie_payment_method_name'];
-        $returnUrl = $transactionData->getOrder()->getCustomFields()['mollie_payments']['transactionReturnUrl'];
+        $returnUrl = $originalOrder->getCustomFields()['mollie_payments']['transactionReturnUrl'];
 
         $customFields = $order->getCustomFields() ?? [];
         $customFieldsStruct = new MollieOrderCustomFieldsStruct($customFields);
@@ -220,7 +288,8 @@ class WebhookSubscriptionController extends StorefrontController
                 $salesChannelContext->getContext()
             );
 
-            $payment = $this->orderApiService->createOrReusePayment($mollieOrderId, $paymentMethod, $salesChannelContext);
+            $payment = $this->orderApiService->createOrReusePayment($mollieOrderId, $paymentMethod,
+                $salesChannelContext);
 
             // if direct payment return to success page
             if (MolliePaymentStatus::isApprovedStatus($payment->status) && empty($payment->getCheckoutUrl())) {
@@ -263,7 +332,8 @@ class WebhookSubscriptionController extends StorefrontController
         );
 
         // create new order at mollie
-        $mollieOrder = $this->orderApiService->createOrder($mollieOrderArray, $order->getSalesChannelId(), $salesChannelContext);
+        $mollieOrder = $this->orderApiService->createOrder($mollieOrderArray, $order->getSalesChannelId(),
+            $salesChannelContext);
 
         if ($mollieOrder instanceof MollieOrder) {
             $customFieldsStruct->setMollieOrderId($mollieOrder->id);
@@ -285,6 +355,7 @@ class WebhookSubscriptionController extends StorefrontController
     private function getOrder(?string $orderId): ?OrderEntity
     {
         $criteria = (new Criteria([$orderId]));
+        $criteria->addAssociation('addresses');
         $criteria->addAssociation('transactions.stateMachineState');
         $criteria->addAssociation('transactions.paymentMethod');
         $criteria->addAssociation('orderCustomer.customer');
@@ -292,7 +363,10 @@ class WebhookSubscriptionController extends StorefrontController
         $criteria->addAssociation('transactions.paymentMethod.appPaymentMethod.app');
         $criteria->addAssociation('language');
         $criteria->addAssociation('currency');
-        $criteria->addAssociation('deliveries');
+        $criteria->addAssociation('deliveries.positions.orderLineItem');
+        $criteria->addAssociation('deliveries.shippingOrderAddress');
+        $criteria->addAssociation('deliveries.shippingMethod');
+        $criteria->addAssociation('deliveries.shippingOrderAddress.country');
         $criteria->addAssociation('billingAddress.country');
         $criteria->addAssociation('lineItems');
 
@@ -321,8 +395,37 @@ class WebhookSubscriptionController extends StorefrontController
             'email' => $orderCustomer->getEmail(),
             'salutationId' => $orderCustomer->getSalutationId(),
             'firstName' => $orderCustomer->getFirstName(),
-            'lastName' => $orderCustomer->getLastName()
+            'lastName' => $orderCustomer->getLastName(),
         ];
+    }
+
+    private function getOrderAddresses(OrderAddressCollection $addresses): array
+    {
+        $addressData = [];
+
+        /** @var OrderAddressEntity $address */
+        foreach ($addresses as $address) {
+            $addressData[] = [
+                'id' => $address->getId(),
+                'salutationId' => $address->getSalutationId(),
+                'firstName' => $address->getFirstName(),
+                'lastName' => $address->getLastName(),
+                'street' => $address->getStreet(),
+                'zipcode' => $address->getZipcode(),
+                'city' => $address->getCity(),
+                'company' => $address->getCompany(),
+                'department' => $address->getDepartment(),
+                'title' => $address->getTitle(),
+                'vatId' => $address->getVatId(),
+                'phoneNumber' => $address->getPhoneNumber(),
+                'additionalAddressLine1' => $address->getAdditionalAddressLine1(),
+                'additionalAddressLine2' => $address->getAdditionalAddressLine2(),
+                'countryId' => $address->getCountryId(),
+                'countryStateId' => $address->getCountryStateId(),
+            ];
+        }
+
+        return $addressData;
     }
 
     /**

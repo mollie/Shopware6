@@ -6,6 +6,7 @@ use Exception;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\LoggerService;
+use Kiener\MolliePayments\Service\Subscription\DTO\SubscriptionOption;
 use Kiener\MolliePayments\Service\Subscription\SubscriptionOptions;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Exceptions\IncompatiblePlatform;
@@ -129,20 +130,24 @@ class CreateSubscriptionsSubscriber implements EventSubscriberInterface
         }
 
         if ($event->getToPlace()->getId() !== $orderTransactionsStatePaidId) {
-
             return;
         }
 
         $order = $this->getOrder($event->getEntityId(), $event->getContext());
+        if (!$order instanceof OrderEntity) {
+            return;
+        }
+        $originalOrderId = $order->getId();
+
+        $customerId = $this->customerService->getMollieCustomerId(
+            $order->getOrderCustomer()->getCustomerId(),
+            $order->getSalesChannelId(),
+            $event->getContext()
+        );
 
         $subscriptions = $this->subscriptionOptions->forOrder($order, $event->getEntityId());
         foreach ($subscriptions as $subscriptionOptions) {
-            $customerId = $this->customerService->getMollieCustomerId(
-                $order->getOrderCustomer()->getCustomerId(),
-                $order->getSalesChannelId(),
-                $event->getContext()
-            );
-            $this->createSubscription($customerId, $subscriptionOptions, $event->getContext());
+            $this->createSubscription($customerId, $originalOrderId, $subscriptionOptions, $event->getContext());
         }
 
         $this->orderTransactionRepository->upsert([[
@@ -153,11 +158,12 @@ class CreateSubscriptionsSubscriber implements EventSubscriberInterface
 
     /**
      * @param $customerId
-     * @param $subscriptionOptions
+     * @param string $customerId
+     * @param SubscriptionOption $subscriptionOptions
      * @param $context
      * @throws IncompatiblePlatform
      */
-    private function createSubscription($customerId, $subscriptionOptions, $context)
+    private function createSubscription($customerId, $originalOrderId, $subscriptionOptions, $context)
     {
         $this->loggerService->addEntry(
             'request',
@@ -172,10 +178,11 @@ class CreateSubscriptionsSubscriber implements EventSubscriberInterface
 
         $this->mollieSubscriptionToProductRepository->create([
             [
-                'id' => Uuid::randomHex(),
+                'id' => $subscriptionOptions->getSubscriptionId(),
                 'mollieCustomerId' => $subscription->customerId,
                 'subscriptionId' => $subscription->id,
                 'productId' => $subscriptionOptions->getProductId(),
+                'originalOrderId' => $originalOrderId,
                 'salesChannelId' => $subscriptionOptions->getSalesChannelId(),
                 'status' => $subscription->status,
                 'description' => $subscription->description,
@@ -183,7 +190,7 @@ class CreateSubscriptionsSubscriber implements EventSubscriberInterface
                 'currency' => $subscription->amount->currency,
                 'nextPaymentDate' => $subscription->nextPaymentDate
             ]
-        ], Context::createDefaultContext());
+        ], $context);
     }
 
     /**
