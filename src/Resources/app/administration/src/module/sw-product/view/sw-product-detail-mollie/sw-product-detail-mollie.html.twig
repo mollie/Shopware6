@@ -1,33 +1,36 @@
 <div>
     {% block sw_product_detail_mollie_vouchers %}
-    <sw-card :title="$tc('mollie-payments.vouchers.CARD_TITLE')">
-        <sw-container gap="0px 30px" class="sw-product-detail-mollie-vouchers-form__container">
+        <sw-card :title="$tc('mollie-payments.vouchers.CARD_TITLE')">
+            <sw-container gap="0px 30px" class="sw-product-detail-mollie-vouchers-form__container">
 
-            <sw-container columns="1fr">
+                <sw-container columns="1fr">
                 <span class="sw-product-detail-mollie-vouchers__description-title">
                     {{ $tc('mollie-payments.vouchers.VOUCHER_INFO_TITLE') }}
                 </span>
-            </sw-container>
+                </sw-container>
 
-            <sw-container columns="1fr" class="sw-product-detail-mollie-vouchers__image-container">
-                <img class="sw-product-detail-mollie-vouchers__image" src="/bundles/molliepayments/administration/img/payment-voucher.svg">
-            </sw-container>
+                <sw-container columns="1fr" class="sw-product-detail-mollie-vouchers__image-container">
+                    <img class="sw-product-detail-mollie-vouchers__image"
+                         src="/bundles/molliepayments/administration/img/payment-voucher.svg">
+                </sw-container>
 
-            <sw-container columns="1fr">
-                <p class="sw-product-feature-set-form__description-body">
-                    {{ $tc('mollie-payments.vouchers.VOUCHER_INFO_DESCRIPTION') }}
-                </p>
-            </sw-container>
+                <sw-container columns="1fr">
+                    <p class="sw-product-feature-set-form__description-body">
+                        {{ $tc('mollie-payments.vouchers.VOUCHER_INFO_DESCRIPTION') }}
+                    </p>
+                </sw-container>
 
-            <sw-container columns="6fr 1fr">
-                <div></div>
-                <sw-button class="sw-product-detail-mollie-vouchers__button-readmore" :block="true" variant="primary" size="small" link="https://github.com/mollie/Shopware6/wiki/Voucher">
-                    {{ $tc('mollie-payments.vouchers.VOUCHER_BTN_READMORE') }}
-                </sw-button>
-            </sw-container>
+                <sw-container columns="6fr 1fr">
+                    <div></div>
+                    <sw-button class="sw-product-detail-mollie-vouchers__button-readmore" :block="true"
+                               variant="primary"
+                               size="small" link="https://github.com/mollie/Shopware6/wiki/Voucher">
+                        {{ $tc('mollie-payments.vouchers.VOUCHER_BTN_READMORE') }}
+                    </sw-button>
+                </sw-container>
 
-            <sw-container columns="1fr" v-if="isDefaultLanguage">
-                <sw-inherit-wrapper
+                <sw-container columns="1fr" v-if="isDefaultLanguage">
+                    <sw-inherit-wrapper
                         :label="$tc('mollie-payments.vouchers.VOUCHER_TYPE_CAPTION')"
                         v-model="productVoucherType"
                         :hasParent="hasParentProduct"
@@ -35,116 +38,30 @@
                         :customInheritationCheckFunction="checkInheritance"
                         :customRestoreInheritanceFunction="restoreInheritance"
                         :customRemoveInheritanceFunction="removeInheritance">
-                    <template #content="content">
-                        <sw-select-field
+                        <template #content="content">
+                            <sw-select-field
                                 class="mollie-voucher-type"
                                 :value="content.currentValue"
                                 :disabled="content.isInherited"
                                 @change="onVoucherChanged">
-                            <option v-for="type in voucherTypes" :key="type.key" :value="type.key">
-                                {{ type.name }}
-                            </option>
-                        </sw-select-field>
-                    </template>
-                </sw-inherit-wrapper>
-            </sw-container>
-
-            <sw-container columns="1fr" v-if="!isDefaultLanguage">
-                <sw-alert variant="default" :showIcon="true" :closable="false" class="sw-product-detail-mollie-vouchers__inheritance-warning">
-                    {{ $tc('mollie-payments.vouchers.VOUCHER_INFO_DEFAULTLANGUAGE') }}
-                </sw-alert>
-            </sw-container>
-
-        </sw-container>
-    </sw-card>
-{% endblock %}
-
-{% block sw_product_detail_mollie_subscription %}
-        <sw-card :title="$tc('mollie-subscription.card-title')">
-            <sw-container gap="0px 30px" class="sw-product-detail-mollie-subscription-form__container">
-                <sw-container columns="1fr">
-                    <span class="sw-product-detail-mollie-subscription__description-title">
-                        {{ $tc('mollie-subscription.title') }}
-                    </span>
+                                <option v-for="type in voucherTypes" :key="type.key" :value="type.key">
+                                    {{ type.name }}
+                                </option>
+                            </sw-select-field>
+                        </template>
+                    </sw-inherit-wrapper>
                 </sw-container>
-
-                <sw-container columns="1fr">
-                    <p class="sw-product-feature-set-form__description-body">
-                        {{ $tc('mollie-subscription.description') }}
-                    </p>
-                </sw-container>
-
-                <sw-container gap="0px 30px" class="sw-product-detail-mollie-subscription-form__container">
-                <sw-container columns="1fr" v-if="isDefaultLanguage">
-
-                    <sw-switch-field
-                            name="mollieSubscriptionProduct"
-                            v-model="mollieSubscriptionProduct"
-                            :hasParent="hasParentProduct"
-                            :label="$tc('mollie-subscription.mollieSubscriptionProduct')"
-                            @change="onChanged($event, 'mollieSubscriptionProduct')"/>
-
-                    <sw-container class="sw-product-detail-mollie-subscription-form__subscriptionInterval">
-                        <sw-text-field
-                                class="subscription-form-field"
-                                name="mollieSubscriptionIntervalAmount"
-                                v-model="mollieSubscriptionIntervalAmount"
-                                :hasParent="hasParentProduct"
-                                :label="$tc('mollie-subscription.mollieSubscriptionIntervalAmount')"
-                                :required="mollieSubscriptionProduct"
-                                @change="onChanged($event, 'intervalAmount')"/>
-
-                        <sw-select-field
-                                name="mollieSubscriptionIntervalType"
-                                v-model="mollieSubscriptionIntervalType"
-                                :label="$tc('mollie-subscription.mollieSubscriptionIntervalType')"
-                                :hasParent="hasParentProduct"
-                                class="subscription-form-field"
-                                :required="mollieSubscriptionProduct"
-                                :value="mollieSubscriptionIntervalType"
-                                @change="onChanged($event, 'intervalType')">
-                            <option
-                                    v-for="interval in intervalTypes"
-                                    :key="interval.key"
-                                    :value="interval.key">
-                                {{ interval.name }}
-                            </option>
-                        </sw-select-field>
-                    </sw-container>
-
-                    <sw-container class="sw-product-detail-mollie-subscription-form__subscriptionRepetition">
-                        <sw-text-field
-                                class="subscription-form-field"
-                                name="mollieSubscriptionRepetitionAmount"
-                                v-model="mollieSubscriptionRepetitionAmount"
-                                :hasParent="hasParentProduct"
-                                :required="mollieSubscriptionProduct"
-                                :label="$tc('mollie-subscription.mollieSubscriptionRepetitionAmount')"
-                                @change="onChanged($event, 'repetitionAmount')"/>
-
-                        <sw-select-field
-                                class="subscription-form-field"
-                                name="mollieSubscriptionRepetitionType"
-                                v-model="mollieSubscriptionRepetitionType"
-                                :label="$tc('mollie-subscription.mollieSubscriptionRepetitionType')"
-                                :hasParent="hasParentProduct"
-                                :required="mollieSubscriptionProduct"
-                                :value="mollieSubscriptionRepetitionType"
-                                @change="onChanged($event, 'repetitionType')">
-                            <option v-for="repetition in repetitionTypes" :key="repetition.key" :value="repetition.key">
-                                {{ repetition.name }}
-                            </option>
-                        </sw-select-field>
-                    </sw-container>
-                </sw-container>
-            </sw-container>
 
                 <sw-container columns="1fr" v-if="!isDefaultLanguage">
-                    <sw-alert variant="default" :showIcon="true" :closable="false" class="sw-product-detail-mollie-subscription__inheritance-warning">
-                        {{ $tc('mollie-subscription.infoDefaultLanguage') }}
+                    <sw-alert variant="default" :showIcon="true" :closable="false"
+                              class="sw-product-detail-mollie-vouchers__inheritance-warning">
+                        {{ $tc('mollie-payments.vouchers.VOUCHER_INFO_DEFAULTLANGUAGE') }}
                     </sw-alert>
                 </sw-container>
+
             </sw-container>
         </sw-card>
-{% endblock %}
+    {% endblock %}
+
+    <sw-product-mollie-subscription-config></sw-product-mollie-subscription-config>
 </div>

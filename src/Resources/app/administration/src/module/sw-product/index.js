@@ -1,3 +1,4 @@
+import './component/sw-product-mollie-subscription-config'
 import './page/sw-product-detail'
 import './view/sw-product-detail-mollie'
 

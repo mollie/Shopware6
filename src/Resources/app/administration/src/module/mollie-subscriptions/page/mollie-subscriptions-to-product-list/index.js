@@ -42,6 +42,18 @@ Component.register('mollie-subscriptions-to-product-list', {
         columns() {
             return this.getColumns();
         },
+
+        prePaymentReminderEmail() {
+            if (!this.systemConfig) {
+                return null;
+            }
+
+            if (this.systemConfig['MolliePayments.config.prePaymentReminderEmail'] !== undefined) {
+                return this.systemConfig['MolliePayments.config.prePaymentReminderEmail'];
+            }
+
+            return null;
+        },
     },
 
     created() {
@@ -121,8 +133,7 @@ Component.register('mollie-subscriptions-to-product-list', {
          * @returns {Date}
          */
         prePaymentReminder(item) {
-            var prePaymentReminderEmail = this.systemConfig['MolliePayments.config.prePaymentReminderEmail'];
-            if (prePaymentReminderEmail != null && prePaymentReminderEmail) {
+            if (this.prePaymentReminderEmail != null && this.prePaymentReminderEmail) {
                 var b = new Date(item.nextPaymentDate);
                 var daysBeforeReminder = this.systemConfig['MolliePayments.config.daysBeforeReminder'];
                 b.setDate(b.getDate() - daysBeforeReminder);

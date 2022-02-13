@@ -1,0 +1,113 @@
+{% block sw_product_detail_mollie_subscription %}
+    <sw-card :title="$tc('mollie-subscription.card-title')">
+        <sw-container gap="0px 30px" class="sw-product-detail-mollie-subscription-form__container">
+            <sw-container columns="1fr">
+                    <span class="sw-product-detail-mollie-subscription__description-title">
+                        {{ $tc('mollie-subscription.title') }}
+                    </span>
+            </sw-container>
+
+            <sw-container columns="1fr">
+                <p class="sw-product-feature-set-form__description-body">
+                    {{ $tc('mollie-subscription.description') }}
+                </p>
+            </sw-container>
+
+            <sw-container gap="0px 30px" class="sw-product-detail-mollie-subscription-form__container">
+                <sw-container columns="1fr" v-if="isDefaultLanguage">
+                    <sw-inherit-wrapper
+                        v-model="product.customFields.mollie_subscription.mollie_subscription_product"
+                        :has-parent="!!parentProduct.id"
+                        :inherited-value="parentProduct.customFields.mollie_subscription.mollie_subscription_product"
+                    >
+                        <template #content="props">
+                            <sw-switch-field
+                                :map-inheritance="props"
+                                :label="$tc('mollie-subscription.mollieSubscriptionProduct')"
+                                :disabled="props.isInherited"
+                                :value="props.currentValue"
+                                @change="props.updateCurrentValue"
+                            />
+                        </template>
+                    </sw-inherit-wrapper>
+                </sw-container>
+
+                <sw-container columns="1fr 1fr" gap="30px">
+                    <sw-inherit-wrapper
+                        v-model="product.customFields.mollie_subscription.mollie_subscription_interval_amount"
+                        :has-parent="!!parentProduct.id"
+                        :inherited-value="parentProduct.customFields.mollie_subscription.mollie_subscription_interval_amount"
+                    >
+                        <template #content="props">
+                            <sw-text-field
+                                :label="$tc('mollie-subscription.mollieSubscriptionIntervalAmount')"
+                                :map-inheritance="props"
+                                :value="props.currentValue"
+                                @change="props.updateCurrentValue"
+                                :required="product.customFields.mollie_subscription.mollie_subscription_product"/>
+                        </template>
+                    </sw-inherit-wrapper>
+
+                    <sw-inherit-wrapper
+                        v-model="product.customFields.mollie_subscription.mollie_subscription_interval_type"
+                        :has-parent="!!parentProduct.id"
+                        :inherited-value="parentProduct.customFields.mollie_subscription.mollie_subscription_interval_type"
+                        :label="$tc('mollie-subscription.mollieSubscriptionIntervalType')"
+                    >
+                        <template #content="props">
+                            <sw-single-select
+                                :options="intervalTypes"
+                                :disabled="props.isInherited"
+                                :value="props.currentValue"
+                                @change="props.updateCurrentValue"
+                                :required="product.customFields.mollie_subscription.mollie_subscription_product">
+                            </sw-single-select>
+                        </template>
+                    </sw-inherit-wrapper>
+                </sw-container>
+
+                <sw-container columns="1fr 1fr" gap="30px">
+                    <sw-inherit-wrapper
+                        v-model="product.customFields.mollie_subscription.mollie_subscription_repetition_amount"
+                        :has-parent="!!parentProduct.id"
+                        :inherited-value="parentProduct.customFields.mollie_subscription.mollie_subscription_repetition_amount"
+                    >
+                        <template #content="props">
+                            <sw-text-field
+                                :label="$tc('mollie-subscription.mollieSubscriptionRepetitionAmount')"
+                                :map-inheritance="props"
+                                :value="props.currentValue"
+                                @change="props.updateCurrentValue"
+                                :required="product.customFields.mollie_subscription.mollie_subscription_product && product.customFields.mollie_subscription.mollie_subscription_repetition_type === 'times'"
+                            />
+                        </template>
+                    </sw-inherit-wrapper>
+
+                    <sw-inherit-wrapper
+                        v-model="product.customFields.mollie_subscription.mollie_subscription_repetition_type"
+                        :has-parent="!!parentProduct.id"
+                        :inherited-value="parentProduct.customFields.mollie_subscription.mollie_subscription_repetition_type"
+                        :label="$tc('mollie-subscription.mollieSubscriptionRepetitionType')"
+                    >
+                        <template #content="props">
+                            <sw-single-select
+                                :options="repetitionTypes"
+                                :disabled="props.isInherited"
+                                :value="props.currentValue"
+                                @change="props.updateCurrentValue"
+                                :required="product.customFields.mollie_subscription.mollie_subscription_product">
+                            </sw-single-select>
+                        </template>
+                    </sw-inherit-wrapper>
+                </sw-container>
+            </sw-container>
+
+            <sw-container columns="1fr" v-if="!isDefaultLanguage">
+                <sw-alert variant="default" :showIcon="true" :closable="false"
+                          class="sw-product-detail-mollie-subscription__inheritance-warning">
+                    {{ $tc('mollie-subscription.infoDefaultLanguage') }}
+                </sw-alert>
+            </sw-container>
+        </sw-container>
+    </sw-card>
+{% endblock %}

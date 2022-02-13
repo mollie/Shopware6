@@ -20,28 +20,12 @@ Shopware.Component.register('sw-product-detail-mollie', {
         };
     },
 
-    props: {
-        productId: {
-            required: true,
-            type: String,
-        },
-    },
-
     data() {
         return {
             productEntity: null,
             parentVoucherType: '',
             productVoucherType: '',
-            mollieSubscriptionProduct: false,
-            mollieSubscriptionIntervalAmount: '',
-            mollieSubscriptionIntervalType: '',
-            mollieSubscriptionRepetitionAmount: '',
-            mollieSubscriptionRepetitionType: '',
         }
-    },
-
-    created() {
-        this.productId = this.$route.params.id
     },
 
     mounted() {
@@ -49,7 +33,6 @@ Shopware.Component.register('sw-product-detail-mollie', {
     },
 
     computed: {
-
         ...mapState('swProductDetail', [
             'product',
         ]),
@@ -67,6 +50,10 @@ Shopware.Component.register('sw-product-detail-mollie', {
             systemLanguageId: state => state.api.systemLanguageId,
         }),
 
+        productId() {
+            return this.$route.params.id;
+        },
+
         /**
          *
          * @returns {[{name, key: number}, {name, key: number}, {name, key: number}, {name, key: number}]}
@@ -80,28 +67,6 @@ Shopware.Component.register('sw-product-detail-mollie', {
             ];
         },
 
-        /**
-         *
-         * @returns {[{name, key: number}, {name, key: number}, {name, key: number}]}
-         */
-        intervalTypes() {
-            return [
-                {key: 'days', name: this.$tc('mollie-subscription.days')},
-                {key: 'weeks', name: this.$tc('mollie-subscription.weeks')},
-                {key: 'months', name: this.$tc('mollie-subscription.months')},
-            ];
-        },
-
-        /**
-         *
-         * @returns {[{name, key: number}, {name, key: number}]}
-         */
-        repetitionTypes() {
-            return [
-                {key: 'times', name: this.$tc('mollie-subscription.times')},
-                {key: 'infinite', name: this.$tc('mollie-subscription.infinite')},
-            ];
-        },
 
         /**
          *
@@ -172,14 +137,6 @@ Shopware.Component.register('sw-product-detail-mollie', {
         },
 
         /**
-         * @param attr
-         * @param newValue
-         */
-        onChanged(newValue, attr) {
-            this.updateSubscriptionData(attr, newValue);
-        },
-
-        /**
          *
          * @returns {boolean}
          */
@@ -224,11 +181,6 @@ Shopware.Component.register('sw-product-detail-mollie', {
 
             this.parentVoucherType = '';
             this.productVoucherType = '';
-            this.mollieSubscriptionProduct = '';
-            this.mollieSubscriptionIntervalAmount = '';
-            this.mollieSubscriptionIntervalType = '';
-            this.mollieSubscriptionRepetitionAmount = '';
-            this.mollieSubscriptionRepetitionType = '';
 
             // if we do have a parent, then fetch that product
             // and read its voucher type for our local variable
@@ -242,31 +194,11 @@ Shopware.Component.register('sw-product-detail-mollie', {
                 this.productRepository.get(this.product.parentId, Shopware.Context.api).then(parent => {
                     const parentAtts = new ProductAttributes(parent);
                     this.parentVoucherType = parentAtts.getVoucherType();
-                    this.mollieSubscriptionProduct = parentAtts.getMollieSubscriptionProduct();
-                    this.mollieSubscriptionIntervalAmount = parentAtts.getMollieSubscriptionIntervalAmount();
-                    this.mollieSubscriptionIntervalType = parentAtts.getMollieSubscriptionIntervalType();
-                    this.mollieSubscriptionRepetitionAmount = parentAtts.getMollieSubscriptionRepetitionAmount();
-                    this.mollieSubscriptionRepetitionType = parentAtts.getMollieSubscriptionRepetitionType();
 
                     // if we have a parent, and its nothing, that it should
                     // at least display NONE
                     if (this.stringUtils.isNullOrEmpty(this.parentVoucherType)) {
                         this.parentVoucherType = this.typeNONE;
-                    }
-                    if (this.stringUtils.isNullOrEmpty(this.mollieSubscriptionProduct)) {
-                        this.mollieSubscriptionProduct = false;
-                    }
-                    if (this.stringUtils.isNullOrEmpty(this.mollieSubscriptionIntervalAmount )) {
-                        this.mollieSubscriptionIntervalAmount = '';
-                    }
-                    if (this.stringUtils.isNullOrEmpty(this.mollieSubscriptionIntervalType)) {
-                        this.mollieSubscriptionIntervalType = '';
-                    }
-                    if (this.stringUtils.isNullOrEmpty(this.mollieSubscriptionRepetitionAmount)) {
-                        this.mollieSubscriptionRepetitionAmount = '';
-                    }
-                    if (this.stringUtils.isNullOrEmpty(this.mollieSubscriptionRepetitionType )) {
-                        this.mollieSubscriptionRepetitionType  = '';
                     }
                 });
             }
@@ -276,11 +208,6 @@ Shopware.Component.register('sw-product-detail-mollie', {
                 const mollieAttributes = new ProductAttributes(parent);
 
                 this.productVoucherType = mollieAttributes.getVoucherType();
-                this.mollieSubscriptionProduct = mollieAttributes.getMollieSubscriptionProduct();
-                this.mollieSubscriptionIntervalAmount = mollieAttributes.getMollieSubscriptionIntervalAmount();
-                this.mollieSubscriptionIntervalType = mollieAttributes.getMollieSubscriptionIntervalType();
-                this.mollieSubscriptionRepetitionAmount = mollieAttributes.getMollieSubscriptionRepetitionAmount();
-                this.mollieSubscriptionRepetitionType = mollieAttributes.getMollieSubscriptionRepetitionType();
             });
 
 
@@ -289,69 +216,6 @@ Shopware.Component.register('sw-product-detail-mollie', {
             if (!this.hasParentProduct && this.stringUtils.isNullOrEmpty(this.productVoucherType)) {
                 this.productVoucherType = this.typeNONE;
             }
-            if (!this.hasParentProduct && this.stringUtils.isNullOrEmpty(this.mollieSubscriptionProduct)) {
-                this.mollieSubscriptionProduct = false;
-            }
-            if (!this.hasParentProduct && this.stringUtils.isNullOrEmpty(this.mollieSubscriptionIntervalAmount)) {
-                this.mollieSubscriptionIntervalAmount = '';
-            }
-            if (!this.hasParentProduct && this.stringUtils.isNullOrEmpty(this.mollieSubscriptionIntervalType)) {
-                this.mollieSubscriptionIntervalType = '';
-            }
-            if (!this.hasParentProduct && this.stringUtils.isNullOrEmpty(this.mollieSubscriptionRepetitionAmount)) {
-                this.mollieSubscriptionRepetitionAmount = '';
-            }
-            if (!this.hasParentProduct && this.stringUtils.isNullOrEmpty(this.mollieSubscriptionRepetitionType)) {
-                this.mollieSubscriptionRepetitionType = '';
-            }
-        },
-
-        /**
-         *
-         */
-        updateSubscriptionData(attr, newValue) {
-            if (!this.product) {
-                return;
-            }
-
-            const mollieAttributes = new ProductAttributes(this.product)
-
-            switch (attr) {
-                case 'mollieSubscriptionProduct':
-                    mollieAttributes.setMollieSubscriptionProduct(newValue);
-                    break;
-                case 'intervalAmount':
-                    if (newValue !== '') {
-                        mollieAttributes.setMollieSubscriptionIntervalAmount(newValue);
-                    } else {
-                        mollieAttributes.clearMollieSubscriptionIntervalAmount();
-                    }
-                    break;
-                case 'intervalType':
-                    if (newValue !== '') {
-                        mollieAttributes.setMollieSubscriptionIntervalType(newValue);
-                    } else {
-                        mollieAttributes.clearMollieSubscriptionIntervalType();
-                    }
-                    break;
-                case 'repetitionAmount':
-                    if (newValue !== '') {
-                        mollieAttributes.setMollieSubscriptionRepetitionAmount(newValue);
-                    } else {
-                        mollieAttributes.clearMollieSubscriptionRepetitionAmount();
-                    }
-                    break;
-                case 'repetitionType' :
-                    if (newValue !== '') {
-                        mollieAttributes.setMollieSubscriptionRepetitionType(newValue);
-                    } else {
-                        mollieAttributes.clearMollieSubscriptionRepetitionType();
-                    }
-                    break;
-            }
-
-            // now update our product data
-            this.productService.updateCustomFieldsSubscription(this.product, mollieAttributes);
         },
 
         /**
@@ -377,5 +241,4 @@ Shopware.Component.register('sw-product-detail-mollie', {
             this.productService.updateCustomFields(this.product, mollieAttributes);
         },
     },
-
 });
