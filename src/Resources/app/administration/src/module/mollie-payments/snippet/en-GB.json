@@ -1,5 +1,6 @@
 {
   "mollie-payments": {
+    "pluginTitle": "MolliePayments",
     "general": {
       "mainMenuItemGeneral": "Mollie Payments",
       "descriptionTextModule": "Mollie Payments",

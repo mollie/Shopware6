@@ -1,5 +1,7 @@
 {
   "mollie-payments": {
+    "pluginTitle": "Mollie",
+    "pluginDescripion": "Mollie Module",
     "vouchers": {
       "CARD_TITLE": "Voucher",
       "VOUCHER_INFO_TITLE": "Voucher Betalingen",

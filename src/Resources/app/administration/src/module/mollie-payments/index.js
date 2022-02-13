@@ -7,7 +7,7 @@ const { Module } = Shopware;
 
 Module.register('mollie-payments', {
     type: 'plugin',
-    name: 'MolliePayments',
+    name: 'mollie-payments.pluginTitle',
     title: 'mollie-payments.general.mainMenuItemGeneral',
     description: 'mollie-payments.general.descriptionTextModule',
     version: '1.0.0',

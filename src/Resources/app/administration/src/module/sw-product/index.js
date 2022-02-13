@@ -13,8 +13,8 @@ const {Module} = Shopware;
 Module.register('mollie-sw-product-detail', {
     type: 'plugin',
     name: 'MolliePayments',
-    title: 'Mollie',
-    description: 'Mollie Module',
+    title: 'mollie-payments.pluginTitle',
+    description: 'mollie-payments.pluginDescripion',
     version: '1.0.0',
     targetVersion: '1.0.0',
     color: '#333',

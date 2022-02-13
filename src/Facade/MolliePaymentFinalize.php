@@ -24,10 +24,6 @@ class MolliePaymentFinalize
      */
     private $mollieApiFactory;
     /**
-     * @var TransactionTransitionServiceInterface
-     */
-    private $transactionTransitionService;
-    /**
      * @var OrderStatusConverter
      */
     private $orderStatusConverter;
@@ -42,14 +38,11 @@ class MolliePaymentFinalize
 
     public function __construct(
         MollieApiFactory                      $mollieApiFactory,
-        TransactionTransitionServiceInterface $transactionTransitionService,
         OrderStatusConverter                  $orderStatusConverter,
         OrderStatusUpdater                    $orderStatusUpdater,
         SettingsService                       $settingsService
-    )
-    {
+    ) {
         $this->mollieApiFactory = $mollieApiFactory;
-        $this->transactionTransitionService = $transactionTransitionService;
         $this->orderStatusConverter = $orderStatusConverter;
         $this->orderStatusUpdater = $orderStatusUpdater;
         $this->settingsService = $settingsService;
@@ -79,9 +72,7 @@ class MolliePaymentFinalize
 
         $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
 
-
         $paymentStatus = $this->orderStatusConverter->getMollieStatus($mollieOrder);
-
 
         # Attention
         # Our payment status will either be set by us, or automatically by Shopware using exceptions below.
@@ -94,32 +85,27 @@ class MolliePaymentFinalize
             $salesChannelContext->getContext()
         );
 
-
         # now either set the payment status for successful payments
         # or make sure to throw an exception for Shopware in case
         # of failed payments.
         if (!MolliePaymentStatus::isFailedStatus($paymentStatus)) {
-
             $this->orderStatusUpdater->updatePaymentStatus($transactionStruct->getOrderTransaction(), $paymentStatus, $salesChannelContext->getContext());
 
-        } else {
-
-            $orderTransactionID = $transactionStruct->getOrderTransaction()->getUniqueIdentifier();
-
-            # let's also create a different handling, if the customer either cancelled
-            # or if the payment really failed. this will lead to a different order payment status in the end.
-            if ($paymentStatus === MolliePaymentStatus::MOLLIE_PAYMENT_CANCELED) {
-
-                $message = sprintf('Payment for order %s (%s) was cancelled by the customer.', $order->getOrderNumber(), $mollieOrder->id);
-
-                throw new CustomerCanceledAsyncPaymentException($orderTransactionID, $message);
-
-            } else {
-
-                $message = sprintf('Payment for order %s (%s) failed. The Mollie payment status was not successful for this payment attempt.', $order->getOrderNumber(), $mollieOrder->id);
-
-                throw new AsyncPaymentFinalizeException($orderTransactionID, $message);
-            }
+            return;
         }
+
+        $orderTransactionID = $transactionStruct->getOrderTransaction()->getUniqueIdentifier();
+
+        # let's also create a different handling, if the customer either cancelled
+        # or if the payment really failed. this will lead to a different order payment status in the end.
+        if ($paymentStatus === MolliePaymentStatus::MOLLIE_PAYMENT_CANCELED) {
+            $message = sprintf('Payment for order %s (%s) was cancelled by the customer.', $order->getOrderNumber(), $mollieOrder->id);
+
+            throw new CustomerCanceledAsyncPaymentException($orderTransactionID, $message);
+        }
+
+        $message = sprintf('Payment for order %s (%s) failed. The Mollie payment status was not successful for this payment attempt.', $order->getOrderNumber(), $mollieOrder->id);
+
+        throw new AsyncPaymentFinalizeException($orderTransactionID, $message);
     }
 }
