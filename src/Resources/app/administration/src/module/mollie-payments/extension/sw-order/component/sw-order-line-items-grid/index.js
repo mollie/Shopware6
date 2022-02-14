@@ -365,11 +365,19 @@ Component.override('sw-order-line-items-grid', {
                 return '~';
             }
 
+            if (this.shippingStatus[item.id] === null) {
+                return '~';
+            }
+
             return this.shippingStatus[item.id].quantityShippable;
         },
 
         shippedQuantity(item) {
             if (this.shippingStatus === null) {
+                return '~';
+            }
+
+            if (this.shippingStatus[item.id] === null) {
                 return '~';
             }
 
