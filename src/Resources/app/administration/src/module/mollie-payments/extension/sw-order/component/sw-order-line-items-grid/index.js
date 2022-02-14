@@ -2,7 +2,7 @@ import template from './sw-order-line-items-grid.html.twig';
 import './sw-order-line-items-grid.scss';
 
 // eslint-disable-next-line no-undef
-const {Component, Filter, Mixin} = Shopware;
+const {Component, Mixin} = Shopware;
 // eslint-disable-next-line no-undef
 const {string} = Shopware.Utils;
 
@@ -40,8 +40,6 @@ Component.override('sw-order-line-items-grid', {
     data() {
         return {
             isLoading: false,
-            isRefundLoading: false,
-            isRefundCancelLoading: false,
             isShipOrderLoading: false,
             isShipItemLoading: false,
             refundAmount: 0.0,
@@ -144,29 +142,6 @@ Component.override('sw-order-line-items-grid', {
 
             return count;
         },
-
-        refundAmountPending() {
-            let total = 0;
-            this.refunds.forEach((refund) => {
-                if(refund.isPending || refund.isQueued) {
-                    total += (refund.amount.value * 100 || 0);
-                }
-            });
-            return Math.max(0, total / 100);
-        },
-
-        orderRefundAmount() {
-            return Math.max(0, ((this.order.amountTotal * 100) - (this.refundedAmount * 100) - (this.refundAmountPending * 100)) / 100);
-        },
-
-        refundAmountHigherThanOrderThreshold() {
-            return this.refundAmount > this.orderRefundAmount
-                && !this.refundAmountHigherThanMollieThreshold;
-        },
-
-        refundAmountHigherThanMollieThreshold() {
-            return this.refundAmount > this.remainingAmount;
-        },
     },
 
     created() {
@@ -201,8 +176,6 @@ Component.override('sw-order-line-items-grid', {
                 return;
             }
 
-            this.isRefundLoading = true;
-
             this.MolliePaymentsRefundService
                 .refund({
                     orderId: this.order.id,
@@ -227,8 +200,6 @@ Component.override('sw-order-line-items-grid', {
                     this.createNotificationError({
                         message: response.message,
                     });
-                }).finally(() => {
-                    this.isRefundLoading = false;
                 });
         },
 
@@ -237,8 +208,6 @@ Component.override('sw-order-line-items-grid', {
         },
 
         cancelRefund(item) {
-            this.isRefundCancelLoading = true;
-
             this.MolliePaymentsRefundService
                 .cancel({
                     orderId: this.order.id,
@@ -247,12 +216,12 @@ Component.override('sw-order-line-items-grid', {
                 .then((response) => {
                     if (response.success) {
                         this.createNotificationSuccess({
-                            message: this.$tc('mollie-payments.modals.refund.cancelSuccess'),
+                            message: this.$tc('mollie-payments.modals.refund.success'),
                         });
                         this.showRefundModal = false;
                     } else {
                         this.createNotificationError({
-                            message: this.$tc('mollie-payments.modals.refund.cancelError'),
+                            message: this.$tc('mollie-payments.modals.refund.error'),
                         });
                     }
                 })
@@ -263,9 +232,6 @@ Component.override('sw-order-line-items-grid', {
                     this.createNotificationError({
                         message: response.message,
                     });
-                })
-                .finally(() => {
-                    this.isRefundCancelLoading = false;
                 });
         },
 
@@ -275,15 +241,6 @@ Component.override('sw-order-line-items-grid', {
 
         getStatusDescription(status) {
             return this.$tc('mollie-payments.modals.refund.list.status-description.' + status);
-        },
-
-        setRefundAmount(amount) {
-            this.refundAmount = amount;
-        },
-
-        // I don't even know why this is needed, but the filter won't work in combination with $tc, at least not in twig
-        currency(...args) {
-            return Filter.getByName('currency')(...args);
         },
 
         //==== Shipping =============================================================================================//

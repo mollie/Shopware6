@@ -17,19 +17,21 @@
                     {% block sw_order_line_items_grid_mollie_actions_button %}
                         <sw-button class="sw-order-line-items-grid__actions-btn" variant="ghost" size="small"
                                    :block="true"
-                                   :disabled="possibleActionsCount < 1">
+                                   v-if="possibleActionsCount >= 1">
                             <sw-icon name="default-badge-info" decorative></sw-icon>
-                            {{ $tc('mollie-payments.general.btnMollieActions') }}&nbsp;
-                            <template v-if="possibleActionsCount >= 1">
-                                ({{ possibleActionsCount }})
-                            </template>
+                            {{ $tc('mollie-payments.general.btnMollieActions') }}&nbsp;({{ possibleActionsCount }})
+                        </sw-button>
+                        <sw-button class="sw-order-line-items-grid__actions-btn" variant="ghost" size="small"
+                                   v-if="possibleActionsCount < 1"
+                                   disabled="true">
+                            {{ $tc('mollie-payments.general.btnMollieActions') }}
                         </sw-button>
                     {% endblock %}
 
                     {% block sw_order_line_items_grid_mollie_actions_context_button %}
-                        <sw-context-button :disabled="possibleActionsCount < 1">
+                        <sw-context-button>
                             <template #button>
-                                <sw-button variant="ghost" size="small" square :disabled="possibleActionsCount < 1">
+                                <sw-button variant="ghost" size="small" square>
                                     <sw-icon name="small-arrow-small-down" decorative>
                                     </sw-icon>
                                 </sw-button>
@@ -72,7 +74,6 @@
                     :dataSource="refunds"
                     :columns="getRefundListColumns"
                     :showSelection="false"
-                    :isLoading="isRefundCancelLoading"
                     v-if="refunds.length > 0">
                 <template #column-amount.value="{ item }">
                     <sw-container columns="1fr auto" gap="8px" align="center">
@@ -97,8 +98,7 @@
                     </sw-context-menu-item>
                 </template>
             </sw-data-grid>
-
-            <sw-container columns="1fr" gap="16px">
+            <div>
                 <sw-description-list grid="225px 1fr"
                                      v-if="!isLoading"
                                      class="sw-order-detail__summary-data">
@@ -138,65 +138,23 @@
 
                 <sw-number-field
                         :min="0"
+                        :max="remainingAmount"
                         v-model="refundAmount"
                         numberType="float"
                         size="medium"
-                        :step="1"
-                        :isInvalid="refundAmountHigherThanMollieThreshold">
+                        :step="1">
                     <template #suffix>
                         {{ order.currency.symbol }}
                     </template>
                 </sw-number-field>
-            </sw-container>
+            </div>
         </sw-container>
 
-        <sw-alert variant="warning" v-if="refundAmountHigherThanOrderThreshold">
-            {{ $tc('mollie-payments.modals.refund.warning.orderThreshold', 0, {
-                orderMaximum : currency(orderRefundAmount, order.currency.shortName),
-                mollieMaximum : currency(remainingAmount, order.currency.shortName),
-                refundAmount : currency(refundAmount, order.currency.shortName),
-            }) }}
-            <template #actions>
-                <sw-button @click="setRefundAmount(orderRefundAmount)" v-if="orderMaximum > 0">
-                    {{ $tc('mollie-payments.modals.refund.warning.refundAmountButton', 0, {
-                        amount: currency(orderRefundAmount, order.currency.shortName)
-                    }) }}
-                </sw-button>
-            </template>
-        </sw-alert>
-
-        <sw-alert variant="error" v-if="refundAmountHigherThanMollieThreshold">
-            {{ $tc('mollie-payments.modals.refund.warning.mollieThreshold', 0, {
-                orderMaximum : currency(orderRefundAmount, order.currency.shortName),
-                mollieMaximum : currency(remainingAmount, order.currency.shortName),
-                refundAmount : currency(refundAmount, order.currency.shortName),
-            }) }}
-            <template #actions>
-                <sw-button @click="setRefundAmount(orderRefundAmount)" v-if="orderMaximum > 0">
-                    {{ $tc('mollie-payments.modals.refund.warning.refundAmountButton', 0, {
-                        amount: currency(orderRefundAmount, order.currency.shortName)
-                    }) }}
-                </sw-button>
-                <sw-button v-if="remainingAmount > orderRefundAmount"
-                           @click="setRefundAmount(remainingAmount)" v-if="remainingAmount > 0">
-                    {{ $tc('mollie-payments.modals.refund.warning.refundAmountButton', 0, {
-                        amount: currency(remainingAmount, order.currency.shortName)
-                    }) }}
-                </sw-button>
-            </template>
-        </sw-alert>
-
         <template #modal-footer>
-            <sw-button @click="onCloseRefundModal"
-                       size="small"
-                       :disabled="isRefundLoading || isRefundCancelLoading">
+            <sw-button @click="onCloseRefundModal" size="small">
                 {{ $tc('mollie-payments.modals.refund.cancelButton') }}
             </sw-button>
-            <sw-button @click="onConfirmRefund()"
-                       variant="primary"
-                       size="small"
-                       :isLoading="isRefundLoading"
-                       :disabled="isRefundCancelLoading">
+            <sw-button @click="onConfirmRefund()" variant="primary" size="small">
                 {{ $tc('mollie-payments.modals.refund.confirmButton') }}
             </sw-button>
         </template>
