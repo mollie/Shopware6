@@ -25,7 +25,6 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
 class MolliePayments extends Plugin
 {
-
     const PLUGIN_VERSION = '1.5.7';
 
     /**
@@ -152,18 +151,18 @@ class MolliePayments extends Plugin
                     'de-DE' => 'Anstehende Abonnementverlängerung von {{ salesChannel.name }}'
                 ],
                 'contentPlain' => "Dear %salutation% %customer_name%\n
-                Good news! We are getting your %subscriptions_productName% subscription ready for 
-                %subscriptions_nextPaymentDate%, this e-mail is just to inform you that the payment with an amount of 
-                %subscriptions_amount% is going to be captured on this date as well. 
-                For any changes, you can log in to your account on {{ salesChannel.name }} and pause or cancel 
+                Good news! We are getting your %subscriptions_productName% subscription ready for
+                %subscriptions_nextPaymentDate%, this e-mail is just to inform you that the payment with an amount of
+                %subscriptions_amount% is going to be captured on this date as well.
+                For any changes, you can log in to your account on {{ salesChannel.name }} and pause or cancel
                 the subscription at any time.
                 \nThanks again\n{{ salesChannel.translated.name }}",
                 'contentHtml' => '<div style="font-family:arial; font-size:12px;"><br/>
                                   <p>Dear %salutation% %customer_name%,</p>
-                                  <p>Good news! We are getting your %subscriptions_productName% subscription ready for 
-                                  %subscriptions_nextPaymentDate%, this e-mail is just to inform you that the payment 
-                                  with an amount of %subscriptions_amount% is going to be captured on this date as well. 
-                                  For any changes, you can log in to your account on {{ salesChannel.name }}  
+                                  <p>Good news! We are getting your %subscriptions_productName% subscription ready for
+                                  %subscriptions_nextPaymentDate%, this e-mail is just to inform you that the payment
+                                  with an amount of %subscriptions_amount% is going to be captured on this date as well.
+                                  For any changes, you can log in to your account on {{ salesChannel.name }}
                                   and pause or cancel the subscription at any time.</p>
                                   <p>Thanks again</p>
                                   <p>{{ salesChannel.translated.name }}</p>
