@@ -142,6 +142,7 @@ class MolliePayments extends Plugin
                 ]
             ]
         ];
+
         $mailTemplate = [
             [
                 'id' => Uuid::randomHex(),
