@@ -1,5 +1,6 @@
 <div id="mollie_components_credit_card{% if sw64 %}_sw64{% endif %}"
      class="mollie-components-credit-card{% if not showIfActive %} d-none{% endif %}"
+      data-mollie-template-creditcard-components{% if sw64 %}-sw64{% endif %}
         {% if page.enable_credit_card_components == true %}
     data-mollie-credit-card-components-{% if sw64 %}sw64-{% endif %}options='{
         "customerId": "{{ context.customer.id }}",
