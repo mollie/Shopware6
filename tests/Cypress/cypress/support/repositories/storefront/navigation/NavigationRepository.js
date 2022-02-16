@@ -13,7 +13,7 @@ export default class NavigationRepository {
      * @returns {*}
      */
     getClothingMenuItem() {
-        return cy.get('#mainNavigation > div.container > nav > a:nth-child(2)');
+        return cy.get('#mainNavigation > div.container > nav > a:nth-child(3)');
     }
 
 }
