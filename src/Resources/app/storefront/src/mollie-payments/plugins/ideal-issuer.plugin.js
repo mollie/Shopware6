@@ -31,6 +31,14 @@ export default class MollieIDealIssuer extends Plugin {
         // load our controls
         // and register the necessary events
         this.initControls();
+
+        // now check if we even have a payment form
+        // if not, then we are not on the checkout page
+        // but maybe in the accounts page instead...we dont need components there
+        if (this._paymentForm === null) {
+            return;
+        }
+
         this.registerEvents();
 
         // update the visibility of our
@@ -72,6 +80,10 @@ export default class MollieIDealIssuer extends Plugin {
             this._paymentForm = oldPaymentForm;
         }
 
+        if (this._paymentForm === undefined || this._paymentForm === null) {
+            return;
+        }
+
         this._radioInputs = this._paymentForm.querySelectorAll('input[type="radio"]');
         this._iDealRadioInput = this._paymentForm.querySelector('input[type="radio"].ideal');
     }
@@ -80,6 +92,10 @@ export default class MollieIDealIssuer extends Plugin {
      *
      */
     registerEvents() {
+
+        if (this._paymentForm === null) {
+            return;
+        }
 
         // create locally scoped variables
         // for async functions. this is required
