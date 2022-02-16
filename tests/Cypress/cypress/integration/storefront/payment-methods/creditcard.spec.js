@@ -93,13 +93,17 @@ describe('Credit Card Components', () => {
 
                 payment.fillCreditCardComponents(' ', validCardNumber, '1228', '1234');
 
+                cy.screenshot('invalid-card-holder-invalid-value-1.png', {'capture': 'fullPage'});
+
                 if (shopware.isVersionGreaterEqual(6.4)) {
                     checkout.placeOrderOnConfirm();
                 } else {
                     payment.closePaymentsModal();
                 }
 
-                cy.wait(1000);
+                cy.wait(1200);
+
+                cy.screenshot('invalid-card-holder-invalid-value-2.png', {'capture': 'fullPage'});
 
                 // if we have a space as invalid card holder name
                 // then somehow this error appears.
@@ -182,6 +186,8 @@ describe('Credit Card Components', () => {
                 cy.contains('Complete payment');
 
 
+                cy.screenshot('components-edit-order-1.png', {'capture': 'fullPage'});
+
                 if (shopware.isVersionGreaterEqual(6.4)) {
 
                     payment.showAllPaymentMethods();
@@ -200,6 +206,7 @@ describe('Credit Card Components', () => {
                     payment.closePaymentsModal();
                 }
 
+                cy.screenshot('components-edit-order-2.png', {'capture': 'fullPage'});
 
                 shopware.prepareDomainChange();
                 checkout.placeOrderOnEdit();
