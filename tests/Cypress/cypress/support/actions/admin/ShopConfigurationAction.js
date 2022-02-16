@@ -28,10 +28,14 @@ export default class ShopConfigurationAction {
         // assign all payment methods to
         // all available sales channels
         this.apiClient.get('/sales-channel').then(channels => {
+
+            if (channels === undefined || channels === null) {
+                throw new Error('Attention, No Sales Channels found trough Shopware API');
+            }
+
             channels.forEach(channel => {
                 this._configureSalesChannel(channel.id);
                 this._configureMolliePlugin(channel.id, mollieFailureMode, creditCardComponents, applePayDirect);
-
             });
         });
 
@@ -69,6 +73,11 @@ export default class ShopConfigurationAction {
 
 
         this.apiClient.get('/product').then(products => {
+
+            if (products === undefined || products === null) {
+                throw new Error('Attention, No products found trough Shopware API');
+            }
+
             products.forEach(product => {
                 const data = {
                     "id": product.id,
@@ -122,6 +131,10 @@ export default class ShopConfigurationAction {
 
         this.apiClient.get('/payment-method').then(payments => {
 
+            if (payments === undefined || payments === null) {
+                throw new Error('Attention, No payments found trough Shopware API');
+            }
+
             payments.forEach(element => {
 
                 let shouldBeActive = false;
@@ -158,6 +171,10 @@ export default class ShopConfigurationAction {
 
         this.apiClient.get('/rule').then(rules => {
 
+            if (rules === undefined || rules === null) {
+                throw new Error('Attention, No rules found trough Shopware API');
+            }
+
             rules.forEach(rule => {
 
                 // get the all customers rule
@@ -165,6 +182,10 @@ export default class ShopConfigurationAction {
                 if (rule.attributes.name === 'All customers') {
 
                     this.apiClient.get('/shipping-method').then(shippingMethods => {
+
+                        if (shippingMethods === undefined || shippingMethods === null) {
+                            throw new Error('Attention, No shippingMethods trough Shopware API');
+                        }
 
                         shippingMethods.forEach(element => {
 
@@ -206,6 +227,10 @@ export default class ShopConfigurationAction {
     _configureSalesChannel(id) {
 
         this.apiClient.get('/payment-method').then(payments => {
+
+            if (payments === undefined || payments === null) {
+                throw new Error('Attention, No payments trough Shopware API');
+            }
 
             let paymentMethodsIds = [];
 
