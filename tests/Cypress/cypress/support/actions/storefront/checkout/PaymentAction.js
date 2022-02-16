@@ -74,28 +74,40 @@ export default class PaymentAction {
         // always make sure that the iFrame is loaded
         cy.wait(1000);
 
+        // that iframe seems to need a bit. had some missing characters recently
+        // so we click in a textfield, wait and then type
+        const clickTimeMS = 100;
+
         // we can insert nothing
         // but cypress would throw an error with .type()
         if (name !== "") {
             cy.get('iframe[name="cardHolder-input"]').then($element => {
                 const $body = $element.contents().find('body')
-                cy.wrap($body).find('#cardHolder').eq(0).click().type(name);
+                cy.wrap($body).find('#cardHolder').eq(0).click();
+                cy.wait(clickTimeMS);
+                cy.wrap($body).find('#cardHolder').eq(0).type(name);
             })
         }
 
         cy.get('iframe[name="cardNumber-input"]').then($element => {
             const $body = $element.contents().find('body')
-            cy.wrap($body).find('#cardNumber').eq(0).click().type(number);
+            cy.wrap($body).find('#cardNumber').eq(0).click();
+            cy.wait(clickTimeMS);
+            cy.wrap($body).find('#cardNumber').eq(0).type(number);
         })
 
         cy.get('iframe[name="expiryDate-input"]').then($element => {
             const $body = $element.contents().find('body')
-            cy.wrap($body).find('#expiryDate').eq(0).click().type(expiryDate);
+            cy.wrap($body).find('#expiryDate').eq(0).click();
+            cy.wait(clickTimeMS);
+            cy.wrap($body).find('#expiryDate').eq(0).type(expiryDate);
         })
 
         cy.get('iframe[name="verificationCode-input"]').then($element => {
             const $body = $element.contents().find('body')
-            cy.wrap($body).find('#verificationCode').eq(0).click().type(cvc);
+            cy.wrap($body).find('#verificationCode').eq(0).click();
+            cy.wait(clickTimeMS);
+            cy.wrap($body).find('#verificationCode').eq(0).type(cvc);
         })
     }
 
