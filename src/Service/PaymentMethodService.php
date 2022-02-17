@@ -149,6 +149,8 @@ class PaymentMethodService
             if (isset($existingPaymentMethod)) {
                 $paymentMethodData['id'] = $existingPaymentMethod->getId();
                 $paymentMethodData['name'] = $existingPaymentMethod->getName();
+                $paymentMethodData['description'] = $existingPaymentMethod->getDescription();
+                $paymentMethodData['active'] = $existingPaymentMethod->getActive();
             }
 
             // Add payment method data to array of payment data
