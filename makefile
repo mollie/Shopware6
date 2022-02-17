@@ -25,11 +25,11 @@ dev: ## Installs all dev dependencies
 	cd src/Resources/app/storefront && npm install
 
 clean: ## Cleans all dependencies
-	rm -rf vendor
+	rm -rf vendor/*
 	rm -rf .reports | true
-	rm -rf ./src/Resources/app/administration/node_modules
+	rm -rf ./src/Resources/app/administration/node_modules/*
 	rm -rf ./src/Resources/app/administration/package-lock.json
-	rm -rf ./src/Resources/app/storefront/node_modules
+	rm -rf ./src/Resources/app/storefront/node_modules/*
 	rm -rf ./src/Resources/app/storefront/package-lock.json
 
 build: ## Installs the plugin, and builds the artifacts using the Shopware build commands (requires Shopware)
