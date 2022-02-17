@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Service\MollieApi\Builder;
 
+use Kiener\MolliePayments\Event\MollieOrderBuildEvent;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Hydrator\MollieLineItemHydrator;
 use Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher;
@@ -18,6 +19,7 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\Locale\LocaleEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\SalesChannel\SalesChannelDefinition;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 class MollieOrderBuilder
@@ -84,6 +86,11 @@ class MollieOrderBuilder
      */
     private $mollieLineItemHydrator;
 
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
+
 
     /**
      * @param SettingsService $settingsService
@@ -97,8 +104,9 @@ class MollieOrderBuilder
      * @param MollieShippingLineItemBuilder $shippingLineItemBuilder
      * @param VerticalTaxLineItemFixer $verticalTaxLineItemFixer
      * @param MollieLineItemHydrator $mollieLineItemHydrator
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function __construct(SettingsService $settingsService, OrderDataExtractor $extractor, RouterInterface $router, MollieOrderPriceBuilder $priceBuilder, MollieLineItemBuilder $lineItemBuilder, MollieOrderAddressBuilder $addressBuilder, MollieOrderCustomerEnricher $customerEnricher, LoggerInterface $loggerService, MollieShippingLineItemBuilder $shippingLineItemBuilder, VerticalTaxLineItemFixer $verticalTaxLineItemFixer, MollieLineItemHydrator $mollieLineItemHydrator)
+    public function __construct(SettingsService $settingsService, OrderDataExtractor $extractor, RouterInterface $router, MollieOrderPriceBuilder $priceBuilder, MollieLineItemBuilder $lineItemBuilder, MollieOrderAddressBuilder $addressBuilder, MollieOrderCustomerEnricher $customerEnricher, LoggerInterface $loggerService, MollieShippingLineItemBuilder $shippingLineItemBuilder, VerticalTaxLineItemFixer $verticalTaxLineItemFixer, MollieLineItemHydrator $mollieLineItemHydrator, EventDispatcherInterface $dispatcher)
     {
         $this->settingsService = $settingsService;
         $this->logger = $loggerService;
@@ -111,6 +119,7 @@ class MollieOrderBuilder
         $this->shippingLineItemBuilder = $shippingLineItemBuilder;
         $this->verticalTaxLineItemFixer = $verticalTaxLineItemFixer;
         $this->mollieLineItemHydrator = $mollieLineItemHydrator;
+        $this->dispatcher = $dispatcher;
 
         $this->webhookBuilder = new WebhookBuilder($router);
     }
@@ -233,7 +242,19 @@ class MollieOrderBuilder
             ]
         );
 
-        return $orderData;
+        $event = new MollieOrderBuildEvent(
+            $orderData,
+            $order,
+            $transactionId,
+            $paymentMethod,
+            $returnUrl,
+            $salesChannelContext,
+            $handler,
+            $paymentData
+        );
+        $this->dispatcher->dispatch($event);
+
+        return $event->getOrderData();
     }
 
     /**
