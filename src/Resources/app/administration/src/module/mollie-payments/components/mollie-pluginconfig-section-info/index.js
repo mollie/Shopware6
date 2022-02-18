@@ -12,6 +12,12 @@ Component.register('mollie-pluginconfig-section-info', {
         Mixin.getByName('notification'),
     ],
 
+    data() {
+        return {
+            isSupportOpen: true,
+        };
+    },
+
     computed: {
 
         /**
@@ -31,6 +37,16 @@ Component.register('mollie-pluginconfig-section-info', {
             }
 
             return user.firstName;
+        },
+    },
+
+    methods: {
+        openSupport() {
+            this.isSupportOpen = true;
+        },
+
+        closeSupport() {
+            this.isSupportOpen = false;
         },
     },
 });
