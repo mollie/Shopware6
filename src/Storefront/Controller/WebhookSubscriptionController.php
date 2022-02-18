@@ -95,7 +95,11 @@ class WebhookSubscriptionController extends StorefrontController
      * @var UpdateOrderLineItems
      */
     private $updateOrderLineItems;
-    private EntityRepositoryInterface $subscriptionRepository;
+
+    /**
+     * @var EntityRepositoryInterface
+     */
+    private $subscriptionRepository;
 
     /**
      * @param TransactionService $transactionService

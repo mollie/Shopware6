@@ -17,7 +17,8 @@ class Migration1644754635AddOriginalOrderIdToSubscription extends MigrationStep
         $connection->executeStatement(<<<SQL
 ALTER TABLE `mollie_subscription_to_product`
 ADD COLUMN `original_order_id` BINARY(16) NOT NULL AFTER `product_id`;
-SQL);
+SQL
+        );
     }
 
     public function updateDestructive(Connection $connection): void
