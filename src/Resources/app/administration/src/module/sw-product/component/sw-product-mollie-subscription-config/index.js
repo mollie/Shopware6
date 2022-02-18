@@ -1,7 +1,8 @@
 import template from './sw-product-mollie-subscription-config.html.twig';
 
-const { Criteria } = Shopware.Data;
-const { Component, Context, Mixin } = Shopware;
+// eslint-disable-next-line no-undef
+const { Component } = Shopware;
+// eslint-disable-next-line no-undef
 const { mapState } = Shopware.Component.getComponentHelper();
 
 Component.register('sw-product-mollie-subscription-config', {

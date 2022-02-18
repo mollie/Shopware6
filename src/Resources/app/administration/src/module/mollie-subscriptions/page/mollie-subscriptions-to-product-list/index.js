@@ -152,8 +152,6 @@ Component.register('mollie-subscriptions-to-product-list', {
                     salesChannelId: item.salesChannelId,
                 })
                 .then((response) => {
-                    console.log(response);
-                    console.log(response.success);
                     if (response.success) {
                         this.createNotificationSuccess({
                             message: this.$tc('mollie-subscriptions.page.list.columns.action.success'),
