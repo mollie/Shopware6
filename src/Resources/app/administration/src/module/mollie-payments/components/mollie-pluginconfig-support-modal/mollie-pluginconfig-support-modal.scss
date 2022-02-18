@@ -1,0 +1,23 @@
+.mollie-support-modal {
+    .sw-description-list {
+        position: relative;
+
+        dt, dd {
+            border-bottom: none;
+
+
+        }
+
+        dt {
+            padding: 16px 4px 4px;
+
+            &:first-child {
+                padding-top: 4px;
+            }
+        }
+
+        dd {
+            padding: 1px 4px;
+        }
+    }
+}

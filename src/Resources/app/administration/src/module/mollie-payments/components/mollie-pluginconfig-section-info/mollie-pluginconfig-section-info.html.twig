@@ -48,4 +48,5 @@
             {{ $tc('mollie-payments.config.info.btnTroubleshooting') }}
         </sw-external-link>
     </div>
+    <mollie-pluginconfig-support-modal v-if="isSupportOpen" @close="closeSupport"/>
 </sw-container>
