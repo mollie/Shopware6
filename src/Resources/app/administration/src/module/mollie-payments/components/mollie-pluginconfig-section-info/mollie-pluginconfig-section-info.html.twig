@@ -1,7 +1,7 @@
 <sw-container class="mollie-pluginconfig-info" gap="16px" columns="3fr 1fr">
     <div>
         <div class="title">
-            {{ title }}
+            {{ $tc('mollie-payments.config.info.title', 0, { userName: userName}) }}
         </div>
         <div class="description">
             {{ $tc('mollie-payments.config.info.descriptionTop') }}<br/>

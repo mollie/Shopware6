@@ -21,7 +21,7 @@
     },
     "config": {
       "info": {
-        "title": "Hi ##userName##, Welcome to Mollie!",
+        "title": "Hi {userName}, Welcome to Mollie!",
         "descriptionTop": "Onboarding is easy with Mollie!",
         "descriptionBottom": "That's it!",
         "descriptionFooter": "If you want to learn more about our plugin, please visit our official documentation page.",

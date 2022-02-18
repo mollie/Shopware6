@@ -16,18 +16,6 @@ Component.register('mollie-pluginconfig-section-info', {
 
         /**
          *
-         * @returns {*}
-         */
-        title() {
-            let text = this.$tc('mollie-payments.config.info.title');
-
-            text = text.replace('##userName##', this.userName);
-
-            return text;
-        },
-
-        /**
-         *
          * @returns {string|*}
          */
         userName() {
