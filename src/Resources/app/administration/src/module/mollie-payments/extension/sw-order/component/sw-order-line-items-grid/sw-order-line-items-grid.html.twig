@@ -74,7 +74,6 @@
                     :dataSource="refunds"
                     :columns="getRefundListColumns"
                     :showSelection="false"
-                    :isLoading="isRefundCancelLoading"
                     v-if="refunds.length > 0">
                 <template #column-amount.value="{ item }">
                     <sw-container columns="1fr auto" gap="8px" align="center">
@@ -102,7 +101,6 @@
 
             <sw-container columns="1fr" gap="16px">
                 <sw-description-list grid="225px 1fr"
-                                     v-if="!isLoading"
                                      class="sw-order-detail__summary-data">
                     {% block sw_order_line_items_grid_refund_summary %}
                         {% block sw_order_line_items_grid_refund_summary_amount_total %}
@@ -149,7 +147,10 @@
                         {{ order.currency.symbol }}
                     </template>
                 </sw-number-field>
+
             </sw-container>
+
+            <sw-loader v-if="isRefundLoading || isRefundCancelLoading"/>
         </sw-container>
 
         <sw-alert variant="warning" v-if="refundAmountHigherThanOrderThreshold">
