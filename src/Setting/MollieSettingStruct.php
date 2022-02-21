@@ -93,7 +93,7 @@ class MollieSettingStruct extends Struct
     /**
      * @var string[]
      */
-    protected $restrictApplePayDirect = [];
+    protected $applePayDirectRestrictions = [];
 
     /**
      * @var string
@@ -368,7 +368,7 @@ class MollieSettingStruct extends Struct
      */
     public function getRestrictApplePayDirect(): array
     {
-        return $this->restrictApplePayDirect;
+        return $this->applePayDirectRestrictions;
     }
 
     /**

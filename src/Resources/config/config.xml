@@ -141,12 +141,14 @@
             <helpText lang="de-DE">Konfiguration der Lebensdauer bis eine Bestellung verfällt, sofern sie nicht bezahlt wurde. Diese Konfiguration wirkt sich auf alle Zahlungsarten aus.</helpText>
             <helpText lang="nl-NL">Configureer de levensduur van een bestelling totdat deze vervalt als er niet betaald is. Dit geldt voor alle betaalmethoden.</helpText>
         </input-field>
-
         <input-field type="multi-select">
-            <name>restrictApplePayDirect</name>
+            <name>applePayDirectRestrictions</name>
             <label>Apple Pay Display Restrictions</label>
             <label lang="de-DE">Apple Pay Anzeige Einschränkungen</label>
             <label lang="nl-NL">Apple Pay weergavebeperkingen</label>
+            <helpText>Restrict Apple Pay Direct from being displayed on these pages.</helpText>
+            <helpText lang="de-DE">Verhindere die Anzeige von Apple Pay Direct auf den hier gewählten Seiten</helpText>
+            <helpText lang="nl-NL">Voorkom dat Apple Pay Direct wordt weergegeven op deze pagina's.</helpText>
             <options>
                 <option>
                     <id>plp</id>
