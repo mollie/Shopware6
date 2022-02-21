@@ -1,6 +1,6 @@
 import Plugin from 'src/plugin-system/plugin.class';
 import DomAccess from 'src/helper/dom-access.helper';
-import HttpClient from '../services/HttpClient'
+import HttpClient from '../services/HttpClient';
 import DeviceDetection from 'src/helper/device-detection.helper';
 
 
