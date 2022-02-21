@@ -159,7 +159,8 @@
                 refundAmount : currency(refundAmount, order.currency.shortName),
             }) }}
             <template #actions>
-                <sw-button @click="setRefundAmount(orderRefundAmount)" v-if="orderMaximum > 0">
+                <sw-button v-if="orderRefundAmount > 0"
+                           @click="setRefundAmount(orderRefundAmount)">
                     {{ $tc('mollie-payments.modals.refund.warning.refundAmountButton', 0, {
                         amount: currency(orderRefundAmount, order.currency.shortName)
                     }) }}
@@ -174,13 +175,14 @@
                 refundAmount : currency(refundAmount, order.currency.shortName),
             }) }}
             <template #actions>
-                <sw-button @click="setRefundAmount(orderRefundAmount)" v-if="orderMaximum > 0">
+                <sw-button v-if="orderRefundAmount > 0"
+                           @click="setRefundAmount(orderRefundAmount)">
                     {{ $tc('mollie-payments.modals.refund.warning.refundAmountButton', 0, {
                         amount: currency(orderRefundAmount, order.currency.shortName)
                     }) }}
                 </sw-button>
                 <sw-button v-if="remainingAmount > orderRefundAmount"
-                           @click="setRefundAmount(remainingAmount)" v-if="remainingAmount > 0">
+                           @click="setRefundAmount(remainingAmount)">
                     {{ $tc('mollie-payments.modals.refund.warning.refundAmountButton', 0, {
                         amount: currency(remainingAmount, order.currency.shortName)
                     }) }}
