@@ -14,6 +14,7 @@ use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Service\UpdateOrderTransactionCustomFields;
 use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
 use Kiener\MolliePayments\Struct\OrderTransaction\OrderTransactionAttributes;
+use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Exceptions\IncompatiblePlatform;
 use Mollie\Api\Resources\Payment;
@@ -21,6 +22,7 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\Exception\AsyncPaymentFinalizeException;
 use Shopware\Core\Checkout\Payment\Exception\CustomerCanceledAsyncPaymentException;
+use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class MolliePaymentFinalize
@@ -116,10 +118,20 @@ class MolliePaymentFinalize
         );
 
 
+        $paymentMethod = $transactionStruct->getOrderTransaction()->getPaymentMethod();
+
+        if (!$paymentMethod instanceof PaymentMethodEntity) {
+            throw new \Exception('No payment method found when finalizing order');
+        }
+
+        $mollieAttributes = new PaymentMethodAttributes($paymentMethod);
+
+        $molliePaymentMethodKey = $mollieAttributes->getMollieIdentifier();
+
         # now either set the payment status for successful payments
         # or make sure to throw an exception for Shopware in case
         # of failed payments.
-        if (!MolliePaymentStatus::isFailedStatus($paymentStatus)) {
+        if (!MolliePaymentStatus::isFailedStatus($molliePaymentMethodKey, $paymentStatus)) {
 
             $this->orderStatusUpdater->updatePaymentStatus($transactionStruct->getOrderTransaction(), $paymentStatus, $salesChannelContext->getContext());
 
