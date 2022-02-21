@@ -2,7 +2,7 @@ import template from './sw-order-line-items-grid.html.twig';
 import './sw-order-line-items-grid.scss';
 
 // eslint-disable-next-line no-undef
-const {Component, Mixin} = Shopware;
+const {Component, Filter, Mixin} = Shopware;
 // eslint-disable-next-line no-undef
 const {string} = Shopware.Utils;
 
@@ -40,6 +40,8 @@ Component.override('sw-order-line-items-grid', {
     data() {
         return {
             isLoading: false,
+            isRefundLoading: false,
+            isRefundCancelLoading: false,
             isShipOrderLoading: false,
             isShipItemLoading: false,
             refundAmount: 0.0,
@@ -142,6 +144,29 @@ Component.override('sw-order-line-items-grid', {
 
             return count;
         },
+
+        refundAmountPending() {
+            let total = 0.0;
+            this.refunds.forEach((refund) => {
+                if(refund.isPending || refund.isQueued) {
+                    total += (refund.amount.value || 0);
+                }
+            });
+            return total;
+        },
+
+        orderRefundAmount() {
+            return this.order.amountTotal - this.refundedAmount - this.refundAmountPending;
+        },
+
+        refundAmountHigherThanOrderThreshold() {
+            return this.refundAmount > this.orderRefundAmount
+                && !this.refundAmountHigherThanMollieThreshold;
+        },
+
+        refundAmountHigherThanMollieThreshold() {
+            return this.refundAmount > this.remainingAmount;
+        },
     },
 
     created() {
@@ -176,6 +201,8 @@ Component.override('sw-order-line-items-grid', {
                 return;
             }
 
+            this.isRefundLoading = true;
+
             this.MolliePaymentsRefundService
                 .refund({
                     orderId: this.order.id,
@@ -200,6 +227,8 @@ Component.override('sw-order-line-items-grid', {
                     this.createNotificationError({
                         message: response.message,
                     });
+                }).finally(() => {
+                    this.isRefundLoading = false;
                 });
         },
 
@@ -208,6 +237,8 @@ Component.override('sw-order-line-items-grid', {
         },
 
         cancelRefund(item) {
+            this.isRefundCancelLoading = true;
+
             this.MolliePaymentsRefundService
                 .cancel({
                     orderId: this.order.id,
@@ -232,6 +263,9 @@ Component.override('sw-order-line-items-grid', {
                     this.createNotificationError({
                         message: response.message,
                     });
+                })
+                .finally(() => {
+                    this.isRefundCancelLoading = false;
                 });
         },
 
@@ -241,6 +275,15 @@ Component.override('sw-order-line-items-grid', {
 
         getStatusDescription(status) {
             return this.$tc('mollie-payments.modals.refund.list.status-description.' + status);
+        },
+
+        setRefundAmount(amount) {
+            this.refundAmount = amount;
+        },
+
+        // I don't even know why this is needed, but the filter won't work in combination with $tc, at least not in twig
+        currency(...args) {
+            return Filter.getByName('currency')(...args);
         },
 
         //==== Shipping =============================================================================================//
