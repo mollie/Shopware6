@@ -61,10 +61,12 @@
         "title": "Terugbetaling via Mollie",
         "success": "Er is een terugbetaling aangemaakt bij Mollie. Het kan 2 uur duren voordat de terugbetaling is voltooid. Tot deze tijd kunt u de terugbetaling annuleren.",
         "error": "Er is iets mis gegaan bij het aanmaken van een terugbetaling.",
+        "cancelSuccess": "De terugbetaling is geannuleerd.",
+        "cancelError": "Er is iets misgegaan bij het proberen te annuleren van deze terugbetaling.",
         "warning": {
           "low-amount": "Voer een terug te betalen bedrag in.",
-          "orderThreshold": "Attentie, u probeert meer terug te betalen dan het totaalbedrag van deze bestelling ({orderMaximum}.)",
-          "mollieThreshold": "Het bedrag dat u probeert terug te betalen overschrijdt het maximumbedrag dat is toegestaan door Mollie ({mollieMaximum}.)",
+          "orderThreshold": "Attentie, u probeert meer terug te betalen dan het overgebleven totaalbedrag van deze bestelling ({orderMaximum})",
+          "mollieThreshold": "Het bedrag dat u probeert terug te betalen overschrijdt het maximumbedrag dat is toegestaan door Mollie ({mollieMaximum})",
           "refundAmountButton": "{amount} terugbetalen"
         },
         "confirmButton": "Terugbetalen",

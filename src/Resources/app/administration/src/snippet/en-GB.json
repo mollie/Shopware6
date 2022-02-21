@@ -61,10 +61,12 @@
         "title": "Refund through Mollie",
         "success": "A refund has been created in Mollie. It may take 2 hours for the refund to complete. Until this time, you can cancel the refund.",
         "error": "Something went wrong creating a refund.",
+        "cancelSuccess": "The refund has been canceled.",
+        "cancelError": "Something went wrong trying to cancel this refund.",
         "warning": {
           "low-amount": "Please enter an amount to be refunded.",
-          "orderThreshold": "Attention, you are trying to refund more than the total amount of this order ({orderMaximum}.)",
-          "mollieThreshold": "The amount you're trying to refund exceeds the maximum amount allowed by Mollie ({mollieMaximum}.)",
+          "orderThreshold": "Attention, you are trying to refund more than the total amount remaining on this order ({orderMaximum})",
+          "mollieThreshold": "The amount you're trying to refund exceeds the maximum amount allowed by Mollie ({mollieMaximum})",
           "refundAmountButton": "Refund {amount}"
         },
         "confirmButton": "Refund",
