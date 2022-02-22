@@ -35,7 +35,11 @@ describe('Credit Card Components', () => {
 
             beforeEach(() => {
                 devices.setDevice(device);
-                configAction.setupShop(true, true, false);
+
+                // we need the Shopware failure mode for some tests in this file
+                // so let's just do this here once
+                configAction.setupShop(false, true, false);
+
                 session.resetSessionData();
                 session.resetBrowserSession();
             });
@@ -164,10 +168,6 @@ describe('Credit Card Components', () => {
 
             it('Components work on edit order page', () => {
 
-                // We need to test this with Shopware's complete order page.
-                // So we disable the Mollie failure mode for this test only
-                configAction.setupShop(false, true, false);
-
                 scenarioDummyBasket.execute();
 
                 // we have to use something else than CREDIT CARD
@@ -221,6 +221,28 @@ describe('Credit Card Components', () => {
 
                 cy.url().should('include', '/checkout/finish');
                 cy.contains('Thank you for updating your order');
+            })
+
+            it('Open Credit Card payment leads to failure', () => {
+
+                setUp();
+
+                payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '1228', '1234');
+
+                // we are still in our modal, so we
+                // have to close it in older versions
+                if (shopware.isVersionLower(6.4)) {
+                    payment.closePaymentsModal();
+                }
+
+                shopware.prepareDomainChange();
+                checkout.placeOrderOnConfirm();
+
+                molliePayment.initSandboxCookie();
+                molliePayment.selectOpen();
+
+                cy.url().should('include', '/account/order/edit');
+                cy.contains('Complete payment');
             })
 
         })
