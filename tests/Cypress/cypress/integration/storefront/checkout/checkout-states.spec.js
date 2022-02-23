@@ -42,6 +42,28 @@ context("Order Status Mapping Tests", () => {
 
     context(devices.getDescription(device), () => {
 
+        it('Test Status Open stays In-Progress', () => {
+
+            // we create a SEPA bank transfer payment
+            // the payment status will be IN PROGRESS then in Shopware.
+            // in reality, SEPA leads to "OPEN". So Mollie will tell us its "only" OPEN
+            // but we still need to stick with IN_PROGRESS, otherwise it would be
+            // confusing for merchants.
+
+            scenarioDummyBasket.execute();
+            paymentAction.switchPaymentMethod('Banktransfer');
+
+            shopware.prepareDomainChange();
+            checkout.placeOrderOnConfirm();
+
+            molliePayment.initSandboxCookie();
+            molliePayment.selectOpen();
+
+            adminLogin.login();
+            adminOrders.assertLatestOrderStatus('Open');
+            adminOrders.assertLatestPaymentStatus('In Progress');
+        })
+
         it('Test Status Paid', () => {
 
             scenarioDummyBasket.execute();
@@ -109,5 +131,6 @@ context("Order Status Mapping Tests", () => {
             adminOrders.assertLatestOrderStatus('Cancelled');
             adminOrders.assertLatestPaymentStatus('Cancelled');
         })
+
     })
 })
