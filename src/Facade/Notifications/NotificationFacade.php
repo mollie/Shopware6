@@ -21,9 +21,11 @@ use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 
@@ -122,7 +124,12 @@ class NotificationFacade
 
         $mollieOrderId = $this->getMollieId($swOrder);
 
-        $this->logger->info('Webhook for order ' . $swOrder->getOrderNumber() . ' and Mollie ID: ' . $mollieOrderId . ' has been received');
+        # now get the latest transaction of that order
+        # we always need to make sure to use the latest one, because this
+        # is the one, that is really visible in the administration.
+        # if we don't add to that one, then the previous one is suddenly visible again
+        # which causes confusion and troubles in the end
+        $transaction = $this->getOrderTransactions($swOrder->getId(), $contextSC->getContext())->last();
 
         # --------------------------------------------------------------------------------------------
 
@@ -135,6 +142,8 @@ class NotificationFacade
         # --------------------------------------------------------------------------------------------
 
         $status = $this->statusConverter->getMollieOrderStatus($mollieOrder);
+
+        $this->logger->info('Webhook for order ' . $swOrder->getOrderNumber() . ' and Mollie ID: ' . $mollieOrderId . ' has been received with Status: ' . $status);
 
         $this->statusUpdater->updatePaymentStatus($transaction, $status, $contextSC->getContext());
 
@@ -174,6 +183,22 @@ class NotificationFacade
         $criteria->addAssociation('paymentMethod');
 
         return $this->repoOrderTransactions->search($criteria, $context)->first();
+    }
+
+    /**
+     * @param string $orderID
+     * @param Context $context
+     * @return EntitySearchResult<OrderTransactionEntity>
+     */
+    private function getOrderTransactions(string $orderID, Context $context): EntitySearchResult
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('order.id', $orderID));
+        $criteria->addAssociation('order');
+        $criteria->addAssociation('paymentMethod');
+        $criteria->addSorting(new FieldSorting('createdAt'));
+
+        return $this->repoOrderTransactions->search($criteria, $context);
     }
 
     /**
