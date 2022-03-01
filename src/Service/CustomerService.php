@@ -340,7 +340,7 @@ class CustomerService
         }
 
         // Then assign all custom fields under the mollie_payments key
-        $struct->assign($customFields['mollie_payments'] ?? []);
+        $struct->assign($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS] ?? []);
 
         return $struct;
     }
