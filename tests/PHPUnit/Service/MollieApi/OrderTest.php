@@ -17,6 +17,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Shopware\Core\Framework\Context;
+use Symfony\Component\Routing\RouterInterface;
 
 class OrderTest extends TestCase
 {
@@ -40,6 +41,15 @@ class OrderTest extends TestCase
      */
     private $paymentApiService;
 
+    /**
+     * @var RouterInterface
+     */
+    protected $router;
+
+
+    /***
+     * @return void
+     */
     protected function setUp(): void
     {
         $this->clientMock = $this->createMock(MollieApiClient::class);
@@ -51,7 +61,14 @@ class OrderTest extends TestCase
 
         $this->loggerServiceMock = new NullLogger();
         $this->paymentApiService = new MolliePaymentApi($apiFactoryMock);
-        $this->orderApiService = new MollieOrderApi($apiFactoryMock, $this->paymentApiService, $this->loggerServiceMock);
+        $this->router = $this->getMockBuilder(RouterInterface::class)->disableOriginalConstructor()->getMock();
+
+        $this->orderApiService = new MollieOrderApi(
+            $apiFactoryMock,
+            $this->paymentApiService,
+            $this->router,
+            $this->loggerServiceMock
+        );
     }
 
     /**

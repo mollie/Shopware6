@@ -610,7 +610,7 @@ class ApplePayDirectController extends StorefrontController
             # This is required for a smooth checkout with our already validated Apple Pay transaction.
             $this->paymentHandler->setToken($paymentToken);
 
-            $paymentData = $this->molliePayments->preparePayProcessAtMollie(ApplePayPayment::PAYMENT_METHOD_NAME, $asyncPaymentTransition, $context, $this->paymentHandler);
+            $paymentData = $this->molliePayments->startMolliePayment(ApplePayPayment::PAYMENT_METHOD_NAME, $asyncPaymentTransition, $context, $this->paymentHandler);
 
             if (empty($paymentData->getCheckoutURL())) {
                 throw new \Exception('Error when creating Apple Pay order in Mollie');

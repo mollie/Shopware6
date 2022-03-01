@@ -28,6 +28,7 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\System\Currency\CurrencyEntity;
+use Symfony\Component\Routing\RouterInterface;
 
 class RefundsServiceTest extends TestCase
 {
@@ -59,7 +60,9 @@ class RefundsServiceTest extends TestCase
 
         $loggerServiceMock = new NullLogger();
         $paymentApiService = new MolliePaymentApi($apiFactoryMock);
-        $mollieOrderApiMock = new MollieOrderApi($apiFactoryMock, $paymentApiService, $loggerServiceMock);
+        $router = $this->getMockBuilder(RouterInterface::class)->disableOriginalConstructor()->getMock();
+
+        $mollieOrderApiMock = new MollieOrderApi($apiFactoryMock, $paymentApiService, $router, $loggerServiceMock);
 
         $this->refundService = new RefundService(
             $mollieOrderApiMock,

@@ -105,7 +105,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
 
         try {
 
-            $paymentData = $this->payFacade->preparePayProcessAtMollie(
+            $paymentData = $this->payFacade->startMolliePayment(
                 $this->paymentMethod,
                 $transaction,
                 $salesChannelContext,
@@ -128,6 +128,9 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
 
         try {
 
+            # before we send the customer to the Mollie payment page
+            # we will process the order transaction, which means we set it to be IN PROGRESS.
+            # this is just how it works at the moment, I did only add the comment for it here :)
             $this->transactionTransitionService->processTransaction($transaction->getOrderTransaction(), $salesChannelContext->getContext());
 
         } catch (\Exception $exception) {
