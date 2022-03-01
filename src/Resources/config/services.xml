@@ -171,12 +171,6 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Subscriber\PaymentMethodSubscriber" class="Kiener\MolliePayments\Subscriber\PaymentMethodSubscriber">
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
-            <argument type="service" id="payment_method.repository"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
         <service id="Kiener\MolliePayments\Subscriber\TestModeNotificationSubscriber">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <tag name="kernel.event_subscriber"/>
