@@ -53,16 +53,16 @@ class PaymentMethodService
     /**
      * PaymentMethodService constructor.
      *
-     * @param MediaService              $mediaService
+     * @param MediaService $mediaService
      * @param EntityRepositoryInterface $mediaRepository
      * @param EntityRepositoryInterface $paymentRepository
-     * @param PluginIdProvider          $pluginIdProvider
+     * @param PluginIdProvider $pluginIdProvider
      */
     public function __construct(
-        MediaService $mediaService,
+        MediaService              $mediaService,
         EntityRepositoryInterface $mediaRepository,
         EntityRepositoryInterface $paymentRepository,
-        PluginIdProvider $pluginIdProvider
+        PluginIdProvider          $pluginIdProvider
     )
     {
         $this->mediaService = $mediaService;
@@ -86,6 +86,12 @@ class PaymentMethodService
      */
     public function installAndActivatePaymentMethods(Context $context): void
     {
+        # install payment methods that are not allowed anymore.
+        # we still need the min the database
+        # but always disable them :)
+        $this->disablePaymentMethod(IngHomePayPayment::class, $context);
+
+
         // Get installable payment methods
         $installablePaymentMethods = $this->getInstallablePaymentMethods();
 
@@ -111,7 +117,7 @@ class PaymentMethodService
      * @param array $paymentMethods
      * @param Context $context
      */
-    public function addPaymentMethods(array $paymentMethods, Context $context) : void
+    public function addPaymentMethods(array $paymentMethods, Context $context): void
     {
         // Get the plugin ID
         $pluginId = $this->pluginIdProvider->getPluginIdByBaseClass(MolliePayments::class, $context);
@@ -213,9 +219,27 @@ class PaymentMethodService
                 $existingPaymentMethod = $this->getPaymentMethod($paymentMethod['handler'], $context);
 
                 if (isset($existingPaymentMethod)) {
-                    $this->activatePaymentMethod($existingPaymentMethod->getId(), true, $context);
+                    $this->setPaymentMethodActivated($existingPaymentMethod->getId(), true, $context);
                 }
             }
+        }
+    }
+
+    /**
+     * @param string $handlerName
+     * @param Context $context
+     * @return void
+     */
+    public function disablePaymentMethod(string $handlerName, Context $context): void
+    {
+        $existingPaymentMethod = $this->getPaymentMethod($handlerName, $context);
+
+        if (isset($existingPaymentMethod)) {
+            $this->setPaymentMethodActivated(
+                $existingPaymentMethod->getId(),
+                false,
+                $context
+            );
         }
     }
 
@@ -228,9 +252,9 @@ class PaymentMethodService
      *
      * @return EntityWrittenContainerEvent
      */
-    public function activatePaymentMethod(
-        string $paymentMethodId,
-        bool $active,
+    public function setPaymentMethodActivated(
+        string  $paymentMethodId,
+        bool    $active,
         Context $context
     ): EntityWrittenContainerEvent
     {
@@ -252,7 +276,7 @@ class PaymentMethodService
      * @return PaymentMethodEntity
      * @throws InconsistentCriteriaIdsException
      */
-    public function getPaymentMethodById($id) : ?PaymentMethodEntity
+    public function getPaymentMethodById($id): ?PaymentMethodEntity
     {
         // Fetch ID for update
         $paymentCriteria = new Criteria();
@@ -273,7 +297,7 @@ class PaymentMethodService
      *
      * @return array
      */
-    public function getInstallablePaymentMethods() : array
+    public function getInstallablePaymentMethods(): array
     {
         // Variables
         $paymentMethods = [];
@@ -303,7 +327,7 @@ class PaymentMethodService
      *
      * @return PaymentMethodEntity|null
      */
-    private function getPaymentMethod($handlerIdentifier, Context $context) : ?PaymentMethodEntity
+    private function getPaymentMethod($handlerIdentifier, Context $context): ?PaymentMethodEntity
     {
         // Fetch ID for update
         $paymentCriteria = new Criteria();
@@ -335,7 +359,7 @@ class PaymentMethodService
             // DirectDebitPayment::class,   // Is removed for now because it's only used for recurring
             EpsPayment::class,
             GiftCardPayment::class,
-            GiroPayPayment::class,
+            # GiroPayPayment::class, // not allowed anymore
             iDealPayment::class,
             IngHomePayPayment::class,
             KbcPayment::class,
@@ -353,7 +377,7 @@ class PaymentMethodService
     /**
      * Retrieve the icon from the database, or add it.
      *
-     * @param array   $paymentMethod
+     * @param array $paymentMethod
      * @param Context $context
      *
      * @return string
@@ -378,7 +402,7 @@ class PaymentMethodService
         $iconExt = 'svg';
         $iconBlob = file_get_contents('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.svg');
 
-        if(empty(trim($iconBlob))) {
+        if (empty(trim($iconBlob))) {
             $iconBlob = file_get_contents('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.png');
             $iconMime = 'image/png';
             $iconExt = 'png';
@@ -401,11 +425,12 @@ class PaymentMethodService
      * @param Order $mollieOrder
      * @return bool
      */
-    public function isPaidApplePayTransaction(OrderTransactionEntity $transaction, Order $mollieOrder) : bool {
+    public function isPaidApplePayTransaction(OrderTransactionEntity $transaction, Order $mollieOrder): bool
+    {
         $paymentMethodId = $transaction->getPaymentMethodId();
         $paymentMethod = $transaction->getPaymentMethod();
 
-        if(!$paymentMethod instanceof PaymentMethodEntity) {
+        if (!$paymentMethod instanceof PaymentMethodEntity) {
             $criteria = new Criteria([$paymentMethodId]);
             $paymentMethod = $this->paymentRepository->search($criteria, Context::createDefaultContext())->first();
         }
