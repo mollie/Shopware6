@@ -278,34 +278,33 @@ export default class MollieApplePayDirect extends Plugin {
      * @param payment
      */
     finishPayment(checkoutURL, paymentToken, payment) {
-        var $form;
-        var createField = function (name, val) {
-            return $('<input>', {
-                type: 'hidden',
-                name: name,
-                value: val,
-            });
-        };
+        const createInput = function (name, val) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = name;
+            input.value = val;
 
-        $form = $('<form>', {
-            action: checkoutURL,
-            method: 'POST',
-        });
+            return input;
+        }
+
+        const form = document.createElement('form');
+        form.action = checkoutURL;
+        form.method = 'POST';
 
         // add billing data
-        createField('email', payment.shippingContact.emailAddress).appendTo($form);
-        createField('lastname', payment.shippingContact.familyName).appendTo($form);
-        createField('firstname', payment.shippingContact.givenName).appendTo($form);
-        createField('street', payment.shippingContact.addressLines[0]).appendTo($form);
-        createField('postalCode', payment.shippingContact.postalCode).appendTo($form);
-        createField('city', payment.shippingContact.locality).appendTo($form);
-        createField('countryCode', payment.shippingContact.countryCode).appendTo($form);
+        form.insertAdjacentElement('beforeend', createInput('email', payment.shippingContact.emailAddress));
+        form.insertAdjacentElement('beforeend', createInput('lastname', payment.shippingContact.familyName));
+        form.insertAdjacentElement('beforeend', createInput('firstname', payment.shippingContact.givenName));
+        form.insertAdjacentElement('beforeend', createInput('street', payment.shippingContact.addressLines[0]));
+        form.insertAdjacentElement('beforeend', createInput('postalCode', payment.shippingContact.postalCode));
+        form.insertAdjacentElement('beforeend', createInput('city', payment.shippingContact.locality));
+        form.insertAdjacentElement('beforeend', createInput('countryCode', payment.shippingContact.countryCode));
         // also add our payment token
-        createField('paymentToken', paymentToken).appendTo($form);
+        form.insertAdjacentElement('beforeend', createInput('paymentToken', paymentToken));
 
-        $form.appendTo($('body'));
+        document.body.insertAdjacentElement('beforeend', form);
 
-        $form.submit();
+        form.submit();
     }
 
     /**
