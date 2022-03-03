@@ -6,6 +6,7 @@ use Kiener\MolliePayments\Helper\ProfileHelper;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\MollieApiClient;
+use Mollie\Api\Resources\Profile;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
@@ -111,7 +112,6 @@ class SystemConfigSubscriber implements EventSubscriberInterface
             $this->logger->debug(
                 "API key has been removed, removing associated profile ID",
                 [
-                    'apiKey' => $value,
                     'salesChannelId' => $salesChannelId ?? 'null',
                     'mode' => $testMode ? 'test' : 'live',
                 ]
@@ -126,7 +126,6 @@ class SystemConfigSubscriber implements EventSubscriberInterface
         $this->logger->debug(
             "Fetching profile ID",
             [
-                'apiKey' => $value,
                 'salesChannelId' => $salesChannelId ?? 'null',
                 'mode' => $testMode ? 'test' : 'live',
             ]
@@ -136,12 +135,23 @@ class SystemConfigSubscriber implements EventSubscriberInterface
         $this->apiClient->setApiKey($value);
 
         $profile = ProfileHelper::getProfile($this->apiClient, new MollieSettingStruct());
+
+        if(!$profile instanceof Profile) {
+            $this->logger->error(
+                'Could not get profile using these settings',
+                [
+                    'salesChannelId' => $salesChannelId ?? 'null',
+                    'mode' => $testMode ? 'test' : 'live',
+                ]
+            );
+            return;
+        }
+
         $this->profileIdStorage[$salesChannelId . $profileKey] = $profile->id;
 
         $this->logger->debug(
             "Saving profile ID",
             [
-                'apiKey' => $value,
                 'salesChannelId' => $salesChannelId ?? 'null',
                 'mode' => $testMode ? 'test' : 'live',
                 'profileId' => $profile->id
