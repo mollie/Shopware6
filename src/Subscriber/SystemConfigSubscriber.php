@@ -112,7 +112,6 @@ class SystemConfigSubscriber implements EventSubscriberInterface
             $this->logger->debug(
                 "API key has been removed, removing associated profile ID",
                 [
-                    'apiKey' => $value,
                     'salesChannelId' => $salesChannelId ?? 'null',
                     'mode' => $testMode ? 'test' : 'live',
                 ]
@@ -127,7 +126,6 @@ class SystemConfigSubscriber implements EventSubscriberInterface
         $this->logger->debug(
             "Fetching profile ID",
             [
-                'apiKey' => $value,
                 'salesChannelId' => $salesChannelId ?? 'null',
                 'mode' => $testMode ? 'test' : 'live',
             ]
@@ -142,7 +140,6 @@ class SystemConfigSubscriber implements EventSubscriberInterface
             $this->logger->error(
                 'Could not get profile using these settings',
                 [
-                    'apiKey' => $value,
                     'salesChannelId' => $salesChannelId ?? 'null',
                     'mode' => $testMode ? 'test' : 'live',
                 ]
@@ -155,7 +152,6 @@ class SystemConfigSubscriber implements EventSubscriberInterface
         $this->logger->debug(
             "Saving profile ID",
             [
-                'apiKey' => $value,
                 'salesChannelId' => $salesChannelId ?? 'null',
                 'mode' => $testMode ? 'test' : 'live',
                 'profileId' => $profile->id
