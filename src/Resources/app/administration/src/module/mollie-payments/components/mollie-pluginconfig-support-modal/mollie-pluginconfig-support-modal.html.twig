@@ -1,9 +1,9 @@
 <sw-modal class="mollie-support-modal"
           title="Hello"
-          size="800px"
+          variant="large"
           @modal-close="$emit('close')">
 
-    <sw-container columns="3fr 1fr" gap="16px">
+    <sw-container columns="10fr 4fr" gap="16px">
         <sw-container gap="16px" columns="1fr" align="start">
             <sw-text-field v-model="contactName"
                            label="Your name"
@@ -39,7 +39,7 @@
                 {{ molliePlugin.label }} log files
             </dd>
             <dd v-if="molliePlugin">
-                {{ molliePlugin.label }} config
+                {{ molliePlugin.label }} configuration
                 <sw-help-text text="API keys are excluded"/>
             </dd>
 
