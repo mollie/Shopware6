@@ -89,6 +89,10 @@
             "refunded": "Der Rückerstattungsbetrag wurde an den Kunden überwiesen.",
             "failed": "Die Rückerstattung ist nach der Bearbeitung fehlgeschlagen. Zum Beispiel hat der Kunde sein Bankkonto geschlossen. Das Geld wird auf das Konto zurücküberwiesen."
           }
+        },
+        "cancel": {
+          "success": "Die ausstehende Rückerstattung wurde erfolgreich storniert",
+          "error": "Fehler beim Stornieren der ausstehenden Rückerstattung"
         }
       },
       "shipping": {

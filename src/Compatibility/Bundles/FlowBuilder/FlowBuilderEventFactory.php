@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder;
 
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\DummyEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund\RefundStartedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookReceivedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedAuthorizedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedCancelledEvent;
@@ -160,6 +161,20 @@ class FlowBuilderEventFactory
         }
 
         return new WebhookReceivedCompletedEvent($orderEntity, $context);
+    }
+
+    /**
+     * @param OrderEntity $orderEntity
+     * @param Context $context
+     * @return DummyEvent|RefundStartedEvent
+     */
+    public function buildRefundStartedEvent(OrderEntity $orderEntity, Context $context)
+    {
+        if ($this->versionCompare->lt(FlowBuilderFactory::FLOW_BUILDER_MIN_VERSION)) {
+            return new DummyEvent();
+        }
+
+        return new RefundStartedEvent($orderEntity, $context);
     }
 
 }

@@ -26,8 +26,8 @@
 
         <service id="Kiener\MolliePayments\Controller\Api\RefundController" public="true">
             <argument type="service" id="Kiener\MolliePayments\Facade\MollieRefundFacade"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="mollie_payments.logger"/>
-
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
@@ -46,6 +46,14 @@
             <argument type="service" id="Kiener\MolliePayments\Service\PaymentMethodService"/>
             <argument type="service" id="mollie_payments.logger"/>
 
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+
+        <service id="Kiener\MolliePayments\Controller\Api\RefundManagerController" public="true">
+            <argument type="service" id="Kiener\MolliePayments\Facade\MollieRefundFacade"/>
+            <argument type="service" id="mollie_payments.logger"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>

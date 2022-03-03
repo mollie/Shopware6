@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Subscriber;
 
 
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund\RefundStartedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookReceivedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedAuthorizedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedCancelledEvent;
@@ -87,6 +88,10 @@ class BusinessEventCollectorSubscriber implements EventSubscriberInterface
 
         /** @var BusinessEventDefinition $definition */
         $definition = $this->businessEventCollector->define(WebhookReceivedChargebackEvent::class);
+        $collection->set($definition->getName(), $definition);
+
+        /** @var BusinessEventDefinition $definition */
+        $definition = $this->businessEventCollector->define(RefundStartedEvent::class);
         $collection->set($definition->getName(), $definition);
     }
 

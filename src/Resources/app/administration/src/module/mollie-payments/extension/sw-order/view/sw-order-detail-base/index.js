@@ -42,12 +42,14 @@ Component.override('sw-order-detail-base', {
     methods: {
         getMollieData() {
             if (this.isMollieOrder) {
-                this.MolliePaymentsRefundService
-                    .total({orderId: this.order.id})
+
+                this.MolliePaymentsRefundService.list({orderId: this.order.id})
                     .then((response) => {
-                        this.remainingAmount = response.remaining;
-                        this.refundedAmount = response.refunded;
-                        this.voucherAmount = response.voucherAmount;
+                        this.remainingAmount = response.totals.remaining;
+                        this.refundedAmount = response.totals.refunded;
+                        this.voucherAmount = response.totals.voucherAmount;
+                        this.refundAmountPending = response.totals.pendingRefunds;
+                        this.refunds = response.refunds;
                     })
                     .catch((response) => {
                         this.createNotificationError({
@@ -62,24 +64,6 @@ Component.override('sw-order-detail-base', {
                         this.shippedQuantity = response.quantity;
                     });
 
-                this.MolliePaymentsRefundService
-                    .list({orderId: this.order.id})
-                    .then((response) => {
-                        return this.refunds = response;
-                    })
-                    .then((refunds) => {
-                        this.refundAmountPending = 0.0;
-                        refunds.forEach((refund) => {
-                            if(refund.isPending || refund.isQueued) {
-                                this.refundAmountPending += (refund.amount.value || 0);
-                            }
-                        });
-                    })
-                    .catch((response) => {
-                        this.createNotificationError({
-                            message: response.message,
-                        });
-                    });
             }
         },
     },

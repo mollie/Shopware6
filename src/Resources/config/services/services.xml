@@ -62,11 +62,19 @@
             <argument type="service" id="mollie_payments.logger"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\RefundService">
+        <service id="Kiener\MolliePayments\Service\Refund\RefundService">
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Stock\StockUpdater"/>
             <argument type="service" id="Kiener\MolliePayments\Hydrator\RefundHydrator"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
         </service>
+
+        <service id="Kiener\MolliePayments\Service\Stock\StockUpdater">
+            <argument type="service" id="Doctrine\DBAL\Connection"/>
+        </service>
+
 
         <service id="Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor">
             <argument type="service" id="mollie_payments.logger"/>
@@ -131,9 +139,9 @@
         </service>
 
         <service id="Kiener\MolliePayments\Service\Payment\Provider\ActivePaymentMethodsProvider">
-            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory" />
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder" />
-            <argument type="service" id="mollie_payments.logger" />
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder"/>
+            <argument type="service" id="mollie_payments.logger"/>
         </service>
 
     </services>

@@ -1,0 +1,377 @@
+<sw-card-section class="mollie-refund-manager">
+    <sw-container columns="1fr">
+        {# --------------------------------------------------------------------------------------------- #}
+        {# --------------------------------------------------------------------------------------------- #}
+        {# --------------------------------------------------------------------------------------------- #}
+        <sw-card :title="orderCardTitle" :hero="false" :large="true">
+            <sw-container columns="5fr 1fr">
+                <div>
+                    <sw-button-group>
+                        <sw-button variant="context" size="small" @click="selectAllQty()">
+                            Select All
+                        </sw-button>
+                        <sw-button variant="context" size="small" @click="resetCartItemsForm()">
+                            Reset Form
+                        </sw-button>
+                    </sw-button-group>
+                </div>
+                <div style="text-align: right;">
+                    <sw-external-link :small="false" icon="small-arrow-small-external" rel="noopener"
+                                      target="_blank"
+                                      href="https://docs.mollie.com/payments/refunds#refund-statuses">
+                        How to use this form?
+                    </sw-external-link>
+                </div>
+            </sw-container>
+            <sw-data-grid :dataSource="refundLineItems"
+                          :isLoading="isRefundDataLoading"
+                          :columns="getLineItemColumns"
+                          :showSelection="false"
+                          :selectable="false"
+                          :showActions="true"
+                          :allowInlineEdit="false"
+                          :plainAppearance="true">
+
+                <template #actions="{ item }">
+                    <sw-context-menu-item icon="default-basic-x-line"
+                                          @click="onItemReset(item)">
+                        Reset Line
+                    </sw-context-menu-item>
+                </template>
+
+                <template #column-shopware.label="{ item }">
+
+                    <sw-icon v-if="item.shopware.promotion.discount > 0"
+                             name="default-package-gift"
+                             :small="true"
+                             color="rgb(210, 210, 210)"
+                             style="margin-right:10px;">
+                    </sw-icon>
+
+                    <sw-icon v-if="isItemPromotion(item)"
+                             name="default-package-gift"
+                             :small="true"
+                             color="rgb(255, 215, 0)"
+                             style="margin-right:10px;">
+                    </sw-icon>
+
+                    <sw-icon v-if="isItemDelivery(item)"
+                             name="default-package-open"
+                             :small="true"
+                             color="rgb(24, 158, 255)"
+                             style="margin-right:10px;">
+                    </sw-icon>
+
+                    {{ item.shopware.label }}
+                </template>
+                <template #column-shopware.unitPrice="{ item }">
+                    {{ item.shopware.unitPrice | currency(order.currency.shortName) }}
+                </template>
+                <template #column-shopware.totalPrice="{ item }">
+                    <div v-if="isItemPromotion(item)">
+                        -
+                    </div>
+                    <div v-if="!isItemPromotion(item)">
+                        {{ item.shopware.totalPrice | currency(order.currency.shortName) }}
+                    </div>
+                </template>
+                <template #column-shopware.quantity="{ item }">
+                    {{ item.shopware.quantity }} pc.
+                </template>
+                <template #column-refunded="{ item }">
+                    {{ item.refunded }} pc.
+                </template>
+                <template #column-inputQuantity="{ item }">
+                    <sw-icon v-if="!isItemRefundable(item)" name="default-basic-checkmark-circle" color="#1abc9c"></sw-icon>
+                    <sw-number-field numberType="float"
+                                     v-model="item.refundQuantity"
+                                     v-if="isItemRefundable(item)"
+                                     :allowEmpty="true"
+                                     :class="{ 'tutorial-active' : tutorialPartialQuantityVisible || tutorialPartialPromotionsVisible || (tutorialRefundShipping && isItemDelivery(item)), 'input-mode-active' : item.refundMode == 'quantity', 'input-mode-inactive' : item.refundMode == 'amount' }"
+                                     @change="onItemQtyChanged(item)">
+                        <template #suffix>
+                            pc.
+                        </template>
+                    </sw-number-field>
+                </template>
+                <template #column-inputAmount="{ item }">
+                    <sw-number-field numberType="float"
+                                     v-model="item.refundAmount"
+                                     v-if="isItemRefundable(item) && !isItemPromotion(item)"
+                                     :allowEmpty="true"
+                                     :class="{ 'tutorial-active' : tutorialPartialQuantityVisible || tutorialPartialPromotionsVisible || (tutorialRefundShipping && isItemDelivery(item)), 'input-mode-active' : item.refundMode == 'amount', 'input-mode-inactive' : item.refundMode == 'quantity' }"
+                                     @change="onItemAmountChanged(item)">
+                        <template #suffix>
+                            {{ order.currency.symbol }}
+                        </template>
+                    </sw-number-field>
+                    <div v-if="isItemPromotion(item)">
+                        {{ item.refundAmount | currency(order.currency.shortName) }}
+                    </div>
+                </template>
+                <template #column-inputConsiderPromotion="{ item }">
+                    <div v-if="isItemRefundable(item) && !isItemPromotion(item) && isItemPromotionDiscounted(item)">
+                        <sw-checkbox-field label="Deduct Promotion"
+                                           v-model="item.refundPromotion"
+                                           class="check-deduct-promotion"
+                                           :class="{ 'tutorial-active': tutorialPartialPromotionsVisible }"
+                                           @change="onItemPromotionChanged(item)">
+                        </sw-checkbox-field>
+                    </div>
+                </template>
+                <template #column-inputStock=" { item }">
+                    <sw-number-field numberType="float"
+                                     v-model="item.resetStock"
+                                     v-if="isItemRefundable(item) && !isItemPromotion(item) && !isItemDelivery(item)"
+                                     :class="{ 'tutorial-active' : tutorialResetStock }"
+                                     :allowEmpty="true">
+                        <template #suffix>
+                            pc.
+                        </template>
+                    </sw-number-field>
+                </template>
+            </sw-data-grid>
+        </sw-card>
+        {# --------------------------------------------------------------------------------------------- #}
+        {# --------------------------------------------------------------------------------------------- #}
+        {# --------------------------------------------------------------------------------------------- #}
+        <sw-card :hero="false" :large="true">
+            <sw-container columns="1fr" gap="0px">
+                <div style="text-align: left;">
+                    <sw-button variant="context" size="small" icon="default-basic-x-block" @click="resetTutorials()">
+                        Reset Tutorials
+                    </sw-button>
+                </div>
+            </sw-container>
+            <sw-container columns="4fr 4fr 3fr" gap="0px">
+                <sw-card-section divider="right">
+                    <sw-container columns="1fr 20fr" style="margin-bottom:30px;">
+                        <sw-icon name="default-money-cash" :small="false" color="rgb(7, 172, 0)" style="margin-right:10px;"></sw-icon>
+                        <div>
+                            <strong>Full Refund</strong>
+                            <br/>
+                            Just use the button for the full refund. This makes sure that all your items are marked as refunded and the full amount is returned to the customer.<br/>
+                            <br/>
+                            <sw-button variant="ghost" size="small" @click="toggleTutorialFull()">
+                                Show/Hide Tutorial
+                            </sw-button>
+                        </div>
+                    </sw-container>
+                    <sw-container columns="1fr 20fr" style="margin-bottom:30px;">
+                        <sw-icon name="default-building-shop" :small="false" color="rgb(202 82 8)" style="margin-right:10px;"></sw-icon>
+                        <div>
+                            <strong>Stock Reset</strong><br/>
+                            You can automatically increase the available stock by entering the quantity that you would like to put back in stock.
+                            Just enter it before proceeding with a full or partial refund.
+                            Resetting the stock can be combined with the actual refund process in a flexible way.
+                            <br/>
+                            <br/>
+                            <sw-button variant="ghost" size="small" @click="toggleTutorialStock()">
+                                Show/Hide Tutorial
+                            </sw-button>
+                        </div>
+                    </sw-container>
+                    <sw-container columns="1fr 20fr">
+                        <sw-icon name="default-package-open" :small="false" color="rgb(24, 158, 255)" style="margin-right:10px;"></sw-icon>
+                        <div>
+                            <strong>Shipping</strong><br/>
+                            Shipping items can be refunded as any other produt item. Either enter the full quantity or a custom partial
+                            amount and proceed with the refund.
+                            Refunding shipping costs can be combined with the actual refund process of items in a flexible way.
+                            <br/>
+                            <br/>
+                            <sw-button variant="ghost" size="small" @click="toggleTutorialShipping()">
+                                Show/Hide Tutorial
+                            </sw-button>
+                        </div>
+                    </sw-container>
+                </sw-card-section>
+                {# --------------------------------------------------------------------------------------------- #}
+                <sw-card-section divider="right">
+                    <sw-container columns="1fr 20fr" style="margin-bottom:30px;">
+                        <sw-icon name="default-money-cash" :small="false" color="rgb(7, 172, 0)" style="margin-right:10px;"></sw-icon>
+                        <div>
+                            <strong>Partial Refund (only amount)</strong><br/>
+                            Just enter the partial amount in the text field and start the refund.
+                            <br/>
+                            <br/>
+                            <sw-button variant="ghost" size="small" @click="toggleTutorialPartialAmount()">
+                                Show/Hide Tutorial
+                            </sw-button>
+                        </div>
+                    </sw-container>
+                    <sw-container columns="1fr 20fr" style="margin-bottom:30px;">
+                        <sw-icon name="default-money-cash" :small="false" color="rgb(7, 172, 0)" style="margin-right:10px;"></sw-icon>
+                        <div>
+                            <strong>Partial Refund (with items)</strong>
+                            <br/>
+                            If you want to mark quantities and items as refunded in Mollie, use the form above.
+                            Set your quantities and provide a custom amount for every item that will be refunded.
+                            The total sum will then be visible in the final refund amount text field.
+                            Remember, it's still possible to adjust this final amount before starting your refund.
+                            <br/>
+                            <br/>
+                            <sw-button variant="ghost" size="small" @click="toggleTutorialPartialQuantities()">
+                                Show/Hide Tutorial
+                            </sw-button>
+                        </div>
+                    </sw-container>
+                    <sw-container columns="1fr 20fr">
+                        <sw-icon name="default-package-gift" :small="false" color="rgb(255, 215, 0)" style="margin-right:10px;"></sw-icon>
+                        <div>
+                            <strong>Partial Refund (with promotions)</strong><br/>
+                            If you have a promotion in your cart, then your promotion is a separate line item.
+                            If you want to refund all discounted items, go ahead and refund their total values and the
+                            full promotion line item itself. However, if you only want to refund a few items that were discounted, you
+                            can deduct the applied discount automatically for every single line item. You can of course always change values if they are not correct.
+                            <br/>
+                            <br/>
+                            <sw-button variant="ghost" size="small" @click="toggleTutorialPartialPromotions()">
+                                Show/Hide Tutorial
+                            </sw-button>
+                        </div>
+                    </sw-container>
+                </sw-card-section>
+                {# --------------------------------------------------------------------------------------------- #}
+                {# --------------------------------------------------------------------------------------------- #}
+                <sw-card-section>
+                    <div grid="1fr" v-if="isRefundDataLoading" style="margin-bottom:50px; text-align:center;">
+                        Data is loading...<br/>
+                        <br/>
+                    </div>
+                    <sw-description-list grid="2fr 1fr"
+                                         class="sw-order-detail__summary-data"
+                                         style="margin-bottom:20px;"
+                                         v-if="!isRefundDataLoading">
+                        {% block sw_order_line_items_grid_refund_summary %}
+                            {% block sw_order_line_items_grid_refund_summary_amount_total %}
+                                <template v-if="order.price.taxStatus !== 'tax-free'">
+                                    <dt>{{ $tc('sw-order.detailBase.summaryLabelAmountTotal') }}</dt>
+                                    <dd style="text-align:right;">{{ order.amountTotal | currency(order.currency.shortName) }}</dd>
+                                </template>
+                            {% endblock %}
+                            {% block sw_order_line_items_grid_refund_summary_amount_free_tax %}
+                                <template v-if="order.price.taxStatus === 'tax-free'">
+                                    <dt>{{ $tc('sw-order.detailBase.summaryLabelAmount') }}</dt>
+                                    <dd style="text-align:right;">{{ order.positionPrice | currency(order.currency.translated.shortName) }}</dd>
+                                </template>
+                            {% endblock %}
+                            {% block sw_order_line_items_grid_refund_summary_amount_voucher %}
+                                <template v-if="voucherAmount > 0">
+                                    <dt>{{ $tc('sw-order.detailExtended.totalVouchers') }}</dt>
+                                    <dd style="text-align:right;">- {{ voucherAmount | currency(order.currency.shortName) }}</dd>
+                                </template>
+                            {% endblock %}
+                            {% block sw_order_line_items_grid_refund_summary_amount_pending_refunds %}
+                                <dt>Pending Refunds</dt>
+                                <dd style="text-align:right;">- {{ pendingRefunds | currency(order.currency.shortName) }}</dd>
+                            {% endblock %}
+                            {% block sw_order_line_items_grid_refund_summary_amount_refunded %}
+                                <dt>{{ $tc('sw-order.detailExtended.totalRefunds') }}</dt>
+                                <dd style="text-align:right;">- {{ refundedAmount | currency(order.currency.shortName) }}</dd>
+                            {% endblock %}
+                            {% block sw_order_line_items_grid_refund_summary_amount_remaining %}
+                                <dt>{{ $tc('sw-order.detailExtended.totalRemaining') }}</dt>
+                                <dd style="text-align:right;font-weight:bold;">= {{ remainingAmount | currency(order.currency.shortName) }}</dd>
+                            {% endblock %}
+                        {% endblock %}
+                    </sw-description-list>
+                    {# --------------------------------------------------------------------------------------------- #}
+                    <sw-container gap="2px">
+                        <sw-number-field numberType="float"
+                                         size="medium"
+                                         v-model="refundAmount"
+                                         :min="0"
+                                         :class="{ 'tutorial-active' : tutorialPartialAmountRefundVisible || tutorialPartialQuantityVisible || tutorialPartialPromotionsVisible || tutorialRefundShipping }">
+                            <template #suffix>
+                                {{ order.currency.symbol }}
+                            </template>
+                        </sw-number-field>
+                        <sw-button v-if="isFixButtonAvailable()"
+                                   variant="ghost-danger" :block="true"
+                                   class="btn-fix-diff"
+                                   @click="setFullAmount()">
+                            Fix Difference (Top Up)
+                        </sw-button>
+                    </sw-container>
+                    {# --------------------------------------------------------------------------------------------- #}
+                    <sw-textarea-field type="textarea"
+                                       v-model="refundDescription"
+                                       class="field-description"
+                                       placeholder="Optional description for this refund">
+                    </sw-textarea-field>
+                    {# --------------------------------------------------------------------------------------------- #}
+                    <sw-checkbox-field v-model="checkRefund"
+                                       :bordered="true"
+                                       label="I have verified the total refund amount and the configured quantities to refund and re-stock.">
+                    </sw-checkbox-field>
+                    {# --------------------------------------------------------------------------------------------- #}
+                    <sw-button variant="contrast"
+                               :block="true"
+                               :disabled="!checkRefund"
+                               :class="{ 'tutorial-active' : tutorialPartialAmountRefundVisible || tutorialPartialQuantityVisible || tutorialPartialPromotionsVisible || tutorialResetStock || tutorialRefundShipping }"
+                               @click="onStartRefund()">
+                        {{ $tc('mollie-payments.modals.refund.confirmButton') }}
+                    </sw-button>
+                    <hr style="margin-top:20px;margin-bottom:20px;"/>
+                    <sw-button variant="danger" :block="true"
+                               :disabled="!checkRefund"
+                               @click="onRefundAll()"
+                               :class="{ 'tutorial-active' : tutorialFullRefundVisible || tutorialResetStock || tutorialRefundShipping  }"
+                               style="margin-top:5px;">
+                        Full Refund
+                    </sw-button>
+                </sw-card-section>
+            </sw-container>
+        </sw-card>
+        {# --------------------------------------------------------------------------------------------- #}
+        {# --------------------------------------------------------------------------------------------- #}
+        {# --------------------------------------------------------------------------------------------- #}
+        <sw-container columns="1fr">
+            <sw-card title="Refunds in Mollie Dashboard" :hero="false" :large="true">
+                <div style="display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+        justify-content: flex-end;margin-bottom:30px;">
+                    <sw-external-link :small="false" icon="small-arrow-small-external" rel="noopener"
+                                      target="_blank" href="https://docs.mollie.com/payments/refunds#refund-statuses">
+                        More about refunds
+                    </sw-external-link>
+                </div>
+                <sw-data-grid :dataSource="existingRefunds"
+                              :columns="getRefundListColumns"
+                              :showSelection="false"
+                              :isLoading="isRefundDataLoading">
+                    <template #column-amount.value="{ item }">
+                        <sw-container columns="1fr auto" gap="8px" align="center">
+                            {{ item.amount.value | currency(item.amount.currency) }}
+                            <sw-help-text :text="item.description"></sw-help-text>
+                        </sw-container>
+                    </template>
+                    <template #column-status="{ item }">
+                        <sw-container columns="1fr auto" gap="8px" align="center">
+                            <sw-label :variant="getStatusBadge(item.status)" size="medium" appearance="default" :ghost="false" :caps="false" :dismissable="false">
+                                {{ getStatus(item.status) }}
+                            </sw-label>
+                            <sw-help-text :text="getStatusDescription(item.status)"></sw-help-text>
+                        </sw-container>
+                    </template>
+                    <template #column-createdAt="{ item }">
+                        {{ item.createdAt | date({hour: '2-digit', minute: '2-digit'}) }}
+                    </template>
+                    <template #actions="{ item }">
+                        <sw-context-menu-item :disabled="!isRefundCancelable(item)"
+                                              variant="danger"
+                                              @click="cancelRefund(item)">
+                            {{ $tc('mollie-payments.modals.refund.list.context.cancel') }}
+                        </sw-context-menu-item>
+                    </template>
+                </sw-data-grid>
+            </sw-card>
+        </sw-container>
+        {# --------------------------------------------------------------------------------------------- #}
+        {# --------------------------------------------------------------------------------------------- #}
+        {# --------------------------------------------------------------------------------------------- #}
+    </sw-container>
+    </div>
+</sw-card-section>

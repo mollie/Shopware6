@@ -12,5 +12,12 @@
             <tag name="console.command"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Command\Refunds\RefundCommand">
+            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="order.repository"/>
+            <argument type="service" id="Doctrine\DBAL\Connection"/>
+            <tag name="console.command"/>
+        </service>
+
     </services>
 </container>

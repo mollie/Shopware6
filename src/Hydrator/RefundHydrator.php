@@ -42,6 +42,7 @@ class RefundHydrator
             'isProcessing' => $refund->isProcessing(),
             'isQueued' => $refund->isQueued(),
             'isTransferred' => $refund->isTransferred(),
+            'metadata' => json_decode((string)$refund->metadata, true),
         ];
     }
 }

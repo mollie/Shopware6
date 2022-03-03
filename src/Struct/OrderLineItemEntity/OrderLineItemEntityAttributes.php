@@ -15,6 +15,10 @@ class OrderLineItemEntityAttributes
      */
     private $voucherType;
 
+    /**
+     * @var string
+     */
+    private $mollieOrderLineID;
 
     /**
      * @param OrderLineItemEntity $lineItem
@@ -22,6 +26,7 @@ class OrderLineItemEntityAttributes
     public function __construct(OrderLineItemEntity $lineItem)
     {
         $this->voucherType = '';
+        $this->mollieOrderLineID = '';
 
         if ($lineItem->getPayload() === null) {
             return;
@@ -32,6 +37,10 @@ class OrderLineItemEntityAttributes
         }
 
         $customFields = $lineItem->getPayload()['customFields'];
+
+        if ($customFields === null || empty($customFields)) {
+            $customFields = $lineItem->getCustomFields();
+        }
 
         if ($customFields === null) {
             return;
@@ -45,6 +54,10 @@ class OrderLineItemEntityAttributes
 
         if (array_key_exists('voucher_type', $mollieData)) {
             $this->voucherType = (string)$mollieData['voucher_type'];
+        }
+
+        if (array_key_exists('order_line_id', $mollieData)) {
+            $this->mollieOrderLineID = (string)$mollieData['order_line_id'];
         }
 
     }
@@ -66,6 +79,14 @@ class OrderLineItemEntityAttributes
         }
 
         return $this->voucherType;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMollieOrderLineID(): string
+    {
+        return $this->mollieOrderLineID;
     }
 
 }

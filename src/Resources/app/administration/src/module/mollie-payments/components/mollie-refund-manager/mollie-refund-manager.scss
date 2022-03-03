@@ -1,0 +1,59 @@
+.mollie-refund-manager {
+
+    background-color: #f0f2f5;
+    padding: 30px;
+
+    input {
+        padding: 6px;
+        text-align: center;
+    }
+
+    .tutorial-active {
+        border: red solid 4px;
+        padding: 6px;
+    }
+
+    .sw-field__addition {
+        padding: 6px;
+    }
+
+    .input-mode-active {
+
+        input {
+            // background: oldlace;
+            background: antiquewhite;
+        }
+    }
+
+    .input-mode-inactive {
+        input {
+            background: initial;
+        }
+
+    }
+
+    .sw-card--large {
+        margin-left: 20px;
+        margin-right: 20px;
+
+        max-width: 100%;
+    }
+
+    .check-deduct-promotion {
+
+        label {
+            font-size: 12px;
+        }
+
+    }
+
+    .field-description {
+        margin-bottom: 10px;
+    }
+
+    .btn-fix-diff {
+        margin-bottom: 5px;
+        margin-left: 1px;
+    }
+}
+

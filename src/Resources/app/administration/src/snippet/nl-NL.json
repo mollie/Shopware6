@@ -89,6 +89,10 @@
             "refunded": "Het restitutiebedrag is overgemaakt naar de klant.",
             "failed": "De terugbetaling is mislukt na verwerking. De klant heeft bijvoorbeeld zijn/haar bankrekening opgeheven. Het geld zal worden teruggestort op de rekening."
           }
+        },
+        "cancel": {
+          "success": "",
+          "error": ""
         }
       },
       "shipping": {

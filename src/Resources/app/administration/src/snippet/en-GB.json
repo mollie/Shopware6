@@ -58,7 +58,7 @@
     },
     "modals": {
       "refund": {
-        "title": "Refund through Mollie",
+        "title": "Mollie Refund Manager",
         "success": "A refund has been created in Mollie. It may take 2 hours for the refund to complete. Until this time, you can cancel the refund.",
         "error": "Something went wrong creating a refund.",
         "warning": {
@@ -89,6 +89,10 @@
             "refunded": "The refund amount has been transferred to the consumer.",
             "failed": "The refund has failed after processing. For example, the customer has closed his / her bank account. The funds will be returned to your account."
           }
+        },
+        "cancel": {
+          "success": "The pending refund has been successfully cancelled!",
+          "error": "Error when cancelling the pending refund!"
         }
       },
       "shipping": {

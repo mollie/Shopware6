@@ -5,6 +5,8 @@ namespace Kiener\MolliePayments\Service\Order;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Types\OrderLineType;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
@@ -55,5 +57,6 @@ class UpdateOrderLineItems
             $this->orderLineRepository->update([$data], $salesChannelContext->getContext());
         }
     }
+
 
 }
