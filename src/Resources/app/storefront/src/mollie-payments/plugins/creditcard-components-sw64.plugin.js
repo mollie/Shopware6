@@ -268,13 +268,14 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
     continueShopwareCheckout(form) {
 
         if (DeviceDetection.isIEBrowser()) {
-            const createField = function (name, val) {
-                return $('<input>', {
-                    type: 'checkbox',
-                    name: name,
-                    checked: val,
-                    style: 'display: none;',
-                });
+            const createInput = function (name, val) {
+                const input = document.createElement('input');
+                input.type = 'checkbox';
+                input.name = name;
+                input.checked = val;
+                input.style.display = 'none';
+
+                return input;
             };
 
             const checkTOS = document.getElementById('tos');
@@ -282,7 +283,7 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
             // we might not always have the TOS checkbox (editOrder)
             // but if we have it, we have to add it again
             if (checkTOS !== undefined && checkTOS !== null) {
-                createField('tos', checkTOS.checked).appendTo(form);
+                form.insertAdjacentElement('beforeend', createInput('tos', checkTOS.checked));
             }
         }
 

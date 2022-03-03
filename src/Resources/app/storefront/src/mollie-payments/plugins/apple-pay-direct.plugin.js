@@ -278,7 +278,7 @@ export default class MollieApplePayDirect extends Plugin {
      * @param payment
      */
     finishPayment(checkoutURL, paymentToken, payment) {
-        function createInput(name, val) {
+        const createInput = function (name, val) {
             const input = document.createElement('input');
             input.type = 'hidden';
             input.name = name;
