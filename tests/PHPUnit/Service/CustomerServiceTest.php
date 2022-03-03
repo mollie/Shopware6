@@ -14,6 +14,7 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
+use Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -42,7 +43,8 @@ class CustomerServiceTest extends TestCase
             $this->createMock(SalesChannelContextPersister::class),
             $this->createMock(EntityRepositoryInterface::class),
             $this->settingsService,
-            'does.not.matter.here'
+            'does.not.matter.here',
+            $this->createMock(NumberRangeValueGeneratorInterface::class)
         );
 
     }
