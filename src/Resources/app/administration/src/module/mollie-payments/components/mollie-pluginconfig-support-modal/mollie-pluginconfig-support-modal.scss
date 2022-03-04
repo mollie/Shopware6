@@ -12,12 +12,17 @@
             padding: 16px 4px 4px;
 
             &:first-child {
-                padding-top: 4px;
+                padding-top: 0;
             }
         }
 
         dd {
             padding: 1px 4px;
         }
+    }
+
+    .sw-text-editor .sw-text-editor__content-editor p,
+    .sw-text-editor .sw-text-editor__content-editor div {
+        margin-top: 0;
     }
 }
