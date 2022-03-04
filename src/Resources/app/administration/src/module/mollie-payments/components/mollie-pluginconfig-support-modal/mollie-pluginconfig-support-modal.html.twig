@@ -5,19 +5,19 @@
 
     <sw-container columns="10fr 4fr" gap="16px">
         <sw-container gap="16px" columns="1fr" align="start">
-            <sw-text-field v-model="contactName"
+            <sw-text-field v-model="name"
                            label="Your name"
                            :placeholder="userName"
                            size="medium"/>
 
-            <sw-email-field v-model="contactEmail"
+            <sw-email-field v-model="email"
                             label="Your email"
                             :placeholder="user.email"
                             size="medium"/>
 
             <sw-text-field v-model="subject"
                            label="Subject"
-                           size="medium"/>
+                           size="medium" />
 
             <sw-text-editor v-model="message"
                             label="Message"/>
@@ -46,10 +46,26 @@
 
             <sw-loader v-if="isLoading"/>
         </sw-description-list>
+
+        <sw-loader v-if="isSubmitting"/>
     </sw-container>
 
     <template #modal-footer>
-        <sw-button size="small" @click="$emit('close')">Cancel</sw-button>
-        <sw-button size="small" variant="primary" :disabled="isLoading">Request support</sw-button>
+        <sw-button size="small"
+                   :isLoading="isSubmitting"
+                   @click="$emit('close')">
+            Cancel
+        </sw-button>
+
+        <sw-button-process size="small"
+                           variant="primary"
+                           :animationTimeout="2500"
+                           :disabled="isLoading || !canSubmit"
+                           :isLoading="isSubmitting"
+                           :processSuccess="mailSent"
+                           @click="onRequestSupport"
+                           @process-finish="mailSent = false">
+            Request support
+        </sw-button-process>
     </template>
 </sw-modal>

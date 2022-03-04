@@ -3,12 +3,15 @@ import './mollie-pluginconfig-support-modal.scss';
 
 // eslint-disable-next-line no-undef
 const {Component, Context, Mixin, State} = Shopware;
+// eslint-disable-next-line no-undef
+const {string} = Shopware.Utils;
 
 Component.register('mollie-pluginconfig-support-modal', {
     template,
 
     inject: [
         'shopwareExtensionService',
+        'MolliePaymentsSupportService',
     ],
 
     mixins: [
@@ -17,10 +20,13 @@ Component.register('mollie-pluginconfig-support-modal', {
 
     data() {
         return {
-            contactName: '',
-            contactEmail: '',
+            name: '',
+            email: '',
             subject: '',
             message: '',
+
+            isSubmitting: false,
+            mailSent: false,
         }
     },
 
@@ -29,8 +35,37 @@ Component.register('mollie-pluginconfig-support-modal', {
             return State.get('shopwareExtensions').myExtensions.loading;
         },
 
+        canSubmit() {
+            return !string.isEmptyOrSpaces(this.contactName)
+                && !string.isEmptyOrSpaces(this.contactEmail)
+                && !string.isEmptyOrSpaces(this.subject)
+                && !string.isEmptyOrSpaces(this.message)
+        },
+
         shopwareVersion() {
             return this.humanReadableVersion(Context.app.config.version);
+        },
+
+        contactName: {
+            get() {
+                return !string.isEmptyOrSpaces(name)
+                    ? this.name
+                    : this.userName;
+            },
+            set(value) {
+                this.name = value;
+            },
+        },
+
+        contactEmail: {
+            get() {
+                return !string.isEmptyOrSpaces(this.email)
+                    ? this.email
+                    : this.user.email;
+            },
+            set(value) {
+                this.email = value;
+            },
         },
 
         user() {
@@ -100,6 +135,30 @@ Component.register('mollie-pluginconfig-support-modal', {
             }
 
             return text;
+        },
+
+        onRequestSupport() {
+            this.isSubmitting = true;
+
+            this.MolliePaymentsSupportService
+                .request(
+                    this.contactName,
+                    this.contactEmail,
+                    this.subject,
+                    this.message,
+                )
+                .then((response) => {
+                    console.log(response);
+                    this.mailSent = true;
+                })
+                .finally(() => this.isSubmitting = false)
+            // console.log(
+            //     `'${this.contactName}'`,
+            //     `'${this.contactEmail}'`,
+            //     `'${this.subject}'`,
+            //     `'${this.message}'`
+            // );
+
         },
     },
 });

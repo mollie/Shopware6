@@ -1,12 +1,9 @@
 import MolliePaymentsConfigService from '../core/service/api/mollie-payments-config.service';
-
 import MolliePaymentsOrderService from '../core/service/api/mollie-payments-order.service';
-
-import MolliePaymentsRefundService from '../core/service/api/mollie-payments-refund.service';
-
-import MolliePaymentsShippingService from '../core/service/api/mollie-payments-shipping.service';
-
 import MolliePaymentsPaymentMethodService from '../core/service/api/mollie-payments-payment-method.service';
+import MolliePaymentsRefundService from '../core/service/api/mollie-payments-refund.service';
+import MolliePaymentsShippingService from '../core/service/api/mollie-payments-shipping.service';
+import MolliePaymentsSupportService from '../core/service/api/mollie-payments-support.service';
 
 // eslint-disable-next-line no-undef
 const {Application} = Shopware;
@@ -27,6 +24,12 @@ Application.addServiceProvider('MolliePaymentsOrderService', (container) => {
     return new MolliePaymentsOrderService(initContainer.httpClient, container.loginService);
 });
 
+Application.addServiceProvider('MolliePaymentsPaymentMethodService', (container) => {
+    const initContainer = Application.getContainer('init');
+
+    return new MolliePaymentsPaymentMethodService(initContainer.httpClient, container.loginService);
+});
+
 Application.addServiceProvider('MolliePaymentsRefundService', (container) => {
     const initContainer = Application.getContainer('init');
 
@@ -39,8 +42,9 @@ Application.addServiceProvider('MolliePaymentsShippingService', (container) => {
     return new MolliePaymentsShippingService(initContainer.httpClient, container.loginService);
 });
 
-Application.addServiceProvider('MolliePaymentsPaymentMethodService', (container) => {
+Application.addServiceProvider('MolliePaymentsSupportService', (container) => {
     const initContainer = Application.getContainer('init');
 
-    return new MolliePaymentsPaymentMethodService(initContainer.httpClient, container.loginService);
+    return new MolliePaymentsSupportService(initContainer.httpClient, container.loginService);
 });
+
