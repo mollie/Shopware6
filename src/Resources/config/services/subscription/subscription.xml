@@ -43,9 +43,9 @@
             <argument type="service" id="mollie_subscription_to_product.repository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Subscription\SubscriptionOptions"/>
             <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\LoggerService"/>
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
 
             <tag name="kernel.event_subscriber"/>
         </service>

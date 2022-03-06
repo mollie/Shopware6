@@ -21,6 +21,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\StateMachine\Event\StateMachineTransitionEvent;
+use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CreateSubscriptionsSubscriber implements EventSubscriberInterface
@@ -46,11 +47,6 @@ class CreateSubscriptionsSubscriber implements EventSubscriberInterface
     private $subscriptionOptions;
 
     /**
-     * @var MollieApiClient
-     */
-    private $mollieApi;
-
-    /**
      * @var EntityRepositoryInterface
      */
     private $mollieSubscriptionToProductRepository;
@@ -71,15 +67,20 @@ class CreateSubscriptionsSubscriber implements EventSubscriberInterface
     private $loggerService;
 
     /**
+     * @var SystemConfigService
+     */
+    private $systemConfigService;
+
+    /**
      * @param EntityRepositoryInterface $stateMachineStateRepository
      * @param EntityRepositoryInterface $orderRepository
      * @param EntityRepositoryInterface $orderTransactionRepository
      * @param EntityRepositoryInterface $mollieSubscriptionToProductRepository
      * @param SubscriptionOptions $subscriptionOptions
      * @param MollieApiFactory $apiFactory
-     * @param MollieApiClient $mollieApi
      * @param CustomerService $customerService
      * @param LoggerService $loggerService
+     * @param SystemConfigService $systemConfigService
      */
     public function __construct(
         EntityRepositoryInterface $stateMachineStateRepository,
@@ -88,9 +89,9 @@ class CreateSubscriptionsSubscriber implements EventSubscriberInterface
         EntityRepositoryInterface $mollieSubscriptionToProductRepository,
         SubscriptionOptions $subscriptionOptions,
         MollieApiFactory $apiFactory,
-        MollieApiClient $mollieApi,
         CustomerService $customerService,
-        LoggerService $loggerService
+        LoggerService $loggerService,
+        SystemConfigService $systemConfigService
     ) {
         $this->stateMachineStateRepository = $stateMachineStateRepository;
         $this->orderRepository = $orderRepository;
@@ -98,9 +99,9 @@ class CreateSubscriptionsSubscriber implements EventSubscriberInterface
         $this->orderTransactionRepository = $orderTransactionRepository;
         $this->subscriptionOptions = $subscriptionOptions;
         $this->apiFactory = $apiFactory;
-        $this->mollieApi = $mollieApi;
         $this->customerService = $customerService;
         $this->loggerService = $loggerService;
+        $this->systemConfigService = $systemConfigService;
     }
 
     /**
@@ -121,6 +122,10 @@ class CreateSubscriptionsSubscriber implements EventSubscriberInterface
     public function onStateTransition(StateMachineTransitionEvent $event)
     {
         if ($event->getEntityName() !== OrderTransactionDefinition::ENTITY_NAME) {
+            return;
+        }
+
+        if (!$this->systemConfigService->get('MolliePayments.config.enableSubscriptions')) {
             return;
         }
 
