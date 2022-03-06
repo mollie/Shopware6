@@ -17,6 +17,7 @@
         <service id="Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\Subscription\SubscriptionPaymentMethodRoute63"
                  decorates="Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRoute">
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\Voucher\HideVoucherPaymentMethodRoute63.inner"/>
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
             <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
         </service>
 

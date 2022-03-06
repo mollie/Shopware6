@@ -7,6 +7,7 @@ use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Payment\SalesChannel\AbstractPaymentMethodRoute;
 use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRouteResponse;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -29,15 +30,22 @@ class SubscriptionPaymentMethodRoute62 extends AbstractPaymentMethodRoute
     private $decorated;
 
     /**
+     * @var SystemConfigService
+     */
+    private $systemConfigService;
+
+    /**
      * @var Container
      */
     private $container;
 
     public function __construct(
         AbstractPaymentMethodRoute $corePaymentMethodRoute,
+        SystemConfigService $systemConfigService,
         Container $container
     ) {
         $this->decorated = $corePaymentMethodRoute;
+        $this->systemConfigService = $systemConfigService;
         $this->container = $container;
     }
 
@@ -78,6 +86,10 @@ class SubscriptionPaymentMethodRoute62 extends AbstractPaymentMethodRoute
 
     private function isSubscriptionCart(Cart $cart): bool
     {
+        if (!$this->systemConfigService->get('MolliePayments.config.enableSubscriptions')) {
+            return false;
+        }
+
         foreach ($cart->getLineItems() as $lineItem) {
             $customFields = $lineItem->getPayload()['customFields'];
             if (isset($customFields["mollie_subscription"]['mollie_subscription_product'])
