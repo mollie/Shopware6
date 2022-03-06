@@ -20,6 +20,12 @@
                         </template>
                     {% endblock %}
 
+                    {% block mollie_subscriptions_list_content_list_status %}
+                        <template #column-status="{ item }">
+                            {{ statusTransation(item.status) }}
+                        </template>
+                    {% endblock %}
+
                     {% block mollie_subscriptions_list_content_list_created_at %}
                         <template #column-createdAt="{ item }">
                             {{ item.createdAt | date('d/m/Y') }}

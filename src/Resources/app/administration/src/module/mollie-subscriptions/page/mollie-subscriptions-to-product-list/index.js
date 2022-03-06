@@ -128,6 +128,14 @@ Component.register('mollie-subscriptions-to-product-list', {
             }];
         },
 
+        statusTransation(status) {
+            if (['pending', 'active', 'canceled', 'suspended', 'completed'].includes(status)) {
+                return this.$tc('mollie-subscriptions.subscriptionStatus.' + status);
+            }
+
+            return status;
+        },
+
         /**
          * @param item
          * @returns {Date}

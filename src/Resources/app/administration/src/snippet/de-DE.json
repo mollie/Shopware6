@@ -7,6 +7,13 @@
         },
         "product": {
             "cardTitle": "Mollie"
+        },
+        "subscriptionStatus":  {
+            "pending": "Anhängig",
+            "active": "Aktiv",
+            "canceled": "Abgebrochen",
+            "suspended": "Ausgesetzt",
+            "completed": "Abgeschlossen"
         }
     }
 }
