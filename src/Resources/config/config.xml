@@ -261,13 +261,6 @@
             <label lang="nl-NL">Abonnementen inschakelen</label>
             <defaultValue>false</defaultValue>
         </input-field>
-        <input-field type="text">
-            <name>addToCartText</name>
-            <label>Add to cart button text</label>
-            <label lang="de-DE">Schaltflächentext zum Warenkorb hinzufügen</label>
-            <label lang="nl-NL">Tekst toevoegen aan winkelwagenknop</label>
-            <defaultValue>Subscribe</defaultValue>
-        </input-field>
         <input-field type="bool">
             <name>showSubscriptionLabel</name>
             <label>Show Subscriptions label on PDP</label>

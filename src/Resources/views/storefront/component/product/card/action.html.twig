@@ -79,9 +79,8 @@
                         {% block page_product_detail_product_buy_button %}
                             {% if(config('MolliePayments.config.enableSubscriptions') and product.customFields.mollie_subscription.mollie_subscription_product) %}
                                 <button class="btn btn-block btn-buy"
-                                        title="{{ config('MolliePayments.config.addToCartText') }}">
-                                    {{ config('MolliePayments.config.addToCartText') }}
-                                    {% if config('MolliePayments.config.addToCartText') is empty %} {{ "mollie-subscriptions.product.addToCartText"|trans|sw_sanitize }} {% endif %}
+                                        title="{{ "mollie-subscriptions.product.addToCartText"|trans|sw_sanitize }}">
+                                    {{ "mollie-subscriptions.product.addToCartText"|trans|sw_sanitize }}
                                 </button>
                             {% else %}
                                 <button class="btn btn-block btn-buy"
