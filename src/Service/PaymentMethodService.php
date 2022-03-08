@@ -9,7 +9,6 @@ use Kiener\MolliePayments\Handler\Method\BelfiusPayment;
 use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
 use Kiener\MolliePayments\Handler\Method\EpsPayment;
 use Kiener\MolliePayments\Handler\Method\GiftCardPayment;
-use Kiener\MolliePayments\Handler\Method\GiroPayPayment;
 use Kiener\MolliePayments\Handler\Method\iDealPayment;
 use Kiener\MolliePayments\Handler\Method\IngHomePayPayment;
 use Kiener\MolliePayments\Handler\Method\KbcPayment;
@@ -122,50 +121,66 @@ class PaymentMethodService
         // Get the plugin ID
         $pluginId = $this->pluginIdProvider->getPluginIdByBaseClass(MolliePayments::class, $context);
 
-        // Variables
-        $paymentData = [];
+        $upsertData = [];
 
         foreach ($paymentMethods as $paymentMethod) {
+
+            $identifier = $paymentMethod['handler'];
+
             // Upload icon to the media repository
             $mediaId = $this->getMediaId($paymentMethod, $context);
 
-            // Build array of payment method data
-            $paymentMethodData = [
-                'handlerIdentifier' => $paymentMethod['handler'],
-                'name' => $paymentMethod['description'],
-                'description' => '',
-                'pluginId' => $pluginId,
-                'mediaId' => $mediaId,
-                'afterOrderEnabled' => true,
-                'customFields' => [
-                    'mollie_payment_method_name' => $paymentMethod['name'],
-                ],
-            ];
 
-            // Get existing payment method so we can update it by it's ID
             try {
-                $existingPaymentMethod = $this->getPaymentMethod(
-                    $paymentMethodData['handlerIdentifier'],
-                    $context
-                );
+                $existingPaymentMethod = $this->getPaymentMethod($identifier, $context);
             } catch (InconsistentCriteriaIdsException $e) {
-                // On error, we assume the payment method doesn't exist
+                $existingPaymentMethod = null;
             }
 
-            if (isset($existingPaymentMethod)) {
-                $paymentMethodData['id'] = $existingPaymentMethod->getId();
-                $paymentMethodData['name'] = $existingPaymentMethod->getName();
-                $paymentMethodData['description'] = $existingPaymentMethod->getDescription();
-                $paymentMethodData['active'] = $existingPaymentMethod->getActive();
-            }
 
-            // Add payment method data to array of payment data
-            $paymentData[] = $paymentMethodData;
+            if ($existingPaymentMethod instanceof PaymentMethodEntity) {
+                $paymentMethodData = [
+                    'handlerIdentifier' => $paymentMethod['handler'],
+                    # ------------------------------------------
+                    # make sure to repair some fields in here
+                    # so that Mollie does always work for our wonderful customers :)
+                    'pluginId' => $pluginId,
+                    'customFields' => [
+                        'mollie_payment_method_name' => $paymentMethod['name'],
+                    ],
+                    # ------------------------------------------
+                    # unfortunately some fields are required (*sigh)
+                    # so we need to provide those with the value of
+                    # the existing method!!!
+                    'name' => $existingPaymentMethod->getName(),
+                ];
+
+                $upsertData[] = $paymentMethodData;
+
+            } else {
+
+                # let's create a full parameter list of everything
+                # that our new payment method needs to have
+                $paymentMethodData = [
+                    'handlerIdentifier' => $paymentMethod['handler'],
+                    'pluginId' => $pluginId,
+                    # ------------------------------------------
+                    'name' => $paymentMethod['description'],
+                    'description' => '',
+                    'mediaId' => $mediaId,
+                    'afterOrderEnabled' => true,
+                    # ------------------------------------------
+                    'customFields' => [
+                        'mollie_payment_method_name' => $paymentMethod['name'],
+                    ],
+                ];
+
+                $upsertData[] = $paymentMethodData;
+            }
         }
 
-        // Insert or update payment data
-        if (count($paymentData)) {
-            $this->paymentRepository->upsert($paymentData, $context);
+        if (count($upsertData) > 0) {
+            $this->paymentRepository->upsert($upsertData, $context);
         }
     }
 
