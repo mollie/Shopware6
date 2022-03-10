@@ -2,20 +2,19 @@
 
 namespace Kiener\MolliePayments\Service\Mail;
 
+use Kiener\MolliePayments\Exception\MailBodyEmptyException;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Mail\Service\AbstractMailFactory;
 use Shopware\Core\Content\Mail\Service\AbstractMailSender;
+use Shopware\Core\Content\MailTemplate\Exception\MailTransportFailedException;
 use Shopware\Core\Framework\Validation\DataValidationDefinition;
 use Shopware\Core\Framework\Validation\DataValidator;
-use Symfony\Component\Mime\Email;
+use Shopware\Core\Framework\Validation\Exception\ConstraintViolationException;
 use Symfony\Component\Validator\Constraints\Email as EmailConstraint;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class MailService
+class MailService implements MailServiceInterface
 {
-    const RECIPIENTS = [
-    ];
-
     /**
      * @var DataValidator
      */
@@ -39,45 +38,54 @@ class MailService
     public function __construct(
         DataValidator       $dataValidator,
         AbstractMailFactory $mailFactory,
-        AbstractMailSender  $emailSender,
+        AbstractMailSender  $mailSender,
         LoggerInterface     $logger
     )
     {
         $this->dataValidator = $dataValidator;
         $this->mailFactory = $mailFactory;
-        $this->mailSender = $emailSender;
+        $this->mailSender = $mailSender;
         $this->logger = $logger;
     }
 
-    public function send(array $data, ?array $attachments = null): ?Email
+    /**
+     * @param array $data
+     * @param array $attachments
+     * @throws ConstraintViolationException
+     * @throws MailTransportFailedException
+     * @return void
+     */
+    public function send(array $data, array $attachments = []): void
     {
         $definition = $this->getValidationDefinition();
         $this->dataValidator->validate($data, $definition);
 
         $contents = $this->buildContents($data);
 
+        $fileAttachments = [];
+        $binAttachments = [];
+
+        if (!empty($attachments)) {
+            foreach ($attachments as $attachment) {
+                if (is_string($attachment)) {
+                    $fileAttachments[] = $attachment;
+                } else {
+                    $binAttachments[] = $attachment;
+                }
+            }
+        }
+
         $mail = $this->mailFactory->create(
             $data['subject'],
             [$data['senderEmail'] => $data['senderName']],
             self::RECIPIENTS,
             $contents,
+            $fileAttachments,
             [],
-            [],
-            $attachments
+            $binAttachments
         );
 
-        if ($mail->getBody()->toString() === '') {
-            $this->logger->error(
-                "message is null:\n"
-                . 'Data:'
-                . json_encode($data) . "\n"
-            );
-
-            return null;
-        }
-
         $this->mailSender->send($mail);
-        return $mail;
     }
 
     private function buildContents(array $data): array

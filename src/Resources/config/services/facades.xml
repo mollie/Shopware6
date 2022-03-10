@@ -54,7 +54,8 @@
         </service>
 
         <service id="Kiener\MolliePayments\Facade\MollieSupportFacade">
-            <argument type="service" id="Kiener\MolliePayments\Service\Mail\MailService"/>
+            <argument type="service" id="mollie_payments.mail_service"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Mail\AttachmentCollector"/>
             <argument type="service" id="mollie_payments.logger"/>
         </service>
     </services>

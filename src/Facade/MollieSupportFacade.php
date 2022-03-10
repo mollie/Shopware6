@@ -2,15 +2,21 @@
 
 namespace Kiener\MolliePayments\Facade;
 
-use Kiener\MolliePayments\Service\Mail\MailService;
+use Kiener\MolliePayments\Service\Mail\AttachmentCollector;
+use Kiener\MolliePayments\Service\Mail\MailServiceInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
-use Symfony\Component\Mime\Email;
 
 class MollieSupportFacade
 {
+
     /**
-     * @var MailService
+     * @var AttachmentCollector
+     */
+    protected $attachmentCollector;
+
+    /**
+     * @var MailServiceInterface
      */
     protected $mailService;
 
@@ -20,10 +26,12 @@ class MollieSupportFacade
     protected $logger;
 
     public function __construct(
-        MailService     $mailService,
-        LoggerInterface $logger
+        MailServiceInterface $mailService,
+        AttachmentCollector  $attachmentCollector,
+        LoggerInterface      $logger
     )
     {
+        $this->attachmentCollector = $attachmentCollector;
         $this->mailService = $mailService;
         $this->logger = $logger;
     }
@@ -34,10 +42,11 @@ class MollieSupportFacade
         string  $subject,
         string  $contentHtml,
         Context $context
-    ): ?Email
+    ): void
     {
         $data = compact('senderName', 'senderEmail', 'subject', 'contentHtml');
+        $attachments = $this->attachmentCollector->collect($context);
 
-        return $this->mailService->send($data);
+        $this->mailService->send($data, $attachments);
     }
 }

@@ -2,16 +2,17 @@
 
 namespace Kiener\MolliePayments\Controller\Api;
 
+use Kiener\MolliePayments\Exception\MailBodyEmptyException;
 use Kiener\MolliePayments\Facade\MollieSupportFacade;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\MailTemplate\Exception\MailTransportFailedException;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
+use Shopware\Core\Framework\Validation\Exception\ConstraintViolationException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 
 class SupportController extends AbstractController
@@ -82,12 +83,9 @@ class SupportController extends AbstractController
     ): JsonResponse
     {
         try {
-            $mail = $this->supportFacade->request($name, $email, $subject, $message, $context);
-
-            if ($mail instanceof Email) {
-                return $this->json(['sent' => true]);
-            }
-        } catch (MailTransportFailedException $e) {
+            $this->supportFacade->request($name, $email, $subject, $message, $context);
+            return $this->json(['sent' => true]);
+        } catch (ConstraintViolationException|MailTransportFailedException $e) {
             $this->logger->error(
                 $e->getMessage(),
                 [
@@ -98,8 +96,11 @@ class SupportController extends AbstractController
                     'exceptionParams' => $e->getParameters()
                 ]
             );
-        }
 
-        return $this->json(['sent' => false]);
+            return $this->json([
+                'sent' => false,
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 }
