@@ -2,16 +2,11 @@
 
 namespace Kiener\MolliePayments\Service\Mail;
 
-use Kiener\MolliePayments\Exception\MailBodyEmptyException;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Mail\Service\AbstractMailFactory;
 use Shopware\Core\Content\Mail\Service\AbstractMailSender;
 use Shopware\Core\Content\MailTemplate\Exception\MailTransportFailedException;
-use Shopware\Core\Framework\Validation\DataValidationDefinition;
 use Shopware\Core\Framework\Validation\DataValidator;
-use Shopware\Core\Framework\Validation\Exception\ConstraintViolationException;
-use Symfony\Component\Validator\Constraints\Email as EmailConstraint;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 class MailService extends AbstractMailService
 {
@@ -49,11 +44,8 @@ class MailService extends AbstractMailService
     }
 
     /**
-     * @param array $data
-     * @param array $attachments
-     * @throws ConstraintViolationException
+     * @inheritDoc
      * @throws MailTransportFailedException
-     * @return void
      */
     public function send(array $data, array $attachments = []): void
     {
@@ -87,28 +79,4 @@ class MailService extends AbstractMailService
 
         $this->mailSender->send($mail);
     }
-
-    private function buildContents(array $data): array
-    {
-        $plain = strip_tags(str_replace(['<div>', '</div>'], "\r\n", $data['contentHtml']));
-
-        return [
-            'text/html' => '<div style="font-family:arial; font-size:12px;">' . $data['contentHtml'] . '</div>',
-            'text/plain' => $plain,
-        ];
-    }
-
-    private function getValidationDefinition(): DataValidationDefinition
-    {
-        $definition = new DataValidationDefinition('mail_service.send');
-
-        $definition->add('contentHtml', new NotBlank());
-        $definition->add('subject', new NotBlank());
-        $definition->add('senderName', new NotBlank());
-        $definition->add('senderEmail', new NotBlank(), new EmailConstraint());
-
-        return $definition;
-    }
-
-
 }
