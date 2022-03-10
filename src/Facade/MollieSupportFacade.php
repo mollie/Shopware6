@@ -3,7 +3,7 @@
 namespace Kiener\MolliePayments\Facade;
 
 use Kiener\MolliePayments\Service\Mail\AttachmentCollector;
-use Kiener\MolliePayments\Service\Mail\MailServiceInterface;
+use Kiener\MolliePayments\Service\Mail\AbstractMailService;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 
@@ -16,7 +16,7 @@ class MollieSupportFacade
     protected $attachmentCollector;
 
     /**
-     * @var MailServiceInterface
+     * @var AbstractMailService
      */
     protected $mailService;
 
@@ -26,9 +26,9 @@ class MollieSupportFacade
     protected $logger;
 
     public function __construct(
-        MailServiceInterface $mailService,
-        AttachmentCollector  $attachmentCollector,
-        LoggerInterface      $logger
+        AbstractMailService $mailService,
+        AttachmentCollector $attachmentCollector,
+        LoggerInterface     $logger
     )
     {
         $this->attachmentCollector = $attachmentCollector;

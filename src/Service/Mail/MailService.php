@@ -13,7 +13,7 @@ use Shopware\Core\Framework\Validation\Exception\ConstraintViolationException;
 use Symfony\Component\Validator\Constraints\Email as EmailConstraint;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class MailService implements MailServiceInterface
+class MailService extends AbstractMailService
 {
     /**
      * @var DataValidator

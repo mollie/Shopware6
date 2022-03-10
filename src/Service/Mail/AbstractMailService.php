@@ -5,7 +5,7 @@ namespace Kiener\MolliePayments\Service\Mail;
 use Shopware\Core\Content\MailTemplate\Exception\MailTransportFailedException;
 use Shopware\Core\Framework\Validation\Exception\ConstraintViolationException;
 
-interface MailServiceInterface
+abstract class AbstractMailService
 {
     const RECIPIENTS = [
         // email => name
