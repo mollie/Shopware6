@@ -139,8 +139,8 @@
         <!-- Mail -->
         <service id="mollie_payments.mail_service" class="Kiener\MolliePayments\Service\Mail\MailService63">
             <argument type="service" id="Shopware\Core\Framework\Validation\DataValidator"/>
-            <argument type="service" id="Shopware\Core\Content\MailTemplate/Service/MessageFactory"/>
-            <argument type="service" id="Shopware\Core\Content\MailTemplate/Service/MailSender"/>
+            <argument type="service" id="Shopware\Core\Content\MailTemplate\Service\MessageFactory"/>
+            <argument type="service" id="Shopware\Core\Content\MailTemplate\Service\MailSender"/>
             <argument type="service" id="mollie_payments.logger"/>
         </service>
 

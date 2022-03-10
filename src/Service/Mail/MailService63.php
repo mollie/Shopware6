@@ -3,6 +3,8 @@
 namespace Kiener\MolliePayments\Service\Mail;
 
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Content\MailTemplate\Service\MailSender;
+use Shopware\Core\Content\MailTemplate\Service\MessageFactory;
 use Shopware\Core\Framework\Validation\DataValidator;
 
 class MailService63 extends AbstractMailService
