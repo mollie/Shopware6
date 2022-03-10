@@ -1,53 +1,60 @@
-export default class OrderRefundGridBuilder {
+// eslint-disable-next-line no-undef
+const {Application} = Shopware;
+
+export default class ShopwareOrderGrid {
+
 
     /**
      *
      * @returns {[{property: string, label: string, align: string},{property: string, label: string, align: string},{property: string, width: string, label: string, align: string},{property: string, width: string, label: string, align: string},{property: string, width: string, label: string, align: string},null,null,null,null,null]}
      */
     buildColumns() {
+
+        const app = Application.getApplicationRoot();
+
         return [
             {
-                label: 'Item',
+                label: app.$tc('mollie-payments.refund-manager.cart.grid.columns.item'),
                 property: 'shopware.label',
                 align: 'left',
             },
             {
-                label: 'Product Number',
+                label: app.$tc('mollie-payments.refund-manager.cart.grid.columns.productNumber'),
                 property: 'shopware.productNumber',
                 align: 'left',
             },
             {
-                label: 'Unit Price',
+                label: app.$tc('mollie-payments.refund-manager.cart.grid.columns.unitPrice'),
                 property: 'shopware.unitPrice',
                 width: '90px',
                 align: 'right',
             },
             {
-                label: 'Quantity',
+                label: app.$tc('mollie-payments.refund-manager.cart.grid.columns.quantity'),
                 property: 'shopware.quantity',
                 width: '50px',
                 align: 'right',
             },
             {
-                label: 'Refunded',
+                label: app.$tc('mollie-payments.refund-manager.cart.grid.columns.refunded'),
                 property: 'refunded',
                 width: '50px',
                 align: 'right',
             },
             {
-                label: 'Refund',
+                label: app.$tc('mollie-payments.refund-manager.cart.grid.columns.refundQuantity'),
                 property: 'inputQuantity',
                 width: '140px',
                 align: 'center',
             },
             {
-                label: 'Total',
+                label: app.$tc('mollie-payments.refund-manager.cart.grid.columns.totalPrice'),
                 property: 'shopware.totalPrice',
                 width: '110px',
                 align: 'right',
             },
             {
-                label: 'Refund',
+                label: app.$tc('mollie-payments.refund-manager.cart.grid.columns.refundAmount'),
                 property: 'inputAmount',
                 width: '150px',
                 align: 'center',
@@ -58,7 +65,7 @@ export default class OrderRefundGridBuilder {
                 align: 'center',
             },
             {
-                label: 'Reset Stock',
+                label: app.$tc('mollie-payments.refund-manager.cart.grid.columns.resetStock'),
                 property: 'inputStock',
                 width: '135px',
                 align: 'center',

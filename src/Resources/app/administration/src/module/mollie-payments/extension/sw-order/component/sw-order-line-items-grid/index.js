@@ -17,24 +17,20 @@ Component.override('sw-order-line-items-grid', {
         'MolliePaymentsShippingService',
     ],
 
-    props: {
-        remainingAmount: {
-            type: Number,
-            required: true,
-        },
-        refunds: {
-            type: Array,
-            required: true,
-        },
-    },
 
+    /**
+     *
+     * @returns {{isLoading: boolean, shippingStatus: null, showRefundModal: boolean, isShipOrderLoading: boolean, showShipItemModal: null, showShipOrderModal: boolean, showTrackingInfo: boolean, tracking: {carrier: string, code: string, url: string}, isShipItemLoading: boolean, shipQuantity: number}}
+     */
     data() {
         return {
             isLoading: false,
+            // ---------------------------------
+            showRefundModal: false,
+            // ---------------------------------
             isShipOrderLoading: false,
             isShipItemLoading: false,
             shipQuantity: 0,
-            showRefundModal: false,
             showShipOrderModal: false,
             showShipItemModal: null,
             showTrackingInfo: false,
@@ -131,13 +127,15 @@ Component.override('sw-order-line-items-grid', {
             }
         },
 
-        //==== Refunds ==============================================================================================//
 
-        onOpenRefundModal() {
+        // ==============================================================================================//
+        //  REFUND MANAGER
+
+        onOpenRefundManager() {
             this.showRefundModal = true;
         },
 
-        onCloseRefundModal() {
+        onCloseRefundManager() {
             this.showRefundModal = false;
         },
 

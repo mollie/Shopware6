@@ -1,11 +1,12 @@
 import template from './mollie-refund-manager.html.twig';
 import './mollie-refund-manager.scss';
-import MollieRefundItemBuilder from './services/MollieRefundItemBuilder';
-import OrderRefundGridBuilder from "./services/OrderRefundGridBuilder";
-import MollieRefundsGridBuilder from "./services/MollieRefundsGridBuilder";
+import ShopwareOrderGrid from "./grids/ShopwareOrderGrid";
+import MollieRefundsGrid from "./grids/MollieRefundsGrid";
+import RefundItemService from "./services/RefundItemService";
 
 // eslint-disable-next-line no-undef
 const {Component, Mixin} = Shopware;
+
 
 Component.register('mollie-refund-manager', {
     template,
@@ -15,6 +16,7 @@ Component.register('mollie-refund-manager', {
     ],
 
     inject: [
+        'MolliePaymentsConfigService',
         'MolliePaymentsRefundService',
     ],
 
@@ -27,26 +29,38 @@ Component.register('mollie-refund-manager', {
 
     data() {
         return {
+            // -------------------------------
+            // services
+            itemService: null,
+            // ------------------
+            // configs
+            configVerifyRefund: true,
+            configAutoStockReset: true,
+            configShowInstructions: true,
+            // -------------------------------
+            // basic view stuff
             isRefundDataLoading: false,
             // -------------------------------
-            checkRefund: false,
+            // grids
+            orderItems: [],
+            mollieRefunds: [],
+            // -------------------------------
+            // calculator
+            remainingAmount: 0,
+            refundAmount: 0,
+            refundedAmount: 0,
+            voucherAmount: 0,
+            pendingRefunds: 0,
+            checkVerifyRefund: false,
             refundDescription: '',
             // -------------------------------
-            refundLineItems: [],
-            existingRefunds: [],
-            // -------------------------------
+            // tutorials
             tutorialFullRefundVisible: false,
             tutorialPartialAmountRefundVisible: false,
             tutorialPartialQuantityVisible: false,
             tutorialPartialPromotionsVisible: false,
             tutorialResetStock: false,
             tutorialRefundShipping: false,
-            // -------------------------------
-            remainingAmount: 0,
-            refundAmount: 0,
-            refundedAmount: 0,
-            voucherAmount: 0,
-            pendingRefunds: 0,
         };
     },
 
@@ -59,29 +73,35 @@ Component.register('mollie-refund-manager', {
     computed: {
 
         /**
-         *
+         * Returns the translated title for the sw-card
+         * of the current Shopware order and its cart overview.
+         * This can have dynamic values, so we use a JS function
          * @returns {string}
          */
-        orderCardTitle() {
-            return 'Order ' + this.order.orderNumber;
+        titleCardOrder() {
+            let text = this.$tc('mollie-payments.refund-manager.cart.title');
+            text = text.replace('##orderNumber##', this.order.orderNumber);
+            return text;
         },
 
         /**
-         *
+         * Gets a list of columns for the
+         * grid of the current order and its line items
          * @returns {[{property: string, label: string, align: string},{property: string, label: string, align: string},{property: string, width: string, label: string, align: string},{property: string, width: string, label: string, align: string},{property: string, width: string, label: string, align: string},null,null,null,null,null]}
          */
-        getLineItemColumns() {
-            const builder = new OrderRefundGridBuilder();
-            return builder.buildColumns();
+        gridCartColumns() {
+            const grid = new ShopwareOrderGrid();
+            return grid.buildColumns();
         },
 
         /**
-         *
+         * Gets a list of columns for the
+         * grid of currently existing refunds from the Mollie Dashboard
          * @returns {[{property: string, label: string, align: string},{property: string, label: string, align: string},{property: string, width: string, label: string, align: string},{property: string, width: string, label: string, align: string},{property: string, width: string, label: string, align: string},null,null,null,null,null]}
          */
-        getRefundListColumns() {
-            const builder = new MollieRefundsGridBuilder();
-            return builder.buildColumns();
+        gridMollieRefundsColumns() {
+            const grid = new MollieRefundsGrid();
+            return grid.buildColumns();
         },
 
     },
@@ -92,279 +112,258 @@ Component.register('mollie-refund-manager', {
          *
          */
         createdComponent() {
-            this.remainingAmount = 0;
+
+            this.itemService = new RefundItemService();
 
             if (this.order) {
-                this.fetchMollieData();
+                // immediately load our Mollie data
+                // as soon as we open the form
+                this._fetchFormData();
+
+                const me = this;
+
+                // also get the config for the refund manager
+                // so that we can show/hide a few things
+                this.MolliePaymentsConfigService.getRefundManagerConfig(this.order.salesChannelId).then((response) => {
+                    me.configVerifyRefund = response.verifyRefund;
+                    me.configAutoStockReset = response.autoStockReset;
+                    me.configShowInstructions = response.showInstructions;
+                });
             }
         },
 
+
+        // ---------------------------------------------------------------------------------------------------------
+        // <editor-fold desc="ORDER FORM">
+        // ---------------------------------------------------------------------------------------------------------
+
         /**
-         *
+         * Gets if that provided item is a promotion line item in Shopware.
+         * @param item
+         * @returns {boolean}
          */
-        fetchMollieData() {
-
-            this.isRefundDataLoading = true;
-
-            this.MolliePaymentsRefundService.list({orderId: this.order.id})
-                .then((response) => {
-                    this.remainingAmount = response.totals.remaining;
-                    this.refundedAmount = response.totals.refunded;
-                    this.voucherAmount = response.totals.voucherAmount;
-                    this.pendingRefunds = response.totals.pendingRefunds;
-                    this.existingRefunds = response.refunds;
-                    this.refundLineItems = response.cart;
-
-                    this.isRefundDataLoading = false;
-
-                })
-                .catch((response) => {
-                    this.createNotificationError({
-                        message: response.message,
-                    });
-                    this.isRefundDataLoading = false;
-                });
+        isItemPromotion(item) {
+            return this.itemService.isTypePromotion(item);
         },
 
         /**
-         *
+         * Gets if the provided item is a delivery/shipping item in Shopware.
+         * @param item
+         * @returns {boolean}
+         */
+        isItemDelivery(item) {
+            return this.itemService.isTypeDelivery(item);
+        },
+
+        /**
+         * Gets if the provided item is discounted by a promotion.
+         * @param item
+         * @returns {boolean}
+         */
+        isItemDiscounted(item) {
+            return this.itemService.isDiscounted(item);
+        },
+
+        /**
+         * Gets if the provided item can still be refunded.
+         * @param item
+         * @returns {boolean}
+         */
+        isItemRefundable(item) {
+            return this.itemService.isRefundable(item);
+        },
+
+        /**
+         * This automatically selects all items by
+         * assigning their maximum quantity to be refunded.
+         * We iterate through all items and just mark them
+         * to be fully refunded.
+         */
+        btnSelectAllItems_Click() {
+            const me = this;
+            this.orderItems.forEach(function (item) {
+                me.itemService.setFullRefund(item);
+            });
+            this._calculateFinalAmount();
+        },
+
+        /**
+         * Clicking this button will reset all line items
+         * to its original values.
+         */
+        btnResetCartForm_Click() {
+            const me = this;
+            this.orderItems.forEach(function (item) {
+                me.itemService.resetRefundData(item);
+            });
+            this._calculateFinalAmount();
+
+            // also make sure to uncheck our
+            // verification checkbox
+            this.checkRefund = false;
+        },
+
+        /**
+         * This will be executed as soon as the user
+         * changes the quantity of an item in the cart grid.
          * @param item
          */
         onItemQtyChanged(item) {
 
-            const maxQty = item.shopware.quantity - item.refunded;
-            if (item.refundQuantity > maxQty) {
-                item.refundQuantity = maxQty;
+            this.itemService.onQuantityChanged(item);
+
+            // verify if we also need to
+            // set the stock automatically
+            if (this.configAutoStockReset) {
+                this.itemService.setStockReset(item, item.refundQuantity);
             }
 
-            // do only update if our
-            // amount has not yet been adjusted
-            if (item.refundMode === 'amount') {
-                this.calculateRefundAmount();
-                return;
-            }
-
-            if (item.refundQuantity === 0) {
-                return;
-            }
-
-            item.refundMode = 'quantity';
-            //  item.refundAmount = (item.shopware.unitPrice * item.refundQuantity) - item.shopware.promotion.discount;
-
-            this.onItemPromotionChanged(item);
-            //  item.refundAmount = (item.shopware.unitPrice * item.refundQuantity);
-
-            this.calculateRefundAmount();
+            this._calculateFinalAmount();
         },
 
         /**
-         *
-         * @param item
-         */
-        onItemPromotionChanged(item) {
-
-            if (item.refundMode === 'amount') {
-                // only in quantity or NONE mode
-                return;
-            }
-
-            if (item.refundQuantity === 0) {
-                return;
-            }
-
-            if (item.refundPromotion) {
-                const discountPerQty = item.shopware.promotion.discount / item.shopware.promotion.quantity;
-                item.refundAmount = (item.shopware.unitPrice * item.refundQuantity) - (item.refundQuantity * discountPerQty);
-            } else {
-                item.refundAmount = (item.shopware.unitPrice * item.refundQuantity);
-            }
-
-            this.calculateRefundAmount();
-        },
-
-        /**
-         *
+         * This will be executed when the user changes
+         * the amount text field of a certain cart item
          * @param item
          */
         onItemAmountChanged(item) {
-
-            if (item.refundMode === 'quantity') {
-                this.calculateRefundAmount();
-                return;
-            }
-
-            item.refundMode = 'amount';
-
-            if (item.refundQuantity <= 0) {
-                item.refundQuantity = parseInt(item.refundAmount / item.shopware.unitPrice);
-            }
-
-            this.calculateRefundAmount();
+            this.itemService.onAmountChanged(item);
+            this._calculateFinalAmount();
         },
 
         /**
-         *
+         * This will be executed if the user changes the
+         * configuration to either allow or forbid the deduction
+         * of a promotion, in case of discounted items.
          * @param item
          */
-        onItemReset(item) {
-            item.refundMode = 'none';
-            item.refundQuantity = 0;
-            item.refundAmount = 0;
-            item.resetStock = 0;
-            item.refundPromotion = false;
-
-            this.calculateRefundAmount();
-        },
-
-        selectAllQty() {
-            const me = this;
-            this.refundLineItems.forEach(function (item) {
-                item.refundQuantity = item.shopware.quantity - item.refunded;
-                me.onItemQtyChanged(item);
-            });
-
-            this.calculateRefundAmount();
+        onItemPromotionDeductionChanged(item) {
+            this.itemService.onPromotionDeductionChanged(item);
+            this._calculateFinalAmount();
         },
 
         /**
-         *
-         */
-        resetCartItemsForm() {
-            const me = this;
-            this.refundLineItems.forEach(function (item) {
-                me.onItemReset(item);
-            });
-
-            this.checkRefund = false;
-
-            this.calculateRefundAmount();
-        },
-
-        /**
-         *
+         * This will be used, if the user decides to reset a
+         * specific line item to its original values
          * @param item
-         * @returns {*}
          */
-        isRefundCancelable(item) {
-            return item.isPending || item.isQueued;
+        btnResetLine_Click(item) {
+            this.itemService.resetRefundData(item);
+            this._calculateFinalAmount();
         },
+
+        // ---------------------------------------------------------------------------------------------------------
+        // </editor-fold>
+        // ---------------------------------------------------------------------------------------------------------
+
+
+        // ---------------------------------------------------------------------------------------------------------
+        // <editor-fold desc="INSTRUCTIONS">
+        // ---------------------------------------------------------------------------------------------------------
 
         /**
          *
-         * @param status
-         * @returns {*}
          */
-        getStatus(status) {
-            return this.$tc('mollie-payments.modals.refund.list.status.' + status);
-        },
-
-        isItemPromotion(item) {
-            return item.shopware.isPromotion;
-        },
-
-        isItemDelivery(item) {
-            return item.shopware.isDelivery;
-        },
-
-        isItemPromotionDiscounted(item) {
-            return item.shopware.promotion.discount > 0;
-        },
-
-        /**
-         *
-         * @param status
-         * @returns {string}
-         */
-        getStatusBadge(status) {
-            if (status === 'refunded') {
-                return 'success';
-            }
-            return 'warning';
-        },
-
-        /**
-         *
-         * @param status
-         * @returns {*}
-         */
-        getStatusDescription(status) {
-            return this.$tc('mollie-payments.modals.refund.list.status-description.' + status);
+        btnToggleTutorialFull_Click() {
+            this.tutorialFullRefundVisible = !this.tutorialFullRefundVisible;
         },
 
         /**
          *
          */
-        calculateRefundAmount() {
-            var totalRefundAmount = 0;
-
-            this.refundLineItems.forEach(function (lineItem) {
-                totalRefundAmount += parseFloat(lineItem.refundAmount);
-            });
-
-            this.refundAmount = this.roundToTwo(totalRefundAmount);
+        btnToggleTutorialPartialAmount_Click() {
+            this.tutorialPartialAmountRefundVisible = !this.tutorialPartialAmountRefundVisible;
         },
 
         /**
          *
          */
-        onRefundAll() {
-            this.MolliePaymentsRefundService.refundAll(
-                {
-                    orderId: this.order.id,
-                    amount: this.remainingAmount,
-                })
-                .then((response) => {
-                    if (response.success) {
-
-                        this.createNotificationSuccess({
-                            message: this.$tc('mollie-payments.modals.refund.success'),
-                        });
-
-                        // fetch new data
-                        this.fetchMollieData();
-
-                        // reset existing values
-                        this.resetCartItemsForm();
-
-                        this.$emit('refund-success');
-
-                    } else {
-                        this.createNotificationError({
-                            message: this.$tc('mollie-payments.modals.refund.error'),
-                        });
-                    }
-                })
-                .catch((response) => {
-                    this.createNotificationError({
-                        message: response.message,
-                    });
-                });
-        },
-
-        isItemRefundable(item) {
-            if (item.refunded >= item.shopware.quantity) {
-                return false;
-            }
-
-            return true;
+        btnToggleTutorialPartialQuantities_Click() {
+            this.tutorialPartialQuantityVisible = !this.tutorialPartialQuantityVisible;
         },
 
         /**
          *
          */
-        onStartRefund() {
+        btnToggleTutorialPartialPromotions_Click() {
+            this.tutorialPartialPromotionsVisible = !this.tutorialPartialPromotionsVisible;
+        },
+
+        /**
+         *
+         */
+        btnToggleTutorialStock_Click() {
+            this.tutorialResetStock = !this.tutorialResetStock;
+        },
+
+        /**
+         *
+         */
+        btnToggleTutorialShipping_Click() {
+            this.tutorialRefundShipping = !this.tutorialRefundShipping;
+        },
+
+        /**
+         *
+         */
+        btnResetTutorials_Click() {
+            this.tutorialFullRefundVisible = false;
+            this.tutorialPartialAmountRefundVisible = false;
+            this.tutorialPartialQuantityVisible = false;
+            this.tutorialPartialPromotionsVisible = false;
+
+            this.tutorialResetStock = false;
+            this.tutorialRefundShipping = false;
+        },
+
+        // ---------------------------------------------------------------------------------------------------------
+        // </editor-fold>
+        // ---------------------------------------------------------------------------------------------------------
+
+
+        // ---------------------------------------------------------------------------------------------------------
+        // <editor-fold desc="SUMMARY">
+        // ---------------------------------------------------------------------------------------------------------
+
+        /**
+         * Gets if the button to fix the refund amount
+         * is available or not. This should only be available
+         * if the amount of the refund and the remaining amount is
+         * almost the same but not exactly due to rounding issues.
+         * @returns {boolean}
+         */
+        isButtonFixDiffAvailable() {
+
+            const diff = Math.abs(this.refundAmount - this.remainingAmount);
+
+            // show if 5 cents or less diff
+            return diff > 0 && diff <= 0.05;
+        },
+
+        /**
+         * This click handler makes sure to use the
+         * full remaining amount for the refund field.
+         * This is an easy "top up" feature in case of
+         * rounding issues.
+         */
+        btnFixDiff_Click() {
+            this.refundAmount = this.remainingAmount;
+        },
+
+        /**
+         * This click handler starts a partial refund
+         * with everything that has been set up in our cart form.
+         */
+        btnRefund_Click() {
 
             if (this.refundAmount <= 0.0) {
-                this.createNotificationWarning({
-                    message: this.$tc('mollie-payments.modals.refund.warning.low-amount'),
-                });
-
+                this._showNotificationWarning(this.$tc('mollie-payments.refund-manager.notifications.errors.low-amount'));
                 return;
             }
 
             var itemData = [];
 
-            this.refundLineItems.forEach(function (item) {
+            this.orderItems.forEach(function (item) {
 
                 const data = {
                     'id': item.shopware.id,
@@ -386,38 +385,115 @@ Component.register('mollie-refund-manager', {
                     items: itemData,
                 })
                 .then((response) => {
-                    if (response.success) {
 
-                        this.createNotificationSuccess({
-                            message: this.$tc('mollie-payments.modals.refund.success'),
-                        });
-
-                        // fetch new data
-                        this.fetchMollieData();
-
-                        // reset existing values
-                        this.resetCartItemsForm();
-
-                        this.$emit('refund-success');
-
-                    } else {
-                        this.createNotificationError({
-                            message: this.$tc('mollie-payments.modals.refund.error'),
-                        });
+                    if (!response.success) {
+                        this._showNotificationError(this.$tc('mollie-payments.refund-manager.notifications.error'));
                     }
+
+                    this._showNotificationSuccess(this.$tc('mollie-payments.refund-manager.notifications.success'));
+
+                    this.$emit('refund-success');
+
+                    // fetch new data
+                    this._fetchFormData();
+
+                    // reset existing values
+                    this.btnResetCartForm_Click();
+
                 })
                 .catch((response) => {
-                    this.createNotificationError({
-                        message: response.message,
-                    });
+                    this._showNotificationError(response.message);
                 });
+        },
+
+        /**
+         * This click handler starts a full refund for the whole order.
+         * This will in most cases not consider any special line item setups
+         * but only do a full refund and stock reset.
+         */
+        btnRefundFull_Click() {
+            this.MolliePaymentsRefundService.refundAll(
+                {
+                    orderId: this.order.id,
+                    amount: this.remainingAmount,
+                })
+                .then((response) => {
+
+                    if (!response.success) {
+                        this._showNotificationError(this.$tc('mollie-payments.refund-manager.notifications.error'));
+                    }
+
+
+                    this._showNotificationSuccess(this.$tc('mollie-payments.refund-manager.notifications.success'));
+
+                    this.$emit('refund-success');
+
+                    // fetch new data
+                    this._fetchFormData();
+
+                    // reset existing values
+                    this.btnResetCartForm_Click();
+                })
+                .catch((response) => {
+                    this._showNotificationError(response.message);
+                });
+        },
+
+        // ---------------------------------------------------------------------------------------------------------
+        // </editor-fold>
+        // ---------------------------------------------------------------------------------------------------------
+
+
+        // ---------------------------------------------------------------------------------------------------------
+        // <editor-fold desc="REFUND GRID">
+        // ---------------------------------------------------------------------------------------------------------
+
+        /**
+         * Gets the provided status key translated into
+         * a snippet of Shopware.
+         * @param statusKey
+         * @returns {string}
+         */
+        getRefundStatusName(statusKey) {
+            return this.$tc('mollie-payments.refunds.status.' + statusKey);
+        },
+
+        /**
+         * Gets the translated description of the provided status key.
+         * @param statusKey
+         * @returns {*}
+         */
+        getRefundStatusDescription(statusKey) {
+            return this.$tc('mollie-payments.refunds.status.description.' + statusKey);
+        },
+
+        /**
+         * Gets the status badge color (button variant) depending
+         * on the provided status key.
+         * @param statusKey
+         * @returns {string}
+         */
+        getRefundStatusBadge(statusKey) {
+            if (statusKey === 'refunded') {
+                return 'success';
+            }
+            return 'warning';
+        },
+
+        /**
+         * Gets if the provided refund can be cancelled or not.
+         * @param item
+         * @returns {*}
+         */
+        isRefundCancelable(item) {
+            return item.isPending || item.isQueued;
         },
 
         /**
          *
          * @param item
          */
-        cancelRefund(item) {
+        btnCancelRefund_Click(item) {
 
             this.MolliePaymentsRefundService.cancel(
                 {
@@ -426,82 +502,132 @@ Component.register('mollie-refund-manager', {
                 })
                 .then((response) => {
                     if (response.success) {
-                        this.createNotificationSuccess({
-                            message: this.$tc('mollie-payments.modals.refund.cancel.success'),
-                        });
+                        this._showNotificationWarning(this.$tc('mollie-payments.refund-manager.notifications.success'));
                     } else {
-                        this.createNotificationError({
-                            message: this.$tc('mollie-payments.modals.refund.cancel.error'),
-                        });
+                        this._showNotificationError(this.$tc('mollie-payments.refund-manager.notifications.error'));
                     }
-                })
-                .then(() => {
+
                     this.$emit('refund-cancelled');
-                    this.fetchMollieData();
+                    this._fetchFormData();
                 })
                 .catch((response) => {
+                    this._showNotificationError(response.error);
+                });
+        },
+
+        // ---------------------------------------------------------------------------------------------------------
+        // </editor-fold>
+        // ---------------------------------------------------------------------------------------------------------
+
+
+        // ---------------------------------------------------------------------------------------------------------
+        // <editor-fold desc="PRIVATE METHODS">
+        // ---------------------------------------------------------------------------------------------------------
+
+        /**
+         * Loads all data from Mollie (or Shopware) for this order.
+         * The whole content of the form is then replaced
+         * with that live data.
+         */
+        _fetchFormData() {
+
+            this.isRefundDataLoading = true;
+
+            this.MolliePaymentsRefundService.list(
+                {
+                    orderId: this.order.id,
+                })
+                .then((response) => {
+                    // we got the response from our plugin API endpoint.
+                    // now simply assign the values to our props
+                    // so that vue will show it
+                    this.existingRefunds = response.refunds;
+                    this.orderItems = response.cart;
+                    this.remainingAmount = response.totals.remaining;
+                    this.refundedAmount = response.totals.refunded;
+                    this.voucherAmount = response.totals.voucherAmount;
+                    this.pendingRefunds = response.totals.pendingRefunds;
+                    // yep, we're done loading ;)
+                    this.isRefundDataLoading = false;
+                })
+                .catch((response) => {
+                    this.isRefundDataLoading = false;
+                    // now show an error
                     this.createNotificationError({
                         message: response.message,
                     });
                 });
         },
 
-        setFullAmount() {
-            this.refundAmount = this.remainingAmount;
+        /**
+         *
+         */
+        _calculateFinalAmount() {
+            var totalRefundAmount = 0;
+
+            this.orderItems.forEach(function (lineItem) {
+                totalRefundAmount += parseFloat(lineItem.refundAmount);
+            });
+
+            this.refundAmount = this._roundToTwo(totalRefundAmount);
         },
-
-        isFixButtonAvailable() {
-
-            const diff = Math.abs(this.refundAmount - this.remainingAmount);
-            console.log(diff);
-            // show if 5 cents or less diff
-            return diff > 0 && diff <= 0.05;
-        },
-
 
         /**
          *
          * @param num
          * @returns {number}
          */
-        roundToTwo(num) {
+        _roundToTwo(num) {
             return +(Math.round(num + "e+2") + "e-2");
         },
 
-
-        toggleTutorialFull() {
-            this.tutorialFullRefundVisible = !this.tutorialFullRefundVisible;
+        /**
+         *
+         * @param snippetKey
+         * @private
+         */
+        _showNotification(snippetKey) {
+            this.createNotificationWarning({
+                message: this.$tc(snippetKey),
+            });
         },
 
-        toggleTutorialPartialAmount() {
-            this.tutorialPartialAmountRefundVisible = !this.tutorialPartialAmountRefundVisible;
+        /**
+         *
+         * @param text
+         * @private
+         */
+        _showNotificationWarning(text) {
+            this.createNotificationWarning({
+                message: this.$tc(text),
+            });
         },
 
-        toggleTutorialPartialQuantities() {
-            this.tutorialPartialQuantityVisible = !this.tutorialPartialQuantityVisible;
+        /**
+         *
+         * @param text
+         * @private
+         */
+        _showNotificationSuccess(text) {
+            this.createNotificationSuccess({
+                message: text,
+            });
         },
 
-        toggleTutorialPartialPromotions() {
-            this.tutorialPartialPromotionsVisible = !this.tutorialPartialPromotionsVisible;
+        /**
+         *
+         * @param text
+         * @private
+         */
+        _showNotificationError(text) {
+            this.createNotificationError({
+                message: text,
+            });
         },
 
-        toggleTutorialStock() {
-            this.tutorialResetStock = !this.tutorialResetStock;
-        },
-
-        toggleTutorialShipping() {
-            this.tutorialRefundShipping = !this.tutorialRefundShipping;
-        },
-
-        resetTutorials() {
-            this.tutorialFullRefundVisible = false;
-            this.tutorialPartialAmountRefundVisible = false;
-            this.tutorialPartialQuantityVisible = false;
-            this.tutorialPartialPromotionsVisible = false;
-
-            this.tutorialResetStock = false;
-            this.tutorialRefundShipping = false;
-        },
+        // ---------------------------------------------------------------------------------------------------------
+        // </editor-fold>
+        // ---------------------------------------------------------------------------------------------------------
 
     },
 });

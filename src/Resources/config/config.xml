@@ -3,7 +3,9 @@
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/master/src/Core/System/SystemConfig/Schema/config.xsd">
 
     <card>
-        <title> </title>
+        <title>
+            
+        </title>
         <component name="mollie-pluginconfig-section-info">
             <name>molliePluginConfigSectionInfo</name>
         </component>
@@ -98,6 +100,41 @@
         <component name="mollie-pluginconfig-section-payments">
             <name>molliePluginConfigSectionPayments</name>
         </component>
+    </card>
+    <card>
+        <title>Refund Manager</title>
+        <title lang="de-DE">Refund Manager</title>
+        <title lang="nl-NL">Refund Manager</title>
+        <input-field type="bool">
+            <name>refundManagerAutoStockReset</name>
+            <defaultValue>true</defaultValue>
+            <label>Automatically include Stock Reset</label>
+            <label lang="de-DE"></label>
+            <label lang="nl-NL"></label>
+            <helpText>Automatically set the entered refund quantity as the quantity to use to increase the stock again.</helpText>
+            <helpText lang="de-DE"></helpText>
+            <helpText lang="nl-NL"></helpText>
+        </input-field>
+        <input-field type="bool">
+            <name>refundManagerVerifyRefund</name>
+            <defaultValue>true</defaultValue>
+            <label>Verify Refunds</label>
+            <label lang="de-DE"></label>
+            <label lang="nl-NL"></label>
+            <helpText>If enabled, a verification checkbox needs to be checked to proceed with the refund. We recommend this to avoid accidental refunds and stock changes.</helpText>
+            <helpText lang="de-DE"></helpText>
+            <helpText lang="nl-NL"></helpText>
+        </input-field>
+        <input-field type="bool">
+            <name>refundManagerShowInstructions</name>
+            <defaultValue>true</defaultValue>
+            <label>Show Instructions</label>
+            <label lang="de-DE"></label>
+            <label lang="nl-NL"></label>
+            <helpText>Shows or hides the instructions area. You can simply turn this off in case it's disturbing once you're familiar with the Refund Manager.</helpText>
+            <helpText lang="de-DE"></helpText>
+            <helpText lang="nl-NL"></helpText>
+        </input-field>
     </card>
     <card>
         <title>Additional Settings</title>

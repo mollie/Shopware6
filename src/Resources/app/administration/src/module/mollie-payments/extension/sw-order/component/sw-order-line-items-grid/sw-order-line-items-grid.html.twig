@@ -45,8 +45,8 @@
                                 {% block sw_order_line_items_grid_mollie_actions_dropdown_refund %}
                                     <sw-context-menu-item class="sw-order-line-items-grid__actions-refund-btn"
                                                           icon="default-money-cash"
-                                                          @click="onOpenRefundModal">
-                                        {{ $tc('mollie-payments.general.refundThroughMollie') }}
+                                                          @click="onOpenRefundManager">
+                                        {{ $tc('sw-order.detailExtended.refundManager.btnOpenRefundManager') }}
                                     </sw-context-menu-item>
                                 {% endblock %}
                             {% endblock %}
@@ -58,24 +58,22 @@
 
     </sw-container>
 
-    {#
+    {#  style="background-color: #f0f2f5 !important;"
     ===================================================================================================================
     REFUND MANAGER
     ===================================================================================================================
     #}
     <sw-modal v-if="showRefundModal"
-              :title="$tc('mollie-payments.modals.refund.title')"
-              class="mollie-modal-refund-manager"
               variant="full"
-              @modal-close="onCloseRefundModal">
-
+              :title="$tc('sw-order.detailExtended.refundManager.title')"
+              class="mollie-modal-refund-manager"
+              @modal-close="onCloseRefundManager">
         <mollie-refund-manager
                 :order="order">
         </mollie-refund-manager>
-
         <template #modal-footer>
-            <sw-button size="large" @click="onCloseRefundModal">
-                Close
+            <sw-button size="large" @click="onCloseRefundManager">
+                {{ $tc('sw-order.detailExtended.refundManager.btnCloseRefundManager') }}
             </sw-button>
         </template>
     </sw-modal>
