@@ -154,5 +154,11 @@
             <tag name="mollie_payments.mail.attachment_generator"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Service\Mail\AttachmentGenerator\PluginConfigurationGenerator">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="sales_channel.repository"/>
+<!--            <tag name="mollie_payments.mail.attachment_generator"/>-->
+        </service>
+
     </services>
 </container>
