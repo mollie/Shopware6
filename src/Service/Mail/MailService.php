@@ -55,7 +55,7 @@ class MailService extends AbstractMailService
         $mail = $this->mailFactory->create(
             $data['subject'],
             ['no-reply@localhost' => 'Localhost'],
-            self::RECIPIENTS,
+            $this->getRecipients($data['recipientLocale']),
             $this->buildContents($data),
             $this->filterFileAttachments($attachments),
             [], // Additional data, but doesn't work properly.

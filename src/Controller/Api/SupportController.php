@@ -8,7 +8,6 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\MailTemplate\Exception\MailTransportFailedException;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
-use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\Framework\Validation\Exception\ConstraintViolationException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -45,14 +44,24 @@ class SupportController extends AbstractController
      * @param Context $context
      * @return JsonResponse
      */
-    public function requestSupport(RequestDataBag $data, Context $context): JsonResponse
+    public function requestSupport(Request $request, Context $context): JsonResponse
     {
+        $data = $request->request;
+
         $name = $data->get('name');
         $email = $data->get('email');
+        $recipientLocale = $data->get('recipientLocale');
         $subject = $data->get('subject');
         $message = $data->get('message');
 
-        return $this->requestSupportResponse($name, $email, $subject, $message, $context);
+        return $this->requestSupportResponse(
+            $name,
+            $email,
+            $recipientLocale,
+            $subject,
+            $message,
+            $context
+        );
     }
 
     /**
@@ -64,26 +73,45 @@ class SupportController extends AbstractController
      * @param Context $context
      * @return JsonResponse
      */
-    public function requestSupportLegacy(RequestDataBag $data, Context $context): JsonResponse
+    public function requestSupportLegacy(Request $request, Context $context): JsonResponse
     {
+        $data = $request->request;
+
         $name = $data->get('name');
         $email = $data->get('email');
+        $recipientLocale = $data->get('recipientLocale');
         $subject = $data->get('subject');
         $message = $data->get('message');
 
-        return $this->requestSupportResponse($name, $email, $subject, $message, $context);
+        return $this->requestSupportResponse(
+            $name,
+            $email,
+            $recipientLocale,
+            $subject,
+            $message,
+            $context
+        );
     }
 
     private function requestSupportResponse(
         string  $name,
         string  $email,
+        ?string $recipientLocale,
         string  $subject,
         string  $message,
         Context $context
     ): JsonResponse
     {
         try {
-            $this->supportFacade->request($name, $email, $subject, $message, $context);
+            $this->supportFacade->request(
+                $name,
+                $email,
+                $recipientLocale,
+                $subject,
+                $message,
+                $context
+            );
+
             return $this->json(['sent' => true]);
         } catch (ConstraintViolationException|MailTransportFailedException $e) {
             $this->logger->error(

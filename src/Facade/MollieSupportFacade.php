@@ -2,8 +2,8 @@
 
 namespace Kiener\MolliePayments\Facade;
 
-use Kiener\MolliePayments\Service\Mail\AttachmentCollector;
 use Kiener\MolliePayments\Service\Mail\AbstractMailService;
+use Kiener\MolliePayments\Service\Mail\AttachmentCollector;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 
@@ -39,12 +39,20 @@ class MollieSupportFacade
     public function request(
         string  $replyToName,
         string  $replyToEmail,
+        ?string $recipientLocale,
         string  $subject,
         string  $contentHtml,
         Context $context
     ): void
     {
-        $data = compact('replyToName', 'replyToEmail', 'subject', 'contentHtml');
+        $data = compact(
+            'replyToName',
+            'replyToEmail',
+            'recipientLocale',
+            'subject',
+            'contentHtml'
+        );
+
         $attachments = $this->attachmentCollector->collect($context);
 
         $this->mailService->send($data, $attachments);

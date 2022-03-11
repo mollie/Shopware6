@@ -28,11 +28,11 @@ Component.register('mollie-pluginconfig-support-modal', {
             subject: '',
             message: '',
 
-            recipient: '',
+            recipientLocale: '',
             recipientOptions: [
                 {
                     label: "International Support",
-                    value: 'global',
+                    value: null,
                 },
                 {
                     label: "German Support",
@@ -140,9 +140,9 @@ Component.register('mollie-pluginconfig-support-modal', {
         },
 
         determineDefaultSupportDesk() {
-            this.recipient = this.recipientOptions.some(option => option.value === this.locale)
+            this.recipientLocale = this.recipientOptions.some(option => option.value === this.locale)
                 ? this.locale
-                : 'global';
+                : null;
         },
 
         loadPluginsLegacy() {
@@ -170,10 +170,11 @@ Component.register('mollie-pluginconfig-support-modal', {
                 .request(
                     this.contactName,
                     this.contactEmail,
+                    this.recipientLocale,
                     this.subject,
                     this.message,
                 )
-                .then((response) => {
+                .then(() => {
                     this.mailSent = true;
                 })
                 .finally(() => this.isSubmitting = false)

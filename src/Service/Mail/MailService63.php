@@ -48,7 +48,7 @@ class MailService63 extends AbstractMailService
         $mail = $this->mailFactory->createMessage(
             $data['subject'],
             [$data['senderEmail'] => $data['senderName']],
-            self::RECIPIENTS,
+            $this->getRecipients($data['recipientLocale']),
             $this->buildContents($data),
             $this->filterFileAttachments($attachments),
             $this->filterBinaryAttachments($attachments)

@@ -20,10 +20,11 @@ export default class MolliePaymentsSupportService extends ApiService {
             });
     }
 
-    request(name, email, subject, message) {
+    request(name, email, recipientLocale, subject, message) {
         const data = {
             name: name,
             email: email,
+            recipientLocale: recipientLocale,
             subject: subject,
             message: message,
         };

@@ -9,7 +9,14 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 abstract class AbstractMailService
 {
-    protected const RECIPIENTS = [
+    private const RECIPIENTS = [
+        // locale => recipients
+        'de-DE' => [
+            // email => name
+        ]
+    ];
+
+    private const INT_RECIPIENTS = [
         // email => name
     ];
 
@@ -20,6 +27,15 @@ abstract class AbstractMailService
      * @throws ConstraintViolationException
      */
     public abstract function send(array $data, array $attachments = []): void;
+
+    protected function getRecipients(?string $locale = null)
+    {
+        if (!empty($locale) && array_key_exists($locale, self::RECIPIENTS)) {
+            return self::RECIPIENTS[$locale];
+        }
+
+        return self::INT_RECIPIENTS;
+    }
 
     /**
      * @param array $data
