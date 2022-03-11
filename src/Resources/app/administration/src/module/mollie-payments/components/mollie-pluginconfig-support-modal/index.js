@@ -2,17 +2,20 @@ import template from './mollie-pluginconfig-support-modal.html.twig';
 import './mollie-pluginconfig-support-modal.scss';
 
 // eslint-disable-next-line no-undef
-const {Component, Context, Mixin, State} = Shopware;
+const { Component, Context, Mixin, State } = Shopware;
 // eslint-disable-next-line no-undef
-const {string} = Shopware.Utils;
+const { Criteria } = Shopware.Data;
+// eslint-disable-next-line no-undef
+const { string } = Shopware.Utils;
 
 Component.register('mollie-pluginconfig-support-modal', {
     template,
 
-    inject: [
-        'shopwareExtensionService',
-        'MolliePaymentsSupportService',
-    ],
+    inject: {
+        shopwareExtensionService: { default: null }, // This did not exist before 6.4, so default to null to avoid errors.
+        MolliePaymentsSupportService: {},
+        repositoryFactory: {},
+    },
 
     mixins: [
         Mixin.getByName('notification'),
@@ -27,12 +30,18 @@ Component.register('mollie-pluginconfig-support-modal', {
 
             isSubmitting: false,
             mailSent: false,
+
+            isLoadingPlugins: false,
         }
     },
 
     computed: {
         isLoading() {
-            return State.get('shopwareExtensions').myExtensions.loading;
+            if (this.shopwareExtensionService) {
+                return this.shopwareExtensionService.myExtensions.loading;
+            }
+
+            return this.isLoadingPlugins;
         },
 
         canSubmit() {
@@ -42,9 +51,6 @@ Component.register('mollie-pluginconfig-support-modal', {
                 && !string.isEmptyOrSpaces(this.message)
         },
 
-        shopwareVersion() {
-            return this.humanReadableVersion(Context.app.config.version);
-        },
 
         contactName: {
             get() {
@@ -73,12 +79,30 @@ Component.register('mollie-pluginconfig-support-modal', {
         },
 
         userName() {
-            return `${this.user?.firstName} ${this.user?.lastName}`.trim() ?? this.user?.userName ?? '';
+            if (!this.user) {
+                return '';
+            }
+
+            if (this.user.firstName === '') {
+                return this.user.username;
+            }
+
+            return this.user.firstName + ' ' + this.user.lastName;
+
+            // return `${this.user?.firstName} ${this.user?.lastName}`.trim() ?? this.user?.userName ?? '';
+        },
+
+        plugins() {
+            // If this is not null, we're in Shopware 6.4 and using the new extension service
+            if (this.shopwareExtensionService) {
+                return State.get('shopwareExtensions').myExtensions.data || [];
+            }
+
+            return State.get('swPlugin').plugins || [];
         },
 
         molliePlugin() {
-            return State.get('shopwareExtensions').myExtensions.data
-                .find(plugin => plugin.name === 'MolliePayments');
+            return this.plugins.find(plugin => plugin.name === 'MolliePayments');
         },
 
         mollieVersion() {
@@ -86,55 +110,43 @@ Component.register('mollie-pluginconfig-support-modal', {
                 ? this.humanReadableVersion(this.molliePlugin.version)
                 : '';
         },
+
+        shopwareVersion() {
+            return this.humanReadableVersion(Context.app.config.version);
+        },
     },
 
     mounted() {
-        if(!this.molliePlugin) {
-            this.shopwareExtensionService.updateExtensionData();
-        }
+        this.mountedComponent();
     },
 
     methods: {
-        humanReadableVersion(version) {
-            const match = version.match(/(\d+\.?\d+\.?\d+\.?\d*)-?([a-z]+)?(\d+(.\d+)*)?/i);
-
-            if (match === null) {
-                return version;
+        mountedComponent() {
+            if (this.plugins.length === 0) {
+                if (this.shopwareExtensionService) {
+                    this.shopwareExtensionService.updateExtensionData();
+                } else {
+                    this.loadPluginsLegacy();
+                }
             }
-
-            let output = `v${match[1]}`;
-
-            if (match[2]) {
-                output += ` ${this.getHumanReadableText(match[2])}`;
-            } else {
-                output += ' Stable Version';
-            }
-
-            if (match[3]) {
-                output += ` ${match[3]}`;
-            }
-
-            return output;
         },
 
-        getHumanReadableText(text) {
-            if (text === 'dp') {
-                return 'Developer Preview';
+        loadPluginsLegacy() {
+            this.isLoadingPlugins = true;
+
+            const criteria = new Criteria();
+            criteria.setTerm('Mollie');
+
+            const searchData = {
+                criteria: criteria,
+                repository: this.repositoryFactory.create('plugin'),
+                context: Context.api,
             }
 
-            if (text === 'rc') {
-                return 'Release Candidate';
-            }
-
-            if (text === 'dev') {
-                return 'Developer Version';
-            }
-
-            if (text === 'ea') {
-                return 'Early Access';
-            }
-
-            return text;
+            State.dispatch('swPlugin/updatePluginList', searchData)
+                .finally(() => {
+                    this.isLoadingPlugins = false;
+                });
         },
 
         onRequestSupport() {
@@ -148,17 +160,46 @@ Component.register('mollie-pluginconfig-support-modal', {
                     this.message,
                 )
                 .then((response) => {
-                    console.log(response);
                     this.mailSent = true;
                 })
                 .finally(() => this.isSubmitting = false)
-            // console.log(
-            //     `'${this.contactName}'`,
-            //     `'${this.contactEmail}'`,
-            //     `'${this.subject}'`,
-            //     `'${this.message}'`
-            // );
+        },
 
+        humanReadableVersion(version) {
+            const match = version.match(/(\d+\.?\d+\.?\d+\.?\d*)-?([a-z]+)?(\d+(.\d+)*)?/i);
+
+            if (match === null) {
+                return version;
+            }
+
+            let output = `v${ match[1] }`;
+
+            if (match[2]) {
+                output += ` ${ this.getHumanReadableText(match[2]) }`;
+            } else {
+                output += ' Stable Version';
+            }
+
+            if (match[3]) {
+                output += ` ${ match[3] }`;
+            }
+
+            return output;
+        },
+
+        getHumanReadableText(text) {
+            switch (text) {
+                case 'dp':
+                    return 'Developer Preview';
+                case 'rc':
+                    return 'Release Candidate';
+                case 'dev':
+                    return 'Developer Version';
+                case 'ea':
+                    return 'Early Access';
+                default:
+                    return text;
+            }
         },
     },
 });
