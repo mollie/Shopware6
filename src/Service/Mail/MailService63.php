@@ -69,6 +69,8 @@ class MailService63 extends AbstractMailService
             $binAttachments
         );
 
+        $mail->addReplyTo($data['replyToEmail'], $data['replyToName']);
+
         $this->mailSender->send($mail);
     }
 }

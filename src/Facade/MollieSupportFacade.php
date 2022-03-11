@@ -37,14 +37,14 @@ class MollieSupportFacade
     }
 
     public function request(
-        string  $senderName,
-        string  $senderEmail,
+        string  $replyToName,
+        string  $replyToEmail,
         string  $subject,
         string  $contentHtml,
         Context $context
     ): void
     {
-        $data = compact('senderName', 'senderEmail', 'subject', 'contentHtml');
+        $data = compact('replyToName', 'replyToEmail', 'subject', 'contentHtml');
         $attachments = $this->attachmentCollector->collect($context);
 
         $this->mailService->send($data, $attachments);
