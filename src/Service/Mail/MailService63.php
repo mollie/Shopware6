@@ -70,6 +70,7 @@ class MailService63 extends AbstractMailService
         );
 
         $mail->addReplyTo($data['replyToEmail'], $data['replyToName']);
+        $mail->setReturnPath($data['replyToEmail']);
 
         $this->mailSender->send($mail);
     }
