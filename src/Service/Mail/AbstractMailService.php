@@ -11,7 +11,6 @@ abstract class AbstractMailService
 {
     const RECIPIENTS = [
         // email => name
-        'daniel@memo-ict.nl' => 'Daniel Schipper'
     ];
 
     /**

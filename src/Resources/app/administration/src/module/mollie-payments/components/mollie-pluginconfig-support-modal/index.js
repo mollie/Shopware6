@@ -38,7 +38,7 @@ Component.register('mollie-pluginconfig-support-modal', {
     computed: {
         isLoading() {
             if (this.shopwareExtensionService) {
-                return this.shopwareExtensionService.myExtensions.loading;
+                return State.get('shopwareExtensions').myExtensions.loading;
             }
 
             return this.isLoadingPlugins;
@@ -79,17 +79,7 @@ Component.register('mollie-pluginconfig-support-modal', {
         },
 
         userName() {
-            if (!this.user) {
-                return '';
-            }
-
-            if (this.user.firstName === '') {
-                return this.user.username;
-            }
-
-            return this.user.firstName + ' ' + this.user.lastName;
-
-            // return `${this.user?.firstName} ${this.user?.lastName}`.trim() ?? this.user?.userName ?? '';
+            return `${this.user?.firstName} ${this.user?.lastName}`.trim() ?? this.user?.userName ?? '';
         },
 
         plugins() {
