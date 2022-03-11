@@ -43,7 +43,10 @@ Component.override('sw-order-detail-base', {
         getMollieData() {
             if (this.isMollieOrder) {
 
-                this.MolliePaymentsRefundService.list({orderId: this.order.id})
+                this.MolliePaymentsRefundService.getRefundManagerData(
+                    {
+                        orderId: this.order.id,
+                    })
                     .then((response) => {
                         this.remainingAmount = response.totals.remaining;
                         this.refundedAmount = response.totals.refunded;

@@ -7,7 +7,7 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Dispatchers\Shopware
 use Kiener\MolliePayments\Compatibility\VersionCompare;
 
 
-class FlowBuilderFactory
+class FlowBuilderFactory implements FlowBuilderFactoryInterface
 {
 
     /**

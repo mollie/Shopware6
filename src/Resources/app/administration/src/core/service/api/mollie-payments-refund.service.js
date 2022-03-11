@@ -18,8 +18,17 @@ export default class MolliePaymentsRefundService extends ApiService {
      * @param data
      * @returns {*}
      */
+    getRefundManagerData(data = {orderId: null}) {
+        return this.__post('/refund-manager/data', data);
+    }
+
+    /**
+     *
+     * @param data
+     * @returns {*}
+     */
     list(data = {orderId: null}) {
-        return this.__post('/list', data);
+        return this.__post('/refund/list', data);
     }
 
     /**
@@ -28,7 +37,7 @@ export default class MolliePaymentsRefundService extends ApiService {
      * @returns {*}
      */
     refund(data = {orderId: null, amount: null, description: '', items: []}) {
-        return this.__post('', data);
+        return this.__post('/refund', data);
     }
 
     /**
@@ -36,8 +45,8 @@ export default class MolliePaymentsRefundService extends ApiService {
      * @param data
      * @returns {*}
      */
-    refundAll(data = {orderId: null, amount: null}) {
-        return this.__post('', data);
+    refundAll(data = {orderId: null}) {
+        return this.__post('/refund', data);
     }
 
     /**
@@ -46,7 +55,7 @@ export default class MolliePaymentsRefundService extends ApiService {
      * @returns {*}
      */
     cancel(data = {orderId: null, refundId: null}) {
-        return this.__post('/cancel', data);
+        return this.__post('/refund/cancel', data);
     }
 
 
@@ -61,7 +70,7 @@ export default class MolliePaymentsRefundService extends ApiService {
     __post(endpoint = '', data = {}, headers = {}) {
         return this.httpClient
             .post(
-                `_action/${this.getApiBasePath()}/refund${endpoint}`,
+                `_action/${this.getApiBasePath()}${endpoint}`,
                 JSON.stringify(data),
                 {
                     headers: this.getBasicHeaders(headers),

@@ -1,8 +1,8 @@
 import template from './mollie-refund-manager.html.twig';
 import './mollie-refund-manager.scss';
-import ShopwareOrderGrid from "./grids/ShopwareOrderGrid";
-import MollieRefundsGrid from "./grids/MollieRefundsGrid";
-import RefundItemService from "./services/RefundItemService";
+import ShopwareOrderGrid from './grids/ShopwareOrderGrid';
+import MollieRefundsGrid from './grids/MollieRefundsGrid';
+import RefundItemService from './services/RefundItemService';
 
 // eslint-disable-next-line no-undef
 const {Component, Mixin} = Shopware;
@@ -199,8 +199,9 @@ Component.register('mollie-refund-manager', {
             this._calculateFinalAmount();
 
             // also make sure to uncheck our
-            // verification checkbox
+            // verification checkbox and clean our text
             this.checkRefund = false;
+            this.refundDescription = '';
         },
 
         /**
@@ -387,10 +388,11 @@ Component.register('mollie-refund-manager', {
                 .then((response) => {
 
                     if (!response.success) {
-                        this._showNotificationError(this.$tc('mollie-payments.refund-manager.notifications.error'));
+                        this._showNotificationError(this.$tc('mollie-payments.refund-manager.notifications.error.refund-created'));
+                        return;
                     }
 
-                    this._showNotificationSuccess(this.$tc('mollie-payments.refund-manager.notifications.success'));
+                    this._showNotificationSuccess(this.$tc('mollie-payments.refund-manager.notifications.success.refund-created'));
 
                     this.$emit('refund-success');
 
@@ -415,16 +417,15 @@ Component.register('mollie-refund-manager', {
             this.MolliePaymentsRefundService.refundAll(
                 {
                     orderId: this.order.id,
-                    amount: this.remainingAmount,
                 })
                 .then((response) => {
 
                     if (!response.success) {
-                        this._showNotificationError(this.$tc('mollie-payments.refund-manager.notifications.error'));
+                        this._showNotificationError(this.$tc('mollie-payments.refund-manager.notifications.error.refund-created'));
+                        return;
                     }
 
-
-                    this._showNotificationSuccess(this.$tc('mollie-payments.refund-manager.notifications.success'));
+                    this._showNotificationSuccess(this.$tc('mollie-payments.refund-manager.notifications.success.refund-created'));
 
                     this.$emit('refund-success');
 
@@ -467,6 +468,24 @@ Component.register('mollie-refund-manager', {
             return this.$tc('mollie-payments.refunds.status.description.' + statusKey);
         },
 
+        getRefundCompositions(item) {
+
+            if (!item || !item.metadata || !item.metadata.composition) {
+                return [
+                    this.$tc('mollie-payments.refund-manager.refunds.grid.lblNoComposition'),
+                ];
+            }
+
+            const me = this;
+            const result = [];
+
+            item.metadata.composition.forEach(function (entry) {
+                result.push(entry.swReference + ' (' + entry.quantity + ' x ' + entry.amount + ' ' + me.order.currency.symbol + ')');
+            });
+
+            return result;
+        },
+
         /**
          * Gets the status badge color (button variant) depending
          * on the provided status key.
@@ -501,11 +520,12 @@ Component.register('mollie-refund-manager', {
                     refundId: item.id,
                 })
                 .then((response) => {
-                    if (response.success) {
-                        this._showNotificationWarning(this.$tc('mollie-payments.refund-manager.notifications.success'));
-                    } else {
-                        this._showNotificationError(this.$tc('mollie-payments.refund-manager.notifications.error'));
+                    if (!response.success) {
+                        this._showNotificationError(this.$tc('mollie-payments.refund-manager.notifications.error.refund-canceled'));
+                        return;
                     }
+
+                    this._showNotificationSuccess(this.$tc('mollie-payments.refund-manager.notifications.success.refund-canceled'));
 
                     this.$emit('refund-cancelled');
                     this._fetchFormData();
@@ -533,7 +553,7 @@ Component.register('mollie-refund-manager', {
 
             this.isRefundDataLoading = true;
 
-            this.MolliePaymentsRefundService.list(
+            this.MolliePaymentsRefundService.getRefundManagerData(
                 {
                     orderId: this.order.id,
                 })
@@ -541,7 +561,7 @@ Component.register('mollie-refund-manager', {
                     // we got the response from our plugin API endpoint.
                     // now simply assign the values to our props
                     // so that vue will show it
-                    this.existingRefunds = response.refunds;
+                    this.mollieRefunds = response.refunds;
                     this.orderItems = response.cart;
                     this.remainingAmount = response.totals.remaining;
                     this.refundedAmount = response.totals.refunded;
@@ -578,7 +598,7 @@ Component.register('mollie-refund-manager', {
          * @returns {number}
          */
         _roundToTwo(num) {
-            return +(Math.round(num + "e+2") + "e-2");
+            return +(Math.round(num + 'e+2') + 'e-2');
         },
 
         /**

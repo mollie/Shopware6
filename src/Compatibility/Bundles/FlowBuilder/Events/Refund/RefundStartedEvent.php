@@ -22,6 +22,11 @@ class RefundStartedEvent extends Event implements OrderAware, BusinessEventInter
     private $order;
 
     /**
+     * @var float
+     */
+    private $amount;
+
+    /**
      * @var Context
      */
     private $context;
@@ -29,11 +34,13 @@ class RefundStartedEvent extends Event implements OrderAware, BusinessEventInter
 
     /**
      * @param OrderEntity $orderEntity
+     * @param float $amount
      * @param Context $context
      */
-    public function __construct(OrderEntity $orderEntity, Context $context)
+    public function __construct(OrderEntity $orderEntity, float $amount, Context $context)
     {
         $this->order = $orderEntity;
+        $this->amount = $amount;
         $this->context = $context;
     }
 
@@ -68,6 +75,14 @@ class RefundStartedEvent extends Event implements OrderAware, BusinessEventInter
     public function getOrder(): OrderEntity
     {
         return $this->order;
+    }
+
+    /**
+     * @return float
+     */
+    public function getAmount(): float
+    {
+        return $this->amount;
     }
 
     /**

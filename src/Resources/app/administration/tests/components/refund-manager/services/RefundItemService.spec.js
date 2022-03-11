@@ -27,13 +27,13 @@ beforeEach(() => {
 // ---------------------------------------------------------------------------------------------------
 
 test('Item can set a custom quantity for the stock reset', () => {
-    item.setStockReset(item, 2);
+    service.setStockReset(item, 2);
     expect(item.resetStock).toBe(2);
 });
 
 test('Item does not overwrite the stock reset quantity if already configured', () => {
     item.resetStock = 1;
-    item.setStockReset(item, 2);
+    service.setStockReset(item, 2);
     expect(item.resetStock).toBe(1);
 });
 

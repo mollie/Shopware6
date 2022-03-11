@@ -165,16 +165,17 @@ class FlowBuilderEventFactory
 
     /**
      * @param OrderEntity $orderEntity
+     * @param float $amount
      * @param Context $context
      * @return DummyEvent|RefundStartedEvent
      */
-    public function buildRefundStartedEvent(OrderEntity $orderEntity, Context $context)
+    public function buildRefundStartedEvent(OrderEntity $orderEntity, float $amount, Context $context)
     {
         if ($this->versionCompare->lt(FlowBuilderFactory::FLOW_BUILDER_MIN_VERSION)) {
             return new DummyEvent();
         }
 
-        return new RefundStartedEvent($orderEntity, $context);
+        return new RefundStartedEvent($orderEntity, $amount, $context);
     }
 
 }

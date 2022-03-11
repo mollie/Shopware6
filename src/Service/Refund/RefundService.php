@@ -2,10 +2,8 @@
 
 namespace Kiener\MolliePayments\Service\Refund;
 
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatcherAdapterInterface;
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Exception\CouldNotCancelMollieRefundException;
+use Kiener\MolliePayments\Exception\CouldNotCreateMollieRefundException;
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieOrderException;
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieRefundsException;
@@ -13,8 +11,9 @@ use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Hydrator\RefundHydrator;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Service\OrderService;
-use Kiener\MolliePayments\Service\Refund\Item\MollieRefundItem;
-use Kiener\MolliePayments\Service\Stock\StockUpdater;
+use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
+use Kiener\MolliePayments\Service\Refund\Item\RefundItemType;
+use Kiener\MolliePayments\Service\Refund\Mollie\RefundMetadata;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Refund;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -34,65 +33,71 @@ class RefundService implements RefundServiceInterface
     private $orders;
 
     /**
-     * @var StockUpdater
-     */
-    private $stock;
-
-    /**
      * @var RefundHydrator
      */
     private $refundHydrator;
-
-    /**
-     * @var FlowBuilderDispatcherAdapterInterface
-     */
-    private $flowBuilderDispatcher;
-
-    /**
-     * @var FlowBuilderEventFactory
-     */
-    private $flowBuilderEventFactory;
 
 
     /**
      * @param Order $mollie
      * @param OrderService $orders
-     * @param StockUpdater $stock
      * @param RefundHydrator $refundHydrator
-     * @param FlowBuilderFactory $flowBuilderFactory
-     * @param FlowBuilderEventFactory $flowBuilderEventFactory
-     * @throws \Exception
      */
-    public function __construct(Order $mollie, OrderService $orders, StockUpdater $stock, RefundHydrator $refundHydrator, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory)
+    public function __construct(Order $mollie, OrderService $orders, RefundHydrator $refundHydrator)
     {
         $this->mollie = $mollie;
         $this->orders = $orders;
-        $this->stock = $stock;
         $this->refundHydrator = $refundHydrator;
-        $this->flowBuilderEventFactory = $flowBuilderEventFactory;
-
-        $this->flowBuilderDispatcher = $flowBuilderFactory->createDispatcher();
     }
 
 
     /**
      * @param OrderEntity $order
      * @param string $description
+     * @param RefundItem[] $refundItems
      * @param Context $context
      * @return Refund
+     * @throws ApiException
      */
-    public function refundFull(OrderEntity $order, string $description, Context $context): Refund
+    public function refundFull(OrderEntity $order, string $description, array $refundItems, Context $context): Refund
     {
         $mollieOrderId = $this->orders->getMollieOrderId($order);
-
         $mollieOrder = $this->mollie->getMollieOrder($mollieOrderId, '');
 
-        $refund = $mollieOrder->refundAll([
-            'description' => $description,
-        ]);
 
-        $event = $this->flowBuilderEventFactory->buildRefundStartedEvent($order, $context);
-        $this->flowBuilderDispatcher->dispatch($event);
+        $metadata = new RefundMetadata(RefundItemType::FULL, $refundItems);
+
+        $params = [
+            'description' => $description,
+            'metadata' => $metadata->toString(),
+        ];
+
+        if (count($refundItems) > 0) {
+
+            $lines = [];
+
+            foreach ($refundItems as $item) {
+                # quantities of 0 do not work with the Mollie API
+                if ($item->getQuantity() <= 0) {
+                    continue;
+                }
+
+                $lines[] = [
+                    'id' => $item->getMollieLineId(),
+                    'quantity' => $item->getQuantity(),
+                ];
+            }
+
+            $params['lines'] = $lines;
+        }
+
+        # REFUND WITH MOLLIE
+        # ---------------------------------------------------------------------------------------------
+        $refund = $mollieOrder->refund($params);
+
+        if (!$refund instanceof Refund) {
+            throw new CouldNotCreateMollieRefundException($mollieOrderId, $order->getOrderNumber());
+        }
 
         return $refund;
     }
@@ -101,26 +106,18 @@ class RefundService implements RefundServiceInterface
      * @param OrderEntity $order
      * @param string $description
      * @param float $amount
-     * @param array $lineItems
+     * @param RefundItem[] $lineItems
      * @param Context $context
      * @return Refund
      * @throws ApiException
      */
-    public function refundAmount(OrderEntity $order, string $description, float $amount, array $lineItems, Context $context): Refund
+    public function refundPartial(OrderEntity $order, string $description, float $amount, array $lineItems, Context $context): Refund
     {
         $mollieOrderId = $this->orders->getMollieOrderId($order);
 
-        $payment = $this->mollie->getCompletedPayment($mollieOrderId, $order->getSalesChannelId());
+        $metadata = new RefundMetadata(RefundItemType::PARTIAL, $lineItems);
 
-        $metadata = [];
-        foreach ($lineItems as $item) {
-            if ($item->getQuantity() > 0) {
-                $metadata['composition'][] = [
-                    'lineItemId' => $item->getMollieLineID(),
-                    'quantity' => $item->getQuantity()
-                ];
-            }
-        }
+        $payment = $this->mollie->getCompletedPayment($mollieOrderId, $order->getSalesChannelId());
 
         $refund = $payment->refund([
             'amount' => [
@@ -128,83 +125,15 @@ class RefundService implements RefundServiceInterface
                 'currency' => $order->getCurrency()->getIsoCode()
             ],
             'description' => $description,
-            'metadata' => json_encode($metadata),
-        ]);
-
-        if ($refund instanceof Refund) {
-            $event = $this->flowBuilderEventFactory->buildRefundStartedEvent($order, $context);
-            $this->flowBuilderDispatcher->dispatch($event);
-
-            return $refund;
-        }
-
-        throw new \Exception('No refund could be created for order: ' . $order->getOrderNumber());
-    }
-
-    /**
-     * @param OrderEntity $order
-     * @param string $description
-     * @param array $refundItems
-     * @param Context $context
-     * @return Refund|void
-     */
-    public function refundItems(OrderEntity $order, string $description, array $refundItems, Context $context): Refund
-    {
-        $mollieOrderId = $this->orders->getMollieOrderId($order);
-        $mollieOrder = $this->mollie->getMollieOrder($mollieOrderId, '');
-
-
-        $lines = [];
-
-        /** @var MollieRefundItem $item */
-        foreach ($refundItems as $item) {
-            # quantities of 0 do not
-            # work with the Mollie API
-            if ($item->getQuantity() <= 0) {
-                continue;
-            }
-
-            $lines[] = [
-                'id' => $item->getMollieLineId(),
-                'quantity' => $item->getQuantity(),
-                'amount' => [
-                    'value' => number_format($item->getAmount(), 2, '.', ''),
-                    'currency' => $order->getCurrency()->getIsoCode()
-                ],
-            ];
-        }
-
-        # REFUND WITH MOLLIE
-        # ---------------------------------------------------------------------------------------------
-        $refund = $mollieOrder->refund([
-            'description' => $description,
-            'lines' => $lines,
+            'metadata' => $metadata->toString(),
         ]);
 
         if (!$refund instanceof Refund) {
-            throw new \Exception('No refund could be created for order: ' . $order->getOrderNumber());
+            throw new CouldNotCreateMollieRefundException($mollieOrderId, $order->getOrderNumber());
         }
-
-
-        # RESET STOCK
-        # ---------------------------------------------------------------------------------------------
-        # if everything worked above, iterate through all our
-        # refund items and increase their stock
-        foreach ($refundItems as $item) {
-
-            if (empty($item->getProductID())) {
-                continue;
-            }
-
-            $this->stock->increaseStock($item->getProductID(), $item->getResetStock());
-        }
-
-        $event = $this->flowBuilderEventFactory->buildRefundStartedEvent($order, $context);
-        $this->flowBuilderDispatcher->dispatch($event);
 
         return $refund;
     }
-
 
     /**
      * @param OrderEntity $order

@@ -101,7 +101,7 @@
         "linkResetTutorials": "Reset Tutorials",
         "btnToggleTutorial": "Show/Hide Tutorial",
         "titleFullRefund": "Full Refund",
-        "textFullRefund" : "Just use the button for the full refund. This makes sure that all your items are marked as refunded and the full amount is returned to the customer.",
+        "textFullRefund": "Just use the button for the full refund. This makes sure that all your items are marked as refunded and the full amount is returned to the customer.",
         "titleStockReset": "Stock Reset",
         "textStockReset": "You can automatically increase the available stock by entering the quantity that you would like to put back in stock. Just enter it before proceeding with a full or partial refund. Resetting the stock can be combined with the actual refund process in a flexible way.",
         "titleShipping": "Shipping",
@@ -135,16 +135,22 @@
             "amount": "Amount",
             "status": "Status",
             "description": "Description",
+            "composition": "Composition",
             "date": "Date"
           },
+          "lblNoComposition" : "No composition available",
           "btnCancelRefund": "Cancel this refund"
         }
       },
       "notifications": {
-        "success": "A refund has been created in Mollie. It may take 2 hours for the refund to complete. Until this time, you can cancel the refund.",
-        "error": "Something went wrong creating a refund.",
-        "errors": {
-          "low-amount": "Please enter an amount to be refunded."
+        "success": {
+          "refund-created": "A refund has been created in Mollie. It may take 2 hours for the refund to complete. Until this time, you can cancel the refund.",
+          "refund-canceled": "The pending refund has been successfully cancelled and removed."
+        },
+        "error": {
+          "low-amount": "Please enter an amount to be refunded.",
+          "refund-created": "Something went wrong creating a refund.",
+          "refund-canceled": "There was a problem when cancelling the pending refund. Please try it again in the Mollie Dashboard."
         }
       }
     },

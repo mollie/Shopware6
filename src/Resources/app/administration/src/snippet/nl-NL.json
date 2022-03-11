@@ -135,16 +135,22 @@
             "amount": "Bedrag",
             "status": "Status",
             "description": "Beschrijving",
+            "composition": "Metadata",
             "date": "Datum"
           },
+          "lblNoComposition" : "No composition available",
           "btnCancelRefund": "Annuleer deze terugbetaling\n"
         }
       },
       "notifications": {
-        "success": "Er is een terugbetaling aangemaakt bij Mollie. Het kan 2 uur duren voordat de terugbetaling is voltooid. Tot deze tijd kunt u de terugbetaling annuleren.",
-        "error": "Er is iets mis gegaan bij het aanmaken van een terugbetaling.",
-        "errors": {
-          "low-amount": "Voer een terug te betalen bedrag in."
+        "success": {
+          "refund-created": "Er is een terugbetaling aangemaakt bij Mollie. Het kan 2 uur duren voordat de terugbetaling is voltooid. Tot deze tijd kunt u de terugbetaling annuleren.",
+          "refund-canceled": ""
+        },
+        "error": {
+          "low-amount": "Voer een terug te betalen bedrag in.",
+          "refund-created": "Er is iets mis gegaan bij het aanmaken van een terugbetaling.",
+          "refund-canceled": "There was a problem when cancelling the pending refund. Please try it again in the Mollie Dashboard."
         }
       }
     },

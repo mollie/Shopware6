@@ -2,7 +2,7 @@
 
 namespace Kiener\MolliePayments\Service\Refund;
 
-use Kiener\MolliePayments\Service\Refund\Item\MollieRefundItem;
+use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Refund;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -14,31 +14,22 @@ interface RefundServiceInterface
     /**
      * @param OrderEntity $order
      * @param string $description
+     * @param RefundItem[] $refundItems
      * @param Context $context
      * @return Refund
      */
-    public function refundFull(OrderEntity $order, string $description, Context $context): Refund;
+    public function refundFull(OrderEntity $order, string $description, array $refundItems, Context $context): Refund;
 
     /**
      * @param OrderEntity $order
      * @param string $description
      * @param float $amount
-     * @param MollieRefundItem[] $lineItems
+     * @param RefundItem[] $lineItems
      * @param Context $context
      * @return Refund
      * @throws ApiException
      */
-    public function refundAmount(OrderEntity $order, string $description, float $amount, array $lineItems, Context $context): Refund;
-
-    /**
-     * @param OrderEntity $order
-     * @param string $description
-     * @param MollieRefundItem[] $refundItems
-     * @param Context $context
-     * @return Refund
-     * @throws ApiException
-     */
-    public function refundItems(OrderEntity $order, string $description, array $refundItems, Context $context): Refund;
+    public function refundPartial(OrderEntity $order, string $description, float $amount, array $lineItems, Context $context): Refund;
 
     /**
      * @param OrderEntity $order
@@ -49,7 +40,7 @@ interface RefundServiceInterface
 
     /**
      * @param OrderEntity $order
-     * @return array
+     * @return Refund[]
      */
     public function getRefunds(OrderEntity $order): array;
 

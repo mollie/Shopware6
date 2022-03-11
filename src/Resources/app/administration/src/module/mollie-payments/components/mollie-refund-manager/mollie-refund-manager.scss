@@ -1,61 +1,56 @@
 .mollie-refund-manager {
-
-    // otherwise it would not be wide
-    // enough if the instructions are turned off
+    /*
+    otherwise it would not be wide
+    enough if the instructions are turned off
+    */
     width: 100%;
-
     background-color: #f0f2f5;
-    padding: 30px;
+    padding: 20px;
 
-    // important to have the full
-    // width of the background color when being
-    // started within a modal component
+    /*
+     important to have the full
+     width of the background color when being
+     started within a modal component
+    */
     display: inline-table;
 
-
     .color-delivery {
-        color: rgb(24, 158, 255);
+        color: #189effff;
     }
 
     .color-refund {
-        color: #1abc9c;
+        color: #1abc9cff;
     }
 
     .color-stock {
-        color: rgb(202 82 8);
+        color: #ca5208ff;
     }
 
     .color-promotion {
-        color: rgb(255, 215, 0);
+        color: #ffd700ff;
     }
 
     .color-product-discounted {
-        color: rgb(210, 210, 210);
+        color: #d2d2d2ff;
     }
 
     .color-refunded {
         color: #1abc9c;
     }
 
-
     .sw-card--large {
         margin-left: 20px;
         margin-right: 20px;
-
         max-width: 100%;
     }
-
 
     .tutorial-active {
         border: red solid 4px;
         padding: 6px;
     }
 
-
     .mollie-refund-manager-order-container {
-
         .order-container-top {
-
             .order-container-top-left {
                 text-align: left;
             }
@@ -66,7 +61,6 @@
         }
 
         .order-grid {
-
             .order-item-icon {
                 margin-right: 10px;
             }
@@ -76,63 +70,57 @@
                 text-align: center;
             }
 
-            // this helps to have a bit more padding
-            // inside the input fields within the order item grid
+            /*
+             this helps to have a bit more padding
+             inside the input fields within the order item grid
+             */
             .sw-field__addition {
                 padding: 6px;
             }
+        }
 
-            .input-mode-active {
-
-                input {
-                    // background: oldlace;
-                    background: antiquewhite;
-                }
+        .input-mode-active {
+            input {
+                background: antiquewhite;
             }
+        }
 
-            .input-mode-inactive {
-                input {
-                    background: initial;
-                }
+        .input-mode-inactive {
+            input {
+                background: initial;
             }
+        }
 
-            .check-deduct-promotion {
-
-                label {
-                    font-size: 12px;
-                }
+        .check-deduct-promotion {
+            label {
+                font-size: 12px;
             }
         }
     }
 
     .mollie-refund-manager-instructions-container {
-
         .instructions-container-top {
             text-align: left;
         }
 
         .instructions-container-content {
-
             .instructions-block {
                 margin-bottom: 30px;
+            }
 
-                .instructions-block-icon {
-                    margin-right: 10px;
-                }
+            .instructions-block-icon {
+                margin-right: 10px;
             }
         }
     }
 
-
     .mollie-refund-manager-summary-container {
-
         .summary-loading-container {
             margin-bottom: 50px;
             text-align: center;
         }
 
         .summary-content {
-
             margin-bottom: 20px;
 
             .summary-item-value {
@@ -150,7 +138,6 @@
                 color: red;
                 font-size: 16px;
             }
-
         }
 
         .btn-fix-diff {
@@ -168,9 +155,7 @@
         }
     }
 
-
     .mollie-refund-manager-refunds {
-
         .instructions-bar {
             display: flex;
             flex-wrap: wrap;
@@ -179,6 +164,4 @@
             margin-bottom: 30px;
         }
     }
-
 }
-

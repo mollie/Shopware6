@@ -222,7 +222,9 @@
                 {# --------------------------------------------------------------------------------------------- #}
                 <sw-card-section class="mollie-refund-manager-summary-container">
                     <div v-if="isRefundDataLoading" grid="1fr" class="summary-loading-container">
-                        {{ $tc('mollie-payments.refund-manager.summary.dataLoading') }}
+                        <sw-loader size="30px">
+                            {{ $tc('mollie-payments.refund-manager.summary.dataLoading') }}
+                        </sw-loader>
                     </div>
                     {# --------------------------------------------------------------------------------------------- #}
                     <sw-description-list v-if="!isRefundDataLoading" grid="2fr 1fr" class="summary-content">
@@ -373,6 +375,18 @@
                 </template>
                 <template #column-createdAt="{ item }">
                     {{ item.createdAt | date({hour: '2-digit', minute: '2-digit'}) }}
+                </template>
+                <template #column-composition="{ item }">
+                    <sw-label v-for="composition in getRefundCompositions(item)"
+                              :key="composition.createdAt"
+                              variant="neutral"
+                              :ghost="false"
+                              size="default"
+                              appearance="default"
+                              :caps="false"
+                              :dismissable="false">
+                        {{ composition }}
+                    </sw-label>
                 </template>
                 <template #actions="{ item }">
                     <sw-context-menu-item :disabled="!isRefundCancelable(item)"

@@ -9,7 +9,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Doctrine\RetryableQuery;
 use Shopware\Core\Framework\Uuid\Uuid;
 
 
-class StockUpdater
+class StockUpdater implements StockUpdaterInterface
 {
 
     /**

@@ -2,10 +2,12 @@
 
 namespace Kiener\MolliePayments\Controller\Api;
 
+use Kiener\MolliePayments\Components\RefundManager\RefundManager;
+use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
+use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
-use Kiener\MolliePayments\Facade\MollieRefundFacade;
 use Kiener\MolliePayments\Service\OrderService;
-use Mollie\Api\Resources\Refund;
+use Kiener\MolliePayments\Service\Refund\RefundService;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
@@ -25,9 +27,14 @@ class RefundController extends AbstractController
     private $orderService;
 
     /**
-     * @var MollieRefundFacade
+     * @var RefundManager
      */
-    private $refunds;
+    private $refundManager;
+
+    /**
+     * @var RefundService
+     */
+    private $refundService;
 
     /**
      * @var LoggerInterface
@@ -36,14 +43,16 @@ class RefundController extends AbstractController
 
 
     /**
-     * @param MollieRefundFacade $refundFacade
      * @param OrderService $orderService
+     * @param RefundManager $refundManager
+     * @param RefundService $refundService
      * @param LoggerInterface $logger
      */
-    public function __construct(MollieRefundFacade $refundFacade, OrderService $orderService, LoggerInterface $logger)
+    public function __construct(OrderService $orderService, RefundManager $refundManager, RefundService $refundService, LoggerInterface $logger)
     {
-        $this->refunds = $refundFacade;
         $this->orderService = $orderService;
+        $this->refundManager = $refundManager;
+        $this->refundService = $refundService;
         $this->logger = $logger;
     }
 
@@ -61,32 +70,54 @@ class RefundController extends AbstractController
      * @param Context $context
      * @return JsonResponse
      */
-    public function refundOrder(QueryDataBag $query, Context $context): JsonResponse
+    public function refundOrderNumber(QueryDataBag $query, Context $context): JsonResponse
+    {
+        $orderNumber = (string)$query->get('number');
+        $description = $query->get('description', '');
+        $amount = $query->get('amount', null); # we need NULL as full refund option
+        $items = []; # nullable items means -> all items
+
+        /** @var RequestDataBag $items */
+        $itemsBag = $query->get('items', []);
+
+        if ($itemsBag instanceof RequestDataBag) {
+            $items = $itemsBag->all();
+        }
+
+        return $this->refundAction(
+            '',
+            $orderNumber,
+            $description,
+            $amount,
+            $items,
+            $context
+        );
+    }
+
+    # ----------------------------------------------------------------------------------------------------------------------------------------
+    # ----------------------------------------------------------------------------------------------------------------------------------------
+    # ----------------------------------------------------------------------------------------------------------------------------------------
+    # TECHNICAL ADMIN APIs
+
+    /**
+     * @RouteScope(scopes={"api"})
+     * @Route("/api/_action/mollie/refund-manager/data", defaults={"auth_enabled"=true}, name="api.action.mollie.refund-manager.data", methods={"POST"})
+     *
+     * @param RequestDataBag $data
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function refundManagerData(RequestDataBag $data, Context $context): JsonResponse
     {
         try {
 
-            $orderNumber = (string)$query->get('number');
+            $orderId = $data->getAlnum('orderId');
 
-            if (empty($orderNumber)) {
-                throw new \InvalidArgumentException('Missing Argument for Order Number!');
-            }
+            $order = $this->orderService->getOrder($orderId, $context);
 
-            $amount = $query->get('amount', null);
-            $description = $query->get('description', '');
+            $data = $this->refundManager->getData($order, $context);
 
-            $order = $this->orderService->getOrderByNumber($orderNumber, $context);
-
-            $refund = $this->refunds->startRefundProcess(
-                $order,
-                $description,
-                $amount,
-                [],
-                $context
-            );
-
-            return $this->json([
-                'success' => true
-            ]);
+            return $this->json($data->toArray());
 
         } catch (ShopwareHttpException $e) {
 
@@ -100,12 +131,6 @@ class RefundController extends AbstractController
         }
     }
 
-
-    # ----------------------------------------------------------------------------------------------------------------------------------------
-    # ----------------------------------------------------------------------------------------------------------------------------------------
-    # ----------------------------------------------------------------------------------------------------------------------------------------
-    # TECHNICAL ADMIN APIs
-
     /**
      * @RouteScope(scopes={"api"})
      * @Route("/api/_action/mollie/refund/list", defaults={"auth_enabled"=true}, name="api.action.mollie.refund.list", methods={"POST"})
@@ -116,7 +141,7 @@ class RefundController extends AbstractController
      */
     public function list(RequestDataBag $data, Context $context): JsonResponse
     {
-        return $this->listMollieData($data->getAlnum('orderId'), $context);
+        return $this->listRefundsAction($data->getAlnum('orderId'), $context);
     }
 
     /**
@@ -129,7 +154,7 @@ class RefundController extends AbstractController
      */
     public function total(RequestDataBag $data, Context $context): JsonResponse
     {
-        return $this->listTotalValues($data->getAlnum('orderId'), $context);
+        return $this->listTotalAction($data->getAlnum('orderId'), $context);
     }
 
     /**
@@ -140,24 +165,26 @@ class RefundController extends AbstractController
      * @param Context $context
      * @return JsonResponse
      */
-    public function refund(RequestDataBag $data, Context $context): JsonResponse
+    public function refundOrderID(RequestDataBag $data, Context $context): JsonResponse
     {
         $orderId = $data->getAlnum('orderId', '');
         $description = $data->get('description', '');
-        $amount = $data->get('amount', 0.0);
+        $amount = $data->get('amount', null);
+        $items = [];
 
         /** @var RequestDataBag $items */
-        $items = $data->get('items', []);
+        $itemsBag = $data->get('items', []);
 
-        $refundItems = [];
-        if ($items instanceof RequestDataBag) {
-            $refundItems = $items->all();
+        if ($itemsBag instanceof RequestDataBag) {
+            $items = $itemsBag->all();
         }
-        return $this->startRefund(
+
+        return $this->refundAction(
             $orderId,
+            '',
             $description,
             $amount,
-            $refundItems,
+            $items,
             $context
         );
     }
@@ -172,9 +199,8 @@ class RefundController extends AbstractController
      */
     public function cancel(RequestDataBag $data, Context $context): JsonResponse
     {
-        return $this->cancelResponse($data->getAlnum('orderId'), $data->get('refundId'), $context);
+        return $this->cancelRefundAction($data->getAlnum('orderId'), $data->get('refundId'), $context);
     }
-
 
     /**
      * @RouteScope(scopes={"api"})
@@ -186,7 +212,7 @@ class RefundController extends AbstractController
      */
     public function listLegacy(RequestDataBag $data, Context $context): JsonResponse
     {
-        return $this->listMollieData($data->getAlnum('orderId'), $context);
+        return $this->listRefundsAction($data->getAlnum('orderId'), $context);
     }
 
     /**
@@ -199,7 +225,7 @@ class RefundController extends AbstractController
      */
     public function totalLegacy(RequestDataBag $data, Context $context): JsonResponse
     {
-        return $this->listTotalValues($data->getAlnum('orderId'), $context);
+        return $this->listTotalAction($data->getAlnum('orderId'), $context);
     }
 
     /**
@@ -212,13 +238,7 @@ class RefundController extends AbstractController
      */
     public function refundLegacy(RequestDataBag $data, Context $context): JsonResponse
     {
-        return $this->startRefund(
-            $data->getAlnum('orderId'),
-            $data->get('description', ''),
-            $data->get('amount', 0.0),
-            $data->get('items', []),
-            $context
-        );
+        return $this->refundOrderID($data, $context);
     }
 
     /**
@@ -231,41 +251,27 @@ class RefundController extends AbstractController
      */
     public function cancelLegacy(RequestDataBag $data, Context $context): JsonResponse
     {
-        return $this->cancelResponse($data->getAlnum('orderId'), $data->get('refundId'), $context);
+        return $this->cancelRefundAction($data->getAlnum('orderId'), $data->get('refundId'), $context);
     }
 
     # ----------------------------------------------------------------------------------------------------------------------------------------
     # ----------------------------------------------------------------------------------------------------------------------------------------
     # ----------------------------------------------------------------------------------------------------------------------------------------
 
-
     /**
      * @param string $orderId
      * @param Context $context
      * @return JsonResponse
      */
-    private function listMollieData(string $orderId, Context $context): JsonResponse
+    private function listRefundsAction(string $orderId, Context $context): JsonResponse
     {
         try {
 
-            $refunds = $this->refunds->getMollieRefundData($orderId, $context);
+            $order = $this->orderService->getOrder($orderId, $context);
+
+            $refunds = $this->refundService->getRefunds($order);
+
             return $this->json($refunds);
-
-        } catch (PaymentNotFoundException $e) {
-
-            # This indicates there is no completed payment for this order,
-            # so there are no refunds yet.
-            $totals = [
-                'refunds' => [],
-                'totals' => [
-                    'remaining' => 0,
-                    'voucherAmount' => 0,
-                    'pendingRefunds' => 0,
-                    'refunded' => 0,
-                ],
-            ];
-
-            return $this->json($totals);
 
         } catch (ShopwareHttpException $e) {
 
@@ -284,12 +290,22 @@ class RefundController extends AbstractController
      * @param Context $context
      * @return JsonResponse
      */
-    private function listTotalValues(string $orderId, Context $context): JsonResponse
+    private function listTotalAction(string $orderId, Context $context): JsonResponse
     {
         try {
 
-            $totals = $this->refunds->getTotalsByOrderId($orderId, $context);
-            return $this->json($totals);
+            $order = $this->orderService->getOrder($orderId, $context);
+
+            $data = $this->refundManager->getData($order, $context);
+
+            $json = [
+                'remaining' => round($data->getAmountRemaining(), 2),
+                'refunded' => round($data->getAmountCompletedRefunds(), 2),
+                'voucherAmount' => round($data->getAmountVouchers(), 2),
+                'pendingRefunds' => round($data->getAmountPendingRefunds(), 2),
+            ];
+
+            return $this->json($json);
 
         } catch (ShopwareHttpException $e) {
 
@@ -317,39 +333,67 @@ class RefundController extends AbstractController
 
     /**
      * @param string $orderId
+     * @param string $orderNumber
      * @param string $description
-     * @param float $amount
+     * @param float|null $amount
      * @param array $items
      * @param Context $context
      * @return JsonResponse
      */
-    private function startRefund(string $orderId, string $description, float $amount, array $items, Context $context): JsonResponse
+    private function refundAction(string $orderId, string $orderNumber, string $description, ?float $amount, array $items, Context $context): JsonResponse
     {
         try {
 
-            $order = $this->orderService->getOrder($orderId, $context);
+            if (!empty($orderId)) {
 
-            $refund = $this->refunds->startRefundProcess(
-                $order,
+                $order = $this->orderService->getOrder($orderId, $context);
+
+            } else {
+
+                if (empty($orderNumber)) {
+                    throw new \InvalidArgumentException('Missing Argument for Order ID or order number!');
+                }
+
+                $order = $this->orderService->getOrderByNumber($orderNumber, $context);
+            }
+
+
+            $refundRequest = new RefundRequest(
+                $order->getOrderNumber(),
                 $description,
-                $amount,
-                $items,
+                $amount
+            );
+
+            foreach ($items as $item) {
+                $refundRequest->addItem(new RefundRequestItem(
+                    (string)$item['id'],
+                    $item['amount'],
+                    (int)$item['quantity'],
+                    (int)$item['resetStock']
+                ));
+            }
+
+            $refund = $this->refundManager->refund(
+                $order,
+                $refundRequest,
                 $context
             );
 
             return $this->json([
-                'success' => ($refund instanceof Refund)
+                'success' => true,
+                'refundId' => $refund->id
             ]);
-
-        } catch (ShopwareHttpException $e) {
-
-            $this->logger->error($e->getMessage());
-            return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
 
         } catch (\Throwable $e) {
 
             $this->logger->error($e->getMessage());
-            return $this->json(['message' => $e->getMessage()], 500);
+
+            return $this->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ],
+                500
+            );
         }
     }
 
@@ -359,10 +403,12 @@ class RefundController extends AbstractController
      * @param Context $context
      * @return JsonResponse
      */
-    private function cancelResponse(string $orderId, string $refundId, Context $context): JsonResponse
+    private function cancelRefundAction(string $orderId, string $refundId, Context $context): JsonResponse
     {
         try {
-            $success = $this->refunds->cancelUsingOrderId($orderId, $refundId, $context);
+
+            $success = $this->refundManager->cancelRefund($orderId, $refundId, $context);
+
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());

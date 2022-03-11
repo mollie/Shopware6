@@ -47,7 +47,7 @@ class RefundOrderActionTest extends TestCase
         $order->setOrderNumber('ord-123');
 
         $fakeOrderService = new FakeOrderService($order);
-        $fakeRefund = new FakeRefundService();
+        $fakeRefund = new FakeRefundService(0);
 
         $flowEvent = $this->buildOrderStateFlowEvent($order, 'action.mollie.order.refund');
 

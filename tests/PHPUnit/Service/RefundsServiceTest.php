@@ -10,7 +10,7 @@ use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\MollieApi\Order as MollieOrderApi;
 use Kiener\MolliePayments\Service\MollieApi\Payment as MolliePaymentApi;
 use Kiener\MolliePayments\Service\OrderService;
-use Kiener\MolliePayments\Service\RefundService;
+use Kiener\MolliePayments\Service\Refund\RefundService;
 use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Service\UpdateOrderTransactionCustomFields;
 use Mollie\Api\Endpoints\OrderEndpoint;
@@ -76,14 +76,12 @@ class RefundsServiceTest extends TestCase
      * @param bool $isMollieOrder
      * @param string|null $paymentStatus
      * @param string|null $exceptionClass
+     * @return void
+     * @throws \Mollie\Api\Exceptions\ApiException
+     *
      * @dataProvider getRefundTestData
      */
-    public function testRefunds(
-        bool    $expected,
-        bool    $isMollieOrder,
-        ?string $paymentStatus,
-        ?string $exceptionClass
-    ): void
+    public function testRefunds(bool $expected, bool $isMollieOrder, ?string $paymentStatus, ?string $exceptionClass): void
     {
         $orderEntityMock = $this->getOrderEntityMock($isMollieOrder);
 
@@ -95,10 +93,12 @@ class RefundsServiceTest extends TestCase
             self::expectException($exceptionClass);
         }
 
-        $result = $this->refundService->refund(
+        $result = $this->refundService->refundPartial(
             $orderEntityMock,
+            'test refund',
             24.99,
-            'test refund'
+            [],
+            Context::createDefaultContext()
         );
 
         static::assertEquals($expected, $result instanceof Refund);

@@ -110,7 +110,9 @@ class RefundOrderAction extends FlowAction
 
             $this->refundService->refundFull(
                 $order,
-                'Refund through Shopware Flow Builder'
+                'Refund through Shopware Flow Builder',
+                [],
+                $baseEvent->getContext()
             );
 
         } catch (\Exception $ex) {

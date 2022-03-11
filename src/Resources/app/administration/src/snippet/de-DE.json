@@ -135,16 +135,22 @@
             "amount": "Betrag",
             "status": "Status",
             "description": "Beschreibung",
+            "composition": "Zusammensetzung",
             "date": "Datum"
           },
+          "lblNoComposition" : "Keine Zusammensetzung verfügbar",
           "btnCancelRefund": "Diese Rückerstattung stornieren"
         }
       },
       "notifications": {
-        "success": "Es wurde eine Rückerstattung bei Mollie erstellt. Es kann bis zu 2 Stunden dauern, bis die Rückerstattung abgeschlossen ist. Bis dahin können Sie die Rückerstattung stornieren.",
-        "error": "Beim Erstellen einer Rückerstattung ist etwas schief gelaufen.",
-        "errors": {
-          "low-amount": "Bitte geben Sie einen zu erstattenden Betrag ein."
+        "success": {
+          "refund-created": "Es wurde eine Rückerstattung bei Mollie erstellt. Es kann bis zu 2 Stunden dauern, bis die Rückerstattung abgeschlossen ist. Bis dahin können Sie die Rückerstattung stornieren.",
+          "refund-canceled": "Die ausstehende Rückerstattung wurde erfolgreich storniert und entfernt."
+        },
+        "error": {
+          "low-amount": "Bitte geben Sie einen zu erstattenden Betrag ein.",
+          "refund-created": "Beim Erstellen einer Rückerstattung ist etwas schief gelaufen.",
+          "refund-canceled": "Es gab ein Problem beim Löschen der ausstehenden Rückertattung. Bitte versuche es erneut im Mollie Dashboard."
         }
       }
     },
