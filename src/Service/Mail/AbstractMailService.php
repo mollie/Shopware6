@@ -35,6 +35,24 @@ abstract class AbstractMailService
         ];
     }
 
+    protected function filterFileAttachments(array $attachments = [])
+    {
+        return array_filter($attachments, function ($attachment) {
+            return is_string($attachment)
+                && file_exists($attachment);
+        });
+    }
+
+    protected function filterBinaryAttachments(array $attachments = [])
+    {
+        return array_filter($attachments, function ($attachment) {
+            return is_array($attachment)
+                && array_key_exists('content', $attachment)
+                && array_key_exists('fileName', $attachment)
+                && array_key_exists('mimeType', $attachment);
+        });
+    }
+
     /**
      * @return DataValidationDefinition
      */

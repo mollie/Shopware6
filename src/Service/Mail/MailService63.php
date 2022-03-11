@@ -45,28 +45,13 @@ class MailService63 extends AbstractMailService
         $definition = $this->getValidationDefinition();
         $this->dataValidator->validate($data, $definition);
 
-        $contents = $this->buildContents($data);
-
-        $fileAttachments = [];
-        $binAttachments = [];
-
-        if (!empty($attachments)) {
-            foreach ($attachments as $attachment) {
-                if (is_string($attachment)) {
-                    $fileAttachments[] = $attachment;
-                } else {
-                    $binAttachments[] = $attachment;
-                }
-            }
-        }
-
         $mail = $this->mailFactory->createMessage(
             $data['subject'],
             [$data['senderEmail'] => $data['senderName']],
             self::RECIPIENTS,
-            $contents,
-            $fileAttachments,
-            $binAttachments
+            $this->buildContents($data),
+            $this->filterFileAttachments($attachments),
+            $this->filterBinaryAttachments($attachments)
         );
 
         $mail->addReplyTo($data['replyToEmail'], $data['replyToName']);

@@ -52,29 +52,14 @@ class MailService extends AbstractMailService
         $definition = $this->getValidationDefinition();
         $this->dataValidator->validate($data, $definition);
 
-        $contents = $this->buildContents($data);
-
-        $fileAttachments = [];
-        $binAttachments = [];
-
-        if (!empty($attachments)) {
-            foreach ($attachments as $attachment) {
-                if (is_string($attachment)) {
-                    $fileAttachments[] = $attachment;
-                } else {
-                    $binAttachments[] = $attachment;
-                }
-            }
-        }
-
         $mail = $this->mailFactory->create(
             $data['subject'],
             ['no-reply@localhost' => 'Localhost'],
             self::RECIPIENTS,
-            $contents,
-            $fileAttachments,
-            [],
-            $binAttachments
+            $this->buildContents($data),
+            $this->filterFileAttachments($attachments),
+            [], // Additional data, but doesn't work properly.
+            $this->filterBinaryAttachments($attachments)
         );
 
         $mail->addReplyTo(...$this->formatMailAddresses([$data['replyToEmail'] => $data['replyToName']]));
