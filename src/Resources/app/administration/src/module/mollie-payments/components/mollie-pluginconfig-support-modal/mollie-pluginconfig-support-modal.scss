@@ -4,8 +4,6 @@
 
         dt, dd {
             border-bottom: none;
-
-
         }
 
         dt {
@@ -21,8 +19,16 @@
         }
     }
 
-    .sw-text-editor .sw-text-editor__content-editor p,
-    .sw-text-editor .sw-text-editor__content-editor div {
-        margin-top: 0;
+    .sw-text-editor .sw-text-editor__content-editor {
+        p {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+
+        div {
+            margin-top: 0;
+        }
     }
 }
+
+
