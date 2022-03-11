@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 abstract class AbstractMailService
 {
-    const RECIPIENTS = [
+    protected const RECIPIENTS = [
         // email => name
     ];
 
@@ -27,7 +27,7 @@ abstract class AbstractMailService
      */
     protected function buildContents(array $data): array
     {
-        $plain = strip_tags(str_replace(['<div>', '</div>'], "\r\n", $data['contentHtml']));
+        $plain = strip_tags(str_replace(['</p>', '<br>', '<br/>'], "\r\n", $data['contentHtml']));
 
         return [
             'text/html' => '<div style="font-family:arial; font-size:12px;">' . $data['contentHtml'] . '</div>',
