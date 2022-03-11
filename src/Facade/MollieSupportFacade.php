@@ -40,6 +40,7 @@ class MollieSupportFacade
         string  $replyToName,
         string  $replyToEmail,
         ?string $recipientLocale,
+        string  $noReplyHost,
         string  $subject,
         string  $contentHtml,
         Context $context
@@ -49,6 +50,7 @@ class MollieSupportFacade
             'replyToName',
             'replyToEmail',
             'recipientLocale',
+            'noReplyHost',
             'subject',
             'contentHtml'
         );

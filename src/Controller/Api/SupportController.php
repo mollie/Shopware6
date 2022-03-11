@@ -58,6 +58,7 @@ class SupportController extends AbstractController
             $name,
             $email,
             $recipientLocale,
+            $request->getHost(),
             $subject,
             $message,
             $context
@@ -75,6 +76,7 @@ class SupportController extends AbstractController
      */
     public function requestSupportLegacy(Request $request, Context $context): JsonResponse
     {
+
         $data = $request->request;
 
         $name = $data->get('name');
@@ -87,6 +89,7 @@ class SupportController extends AbstractController
             $name,
             $email,
             $recipientLocale,
+            $request->getHost(),
             $subject,
             $message,
             $context
@@ -97,6 +100,7 @@ class SupportController extends AbstractController
         string  $name,
         string  $email,
         ?string $recipientLocale,
+        string  $host,
         string  $subject,
         string  $message,
         Context $context
@@ -107,6 +111,7 @@ class SupportController extends AbstractController
                 $name,
                 $email,
                 $recipientLocale,
+                $host,
                 $subject,
                 $message,
                 $context
