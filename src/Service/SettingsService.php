@@ -40,13 +40,13 @@ class SettingsService
      * Get Mollie settings from configuration.
      *
      * @param string|null $salesChannelId
-     * @param bool $inheritGlobal
+     *
      * @return MollieSettingStruct
      */
-    public function getSettings(?string $salesChannelId = null, bool $inheritGlobal = true): MollieSettingStruct
+    public function getSettings(?string $salesChannelId = null): MollieSettingStruct
     {
         $structData = [];
-        $systemConfigData = $this->systemConfigService->getDomain(self::SYSTEM_CONFIG_DOMAIN, $salesChannelId, $inheritGlobal);
+        $systemConfigData = $this->systemConfigService->getDomain(self::SYSTEM_CONFIG_DOMAIN, $salesChannelId, true);
 
         foreach ($systemConfigData as $key => $value) {
             if (stripos($key, self::SYSTEM_CONFIG_DOMAIN) !== false) {
