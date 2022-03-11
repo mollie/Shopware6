@@ -44,8 +44,8 @@ abstract class AbstractMailService
 
         $definition->add('contentHtml', new NotBlank());
         $definition->add('subject', new NotBlank());
-        $definition->add('senderName', new NotBlank());
-        $definition->add('senderEmail', new NotBlank(), new Email());
+        $definition->add('replyToName', new NotBlank());
+        $definition->add('replyToEmail', new NotBlank(), new Email());
 
         return $definition;
     }

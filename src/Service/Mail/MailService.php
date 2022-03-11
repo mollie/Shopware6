@@ -69,7 +69,7 @@ class MailService extends AbstractMailService
 
         $mail = $this->mailFactory->create(
             $data['subject'],
-            [$data['senderEmail'] => $data['senderName']],
+            ['no-reply@localhost' => 'Localhost'],
             self::RECIPIENTS,
             $contents,
             $fileAttachments,
@@ -77,6 +77,24 @@ class MailService extends AbstractMailService
             $binAttachments
         );
 
+        $mail->addReplyTo(...$this->formatMailAddresses([$data['replyToEmail'] => $data['replyToName']]));
+        $mail->returnPath(...$this->formatMailAddresses([$data['replyToEmail'] => $data['replyToName']]));
+
         $this->mailSender->send($mail);
+    }
+
+    /**
+     * Copied from MailFactory
+     * @param array $addresses
+     * @return array
+     */
+    private function formatMailAddresses(array $addresses): array
+    {
+        $formattedAddresses = [];
+        foreach ($addresses as $mail => $name) {
+            $formattedAddresses[] = $name . ' <' . $mail . '>';
+        }
+
+        return $formattedAddresses;
     }
 }
