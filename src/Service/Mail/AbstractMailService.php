@@ -14,11 +14,13 @@ abstract class AbstractMailService
         // locale => recipients
         'de-DE' => [
             // email => name
+            'meinsupport@mollie.com' => 'Mollie Support DE',
         ]
     ];
 
     private const INT_RECIPIENTS = [
         // email => name
+        'info@mollie.com' => 'Mollie Support',
     ];
 
     /**

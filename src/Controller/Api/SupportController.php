@@ -76,7 +76,6 @@ class SupportController extends AbstractController
      */
     public function requestSupportLegacy(Request $request, Context $context): JsonResponse
     {
-
         $data = $request->request;
 
         $name = $data->get('name');
