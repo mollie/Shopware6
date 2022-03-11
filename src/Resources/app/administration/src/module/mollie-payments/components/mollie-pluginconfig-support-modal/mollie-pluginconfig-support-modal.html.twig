@@ -5,15 +5,22 @@
 
     <sw-container columns="10fr 4fr" gap="16px">
         <sw-container gap="16px" columns="1fr" align="start">
-            <sw-text-field v-model="name"
-                           label="Your name"
-                           :placeholder="userName"
-                           size="medium"/>
+            <sw-container columns="1fr 1fr" gap="16px">
+                <sw-text-field v-model="name"
+                               label="Your name"
+                               :placeholder="userName"
+                               size="medium"/>
 
-            <sw-email-field v-model="email"
-                            label="Your email"
-                            :placeholder="user.email"
-                            size="medium"/>
+                <sw-email-field v-model="email"
+                                label="Your email"
+                                :placeholder="user.email"
+                                size="medium"/>
+            </sw-container>
+
+            <sw-single-select v-model="recipient"
+                             label="Send request to"
+                             :options="recipientOptions"
+                             size="medium"/>
 
             <sw-text-field v-model="subject"
                            label="Subject"

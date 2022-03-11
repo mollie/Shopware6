@@ -2,7 +2,7 @@ import template from './mollie-pluginconfig-support-modal.html.twig';
 import './mollie-pluginconfig-support-modal.scss';
 
 // eslint-disable-next-line no-undef
-const { Component, Context, Mixin, State } = Shopware;
+const { Application, Component, Context, Mixin, State } = Shopware;
 // eslint-disable-next-line no-undef
 const { Criteria } = Shopware.Data;
 // eslint-disable-next-line no-undef
@@ -27,6 +27,18 @@ Component.register('mollie-pluginconfig-support-modal', {
             email: '',
             subject: '',
             message: '',
+
+            recipient: '',
+            recipientOptions: [
+                {
+                    label: "International Support",
+                    value: 'global',
+                },
+                {
+                    label: "German Support",
+                    value: 'de-DE',
+                },
+            ],
 
             isSubmitting: false,
             mailSent: false,
@@ -74,6 +86,10 @@ Component.register('mollie-pluginconfig-support-modal', {
             },
         },
 
+        locale() {
+            return Application.getContainer('factory').locale.getLastKnownLocale();
+        },
+
         user() {
             return State.get('session').currentUser;
         },
@@ -112,6 +128,8 @@ Component.register('mollie-pluginconfig-support-modal', {
 
     methods: {
         mountedComponent() {
+            this.determineDefaultSupportDesk();
+
             if (this.plugins.length === 0) {
                 if (this.shopwareExtensionService) {
                     this.shopwareExtensionService.updateExtensionData();
@@ -119,6 +137,12 @@ Component.register('mollie-pluginconfig-support-modal', {
                     this.loadPluginsLegacy();
                 }
             }
+        },
+
+        determineDefaultSupportDesk() {
+            this.recipient = this.recipientOptions.some(option => option.value === this.locale)
+                ? this.locale
+                : 'global';
         },
 
         loadPluginsLegacy() {
