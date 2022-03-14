@@ -200,7 +200,7 @@ Component.register('mollie-refund-manager', {
 
             // also make sure to uncheck our
             // verification checkbox and clean our text
-            this.checkRefund = false;
+            this.checkVerifyRefund = false;
             this.refundDescription = '';
         },
 
@@ -358,7 +358,7 @@ Component.register('mollie-refund-manager', {
         btnRefund_Click() {
 
             if (this.refundAmount <= 0.0) {
-                this._showNotificationWarning(this.$tc('mollie-payments.refund-manager.notifications.errors.low-amount'));
+                this._showNotificationWarning(this.$tc('mollie-payments.refund-manager.notifications.error.low-amount'));
                 return;
             }
 

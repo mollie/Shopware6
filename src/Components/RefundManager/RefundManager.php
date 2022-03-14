@@ -257,6 +257,13 @@ class RefundManager
 
         foreach ($request->getItems() as $requestItem) {
 
+            # if we have no quantity and no amount,
+            # then we have to skip this. this is no valid refund!
+            # this is crucial, otherwise we might do the wrong type of refund
+            if ($requestItem->getQuantity() === 0 && $requestItem->getAmount() === 0.0) {
+                continue;
+            }
+
             $mollieLineID = '';
             $shopwareReferenceID = '';
 
@@ -306,7 +313,7 @@ class RefundManager
                 $requestItem->getLineId(),
                 $mollieLineID,
                 (string)$shopwareReferenceID,
-                $requestItem->getStockIncreaseQty(),
+                $requestItem->getQuantity(),
                 $requestItem->getAmount()
             );
         }

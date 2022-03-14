@@ -155,14 +155,6 @@
       }
     },
     "modals": {
-      "refund": {
-        "confirmButton": "Rückerstatten",
-        "cancelButton": "Abbrechen",
-        "cancel": {
-          "success": "Die ausstehende Rückerstattung wurde erfolgreich storniert",
-          "error": "Fehler beim Stornieren der ausstehenden Rückerstattung"
-        }
-      },
       "shipping": {
         "title": "Versand an Mollie melden",
         "item": {

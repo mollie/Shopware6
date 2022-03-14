@@ -93,15 +93,20 @@ class RefundRequest
      */
     public function isFullRefundAmountOnly(): bool
     {
-        return ($this->amount === null && count($this->items) <= 0);
+        return ($this->amount === null && !$this->hasRefundableItemInstructions());
     }
 
     /**
+     * @param OrderEntity $order
      * @return bool
      */
     public function isFullRefundWithItems(OrderEntity $order): bool
     {
-        if (count($this->items) <= 0) {
+        if (!$this->hasRefundableItemInstructions()) {
+            return false;
+        }
+
+        if ($this->amount !== null) {
             return false;
         }
 
@@ -124,7 +129,7 @@ class RefundRequest
             return false;
         }
 
-        if (count($this->items) > 0) {
+        if ($this->hasRefundableItemInstructions()) {
             return false;
         }
 
@@ -133,6 +138,7 @@ class RefundRequest
     }
 
     /**
+     * @param OrderEntity $order
      * @return bool
      */
     public function isPartialAmountWithItems(OrderEntity $order): bool
@@ -141,7 +147,7 @@ class RefundRequest
             return false;
         }
 
-        if (count($this->items) <= 0) {
+        if (!$this->hasRefundableItemInstructions()) {
             return false;
         }
 
@@ -183,6 +189,21 @@ class RefundRequest
         }
 
         return $isDifferentAmount;
+    }
+
+    /**
+     * @return bool
+     */
+    private function hasRefundableItemInstructions(): bool
+    {
+        foreach ($this->items as $item) {
+
+            if ($item->getQuantity() > 0 || $item->getAmount() > 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

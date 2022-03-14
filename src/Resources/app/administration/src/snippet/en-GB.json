@@ -155,14 +155,6 @@
       }
     },
     "modals": {
-      "refund": {
-        "confirmButton": "Refund",
-        "cancelButton": "Do not refund",
-        "cancel": {
-          "success": "The pending refund has been successfully cancelled!",
-          "error": "Error when cancelling the pending refund!"
-        }
-      },
       "shipping": {
         "title": "Ship through Mollie",
         "item": {

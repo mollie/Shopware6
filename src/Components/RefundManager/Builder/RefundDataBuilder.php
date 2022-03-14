@@ -215,14 +215,14 @@ class RefundDataBuilder
         # so this is only stored because of our plugin in the metadata of the refunds.
         # we search for our item in the metadata composition of all refunds
 
-        /** @var Refund $refund */
+        /** @var array<mixed> $refund */
         foreach ($refunds as $refund) {
 
-            if (!isset($refund->metadata)) {
+            if (!isset($refund['metadata'])) {
                 continue;
             }
 
-            $metadata = RefundMetadata::fromArray($refund->metadata);
+            $metadata = RefundMetadata::fromArray($refund['metadata']);
 
             # if we do have a FULL item refund then
             # we must NOT substract our item again.

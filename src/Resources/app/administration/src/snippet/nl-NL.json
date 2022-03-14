@@ -77,29 +77,29 @@
         "unitQuantity": "pc."
       },
       "cart": {
-        "title": "Bestelling ##orderNumber##",
-        "btnSelectAll": "",
-        "btnResetForm": "",
-        "linkHowTo": "",
+        "title": "Order ##orderNumber##",
+        "btnSelectAll": "Select All",
+        "btnResetForm": "Reset Form",
+        "linkHowTo": "How to use this form?",
         "grid": {
           "columns": {
-            "item": "",
-            "productNumber": "",
-            "unitPrice": "",
-            "quantity": "",
-            "refunded": "",
-            "refundQuantity": "",
-            "totalPrice": "",
-            "refundAmount": "",
-            "resetStock": ""
+            "item": "Item",
+            "productNumber": "Product Number",
+            "unitPrice": "Unit Price",
+            "quantity": "Quantity",
+            "refunded": "Refunded",
+            "refundQuantity": "Refund",
+            "totalPrice": "Total",
+            "refundAmount": "Refund",
+            "resetStock": "Reset Stock"
           },
-          "btnResetLine": "",
-          "checkDeductPromotion": ""
+          "btnResetLine": "Reset Line",
+          "checkDeductPromotion": "Deduct promotion"
         }
       },
       "instructions": {
-        "linkResetTutorials": "",
-        "btnToggleTutorial": "",
+        "linkResetTutorials": "Reset Tutorials",
+        "btnToggleTutorial": "Show/Hide Tutorial",
         "titleFullRefund": "Full Refund",
         "textFullRefund": "Just use the button for the full refund. This makes sure that all your items are marked as refunded and the full amount is returned to the customer.",
         "titleStockReset": "Stock Reset",
@@ -114,55 +114,47 @@
         "textPartialPromotions": "If you have a promotion in your cart, then your promotion is a separate line item. If you want to refund all discounted items, go ahead and refund their total values and the full promotion line item itself. However, if you only want to refund a few items that were discounted, you can deduct the applied discount automatically for every single line item. You can of course always change values if they are not correct."
       },
       "summary": {
-        "dataLoading": "",
-        "captionTotal": "",
-        "captionTotalTaxFree": "",
-        "captionPendingRefunds": "",
-        "captionVouchers": "",
-        "captionRefunded": "",
-        "captionRemaining": "",
-        "btnFixDiff": "",
-        "placeholderDescription": "",
-        "checkVerification": "",
-        "btnRefund": "",
-        "btnFullRefund": ""
+        "dataLoading": "Data is loading...",
+        "captionTotal": "Total incl. taxes",
+        "captionTotalTaxFree": "Total",
+        "captionPendingRefunds": "Waiting to be refunded",
+        "captionVouchers": "Voucher amount",
+        "captionRefunded": "Refunded amount",
+        "captionRemaining": "Refundable amount",
+        "btnFixDiff": "Fix Difference",
+        "placeholderDescription": "add an optional description for your refund",
+        "checkVerification": "I have verified the total refund amount and the configured quantities to refund and re-stock.",
+        "btnRefund": "Refund",
+        "btnFullRefund": "Full Refund"
       },
       "refunds": {
-        "title": "",
-        "linkMore": "",
+        "title": "Refunds in the Mollie Dashboard",
+        "linkMore": "More about refunds",
         "grid": {
           "columns": {
-            "amount": "Bedrag",
+            "amount": "Amount",
             "status": "Status",
-            "description": "Beschrijving",
-            "composition": "Metadata",
-            "date": "Datum"
+            "description": "Description",
+            "composition": "Composition",
+            "date": "Date"
           },
-          "lblNoComposition" : "No composition available",
-          "btnCancelRefund": "Annuleer deze terugbetaling\n"
+          "lblNoComposition": "No composition available",
+          "btnCancelRefund": "Cancel this refund"
         }
       },
       "notifications": {
         "success": {
-          "refund-created": "Er is een terugbetaling aangemaakt bij Mollie. Het kan 2 uur duren voordat de terugbetaling is voltooid. Tot deze tijd kunt u de terugbetaling annuleren.",
-          "refund-canceled": ""
+          "refund-created": "A refund has been created in Mollie. It may take 2 hours for the refund to complete. Until this time, you can cancel the refund.",
+          "refund-canceled": "The pending refund has been successfully cancelled and removed."
         },
         "error": {
-          "low-amount": "Voer een terug te betalen bedrag in.",
-          "refund-created": "Er is iets mis gegaan bij het aanmaken van een terugbetaling.",
+          "low-amount": "Please enter an amount to be refunded.",
+          "refund-created": "Something went wrong creating a refund.",
           "refund-canceled": "There was a problem when cancelling the pending refund. Please try it again in the Mollie Dashboard."
         }
       }
     },
     "modals": {
-      "refund": {
-        "confirmButton": "Terugbetalen",
-        "cancelButton": "Niet terugbetalen",
-        "cancel": {
-          "success": "",
-          "error": ""
-        }
-      },
       "shipping": {
         "title": "Verzenden bij Mollie",
         "item": {
