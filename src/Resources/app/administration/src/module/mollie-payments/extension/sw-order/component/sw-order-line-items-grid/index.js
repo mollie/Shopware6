@@ -361,27 +361,31 @@ Component.override('sw-order-line-items-grid', {
         },
 
         shippableQuantity(item) {
-            if (this.shippingStatus === null) {
+            if (this.shippingStatus === null || this.shippingStatus === undefined) {
                 return '~';
             }
 
-            if (this.shippingStatus[item.id] === null) {
+            const itemShippingStatus = this.shippingStatus[item.id];
+
+            if (itemShippingStatus === null || itemShippingStatus === undefined) {
                 return '~';
             }
 
-            return this.shippingStatus[item.id].quantityShippable;
+            return itemShippingStatus.quantityShippable;
         },
 
         shippedQuantity(item) {
-            if (this.shippingStatus === null) {
+            if (this.shippingStatus === null || this.shippingStatus === undefined) {
                 return '~';
             }
 
-            if (this.shippingStatus[item.id] === null) {
+            const itemShippingStatus = this.shippingStatus[item.id];
+
+            if (itemShippingStatus === null || itemShippingStatus === undefined) {
                 return '~';
             }
 
-            return this.shippingStatus[item.id].quantityShipped;
+            return itemShippingStatus.quantityShipped;
         },
 
         //==== Tracking =============================================================================================//
