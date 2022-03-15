@@ -48,8 +48,8 @@
         "updatePaymentMethods": {
           "title": "Mollie Payments",
           "button": "Betaalmethoden updaten",
-          "succeeded": "De betaalmethoden zijn succesvol geüpdated.",
-          "failed": "De betaalmethoden konden niet worden geüpdated."
+          "succeeded": "De betaalmethoden zijn succesvol geupdated.",
+          "failed": "De betaalmethoden konden niet worden geupdated."
         },
         "mollieLimits": {
           "link": "Open betalingslimieten van Mollie"
@@ -74,83 +74,83 @@
     },
     "refund-manager": {
       "general": {
-        "unitQuantity": "pc."
+        "unitQuantity": "st."
       },
       "cart": {
-        "title": "Order ##orderNumber##",
-        "btnSelectAll": "Select All",
-        "btnResetForm": "Reset Form",
-        "linkHowTo": "How to use this form?",
+        "title": "Bestelling ##orderNumber##",
+        "btnSelectAll": "Alles selecteren",
+        "btnResetForm": "Formulier resetten",
+        "linkHowTo": "Hoe gebruik je dit formulier?",
         "grid": {
           "columns": {
-            "item": "Item",
-            "productNumber": "Product Number",
-            "unitPrice": "Unit Price",
-            "quantity": "Quantity",
-            "refunded": "Refunded",
-            "refundQuantity": "Refund",
-            "totalPrice": "Total",
-            "refundAmount": "Refund",
-            "resetStock": "Reset Stock"
+            "item": "Artikel",
+            "productNumber": "Artikelnummer",
+            "unitPrice": "Prijs per eenheid",
+            "quantity": "Aantal",
+            "refunded": "Vergoed",
+            "refundQuantity": "Vergoeding",
+            "totalPrice": "Totaal",
+            "refundAmount": "Vergoeding",
+            "resetStock": "Voorraad resetten"
           },
-          "btnResetLine": "Reset Line",
-          "checkDeductPromotion": "Deduct promotion"
+          "btnResetLine": "Rij resetten",
+          "checkDeductPromotion": "Promotie aftrekken"
         }
       },
       "instructions": {
-        "linkResetTutorials": "Reset Tutorials",
-        "btnToggleTutorial": "Show/Hide Tutorial",
-        "titleFullRefund": "Full Refund",
-        "textFullRefund": "Just use the button for the full refund. This makes sure that all your items are marked as refunded and the full amount is returned to the customer.",
-        "titleStockReset": "Stock Reset",
-        "textStockReset": "You can automatically increase the available stock by entering the quantity that you would like to put back in stock. Just enter it before proceeding with a full or partial refund. Resetting the stock can be combined with the actual refund process in a flexible way.",
-        "titleShipping": "Shipping",
-        "textShipping": "Shipping items can be refunded as any other produt item. Either enter the full quantity or a custom partial amount and proceed with the refund. Refunding shipping costs can be combined with the actual refund process of items in a flexible way.",
-        "titlePartialAmount": "Partial Refund (only amount)",
-        "textPartialAmount": "Just enter the partial amount in the text field and start the refund.",
-        "titlePartialItems": "Partial Refund (with items)",
-        "textPartialItems": "If you want to mark quantities and items as refunded in Mollie, use the form above. Set your quantities and provide a custom amount for every item that will be refunded. The total sum will then be visible in the final refund amount text field. Remember, it's still possible to adjust this final amount before starting your refund.",
-        "titlePartialPromotions": "Partial Refund (with promotions)",
-        "textPartialPromotions": "If you have a promotion in your cart, then your promotion is a separate line item. If you want to refund all discounted items, go ahead and refund their total values and the full promotion line item itself. However, if you only want to refund a few items that were discounted, you can deduct the applied discount automatically for every single line item. You can of course always change values if they are not correct."
+        "linkResetTutorials": "Handleidingen resetten",
+        "btnToggleTutorial": "Handleidingen tonen/verbergen",
+        "titleFullRefund": "Volledige terugbetaling",
+        "textFullRefund": "Gebruik gewoon de knop voor de volledige terugbetaling. Dit zorgt ervoor dat alle artikelen worden gemarkeerd als terugbetaald en het volledige bedrag wordt vergoed aan de klant.",
+        "titleStockReset": "Voorraad resetten",
+        "textStockReset": "Je kunt de beschikbare voorraad automatisch verhogen door de hoeveelheid in te voeren die u weer op voorraad wilt hebben. Dit moet je invoeren voordat je overgaat tot een volledige of gedeeltelijke terugbetaling. Het terugzetten van de voorraad kan op een flexibele manier gecombineerd worden met het eigenlijke terugbetalingsproces.",
+        "titleShipping": "Verzendkosten",
+        "textShipping": "Verzendkosten kunnen worden terugbetaald zoals elk ander artikel. Voer de volledige hoeveelheid in of een aangepast deelbedrag en ga verder met de terugbetaling. Het terugbetalen van verzendkosten kan op een flexibele manier gecombineerd worden met het eigenlijke terugbetalingsproces van artikelen.",
+        "titlePartialAmount": "Gedeeltelijke terugbetaling (enkel een bedrag)",
+        "textPartialAmount": "Voer gewoon het deelbedrag in het tekstveld in en start de terugbetaling.",
+        "titlePartialItems": "Gedeeltelijke terugbetaling (met artikelen)",
+        "textPartialItems": "Als u hoeveelheden en artikelen als terugbetaald wilt markeren in Mollie, gebruik dan bovenstaand formulier. Stel uw hoeveelheden in en geef een aangepast bedrag op voor elk item dat zal worden terugbetaald. De totale som zal dan zichtbaar zijn in het tekstveld met het finale terugbetalingsbedrag. Vergeet niet dat het nog steeds mogelijk is om dit eindbedrag aan te passen voordat u de terugbetaling start.",
+        "titlePartialPromotions": "Gedeeltelijke terugbetaling (met promotions)",
+        "textPartialPromotions": "Als je een promotion in je winkelwagen hebt, dan is de promotion een eigen line item. Als je alle afgeprijsde artikelen wilt terugbetalen, dan kann je de totale waarde van alle artikelen terugbetalen en ook de promotie zelf. Als u echter slechts een paar afgeprijsde artikelen wilt terugbetalen, kunt je de aangepaste korting automatisch aftrekken voor elk afzonderlijk artikel. Je kunt natuurlijk altijd de waarden veranderen mochten ze niet juist zijn."
       },
       "summary": {
-        "dataLoading": "Data is loading...",
-        "captionTotal": "Total incl. taxes",
-        "captionTotalTaxFree": "Total",
-        "captionPendingRefunds": "Waiting to be refunded",
-        "captionVouchers": "Voucher amount",
-        "captionRefunded": "Refunded amount",
-        "captionRemaining": "Refundable amount",
-        "btnFixDiff": "Fix Difference",
-        "placeholderDescription": "add an optional description for your refund",
-        "checkVerification": "I have verified the total refund amount and the configured quantities to refund and re-stock.",
-        "btnRefund": "Refund",
-        "btnFullRefund": "Full Refund"
+        "dataLoading": "Gegevens worden geladen...",
+        "captionTotal": "Totaal incl. belasting",
+        "captionTotalTaxFree": "Totaal",
+        "captionPendingRefunds": "Wachtend op terugbetaling",
+        "captionVouchers": "Voucher bedrag",
+        "captionRefunded": "Terugbetaald bedrag",
+        "captionRemaining": "Terugbetaalbaar bedrag",
+        "btnFixDiff": "Herstel verschil",
+        "placeholderDescription": "Een optionele beschrijving aan terugbetaling toevoegen",
+        "checkVerification": "Ik heb het totale restitutiebedrag en de geconfigureerde hoeveelheden voor restitutie en herbevoorrading geverifieerd.",
+        "btnRefund": "Terugbetaling",
+        "btnFullRefund": "Volledige terugbetaling"
       },
       "refunds": {
-        "title": "Refunds in the Mollie Dashboard",
-        "linkMore": "More about refunds",
+        "title": "Terugbetalingen in het Mollie Dashboard",
+        "linkMore": "Meer over terugbetalingen",
         "grid": {
           "columns": {
-            "amount": "Amount",
+            "amount": "Bedrag",
             "status": "Status",
-            "description": "Description",
-            "composition": "Composition",
-            "date": "Date"
+            "description": "Beschrijving",
+            "composition": "Samenstelling",
+            "date": "Datum"
           },
-          "lblNoComposition": "No composition available",
-          "btnCancelRefund": "Cancel this refund"
+          "lblNoComposition": "Geen samenstelling beschikbaar",
+          "btnCancelRefund": "Annuleer deze terugbetaling"
         }
       },
       "notifications": {
         "success": {
-          "refund-created": "A refund has been created in Mollie. It may take 2 hours for the refund to complete. Until this time, you can cancel the refund.",
-          "refund-canceled": "The pending refund has been successfully cancelled and removed."
+          "refund-created": "Er is een terugbetaling aangemaakt in Mollie. Het kan 2 uur duren voordat de terugbetaling is voltooid. Tot die tijd kan de terugbetaling worden geannuleerd.",
+          "refund-canceled": "De uitstaande terugbetaling is met succes geannuleerd en verwijderd."
         },
         "error": {
-          "low-amount": "Please enter an amount to be refunded.",
-          "refund-created": "Something went wrong creating a refund.",
-          "refund-canceled": "There was a problem when cancelling the pending refund. Please try it again in the Mollie Dashboard."
+          "low-amount": "Vull een terug te betalen bedrag in",
+          "refund-created": "Er is iets misgegaan bij het aanmaken van een terugbetaling.",
+          "refund-canceled": "Er is een probleem opgetreden bij het annuleren van de uitstaande terugbetaling. Probeer het opnieuw in het Mollie Dashboard."
         }
       }
     },
