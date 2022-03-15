@@ -141,6 +141,8 @@ class PaymentMethodService
 
             if ($existingPaymentMethod instanceof PaymentMethodEntity) {
                 $paymentMethodData = [
+                    # ALWAYS ADD THE ID, otherwise upsert would create NEW entries!
+                    'id' => $existingPaymentMethod->getId(),
                     'handlerIdentifier' => $paymentMethod['handler'],
                     # ------------------------------------------
                     # make sure to repair some fields in here
