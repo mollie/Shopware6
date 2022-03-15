@@ -11,6 +11,7 @@ use Mollie\Api\Types\PaymentMethod;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Framework\Rule\Container\ContainerInterface;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class BankTransferPayment extends PaymentHandler
@@ -26,15 +27,15 @@ class BankTransferPayment extends PaymentHandler
     /** @var SettingsService */
     private $settingsService;
 
-    public function __construct(
-        LoggerInterface $logger,
-        MolliePaymentDoPay $payFacade,
-        MolliePaymentFinalize $finalizeFacade,
-        TransactionTransitionServiceInterface $transactionTransitionService,
-        SettingsService $settingsService
-    )
+
+    /**
+     * @param LoggerInterface $logger
+     * @param \Psr\Container\ContainerInterface $container
+     * @param SettingsService $settingsService
+     */
+    public function __construct(LoggerInterface $logger, \Psr\Container\ContainerInterface $container, SettingsService $settingsService)
     {
-        parent::__construct($logger, $payFacade, $finalizeFacade, $transactionTransitionService);
+        parent::__construct($logger, $container);
         $this->settingsService = $settingsService;
     }
 
@@ -46,10 +47,10 @@ class BankTransferPayment extends PaymentHandler
      * @return array
      */
     public function processPaymentMethodSpecificParameters(
-        array $orderData,
-        OrderEntity $orderEntity,
+        array               $orderData,
+        OrderEntity         $orderEntity,
         SalesChannelContext $salesChannelContext,
-        CustomerEntity $customer
+        CustomerEntity      $customer
     ): array
     {
         $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
