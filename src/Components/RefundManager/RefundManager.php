@@ -135,9 +135,12 @@ class RefundManager
         $refund = null;
 
         if ($request->isFullRefundAmountOnly()) {
-            $refund = $this->refundService->refundFull(
+            # full amount refunds cannot be done without items
+            # so we have to do a partial refund with the full amount
+            $refund = $this->refundService->refundPartial(
                 $order,
                 $request->getDescription(),
+                $order->getAmountTotal(),
                 [],
                 $context
             );
@@ -256,13 +259,6 @@ class RefundManager
         $serviceItems = [];
 
         foreach ($request->getItems() as $requestItem) {
-
-            # if we have no quantity and no amount,
-            # then we have to skip this. this is no valid refund!
-            # this is crucial, otherwise we might do the wrong type of refund
-            if ($requestItem->getQuantity() === 0 && $requestItem->getAmount() === 0.0) {
-                continue;
-            }
 
             $mollieLineID = '';
             $shopwareReferenceID = '';

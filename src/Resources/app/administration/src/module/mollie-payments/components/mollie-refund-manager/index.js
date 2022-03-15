@@ -417,6 +417,7 @@ Component.register('mollie-refund-manager', {
             this.MolliePaymentsRefundService.refundAll(
                 {
                     orderId: this.order.id,
+                    description: this.refundDescription,
                 })
                 .then((response) => {
 

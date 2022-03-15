@@ -11,17 +11,15 @@ import PaymentAction from "Actions/storefront/checkout/PaymentAction";
 import DummyBasketScenario from "Scenarios/DummyBasketScenario";
 import AdminOrdersAction from "Actions/admin/AdminOrdersAction";
 import AdminLoginAction from "Actions/admin/AdminLoginAction";
-import OrderDetailsRepository from "Repositories/admin/orders/OrderDetailsRepository";
-import MollieRefundManagerRepository from "Repositories/admin/orders/MollieRefundManagerRepository";
+import RefundManagerAction from "Actions/admin/RefundManagerAction";
+import RefundManagerRepository from "Repositories/admin/refund-manager/RefundManagerRepository";
 
 
 const devices = new Devices();
 const session = new Session();
-const element = new Element();
+const elementHelper = new Element();
 const shopware = new Shopware();
 
-const repoOrdersDetails = new OrderDetailsRepository();
-const repoRefundManager = new MollieRefundManagerRepository();
 
 const configAction = new ShopConfigurationAction();
 const checkout = new CheckoutAction();
@@ -29,6 +27,9 @@ const paymentAction = new PaymentAction();
 const molliePayment = new PaymentScreenAction();
 const adminOrders = new AdminOrdersAction();
 const adminLogin = new AdminLoginAction();
+const refundManager = new RefundManagerAction();
+
+const repoRefundManager = new RefundManagerRepository();
 
 const scenarioDummyBasket = new DummyBasketScenario(1);
 
@@ -48,85 +49,92 @@ context("Order Refunds", () => {
 
     context(devices.getDescription(device), () => {
 
-        it('Refund Manager not available if not paid', () => {
+        it.only('Create full refund and cancel it', () => {
 
-            scenarioDummyBasket.execute();
-            paymentAction.switchPaymentMethod('Pay later');
+            createOrderAndOpenAdmin();
 
-            shopware.prepareDomainChange();
-            checkout.placeOrderOnConfirm();
 
-            molliePayment.initSandboxCookie();
-            molliePayment.selectAuthorized();
+            const REFUND_DESCRIPTION = 'full refund with Cypress';
 
-            adminLogin.login();
-            adminOrders.openOrders();
-            adminOrders.openLastOrder();
+            // -------------------------------------------------------------------------------
 
-            repoOrdersDetails.getMollieActionsButton().click();
-            repoOrdersDetails.getMollieActionButtonRefundOrder().should('have.class', 'is--disabled');
-        })
+            // open the refund manager
+            // and start a partial refund of 2 EUR
+            adminOrders.openRefundManager();
 
-        it('Refund Order in Admin', () => {
+            // check if our button is disabled if
+            // the checkbox for the verification is not enabled
+            repoRefundManager.getFullRefundButton().should('be.disabled');
 
-            scenarioDummyBasket.execute();
-            paymentAction.switchPaymentMethod('PayPal');
+            // now start the partial refund
+            refundManager.fullRefund(REFUND_DESCRIPTION);
 
-            shopware.prepareDomainChange();
-            checkout.placeOrderOnConfirm();
-
-            molliePayment.initSandboxCookie();
-            molliePayment.selectPaid();
-
-            adminLogin.login();
-            adminOrders.openOrders();
-            adminOrders.openLastOrder();
-
-            // now refund our order with 1 EUR
-            adminOrders.refundOrder("1");
-
-            // after refunded, open the refund manager
-            // and verify that we see a PENDING refund in it as well as
-            // the correct 1 EUR value.
-            repoOrdersDetails.getMollieActionsButton().click();
-            repoOrdersDetails.getMollieActionButtonRefundOrder().click();
+            // verify that our refund now exists
             repoRefundManager.getFirstRefundStatusLabel().contains('Pending');
+            repoRefundManager.getFirstRefundDescriptionLabel().contains(REFUND_DESCRIPTION);
 
-            // because of (weird) number formats which might not be the same all the time (even if they should)
-            // we just search within multiple formats
-            element.containsText(
-                repoRefundManager.getFirstRefundAmountLabel(),
-                ['1.00', '1,00']
-            )
+            // -------------------------------------------------------------------------------
+
+            // now cancel our pending refund
+            // and make sure that its gone afterwards
+            refundManager.cancelPendingRefund();
+            cy.contains(REFUND_DESCRIPTION).should('not.exist')
         })
 
-        it('Cancel pending refund in Admin', () => {
 
-            scenarioDummyBasket.execute();
-            paymentAction.switchPaymentMethod('PayPal');
+        it('Create partial refund and cancel it', () => {
 
-            shopware.prepareDomainChange();
-            checkout.placeOrderOnConfirm();
+            createOrderAndOpenAdmin();
 
-            molliePayment.initSandboxCookie();
-            molliePayment.selectPaid();
 
-            adminLogin.login();
-            adminOrders.openOrders();
-            adminOrders.openLastOrder();
+            const REFUND_DESCRIPTION = 'partial refund with Cypress';
 
-            // now refund our order with 1 EUR
-            adminOrders.refundOrder("1");
+            // -------------------------------------------------------------------------------
 
-            // afterwards, try to cancel our refund again
-            adminOrders.cancelOrderRefund();
+            // open the refund manager
+            // and start a partial refund of 2 EUR
+            adminOrders.openRefundManager();
 
-            // let's open the refund manager, and verify
-            // that the pending refund is NOT existing anymore
-            repoOrdersDetails.getMollieActionsButton().click();
-            repoOrdersDetails.getMollieActionButtonRefundOrder().click();
-            cy.contains('Pending').should('not.exist');
+            // check if our button is disabled if
+            // the checkbox for the verification is not enabled
+            repoRefundManager.getRefundButton().should('be.disabled');
+
+            // now start the partial refund
+            refundManager.partialAmountRefund(2, REFUND_DESCRIPTION);
+
+            // verify that our refund now exists
+            repoRefundManager.getFirstRefundStatusLabel().contains('Pending');
+            repoRefundManager.getFirstRefundDescriptionLabel().contains(REFUND_DESCRIPTION);
+            // because of (weird) number formats which might not be the same
+            // all the time (even if they should) we just search within multiple formats
+            elementHelper.assertContainsText(
+                repoRefundManager.getFirstRefundAmountLabel(),
+                ['2.00', '2,00']
+            )
+
+            // -------------------------------------------------------------------------------
+
+            // now cancel our pending refund
+            // and make sure that its gone afterwards
+            refundManager.cancelPendingRefund();
+            cy.contains(REFUND_DESCRIPTION).should('not.exist')
         })
 
     })
 })
+
+
+function createOrderAndOpenAdmin() {
+    scenarioDummyBasket.execute();
+    paymentAction.switchPaymentMethod('PayPal');
+
+    shopware.prepareDomainChange();
+    checkout.placeOrderOnConfirm();
+
+    molliePayment.initSandboxCookie();
+    molliePayment.selectPaid();
+
+    adminLogin.login();
+    adminOrders.openOrders();
+    adminOrders.openLastOrder();
+}
