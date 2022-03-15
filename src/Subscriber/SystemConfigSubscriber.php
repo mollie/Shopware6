@@ -51,7 +51,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface
     {
         foreach ($event->getPayloads() as $payload) {
             $this->checkSystemConfigChange(
-                $payload['configurationKey'],
+                (string)$payload['configurationKey'],
                 $payload['configurationValue'],
                 $payload['salesChannelId'],
                 $event->getContext()
