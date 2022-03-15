@@ -49,7 +49,7 @@ context("Order Refunds", () => {
 
     context(devices.getDescription(device), () => {
 
-        it.only('Create full refund and cancel it', () => {
+        it('Create full refund and cancel it', () => {
 
             createOrderAndOpenAdmin();
 
