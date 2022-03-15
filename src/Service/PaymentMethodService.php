@@ -9,6 +9,7 @@ use Kiener\MolliePayments\Handler\Method\BelfiusPayment;
 use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
 use Kiener\MolliePayments\Handler\Method\EpsPayment;
 use Kiener\MolliePayments\Handler\Method\GiftCardPayment;
+use Kiener\MolliePayments\Handler\Method\GiroPayPayment;
 use Kiener\MolliePayments\Handler\Method\iDealPayment;
 use Kiener\MolliePayments\Handler\Method\IngHomePayPayment;
 use Kiener\MolliePayments\Handler\Method\KbcPayment;
@@ -374,9 +375,9 @@ class PaymentMethodService
             // DirectDebitPayment::class,   // Is removed for now because it's only used for recurring
             EpsPayment::class,
             GiftCardPayment::class,
-            # GiroPayPayment::class, // not allowed anymore
+            GiroPayPayment::class,
             iDealPayment::class,
-            IngHomePayPayment::class,
+            // IngHomePayPayment::class, // not allowed anymore
             KbcPayment::class,
             KlarnaPayLaterPayment::class,
             KlarnaPayNowPayment::class,
