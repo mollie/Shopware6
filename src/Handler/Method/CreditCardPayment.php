@@ -8,6 +8,7 @@ use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Mollie\Api\Types\PaymentMethod;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -28,21 +29,19 @@ class CreditCardPayment extends PaymentHandler
 
     public function __construct(
         LoggerInterface $logger,
-        MolliePaymentDoPay $payFacade,
-        MolliePaymentFinalize $finalizeFacade,
-        TransactionTransitionServiceInterface $transactionTransitionService,
+        ContainerInterface         $container,
         CustomerService $customerService
     )
     {
-        parent::__construct($logger, $payFacade, $finalizeFacade, $transactionTransitionService);
+        parent::__construct($logger, $container);
         $this->customerService = $customerService;
     }
 
     public function processPaymentMethodSpecificParameters(
-        array $orderData,
-        OrderEntity $orderEntity,
+        array               $orderData,
+        OrderEntity         $orderEntity,
         SalesChannelContext $salesChannelContext,
-        CustomerEntity $customer
+        CustomerEntity      $customer
     ): array
     {
         $customFields = $customer->getCustomFields() ?? [];

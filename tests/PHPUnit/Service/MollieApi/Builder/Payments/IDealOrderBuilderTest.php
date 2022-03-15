@@ -4,21 +4,32 @@ namespace MolliePayments\Tests\Service\MollieApi\Builder;
 
 use DateTime;
 use DateTimeZone;
-use Kiener\MolliePayments\Handler\Method\SofortPayment;
+use Faker\Extension\Container;
+use Kiener\MolliePayments\Handler\Method\iDealPayment;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Mollie\Api\Types\PaymentMethod;
+use MolliePayments\Tests\Fakes\FakeContainer;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Currency\CurrencyEntity;
 
-class SofortOrderBuilderTest extends AbstractMollieOrderBuilder
+class IDealOrderBuilderTest extends AbstractMollieOrderBuilder
 {
     public function testOrderBuild(): void
     {
         $redirectWebhookUrl = 'https://foo';
         $this->router->method('generate')->willReturn($redirectWebhookUrl);
-        $paymentMethod = PaymentMethod::SOFORT;
-        $this->paymentHandler = new SofortPayment($this->loggerService, $this->mollieDoPaymentFacade, $this->molliePaymentFinalize, $this->transitionService);
+        $paymentMethod = PaymentMethod::IDEAL;
+
+        $this->paymentHandler = new iDealPayment(
+            $this->loggerService,
+            new FakeContainer()
+        );
+
+        $preferredIdealIssuer = 'preferredIssuer';
+        $this->customer->setCustomFields([
+            'mollie_payments' => ['preferred_ideal_issuer' => $preferredIdealIssuer]
+        ]);
 
         $transactionId = Uuid::randomHex();
         $amountTotal = 27.0;
@@ -45,7 +56,10 @@ class SofortOrderBuilderTest extends AbstractMollieOrderBuilder
             'locale' => $this->localeCode,
             'method' => $paymentMethod,
             'orderNumber' => $orderNumber,
-            'payment' => ['webhookUrl' => $redirectWebhookUrl],
+            'payment' => [
+                'webhookUrl' => $redirectWebhookUrl,
+                'issuer' => $preferredIdealIssuer
+            ],
             'redirectUrl' => $redirectWebhookUrl,
             'webhookUrl' => $redirectWebhookUrl,
             'lines' => $this->getExpectedLineItems($taxStatus, $lineItems, $currency),

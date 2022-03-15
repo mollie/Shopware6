@@ -4,21 +4,31 @@ namespace MolliePayments\Tests\Service\MollieApi\Builder;
 
 use DateTime;
 use DateTimeZone;
-use Kiener\MolliePayments\Handler\Method\KbcPayment;
+use Faker\Extension\Container;
+use Kiener\MolliePayments\Handler\Method\PaySafeCardPayment;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Mollie\Api\Types\PaymentMethod;
+use MolliePayments\Tests\Fakes\FakeContainer;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Currency\CurrencyEntity;
 
-class KbcOrderBuilderTest extends AbstractMollieOrderBuilder
+class PaySafeOrderBuilderTest extends AbstractMollieOrderBuilder
 {
     public function testOrderBuild(): void
     {
         $redirectWebhookUrl = 'https://foo';
         $this->router->method('generate')->willReturn($redirectWebhookUrl);
-        $paymentMethod = PaymentMethod::KBC;
-        $this->paymentHandler = new KbcPayment($this->loggerService, $this->mollieDoPaymentFacade, $this->molliePaymentFinalize, $this->transitionService);
+        $paymentMethod = PaymentMethod::PAYSAFECARD;
+
+        $this->paymentHandler = new PaySafeCardPayment(
+            $this->loggerService,
+            new FakeContainer()
+        );
+
+
+        $customerNumber = 'fooBar';
+        $this->customer->setCustomerNumber($customerNumber);
 
         $transactionId = Uuid::randomHex();
         $amountTotal = 27.0;
@@ -29,7 +39,7 @@ class KbcOrderBuilderTest extends AbstractMollieOrderBuilder
         $currency->setId(Uuid::randomHex());
         $currency->setIsoCode($currencyISO);
 
-        $orderNumber = 'foo number very long';
+        $orderNumber = 'foo number';
         $lineItems = $this->getDummyLineItems();
 
         $order = $this->getOrderEntity($amountTotal, $taxStatus, $currency, $lineItems, $orderNumber);
@@ -46,7 +56,8 @@ class KbcOrderBuilderTest extends AbstractMollieOrderBuilder
             'method' => $paymentMethod,
             'orderNumber' => $orderNumber,
             'payment' => [
-                'webhookUrl' => $redirectWebhookUrl
+                'webhookUrl' => $redirectWebhookUrl,
+                'customerReference' => $customerNumber
             ],
             'redirectUrl' => $redirectWebhookUrl,
             'webhookUrl' => $redirectWebhookUrl,

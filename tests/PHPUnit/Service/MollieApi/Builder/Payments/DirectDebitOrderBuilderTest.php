@@ -4,26 +4,33 @@ namespace MolliePayments\Tests\Service\MollieApi\Builder;
 
 use DateTime;
 use DateTimeZone;
-use Kiener\MolliePayments\Handler\Method\iDealPayment;
+use Faker\Extension\Container;
+use Kiener\MolliePayments\Handler\Method\DirectDebitPayment;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Mollie\Api\Types\PaymentMethod;
+use MolliePayments\Tests\Fakes\FakeContainer;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Currency\CurrencyEntity;
 
-class IDealOrderBuilderTest extends AbstractMollieOrderBuilder
+class DirectDebitOrderBuilderTest extends AbstractMollieOrderBuilder
 {
     public function testOrderBuild(): void
     {
         $redirectWebhookUrl = 'https://foo';
         $this->router->method('generate')->willReturn($redirectWebhookUrl);
-        $paymentMethod = PaymentMethod::IDEAL;
-        $this->paymentHandler = new iDealPayment($this->loggerService, $this->mollieDoPaymentFacade, $this->molliePaymentFinalize, $this->transitionService);
-        $preferredIdealIssuer = 'preferredIssuer';
-        $this->customer->setCustomFields([
-            'mollie_payments' => ['preferred_ideal_issuer' => $preferredIdealIssuer]
-        ]);
+        $paymentMethod = PaymentMethod::DIRECTDEBIT;
 
+
+        $this->paymentHandler = new DirectDebitPayment(
+            $this->loggerService,
+            new FakeContainer()
+        );
+
+        $firstName = 'First';
+        $lastName = 'Last';
+        $this->customer->setFirstName($firstName);
+        $this->customer->setLastName($lastName);
         $transactionId = Uuid::randomHex();
         $amountTotal = 27.0;
         $taxStatus = CartPrice::TAX_STATE_GROSS;
@@ -51,7 +58,7 @@ class IDealOrderBuilderTest extends AbstractMollieOrderBuilder
             'orderNumber' => $orderNumber,
             'payment' => [
                 'webhookUrl' => $redirectWebhookUrl,
-                'issuer' => $preferredIdealIssuer
+                'consumerName' => sprintf('%s %s', $firstName, $lastName)
             ],
             'redirectUrl' => $redirectWebhookUrl,
             'webhookUrl' => $redirectWebhookUrl,

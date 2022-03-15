@@ -8,6 +8,7 @@ use Kiener\MolliePayments\Facade\MolliePaymentFinalize;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
 use Mollie\Api\Exceptions\ApiException;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -16,7 +17,6 @@ use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\AsynchronousPaymentHandle
 use Shopware\Core\Checkout\Payment\Exception\AsyncPaymentFinalizeException;
 use Shopware\Core\Checkout\Payment\Exception\CustomerCanceledAsyncPaymentException;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
-use Shopware\Core\System\Locale\LocaleEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -46,20 +46,22 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
     /** @var MolliePaymentFinalize */
     private $finalizeFacade;
 
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
+
 
     /**
      * @param LoggerInterface $logger
-     * @param MolliePaymentDoPay $payFacade
-     * @param MolliePaymentFinalize $finalizeFacade
-     * @param TransactionTransitionServiceInterface $transactionTransitionService
+     * @param ContainerInterface $container
      */
-    public function __construct(LoggerInterface $logger, MolliePaymentDoPay $payFacade, MolliePaymentFinalize $finalizeFacade, TransactionTransitionServiceInterface $transactionTransitionService)
+    public function __construct(LoggerInterface $logger, ContainerInterface $container)
     {
         $this->logger = $logger;
-        $this->payFacade = $payFacade;
-        $this->transactionTransitionService = $transactionTransitionService;
-        $this->finalizeFacade = $finalizeFacade;
+        $this->container = $container;
     }
+
 
     /**
      * @param array $orderData
@@ -91,6 +93,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      */
     public function pay(AsyncPaymentTransactionStruct $transaction, RequestDataBag $dataBag, SalesChannelContext $salesChannelContext): RedirectResponse
     {
+        $this->loadServices();
 
         $this->logger->info(
             'Starting Checkout for order ' . $transaction->getOrder()->getOrderNumber() . ' with payment: ' . $this->paymentMethod,
@@ -152,6 +155,8 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      */
     public function finalize(AsyncPaymentTransactionStruct $transaction, Request $request, SalesChannelContext $salesChannelContext): void
     {
+        $this->loadServices();
+
         $orderAttributes = new MollieOrderCustomFieldsStruct($transaction->getOrder()->getCustomFields());
         $molliedID = $orderAttributes->getMollieOrderId();
 
@@ -194,4 +199,25 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             );
         }
     }
+
+    /**
+     * Attention!!!! With Shopware 6.4.9.0 there was suddenly a circular reference with these services.
+     * but ONLY if the tag "shopware.payment.method.async" was used in the service xml.
+     * So it seems as if that tag leads to a certain time during DI where things might just be under
+     * construction and not already existing, so that a circular reference is occurring?
+     * I have no clue, but lazy loading will fix this.
+     *
+     * @return void
+     * @throws \Exception
+     */
+    private function loadServices(): void
+    {
+        /** @var \Symfony\Component\DependencyInjection\Container $container */
+        $container = $this->container;#
+
+        $this->payFacade = $container->get('Kiener\MolliePayments\Facade\MolliePaymentDoPay');
+        $this->finalizeFacade = $container->get('Kiener\MolliePayments\Facade\MolliePaymentFinalize');
+        $this->transactionTransitionService = $container->get('Kiener\MolliePayments\Service\Transition\TransactionTransitionService');
+    }
+
 }

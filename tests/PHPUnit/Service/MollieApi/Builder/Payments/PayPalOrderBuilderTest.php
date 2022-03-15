@@ -4,9 +4,11 @@ namespace MolliePayments\Tests\Service\MollieApi\Builder;
 
 use DateTime;
 use DateTimeZone;
+use Faker\Extension\Container;
 use Kiener\MolliePayments\Handler\Method\PayPalPayment;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Mollie\Api\Types\PaymentMethod;
+use MolliePayments\Tests\Fakes\FakeContainer;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -19,7 +21,11 @@ class PayPalOrderBuilderTest extends AbstractMollieOrderBuilder
         $redirectWebhookUrl = 'https://foo';
         $this->router->method('generate')->willReturn($redirectWebhookUrl);
         $paymentMethod = PaymentMethod::PAYPAL;
-        $this->paymentHandler = new PayPalPayment($this->loggerService, $this->mollieDoPaymentFacade, $this->molliePaymentFinalize, $this->transitionService);
+
+        $this->paymentHandler = new PayPalPayment(
+            $this->loggerService,
+            new FakeContainer()
+        );
 
         $transactionId = Uuid::randomHex();
         $amountTotal = 27.0;
@@ -63,7 +69,11 @@ class PayPalOrderBuilderTest extends AbstractMollieOrderBuilder
         $redirectWebhookUrl = 'https://foo';
         $this->router->method('generate')->willReturn($redirectWebhookUrl);
         $paymentMethod = PaymentMethod::PAYPAL;
-        $this->paymentHandler = new PayPalPayment($this->loggerService, $this->mollieDoPaymentFacade, $this->molliePaymentFinalize, $this->transitionService);
+
+        $this->paymentHandler = new PayPalPayment(
+            $this->loggerService,
+            new FakeContainer()
+        );
 
         $transactionId = Uuid::randomHex();
         $amountTotal = 42.0;
