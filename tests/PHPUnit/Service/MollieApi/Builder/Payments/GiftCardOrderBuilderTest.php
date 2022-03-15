@@ -4,21 +4,27 @@ namespace MolliePayments\Tests\Service\MollieApi\Builder;
 
 use DateTime;
 use DateTimeZone;
-use Kiener\MolliePayments\Handler\Method\Przelewy24Payment;
+use Faker\Extension\Container;
+use Kiener\MolliePayments\Handler\Method\GiftCardPayment;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Mollie\Api\Types\PaymentMethod;
+use MolliePayments\Tests\Fakes\FakeContainer;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Currency\CurrencyEntity;
 
-class Przelewy24OrderBuilderTest extends AbstractMollieOrderBuilder
+class GiftCardOrderBuilderTest extends AbstractMollieOrderBuilder
 {
     public function testOrderBuild(): void
     {
         $redirectWebhookUrl = 'https://foo';
         $this->router->method('generate')->willReturn($redirectWebhookUrl);
-        $paymentMethod = PaymentMethod::PRZELEWY24;
-        $this->paymentHandler = new Przelewy24Payment($this->loggerService, $this->mollieDoPaymentFacade, $this->molliePaymentFinalize, $this->transitionService);
+        $paymentMethod = PaymentMethod::GIFTCARD;
+
+        $this->paymentHandler = new GiftCardPayment(
+            $this->loggerService,
+            new FakeContainer()
+        );
 
         $transactionId = Uuid::randomHex();
         $amountTotal = 27.0;
@@ -45,9 +51,7 @@ class Przelewy24OrderBuilderTest extends AbstractMollieOrderBuilder
             'locale' => $this->localeCode,
             'method' => $paymentMethod,
             'orderNumber' => $orderNumber,
-            'payment' => [
-                'webhookUrl' => $redirectWebhookUrl
-            ],
+            'payment' => ['webhookUrl' => $redirectWebhookUrl],
             'redirectUrl' => $redirectWebhookUrl,
             'webhookUrl' => $redirectWebhookUrl,
             'lines' => $this->getExpectedLineItems($taxStatus, $lineItems, $currency),

@@ -2,23 +2,31 @@
 
 namespace MolliePayments\Tests\Service\MollieApi\Builder;
 
+
 use DateTime;
 use DateTimeZone;
-use Kiener\MolliePayments\Handler\Method\GiftCardPayment;
+use Faker\Extension\Container;
+use Kiener\MolliePayments\Handler\Method\BanContactPayment;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Mollie\Api\Types\PaymentMethod;
+use MolliePayments\Tests\Fakes\FakeContainer;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Currency\CurrencyEntity;
 
-class GiftCardOrderBuilderTest extends AbstractMollieOrderBuilder
+class BanContactOrderBuilderTest extends AbstractMollieOrderBuilder
 {
     public function testOrderBuild(): void
     {
         $redirectWebhookUrl = 'https://foo';
         $this->router->method('generate')->willReturn($redirectWebhookUrl);
-        $paymentMethod = PaymentMethod::GIFTCARD;
-        $this->paymentHandler = new GiftCardPayment($this->loggerService, $this->mollieDoPaymentFacade, $this->molliePaymentFinalize, $this->transitionService);
+        $paymentMethod = PaymentMethod::BANCONTACT;
+
+
+        $this->paymentHandler = new BanContactPayment(
+            $this->loggerService,
+            new FakeContainer()
+        );
 
         $transactionId = Uuid::randomHex();
         $amountTotal = 27.0;

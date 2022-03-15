@@ -4,10 +4,12 @@ namespace MolliePayments\Tests\Service\MollieApi\Builder;
 
 use DateTime;
 use DateTimeZone;
+use Faker\Extension\Container;
 use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Mollie\Api\Types\PaymentMethod;
+use MolliePayments\Tests\Fakes\FakeContainer;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Currency\CurrencyEntity;
@@ -22,7 +24,12 @@ class CreditCardOrderBuilderTest extends AbstractMollieOrderBuilder
         /** @var CustomerService $customerService */
         $customerService = $this->getMockBuilder(CustomerService::class)->disableOriginalConstructor()->getMock();
         $customerService->expects($this->never())->method('setCardToken');
-        $this->paymentHandler = new CreditCardPayment($this->loggerService, $this->mollieDoPaymentFacade, $this->molliePaymentFinalize, $this->transitionService, $customerService);
+
+        $this->paymentHandler = new CreditCardPayment(
+            $this->loggerService,
+            new FakeContainer(),
+            $customerService
+        );
 
         $transactionId = Uuid::randomHex();
         $amountTotal = 27.0;
@@ -70,7 +77,13 @@ class CreditCardOrderBuilderTest extends AbstractMollieOrderBuilder
         /** @var CustomerService $customerService */
         $customerService = $this->getMockBuilder(CustomerService::class)->disableOriginalConstructor()->getMock();
         $customerService->expects($this->once())->method('setCardToken');
-        $this->paymentHandler = new CreditCardPayment($this->loggerService, $this->mollieDoPaymentFacade, $this->molliePaymentFinalize, $this->transitionService, $customerService);
+
+        $this->paymentHandler = new CreditCardPayment(
+            $this->loggerService,
+            new FakeContainer(),
+            $customerService
+        );
+
         $this->customer->setCustomFields(['mollie_payments' => ['credit_card_token' => $token]]);
 
         $transactionId = Uuid::randomHex();
