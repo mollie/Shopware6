@@ -129,6 +129,9 @@ export default class ShopConfigurationAction {
      */
     _activatePaymentMethods() {
 
+        // this is flaky...maybe we just give a bit time?
+        cy.wait(1000);
+
         this.apiClient.get('/payment-method').then(payments => {
 
             if (payments === undefined || payments === null) {
