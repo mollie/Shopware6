@@ -44,7 +44,7 @@ class RefundItem
         $this->mollieLineID = $mollieLineID;
         $this->shopwareReference = $shopwareReference;
         $this->quantity = $quantity;
-        $this->amount = $amount;
+        $this->amount = round($amount, 2);
     }
 
 

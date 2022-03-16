@@ -94,6 +94,7 @@ class RefundManagerTest extends TestCase
         $order->setId('O1');
         $order->setOrderNumber('ord-123');
         $order->setSalesChannelId('SC1');
+        $order->setAmountTotal(9999);
 
         /** @var Context $fakeContext */
         $fakeContext = $this->createDummyMock(Context::class, $this);
