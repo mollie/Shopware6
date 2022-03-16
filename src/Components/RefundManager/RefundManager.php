@@ -23,6 +23,7 @@ use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttribut
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Refund;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
@@ -285,7 +286,7 @@ class RefundManager
             } else {
 
                 # yeah i know complexity...but for now lets keep it compact :)
-                if ($order->getDeliveries() !== null) {
+                if ($order->getDeliveries() instanceof OrderDeliveryCollection) {
                     # if we do not have an item
                     # then it might be a delivery in Shopware
                     foreach ($order->getDeliveries() as $delivery) {
