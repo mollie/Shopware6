@@ -68,7 +68,7 @@
             <argument type="service" id="Kiener\MolliePayments\Hydrator\RefundHydrator"/>
         </service>
 
-        <service id="StockManager">
+        <service id="Kiener\MolliePayments\Service\Stock\StockManager">
             <argument type="service" id="Doctrine\DBAL\Connection"/>
         </service>
 
