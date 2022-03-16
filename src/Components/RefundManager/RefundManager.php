@@ -8,6 +8,7 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFact
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactoryInterface;
 use Kiener\MolliePayments\Components\RefundManager\Builder\RefundDataBuilder;
+use Kiener\MolliePayments\Components\RefundManager\Integrators\StockManagerInterface;
 use Kiener\MolliePayments\Components\RefundManager\RefundData\RefundData;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieRefundException;
@@ -17,8 +18,7 @@ use Kiener\MolliePayments\Service\OrderServiceInterface;
 use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
 use Kiener\MolliePayments\Service\Refund\RefundService;
 use Kiener\MolliePayments\Service\Refund\RefundServiceInterface;
-use Kiener\MolliePayments\Service\Stock\StockUpdater;
-use Kiener\MolliePayments\Service\Stock\StockUpdaterInterface;
+use Kiener\MolliePayments\Service\Stock\StockManager;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Refund;
@@ -51,9 +51,9 @@ class RefundManager
     private $builderData;
 
     /**
-     * @var StockUpdaterInterface
+     * @var StockManagerInterface
      */
-    private $stockUpdater;
+    private $stockManager;
 
     /**
      * @var FlowBuilderDispatcherAdapterInterface
@@ -78,17 +78,17 @@ class RefundManager
      * @param Order $mollieOrder
      * @param FlowBuilderFactoryInterface $flowBuilderFactory
      * @param FlowBuilderEventFactory $flowBuilderEventFactory
-     * @param StockUpdaterInterface $stockUpdater
+     * @param StockManagerInterface $stockUpdater
      * @param LoggerInterface $logger
      * @throws \Exception
      */
-    public function __construct(RefundDataBuilder $refundDataBuilder, OrderServiceInterface $orderService, RefundServiceInterface $refundService, Order $mollieOrder, FlowBuilderFactoryInterface $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, StockUpdaterInterface $stockUpdater, LoggerInterface $logger)
+    public function __construct(RefundDataBuilder $refundDataBuilder, OrderServiceInterface $orderService, RefundServiceInterface $refundService, Order $mollieOrder, FlowBuilderFactoryInterface $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, StockManagerInterface $stockUpdater, LoggerInterface $logger)
     {
         $this->builderData = $refundDataBuilder;
         $this->orderService = $orderService;
         $this->mollie = $mollieOrder;
         $this->refundService = $refundService;
-        $this->stockUpdater = $stockUpdater;
+        $this->stockManager = $stockUpdater;
         $this->logger = $logger;
 
         $this->flowBuilderEventFactory = $flowBuilderEventFactory;
@@ -177,10 +177,13 @@ class RefundManager
 
         $refundAmount = (float)$refund->amount->value;
 
+
+
         # DISPATCH FLOW BUILDER
         # ---------------------------------------------------------------------------------------------
         $event = $this->flowBuilderEventFactory->buildRefundStartedEvent($order, $refundAmount, $context);
         $this->flowBuilderDispatcher->dispatch($event);
+
 
 
         # ---------------------------------------------------------------------------------------------
@@ -197,11 +200,12 @@ class RefundManager
             $orderItem = $this->getOrderItem($order, $item->getLineId());
 
             if ($orderItem instanceof OrderLineItemEntity) {
-                # extract our product id from
-                # the reference ID
-                $productID = (string)$orderItem->getReferencedId();
-                # and now simply increase that stock
-                $this->stockUpdater->increaseStock($productID, $item->getStockIncreaseQty());
+                # and now simply call our stock manager
+                $this->stockManager->increaseStock(
+                    $orderItem,
+                    $item->getStockIncreaseQty(),
+                    $refund->id
+                );
             }
         }
 

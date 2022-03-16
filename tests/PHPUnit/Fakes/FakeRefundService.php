@@ -24,16 +24,23 @@ class FakeRefundService implements RefundServiceInterface
     private $refundedOrder;
 
     /**
+     * @var string
+     */
+    private $refundID;
+
+    /**
      * @var float
      */
     private $refundAmount;
 
 
     /**
+     * @param string $refundID
      * @param float $refundAmount
      */
-    public function __construct(float $refundAmount)
+    public function __construct(string $refundID, float $refundAmount)
     {
+        $this->refundID = $refundID;
         $this->refundAmount = $refundAmount;
 
         $this->fullyRefunded = false;
@@ -135,6 +142,8 @@ class FakeRefundService implements RefundServiceInterface
     private function buildFakeRefund(): Refund
     {
         $refund = new Refund(new MollieApiClient());
+
+        $refund->id = $this->refundID;
 
         $refund->amount = new \stdClass();
         $refund->amount->value = $this->refundAmount;

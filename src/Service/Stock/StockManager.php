@@ -4,12 +4,15 @@ namespace Kiener\MolliePayments\Service\Stock;
 
 
 use Doctrine\DBAL\Connection;
+use Kiener\MolliePayments\Components\RefundManager\Integrators\StockManagerInterface;
+use Mollie\Api\Resources\Refund;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\DataAbstractionLayer\Doctrine\RetryableQuery;
 use Shopware\Core\Framework\Uuid\Uuid;
 
 
-class StockUpdater implements StockUpdaterInterface
+class StockManager implements StockManagerInterface
 {
 
     /**
@@ -27,12 +30,26 @@ class StockUpdater implements StockUpdaterInterface
     }
 
     /**
-     * @param string $productID
+     * @param OrderLineItemEntity $lineItem
      * @param int $quantity
+     * @param string $mollieRefundID
      * @return void
+     * @throws \Doctrine\DBAL\Exception
      */
-    public function increaseStock(string $productID, int $quantity): void
+    public function increaseStock(OrderLineItemEntity $lineItem, int $quantity, string $mollieRefundID): void
     {
+        if ($lineItem->getPayload() === null) {
+            return;
+        }
+
+        # check if we have a product
+        if (!isset($lineItem->getPayload()['productNumber'])) {
+            return;
+        }
+
+        # extract our PRODUCT ID from the reference ID
+        $productID = (string)$lineItem->getReferencedId();
+
         $update = new RetryableQuery(
             $this->connection,
             $this->connection->prepare(

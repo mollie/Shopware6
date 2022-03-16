@@ -14,7 +14,7 @@ use MolliePayments\Tests\Fakes\FakeOrderService;
 use MolliePayments\Tests\Fakes\FakeRefundService;
 use MolliePayments\Tests\Fakes\FlowBuilder\FakeFlowBuilderDispatcher;
 use MolliePayments\Tests\Fakes\FlowBuilder\FakeFlowBuilderFactory;
-use MolliePayments\Tests\Fakes\StockUpdater\FakeStockUpdater;
+use MolliePayments\Tests\Fakes\StockUpdater\FakeStockManager;
 use MolliePayments\Tests\Traits\MockTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
@@ -40,7 +40,7 @@ class RefundManagerTest extends TestCase
     private $fakeFlowBuilderDispatcher;
 
     /**
-     * @var FakeStockUpdater
+     * @var FakeStockManager
      */
     private $fakeStockUpdater;
 
@@ -59,8 +59,8 @@ class RefundManagerTest extends TestCase
         $order->setOrderNumber('ord-123');
 
         $fakeOrderService = new FakeOrderService($order);
-        $fakeRefundService = new FakeRefundService(9999);
-        $this->fakeStockUpdater = new FakeStockUpdater();
+        $fakeRefundService = new FakeRefundService('r-xyz-123', 9999);
+        $this->fakeStockUpdater = new FakeStockManager();
 
         /** @var Order $fakeOrder */
         $fakeOrder = $this->createDummyMock(Order::class, $this);
@@ -134,6 +134,7 @@ class RefundManagerTest extends TestCase
         $order->setSalesChannelId('SC1');
 
         $item1 = new OrderLineItemEntity();
+        $item1->setLabel('Product T-Shirt');
         $item1->setId('line-1');
         $item1->setUnitPrice(19.99);
         $item1->setReferencedId('product-id-1');
@@ -152,8 +153,13 @@ class RefundManagerTest extends TestCase
         $refund = $this->manager->refund($order, $refundRequest, $fakeContext);
 
 
+        # first verify if it was called
+        $this->assertEquals(true, $this->fakeStockUpdater->isCalled(), 'Stock Updater was not called');
+        # and now verify the passed data
+        $this->assertEquals('Product T-Shirt', $this->fakeStockUpdater->getLineItemLabel());
         $this->assertEquals('product-id-1', $this->fakeStockUpdater->getProductID());
         $this->assertEquals(1, $this->fakeStockUpdater->getQuantity());
+        $this->assertEquals('r-xyz-123', $this->fakeStockUpdater->getMollieRefundID());
     }
 
 }
