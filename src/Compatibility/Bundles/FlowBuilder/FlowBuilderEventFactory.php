@@ -12,7 +12,9 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatus
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedExpiredEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedFailedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedPaidEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedPartialRefundedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedPendingEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedRefundedEvent;
 use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -147,6 +149,34 @@ class FlowBuilderEventFactory
         }
 
         return new WebhookReceivedChargebackEvent($orderEntity, $context);
+    }
+
+    /**
+     * @param OrderEntity $orderEntity
+     * @param Context $context
+     * @return DummyEvent|WebhookReceivedRefundedEvent
+     */
+    public function buildWebhookReceivedRefundedEvent(OrderEntity $orderEntity, Context $context)
+    {
+        if ($this->versionCompare->lt(FlowBuilderFactory::FLOW_BUILDER_MIN_VERSION)) {
+            return new DummyEvent();
+        }
+
+        return new WebhookReceivedRefundedEvent($orderEntity, $context);
+    }
+
+    /**
+     * @param OrderEntity $orderEntity
+     * @param Context $context
+     * @return DummyEvent|WebhookReceivedPartialRefundedEvent
+     */
+    public function buildWebhookReceivedPartialRefundedEvent(OrderEntity $orderEntity, Context $context)
+    {
+        if ($this->versionCompare->lt(FlowBuilderFactory::FLOW_BUILDER_MIN_VERSION)) {
+            return new DummyEvent();
+        }
+
+        return new WebhookReceivedPartialRefundedEvent($orderEntity, $context);
     }
 
     /**
