@@ -105,10 +105,7 @@ class RefundRequest
         if (!$this->hasRefundableItemInstructions()) {
             return false;
         }
-
-        if ($this->amount !== null) {
-            return false;
-        }
+        
 
         $itemsDifferToCartAmount = $this->isDifferentAmount($order);
 
