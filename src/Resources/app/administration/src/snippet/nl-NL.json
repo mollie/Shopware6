@@ -8,7 +8,10 @@
       "mollie_webhook_received_status_expired": " Mollie Webhook Ontvangen (Vervallen)",
       "mollie_webhook_received_status_pending": " Mollie Webhook Ontvangen (In Afwachting)",
       "mollie_webhook_received_status_paid": " Mollie Webhook Ontvangen (Betaald)",
-      "mollie_webhook_received_status_completed": " Mollie Webhook Ontvangen (Voltooid)"
+      "mollie_webhook_received_status_completed": " Mollie Webhook Ontvangen (Voltooid)",
+      "mollie_webhook_received_status_refunded": " Mollie Webhook Ontvangen (Terugbetaald)",
+      "mollie_webhook_received_status_partially_refunded": " Mollie Webhook Ontvangen (Gedeeltelijk terugbetaald)",
+      "mollie_refund_started": " Mollie terugbetaling gestart"
     }
   },
   "mollie-payments": {

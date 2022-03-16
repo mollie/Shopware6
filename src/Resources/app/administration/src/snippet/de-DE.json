@@ -8,7 +8,10 @@
       "mollie_webhook_received_status_expired": " Mollie Webhook empfangen (Abgelaufen)",
       "mollie_webhook_received_status_pending": " Mollie Webhook empfangen (Wartend)",
       "mollie_webhook_received_status_paid": " Mollie Webhook empfangen (Bezahlt)",
-      "mollie_webhook_received_status_completed": " Mollie Webhook empfangen (Komplett)"
+      "mollie_webhook_received_status_completed": " Mollie Webhook empfangen (Komplett)",
+      "mollie_webhook_received_status_refunded": " Mollie Webhook empfangen (Rückerstattet)",
+      "mollie_webhook_received_status_partially_refunded": " Mollie Webhook empfangen (Teilweise Rückerstattet)",
+      "mollie_refund_started": " Mollie Rückerstattung gestartet"
     }
   },
   "mollie-payments": {
