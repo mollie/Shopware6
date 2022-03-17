@@ -46,45 +46,92 @@ class ConfigController extends AbstractController
 
     /**
      * @RouteScope(scopes={"api"})
-     * @Route("/api/v{version}/_action/mollie/config/test-api-keys",
-     *         defaults={"auth_enabled"=true}, name="api.action.mollie.config.test-api-keys", methods={"POST"})
+     * @Route("/api/v{version}/_action/mollie/config/test-api-keys", defaults={"auth_enabled"=true}, name="api.action.mollie.config.test-api-keys", methods={"POST"})
      *
      * @param Request $request
-     *
      * @return JsonResponse
      */
     public function testApiKeys(Request $request): JsonResponse
     {
-        // Get the live API key
         $liveApiKey = $request->get('liveApiKey');
-
-        // Get the test API key
         $testApiKey = $request->get('testApiKey');
 
-        return $this->getResponse($liveApiKey, $testApiKey);
+        return $this->testApiKeysAction($liveApiKey, $testApiKey);
     }
 
     /**
      * @RouteScope(scopes={"api"})
-     * @Route("/api/_action/mollie/config/test-api-keys",
-     *         defaults={"auth_enabled"=true}, name="api.action.mollie.config.test-api-keys-64", methods={"POST"})
+     * @Route("/api/_action/mollie/config/test-api-keys", defaults={"auth_enabled"=true}, name="api.action.mollie.config.test-api-keys-64", methods={"POST"})
      *
      * @param Request $request
-     *
      * @return JsonResponse
      */
     public function testApiKeys64(Request $request): JsonResponse
     {
-        // Get the live API key
         $liveApiKey = $request->get('liveApiKey');
-
-        // Get the test API key
         $testApiKey = $request->get('testApiKey');
 
-        return $this->getResponse($liveApiKey, $testApiKey);
+        return $this->testApiKeysAction($liveApiKey, $testApiKey);
     }
 
-    private function getResponse(string $liveApiKey, string $testApiKey): JsonResponse
+    /**
+     * This route can be used to verify if there might be any warnings when using the flow builder.
+     * Some automation settings might interfere with the flow builder and thus we try to
+     * at least let the merchant know about it.
+     * @RouteScope(scopes={"api"})
+     * @Route("/api/_action/mollie/config/validate/flowbuilder",
+     *         defaults={"auth_enabled"=true}, name="api.action.mollie.config.validate.flowbuilder", methods={"POST"})
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function validateFlowBuilder(Request $request, Context $context): JsonResponse
+    {
+        $locale = (string)$request->get('locale');
+
+        if (empty($locale)) {
+            $locale = 'en-GB';
+        }
+
+
+        $automaticShippingFound = false;
+
+        $allConfigs = $this->settings->getAllSalesChannelSettings($context);
+
+        /**
+         * @var string $scID
+         * @var MollieSettingStruct $scConfig
+         */
+        foreach ($allConfigs as $scID => $scConfig) {
+            if ($scConfig->getAutomaticShipping()) {
+                $automaticShippingFound = true;
+            }
+        }
+
+
+        $warnings = [];
+
+        if ($automaticShippingFound) {
+            $warnings[] = $this->getAdminSnippet('mollie-payments.sw-flow.actions.warnings.automaticShipping', $locale);
+        }
+
+        return new JsonResponse([
+            'locale' => $locale,
+            'actions' => [
+                'shipping' => [
+                    'warnings' => $warnings
+                ],
+            ],
+        ]);
+    }
+
+
+    /**
+     * @param string $liveApiKey
+     * @param string $testApiKey
+     * @return JsonResponse
+     */
+    private function testApiKeysAction(string $liveApiKey, string $testApiKey): JsonResponse
     {
         /** @var array $keys */
         $keys = [
@@ -131,59 +178,6 @@ class ConfigController extends AbstractController
 
         return new JsonResponse([
             'results' => $results
-        ]);
-    }
-
-    /**
-     * This route can be used to verify if there might be any warnings when using the flow builder.
-     * Some automation settings might interfere with the flow builder and thus we try to
-     * at least let the merchant know about it.
-     *
-     * @RouteScope(scopes={"api"})
-     * @Route("/api/_action/mollie/config/validate/flowbuilder",
-     *         defaults={"auth_enabled"=true}, name="api.action.mollie.config.validate.flowbuilder", methods={"POST"})
-     *
-     * @param Request $request
-     *
-     * @return JsonResponse
-     */
-    public function validateFlowBuilder(Request $request, Context $context): JsonResponse
-    {
-        $locale = (string)$request->get('locale');
-
-        if (empty($locale)) {
-            $locale = 'en-GB';
-        }
-
-
-        $automaticShippingFound = false;
-
-        $allConfigs = $this->settings->getAllSalesChannelSettings($context);
-
-        /**
-         * @var string $scID
-         * @var MollieSettingStruct $scConfig
-         */
-        foreach ($allConfigs as $scID => $scConfig) {
-            if ($scConfig->getAutomaticShipping()) {
-                $automaticShippingFound = true;
-            }
-        }
-
-
-        $warnings = [];
-
-        if ($automaticShippingFound) {
-            $warnings[] = $this->getAdminSnippet('mollie-payments.sw-flow.actions.warnings.automaticShipping', $locale);
-        }
-
-        return new JsonResponse([
-            'locale' => $locale,
-            'actions' => [
-                'shipping' => [
-                    'warnings' => $warnings
-                ],
-            ],
         ]);
     }
 
