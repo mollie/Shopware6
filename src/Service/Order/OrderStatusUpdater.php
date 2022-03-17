@@ -8,6 +8,7 @@ use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterfa
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity;
@@ -70,64 +71,74 @@ class OrderStatusUpdater
 
     /**
      * @param OrderTransactionEntity $transaction
-     * @param string $status
+     * @param string $targetShopwareStatusKey
      * @param Context $context
+     * @return void
      * @throws \Exception
      */
-    public function updatePaymentStatus(OrderTransactionEntity $transaction, string $status, Context $context): void
+    public function updatePaymentStatus(OrderTransactionEntity $transaction, string $targetShopwareStatusKey, Context $context): void
     {
-        $transactionState = $transaction->getStateMachineState();
+        $currentShopwareState = $transaction->getStateMachineState();
 
-        if (!$transactionState instanceof StateMachineStateEntity) {
+        if (!$currentShopwareState instanceof StateMachineStateEntity) {
             return;
         }
+
+        $currentShopwareStatusKey = $currentShopwareState->getTechnicalName();
+
 
         # if we already have the target status then
         # skip this progress and don't do anything
-        if ($transactionState->getTechnicalName() === $status) {
+        if ($currentShopwareStatusKey === $targetShopwareStatusKey) {
             return;
         }
 
-        switch ($status) {
+        switch ($targetShopwareStatusKey) {
             case MolliePaymentStatus::MOLLIE_PAYMENT_OPEN:
-                $this->transactionTransitionService->reOpenTransaction($transaction, $context);
-
+                {
+                    # if we are already in_progress...then don't switch to OPEN again
+                    # otherwise SEPA bank transfer would switch back to OPEN
+                    if ($currentShopwareStatusKey !== OrderTransactionStates::STATE_IN_PROGRESS) {
+                        $this->transactionTransitionService->reOpenTransaction($transaction, $context);
+                    }
+                }
                 break;
+
             case MolliePaymentStatus::MOLLIE_PAYMENT_AUTHORIZED:
                 $this->transactionTransitionService->authorizeTransaction($transaction, $context);
-
                 break;
+
             case MolliePaymentStatus::MOLLIE_PAYMENT_CHARGEBACK:
                 $this->transactionTransitionService->chargebackTransaction($transaction, $context);
-
                 break;
+
             case MolliePaymentStatus::MOLLIE_PAYMENT_PENDING:
-
                 break;
+
             case MolliePaymentStatus::MOLLIE_PAYMENT_PAID:
             case MolliePaymentStatus::MOLLIE_PAYMENT_COMPLETED:
                 $this->transactionTransitionService->payTransaction($transaction, $context);
-
                 break;
+
             case MolliePaymentStatus::MOLLIE_PAYMENT_FAILED:
             case MolliePaymentStatus::MOLLIE_PAYMENT_EXPIRED:
                 $this->transactionTransitionService->failTransaction($transaction, $context);
-
                 break;
+
             case MolliePaymentStatus::MOLLIE_PAYMENT_CANCELED:
                 $this->transactionTransitionService->cancelTransaction($transaction, $context);
-
                 break;
+
             case MolliePaymentStatus::MOLLIE_PAYMENT_REFUNDED:
                 $this->transactionTransitionService->refundTransaction($transaction, $context);
-
                 break;
+
             case MolliePaymentStatus::MOLLIE_PAYMENT_PARTIALLY_REFUNDED:
                 $this->transitionHandler->refundPartially($transaction->getId(), $context);
-
                 break;
+
             default:
-                throw new \Exception('Updating Payment Status of Order not possible for status: ' . $status);
+                throw new \Exception('Updating Payment Status of Order not possible for status: ' . $targetShopwareStatusKey);
         }
 
         # last but not least,

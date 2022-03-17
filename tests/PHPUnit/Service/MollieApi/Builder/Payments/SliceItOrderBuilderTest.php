@@ -2,24 +2,29 @@
 
 namespace MolliePayments\Tests\Service\MollieApi\Builder;
 
-
 use DateTime;
 use DateTimeZone;
-use Kiener\MolliePayments\Handler\Method\GiroPayPayment;
+use Faker\Extension\Container;
+use Kiener\MolliePayments\Handler\Method\KlarnaSliceItPayment;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Mollie\Api\Types\PaymentMethod;
+use MolliePayments\Tests\Fakes\FakeContainer;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Currency\CurrencyEntity;
 
-class GiroPayOrderBuilderTest extends AbstractMollieOrderBuilder
+class SliceItOrderBuilderTest extends AbstractMollieOrderBuilder
 {
     public function testOrderBuild(): void
     {
         $redirectWebhookUrl = 'https://foo';
         $this->router->method('generate')->willReturn($redirectWebhookUrl);
-        $paymentMethod = PaymentMethod::GIROPAY;
-        $this->paymentHandler = new GiroPayPayment($this->loggerService, $this->mollieDoPaymentFacade, $this->molliePaymentFinalize, $this->transitionService);
+        $paymentMethod = PaymentMethod::KLARNA_SLICE_IT;
+
+        $this->paymentHandler = new KlarnaSliceItPayment(
+            $this->loggerService,
+            new FakeContainer()
+        );
 
         $transactionId = Uuid::randomHex();
         $amountTotal = 27.0;

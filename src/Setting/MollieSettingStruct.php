@@ -91,6 +91,11 @@ class MollieSettingStruct extends Struct
     protected $automaticShipping;
 
     /**
+     * @var string[]
+     */
+    protected $applePayDirectRestrictions = [];
+
+    /**
      * @var string
      */
     protected $orderStateWithAPaidTransaction = self::ORDER_STATE_SKIP;
@@ -356,6 +361,14 @@ class MollieSettingStruct extends Struct
             ->setTimezone(new DateTimeZone('UTC'))
             ->modify(sprintf('+%d day', $orderLifeTimeDays))
             ->format('Y-m-d');
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getRestrictApplePayDirect(): array
+    {
+        return $this->applePayDirectRestrictions;
     }
 
     /**

@@ -20,6 +20,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEve
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
+use Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -57,6 +58,9 @@ class CustomerService
     /** @var string */
     private $shopwareVersion;
 
+    /** @var NumberRangeValueGeneratorInterface */
+    private $valueGenerator;
+
     /**
      * Creates a new instance of the customer service.
      *
@@ -69,17 +73,19 @@ class CustomerService
      * @param EntityRepositoryInterface $salutationRepository
      * @param SettingsService $settingsService
      * @param string $shopwareVersion
+     * @param NumberRangeValueGeneratorInterface $valueGenerator
      */
     public function __construct(
-        EntityRepositoryInterface    $countryRepository,
-        EntityRepositoryInterface    $customerRepository,
-        Customer                     $customerApiService,
-        EventDispatcherInterface     $eventDispatcher,
-        LoggerInterface              $logger,
-        SalesChannelContextPersister $salesChannelContextPersister,
-        EntityRepositoryInterface    $salutationRepository,
-        SettingsService              $settingsService,
-        string                       $shopwareVersion
+        EntityRepositoryInterface          $countryRepository,
+        EntityRepositoryInterface          $customerRepository,
+        Customer                           $customerApiService,
+        EventDispatcherInterface           $eventDispatcher,
+        LoggerInterface                    $logger,
+        SalesChannelContextPersister       $salesChannelContextPersister,
+        EntityRepositoryInterface          $salutationRepository,
+        SettingsService                    $settingsService,
+        string                             $shopwareVersion,
+        NumberRangeValueGeneratorInterface $valueGenerator
     )
     {
         $this->countryRepository = $countryRepository;
@@ -91,6 +97,7 @@ class CustomerService
         $this->salutationRepository = $salutationRepository;
         $this->settingsService = $settingsService;
         $this->shopwareVersion = $shopwareVersion;
+        $this->valueGenerator = $valueGenerator;
     }
 
     /**
@@ -222,7 +229,6 @@ class CustomerService
         ]], $context);
     }
 
-
     /**
      * Stores the ideal issuer in the custom fields of the customer.
      *
@@ -278,7 +284,7 @@ class CustomerService
     {
         $existingStruct = $this->getCustomerStruct($customerId, $context);
 
-        $existingStruct->setCustomerId($mollieCustomerId, $profileId,$testMode);
+        $existingStruct->setCustomerId($mollieCustomerId, $profileId, $testMode);
 
         $customFields = $existingStruct->toCustomFieldsArray();
 
@@ -340,7 +346,7 @@ class CustomerService
         }
 
         // Then assign all custom fields under the mollie_payments key
-        $struct->assign($customFields['mollie_payments'] ?? []);
+        $struct->assign($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS] ?? []);
 
         return $struct;
     }
@@ -386,27 +392,29 @@ class CustomerService
      */
     public function createApplePayDirectCustomer(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, string $paymentMethodId, SalesChannelContext $context)
     {
-        /** @var string $customerId */
         $customerId = Uuid::randomHex();
-
-        /** @var string $addressId */
         $addressId = Uuid::randomHex();
-
 
         $salutationId = $this->getSalutationId($context->getContext());
         $countryId = $this->getCountryId($countryISO2, $context->getContext());
+
+        $customerNumber = $this->valueGenerator->getValue(
+            'customer',
+            $context->getContext(),
+            $context->getSalesChannelId()
+        );
 
         $customer = [
             'id' => $customerId,
             'salutationId' => $salutationId,
             'firstName' => $firstname,
             'lastName' => $lastname,
-            'customerNumber' => 'ApplePay.' . time(),
+            'customerNumber' => $customerNumber,
             'guest' => true,
             'email' => $email,
             'password' => Uuid::randomHex(),
             'defaultPaymentMethodId' => $paymentMethodId,
-            'groupId' => Defaults::FALLBACK_CUSTOMER_GROUP,
+            'groupId' => $context->getSalesChannel()->getCustomerGroupId(),
             'salesChannelId' => $context->getSalesChannel()->getId(),
             'defaultBillingAddressId' => $addressId,
             'defaultShippingAddressId' => $addressId,

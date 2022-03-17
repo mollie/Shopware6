@@ -51,6 +51,7 @@
             <argument type="service" id="salutation.repository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument>%kernel.shopware_version%</argument>
+            <argument type="service" id="Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\CustomFieldService" class="Kiener\MolliePayments\Service\CustomFieldService">
@@ -168,12 +169,6 @@
             <argument type="service" id="Mollie\Api\MollieApiClient"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\PaymentMethodService"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Subscriber\PaymentMethodSubscriber" class="Kiener\MolliePayments\Subscriber\PaymentMethodSubscriber">
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
-            <argument type="service" id="payment_method.repository"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 

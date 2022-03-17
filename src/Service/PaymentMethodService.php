@@ -53,16 +53,16 @@ class PaymentMethodService
     /**
      * PaymentMethodService constructor.
      *
-     * @param MediaService              $mediaService
+     * @param MediaService $mediaService
      * @param EntityRepositoryInterface $mediaRepository
      * @param EntityRepositoryInterface $paymentRepository
-     * @param PluginIdProvider          $pluginIdProvider
+     * @param PluginIdProvider $pluginIdProvider
      */
     public function __construct(
-        MediaService $mediaService,
+        MediaService              $mediaService,
         EntityRepositoryInterface $mediaRepository,
         EntityRepositoryInterface $paymentRepository,
-        PluginIdProvider $pluginIdProvider
+        PluginIdProvider          $pluginIdProvider
     )
     {
         $this->mediaService = $mediaService;
@@ -86,6 +86,12 @@ class PaymentMethodService
      */
     public function installAndActivatePaymentMethods(Context $context): void
     {
+        # install payment methods that are not allowed anymore.
+        # we still need the min the database
+        # but always disable them :)
+        $this->disablePaymentMethod(IngHomePayPayment::class, $context);
+
+
         // Get installable payment methods
         $installablePaymentMethods = $this->getInstallablePaymentMethods();
 
@@ -111,53 +117,73 @@ class PaymentMethodService
      * @param array $paymentMethods
      * @param Context $context
      */
-    public function addPaymentMethods(array $paymentMethods, Context $context) : void
+    public function addPaymentMethods(array $paymentMethods, Context $context): void
     {
         // Get the plugin ID
         $pluginId = $this->pluginIdProvider->getPluginIdByBaseClass(MolliePayments::class, $context);
 
-        // Variables
-        $paymentData = [];
+        $upsertData = [];
 
         foreach ($paymentMethods as $paymentMethod) {
+
+            $identifier = $paymentMethod['handler'];
+
             // Upload icon to the media repository
             $mediaId = $this->getMediaId($paymentMethod, $context);
 
-            // Build array of payment method data
-            $paymentMethodData = [
-                'handlerIdentifier' => $paymentMethod['handler'],
-                'name' => $paymentMethod['description'],
-                'description' => '',
-                'pluginId' => $pluginId,
-                'mediaId' => $mediaId,
-                'afterOrderEnabled' => true,
-                'customFields' => [
-                    'mollie_payment_method_name' => $paymentMethod['name'],
-                ],
-            ];
 
-            // Get existing payment method so we can update it by it's ID
             try {
-                $existingPaymentMethod = $this->getPaymentMethod(
-                    $paymentMethodData['handlerIdentifier'],
-                    $context
-                );
+                $existingPaymentMethod = $this->getPaymentMethod($identifier, $context);
             } catch (InconsistentCriteriaIdsException $e) {
-                // On error, we assume the payment method doesn't exist
+                $existingPaymentMethod = null;
             }
 
-            if (isset($existingPaymentMethod)) {
-                $paymentMethodData['id'] = $existingPaymentMethod->getId();
-                $paymentMethodData['name'] = $existingPaymentMethod->getName();
-            }
 
-            // Add payment method data to array of payment data
-            $paymentData[] = $paymentMethodData;
+            if ($existingPaymentMethod instanceof PaymentMethodEntity) {
+                $paymentMethodData = [
+                    # ALWAYS ADD THE ID, otherwise upsert would create NEW entries!
+                    'id' => $existingPaymentMethod->getId(),
+                    'handlerIdentifier' => $paymentMethod['handler'],
+                    # ------------------------------------------
+                    # make sure to repair some fields in here
+                    # so that Mollie does always work for our wonderful customers :)
+                    'pluginId' => $pluginId,
+                    'customFields' => [
+                        'mollie_payment_method_name' => $paymentMethod['name'],
+                    ],
+                    # ------------------------------------------
+                    # unfortunately some fields are required (*sigh)
+                    # so we need to provide those with the value of
+                    # the existing method!!!
+                    'name' => $existingPaymentMethod->getName(),
+                ];
+
+                $upsertData[] = $paymentMethodData;
+
+            } else {
+
+                # let's create a full parameter list of everything
+                # that our new payment method needs to have
+                $paymentMethodData = [
+                    'handlerIdentifier' => $paymentMethod['handler'],
+                    'pluginId' => $pluginId,
+                    # ------------------------------------------
+                    'name' => $paymentMethod['description'],
+                    'description' => '',
+                    'mediaId' => $mediaId,
+                    'afterOrderEnabled' => true,
+                    # ------------------------------------------
+                    'customFields' => [
+                        'mollie_payment_method_name' => $paymentMethod['name'],
+                    ],
+                ];
+
+                $upsertData[] = $paymentMethodData;
+            }
         }
 
-        // Insert or update payment data
-        if (count($paymentData)) {
-            $this->paymentRepository->upsert($paymentData, $context);
+        if (count($upsertData) > 0) {
+            $this->paymentRepository->upsert($upsertData, $context);
         }
     }
 
@@ -211,9 +237,27 @@ class PaymentMethodService
                 $existingPaymentMethod = $this->getPaymentMethod($paymentMethod['handler'], $context);
 
                 if (isset($existingPaymentMethod)) {
-                    $this->activatePaymentMethod($existingPaymentMethod->getId(), true, $context);
+                    $this->setPaymentMethodActivated($existingPaymentMethod->getId(), true, $context);
                 }
             }
+        }
+    }
+
+    /**
+     * @param string $handlerName
+     * @param Context $context
+     * @return void
+     */
+    public function disablePaymentMethod(string $handlerName, Context $context): void
+    {
+        $existingPaymentMethod = $this->getPaymentMethod($handlerName, $context);
+
+        if (isset($existingPaymentMethod)) {
+            $this->setPaymentMethodActivated(
+                $existingPaymentMethod->getId(),
+                false,
+                $context
+            );
         }
     }
 
@@ -226,9 +270,9 @@ class PaymentMethodService
      *
      * @return EntityWrittenContainerEvent
      */
-    public function activatePaymentMethod(
-        string $paymentMethodId,
-        bool $active,
+    public function setPaymentMethodActivated(
+        string  $paymentMethodId,
+        bool    $active,
         Context $context
     ): EntityWrittenContainerEvent
     {
@@ -250,7 +294,7 @@ class PaymentMethodService
      * @return PaymentMethodEntity
      * @throws InconsistentCriteriaIdsException
      */
-    public function getPaymentMethodById($id) : ?PaymentMethodEntity
+    public function getPaymentMethodById($id): ?PaymentMethodEntity
     {
         // Fetch ID for update
         $paymentCriteria = new Criteria();
@@ -271,7 +315,7 @@ class PaymentMethodService
      *
      * @return array
      */
-    public function getInstallablePaymentMethods() : array
+    public function getInstallablePaymentMethods(): array
     {
         // Variables
         $paymentMethods = [];
@@ -301,7 +345,7 @@ class PaymentMethodService
      *
      * @return PaymentMethodEntity|null
      */
-    private function getPaymentMethod($handlerIdentifier, Context $context) : ?PaymentMethodEntity
+    private function getPaymentMethod($handlerIdentifier, Context $context): ?PaymentMethodEntity
     {
         // Fetch ID for update
         $paymentCriteria = new Criteria();
@@ -335,7 +379,7 @@ class PaymentMethodService
             GiftCardPayment::class,
             GiroPayPayment::class,
             iDealPayment::class,
-            IngHomePayPayment::class,
+            // IngHomePayPayment::class, // not allowed anymore
             KbcPayment::class,
             KlarnaPayLaterPayment::class,
             KlarnaPayNowPayment::class,
@@ -351,7 +395,7 @@ class PaymentMethodService
     /**
      * Retrieve the icon from the database, or add it.
      *
-     * @param array   $paymentMethod
+     * @param array $paymentMethod
      * @param Context $context
      *
      * @return string
@@ -376,7 +420,7 @@ class PaymentMethodService
         $iconExt = 'svg';
         $iconBlob = file_get_contents('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.svg');
 
-        if(empty(trim($iconBlob))) {
+        if (empty(trim($iconBlob))) {
             $iconBlob = file_get_contents('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.png');
             $iconMime = 'image/png';
             $iconExt = 'png';
@@ -399,11 +443,12 @@ class PaymentMethodService
      * @param Order $mollieOrder
      * @return bool
      */
-    public function isPaidApplePayTransaction(OrderTransactionEntity $transaction, Order $mollieOrder) : bool {
+    public function isPaidApplePayTransaction(OrderTransactionEntity $transaction, Order $mollieOrder): bool
+    {
         $paymentMethodId = $transaction->getPaymentMethodId();
         $paymentMethod = $transaction->getPaymentMethod();
 
-        if(!$paymentMethod instanceof PaymentMethodEntity) {
+        if (!$paymentMethod instanceof PaymentMethodEntity) {
             $criteria = new Criteria([$paymentMethodId]);
             $paymentMethod = $this->paymentRepository->search($criteria, Context::createDefaultContext())->first();
         }

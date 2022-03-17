@@ -1,5 +1,6 @@
 import Plugin from 'src/plugin-system/plugin.class';
 import DomAccess from 'src/helper/dom-access.helper';
+import HttpClient from '../services/HttpClient';
 
 export default class MollieApplePayDirect extends Plugin {
 
@@ -16,6 +17,7 @@ export default class MollieApplePayDirect extends Plugin {
     init() {
         const me = this;
 
+        me.client = new HttpClient();
 
         // we might have wrapping containers
         // that also need to be hidden -> they might have different margins or other things
@@ -48,41 +50,24 @@ export default class MollieApplePayDirect extends Plugin {
 
         // verify if apple pay is even allowed
         // in our current sales channel
-        const applePayAvailablePromise = this.isApplePayAvailable(shopUrl);
 
-        applePayAvailablePromise.then(function (data) {
+        me.client.get(
+            shopUrl + '/mollie/apple-pay/available',
+            data => {
+                if (data.available === undefined || data.available === false) {
+                    return;
+                }
 
-            if (data.available === undefined || data.available === false) {
-                return;
-            }
-
-            applePayButtons.forEach(function (button) {
-                // Remove display none
-                button.classList.remove('d-none');
-                // remove previous handlers (just in case)
-                button.removeEventListener('click', me.onButtonClick.bind(me));
-                // add click event handlers
-                button.addEventListener('click', me.onButtonClick.bind(me));
-            });
-        });
-    }
-
-
-    /**
-     *
-     * @param shopUrl
-     * @returns {Promise<unknown>}
-     */
-    isApplePayAvailable(shopUrl) {
-        return new Promise(function (resolve, reject) {
-            fetch(shopUrl + '/mollie/apple-pay/available')
-                .then(response => response.json())
-                .then(data => resolve(data))
-                // eslint-disable-next-line no-unused-vars
-                .catch((error) => {
-                    reject();
+                applePayButtons.forEach(function (button) {
+                    // Remove display none
+                    button.classList.remove('d-none');
+                    // remove previous handlers (just in case)
+                    button.removeEventListener('click', me.onButtonClick.bind(me));
+                    // add click event handlers
+                    button.addEventListener('click', me.onButtonClick.bind(me));
                 });
-        });
+            }
+        );
     }
 
     /**
@@ -127,15 +112,13 @@ export default class MollieApplePayDirect extends Plugin {
      * @param shopSlug
      */
     addProductToCart(id, quantity, shopSlug) {
-        fetch(shopSlug + '/mollie/apple-pay/add-product',
-            {
-                method: 'POST',
-                body: JSON.stringify({
-                    'id': id,
-                    'quantity': quantity,
-                }),
-            }
-        );
+        this.client.post(
+            shopSlug + '/mollie/apple-pay/add-product',
+            JSON.stringify({
+                'id': id,
+                'quantity': quantity,
+            })
+        )
     }
 
     /**
@@ -175,24 +158,19 @@ export default class MollieApplePayDirect extends Plugin {
         const session = new ApplePaySession(this.APPLE_PAY_VERSION, request);
 
         session.onvalidatemerchant = function (event) {
-
-            fetch(shopSlug + '/mollie/apple-pay/validate',
-                {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        validationUrl: event.validationURL,
-                    }),
-                })
-                .then(function (response) {
-                    return response.json();
-                })
-                .then(function (validationData) {
+            me.client.post(
+                shopSlug + '/mollie/apple-pay/validate',
+                JSON.stringify({
+                    validationUrl: event.validationURL,
+                }),
+                (validationData) => {
                     const data = JSON.parse(validationData.session);
                     session.completeMerchantValidation(data);
-                })
-                .catch(() => {
+                },
+                () => {
                     session.abort();
-                });
+                }
+            );
         };
 
         session.onshippingcontactselected = function (event) {
@@ -203,17 +181,12 @@ export default class MollieApplePayDirect extends Plugin {
                 countryCode = event.shippingContact.countryCode;
             }
 
-            fetch(shopSlug + '/mollie/apple-pay/shipping-methods',
-                {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        countryCode: countryCode,
-                    }),
-                })
-                .then(function (response) {
-                    return response.json();
-                })
-                .then(function (data) {
+            me.client.post(
+                shopSlug + '/mollie/apple-pay/shipping-methods',
+                JSON.stringify({
+                    countryCode: countryCode,
+                }),
+                (data) => {
                     if (data.success) {
                         session.completeShippingContactSelection(
                             // eslint-disable-next-line no-undef
@@ -235,25 +208,21 @@ export default class MollieApplePayDirect extends Plugin {
                             []
                         );
                     }
-                })
-                .catch(() => {
+                },
+                () => {
                     session.abort();
-                });
+                }
+            );
         };
 
         session.onshippingmethodselected = function (event) {
 
-            fetch(shopSlug + '/mollie/apple-pay/set-shipping',
-                {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        identifier: event.shippingMethod.identifier,
-                    }),
-                })
-                .then(function (response) {
-                    return response.json();
-                })
-                .then(function (data) {
+            me.client.post(
+                shopSlug + '/mollie/apple-pay/set-shipping',
+                JSON.stringify({
+                    identifier: event.shippingMethod.identifier,
+                }),
+                (data) => {
                     if (data.success) {
                         session.completeShippingMethodSelection(
                             // eslint-disable-next-line no-undef
@@ -273,10 +242,11 @@ export default class MollieApplePayDirect extends Plugin {
                             []
                         );
                     }
-                })
-                .catch(() => {
+                },
+                () => {
                     session.abort();
-                });
+                }
+            );
         };
 
         session.onpaymentauthorized = function (event) {
@@ -294,7 +264,8 @@ export default class MollieApplePayDirect extends Plugin {
         };
 
         session.oncancel = function () {
-            fetch(shopSlug + '/mollie/apple-pay/restore-cart', {method: 'POST'});
+
+            me.client.post(shopSlug + '/mollie/apple-pay/restore-cart');
         };
 
         return session;
@@ -307,34 +278,33 @@ export default class MollieApplePayDirect extends Plugin {
      * @param payment
      */
     finishPayment(checkoutURL, paymentToken, payment) {
-        var $form;
-        var createField = function (name, val) {
-            return $('<input>', {
-                type: 'hidden',
-                name: name,
-                value: val,
-            });
-        };
+        const createInput = function (name, val) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = name;
+            input.value = val;
 
-        $form = $('<form>', {
-            action: checkoutURL,
-            method: 'POST',
-        });
+            return input;
+        }
+
+        const form = document.createElement('form');
+        form.action = checkoutURL;
+        form.method = 'POST';
 
         // add billing data
-        createField('email', payment.shippingContact.emailAddress).appendTo($form);
-        createField('lastname', payment.shippingContact.familyName).appendTo($form);
-        createField('firstname', payment.shippingContact.givenName).appendTo($form);
-        createField('street', payment.shippingContact.addressLines[0]).appendTo($form);
-        createField('postalCode', payment.shippingContact.postalCode).appendTo($form);
-        createField('city', payment.shippingContact.locality).appendTo($form);
-        createField('countryCode', payment.shippingContact.countryCode).appendTo($form);
+        form.insertAdjacentElement('beforeend', createInput('email', payment.shippingContact.emailAddress));
+        form.insertAdjacentElement('beforeend', createInput('lastname', payment.shippingContact.familyName));
+        form.insertAdjacentElement('beforeend', createInput('firstname', payment.shippingContact.givenName));
+        form.insertAdjacentElement('beforeend', createInput('street', payment.shippingContact.addressLines[0]));
+        form.insertAdjacentElement('beforeend', createInput('postalCode', payment.shippingContact.postalCode));
+        form.insertAdjacentElement('beforeend', createInput('city', payment.shippingContact.locality));
+        form.insertAdjacentElement('beforeend', createInput('countryCode', payment.shippingContact.countryCode));
         // also add our payment token
-        createField('paymentToken', paymentToken).appendTo($form);
+        form.insertAdjacentElement('beforeend', createInput('paymentToken', paymentToken));
 
-        $form.appendTo($('body'));
+        document.body.insertAdjacentElement('beforeend', form);
 
-        $form.submit();
+        form.submit();
     }
 
     /**

@@ -3,12 +3,11 @@
 namespace Kiener\MolliePayments\Service\MollieApi;
 
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieOrderException;
-use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeFetchedException;
-use Kiener\MolliePayments\Exception\MollieOrderPaymentCouldNotBeCreatedException;
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\MollieApi\Payment as PaymentApiService;
+use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Order as MollieOrder;
 use Mollie\Api\Resources\OrderLine;
@@ -20,8 +19,8 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Framework\Context;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Symfony\Component\Routing\RouterInterface;
 
 class Order
 {
@@ -36,16 +35,24 @@ class Order
     private $paymentApiService;
 
     /**
+     * @var WebhookBuilder
+     */
+    private $webhookBuilder;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
 
 
-    public function __construct(MollieApiFactory $clientFactory, PaymentApiService $paymentApiService, LoggerInterface $logger)
+
+    public function __construct(MollieApiFactory $clientFactory, PaymentApiService $paymentApiService, RouterInterface $router, LoggerInterface $logger)
     {
         $this->clientFactory = $clientFactory;
         $this->logger = $logger;
         $this->paymentApiService = $paymentApiService;
+
+        $this->webhookBuilder = new WebhookBuilder($router);
     }
 
     /**
@@ -83,9 +90,9 @@ class Order
      * @throws CouldNotFetchMollieOrderException
      */
     public function getMollieOrderLine(
-        string  $mollieOrderId,
-        string  $mollieOrderLineId,
-        string  $salesChannelId
+        string $mollieOrderId,
+        string $mollieOrderLineId,
+        string $salesChannelId
     ): OrderLine
     {
         return $this->getMollieOrder($mollieOrderId, $salesChannelId)->lines()->get($mollieOrderLineId);
@@ -114,91 +121,86 @@ class Order
     }
 
     /**
-     * function creates a new payment at mollie
-     *
-     * if an open payment in mollie order exists, this payment is used but is updated by correct payment method
-     *
      * @param string $mollieOrderId
      * @param string $paymentMethod
+     * @param string $swOrderTransactionID
      * @param PaymentHandler $paymentHandler
+     * @param OrderEntity $order
      * @param CustomerEntity $customer
      * @param SalesChannelContext $salesChannelContext
      * @return Payment
      * @throws ApiException
      */
-    public function createOrReusePayment(
-        string $mollieOrderId,
-        string $paymentMethod,
-        PaymentHandler $paymentHandler,
-        OrderEntity $order,
-        CustomerEntity $customer,
-        SalesChannelContext $salesChannelContext
-    ): Payment
+    public function createOrReusePayment(string $mollieOrderId, string $paymentMethod, string $swOrderTransactionID, PaymentHandler $paymentHandler, OrderEntity $order, CustomerEntity $customer, SalesChannelContext $salesChannelContext): Payment
     {
+        # fetch the current Mollie order including
+        # all its existing payments and transactions
         $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelContext->getSalesChannel()->getId(), ['embed' => 'payments']);
 
-        if (!$mollieOrder instanceof MollieOrder) {
+        # now search for an open payment
+        # if it's still open, then we just reuse this one
+        $existingOpenPayment = $this->getOpenPayment($mollieOrder);
 
-            throw new MollieOrderCouldNotBeFetchedException($mollieOrderId);
+
+        # it's not possible to have more than 1 payment OPEN
+        # also, OPEN payments cannot be cancelled.
+        # there are circumstances where we retry even though a payment is open.
+        # this could be a navigation to the orders in the account where a change-payment method is possible.
+        # so if we have no OPEN payment, we just create a new one
+        # if we have one, we make sure to update this one
+
+        if (!$existingOpenPayment instanceof Payment) {
+            return $this->createNewOrderPayment(
+                $mollieOrder, $paymentMethod,
+                $swOrderTransactionID,
+                $paymentHandler,
+                $order,
+                $customer,
+                $salesChannelContext
+            );
         }
 
-        $payment = $this->getOpenPayment($mollieOrder);
+        # -------------------------------------------------------------------------------------------------------
 
-        if (!$payment instanceof Payment) {
+        # verify if we can cancel the previous payment.
+        # if we can, better to these, just to have some nice and clean data.
+        # we will then create a new payment for our attempt.
+        if ($existingOpenPayment->isCancelable) {
 
-            $this->logger->debug(
-                'Didn\'t find an open payment. Creating a new payment at mollie',
-                [
-                    'saleschannel' => $salesChannelContext->getSalesChannel()->getName(),
-                ]
+            $this->paymentApiService->delete(
+                $existingOpenPayment->id,
+                $salesChannelContext->getSalesChannel()->getId()
             );
 
-            return $this->prepareNewPayment($mollieOrder, $paymentMethod, $paymentHandler, $order, $customer, $salesChannelContext);
-        }
-
-        if ($payment->method === $paymentMethod) {
-
-            $this->logger->debug(
-                'Found an open payment and payment methods are same. Reusing this payment',
-                [
-                    'saleschannel' => $salesChannelContext->getSalesChannel()->getName(),
-                ]
+            return $this->createNewOrderPayment(
+                $mollieOrder,
+                $paymentMethod,
+                $swOrderTransactionID,
+                $paymentHandler,
+                $order,
+                $customer,
+                $salesChannelContext
             );
-
-            return $payment;
         }
 
-        if (!$payment->isCancelable) {
 
-            $this->logger->debug(
-                'Found an open payment but it isn\'t cancelable. Reusing this payment, otherwise we could never complete payment',
-                [
-                    'saleschannel' => $salesChannelContext->getSalesChannel()->getName(),
-                ]
-            );
+        # TODO does not yet work and I'm not quite sure if that is even happening?!
+        # we have to update the payment method, if it switches.
+        # otherwise one would still see the previous one
+        # $existingOpenPayment = $this->updateExistingPayment(
+        #     $existingOpenPayment,
+        #     $paymentMethod,
+        #     $salesChannelContext->getSalesChannelId()
+        # );
 
-            return $payment;
-        }
-
-        try {
-
-            $this->logger->debug(
-                'Found an open payment and cancel it. Create new payment with new payment method',
-                [
-                    'saleschannel' => $salesChannelContext->getSalesChannel()->getName(),
-                ]
-            );
-
-            $this->paymentApiService->delete($payment->id, $salesChannelContext->getSalesChannel()->getId());
-
-            /** @var Payment $payment */
-            return $this->prepareNewPayment($mollieOrder, $paymentMethod, $paymentHandler, $order, $customer, $salesChannelContext);
-        } catch (ApiException $e) {
-
-            throw new MollieOrderPaymentCouldNotBeCreatedException($mollieOrderId, [], $e);
-        }
+        return $existingOpenPayment;
     }
 
+
+    /**
+     * @param MollieOrder $mollieOrder
+     * @return Payment|null
+     */
     private function getOpenPayment(MollieOrder $mollieOrder): ?Payment
     {
         $payments = $mollieOrder->payments();
@@ -219,8 +221,30 @@ class Order
     }
 
     /**
+     * @param Payment $payment
+     * @param string $newPaymnetMethod
+     * @param string $salesChannelID
+     * @return Payment
+     * @throws ApiException
+     */
+    private function updateExistingPayment(Payment $payment, string $newPaymnetMethod, string $salesChannelID): Payment
+    {
+        #  NOT WORKING ? !damn
+        # but we need to update the payment method :D TODO
+        $apiClient = $this->clientFactory->getClient($salesChannelID);
+
+        return $apiClient->payments->update(
+            $payment->id,
+            [
+                'method' => $newPaymnetMethod,
+            ]
+        );
+    }
+
+    /**
      * @param MollieOrder $mollieOrder
      * @param string $paymentMethod
+     * @param string $swOrderTransactionID
      * @param PaymentHandler $paymentHandler
      * @param OrderEntity $order
      * @param CustomerEntity $customer
@@ -228,32 +252,43 @@ class Order
      * @return Payment
      * @throws ApiException
      */
-    private function prepareNewPayment(
-        MollieOrder    $mollieOrder,
-        string         $paymentMethod,
-        PaymentHandler $paymentHandler,
-        OrderEntity    $order,
-        CustomerEntity $customer,
-        SalesChannelContext $salesChannelContext
-    ): Payment
+    private function createNewOrderPayment(MollieOrder $mollieOrder, string $paymentMethod, string $swOrderTransactionID, PaymentHandler $paymentHandler, OrderEntity $order, CustomerEntity $customer, SalesChannelContext $salesChannelContext): Payment
     {
-        // To add payment method specific parameters to our payment data, the method requires an array named orderData
-        // We have no interest in order data, just the payment data that is inside it, but we still need to pass
-        // along an array with a key 'payment'. This is our fake order data array.
-        $fakeOrder = [
+        $webhookUrl = $this->webhookBuilder->buildWebhook($swOrderTransactionID);
+
+
+        # let's create a new order body
+        # for our new payment.
+        $newPaymentData = [
             'payment' => [
-                'method' => $paymentMethod
-            ]
+                'method' => $paymentMethod,
+            ],
         ];
 
-        $fakeOrder = $paymentHandler->processPaymentMethodSpecificParameters(
-            $fakeOrder,
-            $order,
-            $salesChannelContext,
-            $customer
+        # now we have to add payment specific data
+        # like we would do with initial orders too
+        $tmpOrder = $paymentHandler->processPaymentMethodSpecificParameters($newPaymentData, $order, $salesChannelContext, $customer);
+        # extract our modified and final payment data
+        $finalPaymentData = $tmpOrder['payment'];
+
+
+        # create our new payment with the
+        # Mollie API for our existing order
+        $payment = $mollieOrder->createPayment($finalPaymentData);
+
+        # unfortunately the API has a bug at the moment.
+        # we cannot modify the webhook URL with the create method.
+        # but we need to make sure to change it to the new OrderTransactionID of Shopware
+        $apiClient = $this->clientFactory->getClient($salesChannelContext->getSalesChannelId());
+
+        $apiClient->payments->update(
+            $payment->id,
+            [
+                'webhookUrl' => $webhookUrl,
+            ]
         );
 
-        return $mollieOrder->createPayment($fakeOrder['payment']);
+        return $payment;
     }
 
     public function getPaymentUrl(string $mollieOrderId, string $salesChannelId): ?string

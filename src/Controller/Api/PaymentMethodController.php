@@ -36,16 +36,42 @@ class PaymentMethodController extends AbstractController
 
     /**
      * @RouteScope(scopes={"api"})
-     * @Route("/api/_action/mollie/payment-method/update-methods",
-     *         defaults={"auth_enabled"=true}, name="api.mollie.payment-method.update-methods", methods={"GET"})
+     * @Route("/api/_action/mollie/payment-method/update-methods", defaults={"auth_enabled"=true}, name="api.mollie.payment-method.update-methods", methods={"GET"})
      *
      * @param Context $context
      * @return JsonResponse
      */
     public function updatePaymentMethods(Context $context): JsonResponse
     {
+        return $this->updatePaymentMethodsAction($context);
+    }
+
+    /**
+     * @RouteScope(scopes={"api"})
+     * @Route("/api/v{version}/_action/mollie/payment-method/update-methods", defaults={"auth_enabled"=true}, name="api.mollie.payment-method.update-methods.legacy", methods={"GET"})
+     *
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function updatePaymentMethodsLegacy(Context $context): JsonResponse
+    {
+        return $this->updatePaymentMethodsAction($context);
+    }
+
+    /**
+     * @param Context $context
+     * @return JsonResponse
+     */
+    private function updatePaymentMethodsAction(Context $context): JsonResponse
+    {
         try {
+
             $this->paymentMethodService->installAndActivatePaymentMethods($context);
+
+            return $this->json([
+                'success' => true,
+            ]);
+
         } catch (Throwable $exception) {
             $this->logger->error($exception->getMessage());
 
@@ -54,9 +80,7 @@ class PaymentMethodController extends AbstractController
                 $exception instanceof ShopwareHttpException ? $exception->getStatusCode() : 500
             );
         }
-
-        return $this->json([
-            'success' => true,
-        ]);
     }
+
 }
+

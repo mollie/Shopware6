@@ -4,21 +4,36 @@ namespace MolliePayments\Tests\Service\MollieApi\Builder;
 
 use DateTime;
 use DateTimeZone;
-use Kiener\MolliePayments\Handler\Method\BelfiusPayment;
+use Faker\Extension\Container;
+use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Mollie\Api\Types\PaymentMethod;
+use MolliePayments\Tests\Fakes\FakeContainer;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Currency\CurrencyEntity;
 
-class BelfiusOrderBuilderTest extends AbstractMollieOrderBuilder
+class BankTransferOrderBuilderTest extends AbstractMollieOrderBuilder
 {
     public function testOrderBuild(): void
     {
         $redirectWebhookUrl = 'https://foo';
         $this->router->method('generate')->willReturn($redirectWebhookUrl);
-        $paymentMethod = PaymentMethod::BELFIUS;
-        $this->paymentHandler = new BelfiusPayment($this->loggerService, $this->mollieDoPaymentFacade, $this->molliePaymentFinalize, $this->transitionService);
+        $paymentMethod = PaymentMethod::BANKTRANSFER;
+
+
+        $this->paymentHandler = new BankTransferPayment(
+            $this->loggerService,
+            new FakeContainer(),
+            $this->settingsService
+        );
+
+
+        $bankDueDays = $this->expiresAt + 5;
+        $this->settingStruct->assign([
+            'orderLifetimeDays' => $this->expiresAt,
+            'paymentMethodBankTransferDueDateDays' => $bankDueDays
+        ]);
 
         $transactionId = Uuid::randomHex();
         $amountTotal = 27.0;
@@ -37,7 +52,7 @@ class BelfiusOrderBuilderTest extends AbstractMollieOrderBuilder
         $actual = $this->builder->build($order, $transactionId, $paymentMethod, 'https://foo', $this->salesChannelContext, $this->paymentHandler, []);
 
         $expectedOrderLifeTime = (new DateTime())->setTimezone(new DateTimeZone('UTC'))
-            ->modify(sprintf('+%d day', $this->expiresAt))
+            ->modify(sprintf('+%d day', $bankDueDays))
             ->format('Y-m-d');
 
         $expected = [

@@ -74,8 +74,22 @@ class MolliePaymentStatusTest extends TestCase
      */
     public function testFailedStatus(bool $expected, string $status): void
     {
-        $isApproved = MolliePaymentStatus::isFailedStatus($status);
+        $isApproved = MolliePaymentStatus::isFailedStatus('', $status);
 
         $this->assertEquals($expected, $isApproved);
     }
+
+    /**
+     * This test verifies that open credit cards are not approved as valid payment.
+     * We don't know when this happens, but the payment has still "created" and will be expired
+     * after 15 minutes by Mollie. If we show a success, then nobody would recognize that it didnt work
+     * and so its expired and leads to a cancelled order.
+     */
+    public function testOpenCreditCardFails(): void
+    {
+        $isApproved = MolliePaymentStatus::isFailedStatus('creditcard', MolliePaymentStatus::MOLLIE_PAYMENT_OPEN);
+
+        $this->assertEquals(true, $isApproved);
+    }
+
 }

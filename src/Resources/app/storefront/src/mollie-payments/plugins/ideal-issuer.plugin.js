@@ -39,6 +39,11 @@ export default class MollieIDealIssuer extends Plugin {
             return;
         }
 
+        // if we dont have the issuers dropdown available, then we can't even do anything
+        if (this._issuersDropdown === null) {
+            return;
+        }
+
         this.registerEvents();
 
         // update the visibility of our
