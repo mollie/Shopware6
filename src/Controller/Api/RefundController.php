@@ -204,6 +204,19 @@ class RefundController extends AbstractController
 
     /**
      * @RouteScope(scopes={"api"})
+     * @Route("/api/v{version}/_action/mollie/refund-manager/data", defaults={"auth_enabled"=true}, name="api.action.mollie.refund-manager.data.legacy", methods={"POST"})
+     *
+     * @param RequestDataBag $data
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function refundManagerDataLegacy(RequestDataBag $data, Context $context): JsonResponse
+    {
+        return $this->refundManagerData($data, $context);
+    }
+
+    /**
+     * @RouteScope(scopes={"api"})
      * @Route("/api/v{version}/_action/mollie/refund/list", defaults={"auth_enabled"=true}, name="api.action.mollie.refund.list.legacy", methods={"POST"})
      *
      * @param RequestDataBag $data

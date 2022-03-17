@@ -14,6 +14,7 @@ use Shopware\Core\Framework\Api\Context\AdminApiSource;
 use Shopware\Core\Framework\Api\Context\Exception\InvalidContextSourceException;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
+use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -193,8 +194,7 @@ class ConfigController extends AbstractController
      * for fields, flows and actions.
      *
      * @RouteScope(scopes={"api"})
-     * @Route("/api/_action/mollie/config/refund-manager",
-     *         defaults={"auth_enabled"=true}, name="api.action.mollie.config.refund-manager", methods={"POST"})
+     * @Route("/api/_action/mollie/config/refund-manager", defaults={"auth_enabled"=true}, name="api.action.mollie.config.refund-manager", methods={"POST"})
      *
      * @param Request $request
      * @param Context $context
@@ -219,6 +219,19 @@ class ConfigController extends AbstractController
             'verifyRefund' => $config->isRefundManagerVerifyRefund(),
             'showInstructions' => $config->isRefundManagerShowInstructions(),
         ]);
+    }
+
+    /**
+     * @RouteScope(scopes={"api"})
+     * @Route("/api/v{version}/_action/mollie/config/refund-manager", defaults={"auth_enabled"=true}, name="api.action.mollie.config.refund-manager.legacy", methods={"POST"})
+     *
+     * @param Request $request
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function getRefundManagerConfigLegacy(Request $request, Context $context): JsonResponse
+    {
+        return $this->getRefundManagerConfig($request, $context);
     }
 
     /**

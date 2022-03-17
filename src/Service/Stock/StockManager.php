@@ -50,18 +50,17 @@ class StockManager implements StockManagerInterface
         # extract our PRODUCT ID from the reference ID
         $productID = (string)$lineItem->getReferencedId();
 
-        $update = new RetryableQuery(
-            $this->connection,
-            $this->connection->prepare(
-                'UPDATE product SET available_stock = available_stock + :refundQuantity, sales = sales - :refundQuantity, updated_at = :now WHERE id = :id'
-            )
+        $update = $this->connection->prepare(
+            'UPDATE product SET available_stock = available_stock + :refundQuantity, sales = sales - :refundQuantity, updated_at = :now WHERE id = :id'
         );
 
-        $update->execute([
-            'id' => Uuid::fromHexToBytes($productID),
-            'refundQuantity' => $quantity,
-            'now' => (new \DateTime())->format(Defaults::STORAGE_DATE_TIME_FORMAT),
-        ]);
+        $update->execute(
+            [
+                'id' => Uuid::fromHexToBytes($productID),
+                'refundQuantity' => $quantity,
+                'now' => (new \DateTime())->format(Defaults::STORAGE_DATE_TIME_FORMAT),
+            ]
+        );
     }
 
 }
