@@ -120,13 +120,19 @@ class MolliePaymentFinalize
 
         $paymentMethod = $transactionStruct->getOrderTransaction()->getPaymentMethod();
 
-        if (!$paymentMethod instanceof PaymentMethodEntity) {
-            throw new \Exception('No payment method found when finalizing order');
+        # in some combinations (older Shopware versions + Mollie failure mode)
+        # we don't have a payment method in the order transaction.
+        # so we grab our identifier from the mollie order
+        if ($paymentMethod instanceof PaymentMethodEntity) {
+            # load our correct key
+            # from the shopware payment method custom field
+            $mollieAttributes = new PaymentMethodAttributes($paymentMethod);
+            $molliePaymentMethodKey = $mollieAttributes->getMollieIdentifier();
+        } else {
+            # load it from the mollie order id
+            $molliePaymentMethodKey = $mollieOrder->method;
         }
 
-        $mollieAttributes = new PaymentMethodAttributes($paymentMethod);
-
-        $molliePaymentMethodKey = $mollieAttributes->getMollieIdentifier();
 
         # now either set the payment status for successful payments
         # or make sure to throw an exception for Shopware in case
