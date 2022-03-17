@@ -1,4 +1,5 @@
 import Plugin from 'src/plugin-system/plugin.class';
+import HttpClient from "../services/HttpClient";
 
 export default class MollieCreditCardComponents extends Plugin {
     static options = {
@@ -20,6 +21,8 @@ export default class MollieCreditCardComponents extends Plugin {
         if (mollieController) {
             mollieController.remove();
         }
+
+        this.client = new HttpClient();
 
         // Fix the trailing slash in the shop URL
         if (this.options.shopUrl != null && this.options.shopUrl.substr(-1) === '/') {
