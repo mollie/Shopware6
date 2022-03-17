@@ -22,6 +22,7 @@ use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterfa
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
 use MolliePayments\Tests\Fakes\FakeCompatibilityGateway;
+use MolliePayments\Tests\Fakes\FakeEventDispatcher;
 use MolliePayments\Tests\Traits\OrderTrait;
 use MolliePayments\Tests\Utils\Traits\PaymentBuilderTrait;
 use PHPUnit\Framework\TestCase;
@@ -164,7 +165,8 @@ abstract class AbstractMollieOrderBuilder extends TestCase
             $this->loggerService,
             new MollieShippingLineItemBuilder(new PriceCalculator(), new MollieOrderPriceBuilder()),
             new VerticalTaxLineItemFixer($this->loggerService),
-            new MollieLineItemHydrator(new MollieOrderPriceBuilder())
+            new MollieLineItemHydrator(new MollieOrderPriceBuilder()),
+            new FakeEventDispatcher()
         );
     }
 
