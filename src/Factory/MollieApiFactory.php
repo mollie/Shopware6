@@ -111,7 +111,7 @@ class MollieApiFactory
      * @param string $apiKey
      * @return MollieApiClient
      */
-    private function buildClient(string $apiKey): MollieApiClient
+    public function buildClient(string $apiKey): MollieApiClient
     {
         try {
 
@@ -125,7 +125,7 @@ class MollieApiFactory
             $this->apiClient->setApiKey($apiKey);
 
             $this->apiClient->addVersionString('Shopware/' . $this->shopwareVersion);
-            
+
             $this->apiClient->addVersionString('MollieShopware6/' . MolliePayments::PLUGIN_VERSION);
 
         } catch (Exception $e) {

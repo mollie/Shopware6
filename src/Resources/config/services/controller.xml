@@ -10,6 +10,8 @@
         <service id="Kiener\MolliePayments\Controller\Api\ConfigController" public="true">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Shopware\Administration\Snippet\CachedSnippetFinder"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\ApiKeyValidator"/>
+
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
