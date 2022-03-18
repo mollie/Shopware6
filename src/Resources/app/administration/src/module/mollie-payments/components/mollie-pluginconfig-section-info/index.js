@@ -18,10 +18,12 @@ Component.register('mollie-pluginconfig-section-info', {
         };
     },
 
-    computed: {
+    shortcuts: {
+        'SYSTEMKEY+i': 'openConfigImport',
+    },
 
+    computed: {
         /**
-         *
          * @returns {string|*}
          */
         userName() {
@@ -41,6 +43,10 @@ Component.register('mollie-pluginconfig-section-info', {
     },
 
     methods: {
+        openConfigImport() {
+            // TODO create and open a configuration import modal
+        },
+
         openSupport() {
             this.isSupportOpen = true;
         },
