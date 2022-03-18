@@ -1,4 +1,10 @@
 .mollie-support-modal {
+    &__form {
+        & :last-child {
+            margin-bottom: 0;
+        }
+    }
+
     .sw-description-list {
         position: relative;
 
