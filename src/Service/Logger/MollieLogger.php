@@ -3,7 +3,6 @@
 namespace Kiener\MolliePayments\Service\Logger;
 
 use Kiener\MolliePayments\Service\Logger\Processors\AnonymousWebProcessor;
-use Kiener\MolliePayments\Service\Logger\Services\IPAnonymizer;
 use Kiener\MolliePayments\Service\Logger\Services\URLAnonymizer;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
@@ -63,7 +62,6 @@ class MollieLogger implements LoggerInterface
 
         $this->webProcessor = new AnonymousWebProcessor(
             new WebProcessor(),
-            new IPAnonymizer('*'),
             new URLAnonymizer()
         );
 
