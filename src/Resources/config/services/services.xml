@@ -154,10 +154,21 @@
             <tag name="mollie_payments.mail.attachment_generator"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\Mail\AttachmentGenerator\PluginConfigurationGenerator">
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+        <service id="Kiener\MolliePayments\Service\Mail\AttachmentGenerator\ReadablePluginConfigurationGenerator">
+            <argument type="service" id="Shopware\Core\System\SystemConfig\Service\ConfigurationService"/>
             <argument type="service" id="sales_channel.repository"/>
-<!--            <tag name="mollie_payments.mail.attachment_generator"/>-->
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\ApiKeyValidator"/>
+
+            <tag name="mollie_payments.mail.attachment_generator"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Service\Mail\AttachmentGenerator\JsonPluginConfigurationGenerator">
+            <argument type="service" id="Shopware\Core\System\SystemConfig\Service\ConfigurationService"/>
+            <argument type="service" id="sales_channel.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+
+            <tag name="mollie_payments.mail.attachment_generator"/>
         </service>
 
     </services>
