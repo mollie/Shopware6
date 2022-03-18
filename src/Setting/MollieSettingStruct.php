@@ -121,6 +121,11 @@ class MollieSettingStruct extends Struct
     protected $orderStateWithAChargebackTransaction = self::ORDER_STATE_SKIP;
 
     /**
+     * @var string[]
+     */
+    protected $restrictApplePayDirect = [];
+
+    /**
      * @return string
      */
     public function getLiveApiKey(): string
