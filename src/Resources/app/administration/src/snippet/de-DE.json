@@ -32,6 +32,7 @@
         "onboardingStep3Link": "Verkaufskanäle öffnen",
         "btnDocumentation": "Dokumentation",
         "btnSupport": "Support",
+        "btnRequestSupport": "Unterstützung anfordern",
         "btnTroubleshooting": "zu den Fehlerbehebungen"
       },
       "api": {
@@ -53,6 +54,26 @@
         },
         "mollieLimits": {
           "link": "Öffne Mollie Zahlungs Limits"
+        }
+      },
+      "support": {
+        "modalTitle": "Unterstützung von Mollie anfordern",
+        "btnCancel": "Abbrechen",
+        "btnConfirm": "Unterstützung anfordern",
+        "form": {
+          "name": "Ihr Name",
+          "email": "Ihre E-Mail",
+          "recipient": "Anfrage senden an",
+          "subject": "Betreff",
+          "message": "Nachricht"
+        },
+        "data": {
+          "header": "Gesammelte Daten:",
+          "other": "Andere:",
+          "shopwareVersion": "Shopware-Version",
+          "pluginLogs": "{plugin} log files",
+          "pluginConfiguration": "{plugin}-Konfiguration",
+          "pluginConfigurationHelpText": "API-Schlüssel sind ausgeschlossen."
         }
       }
     },

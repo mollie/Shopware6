@@ -32,6 +32,7 @@
         "onboardingStep3Link": "naar je verkoopkanalen",
         "btnDocumentation": "Documentatie",
         "btnSupport": "Support",
+        "btnRequestSupport": "Verzoek support",
         "btnTroubleshooting": "Troubleshooting Gids"
       },
       "api": {
@@ -53,6 +54,26 @@
         },
         "mollieLimits": {
           "link": "Open betalingslimieten van Mollie"
+        }
+      },
+      "support": {
+        "modalTitle": "Verzoek support van Mollie",
+        "btnCancel": "Cancel",
+        "btnConfirm": "Verzoek support",
+        "form": {
+          "name": "Uw naam",
+          "email": "Uw e-mail",
+          "recipient": "Stuur verzoek naar",
+          "subject": "Onderwerp",
+          "message": "Message"
+        },
+        "data": {
+          "header": "Verzamelde gegevens:",
+          "other": "Andere:",
+          "shopwareVersion": "Shopwareversie",
+          "pluginLogs": "{plugin} logbestanden",
+          "pluginConfiguration": "{plugin} configuratie",
+          "pluginConfigurationHelpText": "API-sleutels zijn uitgesloten."
         }
       }
     },
