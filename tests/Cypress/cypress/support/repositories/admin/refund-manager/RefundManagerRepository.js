@@ -70,7 +70,7 @@ export default class RefundManagerRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getFirstRefundContextButton() {
-        return cy.get(':nth-child(3) > .sw-card > .sw-card__content > .sw-data-grid > .sw-data-grid__wrapper > .sw-data-grid__table > .sw-data-grid__body > .sw-data-grid__row > .sw-data-grid__cell--actions > .sw-data-grid__cell-content > .sw-context-button > .sw-context-button__button');
+        return cy.get('.mollie-refund-manager-refunds button[class=sw-context-button__button');
     }
 
     /**
