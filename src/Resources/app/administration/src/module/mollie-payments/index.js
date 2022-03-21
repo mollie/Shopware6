@@ -1,9 +1,10 @@
 import './extension/sw-customer';
 import './extension/sw-order';
-import './components/mollie-tracking-info';
 import './components/mollie-pluginconfig-section-info';
 import './components/mollie-pluginconfig-section-api';
 import './components/mollie-pluginconfig-section-payments';
+import './components/mollie-tracking-info';
+import './components/mollie-refund-manager';
 
 
 import deDE from '../../snippet/de-DE.json';
@@ -28,4 +29,5 @@ Module.register('mollie-payments', {
         'en-GB': enGB,
         'nl-NL': nlNL,
     },
+
 });

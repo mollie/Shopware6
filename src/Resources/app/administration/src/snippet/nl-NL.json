@@ -8,7 +8,10 @@
       "mollie_webhook_received_status_expired": " Mollie Webhook Ontvangen (Vervallen)",
       "mollie_webhook_received_status_pending": " Mollie Webhook Ontvangen (In Afwachting)",
       "mollie_webhook_received_status_paid": " Mollie Webhook Ontvangen (Betaald)",
-      "mollie_webhook_received_status_completed": " Mollie Webhook Ontvangen (Voltooid)"
+      "mollie_webhook_received_status_completed": " Mollie Webhook Ontvangen (Voltooid)",
+      "mollie_webhook_received_status_refunded": " Mollie Webhook Ontvangen (Terugbetaald)",
+      "mollie_webhook_received_status_partially_refunded": " Mollie Webhook Ontvangen (Gedeeltelijk terugbetaald)",
+      "mollie_refund_started": " Mollie terugbetaling gestart"
     }
   },
   "mollie-payments": {
@@ -48,49 +51,113 @@
         "updatePaymentMethods": {
           "title": "Mollie Payments",
           "button": "Betaalmethoden updaten",
-          "succeeded": "De betaalmethoden zijn succesvol geüpdated.",
-          "failed": "De betaalmethoden konden niet worden geüpdated."
+          "succeeded": "De betaalmethoden zijn succesvol geupdated.",
+          "failed": "De betaalmethoden konden niet worden geupdated."
         },
         "mollieLimits": {
           "link": "Open betalingslimieten van Mollie"
         }
       }
     },
-    "modals": {
-      "refund": {
-        "title": "Terugbetaling via Mollie",
-        "success": "Er is een terugbetaling aangemaakt bij Mollie. Het kan 2 uur duren voordat de terugbetaling is voltooid. Tot deze tijd kunt u de terugbetaling annuleren.",
-        "error": "Er is iets mis gegaan bij het aanmaken van een terugbetaling.",
-        "warning": {
-          "low-amount": "Voer een terug te betalen bedrag in."
-        },
-        "confirmButton": "Terugbetalen",
-        "cancelButton": "Niet terugbetalen",
-        "list": {
-          "column": {
-            "amount": "Bedrag",
-            "status": "Status",
-            "date": "Datum"
+    "refunds": {
+      "status": {
+        "queued": "In wachtrij",
+        "pending": "In afwachting",
+        "processing": "In behandeling",
+        "refunded": "Terugbetaald",
+        "failed": "Mislukt",
+        "description": {
+          "queued": "De terugbetaling wordt in de wachtrij geplaatst totdat er voldoende saldo is om de terugbetaling te verwerken. U kunt de terugbetaling nog steeds annuleren.",
+          "pending": "De terugbetaling wordt de volgende werkdag naar de bank gestuurd. U kunt de terugbetaling nog annuleren.",
+          "processing": "De terugbetaling is naar de bank gestuurd. Het bedrag wordt zo spoedig mogelijk overgemaakt op de rekening van de klant.",
+          "refunded": "Het restitutiebedrag is overgemaakt naar de klant.",
+          "failed": "De terugbetaling is mislukt na verwerking. De klant heeft bijvoorbeeld zijn/haar bankrekening opgeheven. Het geld zal worden teruggestort op de rekening."
+        }
+      }
+    },
+    "refund-manager": {
+      "general": {
+        "unitQuantity": "st."
+      },
+      "cart": {
+        "title": "Bestelling ##orderNumber##",
+        "btnSelectAll": "Alles selecteren",
+        "btnResetForm": "Formulier resetten",
+        "linkHowTo": "Hoe gebruik je dit formulier?",
+        "grid": {
+          "columns": {
+            "item": "Artikel",
+            "productNumber": "Artikelnummer",
+            "unitPrice": "Prijs per eenheid",
+            "quantity": "Aantal",
+            "refunded": "Vergoed",
+            "refundQuantity": "Vergoeding",
+            "totalPrice": "Totaal",
+            "refundAmount": "Vergoeding",
+            "resetStock": "Voorraad resetten"
           },
-          "context": {
-            "cancel": "Annuleer deze terugbetaling\n"
-          },
-          "status": {
-            "queued": "In wachtrij",
-            "pending": "In afwachting",
-            "processing": "In behandeling",
-            "refunded": "Terugbetaald",
-            "failed": "Mislukt"
-          },
-          "status-description": {
-            "queued": "De terugbetaling wordt in de wachtrij geplaatst totdat er voldoende saldo is om de terugbetaling te verwerken. U kunt de terugbetaling nog steeds annuleren.",
-            "pending": "De terugbetaling wordt de volgende werkdag naar de bank gestuurd. U kunt de terugbetaling nog annuleren.",
-            "processing": "De terugbetaling is naar de bank gestuurd. Het bedrag wordt zo spoedig mogelijk overgemaakt op de rekening van de klant.",
-            "refunded": "Het restitutiebedrag is overgemaakt naar de klant.",
-            "failed": "De terugbetaling is mislukt na verwerking. De klant heeft bijvoorbeeld zijn/haar bankrekening opgeheven. Het geld zal worden teruggestort op de rekening."
-          }
+          "btnResetLine": "Rij resetten",
+          "checkDeductPromotion": "Promotie aftrekken"
         }
       },
+      "instructions": {
+        "linkResetTutorials": "Handleidingen resetten",
+        "btnToggleTutorial": "Handleidingen tonen/verbergen",
+        "titleFullRefund": "Volledige terugbetaling",
+        "textFullRefund": "Gebruik gewoon de knop voor de volledige terugbetaling. Dit zorgt ervoor dat alle artikelen worden gemarkeerd als terugbetaald en het volledige bedrag wordt vergoed aan de klant.",
+        "titleStockReset": "Voorraad resetten",
+        "textStockReset": "Je kunt de beschikbare voorraad automatisch verhogen door de hoeveelheid in te voeren die u weer op voorraad wilt hebben. Dit moet je invoeren voordat je overgaat tot een volledige of gedeeltelijke terugbetaling. Het terugzetten van de voorraad kan op een flexibele manier gecombineerd worden met het eigenlijke terugbetalingsproces.",
+        "titleShipping": "Verzendkosten",
+        "textShipping": "Verzendkosten kunnen worden terugbetaald zoals elk ander artikel. Voer de volledige hoeveelheid in of een aangepast deelbedrag en ga verder met de terugbetaling. Het terugbetalen van verzendkosten kan op een flexibele manier gecombineerd worden met het eigenlijke terugbetalingsproces van artikelen.",
+        "titlePartialAmount": "Gedeeltelijke terugbetaling (enkel een bedrag)",
+        "textPartialAmount": "Voer gewoon het deelbedrag in het tekstveld in en start de terugbetaling.",
+        "titlePartialItems": "Gedeeltelijke terugbetaling (met artikelen)",
+        "textPartialItems": "Als u hoeveelheden en artikelen als terugbetaald wilt markeren in Mollie, gebruik dan bovenstaand formulier. Stel uw hoeveelheden in en geef een aangepast bedrag op voor elk item dat zal worden terugbetaald. De totale som zal dan zichtbaar zijn in het tekstveld met het finale terugbetalingsbedrag. Vergeet niet dat het nog steeds mogelijk is om dit eindbedrag aan te passen voordat u de terugbetaling start.",
+        "titlePartialPromotions": "Gedeeltelijke terugbetaling (met promotions)",
+        "textPartialPromotions": "Als je een promotion in je winkelwagen hebt, dan is de promotion een eigen line item. Als je alle afgeprijsde artikelen wilt terugbetalen, dan kann je de totale waarde van alle artikelen terugbetalen en ook de promotie zelf. Als u echter slechts een paar afgeprijsde artikelen wilt terugbetalen, kunt je de aangepaste korting automatisch aftrekken voor elk afzonderlijk artikel. Je kunt natuurlijk altijd de waarden veranderen mochten ze niet juist zijn."
+      },
+      "summary": {
+        "dataLoading": "Gegevens worden geladen...",
+        "captionTotal": "Totaal incl. belasting",
+        "captionTotalTaxFree": "Totaal",
+        "captionPendingRefunds": "Wachtend op terugbetaling",
+        "captionVouchers": "Voucher bedrag",
+        "captionRefunded": "Terugbetaald bedrag",
+        "captionRemaining": "Terugbetaalbaar bedrag",
+        "btnFixDiff": "Herstel verschil",
+        "placeholderDescription": "Een optionele beschrijving aan terugbetaling toevoegen",
+        "checkVerification": "Ik heb het totale restitutiebedrag en de geconfigureerde hoeveelheden voor restitutie en herbevoorrading geverifieerd.",
+        "btnRefund": "Terugbetaling",
+        "btnFullRefund": "Volledige terugbetaling"
+      },
+      "refunds": {
+        "title": "Terugbetalingen in het Mollie Dashboard",
+        "linkMore": "Meer over terugbetalingen",
+        "grid": {
+          "columns": {
+            "amount": "Bedrag",
+            "status": "Status",
+            "description": "Beschrijving",
+            "composition": "Samenstelling",
+            "date": "Datum"
+          },
+          "lblNoComposition": "Geen samenstelling beschikbaar",
+          "btnCancelRefund": "Annuleer deze terugbetaling"
+        }
+      },
+      "notifications": {
+        "success": {
+          "refund-created": "Er is een terugbetaling aangemaakt in Mollie. Het kan 2 uur duren voordat de terugbetaling is voltooid. Tot die tijd kan de terugbetaling worden geannuleerd.",
+          "refund-canceled": "De uitstaande terugbetaling is met succes geannuleerd en verwijderd."
+        },
+        "error": {
+          "low-amount": "Vull een terug te betalen bedrag in",
+          "refund-created": "Er is iets misgegaan bij het aanmaken van een terugbetaling.",
+          "refund-canceled": "Er is een probleem opgetreden bij het annuleren van de uitstaande terugbetaling. Probeer het opnieuw in het Mollie Dashboard."
+        }
+      }
+    },
+    "modals": {
       "shipping": {
         "title": "Verzenden bij Mollie",
         "item": {
@@ -167,7 +234,12 @@
       "totalRefundsPending": "Wachtend op terugbetaling",
       "totalRemaining": "Terug te betalen",
       "totalVouchers": "Voucher",
-      "totalShipments": "Verzonden bedrag ({quantity} items)"
+      "totalShipments": "Verzonden bedrag ({quantity} items)",
+      "refundManager": {
+        "title": "",
+        "btnOpenRefundManager": "",
+        "btnCloseRefundManager": ""
+      }
     }
   },
   "sw-customer": {

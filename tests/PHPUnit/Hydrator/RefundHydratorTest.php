@@ -6,13 +6,18 @@ use Kiener\MolliePayments\Hydrator\RefundHydrator;
 use Mollie\Api\Resources\Refund;
 use Mollie\Api\Types\RefundStatus;
 use PHPUnit\Framework\TestCase;
-use Shopware\Core\Framework\Util\Random;
 
 class RefundHydratorTest extends TestCase
 {
-    /** @var RefundHydrator */
+    /**
+     * @var RefundHydrator
+     */
     private $refundHydrator;
 
+
+    /**
+     * @return void
+     */
     public function setUp(): void
     {
         $this->refundHydrator = new RefundHydrator();
@@ -23,15 +28,15 @@ class RefundHydratorTest extends TestCase
      * @param Refund $refund
      * @dataProvider getHydratorTestData
      */
-    public function testRefundHydrator(
-        array $expected,
-        Refund $refund
-    )
+    public function testRefundHydrator(array $expected, Refund $refund)
     {
         self::assertIsArray($this->refundHydrator->hydrate($refund));
         self::assertEquals($expected, $this->refundHydrator->hydrate($refund));
     }
 
+    /**
+     * @return array[]
+     */
     public function getHydratorTestData()
     {
         return [
@@ -70,6 +75,12 @@ class RefundHydratorTest extends TestCase
         ];
     }
 
+    /**
+     * @param float|null $amount
+     * @param float|null $settlementAmount
+     * @param string $status
+     * @return array
+     */
     private function getExpectedData(?float $amount, ?float $settlementAmount, string $status = RefundStatus::STATUS_QUEUED): array
     {
         if (!is_null($amount)) {
@@ -100,6 +111,7 @@ class RefundHydratorTest extends TestCase
             'isProcessing' => $status == RefundStatus::STATUS_PROCESSING,
             'isQueued' => $status == RefundStatus::STATUS_QUEUED,
             'isTransferred' => $status == RefundStatus::STATUS_REFUNDED,
+            'metadata' => null,
         ];
     }
 
@@ -127,7 +139,7 @@ class RefundHydratorTest extends TestCase
                 'isProcessing' => $status == RefundStatus::STATUS_PROCESSING,
                 'isTransferred' => $status == RefundStatus::STATUS_REFUNDED,
                 'isFailed' => $status == RefundStatus::STATUS_FAILED,
-                'cancel' => null
+                'cancel' => null,
             ]
         );
 

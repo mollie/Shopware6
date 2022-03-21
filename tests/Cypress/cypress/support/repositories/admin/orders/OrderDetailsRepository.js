@@ -20,7 +20,7 @@ export default class OrdersListRepository {
      *
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
-    getMollieActionButtonRefundOrder() {
+    getMollieRefundManagerButton() {
         return cy.get('.sw-order-line-items-grid__actions-refund-btn');
     }
 

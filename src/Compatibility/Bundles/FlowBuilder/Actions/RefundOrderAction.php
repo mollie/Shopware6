@@ -4,7 +4,7 @@ namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Actions;
 
 
 use Kiener\MolliePayments\Service\OrderServiceInterface;
-use Kiener\MolliePayments\Service\RefundServiceInterface;
+use Kiener\MolliePayments\Service\Refund\RefundServiceInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Flow\Dispatching\Action\FlowAction;
 use Shopware\Core\Framework\Event\FlowEvent;
@@ -108,9 +108,11 @@ class RefundOrderAction extends FlowAction
 
             $this->logger->info('Starting Refund through Flow Builder Action for order: ' . $orderNumber);
 
-            $this->refundService->refundFullOrder(
+            $this->refundService->refundFull(
                 $order,
-                'Refund through Shopware Flow Builder'
+                'Refund through Shopware Flow Builder',
+                [],
+                $baseEvent->getContext()
             );
 
         } catch (\Exception $ex) {

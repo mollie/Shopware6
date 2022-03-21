@@ -304,6 +304,14 @@ class NotificationFacade
             case MolliePaymentStatus::MOLLIE_PAYMENT_CHARGEBACK:
                 $paymentEvent = $this->flowBuilderEventFactory->buildWebhookReceivedChargebackEvent($swOrder, $context);
                 break;
+
+            case MolliePaymentStatus::MOLLIE_PAYMENT_REFUNDED:
+                $paymentEvent = $this->flowBuilderEventFactory->buildWebhookReceivedRefundedEvent($swOrder, $context);
+                break;
+
+            case MolliePaymentStatus::MOLLIE_PAYMENT_PARTIALLY_REFUNDED:
+                $paymentEvent = $this->flowBuilderEventFactory->buildWebhookReceivedPartialRefundedEvent($swOrder, $context);
+                break;
         }
 
         if ($paymentEvent !== null) {

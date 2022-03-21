@@ -89,6 +89,7 @@ class OrderService implements OrderServiceInterface
         $criteria->addAssociation('language.locale');
         $criteria->addAssociation('lineItems.product.media');
         $criteria->addAssociation('deliveries.shippingOrderAddress');
+        $criteria->addAssociation('deliveries.shippingMethod');
         $criteria->addAssociation('transactions.paymentMethod');
 
         /** @var OrderEntity $order */

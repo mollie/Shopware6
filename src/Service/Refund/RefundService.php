@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Service;
+namespace Kiener\MolliePayments\Service\Refund;
 
 use Kiener\MolliePayments\Exception\CouldNotCancelMollieRefundException;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieRefundException;
@@ -10,6 +10,10 @@ use Kiener\MolliePayments\Exception\CouldNotFetchMollieRefundsException;
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Hydrator\RefundHydrator;
 use Kiener\MolliePayments\Service\MollieApi\Order;
+use Kiener\MolliePayments\Service\OrderService;
+use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
+use Kiener\MolliePayments\Service\Refund\Item\RefundItemType;
+use Kiener\MolliePayments\Service\Refund\Mollie\RefundMetadata;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Refund;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -17,72 +21,118 @@ use Shopware\Core\Framework\Context;
 
 class RefundService implements RefundServiceInterface
 {
-    /** @var Order */
-    private $mollieOrderApi;
-
-    /** @var OrderService */
-    private $orderService;
-
-    /** @var RefundHydrator */
-    private $refundHydrator;
 
     /**
-     * CustomFieldService constructor.
-     *
-     * @param Order $mollieOrderApi
-     * @param OrderService $orderService
+     * @var Order
+     */
+    private $mollie;
+
+    /**
+     * @var OrderService
+     */
+    private $orders;
+
+    /**
+     * @var RefundHydrator
+     */
+    private $refundHydrator;
+
+
+    /**
+     * @param Order $mollie
+     * @param OrderService $orders
      * @param RefundHydrator $refundHydrator
      */
-    public function __construct(
-        Order          $mollieOrderApi,
-        OrderService   $orderService,
-        RefundHydrator $refundHydrator
-    )
+    public function __construct(Order $mollie, OrderService $orders, RefundHydrator $refundHydrator)
     {
-        $this->mollieOrderApi = $mollieOrderApi;
-        $this->orderService = $orderService;
+        $this->mollie = $mollie;
+        $this->orders = $orders;
         $this->refundHydrator = $refundHydrator;
     }
 
+
     /**
      * @param OrderEntity $order
-     * @param float $amount
      * @param string $description
+     * @param RefundItem[] $refundItems
+     * @param Context $context
      * @return Refund
+     * @throws ApiException
      */
-    public function refund(OrderEntity $order, float $amount, string $description): Refund
+    public function refundFull(OrderEntity $order, string $description, array $refundItems, Context $context): Refund
     {
-        $mollieOrderId = $this->orderService->getMollieOrderId($order);
+        $mollieOrderId = $this->orders->getMollieOrderId($order);
+        $mollieOrder = $this->mollie->getMollieOrder($mollieOrderId, '');
 
-        $payment = $this->mollieOrderApi->getCompletedPayment($mollieOrderId, $order->getSalesChannelId());
 
-        try {
-            $refund = $payment->refund([
-                'amount' => [
-                    'value' => number_format($amount, 2, '.', ''),
-                    'currency' => $order->getCurrency()->getIsoCode()
-                ],
-                'description' => $description
-            ]);
+        $metadata = new RefundMetadata(RefundItemType::FULL, $refundItems);
 
-            if ($refund instanceof Refund) {
-                return $refund;
+        $params = [
+            'description' => $description,
+            'metadata' => $metadata->toString(),
+        ];
+
+        if (count($refundItems) > 0) {
+
+            $lines = [];
+
+            foreach ($refundItems as $item) {
+                # quantities of 0 do not work with the Mollie API
+                if ($item->getQuantity() <= 0) {
+                    continue;
+                }
+
+                $lines[] = [
+                    'id' => $item->getMollieLineId(),
+                    'quantity' => $item->getQuantity(),
+                ];
             }
 
-            throw new CouldNotCreateMollieRefundException($mollieOrderId, $order->getOrderNumber());
-        } catch (ApiException $e) {
-            throw new CouldNotCreateMollieRefundException($mollieOrderId, $order->getOrderNumber(), $e);
+            $params['lines'] = $lines;
         }
+
+        # REFUND WITH MOLLIE
+        # ---------------------------------------------------------------------------------------------
+        $refund = $mollieOrder->refund($params);
+
+        if (!$refund instanceof Refund) {
+            throw new CouldNotCreateMollieRefundException($mollieOrderId, $order->getOrderNumber());
+        }
+
+        return $refund;
     }
 
     /**
      * @param OrderEntity $order
      * @param string $description
+     * @param float $amount
+     * @param RefundItem[] $lineItems
+     * @param Context $context
      * @return Refund
+     * @throws ApiException
      */
-    public function refundFullOrder(OrderEntity $order, string $description): Refund
+    public function refundPartial(OrderEntity $order, string $description, float $amount, array $lineItems, Context $context): Refund
     {
-        return $this->refund($order, $order->getAmountTotal(), $description);
+        $mollieOrderId = $this->orders->getMollieOrderId($order);
+
+        $metadata = new RefundMetadata(RefundItemType::PARTIAL, $lineItems);
+
+        $payment = $this->mollie->getCompletedPayment($mollieOrderId, $order->getSalesChannelId());
+
+        $refund = $payment->refund([
+            'amount' => [
+                'value' => number_format($amount, 2, '.', ''),
+                'currency' => $order->getCurrency()->getIsoCode()
+            ],
+            'description' => $description,
+            'metadata' => $metadata->toString(),
+        ]);
+
+        if (!$refund instanceof Refund) {
+            throw new CouldNotCreateMollieRefundException($mollieOrderId, $order->getOrderNumber());
+        }
+
+        return $refund;
     }
 
     /**
@@ -96,9 +146,9 @@ class RefundService implements RefundServiceInterface
      */
     public function cancel(OrderEntity $order, string $refundId): bool
     {
-        $mollieOrderId = $this->orderService->getMollieOrderId($order);
+        $mollieOrderId = $this->orders->getMollieOrderId($order);
 
-        $payment = $this->mollieOrderApi->getCompletedPayment($mollieOrderId, $order->getSalesChannelId());
+        $payment = $this->mollie->getCompletedPayment($mollieOrderId, $order->getSalesChannelId());
 
         try {
             // getRefund doesn't contain all necessary @throws tags.
@@ -136,9 +186,9 @@ class RefundService implements RefundServiceInterface
      */
     public function getRefunds(OrderEntity $order): array
     {
-        $mollieOrderId = $this->orderService->getMollieOrderId($order);
+        $mollieOrderId = $this->orders->getMollieOrderId($order);
 
-        $payment = $this->mollieOrderApi->getCompletedPayment($mollieOrderId, $order->getSalesChannelId());
+        $payment = $this->mollie->getCompletedPayment($mollieOrderId, $order->getSalesChannelId());
 
         try {
             $refundsArray = [];
@@ -162,8 +212,8 @@ class RefundService implements RefundServiceInterface
      */
     public function getRemainingAmount(OrderEntity $order): float
     {
-        $payment = $this->mollieOrderApi->getCompletedPayment(
-            $this->orderService->getMollieOrderId($order),
+        $payment = $this->mollie->getCompletedPayment(
+            $this->orders->getMollieOrderId($order),
             $order->getSalesChannelId()
         );
 
@@ -172,13 +222,12 @@ class RefundService implements RefundServiceInterface
 
     /**
      * @param OrderEntity $order
-     * @param Context $context
      * @return float
      */
     public function getVoucherPaidAmount(OrderEntity $order): float
     {
-        $payment = $this->mollieOrderApi->getCompletedPayment(
-            $this->orderService->getMollieOrderId($order),
+        $payment = $this->mollie->getCompletedPayment(
+            $this->orders->getMollieOrderId($order),
             $order->getSalesChannelId()
         );
 
@@ -209,11 +258,12 @@ class RefundService implements RefundServiceInterface
      */
     public function getRefundedAmount(OrderEntity $order): float
     {
-        $payment = $this->mollieOrderApi->getCompletedPayment(
-            $this->orderService->getMollieOrderId($order),
+        $payment = $this->mollie->getCompletedPayment(
+            $this->orders->getMollieOrderId($order),
             $order->getSalesChannelId()
         );
 
         return $payment->getAmountRefunded();
     }
+
 }

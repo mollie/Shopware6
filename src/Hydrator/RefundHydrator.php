@@ -28,6 +28,12 @@ class RefundHydrator
             ];
         }
 
+        $metaData = '';
+
+        if (property_exists($refund, 'metadata')) {
+            $metaData = (string)$refund->metadata;
+        }
+
         return [
             'id' => $refund->id,
             'orderId' => $refund->orderId,
@@ -42,6 +48,7 @@ class RefundHydrator
             'isProcessing' => $refund->isProcessing(),
             'isQueued' => $refund->isQueued(),
             'isTransferred' => $refund->isTransferred(),
+            'metadata' => json_decode($metaData, true),
         ];
     }
 }

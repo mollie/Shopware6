@@ -1,15 +1,76 @@
 // eslint-disable-next-line no-undef
 const ApiService = Shopware.Classes.ApiService;
 
-class MolliePaymentsRefundService extends ApiService {
+export default class MolliePaymentsRefundService extends ApiService {
+
+    /**
+     *
+     * @param httpClient
+     * @param loginService
+     * @param apiEndpoint
+     */
     constructor(httpClient, loginService, apiEndpoint = 'mollie') {
         super(httpClient, loginService, apiEndpoint);
     }
 
+    /**
+     *
+     * @param data
+     * @returns {*}
+     */
+    getRefundManagerData(data = {orderId: null}) {
+        return this.__post('/refund-manager/data', data);
+    }
+
+    /**
+     *
+     * @param data
+     * @returns {*}
+     */
+    list(data = {orderId: null}) {
+        return this.__post('/refund/list', data);
+    }
+
+    /**
+     *
+     * @param data
+     * @returns {*}
+     */
+    refund(data = {orderId: null, amount: null, description: '', items: []}) {
+        return this.__post('/refund', data);
+    }
+
+    /**
+     *
+     * @param data
+     * @returns {*}
+     */
+    refundAll(data = {orderId: null, description: ''}) {
+        return this.__post('/refund', data);
+    }
+
+    /**
+     *
+     * @param data
+     * @returns {*}
+     */
+    cancel(data = {orderId: null, refundId: null}) {
+        return this.__post('/refund/cancel', data);
+    }
+
+
+    /**
+     *
+     * @param endpoint
+     * @param data
+     * @param headers
+     * @returns {*}
+     * @private
+     */
     __post(endpoint = '', data = {}, headers = {}) {
         return this.httpClient
             .post(
-                `_action/${this.getApiBasePath()}/refund${endpoint}`,
+                `_action/${this.getApiBasePath()}${endpoint}`,
                 JSON.stringify(data),
                 {
                     headers: this.getBasicHeaders(headers),
@@ -20,21 +81,4 @@ class MolliePaymentsRefundService extends ApiService {
             });
     }
 
-    refund(data = {orderId: null, amount: null}) {
-        return this.__post('', data);
-    }
-
-    cancel(data = {orderId: null, refundId: null}) {
-        return this.__post('/cancel', data);
-    }
-
-    list(data = {orderId: null}) {
-        return this.__post('/list', data);
-    }
-
-    total(data = {orderId: null}) {
-        return this.__post('/total', data);
-    }
 }
-
-export default MolliePaymentsRefundService;
