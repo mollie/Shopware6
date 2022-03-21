@@ -29,22 +29,24 @@ const validCardNumber = '3782 822463 10005';
 
 describe('Credit Card Components', () => {
 
+    before(function () {
+
+        devices.setDevice(devices.getFirstDevice());
+        // we need the Shopware failure mode for some tests in this file
+        // so let's just do this here once
+        configAction.setupShop(false, true, false);
+    })
+
     testDevices.forEach(device => {
+
+        beforeEach(() => {
+            devices.setDevice(device);
+            session.resetSessionData();
+            session.resetBrowserSession();
+        });
 
         context(devices.getDescription(device), () => {
 
-            beforeEach(() => {
-                devices.setDevice(device);
-
-                // we need the Shopware failure mode for some tests in this file
-                // so let's just do this here once
-                configAction.setupShop(false, true, false);
-
-                session.resetSessionData();
-                session.resetBrowserSession();
-            });
-
-            // skip this test until risk management for credit card max amount is set higher by mollie
             it('Successful card payment', () => {
 
                 setUp();
@@ -235,7 +237,6 @@ describe('Credit Card Components', () => {
                 cy.url().should('include', '/account/order/edit');
                 cy.contains('Complete payment');
             })
-
         })
     })
 })
