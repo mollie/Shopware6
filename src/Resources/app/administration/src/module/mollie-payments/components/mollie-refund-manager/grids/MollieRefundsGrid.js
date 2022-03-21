@@ -23,7 +23,7 @@ export default class MollieRefundsGrid {
             {
                 property: 'status',
                 label: app.$tc('mollie-payments.refund-manager.refunds.grid.columns.status'),
-                width: '160px',
+                width: '190px',
                 sortable: true,
             },
             {

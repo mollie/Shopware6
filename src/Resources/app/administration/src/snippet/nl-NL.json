@@ -236,9 +236,9 @@
       "totalVouchers": "Voucher",
       "totalShipments": "Verzonden bedrag ({quantity} items)",
       "refundManager": {
-        "title": "",
-        "btnOpenRefundManager": "",
-        "btnCloseRefundManager": ""
+        "title": "Terugbetaling via Mollie",
+        "btnOpenRefundManager": "Refund Manager openen",
+        "btnCloseRefundManager": "Refund Manager sluiten"
       }
     }
   },
