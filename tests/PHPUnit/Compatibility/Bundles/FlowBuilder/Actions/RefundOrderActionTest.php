@@ -45,6 +45,7 @@ class RefundOrderActionTest extends TestCase
         $order = new OrderEntity();
         $order->setId('O1');
         $order->setOrderNumber('ord-123');
+        $order->setAmountTotal(19.99);
 
         $fakeOrderService = new FakeOrderService($order);
         $fakeRefund = new FakeRefundService('r123', 0);
