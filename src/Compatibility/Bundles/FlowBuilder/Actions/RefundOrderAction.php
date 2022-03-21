@@ -108,9 +108,10 @@ class RefundOrderAction extends FlowAction
 
             $this->logger->info('Starting Refund through Flow Builder Action for order: ' . $orderNumber);
 
-            $this->refundService->refundFull(
+            $this->refundService->refundPartial(
                 $order,
                 'Refund through Shopware Flow Builder',
+                $order->getAmountTotal(),
                 [],
                 $baseEvent->getContext()
             );
