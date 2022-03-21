@@ -177,7 +177,7 @@ export default class ShopConfigurationAction {
         this.apiClient.get('/rule').then(rules => {
 
             if (rules === undefined || rules === null) {
-                throw new Error('Attention, No rules found trough Shopware API');
+                rules = [];
             }
 
             rules.forEach(rule => {
