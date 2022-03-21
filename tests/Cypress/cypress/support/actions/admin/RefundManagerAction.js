@@ -6,6 +6,12 @@ const shopware = new Shopware();
 
 const repoRefundManager = new RefundManagerRepository();
 
+// we have to force it
+// because due to scrolling it might not
+// always be visible
+const forceOption = {force: true};
+
+
 export default class RefundManagerAction {
 
 
@@ -13,11 +19,10 @@ export default class RefundManagerAction {
      *
      * @param description
      */
-    fullRefund(description)
-    {
-        repoRefundManager.getDescription().clear().type(description);
-        repoRefundManager.getVerifyCheckbox().click();
-        repoRefundManager.getFullRefundButton().click();
+    fullRefund(description) {
+        repoRefundManager.getDescription().clear(forceOption).type(description, forceOption);
+        repoRefundManager.getVerifyCheckbox().click(forceOption);
+        repoRefundManager.getFullRefundButton().click(forceOption);
 
         // here are automatic reloads and things as it seems
         // I really want to test the real UX, so we just wait like a human
@@ -30,11 +35,10 @@ export default class RefundManagerAction {
      * @param description
      */
     partialAmountRefund(amount, description) {
-
-        repoRefundManager.getAmountField().clear().type(amount);
-        repoRefundManager.getDescription().clear().type(description);
-        repoRefundManager.getVerifyCheckbox().click();
-        repoRefundManager.getRefundButton().click();
+        repoRefundManager.getAmountField().clear(forceOption).type(amount, forceOption);
+        repoRefundManager.getDescription().clear(forceOption).type(description, forceOption);
+        repoRefundManager.getVerifyCheckbox().click(forceOption);
+        repoRefundManager.getRefundButton().click(forceOption);
 
         // here are automatic reloads and things as it seems
         // I really want to test the real UX, so we just wait like a human
@@ -45,9 +49,8 @@ export default class RefundManagerAction {
      *
      */
     cancelPendingRefund() {
-
-        repoRefundManager.getFirstRefundContextButton().click();
-        repoRefundManager.getFirstRefundCancelButton().click();
+        repoRefundManager.getFirstRefundContextButton().click(forceOption);
+        repoRefundManager.getFirstRefundCancelButton().click(forceOption);
 
         // here are automatic reloads and things as it seems
         // I really want to test the real UX, so we just wait like a human
