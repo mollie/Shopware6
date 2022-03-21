@@ -108,32 +108,32 @@
         <input-field type="bool">
             <name>refundManagerAutoStockReset</name>
             <defaultValue>true</defaultValue>
-            <label>Automatically include Stock Reset</label>
-            <label lang="de-DE"></label>
-            <label lang="nl-NL"></label>
-            <helpText>Automatically set the entered refund quantity as the quantity to use to increase the stock again.</helpText>
-            <helpText lang="de-DE"></helpText>
-            <helpText lang="nl-NL"></helpText>
+            <label>Automatically include Stock-Reset</label>
+            <label lang="de-DE">Automatisch Lagerbestand zurücksetzen vorbefüllen</label>
+            <label lang="nl-NL">Automatisch voorraad-reset instellen</label>
+            <helpText>Automatically set the entered refund quantity also as the quantity to be used to increase the stock again.</helpText>
+            <helpText lang="de-DE">Sofern aktiv, wird die eingegebene Rückerstattungsmenge automatisch als Menge für den Lagerbestand verwendet und dieses Feld vorbefüllt.</helpText>
+            <helpText lang="nl-NL">Stel de ingevoerde restitutiehoeveelheid automatisch ook in als de hoeveelheid die moet worden gebruikt om de voorraad weer te vergroten</helpText>
         </input-field>
         <input-field type="bool">
             <name>refundManagerVerifyRefund</name>
             <defaultValue>true</defaultValue>
             <label>Verify Refunds</label>
-            <label lang="de-DE"></label>
-            <label lang="nl-NL"></label>
+            <label lang="de-DE">Rückerstattungen überprüfen</label>
+            <label lang="nl-NL">Terugbetalingen controleren</label>
             <helpText>If enabled, a verification checkbox needs to be checked to proceed with the refund. We recommend this to avoid accidental refunds and stock changes.</helpText>
-            <helpText lang="de-DE"></helpText>
-            <helpText lang="nl-NL"></helpText>
+            <helpText lang="de-DE">Wenn aktiv, muss ein Überprüfungskästchen aktiviert werden, um mit der Rückerstattung fortzufahren. Wir empfehlen dies, um versehentliche Rückerstattungen und Bestandsänderungen zu vermeiden.</helpText>
+            <helpText lang="nl-NL">Indien actief, moet een selectievakje worden geactiveerd om verder te gaan met de terugbetaling. Wij raden dit aan om onbedoelde terugbetalingen en voorraadwijzigingen te voorkomen.</helpText>
         </input-field>
         <input-field type="bool">
             <name>refundManagerShowInstructions</name>
             <defaultValue>true</defaultValue>
             <label>Show Instructions</label>
-            <label lang="de-DE"></label>
-            <label lang="nl-NL"></label>
+            <label lang="de-DE">Anleitungen anzeigen</label>
+            <label lang="nl-NL">Handleiding tonen</label>
             <helpText>Shows or hides the instructions area. You can simply turn this off in case it's disturbing once you're familiar with the Refund Manager.</helpText>
-            <helpText lang="de-DE"></helpText>
-            <helpText lang="nl-NL"></helpText>
+            <helpText lang="de-DE">Diese Funktion kann benutzt werden, um die Anleitungen auszublenden, sofern man einmal mit dem Refund Manager vetraut ist.</helpText>
+            <helpText lang="nl-NL">Toont of verbergt de handleiding. Als het storend is, kan je het direkt deactiveren als je eenmaal vertrouwd bent met de Refund Manager.</helpText>
         </input-field>
     </card>
     <card>
