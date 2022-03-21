@@ -87,6 +87,9 @@ class FakeRefundService implements RefundServiceInterface
      */
     public function refundPartial(OrderEntity $order, string $description, float $amount, array $lineItems, Context $context): Refund
     {
+        $this->fullyRefunded = false;
+        $this->refundedOrder = $order;
+
         return $this->buildFakeRefund();
     }
 

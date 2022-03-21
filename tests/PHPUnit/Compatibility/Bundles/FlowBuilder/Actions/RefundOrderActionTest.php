@@ -57,9 +57,9 @@ class RefundOrderActionTest extends TestCase
         $action = new RefundOrderAction($fakeOrderService, $fakeRefund, new NullLogger());
         $action->handle($flowEvent);
 
-        # let's see if our refund service did receive
-        # the correct calls and data
-        $this->assertEquals(true, $fakeRefund->isFullyRefunded());
+        # let's see if our refund service did receive the correct calls and data
+        # we use a partial refund with full amount in that case
+        $this->assertEquals(false, $fakeRefund->isFullyRefunded());
         $this->assertEquals('ord-123', $fakeRefund->getRefundedOrder()->getOrderNumber());
     }
 
