@@ -139,37 +139,19 @@ paths:
         "200":
           description: "successful operation"
 
-
-  /api/search/state-machine-history:
-    post:
+  /api/order/{id}/transactions:
+    get:
       tags:
         - "Shopware Order"
-      summary: "Search for the transaction status history"
-      description: "Please insert your order order_transaction.id from the order search response body."
+      summary: "You can simply copy the Order ID from the Administration"
+      description: ""
       security:
         - AdminAPI: [ ]
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                associations:
-                  type: object
-                  properties:
-                    toStateMachineState:
-                      type: object
-                filter:
-                  type: array
-                  items:
-                    properties:
-                        field:
-                          default: "state_machine_history.entityId.id"
-                        type:
-                          default: "equals"
-                        value:
-                          default: "#OrderTransactionID#"
-
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "Shopware Order ID"
+          required: true
       responses:
         "200":
           description: "successful operation"
