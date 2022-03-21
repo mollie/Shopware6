@@ -2,39 +2,31 @@
 
 namespace Kiener\MolliePayments\Service\Logger\Processors;
 
-use Kiener\MolliePayments\Service\Logger\Services\IPAnonymizer;
-use Kiener\MolliePayments\Service\Logger\Services\URLAnonymizer;
-use Monolog\Processor\WebProcessor;
-
+use Kiener\MolliePayments\Service\Logger\Services\URLAnonymizerInterface;
+use Monolog\Processor\ProcessorInterface;
+use Symfony\Component\HttpFoundation\IpUtils;
 
 class AnonymousWebProcessor
 {
 
     /**
-     * @var WebProcessor
+     * @var ProcessorInterface
      */
     private $webProcessor;
 
     /**
-     * @var IPAnonymizer
-     */
-    private $ipAnonymizer;
-
-    /**
-     * @var URLAnonymizer
+     * @var URLAnonymizerInterface
      */
     private $urlAnonymizer;
 
 
     /**
-     * @param WebProcessor $webProcessor
-     * @param IPAnonymizer $ipAnonymizer
-     * @param URLAnonymizer $urlAnonymizer
+     * @param ProcessorInterface $webProcessor
+     * @param URLAnonymizerInterface $urlAnonymizer
      */
-    public function __construct(WebProcessor $webProcessor, IPAnonymizer $ipAnonymizer, URLAnonymizer $urlAnonymizer)
+    public function __construct(ProcessorInterface $webProcessor, URLAnonymizerInterface $urlAnonymizer)
     {
         $this->webProcessor = $webProcessor;
-        $this->ipAnonymizer = $ipAnonymizer;
         $this->urlAnonymizer = $urlAnonymizer;
     }
 
@@ -46,23 +38,16 @@ class AnonymousWebProcessor
     {
         $record = $this->webProcessor->__invoke($record);
 
-        if (array_key_exists('ip', $record['extra'])) {
+        if (array_key_exists('extra', $record)) {
+            if (array_key_exists('ip', $record['extra'])) {
+                # replace it with our anonymous IP
+                $record['extra']['ip'] = IpUtils::anonymize(trim($record['extra']['ip']));
+            }
 
-            # get the original IP
-            $originalIP = $record['extra']['ip'];
-
-            # replace it with our anonymous IP
-            $record['extra']['ip'] = $this->ipAnonymizer->anonymize($originalIP);
+            if (array_key_exists('url', $record['extra'])) {
+                $record['extra']['url'] = $this->urlAnonymizer->anonymize($record['extra']['url']);
+            }
         }
-
-        if (array_key_exists('url', $record['extra'])) {
-
-            $url = $record['extra']['url'];
-
-            $record['extra']['url'] = $this->urlAnonymizer->anonymize($url);
-        }
-
         return $record;
     }
-
 }
