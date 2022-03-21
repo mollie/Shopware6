@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem\Delivery
 use Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem\ProductItem;
 use Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem\PromotionItem;
 use Kiener\MolliePayments\Components\RefundManager\RefundData\RefundData;
+use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\OrderServiceInterface;
@@ -66,8 +67,15 @@ class RefundDataBuilder
         $mollieOrder = $this->mollie->getMollieOrder($mollieOrderId, '');
 
 
-        # now get all Mollie refunds from the Dashboard
-        $refunds = $this->refundService->getRefunds($order);
+        try {
+
+            $refunds = $this->refundService->getRefunds($order);
+
+        } catch (PaymentNotFoundException $ex) {
+            # if we dont have a payment, then theres also no refunds
+            # we still need our data, only with an empty list of refunds
+            $refunds = [];
+        }
 
 
         $promotionCompositions = $this->getAllPromotionCompositions($order);
@@ -119,11 +127,22 @@ class RefundDataBuilder
         # now fetch some basic values from the API
         # TODO: these API calls should be removed one day, once I have more time (this refund manager is indeed huge) for now it's fine
         # ----------------------------------------------------------------------------
-        $remaining = $this->refundService->getRemainingAmount($order);
-        $refundedTotal = $this->refundService->getRefundedAmount($order);
-        $voucherAmount = $this->refundService->getVoucherPaidAmount($order);
-        # ----------------------------------------------------------------------------
-        $pendingRefundAmount = $this->getPendingRefundAmount($refunds);
+        try {
+
+            $remaining = $this->refundService->getRemainingAmount($order);
+            $refundedTotal = $this->refundService->getRefundedAmount($order);
+            $voucherAmount = $this->refundService->getVoucherPaidAmount($order);
+            # ----------------------------------------------------------------------------
+            $pendingRefundAmount = $this->getPendingRefundAmount($refunds);
+
+        } catch (PaymentNotFoundException $ex) {
+            # if we dont have a payment,
+            # then there are no values
+            $remaining = 0;
+            $refundedTotal = 0;
+            $voucherAmount = 0;
+            $pendingRefundAmount = 0;
+        }
 
 
         return new RefundData(
