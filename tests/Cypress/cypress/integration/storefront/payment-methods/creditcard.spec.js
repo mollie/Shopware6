@@ -30,215 +30,228 @@ const validCardNumber = '3782 822463 10005';
 describe('Credit Card Components', () => {
 
     before(function () {
-
         devices.setDevice(devices.getFirstDevice());
         // we need the Shopware failure mode for some tests in this file
         // so let's just do this here once
         configAction.setupShop(false, true, false);
     })
 
-    testDevices.forEach(device => {
+    beforeEach(() => {
+        devices.setDevice(devices.getFirstDevice());
+        session.resetSessionData();
+        session.resetBrowserSession();
+    });
 
-        beforeEach(() => {
-            devices.setDevice(device);
-            session.resetSessionData();
-            session.resetBrowserSession();
-        });
+    context(devices.getDescription(devices.getFirstDevice()), () => {
 
-        context(devices.getDescription(device), () => {
+        it('Successful card payment', () => {
 
-            it('Successful card payment', () => {
+            setUp();
 
-                setUp();
+            payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '1228', '1234');
 
-                payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '1228', '1234');
+            // we are still in our modal, so we
+            // have to close it in older versions
+            if (shopware.isVersionLower(6.4)) {
+                payment.closePaymentsModal();
+            }
 
-                // we are still in our modal, so we
-                // have to close it in older versions
-                if (shopware.isVersionLower(6.4)) {
-                    payment.closePaymentsModal();
-                }
+            shopware.prepareDomainChange();
+            checkout.placeOrderOnConfirm();
 
-                shopware.prepareDomainChange();
-                checkout.placeOrderOnConfirm();
+            cy.url().should('include', 'https://www.mollie.com/checkout/');
 
-                cy.url().should('include', 'https://www.mollie.com/checkout/');
+            // verify that our component card is really
+            // been used by comparing the last 4 digits
+            cy.contains('**** ' + validCardNumber.substr(validCardNumber.length - 4));
 
-                // verify that our component card is really
-                // been used by comparing the last 4 digits
-                cy.contains('**** ' + validCardNumber.substr(validCardNumber.length - 4));
+            molliePayment.initSandboxCookie();
 
-                molliePayment.initSandboxCookie();
+            molliePayment.selectPaid();
 
-                molliePayment.selectPaid();
-
-                cy.url().should('include', '/checkout/finish');
-                cy.contains('Thank you for your order');
-            })
-
-            it('Invalid Card Holder (Empty)', () => {
-
-                setUp();
-
-                payment.fillCreditCardComponents('', validCardNumber, '1228', '1234');
-
-                if (shopware.isVersionGreaterEqual(6.4)) {
-                    checkout.placeOrderOnConfirm();
-                } else {
-                    payment.closePaymentsModal();
-                }
-
-                cy.wait(1000);
-
-                assertComponentErrors(false, true, true, true);
-            })
-
-            it('Invalid Card Holder (Invalid Value)', () => {
-
-                setUp();
-
-                payment.fillCreditCardComponents(' ', validCardNumber, '1228', '1234');
-
-                if (shopware.isVersionGreaterEqual(6.4)) {
-                    checkout.placeOrderOnConfirm();
-                } else {
-                    payment.closePaymentsModal();
-                }
-
-                cy.wait(1200);
-
-                // if we have a space as invalid card holder name
-                // then somehow this error appears.
-                // its not consistent, so we just assert for this text
-                cy.contains("Failed to submit card data");
-            })
-
-            it('Invalid Card Number', () => {
-
-                setUp();
-
-                payment.fillCreditCardComponents('Mollie Tester', '3782', '1228', '1234');
-
-                if (shopware.isVersionGreaterEqual(6.4)) {
-                    checkout.placeOrderOnConfirm();
-                } else {
-                    payment.closePaymentsModal();
-                }
-
-                cy.wait(1000);
-
-                assertComponentErrors(true, false, true, true);
-            })
-
-            it('Invalid Expiry Date', () => {
-
-                setUp();
-
-                payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '12', '1234');
-
-                if (shopware.isVersionGreaterEqual(6.4)) {
-                    checkout.placeOrderOnConfirm();
-                } else {
-                    payment.closePaymentsModal();
-                }
-
-                cy.wait(1000);
-
-                assertComponentErrors(true, true, false, true);
-            })
-
-            it('Invalid CVC Code', () => {
-
-                setUp();
-
-                payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '1228', '124');
-
-                if (shopware.isVersionGreaterEqual(6.4)) {
-                    checkout.placeOrderOnConfirm();
-                } else {
-                    payment.closePaymentsModal();
-                }
-
-                cy.wait(1000);
-
-                assertComponentErrors(true, true, true, false);
-            })
-
-            it('Components work on edit order page', () => {
-
-                scenarioDummyBasket.execute();
-
-                // we have to use something else than CREDIT CARD
-                // why?! because the way how Shopware behaves in the after-order payment process is, that it
-                // just does NOTHING when no payment method change happens!!! it just shows "payment method updated" :)
-                // but does not process a payment
-                payment.switchPaymentMethod('PayPal');
-
-                shopware.prepareDomainChange();
-                checkout.placeOrderOnConfirm();
-
-                molliePayment.initSandboxCookie();
-                molliePayment.selectFailed();
-
-                cy.url().should('include', '/account/order/edit');
-                cy.contains('Complete payment');
-
-                if (shopware.isVersionGreaterEqual(6.4)) {
-
-                    payment.showAllPaymentMethods();
-                    payment.selectPaymentMethod('Credit card');
-                    payment.showAllPaymentMethods();
-
-                    payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '1228', '1234');
-
-                } else {
-
-                    payment.openPaymentsModal();
-                    payment.selectPaymentMethod('Credit card');
-
-                    payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '1228', '1234');
-
-                    payment.closePaymentsModal();
-                }
-
-                shopware.prepareDomainChange();
-                checkout.placeOrderOnEdit();
-
-                molliePayment.initSandboxCookie();
-
-                // verify that our component card is really
-                // been used by comparing the last 4 digits
-                cy.contains('**** ' + validCardNumber.substr(validCardNumber.length - 4));
-
-                molliePayment.selectPaid();
-
-                cy.url().should('include', '/checkout/finish');
-                cy.contains('Thank you for updating your order');
-            })
-
-            it('Open Credit Card payment leads to failure', () => {
-
-                setUp();
-
-                payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '1228', '1234');
-
-                // we are still in our modal, so we
-                // have to close it in older versions
-                if (shopware.isVersionLower(6.4)) {
-                    payment.closePaymentsModal();
-                }
-
-                shopware.prepareDomainChange();
-                checkout.placeOrderOnConfirm();
-
-                molliePayment.initSandboxCookie();
-                molliePayment.selectOpen();
-
-                cy.url().should('include', '/account/order/edit');
-                cy.contains('Complete payment');
-            })
+            cy.url().should('include', '/checkout/finish');
+            cy.contains('Thank you for your order');
         })
+
+        it('Invalid Card Holder (Empty)', () => {
+
+            setUp();
+
+            payment.fillCreditCardComponents('', validCardNumber, '1228', '1234');
+
+            if (shopware.isVersionGreaterEqual(6.4)) {
+                checkout.placeOrderOnConfirm();
+            } else {
+                payment.closePaymentsModal();
+            }
+
+            cy.wait(1000);
+
+            assertComponentErrors(false, true, true, true);
+        })
+
+        it('Invalid Card Holder (Invalid Value)', () => {
+
+            setUp();
+
+            payment.fillCreditCardComponents(' ', validCardNumber, '1228', '1234');
+
+            if (shopware.isVersionGreaterEqual(6.4)) {
+                checkout.placeOrderOnConfirm();
+            } else {
+                payment.closePaymentsModal();
+            }
+
+            cy.wait(1200);
+
+            // if we have a space as invalid card holder name
+            // then somehow this error appears.
+            // its not consistent, so we just assert for this text
+            cy.contains("Failed to submit card data");
+        })
+
+        it('Invalid Card Number', () => {
+
+            setUp();
+
+            payment.fillCreditCardComponents('Mollie Tester', '3782', '1228', '1234');
+
+            if (shopware.isVersionGreaterEqual(6.4)) {
+                checkout.placeOrderOnConfirm();
+            } else {
+                payment.closePaymentsModal();
+            }
+
+            cy.wait(1000);
+
+            assertComponentErrors(true, false, true, true);
+        })
+
+        it('Invalid Expiry Date', () => {
+
+            setUp();
+
+            payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '12', '1234');
+
+            if (shopware.isVersionGreaterEqual(6.4)) {
+                checkout.placeOrderOnConfirm();
+            } else {
+                payment.closePaymentsModal();
+            }
+
+            cy.wait(1000);
+
+            assertComponentErrors(true, true, false, true);
+        })
+
+        it('Invalid CVC Code', () => {
+
+            setUp();
+
+            payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '1228', '124');
+
+            if (shopware.isVersionGreaterEqual(6.4)) {
+                checkout.placeOrderOnConfirm();
+            } else {
+                payment.closePaymentsModal();
+            }
+
+            cy.wait(1000);
+
+            assertComponentErrors(true, true, true, false);
+        })
+
+        it('Components work on edit order page', () => {
+
+            scenarioDummyBasket.execute();
+
+            // we have to use something else than CREDIT CARD
+            // why?! because the way how Shopware behaves in the after-order payment process is, that it
+            // just does NOTHING when no payment method change happens!!! it just shows "payment method updated" :)
+            // but does not process a payment
+            payment.switchPaymentMethod('PayPal');
+
+            shopware.prepareDomainChange();
+            checkout.placeOrderOnConfirm();
+
+            molliePayment.initSandboxCookie();
+            molliePayment.selectFailed();
+
+            cy.url().should('include', '/account/order/edit');
+            cy.contains('Complete payment');
+
+            if (shopware.isVersionGreaterEqual(6.4)) {
+
+                payment.showAllPaymentMethods();
+                payment.selectPaymentMethod('Credit card');
+                payment.showAllPaymentMethods();
+
+                payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '1228', '1234');
+
+            } else {
+
+                payment.openPaymentsModal();
+                payment.selectPaymentMethod('Credit card');
+
+                payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '1228', '1234');
+
+                payment.closePaymentsModal();
+            }
+
+            shopware.prepareDomainChange();
+            checkout.placeOrderOnEdit();
+
+            molliePayment.initSandboxCookie();
+
+            // verify that our component card is really
+            // been used by comparing the last 4 digits
+            cy.contains('**** ' + validCardNumber.substr(validCardNumber.length - 4));
+
+            molliePayment.selectPaid();
+
+            cy.url().should('include', '/checkout/finish');
+            cy.contains('Thank you for updating your order');
+        })
+
     })
+})
+
+describe('Status Tests', () => {
+
+    before(function () {
+        devices.setDevice(devices.getFirstDevice());
+        // turn off credit card components
+        // to speed up a few  things
+        configAction.setupPlugin(false, false, false);
+
+    })
+
+    beforeEach(() => {
+        devices.setDevice(devices.getFirstDevice());
+        session.resetSessionData();
+        session.resetBrowserSession();
+    });
+
+    it('Open Credit Card payment leads to failure', () => {
+
+        setUp();
+
+        // we are still in our modal, so we
+        // have to close it in older versions
+        if (shopware.isVersionLower(6.4)) {
+            payment.closePaymentsModal();
+        }
+
+        shopware.prepareDomainChange();
+        checkout.placeOrderOnConfirm();
+
+        molliePayment.initSandboxCookie();
+        molliePayment.selectOpen();
+
+        cy.url().should('include', '/account/order/edit');
+        cy.contains('Complete payment');
+    })
+
 })
 
 

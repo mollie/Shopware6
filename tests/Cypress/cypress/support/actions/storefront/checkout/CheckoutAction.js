@@ -18,17 +18,19 @@ export default class CheckoutAction {
 
     /**
      *
-     * @param quantity
      */
-    prepareDummyCart(quantity) {
+    clearCart() {
+        // open off canvas
+        cy.get('.header-cart-total').click();
 
-        topMenu.clickOnHome();
+        const btnRemoveItem = '.cart-item-remove > .btn';
 
-        listing.clickOnFirstProduct();
-
-        pdp.addToCart(quantity);
-
-        this.goToCheckoutInOffCanvas();
+        cy.get('body').then((body) => {
+            if (body.find(btnRemoveItem).length > 0) {
+                cy.get(btnRemoveItem).click({multiple: true});
+                cy.wait(300);
+            }
+        });
     }
 
     /**

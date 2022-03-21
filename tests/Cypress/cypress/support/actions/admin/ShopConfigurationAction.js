@@ -32,6 +32,23 @@ export default class ShopConfigurationAction {
 
         cy.wait(500);
 
+        this.setupPlugin(mollieFailureMode, creditCardComponents, applePayDirect);
+
+        // let's just wait a bit
+        cy.wait(10000);
+
+        this._clearCache();
+    }
+
+
+    /**
+     *
+     * @param mollieFailureMode
+     * @param creditCardComponents
+     * @param applePayDirect
+     */
+    setupPlugin(mollieFailureMode, creditCardComponents, applePayDirect) {
+
         // assign all payment methods to
         // all available sales channels
         this.apiClient.get('/sales-channel').then(channels => {
@@ -45,11 +62,6 @@ export default class ShopConfigurationAction {
                 this._configureMolliePlugin(channel.id, mollieFailureMode, creditCardComponents, applePayDirect);
             });
         });
-
-        // let's just wait a bit
-        cy.wait(10000);
-
-        this._clearCache();
     }
 
     /**
