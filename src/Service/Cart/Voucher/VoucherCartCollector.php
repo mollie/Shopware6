@@ -2,18 +2,31 @@
 
 namespace Kiener\MolliePayments\Service\Cart\Voucher;
 
+use Kiener\MolliePayments\Controller\Api\PaymentMethodController;
+use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
+use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Kiener\MolliePayments\Struct\Voucher\VoucherType;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\CartBehavior;
 use Shopware\Core\Checkout\Cart\CartDataCollectorInterface;
 use Shopware\Core\Checkout\Cart\LineItem\CartDataCollection;
+use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
+use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class VoucherCartCollector implements CartDataCollectorInterface
 {
 
     public const VOUCHER_PERMITTED = 'mollie-voucher-permitted';
+
+    /**
+     * @var EntityRepositoryInterface
+     */
+    private $repoPaymentMethods;
 
     /**
      * @var VoucherService
@@ -23,10 +36,12 @@ class VoucherCartCollector implements CartDataCollectorInterface
 
     /**
      * @param VoucherService $voucherService
+     * @param EntityRepositoryInterface $paymentMethodRepository
      */
-    public function __construct(VoucherService $voucherService)
+    public function __construct(VoucherService $voucherService, EntityRepositoryInterface $paymentMethodRepository)
     {
         $this->voucherService = $voucherService;
+        $this->repoPaymentMethods = $paymentMethodRepository;
     }
 
 
@@ -42,34 +57,67 @@ class VoucherCartCollector implements CartDataCollectorInterface
      */
     public function collect(CartDataCollection $data, Cart $original, SalesChannelContext $context, CartBehavior $behavior): void
     {
+        $salesChannelHasVoucherMethod = true;
+
+        # if we have a lot of products, the performance might not be good enough at the moment.
+        # we try to improve this as first step, by only verifying our products
+        # if we even have the voucher payment method assigned to our Sales Channel.
+        # if it's not assigned anyway, then we can simply skip that step
+        /** @var string[]|null $paymentMethodIDs */
+        $paymentMethodIDs = $context->getSalesChannel()->getPaymentMethodIds();
+
+        if (is_array($paymentMethodIDs)) {
+            $voucherID = $this->getVoucherID($context->getContext());
+            $salesChannelHasVoucherMethod = in_array($voucherID, $paymentMethodIDs, true);
+        }
+
+
         $cartHasVoucher = false;
 
-        foreach ($original->getLineItems() as $item) {
+        if ($salesChannelHasVoucherMethod) {
+            foreach ($original->getLineItems() as $item) {
 
-            # get the final inherited voucher type of the product
-            # this might even be from the parent
-            $voucherType = $this->voucherService->getFinalVoucherType($item, $context);
+                # get the final inherited voucher type of the product
+                # this might even be from the parent
+                $voucherType = $this->voucherService->getFinalVoucherType($item, $context);
 
-            # if we have a valid voucher product
-            # then we have to update the actual line item,
-            # because the current one might be empty, if only our PARENT would be configured.
-            if (VoucherType::isVoucherProduct($voucherType)) {
+                # if we have a valid voucher product
+                # then we have to update the actual line item,
+                # because the current one might be empty, if only our PARENT would be configured.
+                if (VoucherType::isVoucherProduct($voucherType)) {
 
-                $cartHasVoucher = true;
+                    $cartHasVoucher = true;
 
-                # load current custom fields data of mollie
-                # and overwrite the voucher type that we just searched
-                $attributes = new LineItemAttributes($item);
-                $attributes->setVoucherType($voucherType);
+                    # load current custom fields data of mollie
+                    # and overwrite the voucher type that we just searched
+                    $attributes = new LineItemAttributes($item);
+                    $attributes->setVoucherType($voucherType);
 
-                $customFields = $item->getPayload()['customFields'];
-                $customFields['mollie_payments'] = $attributes->toArray();
+                    $customFields = $item->getPayload()['customFields'];
+                    $customFields['mollie_payments'] = $attributes->toArray();
 
-                $item->setPayloadValue('customFields', $customFields);
+                    $item->setPayloadValue('customFields', $customFields);
+                }
             }
         }
 
         $data->set(self::VOUCHER_PERMITTED, $cartHasVoucher);
+    }
+
+
+    /**
+     * @param Context|null $context
+     * @return array|string
+     */
+    private function getVoucherID(Context $context)
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('handlerIdentifier', VoucherPayment::class));
+
+        // Get payment methods
+        $paymentMethods = $this->repoPaymentMethods->searchIds($criteria, $context)->getIds();
+
+        return $paymentMethods[0];
     }
 
 }
