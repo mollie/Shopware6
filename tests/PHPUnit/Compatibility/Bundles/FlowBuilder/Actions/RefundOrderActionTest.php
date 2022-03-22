@@ -4,10 +4,8 @@ namespace Kiener\MolliePayments\Tests\Compatibility\Bundles\FlowBuilder\Actions;
 
 
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Actions\RefundOrderAction;
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Actions\ShipOrderAction;
-use MolliePayments\Tests\Fakes\FakeMollieShipment;
 use MolliePayments\Tests\Fakes\FakeOrderService;
-use MolliePayments\Tests\Fakes\FakeRefundService;
+use MolliePayments\Tests\Fakes\FakeRefundManager;
 use MolliePayments\Tests\Traits\FlowBuilderTestTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
@@ -31,11 +29,10 @@ class RefundOrderActionTest extends TestCase
     }
 
     /**
-     * This test verifies that our refund is correctly triggered
-     * when this flow action is started.
-     * We get our order and number from a fake service and send it to the fake refund.
+     * This test verifies that our refund is correctly triggered when this flow action is started.
+     * We get our order and number from a fake service and send it to the fake refund manager.
      * If everything works out correctly, our refund service is called with a full-refund
-     * as well as the correct order.
+     * as well as the correct order. So we also verify that a full refund request is built
      *
      * @return void
      * @throws \Exception
@@ -48,19 +45,24 @@ class RefundOrderActionTest extends TestCase
         $order->setAmountTotal(19.99);
 
         $fakeOrderService = new FakeOrderService($order);
-        $fakeRefund = new FakeRefundService('r123', 0);
+        $fakeRefundManager = new FakeRefundManager('r123', 0);
 
         $flowEvent = $this->buildOrderStateFlowEvent($order, 'action.mollie.order.refund');
 
         # build our action and
         # start the handling process with our prepared data
-        $action = new RefundOrderAction($fakeOrderService, $fakeRefund, new NullLogger());
+        $action = new RefundOrderAction($fakeOrderService, $fakeRefundManager, new NullLogger());
         $action->handle($flowEvent);
 
-        # let's see if our refund service did receive the correct calls and data
-        # we use a partial refund with full amount in that case
-        $this->assertEquals(false, $fakeRefund->isFullyRefunded());
-        $this->assertEquals('ord-123', $fakeRefund->getRefundedOrder()->getOrderNumber());
+
+        # verify the passed request object
+        $this->assertEquals('ord-123', $fakeRefundManager->getRefundRequest()->getOrderNumber());
+        $this->assertEquals('Refund through Shopware Flow Builder', $fakeRefundManager->getRefundRequest()->getDescription());
+        $this->assertEquals(null, $fakeRefundManager->getRefundRequest()->getAmount(), 'amount needs to be NULL to detect it as full refund');
+        $this->assertEquals([], $fakeRefundManager->getRefundRequest()->getItems());
+
+        # verify that the correct order has been fetched
+        $this->assertEquals('ord-123', $fakeRefundManager->getRefundedOrder()->getOrderNumber());
     }
 
 }

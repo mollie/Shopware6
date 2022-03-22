@@ -2,7 +2,7 @@
 
 namespace Kiener\MolliePayments\Controller\Api;
 
-use Kiener\MolliePayments\Components\RefundManager\RefundManager;
+use Kiener\MolliePayments\Components\RefundManager\RefundManagerInterface;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
@@ -27,7 +27,7 @@ class RefundController extends AbstractController
     private $orderService;
 
     /**
-     * @var RefundManager
+     * @var RefundManagerInterface
      */
     private $refundManager;
 
@@ -44,11 +44,11 @@ class RefundController extends AbstractController
 
     /**
      * @param OrderService $orderService
-     * @param RefundManager $refundManager
+     * @param RefundManagerInterface $refundManager
      * @param RefundService $refundService
      * @param LoggerInterface $logger
      */
-    public function __construct(OrderService $orderService, RefundManager $refundManager, RefundService $refundService, LoggerInterface $logger)
+    public function __construct(OrderService $orderService, RefundManagerInterface $refundManager, RefundService $refundService, LoggerInterface $logger)
     {
         $this->orderService = $orderService;
         $this->refundManager = $refundManager;

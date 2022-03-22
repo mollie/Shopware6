@@ -11,6 +11,7 @@ use Kiener\MolliePayments\Components\RefundManager\Builder\RefundDataBuilder;
 use Kiener\MolliePayments\Components\RefundManager\Integrators\StockManagerInterface;
 use Kiener\MolliePayments\Components\RefundManager\RefundData\RefundData;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
+use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieRefundException;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Service\OrderService;
@@ -24,11 +25,12 @@ use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Refund;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 
-class RefundManager
+class RefundManager implements RefundManagerInterface
 {
 
     /**
@@ -136,15 +138,22 @@ class RefundManager
         $refund = null;
 
         if ($request->isFullRefundAmountOnly()) {
-            # full amount refunds cannot be done without items
-            # so we have to do a partial refund with the full amount
-            $refund = $this->refundService->refundPartial(
+            # we have a full refund, but only with amount
+            # and no items. to make sure that we have clean data
+            # we have to extract all items, so that they will be added to the metadata
+            $requestItems = $this->buildRequestItemsFromOrder($order);
+            $request->setItems($requestItems);
+
+            # convert again
+            $serviceItems = $this->convertToRefundItems($request, $order, $mollieOrder);
+
+            $refund = $this->refundService->refundFull(
                 $order,
                 $request->getDescription(),
-                $order->getAmountTotal(),
-                [],
+                $serviceItems,
                 $context
             );
+
         } else if ($request->isFullRefundWithItems($order)) {
             $refund = $this->refundService->refundFull(
                 $order,
@@ -179,12 +188,10 @@ class RefundManager
         $refundAmount = (float)$refund->amount->value;
 
 
-
         # DISPATCH FLOW BUILDER
         # ---------------------------------------------------------------------------------------------
         $event = $this->flowBuilderEventFactory->buildRefundStartedEvent($order, $refundAmount, $context);
         $this->flowBuilderDispatcher->dispatch($event);
-
 
 
         # ---------------------------------------------------------------------------------------------
@@ -251,6 +258,40 @@ class RefundManager
         }
 
         return null;
+    }
+
+
+    /**
+     * @param OrderEntity $order
+     * @return array<mixed>
+     */
+    private function buildRequestItemsFromOrder(OrderEntity $order)
+    {
+        $items = [];
+
+        if ($order->getLineItems() instanceof OrderLineItemCollection) {
+            foreach ($order->getLineItems() as $lineItem) {
+                $items[] = new RefundRequestItem(
+                    $lineItem->getId(),
+                    $lineItem->getTotalPrice(),
+                    $lineItem->getQuantity(),
+                    0
+                );
+            }
+        }
+
+        if ($order->getDeliveries() instanceof OrderDeliveryCollection) {
+            foreach ($order->getDeliveries() as $delivery) {
+                $items[] = new RefundRequestItem(
+                    $delivery->getId(),
+                    $delivery->getShippingCosts()->getTotalPrice(),
+                    $delivery->getShippingCosts()->getQuantity(),
+                    0
+                );
+            }
+        }
+
+        return $items;
     }
 
     /**

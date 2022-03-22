@@ -46,9 +46,18 @@ class RefundRequest
      * @param RefundRequestItem $item
      * @return void
      */
-    public function addItem(RefundRequestItem $item)
+    public function addItem(RefundRequestItem $item): void
     {
         $this->items[] = $item;
+    }
+
+    /**
+     * @param RefundRequestItem[] $items
+     * @return void
+     */
+    public function setItems(array $items): void
+    {
+        $this->items = $items;
     }
 
     /**
@@ -105,7 +114,7 @@ class RefundRequest
         if (!$this->hasRefundableItemInstructions()) {
             return false;
         }
-        
+
 
         $itemsDifferToCartAmount = $this->isDifferentAmount($order);
 
