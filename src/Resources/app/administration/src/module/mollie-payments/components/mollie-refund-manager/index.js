@@ -554,6 +554,9 @@ Component.register('mollie-refund-manager', {
 
             this.isRefundDataLoading = true;
 
+            const me = this;
+
+
             this.MolliePaymentsRefundService.getRefundManagerData(
                 {
                     orderId: this.order.id,
@@ -563,11 +566,21 @@ Component.register('mollie-refund-manager', {
                     // now simply assign the values to our props
                     // so that vue will show it
                     this.mollieRefunds = response.refunds;
-                    this.orderItems = response.cart;
                     this.remainingAmount = response.totals.remaining;
                     this.refundedAmount = response.totals.refunded;
                     this.voucherAmount = response.totals.voucherAmount;
                     this.pendingRefunds = response.totals.pendingRefunds;
+
+                    // assign our items
+                    // and also reset them, so that we
+                    // prepare our local scoped variables such as
+                    // the amount to refund, quantity and more.
+                    // this prepares the data for our refund request calls
+                    this.orderItems = response.cart;
+                    this.orderItems.forEach(function (item) {
+                        me.itemService.resetRefundData(item);
+                    });
+
                     // yep, we're done loading ;)
                     this.isRefundDataLoading = false;
                 })
