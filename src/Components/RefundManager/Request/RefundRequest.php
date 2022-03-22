@@ -183,6 +183,17 @@ class RefundRequest
                     }
                 }
             }
+
+            if ($order->getDeliveries() !== null) {
+                foreach ($order->getDeliveries() as $deliveryItem) {
+                    if ($deliveryItem->getId() === $item->getLineId()) {
+                        if ($deliveryItem->getShippingCosts()->getTotalPrice() !== $item->getAmount()) {
+                            $isDifferentAmount = true;
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
         return $isDifferentAmount;

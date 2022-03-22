@@ -5,6 +5,11 @@ namespace MolliePayments\Tests\Components\RefundManager\Request;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
 use PHPUnit\Framework\TestCase;
+use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
+use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
+use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -106,6 +111,39 @@ class RefundRequestTest extends TestCase
         $request->addItem(new RefundRequestItem('line-1', 19.99, 1, 0));
 
         $this->assertEquals(true, $request->isFullRefundWithItems($order));
+    }
+
+    /**
+     * If we have a delivery item with a partial amount, then we do
+     * not want to have a full refund with items.
+     * We build an order with a delivery item, and then refund that item as quantity 1
+     * but with a partial amount only.
+     * @return void
+     */
+    public function testIsNoFullRefundWithItems_PartialAmountDelivery()
+    {
+        $order = $this->getOrder();
+
+        $delivery = new OrderDeliveryEntity();
+        $delivery->setId('delivery-1');
+        $delivery->setShippingCosts(
+            new CalculatedPrice(
+                4.99,
+                4.99,
+                new CalculatedTaxCollection(),
+                new TaxRuleCollection(),
+                1,
+                null,
+                null
+            )
+        );
+
+        $order->setDeliveries(new OrderDeliveryCollection([$delivery]));
+
+        $request = new RefundRequest('', '', 0);
+        $request->addItem(new RefundRequestItem('delivery-1', 2, 1, 0));
+
+        $this->assertEquals(false, $request->isFullRefundWithItems($order));
     }
 
     /**
