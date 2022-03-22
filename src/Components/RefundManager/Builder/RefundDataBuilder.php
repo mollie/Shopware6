@@ -112,7 +112,19 @@ class RefundDataBuilder
         if ($order->getDeliveries() !== null) {
             foreach ($order->getDeliveries() as $delivery) {
 
-                $alreadyRefundedQty = $this->getRefundedQuantity('', $mollieOrder, $refunds);
+                $mollieLineID = '';
+
+                # search the mollie line id for the order
+                # because we don't have this in our order items
+                /** @var OrderLine $line */
+                foreach ($mollieOrder->lines as $line) {
+                    if ($line->metadata->orderLineItemId === $delivery->getId()) {
+                        $mollieLineID = $line->id;
+                        break;
+                    }
+                }
+
+                $alreadyRefundedQty = $this->getRefundedQuantity($mollieLineID, $mollieOrder, $refunds);
 
                 $refundDeliveryItems[] = new DeliveryItem($delivery, $alreadyRefundedQty);
             }
