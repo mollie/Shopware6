@@ -127,6 +127,7 @@
 
         <service id="Kiener\MolliePayments\Service\Cart\Voucher\VoucherCartCollector">
             <argument type="service" id="Kiener\MolliePayments\Service\Voucher\VoucherService"/>
+            <argument type="service" id="payment_method.repository"/>
             <!-- // inject after product collector(5000) -->
             <tag name="shopware.cart.collector" priority="2000"/>
         </service>
