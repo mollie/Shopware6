@@ -44,66 +44,6 @@ paths:
         "200":
           description: "successful operation"
 
-  /api/mollie/ship/order?number={number}:
-    get:
-      tags:
-        - "Shipping"
-      summary: "Full shipment"
-      security:
-        - AdminAPI: []
-      parameters:
-        - name: "number"
-          in: "path"
-          description: "Shopware order number"
-          required: true
-      responses:
-        "200":
-          description: "successful operation"
-
-  /api/mollie/ship/item?order={order}&item={item}&quantity={quantity}:
-    get:
-      tags:
-        - "Shipping"
-      summary: "Partial shipment"
-      security:
-        - AdminAPI: []
-      parameters:
-        - name: "order"
-          in: "path"
-          description: "Shopware order number"
-          required: true
-        - name: "item"
-          in: "path"
-          description: "product number"
-        - name: "quantity"
-          in: "path"
-          description: "quantity"
-      responses:
-        "200":
-          description: "successful operation"
-
-  /api/mollie/refund/order?number={number}&amount={amount}&description={description}:
-    get:
-      tags:
-        - "Refunds"
-      summary: "Full and partial refund"
-      security:
-        - AdminAPI: []
-      parameters:
-        - name: "number"
-          in: "path"
-          description: "Shopware order number"
-          required: true
-        - name: "amount"
-          in: "path"
-          description: "(optional) partial amount"
-        - name: "description"
-          in: "path"
-          description: "(optional) custom description"
-      responses:
-        "200":
-          description: "successful operation"
-
   /api/search/order:
     post:
       tags:
@@ -134,7 +74,6 @@ paths:
                         default: "equals"
                       value:
                         default: "#OrderID#"
-
       responses:
         "200":
           description: "successful operation"
@@ -143,7 +82,7 @@ paths:
     get:
       tags:
         - "Shopware Order"
-      summary: "You can simply copy the Order ID from the Administration"
+      summary: "See all transactions for the Shopware Order"
       description: ""
       security:
         - AdminAPI: [ ]
@@ -152,6 +91,143 @@ paths:
           in: "path"
           description: "Shopware Order ID"
           required: true
+      responses:
+        "200":
+          description: "successful operation"
+
+
+  /api/mollie/ship/order?number={number}:
+    get:
+      tags:
+        - "Shipping (Operational)"
+      summary: "Full shipment"
+      security:
+        - AdminAPI: []
+      parameters:
+        - name: "number"
+          in: "path"
+          description: "Shopware order number"
+          required: true
+      responses:
+        "200":
+          description: "successful operation"
+
+  /api/mollie/ship/item?order={order}&item={item}&quantity={quantity}:
+    get:
+      tags:
+        - "Shipping (Operational)"
+      summary: "Partial shipment"
+      security:
+        - AdminAPI: []
+      parameters:
+        - name: "order"
+          in: "path"
+          description: "Shopware order number"
+          required: true
+        - name: "item"
+          in: "path"
+          description: "product number"
+        - name: "quantity"
+          in: "path"
+          description: "quantity"
+      responses:
+        "200":
+          description: "successful operation"
+
+  /api/mollie/refund/order?number={number}&description={description}:
+    get:
+      tags:
+        - "Refunds (Operational)"
+      summary: "Full Refund"
+      security:
+        - AdminAPI: []
+      parameters:
+        - name: "number"
+          in: "path"
+          description: "Shopware order number"
+          required: true
+        - name: "description"
+          in: "path"
+          description: "(optional) custom description"
+      responses:
+        "200":
+          description: "successful operation"
+
+  /api/mollie/refund/order?number={number}&amount={amount}&description={description}:
+    get:
+      tags:
+        - "Refunds (Operational)"
+      summary: "Partial Refund"
+      security:
+        - AdminAPI: []
+      parameters:
+        - name: "number"
+          in: "path"
+          description: "Shopware order number"
+          required: true
+        - name: "amount"
+          in: "path"
+          description: "(optional) partial amount"
+        - name: "description"
+          in: "path"
+          description: "(optional) custom description"
+      responses:
+        "200":
+          description: "successful operation"
+
+  /api/_action/mollie/refund-manager/data:
+    post:
+      tags:
+        - "Refunds (Technical)"
+      summary: "Get data from Refund Manager"
+      security:
+        - AdminAPI: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orderId:
+                  default: ""
+      responses:
+        "200":
+          description: "successful operation"
+
+
+  /api/_action/mollie/refund:
+    post:
+      tags:
+        - "Refunds (Technical)"
+      summary: "Refund with Refund Manager"
+      security:
+        - AdminAPI: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orderId:
+                  default: ""
+                amount:
+                  default: "0.00"
+                description:
+                  default: ""
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        default: ""
+                      amount:
+                        default: "0.0"
+                      quantity:
+                        default: "0"
+                      resetStock:
+                        default: "0"
+
       responses:
         "200":
           description: "successful operation"
