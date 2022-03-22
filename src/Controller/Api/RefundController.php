@@ -60,7 +60,7 @@ class RefundController extends AbstractController
     # ----------------------------------------------------------------------------------------------------------------------------------------
     # ----------------------------------------------------------------------------------------------------------------------------------------
     # ----------------------------------------------------------------------------------------------------------------------------------------
-    # PUBLIC EASY APIs
+    # OPERATIONAL APIs
 
     /**
      * @RouteScope(scopes={"api"})
@@ -75,13 +75,14 @@ class RefundController extends AbstractController
         $orderNumber = (string)$query->get('number');
         $description = $query->get('description', '');
         $amount = $query->get('amount', null); # we need NULL as full refund option
-        $items = []; # nullable items means -> all items
+        # we don't allow items here
+        # because this is a non-technical call, and
+        # those items would (at the moment) require order line item IDs
+        $items = [];
 
-        /** @var RequestDataBag $items */
-        $itemsBag = $query->get('items', []);
-
-        if ($itemsBag instanceof RequestDataBag) {
-            $items = $itemsBag->all();
+        # we have to convert to float ;)
+        if ($amount !== null) {
+            $amount = (float)$amount;
         }
 
         return $this->refundAction(

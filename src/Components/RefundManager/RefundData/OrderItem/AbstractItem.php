@@ -22,6 +22,7 @@ abstract class AbstractItem
     protected function buildArray(string $id, string $label, string $referenceNumber, bool $isPromotion, bool $isDelivery, float $unitPrice, int $quantity, float $totalPrice, float $promotionDiscount, int $promotionAffectedQty, int $refundedQty): array
     {
         return [
+            'refunded' => $refundedQty,
             'shopware' => [
                 'id' => $id,
                 'label' => $label,
@@ -37,14 +38,6 @@ abstract class AbstractItem
                 'isPromotion' => $isPromotion,
                 'isDelivery' => $isDelivery,
             ],
-            # ----------------------------------------------------
-            // refund mode: none, quantity, amount
-            'refundMode' => 'none',
-            'refundQuantity' => 0,
-            'refundAmount' => 0,
-            'resetStock' => 0,
-            'refundPromotion' => false,
-            'refunded' => $refundedQty,
         ];
     }
 

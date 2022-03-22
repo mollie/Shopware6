@@ -73,7 +73,9 @@ class RefundRequest
      */
     public function getDescription(): string
     {
-        if (strlen(trim($this->description)) === 0) {
+        # i dont know why, but swagger only sends "," if nothing is provided
+        # this must not happen in production anyway, so lets just skip that :)
+        if (strlen(trim($this->description)) === 0 || $this->description === ',') {
             return "Refunded through Shopware. Order number: " . $this->orderNumber;
         }
 

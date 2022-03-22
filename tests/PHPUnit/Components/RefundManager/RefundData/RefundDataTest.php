@@ -63,6 +63,7 @@ class RefundDataTest extends TestCase
 
         $expected = [
             [
+                'refunded' => 2,
                 'shopware' => [
                     'id' => 'line-1',
                     'label' => 'Product 1',
@@ -78,12 +79,6 @@ class RefundDataTest extends TestCase
                     'isPromotion' => false,
                     'isDelivery' => false,
                 ],
-                'refundMode' => 'none',
-                'refundQuantity' => 0,
-                'refundAmount' => 0,
-                'resetStock' => 0,
-                'refundPromotion' => false,
-                'refunded' => 2,
             ]
         ];
 
