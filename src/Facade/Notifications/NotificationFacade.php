@@ -6,6 +6,7 @@ namespace Kiener\MolliePayments\Facade\Notifications;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatcherAdapterInterface;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
+use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
@@ -58,11 +59,6 @@ class NotificationFacade
     private $repoOrderTransactions;
 
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @var FlowBuilderDispatcherAdapterInterface
      */
     private $flowBuilderDispatcher;
@@ -71,6 +67,16 @@ class NotificationFacade
      * @var FlowBuilderEventFactory
      */
     private $flowBuilderEventFactory;
+
+    /**
+     * @var SubscriptionManager
+     */
+    private $subscriptionManager;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
 
     /**
@@ -81,10 +87,11 @@ class NotificationFacade
      * @param EntityRepositoryInterface $repoOrderTransactions
      * @param FlowBuilderFactory $flowBuilderFactory
      * @param FlowBuilderEventFactory $flowBuilderEventFactory
+     * @param SubscriptionManager $subscription
      * @param LoggerInterface $logger
      * @throws \Exception
      */
-    public function __construct(MollieGatewayInterface $gatewayMollie, OrderStatusConverter $statusConverter, OrderStatusUpdater $statusUpdater, EntityRepositoryInterface $repoPaymentMethods, EntityRepositoryInterface $repoOrderTransactions, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, LoggerInterface $logger)
+    public function __construct(MollieGatewayInterface $gatewayMollie, OrderStatusConverter $statusConverter, OrderStatusUpdater $statusUpdater, EntityRepositoryInterface $repoPaymentMethods, EntityRepositoryInterface $repoOrderTransactions, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionManager $subscription, LoggerInterface $logger)
     {
         $this->gatewayMollie = $gatewayMollie;
         $this->statusConverter = $statusConverter;
@@ -92,6 +99,7 @@ class NotificationFacade
         $this->repoPaymentMethods = $repoPaymentMethods;
         $this->repoOrderTransactions = $repoOrderTransactions;
         $this->flowBuilderEventFactory = $flowBuilderEventFactory;
+        $this->subscriptionManager = $subscription;
         $this->logger = $logger;
 
         $this->flowBuilderDispatcher = $flowBuilderFactory->createDispatcher();
@@ -102,6 +110,7 @@ class NotificationFacade
      * @param string $transactionId
      * @param MollieSettingStruct $settings
      * @param SalesChannelContext $contextSC
+     * @return void
      * @throws \Exception
      */
     public function onNotify(string $transactionId, MollieSettingStruct $settings, SalesChannelContext $contextSC): void
@@ -161,6 +170,20 @@ class NotificationFacade
         }
 
         # --------------------------------------------------------------------------------------------
+        # SUBSCRIPTION
+        # if we have a subscription, then we want to make sure to create it
+        # in our local database too
+        # TODO...verify that this is the correct approach...
+
+        switch ($status) {
+
+            case MolliePaymentStatus::MOLLIE_PAYMENT_PAID:
+            case MolliePaymentStatus::MOLLIE_PAYMENT_AUTHORIZED:
+                $this->subscriptionManager->createSubscriptions($swOrder, $contextSC);
+                break;
+        }
+
+        # --------------------------------------------------------------------------------------------
         # FIRE FLOW BUILDER TRIGGER EVENT
         # we have an adapter setup anyway here, so if flow builder is
         # not yet supported in this shopware version, then
@@ -180,6 +203,8 @@ class NotificationFacade
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('id', $transactionId));
         $criteria->addAssociation('order');
+        $criteria->addAssociation('order.lineItems');
+        $criteria->addAssociation('order.currency');
         $criteria->addAssociation('paymentMethod');
 
         return $this->repoOrderTransactions->search($criteria, $context)->first();

@@ -329,7 +329,7 @@ class WebhookSubscriptionController extends StorefrontController
         );
 
         $this->logger->error(
-            'Created order array for mollie',
+            'Created order array for mollie'
 
         );
 

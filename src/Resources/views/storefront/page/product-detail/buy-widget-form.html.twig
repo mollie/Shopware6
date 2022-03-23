@@ -1,139 +1,51 @@
 {% sw_extends '@Storefront/storefront/page/product-detail/buy-widget-form.html.twig' %}
 
+{% block page_product_detail_buy_container %}
+    {{ parent() }}
 
-{% block page_product_detail_buy_form_inner %}
-    {# @var page \Shopware\Storefront\Page\Product\ProductPage #}
+    {% block page_product_detail_buy_container_apple_direct %}
 
-    {# @var product \Shopware\Core\Content\Product\SalesChannel\SalesChannelProductEntity #}
-    {% set product = page.product %}
-    <form
-            id="productDetailPageBuyProductForm"
-            action="{% block page_product_detail_buy_form_action %}{{ path('frontend.checkout.line-item.add') }}{% endblock %}"
-            method="post"
-            class="buy-widget"
-            data-add-to-cart="true">
-
-        {% block page_product_detail_buy_form_inner_csrf %}
-            {{ sw_csrf('frontend.checkout.line-item.add') }}
-        {% endblock %}
-
+        {# this is for Shopware < 6.4 #}
+        {% set buyableLegacy = (not page.product.isCloseout or (page.product.availableStock >= page.product.minPurchase)) and page.product.childCount <= 0 %}
+        {# this is for Shopware >= 6.4 #}
         {% set buyable = product.available and product.childCount <= 0 and product.calculatedMaxPurchase > 0 %}
-        {% block page_product_detail_buy_container %}
-            {% if buyable %}
-                <div class="form-row buy-widget-container">
-                    {% block page_product_detail_buy_quantity_container %}
-                        <div class="col-4">
-                            {% block page_product_detail_buy_quantity %}
-                                <select name="lineItems[{{ product.id }}][quantity]"
-                                        class="custom-select product-detail-quantity-select">
-                                    {% for quantity in range(product.minPurchase, product.calculatedMaxPurchase, product.purchaseSteps) %}
-                                        <option value="{{ quantity }}">
-                                            {{ quantity }}
-                                            {% if quantity == 1 %}
-                                                {% if product.translated.packUnit %} {{ product.translated.packUnit }}{% endif %}
-                                            {% else %}
-                                                {% if product.translated.packUnitPlural %}
-                                                    {{ product.translated.packUnitPlural }}
-                                                {% elseif product.translated.packUnit %}
-                                                    {{ product.translated.packUnit }}
-                                                {% endif %}
-                                            {% endif %}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                            {% endblock %}
-                        </div>
-                    {% endblock %}
 
-                    {% block page_product_detail_buy_redirect_input %}
-                        {# fallback redirect back to detail page is deactivated via js #}
-                        <input type="hidden"
-                               name="redirectTo"
-                               value="frontend.detail.page">
+        {% set productPrice = 0 %}
 
-                        <input type="hidden"
-                               name="redirectParameters"
-                               data-redirect-parameters="true"
-                               value='{"productId": "{{ product.id }}"}'>
-                    {% endblock %}
+        {% if product.calculatedPrices|length == 1 %}
+            {% set productPrice = product.calculatedPrices.first.unitPrice %}
+        {% else %}
+            {% set productPrice = product.calculatedPrice.unitPrice %}
 
-                    {% block page_product_detail_buy_product_buy_info %}
-                        <input type="hidden"
-                               name="lineItems[{{ product.id }}][id]"
-                               value="{{ product.id }}">
-                        <input type="hidden"
-                               name="lineItems[{{ product.id }}][type]"
-                               value="product">
-                        <input type="hidden"
-                               name="lineItems[{{ product.id }}][referencedId]"
-                               value="{{ product.id }}">
-                        <input type="hidden"
-                               name="lineItems[{{ product.id }}][stackable]"
-                               value="1">
-                        <input type="hidden"
-                               name="lineItems[{{ product.id }}][removable]"
-                               value="1">
-                    {% endblock %}
-
-                    {% block page_product_detail_product_buy_meta %}
-                        <input type="hidden"
-                               name="product-name"
-                               value="{{ product.translated.name }}">
-                        <input type="hidden"
-                               name="brand-name"
-                               value="{{ product.manufacturer.getName() }}">
-                    {% endblock %}
-
-                    {% block page_product_detail_buy_button_container %}
-                        <div class="col-8">
-                            {% block page_product_detail_buy_button %}
-                                {% if(config('MolliePayments.config.enableSubscriptions') and page.product.customFields.mollie_subscription.mollie_subscription_product) %}
-                                    <button class="btn btn-primary btn-block btn-buy"
-                                            title="{{ "mollie-subscriptions.product.addToCartText"|trans|sw_sanitize }}"
-                                            aria-label="{{ "mollie-subscriptions.product.addToCartText"|trans|sw_sanitize }}">
-                                        {{ "mollie-subscriptions.product.addToCartText"|trans|sw_sanitize }}
-                                    </button>
-                                {% else %}
-                                    <button class="btn btn-primary btn-block btn-buy"
-                                            title="{{ "detail.addProduct"|trans|striptags }}"
-                                            aria-label="{{ "detail.addProduct"|trans|striptags }}">
-                                        {{ "detail.addProduct"|trans|sw_sanitize }}
-                                    </button>
-                                {% endif %}
-                            {% endblock %}
-                        </div>
-                    {% endblock %}
-                </div>
+            {% if listPrice.percentage > 0 %}
+                {% set productPrice = listPrice.price %}
             {% endif %}
+        {% endif %}
 
-            {% block page_product_detail_buy_container_apple_direct %}
-
-                {# this is for Shopware < 6.4 #}
-                {% set buyableLegacy = (not page.product.isCloseout or (page.product.availableStock >= page.product.minPurchase)) and page.product.childCount <= 0 %}
-                {# this is for Shopware >= 6.4 #}
-                {% set buyable = product.available and product.childCount <= 0 and product.calculatedMaxPurchase > 0 %}
-
-                {% set productPrice = 0 %}
-
-                {% if product.calculatedPrices|length == 1 %}
-                    {% set productPrice = product.calculatedPrices.first.unitPrice %}
-                {% else %}
-                    {% set productPrice = product.calculatedPrice.unitPrice %}
-
-                    {% if listPrice.percentage > 0 %}
-                        {% set productPrice = listPrice.price %}
-                    {% endif %}
-                {% endif %}
-
-                {% if mollie_applepaydirect_enabled and ('pdp' not in mollie_applepaydirect_restrictions) and  ((buyableLegacy) or (buyable and productPrice) > 0) %}
-                    {% block page_product_detail_buy_container_apple_direct_component %}
-                        <div class="form-row mt-3 justify-content-end js-apple-pay-container">
-                            {% include '@MolliePayments/mollie/component/apple-pay-direct-button.twig' with {cols: 'col-8'} %}
-                        </div>
-                    {% endblock %}
-                {% endif %}
+        {% if mollie_applepaydirect_enabled and ('pdp' not in mollie_applepaydirect_restrictions) and  ((buyableLegacy) or (buyable and productPrice) > 0) %}
+            {% block page_product_detail_buy_container_apple_direct_component %}
+                <div class="form-row mt-3 justify-content-end js-apple-pay-container">
+                    {% include '@MolliePayments/mollie/component/apple-pay-direct-button.twig' with {cols: 'col-8'} %}
+                </div>
             {% endblock %}
+        {% endif %}
+    {% endblock %}
 
-        {% endblock %}
-    </form>
 {% endblock %}
+
+
+
+
+{% block page_product_detail_buy_button %}
+
+    {% if mollie_subscriptions_enabled_beta and page.product.customFields.mollie_subscription.mollie_subscription_product %}
+        <button class="btn btn-primary btn-block btn-buy" title="{{ "mollie-subscriptions.product.addToCartText"|trans|sw_sanitize }}" aria-label="{{ "mollie-subscriptions.product.addToCartText"|trans|sw_sanitize }}">
+            {{ "mollie-subscriptions.product.addToCartText"|trans|sw_sanitize }}
+        </button>
+    {% else %}
+        {{ parent() }}
+    {% endif %}
+
+{% endblock %}
+
+

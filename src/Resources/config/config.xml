@@ -406,7 +406,7 @@
         <title lang="de-DE">Abonnements</title>
         <title lang="nl-NL">Abonnementen</title>
         <input-field type="bool">
-            <name>enableSubscriptions</name>
+            <name>subscriptionsEnableBeta</name>
             <defaultValue>false</defaultValue>
             <label>Enable Subscriptions BETA</label>
             <label lang="de-DE">Abonnements BETA aktivieren</label>
@@ -416,7 +416,7 @@
             <helpText lang="nl-NL"></helpText>
         </input-field>
         <input-field type="bool">
-            <name>showSubscriptionLabel</name>
+            <name>subscriptionsShowIndicator</name>
             <defaultValue>true</defaultValue>
             <label>Show Subscription Indicator</label>
             <label lang="de-DE">Abonnementetikett auf Produktseite anzeigen</label>
@@ -426,7 +426,7 @@
             <helpText lang="nl-NL"></helpText>
         </input-field>
         <input-field type="bool">
-            <name>prePaymentReminderEmail</name>
+            <name>subscriptionsReminderMailEnabled</name>
             <defaultValue>false</defaultValue>
             <label>Enable Payment Reminder Email</label>
             <label lang="de-DE">Zahlungserinnerungs-E-Mail aktivieren</label>
@@ -436,7 +436,7 @@
             <helpText lang="nl-NL"></helpText>
         </input-field>
         <input-field type="int">
-            <name>daysBeforeReminder</name>
+            <name>subscriptionsReminderMailDays</name>
             <defaultValue>2</defaultValue>
             <label>Reminder days before renewal</label>
             <label lang="de-DE"></label>
@@ -446,7 +446,7 @@
             <helpText lang="nl-NL"></helpText>
         </input-field>
         <component name="sw-entity-single-select">
-            <name>emailTemplate</name>
+            <name>subscriptionsReminderMailTemplate</name>
             <entity>mail_template_type</entity>
             <labelProperty>technicalName</labelProperty>
             <label>Email Template</label>

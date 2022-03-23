@@ -6,6 +6,7 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
+use Shopware\Core\Content\MailTemplate\MailTemplateEntity;
 use Shopware\Core\Framework\Struct\Struct;
 
 class MollieSettingStruct extends Struct
@@ -134,6 +135,32 @@ class MollieSettingStruct extends Struct
      * @var string
      */
     protected $orderStateWithAChargebackTransaction = self::ORDER_STATE_SKIP;
+
+    /**
+     * @var bool
+     */
+    protected $subscriptionsEnableBeta;
+
+    /**
+     * @var bool
+     */
+    protected $subscriptionsShowIndicator;
+
+    /**
+     * @var bool
+     */
+    protected $subscriptionsReminderMailEnabled;
+
+    /**
+     * @var int
+     */
+    protected $subscriptionsReminderMailDays;
+
+    /**
+     * @var ?MailTemplateEntity
+     */
+    protected $subscriptionsReminderMailTemplate;
+
 
     /**
      * @return string
@@ -274,7 +301,7 @@ class MollieSettingStruct extends Struct
      */
     public function getUseMolliePaymentMethodLimits(): bool
     {
-        return (bool) $this->useMolliePaymentMethodLimits;
+        return (bool)$this->useMolliePaymentMethodLimits;
     }
 
     /**
@@ -513,6 +540,46 @@ class MollieSettingStruct extends Struct
     public function setRefundManagerShowInstructions(bool $refundManagerShowInstructions): void
     {
         $this->refundManagerShowInstructions = $refundManagerShowInstructions;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSubscriptionsEnableBeta(): bool
+    {
+        return $this->subscriptionsEnableBeta;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSubscriptionsShowIndicator(): bool
+    {
+        return $this->subscriptionsShowIndicator;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSubscriptionsReminderMailEnabled(): bool
+    {
+        return $this->subscriptionsReminderMailEnabled;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSubscriptionsReminderMailDays(): int
+    {
+        return $this->subscriptionsReminderMailDays;
+    }
+
+    /**
+     * @return MailTemplateEntity|null
+     */
+    public function getSubscriptionsReminderMailTemplate(): ?MailTemplateEntity
+    {
+        return $this->subscriptionsReminderMailTemplate;
     }
 
 }

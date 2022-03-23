@@ -5,8 +5,7 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="Kiener\MolliePayments\Service\Subscription\EmailService"
-                 class="Kiener\MolliePayments\Service\Subscription\EmailService">
+        <service id="Kiener\MolliePayments\Components\Subscription\EmailService">
             <argument type="service" id="sales_channel.repository"/>
             <argument type="service" id="customer.repository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
@@ -14,7 +13,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\ConfigService"/>
             <argument type="service" id="product.repository"/>
             <argument type="service" id="mollie_payments.logger"/>
-
         </service>
+
     </services>
 </container>

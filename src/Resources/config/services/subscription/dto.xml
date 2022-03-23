@@ -5,12 +5,12 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="Kiener\MolliePayments\Service\Subscription\DTO\SubscriptionOption" />
 
-        <service id="Kiener\MolliePayments\Service\Subscription\DTO\SubscriptionResponse"
-                 class="Kiener\MolliePayments\Service\Subscription\DTO\SubscriptionResponse">
+
+        <service id="Kiener\MolliePayments\Components\Subscription\DTO\SubscriptionResponse">
             <argument type="service" id="customer.repository"/>
             <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextService"/>
         </service>
+
     </services>
 </container>
