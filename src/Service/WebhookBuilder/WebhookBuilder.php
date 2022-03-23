@@ -7,11 +7,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 class WebhookBuilder
 {
-
-    /**
-     *
-     */
-    private const CUSTOM_DOMAIN_ENV_KEY = 'MOLLIE_SHOP_DOMAIN';
+    public const CUSTOM_DOMAIN_ENV_KEY = 'MOLLIE_SHOP_DOMAIN';
 
     /**
      * @var RouterInterface

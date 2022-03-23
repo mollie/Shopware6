@@ -4,7 +4,7 @@
 
     <card>
         <title>
-            
+
         </title>
         <component name="mollie-pluginconfig-section-info">
             <name>molliePluginConfigSectionInfo</name>
@@ -399,5 +399,62 @@
                 </option>
             </options>
         </input-field>
+    </card>
+
+    <card>
+        <title>Subscriptions</title>
+        <title lang="de-DE">Abonnements</title>
+        <title lang="nl-NL">Abonnementen</title>
+        <input-field type="bool">
+            <name>enableSubscriptions</name>
+            <defaultValue>false</defaultValue>
+            <label>Enable Subscriptions BETA</label>
+            <label lang="de-DE">Abonnements BETA aktivieren</label>
+            <label lang="nl-NL">Abonnementen BETA inschakelen</label>
+            <helpText>Enables the new BETA version of the subscriptions in the plugin.</helpText>
+            <helpText lang="de-DE"></helpText>
+            <helpText lang="nl-NL"></helpText>
+        </input-field>
+        <input-field type="bool">
+            <name>showSubscriptionLabel</name>
+            <defaultValue>true</defaultValue>
+            <label>Show Subscription Indicator</label>
+            <label lang="de-DE">Abonnementetikett auf Produktseite anzeigen</label>
+            <label lang="nl-NL">Label Abonnementen weergeven op productpagina</label>
+            <helpText>Shows a subscription indicator on the product detail page of a subscription product.</helpText>
+            <helpText lang="de-DE"></helpText>
+            <helpText lang="nl-NL"></helpText>
+        </input-field>
+        <input-field type="bool">
+            <name>prePaymentReminderEmail</name>
+            <defaultValue>false</defaultValue>
+            <label>Enable Payment Reminder Email</label>
+            <label lang="de-DE">Zahlungserinnerungs-E-Mail aktivieren</label>
+            <label lang="nl-NL">E-mail voor betalingsherinnering inschakelen</label>
+            <helpText>Activates the automatic payment reminder email. This one will be sent out prior to the renewing of a subscription.</helpText>
+            <helpText lang="de-DE"></helpText>
+            <helpText lang="nl-NL"></helpText>
+        </input-field>
+        <input-field type="int">
+            <name>daysBeforeReminder</name>
+            <defaultValue>2</defaultValue>
+            <label>Reminder days before renewal</label>
+            <label lang="de-DE"></label>
+            <label lang="nl-NL"></label>
+            <helpText>Set a custom number of days in advance for sending out the reminder email of a subscription.</helpText>
+            <helpText lang="de-DE"></helpText>
+            <helpText lang="nl-NL"></helpText>
+        </input-field>
+        <component name="sw-entity-single-select">
+            <name>emailTemplate</name>
+            <entity>mail_template_type</entity>
+            <labelProperty>technicalName</labelProperty>
+            <label>Email Template</label>
+            <label lang="de-DE">E-Mail-Vorlage</label>
+            <label lang="nl-NL">Email sjabloon</label>
+            <helpText>Select the E-Mail template that will be used for the subscription reminder email.</helpText>
+            <helpText lang="de-DE"></helpText>
+            <helpText lang="nl-NL"></helpText>
+        </component>
     </card>
 </config>

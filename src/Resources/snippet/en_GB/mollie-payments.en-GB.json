@@ -29,5 +29,38 @@
         "paymentError": "The payment with Apple Pay failed."
       }
     }
+  },
+  "mollie-subscriptions": {
+    "product": {
+      "information": "Subscription product",
+      "addToCartText": "Subscribe"
+    },
+    "options": {
+      "everyDay": "Every day",
+      "everyDays": "Every %1% days",
+      "everyWeek": "Every week",
+      "everyWeeks": "Every %1% weeks",
+      "everyMonth": "Every month",
+      "everyMonths": "Every %1% months"
+    }
+  },
+  "checkout": {
+    "mollie-subscription-line-item-notice": "Not all payments methods are available when ordering subscription products."
+  },
+  "error": {
+    "mollie-subscription-line-item-notice": "Not all payments methods are available when ordering subscription products."
+  },
+  "account": {
+    "mollieSubscriptionsLink": "Subscriptions",
+    "mollieSubscriptionsTitle": "Subscriptions",
+    "mollieSubscriptionsWelcome": "Your recent subscriptions:",
+    "mollieSubscriptionsInfoEmpty": "You have no subscriptions yet.",
+    "mollieSubscriptionsHeadline": "Subscription:",
+    "mollieSubscriptionId": "Id",
+    "mollieSubscriptionAmount": "Amount",
+    "mollieSubscriptionNextPayment": "Next payment at",
+    "mollieSubscriptionCancel": "Cancel",
+    "mollieSubscriptionContextMenuReorder": "Repeat subscription",
+    "cancelSubscription": "Subscription with ID \"%1%\" has been canceled"
   }
 }

@@ -5,7 +5,7 @@ import StringUtils from '../../../../core/service/utils/string-utils.service';
 import ProductService from '../../../../core/service/product/product.service';
 
 // eslint-disable-next-line no-undef
-const {mapState} = Shopware.Component.getComponentHelper();
+const { mapState, mapGetters } = Shopware.Component.getComponentHelper();
 
 // eslint-disable-next-line no-undef
 Shopware.Component.register('sw-product-detail-mollie', {
@@ -22,6 +22,7 @@ Shopware.Component.register('sw-product-detail-mollie', {
 
     data() {
         return {
+            productEntity: null,
             parentVoucherType: '',
             productVoucherType: '',
         }
@@ -32,15 +33,26 @@ Shopware.Component.register('sw-product-detail-mollie', {
     },
 
     computed: {
-
         ...mapState('swProductDetail', [
             'product',
+        ]),
+
+        ...mapGetters('swProductDetail', [
+            'isLoading',
+        ]),
+
+        ...mapGetters('context', [
+            'isSystemDefaultLanguage',
         ]),
 
         ...mapState('context', {
             languageId: state => state.api.languageId,
             systemLanguageId: state => state.api.systemLanguageId,
         }),
+
+        productId() {
+            return this.$route.params.id;
+        },
 
         /**
          *
@@ -54,6 +66,7 @@ Shopware.Component.register('sw-product-detail-mollie', {
                 {key: 3, name: this.$tc('mollie-payments.vouchers.VOUCHER_TYPE_VALUE_VOUCHER')},
             ];
         },
+
 
         /**
          *
@@ -169,13 +182,14 @@ Shopware.Component.register('sw-product-detail-mollie', {
             this.parentVoucherType = '';
             this.productVoucherType = '';
 
-            if (!this.product) {
-                return;
-            }
-
             // if we do have a parent, then fetch that product
             // and read its voucher type for our local variable
             if (this.hasParentProduct) {
+
+                if (!this.product) {
+                    return;
+                }
+
                 // eslint-disable-next-line no-undef
                 this.productRepository.get(this.product.parentId, Shopware.Context.api).then(parent => {
                     const parentAtts = new ProductAttributes(parent);
@@ -189,9 +203,13 @@ Shopware.Component.register('sw-product-detail-mollie', {
                 });
             }
 
-            const mollieAttributes = new ProductAttributes(this.product);
+            // eslint-disable-next-line no-undef
+            this.productRepository.get(this.productId, Shopware.Context.api).then(parent => {
+                const mollieAttributes = new ProductAttributes(parent);
 
-            this.productVoucherType = mollieAttributes.getVoucherType();
+                this.productVoucherType = mollieAttributes.getVoucherType();
+            });
+
 
             // if we have no parent, and also not yet something assigned
             // then make sure we have a NONE value
@@ -223,5 +241,4 @@ Shopware.Component.register('sw-product-detail-mollie', {
             this.productService.updateCustomFields(this.product, mollieAttributes);
         },
     },
-
 });

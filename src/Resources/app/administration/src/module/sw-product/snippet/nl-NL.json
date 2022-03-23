@@ -1,5 +1,7 @@
 {
   "mollie-payments": {
+    "pluginTitle": "Mollie",
+    "pluginDescripion": "Mollie Module",
     "vouchers": {
       "CARD_TITLE": "Voucher",
       "VOUCHER_INFO_TITLE": "Voucher Betalingen",
@@ -12,5 +14,21 @@
       "VOUCHER_TYPE_VALUE_MEAL": "Meal",
       "VOUCHER_TYPE_VALUE_VOUCHER": "Gift"
     }
+  },
+  "mollie-subscription":  {
+    "card-title": "Abonnement",
+    "title": "Mollie Abonnementen",
+    "description": "Met Mollie-abonnementen kun je eenvoudig abonnementsproducten maken en terugkerende betalingen plannen die plaatsvinden op het ingestelde interval en de ingestelde periode.",
+    "days": "Dag(en)",
+    "weeks": "Weken",
+    "months": "Maanden",
+    "times": "Keer",
+    "infinite": "Eindeloos",
+    "mollieSubscriptionProduct": "Is dit een abonnementsproduct?",
+    "mollieSubscriptionIntervalAmount": "Herhaal betaling elke",
+    "mollieSubscriptionIntervalType": "Type abonnementsinterval",
+    "mollieSubscriptionRepetitionAmount": "Herhaal betaling",
+    "mollieSubscriptionRepetitionType": "Type abonnementsherhaling",
+    "infoDefaultLanguage": "Let op, deze configuratie kan alleen in uw standaardtaal worden bewerkt. Wijzig uw taal om de abonnementsinstellingen van dit product te wijzigen."
   }
 }

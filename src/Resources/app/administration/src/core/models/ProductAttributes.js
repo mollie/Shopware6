@@ -5,8 +5,12 @@ export default class ProductAttributes {
      * @param productEntity
      */
     constructor(productEntity) {
-
         this._voucherType = '';
+        this._mollieSubscriptionProduct = '';
+        this._mollieSubscriptionIntervalAmount = '';
+        this._mollieSubscriptionIntervalType = '';
+        this._mollieSubscriptionRepetitionAmount = '';
+        this._mollieSubscriptionRepetitionType = '';
 
 
         if (productEntity === null) {
@@ -17,13 +21,23 @@ export default class ProductAttributes {
             return;
         }
 
-        if (!productEntity.customFields.mollie_payments) {
+        if (!productEntity.customFields.mollie_payments && !productEntity.customFields.mollie_subscription) {
             return;
         }
 
         const mollieFields = productEntity.customFields.mollie_payments;
+        if (mollieFields !== undefined) {
+            this._voucherType = mollieFields.voucher_type;
+        }
 
-        this._voucherType = mollieFields.voucher_type;
+        const mollieFieldsSubscription = productEntity.customFields.mollie_subscription;
+        if (mollieFieldsSubscription !== undefined) {
+            this._mollieSubscriptionProduct = mollieFieldsSubscription.mollie_subscription_product;
+            this._mollieSubscriptionIntervalAmount = mollieFieldsSubscription.mollie_subscription_interval_amount;
+            this._mollieSubscriptionIntervalType = mollieFieldsSubscription.mollie_subscription_interval_type;
+            this._mollieSubscriptionRepetitionAmount = mollieFieldsSubscription.mollie_subscription_repetition_amount;
+            this._mollieSubscriptionRepetitionType = mollieFieldsSubscription.mollie_subscription_repetition_type;
+        }
     }
 
     /**
@@ -44,6 +58,70 @@ export default class ProductAttributes {
     }
 
     /**
+     * @returns {*}
+     */
+    getMollieSubscriptionProduct() {
+
+        const boolType = this._mollieSubscriptionProduct;
+
+        if (!boolType) {
+            return false;
+        }
+
+        return boolType;
+    }
+
+    /**
+     * @returns {*}
+     */
+    getMollieSubscriptionIntervalAmount() {
+        if (!this._mollieSubscriptionIntervalAmount) {
+            return '';
+        }
+
+        return this._mollieSubscriptionIntervalAmount;
+    }
+
+    /**
+     * @returns {*}
+     */
+    getMollieSubscriptionIntervalType() {
+
+        const stringType = this._mollieSubscriptionIntervalType + '';
+
+        if (stringType !== 'days' || stringType !== 'weeks' || stringType !== 'months') {
+            return '';
+        }
+
+        return stringType;
+    }
+
+    /**
+     * @returns {*}
+     */
+    getMollieSubscriptionRepetitionAmount() {
+        if (!this._mollieSubscriptionRepetitionAmount) {
+            return '';
+        }
+
+        return this._mollieSubscriptionRepetitionAmount;
+    }
+
+    /**
+     * @returns {*}
+     */
+    getMollieSubscriptionRepetitionType() {
+
+        const stringType = this._mollieSubscriptionRepetitionType + '';
+
+        if (stringType !== 'times' || stringType !== 'infinite') {
+            return '';
+        }
+
+        return stringType;
+    }
+
+    /**
      *
      * @param value
      */
@@ -52,10 +130,73 @@ export default class ProductAttributes {
     }
 
     /**
+     * @param value
+     */
+    setMollieSubscriptionProduct(value) {
+        this._mollieSubscriptionProduct = value;
+    }
+
+    /**
+     * @param value
+     */
+    setMollieSubscriptionIntervalAmount(value) {
+        this._mollieSubscriptionIntervalAmount = value;
+    }
+
+    /**
+     * @param value
+     */
+    setMollieSubscriptionIntervalType(value) {
+        this._mollieSubscriptionIntervalType = value;
+    }
+
+    /**
+     * @param value
+     */
+    setMollieSubscriptionRepetitionAmount(value) {
+        this._mollieSubscriptionRepetitionAmount = value;
+    }
+
+    /**
+     * @param value
+     */
+    setMollieSubscriptionRepetitionType(value) {
+        this._mollieSubscriptionRepetitionType = value;
+    }
+
+    /**
      *
      */
     clearVoucherType() {
         this._voucherType = '';
+    }
+
+    /**
+     *
+     */
+    clearMollieSubscriptionIntervalAmount() {
+        this._mollieSubscriptionIntervalAmount = '';
+    }
+
+    /**
+     *
+     */
+    clearMollieSubscriptionIntervalType() {
+        this._mollieSubscriptionIntervalType = '';
+    }
+
+    /**
+     *
+     */
+    clearMollieSubscriptionRepetitionAmount() {
+        this._mollieSubscriptionRepetitionAmount = '';
+    }
+
+    /**
+     *
+     */
+    clearMollieSubscriptionRepetitionType() {
+        this._mollieSubscriptionRepetitionType = '';
     }
 
     /**
@@ -74,6 +215,32 @@ export default class ProductAttributes {
 
     /**
      *
+     * @returns {string[]}
+     */
+    toArraySubscription() {
+        const mollie = {};
+
+        if (this._mollieSubscriptionProduct) {
+            mollie['mollie_subscription_product'] = this._mollieSubscriptionProduct;
+        }
+        if (this._mollieSubscriptionIntervalAmount !== '') {
+            mollie['mollie_subscription_interval_amount'] = this._mollieSubscriptionIntervalAmount;
+        }
+        if (this._mollieSubscriptionIntervalType !== '') {
+            mollie['mollie_subscription_interval_type'] = this._mollieSubscriptionIntervalType;
+        }
+        if (this._mollieSubscriptionRepetitionAmount !== '') {
+            mollie['mollie_subscription_repetition_amount'] = this._mollieSubscriptionRepetitionAmount;
+        }
+        if (this._mollieSubscriptionRepetitionType !== '') {
+            mollie['mollie_subscription_repetition_type'] = this._mollieSubscriptionRepetitionType;
+        }
+
+        return mollie;
+    }
+
+    /**
+     *
      * @returns {boolean}
      */
     hasData() {
@@ -85,4 +252,15 @@ export default class ProductAttributes {
         return false;
     }
 
+    /**
+     *
+     * @returns {boolean}
+     */
+    hasSubscriptionData() {
+        if (this._mollieSubscriptionProduct) {
+            return true;
+        }
+
+        return false;
+    }
 }

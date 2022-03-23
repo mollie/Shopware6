@@ -1,4 +1,5 @@
-@import "../mollie-payments/plugins/creditcard-components.plugin";
-@import "../mollie-payments/plugins/apple-pay-direct.plugin";
-@import "./checkout/payment-selection";
-@import "./account/payment-selection";
+@import '../mollie-payments/plugins/creditcard-components.plugin';
+@import '../mollie-payments/plugins/apple-pay-direct.plugin';
+@import './checkout/payment-selection';
+@import './account/payment-selection';
+@import './account/subscriptions';

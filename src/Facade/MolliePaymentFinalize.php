@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Facade;
 
 use Kiener\MolliePayments\Exception\MissingMollieOrderIdException;
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
+use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
 use Kiener\MolliePayments\Service\MollieApi\Order;
@@ -27,6 +28,11 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class MolliePaymentFinalize
 {
+
+    /**
+     * @var MollieApiFactory
+     */
+    private $mollieApiFactory;
 
     /**
      * @var OrderStatusConverter
@@ -60,6 +66,7 @@ class MolliePaymentFinalize
 
 
     /**
+     * @param MollieApiFactory $mollieApiFactory
      * @param OrderStatusConverter $orderStatusConverter
      * @param OrderStatusUpdater $orderStatusUpdater
      * @param SettingsService $settingsService
@@ -68,8 +75,9 @@ class MolliePaymentFinalize
      * @param Order $mollieOrderService
      * @param OrderService $orderService
      */
-    public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, UpdateOrderCustomFields $updateOrderCustomFields, UpdateOrderTransactionCustomFields $updateOrderTransactionCustomFields, Order $mollieOrderService, OrderService $orderService)
+    public function __construct(MollieApiFactory $mollieApiFactory, OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, UpdateOrderCustomFields $updateOrderCustomFields, UpdateOrderTransactionCustomFields $updateOrderTransactionCustomFields, Order $mollieOrderService, OrderService $orderService)
     {
+        $this->mollieApiFactory = $mollieApiFactory;
         $this->orderStatusConverter = $orderStatusConverter;
         $this->orderStatusUpdater = $orderStatusUpdater;
         $this->settingsService = $settingsService;

@@ -14,6 +14,23 @@
       "mollie_refund_started": " Mollie Refund started"
     }
   },
+  "mollie-subscriptions": {
+    "general": {
+      "menu": {
+        "title": "Mollie Subscriptions"
+      }
+    },
+    "product": {
+      "cardTitle": "Mollie"
+    },
+    "subscriptionStatus":  {
+      "pending": "Pending",
+      "active": "Active",
+      "canceled": "Cancelled",
+      "suspended": "Suspended",
+      "completed": "Completed"
+    }
+  },
   "mollie-payments": {
     "general": {
       "mainMenuItemGeneral": "Mollie Payments",

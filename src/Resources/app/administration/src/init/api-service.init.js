@@ -8,6 +8,8 @@ import MolliePaymentsShippingService from '../core/service/api/mollie-payments-s
 
 import MolliePaymentsPaymentMethodService from '../core/service/api/mollie-payments-payment-method.service';
 
+import MolliePaymentsSubscriptionService from '../core/service/api/mollie-subscription.service';
+
 // eslint-disable-next-line no-undef
 const {Application} = Shopware;
 
@@ -43,4 +45,10 @@ Application.addServiceProvider('MolliePaymentsPaymentMethodService', (container)
     const initContainer = Application.getContainer('init');
 
     return new MolliePaymentsPaymentMethodService(initContainer.httpClient, container.loginService);
+});
+
+Application.addServiceProvider('MolliePaymentsSubscriptionService', (container) => {
+    const initContainer = Application.getContainer('init');
+
+    return new MolliePaymentsSubscriptionService(initContainer.httpClient, container.loginService);
 });

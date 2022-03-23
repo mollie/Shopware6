@@ -1,0 +1,24 @@
+{
+  "mollie-subscriptions": {
+    "title": "Mollie Abonnementen",
+    "page": {
+      "list": {
+        "columns": {
+          "subscription_id": "ID",
+          "customer_id": "Klant",
+          "status": "Toestand",
+          "description": "Beschrijving",
+          "createdAt": "Gemaakt bij",
+          "amount": "Hoeveelheid",
+          "nextPaymentAt": "Volgende betaling bij",
+          "prePaymentReminder": "Vooruitbetalingsherinnering",
+          "action": {
+            "cancel": "Annuleren",
+            "success": "Het abonnement is opgezegd.",
+            "error": "Fout bij opzeggen abonnement. Meer informatie in de logboeken."
+          }
+        }
+      }
+    }
+  }
+}

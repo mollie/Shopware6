@@ -14,6 +14,23 @@
       "mollie_refund_started": " Mollie terugbetaling gestart"
     }
   },
+  "mollie-subscriptions": {
+    "general": {
+      "menu": {
+        "title": "Mollie Abonnementen"
+      }
+    },
+    "product": {
+      "cardTitle": "Mollie"
+    },
+    "subscriptionStatus": {
+      "pending": "In afwachting",
+      "active": "Actief",
+      "canceled": "Geannuleerd",
+      "suspended": "Opgeschort",
+      "completed": "Voltooid"
+    }
+  },
   "mollie-payments": {
     "general": {
       "mainMenuItemGeneral": "Mollie betalingen",

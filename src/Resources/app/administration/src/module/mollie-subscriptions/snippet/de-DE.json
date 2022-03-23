@@ -1,0 +1,24 @@
+{
+    "mollie-subscriptions": {
+      "title": "Mollie-Abonnements",
+      "page": {
+            "list": {
+                "columns": {
+                    "subscription_id": "ID",
+                    "customer_id": "Kundin",
+                    "status": "Status",
+                    "description": "Beschreibung",
+                    "createdAt": "Hergestellt in",
+                    "amount": "Betragen",
+                    "nextPaymentAt": "Nächste Zahlung um",
+                    "prePaymentReminder": "Vorauszahlungserinnerung",
+                  "action": {
+                    "cancel": "Abbrechen",
+                    "success": "Das Abonnement wurde gekündigt.",
+                    "error": "Fehler bei der Kündigung des Abonnements. Weitere Informationen in den Protokollen."
+                  }
+                }
+            }
+        }
+    }
+}

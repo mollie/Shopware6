@@ -29,5 +29,38 @@
         "paymentError": "Die Zahlung mit Apple Pay ist fehlgeschlagen."
       }
     }
+  },
+  "mollie-subscriptions": {
+    "product": {
+      "information": "Abonnementprodukt",
+      "addToCartText": "Abonnieren"
+    },
+    "options": {
+      "everyDay": "Jeden Tag",
+      "everyDays": "Alle %1% Tage",
+      "everyWeek": "Jede Woche",
+      "everyWeeks": "Alle %1% Wochen",
+      "everyMonth": "Jeden Monat",
+      "everyMonths": "Alle %1% Monate"
+    }
+  },
+  "checkout": {
+    "mollie-subscription-line-item-notice": "Bei der Bestellung von Abonnementprodukten sind nicht alle Zahlungsmethoden verfügbar."
+  },
+  "error": {
+    "mollie-subscription-line-item-notice": "Bei der Bestellung von Abonnementprodukten sind nicht alle Zahlungsmethoden verfügbar."
+  },
+  "account": {
+    "mollieSubscriptionsLink": "Abonnements",
+    "mollieSubscriptionsTitle": "Abonnements",
+    "mollieSubscriptionsWelcome": "Ihre letzten Abonnements:",
+    "mollieSubscriptionsInfoEmpty": "Sie haben noch keine Abonnements.",
+    "mollieSubscriptionsHeadline": "Abonnement:",
+    "mollieSubscriptionId": "Id",
+    "mollieSubscriptionAmount": "Betragen",
+    "mollieSubscriptionNextPayment": "Nächste Zahlung um",
+    "mollieSubscriptionCancel": "Abbrechen",
+    "mollieSubscriptionContextMenuReorder": "Abo wiederholen",
+    "cancelSubscription": "Das Abonnement mit der ID \"%1%\" wurde gekündigt"
   }
 }

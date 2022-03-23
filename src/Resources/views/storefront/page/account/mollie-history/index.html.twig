@@ -1,0 +1,75 @@
+{% sw_extends '@Storefront/storefront/page/account/_page.html.twig' %}
+
+{% block page_account_main_content %}
+    {% block page_account_mollie_subscriptions %}
+        <div class="account-mollie-subscriptions">
+            {% block page_account_mollie_subscriptions_welcome %}
+                <div class="account-welcome">
+                    {% block page_account_mollie_subscriptions_welcome_headline %}
+                        <h1>{{ "account.mollieSubscriptionsTitle"|trans|sw_sanitize }}</h1>
+                        <p>{{ "account.mollieSubscriptionsWelcome"|trans|sw_sanitize }}</p>
+                    {% endblock %}
+                </div>
+            {% endblock %}
+            {% block page_account_mollie_subscriptions_main %}
+                <div class="account-order-main account-mollie-main">
+                    {% if page.subscriptions.total == 0 %}
+                        {% block page_account_mollie_subscriptions_info_empty %}
+                            {% sw_include '@Storefront/storefront/utilities/alert.html.twig' with {
+                                type: "warning",
+                                content: "account.mollieSubscriptionsInfoEmpty"|trans|sw_sanitize
+                            } %}
+                        {% endblock %}
+                    {% else %}
+                        {% block page_account_mollie_subscriptions_overview %}
+                            <div class="account-order-overview">
+                                {% block page_account_mollie_subscriptions_table %}
+                                    {% block page_account_mollie_subscriptions_table_body %}
+                                        {% for subscription in page.subscriptions %}
+                                            <div class="table order-table"
+                                                 data-subscription-detail-loader="true">
+                                                {% sw_include '@Storefront/storefront/page/account/mollie-history/subscriptions-item.html.twig' %}
+                                            </div>
+                                        {% endfor %}
+                                    {% endblock %}
+                                {% endblock %}
+                            </div>
+                        {% endblock %}
+
+                        {% block page_account_mollie_subscriptions_paging %}
+                            {% set criteria = page.subscriptions.criteria %}
+                            {% set totalPages = (criteria.limit)|round(0,'ceil') %}
+
+                            {% if totalPages > 1 %}
+                                {% set formAjaxSubmitOptions = {
+                                    replaceSelectors: ".account-mollie-main",
+                                    submitOnChange: true
+                                } %}
+
+                                {% block page_account_mollie_subscriptions_paging_form %}
+                                    <div class="account-mollie-subscriptions-pagination">
+                                        <form class="account-mollie-subscriptions-pagination-form"
+                                              action="{{ path('frontend.account.mollie.page') }}"
+                                              method="post"
+                                              data-form-ajax-submit="true"
+                                              data-form-ajax-submit-options='{{ formAjaxSubmitOptions|json_encode }}'>
+
+                                            {% block page_account_mollie_subscriptions_paging_csrf %}
+                                                {{ sw_csrf('frontend.account.mollie.page') }}
+                                            {% endblock %}
+
+                                            {% sw_include '@Storefront/storefront/component/pagination.html.twig' with {
+                                                entities: page,
+                                                criteria: criteria
+                                            }  %}
+                                        </form>
+                                    </div>
+                                {% endblock %}
+                            {% endif %}
+                        {% endblock %}
+                    {% endif %}
+                </div>
+            {% endblock %}
+        </div>
+    {% endblock %}
+{% endblock %}

@@ -1,5 +1,7 @@
 {
   "mollie-payments": {
+    "pluginTitle": "Mollie",
+    "pluginDescripion": "Mollie Module",
     "vouchers": {
       "CARD_TITLE": "Voucher",
       "VOUCHER_INFO_TITLE": "Voucher Payments",
@@ -12,5 +14,21 @@
       "VOUCHER_TYPE_VALUE_MEAL": "Meal",
       "VOUCHER_TYPE_VALUE_VOUCHER": "Gift"
     }
+  },
+  "mollie-subscription":  {
+    "card-title": "Subscription",
+    "title": "Mollie Subscriptions",
+    "description": "With Mollie subscriptions, you can easily create subscription products and schedule recurring payments to take place at the configured interval and period.",
+    "days": "Day(s)",
+    "weeks": "Week(s)",
+    "months": "Month(s)",
+    "times": "Times",
+    "infinite": "Infinite",
+    "mollieSubscriptionProduct": "Is this a subscription product?",
+    "mollieSubscriptionIntervalAmount": "Repeat Payment Every",
+    "mollieSubscriptionIntervalType": "Subscription Interval Type",
+    "mollieSubscriptionRepetitionAmount": "Repeat Payment",
+    "mollieSubscriptionRepetitionType": "Subscription Repetition Type",
+    "infoDefaultLanguage": "Please note, this configuration can only be edited in your default language. Please change your language to modify the subscription settings of this product."
   }
 }

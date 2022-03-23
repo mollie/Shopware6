@@ -1,0 +1,18 @@
+{% sw_extends '@Storefront/storefront/page/account/sidebar.html.twig' %}
+
+{% block page_account_sidebar_inner %}
+    {% block page_account_sidebar_menu %}
+        {% if not context.customer.guest %}
+
+            {{ parent() }}
+
+            {% block page_account_sidebar_link_mollie_subscriptions %}
+                <a href="{{ path('frontend.account.mollie.page') }}"
+                   title="{{ "account.mollieSubscriptionsLink"|trans|striptags }}"
+                   class="list-group-item list-group-item-action account-aside-item{% if activeRoute is same as('frontend.account.mollie.page') %} is-active{% endif %}">
+                    {{ "account.mollieSubscriptionsLink"|trans|sw_sanitize }}
+                </a>
+            {% endblock %}
+        {% endif %}
+    {% endblock %}
+{% endblock %}
