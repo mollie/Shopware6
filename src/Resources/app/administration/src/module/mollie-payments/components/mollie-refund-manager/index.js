@@ -571,14 +571,26 @@ Component.register('mollie-refund-manager', {
                     this.voucherAmount = response.totals.voucherAmount;
                     this.pendingRefunds = response.totals.pendingRefunds;
 
-                    // assign our items
-                    // and also reset them, so that we
-                    // prepare our local scoped variables such as
-                    // the amount to refund, quantity and more.
-                    // this prepares the data for our refund request calls
-                    this.orderItems = response.cart;
-                    this.orderItems.forEach(function (item) {
-                        me.itemService.resetRefundData(item);
+                    // build our local items
+                    // we have to build it by assigning it to a new local object,
+                    // because we are merging the response data with our local structure
+                    // that will be used for the request later on.
+                    // this is also required to have everything like the focus-color working!
+                    this.orderItems = [];
+                    response.cart.forEach(function (item) {
+
+                        // grab what we need from our response
+                        const localItem = {
+                            'refunded': item.refunded,
+                            'shopware': item.shopware,
+                        }
+
+                        // make sure to reset the refund data
+                        // which implicitly creates our structure for
+                        // the refund request later on
+                        me.itemService.resetRefundData(localItem);
+
+                        me.orderItems.push(localItem);
                     });
 
                     // yep, we're done loading ;)
