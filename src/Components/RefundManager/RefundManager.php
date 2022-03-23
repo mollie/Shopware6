@@ -348,6 +348,13 @@ class RefundManager implements RefundManagerInterface
                 }
             }
 
+            # if we didn't find a valid mollie line ID
+            # then it's just not existing in Mollie.
+            # this can happen on free shippings...
+            if (empty($mollieLineID)) {
+                continue;
+            }
+
             # finally, build our refund item
             # for our refund service with all
             # required information
