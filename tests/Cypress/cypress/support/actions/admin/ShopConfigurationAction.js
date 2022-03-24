@@ -21,9 +21,33 @@ export default class ShopConfigurationAction {
      */
     setupShop(mollieFailureMode, creditCardComponents, applePayDirect) {
 
+        // this is flaky...maybe we just give a bit time?
+        cy.wait(2000);
+
         this._activatePaymentMethods();
 
+        cy.wait(500);
+
         this._prepareShippingMethods();
+
+        cy.wait(500);
+
+        this.setupPlugin(mollieFailureMode, creditCardComponents, applePayDirect);
+
+        // let's just wait a bit
+        cy.wait(10000);
+
+        this._clearCache();
+    }
+
+
+    /**
+     *
+     * @param mollieFailureMode
+     * @param creditCardComponents
+     * @param applePayDirect
+     */
+    setupPlugin(mollieFailureMode, creditCardComponents, applePayDirect) {
 
         // assign all payment methods to
         // all available sales channels
@@ -38,11 +62,6 @@ export default class ShopConfigurationAction {
                 this._configureMolliePlugin(channel.id, mollieFailureMode, creditCardComponents, applePayDirect);
             });
         });
-
-        // let's just wait a bit
-        cy.wait(10000);
-
-        this._clearCache();
     }
 
     /**
@@ -128,10 +147,6 @@ export default class ShopConfigurationAction {
      * @private
      */
     _activatePaymentMethods() {
-
-        // this is flaky...maybe we just give a bit time?
-        cy.wait(1000);
-
         this.apiClient.get('/payment-method').then(payments => {
 
             if (payments === undefined || payments === null) {
@@ -171,11 +186,10 @@ export default class ShopConfigurationAction {
      * @private
      */
     _prepareShippingMethods() {
-
         this.apiClient.get('/rule').then(rules => {
 
             if (rules === undefined || rules === null) {
-                throw new Error('Attention, No rules found trough Shopware API');
+                rules = [];
             }
 
             rules.forEach(rule => {
@@ -228,7 +242,6 @@ export default class ShopConfigurationAction {
      * @private
      */
     _configureSalesChannel(id) {
-
         this.apiClient.get('/payment-method').then(payments => {
 
             if (payments === undefined || payments === null) {

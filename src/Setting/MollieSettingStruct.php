@@ -91,6 +91,21 @@ class MollieSettingStruct extends Struct
     protected $automaticShipping;
 
     /**
+     * @var bool
+     */
+    protected $refundManagerVerifyRefund;
+
+    /**
+     * @var bool
+     */
+    protected $refundManagerAutoStockReset;
+
+    /**
+     * @var bool
+     */
+    protected $refundManagerShowInstructions;
+
+    /**
      * @var string[]
      */
     protected $applePayDirectRestrictions = [];
@@ -450,6 +465,54 @@ class MollieSettingStruct extends Struct
     public function setAutomaticShipping(bool $automaticShipping): void
     {
         $this->automaticShipping = $automaticShipping;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRefundManagerVerifyRefund(): bool
+    {
+        return (bool)$this->refundManagerVerifyRefund;
+    }
+
+    /**
+     * @param bool $refundManagerVerifyRefund
+     */
+    public function setRefundManagerVerifyRefund(bool $refundManagerVerifyRefund): void
+    {
+        $this->refundManagerVerifyRefund = $refundManagerVerifyRefund;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRefundManagerAutoStockReset(): bool
+    {
+        return (bool)$this->refundManagerAutoStockReset;
+    }
+
+    /**
+     * @param bool $refundManagerAutoStockReset
+     */
+    public function setRefundManagerAutoStockReset(bool $refundManagerAutoStockReset): void
+    {
+        $this->refundManagerAutoStockReset = $refundManagerAutoStockReset;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRefundManagerShowInstructions(): bool
+    {
+        return (bool)$this->refundManagerShowInstructions;
+    }
+
+    /**
+     * @param bool $refundManagerShowInstructions
+     */
+    public function setRefundManagerShowInstructions(bool $refundManagerShowInstructions): void
+    {
+        $this->refundManagerShowInstructions = $refundManagerShowInstructions;
     }
 
 }

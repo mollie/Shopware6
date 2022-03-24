@@ -1,5 +1,5 @@
 import Plugin from 'src/plugin-system/plugin.class';
-import HttpClient from "../services/HttpClient";
+import HttpClient from '../services/HttpClient';
 
 export default class MollieCreditCardComponents extends Plugin {
     static options = {

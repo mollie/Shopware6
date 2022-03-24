@@ -109,6 +109,10 @@ export default class PaymentAction {
             cy.wait(clickTimeMS);
             cy.wrap($body).find('#verificationCode').eq(0).type(cvc);
         })
+
+        // just wait a bit
+        // after filling the iframes out
+        cy.wait(1000);
     }
 
     /**

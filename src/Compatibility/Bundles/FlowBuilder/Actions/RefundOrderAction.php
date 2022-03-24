@@ -3,8 +3,9 @@
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Actions;
 
 
+use Kiener\MolliePayments\Components\RefundManager\RefundManagerInterface;
+use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Service\OrderServiceInterface;
-use Kiener\MolliePayments\Service\RefundServiceInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Flow\Dispatching\Action\FlowAction;
 use Shopware\Core\Framework\Event\FlowEvent;
@@ -15,30 +16,30 @@ class RefundOrderAction extends FlowAction
 {
 
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @var OrderServiceInterface
      */
     private $orderService;
 
     /**
-     * @var RefundServiceInterface
+     * @var RefundManagerInterface
      */
-    private $refundService;
+    private $refundManager;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
 
     /**
      * @param OrderServiceInterface $orderService
-     * @param RefundServiceInterface $refundService
+     * @param RefundManagerInterface $refundManager
      * @param LoggerInterface $logger
      */
-    public function __construct(OrderServiceInterface $orderService, RefundServiceInterface $refundService, LoggerInterface $logger)
+    public function __construct(OrderServiceInterface $orderService, RefundManagerInterface $refundManager, LoggerInterface $logger)
     {
         $this->orderService = $orderService;
-        $this->refundService = $refundService;
+        $this->refundManager = $refundManager;
         $this->logger = $logger;
     }
 
@@ -108,10 +109,13 @@ class RefundOrderAction extends FlowAction
 
             $this->logger->info('Starting Refund through Flow Builder Action for order: ' . $orderNumber);
 
-            $this->refundService->refundFullOrder(
-                $order,
-                'Refund through Shopware Flow Builder'
+            $request = new RefundRequest(
+                (string)$order->getOrderNumber(),
+                'Refund through Shopware Flow Builder',
+                null
             );
+
+            $this->refundManager->refund($order, $request, $baseEvent->getContext());
 
         } catch (\Exception $ex) {
 

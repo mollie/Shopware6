@@ -8,7 +8,10 @@
       "mollie_webhook_received_status_expired": " Mollie Webhook Received (Expired)",
       "mollie_webhook_received_status_pending": " Mollie Webhook Received (Pending)",
       "mollie_webhook_received_status_paid": " Mollie Webhook Received (Paid)",
-      "mollie_webhook_received_status_completed": " Mollie Webhook Received (Completed)"
+      "mollie_webhook_received_status_completed": " Mollie Webhook Received (Completed)",
+      "mollie_webhook_received_status_refunded": " Mollie Webhook Received (Refunded)",
+      "mollie_webhook_received_status_partially_refunded": " Mollie Webhook Received (Partially Refunded)",
+      "mollie_refund_started": " Mollie Refund started"
     }
   },
   "mollie-payments": {
@@ -77,41 +80,105 @@
         }
       }
     },
-    "modals": {
-      "refund": {
-        "title": "Refund through Mollie",
-        "success": "A refund has been created in Mollie. It may take 2 hours for the refund to complete. Until this time, you can cancel the refund.",
-        "error": "Something went wrong creating a refund.",
-        "warning": {
-          "low-amount": "Please enter an amount to be refunded."
-        },
-        "confirmButton": "Refund",
-        "cancelButton": "Do not refund",
-        "list": {
-          "column": {
-            "amount": "Amount",
-            "status": "Status",
-            "date": "Date"
-          },
-          "context": {
-            "cancel": "Cancel this refund"
-          },
-          "status": {
-            "queued": "Queued",
-            "pending": "Pending",
-            "processing": "Processing",
+    "refunds": {
+      "status": {
+        "queued": "Queued",
+        "pending": "Pending",
+        "processing": "Processing",
+        "refunded": "Refunded",
+        "failed": "Failed",
+        "description": {
+          "queued": "The refund is queued until there is enough balance to process te refund. You can still cancel the refund.",
+          "pending": "The refund will be sent to the bank on the next business day. You can still cancel the refund.",
+          "processing": "The refund has been sent to the bank. The refund amount will be transferred to the consumer account as soon as possible.",
+          "refunded": "The refund amount has been transferred to the consumer.",
+          "failed": "The refund has failed after processing. For example, the customer has closed his / her bank account. The funds will be returned to your account."
+        }
+      }
+    },
+    "refund-manager": {
+      "general": {
+        "unitQuantity": "pc."
+      },
+      "cart": {
+        "title": "Order ##orderNumber##",
+        "btnSelectAll": "Select All",
+        "btnResetForm": "Reset Form",
+        "linkHowTo": "How to use this form?",
+        "grid": {
+          "columns": {
+            "item": "Item",
+            "productNumber": "Product Number",
+            "unitPrice": "Unit Price",
+            "quantity": "Quantity",
             "refunded": "Refunded",
-            "failed": "Failed"
+            "refundQuantity": "Refund",
+            "totalPrice": "Total",
+            "refundAmount": "Refund",
+            "resetStock": "Reset Stock"
           },
-          "status-description": {
-            "queued": "The refund is queued until there is enough balance to process te refund. You can still cancel the refund.",
-            "pending": "The refund will be sent to the bank on the next business day. You can still cancel the refund.",
-            "processing": "The refund has been sent to the bank. The refund amount will be transferred to the consumer account as soon as possible.",
-            "refunded": "The refund amount has been transferred to the consumer.",
-            "failed": "The refund has failed after processing. For example, the customer has closed his / her bank account. The funds will be returned to your account."
-          }
+          "btnResetLine": "Reset Line",
+          "checkDeductPromotion": "Deduct promotion"
         }
       },
+      "instructions": {
+        "linkResetTutorials": "Reset Tutorials",
+        "btnToggleTutorial": "Show/Hide Tutorial",
+        "titleFullRefund": "Full Refund",
+        "textFullRefund": "Just use the button for the full refund. This makes sure that all your items are marked as refunded and the full amount is returned to the customer.",
+        "titleStockReset": "Stock Reset",
+        "textStockReset": "You can automatically increase the available stock by entering the quantity that you would like to put back in stock. Just enter it before proceeding with a full or partial refund. Resetting the stock can be combined with the actual refund process in a flexible way.",
+        "titleShipping": "Shipping",
+        "textShipping": "Shipping items can be refunded as any other produt item. Either enter the full quantity or a custom partial amount and proceed with the refund. Refunding shipping costs can be combined with the actual refund process of items in a flexible way.",
+        "titlePartialAmount": "Partial Refund (only amount)",
+        "textPartialAmount": "Just enter the partial amount in the text field and start the refund.",
+        "titlePartialItems": "Partial Refund (with items)",
+        "textPartialItems": "If you want to mark quantities and items as refunded in Mollie, use the form above. Set your quantities and provide a custom amount for every item that will be refunded. The total sum will then be visible in the final refund amount text field. Remember, it's still possible to adjust this final amount before starting your refund.",
+        "titlePartialPromotions": "Partial Refund (with promotions)",
+        "textPartialPromotions": "If you have a promotion in your cart, then your promotion is a separate line item. If you want to refund all discounted items, go ahead and refund their total values and the full promotion line item itself. However, if you only want to refund a few items that were discounted, you can deduct the applied discount automatically for every single line item. You can of course always change values if they are not correct."
+      },
+      "summary": {
+        "dataLoading": "Data is loading...",
+        "captionTotal": "Total incl. taxes",
+        "captionTotalTaxFree": "Total",
+        "captionPendingRefunds": "Waiting to be refunded",
+        "captionVouchers": "Voucher amount",
+        "captionRefunded": "Refunded amount",
+        "captionRemaining": "Refundable amount",
+        "btnFixDiff": "Fix Difference",
+        "placeholderDescription": "add an optional description for your refund",
+        "checkVerification": "I have verified the total refund amount and the configured quantities to refund and re-stock.",
+        "btnRefund": "Refund",
+        "btnFullRefund": "Full Refund"
+      },
+      "refunds": {
+        "title": "Refunds in the Mollie Dashboard",
+        "linkMore": "More about refunds",
+        "grid": {
+          "columns": {
+            "amount": "Amount",
+            "status": "Status",
+            "description": "Description",
+            "composition": "Composition",
+            "date": "Date"
+          },
+          "lblNoComposition" : "No composition available",
+          "btnCancelRefund": "Cancel this refund"
+        }
+      },
+      "notifications": {
+        "success": {
+          "refund-created": "A refund has been created in Mollie. It may take 2 hours for the refund to complete. Until this time, you can cancel the refund.",
+          "refund-canceled": "The pending refund has been successfully cancelled and removed."
+        },
+        "error": {
+          "low-amount": "Please enter an amount to be refunded.",
+          "refund-created": "Something went wrong creating a refund.",
+          "refund-canceled": "There was a problem when cancelling the pending refund. Please try it again in the Mollie Dashboard."
+        }
+      }
+    },
+    "modals": {
       "shipping": {
         "title": "Ship through Mollie",
         "item": {
@@ -188,7 +255,12 @@
       "totalRefundsPending": "Waiting to be refunded",
       "totalRemaining": "Refundable amount",
       "totalVouchers": "Voucher amount",
-      "totalShipments": "Shipped amount ({quantity} items)"
+      "totalShipments": "Shipped amount ({quantity} items)",
+      "refundManager": {
+        "title": "Mollie Refund Manager",
+        "btnOpenRefundManager": "Open Refund Manager",
+        "btnCloseRefundManager": "Close Refund Manager"
+      }
     }
   },
   "sw-customer": {

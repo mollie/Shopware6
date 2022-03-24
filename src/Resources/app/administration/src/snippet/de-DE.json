@@ -8,7 +8,10 @@
       "mollie_webhook_received_status_expired": " Mollie Webhook empfangen (Abgelaufen)",
       "mollie_webhook_received_status_pending": " Mollie Webhook empfangen (Wartend)",
       "mollie_webhook_received_status_paid": " Mollie Webhook empfangen (Bezahlt)",
-      "mollie_webhook_received_status_completed": " Mollie Webhook empfangen (Komplett)"
+      "mollie_webhook_received_status_completed": " Mollie Webhook empfangen (Komplett)",
+      "mollie_webhook_received_status_refunded": " Mollie Webhook empfangen (Rückerstattet)",
+      "mollie_webhook_received_status_partially_refunded": " Mollie Webhook empfangen (Teilweise Rückerstattet)",
+      "mollie_refund_started": " Mollie Rückerstattung gestartet"
     }
   },
   "mollie-payments": {
@@ -77,41 +80,105 @@
         }
       }
     },
-    "modals": {
-      "refund": {
-        "title": "Rückerstattung über Mollie",
-        "success": "Es wurde eine Rückerstattung bei Mollie erstellt. Es kann bis zu 2 Stunden dauern, bis die Rückerstattung abgeschlossen ist. Bis dahin können Sie die Rückerstattung stornieren.",
-        "error": "Beim Erstellen einer Rückerstattung ist etwas schief gelaufen.",
-        "warning": {
-          "low-amount": "Bitte geben Sie einen zu erstattenden Betrag ein."
-        },
-        "confirmButton": "Rückerstatten",
-        "cancelButton": "Abbrechen",
-        "list": {
-          "column": {
-            "amount": "Betrag",
-            "status": "Status",
-            "date": "Datum"
+    "refunds": {
+      "status": {
+        "queued": "Warteschlange",
+        "pending": "Ausstehend",
+        "processing": "Processing",
+        "refunded": "Erstattet",
+        "failed": "Gescheitert",
+        "description": {
+          "queued": "Die Rückerstattung steht in der Warteschlange, bis genügend Guthaben vorhanden ist, um die Rückerstattung zu verarbeiten. Sie können die Rückerstattung noch stornieren.",
+          "pending": "Die Rückerstattung wird am nächsten Werktag an die Bank gesendet. Sie können die Rückerstattung immer noch stornieren.",
+          "processing": "Die Rückerstattung wurde an die Bank gesendet. Der Rückerstattungsbetrag wird so schnell wie möglich auf das Kundenkonto überwiesen.",
+          "refunded": "Der Rückerstattungsbetrag wurde an den Kunden überwiesen.",
+          "failed": "Die Rückerstattung ist nach der Bearbeitung fehlgeschlagen. Zum Beispiel hat der Kunde sein Bankkonto geschlossen. Das Geld wird auf das Konto zurücküberwiesen."
+        }
+      }
+    },
+    "refund-manager": {
+      "general": {
+        "unitQuantity": "Stk."
+      },
+      "cart": {
+        "title": "Bestellung ##orderNumber##",
+        "btnSelectAll": "Alle auswählen",
+        "btnResetForm": "Formular zurücksetzen",
+        "linkHowTo": "Wie benutze ich dieses Formular?",
+        "grid": {
+          "columns": {
+            "item": "Position",
+            "productNumber": "Produktnummer",
+            "unitPrice": "Stückpreis",
+            "quantity": "Anzahl",
+            "refunded": "Rückerstattet",
+            "refundQuantity": "Rückerstatten",
+            "totalPrice": "Gesamt",
+            "refundAmount": "Rückerstatten",
+            "resetStock": "Lagerbestand zurücksetzen"
           },
-          "context": {
-            "cancel": "Diese Rückerstattung stornieren"
-          },
-          "status": {
-            "queued": "Warteschlange",
-            "pending": "Ausstehend",
-            "processing": "Processing",
-            "refunded": "Erstattet",
-            "failed": "Gescheitert"
-          },
-          "status-description": {
-            "queued": "Die Rückerstattung steht in der Warteschlange, bis genügend Guthaben vorhanden ist, um die Rückerstattung zu verarbeiten. Sie können die Rückerstattung noch stornieren.",
-            "pending": "Die Rückerstattung wird am nächsten Werktag an die Bank gesendet. Sie können die Rückerstattung immer noch stornieren.",
-            "processing": "Die Rückerstattung wurde an die Bank gesendet. Der Rückerstattungsbetrag wird so schnell wie möglich auf das Kundenkonto überwiesen.",
-            "refunded": "Der Rückerstattungsbetrag wurde an den Kunden überwiesen.",
-            "failed": "Die Rückerstattung ist nach der Bearbeitung fehlgeschlagen. Zum Beispiel hat der Kunde sein Bankkonto geschlossen. Das Geld wird auf das Konto zurücküberwiesen."
-          }
+          "btnResetLine": "Zeile zurücksetzen",
+          "checkDeductPromotion": "Rabatt abziehen"
         }
       },
+      "instructions": {
+        "linkResetTutorials": "Tutorials zurücksetzen",
+        "btnToggleTutorial": "Tutorial anzeigen/verstecken",
+        "titleFullRefund": "Vollständige Rückerstattung",
+        "textFullRefund": "Verwenden Sie einfach die Schaltfläche für die vollständige Rückerstattung. Dadurch wird sichergestellt, dass alle Ihre Artikel als erstattet markiert werden und der volle Betrag an den Kunden zurückerstattet wird.",
+        "titleStockReset": "Lagerbestand zurücksetzen",
+        "textStockReset": "Sie können den verfügbaren Bestand automatisch erhöhen, indem Sie die Menge eingeben, die Sie wieder auf Lager haben möchten. Geben Sie es einfach ein, bevor Sie mit einer vollständigen oder teilweisen Rückerstattung fortfahren. Das Zurücksetzen des Bestands kann flexibel mit dem eigentlichen Rückerstattungsprozess kombiniert werden.",
+        "titleShipping": "Versandkosten",
+        "textShipping": "Versandartikel können wie alle anderen Produktartikel erstattet werden. Geben Sie entweder die volle Menge oder einen benutzerdefinierten Teilbetrag ein und fahren Sie mit der Rückerstattung fort. Die Rückerstattung der Versandkosten kann flexibel mit dem eigentlichen Rückerstattungsprozess von Artikeln kombiniert werden.",
+        "titlePartialAmount": "Teilweise Rückerstattung (nur Betrag)",
+        "textPartialAmount": "Geben Sie einfach den Teilbetrag in das Textfeld ein und starten Sie die Rückerstattung.",
+        "titlePartialItems": "Teilweise Rückerstattung (mit Positionen)",
+        "textPartialItems": "Wenn Sie Mengen und Artikel in Mollie als erstattet markieren möchten, verwenden Sie das obige Formular. Legen Sie Ihre Mengen fest und geben Sie einen benutzerdefinierten Betrag für jeden Artikel an, der erstattet wird. Die Gesamtsumme wird dann im Textfeld des finalen Erstattungsbetrages angezeigt. Denken Sie daran, dass es immer noch möglich ist, diesen endgültigen Betrag anzupassen, bevor Sie mit der Rückerstattung beginnen.",
+        "titlePartialPromotions": "Teilweise Rückerstattung (mit Rabatten)",
+        "textPartialPromotions": "Wenn Sie eine oder mehrere Rabatte in Ihrem Warenkorb haben, dann sind diese in Shopware als eigene Position in der Bestellung angelegt. Wenn Sie nun alle rabattierten Artikel erstatten möchten, erstatten Sie einfach alle Positionen der Artikel sowie die gesamte Rabattposition selbst. Wenn Sie jedoch nur einen Teil der rabattierten Artikel erstatten möchten, können Sie den angewendeten Rabatt automatisch für jeden einzelnen Artikel abziehen lassen. Sie können Werte natürlich jederzeit ändern, wenn sie nicht korrekt sind."
+      },
+      "summary": {
+        "dataLoading": "Daten werden geladen...",
+        "captionTotal": "Gesamtsumme inkl. MwSt.",
+        "captionTotalTaxFree": "Gesamtsumme",
+        "captionPendingRefunds": "Warten auf Rückerstattung",
+        "captionVouchers": "Gutscheine",
+        "captionRefunded": "Rückerstattete Menge",
+        "captionRemaining": "Rückerstattbar",
+        "btnFixDiff": "Differenz ausfüllen",
+        "placeholderDescription": "Füge dieser Erstattung eine optionale Notiz hinzu.",
+        "checkVerification": "Ich habe den Betrag der Rückerstattung geprüft und die Anzahl der Positionen für Erstattung und Lagerbestand konfiguriert.",
+        "btnRefund": "Rückerstatten",
+        "btnFullRefund": "Vollständig rückerstatten"
+      },
+      "refunds": {
+        "title": "Rückerstattungen im Mollie Dashboard",
+        "linkMore": "Mehr über Rückerstattungen",
+        "grid": {
+          "columns": {
+            "amount": "Betrag",
+            "status": "Status",
+            "description": "Beschreibung",
+            "composition": "Zusammensetzung",
+            "date": "Datum"
+          },
+          "lblNoComposition" : "Keine Zusammensetzung verfügbar",
+          "btnCancelRefund": "Diese Rückerstattung stornieren"
+        }
+      },
+      "notifications": {
+        "success": {
+          "refund-created": "Es wurde eine Rückerstattung bei Mollie erstellt. Es kann bis zu 2 Stunden dauern, bis die Rückerstattung abgeschlossen ist. Bis dahin können Sie die Rückerstattung stornieren.",
+          "refund-canceled": "Die ausstehende Rückerstattung wurde erfolgreich storniert und entfernt."
+        },
+        "error": {
+          "low-amount": "Bitte geben Sie einen zu erstattenden Betrag ein.",
+          "refund-created": "Beim Erstellen einer Rückerstattung ist etwas schief gelaufen.",
+          "refund-canceled": "Es gab ein Problem beim Löschen der ausstehenden Rückertattung. Bitte versuche es erneut im Mollie Dashboard."
+        }
+      }
+    },
+    "modals": {
       "shipping": {
         "title": "Versand an Mollie melden",
         "item": {
@@ -188,7 +255,12 @@
       "totalRefundsPending": "Warten auf Rückerstattung",
       "totalRemaining": "Rückerstattbar",
       "totalVouchers": "Gutscheine",
-      "totalShipments": "Versandte Menge ({quantity} Stück)"
+      "totalShipments": "Versandte Menge ({quantity} Stück)",
+      "refundManager": {
+        "title": "Rückerstattung über Mollie",
+        "btnOpenRefundManager": "Refund Manager öffnen",
+        "btnCloseRefundManager": "Refund Manager schließen"
+      }
     }
   },
   "sw-customer": {

@@ -3,7 +3,7 @@
 namespace Kiener\MolliePayments\Service\Logger\Services;
 
 
-class URLAnonymizer
+class URLAnonymizer implements URLAnonymizerInterface
 {
 
     /**

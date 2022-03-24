@@ -2,15 +2,13 @@
 
 namespace MolliePayments\Tests\Fakes;
 
-use Kiener\MolliePayments\Service\OrderServiceInterface;
-use Kiener\MolliePayments\Service\RefundServiceInterface;
+use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
+use Kiener\MolliePayments\Service\Refund\RefundServiceInterface;
+use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Refund;
-use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\Validation\DataBag\DataBag;
-use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class FakeRefundService implements RefundServiceInterface
 {
@@ -25,12 +23,26 @@ class FakeRefundService implements RefundServiceInterface
      */
     private $refundedOrder;
 
+    /**
+     * @var string
+     */
+    private $refundID;
 
     /**
-     *
+     * @var float
      */
-    public function __construct()
+    private $refundAmount;
+
+
+    /**
+     * @param string $refundID
+     * @param float $refundAmount
+     */
+    public function __construct(string $refundID, float $refundAmount)
     {
+        $this->refundID = $refundID;
+        $this->refundAmount = $refundAmount;
+
         $this->fullyRefunded = false;
     }
 
@@ -50,29 +62,35 @@ class FakeRefundService implements RefundServiceInterface
         return $this->refundedOrder;
     }
 
-
     /**
      * @param OrderEntity $order
-     * @param float $amount
-     * @param string|null $description
+     * @param string $description
+     * @param array $refundItems
+     * @param Context $context
      * @return Refund
      */
-    public function refund(OrderEntity $order, float $amount, ?string $description): Refund
+    public function refundFull(OrderEntity $order, string $description, array $refundItems, Context $context): Refund
     {
-        // TODO: Implement refund() method.
+        $this->fullyRefunded = true;
+        $this->refundedOrder = $order;
+
+        return $this->buildFakeRefund();
     }
 
     /**
      * @param OrderEntity $order
      * @param string $description
+     * @param float $amount
+     * @param array $lineItems
+     * @param Context $context
      * @return Refund
      */
-    public function refundFullOrder(OrderEntity $order, string $description): Refund
+    public function refundPartial(OrderEntity $order, string $description, float $amount, array $lineItems, Context $context): Refund
     {
-        $this->fullyRefunded = true;
+        $this->fullyRefunded = false;
         $this->refundedOrder = $order;
 
-        return new Refund(new MollieApiClient());
+        return $this->buildFakeRefund();
     }
 
     /**
@@ -119,6 +137,21 @@ class FakeRefundService implements RefundServiceInterface
     public function getRefundedAmount(OrderEntity $order): float
     {
         // TODO: Implement getRefundedAmount() method.
+    }
+
+    /**
+     * @return Refund
+     */
+    private function buildFakeRefund(): Refund
+    {
+        $refund = new Refund(new MollieApiClient());
+
+        $refund->id = $this->refundID;
+
+        $refund->amount = new \stdClass();
+        $refund->amount->value = $this->refundAmount;
+
+        return $refund;
     }
 
 }

@@ -17,6 +17,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieShippingLineItemBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\VerticalTaxLineItemFixer"/>
             <argument type="service" id="Kiener\MolliePayments\Hydrator\MollieLineItemHydrator"/>
+            <argument type="service" id="event_dispatcher"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieShippingLineItemBuilder">
