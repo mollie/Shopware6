@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Service\Mail\AttachmentGenerator;
 
+use Kiener\MolliePayments\Service\ConfigService;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
@@ -31,9 +32,14 @@ class JsonPluginConfigurationGenerator extends PluginConfigurationGenerator
                 unset($vars[$ignoreKey]);
             }
 
+            $varsWithDomain = [];
+            foreach ($vars as $key => $value) {
+                $varsWithDomain[rtrim(ConfigService::SYSTEM_CONFIG_DOMAIN, '.') . '.' . $key] = $value;
+            }
+
             $configs[] = [
                 'label' => $salesChannel->getTranslation('name'),
-                'config' => $vars,
+                'config' => $varsWithDomain,
             ];
         }
 
