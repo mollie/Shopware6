@@ -60,9 +60,7 @@ class SubscriptionController extends AbstractController
      */
     public function getAllSubscriptions(RequestDataBag $data, Context $context): JsonResponse
     {
-        $subscriptions = $this->subscriptionManager->getAll();
-
-        return new JsonResponse(['success' => $subscriptions]);
+        return new JsonResponse(['success' => 1]);
     }
 
 }

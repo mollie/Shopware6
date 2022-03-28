@@ -45,14 +45,19 @@ class Order
     private $logger;
 
 
-
-    public function __construct(MollieApiFactory $clientFactory, PaymentApiService $paymentApiService, RouterInterface $router, LoggerInterface $logger)
+    /**
+     * @param MollieApiFactory $clientFactory
+     * @param \Kiener\MolliePayments\Service\MollieApi\Payment $paymentApiService
+     * @param RouterInterface $router
+     * @param WebhookBuilder $webhookBuilder
+     * @param LoggerInterface $logger
+     */
+    public function __construct(MollieApiFactory $clientFactory, PaymentApiService $paymentApiService, RouterInterface $router, WebhookBuilder $webhookBuilder, LoggerInterface $logger)
     {
         $this->clientFactory = $clientFactory;
         $this->logger = $logger;
         $this->paymentApiService = $paymentApiService;
-
-        $this->webhookBuilder = new WebhookBuilder($router);
+        $this->webhookBuilder = $webhookBuilder;
     }
 
     /**

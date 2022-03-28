@@ -32,7 +32,7 @@ class Migration1644753635CreateSubscription extends MigrationStep
      */
     public function updateDestructive(Connection $connection): void
     {
-        $connection->exec("DROP TABLE `mollie_subscription`");
+        $connection->exec("DROP TABLE mollie_subscription");
     }
 
     /**
@@ -44,19 +44,20 @@ class Migration1644753635CreateSubscription extends MigrationStep
         $connection->exec(
             "CREATE TABLE IF NOT EXISTS mollie_subscription (
                     id BINARY(16) NOT NULL,
-                    mollie_customer_id VARCHAR(255) NOT NULL,
-                    mollie_subscription_id VARCHAR(255) NOT NULL,
-                    product_id BINARY(16) NOT NULL,
-                    sales_channel_id BINARY(16) NOT NULL,
+                    customer_id BINARY(16) NOT NULL,
+                    mollie_id VARCHAR(255),
+                    mollie_customer_id VARCHAR(255),
                     description VARCHAR(255) NULL,
                     amount FLOAT (10,3) NOT NULL,
                     currency VARCHAR(255) NOT NULL,
-                    original_order_id BINARY(16) NOT NULL,
+                    product_id BINARY(16) NOT NULL,
+                    metadata json NULL,
+                    order_id BINARY(16) NOT NULL,
+                    sales_channel_id BINARY(16) NOT NULL,
                     created_at DATETIME(3) NOT NULL,
                     updated_at DATETIME(3) NULL,
                     PRIMARY KEY (id)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
                 ");
     }
-
 }

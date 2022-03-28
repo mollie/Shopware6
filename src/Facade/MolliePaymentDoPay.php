@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Facade;
 
+use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Exception\PaymentUrlException;
@@ -66,6 +67,11 @@ class MolliePaymentDoPay
     private $updaterLineItemCustomFields;
 
     /**
+     * @var SubscriptionManager
+     */
+    private $subscriptionManager;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -80,9 +86,10 @@ class MolliePaymentDoPay
      * @param SettingsService $settingsService
      * @param UpdateOrderCustomFields $updateOrderCustomFields
      * @param UpdateOrderLineItems $updateOrderLineItems
+     * @param SubscriptionManager $subscriptionManager
      * @param LoggerInterface $logger
      */
-    public function __construct(OrderDataExtractor $extractor, MollieOrderBuilder $orderBuilder, OrderService $orderService, Order $orderApiService, CustomerService $customerService, SettingsService $settingsService, UpdateOrderCustomFields $updateOrderCustomFields, UpdateOrderLineItems $updateOrderLineItems, LoggerInterface $logger)
+    public function __construct(OrderDataExtractor $extractor, MollieOrderBuilder $orderBuilder, OrderService $orderService, Order $orderApiService, CustomerService $customerService, SettingsService $settingsService, UpdateOrderCustomFields $updateOrderCustomFields, UpdateOrderLineItems $updateOrderLineItems, SubscriptionManager $subscriptionManager, LoggerInterface $logger)
     {
         $this->extractor = $extractor;
         $this->orderBuilder = $orderBuilder;
@@ -92,6 +99,7 @@ class MolliePaymentDoPay
         $this->settingsService = $settingsService;
         $this->updaterOrderCustomFields = $updateOrderCustomFields;
         $this->updaterLineItemCustomFields = $updateOrderLineItems;
+        $this->subscriptionManager = $subscriptionManager;
         $this->logger = $logger;
     }
 
@@ -121,6 +129,10 @@ class MolliePaymentDoPay
 
         // get order with all needed associations
         $order = $this->orderService->getOrder($transactionStruct->getOrder()->getId(), $salesChannelContext->getContext());
+
+        if (!$order instanceof OrderEntity) {
+            throw new \Exception('Order in Shopware not existing when preparing Mollie payment');
+        }
 
         # build our custom fields
         # object for this order
@@ -180,6 +192,14 @@ class MolliePaymentDoPay
 
         # this condition somehow looks weird to me (TODO)
         $checkoutURL = $orderCustomFields->getMolliePaymentUrl() ?? $orderCustomFields->getTransactionReturnUrl() ?? $transactionStruct->getReturnUrl();
+
+
+        # now create subscriptions from our order for
+        # all products that are configured to be a subscription.
+        # this will prepare the subscriptions in our database.
+        # the confirmation of these, however, will be done in a webhook
+        $this->subscriptionManager->createSubscriptions($order, $salesChannelContext);
+
 
         return new MolliePaymentPrepareData((string)$checkoutURL, (string)$mollieOrder->id);
     }

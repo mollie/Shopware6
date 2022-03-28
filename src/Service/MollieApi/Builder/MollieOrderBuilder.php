@@ -105,8 +105,9 @@ class MollieOrderBuilder
      * @param VerticalTaxLineItemFixer $verticalTaxLineItemFixer
      * @param MollieLineItemHydrator $mollieLineItemHydrator
      * @param EventDispatcherInterface $eventDispatcher
+     * @param WebhookBuilder $webhookBuilder
      */
-    public function __construct(SettingsService $settingsService, OrderDataExtractor $extractor, RouterInterface $router, MollieOrderPriceBuilder $priceBuilder, MollieLineItemBuilder $lineItemBuilder, MollieOrderAddressBuilder $addressBuilder, MollieOrderCustomerEnricher $customerEnricher, LoggerInterface $loggerService, MollieShippingLineItemBuilder $shippingLineItemBuilder, VerticalTaxLineItemFixer $verticalTaxLineItemFixer, MollieLineItemHydrator $mollieLineItemHydrator, EventDispatcherInterface $eventDispatcher)
+    public function __construct(SettingsService $settingsService, OrderDataExtractor $extractor, RouterInterface $router, MollieOrderPriceBuilder $priceBuilder, MollieLineItemBuilder $lineItemBuilder, MollieOrderAddressBuilder $addressBuilder, MollieOrderCustomerEnricher $customerEnricher, LoggerInterface $loggerService, MollieShippingLineItemBuilder $shippingLineItemBuilder, VerticalTaxLineItemFixer $verticalTaxLineItemFixer, MollieLineItemHydrator $mollieLineItemHydrator, EventDispatcherInterface $eventDispatcher, WebhookBuilder $webhookBuilder)
     {
         $this->settingsService = $settingsService;
         $this->logger = $loggerService;
@@ -120,8 +121,7 @@ class MollieOrderBuilder
         $this->verticalTaxLineItemFixer = $verticalTaxLineItemFixer;
         $this->mollieLineItemHydrator = $mollieLineItemHydrator;
         $this->eventDispatcher = $eventDispatcher;
-
-        $this->webhookBuilder = new WebhookBuilder($router);
+        $this->webhookBuilder = $webhookBuilder;
     }
 
 

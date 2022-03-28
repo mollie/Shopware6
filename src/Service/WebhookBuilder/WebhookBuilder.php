@@ -54,4 +54,29 @@ class WebhookBuilder
         return $webhookUrl;
     }
 
+    /**
+     * @param string $subscriptionId
+     * @return string
+     */
+    public function buildSubscriptionWebhook(string $subscriptionId): string
+    {
+        $webhookUrl = $this->router->generate(
+            'frontend.mollie.subscriptions.webhook',
+            ['subscriptionId' => $subscriptionId],
+            $this->router::ABSOLUTE_URL
+        );
+
+        $customDomain = trim((string)getenv(self::CUSTOM_DOMAIN_ENV_KEY));
+
+        if ($customDomain !== '') {
+
+            $components = parse_url($webhookUrl);
+
+            # replace old domain with new custom domain
+            $webhookUrl = str_replace((string)$components['host'], $customDomain, $webhookUrl);
+        }
+
+        return $webhookUrl;
+    }
+
 }

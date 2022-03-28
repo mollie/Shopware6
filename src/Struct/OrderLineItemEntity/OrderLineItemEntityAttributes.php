@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Struct\OrderLineItemEntity;
 
 
 use Kiener\MolliePayments\Struct\Voucher\VoucherType;
-use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 
 class OrderLineItemEntityAttributes
@@ -20,6 +19,25 @@ class OrderLineItemEntityAttributes
      */
     private $mollieOrderLineID;
 
+    /**
+     * @var int
+     */
+    private $subscriptionInterval;
+
+    /**
+     * @var string
+     */
+    private $subscriptionIntervalUnit;
+
+    /**
+     * @var ?int
+     */
+    private $subscriptionRepetitionCount;
+
+    /**
+     * @var string
+     */
+    private $subscriptionRepetitionType;
 
     /**
      * @param OrderLineItemEntity $lineItem
@@ -28,6 +46,11 @@ class OrderLineItemEntityAttributes
     {
         $this->voucherType = $this->getCustomFieldValue($lineItem, 'voucher_type');
         $this->mollieOrderLineID = $this->getCustomFieldValue($lineItem, 'order_line_id');
+
+        $this->subscriptionInterval = $this->getCustomFieldValue($lineItem, 'mollie_subscription_interval_amount');
+        $this->subscriptionIntervalUnit = $this->getCustomFieldValue($lineItem, 'mollie_subscription_interval_type');
+        $this->subscriptionRepetitionCount = $this->getCustomFieldValue($lineItem, 'mollie_subscription_repetition_amount');
+        $this->subscriptionRepetitionType = $this->getCustomFieldValue($lineItem, 'mollie_subscription_repetition_type');
     }
 
     /**
@@ -55,6 +78,38 @@ class OrderLineItemEntityAttributes
     public function getMollieOrderLineID(): string
     {
         return $this->mollieOrderLineID;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSubscriptionInterval()
+    {
+        return $this->subscriptionInterval;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSubscriptionIntervalUnit(): string
+    {
+        return $this->subscriptionIntervalUnit;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getSubscriptionRepetitionCount()
+    {
+        return $this->subscriptionRepetitionCount;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSubscriptionRepetitionType(): string
+    {
+        return $this->subscriptionRepetitionType;
     }
 
 

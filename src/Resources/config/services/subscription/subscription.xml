@@ -11,7 +11,7 @@
         </service>
 
         <service id="Kiener\MolliePayments\Components\Subscription\Builder\MollieDataBuilder">
-            <argument type="service" id="Symfony\Component\Routing\RouterInterface"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder"/>
         </service>
 
         <service id="Kiener\MolliePayments\Components\Subscription\Builder\SubscriptionBuilder">
@@ -22,6 +22,10 @@
             <tag name="shopware.cart.validator"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Components\Subscription\Repository\SubscriptionRepository">
+            <argument type="service" id="mollie_subscription.repository"/>
+        </service>
+
         <service id="Kiener\MolliePayments\Components\Subscription\Page\Account\Mollie\AccountSubscriptionsPageLoader">
             <argument type="service" id="mollie_subscription.repository"/>
             <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
@@ -29,12 +33,11 @@
         </service>
 
         <service id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager">
-            <argument type="service" id="mollie_subscription.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Repository\SubscriptionRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Builder\MollieDataBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Builder\SubscriptionBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
             <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
-            <argument type="service" id="mollie_payments.logger"/>
         </service>
 
     </services>

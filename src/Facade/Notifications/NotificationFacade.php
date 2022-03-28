@@ -171,15 +171,20 @@ class NotificationFacade
 
         # --------------------------------------------------------------------------------------------
         # SUBSCRIPTION
-        # if we have a subscription, then we want to make sure to create it
-        # in our local database too
-        # TODO...verify that this is the correct approach...
+        # this will confirm our created subscriptions in all cases of successful payments.
+        # that path will create the actual subscription inside Mollie which will be used for recurring.
+        # if our payment expired, then we can also expire our local subscription in the database.
 
         switch ($status) {
 
             case MolliePaymentStatus::MOLLIE_PAYMENT_PAID:
+            case MolliePaymentStatus::MOLLIE_PAYMENT_PENDING:
             case MolliePaymentStatus::MOLLIE_PAYMENT_AUTHORIZED:
-                $this->subscriptionManager->createSubscriptions($swOrder, $contextSC);
+                $this->subscriptionManager->confirmSubscriptions($swOrder, $contextSC);
+                break;
+
+            case MolliePaymentStatus::MOLLIE_PAYMENT_EXPIRED:
+                $this->subscriptionManager->cancelPendingSubscriptions($swOrder, $contextSC);
                 break;
         }
 

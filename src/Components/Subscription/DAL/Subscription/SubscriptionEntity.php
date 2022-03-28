@@ -3,14 +3,31 @@
 namespace Kiener\MolliePayments\Components\Subscription\DAL\Subscription;
 
 
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
 use Monolog\DateTimeImmutable;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
 
 class SubscriptionEntity extends Entity
 {
+
     use EntityIdTrait;
 
+
+    /**
+     * @var string
+     */
+    protected $customerId;
+
+    /**
+     * @var string
+     */
+    protected $mollieId;
+
+    /**
+     * @var string
+     */
+    protected $mollieCustomerId;
 
     /**
      * @var string
@@ -25,37 +42,17 @@ class SubscriptionEntity extends Entity
     /**
      * @var string
      */
-    private $currencyIso;
+    protected $currency;
 
     /**
      * @var string
      */
-    protected $shopwareProductId;
+    protected $productId;
 
     /**
      * @var string
      */
-    private $startDate;
-
-    /**
-     * @var string
-     */
-    private $intervalValue;
-
-    /**
-     * @var string
-     */
-    private $intervalType;
-
-    /**
-     * @var string
-     */
-    private $repetitionAmount;
-
-    /**
-     * @var string
-     */
-    protected $originalOrderId;
+    protected $orderId;
 
     /**
      * @var string
@@ -63,41 +60,9 @@ class SubscriptionEntity extends Entity
     protected $salesChannelId;
 
     /**
-     * @var string
+     * @var array|null
      */
-    protected $mollieSubscriptionId;
-
-    /**
-     * @var string
-     */
-    protected $mollieCustomerId;
-
-
-    /**
-     * @param string $description
-     * @param float $amount
-     * @param string $currencyISO
-     * @param string $shopwareProductId
-     * @param string $startDate
-     * @param string $intervalValue
-     * @param string $intervalType
-     * @param string $repetitionAmount
-     * @param string $originalOrderId
-     * @param string $salesChannelId
-     */
-    public function __construct(string $description, float $amount, string $currencyISO, string $shopwareProductId, string $startDate, string $intervalValue, string $intervalType, string $repetitionAmount, string $originalOrderId, string $salesChannelId)
-    {
-        $this->description = $description;
-        $this->amount = $amount;
-        $this->currencyIso = $currencyISO;
-        $this->shopwareProductId = $shopwareProductId;
-        $this->startDate = $startDate;
-        $this->intervalValue = $intervalValue;
-        $this->intervalType = $intervalType;
-        $this->repetitionAmount = $repetitionAmount;
-        $this->originalOrderId = $originalOrderId;
-        $this->salesChannelId = $salesChannelId;
-    }
+    protected $metadata;
 
 
     /**
@@ -108,7 +73,78 @@ class SubscriptionEntity extends Entity
     public function setMollieData(string $mollieCustomerId, string $mollieSubscriptionId): void
     {
         $this->mollieCustomerId = $mollieCustomerId;
-        $this->mollieSubscriptionId = $mollieSubscriptionId;
+        $this->mollieId = $mollieSubscriptionId;
+
+        $this->setMetadata('', 0, '', null);
+    }
+
+    /**
+     * @param string $startDate
+     * @param int $interval
+     * @param string $intervalUnit
+     * @param int|null $times
+     */
+    public function setMetadata(string $startDate, int $interval, string $intervalUnit, ?int $times): void
+    {
+        $meta = new SubscriptionMetadata($startDate, $interval, $intervalUnit, $times);
+
+        $this->metadata = $meta->toArray();
+    }
+
+    /**
+     * @return SubscriptionMetadata
+     */
+    public function getMetadata(): SubscriptionMetadata
+    {
+        return SubscriptionMetadata::fromArray($this->metadata);
+    }
+
+    /**
+     * @return string
+     */
+    public function getCustomerId(): string
+    {
+        return (string)$this->customerId;
+    }
+
+    /**
+     * @param string $customerId
+     */
+    public function setCustomerId(string $customerId): void
+    {
+        $this->customerId = $customerId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMollieId(): string
+    {
+        return (string)$this->mollieId;
+    }
+
+    /**
+     * @param string $mollieId
+     */
+    public function setMollieId(string $mollieId): void
+    {
+        $this->mollieId = $mollieId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMollieCustomerId(): string
+    {
+        return (string)$this->mollieCustomerId;
+    }
+
+    /**
+     * @param string $mollieCustomerId
+     */
+    public function setMollieCustomerId(string $mollieCustomerId): void
+    {
+        $this->mollieCustomerId = $mollieCustomerId;
     }
 
     /**
@@ -120,59 +156,75 @@ class SubscriptionEntity extends Entity
     }
 
     /**
+     * @param string $description
+     */
+    public function setDescription(string $description): void
+    {
+        $this->description = $description;
+    }
+
+    /**
      * @return float
      */
     public function getAmount(): float
     {
-        return $this->amount;
+        return (float)$this->amount;
+    }
+
+    /**
+     * @param float $amount
+     */
+    public function setAmount(float $amount): void
+    {
+        $this->amount = $amount;
     }
 
     /**
      * @return string
      */
-    public function getCurrencyIso(): string
+    public function getCurrency(): string
     {
-        return $this->currencyIso;
+        return (string)$this->currency;
+    }
+
+    /**
+     * @param string $currency
+     */
+    public function setCurrency(string $currency): void
+    {
+        $this->currency = $currency;
     }
 
     /**
      * @return string
      */
-    public function getShopwareProductId(): string
+    public function getProductId(): string
     {
-        return $this->shopwareProductId;
+        return (string)$this->productId;
+    }
+
+    /**
+     * @param string $productId
+     */
+    public function setProductId(string $productId): void
+    {
+        $this->productId = $productId;
     }
 
     /**
      * @return string
      */
-    public function getStartDate(): string
+    public function getOrderId(): string
     {
-        return $this->startDate;
+        return (string)$this->orderId;
     }
 
     /**
-     * @return string
+     * @param string $orderId
      */
-    public function getIntervalValue(): string
+    public function setOrderId(string $orderId): void
     {
-        return $this->intervalValue;
-    }
-
-    /**
-     * @return string
-     */
-    public function getIntervalType(): string
-    {
-        return $this->intervalType;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRepetitionAmount(): string
-    {
-        return $this->repetitionAmount;
+        $this->orderId = $orderId;
     }
 
     /**
@@ -180,31 +232,15 @@ class SubscriptionEntity extends Entity
      */
     public function getSalesChannelId(): string
     {
-        return $this->salesChannelId;
+        return (string)$this->salesChannelId;
     }
 
     /**
-     * @return string
+     * @param string $salesChannelId
      */
-    public function getMollieCustomerId(): string
+    public function setSalesChannelId(string $salesChannelId): void
     {
-        return $this->mollieCustomerId;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMollieSubscriptionId(): string
-    {
-        return $this->mollieSubscriptionId;
-    }
-
-    /**
-     * @return string
-     */
-    public function getOriginalOrderId(): string
-    {
-        return $this->originalOrderId;
+        $this->salesChannelId = $salesChannelId;
     }
 
 }

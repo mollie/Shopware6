@@ -5,6 +5,11 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+
+        <service id="Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder">
+            <argument type="service" id="router"/>
+        </service>
+
         <service id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderBuilder">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor"/>
@@ -18,6 +23,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\VerticalTaxLineItemFixer"/>
             <argument type="service" id="Kiener\MolliePayments\Hydrator\MollieLineItemHydrator"/>
             <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieShippingLineItemBuilder">

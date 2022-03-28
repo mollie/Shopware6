@@ -12,6 +12,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\PrimaryKey;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\Required;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\FloatField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\IdField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\JsonField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\UpdatedAtField;
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
@@ -54,17 +55,21 @@ class SubscriptionDefinition extends EntityDefinition
         return new FieldCollection([
             (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
 
+            (new FkField('customer_id', 'customerId', OrderDefinition::class))->addFlags(new ApiAware()),
+
+            (new StringField('mollie_id', 'mollieId')),
+            (new StringField('mollie_customer_id', 'mollieCustomerId')),
+
             new StringField('description', 'description'),
             new FloatField('amount', 'amount'),
             new StringField('currency', 'currency'),
+            (new FkField('product_id', 'productId', ProductDefinition::class))->addFlags(new ApiAware()),
 
-            (new FkField('product_id', 'shopwareProductId', ProductDefinition::class))->addFlags(new ApiAware()),
-
-            (new StringField('mollie_subscription_id', 'mollieSubscriptionId')),
-            (new StringField('mollie_customer_id', 'mollieCustomerId')),
-
-            (new FkField('original_order_id', 'originalOrderId', OrderDefinition::class))->addFlags(new ApiAware()),
+            (new FkField('order_id', 'orderId', OrderDefinition::class))->addFlags(new ApiAware()),
             (new FkField('sales_channel_id', 'salesChannelId', SalesChannelDefinition::class))->addFlags(new ApiAware()),
+
+            (new JsonField('metadata', 'metadata')),
+
 
             new CreatedAtField(),
             new UpdatedAtField(),

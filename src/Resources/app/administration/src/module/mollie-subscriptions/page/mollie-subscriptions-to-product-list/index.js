@@ -1,9 +1,11 @@
 import template from './mollie-subscriptions-to-product-list.html.twig';
+import ShopwareOrderGrid from "../../../mollie-payments/components/mollie-refund-manager/grids/ShopwareOrderGrid";
+import MollieSubscriptionGrid from "./grids/MollieSubscriptionGrid";
 
 // eslint-disable-next-line no-undef
-const { Component, Mixin } = Shopware;
+const {Component, Mixin} = Shopware;
 // eslint-disable-next-line no-undef
-const { Criteria } = Shopware.Data;
+const {Criteria} = Shopware.Data;
 
 Component.register('mollie-subscriptions-to-product-list', {
     template,
@@ -62,7 +64,7 @@ Component.register('mollie-subscriptions-to-product-list', {
 
     methods: {
         createdComponent() {
-            this.repository = this.repositoryFactory.create('mollie_subscription_to_product');
+            this.repository = this.repositoryFactory.create('mollie_subscription');
             this.getSubscriptions();
             this.systemConfigApiService.getValues('MolliePayments.config').then(configData => {
                 this.systemConfig = configData;
@@ -86,46 +88,8 @@ Component.register('mollie-subscriptions-to-product-list', {
          * @returns {[{allowResize: boolean, dataIndex: string, property: string, label}, {allowResize: boolean, dataIndex: string, property: string, label}, {allowResize: boolean, property: string, label}, {allowResize: boolean, property: string, label}, {allowResize: boolean, property: string, label}, null, null, null]}
          */
         getColumns() {
-            return [{
-                property: 'subscriptionId',
-                dataIndex: 'subscriptionId',
-                label: this.$tc('mollie-subscriptions.page.list.columns.subscription_id'),
-                allowResize: true,
-            }, {
-                property: 'mollieCustomerId',
-                dataIndex: 'mollieCustomerId',
-                label: this.$tc('mollie-subscriptions.page.list.columns.customer_id'),
-                allowResize: true,
-            }, {
-                property: 'salesChannelId',
-                dataIndex: 'salesChannelId',
-                label: this.$tc('mollie-subscriptions.page.list.columns.salesChannelId'),
-                visible: false,
-            }, {
-                property: 'status',
-                label: this.$tc('mollie-subscriptions.page.list.columns.status'),
-                allowResize: true,
-            }, {
-                property: 'description',
-                label: this.$tc('mollie-subscriptions.page.list.columns.description'),
-                allowResize: true,
-            }, {
-                property: 'createdAt',
-                label: this.$tc('mollie-subscriptions.page.list.columns.createdAt'),
-                allowResize: true,
-            }, {
-                property: 'amount',
-                label: this.$tc('mollie-subscriptions.page.list.columns.amount'),
-                allowResize: true,
-            }, {
-                property: 'nextPaymentDate',
-                label: this.$tc('mollie-subscriptions.page.list.columns.nextPaymentAt'),
-                allowResize: true,
-            }, {
-                property: 'prePaymentReminder',
-                label: this.$tc('mollie-subscriptions.page.list.columns.prePaymentReminder'),
-                allowResize: true,
-            }];
+            const grid = new MollieSubscriptionGrid();
+            return grid.buildColumns();
         },
 
         statusTransation(status) {

@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Components\Subscription\Builder;
 use Exception;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Setting\Source\RepetitionType;
+use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -22,16 +23,15 @@ class SubscriptionBuilder
     {
         $subscriptions = [];
 
-        foreach ($order->getLineItems() as $orderItem) {
+        foreach ($order->getLineItems() as $lineItem) {
 
-            $payload = $orderItem->getPayload();
-            $customFields = $payload['customFields'];
+            $attributes = new OrderLineItemEntityAttributes($lineItem);
 
-            if (!array_key_exists('mollie_subscription', $customFields) || !array_key_exists('mollie_subscription_product', $customFields['mollie_subscription']) || !$customFields['mollie_subscription']['mollie_subscription_product']) {
+            if ($attributes->getSubscriptionInterval() <= 0) {
                 continue;
             }
 
-            $subscriptions[] = $this->buildItemSubscription($orderItem, $order);
+            $subscriptions[] = $this->buildItemSubscription($lineItem, $order);
         }
 
         return $subscriptions;
@@ -44,34 +44,38 @@ class SubscriptionBuilder
      */
     private function buildItemSubscription(OrderLineItemEntity $lineItem, OrderEntity $order): SubscriptionEntity
     {
-        $customFields = $lineItem->getPayload()['customFields'];
+        $attributes = new OrderLineItemEntityAttributes($lineItem);
 
-        $intervalAmount = (string)$customFields["mollie_subscription"]['mollie_subscription_interval_amount'];
-        $intervalType = (string)$customFields["mollie_subscription"]['mollie_subscription_interval_type'];
-        $repetitionType = (string)$customFields["mollie_subscription"]['mollie_subscription_repetition_type'];
+        $interval = $attributes->getSubscriptionInterval();
+        $intervalUnit = $attributes->getSubscriptionIntervalUnit();
 
-        $repetitionAmount = 0;
+        $times = $attributes->getSubscriptionRepetitionCount();
+        $repetitionType = $attributes->getSubscriptionRepetitionType();
 
         if ($repetitionType === RepetitionType::INFINITE) {
-            $repetitionAmount = '';
+            $times = null;
         }
 
 
-        $entity = new SubscriptionEntity(
-            $order->getOrderNumber() . ': ' . $lineItem->getLabel(),
-            $lineItem->getTotalPrice(),
-            $order->getCurrency()->getIsoCode(),
-            $lineItem->getProductId(),
-            $order->getOrderDateTime()->format('Y-m-d'),
-            $intervalAmount,
-            $intervalType,
-            $repetitionAmount,
-            $order->getId(),
-            $order->getSalesChannelId(),
-        );
-
-        # create a new shopware ID
+        $entity = new SubscriptionEntity();
         $entity->setId(Uuid::randomHex());
+
+        $entity->setDescription($order->getOrderNumber() . ': ' . $lineItem->getLabel());
+        $entity->setAmount($lineItem->getTotalPrice());
+        $entity->setCurrency($order->getCurrency()->getIsoCode());
+        $entity->setAmount($lineItem->getTotalPrice());
+
+        $entity->setCustomerId($order->getOrderCustomer()->getId());
+        $entity->setProductId($lineItem->getProductId());
+        $entity->setOrderId($order->getId());
+        $entity->setSalesChannelId($order->getSalesChannelId());
+
+        $entity->setMetadata(
+            $order->getOrderDateTime()->format('Y-m-d'),
+            $interval,
+            $intervalUnit,
+            $times
+        );
 
         return $entity;
     }

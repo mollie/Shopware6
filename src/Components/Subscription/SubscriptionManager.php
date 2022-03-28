@@ -4,12 +4,10 @@ namespace Kiener\MolliePayments\Components\Subscription;
 
 use Kiener\MolliePayments\Components\Subscription\Builder\MollieDataBuilder;
 use Kiener\MolliePayments\Components\Subscription\Builder\SubscriptionBuilder;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
+use Kiener\MolliePayments\Components\Subscription\Repository\SubscriptionRepository;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Service\CustomerService;
-use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -25,10 +23,10 @@ class SubscriptionManager
     /**
      * @var MollieDataBuilder
      */
-    private $builderMollieDefinition;
+    private $builderMollie;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var SubscriptionRepository
      */
     private $repoSubscriptions;
 
@@ -40,47 +38,51 @@ class SubscriptionManager
     /**
      * @var MollieGatewayInterface
      */
-    private $gatewayMollie;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private $gwMollie;
 
 
     /**
-     * @param EntityRepositoryInterface $repoSubscriptions
+     * @param SubscriptionRepository $repoSubscriptions
      * @param MollieDataBuilder $definitionBuilder
      * @param SubscriptionBuilder $subscriptionBuilder
      * @param CustomerService $customers
      * @param MollieGatewayInterface $gatewayMollie
-     * @param LoggerInterface $logger
      */
-    public function __construct(EntityRepositoryInterface $repoSubscriptions, MollieDataBuilder $definitionBuilder, SubscriptionBuilder $subscriptionBuilder, CustomerService $customers, MollieGatewayInterface $gatewayMollie, LoggerInterface $logger)
+    public function __construct(SubscriptionRepository $repoSubscriptions, MollieDataBuilder $definitionBuilder, SubscriptionBuilder $subscriptionBuilder, CustomerService $customers, MollieGatewayInterface $gatewayMollie)
     {
         $this->repoSubscriptions = $repoSubscriptions;
-        $this->builderMollieDefinition = $definitionBuilder;
+        $this->builderMollie = $definitionBuilder;
         $this->builderSubscription = $subscriptionBuilder;
         $this->customers = $customers;
-        $this->gatewayMollie = $gatewayMollie;
-        $this->logger = $logger;
+        $this->gwMollie = $gatewayMollie;
     }
 
+
     /**
-     * @return array
+     * @param OrderEntity $order
+     * @param SalesChannelContext $context
+     * @throws \Exception
      */
-    public function getAll(): array
+    public function createSubscriptions(OrderEntity $order, SalesChannelContext $context): void
     {
-        return $this->gatewayMollie->getAllSubscriptions()->getArrayCopy();
+        # extract and build our subscription items
+        # from the current order entity.
+        # this will lead to a separate subscription
+        # for each subscription product in that order
+        $orderSubscriptions = $this->builderSubscription->buildSubscriptions($order);
+
+        foreach ($orderSubscriptions as $subscription) {
+            $this->repoSubscriptions->insertSubscription($subscription, $context->getContext());
+        }
+
+        # TODO mark order as subscription order!
     }
 
     /**
      * @param OrderEntity $order
      * @param SalesChannelContext $context
-     * @return void
-     * @throws \Exception
      */
-    public function createSubscriptions(OrderEntity $order, SalesChannelContext $context): void
+    public function confirmSubscriptions(OrderEntity $order, SalesChannelContext $context): void
     {
         $customerId = $this->customers->getMollieCustomerId(
             $order->getOrderCustomer()->getCustomerId(),
@@ -90,48 +92,37 @@ class SubscriptionManager
 
 
         # switch out client to the correct sales channel
-        $this->gatewayMollie->switchClient($context->getSalesChannel()->getId());
+        $this->gwMollie->switchClient($context->getSalesChannel()->getId());
 
-        # extract and build our subscription items
-        # from the current order entity.
-        # this will lead to a separate subscription
-        # for each subscription product in that order
-        $orderSubscriptions = $this->builderSubscription->buildSubscriptions($order);
 
-        foreach ($orderSubscriptions as $subscription) {
+        $pendingSubscriptions = $this->repoSubscriptions->getPendingSubscriptions($order->getId(), $context->getContext());
 
-            try {
+        foreach ($pendingSubscriptions as $subscription) {
 
-                # convert our subscription into a mollie definition
-                $mollieData = $this->builderMollieDefinition->buildDefinition($subscription);
+            # convert our subscription into a mollie definition
+            $mollieData = $this->builderMollie->buildDefinition($subscription);
 
-                # create the subscription in Mollie.
-                #this is important to really start the subscription process
-                $mollieSubscription = $this->gatewayMollie->createSubscription($customerId, $mollieData);
+            # create the subscription in Mollie.
+            # this is important to really start the subscription process
+            $mollieSubscription = $this->gwMollie->createSubscription($customerId, $mollieData);
 
-                # now update our local entity with the
-                # new IDs that we get from mollie
-                $subscription->setMollieData($customerId, $mollieSubscription->id);
-
-                # save our subscription in our local database
-                $this->saveSubscriptionEntity($subscription, $context);
-
-            } catch (\Exception $exception) {
-
-                $this->logger->emergency(
-                    'Error when creating Subscription in Mollie for order: ' . $order->getOrderNumber(),
-                    [
-                        'error' => $exception->getMessage(),
-                    ]
-                );
-            }
+            # save our subscription in our local database
+            $this->repoSubscriptions->confirmSubscription(
+                $subscription->getId(),
+                $mollieSubscription->id,
+                $mollieSubscription->customerId,
+                $context->getContext()
+            );
         }
+    }
 
-
-        #   $this->repoOrderTransactions->upsert([[
-        #       'id' => $event->getEntityId(),
-        #       'customFields' => ['subscription_created' => date('Y-m-d')]
-        #   ]], $event->getContext());
+    /**
+     * @param OrderEntity $order
+     * @param SalesChannelContext $context
+     */
+    public function cancelPendingSubscriptions(OrderEntity $order, SalesChannelContext $context): void
+    {
+        # TODO
     }
 
     /**
@@ -142,11 +133,11 @@ class SubscriptionManager
      */
     public function cancelSubscription(string $subscriptionId, string $mollieCustomerId, SalesChannelContext $context): void
     {
-        $this->gatewayMollie->switchClient($context->getSalesChannel()->getId());
+        $this->gwMollie->switchClient($context->getSalesChannel()->getId());
 
         try {
 
-            $this->gatewayMollie->cancelSubscription($subscriptionId, $mollieCustomerId);
+            $this->gwMollie->cancelSubscription($subscriptionId, $mollieCustomerId);
 
         } catch (\Exception $exception) {
 
@@ -154,29 +145,6 @@ class SubscriptionManager
 
             $this->cancelSubscriptionReference($mollieCustomerId, $subscriptionId, $context);
         }
-    }
-
-    /**
-     * @param SubscriptionEntity $subscription
-     * @param SalesChannelContext $context
-     */
-    private function saveSubscriptionEntity(SubscriptionEntity $subscription, SalesChannelContext $context)
-    {
-        $this->repoSubscriptions->create([
-            [
-                'id' => $subscription->getId(),
-                'mollieCustomerId' => '22', #$subscription->getMollieCustomerId(),
-                'mollieSubscriptionId' => '2', # $subscription->getMollieSubscriptionId(),
-                'productId' => $subscription->getShopwareProductId(),
-                'originalOrderId' => $subscription->getOriginalOrderId(),
-                'salesChannelId' => $context->getSalesChannelId(),
-                'description' => $subscription->getDescription(),
-                'amount' => $subscription->getAmount(),
-                'currency' => $subscription->getCurrencyIso()
-            ]
-        ],
-            $context->getContext()
-        );
     }
 
     /**

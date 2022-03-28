@@ -7,10 +7,5 @@
     <services>
 
 
-        <service id="Kiener\MolliePayments\Components\Subscription\DTO\SubscriptionResponse">
-            <argument type="service" id="customer.repository"/>
-            <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextService"/>
-        </service>
-
     </services>
 </container>

@@ -28,6 +28,7 @@ class MolliePayments extends Plugin
 
     const PLUGIN_VERSION = '2.2.0';
 
+
     /**
      * @param ContainerBuilder $container
      * @throws Exception
@@ -44,11 +45,17 @@ class MolliePayments extends Plugin
         $loader->loadServices();
     }
 
+    /**
+     *
+     */
     public function boot(): void
     {
         parent::boot();
     }
 
+    /**
+     * @param InstallContext $context
+     */
     public function install(InstallContext $context): void
     {
         parent::install($context);
@@ -67,6 +74,9 @@ class MolliePayments extends Plugin
         $this->addReminderEmailTemplate($context);
     }
 
+    /**
+     * @param UpdateContext $context
+     */
     public function update(UpdateContext $context): void
     {
         parent::update($context);
@@ -82,26 +92,37 @@ class MolliePayments extends Plugin
         }
     }
 
+    /**
+     * @param InstallContext $context
+     */
     public function postInstall(InstallContext $context): void
     {
         parent::postInstall($context);
     }
 
+    /**
+     * @param UninstallContext $context
+     */
     public function uninstall(UninstallContext $context): void
     {
         parent::uninstall($context);
 
         $this->deleteReminderEmailTemplate($context);
 
-        /** @var Connection $connection */
-        $connection = $this->container->get(Connection::class);
+        # TODO - maybe bind to keep data?
 
-        try {
-            $connection->exec('DROP TABLE IF EXISTS `mollie_subscription_to_product`');
-        } catch (Exception $exception) {
-        }
+        # /** @var Connection $connection */
+        #  $connection = $this->container->get(Connection::class);
+
+        # try {
+        #     $connection->exec('DROP TABLE IF EXISTS `mollie_subscription_to_product`');
+        # } catch (Exception $exception) {
+        # }
     }
 
+    /**
+     * @param ActivateContext $context
+     */
     public function activate(ActivateContext $context): void
     {
         parent::activate($context);
@@ -115,6 +136,9 @@ class MolliePayments extends Plugin
         $domainVerificationService->downloadDomainAssociationFile();
     }
 
+    /**
+     * @param DeactivateContext $context
+     */
     public function deactivate(DeactivateContext $context): void
     {
         parent::deactivate($context);
@@ -222,4 +246,5 @@ class MolliePayments extends Plugin
             ['id' => $reminderEmailTemplate->getId()]
         ], $context->getContext());
     }
+
 }
