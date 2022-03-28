@@ -2,6 +2,8 @@
 
 namespace Kiener\MolliePayments\Storefront\Controller;
 
+use Kiener\MolliePayments\Components\Subscription\Page\Account\PageLoader;
+use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Page\Account\Mollie\AccountSubscriptionsPageLoader;
 use Kiener\MolliePayments\Service\Subscription\CancelSubscriptionsService;
 use Shopware\Core\Framework\Routing\Annotation\LoginRequired;
@@ -17,55 +19,60 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class AccountController extends StorefrontController
 {
-    /**
-     * @var AccountSubscriptionsPageLoader
-     */
-    private $subscriptionsPageLoader;
 
     /**
-     * @var CancelSubscriptionsService
+     * @var PageLoader
      */
-    private $cancelSubscriptionsService;
+    private $pageLoader;
 
     /**
-     * @param AccountSubscriptionsPageLoader $subscriptionsPageLoader
-     * @param CancelSubscriptionsService $cancelSubscriptionsService
+     * @var SubscriptionManager
      */
-    public function __construct(
-        AccountSubscriptionsPageLoader $subscriptionsPageLoader,
-        CancelSubscriptionsService $cancelSubscriptionsService
-    ) {
-        $this->subscriptionsPageLoader = $subscriptionsPageLoader;
-        $this->cancelSubscriptionsService = $cancelSubscriptionsService;
+    private $subscriptionManager;
+
+
+    /**
+     * @param PageLoader $pageLoader
+     * @param SubscriptionManager $subscriptionManager
+     */
+    public function __construct(PageLoader $pageLoader, SubscriptionManager $subscriptionManager)
+    {
+        $this->pageLoader = $pageLoader;
+        $this->subscriptionManager = $subscriptionManager;
     }
+
 
     /**
      * @LoginRequired()
-     * @Route("/account/mollie", name="frontend.account.mollie.page", options={"seo"="false"},
-     *     methods={"GET", "POST"}, defaults={"XmlHttpRequest"=true})
+     * @Route("/account/mollie/subscriptions", name="frontend.account.mollie.subscriptions.page", options={"seo"="false"}, methods={"GET", "POST"}, defaults={"XmlHttpRequest"=true})
      */
-    public function mollieOverview(
-        Request $request,
-        SalesChannelContext $salesChannelContext
-    ): Response {
-        $page = $this->subscriptionsPageLoader->load($request, $salesChannelContext);
+    public function subscriptionsList(Request $request, SalesChannelContext $salesChannelContext): Response
+    {
+        $page = $this->pageLoader->load($request, $salesChannelContext);
+
         return $this->renderStorefront(
-            '@Storefront/storefront/page/account/mollie-history/index.html.twig',
-            ['page' => $page]
+            '@Storefront/storefront/page/account/subscriptions/index.html.twig',
+            [
+                'page' => $page
+            ]
         );
     }
 
     /**
-     * @Route("/account/mollie/cancel/{subscriptionId}/{mollieCustomerId}/{salesChannelId}",
-     *     name="frontend.account.mollie.cancel",
-     *     methods={"POST"})
+     * @LoginRequired()
+     * @Route("/account/mollie/subscriptions/{subscriptionId}/cancel", name="frontend.account.mollie.subscriptions.cancel", methods={"POST"})
      */
-    public function cancelSubscriptions($subscriptionId, $mollieCustomerId, $salesChannelId): Response
+    public function cancelSubscription($subscriptionId, SalesChannelContext $context): Response
     {
-        if ($this->cancelSubscriptionsService->cancelSubscriptions($subscriptionId, $mollieCustomerId, $salesChannelId)) {
-            $this->addFlash(self::SUCCESS, $this->trans('account.cancelSubscription', ['%1%' => $subscriptionId]));
-        }
+        $this->subscriptionManager->cancelSubscription($subscriptionId, $context->getContext());
 
-        return $this->redirectToRoute('frontend.account.mollie.page');
+        $this->addFlash(self::SUCCESS,
+            $this->trans('account.cancelSubscription',
+                ['%1%' => $subscriptionId]
+            )
+        );
+
+        return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
     }
+
 }

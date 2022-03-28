@@ -2,27 +2,33 @@
 
 namespace Kiener\MolliePayments\Service\WebhookBuilder;
 
+use Kiener\MolliePayments\Service\SettingsService;
 use Symfony\Component\Routing\RouterInterface;
 
 
 class WebhookBuilder
 {
-    public const CUSTOM_DOMAIN_ENV_KEY = 'MOLLIE_SHOP_DOMAIN';
-
     /**
      * @var RouterInterface
      */
     protected $router;
 
+    /**
+     * @var SettingsService
+     */
+    private $pluginSettings;
+
 
     /**
-     * WebhookBuilder constructor.
      * @param RouterInterface $router
+     * @param SettingsService $pluginSettings
      */
-    public function __construct(RouterInterface $router)
+    public function __construct(RouterInterface $router, SettingsService $pluginSettings)
     {
         $this->router = $router;
+        $this->pluginSettings = $pluginSettings;
     }
+
 
     /**
      * @param string $transactionId
@@ -41,7 +47,7 @@ class WebhookBuilder
         );
 
 
-        $customDomain = trim((string)getenv(self::CUSTOM_DOMAIN_ENV_KEY));
+        $customDomain = $this->pluginSettings->getEnvMollieShopDomain();
 
         if ($customDomain !== '') {
 
@@ -61,12 +67,12 @@ class WebhookBuilder
     public function buildSubscriptionWebhook(string $subscriptionId): string
     {
         $webhookUrl = $this->router->generate(
-            'frontend.mollie.subscriptions.webhook',
-            ['subscriptionId' => $subscriptionId],
+            'frontend.mollie.webhook.subscription.renew',
+            ['swSubscriptionId' => $subscriptionId],
             $this->router::ABSOLUTE_URL
         );
 
-        $customDomain = trim((string)getenv(self::CUSTOM_DOMAIN_ENV_KEY));
+        $customDomain = $this->pluginSettings->getEnvMollieShopDomain();
 
         if ($customDomain !== '') {
 

@@ -7,7 +7,7 @@ use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderLineIdException;
 use Kiener\MolliePayments\Exception\OrderNumberNotFoundException;
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Service\MollieApi\Order;
-use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
+use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderTransaction\OrderTransactionAttributes;
 use Mollie\Api\Resources\Payment;
 use Psr\Log\LoggerInterface;
@@ -189,10 +189,10 @@ class OrderService implements OrderServiceInterface
     {
         $customFields = $order->getCustomFields() ?? [];
 
-        $customFieldsStruct = new MollieOrderCustomFieldsStruct($customFields);
+        $customFieldsStruct = new OrderAttributes($order);
         $customFieldsStruct->setMollieOrderId($mollieOrderID); # TODO i dont like that this is an optional SETTER in here!
 
-        
+
         $thirdPartyPaymentId = '';
         $molliePaymentID = '';
 
@@ -246,6 +246,59 @@ class OrderService implements OrderServiceInterface
             $orderTransactionId,
             $orderTransactionCustomFields,
             $scContext
+        );
+
+    }
+
+
+    /**
+     * @param OrderEntity $order
+     * @param string $orderTransactionId
+     * @param string $mollieOrderID
+     * @param string $swSubscriptionId
+     * @param string $mollieSubscriptionId
+     * @param Payment $molliePayment
+     * @param SalesChannelContext $context
+     */
+    public function updateMollieData(OrderEntity $order, string $orderTransactionId, string $mollieOrderID, string $swSubscriptionId, string $mollieSubscriptionId, Payment $molliePayment, SalesChannelContext $context)
+    {
+        $thirdPartyPaymentId = '';
+
+        # check if we have a PayPal reference
+        if (isset($molliePayment->details, $molliePayment->details->paypalReference)) {
+            $thirdPartyPaymentId = $molliePayment->details->paypalReference;
+        }
+        # check if we have a Bank Transfer reference
+        if (isset($molliePayment->details, $molliePayment->details->transferReference)) {
+            $thirdPartyPaymentId = $molliePayment->details->transferReference;
+        }
+
+        # --------------------------------------------------------------------------------
+
+        $orderAttributes = new OrderAttributes($order);
+        $orderAttributes->setMollieOrderId($mollieOrderID);
+        $orderAttributes->setMolliePaymentId($molliePayment->id);
+        $orderAttributes->setSubscriptionData($swSubscriptionId, $mollieSubscriptionId);
+        $orderAttributes->setThirdPartyPaymentId($thirdPartyPaymentId);
+
+        $this->updateOrderCustomFields->updateOrder(
+            $order->getId(),
+            $orderAttributes,
+            $context
+        );
+
+        # --------------------------------------------------------------------------------
+
+        // Add the transaction and order IDs to the order's transaction custom fields
+        $orderTransactionCustomFields = new OrderTransactionAttributes();
+        $orderTransactionCustomFields->setMollieOrderId($mollieOrderID);
+        $orderTransactionCustomFields->setMolliePaymentId($molliePayment->id);
+        $orderTransactionCustomFields->setThirdPartyPaymentId($thirdPartyPaymentId);
+
+        $this->updateOrderTransactionCustomFields->updateOrderTransaction(
+            $orderTransactionId,
+            $orderTransactionCustomFields,
+            $context
         );
 
     }

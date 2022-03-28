@@ -33,7 +33,7 @@ class SubscriptionController extends AbstractController
 
     /**
      * @RouteScope(scopes={"api"})
-     * @Route("/api/_action/mollie/subscription/cancel", defaults={"auth_enabled"=true}, name="api.action.mollie.subscription.cancel", methods={"POST"})
+     * @Route("/api/_action/mollie/subscriptions/cancel", defaults={"auth_enabled"=true}, name="api.action.mollie.subscription.cancel", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -41,18 +41,17 @@ class SubscriptionController extends AbstractController
      */
     public function cancel(RequestDataBag $data, Context $context): JsonResponse
     {
-        $response = $this->cancelSubscriptionsService->cancelSubscriptions(
+        $this->subscriptionManager->cancelSubscription(
             $data->get('id'),
-            $data->get('customerId'),
-            $data->get('salesChannelId')
+            $context
         );
 
-        return new JsonResponse(['success' => $response]);
+        return new JsonResponse(['success' => true]);
     }
 
     /**
      * @RouteScope(scopes={"api"})
-     * @Route("/api/_action/mollie/subscription/all", defaults={"auth_enabled"=true}, name="api.action.mollie.subscription.all", methods={"GET"})
+     * @Route("/api/_action/mollie/subscriptions", defaults={"auth_enabled"=true}, name="api.action.mollie.subscription.all", methods={"GET"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -60,7 +59,13 @@ class SubscriptionController extends AbstractController
      */
     public function getAllSubscriptions(RequestDataBag $data, Context $context): JsonResponse
     {
-        return new JsonResponse(['success' => 1]);
+        $list = $this->subscriptionManager->getAllSubscriptions($context);
+
+        return new JsonResponse([
+                'success' => true,
+                'subscriptions' => $list,
+            ]
+        );
     }
 
 }

@@ -13,6 +13,7 @@ use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
 use Kiener\MolliePayments\Service\Order\OrderStatusUpdater;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
+use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Mollie\Api\Resources\Order;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
@@ -131,8 +132,6 @@ class NotificationFacade
             throw new OrderNotFoundException('Shopware Order not found for transaction: ' . $transactionId);
         }
 
-        $mollieOrderId = $this->getMollieId($swOrder);
-
         # now get the latest transaction of that order
         # we always need to make sure to use the latest one, because this
         # is the one, that is really visible in the administration.
@@ -142,15 +141,29 @@ class NotificationFacade
 
         # --------------------------------------------------------------------------------------------
 
+        $orderAttributes = new OrderAttributes($swOrder);
+
+        $mollieOrderId = $orderAttributes->getMollieOrderId();
+
+
         $this->gatewayMollie->switchClient($contextSC->getSalesChannel()->getId());
 
-        # fetch the order of our mollie ID
-        # from our sales channel mollie profile
-        $mollieOrder = $this->gatewayMollie->getOrder($mollieOrderId);
+        $molliePayment = null;
+        $mollieOrder = null;
+
+        if ($orderAttributes->isTypeSubscription()) {
+            # subscriptions are automatically charged using a payment ID
+            # so we do not have an order, but a payment instead
+            $molliePayment = $this->gatewayMollie->getPayment($orderAttributes->getMolliePaymentId());
+            $status = $this->statusConverter->getMolliePaymentStatus($molliePayment);
+        } else {
+            # fetch the order of our mollie ID
+            # from our sales channel mollie profile
+            $mollieOrder = $this->gatewayMollie->getOrder($mollieOrderId);
+            $status = $this->statusConverter->getMollieOrderStatus($mollieOrder);
+        }
 
         # --------------------------------------------------------------------------------------------
-
-        $status = $this->statusConverter->getMollieOrderStatus($mollieOrder);
 
         $this->logger->info('Webhook for order ' . $swOrder->getOrderNumber() . ' and Mollie ID: ' . $mollieOrderId . ' has been received with Status: ' . $status);
 
@@ -165,7 +178,7 @@ class NotificationFacade
         # then we want to update the one inside Shopware
         # If our order is Apple Pay, then DO NOT CONVERT THIS TO CREDIT CARD!
         # we want to keep apple pay as payment method
-        if ($transaction->getPaymentMethod() instanceof PaymentMethodEntity && $transaction->getPaymentMethod()->getHandlerIdentifier() !== ApplePayPayment::class) {
+        if ($mollieOrder instanceof Order && $transaction->getPaymentMethod() instanceof PaymentMethodEntity && $transaction->getPaymentMethod()->getHandlerIdentifier() !== ApplePayPayment::class) {
             $this->updatePaymentMethod($transaction, $mollieOrder, $contextSC->getContext());
         }
 
@@ -180,7 +193,7 @@ class NotificationFacade
             case MolliePaymentStatus::MOLLIE_PAYMENT_PAID:
             case MolliePaymentStatus::MOLLIE_PAYMENT_PENDING:
             case MolliePaymentStatus::MOLLIE_PAYMENT_AUTHORIZED:
-                $this->subscriptionManager->confirmSubscriptions($swOrder, $contextSC);
+                $this->subscriptionManager->confirmSubscription($swOrder, $contextSC);
                 break;
 
             case MolliePaymentStatus::MOLLIE_PAYMENT_EXPIRED:
@@ -220,7 +233,7 @@ class NotificationFacade
      * @param Context $context
      * @return EntitySearchResult<OrderTransactionEntity>
      */
-    private function getOrderTransactions(string $orderID, Context $context): EntitySearchResult
+    public function getOrderTransactions(string $orderID, Context $context): EntitySearchResult
     {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('order.id', $orderID));

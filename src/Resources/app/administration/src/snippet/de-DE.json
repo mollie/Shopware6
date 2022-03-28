@@ -14,23 +14,6 @@
       "mollie_refund_started": " Mollie Rückerstattung gestartet"
     }
   },
-  "mollie-subscriptions": {
-    "general": {
-      "menu": {
-        "title": "Mollie-Abonnements"
-      }
-    },
-    "product": {
-      "cardTitle": "Mollie"
-    },
-    "subscriptionStatus":  {
-      "pending": "Anhängig",
-      "active": "Aktiv",
-      "canceled": "Abgebrochen",
-      "suspended": "Ausgesetzt",
-      "completed": "Abgeschlossen"
-    }
-  },
   "mollie-payments": {
     "general": {
       "mainMenuItemGeneral": "Mollie Payments Zahlungen",
@@ -75,6 +58,10 @@
           "link": "Öffne Mollie Zahlungs Limits"
         }
       }
+    },
+    "rules": {
+      "itemSubscriptionRule": "Item is subscription (Mollie)",
+      "cartSubscriptionRule": "Cart has subscription items (Mollie)"
     },
     "refunds": {
       "status": {
@@ -158,7 +145,7 @@
             "composition": "Zusammensetzung",
             "date": "Datum"
           },
-          "lblNoComposition" : "Keine Zusammensetzung verfügbar",
+          "lblNoComposition": "Keine Zusammensetzung verfügbar",
           "btnCancelRefund": "Diese Rückerstattung stornieren"
         }
       },
@@ -236,6 +223,38 @@
         },
         "warnings": {
           "automaticShipping": "Automatischer Versand in Plugin Konfiguration"
+        }
+      }
+    },
+    "subscriptions": {
+      "status": {
+        "pending": "Ausstehend",
+        "active": "Aktiv",
+        "canceled": "Abgebrochen",
+        "suspended": "Ausgesetzt",
+        "completed": "Abgeschlossen"
+      },
+      "navigation": {
+        "title": "Mollie Abonnements"
+      },
+      "list": {
+        "columns": {
+          "customer": "Kunde",
+          "subscription_id": "Mollie ID",
+          "customer_id": "Mollie Kunde",
+          "status": "Status",
+          "description": "Beschreibung",
+          "amount": "Betrag",
+          "quantity": "Anzahl",
+          "nextPaymentAt": "Nächste Zahlung",
+          "prePaymentReminder": "Erinnert am",
+          "canceledAt": "Gekündigt",
+          "createdAt": "Erstellt",
+          "action": {
+            "cancel": "Abbrechen",
+            "success": "Das Abonnement wurde gekündigt.",
+            "error": "Fehler bei der Kündigung des Abonnements. Weitere Informationen in den Protokollen."
+          }
         }
       }
     }

@@ -31,19 +31,19 @@
 
                 <sw-container columns="1fr" v-if="isDefaultLanguage">
                     <sw-inherit-wrapper
-                        :label="$tc('mollie-payments.vouchers.VOUCHER_TYPE_CAPTION')"
-                        v-model="productVoucherType"
-                        :hasParent="hasParentProduct"
-                        :inheritedValue="parentVoucherType"
-                        :customInheritationCheckFunction="checkInheritance"
-                        :customRestoreInheritanceFunction="restoreInheritance"
-                        :customRemoveInheritanceFunction="removeInheritance">
+                            :label="$tc('mollie-payments.vouchers.VOUCHER_TYPE_CAPTION')"
+                            v-model="productVoucherType"
+                            :hasParent="hasParentProduct"
+                            :inheritedValue="parentVoucherType"
+                            :customInheritationCheckFunction="checkInheritance"
+                            :customRestoreInheritanceFunction="restoreInheritance"
+                            :customRemoveInheritanceFunction="removeInheritance">
                         <template #content="content">
                             <sw-select-field
-                                class="mollie-voucher-type"
-                                :value="content.currentValue"
-                                :disabled="content.isInherited"
-                                @change="onVoucherChanged">
+                                    class="mollie-voucher-type"
+                                    :value="content.currentValue"
+                                    :disabled="content.isInherited"
+                                    @change="onVoucherChanged">
                                 <option v-for="type in voucherTypes" :key="type.key" :value="type.key">
                                     {{ type.name }}
                                 </option>
@@ -63,5 +63,126 @@
         </sw-card>
     {% endblock %}
 
-    <sw-product-mollie-subscription-config></sw-product-mollie-subscription-config>
+    {# --------------------------------------------------------------------------------------------- #}
+    {# --------------------------------------------------------------------------------------------- #}
+    {# --------------------------------------------------------------------------------------------- #}
+
+    {% block sw_product_detail_mollie_subscription %}
+        <sw-card :title="$tc('mollie-subscription.card-title')">
+            <sw-container gap="0px 30px" class="sw-product-detail-mollie-subscription-form__container">
+                <sw-container columns="1fr">
+                    <span class="sw-product-detail-mollie-subscription__description-title">
+                        {{ $tc('mollie-subscription.title') }}
+                    </span>
+                </sw-container>
+                <sw-container columns="1fr">
+                    <p class="sw-product-feature-set-form__description-body">
+                        {{ $tc('mollie-subscription.description') }}
+                    </p>
+                </sw-container>
+                <sw-container gap="0px 30px" class="sw-product-detail-mollie-subscription-form__container">
+                    {# --------------------------------------------------------------------------------------------- #}
+                    {# --------------------------------------------------------------------------------------------- #}
+                    {# --------------------------------------------------------------------------------------------- #}
+                    <sw-container columns="1fr" v-if="isDefaultLanguage">
+                        <sw-inherit-wrapper v-model="productIsSubscription"
+                                            :hasParent="hasParentProduct"
+                                            :inheritedValue="parentIsSubscription"
+                                            :customInheritationCheckFunction="checkInheritance"
+                                            :customRestoreInheritanceFunction="restoreInheritance"
+                                            :customRemoveInheritanceFunction="removeInheritance">
+                            <template #content="props">
+                                <sw-switch-field :map-inheritance="props"
+                                                 :label="$tc('mollie-subscription.mollieSubscriptionProduct')"
+                                                 :disabled="props.isInherited"
+                                                 :value="props.currentValue"
+                                                 @change="onIsSubscriptionChanged">
+                                </sw-switch-field>
+                            </template>
+                        </sw-inherit-wrapper>
+                    </sw-container>
+                    {# --------------------------------------------------------------------------------------------- #}
+                    {# --------------------------------------------------------------------------------------------- #}
+                    {# --------------------------------------------------------------------------------------------- #}
+                    <sw-container columns="1fr 1fr" gap="30px">
+                        <sw-inherit-wrapper v-model="productSubscriptionInterval"
+                                            :hasParent="hasParentProduct"
+                                            :inheritedValue="parentSubscriptionInterval"
+                                            :customInheritationCheckFunction="checkInheritance"
+                                            :customRestoreInheritanceFunction="restoreInheritance"
+                                            :customRemoveInheritanceFunction="removeInheritance">
+                            <template #content="props">
+                                <sw-text-field :map-inheritance="props"
+                                               :label="$tc('mollie-subscription.mollieSubscriptionIntervalAmount')"
+                                               :disabled="props.isInherited"
+                                               :value="props.currentValue"
+                                               @change="onSubscriptionIntervalChanged">
+                                </sw-text-field>
+                            </template>
+                        </sw-inherit-wrapper>
+                        <sw-inherit-wrapper v-model="productSubscriptionIntervalUnit"
+                                            :label="$tc('mollie-subscription.mollieSubscriptionIntervalType')"
+                                            :hasParent="hasParentProduct"
+                                            :inheritedValue="parentSubscriptionIntervalUnit"
+                                            :customInheritationCheckFunction="checkInheritance"
+                                            :customRestoreInheritanceFunction="restoreInheritance"
+                                            :customRemoveInheritanceFunction="removeInheritance">
+                            <template #content="content">
+                                <sw-single-select :options="subscriptionIntervalTypes"
+                                                  :value="content.currentValue"
+                                                  :disabled="content.isInherited"
+                                                  @change="onSubscriptionIntervalUnitChanged">
+                                </sw-single-select>
+                            </template>
+                        </sw-inherit-wrapper>
+                    </sw-container>
+                    {# --------------------------------------------------------------------------------------------- #}
+                    {# --------------------------------------------------------------------------------------------- #}
+                    {# --------------------------------------------------------------------------------------------- #}
+                    <sw-container columns="1fr 1fr" gap="30px">
+                        <sw-inherit-wrapper v-model="productSubscriptionRepetition"
+                                            :hasParent="hasParentProduct"
+                                            :inheritedValue="parentSubscriptionRepetition"
+                                            :customInheritationCheckFunction="checkInheritance"
+                                            :customRestoreInheritanceFunction="restoreInheritance"
+                                            :customRemoveInheritanceFunction="removeInheritance">
+                            <template #content="props">
+                                <sw-text-field :label="$tc('mollie-subscription.mollieSubscriptionRepetitionAmount')"
+                                               :map-inheritance="props"
+                                               :disabled="props.isInherited"
+                                               :value="props.currentValue"
+                                               @change="onSubscriptionRepetitionChanged">
+
+                                </sw-text-field>
+                            </template>
+                        </sw-inherit-wrapper>
+                        <sw-inherit-wrapper :label="$tc('mollie-subscription.mollieSubscriptionRepetitionType')"
+                                            v-model="productSubscriptionRepetitionType"
+                                            :hasParent="hasParentProduct"
+                                            :inheritedValue="parentSubscriptionRepetitionType"
+                                            :customInheritationCheckFunction="checkInheritance"
+                                            :customRestoreInheritanceFunction="restoreInheritance"
+                                            :customRemoveInheritanceFunction="removeInheritance">
+                            <template #content="props">
+                                <sw-single-select :options="subscriptionRepetitionTypes"
+                                                  :disabled="props.isInherited"
+                                                  :value="props.currentValue"
+                                                  @change="onSubscriptionRepetitionTypeChanged">
+                                </sw-single-select>
+                            </template>
+                        </sw-inherit-wrapper>
+                    </sw-container>
+                    {# --------------------------------------------------------------------------------------------- #}
+                    {# --------------------------------------------------------------------------------------------- #}
+                    {# --------------------------------------------------------------------------------------------- #}
+                </sw-container>
+                <sw-container columns="1fr" v-if="!isDefaultLanguage">
+                    <sw-alert variant="default" :showIcon="true" :closable="false"
+                              class="sw-product-detail-mollie-subscription__inheritance-warning">
+                        {{ $tc('mollie-subscription.infoDefaultLanguage') }}
+                    </sw-alert>
+                </sw-container>
+            </sw-container>
+        </sw-card>
+    {% endblock %}
 </div>

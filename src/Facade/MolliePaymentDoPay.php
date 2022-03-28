@@ -16,7 +16,7 @@ use Kiener\MolliePayments\Service\Order\UpdateOrderLineItems;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
-use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
+use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\MolliePaymentPrepareData;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Order as MollieOrder;
@@ -136,7 +136,7 @@ class MolliePaymentDoPay
 
         # build our custom fields
         # object for this order
-        $orderCustomFields = new MollieOrderCustomFieldsStruct($order->getCustomFields() ?? []);
+        $orderCustomFields = new OrderAttributes($order);
         $orderCustomFields->setTransactionReturnUrl($transactionStruct->getReturnUrl());
 
         # extract the main Mollie Order ID "ord_xyz" that
@@ -179,10 +179,23 @@ class MolliePaymentDoPay
         # for this payment in Shopware.
         $mollieOrder = $this->createMollieOrder($order, $paymentMethod, $transactionStruct, $salesChannelContext, $paymentHandler);
 
+        # now create subscriptions from our order for
+        # all products that are configured to be a subscription.
+        # this will prepare the subscriptions in our database.
+        # the confirmation of these, however, will be done in a webhook
+        $subscriptionId = $this->subscriptionManager->createSubscription($order, $salesChannelContext);
+
+
         # now update our custom struct values
         # and immediately set our Mollie Order ID and more
         $orderCustomFields->setMollieOrderId($mollieOrder->id);
         $orderCustomFields->setMolliePaymentUrl($mollieOrder->getCheckoutUrl());
+
+        # if we have a subscription, make sure
+        # to remember the ID in our order
+        if (!empty($subscriptionId)) {
+            $orderCustomFields->setSubscriptionData($subscriptionId, '');
+        }
 
         # we save that data in both, the order and
         # the order line items
@@ -192,13 +205,6 @@ class MolliePaymentDoPay
 
         # this condition somehow looks weird to me (TODO)
         $checkoutURL = $orderCustomFields->getMolliePaymentUrl() ?? $orderCustomFields->getTransactionReturnUrl() ?? $transactionStruct->getReturnUrl();
-
-
-        # now create subscriptions from our order for
-        # all products that are configured to be a subscription.
-        # this will prepare the subscriptions in our database.
-        # the confirmation of these, however, will be done in a webhook
-        $this->subscriptionManager->createSubscriptions($order, $salesChannelContext);
 
 
         return new MolliePaymentPrepareData((string)$checkoutURL, (string)$mollieOrder->id);
@@ -242,7 +248,7 @@ class MolliePaymentDoPay
     /**
      * @param OrderEntity $order
      * @param string $swOrderTransactionID
-     * @param MollieOrderCustomFieldsStruct $orderCustomFields
+     * @param OrderAttributes $orderCustomFields
      * @param string $mollieOrderId
      * @param string $paymentMethod
      * @param AsyncPaymentTransactionStruct $transactionStruct
@@ -251,7 +257,7 @@ class MolliePaymentDoPay
      * @return MolliePaymentPrepareData
      * @throws ApiException
      */
-    private function handleNextPaymentAttempt(OrderEntity $order, string $swOrderTransactionID, MollieOrderCustomFieldsStruct $orderCustomFields, string $mollieOrderId, string $paymentMethod, AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext, PaymentHandler $paymentHandler): MolliePaymentPrepareData
+    private function handleNextPaymentAttempt(OrderEntity $order, string $swOrderTransactionID, OrderAttributes $orderCustomFields, string $mollieOrderId, string $paymentMethod, AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext, PaymentHandler $paymentHandler): MolliePaymentPrepareData
     {
         $this->logger->debug(
             'Start additional payment attempt for order: ' . $order->getOrderNumber(),

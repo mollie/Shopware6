@@ -12,6 +12,7 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Struct\MollieLineItem;
+use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
@@ -285,14 +286,14 @@ class MollieOrderBuilder
     private function isSubscriptions($lines): bool
     {
         foreach ($lines as $line) {
-            $customFields = !is_null($line->getPayload()) && !is_null($line->getPayload()['customFields'])
-                ? $line->getPayload()['customFields'] : [];
-            if (isset($customFields["mollie_subscription"])
-                && isset($customFields["mollie_subscription"]['mollie_subscription_product'])
-                && $customFields["mollie_subscription"]['mollie_subscription_product']) {
+
+            $attributes = new OrderLineItemEntityAttributes($line);
+
+            if ($attributes->isSubscriptionProduct()) {
                 return true;
             }
         }
+
         return false;
     }
 

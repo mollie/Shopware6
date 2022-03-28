@@ -70,7 +70,7 @@ class SubscriptionMetadata
         return [
             'start_date' => $this->startDate,
             'interval_value' => $this->interval,
-            'interval_unit' => $this->interval,
+            'interval_unit' => $this->intervalUnit,
             'times' => $this->times,
         ];
     }

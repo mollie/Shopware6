@@ -13,7 +13,7 @@ use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Service\UpdateOrderTransactionCustomFields;
-use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
+use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderTransaction\OrderTransactionAttributes;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
 use Mollie\Api\Exceptions\ApiException;
@@ -96,7 +96,7 @@ class MolliePaymentFinalize
     {
         $order = $transactionStruct->getOrder();
         $customFields = $order->getCustomFields() ?? [];
-        $customFieldsStruct = new MollieOrderCustomFieldsStruct($customFields);
+        $customFieldsStruct = new OrderAttributes($order);
         $mollieOrderId = $customFieldsStruct->getMollieOrderId();
 
         if (empty($mollieOrderId)) {
@@ -178,6 +178,7 @@ class MolliePaymentFinalize
             $transactionStruct->getOrderTransaction()->getId(),
             $salesChannelContext
         );
+
     }
 
 }

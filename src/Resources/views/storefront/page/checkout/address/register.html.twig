@@ -3,7 +3,7 @@
 {% block component_account_register_personal_account_fields %}
     {% set isMollieSubscription = false %}
     {% for element in page.cart.data.elements %}
-        {% if(element._entityName == "product" and element.customFields.mollie_subscription.mollie_subscription_product) %}
+        {% if(element._entityName == "product" and element.customFields.mollie_payments.subscription_product) %}
             {% set isMollieSubscription = true %}
         {% endif %}
     {% endfor %}

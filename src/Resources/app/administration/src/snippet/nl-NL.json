@@ -14,23 +14,6 @@
       "mollie_refund_started": " Mollie terugbetaling gestart"
     }
   },
-  "mollie-subscriptions": {
-    "general": {
-      "menu": {
-        "title": "Mollie Abonnementen"
-      }
-    },
-    "product": {
-      "cardTitle": "Mollie"
-    },
-    "subscriptionStatus": {
-      "pending": "In afwachting",
-      "active": "Actief",
-      "canceled": "Geannuleerd",
-      "suspended": "Opgeschort",
-      "completed": "Voltooid"
-    }
-  },
   "mollie-payments": {
     "general": {
       "mainMenuItemGeneral": "Mollie betalingen",
@@ -75,6 +58,10 @@
           "link": "Open betalingslimieten van Mollie"
         }
       }
+    },
+    "rules": {
+      "itemSubscriptionRule": "Item is subscription (Mollie)",
+      "cartSubscriptionRule": "Cart has subscription items (Mollie)"
     },
     "refunds": {
       "status": {
@@ -236,6 +223,38 @@
         },
         "warnings": {
           "automaticShipping": "Automatische verzending in plugin configuratie"
+        }
+      }
+    },
+    "subscriptions": {
+      "status": {
+        "pending": "Pending",
+        "active": "Active",
+        "canceled": "Canceled",
+        "suspended": "Suspended",
+        "completed": "Completed"
+      },
+      "navigation": {
+        "title": "Mollie Abonnementen"
+      },
+      "list": {
+        "columns": {
+          "customer": "Klant",
+          "subscription_id": "Mollie ID",
+          "customer_id": "Mollie Klant",
+          "status": "Toestand",
+          "canceledAt": "",
+          "description": "Beschrijving",
+          "createdAt": "Gemaakt bij",
+          "amount": "Hoeveelheid",
+          "quantity": "",
+          "nextPaymentAt": "",
+          "prePaymentReminder": "",
+          "action": {
+            "cancel": "Annuleren",
+            "success": "Het abonnement is opgezegd.",
+            "error": "Fout bij opzeggen abonnement. Meer informatie in de logboeken."
+          }
         }
       }
     }

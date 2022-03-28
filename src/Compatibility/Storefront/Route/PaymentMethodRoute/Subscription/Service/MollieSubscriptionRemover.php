@@ -3,13 +3,11 @@
 namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\Subscription\Service;
 
 
-use Kiener\MolliePayments\Service\Payment\Provider\ActivePaymentMethodsProviderInterface;
 use Kiener\MolliePayments\Service\SettingsService;
+use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
-use Mollie\Api\Resources\Method;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
-use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRouteResponse;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Container;
@@ -72,7 +70,11 @@ class MollieSubscriptionRemover
         }
 
         foreach ($originalData->getPaymentMethods() as $key => $paymentMethod) {
-            $paymentMethodName = $paymentMethod->getTranslation('customFields')['mollie_payment_method_name'] ?? '';
+
+            $attributes = new PaymentMethodAttributes($paymentMethod);
+
+            $paymentMethodName = $attributes->getMollieIdentifier();
+
             if (!in_array($paymentMethodName, self::ALLOWED_METHODS)) {
                 $originalData->getPaymentMethods()->remove($key);
             }
@@ -88,9 +90,10 @@ class MollieSubscriptionRemover
     private function isSubscriptionCart(Cart $cart): bool
     {
         foreach ($cart->getLineItems() as $lineItem) {
-            $customFields = $lineItem->getPayload()['customFields'];
-            if (isset($customFields["mollie_subscription"]['mollie_subscription_product'])
-                && $customFields["mollie_subscription"]['mollie_subscription_product']) {
+
+            $attribute = new LineItemAttributes($lineItem);
+
+            if ($attribute->isSubscriptionProduct()) {
                 return true;
             }
         }

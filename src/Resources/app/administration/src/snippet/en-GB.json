@@ -14,23 +14,6 @@
       "mollie_refund_started": " Mollie Refund started"
     }
   },
-  "mollie-subscriptions": {
-    "general": {
-      "menu": {
-        "title": "Mollie Subscriptions"
-      }
-    },
-    "product": {
-      "cardTitle": "Mollie"
-    },
-    "subscriptionStatus":  {
-      "pending": "Pending",
-      "active": "Active",
-      "canceled": "Cancelled",
-      "suspended": "Suspended",
-      "completed": "Completed"
-    }
-  },
   "mollie-payments": {
     "general": {
       "mainMenuItemGeneral": "Mollie Payments",
@@ -75,6 +58,10 @@
           "link": "Open Mollie Payment Limits"
         }
       }
+    },
+    "rules": {
+      "itemSubscriptionRule": "Item is subscription (Mollie)",
+      "cartSubscriptionRule": "Cart with subscriptions (Mollie)"
     },
     "refunds": {
       "status": {
@@ -158,7 +145,7 @@
             "composition": "Composition",
             "date": "Date"
           },
-          "lblNoComposition" : "No composition available",
+          "lblNoComposition": "No composition available",
           "btnCancelRefund": "Cancel this refund"
         }
       },
@@ -236,6 +223,38 @@
         },
         "warnings": {
           "automaticShipping": "Automatic shipping in plugin configuration"
+        }
+      }
+    },
+    "subscriptions": {
+      "status": {
+        "pending": "Pending",
+        "active": "Active",
+        "canceled": "Canceled",
+        "suspended": "Suspended",
+        "completed": "Completed"
+      },
+      "navigation": {
+        "title": "Mollie Subscriptions"
+      },
+      "list": {
+        "columns": {
+          "customer": "Customer",
+          "subscription_id": "Mollie ID",
+          "customer_id": "Mollie Customer",
+          "status": "Status",
+          "canceledAt": "Canceled at",
+          "description": "Description",
+          "createdAt": "Created at",
+          "amount": "Amount",
+          "quantity": "Quantity",
+          "nextPaymentAt": "Next Payment",
+          "prePaymentReminder": "Reminded at",
+          "action": {
+            "cancel": "Cancel",
+            "success": "The subscription has been canceled",
+            "error": "Error in cancel subscription. More information in the logs."
+          }
         }
       }
     }

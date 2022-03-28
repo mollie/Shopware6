@@ -1,10 +1,10 @@
 import './init/api-service.init';
-import './module/mollie-payments';
-import './module/sw-product';
-import './module/mollie-subscriptions';
 import './extension/sw-flow-sequence-action';
 import './component/flow-sequence/action-order-ship-modal';
 import './component/flow-sequence/action-order-refund-modal';
+import './module/mollie-payments';
+import './module/sw-product';
+
 
 import deDE from './snippet/de-DE';
 import enGB from './snippet/en-GB';

@@ -2,25 +2,20 @@
 
 namespace Kiener\MolliePayments;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Exception;
 use Kiener\MolliePayments\Compatibility\DependencyLoader;
+use Kiener\MolliePayments\Components\Subscription\Services\Installer\MailTemplateInstaller;
 use Kiener\MolliePayments\Service\ApplePayDirect\ApplePayDomainVerificationService;
 use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\PaymentMethodService;
-use Shopware\Core\Content\MailTemplate\Aggregate\MailTemplateType\MailTemplateTypeEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Plugin;
 use Shopware\Core\Framework\Plugin\Context\ActivateContext;
 use Shopware\Core\Framework\Plugin\Context\DeactivateContext;
 use Shopware\Core\Framework\Plugin\Context\InstallContext;
 use Shopware\Core\Framework\Plugin\Context\UninstallContext;
 use Shopware\Core\Framework\Plugin\Context\UpdateContext;
-use Shopware\Core\Framework\Uuid\Uuid;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class MolliePayments extends Plugin
@@ -70,8 +65,6 @@ class MolliePayments extends Plugin
         );
 
         $customFieldService->addCustomFields($context->getContext());
-
-        $this->addReminderEmailTemplate($context);
     }
 
     /**
@@ -82,13 +75,10 @@ class MolliePayments extends Plugin
         parent::update($context);
 
         if ($context->getPlugin()->isActive() === true) {
-            // Install and activate payment methods
-            $this->installAndActivatePaymentMethods($context->getContext());
-
-            // add domain verification
-            /** @var ApplePayDomainVerificationService $domainVerificationService */
-            $domainVerificationService = $this->container->get(ApplePayDomainVerificationService::class);
-            $domainVerificationService->downloadDomainAssociationFile();
+            # only prepare our whole plugin
+            # if it is indeed active at the moment.
+            # otherwise service would not be found of course
+            $this->preparePlugin($context->getContext());
         }
     }
 
@@ -106,18 +96,6 @@ class MolliePayments extends Plugin
     public function uninstall(UninstallContext $context): void
     {
         parent::uninstall($context);
-
-        $this->deleteReminderEmailTemplate($context);
-
-        # TODO - maybe bind to keep data?
-
-        # /** @var Connection $connection */
-        #  $connection = $this->container->get(Connection::class);
-
-        # try {
-        #     $connection->exec('DROP TABLE IF EXISTS `mollie_subscription_to_product`');
-        # } catch (Exception $exception) {
-        # }
     }
 
     /**
@@ -127,13 +105,7 @@ class MolliePayments extends Plugin
     {
         parent::activate($context);
 
-        // Install and activate payment methods
-        $this->installAndActivatePaymentMethods($context->getContext());
-
-        // Add domain verification
-        /** @var ApplePayDomainVerificationService $domainVerificationService */
-        $domainVerificationService = $this->container->get(ApplePayDomainVerificationService::class);
-        $domainVerificationService->downloadDomainAssociationFile();
+        $this->preparePlugin($context->getContext());
     }
 
     /**
@@ -144,107 +116,26 @@ class MolliePayments extends Plugin
         parent::deactivate($context);
     }
 
+
     /**
      * @param Context $context
+     * @throws \Doctrine\DBAL\Exception
      */
-    private function installAndActivatePaymentMethods(Context $context): void
+    private function preparePlugin(Context $context): void
     {
+        // Install and activate payment methods
         /** @var PaymentMethodService $paymentMethodService */
         $paymentMethodService = $this->container->get(PaymentMethodService::class);
-
         $paymentMethodService->installAndActivatePaymentMethods($context);
-    }
 
-    /**
-     * @param InstallContext $context
-     */
-    private function addReminderEmailTemplate(InstallContext $context): void
-    {
-        /** @var EntityRepositoryInterface $mailTemplateTypeRepository */
-        $mailTemplateTypeRepository = $this->container->get('mail_template_type.repository');
-        /** @var EntityRepositoryInterface $mailTemplateRepository */
-        $mailTemplateRepository = $this->container->get('mail_template.repository');
-        $mailTemplateTypeId = Uuid::randomHex();
-        $mailTemplateType = [
-            [
-                'id' => $mailTemplateTypeId,
-                'name' => 'Molle Reminder',
-                'technicalName' => 'mollie_subscriptions_reminder',
-                'availableEntities' => [
-                    'subscription' => 'mollie_subscription_to_product',
-                    'salesChannel' => 'sales_channel'
-                ]
-            ]
-        ];
+        // Add domain verification
+        /** @var ApplePayDomainVerificationService $domainVerificationService */
+        $domainVerificationService = $this->container->get(ApplePayDomainVerificationService::class);
+        $domainVerificationService->downloadDomainAssociationFile();
 
-        $mailTemplate = [
-            [
-                'id' => Uuid::randomHex(),
-                'mailTemplateTypeId' => $mailTemplateTypeId,
-                'subject' => [
-                    'en-GB' => 'Upcoming subscription renewal from {{ salesChannel.name }}',
-                    'de-DE' => 'Anstehende Abonnementverlängerung von {{ salesChannel.name }}'
-                ],
-                'contentPlain' => "Dear %salutation% %customer_name%\n
-                Good news! We are getting your %subscriptions_productName% subscription ready for
-                %subscriptions_nextPaymentDate%, this e-mail is just to inform you that the payment with an amount of
-                %subscriptions_amount% is going to be captured on this date as well.
-                For any changes, you can log in to your account on {{ salesChannel.name }} and pause or cancel
-                the subscription at any time.
-                \nThanks again\n{{ salesChannel.translated.name }}",
-                'contentHtml' => '<div style="font-family:arial; font-size:12px;"><br/>
-                                  <p>Dear %salutation% %customer_name%,</p>
-                                  <p>Good news! We are getting your %subscriptions_productName% subscription ready for
-                                  %subscriptions_nextPaymentDate%, this e-mail is just to inform you that the payment
-                                  with an amount of %subscriptions_amount% is going to be captured on this date as well.
-                                  For any changes, you can log in to your account on {{ salesChannel.name }}
-                                  and pause or cancel the subscription at any time.</p>
-                                  <p>Thanks again</p>
-                                  <p>{{ salesChannel.translated.name }}</p>
-                                  </div>',
-            ]
-        ];
-
-        try {
-            $mailTemplateTypeRepository->create($mailTemplateType, $context->getContext());
-            $mailTemplateRepository->create($mailTemplate, $context->getContext());
-        } catch (UniqueConstraintViolationException $exception) {
-        }
-    }
-
-    /**
-     * @param UninstallContext $context
-     */
-    private function deleteReminderEmailTemplate(UninstallContext $context): void
-    {
-        /** @var EntityRepositoryInterface $mailTemplateTypeRepository */
-        $mailTemplateTypeRepository = $this->container->get('mail_template_type.repository');
-
-        /** @var EntityRepositoryInterface $mailTemplateRepository */
-        $mailTemplateRepository = $this->container->get('mail_template.repository');
-
-        /** @var MailTemplateTypeEntity $reminderEmailTemplate */
-        $reminderEmailTemplate = $mailTemplateTypeRepository->search(
-            (new Criteria())
-                ->addFilter(new EqualsFilter('technicalName', 'mollie_subscriptions_reminder')),
-            $context->getContext()
-        )->first();
-
-        $mailTemplateIds = $mailTemplateRepository->searchIds(
-            (new Criteria())
-                ->addFilter(new EqualsFilter('mailTemplateTypeId', $reminderEmailTemplate->getId())),
-            $context->getContext()
-        )->getIds();
-
-        $ids = array_map(static function ($id) {
-            return ['id' => $id];
-        }, $mailTemplateIds);
-
-        $mailTemplateRepository->delete($ids, $context->getContext());
-
-        $mailTemplateTypeRepository->delete([
-            ['id' => $reminderEmailTemplate->getId()]
-        ], $context->getContext());
+        /** @var MailTemplateInstaller $subscriptionMailInstaller */
+        $subscriptionMailInstaller = $this->container->get(MailTemplateInstaller::class);
+        $subscriptionMailInstaller->install($context);
     }
 
 }

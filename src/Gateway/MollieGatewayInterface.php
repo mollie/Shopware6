@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Gateway;
 
 use Kiener\MolliePayments\Gateway\Mollie\Model\SubscriptionDefinitionInterface;
 use Mollie\Api\Resources\Order;
+use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\Subscription;
 use Mollie\Api\Resources\SubscriptionCollection;
 
@@ -34,6 +35,12 @@ interface MollieGatewayInterface
     public function getOrder(string $orderId): Order;
 
     /**
+     * @param string $paymentId
+     * @return Payment
+     */
+    public function getPayment(string $paymentId): Payment;
+
+    /**
      * @param string $customerID
      * @param array<mixed> $data
      * @return Subscription
@@ -48,8 +55,10 @@ interface MollieGatewayInterface
     public function cancelSubscription(string $subscriptionId, string $customerId): void;
 
     /**
-     * @return SubscriptionCollection
+     * @param string $subscriptionId
+     * @param string $customerId
+     * @return Subscription
      */
-    public function getAllSubscriptions(): SubscriptionCollection;
+    public function getSubscription(string $subscriptionId, string $customerId): Subscription;
 
 }

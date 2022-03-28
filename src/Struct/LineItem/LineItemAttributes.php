@@ -18,6 +18,31 @@ class LineItemAttributes
      */
     private $voucherType;
 
+    /**
+     * @var bool
+     */
+    private $subscriptionProduct;
+
+    /**
+     * @var int
+     */
+    private $subscriptionInterval;
+
+    /**
+     * @var string
+     */
+    private $subscriptionIntervalUnit;
+
+    /**
+     * @var string
+     */
+    private $subscriptionRepetition;
+
+    /**
+     * @var string
+     */
+    private $subscriptionRepetitionType;
+
 
     /**
      * @param LineItem $lineItem
@@ -33,26 +58,13 @@ class LineItemAttributes
             $this->productNumber = (string)$payload['productNumber'];
         }
 
+        $this->voucherType = (int)$this->getCustomFieldValue($lineItem, 'voucher_type');
 
-        if (!array_key_exists('customFields', $lineItem->getPayload())) {
-            return;
-        }
-
-        $customFields = $lineItem->getPayload()['customFields'];
-
-        if ($customFields === null) {
-            return;
-        }
-
-        if (!array_key_exists('mollie_payments', $customFields)) {
-            return;
-        }
-
-        $mollieData = $customFields['mollie_payments'];
-
-        if (array_key_exists('voucher_type', $mollieData)) {
-            $this->voucherType = (string)$mollieData['voucher_type'];
-        }
+        $this->subscriptionProduct = (bool)$this->getCustomFieldValue($lineItem, 'subscription_product');
+        $this->subscriptionInterval = (int)$this->getCustomFieldValue($lineItem, 'subscription_interval');
+        $this->subscriptionIntervalUnit = (string)$this->getCustomFieldValue($lineItem, 'subscription_interval_unit');
+        $this->subscriptionRepetition = (int)$this->getCustomFieldValue($lineItem, 'subscription_repetition');
+        $this->subscriptionRepetitionType = (string)$this->getCustomFieldValue($lineItem, 'subscription_repetition_type');
     }
 
     /**
@@ -80,6 +92,46 @@ class LineItemAttributes
     }
 
     /**
+     * @return bool
+     */
+    public function isSubscriptionProduct(): bool
+    {
+        return $this->subscriptionProduct;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSubscriptionInterval()
+    {
+        return $this->subscriptionInterval;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSubscriptionIntervalUnit()
+    {
+        return $this->subscriptionIntervalUnit;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSubscriptionRepetition()
+    {
+        return $this->subscriptionRepetition;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSubscriptionRepetitionType(): string
+    {
+        return $this->subscriptionRepetitionType;
+    }
+
+    /**
      * @return array<mixed>
      */
     public function toArray(): array
@@ -87,6 +139,33 @@ class LineItemAttributes
         return [
             'voucher_type' => $this->voucherType
         ];
+    }
+
+    /**
+     * @param LineItem $lineItem
+     * @param string $keyName
+     * @return string
+     */
+    private function getCustomFieldValue(LineItem $lineItem, string $keyName): string
+    {
+        $foundValue = '';
+
+        if ($lineItem->getPayload() !== null) {
+            # check if we have customFields in our payload
+            if (array_key_exists('customFields', $lineItem->getPayload())) {
+                # load the custom fields
+                $customFields = $lineItem->getPayload()['customFields'];
+                # check if we have a mollie entry
+                if ($customFields !== null && array_key_exists('mollie_payments', $customFields)) {
+                    # load the mollie entry
+                    $mollieData = $customFields['mollie_payments'];
+                    # assign our value if we have it
+                    $foundValue = (array_key_exists($keyName, $mollieData)) ? (string)$mollieData[$keyName] : '';
+                }
+            }
+        }
+
+        return $foundValue;
     }
 
 }

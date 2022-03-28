@@ -8,6 +8,7 @@ use Kiener\MolliePayments\Gateway\Mollie\Model\SubscriptionDefinitionInterface;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order;
+use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\Profile;
 use Mollie\Api\Resources\Subscription;
 use Mollie\Api\Resources\SubscriptionCollection;
@@ -106,6 +107,16 @@ class MollieGateway implements MollieGatewayInterface
     }
 
     /**
+     * @param string $paymentId
+     * @return Payment
+     * @throws \Mollie\Api\Exceptions\ApiException
+     */
+    public function getPayment(string $paymentId): Payment
+    {
+        return $this->apiClient->payments->get($paymentId);
+    }
+
+    /**
      * @param string $customerID
      * @param array<mixed> $data
      * @return Subscription
@@ -131,12 +142,14 @@ class MollieGateway implements MollieGatewayInterface
     }
 
     /**
-     * @return SubscriptionCollection
+     * @param string $subscriptionId
+     * @param string $customerId
+     * @return Subscription
      * @throws \Mollie\Api\Exceptions\ApiException
      */
-    public function getAllSubscriptions(): SubscriptionCollection
+    public function getSubscription(string $subscriptionId, string $customerId): Subscription
     {
-        return $this->apiClient->subscriptions->page();
+        return $this->apiClient->subscriptions->getForId($customerId, $subscriptionId);
     }
 
 }

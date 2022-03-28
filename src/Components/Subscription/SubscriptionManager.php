@@ -2,12 +2,26 @@
 
 namespace Kiener\MolliePayments\Components\Subscription;
 
-use Kiener\MolliePayments\Components\Subscription\Builder\MollieDataBuilder;
-use Kiener\MolliePayments\Components\Subscription\Builder\SubscriptionBuilder;
-use Kiener\MolliePayments\Components\Subscription\Repository\SubscriptionRepository;
+use DateTime;
+use Exception;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatcherAdapterInterface;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactoryInterface;
+use Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
+use Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder;
+use Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder;
+use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionReminder\ReminderValidator;
+use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing\SubscriptionRenewing;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Service\CustomerService;
+use Kiener\MolliePayments\Service\SettingsService;
+use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
+use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\IdField;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -16,14 +30,19 @@ class SubscriptionManager
 {
 
     /**
+     * @var SettingsService
+     */
+    private $pluginSettings;
+
+    /**
      * @var SubscriptionBuilder
      */
-    private $builderSubscription;
+    private $subscriptionBuilder;
 
     /**
      * @var MollieDataBuilder
      */
-    private $builderMollie;
+    private $mollieRequestBuilder;
 
     /**
      * @var SubscriptionRepository
@@ -31,89 +50,275 @@ class SubscriptionManager
     private $repoSubscriptions;
 
     /**
-     * @var CustomerService
+     * @var EntityRepositoryInterface
      */
-    private $customers;
+    private $repoSalesChannel;
 
     /**
      * @var MollieGatewayInterface
      */
     private $gwMollie;
 
+    /**
+     * @var ReminderValidator
+     */
+    private $reminderValidator;
 
     /**
+     * @var CustomerService
+     */
+    private $customerService;
+
+    /**
+     * @var SubscriptionRenewing
+     */
+    private $renewingService;
+
+    /**
+     * @var FlowBuilderDispatcherAdapterInterface
+     */
+    private $flowBuilderDispatcher;
+
+    /**
+     * @var FlowBuilderEventFactory
+     */
+    private $flowBuilderEventFactory;
+
+
+    /**
+     * @param FlowBuilderFactoryInterface $flowBuilderFactory
+     * @param FlowBuilderEventFactory $flowBuilderEventFactory
      * @param SubscriptionRepository $repoSubscriptions
+     * @param SettingsService $settingsService
      * @param MollieDataBuilder $definitionBuilder
      * @param SubscriptionBuilder $subscriptionBuilder
      * @param CustomerService $customers
      * @param MollieGatewayInterface $gatewayMollie
+     * @param SubscriptionRenewing $renewingService
+     * @param EntityRepositoryInterface $repoSalesChannel
      */
-    public function __construct(SubscriptionRepository $repoSubscriptions, MollieDataBuilder $definitionBuilder, SubscriptionBuilder $subscriptionBuilder, CustomerService $customers, MollieGatewayInterface $gatewayMollie)
+    public function __construct(FlowBuilderFactoryInterface $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionRepository $repoSubscriptions, SettingsService $settingsService, MollieDataBuilder $definitionBuilder, SubscriptionBuilder $subscriptionBuilder, CustomerService $customers, MollieGatewayInterface $gatewayMollie, SubscriptionRenewing $renewingService, EntityRepositoryInterface $repoSalesChannel)
     {
+        $this->pluginSettings = $settingsService;
         $this->repoSubscriptions = $repoSubscriptions;
-        $this->builderMollie = $definitionBuilder;
-        $this->builderSubscription = $subscriptionBuilder;
-        $this->customers = $customers;
+        $this->mollieRequestBuilder = $definitionBuilder;
+        $this->subscriptionBuilder = $subscriptionBuilder;
+        $this->customerService = $customers;
         $this->gwMollie = $gatewayMollie;
+        $this->renewingService = $renewingService;
+        $this->repoSalesChannel = $repoSalesChannel;
+
+        $this->flowBuilderEventFactory = $flowBuilderEventFactory;
+        $this->flowBuilderDispatcher = $flowBuilderFactory->createDispatcher();
+
+        $this->reminderValidator = new ReminderValidator();
     }
 
+    /**
+     * @param Context $context
+     * @return array
+     */
+    public function getAllSubscriptions(Context $context): array
+    {
+        $list = [];
+
+        $subscriptions = $this->repoSubscriptions->findAll($context);
+
+        /** @var SubscriptionEntity $subscription */
+        foreach ($subscriptions as $subscription) {
+
+            $isActive = false;
+
+            if ($subscription->isConfirmed()) {
+                $this->gwMollie->switchClient($subscription->getSalesChannelId());
+
+                $mollieSubscription = $this->gwMollie->getSubscription($subscription->getMollieId(), $subscription->getMollieCustomerId());
+
+                $isActive = ($mollieSubscription->status === 'active');
+            }
+
+
+            $list[] = [
+                'id' => $subscription->getId(),
+                'mollieId' => $subscription->getMollieId(),
+                'mollieCustomerId' => $subscription->getMollieCustomerId(),
+                'confirmed' => $subscription->isConfirmed(),
+                'active' => $isActive,
+                'description' => $subscription->getDescription(),
+                'amount' => $subscription->getAmount(),
+                'quantity' => $subscription->getQuantity(),
+                'nextPaymentAt' => ($subscription->getNextPaymentAt() !== null) ? $subscription->getNextPaymentAt()->format('Y-m-d H:i:s') : '',
+                'lastRemindedAt' => ($subscription->getLastRemindedAt() !== null) ? $subscription->getLastRemindedAt()->format('Y-m-d H:i:s') : '',
+                'createdAt' => ($subscription->getCreatedAt() !== null) ? $subscription->getCreatedAt()->format('Y-m-d H:i:s') : '',
+                'canceledAt' => ($subscription->getCanceledAt() !== null) ? $subscription->getCanceledAt()->format('Y-m-d H:i:s') : '',
+            ];
+        }
+
+        return $list;
+    }
+
+    /**
+     * @param OrderEntity $order
+     * @param SalesChannelContext $context
+     * @return string
+     * @throws Exception
+     */
+    public function createSubscription(OrderEntity $order, SalesChannelContext $context): string
+    {
+        if ($order->getLineItems()->count() > 1) {
+            # Mixed carts are not allowed for subscriptions
+            return '';
+        }
+
+        $item = $order->getLineItems()->first();
+
+        $attributes = new OrderLineItemEntityAttributes($item);
+
+        if (!$attributes->isSubscriptionProduct()) {
+            # Mixed carts are not allowed for subscriptions
+            return '';
+        }
+
+        if ($attributes->getSubscriptionInterval() <= 0) {
+            throw new Exception('Invalid subscription interval unit');
+        }
+
+        if (empty($attributes->getSubscriptionIntervalUnit())) {
+            throw new Exception('Invalid subscription interval unit');
+        }
+
+        # extract and build our subscription item from the current order entity.
+        $subscription = $this->subscriptionBuilder->buildSubscription($order);
+
+        $this->repoSubscriptions->insertSubscription($subscription, $context->getContext());
+
+        return $subscription->getId();
+    }
 
     /**
      * @param OrderEntity $order
      * @param SalesChannelContext $context
      * @throws \Exception
      */
-    public function createSubscriptions(OrderEntity $order, SalesChannelContext $context): void
+    public function confirmSubscription(OrderEntity $order, SalesChannelContext $context): void
     {
-        # extract and build our subscription items
-        # from the current order entity.
-        # this will lead to a separate subscription
-        # for each subscription product in that order
-        $orderSubscriptions = $this->builderSubscription->buildSubscriptions($order);
-
-        foreach ($orderSubscriptions as $subscription) {
-            $this->repoSubscriptions->insertSubscription($subscription, $context->getContext());
+        if (!$order->getOrderCustomer() instanceof OrderCustomerEntity) {
+            throw new \Exception('Order: ' . $order->getOrderNumber() . ' does not have a linked customer');
         }
 
-        # TODO mark order as subscription order!
-    }
+        $orderSalesChannelId = $order->getSalesChannelId();
 
-    /**
-     * @param OrderEntity $order
-     * @param SalesChannelContext $context
-     */
-    public function confirmSubscriptions(OrderEntity $order, SalesChannelContext $context): void
-    {
-        $customerId = $this->customers->getMollieCustomerId(
-            $order->getOrderCustomer()->getCustomerId(),
-            $order->getSalesChannelId(),
-            $context->getContext()
-        );
+        # first get our mollie customer ID from the order.
+        # this is required to create a subscription
+        $mollieCustomerId = $this->customerService->getMollieCustomerId($order->getOrderCustomer()->getCustomerId(), $orderSalesChannelId, $context->getContext());
 
 
         # switch out client to the correct sales channel
-        $this->gwMollie->switchClient($context->getSalesChannel()->getId());
+        $this->gwMollie->switchClient($orderSalesChannelId);
 
 
-        $pendingSubscriptions = $this->repoSubscriptions->getPendingSubscriptions($order->getId(), $context->getContext());
+        # load all pending subscriptions of the order.
+        # we will now make sure to create Mollie subscriptions and
+        # prepare everything for recurring payments.
+        $pendingSubscriptions = $this->repoSubscriptions->findPendingSubscriptions($order->getId(), $context->getContext());
 
         foreach ($pendingSubscriptions as $subscription) {
 
             # convert our subscription into a mollie definition
-            $mollieData = $this->builderMollie->buildDefinition($subscription);
-
+            $mollieData = $this->mollieRequestBuilder->buildDefinition($subscription);
             # create the subscription in Mollie.
             # this is important to really start the subscription process
-            $mollieSubscription = $this->gwMollie->createSubscription($customerId, $mollieData);
+            $mollieSubscription = $this->gwMollie->createSubscription($mollieCustomerId, $mollieData);
 
-            # save our subscription in our local database
+            # confirm the subscription in our local database
+            # by adding the missing external Mollie IDs
             $this->repoSubscriptions->confirmSubscription(
                 $subscription->getId(),
                 $mollieSubscription->id,
                 $mollieSubscription->customerId,
+                $mollieSubscription->nextPaymentDate,
                 $context->getContext()
             );
         }
+    }
+
+    /**
+     * @param Context $context
+     * @return void
+     * @throws \Exception
+     */
+    public function remindSubscriptionRenewal(Context $context): void
+    {
+        # TODO this is not yet done. in theory we have a different setting in other sales channels..which would mean we would need to iterate channels here!!!
+        $settings = $this->pluginSettings->getSettings();
+
+        if (!$settings->isSubscriptionsReminderMailEnabled()) {
+            return;
+        }
+
+        $today = new DateTime();
+        $daysOffset = $settings->getSubscriptionsReminderMailDays();
+
+        $availableSubscriptions = $this->repoSubscriptions->findByReminderRangeReached($daysOffset, $context);
+
+        /** @var SubscriptionEntity $subscription */
+        foreach ($availableSubscriptions->getElements() as $subscription) {
+
+            # now check if we are allowed to remind or if it was already done
+            $shouldRemind = $this->reminderValidator->shouldRemind(
+                $subscription->getNextPaymentAt(),
+                $today,
+                $daysOffset,
+                $subscription->getLastRemindedAt(),
+            );
+
+            if (!$shouldRemind) {
+                continue;
+            }
+
+            $customer = $this->customerService->getCustomer($subscription->getCustomerId(), $context);
+
+            $criteria = new Criteria();
+            $criteria->addFilter(new EqualsFilter('id', $subscription->getSalesChannelId()));
+            $salesChannel = $this->repoSalesChannel->search($criteria, $context)->first();
+
+            # --------------------------------------------------------------------------------------------------
+            # FLOW BUILDER / BUSINESS EVENTS
+
+            $event = $this->flowBuilderEventFactory->buildSubscriptionRemindedEvent($customer, $subscription, $salesChannel, $context);
+            $this->flowBuilderDispatcher->dispatch($event);
+
+            # --------------------------------------------------------------------------------------------------
+
+            $this->repoSubscriptions->markReminded($subscription->getId(), $context);
+        }
+    }
+
+    /**
+     * @param string $swSubscriptionId
+     * @param string $molliePaymentId
+     * @param SalesChannelContext $context
+     * @return OrderEntity
+     * @throws \Exception
+     */
+    public function renewSubscription(string $swSubscriptionId, string $molliePaymentId, SalesChannelContext $context): OrderEntity
+    {
+        $subscription = $this->repoSubscriptions->findById($swSubscriptionId, $context->getContext());
+
+        $this->gwMollie->switchClient($subscription->getSalesChannelId());
+        $payment = $this->gwMollie->getPayment($molliePaymentId);
+
+
+        $devMode = $this->pluginSettings->getEnvMollieDevMode();
+
+        # if this transaction id is somehow NOT from our subscription
+        # then do not proceed and throw an error.
+        # in DEV mode, we allow this, otherwise we cannot test this!
+        if (!$devMode && (string)$payment->subscriptionId !== $swSubscriptionId) {
+            throw new \Exception('Warning, trying to renew subscription based on a payment that does not belong to this subscription!');
+        }
+
+        return $this->renewingService->renewSubscription($subscription, $payment, $context);
     }
 
     /**
@@ -127,49 +332,20 @@ class SubscriptionManager
 
     /**
      * @param string $subscriptionId
-     * @param string $mollieCustomerId
-     * @param SalesChannelContext $context
-     * @return void
+     * @param Context $context
      */
-    public function cancelSubscription(string $subscriptionId, string $mollieCustomerId, SalesChannelContext $context): void
+    public function cancelSubscription(string $subscriptionId, Context $context): void
     {
-        $this->gwMollie->switchClient($context->getSalesChannel()->getId());
+        $subscription = $this->repoSubscriptions->findById($subscriptionId, $context);
 
-        try {
+        $this->gwMollie->switchClient($subscription->getSalesChannelId());
 
-            $this->gwMollie->cancelSubscription($subscriptionId, $mollieCustomerId);
+        $this->gwMollie->cancelSubscription(
+            $subscription->getMollieId(),
+            $subscription->getMollieCustomerId()
+        );
 
-        } catch (\Exception $exception) {
-
-        } finally {
-
-            $this->cancelSubscriptionReference($mollieCustomerId, $subscriptionId, $context);
-        }
-    }
-
-    /**
-     * @param string $customerId
-     * @param string $subscriptionId
-     * @param SalesChannelContext $context
-     * @return void
-     */
-    private function cancelSubscriptionReference(string $customerId, string $subscriptionId, SalesChannelContext $context)
-    {
-        $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('mollieCustomerId', $customerId));
-        $criteria->addFilter(new EqualsFilter('subscriptionId', $subscriptionId));
-
-
-        $subscription = $this->repoSubscriptions->search($criteria, $context->getContext())->first();
-
-        $data = [
-            [
-                'id' => $subscription->getId(),
-                'status' => 'canceled'
-            ]
-        ];
-
-        $this->repoSubscriptions->upsert($data, $context->getContext());
+        $this->repoSubscriptions->cancelSubscription($subscriptionId, $context);
     }
 
 }

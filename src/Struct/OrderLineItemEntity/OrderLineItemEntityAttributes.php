@@ -15,6 +15,11 @@ class OrderLineItemEntityAttributes
     private $voucherType;
 
     /**
+     * @var bool
+     */
+    private $subscriptionProduct;
+
+    /**
      * @var string
      */
     private $mollieOrderLineID;
@@ -47,10 +52,11 @@ class OrderLineItemEntityAttributes
         $this->voucherType = $this->getCustomFieldValue($lineItem, 'voucher_type');
         $this->mollieOrderLineID = $this->getCustomFieldValue($lineItem, 'order_line_id');
 
-        $this->subscriptionInterval = $this->getCustomFieldValue($lineItem, 'mollie_subscription_interval_amount');
-        $this->subscriptionIntervalUnit = $this->getCustomFieldValue($lineItem, 'mollie_subscription_interval_type');
-        $this->subscriptionRepetitionCount = $this->getCustomFieldValue($lineItem, 'mollie_subscription_repetition_amount');
-        $this->subscriptionRepetitionType = $this->getCustomFieldValue($lineItem, 'mollie_subscription_repetition_type');
+        $this->subscriptionProduct = (bool)$this->getCustomFieldValue($lineItem, 'subscription_product');
+        $this->subscriptionInterval = (int)$this->getCustomFieldValue($lineItem, 'subscription_interval');
+        $this->subscriptionIntervalUnit = (string)$this->getCustomFieldValue($lineItem, 'subscription_interval_unit');
+        $this->subscriptionRepetitionCount = (int)$this->getCustomFieldValue($lineItem, 'subscription_repetition');
+        $this->subscriptionRepetitionType = (string)$this->getCustomFieldValue($lineItem, 'subscription_repetition_type');
     }
 
     /**
@@ -78,6 +84,14 @@ class OrderLineItemEntityAttributes
     public function getMollieOrderLineID(): string
     {
         return $this->mollieOrderLineID;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSubscriptionProduct(): bool
+    {
+        return $this->subscriptionProduct;
     }
 
     /**

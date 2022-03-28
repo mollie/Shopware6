@@ -5,12 +5,13 @@ export default class ProductAttributes {
      * @param productEntity
      */
     constructor(productEntity) {
+
         this._voucherType = '';
-        this._mollieSubscriptionProduct = '';
-        this._mollieSubscriptionIntervalAmount = '';
-        this._mollieSubscriptionIntervalType = '';
-        this._mollieSubscriptionRepetitionAmount = '';
-        this._mollieSubscriptionRepetitionType = '';
+        this._subscriptionProduct = '';
+        this._subscriptionInterval = '';
+        this._subscriptionIntervalUnit = '';
+        this._subscriptionRepetition = '';
+        this._subscriptionRepetitionType = '';
 
 
         if (productEntity === null) {
@@ -21,23 +22,24 @@ export default class ProductAttributes {
             return;
         }
 
-        if (!productEntity.customFields.mollie_payments && !productEntity.customFields.mollie_subscription) {
+        if (!productEntity.customFields.mollie_payments) {
             return;
         }
 
         const mollieFields = productEntity.customFields.mollie_payments;
-        if (mollieFields !== undefined) {
-            this._voucherType = mollieFields.voucher_type;
+
+
+        if (mollieFields === undefined) {
+            return;
         }
 
-        const mollieFieldsSubscription = productEntity.customFields.mollie_subscription;
-        if (mollieFieldsSubscription !== undefined) {
-            this._mollieSubscriptionProduct = mollieFieldsSubscription.mollie_subscription_product;
-            this._mollieSubscriptionIntervalAmount = mollieFieldsSubscription.mollie_subscription_interval_amount;
-            this._mollieSubscriptionIntervalType = mollieFieldsSubscription.mollie_subscription_interval_type;
-            this._mollieSubscriptionRepetitionAmount = mollieFieldsSubscription.mollie_subscription_repetition_amount;
-            this._mollieSubscriptionRepetitionType = mollieFieldsSubscription.mollie_subscription_repetition_type;
-        }
+        this._voucherType = mollieFields.voucher_type;
+
+        this._subscriptionProduct = mollieFields.subscription_product;
+        this._subscriptionInterval = mollieFields.subscription_interval;
+        this._subscriptionIntervalUnit = mollieFields.subscription_interval_unit;
+        this._subscriptionRepetition = mollieFields.subscription_repetition;
+        this._subscriptionRepetitionType = mollieFields.subscription_repetition_type;
     }
 
     /**
@@ -60,9 +62,9 @@ export default class ProductAttributes {
     /**
      * @returns {*}
      */
-    getMollieSubscriptionProduct() {
+    isSubscriptionProduct() {
 
-        const boolType = this._mollieSubscriptionProduct;
+        const boolType = this._subscriptionProduct;
 
         if (!boolType) {
             return false;
@@ -74,22 +76,18 @@ export default class ProductAttributes {
     /**
      * @returns {*}
      */
-    getMollieSubscriptionIntervalAmount() {
-        if (!this._mollieSubscriptionIntervalAmount) {
-            return '';
-        }
-
-        return this._mollieSubscriptionIntervalAmount;
+    getSubscriptionInterval() {
+        return this._subscriptionInterval;
     }
 
     /**
      * @returns {*}
      */
-    getMollieSubscriptionIntervalType() {
+    getSubscriptionIntervalUnit() {
 
-        const stringType = this._mollieSubscriptionIntervalType + '';
+        const stringType = this._subscriptionIntervalUnit + '';
 
-        if (stringType !== 'days' || stringType !== 'weeks' || stringType !== 'months') {
+        if (stringType !== 'days' && stringType !== 'weeks' && stringType !== 'months') {
             return '';
         }
 
@@ -99,22 +97,18 @@ export default class ProductAttributes {
     /**
      * @returns {*}
      */
-    getMollieSubscriptionRepetitionAmount() {
-        if (!this._mollieSubscriptionRepetitionAmount) {
-            return '';
-        }
-
-        return this._mollieSubscriptionRepetitionAmount;
+    getSubscriptionRepetition() {
+        return this._subscriptionRepetition;
     }
 
     /**
      * @returns {*}
      */
-    getMollieSubscriptionRepetitionType() {
+    getSubscriptionRepetitionType() {
 
-        const stringType = this._mollieSubscriptionRepetitionType + '';
+        const stringType = this._subscriptionRepetitionType + '';
 
-        if (stringType !== 'times' || stringType !== 'infinite') {
+        if (stringType !== 'times' && stringType !== 'infinite') {
             return '';
         }
 
@@ -132,36 +126,36 @@ export default class ProductAttributes {
     /**
      * @param value
      */
-    setMollieSubscriptionProduct(value) {
-        this._mollieSubscriptionProduct = value;
+    setSubscriptionProduct(value) {
+        this._subscriptionProduct = value;
     }
 
     /**
      * @param value
      */
-    setMollieSubscriptionIntervalAmount(value) {
-        this._mollieSubscriptionIntervalAmount = value;
+    setSubscriptionInterval(value) {
+        this._subscriptionInterval = value;
     }
 
     /**
      * @param value
      */
-    setMollieSubscriptionIntervalType(value) {
-        this._mollieSubscriptionIntervalType = value;
+    setSubscriptionIntervalUnit(value) {
+        this._subscriptionIntervalUnit = value;
     }
 
     /**
      * @param value
      */
-    setMollieSubscriptionRepetitionAmount(value) {
-        this._mollieSubscriptionRepetitionAmount = value;
+    setSubscriptionRepetition(value) {
+        this._subscriptionRepetition = value;
     }
 
     /**
      * @param value
      */
-    setMollieSubscriptionRepetitionType(value) {
-        this._mollieSubscriptionRepetitionType = value;
+    setSubscriptionRepetitionType(value) {
+        this._subscriptionRepetitionType = value;
     }
 
     /**
@@ -174,29 +168,29 @@ export default class ProductAttributes {
     /**
      *
      */
-    clearMollieSubscriptionIntervalAmount() {
-        this._mollieSubscriptionIntervalAmount = '';
+    clearSubscriptionInterval() {
+        this._subscriptionInterval = '';
     }
 
     /**
      *
      */
-    clearMollieSubscriptionIntervalType() {
-        this._mollieSubscriptionIntervalType = '';
+    clearSubscriptionIntervalUnit() {
+        this._subscriptionIntervalUnit = '';
     }
 
     /**
      *
      */
-    clearMollieSubscriptionRepetitionAmount() {
-        this._mollieSubscriptionRepetitionAmount = '';
+    clearSubscriptionRepetition() {
+        this._subscriptionRepetition = '';
     }
 
     /**
      *
      */
-    clearMollieSubscriptionRepetitionType() {
-        this._mollieSubscriptionRepetitionType = '';
+    clearSubscriptionRepetitionType() {
+        this._subscriptionRepetitionType = '';
     }
 
     /**
@@ -210,30 +204,20 @@ export default class ProductAttributes {
             mollie['voucher_type'] = this._voucherType;
         }
 
-        return mollie;
-    }
-
-    /**
-     *
-     * @returns {string[]}
-     */
-    toArraySubscription() {
-        const mollie = {};
-
-        if (this._mollieSubscriptionProduct) {
-            mollie['mollie_subscription_product'] = this._mollieSubscriptionProduct;
+        if (this._subscriptionProduct) {
+            mollie['subscription_product'] = this._subscriptionProduct;
         }
-        if (this._mollieSubscriptionIntervalAmount !== '') {
-            mollie['mollie_subscription_interval_amount'] = this._mollieSubscriptionIntervalAmount;
+        if (this._subscriptionInterval !== '') {
+            mollie['subscription_interval'] = this._subscriptionInterval;
         }
-        if (this._mollieSubscriptionIntervalType !== '') {
-            mollie['mollie_subscription_interval_type'] = this._mollieSubscriptionIntervalType;
+        if (this._subscriptionIntervalUnit !== '') {
+            mollie['subscription_interval_unit'] = this._subscriptionIntervalUnit;
         }
-        if (this._mollieSubscriptionRepetitionAmount !== '') {
-            mollie['mollie_subscription_repetition_amount'] = this._mollieSubscriptionRepetitionAmount;
+        if (this._subscriptionRepetition !== '') {
+            mollie['subscription_repetition'] = this._subscriptionRepetition;
         }
-        if (this._mollieSubscriptionRepetitionType !== '') {
-            mollie['mollie_subscription_repetition_type'] = this._mollieSubscriptionRepetitionType;
+        if (this._subscriptionRepetitionType !== '') {
+            mollie['subscription_repetition_type'] = this._subscriptionRepetitionType;
         }
 
         return mollie;
@@ -249,18 +233,11 @@ export default class ProductAttributes {
             return true;
         }
 
-        return false;
-    }
-
-    /**
-     *
-     * @returns {boolean}
-     */
-    hasSubscriptionData() {
-        if (this._mollieSubscriptionProduct) {
+        if (this._subscriptionProduct) {
             return true;
         }
 
         return false;
     }
+
 }

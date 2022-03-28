@@ -10,6 +10,10 @@ import MolliePaymentsPaymentMethodService from '../core/service/api/mollie-payme
 
 import MolliePaymentsSubscriptionService from '../core/service/api/mollie-subscription.service';
 
+import '../module/mollie-payments/rules/mollie-lineitem-subscription-rule';
+import '../module/mollie-payments/rules/mollie-cart-subscription-rule';
+
+
 // eslint-disable-next-line no-undef
 const {Application} = Shopware;
 
@@ -51,4 +55,23 @@ Application.addServiceProvider('MolliePaymentsSubscriptionService', (container) 
     const initContainer = Application.getContainer('init');
 
     return new MolliePaymentsSubscriptionService(initContainer.httpClient, container.loginService);
+});
+
+
+Shopware.Application.addServiceProviderDecorator('ruleConditionDataProviderService', (ruleConditionService) => {
+    ruleConditionService.addCondition('mollie_lineitem_subscription_rule', {
+        component: 'mollie-lineitem-subscription-rule',
+        label: 'mollie-payments.rules.itemSubscriptionRule',
+        scopes: ['lineitem'],
+        group: 'item'
+    });
+
+    ruleConditionService.addCondition('mollie_cart_subscription_rule', {
+        component: 'mollie-cart-subscription-rule',
+        label: 'mollie-payments.rules.cartSubscriptionRule',
+        scopes: ['cart'],
+        group: 'cart'
+    });
+
+    return ruleConditionService;
 });

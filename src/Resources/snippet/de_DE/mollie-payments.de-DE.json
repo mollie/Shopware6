@@ -1,4 +1,8 @@
 {
+  "checkout": {
+    "mollie-payments-cart-error-mixedcart": "Ihr Warenkorb enthält mehrere Artikel in Kombination mit Abonnementartikeln. Bitte beachten Sie, dass Sie jeweils nur 1 Abonnementartikel kaufen können.",
+    "mollie-subscription-line-item-notice": "Bei der Bestellung von Abonnementprodukten sind nicht alle Zahlungsmethoden verfügbar."
+  },
   "molliePayments": {
     "testMode": {
       "label": "Testmodus"
@@ -43,12 +47,6 @@
       "everyMonth": "Jeden Monat",
       "everyMonths": "Alle %1% Monate"
     }
-  },
-  "checkout": {
-    "mollie-subscription-line-item-notice": "Bei der Bestellung von Abonnementprodukten sind nicht alle Zahlungsmethoden verfügbar."
-  },
-  "error": {
-    "mollie-subscription-line-item-notice": "Bei der Bestellung von Abonnementprodukten sind nicht alle Zahlungsmethoden verfügbar."
   },
   "account": {
     "mollieSubscriptionsLink": "Abonnements",

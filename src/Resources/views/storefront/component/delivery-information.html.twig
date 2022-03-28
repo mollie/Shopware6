@@ -3,7 +3,7 @@
 {% block component_delivery_information %}
     {{ parent() }}
 
-    {% if mollie_subscriptions_enabled_beta and page.product.customFields.mollie_subscription.mollie_subscription_product and mollie_subscriptions_indicator_enabled %}
+    {% if mollie_subscriptions_enabled_beta and page.product.customFields.mollie_payments.subscription_product and mollie_subscriptions_indicator_enabled %}
         <div class="product-mollie-subscriptions-information">
             <p class="delivery-information mollie-subscriptions">
                 <span class="delivery-status-indicator bg-info"></span>

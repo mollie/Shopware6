@@ -8,6 +8,7 @@
 
         <service id="Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder">
             <argument type="service" id="router"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderBuilder">

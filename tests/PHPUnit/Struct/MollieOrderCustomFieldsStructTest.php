@@ -3,7 +3,7 @@
 namespace MolliePayments\Tests\Struct;
 
 use PHPUnit\Framework\TestCase;
-use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
+use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 
 class MollieOrderCustomFieldsStructTest extends TestCase
 {
@@ -13,8 +13,8 @@ class MollieOrderCustomFieldsStructTest extends TestCase
      */
     public function testEmptyArrayCreation()
     {
-        $struct = new MollieOrderCustomFieldsStruct();
-        $this->assertEquals(['mollie_payments' => []], $struct->getMollieCustomFields());
+        $struct = new OrderAttributes();
+        $this->assertEquals(['mollie_payments' => []], $struct->toArray());
         $this->assertEquals('', $struct->getMollieOrderId());
         $this->assertEquals('', $struct->getMolliePaymentId());
         $this->assertEquals('', $struct->getTransactionReturnUrl());
@@ -27,7 +27,7 @@ class MollieOrderCustomFieldsStructTest extends TestCase
      */
     public function testArrayCreation()
     {
-        $struct = new MollieOrderCustomFieldsStruct([
+        $struct = new OrderAttributes([
             'mollie_payments' => [
                 'order_id' => 'order_id',
                 'payment_id' => 'payment_id',
@@ -43,7 +43,7 @@ class MollieOrderCustomFieldsStructTest extends TestCase
             'third_party_payment_id' => 'third_party_payment_id',
             'transactionReturnUrl' => 'transactionReturnUrl',
             'molliePaymentUrl' => 'molliePaymentUrl'
-        ]], $struct->getMollieCustomFields());
+        ]], $struct->toArray());
         $this->assertEquals('order_id', $struct->getMollieOrderId());
         $this->assertEquals('payment_id', $struct->getMolliePaymentId());
         $this->assertEquals('third_party_payment_id', $struct->getThirdPartyPaymentId());
@@ -57,12 +57,12 @@ class MollieOrderCustomFieldsStructTest extends TestCase
      */
     public function testEmptyOrderId()
     {
-        $struct = new MollieOrderCustomFieldsStruct([
+        $struct = new OrderAttributes([
             'mollie_payments' => [
                 'payment_id' => 'payment_id',
             ],
         ]);
 
-        $this->assertEquals(['mollie_payments' => []], $struct->getMollieCustomFields());
+        $this->assertEquals(['mollie_payments' => []], $struct->toArray());
     }
 }

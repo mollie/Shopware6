@@ -3,8 +3,9 @@
 namespace Kiener\MolliePayments\Components\Subscription\DAL\Subscription;
 
 
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\MollieLiveData;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
-use Monolog\DateTimeImmutable;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
 
@@ -18,6 +19,11 @@ class SubscriptionEntity extends Entity
      * @var string
      */
     protected $customerId;
+
+    /**
+     * @var CustomerEntity
+     */
+    protected $customer;
 
     /**
      * @var string
@@ -38,6 +44,11 @@ class SubscriptionEntity extends Entity
      * @var float
      */
     protected $amount;
+
+    /**
+     * @var int
+     */
+    protected $quantity;
 
     /**
      * @var string
@@ -63,6 +74,26 @@ class SubscriptionEntity extends Entity
      * @var array|null
      */
     protected $metadata;
+
+    /**
+     * @var \DateTimeInterface|null
+     */
+    protected $lastRemindedAt;
+
+    /**
+     * @var \DateTimeInterface|null
+     */
+    protected $nextPaymentAt;
+
+    /**
+     * @var \DateTimeInterface|null
+     */
+    protected $canceledAt;
+
+    /**
+     * @var string
+     */
+    protected $mollieStatus;
 
 
     /**
@@ -180,6 +211,22 @@ class SubscriptionEntity extends Entity
     }
 
     /**
+     * @return int
+     */
+    public function getQuantity(): int
+    {
+        return $this->quantity;
+    }
+
+    /**
+     * @param int $quantity
+     */
+    public function setQuantity(int $quantity): void
+    {
+        $this->quantity = $quantity;
+    }
+
+    /**
      * @return string
      */
     public function getCurrency(): string
@@ -241,6 +288,94 @@ class SubscriptionEntity extends Entity
     public function setSalesChannelId(string $salesChannelId): void
     {
         $this->salesChannelId = $salesChannelId;
+    }
+
+    /**
+     * @return \DateTimeInterface|null
+     */
+    public function getLastRemindedAt(): ?\DateTimeInterface
+    {
+        return $this->lastRemindedAt;
+    }
+
+    /**
+     * @param \DateTimeInterface|null $lastRemindedAt
+     */
+    public function setLastRemindedAt(?\DateTimeInterface $lastRemindedAt): void
+    {
+        $this->lastRemindedAt = $lastRemindedAt;
+    }
+
+    /**
+     * @return \DateTimeInterface|null
+     */
+    public function getNextPaymentAt(): ?\DateTimeInterface
+    {
+        return $this->nextPaymentAt;
+    }
+
+    /**
+     * @param \DateTimeInterface|null $nextPaymentAt
+     */
+    public function setNextPaymentAt(?\DateTimeInterface $nextPaymentAt): void
+    {
+        $this->nextPaymentAt = $nextPaymentAt;
+    }
+
+    /**
+     * @return \DateTimeInterface|null
+     */
+    public function getCanceledAt(): ?\DateTimeInterface
+    {
+        return $this->canceledAt;
+    }
+
+    /**
+     * @param \DateTimeInterface|null $canceledAt
+     */
+    public function setCanceledAt(?\DateTimeInterface $canceledAt): void
+    {
+        $this->canceledAt = $canceledAt;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isConfirmed(): bool
+    {
+        return (!empty($this->mollieId));
+    }
+
+    /**
+     * @return string
+     */
+    public function getMollieStatus(): string
+    {
+        return $this->mollieStatus;
+    }
+
+    /**
+     * @param string $mollieStatus
+     */
+    public function setMollieStatus(string $mollieStatus): void
+    {
+        $this->mollieStatus = $mollieStatus;
+    }
+
+    /**
+     * @return CustomerEntity
+     */
+    public function getCustomer(): CustomerEntity
+    {
+        return $this->customer;
+    }
+
+    /**
+     * @param CustomerEntity $customer
+     */
+    public function setCustomer(CustomerEntity $customer): void
+    {
+        $this->customer = $customer;
     }
 
 }

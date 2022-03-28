@@ -1,4 +1,8 @@
 {
+  "checkout": {
+    "mollie-payments-cart-error-mixedcart": "Your cart contains multiple items in combination with subscription items. Please note you can only purchase 1 subscription item at a time.",
+    "mollie-payments-cart-error-paymentmethod-availability": "Not all payments methods are available when ordering subscription products."
+  },
   "molliePayments": {
     "testMode": {
       "label": "Test mode"
@@ -43,12 +47,6 @@
       "everyMonth": "Every month",
       "everyMonths": "Every %1% months"
     }
-  },
-  "checkout": {
-    "mollie-subscription-line-item-notice": "Not all payments methods are available when ordering subscription products."
-  },
-  "error": {
-    "mollie-subscription-line-item-notice": "Not all payments methods are available when ordering subscription products."
   },
   "account": {
     "mollieSubscriptionsLink": "Subscriptions",
