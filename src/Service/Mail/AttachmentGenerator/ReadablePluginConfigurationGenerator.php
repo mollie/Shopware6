@@ -9,7 +9,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Shopware\Core\System\SystemConfig\Service\ConfigurationService;
 
-class ReadablePluginConfigurationGenerator extends PluginConfigurationGenerator
+class ReadablePluginConfigurationGenerator extends AbstractPluginConfigurationGenerator
 {
     /**
      * @var ApiKeyValidator

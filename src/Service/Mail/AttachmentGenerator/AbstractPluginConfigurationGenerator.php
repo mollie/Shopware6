@@ -5,22 +5,14 @@ namespace Kiener\MolliePayments\Service\Mail\AttachmentGenerator;
 use Kiener\MolliePayments\Service\SettingsService;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\System\SalesChannel\SalesChannelCollection;
-use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Shopware\Core\System\SystemConfig\Service\ConfigurationService;
 
-abstract class PluginConfigurationGenerator implements GeneratorInterface
+abstract class AbstractPluginConfigurationGenerator extends AbstractSalesChannelGenerator
 {
     /**
      * @var ConfigurationService
      */
     protected $configurationService;
-
-    /**
-     * @var EntityRepositoryInterface
-     */
-    protected $salesChannelRepository;
 
     /**
      * @var SettingsService
@@ -38,32 +30,10 @@ abstract class PluginConfigurationGenerator implements GeneratorInterface
         SettingsService           $settingsService
     )
     {
+        parent::__construct($salesChannelRepository);
+
         $this->configurationService = $configurationService;
-        $this->salesChannelRepository = $salesChannelRepository;
         $this->settingsService = $settingsService;
-    }
-
-    /**
-     * @param Context $context
-     * @return array<string, string>
-     */
-    protected function getSalesChannelIds(Context $context): array
-    {
-        /** @var SalesChannelEntity $salesChannel */
-        return $this->getSalesChannels($context)->map(function ($salesChannel) {
-            return $salesChannel->getId();
-        });
-    }
-
-    /**
-     * @param Context $context
-     * @return SalesChannelCollection
-     */
-    protected function getSalesChannels(Context $context): SalesChannelCollection
-    {
-        /** @var SalesChannelCollection $salesChannels */
-        $salesChannels = $this->salesChannelRepository->search(new Criteria(), $context)->getEntities();
-        return $salesChannels;
     }
 
     /**

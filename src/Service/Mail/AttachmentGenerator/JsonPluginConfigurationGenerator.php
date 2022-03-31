@@ -6,7 +6,7 @@ use Kiener\MolliePayments\Service\ConfigService;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
-class JsonPluginConfigurationGenerator extends PluginConfigurationGenerator
+class JsonPluginConfigurationGenerator extends AbstractPluginConfigurationGenerator
 {
     protected $ignoreKeys = [
         'extensions',
