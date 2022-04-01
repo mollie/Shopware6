@@ -60,6 +60,10 @@
                     }) }}
                     <sw-help-text :text="$tc('mollie-payments.config.support.data.pluginConfigurationHelpText')"/>
                 </dd>
+                <dd v-if="molliePlugin">
+                    {{ $tc('mollie-payments.config.support.data.paymentMethods') }}
+                    <sw-help-text :text="$tc('mollie-payments.config.support.data.paymentMethodsHelpText')"/>
+                </dd>
 
 
                 <sw-loader v-if="isLoading"/>

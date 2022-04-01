@@ -76,7 +76,9 @@
           "shopwareVersion": "Shopwareversie",
           "pluginLogs": "{plugin} logbestanden",
           "pluginConfiguration": "{plugin} configuratie",
-          "pluginConfigurationHelpText": "API-sleutels zijn uitgesloten."
+          "pluginConfigurationHelpText": "API-sleutels zijn uitgesloten.",
+          "paymentMethods": "Informatie over betaalmethoden",
+          "paymentMethodsHelpText": "Bevat informatie over betaalmethoden, welke zijn gekoppeld aan de verkoopkanalen, en de betreffende status ervan in uw Mollie account."
         }
       }
     },

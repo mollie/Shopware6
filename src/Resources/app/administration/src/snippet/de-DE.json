@@ -76,7 +76,9 @@
           "shopwareVersion": "Shopware-Version",
           "pluginLogs": "{plugin} log files",
           "pluginConfiguration": "{plugin}-Konfiguration",
-          "pluginConfigurationHelpText": "API-Schlüssel sind ausgeschlossen."
+          "pluginConfigurationHelpText": "API-Schlüssel sind ausgeschlossen.",
+          "paymentMethods": "Daten zur Zahlungsmethode",
+          "paymentMethodsHelpText": "Enthält Informationen darüber, welche Zahlungsmethoden aktiv sind, die den einzelnen Vertriebskanälen zugeordnet sind, sowie deren Status in Ihrem Mollie-Konto."
         }
       }
     },
