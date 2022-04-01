@@ -6,6 +6,11 @@ use Shopware\Core\Framework\ShopwareHttpException;
 
 class SalesChannelPaymentMethodsException extends ShopwareHttpException
 {
+    /**
+     * @param string $salesChannelName
+     * @param array<mixed> $parameters
+     * @param \Throwable|null $previous
+     */
     public function __construct(string $salesChannelName, array $parameters = [], ?\Throwable $previous = null)
     {
         $message = sprintf('Could not extract payment methods from sales channel %s', $salesChannelName);
