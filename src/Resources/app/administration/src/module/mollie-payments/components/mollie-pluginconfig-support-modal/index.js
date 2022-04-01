@@ -31,11 +31,11 @@ Component.register('mollie-pluginconfig-support-modal', {
             recipientLocale: '',
             recipientOptions: [
                 {
-                    label: "International Support",
+                    label: 'International Support',
                     value: null,
                 },
                 {
-                    label: "German Support",
+                    label: 'German Support',
                     value: 'de-DE',
                 },
             ],
@@ -62,7 +62,6 @@ Component.register('mollie-pluginconfig-support-modal', {
                 && !string.isEmptyOrSpaces(this.subject)
                 && !string.isEmptyOrSpaces(this.message)
         },
-
 
         contactName: {
             get() {
