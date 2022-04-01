@@ -50,7 +50,7 @@ abstract class AbstractPluginConfigurationGenerator extends AbstractSalesChannel
         );
 
         foreach ($cards as $card) {
-            $elements = [...$elements, ...$card['elements']];
+            $elements = array_merge($elements, $card['elements']);
         }
 
         return $elements;
