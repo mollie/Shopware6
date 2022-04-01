@@ -142,6 +142,9 @@
             <argument type="service" id="mollie_payments.logger"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Service\SalesChannel\SalesChannelDataExtractor">
+        </service>
+
         <!-- Mail -->
         <service id="mollie_payments.mail_service" class="Kiener\MolliePayments\Service\Mail\MailService63">
             <argument type="service" id="Shopware\Core\Framework\Validation\DataValidator"/>
@@ -173,6 +176,15 @@
             <argument type="service" id="Shopware\Core\System\SystemConfig\Service\ConfigurationService"/>
             <argument type="service" id="sales_channel.repository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+
+            <tag name="mollie_payments.mail.attachment_generator"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Service\Mail\AttachmentGenerator\PaymentMethodGenerator">
+            <argument type="service" id="sales_channel.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
+            <argument type="service" id="payment_method.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SalesChannel\SalesChannelDataExtractor"/>
 
             <tag name="mollie_payments.mail.attachment_generator"/>
         </service>
