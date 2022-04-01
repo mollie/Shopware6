@@ -64,7 +64,7 @@ class RefundDataBuilder
         # first thing is
         # we have to fetch the matching Mollie order for this Shopware order
         $mollieOrderId = $this->orderService->getMollieOrderId($order);
-        $mollieOrder = $this->mollie->getMollieOrder($mollieOrderId, '');
+        $mollieOrder = $this->mollie->getMollieOrder($mollieOrderId, $order->getSalesChannelId());
 
 
         try {
