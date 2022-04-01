@@ -24,6 +24,10 @@ class MailService63 extends AbstractMailService
      */
     private $mailSender;
 
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     public function __construct(
         DataValidator   $dataValidator,
