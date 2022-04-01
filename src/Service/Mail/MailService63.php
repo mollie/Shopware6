@@ -31,8 +31,8 @@ class MailService63 extends AbstractMailService
 
     public function __construct(
         DataValidator   $dataValidator,
-        MessageFactory  $mailFactory,
-        MailSender      $mailSender,
+        MessageFactory  $mailFactory, // @phpstan-ignore-line
+        MailSender      $mailSender, // @phpstan-ignore-line
         LoggerInterface $logger)
     {
         $this->dataValidator = $dataValidator;
