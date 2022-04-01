@@ -14,7 +14,7 @@ Component.register('mollie-pluginconfig-section-info', {
 
     data() {
         return {
-            isSupportOpen: true,
+            isSupportOpen: false,
         };
     },
 
