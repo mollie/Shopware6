@@ -18,7 +18,7 @@ class CartSubscriptionRule extends Rule
     /**
      * @var bool
      */
-    protected bool $isSubscription;
+    protected $isSubscription;
 
 
     /**

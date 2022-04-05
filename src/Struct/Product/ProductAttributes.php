@@ -5,6 +5,8 @@ namespace Kiener\MolliePayments\Struct\Product;
 
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Kiener\MolliePayments\Struct\Voucher\VoucherType;
+use Shopware\Core\Checkout\Cart\LineItem\LineItem;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Content\Product\ProductEntity;
 
 class ProductAttributes
@@ -21,24 +23,7 @@ class ProductAttributes
      */
     public function __construct(ProductEntity $product)
     {
-        $this->voucherType = '';
-
-        if ($product->getCustomFields() === null) {
-            return;
-        }
-
-        $customFields = $product->getCustomFields();
-
-        if (!array_key_exists('mollie_payments', $customFields)) {
-            return;
-        }
-
-        $mollieData = $customFields['mollie_payments'];
-
-        if (array_key_exists('voucher_type', $mollieData)) {
-            $this->voucherType = (string)$mollieData['voucher_type'];
-        }
-
+        $this->voucherType = $this->getCustomFieldValue($product, 'voucher_type');
     }
 
     /**
@@ -60,4 +45,40 @@ class ProductAttributes
         return $this->voucherType;
     }
 
+
+    /**
+     * @param ProductEntity $product
+     * @param string $keyName
+     * @return string
+     */
+    private function getCustomFieldValue(ProductEntity $product, string $keyName): string
+    {
+        $foundValue = '';
+
+
+        $customFields = $product->getCustomFields();
+
+        # ---------------------------------------------------------------------------
+        # search in new structure
+        if ($customFields !== null) {
+            $fullKey = 'mollie_payments.product.' . $keyName;
+            $foundValue = (array_key_exists($fullKey, $customFields)) ? (string)$customFields[$fullKey] : '';
+        }
+
+        # ---------------------------------------------------------------------------
+        # check if old structure exists
+        # and load, but we migrate to the new one
+        # check if we have customFields
+
+        if ($foundValue === '') {
+            if ($customFields !== null && array_key_exists('mollie_payments', $customFields)) {
+                # load the mollie entry
+                $mollieData = $customFields['mollie_payments'];
+                # assign our value if we have it
+                $foundValue = (array_key_exists($keyName, $mollieData)) ? (string)$mollieData[$keyName] : '';
+            }
+        }
+
+        return $foundValue;
+    }
 }

@@ -6,6 +6,8 @@ use Kiener\MolliePayments\Exception\CouldNotFetchMollieOrderException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\MollieApi\Order as MollieOrderApi;
 use Kiener\MolliePayments\Service\MollieApi\Payment as MolliePaymentApi;
+use Kiener\MolliePayments\Service\SettingsService;
+use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
 use Mollie\Api\Endpoints\OrderEndpoint;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
@@ -13,6 +15,7 @@ use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\OrderLineCollection;
 use Mollie\Api\Types\OrderLineType;
+use MolliePayments\Tests\Fakes\FakePluginSettings;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -67,7 +70,8 @@ class OrderTest extends TestCase
             $apiFactoryMock,
             $this->paymentApiService,
             $this->router,
-            $this->loggerServiceMock
+            new WebhookBuilder($this->router, new FakePluginSettings('')),
+            new NullLogger()
         );
     }
 

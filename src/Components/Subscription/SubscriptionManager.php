@@ -26,7 +26,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
-class SubscriptionManager
+class SubscriptionManager implements SubscriptionManagerInterface
 {
 
     /**
@@ -226,7 +226,7 @@ class SubscriptionManager
                 $subscription->getNextPaymentAt(),
                 $today,
                 $daysOffset,
-                $subscription->getLastRemindedAt(),
+                $subscription->getLastRemindedAt()
             );
 
             if (!$shouldRemind) {

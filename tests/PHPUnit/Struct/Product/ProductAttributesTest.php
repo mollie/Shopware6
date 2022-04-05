@@ -11,7 +11,6 @@ use Shopware\Core\Content\Product\ProductEntity;
 class ProductAttributesTest extends TestCase
 {
 
-
     /**
      * This test verifies that non-existing custom fields
      * are correctly handled without an error.
@@ -29,8 +28,9 @@ class ProductAttributesTest extends TestCase
     /**
      * This test verifies that a valid voucher type
      * is correctly assigned and returned later on.
+     * This is our legacy structure, which should still lead to data.
      */
-    public function testVoucherType()
+    public function testVoucherTypeLegacy()
     {
         $method = new ProductEntity();
         $method->setCustomFields([
@@ -45,6 +45,26 @@ class ProductAttributesTest extends TestCase
     }
 
     /**
+     * This test verifies that a valid voucher type
+     * is correctly assigned and returned later on.
+     * If we have a new type of data, then we read that data and skip the legacy one.
+     */
+    public function testVoucherType()
+    {
+        $method = new ProductEntity();
+        $method->setCustomFields([
+            'mollie_payments.product.voucher_type' => VoucherType::TYPE_ECO,
+            'mollie_payments' => [
+                'voucher_type' => VoucherType::TYPE_MEAL
+            ]
+        ]);
+
+        $attributes = new ProductAttributes($method);
+
+        $this->assertEquals(VoucherType::TYPE_ECO, $attributes->getVoucherType());
+    }
+
+    /**
      * This test verifies that we get a NOT SET value
      * for every type that is not officially known.
      */
@@ -52,14 +72,13 @@ class ProductAttributesTest extends TestCase
     {
         $method = new ProductEntity();
         $method->setCustomFields([
-            'mollie_payments' => [
-                'voucher_type' => '5'
-            ]
+            'mollie_payments.product.voucher_type' => '5',
         ]);
 
         $attributes = new ProductAttributes($method);
 
         $this->assertEquals(VoucherType::TYPE_NOTSET, $attributes->getVoucherType());
     }
+
 
 }

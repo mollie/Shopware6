@@ -2,7 +2,7 @@
 
 namespace Kiener\MolliePayments\Facade;
 
-use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
+use Kiener\MolliePayments\Components\Subscription\SubscriptionManagerInterface;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Exception\PaymentUrlException;
@@ -67,7 +67,7 @@ class MolliePaymentDoPay
     private $updaterLineItemCustomFields;
 
     /**
-     * @var SubscriptionManager
+     * @var SubscriptionManagerInterface
      */
     private $subscriptionManager;
 
@@ -86,10 +86,10 @@ class MolliePaymentDoPay
      * @param SettingsService $settingsService
      * @param UpdateOrderCustomFields $updateOrderCustomFields
      * @param UpdateOrderLineItems $updateOrderLineItems
-     * @param SubscriptionManager $subscriptionManager
+     * @param SubscriptionManagerInterface $subscriptionManager
      * @param LoggerInterface $logger
      */
-    public function __construct(OrderDataExtractor $extractor, MollieOrderBuilder $orderBuilder, OrderService $orderService, Order $orderApiService, CustomerService $customerService, SettingsService $settingsService, UpdateOrderCustomFields $updateOrderCustomFields, UpdateOrderLineItems $updateOrderLineItems, SubscriptionManager $subscriptionManager, LoggerInterface $logger)
+    public function __construct(OrderDataExtractor $extractor, MollieOrderBuilder $orderBuilder, OrderService $orderService, Order $orderApiService, CustomerService $customerService, SettingsService $settingsService, UpdateOrderCustomFields $updateOrderCustomFields, UpdateOrderLineItems $updateOrderLineItems, SubscriptionManagerInterface $subscriptionManager, LoggerInterface $logger)
     {
         $this->extractor = $extractor;
         $this->orderBuilder = $orderBuilder;

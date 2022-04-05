@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Service\WebhookBuilder;
 
+use Kiener\MolliePayments\Service\PluginSettingsServiceInterface;
 use Kiener\MolliePayments\Service\SettingsService;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -14,16 +15,16 @@ class WebhookBuilder
     protected $router;
 
     /**
-     * @var SettingsService
+     * @var PluginSettingsServiceInterface
      */
     private $pluginSettings;
 
 
     /**
      * @param RouterInterface $router
-     * @param SettingsService $pluginSettings
+     * @param PluginSettingsServiceInterface $pluginSettings
      */
-    public function __construct(RouterInterface $router, SettingsService $pluginSettings)
+    public function __construct(RouterInterface $router, PluginSettingsServiceInterface $pluginSettings)
     {
         $this->router = $router;
         $this->pluginSettings = $pluginSettings;

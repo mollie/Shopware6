@@ -8,7 +8,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 
-class SettingsService
+class SettingsService implements PluginSettingsServiceInterface
 {
     public const SYSTEM_CONFIG_DOMAIN = 'MolliePayments.config.';
 

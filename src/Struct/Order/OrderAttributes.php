@@ -59,11 +59,11 @@ class OrderAttributes
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getMollieOrderId(): ?string
+    public function getMollieOrderId(): string
     {
-        return $this->mollieOrderId;
+        return (string)$this->mollieOrderId;
     }
 
     /**
@@ -75,11 +75,11 @@ class OrderAttributes
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getMolliePaymentId(): ?string
+    public function getMolliePaymentId(): string
     {
-        return $this->molliePaymentId;
+        return (string)$this->molliePaymentId;
     }
 
     /**
@@ -157,31 +157,31 @@ class OrderAttributes
 
         # lets save some space and only store
         # what is existing
-        if ($this->mollieOrderId !== null) {
+        if ((string)$this->mollieOrderId !== '') {
             $mollieData['order_id'] = $this->mollieOrderId;
         }
 
-        if ($this->molliePaymentId !== null) {
+        if ((string)$this->molliePaymentId !== '') {
             $mollieData['payment_id'] = $this->molliePaymentId;
         }
 
-        if ($this->mollieSubscriptionId !== null) {
+        if ((string)$this->mollieSubscriptionId !== '') {
             $mollieData['swSubscriptionId'] = $this->swSubscriptionId;
         }
 
-        if ($this->mollieSubscriptionId !== null) {
+        if ((string)$this->mollieSubscriptionId !== '') {
             $mollieData['mollieSubscriptionId'] = $this->mollieSubscriptionId;
         }
 
-        if ($this->mollieOrderId !== null) {
+        if ((string)$this->mollieOrderId !== '') {
             $mollieData['third_party_payment_id'] = $this->thirdPartyPaymentId;
         }
 
-        if ($this->transactionReturnUrl !== null) {
+        if ((string)$this->transactionReturnUrl !== '') {
             $mollieData['transactionReturnUrl'] = $this->transactionReturnUrl;
         }
 
-        if ($this->molliePaymentUrl !== null) {
+        if ((string)$this->molliePaymentUrl !== '') {
             $mollieData['molliePaymentUrl'] = $this->molliePaymentUrl;
         }
 

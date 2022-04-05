@@ -208,7 +208,7 @@ class RefundManager implements RefundManagerInterface
 
         if (!$refund instanceof Refund) {
             # a problem happened, lets finish with an exception
-            throw new CouldNotCreateMollieRefundException($mollieOrderId, (string)$order->getOrderNumber());
+            throw new CouldNotCreateMollieRefundException('', (string)$order->getOrderNumber());
         }
 
         $refundAmount = (float)$refund->amount->value;

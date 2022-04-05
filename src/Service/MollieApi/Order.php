@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\MollieApi\Payment as PaymentApiService;
+use Kiener\MolliePayments\Service\MollieApi\Payment as PaymentService;
 use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Order as MollieOrder;
@@ -47,12 +48,11 @@ class Order
 
     /**
      * @param MollieApiFactory $clientFactory
-     * @param \Kiener\MolliePayments\Service\MollieApi\Payment $paymentApiService
-     * @param RouterInterface $router
+     * @param PaymentService $paymentApiService
      * @param WebhookBuilder $webhookBuilder
      * @param LoggerInterface $logger
      */
-    public function __construct(MollieApiFactory $clientFactory, PaymentApiService $paymentApiService, RouterInterface $router, WebhookBuilder $webhookBuilder, LoggerInterface $logger)
+    public function __construct(MollieApiFactory $clientFactory, PaymentApiService $paymentApiService,  WebhookBuilder $webhookBuilder, LoggerInterface $logger)
     {
         $this->clientFactory = $clientFactory;
         $this->logger = $logger;

@@ -13,6 +13,7 @@ use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\Refund\RefundService;
 use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Service\UpdateOrderTransactionCustomFields;
+use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
 use Mollie\Api\Endpoints\OrderEndpoint;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order;
@@ -22,6 +23,8 @@ use Mollie\Api\Resources\Refund;
 use Mollie\Api\Resources\RefundCollection;
 use Mollie\Api\Types\PaymentStatus;
 use Mollie\Api\Types\RefundStatus;
+use MolliePayments\Tests\Fakes\FakeMollieGateway;
+use MolliePayments\Tests\Fakes\FakePluginSettings;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -62,12 +65,19 @@ class RefundsServiceTest extends TestCase
         $paymentApiService = new MolliePaymentApi($apiFactoryMock);
         $router = $this->getMockBuilder(RouterInterface::class)->disableOriginalConstructor()->getMock();
 
-        $mollieOrderApiMock = new MollieOrderApi($apiFactoryMock, $paymentApiService, $router, $loggerServiceMock);
+        $mollieOrderApiMock = new MollieOrderApi(
+            $apiFactoryMock,
+            $paymentApiService,
+            $router,
+            new WebhookBuilder($router, new FakePluginSettings('')),
+            new NullLogger()
+        );
 
         $this->refundService = new RefundService(
             $mollieOrderApiMock,
             $this->orderService,
-            new RefundHydrator()
+            new RefundHydrator(),
+            new FakeMollieGateway()
         );
     }
 

@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Struct\LineItem;
 
 
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
+use Shopware\Core\Content\Product\ProductEntity;
 
 class LineItemAttributes
 {
@@ -58,12 +59,12 @@ class LineItemAttributes
             $this->productNumber = (string)$payload['productNumber'];
         }
 
-        $this->voucherType = (int)$this->getCustomFieldValue($lineItem, 'voucher_type');
+        $this->voucherType = $this->getCustomFieldValue($lineItem, 'voucher_type');
 
         $this->subscriptionProduct = (bool)$this->getCustomFieldValue($lineItem, 'subscription_product');
         $this->subscriptionInterval = (int)$this->getCustomFieldValue($lineItem, 'subscription_interval');
         $this->subscriptionIntervalUnit = (string)$this->getCustomFieldValue($lineItem, 'subscription_interval_unit');
-        $this->subscriptionRepetition = (int)$this->getCustomFieldValue($lineItem, 'subscription_repetition');
+        $this->subscriptionRepetition = (string)$this->getCustomFieldValue($lineItem, 'subscription_repetition');
         $this->subscriptionRepetitionType = (string)$this->getCustomFieldValue($lineItem, 'subscription_repetition_type');
     }
 
@@ -144,24 +145,25 @@ class LineItemAttributes
             $mollieData['voucher_type'] = $this->voucherType;
         }
 
-        if ($this->subscriptionProduct !== null) {
+        # only save if it's a subscription product
+        if ($this->subscriptionProduct) {
             $mollieData['subscription_product'] = $this->subscriptionProduct;
-        }
 
-        if ($this->subscriptionInterval !== null) {
-            $mollieData['subscription_interval'] = $this->subscriptionInterval;
-        }
+            if ($this->subscriptionInterval !== null) {
+                $mollieData['subscription_interval'] = $this->subscriptionInterval;
+            }
 
-        if ($this->subscriptionIntervalUnit !== null) {
-            $mollieData['subscription_interval_unit'] = $this->subscriptionIntervalUnit;
-        }
+            if ($this->subscriptionIntervalUnit !== null) {
+                $mollieData['subscription_interval_unit'] = $this->subscriptionIntervalUnit;
+            }
 
-        if ($this->subscriptionRepetition !== null) {
-            $mollieData['subscription_repetition'] = $this->subscriptionRepetition;
-        }
+            if ($this->subscriptionRepetition !== null) {
+                $mollieData['subscription_repetition'] = $this->subscriptionRepetition;
+            }
 
-        if ($this->subscriptionRepetitionType !== null) {
-            $mollieData['subscription_repetition_type'] = $this->subscriptionRepetitionType;
+            if ($this->subscriptionRepetitionType !== null) {
+                $mollieData['subscription_repetition_type'] = $this->subscriptionRepetitionType;
+            }
         }
 
         return $mollieData;
@@ -177,16 +179,29 @@ class LineItemAttributes
         $foundValue = '';
 
         if ($lineItem->getPayload() !== null) {
+
             # check if we have customFields in our payload
             if (array_key_exists('customFields', $lineItem->getPayload())) {
+
                 # load the custom fields
                 $customFields = $lineItem->getPayload()['customFields'];
-                # check if we have a mollie entry
-                if ($customFields !== null && array_key_exists('mollie_payments', $customFields)) {
-                    # load the mollie entry
-                    $mollieData = $customFields['mollie_payments'];
-                    # assign our value if we have it
-                    $foundValue = (array_key_exists($keyName, $mollieData)) ? (string)$mollieData[$keyName] : '';
+
+                # ---------------------------------------------------------------------------
+                # search in new structure
+                $fullKey = 'mollie_payments.product.' . $keyName;
+                $foundValue = (array_key_exists($fullKey, $customFields)) ? (string)$customFields[$fullKey] : '';
+
+                # ---------------------------------------------------------------------------
+                # check if old structure exists
+                # and load, but we migrate to the new one
+                # check if we have customFields
+                if ($foundValue === '') {
+                    if ($customFields !== null && array_key_exists('mollie_payments', $customFields)) {
+                        # load the mollie entry
+                        $mollieData = $customFields['mollie_payments'];
+                        # assign our value if we have it
+                        $foundValue = (array_key_exists($keyName, $mollieData)) ? (string)$mollieData[$keyName] : '';
+                    }
                 }
             }
         }

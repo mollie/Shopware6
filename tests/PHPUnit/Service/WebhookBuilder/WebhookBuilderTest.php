@@ -2,14 +2,10 @@
 
 namespace MolliePayments\Tests\Service\WebhookBuilder;
 
-use Kiener\MolliePayments\Service\MolliePaymentExtractor;
 use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
+use MolliePayments\Tests\Fakes\FakePluginSettings;
 use MolliePayments\Tests\Fakes\FakeRouter;
 use PHPUnit\Framework\TestCase;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
-use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
-use Shopware\Core\Framework\Uuid\Uuid;
 
 
 class WebhookBuilderTest extends TestCase
@@ -38,7 +34,8 @@ class WebhookBuilderTest extends TestCase
     public function testRouterIsUsed(): void
     {
         $fakeRouter = new FakeRouter('https://local.mollie.shop/notify/123');
-        $builder = new WebhookBuilder($fakeRouter);
+        $builder = new WebhookBuilder($fakeRouter, new FakePluginSettings(''));
+
 
         $url = $builder->buildWebhook('-');
 
@@ -56,10 +53,10 @@ class WebhookBuilderTest extends TestCase
         # prepare our fake server data
         # assign a current domain to replace.
         # also configure our environment variable
-        putenv('MOLLIE_SHOP_DOMAIN=123.eu.ngrok.io');
+        $fakeSettings = new FakePluginSettings('123.eu.ngrok.io');
 
         $fakeRouter = new FakeRouter('https://local.mollie.shop/notify/123');
-        $builder = new WebhookBuilder($fakeRouter);
+        $builder = new WebhookBuilder($fakeRouter, $fakeSettings);
 
         $url = $builder->buildWebhook('-');
 

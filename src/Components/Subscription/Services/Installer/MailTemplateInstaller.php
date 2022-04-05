@@ -32,25 +32,18 @@ class MailTemplateInstaller
     /**
      * @var EntityRepositoryInterface
      */
-    private $repoMailTemplates;
-
-    /**
-     * @var EntityRepositoryInterface
-     */
     private $repoSalesChannels;
 
 
     /**
      * @param Connection $connection
      * @param EntityRepositoryInterface $repoMailTypes
-     * @param EntityRepositoryInterface $repoMailTemplates
      * @param EntityRepositoryInterface $repoSalesChannels
      */
-    public function __construct(Connection $connection, EntityRepositoryInterface $repoMailTypes, EntityRepositoryInterface $repoMailTemplates, EntityRepositoryInterface $repoSalesChannels)
+    public function __construct(Connection $connection, EntityRepositoryInterface $repoMailTypes, EntityRepositoryInterface $repoSalesChannels)
     {
         $this->connection = $connection;
         $this->repoMailTypes = $repoMailTypes;
-        $this->repoMailTemplates = $repoMailTemplates;
         $this->repoSalesChannels = $repoSalesChannels;
     }
 
@@ -318,12 +311,12 @@ Thanks you<br/>
      */
     private function getLanguageIdByLocale(Connection $connection, string $locale): ?string
     {
-        $sql = <<<SQL
+        $sql = "
                 SELECT `language`.`id`
                 FROM `language`
                 INNER JOIN `locale` ON `locale`.`id` = `language`.`locale_id`
                 WHERE `locale`.`code` = :code
-                SQL;
+                ";
 
         $languageId = $connection->executeQuery($sql, ['code' => $locale])->fetchColumn();
         if (!$languageId && $locale !== 'en-GB') {
