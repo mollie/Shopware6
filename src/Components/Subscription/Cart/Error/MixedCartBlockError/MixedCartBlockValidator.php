@@ -62,17 +62,15 @@ class MixedCartBlockValidator implements CartValidatorInterface
             if ($otherItemsCount > 0) {
                 # mixed cart with other items
                 $isMixedCart = true;
-                break;
             }
 
             if ($subscriptionItemsCount > 1) {
                 # mixed cart with multiple subscription items
                 $isMixedCart = true;
-                break;
             }
         }
 
-        if ($isMixedCart) {
+        if ($subscriptionItemsCount > 1 && $isMixedCart) {
             $errorCollection->add(new MixedCartBlockError());
         } else {
             $this->clearError($cart);

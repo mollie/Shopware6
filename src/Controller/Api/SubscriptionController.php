@@ -49,23 +49,4 @@ class SubscriptionController extends AbstractController
         return new JsonResponse(['success' => true]);
     }
 
-    /**
-     * @RouteScope(scopes={"api"})
-     * @Route("/api/_action/mollie/subscriptions", defaults={"auth_enabled"=true}, name="api.action.mollie.subscription.all", methods={"GET"})
-     *
-     * @param RequestDataBag $data
-     * @param Context $context
-     * @return JsonResponse
-     */
-    public function getAllSubscriptions(RequestDataBag $data, Context $context): JsonResponse
-    {
-        $list = $this->subscriptionManager->getAllSubscriptions($context);
-
-        return new JsonResponse([
-                'success' => true,
-                'subscriptions' => $list,
-            ]
-        );
-    }
-
 }

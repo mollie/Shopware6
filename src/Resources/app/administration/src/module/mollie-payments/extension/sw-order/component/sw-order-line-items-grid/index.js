@@ -90,6 +90,17 @@ Component.override('sw-order-line-items-grid', {
         },
 
         isShippingPossible() {
+
+            if (!this.isMollieOrder) {
+                return false;
+            }
+
+            // this can happen on subscription renewals...they have no order id
+            // and therefore the order cannot be shipped
+            if (this.order.customFields.mollie_payments.order_id === '') {
+                return false;
+            }
+
             return this.shippableLineItems.length > 0;
         },
 

@@ -136,9 +136,35 @@ class LineItemAttributes
      */
     public function toArray(): array
     {
-        return [
-            'voucher_type' => $this->voucherType
-        ];
+        $mollieData = [];
+
+        # lets save some space and only store
+        # what is existing
+        if ($this->voucherType !== null) {
+            $mollieData['voucher_type'] = $this->voucherType;
+        }
+
+        if ($this->subscriptionProduct !== null) {
+            $mollieData['subscription_product'] = $this->subscriptionProduct;
+        }
+
+        if ($this->subscriptionInterval !== null) {
+            $mollieData['subscription_interval'] = $this->subscriptionInterval;
+        }
+
+        if ($this->subscriptionIntervalUnit !== null) {
+            $mollieData['subscription_interval_unit'] = $this->subscriptionIntervalUnit;
+        }
+
+        if ($this->subscriptionRepetition !== null) {
+            $mollieData['subscription_repetition'] = $this->subscriptionRepetition;
+        }
+
+        if ($this->subscriptionRepetitionType !== null) {
+            $mollieData['subscription_repetition_type'] = $this->subscriptionRepetitionType;
+        }
+
+        return $mollieData;
     }
 
     /**

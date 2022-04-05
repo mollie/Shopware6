@@ -75,6 +75,11 @@
         </service>
 
 
+        <service id="Kiener\MolliePayments\Service\Installer\CustomFieldsInstaller" public="true">
+            <argument type="service" id="custom_field_set.repository"/>
+        </service>
+
+
         <service id="Kiener\MolliePayments\Service\PaymentMethodService" class="Kiener\MolliePayments\Service\PaymentMethodService" public="true">
             <argument type="service" id="Shopware\Core\Content\Media\MediaService"/>
             <argument type="service" id="media.repository"/>

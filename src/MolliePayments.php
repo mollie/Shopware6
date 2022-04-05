@@ -7,7 +7,10 @@ use Kiener\MolliePayments\Compatibility\DependencyLoader;
 use Kiener\MolliePayments\Components\Subscription\Services\Installer\MailTemplateInstaller;
 use Kiener\MolliePayments\Service\ApplePayDirect\ApplePayDomainVerificationService;
 use Kiener\MolliePayments\Service\CustomFieldService;
+use Kiener\MolliePayments\Service\Installer\CustomFieldsInstaller;
 use Kiener\MolliePayments\Service\PaymentMethodService;
+use KlarnaPayment\Installer\Modules\CustomFieldInstaller;
+use Shopware\Core\Framework\App\Manifest\Xml\CustomFields;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\Plugin;
@@ -136,6 +139,10 @@ class MolliePayments extends Plugin
         /** @var MailTemplateInstaller $subscriptionMailInstaller */
         $subscriptionMailInstaller = $this->container->get(MailTemplateInstaller::class);
         $subscriptionMailInstaller->install($context);
+
+        /** @var CustomFieldsInstaller $customFieldInstaller */
+        $customFieldInstaller = $this->container->get(CustomFieldsInstaller::class);
+        $customFieldInstaller->install($context);
     }
 
 }

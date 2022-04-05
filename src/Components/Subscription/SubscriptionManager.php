@@ -115,49 +115,6 @@ class SubscriptionManager
     }
 
     /**
-     * @param Context $context
-     * @return array
-     */
-    public function getAllSubscriptions(Context $context): array
-    {
-        $list = [];
-
-        $subscriptions = $this->repoSubscriptions->findAll($context);
-
-        /** @var SubscriptionEntity $subscription */
-        foreach ($subscriptions as $subscription) {
-
-            $isActive = false;
-
-            if ($subscription->isConfirmed()) {
-                $this->gwMollie->switchClient($subscription->getSalesChannelId());
-
-                $mollieSubscription = $this->gwMollie->getSubscription($subscription->getMollieId(), $subscription->getMollieCustomerId());
-
-                $isActive = ($mollieSubscription->status === 'active');
-            }
-
-
-            $list[] = [
-                'id' => $subscription->getId(),
-                'mollieId' => $subscription->getMollieId(),
-                'mollieCustomerId' => $subscription->getMollieCustomerId(),
-                'confirmed' => $subscription->isConfirmed(),
-                'active' => $isActive,
-                'description' => $subscription->getDescription(),
-                'amount' => $subscription->getAmount(),
-                'quantity' => $subscription->getQuantity(),
-                'nextPaymentAt' => ($subscription->getNextPaymentAt() !== null) ? $subscription->getNextPaymentAt()->format('Y-m-d H:i:s') : '',
-                'lastRemindedAt' => ($subscription->getLastRemindedAt() !== null) ? $subscription->getLastRemindedAt()->format('Y-m-d H:i:s') : '',
-                'createdAt' => ($subscription->getCreatedAt() !== null) ? $subscription->getCreatedAt()->format('Y-m-d H:i:s') : '',
-                'canceledAt' => ($subscription->getCanceledAt() !== null) ? $subscription->getCanceledAt()->format('Y-m-d H:i:s') : '',
-            ];
-        }
-
-        return $list;
-    }
-
-    /**
      * @param OrderEntity $order
      * @param SalesChannelContext $context
      * @return string
