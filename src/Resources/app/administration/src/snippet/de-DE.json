@@ -15,6 +15,8 @@
     }
   },
   "mollie-payments": {
+    "pluginTitle": "Mollie",
+    "pluginDescription": "Mollie Module",
     "general": {
       "mainMenuItemGeneral": "Mollie Payments Zahlungen",
       "descriptionTextModule": "Mollie Payments Zahlungen",
@@ -161,6 +163,18 @@
         }
       }
     },
+    "vouchers": {
+      "CARD_TITLE": "Gutscheine",
+      "VOUCHER_INFO_TITLE": "Gutschein Bezahlung",
+      "VOUCHER_INFO_DESCRIPTION": "Mit Mollie können Sie ganz einfach Zahlungen in Ihrem Online-Shop mit Öko-, Geschenk- und Essensgutscheinen akzeptieren – eine clevere Wahl, um den Umsatz zu steigern und Ihre Kunden zufrieden zu stellen. Die Zahlungsmethode \"Gutschein\" ist nur sichtbar, wenn Sie mindestens 1 Produkt in Ihrem Warenkorb haben, das mit einem konfigurierten Gutscheintyp berechtigt ist.",
+      "VOUCHER_INFO_DEFAULTLANGUAGE": "Bitte beachten Sie, dass diese Konfiguration nur in der Standard Sprache durchgeführt werden kann. Ändern Sie die hier angezeigte Sprache um den Gutscheintyp verändern zu können.",
+      "VOUCHER_BTN_READMORE": "Mehr lesen",
+      "VOUCHER_TYPE_CAPTION": "Gutschein Typ für Produkt",
+      "VOUCHER_TYPE_VALUE_NONE": "Kein Gutschein Typ",
+      "VOUCHER_TYPE_VALUE_ECO": "Öko",
+      "VOUCHER_TYPE_VALUE_MEAL": "Mahlzeit",
+      "VOUCHER_TYPE_VALUE_VOUCHER": "Geschenk"
+    },
     "modals": {
       "shipping": {
         "title": "Versand an Mollie melden",
@@ -237,6 +251,9 @@
       "navigation": {
         "title": "Mollie Abonnements"
       },
+      "TYPE_DAYS": "Tage",
+      "TYPE_WEEKS": "Woche(n)",
+      "TYPE_MONTHS": "Monat(e)",
       "list": {
         "columns": {
           "customer": "Kunde",
@@ -256,8 +273,19 @@
             "error": "Fehler bei der Kündigung des Abonnements. Weitere Informationen in den Protokollen."
           }
         }
+      },
+      "product": {
+        "card-title": "Abonnement",
+        "title": "Mollie-Abonnements",
+        "description": "Mit Mollie-Abonnements können Sie ganz einfach Abonnementprodukte erstellen und wiederkehrende Zahlungen im konfigurierten Intervall und Zeitraum planen.",
+        "mollieSubscriptionProduct": "Ist das ein Abo-Produkt?",
+        "mollieSubscriptionIntervalAmount": "Zahlung wiederholen alle",
+        "mollieSubscriptionIntervalType": "Abonnement-Intervall-Typ",
+        "mollieSubscriptionRepetitionAmount": "Zahlung wiederholen",
+        "mollieSubscriptionRepetitionType": "Abonnement-Wiederholungstyp",
+        "infoDefaultLanguage": "Bitte beachten Sie, dass diese Konfiguration nur in Ihrer Standardsprache bearbeitet werden kann. Bitte ändern Sie Ihre Sprache, um die Abonnementeinstellungen dieses Produkts zu ändern."
       }
-    }
+     }
   },
   "sw-order": {
     "detailExtended": {

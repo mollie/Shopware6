@@ -4,13 +4,9 @@ namespace Kiener\MolliePayments;
 
 use Exception;
 use Kiener\MolliePayments\Compatibility\DependencyLoader;
-use Kiener\MolliePayments\Components\Subscription\Services\Installer\MailTemplateInstaller;
-use Kiener\MolliePayments\Service\ApplePayDirect\ApplePayDomainVerificationService;
+use Kiener\MolliePayments\Components\Installer\PluginInstaller;
 use Kiener\MolliePayments\Service\CustomFieldService;
-use Kiener\MolliePayments\Service\Installer\CustomFieldsInstaller;
-use Kiener\MolliePayments\Service\PaymentMethodService;
 use KlarnaPayment\Installer\Modules\CustomFieldInstaller;
-use Shopware\Core\Framework\App\Manifest\Xml\CustomFields;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\Plugin;
@@ -44,7 +40,7 @@ class MolliePayments extends Plugin
     }
 
     /**
-     *
+     * @return void
      */
     public function boot(): void
     {
@@ -53,6 +49,7 @@ class MolliePayments extends Plugin
 
     /**
      * @param InstallContext $context
+     * @return void
      */
     public function install(InstallContext $context): void
     {
@@ -72,6 +69,8 @@ class MolliePayments extends Plugin
 
     /**
      * @param UpdateContext $context
+     * @return void
+     * @throws \Doctrine\DBAL\Exception
      */
     public function update(UpdateContext $context): void
     {
@@ -87,6 +86,7 @@ class MolliePayments extends Plugin
 
     /**
      * @param InstallContext $context
+     * @return void
      */
     public function postInstall(InstallContext $context): void
     {
@@ -95,6 +95,7 @@ class MolliePayments extends Plugin
 
     /**
      * @param UninstallContext $context
+     * @return void
      */
     public function uninstall(UninstallContext $context): void
     {
@@ -103,6 +104,8 @@ class MolliePayments extends Plugin
 
     /**
      * @param ActivateContext $context
+     * @return void
+     * @throws \Doctrine\DBAL\Exception
      */
     public function activate(ActivateContext $context): void
     {
@@ -126,23 +129,10 @@ class MolliePayments extends Plugin
      */
     private function preparePlugin(Context $context): void
     {
-        // Install and activate payment methods
-        /** @var PaymentMethodService $paymentMethodService */
-        $paymentMethodService = $this->container->get(PaymentMethodService::class);
-        $paymentMethodService->installAndActivatePaymentMethods($context);
+        /** @var PluginInstaller $pluginInstaller */
+        $pluginInstaller = $this->container->get(PluginInstaller::class);
 
-        // Add domain verification
-        /** @var ApplePayDomainVerificationService $domainVerificationService */
-        $domainVerificationService = $this->container->get(ApplePayDomainVerificationService::class);
-        $domainVerificationService->downloadDomainAssociationFile();
-
-        /** @var MailTemplateInstaller $subscriptionMailInstaller */
-        $subscriptionMailInstaller = $this->container->get(MailTemplateInstaller::class);
-        $subscriptionMailInstaller->install($context);
-
-        /** @var CustomFieldsInstaller $customFieldInstaller */
-        $customFieldInstaller = $this->container->get(CustomFieldsInstaller::class);
-        $customFieldInstaller->install($context);
+        $pluginInstaller->install($context);
     }
 
 }

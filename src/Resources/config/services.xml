@@ -35,6 +35,15 @@
             <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
         </service>
 
+
+        <service id="Kiener\MolliePayments\Components\Installer\PluginInstaller" public="true">
+            <argument type="service" id="Kiener\MolliePayments\Service\Installer\CustomFieldsInstaller"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\PaymentMethodService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\ApplePayDirect\ApplePayDomainVerificationService"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Installer\MailTemplateInstaller"/>
+        </service>
+
+
         <!-- Helpers -->
         <service id="Kiener\MolliePayments\Helper\DeliveryStateHelper" class="Kiener\MolliePayments\Helper\DeliveryStateHelper">
             <argument type="service" id="Kiener\MolliePayments\Service\DeliveryService"/>

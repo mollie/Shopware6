@@ -15,6 +15,8 @@
     }
   },
   "mollie-payments": {
+    "pluginTitle": "Mollie",
+    "pluginDescription": "Mollie Modul",
     "general": {
       "mainMenuItemGeneral": "Mollie Payments",
       "descriptionTextModule": "Mollie Payments",
@@ -161,6 +163,18 @@
         }
       }
     },
+    "vouchers": {
+      "CARD_TITLE": "Voucher",
+      "VOUCHER_INFO_TITLE": "Voucher Payments",
+      "VOUCHER_INFO_DESCRIPTION": "Mollie lets you easily accept payments in your online shop using Eco-, gift- and meal vouchers—a smart choice for boosting sales and satisfying your customers. The payment method \"voucher\" is only visible, if you have at least 1 product with an assigned voucher type in the cart.",
+      "VOUCHER_INFO_DEFAULTLANGUAGE": "Please note, this configuration can only be edited in your default language. Please change your language to modify the voucher type of this product.",
+      "VOUCHER_BTN_READMORE": "Read more",
+      "VOUCHER_TYPE_CAPTION": "Voucher type of product",
+      "VOUCHER_TYPE_VALUE_NONE": "None",
+      "VOUCHER_TYPE_VALUE_ECO": "Eco",
+      "VOUCHER_TYPE_VALUE_MEAL": "Meal",
+      "VOUCHER_TYPE_VALUE_VOUCHER": "Gift"
+    },
     "modals": {
       "shipping": {
         "title": "Ship through Mollie",
@@ -237,6 +251,9 @@
       "navigation": {
         "title": "Mollie Subscriptions"
       },
+      "TYPE_DAYS": "Day(s)",
+      "TYPE_WEEKS": "Week(s)",
+      "TYPE_MONTHS": "Month(s)",
       "list": {
         "columns": {
           "customer": "Customer",
@@ -256,6 +273,16 @@
             "error": "Error in cancel subscription. More information in the logs."
           }
         }
+      },
+      "product": {
+        "card-title": "Subscription",
+        "title": "Mollie Subscriptions",
+        "description": "With Mollie subscriptions, you can easily create subscription products and schedule recurring payments to take place at the configured interval and period.",
+        "mollieSubscriptionProduct": "Subscription Product",
+        "mollieSubscriptionIntervalAmount": "Repeat Payment every",
+        "mollieSubscriptionIntervalType": "Interval Unit",
+        "mollieSubscriptionRepetitionAmount": "Number or repetitions (leave for unlimited)",
+        "infoDefaultLanguage": "Please note, this configuration can only be edited in your default language. Please change your language to modify the subscription settings of this product."
       }
     }
   },

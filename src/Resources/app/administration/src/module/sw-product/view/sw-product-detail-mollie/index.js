@@ -36,7 +36,6 @@ Shopware.Component.register('sw-product-detail-mollie', {
             productSubscriptionInterval: '',
             productSubscriptionIntervalUnit: '',
             productSubscriptionRepetition: '',
-            productSubscriptionRepetitionType: '',
             // --------------------------------------
         }
     },
@@ -94,20 +93,9 @@ Shopware.Component.register('sw-product-detail-mollie', {
          */
         subscriptionIntervalTypes() {
             return [
-                {value: 'days', label: this.$tc('mollie-subscription.days')},
-                {value: 'weeks', label: this.$tc('mollie-subscription.weeks')},
-                {value: 'months', label: this.$tc('mollie-subscription.months')},
-            ];
-        },
-
-        /**
-         *
-         * @returns {[{label, value: string},{label, value: string}]}
-         */
-        subscriptionRepetitionTypes() {
-            return [
-                {value: 'times', label: this.$tc('mollie-subscription.times')},
-                {value: 'infinite', label: this.$tc('mollie-subscription.infinite')},
+                {value: 'days', label: this.$tc('mollie-payments.subscriptions.TYPE_DAYS')},
+                {value: 'weeks', label: this.$tc('mollie-payments.subscriptions.TYPE_WEEKS')},
+                {value: 'months', label: this.$tc('mollie-payments.subscriptions.TYPE_MONTHS')},
             ];
         },
 
@@ -204,14 +192,6 @@ Shopware.Component.register('sw-product-detail-mollie', {
         },
 
         /**
-         * @param newValue
-         */
-        onSubscriptionRepetitionTypeChanged(newValue) {
-            this.productSubscriptionRepetitionType = newValue;
-            this.updateProductData();
-        },
-
-        /**
          *
          * @returns {boolean}
          */
@@ -262,14 +242,12 @@ Shopware.Component.register('sw-product-detail-mollie', {
             this.parentSubscriptionInterval = '';
             this.parentSubscriptionIntervalUnit = '';
             this.parentSubscriptionRepetition = '';
-            this.parentSubscriptionRepetitionType = '';
 
             this.productVoucherType = '';
             this.productIsSubscription = false;
             this.productSubscriptionInterval = '';
             this.productSubscriptionIntervalUnit = '';
             this.productSubscriptionRepetition = '';
-            this.productSubscriptionRepetitionType = '';
 
 
             // if we do have a parent, then fetch that product
@@ -290,10 +268,9 @@ Shopware.Component.register('sw-product-detail-mollie', {
                     this.parentSubscriptionInterval = parentAtts.getSubscriptionInterval();
                     this.parentSubscriptionIntervalUnit = parentAtts.getSubscriptionIntervalUnit();
                     this.parentSubscriptionRepetition = parentAtts.getSubscriptionRepetition();
-                    this.parentSubscriptionRepetitionType = parentAtts.getSubscriptionRepetitionType();
 
                     // FALLBACK on EMPTY VALUES
-                    // if we have a parent, and its nothing, that it should at least display NONE for vouchers
+                    // if we have a parent, and it's nothing, that it should at least display NONE for vouchers
                     if (this.stringUtils.isNullOrEmpty(this.parentVoucherType)) {
                         this.parentVoucherType = this.typeNONE;
                     }
@@ -310,7 +287,6 @@ Shopware.Component.register('sw-product-detail-mollie', {
                 this.productSubscriptionInterval = productAtts.getSubscriptionInterval();
                 this.productSubscriptionIntervalUnit = productAtts.getSubscriptionIntervalUnit();
                 this.productSubscriptionRepetition = productAtts.getSubscriptionRepetition();
-                this.productSubscriptionRepetitionType = productAtts.getSubscriptionRepetitionType();
             });
 
 
@@ -359,13 +335,6 @@ Shopware.Component.register('sw-product-detail-mollie', {
             } else {
                 mollieAttributes.clearSubscriptionRepetition();
             }
-
-            if (this.productSubscriptionRepetitionType !== '') {
-                mollieAttributes.setSubscriptionRepetitionType(this.productSubscriptionRepetitionType);
-            } else {
-                mollieAttributes.clearSubscriptionRepetitionType();
-            }
-
 
             // now update our product data
             this.productService.updateCustomFields(this.product, mollieAttributes);

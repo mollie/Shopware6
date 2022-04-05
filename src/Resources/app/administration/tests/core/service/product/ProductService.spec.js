@@ -9,10 +9,8 @@ test('Product Service correctly updates Custom Fields', () => {
     const product = {
         customFields: {
             'other_data': '4',
-            'mollie_payments': {
-                'voucher_type': '3',
-            }
-        }
+            'mollie_payments.product.voucher_type': '3',
+        },
     };
 
     const attributes = new ProductAttributes(product);
@@ -22,9 +20,7 @@ test('Product Service correctly updates Custom Fields', () => {
 
     const expected = {
         'other_data': '4',
-        'mollie_payments': {
-            'voucher_type': '1',
-        }
+        'mollie_payments.product.voucher_type': '1',
     };
 
     expect(product.customFields).toStrictEqual(expected);
@@ -33,10 +29,8 @@ test('Product Service correctly updates Custom Fields', () => {
 test('Product Service clears Mollie Data if not valid', () => {
     const product = {
         customFields: {
-            'mollie_payments': {
-                'voucher_type': '1',
-            }
-        }
+            'mollie_payments.product.voucher_type': '1',
+        },
     };
 
     const attributes = new ProductAttributes(product);
@@ -44,9 +38,7 @@ test('Product Service clears Mollie Data if not valid', () => {
 
     productService.updateCustomFields(product, attributes);
 
-    const expected = {
-        'mollie_payments': {}
-    };
+    const expected = {};
 
     expect(product.customFields).toStrictEqual(expected);
 });
@@ -55,10 +47,8 @@ test('Product Service only cleans Mollie Data if not existing', () => {
     const product = {
         customFields: {
             'other_data': '4',
-            'mollie_payments': {
-                'voucher_type': '3',
-            }
-        }
+            'mollie_payments.product.voucher_type': '3',
+        },
     };
 
     const attributes = new ProductAttributes(product);
@@ -67,8 +57,7 @@ test('Product Service only cleans Mollie Data if not existing', () => {
     productService.updateCustomFields(product, attributes);
 
     const expected = {
-        'other_data': '4',
-        'mollie_payments': {}
+        'other_data': '4'
     };
 
     expect(product.customFields).toStrictEqual(expected);
@@ -79,8 +68,8 @@ test('Product Service does nothing if no data exists at all for Mollie', () => {
     // we create a product without mollie data
     const product = {
         customFields: {
-            'other_data': '4'
-        }
+            'other_data': '4',
+        },
     };
 
     // we also make sure that our attributes are completely
@@ -91,7 +80,7 @@ test('Product Service does nothing if no data exists at all for Mollie', () => {
     productService.updateCustomFields(product, attributes);
 
     const expected = {
-        'other_data': '4'
+        'other_data': '4',
     };
 
     expect(product.customFields).toStrictEqual(expected);

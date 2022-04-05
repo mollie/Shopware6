@@ -20,14 +20,14 @@ test('Attributes do not crash if our Mollie root node does not exist', () => {
     expect(attributes.getVoucherType()).toBe('');
 });
 
+// --------------------------------------------------------------------------------------------------
+
 test('VoucherType is correctly loaded from custom fields', () => {
 
     const product = {
         customFields: {
-            'mollie_payments': {
-                'voucher_type': '2',
-            }
-        }
+            'mollie_payments.product.voucher_type': '2',
+        },
     };
 
     const attributes = new ProductAttributes(product);
@@ -58,10 +58,8 @@ test('VoucherType can be cleared again', () => {
 
     const product = {
         customFields: {
-            'mollie_payments': {
-                'voucher_type': '2',
-            }
-        }
+            'mollie_payments.product.voucher_type': '2',
+        },
     };
 
     const attributes = new ProductAttributes(product);
@@ -84,4 +82,62 @@ test('Product Attributes hasData works correctly', () => {
     attributes.clearVoucherType();
 
     expect(attributes.hasData()).toBe(false);
+});
+
+// --------------------------------------------------------------------------------------------------
+
+test('Subscription data is correctly loaded from custom fields', () => {
+
+    const product = {
+        customFields: {
+            'mollie_payments.product.subscription.enabled': true,
+            'mollie_payments.product.subscription.interval': 3,
+            'mollie_payments.product.subscription.interval_unit': 'weeks',
+            'mollie_payments.product.subscription.repetition': 2,
+        },
+    };
+
+    const attributes = new ProductAttributes(product);
+
+    expect(attributes.isSubscriptionProduct()).toBe(true);
+    expect(attributes.getSubscriptionInterval()).toBe(3);
+    expect(attributes.getSubscriptionIntervalUnit()).toBe('weeks');
+    expect(attributes.getSubscriptionRepetition()).toBe(2);
+});
+
+test('Invalid Subscription data leads to disabled values', () => {
+
+    const product = {}
+    const attributes = new ProductAttributes(product);
+
+    attributes.setSubscriptionProduct('a');
+    attributes.setSubscriptionInterval('a');
+    attributes.setSubscriptionIntervalUnit('a');
+    attributes.setSubscriptionRepetition('a');
+
+    expect(attributes.isSubscriptionProduct()).toBe(false);
+    expect(attributes.getSubscriptionInterval()).toBe('');
+    expect(attributes.getSubscriptionIntervalUnit()).toBe('');
+    expect(attributes.getSubscriptionRepetition()).toBe('');
+});
+
+test('Subscription data can be cleared again', () => {
+
+    const attributes = new ProductAttributes({});
+
+    attributes.setSubscriptionInterval(3);
+    attributes.setSubscriptionIntervalUnit('weeks');
+    attributes.setSubscriptionRepetition(2);
+
+    expect(attributes.getSubscriptionInterval()).toBe(3);
+    expect(attributes.getSubscriptionIntervalUnit()).toBe('weeks');
+    expect(attributes.getSubscriptionRepetition()).toBe(2);
+
+    attributes.clearSubscriptionInterval();
+    attributes.clearSubscriptionIntervalUnit();
+    attributes.clearSubscriptionRepetition();
+
+    expect(attributes.getSubscriptionInterval()).toBe('');
+    expect(attributes.getSubscriptionIntervalUnit()).toBe('');
+    expect(attributes.getSubscriptionRepetition()).toBe('');
 });

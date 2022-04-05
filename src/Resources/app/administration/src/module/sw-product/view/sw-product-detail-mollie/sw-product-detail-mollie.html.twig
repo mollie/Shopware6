@@ -68,16 +68,16 @@
     {# --------------------------------------------------------------------------------------------- #}
 
     {% block sw_product_detail_mollie_subscription %}
-        <sw-card :title="$tc('mollie-subscription.card-title')">
+        <sw-card :title="$tc('mollie-payments.subscriptions.product.card-title')">
             <sw-container gap="0px 30px" class="sw-product-detail-mollie-subscription-form__container">
                 <sw-container columns="1fr">
                     <span class="sw-product-detail-mollie-subscription__description-title">
-                        {{ $tc('mollie-subscription.title') }}
+                        {{ $tc('mollie-payments.subscriptions.product.title') }}
                     </span>
                 </sw-container>
                 <sw-container columns="1fr">
                     <p class="sw-product-feature-set-form__description-body">
-                        {{ $tc('mollie-subscription.description') }}
+                        {{ $tc('mollie-payments.subscriptions.product.description') }}
                     </p>
                 </sw-container>
                 <sw-container gap="0px 30px" class="sw-product-detail-mollie-subscription-form__container">
@@ -93,7 +93,7 @@
                                             :customRemoveInheritanceFunction="removeInheritance">
                             <template #content="props">
                                 <sw-switch-field :map-inheritance="props"
-                                                 :label="$tc('mollie-subscription.mollieSubscriptionProduct')"
+                                                 :label="$tc('mollie-payments.subscriptions.product.mollieSubscriptionProduct')"
                                                  :disabled="props.isInherited"
                                                  :value="props.currentValue"
                                                  @change="onIsSubscriptionChanged">
@@ -113,7 +113,7 @@
                                             :customRemoveInheritanceFunction="removeInheritance">
                             <template #content="props">
                                 <sw-text-field :map-inheritance="props"
-                                               :label="$tc('mollie-subscription.mollieSubscriptionIntervalAmount')"
+                                               :label="$tc('mollie-payments.subscriptions.product.mollieSubscriptionIntervalAmount')"
                                                :disabled="props.isInherited"
                                                :value="props.currentValue"
                                                @change="onSubscriptionIntervalChanged">
@@ -121,7 +121,7 @@
                             </template>
                         </sw-inherit-wrapper>
                         <sw-inherit-wrapper v-model="productSubscriptionIntervalUnit"
-                                            :label="$tc('mollie-subscription.mollieSubscriptionIntervalType')"
+                                            :label="$tc('mollie-payments.subscriptions.product.mollieSubscriptionIntervalType')"
                                             :hasParent="hasParentProduct"
                                             :inheritedValue="parentSubscriptionIntervalUnit"
                                             :customInheritationCheckFunction="checkInheritance"
@@ -147,28 +147,12 @@
                                             :customRestoreInheritanceFunction="restoreInheritance"
                                             :customRemoveInheritanceFunction="removeInheritance">
                             <template #content="props">
-                                <sw-text-field :label="$tc('mollie-subscription.mollieSubscriptionRepetitionAmount')"
+                                <sw-text-field :label="$tc('mollie-payments.subscriptions.product.mollieSubscriptionRepetitionAmount')"
                                                :map-inheritance="props"
                                                :disabled="props.isInherited"
                                                :value="props.currentValue"
                                                @change="onSubscriptionRepetitionChanged">
-
                                 </sw-text-field>
-                            </template>
-                        </sw-inherit-wrapper>
-                        <sw-inherit-wrapper :label="$tc('mollie-subscription.mollieSubscriptionRepetitionType')"
-                                            v-model="productSubscriptionRepetitionType"
-                                            :hasParent="hasParentProduct"
-                                            :inheritedValue="parentSubscriptionRepetitionType"
-                                            :customInheritationCheckFunction="checkInheritance"
-                                            :customRestoreInheritanceFunction="restoreInheritance"
-                                            :customRemoveInheritanceFunction="removeInheritance">
-                            <template #content="props">
-                                <sw-single-select :options="subscriptionRepetitionTypes"
-                                                  :disabled="props.isInherited"
-                                                  :value="props.currentValue"
-                                                  @change="onSubscriptionRepetitionTypeChanged">
-                                </sw-single-select>
                             </template>
                         </sw-inherit-wrapper>
                     </sw-container>
@@ -179,7 +163,7 @@
                 <sw-container columns="1fr" v-if="!isDefaultLanguage">
                     <sw-alert variant="default" :showIcon="true" :closable="false"
                               class="sw-product-detail-mollie-subscription__inheritance-warning">
-                        {{ $tc('mollie-subscription.infoDefaultLanguage') }}
+                        {{ $tc('mollie-payments.subscriptions.product.infoDefaultLanguage') }}
                     </sw-alert>
                 </sw-container>
             </sw-container>
