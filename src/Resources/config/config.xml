@@ -445,16 +445,6 @@
             <helpText lang="de-DE"></helpText>
             <helpText lang="nl-NL"></helpText>
         </input-field>
-        <component name="sw-entity-single-select">
-            <name>subscriptionsReminderMailTemplate</name>
-            <entity>mail_template_type</entity>
-            <labelProperty>technicalName</labelProperty>
-            <label>Email Template</label>
-            <label lang="de-DE">E-Mail-Vorlage</label>
-            <label lang="nl-NL">Email sjabloon</label>
-            <helpText>Select the E-Mail template that will be used for the subscription reminder email.</helpText>
-            <helpText lang="de-DE"></helpText>
-            <helpText lang="nl-NL"></helpText>
-        </component>
+
     </card>
 </config>

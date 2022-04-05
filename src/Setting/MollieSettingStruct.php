@@ -156,11 +156,6 @@ class MollieSettingStruct extends Struct
      */
     protected $subscriptionsReminderMailDays;
 
-    /**
-     * @var ?MailTemplateEntity
-     */
-    protected $subscriptionsReminderMailTemplate;
-
 
     /**
      * @return string
@@ -574,12 +569,5 @@ class MollieSettingStruct extends Struct
         return $this->subscriptionsReminderMailDays;
     }
 
-    /**
-     * @return MailTemplateEntity|null
-     */
-    public function getSubscriptionsReminderMailTemplate(): ?MailTemplateEntity
-    {
-        return $this->subscriptionsReminderMailTemplate;
-    }
 
 }
