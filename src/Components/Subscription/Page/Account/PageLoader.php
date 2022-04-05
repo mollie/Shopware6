@@ -15,6 +15,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Framework\Page\StorefrontSearchResult;
 use Shopware\Storefront\Page\GenericPageLoaderInterface;
+use Shopware\Storefront\Page\MetaInformation;
 use Symfony\Component\HttpFoundation\Request;
 
 
@@ -40,11 +41,7 @@ class PageLoader
      * @param GenericPageLoaderInterface $genericLoader
      * @param CustomerService $customerService
      */
-    public function __construct(
-        EntityRepositoryInterface  $mollieSubscriptionsRepository,
-        GenericPageLoaderInterface $genericLoader,
-        CustomerService            $customerService
-    )
+    public function __construct(EntityRepositoryInterface $mollieSubscriptionsRepository, GenericPageLoaderInterface $genericLoader, CustomerService $customerService)
     {
         $this->mollieSubscriptionsRepository = $mollieSubscriptionsRepository;
         $this->genericLoader = $genericLoader;
@@ -67,7 +64,7 @@ class PageLoader
         /** @var SubscriptionPage $page */
         $page = SubscriptionPage::createFrom($page);
 
-        if ($page->getMetaInformation()) {
+        if ($page->getMetaInformation() instanceof MetaInformation) {
             $page->getMetaInformation()->setRobots('noindex,follow');
         }
 
@@ -77,7 +74,7 @@ class PageLoader
             return $page;
         }
 
-        /** @var StorefrontSearchResult $storefrontSubscriptions */
+        /** @var StorefrontSearchResult<SubscriptionEntity> $storefrontSubscriptions */
         $storefrontSubscriptions = StorefrontSearchResult::createFrom($subscriptions);
 
         $page->setSubscriptions($storefrontSubscriptions);

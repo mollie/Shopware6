@@ -11,15 +11,20 @@ class ReminderValidator
 {
 
     /**
-     * @param DateTimeInterface $nextRenewal
+     * @param DateTimeInterface|null $nextRenewal
      * @param DateTimeInterface $today
      * @param int $daysDiff
      * @param DateTimeInterface|null $lastReminded
      * @return bool
      * @throws \Exception
      */
-    public function shouldRemind(DateTimeInterface $nextRenewal, DateTimeInterface $today, int $daysDiff, ?DateTimeInterface $lastReminded): bool
+    public function shouldRemind(?DateTimeInterface $nextRenewal, DateTimeInterface $today, int $daysDiff, ?DateTimeInterface $lastReminded): bool
     {
+        if ($nextRenewal === null) {
+            return false;
+        }
+
+
         $nextReminderDate = new DateTime($nextRenewal->format('Y-m-d H:i:s'));
         $nextReminderDate->modify("-" . $daysDiff . " day");
 

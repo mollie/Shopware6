@@ -44,7 +44,7 @@ class SubscriptionMetadata
     }
 
     /**
-     * @param array $metadata
+     * @param array<mixed> $metadata
      * @return SubscriptionMetadata
      */
     public static function fromArray(array $metadata): SubscriptionMetadata
@@ -63,7 +63,7 @@ class SubscriptionMetadata
     }
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public function toArray(): array
     {

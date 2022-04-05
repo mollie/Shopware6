@@ -1,5 +1,6 @@
 import template from './mollie-cart-subscription-rule.html.twig';
 
+// eslint-disable-next-line no-undef
 Shopware.Component.extend('mollie-cart-subscription-rule', 'sw-condition-base', {
     template,
 
@@ -9,12 +10,12 @@ Shopware.Component.extend('mollie-cart-subscription-rule', 'sw-condition-base', 
             return [
                 {
                     label: this.$tc('global.sw-condition.condition.yes'),
-                    value: true
+                    value: true,
                 },
                 {
                     label: this.$tc('global.sw-condition.condition.no'),
-                    value: false
-                }
+                    value: false,
+                },
             ];
         },
 
@@ -33,7 +34,7 @@ Shopware.Component.extend('mollie-cart-subscription-rule', 'sw-condition-base', 
             set(isSubscription) {
                 this.ensureValueExist();
                 this.condition.value = {...this.condition.value, isSubscription};
-            }
-        }
-    }
+            },
+        },
+    },
 });

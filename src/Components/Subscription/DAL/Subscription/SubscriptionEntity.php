@@ -71,7 +71,7 @@ class SubscriptionEntity extends Entity
     protected $salesChannelId;
 
     /**
-     * @var array|null
+     * @var array<mixed>|null
      */
     protected $metadata;
 
@@ -127,7 +127,9 @@ class SubscriptionEntity extends Entity
      */
     public function getMetadata(): SubscriptionMetadata
     {
-        return SubscriptionMetadata::fromArray($this->metadata);
+        $data = ($this->metadata !== null) ? $this->metadata : [];
+
+        return SubscriptionMetadata::fromArray($data);
     }
 
     /**

@@ -9,6 +9,8 @@ use Shopware\Core\Checkout\Cart\Order\OrderConversionContext;
 use Shopware\Core\Checkout\Cart\Order\OrderConverter;
 use Shopware\Core\Checkout\Cart\Processor;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
@@ -53,9 +55,18 @@ class OrderCloneService
      * @param string $newOrderNumber
      * @param Context $context
      * @return string
+     * @throws \Exception
      */
     public function createNewOrder(OrderEntity $existingOrder, string $newOrderNumber, Context $context): string
     {
+        if (!$existingOrder->getAddresses() instanceof OrderAddressCollection) {
+            throw new \Exception('Order does not have an address collection');
+        }
+
+        if (!$existingOrder->getOrderCustomer() instanceof OrderCustomerEntity) {
+            throw new \Exception('Order does not have an order customer assigend');
+        }
+
         $newOrderId = Uuid::randomHex();
 
 
@@ -135,10 +146,12 @@ class OrderCloneService
             $orderData['deliveries'][$index]['id'] = $newDeliveryId;
 
 
-            /** @var OrderDeliveryEntity $orderDelivery */
-            $orderDelivery = $existingOrder->getDeliveries()->get($oldDeliveryId);
+            if ($existingOrder->getDeliveries() instanceof OrderDeliveryCollection) {
+                /** @var OrderDeliveryEntity $orderDelivery */
+                $orderDelivery = $existingOrder->getDeliveries()->get($oldDeliveryId);
 
-            $orderData['deliveries'][$index]['shippingOrderAddressId'] = $mappingsAddressIDs[$orderDelivery->getShippingOrderAddressId()];
+                $orderData['deliveries'][$index]['shippingOrderAddressId'] = $mappingsAddressIDs[$orderDelivery->getShippingOrderAddressId()];
+            }
         }
 
         $context->scope(Context::SYSTEM_SCOPE, function (Context $context) use ($orderData): void {
@@ -149,10 +162,10 @@ class OrderCloneService
     }
 
     /**
-     * @param $orderCustomer
-     * @return array
+     * @param OrderCustomerEntity $orderCustomer
+     * @return array<mixed>
      */
-    private function getOrderCustomer($orderCustomer): array
+    private function getOrderCustomer(OrderCustomerEntity $orderCustomer): array
     {
         return [
             'customerId' => $orderCustomer->getCustomerId(),
@@ -165,7 +178,7 @@ class OrderCloneService
 
     /**
      * @param OrderAddressCollection $addresses
-     * @return array
+     * @return array<mixed>
      */
     private function getOrderAddresses(OrderAddressCollection $addresses): array
     {

@@ -15,7 +15,7 @@ Component.register('mollie-subscriptions-list', {
         'systemConfigApiService',
         'MolliePaymentsSubscriptionService',
         'repositoryFactory',
-        'acl'
+        'acl',
     ],
 
     mixins: [

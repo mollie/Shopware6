@@ -91,7 +91,7 @@ class SubscriptionRemindedEvent extends Event implements CustomerAware, Business
     }
 
     /**
-     * @return string|null
+     * @return string
      */
     public function getSalesChannelId(): string
     {

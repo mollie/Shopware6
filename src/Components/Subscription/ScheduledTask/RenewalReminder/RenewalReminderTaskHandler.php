@@ -36,7 +36,7 @@ class RenewalReminderTaskHandler extends ScheduledTaskHandler
     }
 
     /**
-     * @return iterable
+     * @return iterable<mixed>
      */
     public static function getHandledMessages(): iterable
     {

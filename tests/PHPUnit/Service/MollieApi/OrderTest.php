@@ -30,11 +30,6 @@ class OrderTest extends TestCase
     private $clientMock;
 
     /**
-     * @var LoggerInterface
-     */
-    private $loggerServiceMock;
-
-    /**
      * @var MollieOrderApi
      */
     private $orderApiService;
@@ -62,14 +57,12 @@ class OrderTest extends TestCase
             ['createClient' => $this->clientMock, 'getClient' => $this->clientMock]
         );
 
-        $this->loggerServiceMock = new NullLogger();
         $this->paymentApiService = new MolliePaymentApi($apiFactoryMock);
         $this->router = $this->getMockBuilder(RouterInterface::class)->disableOriginalConstructor()->getMock();
 
         $this->orderApiService = new MollieOrderApi(
             $apiFactoryMock,
             $this->paymentApiService,
-            $this->router,
             new WebhookBuilder($this->router, new FakePluginSettings('')),
             new NullLogger()
         );

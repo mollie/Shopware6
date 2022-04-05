@@ -17,7 +17,9 @@ use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -122,12 +124,17 @@ class SubscriptionManager implements SubscriptionManagerInterface
      */
     public function createSubscription(OrderEntity $order, SalesChannelContext $context): string
     {
-        if ($order->getLineItems()->count() > 1) {
+        if ($order->getLineItems() === null || $order->getLineItems()->count() > 1) {
             # Mixed carts are not allowed for subscriptions
             return '';
         }
 
         $item = $order->getLineItems()->first();
+
+        if (!$item instanceof OrderLineItemEntity) {
+            throw new Exception('No line item entity found for order ' . $order->getOrderNumber());
+        }
+
 
         $attributes = new OrderLineItemEntityAttributes($item);
 
@@ -167,7 +174,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
 
         # first get our mollie customer ID from the order.
         # this is required to create a subscription
-        $mollieCustomerId = $this->customerService->getMollieCustomerId($order->getOrderCustomer()->getCustomerId(), $orderSalesChannelId, $context->getContext());
+        $mollieCustomerId = $this->customerService->getMollieCustomerId((string)$order->getOrderCustomer()->getCustomerId(), $orderSalesChannelId, $context->getContext());
 
 
         # switch out client to the correct sales channel
@@ -191,9 +198,9 @@ class SubscriptionManager implements SubscriptionManagerInterface
             # by adding the missing external Mollie IDs
             $this->repoSubscriptions->confirmSubscription(
                 $subscription->getId(),
-                $mollieSubscription->id,
-                $mollieSubscription->customerId,
-                $mollieSubscription->nextPaymentDate,
+                (string)$mollieSubscription->id,
+                (string)$mollieSubscription->customerId,
+                (string)$mollieSubscription->nextPaymentDate,
                 $context->getContext()
             );
         }
@@ -234,6 +241,10 @@ class SubscriptionManager implements SubscriptionManagerInterface
             }
 
             $customer = $this->customerService->getCustomer($subscription->getCustomerId(), $context);
+
+            if (!$customer instanceof CustomerEntity) {
+                throw new Exception('Shopware Customer not found for Subscription! Cannot remind anyone!');
+            }
 
             $criteria = new Criteria();
             $criteria->addFilter(new EqualsFilter('id', $subscription->getSalesChannelId()));

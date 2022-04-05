@@ -54,7 +54,7 @@ class SubscriptionRepository
 
     /**
      * @param Context $context
-     * @return EntitySearchResult
+     * @return EntitySearchResult<SubscriptionEntity>
      */
     public function findAll(Context $context): EntitySearchResult
     {
@@ -66,7 +66,7 @@ class SubscriptionRepository
     /**
      * @param int $daysOffset
      * @param Context $context
-     * @return EntitySearchResult
+     * @return EntitySearchResult<SubscriptionEntity>
      * @throws \Exception
      */
     public function findByReminderRangeReached(int $daysOffset, Context $context): EntitySearchResult
@@ -93,7 +93,7 @@ class SubscriptionRepository
     /**
      * @param string $orderId
      * @param Context $context
-     * @return EntitySearchResult
+     * @return EntitySearchResult<SubscriptionEntity>
      */
     public function findPendingSubscriptions(string $orderId, Context $context): EntitySearchResult
     {

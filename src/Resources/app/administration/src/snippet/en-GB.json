@@ -281,7 +281,7 @@
         "mollieSubscriptionProduct": "Subscription Product",
         "mollieSubscriptionIntervalAmount": "Repeat Payment every",
         "mollieSubscriptionIntervalType": "Interval Unit",
-        "mollieSubscriptionRepetitionAmount": "Number or repetitions (leave for unlimited)",
+        "mollieSubscriptionRepetitionAmount": "Number or repetitions (leave empty for unlimited)",
         "infoDefaultLanguage": "Please note, this configuration can only be edited in your default language. Please change your language to modify the subscription settings of this product."
       }
     }

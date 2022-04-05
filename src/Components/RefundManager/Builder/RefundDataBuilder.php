@@ -104,9 +104,9 @@ class RefundDataBuilder
                 # extract how many of this item have already been refunded
                 # form all kinds of sources we have within Mollie.
                 # subscriptions have no order, so no quantity is available
-                if ($orderAttributes->isTypeSubscription()) {
-                    $alreadyRefundedQty = 0;
-                } else {
+                $alreadyRefundedQty = 0;
+
+                if (!$orderAttributes->isTypeSubscription() && $mollieOrder instanceof \Mollie\Api\Resources\Order) {
                     $alreadyRefundedQty = $this->getRefundedQuantity($mollieOrderLineId, $mollieOrder, $refunds);
                 }
 
@@ -127,12 +127,10 @@ class RefundDataBuilder
         if ($order->getDeliveries() !== null) {
             foreach ($order->getDeliveries() as $delivery) {
 
+                $alreadyRefundedQty = 0;
+
                 # remember, subscriptions have no order
-                if ($orderAttributes->isTypeSubscription()) {
-
-                    $alreadyRefundedQty = 0;
-
-                } else {
+                if (!$orderAttributes->isTypeSubscription() && $mollieOrder instanceof \Mollie\Api\Resources\Order) {
 
                     # search the mollie line id for the order
                     # because we don't have this in our order items.

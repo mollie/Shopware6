@@ -68,7 +68,6 @@ class RefundsServiceTest extends TestCase
         $mollieOrderApiMock = new MollieOrderApi(
             $apiFactoryMock,
             $paymentApiService,
-            $router,
             new WebhookBuilder($router, new FakePluginSettings('')),
             new NullLogger()
         );

@@ -58,19 +58,19 @@ Application.addServiceProvider('MolliePaymentsSubscriptionService', (container) 
 });
 
 
-Shopware.Application.addServiceProviderDecorator('ruleConditionDataProviderService', (ruleConditionService) => {
+Application.addServiceProviderDecorator('ruleConditionDataProviderService', (ruleConditionService) => {
     ruleConditionService.addCondition('mollie_lineitem_subscription_rule', {
         component: 'mollie-lineitem-subscription-rule',
         label: 'mollie-payments.rules.itemSubscriptionRule',
         scopes: ['lineitem'],
-        group: 'item'
+        group: 'item',
     });
 
     ruleConditionService.addCondition('mollie_cart_subscription_rule', {
         component: 'mollie-cart-subscription-rule',
         label: 'mollie-payments.rules.cartSubscriptionRule',
         scopes: ['cart'],
-        group: 'cart'
+        group: 'cart',
     });
 
     return ruleConditionService;

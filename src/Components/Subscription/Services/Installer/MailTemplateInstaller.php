@@ -112,7 +112,7 @@ class MailTemplateInstaller
             return '';
         }
 
-        return $result->firstId();
+        return (string)$result->firstId();
     }
 
     /**

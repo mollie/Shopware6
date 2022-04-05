@@ -6,9 +6,12 @@ use Exception;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\RepetitionType;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
+use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Uuid\Uuid;
+use Shopware\Core\System\Currency\CurrencyEntity;
 
 
 class SubscriptionBuilder
@@ -21,7 +24,15 @@ class SubscriptionBuilder
      */
     public function buildSubscription(OrderEntity $order): SubscriptionEntity
     {
+        if (!$order->getLineItems() instanceof OrderLineItemCollection) {
+            throw new Exception('Order does not have line items');
+        }
+
         $item = $order->getLineItems()->first();
+
+        if (!$item instanceof OrderLineItemEntity) {
+            throw new Exception('Order does not have a valid line item');
+        }
 
         return $this->buildItemSubscription($item, $order);
     }
@@ -30,9 +41,18 @@ class SubscriptionBuilder
      * @param OrderLineItemEntity $lineItem
      * @param OrderEntity $order
      * @return SubscriptionEntity
+     * @throws Exception
      */
     private function buildItemSubscription(OrderLineItemEntity $lineItem, OrderEntity $order): SubscriptionEntity
     {
+        if (!$order->getCurrency() instanceof CurrencyEntity) {
+            throw new Exception('Order does not have a currency');
+        }
+
+        if (!$order->getOrderCustomer() instanceof OrderCustomerEntity) {
+            throw new Exception('Order does not have an order customer entity');
+        }
+
         $attributes = new OrderLineItemEntityAttributes($lineItem);
 
         $interval = $attributes->getSubscriptionInterval();
@@ -64,8 +84,8 @@ class SubscriptionBuilder
 
         $entity->setQuantity($lineItem->getQuantity());
 
-        $entity->setCustomerId($order->getOrderCustomer()->getCustomerId());
-        $entity->setProductId($lineItem->getProductId());
+        $entity->setCustomerId((string)$order->getOrderCustomer()->getCustomerId());
+        $entity->setProductId((string)$lineItem->getProductId());
         $entity->setOrderId($order->getId());
         $entity->setSalesChannelId($order->getSalesChannelId());
 

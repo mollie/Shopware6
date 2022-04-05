@@ -6,6 +6,8 @@ namespace Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRen
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Service\OrderService;
 use Mollie\Api\Resources\Payment;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -75,13 +77,27 @@ class SubscriptionRenewing
 
         $order = $this->getOrder($orderId, $context->getContext());
 
+        if (!$order instanceof OrderEntity) {
+            throw new \Exception('Cannot renew subscription. Order with ID ' . $orderId . ' not found for subscription: ' . $subscription->getMollieId());
+        }
+
+        if (!$order->getTransactions() instanceof OrderTransactionCollection) {
+            throw new \Exception('Order ' . $order->getOrderNumber() . ' does not have a list of order transactions');
+        }
+
+        $lastTransaction = $order->getTransactions()->last();
+
+        if (!$lastTransaction instanceof OrderTransactionEntity) {
+            throw new \Exception('Order ' . $order->getOrderNumber() . ' does not have a last order transaction');
+        }
+
 
         # also make sure to update our metadata
         # that is stored in the custom fields of the
         # Shopware order and its transactions
         $this->orderService->updateMollieData(
             $order,
-            $order->getTransactions()->last()->getId(),
+            $lastTransaction->getId(),
             '',
             $subscription->getId(),
             $subscription->getMollieId(),
