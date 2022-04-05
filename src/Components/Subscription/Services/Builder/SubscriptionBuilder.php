@@ -59,11 +59,6 @@ class SubscriptionBuilder
         $intervalUnit = $attributes->getSubscriptionIntervalUnit();
 
         $times = $attributes->getSubscriptionRepetitionCount();
-        $repetitionType = $attributes->getSubscriptionRepetitionType();
-
-        if ($repetitionType === RepetitionType::INFINITE) {
-            $times = null;
-        }
 
         $description = $lineItem->getQuantity() . 'x ' . $lineItem->getLabel() . ' (Order #' . $order->getOrderNumber() . ', ' . $lineItem->getTotalPrice() . ' ' . $order->getCurrency()->getIsoCode() . ')';
 

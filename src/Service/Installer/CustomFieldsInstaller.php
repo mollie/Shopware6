@@ -44,7 +44,7 @@ class CustomFieldsInstaller
         $this->repoCustomFields->upsert([
             [
                 'id' => 'f2acb41af0be41638540b31917007fa3',
-                'name' => 'mollie_payments.product',
+                'name' => 'mollie_payments_product',
                 'active' => true,
                 'translated' => false,
                 'config' => [
@@ -63,7 +63,7 @@ class CustomFieldsInstaller
                 'customFields' => [
                     [
                         'id' => '0488544354354c82a0fdd3bcfcfb4f81',
-                        'name' => 'mollie_payments.product.voucher_type',
+                        'name' => 'mollie_payments_product_voucher_type',
                         'active' => true,
                         'type' => CustomFieldTypes::SELECT,
                         'config' => [
@@ -105,7 +105,7 @@ class CustomFieldsInstaller
                     ],
                     [
                         'id' => '73f175f0f60849d3ba3512c62c492098',
-                        'name' => 'mollie_payments.product.subscription.enabled',
+                        'name' => 'mollie_payments_product_subscription_enabled',
                         'active' => true,
                         'type' => CustomFieldTypes::SWITCH,
                         'config' => [
@@ -121,7 +121,7 @@ class CustomFieldsInstaller
                     ],
                     [
                         'id' => 'e2ee7ee0fcb44b2c8fb41d91edcc0b16',
-                        'name' => 'mollie_payments.product.subscription.interval',
+                        'name' => 'mollie_payments_product_subscription_interval',
                         'active' => true,
                         'type' => CustomFieldTypes::INT,
                         'config' => [
@@ -137,7 +137,7 @@ class CustomFieldsInstaller
                     ],
                     [
                         'id' => '5dde0b79c6804c2a93e6137e8699cd0f',
-                        'name' => 'mollie_payments.product.subscription.interval_unit',
+                        'name' => 'mollie_payments_product_subscription_interval_unit',
                         'active' => true,
                         'type' => CustomFieldTypes::SELECT,
                         'config' => [
@@ -179,7 +179,7 @@ class CustomFieldsInstaller
                     ],
                     [
                         'id' => '786f49b48bf34a418c5edb5503f31de5',
-                        'name' => 'mollie_payments.product.subscription.repetition',
+                        'name' => 'mollie_payments_product_subscription_repetition',
                         'active' => true,
                         'type' => CustomFieldTypes::INT,
                         'config' => [

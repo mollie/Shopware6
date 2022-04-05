@@ -2,7 +2,7 @@
 
 {% block buy_widget_buy_container %}
 
-    {% if mollie_subscriptions_enabled_beta and product.customFields.mollie_payments.subscription_product %}
+    {% if mollie_subscriptions_enabled_beta and product.customFields.mollie_payments_product_subscription_enabled %}
         <button class="btn btn-primary btn-block btn-buy" title="{{ "mollie-subscriptions.product.addToCartText"|trans|sw_sanitize }}" aria-label="{{ "mollie-subscriptions.product.addToCartText"|trans|sw_sanitize }}">
             {{ "mollie-subscriptions.product.addToCartText"|trans|sw_sanitize }}
         </button>

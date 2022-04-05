@@ -9,7 +9,7 @@ test('Product Service correctly updates Custom Fields', () => {
     const product = {
         customFields: {
             'other_data': '4',
-            'mollie_payments.product.voucher_type': '3',
+            'mollie_payments_product_voucher_type': '3',
         },
     };
 
@@ -20,7 +20,7 @@ test('Product Service correctly updates Custom Fields', () => {
 
     const expected = {
         'other_data': '4',
-        'mollie_payments.product.voucher_type': '1',
+        'mollie_payments_product_voucher_type': '1',
     };
 
     expect(product.customFields).toStrictEqual(expected);
@@ -29,7 +29,7 @@ test('Product Service correctly updates Custom Fields', () => {
 test('Product Service clears Mollie Data if not valid', () => {
     const product = {
         customFields: {
-            'mollie_payments.product.voucher_type': '1',
+            'mollie_payments_product_voucher_type': '1',
         },
     };
 
@@ -47,7 +47,7 @@ test('Product Service only cleans Mollie Data if not existing', () => {
     const product = {
         customFields: {
             'other_data': '4',
-            'mollie_payments.product.voucher_type': '3',
+            'mollie_payments_product_voucher_type': '3',
         },
     };
 

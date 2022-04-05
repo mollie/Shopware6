@@ -26,7 +26,7 @@ test('VoucherType is correctly loaded from custom fields', () => {
 
     const product = {
         customFields: {
-            'mollie_payments.product.voucher_type': '2',
+            'mollie_payments_product_voucher_type': '2',
         },
     };
 
@@ -58,7 +58,7 @@ test('VoucherType can be cleared again', () => {
 
     const product = {
         customFields: {
-            'mollie_payments.product.voucher_type': '2',
+            'mollie_payments_product_voucher_type': '2',
         },
     };
 
@@ -90,10 +90,10 @@ test('Subscription data is correctly loaded from custom fields', () => {
 
     const product = {
         customFields: {
-            'mollie_payments.product.subscription.enabled': true,
-            'mollie_payments.product.subscription.interval': 3,
-            'mollie_payments.product.subscription.interval_unit': 'weeks',
-            'mollie_payments.product.subscription.repetition': 2,
+            'mollie_payments_product_subscription_enabled': true,
+            'mollie_payments_product_subscription_interval': 3,
+            'mollie_payments_product_subscription_interval_unit': 'weeks',
+            'mollie_payments_product_subscription_repetition': 2,
         },
     };
 

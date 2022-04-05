@@ -76,7 +76,7 @@ class LineItemAttributesTest extends TestCase
         $item = new LineItem('', '');
         $item->setPayload([
             'customFields' => [
-                'mollie_payments.product.voucher_type' => VoucherType::TYPE_MEAL,
+                'mollie_payments_product_voucher_type' => VoucherType::TYPE_MEAL,
             ]
         ]);
 
@@ -94,7 +94,7 @@ class LineItemAttributesTest extends TestCase
         $item = new LineItem('', '');
         $item->setPayload([
             'customFields' => [
-                'mollie_payments.product.voucher_type' => VoucherType::TYPE_MEAL,
+                'mollie_payments_product_voucher_type' => VoucherType::TYPE_MEAL,
             ]
         ]);
 

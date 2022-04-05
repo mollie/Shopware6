@@ -39,10 +39,6 @@ class OrderLineItemEntityAttributes
      */
     private $subscriptionRepetitionCount;
 
-    /**
-     * @var string
-     */
-    private $subscriptionRepetitionType;
 
     /**
      * @param OrderLineItemEntity $lineItem
@@ -52,11 +48,10 @@ class OrderLineItemEntityAttributes
         $this->voucherType = $this->getCustomFieldValue($lineItem, 'voucher_type');
         $this->mollieOrderLineID = $this->getCustomFieldValue($lineItem, 'order_line_id');
 
-        $this->subscriptionProduct = (bool)$this->getCustomFieldValue($lineItem, 'subscription_product');
+        $this->subscriptionProduct = (bool)$this->getCustomFieldValue($lineItem, 'subscription_enabled');
         $this->subscriptionInterval = (int)$this->getCustomFieldValue($lineItem, 'subscription_interval');
         $this->subscriptionIntervalUnit = (string)$this->getCustomFieldValue($lineItem, 'subscription_interval_unit');
         $this->subscriptionRepetitionCount = (int)$this->getCustomFieldValue($lineItem, 'subscription_repetition');
-        $this->subscriptionRepetitionType = (string)$this->getCustomFieldValue($lineItem, 'subscription_repetition_type');
     }
 
     /**
@@ -118,14 +113,6 @@ class OrderLineItemEntityAttributes
         return $this->subscriptionRepetitionCount;
     }
 
-    /**
-     * @return string
-     */
-    public function getSubscriptionRepetitionType(): string
-    {
-        return $this->subscriptionRepetitionType;
-    }
-
 
     /**
      * Somehow there are 2 custom fields? in payload and custom fields?
@@ -146,8 +133,15 @@ class OrderLineItemEntityAttributes
             if (array_key_exists('customFields', $lineItem->getPayload())) {
                 # load the custom fields
                 $customFields = $lineItem->getPayload()['customFields'];
+
+                # ---------------------------------------------------------------------------
+                # search in new structure
+                $fullKey = 'mollie_payments_product_' . $keyName;
+                $foundValue = (array_key_exists($fullKey, $customFields)) ? (string)$customFields[$fullKey] : '';
+
+                # old structure
                 # check if we have a mollie entry
-                if ($customFields !== null && array_key_exists('mollie_payments', $customFields)) {
+                if ($foundValue === '' && $customFields !== null && array_key_exists('mollie_payments', $customFields)) {
                     # load the mollie entry
                     $mollieData = $customFields['mollie_payments'];
                     # assign our value if we have it
@@ -162,12 +156,21 @@ class OrderLineItemEntityAttributes
         if ($foundValue === '') {
             # check if we have customFields
             $customFields = $lineItem->getCustomFields();
-            # check if we have a mollie entry
-            if ($customFields !== null && array_key_exists('mollie_payments', $customFields)) {
-                # load the mollie entry
-                $mollieData = $customFields['mollie_payments'];
-                # assign our value if we have it
-                $foundValue = (array_key_exists($keyName, $mollieData)) ? (string)$mollieData[$keyName] : '';
+
+            if ($customFields !== null) {
+                # ---------------------------------------------------------------------------
+                # search in new structure
+                $fullKey = 'mollie_payments_product_' . $keyName;
+                $foundValue = (array_key_exists($fullKey, $customFields)) ? (string)$customFields[$fullKey] : '';
+
+                # old structure
+                # check if we have a mollie entry
+                if ($foundValue === '' && array_key_exists('mollie_payments', $customFields)) {
+                    # load the mollie entry
+                    $mollieData = $customFields['mollie_payments'];
+                    # assign our value if we have it
+                    $foundValue = (array_key_exists($keyName, $mollieData)) ? (string)$mollieData[$keyName] : '';
+                }
             }
         }
 

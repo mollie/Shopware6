@@ -22,12 +22,12 @@ export default class ProductAttributes {
             return;
         }
 
-        this._voucherType = customFields['mollie_payments.product.voucher_type'];
+        this._voucherType = customFields['mollie_payments_product_voucher_type'];
 
-        this._subscriptionProduct = customFields['mollie_payments.product.subscription.enabled'];
-        this._subscriptionInterval = customFields['mollie_payments.product.subscription.interval'];
-        this._subscriptionIntervalUnit = customFields['mollie_payments.product.subscription.interval_unit'];
-        this._subscriptionRepetition = customFields['mollie_payments.product.subscription.repetition'];
+        this._subscriptionProduct = customFields['mollie_payments_product_subscription_enabled'];
+        this._subscriptionInterval = customFields['mollie_payments_product_subscription_interval'];
+        this._subscriptionIntervalUnit = customFields['mollie_payments_product_subscription_interval_unit'];
+        this._subscriptionRepetition = customFields['mollie_payments_product_subscription_repetition'];
     }
 
     /**
@@ -174,33 +174,33 @@ export default class ProductAttributes {
     toArray(originalFields) {
 
         if (this._voucherType !== '') {
-            originalFields['mollie_payments.product.voucher_type'] = String(this._voucherType);
+            originalFields['mollie_payments_product_voucher_type'] = String(this._voucherType);
         } else {
-            originalFields = this._removeKey(originalFields, 'mollie_payments.product.voucher_type');
+            originalFields = this._removeKey(originalFields, 'mollie_payments_product_voucher_type');
         }
 
         if (this._subscriptionProduct) {
-            originalFields['mollie_payments.product.subscription.enabled'] = this._subscriptionProduct;
+            originalFields['mollie_payments_product_subscription_enabled'] = this._subscriptionProduct;
         } else {
-            originalFields = this._removeKey(originalFields, 'mollie_payments.product.subscription.enabled');
+            originalFields = this._removeKey(originalFields, 'mollie_payments_product_subscription_enabled');
         }
 
         if (this._subscriptionInterval !== undefined && this._subscriptionInterval !== '') {
-            originalFields['mollie_payments.product.subscription.interval'] = parseInt(this._subscriptionInterval);
+            originalFields['mollie_payments_product_subscription_interval'] = parseInt(this._subscriptionInterval);
         } else {
-            originalFields = this._removeKey(originalFields, 'mollie_payments.product.subscription.interval');
+            originalFields = this._removeKey(originalFields, 'mollie_payments_product_subscription_interval');
         }
 
         if (this._subscriptionIntervalUnit !== undefined && this._subscriptionIntervalUnit !== '') {
-            originalFields['mollie_payments.product.subscription.interval_unit'] = this._subscriptionIntervalUnit;
+            originalFields['mollie_payments_product_subscription_interval_unit'] = this._subscriptionIntervalUnit;
         } else {
-            originalFields = this._removeKey(originalFields, 'mollie_payments.product.subscription.interval_unit');
+            originalFields = this._removeKey(originalFields, 'mollie_payments_product_subscription_interval_unit');
         }
 
         if (this._subscriptionRepetition !== undefined && this._subscriptionRepetition !== '') {
-            originalFields['mollie_payments.product.subscription.repetition'] = parseInt(this._subscriptionRepetition);
+            originalFields['mollie_payments_product_subscription_repetition'] = parseInt(this._subscriptionRepetition);
         } else {
-            originalFields = this._removeKey(originalFields, 'mollie_payments.product.subscription.repetition');
+            originalFields = this._removeKey(originalFields, 'mollie_payments_product_subscription_repetition');
         }
 
         return originalFields;

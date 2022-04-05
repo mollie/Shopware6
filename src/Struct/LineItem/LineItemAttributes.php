@@ -61,7 +61,7 @@ class LineItemAttributes
 
         $this->voucherType = $this->getCustomFieldValue($lineItem, 'voucher_type');
 
-        $this->subscriptionProduct = (bool)$this->getCustomFieldValue($lineItem, 'subscription_product');
+        $this->subscriptionProduct = (bool)$this->getCustomFieldValue($lineItem, 'subscription_enabled');
         $this->subscriptionInterval = (int)$this->getCustomFieldValue($lineItem, 'subscription_interval');
         $this->subscriptionIntervalUnit = (string)$this->getCustomFieldValue($lineItem, 'subscription_interval_unit');
         $this->subscriptionRepetition = (string)$this->getCustomFieldValue($lineItem, 'subscription_repetition');
@@ -147,7 +147,7 @@ class LineItemAttributes
 
         # only save if it's a subscription product
         if ($this->subscriptionProduct) {
-            $mollieData['subscription_product'] = $this->subscriptionProduct;
+            $mollieData['subscription_enabled'] = $this->subscriptionProduct;
 
             if ($this->subscriptionInterval !== null) {
                 $mollieData['subscription_interval'] = $this->subscriptionInterval;
@@ -188,7 +188,7 @@ class LineItemAttributes
 
                 # ---------------------------------------------------------------------------
                 # search in new structure
-                $fullKey = 'mollie_payments.product.' . $keyName;
+                $fullKey = 'mollie_payments_product_' . $keyName;
                 $foundValue = (array_key_exists($fullKey, $customFields)) ? (string)$customFields[$fullKey] : '';
 
                 # ---------------------------------------------------------------------------

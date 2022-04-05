@@ -53,7 +53,7 @@ class ProductAttributesTest extends TestCase
     {
         $method = new ProductEntity();
         $method->setCustomFields([
-            'mollie_payments.product.voucher_type' => VoucherType::TYPE_ECO,
+            'mollie_payments_product_voucher_type' => VoucherType::TYPE_ECO,
             'mollie_payments' => [
                 'voucher_type' => VoucherType::TYPE_MEAL
             ]
@@ -72,7 +72,7 @@ class ProductAttributesTest extends TestCase
     {
         $method = new ProductEntity();
         $method->setCustomFields([
-            'mollie_payments.product.voucher_type' => '5',
+            'mollie_payments_product_voucher_type' => '5',
         ]);
 
         $attributes = new ProductAttributes($method);
