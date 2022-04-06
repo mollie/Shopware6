@@ -255,6 +255,7 @@
       "TYPE_WEEKS": "Weken",
       "TYPE_MONTHS": "Maanden",
       "list": {
+        "title": "Abonnementen",
         "columns": {
           "customer": "Klant",
           "subscription_id": "Mollie ID",
@@ -268,7 +269,7 @@
           "nextPaymentAt": "",
           "prePaymentReminder": "",
           "action": {
-            "cancel": "Annuleren",
+            "cancel": "Annuleer abonnement",
             "success": "Het abonnement is opgezegd.",
             "error": "Fout bij opzeggen abonnement. Meer informatie in de logboeken."
           }
@@ -285,6 +286,12 @@
         "mollieSubscriptionRepetitionType": "Type abonnementsherhaling",
         "infoDefaultLanguage": "Let op, deze configuratie kan alleen in uw standaardtaal worden bewerkt. Wijzig uw taal om de abonnementsinstellingen van dit product te wijzigen."
       }
+    },
+    "sw-order-list": {
+      "columns": {
+        "mollie": "Mollie"
+      },
+      "badgeSubscription": "Abo Bestellung"
     }
   },
   "sw-order": {
@@ -299,6 +306,7 @@
       "totalRemaining": "Terug te betalen",
       "totalVouchers": "Voucher",
       "totalShipments": "Verzonden bedrag ({quantity} items)",
+      "subscriptionBadge": "Abonnement besteling",
       "refundManager": {
         "title": "Terugbetaling via Mollie",
         "btnOpenRefundManager": "Refund Manager openen",

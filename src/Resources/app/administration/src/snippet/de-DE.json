@@ -22,7 +22,7 @@
       "descriptionTextModule": "Mollie Payments Zahlungen",
       "btnMollieActions": "Mollie Aktionen",
       "refundThroughMollie": "Rückerstattung über Mollie",
-      "shipThroughMollie": "Versand bei Mollie melden"
+      "shipThroughMollie": "Versand melden"
     },
     "config": {
       "info": {
@@ -255,6 +255,7 @@
       "TYPE_WEEKS": "Woche(n)",
       "TYPE_MONTHS": "Monat(e)",
       "list": {
+        "title": "Abonnements",
         "columns": {
           "customer": "Kunde",
           "subscription_id": "Mollie ID",
@@ -268,7 +269,7 @@
           "canceledAt": "Gekündigt",
           "createdAt": "Erstellt",
           "action": {
-            "cancel": "Abbrechen",
+            "cancel": "Abo kündigen",
             "success": "Das Abonnement wurde gekündigt.",
             "error": "Fehler bei der Kündigung des Abonnements. Weitere Informationen in den Protokollen."
           }
@@ -285,7 +286,13 @@
         "mollieSubscriptionRepetitionType": "Abonnement-Wiederholungstyp",
         "infoDefaultLanguage": "Bitte beachten Sie, dass diese Konfiguration nur in Ihrer Standardsprache bearbeitet werden kann. Bitte ändern Sie Ihre Sprache, um die Abonnementeinstellungen dieses Produkts zu ändern."
       }
-     }
+    },
+    "sw-order-list": {
+      "columns": {
+        "mollie": "Mollie"
+      },
+      "badgeSubscription": "Abo Bestellung"
+    }
   },
   "sw-order": {
     "detailExtended": {
@@ -299,6 +306,7 @@
       "totalRemaining": "Rückerstattbar",
       "totalVouchers": "Gutscheine",
       "totalShipments": "Versandte Menge ({quantity} Stück)",
+      "subscriptionBadge": "Abo Bestellung",
       "refundManager": {
         "title": "Rückerstattung über Mollie",
         "btnOpenRefundManager": "Refund Manager öffnen",

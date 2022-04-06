@@ -3,18 +3,30 @@
 
     <template v-if="mollieOrderId">
         <dt>{{ $tc('sw-order.detailExtended.labelMollieOrderId') }}</dt>
-        <dd>{{ mollieOrderId }}</dd>
-
-        <dt>{{ $tc('sw-order.detailExtended.labelMolliePaymentLink') }}</dt>
         <dd>
-            <sw-button-process size="x-small"
-                               variant="context"
-                               :disabled="!molliePaymentUrl"
-                               :processSuccess="molliePaymentUrlCopied"
-                               :isLoading="isLoading || isMolliePaymentUrlLoading"
-                               @click="copyPaymentUrlToClipboard" @process-finish="onMolliePaymentUrlProcessFinished">
-                {{ $tc('sw-order.detailExtended.buttonMolliePaymentLink') }}
-            </sw-button-process>
+            {{ mollieOrderId }}
+            <div v-if="isSubscription">
+                <sw-label class="mollie-order-user-card-subscription-badge"
+                          variant="info" size="medium" appearance="pill" :ghost="true" :caps="true" :dismissable="false">
+                    {{ $tc('sw-order.detailExtended.subscriptionBadge') }}
+                </sw-label>
+            </div>
         </dd>
+
+        <div v-if="hasPaymentLink">
+            <dt>{{ $tc('sw-order.detailExtended.labelMolliePaymentLink') }}</dt>
+            <dd>
+                <sw-button-process size="x-small"
+
+                                   :disabled="!molliePaymentUrl"
+                                   :processSuccess="molliePaymentUrlCopied"
+                                   :isLoading="isLoading || isMolliePaymentUrlLoading"
+                                   @click="copyPaymentUrlToClipboard"
+                                   @process-finish="onMolliePaymentUrlProcessFinished">
+                    {{ $tc('sw-order.detailExtended.buttonMolliePaymentLink') }}
+                </sw-button-process>
+            </dd>
+        </div>
+
     </template>
 {% endblock %}

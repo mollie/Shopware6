@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Components\Subscription\ScheduledTask\RenewalReminder;
+namespace Kiener\MolliePayments\ScheduledTask\Subscription\RenewalReminder;
 
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Psr\Log\LoggerInterface;

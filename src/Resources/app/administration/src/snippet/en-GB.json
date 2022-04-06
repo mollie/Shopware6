@@ -255,6 +255,7 @@
       "TYPE_WEEKS": "Week(s)",
       "TYPE_MONTHS": "Month(s)",
       "list": {
+        "title": "Subscriptions",
         "columns": {
           "customer": "Customer",
           "subscription_id": "Mollie ID",
@@ -268,7 +269,7 @@
           "nextPaymentAt": "Next Payment",
           "prePaymentReminder": "Reminded at",
           "action": {
-            "cancel": "Cancel",
+            "cancel": "Cancel subscription",
             "success": "The subscription has been canceled",
             "error": "Error in cancel subscription. More information in the logs."
           }
@@ -284,6 +285,12 @@
         "mollieSubscriptionRepetitionAmount": "Number or repetitions (leave empty for unlimited)",
         "infoDefaultLanguage": "Please note, this configuration can only be edited in your default language. Please change your language to modify the subscription settings of this product."
       }
+    },
+    "sw-order-list": {
+      "columns": {
+        "mollie": "Mollie"
+      },
+      "badgeSubscription": "Subscription"
     }
   },
   "sw-order": {
@@ -298,6 +305,7 @@
       "totalRemaining": "Refundable amount",
       "totalVouchers": "Voucher amount",
       "totalShipments": "Shipped amount ({quantity} items)",
+      "subscriptionBadge" : "Subscription Order",
       "refundManager": {
         "title": "Mollie Refund Manager",
         "btnOpenRefundManager": "Open Refund Manager",

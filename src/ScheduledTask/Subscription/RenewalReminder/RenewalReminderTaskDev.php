@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Components\Subscription\ScheduledTask\RenewalReminder;
+namespace Kiener\MolliePayments\ScheduledTask\Subscription\RenewalReminder;
 
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTask;
 
-class RenewalReminderTask extends ScheduledTask
+class RenewalReminderTaskDev extends ScheduledTask
 {
 
     /**
@@ -20,8 +20,7 @@ class RenewalReminderTask extends ScheduledTask
      */
     public static function getDefaultInterval(): int
     {
-        return 60; // 12h
-        #  return 43200; // 12h
+        return 60; // 1 minute
     }
 
 }

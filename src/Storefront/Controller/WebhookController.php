@@ -123,6 +123,10 @@ class WebhookController extends StorefrontController
                 $mollieSubscriptionId = (string)$allParams['subscriptionId'];
             }
 
+            if (empty($molliePaymentId)) {
+                throw new \Exception('Please provide a Mollie Payment ID with the payment that has been done for this subscription');
+            }
+
             # we first start by renewing our subscription.
             # this will create a new order, just like the
             # user would do in the checkout process.

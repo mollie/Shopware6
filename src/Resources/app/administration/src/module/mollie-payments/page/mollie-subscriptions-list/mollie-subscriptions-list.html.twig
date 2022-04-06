@@ -1,8 +1,25 @@
 {% block mollie_payments_subscription_list %}
-    <sw-page>
+    <sw-page class="mollie-subscriptions">
+        {% block mollie_payments_subscription_list_smart_bar_header %}
+            <template slot="smart-bar-header">
+                {% block mollie_payments_subscription_list_smart_bar_header_title %}
+                    <h2>
+                        {% block mollie_payments_subscription_list_smart_bar_header_title_text %}
+                            {{ $tc('mollie-payments.subscriptions.list.title') }}
+                        {% endblock %}
+                        {% block mollie_payments_subscription_list_smart_bar_header_amount %}
+                            <span v-if="!isLoading" class="sw-page__smart-bar-amount">
+                                  ({{ totalSubscriptions }})
+                            </span>
+                        {% endblock %}
+                    </h2>
+                {% endblock %}
+            </template>
+        {% endblock %}
         <template #content>
             {% block mollie_payments_subscription_list_content %}
                 <sw-entity-listing
+                        class="mollie-subscriptions-grid"
                         v-if="subscriptions"
                         :items="subscriptions"
                         :repository="repoSubscriptions"
@@ -32,13 +49,11 @@
                         <template #column-mollieStatus="{ item }">
                             <sw-icon v-if="item.mollieStatus == 'active'"
                                      name="default-basic-checkmark-line" :small="true"
-                                     class=""
-                                     style="color:green;margin-right:5px;">
+                                     class="status-icon color-active">
                             </sw-icon>
                             <sw-icon v-if="item.mollieStatus != 'active'"
                                      name="default-basic-x-line" :small="true"
-                                     class=""
-                                     style="color:red;margin-right:5px;">
+                                     class="status-icon color-inactive">
                             </sw-icon>
                             {{ statusTranslation(item.mollieStatus) }}
                         </template>
@@ -63,9 +78,9 @@
                     {% endblock %}
 
                     {% block mollie_payments_subscription_list_content_actions %}
-                        <template #more-actions="{ item }">
+                        <template #actions="{ item }">
                             {% block mollie_payments_subscription_list_content_actions_cancel %}
-                                <sw-context-menu-item class="sw-entity-listing__context-menu-edit-cancel"
+                                <sw-context-menu-item class="mollie-subscriptions-grid-btn-cancel"
                                                       @click="btnCancel_Click(item)">
                                     {{ $tc('mollie-payments.subscriptions.list.columns.action.cancel') }}
                                 </sw-context-menu-item>

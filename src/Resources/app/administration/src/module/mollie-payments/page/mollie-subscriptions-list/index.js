@@ -1,4 +1,5 @@
 import template from './mollie-subscriptions-list.html.twig';
+import './mollie-subscriptions-list.scss';
 import MollieSubscriptionGrid from './grids/MollieSubscriptionGrid';
 
 // eslint-disable-next-line no-undef
@@ -67,6 +68,15 @@ Component.register('mollie-subscriptions-list', {
 
             return null;
         },
+
+        /**
+         *
+         * @returns {*}
+         */
+        totalSubscriptions() {
+            return this.subscriptions.length;
+        },
+
     },
 
     methods: {

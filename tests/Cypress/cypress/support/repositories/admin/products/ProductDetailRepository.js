@@ -10,10 +10,10 @@ export default class ProductDetailRepository {
 
     /**
      *
-     * @returns {string}
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getMollieTab() {
-        return cy.contains('Mollie');
+        return cy.get('.product-tab-mollie');
     }
 
     /**

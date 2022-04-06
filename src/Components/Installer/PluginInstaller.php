@@ -57,9 +57,9 @@ class PluginInstaller
 
         $this->paymentMethodService->installAndActivatePaymentMethods($context);
 
-        $this->applePayDomainService->downloadDomainAssociationFile();
-
         $this->subscriptionMailInstaller->install($context);
+
+        $this->applePayDomainService->downloadDomainAssociationFile();
     }
 
 }

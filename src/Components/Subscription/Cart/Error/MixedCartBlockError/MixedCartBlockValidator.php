@@ -70,7 +70,7 @@ class MixedCartBlockValidator implements CartValidatorInterface
             }
         }
 
-        if ($subscriptionItemsCount > 1 && $isMixedCart) {
+        if ($subscriptionItemsCount >= 1 && $isMixedCart) {
             $errorCollection->add(new MixedCartBlockError());
         } else {
             $this->clearError($cart);

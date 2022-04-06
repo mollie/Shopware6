@@ -165,7 +165,7 @@ class OrderAttributes
             $mollieData['payment_id'] = $this->molliePaymentId;
         }
 
-        if ((string)$this->mollieSubscriptionId !== '') {
+        if ((string)$this->swSubscriptionId !== '') {
             $mollieData['swSubscriptionId'] = $this->swSubscriptionId;
         }
 

@@ -46,7 +46,7 @@ class CustomFieldsInstaller
                 'id' => 'f2acb41af0be41638540b31917007fa3',
                 'name' => 'mollie_payments_product',
                 'active' => true,
-                'translated' => false,
+                'translated' => true,
                 'config' => [
                     'label' => [
                         'en-GB' => 'Mollie Payments (Product)',
@@ -143,7 +143,7 @@ class CustomFieldsInstaller
                         'config' => [
                             'label' => [
                                 'en-GB' => 'Subscription Interval (Unit)',
-                                'de-DE' => 'Abo-Intervall (Einheit))',
+                                'de-DE' => 'Abo-Intervall (Einheit)',
                                 "nl-NL" => 'Abonnementsinterval (eenheid)',
                             ],
                             'customFieldPosition' => 4,
@@ -181,7 +181,7 @@ class CustomFieldsInstaller
                         'id' => '786f49b48bf34a418c5edb5503f31de5',
                         'name' => 'mollie_payments_product_subscription_repetition',
                         'active' => true,
-                        'type' => CustomFieldTypes::INT,
+                        'type' => CustomFieldTypes::TEXT,
                         'config' => [
                             'label' => [
                                 'en-GB' => 'Subscription Repetition',
@@ -195,7 +195,7 @@ class CustomFieldsInstaller
                             ],
                             'customFieldPosition' => 5,
                             "componentName" => "sw-field",
-                            "customFieldType" => "number",
+                            "customFieldType" => "text",
                         ],
                     ]
                 ]

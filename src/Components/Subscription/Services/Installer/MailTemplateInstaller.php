@@ -32,18 +32,24 @@ class MailTemplateInstaller
     /**
      * @var EntityRepositoryInterface
      */
-    private $repoSalesChannels;
+    private $repoMailTemplates;
 
+    /**
+     * @var EntityRepositoryInterface
+     */
+    private $repoSalesChannels;
 
     /**
      * @param Connection $connection
      * @param EntityRepositoryInterface $repoMailTypes
+     * @param EntityRepositoryInterface $repoMailTemplates
      * @param EntityRepositoryInterface $repoSalesChannels
      */
-    public function __construct(Connection $connection, EntityRepositoryInterface $repoMailTypes, EntityRepositoryInterface $repoSalesChannels)
+    public function __construct(Connection $connection, EntityRepositoryInterface $repoMailTypes, EntityRepositoryInterface $repoMailTemplates, EntityRepositoryInterface $repoSalesChannels)
     {
         $this->connection = $connection;
         $this->repoMailTypes = $repoMailTypes;
+        $this->repoMailTemplates = $repoMailTemplates;
         $this->repoSalesChannels = $repoSalesChannels;
     }
 
@@ -53,11 +59,19 @@ class MailTemplateInstaller
      */
     public function install(Context $context): void
     {
+        # create a new mail template type
+        # if it's not already existing
         $reminderTypeID = $this->getReminderMailTypeID($context);
 
         if (empty($reminderTypeID)) {
             $reminderTypeID = $this->createMailTemplateType($this->connection);
+        }
 
+        # only create a template if the merchant
+        # does not already have one
+        $existingMailTemplateID = $this->getReminderTemplateID($reminderTypeID, $context);
+
+        if (empty($existingMailTemplateID)) {
             $this->createMailTemplate($this->connection, $reminderTypeID);
         }
 
@@ -107,6 +121,25 @@ class MailTemplateInstaller
         $criteria->addFilter(new EqualsFilter('technicalName', 'mollie_subscriptions_renewal_reminder'));
 
         $result = $this->repoMailTypes->searchIds($criteria, $context);
+
+        if (count($result->getIds()) <= 0) {
+            return '';
+        }
+
+        return (string)$result->firstId();
+    }
+
+    /**
+     * @param string $typeID
+     * @param Context $context
+     * @return string
+     */
+    private function getReminderTemplateID(string $typeID, Context $context): string
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('mailTemplateTypeId', $typeID));
+
+        $result = $this->repoMailTemplates->searchIds($criteria, $context);
 
         if (count($result->getIds()) <= 0) {
             return '';
@@ -192,9 +225,15 @@ class MailTemplateInstaller
 
         $subjectEN = 'Your subscription from {{ salesChannel.name }} will be renewed soon';
         $descriptionEN = 'Subscription Renewal Reminder Mail';
+        $contentHtmlEN = file_get_contents(__DIR__ . '/Mails/RenewalReminder/en.html');
+        $contentPlainEN = file_get_contents(__DIR__ . '/Mails/RenewalReminder/en.txt');
 
         $subjectDE = 'Ihr Abonnement von {{ salesChannel.name }} wird in Kürze verlängert';
         $descriptionDE = 'Erinnerungsmail zur Verlängerung des Abonnements';
+        $contentHtmlDE = file_get_contents(__DIR__ . '/Mails/RenewalReminder/de.html');
+        $contentPlainDE = file_get_contents(__DIR__ . '/Mails/RenewalReminder/de.txt');
+
+        # -----------------------------------------------------------------------------------------------------
 
         $defaultLangId = $this->getLanguageIdByLocale($connection, 'en-GB');
         $deLangId = $this->getLanguageIdByLocale($connection, 'de-DE');
@@ -217,8 +256,8 @@ class MailTemplateInstaller
                 'sender_name' => $sender,
                 'subject' => $subjectEN,
                 'description' => $descriptionEN,
-                'content_html' => $this->getContentHtmlEn(),
-                'content_plain' => $this->getContentPlainEn(),
+                'content_html' => $contentHtmlEN,
+                'content_plain' => $contentPlainEN,
                 'created_at' => (new \DateTime())->format(Defaults::STORAGE_DATE_TIME_FORMAT),
             ]);
         }
@@ -232,8 +271,8 @@ class MailTemplateInstaller
                 'sender_name' => $sender,
                 'subject' => $subjectEN,
                 'description' => $descriptionEN,
-                'content_html' => $this->getContentHtmlEn(),
-                'content_plain' => $this->getContentPlainEn(),
+                'content_html' => $contentHtmlEN,
+                'content_plain' => $contentPlainEN,
                 'created_at' => (new \DateTime())->format(Defaults::STORAGE_DATE_TIME_FORMAT),
             ]);
         }
@@ -247,60 +286,11 @@ class MailTemplateInstaller
                 'sender_name' => $sender,
                 'subject' => $subjectDE,
                 'description' => $descriptionDE,
-                'content_html' => $this->getContentHtmlDe(),
-                'content_plain' => $this->getContentPlainDe(),
+                'content_html' => $contentHtmlDE,
+                'content_plain' => $contentPlainDE,
                 'created_at' => (new \DateTime())->format(Defaults::STORAGE_DATE_TIME_FORMAT),
             ]);
         }
-    }
-
-    /**
-     * @return string
-     */
-    private function getContentHtmlEn(): string
-    {
-        return '
-Dear {{ customer.firstName }}<br/>
-<br/>
-Good news!<br/>
-<br/>
-We are getting your subscription ready for you.<br />
-<br />
-<strong>Subscription</strong>: {{ subscription.description }}<br />
-<strong>Next Renewal</strong>: {{ subscription.nextPaymentAt | date("m / d / Y", false) }}.<br />
-<strong>Total Amount</strong>: {{ subscription.amount }} {{ subscription.currency }}<br />
-<br />
-This e-mail is just to inform you that the payment is going to be captured on this date.<br/>
-<br/>
-For any changes, you can log in to your account on {{ salesChannel.name }} and pause or cancel the subscription at any time.<br/>
-<br/>
-Thanks you<br/>
-{{ salesChannel.name }}
-        ';
-    }
-
-    /**
-     * @return string
-     */
-    private function getContentPlainEn(): string
-    {
-        return '';
-    }
-
-    /**
-     * @return string
-     */
-    private function getContentHtmlDe(): string
-    {
-        return $this->getContentHtmlEn();
-    }
-
-    /**
-     * @return string
-     */
-    private function getContentPlainDe(): string
-    {
-        return $this->getContentPlainEn();
     }
 
     /**

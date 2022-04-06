@@ -7,6 +7,7 @@ import './components/mollie-tracking-info';
 import './components/mollie-refund-manager';
 import './page/mollie-subscriptions-list';
 
+
 // eslint-disable-next-line no-undef
 const {Module} = Shopware;
 
