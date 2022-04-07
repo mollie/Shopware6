@@ -166,7 +166,7 @@ context("Checkout Failure Tests", () => {
                 if (shopware.isVersionGreaterEqual('6.4.10.0')) {
                     cy.contains('We have received your order, but the payment was aborted');
                 } else {
-                    cy.contains('We received your order, but we were not able to process your payment');
+                    cy.contains('We received your order, but the payment was aborted');
                 }
 
 
