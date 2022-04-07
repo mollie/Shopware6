@@ -128,7 +128,13 @@ context("Checkout Failure Tests", () => {
                 // the payment failed, so shopware says the order is complete
                 // but we still need to complete the payment and edit the order
                 cy.url().should('include', '/account/order/edit/');
-                cy.contains('We received your order, but we were not able to process your payment');
+
+                if (shopware.isVersionGreaterEqual('6.4.10.0')) {
+                    cy.contains('We have received your order, but we were not able to process your payment');
+                } else {
+                    cy.contains('We received your order, but we were not able to process your payment');
+                }
+
 
                 paymentAction.switchPaymentMethod('Giropay');
 
@@ -156,7 +162,13 @@ context("Checkout Failure Tests", () => {
                 // the payment failed, so shopware says the order is complete
                 // but we still need to complete the payment and edit the order
                 cy.url().should('include', '/account/order/edit/');
-                cy.contains('We received your order, but the payment was aborted');
+
+                if (shopware.isVersionGreaterEqual('6.4.10.0')) {
+                    cy.contains('We have received your order, but the payment was aborted');
+                } else {
+                    cy.contains('We received your order, but we were not able to process your payment');
+                }
+
 
                 paymentAction.switchPaymentMethod('PayPal');
 
