@@ -20,12 +20,9 @@
         <import resource="services/builder.xml"/>
         <import resource="services/controller.xml"/>
         <import resource="services/handlers.xml"/>
+        <import resource="services/scheduled_tasks.xml"/>
 
-        <import resource="services/subscription/subscription.xml"/>
-        <import resource="services/subscription/cron.xml"/>
-        <import resource="services/subscription/dto.xml"/>
-        <import resource="services/subscription/email.xml"/>
-        <import resource="services/subscription/controller.xml"/>
+        <import resource="services/subscription/services.xml"/>
     </imports>
 
     <services>

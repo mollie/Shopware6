@@ -219,11 +219,16 @@ class MolliePaymentDoPay
     {
         try {
 
+            $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
+
+            $orderAttributes = new OrderAttributes($order);
+            $isSubscription = $orderAttributes->isTypeSubscription();
+
             $customer = $this->extractor->extractCustomer($order, $salesChannelContext);
 
-            // Create a Mollie customer if settings allow it and the customer is not a guest.
-            if (!$customer->getGuest() && $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId())->createCustomersAtMollie()) {
-
+            # create customers for every subscription
+            # or if we don't have a guest and our feature is enabled
+            if ($isSubscription || (!$customer->getGuest() && $settings->createCustomersAtMollie())) {
                 $this->customerService->createMollieCustomer(
                     $customer->getId(),
                     $salesChannelContext->getSalesChannel()->getId(),

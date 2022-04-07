@@ -93,6 +93,7 @@
                                             :customRemoveInheritanceFunction="removeInheritance">
                             <template #content="props">
                                 <sw-switch-field :map-inheritance="props"
+                                                 class="mollie-subscription-enabled"
                                                  :label="$tc('mollie-payments.subscriptions.product.mollieSubscriptionProduct')"
                                                  :disabled="props.isInherited"
                                                  :value="props.currentValue"

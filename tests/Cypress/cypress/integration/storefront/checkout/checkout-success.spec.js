@@ -62,7 +62,7 @@ context("Checkout Tests", () => {
         // configure our shop
         configAction.setupShop(true, false, false);
         // configure our products for vouchers
-        configAction.updateProducts('eco');
+        configAction.updateProducts('eco', false, '', '');
     })
 
     beforeEach(() => {

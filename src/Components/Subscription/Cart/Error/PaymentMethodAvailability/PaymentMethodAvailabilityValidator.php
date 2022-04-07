@@ -38,7 +38,7 @@ class PaymentMethodAvailabilityValidator implements CartValidatorInterface
      */
     public function validate(Cart $cart, ErrorCollection $errorCollection, SalesChannelContext $salesChannelContext): void
     {
-        $settings = $this->pluginSettings->getSettings();
+        $settings = $this->pluginSettings->getSettings($salesChannelContext->getSalesChannelId());
 
         if (!$settings->isSubscriptionsEnableBeta()) {
             return;

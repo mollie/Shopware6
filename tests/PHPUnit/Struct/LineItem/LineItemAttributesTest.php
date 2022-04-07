@@ -101,7 +101,7 @@ class LineItemAttributesTest extends TestCase
         $attributes = new LineItemAttributes($item);
 
         $expected = [
-            'voucher_type' => VoucherType::TYPE_MEAL
+            'mollie_payments_product_voucher_type' => VoucherType::TYPE_MEAL
         ];
 
         $this->assertEquals($expected, $attributes->toArray());

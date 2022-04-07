@@ -49,11 +49,12 @@ class Migration1644753635CreateSubscription extends MigrationStep
                 "
         );
 
+        $connection->executeStatement('CREATE INDEX `idx.mollie_subscription.id` ON mollie_subscription (id);');
         $connection->executeStatement('CREATE INDEX `idx.mollie_subscription.customer_id` ON mollie_subscription (customer_id);');
+        $connection->executeStatement('CREATE INDEX `idx.mollie_subscription.product_id` ON mollie_subscription (product_id);');
         $connection->executeStatement('CREATE INDEX `idx.mollie_subscription.canceled_at` ON mollie_subscription (canceled_at);');
         $connection->executeStatement('CREATE INDEX `idx.mollie_subscription.next_payment_at` ON mollie_subscription (next_payment_at);');
         $connection->executeStatement('CREATE INDEX `idx.mollie_subscription.sales_channel_id` ON mollie_subscription (sales_channel_id);');
-        $connection->executeStatement('CREATE INDEX `idx.mollie_subscription.product_id` ON mollie_subscription (product_id);');
     }
 
     /**

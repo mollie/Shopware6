@@ -1,6 +1,6 @@
 <?php
 
-namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\Subscription\Service;
+namespace Kiener\MolliePayments\Components\Subscription\Services\PaymentMethodRemover;
 
 
 use Kiener\MolliePayments\Service\SettingsService;
@@ -12,7 +12,7 @@ use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRouteResponse;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Container;
 
-class MollieSubscriptionRemover
+class PaymentMethodRemover
 {
 
     public const ALLOWED_METHODS = [
@@ -57,7 +57,8 @@ class MollieSubscriptionRemover
      */
     public function removePaymentMethods(PaymentMethodRouteResponse $originalData, SalesChannelContext $context): PaymentMethodRouteResponse
     {
-        $settings = $this->pluginSettings->getSettings();
+        $settings = $this->pluginSettings->getSettings($context->getSalesChannelId());
+
 
         if (!$settings->isSubscriptionsEnableBeta()) {
             return $originalData;

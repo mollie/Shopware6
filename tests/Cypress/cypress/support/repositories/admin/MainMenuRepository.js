@@ -16,6 +16,13 @@ export default class MainMenuRepository {
         return cy.get('.sw-order-index > .sw-admin-menu__navigation-link');
     }
 
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getSubscriptionsOverview() {
+        return cy.get('.mollie-subscriptions > .sw-admin-menu__navigation-link > .sw-admin-menu__navigation-link-label');
+    }
 
     /**
      *

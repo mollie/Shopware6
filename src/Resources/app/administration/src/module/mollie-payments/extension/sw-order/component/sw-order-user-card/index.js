@@ -1,6 +1,6 @@
 import template from './sw-order-user-card.html.twig';
 import './sw-order-user-card.scss';
-import OrderAttributes from "../../../../../../core/models/OrderAttributes";
+import OrderAttributes from '../../../../../../core/models/OrderAttributes';
 
 
 // eslint-disable-next-line no-undef

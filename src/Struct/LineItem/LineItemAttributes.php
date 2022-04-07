@@ -101,6 +101,15 @@ class LineItemAttributes
     }
 
     /**
+     * @param bool $subscriptionProduct
+     */
+    public function setSubscriptionProduct(bool $subscriptionProduct): void
+    {
+        $this->subscriptionProduct = $subscriptionProduct;
+    }
+
+
+    /**
      * @return int
      */
     public function getSubscriptionInterval()
@@ -139,30 +148,32 @@ class LineItemAttributes
     {
         $mollieData = [];
 
+        $prefix = 'mollie_payments_product_';
+
         # lets save some space and only store
         # what is existing
         if ($this->voucherType !== null) {
-            $mollieData['voucher_type'] = $this->voucherType;
+            $mollieData[$prefix . 'voucher_type'] = $this->voucherType;
         }
 
         # only save if it's a subscription product
         if ($this->subscriptionProduct) {
-            $mollieData['subscription_enabled'] = $this->subscriptionProduct;
+            $mollieData[$prefix . 'subscription_enabled'] = $this->subscriptionProduct;
 
             if ($this->subscriptionInterval !== null) {
-                $mollieData['subscription_interval'] = $this->subscriptionInterval;
+                $mollieData[$prefix . 'subscription_interval'] = $this->subscriptionInterval;
             }
 
             if ($this->subscriptionIntervalUnit !== null) {
-                $mollieData['subscription_interval_unit'] = $this->subscriptionIntervalUnit;
+                $mollieData[$prefix . 'subscription_interval_unit'] = $this->subscriptionIntervalUnit;
             }
 
             if ($this->subscriptionRepetition !== null) {
-                $mollieData['subscription_repetition'] = $this->subscriptionRepetition;
+                $mollieData[$prefix . 'subscription_repetition'] = $this->subscriptionRepetition;
             }
 
             if ($this->subscriptionRepetitionType !== null) {
-                $mollieData['subscription_repetition_type'] = $this->subscriptionRepetitionType;
+                $mollieData[$prefix . 'subscription_repetition_type'] = $this->subscriptionRepetitionType;
             }
         }
 

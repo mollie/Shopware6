@@ -24,4 +24,12 @@ export default class ProductDetailRepository {
         return cy.get('.mollie-voucher-type > div > select');
     }
 
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getSubscriptionToggle() {
+        return cy.get('.mollie-subscription-enabled > div > div >input');
+    }
+
 }

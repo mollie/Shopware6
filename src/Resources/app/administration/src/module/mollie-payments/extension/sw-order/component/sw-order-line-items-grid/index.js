@@ -1,6 +1,6 @@
 import template from './sw-order-line-items-grid.html.twig';
 import './sw-order-line-items-grid.scss';
-import OrderAttributes from "../../../../../../core/models/OrderAttributes";
+import OrderAttributes from '../../../../../../core/models/OrderAttributes';
 
 // eslint-disable-next-line no-undef
 const {Component, Mixin} = Shopware;

@@ -3,6 +3,11 @@
 namespace Kiener\MolliePayments\Struct\Order;
 
 
+use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
+use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
+use Shopware\Core\Checkout\Cart\Cart;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 
 
@@ -43,12 +48,18 @@ class OrderAttributes
      */
     private $molliePaymentUrl;
 
+    /**
+     * @var OrderEntity
+     */
+    private $order;
+
 
     /**
      * @param OrderEntity $order
      */
     public function __construct(OrderEntity $order)
     {
+        $this->order = $order;
         $this->mollieOrderId = $this->getCustomFieldValue($order, 'order_id');
         $this->molliePaymentId = $this->getCustomFieldValue($order, 'payment_id');
         $this->swSubscriptionId = $this->getCustomFieldValue($order, 'swSubscriptionId');
@@ -195,8 +206,25 @@ class OrderAttributes
      */
     public function isTypeSubscription(): bool
     {
-        return (!empty($this->mollieSubscriptionId));
+        # if we already have a mollie subscription ID
+        # then we KNOW it's a subscription
+        if (!empty($this->mollieSubscriptionId)) {
+            return true;
+        }
+
+        # otherwise, verify if we have subscription items
+        if ($this->order->getLineItems() instanceof OrderLineItemCollection) {
+            foreach ($this->order->getLineItems() as $lineItem) {
+                $attribute = new OrderLineItemEntityAttributes($lineItem);
+                if ($attribute->isSubscriptionProduct()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
+
 
     /**
      * @param OrderEntity $order

@@ -12,6 +12,7 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Struct\MollieLineItem;
+use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
@@ -208,7 +209,7 @@ class MollieOrderBuilder
 
 
         /** @var MollieSettingStruct $settings */
-        $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
+        $settings = $this->settingsService->getSettings($order->getSalesChannelId());
 
         // set order lifetime like configured
         $dueDate = $settings->getOrderLifetimeDate();
@@ -230,7 +231,12 @@ class MollieOrderBuilder
         }
 
         // enrich data with create customer at mollie
-        $orderData = $this->customerEnricher->enrich($orderData, $customer, $settings, $salesChannelContext);
+        $orderAttributes = new OrderAttributes($order);
+
+        if ($orderAttributes->isTypeSubscription() ||$settings->createCustomersAtMollie()) {
+            $orderData = $this->customerEnricher->enrich($orderData, $customer, $settings, $salesChannelContext);
+        }
+
 
         $this->logger->debug(
             sprintf('Preparing Shopware Order %s to be sent to Mollie', $order->getOrderNumber()),
