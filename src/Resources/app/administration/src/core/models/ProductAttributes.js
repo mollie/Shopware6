@@ -12,6 +12,8 @@ export default class ProductAttributes {
         this._subscriptionIntervalUnit = '';
         this._subscriptionRepetition = '';
 
+        this._hasMollieModifiedData = false;
+
         if (productEntity === null) {
             return;
         }
@@ -28,7 +30,22 @@ export default class ProductAttributes {
         this._subscriptionInterval = customFields['mollie_payments_product_subscription_interval'];
         this._subscriptionIntervalUnit = customFields['mollie_payments_product_subscription_interval_unit'];
         this._subscriptionRepetition = customFields['mollie_payments_product_subscription_repetition'];
+
+
+        // the next thing is, we want to have some basic information if
+        // our mollie data is actually existing in the initial custom fields.
+        // if we do not have it, then also don't create it later on.
+        const keyList = [
+            'mollie_payments_product_voucher_type',
+            'mollie_payments_product_subscription_enabled',
+            'mollie_payments_product_subscription_interval',
+            'mollie_payments_product_subscription_interval_unit',
+            'mollie_payments_product_subscription_repetition',
+        ];
+
+        this._hasMollieData = (this._checkMollieData(keyList, customFields));
     }
+
 
     /**
      *
@@ -94,6 +111,7 @@ export default class ProductAttributes {
      * @param value
      */
     setVoucherType(value) {
+        this._hasMollieModifiedData = true;
         this._voucherType = value;
     }
 
@@ -101,6 +119,7 @@ export default class ProductAttributes {
      * @param value
      */
     setSubscriptionProduct(value) {
+        this._hasMollieModifiedData = true;
         if (typeof value === 'boolean') {
             this._subscriptionProduct = value;
         } else {
@@ -112,17 +131,15 @@ export default class ProductAttributes {
      * @param value
      */
     setSubscriptionInterval(value) {
-        if (typeof value === 'number') {
-            this._subscriptionInterval = value;
-        } else {
-            this._subscriptionInterval = '';
-        }
+        this._hasMollieModifiedData = true;
+        this._subscriptionInterval = value;
     }
 
     /**
      * @param value
      */
     setSubscriptionIntervalUnit(value) {
+        this._hasMollieModifiedData = true;
         this._subscriptionIntervalUnit = value;
     }
 
@@ -130,17 +147,15 @@ export default class ProductAttributes {
      * @param value
      */
     setSubscriptionRepetition(value) {
-        if (typeof value === 'number') {
-            this._subscriptionRepetition = value;
-        } else {
-            this._subscriptionRepetition = '';
-        }
+        this._hasMollieModifiedData = true;
+        this._subscriptionRepetition = value;
     }
 
     /**
      *
      */
     clearVoucherType() {
+        this._hasMollieModifiedData = true;
         this._voucherType = '';
     }
 
@@ -148,6 +163,7 @@ export default class ProductAttributes {
      *
      */
     clearSubscriptionInterval() {
+        this._hasMollieModifiedData = true;
         this._subscriptionInterval = '';
     }
 
@@ -155,6 +171,7 @@ export default class ProductAttributes {
      *
      */
     clearSubscriptionIntervalUnit() {
+        this._hasMollieModifiedData = true;
         this._subscriptionIntervalUnit = '';
     }
 
@@ -162,6 +179,7 @@ export default class ProductAttributes {
      *
      */
     clearSubscriptionRepetition() {
+        this._hasMollieModifiedData = true;
         this._subscriptionRepetition = '';
     }
 
@@ -173,34 +191,39 @@ export default class ProductAttributes {
      */
     toArray(originalFields) {
 
+        if (!this._hasMollieModifiedData) {
+            return originalFields;
+        }
+
+
         if (this._voucherType !== '') {
             originalFields['mollie_payments_product_voucher_type'] = String(this._voucherType);
         } else {
-            originalFields = this._removeKey(originalFields, 'mollie_payments_product_voucher_type');
+            originalFields['mollie_payments_product_voucher_type'] = null;
         }
 
         if (this._subscriptionProduct) {
             originalFields['mollie_payments_product_subscription_enabled'] = this._subscriptionProduct;
         } else {
-            originalFields = this._removeKey(originalFields, 'mollie_payments_product_subscription_enabled');
+            originalFields['mollie_payments_product_subscription_enabled'] = null;
         }
 
         if (this._subscriptionInterval !== undefined && this._subscriptionInterval !== '') {
             originalFields['mollie_payments_product_subscription_interval'] = parseInt(this._subscriptionInterval);
         } else {
-            originalFields = this._removeKey(originalFields, 'mollie_payments_product_subscription_interval');
+            originalFields['mollie_payments_product_subscription_interval'] = null;
         }
 
         if (this._subscriptionIntervalUnit !== undefined && this._subscriptionIntervalUnit !== '') {
             originalFields['mollie_payments_product_subscription_interval_unit'] = this._subscriptionIntervalUnit;
         } else {
-            originalFields = this._removeKey(originalFields, 'mollie_payments_product_subscription_interval_unit');
+            originalFields['mollie_payments_product_subscription_interval_unit'] = null;
         }
 
         if (this._subscriptionRepetition !== undefined && this._subscriptionRepetition !== '') {
-            originalFields['mollie_payments_product_subscription_repetition'] = parseInt(this._subscriptionRepetition);
+            originalFields['mollie_payments_product_subscription_repetition'] = this._subscriptionRepetition;
         } else {
-            originalFields = this._removeKey(originalFields, 'mollie_payments_product_subscription_repetition');
+            originalFields['mollie_payments_product_subscription_repetition'] = null;
         }
 
         return originalFields;
@@ -239,6 +262,23 @@ export default class ProductAttributes {
             }
         }
         return tmpArray;
+    }
+
+    /**
+     *
+     * @param keyList
+     * @param customFields
+     * @returns {boolean}
+     * @private
+     */
+    _checkMollieData(keyList, customFields) {
+        var key = '';
+        for (key in keyList) {
+            if (key in customFields) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

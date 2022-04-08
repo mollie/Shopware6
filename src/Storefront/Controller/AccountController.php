@@ -67,7 +67,7 @@ class AccountController extends StorefrontController
         $this->subscriptionManager->cancelSubscription($subscriptionId, $context->getContext());
 
         $this->addFlash(self::SUCCESS,
-            $this->trans('account.cancelSubscription',
+            $this->trans('molliePayments.subscriptions.account.cancelSubscription',
                 ['%1%' => $subscriptionId]
             )
         );

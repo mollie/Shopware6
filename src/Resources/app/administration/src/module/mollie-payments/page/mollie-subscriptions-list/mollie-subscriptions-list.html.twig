@@ -47,15 +47,14 @@
 
                     {% block mollie_payments_subscription_list_content_status %}
                         <template #column-mollieStatus="{ item }">
-                            <sw-icon v-if="item.mollieStatus == 'active'"
-                                     name="default-basic-checkmark-line" :small="true"
-                                     class="status-icon color-active">
-                            </sw-icon>
-                            <sw-icon v-if="item.mollieStatus != 'active'"
-                                     name="default-basic-x-line" :small="true"
-                                     class="status-icon color-inactive">
-                            </sw-icon>
-                            {{ statusTranslation(item.mollieStatus) }}
+                            <sw-label :variant="statusColor(item.mollieStatus)"
+                                      size="medium"
+                                      appearance="pill"
+                                      :ghost="false"
+                                      :caps="true"
+                                      :dismissable="false">
+                                {{ statusTranslation(item.mollieStatus) }}
+                            </sw-label>
                         </template>
                     {% endblock %}
 

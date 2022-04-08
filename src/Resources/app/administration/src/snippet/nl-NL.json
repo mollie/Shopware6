@@ -278,13 +278,14 @@
       "product": {
         "card-title": "Abonnement",
         "title": "Mollie Abonnementen",
-        "description": "Met Mollie-abonnementen kun je eenvoudig abonnementsproducten maken en terugkerende betalingen plannen die plaatsvinden op het ingestelde interval en de ingestelde periode.",
+        "description": "Het beheren van uw terugkerende betalingen is eenvoudiger dan ooit met onze handige functies. Breng uw bedrijf naar een hoger niveau met efficiënte trackingopties, eenvoudige integraties en meer. Met Mollie-abonnementen kun je eenvoudig abonnementsproducten maken en terugkerende betalingen plannen die plaatsvinden op het ingestelde interval en de ingestelde periode.",
         "mollieSubscriptionProduct": "Is dit een abonnementsproduct?",
         "mollieSubscriptionIntervalAmount": "Herhaal betaling elke",
         "mollieSubscriptionIntervalType": "Type abonnementsinterval",
         "mollieSubscriptionRepetitionAmount": "Herhaal betaling",
-        "mollieSubscriptionRepetitionType": "Type abonnementsherhaling",
-        "infoDefaultLanguage": "Let op, deze configuratie kan alleen in uw standaardtaal worden bewerkt. Wijzig uw taal om de abonnementsinstellingen van dit product te wijzigen."
+        "mollieSubscriptionRepetitionPlaceholder": "Nummer invoeren of leeg laten",
+        "infoDefaultLanguage": "Let op, deze configuratie kan alleen in uw standaardtaal worden bewerkt. Wijzig uw taal om de abonnementsinstellingen van dit product te wijzigen.",
+        "btnReadMore": "Lees meer"
       }
     },
     "sw-order-list": {

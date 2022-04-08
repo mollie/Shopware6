@@ -127,7 +127,10 @@ Component.register('mollie-subscriptions-list', {
                             message: this.$tc('mollie-payments.subscriptions.list.columns.action.success'),
                         });
                         this.showRefundModal = true;
-                        this.fetchSubscriptions();
+
+                        // reload our list
+                        this.getList();
+
                     } else {
                         this.createNotificationError({
                             message: this.$tc('mollie-payments.subscriptions.list.columns.action.error'),
@@ -155,11 +158,34 @@ Component.register('mollie-subscriptions-list', {
          * @returns {*}
          */
         statusTranslation(status) {
+
+            if (status === '' || status === null) {
+                status = 'pending';
+            }
+
             if (['pending', 'active', 'canceled', 'suspended', 'completed'].includes(status)) {
                 return this.$tc('mollie-payments.subscriptions.status.' + status);
             }
 
             return status;
+        },
+
+        /**
+         *
+         * @param status
+         * @returns {string}
+         */
+        statusColor(status) {
+
+            if (status === '' || status === null || status === 'pending') {
+                return 'warning';
+            }
+
+            if (status === 'canceled' || status === 'suspended' || status === 'completed') {
+                return 'neutral';
+            }
+
+            return 'success';
         },
 
         // ---------------------------------------------------------------------------------------------------------

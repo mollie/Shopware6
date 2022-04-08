@@ -278,12 +278,14 @@
       "product": {
         "card-title": "Subscription",
         "title": "Mollie Subscriptions",
-        "description": "With Mollie subscriptions, you can easily create subscription products and schedule recurring payments to take place at the configured interval and period.",
+        "description": "Managing your recurring payments is easier than ever with our helpful features. Take your business to the next level with efficient tracking options, simple integrations, and more. With Mollie subscriptions, you can easily create subscription products and schedule recurring payments to take place at the configured interval and period.",
         "mollieSubscriptionProduct": "Subscription Product",
         "mollieSubscriptionIntervalAmount": "Repeat Payment every",
         "mollieSubscriptionIntervalType": "Interval Unit",
-        "mollieSubscriptionRepetitionAmount": "Number or repetitions (leave empty for unlimited)",
-        "infoDefaultLanguage": "Please note, this configuration can only be edited in your default language. Please change your language to modify the subscription settings of this product."
+        "mollieSubscriptionRepetitionAmount": "Number or repetitions",
+        "mollieSubscriptionRepetitionPlaceholder": "Enter number or leave empty",
+        "infoDefaultLanguage": "Please note, this configuration can only be edited in your default language. Please change your language to modify the subscription settings of this product.",
+        "btnReadMore": "Read more"
       }
     },
     "sw-order-list": {

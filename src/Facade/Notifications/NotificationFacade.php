@@ -151,16 +151,23 @@ class NotificationFacade
         $molliePayment = null;
         $mollieOrder = null;
 
-        if ($orderAttributes->isTypeSubscription()) {
-            # subscriptions are automatically charged using a payment ID
-            # so we do not have an order, but a payment instead
-            $molliePayment = $this->gatewayMollie->getPayment($orderAttributes->getMolliePaymentId());
-            $status = $this->statusConverter->getMolliePaymentStatus($molliePayment);
-        } else {
+
+        if (!empty($orderAttributes->getMollieOrderId())) {
+
             # fetch the order of our mollie ID
             # from our sales channel mollie profile
             $mollieOrder = $this->gatewayMollie->getOrder($mollieOrderId);
             $status = $this->statusConverter->getMollieOrderStatus($mollieOrder);
+
+        } else if ($orderAttributes->isTypeSubscription()) {
+
+            # subscriptions are automatically charged using a payment ID
+            # so we do not have an order, but a payment instead
+            $molliePayment = $this->gatewayMollie->getPayment($orderAttributes->getMolliePaymentId());
+            $status = $this->statusConverter->getMolliePaymentStatus($molliePayment);
+
+        } else {
+            throw new \Exception('Order is neither a Mollie order nor a subscription order: ' . $swOrder->getOrderNumber());
         }
 
         # --------------------------------------------------------------------------------------------

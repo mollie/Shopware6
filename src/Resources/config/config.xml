@@ -426,22 +426,22 @@
             <helpText lang="nl-NL"></helpText>
         </input-field>
         <input-field type="bool">
-            <name>subscriptionsReminderMailEnabled</name>
+            <name>subscriptionsReminderEnabled</name>
             <defaultValue>false</defaultValue>
-            <label>Enable Payment Reminder Email</label>
-            <label lang="de-DE">Zahlungserinnerungs-E-Mail aktivieren</label>
-            <label lang="nl-NL">E-mail voor betalingsherinnering inschakelen</label>
-            <helpText>Activates the automatic payment reminder email. This one will be sent out prior to the renewing of a subscription.</helpText>
+            <label>Enable Events for Renewal Reminders</label>
+            <label lang="de-DE">Events für Aboverlängerungen aktivieren</label>
+            <label lang="nl-NL"></label>
+            <helpText>If enabled, the plugin will automatically fire renewal reminder events for Flow Builder and Business Events that can be used to send out emails to customers or other actions.</helpText>
             <helpText lang="de-DE"></helpText>
             <helpText lang="nl-NL"></helpText>
         </input-field>
         <input-field type="int">
-            <name>subscriptionsReminderMailDays</name>
+            <name>subscriptionsReminderDays</name>
             <defaultValue>2</defaultValue>
-            <label>Reminder days before renewal</label>
+            <label>Remind days before renewal</label>
             <label lang="de-DE"></label>
             <label lang="nl-NL"></label>
-            <helpText>Set a custom number of days in advance for sending out the reminder email of a subscription.</helpText>
+            <helpText>Set the days in prior to the actual renewal for sending renewal reminder events in the system.</helpText>
             <helpText lang="de-DE"></helpText>
             <helpText lang="nl-NL"></helpText>
         </input-field>

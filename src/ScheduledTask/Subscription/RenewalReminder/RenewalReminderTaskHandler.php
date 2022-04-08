@@ -40,7 +40,10 @@ class RenewalReminderTaskHandler extends ScheduledTaskHandler
      */
     public static function getHandledMessages(): iterable
     {
-        return [RenewalReminderTask::class];
+        return [
+            RenewalReminderTask::class,
+            RenewalReminderTaskDev::class,
+        ];
     }
 
     /**
@@ -50,9 +53,13 @@ class RenewalReminderTaskHandler extends ScheduledTaskHandler
     {
         try {
 
+            $this->logger->info('Starting Subscription Renewal Reminder from Scheduled Tasks.');
+
             $context = Context::createDefaultContext();
 
-            $this->subscriptionManager->remindSubscriptionRenewal($context);
+            $remindedCount = $this->subscriptionManager->remindSubscriptionRenewal($context);
+
+            $this->logger->debug($remindedCount . ' subscriptions renewal reminders have been processed successfully!');
 
         } catch (\Throwable $ex) {
 

@@ -67,9 +67,11 @@ class RenewalReminderCommand extends Command
 
             $context = Context::createDefaultContext();
 
-            $this->subscriptionManager->remindSubscriptionRenewal($context);
+            $remindedCount = $this->subscriptionManager->remindSubscriptionRenewal($context);
 
-            $io->success('All subscription renewal reminders have been processed successfully!');
+            $this->logger->debug($remindedCount . ' subscriptions renewal reminders have been processed successfully!');
+
+            $io->success($remindedCount . ' subscriptions renewal reminders have been processed successfully!');
 
             return 0;
 

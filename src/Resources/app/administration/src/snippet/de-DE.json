@@ -278,13 +278,14 @@
       "product": {
         "card-title": "Abonnement",
         "title": "Mollie-Abonnements",
-        "description": "Mit Mollie-Abonnements können Sie ganz einfach Abonnementprodukte erstellen und wiederkehrende Zahlungen im konfigurierten Intervall und Zeitraum planen.",
+        "description": "Die Verwaltung Ihrer wiederkehrenden Zahlungen ist mit unseren hilfreichen Funktionen einfacher denn je. Bringen Sie Ihr Unternehmen mit effizienten Tracking-Optionen, einfachen Integrationen und mehr auf die nächste Stufe. Mit Mollie-Abonnements können Sie ganz einfach Abonnementprodukte erstellen und wiederkehrende Zahlungen so planen, dass sie im konfigurierten Intervall und Zeitraum stattfinden.",
         "mollieSubscriptionProduct": "Ist das ein Abo-Produkt?",
         "mollieSubscriptionIntervalAmount": "Zahlung wiederholen alle",
         "mollieSubscriptionIntervalType": "Abonnement-Intervall-Typ",
         "mollieSubscriptionRepetitionAmount": "Zahlung wiederholen",
-        "mollieSubscriptionRepetitionType": "Abonnement-Wiederholungstyp",
-        "infoDefaultLanguage": "Bitte beachten Sie, dass diese Konfiguration nur in Ihrer Standardsprache bearbeitet werden kann. Bitte ändern Sie Ihre Sprache, um die Abonnementeinstellungen dieses Produkts zu ändern."
+        "mollieSubscriptionRepetitionPlaceholder": "Nummer eingeben oder leer lassen",
+        "infoDefaultLanguage": "Bitte beachten Sie, dass diese Konfiguration nur in Ihrer Standardsprache bearbeitet werden kann. Bitte ändern Sie Ihre Sprache, um die Abonnementeinstellungen dieses Produkts zu ändern.",
+        "btnReadMore": "Mehr lesen"
       }
     },
     "sw-order-list": {

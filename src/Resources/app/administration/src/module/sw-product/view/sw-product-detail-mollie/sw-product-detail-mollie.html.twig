@@ -80,6 +80,15 @@
                         {{ $tc('mollie-payments.subscriptions.product.description') }}
                     </p>
                 </sw-container>
+                <sw-container columns="6fr 1fr">
+                    <div></div>
+                    <sw-button class="sw-product-detail-mollie-vouchers__button-readmore" :block="true"
+                               variant="primary"
+                               size="small" link="https://github.com/mollie/Shopware6/wiki/Subscriptions">
+                        {{ $tc('mollie-payments.subscriptions.product.btnReadMore') }}
+                    </sw-button>
+                </sw-container>
+
                 <sw-container gap="0px 30px" class="sw-product-detail-mollie-subscription-form__container">
                     {# --------------------------------------------------------------------------------------------- #}
                     {# --------------------------------------------------------------------------------------------- #}
@@ -149,6 +158,7 @@
                                             :customRemoveInheritanceFunction="removeInheritance">
                             <template #content="props">
                                 <sw-text-field :label="$tc('mollie-payments.subscriptions.product.mollieSubscriptionRepetitionAmount')"
+                                               :placeholder="$tc('mollie-payments.subscriptions.product.mollieSubscriptionRepetitionPlaceholder')"
                                                :map-inheritance="props"
                                                :disabled="props.isInherited"
                                                :value="props.currentValue"

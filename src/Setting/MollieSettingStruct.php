@@ -149,12 +149,12 @@ class MollieSettingStruct extends Struct
     /**
      * @var bool
      */
-    protected $subscriptionsReminderMailEnabled;
+    protected $subscriptionsReminderEnabled;
 
     /**
      * @var int
      */
-    protected $subscriptionsReminderMailDays;
+    protected $subscriptionsReminderDays;
 
 
     /**
@@ -556,17 +556,17 @@ class MollieSettingStruct extends Struct
     /**
      * @return bool
      */
-    public function isSubscriptionsReminderMailEnabled(): bool
+    public function isSubscriptionsReminderEnabled(): bool
     {
-        return $this->subscriptionsReminderMailEnabled;
+        return $this->subscriptionsReminderEnabled;
     }
 
     /**
      * @return int
      */
-    public function getSubscriptionsReminderMailDays(): int
+    public function getSubscriptionsReminderDays(): int
     {
-        return $this->subscriptionsReminderMailDays;
+        return $this->subscriptionsReminderDays;
     }
 
 

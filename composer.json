@@ -34,7 +34,10 @@
     }
   },
   "config": {
-    "optimize-autoloader": true
+    "optimize-autoloader": true,
+    "allow-plugins": {
+      "infection/extension-installer": true
+    }
   },
   "autoload": {
     "psr-4": {

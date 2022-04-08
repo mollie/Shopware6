@@ -6,8 +6,8 @@
             {% block page_account_mollie_subscriptions_welcome %}
                 <div class="account-welcome">
                     {% block page_account_mollie_subscriptions_welcome_headline %}
-                        <h1>{{ "account.mollieSubscriptionsTitle"|trans|sw_sanitize }}</h1>
-                        <p>{{ "account.mollieSubscriptionsWelcome"|trans|sw_sanitize }}</p>
+                        <h1>{{ "molliePayments.subscriptions.account.mollieSubscriptionsTitle"|trans|sw_sanitize }}</h1>
+                        <p>{{ "molliePayments.subscriptions.account.mollieSubscriptionsWelcome"|trans|sw_sanitize }}</p>
                     {% endblock %}
                 </div>
             {% endblock %}
@@ -17,7 +17,7 @@
                         {% block page_account_mollie_subscriptions_info_empty %}
                             {% sw_include '@Storefront/storefront/utilities/alert.html.twig' with {
                                 type: "warning",
-                                content: "account.mollieSubscriptionsInfoEmpty"|trans|sw_sanitize
+                                content: "molliePayments.subscriptions.account.mollieSubscriptionsInfoEmpty"|trans|sw_sanitize
                             } %}
                         {% endblock %}
                     {% else %}

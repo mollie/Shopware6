@@ -13,9 +13,29 @@ class ProductAttributes
 {
 
     /**
-     * @var string
+     * @var ?string
      */
     private $voucherType;
+
+    /**
+     * @var ?bool
+     */
+    private $subscriptionProduct;
+
+    /**
+     * @var ?int
+     */
+    private $subscriptionInterval;
+
+    /**
+     * @var ?string
+     */
+    private $subscriptionIntervalUnit;
+
+    /**
+     * @var ?int
+     */
+    private $subscriptionRepetitionCount;
 
 
     /**
@@ -24,6 +44,11 @@ class ProductAttributes
     public function __construct(ProductEntity $product)
     {
         $this->voucherType = $this->getCustomFieldValue($product, 'voucher_type');
+
+        $this->subscriptionProduct = $this->getCustomFieldValue($product, 'subscription_enabled');
+        $this->subscriptionInterval = $this->getCustomFieldValue($product, 'subscription_interval');
+        $this->subscriptionIntervalUnit = $this->getCustomFieldValue($product, 'subscription_interval_unit');
+        $this->subscriptionRepetitionCount = $this->getCustomFieldValue($product, 'subscription_repetition');
     }
 
     /**
@@ -42,16 +67,47 @@ class ProductAttributes
             return VoucherType::TYPE_NOTSET;
         }
 
-        return $this->voucherType;
+        return (string)$this->voucherType;
     }
 
+    /**
+     * Gets a list of Mollie fields that can be removed from the
+     * customFields because their value is NULL
+     * @return array<mixed>
+     */
+    public function getRemovableFields(): array
+    {
+        $fields = [];
+
+        if ($this->voucherType === null) {
+            $fields[] = 'mollie_payments_product_voucher_type';
+        }
+
+        if ($this->subscriptionProduct === null) {
+            $fields[] = 'mollie_payments_product_subscription_enabled';
+        }
+
+        if ($this->subscriptionInterval === null) {
+            $fields[] = 'mollie_payments_product_subscription_interval';
+        }
+
+        if ($this->subscriptionIntervalUnit === null) {
+            $fields[] = 'mollie_payments_product_subscription_interval_unit';
+        }
+
+        if ($this->subscriptionRepetitionCount === null) {
+            $fields[] = 'mollie_payments_product_subscription_repetition';
+        }
+
+        return $fields;
+    }
 
     /**
      * @param ProductEntity $product
      * @param string $keyName
-     * @return string
+     * @return mixed
      */
-    private function getCustomFieldValue(ProductEntity $product, string $keyName): string
+    private function getCustomFieldValue(ProductEntity $product, string $keyName)
     {
         $foundValue = '';
 
@@ -62,7 +118,7 @@ class ProductAttributes
         # search in new structure
         if ($customFields !== null) {
             $fullKey = 'mollie_payments_product_' . $keyName;
-            $foundValue = (array_key_exists($fullKey, $customFields)) ? (string)$customFields[$fullKey] : '';
+            $foundValue = (array_key_exists($fullKey, $customFields)) ? $customFields[$fullKey] : null;
         }
 
         # ---------------------------------------------------------------------------
@@ -70,12 +126,12 @@ class ProductAttributes
         # and load, but we migrate to the new one
         # check if we have customFields
 
-        if ($foundValue === '') {
+        if ($foundValue === '' || $foundValue === null) {
             if ($customFields !== null && array_key_exists('mollie_payments', $customFields)) {
                 # load the mollie entry
                 $mollieData = $customFields['mollie_payments'];
                 # assign our value if we have it
-                $foundValue = (array_key_exists($keyName, $mollieData)) ? (string)$mollieData[$keyName] : '';
+                $foundValue = (array_key_exists($keyName, $mollieData)) ? $mollieData[$keyName] : null;
             }
         }
 

@@ -17,6 +17,7 @@ use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
@@ -86,6 +87,11 @@ class SubscriptionManager implements SubscriptionManagerInterface
      */
     private $flowBuilderEventFactory;
 
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
 
     /**
      * @param FlowBuilderFactoryInterface $flowBuilderFactory
@@ -98,8 +104,9 @@ class SubscriptionManager implements SubscriptionManagerInterface
      * @param MollieGatewayInterface $gatewayMollie
      * @param SubscriptionRenewing $renewingService
      * @param EntityRepositoryInterface $repoSalesChannel
+     * @param LoggerInterface $logger
      */
-    public function __construct(FlowBuilderFactoryInterface $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionRepository $repoSubscriptions, SettingsService $settingsService, MollieDataBuilder $definitionBuilder, SubscriptionBuilder $subscriptionBuilder, CustomerService $customers, MollieGatewayInterface $gatewayMollie, SubscriptionRenewing $renewingService, EntityRepositoryInterface $repoSalesChannel)
+    public function __construct(FlowBuilderFactoryInterface $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionRepository $repoSubscriptions, SettingsService $settingsService, MollieDataBuilder $definitionBuilder, SubscriptionBuilder $subscriptionBuilder, CustomerService $customers, MollieGatewayInterface $gatewayMollie, SubscriptionRenewing $renewingService, EntityRepositoryInterface $repoSalesChannel, LoggerInterface $logger)
     {
         $this->pluginSettings = $settingsService;
         $this->repoSubscriptions = $repoSubscriptions;
@@ -109,6 +116,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
         $this->gwMollie = $gatewayMollie;
         $this->renewingService = $renewingService;
         $this->repoSalesChannel = $repoSalesChannel;
+        $this->logger = $logger;
 
         $this->flowBuilderEventFactory = $flowBuilderEventFactory;
         $this->flowBuilderDispatcher = $flowBuilderFactory->createDispatcher();
@@ -151,6 +159,8 @@ class SubscriptionManager implements SubscriptionManagerInterface
             throw new Exception('Invalid subscription interval unit');
         }
 
+        $this->logger->debug('Creating Subscription entry for order: ' . $order->getOrderNumber());
+
         # extract and build our subscription item from the current order entity.
         $subscription = $this->subscriptionBuilder->buildSubscription($order);
 
@@ -169,6 +179,9 @@ class SubscriptionManager implements SubscriptionManagerInterface
         if (!$order->getOrderCustomer() instanceof OrderCustomerEntity) {
             throw new \Exception('Order: ' . $order->getOrderNumber() . ' does not have a linked customer');
         }
+
+        $this->logger->debug('Confirming pending subscription for order: ' . $order->getOrderNumber());
+
 
         $orderSalesChannelId = $order->getSalesChannelId();
 
@@ -208,22 +221,25 @@ class SubscriptionManager implements SubscriptionManagerInterface
 
     /**
      * @param Context $context
-     * @return void
-     * @throws \Exception
+     * @return int
+     * @throws Exception
      */
-    public function remindSubscriptionRenewal(Context $context): void
+    public function remindSubscriptionRenewal(Context $context): int
     {
         # TODO this is not yet done. in theory we have a different setting in other sales channels..which would mean we would need to iterate channels here!!!
         $settings = $this->pluginSettings->getSettings();
 
-        if (!$settings->isSubscriptionsReminderMailEnabled()) {
-            return;
+        if (!$settings->isSubscriptionsReminderEnabled()) {
+            $this->logger->debug('Skipping Subscription renewal reminder. Feature is disabled in plugin configuration.');
+            return 0;
         }
 
         $today = new DateTime();
-        $daysOffset = $settings->getSubscriptionsReminderMailDays();
+        $daysOffset = $settings->getSubscriptionsReminderDays();
 
         $availableSubscriptions = $this->repoSubscriptions->findByReminderRangeReached($daysOffset, $context);
+
+        $remindedCount = 0;
 
         /** @var SubscriptionEntity $subscription */
         foreach ($availableSubscriptions->getElements() as $subscription) {
@@ -259,7 +275,11 @@ class SubscriptionManager implements SubscriptionManagerInterface
             # --------------------------------------------------------------------------------------------------
 
             $this->repoSubscriptions->markReminded($subscription->getId(), $context);
+
+            $remindedCount++;
         }
+
+        return $remindedCount;
     }
 
     /**
