@@ -62,7 +62,7 @@ class RefundService implements RefundServiceInterface
     public function refundFull(OrderEntity $order, string $description, array $refundItems, Context $context): Refund
     {
         $mollieOrderId = $this->orders->getMollieOrderId($order);
-        $mollieOrder = $this->mollie->getMollieOrder($mollieOrderId, '');
+        $mollieOrder = $this->mollie->getMollieOrder($mollieOrderId, $order->getSalesChannelId());
 
 
         $metadata = new RefundMetadata(RefundItemType::FULL, $refundItems);
