@@ -70,9 +70,15 @@
                         </template>
                     {% endblock %}
 
-                    {% block mollie_payments_subscription_list_content_create_at %}
+                    {% block mollie_payments_subscription_list_content_created_at %}
                         <template #column-createdAt="{ item }">
                             {{ item.createdAt | date('d/m/Y') }}
+                        </template>
+                    {% endblock %}
+
+                    {% block mollie_payments_subscription_list_content_canceled_at %}
+                        <template #column-canceledAt="{ item }">
+                            {{ item.canceledAt | date('d/m/Y') }}
                         </template>
                     {% endblock %}
 

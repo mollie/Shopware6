@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Components\Subscription\Cart\Error\PaymentMethodAvailability;
+namespace Kiener\MolliePayments\Components\Subscription\Cart\Error;
 
 
 use Shopware\Core\Checkout\Cart\Error\Error;

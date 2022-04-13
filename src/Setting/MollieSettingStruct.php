@@ -542,7 +542,7 @@ class MollieSettingStruct extends Struct
      */
     public function isSubscriptionsEnableBeta(): bool
     {
-        return $this->subscriptionsEnableBeta;
+        return (bool)$this->subscriptionsEnableBeta;
     }
 
     /**
@@ -550,7 +550,7 @@ class MollieSettingStruct extends Struct
      */
     public function isSubscriptionsShowIndicator(): bool
     {
-        return $this->subscriptionsShowIndicator;
+        return (bool)$this->subscriptionsShowIndicator;
     }
 
     /**
@@ -558,7 +558,7 @@ class MollieSettingStruct extends Struct
      */
     public function isSubscriptionsReminderEnabled(): bool
     {
-        return $this->subscriptionsReminderEnabled;
+        return (bool)$this->subscriptionsReminderEnabled;
     }
 
     /**
@@ -566,7 +566,7 @@ class MollieSettingStruct extends Struct
      */
     public function getSubscriptionsReminderDays(): int
     {
-        return $this->subscriptionsReminderDays;
+        return (int)$this->subscriptionsReminderDays;
     }
 
 

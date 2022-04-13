@@ -1,7 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Components\Subscription\Cart\Error\PaymentMethodAvailability;
+namespace Kiener\MolliePayments\Components\Subscription\Cart\Validator;
 
+use Kiener\MolliePayments\Components\Subscription\Cart\Error\PaymentMethodAvailabilityNotice;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Shopware\Core\Checkout\Cart\Cart;
@@ -12,7 +13,7 @@ use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 
-class PaymentMethodAvailabilityValidator implements CartValidatorInterface
+class AvailabilityInformationValidator implements CartValidatorInterface
 {
 
     /**
@@ -72,7 +73,6 @@ class PaymentMethodAvailabilityValidator implements CartValidatorInterface
     {
         $list = new ErrorCollection();
 
-        /** @var Error $error */
         foreach ($cart->getErrors() as $error) {
 
             if (!$error instanceof PaymentMethodAvailabilityNotice) {

@@ -1,4 +1,10 @@
 {
+  "checkout": {
+    "mollie-payments-cart-guest-account": "Guest Accounts cannot be used for subscription orders.",
+    "mollie-payments-cart-error-mixedcart": "Your cart contains multiple items in combination with subscription items. Please note you can only purchase 1 subscription item at a time.",
+    "mollie-payments-cart-error-paymentmethod-availability": "Not all payments methods are available when ordering subscription products.",
+    "mollie-payments-cart-error-method-invalid": "The currently selected payment method is not available for subscription products."
+  },
   "molliePayments": {
     "testMode": {
       "label": "testmodus"

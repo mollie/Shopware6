@@ -315,7 +315,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
      */
     public function cancelPendingSubscriptions(OrderEntity $order, SalesChannelContext $context): void
     {
-        # TODO
+        # does nothing for now, not necessary
     }
 
     /**
