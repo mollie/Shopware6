@@ -53,6 +53,9 @@ class MollieLimitsRemover
      * @param Container $container
      * @param SettingsService $pluginSettings
      * @param ActivePaymentMethodsProviderInterface $paymentMethodsProvider
+     * @param RouterInterface $router
+     * @param RequestStack $requestStack
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Container                             $container,
