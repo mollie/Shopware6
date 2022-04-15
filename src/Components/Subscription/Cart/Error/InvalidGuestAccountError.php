@@ -11,14 +11,6 @@ class InvalidGuestAccountError extends Error
 
 
     /**
-     *
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * @return string
      */
     public function getId(): string

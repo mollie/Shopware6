@@ -49,7 +49,7 @@ class SetupCommand extends Command
 
         $this
             ->setName((string)self::$defaultName)
-            ->setDescription('Installs and configures the the plugin without the need to disable and activate it again.');
+            ->setDescription('Installs and configures the plugin without the need to disable and activate it again.');
     }
 
     /**

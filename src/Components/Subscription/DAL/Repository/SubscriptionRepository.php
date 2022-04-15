@@ -46,8 +46,7 @@ class SubscriptionRepository
      */
     public function findById(string $id, Context $context): SubscriptionEntity
     {
-        $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('id', $id));
+        $criteria = new Criteria([$id]);
 
         return $this->repoSubscriptions->search($criteria, $context)->first();
     }

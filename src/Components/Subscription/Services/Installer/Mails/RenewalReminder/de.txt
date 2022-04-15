@@ -1,16 +1,16 @@
-Dear {{ customer.firstName }}
+Sehr geehrte(r) {{ customer.firstName }}
 
-Good news!
+Gute Nachrichten!
 
-We are getting your subscription ready for you.
+Wir bereiten Ihr Abonnement für Sie vor.
 
-<strong>Subscription</strong>: {{ subscription.description }}
-<strong>Next Renewal</strong>: {{ subscription.nextPaymentAt | date("m / d / Y", false) }}.
-<strong>Total Amount</strong>: {{ subscription.amount }} {{ subscription.currency }}
+Abonnement: {{ subscription.description }}
+Nächste Verlängerung: {{ subscription.nextPaymentAt | date("m / d / Y", false) }}.
+Gesamtbetrag: {{ subscription.amount }} {{ subscription.currency }}
 
-This e-mail is just to inform you that the payment is going to be captured on this date.
+Diese E-Mail soll Sie nur darüber informieren, dass die Zahlung an diesem Datum erfasst wird.
 
-For any changes, you can log in to your account on {{ salesChannel.name }} and pause or cancel the subscription at any time.
+Für Änderungen können Sie sich bei Ihrem Konto auf {{ salesChannel.name }} anmelden und das Abonnement jederzeit pausieren oder kündigen.
 
-Thanks you
+Danke
 {{ salesChannel.name }}

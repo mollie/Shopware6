@@ -49,10 +49,10 @@ class SubscriptionMetadata
      */
     public static function fromArray(array $metadata): SubscriptionMetadata
     {
-        $startDate = (count($metadata) > 0) ? (string)$metadata['start_date'] : '';
-        $intervalValue = (count($metadata) > 0) ? (int)$metadata['interval_value'] : 0;
-        $intervalUnit = (count($metadata) > 0) ? (string)$metadata['interval_unit'] : '';
-        $times = (count($metadata) > 0) ? $metadata['times'] : null;
+        $startDate = (array_key_exists('start_date', $metadata)) ? (string)$metadata['start_date'] : '';
+        $intervalValue = (array_key_exists('interval_value', $metadata)) ? (int)$metadata['interval_value'] : 0;
+        $intervalUnit = (array_key_exists('interval_unit', $metadata)) ? (string)$metadata['interval_unit'] : '';
+        $times = (array_key_exists('times', $metadata)) ? $metadata['times'] : null;
 
         return new SubscriptionMetadata(
             $startDate,

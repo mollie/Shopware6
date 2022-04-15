@@ -262,8 +262,8 @@ class SubscriptionManager implements SubscriptionManagerInterface
                 throw new Exception('Shopware Customer not found for Subscription! Cannot remind anyone!');
             }
 
-            $criteria = new Criteria();
-            $criteria->addFilter(new EqualsFilter('id', $subscription->getSalesChannelId()));
+            $criteria = new Criteria([$subscription->getSalesChannelId()]);
+
             $salesChannel = $this->repoSalesChannel->search($criteria, $context)->first();
 
             # --------------------------------------------------------------------------------------------------

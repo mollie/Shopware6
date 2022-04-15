@@ -16,12 +16,14 @@ class PaymentMethodAvailabilityNotice extends Error
      */
     private $lineItemId;
 
+
     /**
      * @param string $lineItemId
      */
     public function __construct(string $lineItemId)
     {
         $this->lineItemId = $lineItemId;
+
         parent::__construct();
     }
 
