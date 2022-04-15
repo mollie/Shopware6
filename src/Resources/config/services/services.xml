@@ -66,6 +66,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Hydrator\RefundHydrator"/>
+            <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\Stock\StockManager">

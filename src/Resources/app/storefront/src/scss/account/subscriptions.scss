@@ -1,0 +1,22 @@
+.order-table-header-heading.heading-mollie-subscriptions {
+  max-width: 350px;
+}
+
+.order-item-status-badge.order-item-status-badge-active {
+  background-color: #26b6cf;
+  color: #fff;
+  margin: 10px 0;
+}
+.order-item-status-badge.order-item-status-badge-canceled {
+  background-color: #ffb100;
+  color: #fff;
+  margin: 10px 0;
+}
+
+.order-table-header-description {
+  padding: 0 !important;
+  display: block;
+  font-weight: 400;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}

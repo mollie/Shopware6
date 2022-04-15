@@ -1,0 +1,20 @@
+{% sw_extends '@Storefront/storefront/page/checkout/address/register.html.twig' %}
+
+
+ {% block page_checkout_register_personal_guest %}
+
+     {% set isMollieSubscription = false %}
+     {% for element in page.cart.data.elements %}
+         {% if(element._entityName == "product" and element.customFields.mollie_payments_product_subscription_enabled) %}
+             {% set isMollieSubscription = true %}
+         {% endif %}
+     {% endfor %}
+
+     {% if(isMollieSubscription == true) %}
+         {# we must require a registration, so hide the "do not create customer" checkbox #}
+     {% else %}
+         {{ parent() }}
+     {% endif %}
+
+ {% endblock %}
+

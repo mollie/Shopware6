@@ -1,4 +1,10 @@
 {
+  "checkout": {
+    "mollie-payments-cart-guest-account": "Gäste Konten können nicht für Bestellungen von Abonnements benutzt werden.",
+    "mollie-payments-cart-error-mixedcart": "Ihr Warenkorb enthält mehrere Artikel in Kombination mit Abonnementartikeln. Bitte beachten Sie, dass Sie jeweils nur 1 Abonnementartikel kaufen können.",
+    "mollie-subscription-line-item-notice": "Bei der Bestellung von Abonnementprodukten sind nicht alle Zahlungsmethoden verfügbar.",
+    "mollie-payments-cart-error-method-invalid": "Die aktuell gewählte Zahlungsmethode ist nicht für Abonnementprodukte verfügbar."
+  },
   "molliePayments": {
     "testMode": {
       "label": "Testmodus"
@@ -27,6 +33,33 @@
         "captionSubtotal": "Zwischensumme",
         "captionTaxes": "Steuern",
         "paymentError": "Die Zahlung mit Apple Pay ist fehlgeschlagen."
+      }
+    },
+    "subscriptions": {
+      "product": {
+        "information": "Abonnementprodukt",
+        "addToCartText": "Abonnieren"
+      },
+      "options": {
+        "everyDay": "Jeden Tag",
+        "everyDays": "Alle %1% Tage",
+        "everyWeek": "Jede Woche",
+        "everyWeeks": "Alle %1% Wochen",
+        "everyMonth": "Jeden Monat",
+        "everyMonths": "Alle %1% Monate"
+      },
+      "account": {
+        "mollieSubscriptionsLink": "Abonnements",
+        "mollieSubscriptionsTitle": "Abonnements",
+        "mollieSubscriptionsWelcome": "Ihre letzten Abonnements:",
+        "mollieSubscriptionsInfoEmpty": "Sie haben noch keine Abonnements.",
+        "mollieSubscriptionsHeadline": "Abonnement:",
+        "mollieSubscriptionId": "Id",
+        "mollieSubscriptionAmount": "Betragen",
+        "mollieSubscriptionNextPayment": "Nächste Zahlung um",
+        "mollieSubscriptionCancel": "Abbrechen",
+        "mollieSubscriptionContextMenuReorder": "Abo wiederholen",
+        "cancelSubscription": "Das Abonnement wurde gekündigt"
       }
     }
   }

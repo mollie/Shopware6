@@ -5,6 +5,7 @@
 [![Minimum PHP Version](https://img.shields.io/badge/php-%3E%3D%207.2-8892BF.svg?style=flat)](https://php.net/)  ![Build Status](https://github.com/mollie/Shopware6/actions/workflows/ci_pipe.yml/badge.svg) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/mollie/Shopware6) ![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/mollie/Shopware6/latest)
 
 
+
 ## Introduction
 Mollie offers various payment methods which can be easily integrated into your Shopware-powered webshop by using our official plugin. Mollie accepts all major payment methods such as Visa, Mastercard, American Express, PayPal, iDEAL, SOFORT Banking, SEPA Bank Transfer, SEPA Direct Debit, Apple Pay, KBC/CBC Payment Button, Bancontact, Belfius Pay Button, paysafecard, CartaSi, Cartes Bancaires, Gift cards, Monizze Vouchers and Sodexo Vouchers.
 
@@ -12,7 +13,7 @@ Mollie offers various payment methods which can be easily integrated into your S
 2.  Go to  [Mollie](https://www.mollie.com/signup/)  to create your Mollie account
 3.  Download our plugin in the Shopware store or in the Plugin Manager in your Shopware Backend
 4.  Activate the plugin and enter your Mollie API key
-5.  Assign the payment methods to your sales channels as necessary 
+5.  Assign the payment methods to your sales channels as necessary
 
 Once the onboarding process in your Mollie account is completed, start accepting payments. You’ll usually be up and running within one working day.
 

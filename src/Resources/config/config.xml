@@ -4,7 +4,7 @@
 
     <card>
         <title>
-            
+
         </title>
         <component name="mollie-pluginconfig-section-info">
             <name>molliePluginConfigSectionInfo</name>
@@ -399,5 +399,52 @@
                 </option>
             </options>
         </input-field>
+    </card>
+
+    <card>
+        <title>Subscriptions</title>
+        <title lang="de-DE">Abonnements</title>
+        <title lang="nl-NL">Abonnementen</title>
+        <input-field type="bool">
+            <name>subscriptionsEnableBeta</name>
+            <defaultValue>false</defaultValue>
+            <label>Enable Subscriptions BETA</label>
+            <label lang="de-DE">Abonnements BETA aktivieren</label>
+            <label lang="nl-NL">Abonnementen BETA inschakelen</label>
+            <helpText>Enables the new BETA version of the subscriptions in the plugin.</helpText>
+            <helpText lang="de-DE"></helpText>
+            <helpText lang="nl-NL"></helpText>
+        </input-field>
+        <input-field type="bool">
+            <name>subscriptionsShowIndicator</name>
+            <defaultValue>true</defaultValue>
+            <label>Show Subscription Indicator</label>
+            <label lang="de-DE">Abonnementetikett auf Produktseite anzeigen</label>
+            <label lang="nl-NL">Label Abonnementen weergeven op productpagina</label>
+            <helpText>Shows a subscription indicator on the product detail page of a subscription product.</helpText>
+            <helpText lang="de-DE"></helpText>
+            <helpText lang="nl-NL"></helpText>
+        </input-field>
+        <input-field type="bool">
+            <name>subscriptionsReminderEnabled</name>
+            <defaultValue>false</defaultValue>
+            <label>Enable Events for Renewal Reminders</label>
+            <label lang="de-DE">Events für Aboverlängerungen aktivieren</label>
+            <label lang="nl-NL"></label>
+            <helpText>If enabled, the plugin will automatically fire renewal reminder events for Flow Builder and Business Events that can be used to send out emails to customers or other actions.</helpText>
+            <helpText lang="de-DE"></helpText>
+            <helpText lang="nl-NL"></helpText>
+        </input-field>
+        <input-field type="int">
+            <name>subscriptionsReminderDays</name>
+            <defaultValue>2</defaultValue>
+            <label>Remind days before renewal</label>
+            <label lang="de-DE"></label>
+            <label lang="nl-NL"></label>
+            <helpText>Set the days in prior to the actual renewal for sending renewal reminder events in the system.</helpText>
+            <helpText lang="de-DE"></helpText>
+            <helpText lang="nl-NL"></helpText>
+        </input-field>
+
     </card>
 </config>

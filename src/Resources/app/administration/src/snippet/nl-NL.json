@@ -15,6 +15,8 @@
     }
   },
   "mollie-payments": {
+    "pluginTitle": "Mollie",
+    "pluginDescription": "Mollie Module",
     "general": {
       "mainMenuItemGeneral": "Mollie betalingen",
       "descriptionTextModule": "Mollie betalingen",
@@ -58,6 +60,10 @@
           "link": "Open betalingslimieten van Mollie"
         }
       }
+    },
+    "rules": {
+      "itemSubscriptionRule": "Item is subscription (Mollie)",
+      "cartSubscriptionRule": "Cart has subscription items (Mollie)"
     },
     "refunds": {
       "status": {
@@ -157,6 +163,18 @@
         }
       }
     },
+    "vouchers": {
+      "CARD_TITLE": "Voucher",
+      "VOUCHER_INFO_TITLE": "Voucher Betalingen",
+      "VOUCHER_INFO_DESCRIPTION": "Met Mollie kunt u in uw online winkel eenvoudig betalingen accepteren met Eco-, cadeau- en maaltijdcheques - een slimme keuze om de verkoop te stimuleren en uw klanten tevreden te stellen. De betaalmethode \"voucher\" is alleen zichtbaar als u ten minste 1 product met de toegewezen type \"voucher\", in de winkelwagen heeft.",
+      "VOUCHER_INFO_DEFAULTLANGUAGE": "Let op, deze configuratie kan alleen worden bewerkt in uw standaard taal. Wijzig uw taal om het vouchertype van dit product te veranderen.",
+      "VOUCHER_BTN_READMORE": "Lees meer",
+      "VOUCHER_TYPE_CAPTION": "Vouchertype voor product",
+      "VOUCHER_TYPE_VALUE_NONE": "Geen vouchertype",
+      "VOUCHER_TYPE_VALUE_ECO": "Eco",
+      "VOUCHER_TYPE_VALUE_MEAL": "Meal",
+      "VOUCHER_TYPE_VALUE_VOUCHER": "Gift"
+    },
     "modals": {
       "shipping": {
         "title": "Verzenden bij Mollie",
@@ -221,6 +239,60 @@
           "automaticShipping": "Automatische verzending in plugin configuratie"
         }
       }
+    },
+    "subscriptions": {
+      "status": {
+        "pending": "Pending",
+        "active": "Active",
+        "canceled": "Canceled",
+        "suspended": "Suspended",
+        "completed": "Completed"
+      },
+      "navigation": {
+        "title": "Mollie Abonnementen"
+      },
+      "TYPE_DAYS": "Dag(en)",
+      "TYPE_WEEKS": "Weken",
+      "TYPE_MONTHS": "Maanden",
+      "list": {
+        "title": "Abonnementen",
+        "columns": {
+          "customer": "Klant",
+          "subscription_id": "Mollie ID",
+          "customer_id": "Mollie Klant",
+          "status": "Toestand",
+          "canceledAt": "",
+          "description": "Beschrijving",
+          "createdAt": "Gemaakt bij",
+          "amount": "Hoeveelheid",
+          "quantity": "",
+          "nextPaymentAt": "",
+          "prePaymentReminder": "",
+          "action": {
+            "cancel": "Annuleer abonnement",
+            "success": "Het abonnement is opgezegd.",
+            "error": "Fout bij opzeggen abonnement. Meer informatie in de logboeken."
+          }
+        }
+      },
+      "product": {
+        "card-title": "Abonnement",
+        "title": "Mollie Abonnementen",
+        "description": "Het beheren van uw terugkerende betalingen is eenvoudiger dan ooit met onze handige functies. Breng uw bedrijf naar een hoger niveau met efficiënte trackingopties, eenvoudige integraties en meer. Met Mollie-abonnementen kun je eenvoudig abonnementsproducten maken en terugkerende betalingen plannen die plaatsvinden op het ingestelde interval en de ingestelde periode.",
+        "mollieSubscriptionProduct": "Is dit een abonnementsproduct?",
+        "mollieSubscriptionIntervalAmount": "Herhaal betaling elke",
+        "mollieSubscriptionIntervalType": "Type abonnementsinterval",
+        "mollieSubscriptionRepetitionAmount": "Herhaal betaling",
+        "mollieSubscriptionRepetitionPlaceholder": "Nummer invoeren of leeg laten",
+        "infoDefaultLanguage": "Let op, deze configuratie kan alleen in uw standaardtaal worden bewerkt. Wijzig uw taal om de abonnementsinstellingen van dit product te wijzigen.",
+        "btnReadMore": "Lees meer"
+      }
+    },
+    "sw-order-list": {
+      "columns": {
+        "mollie": "Mollie"
+      },
+      "badgeSubscription": "Abo Bestellung"
     }
   },
   "sw-order": {
@@ -235,6 +307,7 @@
       "totalRemaining": "Terug te betalen",
       "totalVouchers": "Voucher",
       "totalShipments": "Verzonden bedrag ({quantity} items)",
+      "subscriptionBadge": "Abonnement besteling",
       "refundManager": {
         "title": "Terugbetaling via Mollie",
         "btnOpenRefundManager": "Refund Manager openen",

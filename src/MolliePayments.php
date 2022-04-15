@@ -2,10 +2,11 @@
 
 namespace Kiener\MolliePayments;
 
+use Exception;
 use Kiener\MolliePayments\Compatibility\DependencyLoader;
-use Kiener\MolliePayments\Service\ApplePayDirect\ApplePayDomainVerificationService;
+use Kiener\MolliePayments\Components\Installer\PluginInstaller;
 use Kiener\MolliePayments\Service\CustomFieldService;
-use Kiener\MolliePayments\Service\PaymentMethodService;
+use KlarnaPayment\Installer\Modules\CustomFieldInstaller;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\Plugin;
@@ -21,8 +22,10 @@ class MolliePayments extends Plugin
 
     const PLUGIN_VERSION = '2.2.0';
 
+
     /**
      * @param ContainerBuilder $container
+     * @throws Exception
      */
     public function build(ContainerBuilder $container): void
     {
@@ -36,11 +39,18 @@ class MolliePayments extends Plugin
         $loader->loadServices();
     }
 
+    /**
+     * @return void
+     */
     public function boot(): void
     {
         parent::boot();
     }
 
+    /**
+     * @param InstallContext $context
+     * @return void
+     */
     public function install(InstallContext $context): void
     {
         parent::install($context);
@@ -57,57 +67,72 @@ class MolliePayments extends Plugin
         $customFieldService->addCustomFields($context->getContext());
     }
 
+    /**
+     * @param UpdateContext $context
+     * @return void
+     * @throws \Doctrine\DBAL\Exception
+     */
     public function update(UpdateContext $context): void
     {
         parent::update($context);
 
         if ($context->getPlugin()->isActive() === true) {
-            // Install and activate payment methods
-            $this->installAndActivatePaymentMethods($context->getContext());
-
-            // add domain verification
-            /** @var ApplePayDomainVerificationService $domainVerificationService */
-            $domainVerificationService = $this->container->get(ApplePayDomainVerificationService::class);
-            $domainVerificationService->downloadDomainAssociationFile();
+            # only prepare our whole plugin
+            # if it is indeed active at the moment.
+            # otherwise service would not be found of course
+            $this->preparePlugin($context->getContext());
         }
     }
 
+    /**
+     * @param InstallContext $context
+     * @return void
+     */
     public function postInstall(InstallContext $context): void
     {
         parent::postInstall($context);
     }
 
+    /**
+     * @param UninstallContext $context
+     * @return void
+     */
     public function uninstall(UninstallContext $context): void
     {
         parent::uninstall($context);
     }
 
+    /**
+     * @param ActivateContext $context
+     * @return void
+     * @throws \Doctrine\DBAL\Exception
+     */
     public function activate(ActivateContext $context): void
     {
         parent::activate($context);
 
-        // Install and activate payment methods
-        $this->installAndActivatePaymentMethods($context->getContext());
-
-        // Add domain verification
-        /** @var ApplePayDomainVerificationService $domainVerificationService */
-        $domainVerificationService = $this->container->get(ApplePayDomainVerificationService::class);
-        $domainVerificationService->downloadDomainAssociationFile();
+        $this->preparePlugin($context->getContext());
     }
 
+    /**
+     * @param DeactivateContext $context
+     */
     public function deactivate(DeactivateContext $context): void
     {
         parent::deactivate($context);
     }
 
+
     /**
      * @param Context $context
+     * @throws \Doctrine\DBAL\Exception
      */
-    private function installAndActivatePaymentMethods(Context $context): void
+    private function preparePlugin(Context $context): void
     {
-        /** @var PaymentMethodService $paymentMethodService */
-        $paymentMethodService = $this->container->get(PaymentMethodService::class);
+        /** @var PluginInstaller $pluginInstaller */
+        $pluginInstaller = $this->container->get(PluginInstaller::class);
 
-        $paymentMethodService->installAndActivatePaymentMethods($context);
+        $pluginInstaller->install($context);
     }
+
 }

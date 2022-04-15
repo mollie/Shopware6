@@ -6,6 +6,7 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
+use Shopware\Core\Content\MailTemplate\MailTemplateEntity;
 use Shopware\Core\Framework\Struct\Struct;
 
 class MollieSettingStruct extends Struct
@@ -134,6 +135,27 @@ class MollieSettingStruct extends Struct
      * @var string
      */
     protected $orderStateWithAChargebackTransaction = self::ORDER_STATE_SKIP;
+
+    /**
+     * @var bool
+     */
+    protected $subscriptionsEnableBeta;
+
+    /**
+     * @var bool
+     */
+    protected $subscriptionsShowIndicator;
+
+    /**
+     * @var bool
+     */
+    protected $subscriptionsReminderEnabled;
+
+    /**
+     * @var int
+     */
+    protected $subscriptionsReminderDays;
+
 
     /**
      * @return string
@@ -274,7 +296,7 @@ class MollieSettingStruct extends Struct
      */
     public function getUseMolliePaymentMethodLimits(): bool
     {
-        return (bool) $this->useMolliePaymentMethodLimits;
+        return (bool)$this->useMolliePaymentMethodLimits;
     }
 
     /**
@@ -514,5 +536,38 @@ class MollieSettingStruct extends Struct
     {
         $this->refundManagerShowInstructions = $refundManagerShowInstructions;
     }
+
+    /**
+     * @return bool
+     */
+    public function isSubscriptionsEnableBeta(): bool
+    {
+        return (bool)$this->subscriptionsEnableBeta;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSubscriptionsShowIndicator(): bool
+    {
+        return (bool)$this->subscriptionsShowIndicator;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSubscriptionsReminderEnabled(): bool
+    {
+        return (bool)$this->subscriptionsReminderEnabled;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSubscriptionsReminderDays(): int
+    {
+        return (int)$this->subscriptionsReminderDays;
+    }
+
 
 }

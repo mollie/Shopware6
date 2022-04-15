@@ -1,6 +1,6 @@
 {
   "bootstrap": "./phpunit.autoload.php",
-  "minMsi": 20,
+  "minMsi": 19,
   "minCoveredMsi": 20,
   "source": {
     "directories": [
@@ -9,7 +9,8 @@
     "excludes": [
       "Resources",
       "Compatibility/Storefront/Route/PaymentMethodRoute/Voucher",
-      "Compatibility/Storefront/Route/PaymentMethodRoute/MollieLimits"
+      "Compatibility/Storefront/Route/PaymentMethodRoute/MollieLimits",
+      "Compatibility/Storefront/Route/PaymentMethodRoute/Subscription"
     ]
   },
   "mutators": {

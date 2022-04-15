@@ -5,18 +5,15 @@ import './components/mollie-pluginconfig-section-api';
 import './components/mollie-pluginconfig-section-payments';
 import './components/mollie-tracking-info';
 import './components/mollie-refund-manager';
+import './page/mollie-subscriptions-list';
 
-
-import deDE from '../../snippet/de-DE.json';
-import enGB from '../../snippet/en-GB.json';
-import nlNL from '../../snippet/nl-NL.json'
 
 // eslint-disable-next-line no-undef
-const { Module } = Shopware;
+const {Module} = Shopware;
 
 Module.register('mollie-payments', {
     type: 'plugin',
-    name: 'MolliePayments',
+    name: 'mollie-payments.pluginTitle',
     title: 'mollie-payments.general.mainMenuItemGeneral',
     description: 'mollie-payments.general.descriptionTextModule',
     version: '1.0.0',
@@ -24,10 +21,22 @@ Module.register('mollie-payments', {
     color: '#333',
     icon: 'default-action-settings',
 
-    snippets: {
-        'de-DE': deDE,
-        'en-GB': enGB,
-        'nl-NL': nlNL,
+    routes: {
+        subscriptions: {
+            component: 'mollie-subscriptions-list',
+            path: 'subscriptions',
+        },
     },
+
+    navigation: [
+        {
+            id: 'mollie-subscriptions',
+            label: 'mollie-payments.subscriptions.navigation.title',
+            privilege: 'order.viewer',
+            path: 'mollie.payments.subscriptions',
+            parent: 'sw-order',
+            position: 10,
+        },
+    ],
 
 });

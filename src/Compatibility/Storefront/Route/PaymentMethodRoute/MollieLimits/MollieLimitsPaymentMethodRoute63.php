@@ -66,10 +66,11 @@ class MollieLimitsPaymentMethodRoute63 extends AbstractPaymentMethodRoute
      * @param Request $request
      * @param SalesChannelContext $context
      * @return PaymentMethodRouteResponse
+     * @throws \Exception
      */
     public function load(Request $request, SalesChannelContext $context): PaymentMethodRouteResponse
     {
-        $originalData = $this->corePaymentMethodRoute->load($request, $context, $criteria);
+        $originalData = $this->corePaymentMethodRoute->load($request, $context);
 
         return $this->mollieLimits->removePaymentMethods($originalData, $context);
     }

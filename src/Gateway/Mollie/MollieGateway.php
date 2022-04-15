@@ -4,10 +4,14 @@ namespace Kiener\MolliePayments\Gateway\Mollie;
 
 
 use Kiener\MolliePayments\Factory\MollieApiFactory;
+use Kiener\MolliePayments\Gateway\Mollie\Model\SubscriptionDefinitionInterface;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order;
+use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\Profile;
+use Mollie\Api\Resources\Subscription;
+use Mollie\Api\Resources\SubscriptionCollection;
 
 
 class MollieGateway implements MollieGatewayInterface
@@ -22,7 +26,6 @@ class MollieGateway implements MollieGatewayInterface
      * @var MollieApiFactory
      */
     private $factory;
-
 
 
     /**
@@ -101,6 +104,52 @@ class MollieGateway implements MollieGatewayInterface
         );
 
         return $order;
+    }
+
+    /**
+     * @param string $paymentId
+     * @return Payment
+     * @throws \Mollie\Api\Exceptions\ApiException
+     */
+    public function getPayment(string $paymentId): Payment
+    {
+        return $this->apiClient->payments->get($paymentId);
+    }
+
+    /**
+     * @param string $customerID
+     * @param array<mixed> $data
+     * @return Subscription
+     * @throws \Mollie\Api\Exceptions\ApiException
+     */
+    public function createSubscription(string $customerID, array $data): Subscription
+    {
+        return $this->apiClient->subscriptions->createForId($customerID, $data);
+    }
+
+    /**
+     * @param string $subscriptionId
+     * @param string $customerId
+     * @return void
+     * @throws \Mollie\Api\Exceptions\ApiException
+     */
+    public function cancelSubscription(string $subscriptionId, string $customerId): void
+    {
+        $this->apiClient->subscriptions->cancelForId(
+            $customerId,
+            $subscriptionId
+        );
+    }
+
+    /**
+     * @param string $subscriptionId
+     * @param string $customerId
+     * @return Subscription
+     * @throws \Mollie\Api\Exceptions\ApiException
+     */
+    public function getSubscription(string $subscriptionId, string $customerId): Subscription
+    {
+        return $this->apiClient->subscriptions->getForId($customerId, $subscriptionId);
     }
 
 }

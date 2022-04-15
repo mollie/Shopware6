@@ -1,0 +1,9 @@
+{% block sw_condition_value_content %}
+    <sw-single-select name="mollie-cart-subscription-rule"
+                      id="mollie-cart-subscription-rule"
+                      size="medium"
+                      :options="selectValues"
+                      v-model="isSubscription"
+                      class="field--main">
+    </sw-single-select>
+{% endblock %}

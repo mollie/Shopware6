@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Subscriber;
 
 
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund\RefundStartedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionRemindedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookReceivedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedAuthorizedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedCancelledEvent;
@@ -15,6 +16,7 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatus
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedPartialRefundedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedPendingEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedRefundedEvent;
+use Kiener\MolliePayments\Components\Subscription\BusinessEvent\RenewalReminderEvent;
 use Shopware\Core\Framework\Event\BusinessEventCollector;
 use Shopware\Core\Framework\Event\BusinessEventCollectorEvent;
 use Shopware\Core\Framework\Event\BusinessEventDefinition;
@@ -102,6 +104,10 @@ class BusinessEventCollectorSubscriber implements EventSubscriberInterface
 
         /** @var BusinessEventDefinition $definition */
         $definition = $this->businessEventCollector->define(WebhookReceivedPartialRefundedEvent::class);
+        $collection->set($definition->getName(), $definition);
+
+        /** @var BusinessEventDefinition $definition */
+        $definition = $this->businessEventCollector->define(SubscriptionRemindedEvent::class);
         $collection->set($definition->getName(), $definition);
 
     }

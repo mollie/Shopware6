@@ -306,8 +306,6 @@ class CustomerService
             $criteria = new Criteria();
             $criteria->addFilter(new EqualsFilter('id', $customerId));
             $criteria->addAssociations([
-                'activeShippingAddress.country',
-                'activeBillingAddress.country',
                 'defaultShippingAddress.country',
                 'defaultBillingAddress.country',
             ]);
