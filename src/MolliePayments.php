@@ -9,6 +9,7 @@ use Kiener\MolliePayments\Service\CustomFieldService;
 use KlarnaPayment\Installer\Modules\CustomFieldInstaller;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\Migration\MigrationCollection;
 use Shopware\Core\Framework\Plugin;
 use Shopware\Core\Framework\Plugin\Context\ActivateContext;
 use Shopware\Core\Framework\Plugin\Context\DeactivateContext;
@@ -65,6 +66,8 @@ class MolliePayments extends Plugin
         );
 
         $customFieldService->addCustomFields($context->getContext());
+
+        $this->runDbMigrations($context->getMigrationCollection());
     }
 
     /**
@@ -81,6 +84,8 @@ class MolliePayments extends Plugin
             # if it is indeed active at the moment.
             # otherwise service would not be found of course
             $this->preparePlugin($context->getContext());
+
+            $this->runDbMigrations($context->getMigrationCollection());
         }
     }
 
@@ -112,6 +117,8 @@ class MolliePayments extends Plugin
         parent::activate($context);
 
         $this->preparePlugin($context->getContext());
+
+        $this->runDbMigrations($context->getMigrationCollection());
     }
 
     /**
@@ -133,6 +140,15 @@ class MolliePayments extends Plugin
         $pluginInstaller = $this->container->get(PluginInstaller::class);
 
         $pluginInstaller->install($context);
+    }
+
+    /**
+     * @param MigrationCollection $migrationCollection
+     * @return void
+     */
+    private function runDbMigrations(MigrationCollection $migrationCollection): void
+    {
+        $migrationCollection->migrateInPlace();
     }
 
 }
