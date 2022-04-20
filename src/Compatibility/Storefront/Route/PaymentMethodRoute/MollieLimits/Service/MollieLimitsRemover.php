@@ -13,8 +13,10 @@ use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRouteResponse;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\CheckoutController;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
+use Symfony\Component\Routing\Router;
 
 
 class MollieLimitsRemover
@@ -35,7 +37,7 @@ class MollieLimitsRemover
     private $paymentMethodsProvider;
 
     /**
-     * @var RouterInterface
+     * @var RequestMatcherInterface
      */
     private $router;
 
@@ -53,7 +55,7 @@ class MollieLimitsRemover
      * @param Container $container
      * @param SettingsService $pluginSettings
      * @param ActivePaymentMethodsProviderInterface $paymentMethodsProvider
-     * @param RouterInterface $router
+     * @param RequestMatcherInterface $router
      * @param RequestStack $requestStack
      * @param LoggerInterface $logger
      */
@@ -61,7 +63,7 @@ class MollieLimitsRemover
         Container                             $container,
         SettingsService                       $pluginSettings,
         ActivePaymentMethodsProviderInterface $paymentMethodsProvider,
-        RouterInterface                       $router,
+        RequestMatcherInterface               $router,
         RequestStack                          $requestStack,
         LoggerInterface                       $logger
     )
@@ -174,7 +176,13 @@ class MollieLimitsRemover
     private function inCheckout(): bool
     {
         try {
-            $currentRoute = $this->router->matchRequest($this->requestStack->getCurrentRequest());
+            $request = $this->requestStack->getCurrentRequest();
+
+            if(!$request instanceof Request) {
+                return false;
+            }
+
+            $currentRoute = $this->router->matchRequest($request);
             $currentController = current(explode('::', $currentRoute['_controller']));
         } catch (\Throwable $e) {
             $this->logger

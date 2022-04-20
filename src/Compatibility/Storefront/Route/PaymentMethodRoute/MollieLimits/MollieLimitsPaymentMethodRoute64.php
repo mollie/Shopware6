@@ -28,9 +28,7 @@ class MollieLimitsPaymentMethodRoute64 extends AbstractPaymentMethodRoute
 
     /**
      * @param AbstractPaymentMethodRoute $corePaymentMethodRoute
-     * @param Container $container
-     * @param SettingsService $pluginSettings
-     * @param ActivePaymentMethodsProviderInterface $paymentMethodsProvider
+     * @param MollieLimitsRemover $mollieLimits
      */
     public function __construct(AbstractPaymentMethodRoute $corePaymentMethodRoute, MollieLimitsRemover $mollieLimits)
     {
