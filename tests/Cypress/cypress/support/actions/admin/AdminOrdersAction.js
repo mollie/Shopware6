@@ -17,14 +17,9 @@ export default class AdminOrdersAction {
     openOrders() {
         cy.wait(200);
         repoMainMenu.getOrders().click();
-
-        if (shopware.isVersionGreaterEqual(6.4)) {
-            // starting with Shopware 6.4, we have to click
-            // on the overview sub menu entry
-            cy.wait(1000);
-            repoMainMenu.getOrdersOverview().click();
-            cy.wait(1000);
-        }
+        cy.wait(1000);
+        repoMainMenu.getOrdersOverview().click();
+        cy.wait(1000);
     }
 
     /**

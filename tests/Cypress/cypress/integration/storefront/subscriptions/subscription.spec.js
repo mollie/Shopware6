@@ -101,11 +101,17 @@ describe('Subscription', () => {
                 // verify our warning information on the cart page
                 cy.contains('Not all payments methods are available when ordering subscription products');
 
+
                 // now open our payment methods and verify
                 // that some of them are not available
                 // this is a check to at least see that it does something
                 // we also verify that we see all available methods (just to also check if mollie is even configured correctly).
-                paymentAction.showAllPaymentMethods();
+                if (shopware.isVersionGreaterEqual(6.4)) {
+                    paymentAction.showAllPaymentMethods();
+                } else {
+                    paymentAction.openPaymentsModal();
+                }
+
                 cy.contains('Pay later').should('not.exist');
                 cy.contains('paysafecard').should('not.exist');
 
@@ -118,6 +124,9 @@ describe('Subscription', () => {
                 cy.contains('Giropay').should('exist');
                 cy.contains('PayPal').should('exist');
 
+                if (shopware.isVersionLower(6.4)) {
+                    paymentAction.closePaymentsModal();
+                }
 
                 paymentAction.switchPaymentMethod('Credit card');
 
