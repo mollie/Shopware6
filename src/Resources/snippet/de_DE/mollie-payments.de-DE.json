@@ -5,6 +5,12 @@
     "mollie-subscription-line-item-notice": "Bei der Bestellung von Abonnementprodukten sind nicht alle Zahlungsmethoden verfügbar.",
     "mollie-payments-cart-error-method-invalid": "Die aktuell gewählte Zahlungsmethode ist nicht für Abonnementprodukte verfügbar."
   },
+  "error": {
+    "mollie-payments-cart-guest-account": "Gäste Konten können nicht für Bestellungen von Abonnements benutzt werden.",
+    "mollie-payments-cart-error-mixedcart": "Ihr Warenkorb enthält mehrere Artikel in Kombination mit Abonnementartikeln. Bitte beachten Sie, dass Sie jeweils nur 1 Abonnementartikel kaufen können.",
+    "mollie-subscription-line-item-notice": "Bei der Bestellung von Abonnementprodukten sind nicht alle Zahlungsmethoden verfügbar.",
+    "mollie-payments-cart-error-method-invalid": "Die aktuell gewählte Zahlungsmethode ist nicht für Abonnementprodukte verfügbar."
+  },
   "molliePayments": {
     "testMode": {
       "label": "Testmodus"
