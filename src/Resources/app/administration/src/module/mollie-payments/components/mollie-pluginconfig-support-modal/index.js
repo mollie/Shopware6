@@ -94,7 +94,17 @@ Component.register('mollie-pluginconfig-support-modal', {
         },
 
         userName() {
-            return `${this.user?.firstName} ${this.user?.lastName}`.trim() ?? this.user?.userName ?? '';
+            if (!this.user) {
+                return '';
+            }
+
+            const fullName = `${this.user.firstName} ${this.user.lastName}`.trim();
+
+            if (!string.isEmptyOrSpaces(fullName)) {
+                return fullName;
+            }
+
+            return this.user.username;
         },
 
         plugins() {
