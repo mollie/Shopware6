@@ -2,31 +2,29 @@
 
 namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\MollieLimits\Service;
 
-use Kiener\MolliePayments\Service\Cart\Voucher\VoucherCartCollector;
-use Kiener\MolliePayments\Service\Cart\Voucher\VoucherService;
 use Kiener\MolliePayments\Service\Payment\Provider\ActivePaymentMethodsProviderInterface;
 use Kiener\MolliePayments\Service\SettingsService;
-use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
 use Mollie\Api\Resources\Method;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
-use Shopware\Core\Checkout\Payment\SalesChannel\AbstractPaymentMethodRoute;
 use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRouteResponse;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Shopware\Storefront\Controller\CheckoutController;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
+use Symfony\Component\Routing\Router;
 
 
 class MollieLimitsRemover
 {
-
     /**
-     * @var ActivePaymentMethodsProviderInterface
+     * @var Container
      */
-    private $paymentMethodsProvider;
+    private $container;
 
     /**
      * @var SettingsService
@@ -34,21 +32,49 @@ class MollieLimitsRemover
     private $pluginSettings;
 
     /**
-     * @var Container
+     * @var ActivePaymentMethodsProviderInterface
      */
-    private $container;
+    private $paymentMethodsProvider;
 
+    /**
+     * @var RequestMatcherInterface
+     */
+    private $router;
+
+    /**
+     * @var RequestStack
+     */
+    private $requestStack;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
      * @param Container $container
      * @param SettingsService $pluginSettings
      * @param ActivePaymentMethodsProviderInterface $paymentMethodsProvider
+     * @param RequestMatcherInterface $router
+     * @param RequestStack $requestStack
+     * @param LoggerInterface $logger
      */
-    public function __construct( Container $container, SettingsService $pluginSettings, ActivePaymentMethodsProviderInterface $paymentMethodsProvider)
+    public function __construct(
+        Container                             $container,
+        SettingsService                       $pluginSettings,
+        ActivePaymentMethodsProviderInterface $paymentMethodsProvider,
+        RequestMatcherInterface               $router,
+        RequestStack                          $requestStack,
+        LoggerInterface                       $logger
+    )
     {
         $this->container = $container;
         $this->pluginSettings = $pluginSettings;
         $this->paymentMethodsProvider = $paymentMethodsProvider;
+
+        $this->router = $router;
+        $this->requestStack = $requestStack;
+        $this->logger = $logger;
     }
 
 
@@ -65,6 +91,10 @@ class MollieLimitsRemover
         # if we do not use the limits
         # then just return everything
         if (!$settings->getUseMolliePaymentMethodLimits()) {
+            return $originalData;
+        }
+
+        if (!$this->inCheckout()) {
             return $originalData;
         }
 
@@ -131,4 +161,42 @@ class MollieLimitsRemover
         return $service;
     }
 
+    /**
+     * This tries to get the current route/controller from the current request to determine if we're in the checkout.
+     * The CheckoutController encompasses the following routes:
+     * GET /checkout/cart
+     * GET /checkout/confirm
+     * GET /checkout/finish
+     * POST /checkout/order
+     * GET /widgets/checkout/info
+     * GET /checkout/offcanvas
+     *
+     * @return bool
+     */
+    private function inCheckout(): bool
+    {
+        try {
+            $request = $this->requestStack->getCurrentRequest();
+
+            if(!$request instanceof Request) {
+                return false;
+            }
+
+            $currentRoute = $this->router->matchRequest($request);
+            $currentController = current(explode('::', $currentRoute['_controller']));
+        } catch (\Throwable $e) {
+            $this->logger
+                ->error('An error occurred determining current controller', [
+                    'exception' => $e,
+                    'request_stack' => $this->requestStack,
+                    'matched_route' => $currentRoute ?? null,
+                    'matched_controller' => $currentController ?? null,
+                ]);
+
+            // Make sure Shopware will behave normally in the case of an error.
+            return false;
+        }
+
+        return $currentController === CheckoutController::class;
+    }
 }
