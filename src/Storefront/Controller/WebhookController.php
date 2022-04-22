@@ -107,9 +107,8 @@ class WebhookController extends StorefrontController
     {
         # Mollie automatically sends the new payment id and the subscription id.
         # we do not know that payment yet, because it has just been made by Mollie.
-        $molliePaymentId = $requestData->getAlnum('id');
-        $mollieSubscriptionId = $requestData->getAlnum('subscriptionId');
-
+        $molliePaymentId = (string)$requestData->get('id');
+        $mollieSubscriptionId = (string)$requestData->get('subscriptionId');
 
         try {
 
