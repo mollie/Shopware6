@@ -158,6 +158,24 @@ class SubscriptionRepository
 
     /**
      * @param string $id
+     * @param string $nextPaymentDate
+     * @param Context $context
+     * @return void
+     */
+    public function updateNextPaymentAt(string $id, string $nextPaymentDate, Context $context): void
+    {
+        $this->repoSubscriptions->update([
+            [
+                'id' => $id,
+                'nextPaymentAt' => $nextPaymentDate,
+            ]
+        ],
+            $context
+        );
+    }
+
+    /**
+     * @param string $id
      * @param Context $context
      */
     public function markReminded(string $id, Context $context): void

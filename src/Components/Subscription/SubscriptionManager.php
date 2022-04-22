@@ -291,10 +291,14 @@ class SubscriptionManager implements SubscriptionManagerInterface
      */
     public function renewSubscription(string $swSubscriptionId, string $molliePaymentId, SalesChannelContext $context): OrderEntity
     {
-        $subscription = $this->repoSubscriptions->findById($swSubscriptionId, $context->getContext());
+        $swSubscription = $this->repoSubscriptions->findById($swSubscriptionId, $context->getContext());
 
-        $this->gwMollie->switchClient($subscription->getSalesChannelId());
+        $this->gwMollie->switchClient($swSubscription->getSalesChannelId());
+
+        # grab our mollie payment and
+        # also the mollie subscription
         $payment = $this->gwMollie->getPayment($molliePaymentId);
+        $mollieSubscription = $this->gwMollie->getSubscription($swSubscription->getMollieId(), $swSubscription->getMollieCustomerId());
 
 
         $devMode = $this->pluginSettings->getEnvMollieDevMode();
@@ -302,11 +306,20 @@ class SubscriptionManager implements SubscriptionManagerInterface
         # if this transaction id is somehow NOT from our subscription
         # then do not proceed and throw an error.
         # in DEV mode, we allow this, otherwise we cannot test this!
-        if (!$devMode && (string)$payment->subscriptionId !== $subscription->getMollieId()) {
+        if (!$devMode && (string)$payment->subscriptionId !== $swSubscription->getMollieId()) {
             throw new \Exception('Warning, trying to renew subscription based on a payment that does not belong to this subscription!');
         }
 
-        return $this->renewingService->renewSubscription($subscription, $payment, $context);
+        # first thing is,
+        # we have to update our new paymentAt of our local subscription.
+        # we do this immediately because we get the correct data from Mollie anyway
+        $this->repoSubscriptions->updateNextPaymentAt(
+            $swSubscriptionId,
+            (string)$mollieSubscription->nextPaymentDate,
+            $context->getContext()
+        );
+
+        return $this->renewingService->renewSubscription($swSubscription, $payment, $context);
     }
 
     /**

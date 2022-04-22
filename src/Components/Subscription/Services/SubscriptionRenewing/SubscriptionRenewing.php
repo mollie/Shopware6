@@ -60,6 +60,7 @@ class SubscriptionRenewing
      * @param Payment $molliePayment
      * @param SalesChannelContext $context
      * @return OrderEntity
+     * @throws \Exception
      */
     public function renewSubscription(SubscriptionEntity $subscription, Payment $molliePayment, SalesChannelContext $context): OrderEntity
     {
@@ -105,6 +106,7 @@ class SubscriptionRenewing
             $context
         );
 
+        
         return $order;
     }
 
