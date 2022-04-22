@@ -302,7 +302,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
         # if this transaction id is somehow NOT from our subscription
         # then do not proceed and throw an error.
         # in DEV mode, we allow this, otherwise we cannot test this!
-        if (!$devMode && (string)$payment->subscriptionId !== $swSubscriptionId) {
+        if (!$devMode && (string)$payment->subscriptionId !== $subscription->getMollieId()) {
             throw new \Exception('Warning, trying to renew subscription based on a payment that does not belong to this subscription!');
         }
 
