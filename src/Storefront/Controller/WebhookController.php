@@ -105,6 +105,9 @@ class WebhookController extends StorefrontController
      */
     public function webhookSubscriptionRenew(string $swSubscriptionId, Request $request, RequestDataBag $requestData, SalesChannelContext $context): JsonResponse
     {
+        # just to improve testing and manual calls, make it is lower case (requirement for entity repositories)
+        $swSubscriptionId = strtolower($swSubscriptionId);
+
         # Mollie automatically sends the new payment id and the subscription id.
         # we do not know that payment yet, because it has just been made by Mollie.
         $molliePaymentId = (string)$requestData->get('id');
