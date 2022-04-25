@@ -27,10 +27,11 @@ ifndef url
 	@exit 1
 endif
 ifndef shopware
-	CYPRESS_BASE_URL=$(url) CYPRESS_SHOPWARE=6.4.6.0 ./node_modules/.bin/cypress open --env conf=dev
-else
-	CYPRESS_BASE_URL=$(url) CYPRESS_SHOPWARE=$(shopware) ./node_modules/.bin/cypress open --env conf=dev
+	$(warning Please provide the Shopware Version as argument to Start Cypress!)
+	@exit 1
 endif
+	CYPRESS_BASE_URL=$(url) CYPRESS_SHOPWARE=$(shopware) ./node_modules/.bin/cypress open --env conf=dev
+
 
 # ---------------------------------------------------------------------------------------------
 
