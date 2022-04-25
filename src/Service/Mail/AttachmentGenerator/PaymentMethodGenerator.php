@@ -105,7 +105,7 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
 
             /** @var PaymentMethodEntity $paymentMethod */
             foreach ($paymentMethods as $paymentMethod) {
-                $fileContent[] = $paymentMethod->getDistinguishableName() . ($paymentMethod->getId() === $salesChannel->getPaymentMethodId() ? ' (Default)' : '');
+                $fileContent[] = $paymentMethod->getName() . ($paymentMethod->getId() === $salesChannel->getPaymentMethodId() ? ' (Default)' : '');
             }
         } catch (SalesChannelPaymentMethodsException $e) {
             $fileContent[] = 'No payment methods available';
