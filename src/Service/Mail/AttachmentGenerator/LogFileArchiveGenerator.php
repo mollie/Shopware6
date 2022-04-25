@@ -30,11 +30,19 @@ class LogFileArchiveGenerator implements GeneratorInterface
         ]);
         $archive->close();
 
-        $content = \file_get_contents($fullPath);
-        $mimeType = \mime_content_type($fullPath);
 
-        // Don't leave any evidence.
-        \unlink($fullPath);
+        $content = '';
+        $mimeType = '';
+
+        # it can be that no log file exists
+        # in that case just skip it
+        if (file_exists($fullPath)) {
+            $content = \file_get_contents($fullPath);
+            $mimeType = \mime_content_type($fullPath);
+            // Don't leave any evidence.
+            \unlink($fullPath);
+        }
+
 
         return [
             'content' => $content,

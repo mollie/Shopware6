@@ -2,17 +2,17 @@ import template from './mollie-pluginconfig-support-modal.html.twig';
 import './mollie-pluginconfig-support-modal.scss';
 
 // eslint-disable-next-line no-undef
-const { Application, Component, Context, Mixin, State } = Shopware;
+const {Application, Component, Context, Mixin, State} = Shopware;
 // eslint-disable-next-line no-undef
-const { Criteria } = Shopware.Data;
+const {Criteria} = Shopware.Data;
 // eslint-disable-next-line no-undef
-const { string } = Shopware.Utils;
+const {string} = Shopware.Utils;
 
 Component.register('mollie-pluginconfig-support-modal', {
     template,
 
     inject: {
-        shopwareExtensionService: { default: null }, // This did not exist before 6.4, so default to null to avoid errors.
+        shopwareExtensionService: {default: null}, // This did not exist before 6.4, so default to null to avoid errors.
         MolliePaymentsSupportService: {},
         repositoryFactory: {},
     },
@@ -23,27 +23,26 @@ Component.register('mollie-pluginconfig-support-modal', {
 
     data() {
         return {
+            mailSent: false,
+            isSubmitting: false,
+            // ------------------------------------------------------------------
             name: '',
             email: '',
             subject: '',
             message: '',
-
+            // ------------------------------------------------------------------
             recipientLocale: '',
             recipientOptions: [
                 {
-                    label: 'International Support',
+                    label: 'International Support (info@mollie.com)',
                     value: null,
                 },
                 {
-                    label: 'German Support',
+                    label: 'German Support (meinsupport@mollie.com)',
                     value: 'de-DE',
                 },
             ],
 
-            isSubmitting: false,
-            mailSent: false,
-
-            isLoadingPlugins: false,
         }
     },
 
@@ -183,8 +182,19 @@ Component.register('mollie-pluginconfig-support-modal', {
                     this.subject,
                     this.message,
                 )
-                .then(() => {
+                .then((response) => {
+
+                    if (!response.success) {
+                        this._showNotificationError(this.$tc('mollie-payments.config.support.error'));
+                        this.mailSent = false;
+                        return;
+                    }
+
                     this.mailSent = true;
+                    this._showNotificationSuccess(this.$tc('mollie-payments.config.support.success'));
+                })
+                .catch((response) => {
+                    this._showNotificationError(response);
                 })
                 .finally(() => this.isSubmitting = false)
         },
@@ -196,16 +206,16 @@ Component.register('mollie-pluginconfig-support-modal', {
                 return version;
             }
 
-            let output = `v${ match[1] }`;
+            let output = `v${match[1]}`;
 
             if (match[2]) {
-                output += ` ${ this.getHumanReadableText(match[2]) }`;
+                output += ` ${this.getHumanReadableText(match[2])}`;
             } else {
                 output += ' Stable Version';
             }
 
             if (match[3]) {
-                output += ` ${ match[3] }`;
+                output += ` ${match[3]}`;
             }
 
             return output;
@@ -225,5 +235,28 @@ Component.register('mollie-pluginconfig-support-modal', {
                     return text;
             }
         },
+
+        /**
+         *
+         * @param text
+         * @private
+         */
+        _showNotificationSuccess(text) {
+            this.createNotificationSuccess({
+                message: text,
+            });
+        },
+
+        /**
+         *
+         * @param text
+         * @private
+         */
+        _showNotificationError(text) {
+            this.createNotificationError({
+                message: text,
+            });
+        },
+
     },
 });

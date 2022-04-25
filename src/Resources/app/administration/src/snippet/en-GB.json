@@ -34,8 +34,7 @@
         "onboardingStep3": "Assign payment methods to your sales channel.",
         "onboardingStep3Link": "to your sales channels",
         "btnDocumentation": "Documentation",
-        "btnSupport": "Support",
-        "btnRequestSupport": "Request Support",
+        "btnRequestSupport": "Support",
         "btnTroubleshooting": "Troubleshooting Guide"
       },
       "api": {
@@ -63,6 +62,7 @@
         "modalTitle": "Request support from Mollie",
         "btnCancel": "Cancel",
         "btnConfirm": "Request support",
+        "btnSupport": "More about our support",
         "form": {
           "name": "Your name",
           "email": "Your email",
@@ -71,7 +71,7 @@
           "message": "Message"
         },
         "data": {
-          "header": "Collected data:",
+          "header": "Data sent to Mollie:",
           "other": "Other:",
           "shopwareVersion": "Shopware version",
           "pluginLogs": "{plugin} log files",
@@ -79,7 +79,9 @@
           "pluginConfigurationHelpText": "API keys are excluded.",
           "paymentMethods": "Payment method data",
           "paymentMethodsHelpText": "Contains information about which payment methods are active, assigned to each sales channel, as well as their status in your Mollie account."
-        }
+        },
+        "success": "The suport request has been successfully sent. We do our best to reply as soon as possible",
+        "error": "There was a problem when sending the mail through Shopware. Please try it again or contact us directly per e-mail."
       }
     },
     "refunds": {
@@ -164,7 +166,7 @@
             "composition": "Composition",
             "date": "Date"
           },
-          "lblNoComposition" : "No composition available",
+          "lblNoComposition": "No composition available",
           "btnCancelRefund": "Cancel this refund"
         }
       },

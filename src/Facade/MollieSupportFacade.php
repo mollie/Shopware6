@@ -20,43 +20,53 @@ class MollieSupportFacade
      */
     protected $mailService;
 
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
 
-    public function __construct(
-        AbstractMailService $mailService,
-        AttachmentCollector $attachmentCollector,
-        LoggerInterface     $logger
-    )
+    /**
+     * @param AbstractMailService $mailService
+     * @param AttachmentCollector $attachmentCollector
+     */
+    public function __construct(AbstractMailService $mailService, AttachmentCollector $attachmentCollector)
     {
         $this->attachmentCollector = $attachmentCollector;
         $this->mailService = $mailService;
-        $this->logger = $logger;
     }
 
-    public function request(
-        string  $replyToName,
-        string  $replyToEmail,
-        ?string $recipientLocale,
-        string  $noReplyHost,
-        string  $subject,
-        string  $contentHtml,
-        Context $context
-    ): void
+    /**
+     * @param string $replyToName
+     * @param string $replyToEmail
+     * @param string|null $recipientLocale
+     * @param string $noReplyHost
+     * @param string $subject
+     * @param string $contentHtml
+     * @param Context $context
+     * @return void
+     */
+    public function sendSupportRequest(string $replyToName, string $replyToEmail, ?string $recipientLocale, string $noReplyHost, string $subject, string $contentHtml, Context $context): void
     {
-        $data = compact(
-            'replyToName',
-            'replyToEmail',
-            'recipientLocale',
-            'noReplyHost',
-            'subject',
-            'contentHtml'
-        );
+        # improve the automatic data a bit
+        # we add some prefixes, and make sure a few things are
+        # always present in the text
+        $subject = 'Support Shopware 6: ' . $subject;
+
+        $finalHTML = 'Name: ' . $replyToName . '<br />';
+        $finalHTML .= 'E-Mail: ' . $replyToEmail . '<br />';
+        $finalHTML .= '<br />';
+        $finalHTML .= '<br />';
+        $finalHTML .= $contentHtml;
+
+
+        $data = [
+            'replyToName' => $replyToName,
+            'replyToEmail' => $replyToEmail,
+            'recipientLocale' => $recipientLocale,
+            'noReplyHost' => $noReplyHost,
+            'subject' => $subject,
+            'contentHtml' => $finalHTML,
+        ];
 
         $attachments = $this->attachmentCollector->collect($context);
 
         $this->mailService->send($data, $attachments);
     }
+
 }

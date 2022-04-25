@@ -77,7 +77,7 @@ class ReadablePluginConfigurationGenerator extends AbstractPluginConfigurationGe
 
         return [
             'content' => implode("\r\n", $fileContent),
-            'fileName' => 'plugin configuration.txt',
+            'fileName' => 'plugin_configuration.txt',
             'mimeType' => 'text/plain',
         ];
     }

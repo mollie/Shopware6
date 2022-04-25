@@ -62,7 +62,7 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
 
         return [
             'content' => implode("\r\n", $fileContent),
-            'fileName' => 'payment method data.txt',
+            'fileName' => 'payment_method_data.txt',
             'mimeType' => 'text/plain',
         ];
     }
@@ -105,7 +105,7 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
 
             /** @var PaymentMethodEntity $paymentMethod */
             foreach ($paymentMethods as $paymentMethod) {
-                $fileContent[] = $paymentMethod->getDistinguishableName() . ($paymentMethod->getId() === $salesChannel->getPaymentMethodId() ? ' (Default)': '');
+                $fileContent[] = $paymentMethod->getDistinguishableName() . ($paymentMethod->getId() === $salesChannel->getPaymentMethodId() ? ' (Default)' : '');
             }
         } catch (SalesChannelPaymentMethodsException $e) {
             $fileContent[] = 'No payment methods available';
@@ -144,7 +144,7 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
             $methods = $apiClient->methods->allAvailable();
 
             /** @var Method $method */
-            foreach($methods as $method) {
+            foreach ($methods as $method) {
                 $fileContent[] = sprintf('%s: %s', $method->description, $method->status ?? 'Unknown');
             }
         } catch (ApiException $e) {

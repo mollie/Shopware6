@@ -34,8 +34,7 @@
         "onboardingStep3": "Wijs betaalmethoden toe aan je verkoopkanaal.",
         "onboardingStep3Link": "naar je verkoopkanalen",
         "btnDocumentation": "Documentatie",
-        "btnSupport": "Support",
-        "btnRequestSupport": "Verzoek support",
+        "btnRequestSupport": "Support",
         "btnTroubleshooting": "Troubleshooting Gids"
       },
       "api": {
@@ -63,6 +62,7 @@
         "modalTitle": "Verzoek support van Mollie",
         "btnCancel": "Cancel",
         "btnConfirm": "Verzoek support",
+        "btnSupport": "Meer over onze ondersteuning",
         "form": {
           "name": "Uw naam",
           "email": "Uw e-mail",
@@ -71,7 +71,7 @@
           "message": "Message"
         },
         "data": {
-          "header": "Verzamelde gegevens:",
+          "header": "Gegevens verzonden naar Mollie:",
           "other": "Andere:",
           "shopwareVersion": "Shopwareversie",
           "pluginLogs": "{plugin} logbestanden",
@@ -79,7 +79,9 @@
           "pluginConfigurationHelpText": "API-sleutels zijn uitgesloten.",
           "paymentMethods": "Informatie over betaalmethoden",
           "paymentMethodsHelpText": "Bevat informatie over betaalmethoden, welke zijn gekoppeld aan de verkoopkanalen, en de betreffende status ervan in uw Mollie account."
-        }
+        },
+        "success": "Het ondersteuningsverzoek is succesvol verzonden. We doen ons best om zo snel mogelijk te antwoorden",
+        "error": "Helaas was er een probleem met de verzending via Shopware. Probeer het opnieuw of stuur ons direct een e-mail."
       }
     },
     "refunds": {

@@ -3,51 +3,54 @@
           :title="$tc('mollie-payments.config.support.modalTitle')"
           @modal-close="$emit('close')">
 
-    <sw-container class="mollie-support-modal__form"
-                  columns="10fr 4fr"
-                  gap="16px">
-        <sw-container columns="1fr"
-                      gap="16px"
-                      align="start">
-            <sw-container columns="1fr 1fr"
-                          gap="16px">
+    <sw-container class="mollie-support-modal__form" columns="10fr 4fr" gap="16px">
+        <sw-container columns="1fr" gap="16px" align="start">
+
+            <sw-alert v-if="mailSent"
+                      variant="success"
+                      appearance="notification"
+                      :showIcon="true"
+                      :closable="false">
+                {{ $tc('mollie-payments.config.support.success') }}
+            </sw-alert>
+
+            <sw-container columns="1fr 1fr" gap="16px">
                 <sw-text-field v-model="name"
                                :label="$tc('mollie-payments.config.support.form.name')"
                                :placeholder="userName"
-                               size="medium"/>
+                               size="medium">
 
+                </sw-text-field>
                 <sw-email-field v-model="email"
                                 :label="$tc('mollie-payments.config.support.form.email')"
                                 :placeholder="user.email"
-                                size="medium"/>
+                                size="medium">
+
+                </sw-email-field>
             </sw-container>
-
             <sw-single-select v-model="recipientLocale"
-                             :label="$tc('mollie-payments.config.support.form.recipient')"
-                             :options="recipientOptions"
-                             size="medium"/>
-
+                              :label="$tc('mollie-payments.config.support.form.recipient')"
+                              :options="recipientOptions"
+                              size="medium">
+            </sw-single-select>
             <sw-text-field v-model="subject"
                            :label="$tc('mollie-payments.config.support.form.subject')"
-                           size="medium" />
-
+                           size="medium">
+            </sw-text-field>
             <sw-text-editor v-model="message"
-                            :label="$tc('mollie-payments.config.support.form.message')"/>
+                            :label="$tc('mollie-payments.config.support.form.message')">
+            </sw-text-editor>
         </sw-container>
 
-        <sw-container rows="1fr auto auto"
-                      gap="16px">
+        <sw-container rows="1fr auto auto" gap="16px">
             <sw-description-list>
                 <dt>{{ $tc('mollie-payments.config.support.data.header') }}</dt>
-
                 <dt>{{ $tc('mollie-payments.config.support.data.shopwareVersion') }}</dt>
                 <dd>{{ shopwareVersion }}</dd>
-
                 <template v-if="molliePlugin">
                     <dt>{{ molliePlugin.label }}</dt>
                     <dd>{{ mollieVersion }}</dd>
                 </template>
-
                 <dt>{{ $tc('mollie-payments.config.support.data.other') }}</dt>
                 <dd v-if="molliePlugin">
                     {{ $tc('mollie-payments.config.support.data.pluginLogs', 0, {
@@ -58,15 +61,13 @@
                     {{ $tc('mollie-payments.config.support.data.pluginConfiguration', 0, {
                         plugin: molliePlugin.label
                     }) }}
-                    <sw-help-text :text="$tc('mollie-payments.config.support.data.pluginConfigurationHelpText')"/>
+                    <sw-help-text :text="$tc('mollie-payments.config.support.data.pluginConfigurationHelpText')"></sw-help-text>
                 </dd>
                 <dd v-if="molliePlugin">
                     {{ $tc('mollie-payments.config.support.data.paymentMethods') }}
-                    <sw-help-text :text="$tc('mollie-payments.config.support.data.paymentMethodsHelpText')"/>
+                    <sw-help-text :text="$tc('mollie-payments.config.support.data.paymentMethodsHelpText')"></sw-help-text>
                 </dd>
-
-
-                <sw-loader v-if="isLoading"/>
+                <sw-loader v-if="isLoading"></sw-loader>
             </sw-description-list>
 
             <sw-button class="btn-action" link="https://github.com/mollie/Shopware6/wiki">
@@ -76,11 +77,11 @@
 
             <sw-button class="btn-action" link="https://github.com/mollie/Shopware6/wiki/Support">
                 <sw-icon name="default-communication-speech-bubbles"></sw-icon>
-                {{ $tc('mollie-payments.config.info.btnSupport') }}
+                {{ $tc('mollie-payments.config.support.btnSupport') }}
             </sw-button>
         </sw-container>
 
-        <sw-loader v-if="isSubmitting"/>
+        <sw-loader v-if="isSubmitting"></sw-loader>
     </sw-container>
 
     <template #modal-footer>
@@ -89,15 +90,13 @@
                    @click="$emit('close')">
             {{ $tc('mollie-payments.config.support.btnCancel') }}
         </sw-button>
-
         <sw-button-process size="small"
                            variant="primary"
                            :animationTimeout="2500"
                            :disabled="isLoading || !canSubmit"
                            :isLoading="isSubmitting"
                            :processSuccess="mailSent"
-                           @click="onRequestSupport"
-                           @process-finish="mailSent = false">
+                           @click="onRequestSupport">
             {{ $tc('mollie-payments.config.support.btnConfirm') }}
         </sw-button-process>
     </template>

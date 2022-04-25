@@ -2,7 +2,7 @@
 
 namespace Kiener\MolliePayments\Controller\Api;
 
-use Kiener\MolliePayments\Exception\MailBodyEmptyException;
+
 use Kiener\MolliePayments\Facade\MollieSupportFacade;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\MailTemplate\Exception\MailTransportFailedException;
@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class SupportController extends AbstractController
 {
+
     /**
      * @var MollieSupportFacade
      */
@@ -26,10 +27,12 @@ class SupportController extends AbstractController
      */
     protected $logger;
 
-    public function __construct(
-        MollieSupportFacade $supportFacade,
-        LoggerInterface     $logger
-    )
+
+    /**
+     * @param MollieSupportFacade $supportFacade
+     * @param LoggerInterface $logger
+     */
+    public function __construct(MollieSupportFacade $supportFacade, LoggerInterface $logger)
     {
         $this->supportFacade = $supportFacade;
         $this->logger = $logger;
@@ -37,8 +40,7 @@ class SupportController extends AbstractController
 
     /**
      * @RouteScope(scopes={"api"})
-     * @Route("/api/_action/mollie/support/request",
-     *         defaults={"auth_enabled"=true}, name="api.action.mollie.support.request", methods={"POST"})
+     * @Route("/api/_action/mollie/support/request", defaults={"auth_enabled"=true}, name="api.action.mollie.support.request", methods={"POST"})
      *
      * @param Request $request
      * @param Context $context
@@ -54,7 +56,7 @@ class SupportController extends AbstractController
         $subject = $data->get('subject');
         $message = $data->get('message');
 
-        return $this->requestSupportResponse(
+        return $this->sendSupportRequest(
             $name,
             $email,
             $recipientLocale,
@@ -67,8 +69,7 @@ class SupportController extends AbstractController
 
     /**
      * @RouteScope(scopes={"api"})
-     * @Route("/api/v{version}/_action/mollie/support/request",
-     *         defaults={"auth_enabled"=true}, name="api.action.mollie.support.request.legacy", methods={"POST"})
+     * @Route("/api/v{version}/_action/mollie/support/request", defaults={"auth_enabled"=true}, name="api.action.mollie.support.request.legacy", methods={"POST"})
      *
      * @param Request $request
      * @param Context $context
@@ -84,7 +85,7 @@ class SupportController extends AbstractController
         $subject = $data->get('subject');
         $message = $data->get('message');
 
-        return $this->requestSupportResponse(
+        return $this->sendSupportRequest(
             $name,
             $email,
             $recipientLocale,
@@ -95,18 +96,23 @@ class SupportController extends AbstractController
         );
     }
 
-    private function requestSupportResponse(
-        string  $name,
-        string  $email,
-        ?string $recipientLocale,
-        string  $host,
-        string  $subject,
-        string  $message,
-        Context $context
-    ): JsonResponse
+    /**
+     * @param string $name
+     * @param string $email
+     * @param string|null $recipientLocale
+     * @param string $host
+     * @param string $subject
+     * @param string $message
+     * @param Context $context
+     * @return JsonResponse
+     */
+    private function sendSupportRequest(string $name, string $email, ?string $recipientLocale, string $host, string $subject, string $message, Context $context): JsonResponse
     {
         try {
-            $this->supportFacade->request(
+
+            $this->logger->info('Sending Support Request to Mollie: ' . $subject);
+
+            $this->supportFacade->sendSupportRequest(
                 $name,
                 $email,
                 $recipientLocale,
@@ -116,23 +122,42 @@ class SupportController extends AbstractController
                 $context
             );
 
-            return $this->json(['sent' => true]);
+            return $this->json(
+                [
+                    'success' => true,
+                ]
+            );
+
         } catch (ConstraintViolationException|MailTransportFailedException $e) {
+
             $this->logger->error(
                 $e->getMessage(),
                 [
-                    'name' => $name,
-                    'email' => $email,
-                    'subject' => $subject,
-                    'message' => $message,
+                    'error' => $message,
                     'exceptionParams' => $e->getParameters()
                 ]
             );
 
             return $this->json([
-                'sent' => false,
+                'success' => false,
                 'error' => $e->getMessage()
             ]);
+
+        } catch (\Throwable $e) {
+
+            $this->logger->error(
+                $e->getMessage(),
+                [
+                    'error' => $message,
+                ]
+            );
+
+            return $this->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ]);
+
         }
     }
+
 }

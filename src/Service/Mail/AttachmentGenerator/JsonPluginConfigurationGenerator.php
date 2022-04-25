@@ -45,7 +45,7 @@ class JsonPluginConfigurationGenerator extends AbstractPluginConfigurationGenera
 
         return [
             'content' => json_encode($configs),
-            'fileName' => 'plugin configuration.json',
+            'fileName' => 'plugin_configuration.json',
             'mimeType' => 'application/json'
         ];
     }

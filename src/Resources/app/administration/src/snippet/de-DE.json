@@ -34,8 +34,7 @@
         "onboardingStep3": "Weise die Zahlungsarten deinen Verkaufskanälen zu.",
         "onboardingStep3Link": "Verkaufskanäle öffnen",
         "btnDocumentation": "Dokumentation",
-        "btnSupport": "Support",
-        "btnRequestSupport": "Unterstützung anfordern",
+        "btnRequestSupport": "Support",
         "btnTroubleshooting": "zu den Fehlerbehebungen"
       },
       "api": {
@@ -63,6 +62,7 @@
         "modalTitle": "Unterstützung von Mollie anfordern",
         "btnCancel": "Abbrechen",
         "btnConfirm": "Unterstützung anfordern",
+        "btnSupport": "Mehr über unseren Support",
         "form": {
           "name": "Ihr Name",
           "email": "Ihre E-Mail",
@@ -71,7 +71,7 @@
           "message": "Nachricht"
         },
         "data": {
-          "header": "Gesammelte Daten:",
+          "header": "Datentransfer zu Mollie:",
           "other": "Andere:",
           "shopwareVersion": "Shopware-Version",
           "pluginLogs": "{plugin} log files",
@@ -79,7 +79,9 @@
           "pluginConfigurationHelpText": "API-Schlüssel sind ausgeschlossen.",
           "paymentMethods": "Daten zur Zahlungsmethode",
           "paymentMethodsHelpText": "Enthält Informationen darüber, welche Zahlungsmethoden aktiv sind, welche den einzelnen Vertriebskanälen zugeordnet sind, sowie deren Status in Ihrem Mollie-Konto."
-        }
+        },
+        "success": "Die Supportanfrage wurde erfolgreich versendet. Wir geben unser Bestes für eine schnelle Antwort.",
+        "error": "Es gab leider ein Problem beim Versand über Shopware. Bitte probieren Sie es erneut oder kontaktieren uns direkt per E-Mail."
       }
     },
     "refunds": {
@@ -164,7 +166,7 @@
             "composition": "Zusammensetzung",
             "date": "Datum"
           },
-          "lblNoComposition" : "Keine Zusammensetzung verfügbar",
+          "lblNoComposition": "Keine Zusammensetzung verfügbar",
           "btnCancelRefund": "Diese Rückerstattung stornieren"
         }
       },
