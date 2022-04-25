@@ -31,8 +31,11 @@ context("Plugin Config", () => {
 
             cy.visit('/admin#/sw/extension/config/MolliePayments');
 
+            cy.wait(2000);
+
             cy.get('.col-right > button.sw-button').click();
 
+            cy.wait(2000);
 
             // we have to see our modal popup
             cy.contains('Request support from Mollie');
