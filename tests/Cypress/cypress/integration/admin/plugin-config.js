@@ -3,13 +3,14 @@ import Session from "Services/utils/Session"
 // ------------------------------------------------------
 import AdminLoginAction from "Actions/admin/AdminLoginAction";
 import Shopware from "Services/shopware/Shopware";
+import AdminPluginAction from "Actions/admin/AdminPluginAction";
 
 
 const devices = new Devices();
 const session = new Session();
 
 const adminLogin = new AdminLoginAction();
-
+const pluginAction = new AdminPluginAction();
 
 const shopware = new Shopware();
 
@@ -29,7 +30,7 @@ context("Plugin Config", () => {
 
             adminLogin.login();
 
-            cy.visit('/admin#/sw/extension/config/MolliePayments');
+            pluginAction.openPluginConfiguration();
 
             cy.wait(2000);
 
