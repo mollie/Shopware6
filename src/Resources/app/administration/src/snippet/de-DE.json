@@ -24,7 +24,7 @@
     },
     "config": {
       "info": {
-        "title": "Hallo ##userName##, Willkommen bei Mollie!",
+        "title": "Hallo {userName}, Willkommen bei Mollie!",
         "descriptionTop": "Starten mit Mollie ist einfach!",
         "descriptionBottom": "Das ist alles!",
         "descriptionFooter": "Wenn du mehr über unser Plugin lernen möchtest, besuche bitte unsere offizielle Dokumentation.",
@@ -35,6 +35,7 @@
         "onboardingStep3Link": "Verkaufskanäle öffnen",
         "btnDocumentation": "Dokumentation",
         "btnSupport": "Support",
+        "btnRequestSupport": "Unterstützung anfordern",
         "btnTroubleshooting": "zu den Fehlerbehebungen"
       },
       "api": {
@@ -56,6 +57,28 @@
         },
         "mollieLimits": {
           "link": "Öffne Mollie Zahlungs Limits"
+        }
+      },
+      "support": {
+        "modalTitle": "Unterstützung von Mollie anfordern",
+        "btnCancel": "Abbrechen",
+        "btnConfirm": "Unterstützung anfordern",
+        "form": {
+          "name": "Ihr Name",
+          "email": "Ihre E-Mail",
+          "recipient": "Anfrage senden an",
+          "subject": "Betreff",
+          "message": "Nachricht"
+        },
+        "data": {
+          "header": "Gesammelte Daten:",
+          "other": "Andere:",
+          "shopwareVersion": "Shopware-Version",
+          "pluginLogs": "{plugin} log files",
+          "pluginConfiguration": "{plugin}-Konfiguration",
+          "pluginConfigurationHelpText": "API-Schlüssel sind ausgeschlossen.",
+          "paymentMethods": "Daten zur Zahlungsmethode",
+          "paymentMethodsHelpText": "Enthält Informationen darüber, welche Zahlungsmethoden aktiv sind, welche den einzelnen Vertriebskanälen zugeordnet sind, sowie deren Status in Ihrem Mollie-Konto."
         }
       }
     },

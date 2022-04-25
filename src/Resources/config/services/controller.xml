@@ -10,6 +10,8 @@
         <service id="Kiener\MolliePayments\Controller\Api\ConfigController" public="true">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Shopware\Administration\Snippet\CachedSnippetFinder"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\ApiKeyValidator"/>
+
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
@@ -36,6 +38,15 @@
 
         <service id="Kiener\MolliePayments\Controller\Api\ShippingController" public="true">
             <argument type="service" id="Kiener\MolliePayments\Facade\MollieShipment"/>
+            <argument type="service" id="mollie_payments.logger"/>
+
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+
+        <service id="Kiener\MolliePayments\Controller\Api\SupportController" public="true">
+            <argument type="service" id="Kiener\MolliePayments\Facade\MollieSupportFacade"/>
             <argument type="service" id="mollie_payments.logger"/>
 
             <call method="setContainer">

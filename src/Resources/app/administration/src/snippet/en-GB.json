@@ -24,7 +24,7 @@
     },
     "config": {
       "info": {
-        "title": "Hi ##userName##, Welcome to Mollie!",
+        "title": "Hi {userName}, Welcome to Mollie!",
         "descriptionTop": "Onboarding is easy with Mollie!",
         "descriptionBottom": "That's it!",
         "descriptionFooter": "If you want to learn more about our plugin, please visit our official documentation page.",
@@ -35,6 +35,7 @@
         "onboardingStep3Link": "to your sales channels",
         "btnDocumentation": "Documentation",
         "btnSupport": "Support",
+        "btnRequestSupport": "Request Support",
         "btnTroubleshooting": "Troubleshooting Guide"
       },
       "api": {
@@ -56,6 +57,28 @@
         },
         "mollieLimits": {
           "link": "Open Mollie Payment Limits"
+        }
+      },
+      "support": {
+        "modalTitle": "Request support from Mollie",
+        "btnCancel": "Cancel",
+        "btnConfirm": "Request support",
+        "form": {
+          "name": "Your name",
+          "email": "Your email",
+          "recipient": "Send request to",
+          "subject": "Subject",
+          "message": "Message"
+        },
+        "data": {
+          "header": "Collected data:",
+          "other": "Other:",
+          "shopwareVersion": "Shopware version",
+          "pluginLogs": "{plugin} log files",
+          "pluginConfiguration": "{plugin} configuration",
+          "pluginConfigurationHelpText": "API keys are excluded.",
+          "paymentMethods": "Payment method data",
+          "paymentMethodsHelpText": "Contains information about which payment methods are active, assigned to each sales channel, as well as their status in your Mollie account."
         }
       }
     },

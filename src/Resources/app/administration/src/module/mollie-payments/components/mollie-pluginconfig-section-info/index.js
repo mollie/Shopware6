@@ -12,22 +12,18 @@ Component.register('mollie-pluginconfig-section-info', {
         Mixin.getByName('notification'),
     ],
 
+    data() {
+        return {
+            isSupportOpen: false,
+        };
+    },
+
+    shortcuts: {
+        'SYSTEMKEY+i': 'openConfigImport',
+    },
+
     computed: {
-
         /**
-         *
-         * @returns {*}
-         */
-        title() {
-            let text = this.$tc('mollie-payments.config.info.title');
-
-            text = text.replace('##userName##', this.userName);
-
-            return text;
-        },
-
-        /**
-         *
          * @returns {string|*}
          */
         userName() {
@@ -43,6 +39,20 @@ Component.register('mollie-pluginconfig-section-info', {
             }
 
             return user.firstName;
+        },
+    },
+
+    methods: {
+        openConfigImport() {
+            // TODO create and open a configuration import modal
+        },
+
+        openSupport() {
+            this.isSupportOpen = true;
+        },
+
+        closeSupport() {
+            this.isSupportOpen = false;
         },
     },
 });

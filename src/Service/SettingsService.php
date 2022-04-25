@@ -40,7 +40,6 @@ class SettingsService
      * Get Mollie settings from configuration.
      *
      * @param string|null $salesChannelId
-     *
      * @return MollieSettingStruct
      */
     public function getSettings(?string $salesChannelId = null): MollieSettingStruct

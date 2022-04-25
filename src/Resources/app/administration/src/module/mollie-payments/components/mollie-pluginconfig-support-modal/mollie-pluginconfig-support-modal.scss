@@ -1,0 +1,39 @@
+.mollie-support-modal {
+    &__form {
+        & :last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    .sw-description-list {
+        position: relative;
+
+        dt,
+        dd {
+            border-bottom: none;
+        }
+
+        dt {
+            padding: 16px 4px 4px;
+
+            &:first-child {
+                padding-top: 0;
+            }
+        }
+
+        dd {
+            padding: 1px 4px;
+        }
+    }
+
+    .sw-text-editor .sw-text-editor__content-editor {
+        p {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+
+        div {
+            margin-top: 0;
+        }
+    }
+}

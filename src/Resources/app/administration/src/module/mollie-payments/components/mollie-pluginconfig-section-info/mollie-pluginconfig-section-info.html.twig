@@ -1,7 +1,7 @@
 <sw-container class="mollie-pluginconfig-info" gap="16px" columns="3fr 1fr">
     <div>
         <div class="title">
-            {{ title }}
+            {{ $tc('mollie-payments.config.info.title', 0, { userName: userName}) }}
         </div>
         <div class="description">
             {{ $tc('mollie-payments.config.info.descriptionTop') }}<br/>
@@ -38,10 +38,15 @@
             <sw-icon name="default-communication-speech-bubbles"></sw-icon>
             {{ $tc('mollie-payments.config.info.btnSupport') }}
         </sw-button>
+        <sw-button class="btn-action" @click="openSupport">
+            <sw-icon name="default-communication-envelope"></sw-icon>
+            {{ $tc('mollie-payments.config.info.btnRequestSupport') }}
+        </sw-button>
         <sw-external-link class="link-troubleshooting"
                           :small="false" icon="small-arrow-small-external" rel="noopener"
                           target="_blank" href="https://github.com/mollie/Shopware6/wiki/Troubleshooting">
             {{ $tc('mollie-payments.config.info.btnTroubleshooting') }}
         </sw-external-link>
     </div>
+    <mollie-pluginconfig-support-modal v-if="isSupportOpen" @close="closeSupport"/>
 </sw-container>

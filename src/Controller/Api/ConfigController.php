@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Controller\Api;
 use Exception;
 use Kiener\MolliePayments\Facade\MollieShipment;
 use Kiener\MolliePayments\Service\ConfigService;
+use Kiener\MolliePayments\Service\MollieApi\ApiKeyValidator;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\MollieApiClient;
@@ -33,17 +34,25 @@ class ConfigController extends AbstractController
      */
     private $snippetFinder;
 
+    /**
+     * @var ApiKeyValidator
+     */
+    protected $apiKeyValidator;
 
     /**
      * @param SettingsService $settings
      * @param SnippetFinderInterface $snippetFinder
      */
-    public function __construct(SettingsService $settings, SnippetFinderInterface $snippetFinder)
+    public function __construct(
+        SettingsService $settings,
+        SnippetFinderInterface $snippetFinder,
+        ApiKeyValidator $apiKeyValidator
+    )
     {
         $this->settings = $settings;
         $this->snippetFinder = $snippetFinder;
+        $this->apiKeyValidator = $apiKeyValidator;
     }
-
 
     /**
      * @RouteScope(scopes={"api"})
@@ -157,19 +166,7 @@ class ConfigController extends AbstractController
             ];
 
             try {
-                /** @var MollieApiClient $apiClient */
-                $apiClient = new MollieApiClient();
-
-                // Set the current API key
-                $apiClient->setApiKey($key['key']);
-
-                /** @var Profile $profile */
-                $profile = $apiClient->profiles->getCurrent();
-
-                // Check if the profile exists
-                if (isset($profile->id)) {
-                    $result['valid'] = true;
-                }
+                $result['valid'] = $this->apiKeyValidator->validate($key['key']);
             } catch (Exception $e) {
                 // No need to handle this exception
             }
