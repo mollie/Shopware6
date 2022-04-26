@@ -16,11 +16,11 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
-use Symfony\Component\Routing\Router;
 
 
 class MollieLimitsRemover
 {
+
     /**
      * @var Container
      */
@@ -51,6 +51,7 @@ class MollieLimitsRemover
      */
     private $logger;
 
+
     /**
      * @param Container $container
      * @param SettingsService $pluginSettings
@@ -59,19 +60,11 @@ class MollieLimitsRemover
      * @param RequestStack $requestStack
      * @param LoggerInterface $logger
      */
-    public function __construct(
-        Container                             $container,
-        SettingsService                       $pluginSettings,
-        ActivePaymentMethodsProviderInterface $paymentMethodsProvider,
-        RequestMatcherInterface               $router,
-        RequestStack                          $requestStack,
-        LoggerInterface                       $logger
-    )
+    public function __construct(Container $container, SettingsService $pluginSettings, ActivePaymentMethodsProviderInterface $paymentMethodsProvider, RequestMatcherInterface $router, RequestStack $requestStack, LoggerInterface $logger)
     {
         $this->container = $container;
         $this->pluginSettings = $pluginSettings;
         $this->paymentMethodsProvider = $paymentMethodsProvider;
-
         $this->router = $router;
         $this->requestStack = $requestStack;
         $this->logger = $logger;
@@ -94,7 +87,7 @@ class MollieLimitsRemover
             return $originalData;
         }
 
-        if (!$this->inCheckout()) {
+        if (!$this->isRemovingAllowedInContext()) {
             return $originalData;
         }
 
@@ -173,18 +166,28 @@ class MollieLimitsRemover
      *
      * @return bool
      */
-    private function inCheckout(): bool
+    private function isRemovingAllowedInContext(): bool
     {
         try {
             $request = $this->requestStack->getCurrentRequest();
 
-            if(!$request instanceof Request) {
+            if (!$request instanceof Request) {
                 return false;
+            }
+
+            # we also need to allow removing for store-api calls
+            # this is for the headless approach
+            if (strpos($request->getPathInfo(), '/store-api') === 0) {
+                return true;
             }
 
             $currentRoute = $this->router->matchRequest($request);
             $currentController = current(explode('::', $currentRoute['_controller']));
+
+            return $currentController === CheckoutController::class;
+
         } catch (\Throwable $e) {
+
             $this->logger
                 ->error('An error occurred determining current controller', [
                     'exception' => $e,
@@ -196,7 +199,6 @@ class MollieLimitsRemover
             // Make sure Shopware will behave normally in the case of an error.
             return false;
         }
-
-        return $currentController === CheckoutController::class;
     }
+
 }
