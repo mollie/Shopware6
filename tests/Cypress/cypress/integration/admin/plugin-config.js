@@ -32,12 +32,8 @@ context("Plugin Config", () => {
 
             pluginAction.openPluginConfiguration();
 
-            cy.wait(2000);
-
-            cy.get('.col-right > button.sw-button').click();
-
-            cy.wait(2000);
-
+            cy.get('.col-right > button.sw-button', { timeout: 10000 }).click();
+            
             // we have to see our modal popup
             cy.contains('Request support from Mollie');
 
