@@ -86,7 +86,7 @@ class MollieLimitsRemover
      */
     public function removePaymentMethods(PaymentMethodRouteResponse $originalData, SalesChannelContext $context): PaymentMethodRouteResponse
     {
-        $settings = $this->pluginSettings->getSettings();
+        $settings = $this->pluginSettings->getSettings($context->getSalesChannelId());
 
         # if we do not use the limits
         # then just return everything
