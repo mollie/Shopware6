@@ -12,6 +12,7 @@ use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
 use Kiener\MolliePayments\Service\Order\OrderStatusUpdater;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
+use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
 use Mollie\Api\Resources\Order;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
@@ -130,6 +131,19 @@ class NotificationFacade
         # if we don't add to that one, then the previous one is suddenly visible again
         # which causes confusion and troubles in the end
         $transaction = $this->getOrderTransactions($swOrder->getId(), $contextSC->getContext())->last();
+
+
+        # verify if the customer really paid with Mollie in the end
+        $paymentMethod = $transaction->getPaymentMethod();
+        $paymentMethodAttributes = new PaymentMethodAttributes($paymentMethod);
+
+        if (!$paymentMethodAttributes->isMolliePayment()) {
+            # just skip it if it has been paid
+            # with another payment provider
+            # do NOT throw an error
+            return;
+        }
+
 
         # --------------------------------------------------------------------------------------------
 
