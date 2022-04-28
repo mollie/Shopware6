@@ -113,6 +113,11 @@ class MollieSettingStruct extends Struct
     /**
      * @var string
      */
+    protected $orderStateFinalState;
+
+    /**
+     * @var string
+     */
     protected $orderStateWithAPaidTransaction = self::ORDER_STATE_SKIP;
 
     /**
@@ -274,7 +279,7 @@ class MollieSettingStruct extends Struct
      */
     public function getUseMolliePaymentMethodLimits(): bool
     {
-        return (bool) $this->useMolliePaymentMethodLimits;
+        return (bool)$this->useMolliePaymentMethodLimits;
     }
 
     /**
@@ -513,6 +518,22 @@ class MollieSettingStruct extends Struct
     public function setRefundManagerShowInstructions(bool $refundManagerShowInstructions): void
     {
         $this->refundManagerShowInstructions = $refundManagerShowInstructions;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrderStateFinalState(): string
+    {
+        return (string)$this->orderStateFinalState;
+    }
+
+    /**
+     * @param string $orderStateFinalState
+     */
+    public function setOrderStateFinalState(string $orderStateFinalState): void
+    {
+        $this->orderStateFinalState = $orderStateFinalState;
     }
 
 }
