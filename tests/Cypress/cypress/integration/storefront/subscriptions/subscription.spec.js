@@ -90,6 +90,8 @@ describe('Subscription', () => {
                 // and the add to basket button should show that we can subscribe
                 cy.contains('Subscription product');
                 cy.contains('.btn', 'Subscribe');
+                // we also want to see the translated interval
+                cy.contains('Every 3 weeks');
 
                 pdp.addToCart(2);
 
@@ -101,6 +103,8 @@ describe('Subscription', () => {
                 // verify our warning information on the cart page
                 cy.contains('Not all payments methods are available when ordering subscription products');
 
+                // we also want to see the translated interval
+                cy.contains('Every 3 weeks');
 
                 // now open our payment methods and verify
                 // that some of them are not available
