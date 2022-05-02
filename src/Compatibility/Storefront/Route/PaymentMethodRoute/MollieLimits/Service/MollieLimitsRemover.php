@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\MollieLimits\Service;
 
+use Exception;
 use Kiener\MolliePayments\Service\Payment\Provider\ActivePaymentMethodsProviderInterface;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
@@ -15,7 +16,8 @@ use Shopware\Storefront\Controller\CheckoutController;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Throwable;
 
 
 class MollieLimitsRemover
@@ -37,11 +39,6 @@ class MollieLimitsRemover
     private $paymentMethodsProvider;
 
     /**
-     * @var RequestMatcherInterface
-     */
-    private $router;
-
-    /**
      * @var RequestStack
      */
     private $requestStack;
@@ -53,29 +50,27 @@ class MollieLimitsRemover
 
 
     /**
-     * @param Container $container
-     * @param SettingsService $pluginSettings
+     * @param Container                             $container
+     * @param SettingsService                       $pluginSettings
      * @param ActivePaymentMethodsProviderInterface $paymentMethodsProvider
-     * @param RequestMatcherInterface $router
-     * @param RequestStack $requestStack
-     * @param LoggerInterface $logger
+     * @param RouterInterface                       $router
+     * @param RequestStack                          $requestStack
+     * @param LoggerInterface                       $logger
      */
-    public function __construct(Container $container, SettingsService $pluginSettings, ActivePaymentMethodsProviderInterface $paymentMethodsProvider, RequestMatcherInterface $router, RequestStack $requestStack, LoggerInterface $logger)
+    public function __construct(Container $container, SettingsService $pluginSettings, ActivePaymentMethodsProviderInterface $paymentMethodsProvider, RequestStack $requestStack, LoggerInterface $logger)
     {
         $this->container = $container;
         $this->pluginSettings = $pluginSettings;
         $this->paymentMethodsProvider = $paymentMethodsProvider;
-        $this->router = $router;
         $this->requestStack = $requestStack;
         $this->logger = $logger;
     }
 
-
     /**
      * @param PaymentMethodRouteResponse $originalData
-     * @param SalesChannelContext $context
+     * @param SalesChannelContext        $context
      * @return PaymentMethodRouteResponse
-     * @throws \Exception
+     * @throws Exception
      */
     public function removePaymentMethods(PaymentMethodRouteResponse $originalData, SalesChannelContext $context): PaymentMethodRouteResponse
     {
@@ -99,7 +94,7 @@ class MollieLimitsRemover
             $cart,
             $context->getCurrency()->getIsoCode(),
             [
-                $context->getSalesChannel()->getId()
+                $context->getSalesChannel()->getId(),
             ]
         );
 
@@ -141,14 +136,14 @@ class MollieLimitsRemover
      * with a circular reference...even though XML looks fine.
      *
      * @return CartService
-     * @throws \Exception
+     * @throws Exception
      */
     private function getCartServiceLazy(): CartService
     {
         $service = $this->container->get('Shopware\Core\Checkout\Cart\SalesChannel\CartService');
 
         if (!$service instanceof CartService) {
-            throw new \Exception('CartService of Shopware not found!');
+            throw new Exception('CartService of Shopware not found!');
         }
 
         return $service;
@@ -181,19 +176,16 @@ class MollieLimitsRemover
                 return true;
             }
 
-            $currentRoute = $this->router->matchRequest($request);
-            $currentController = current(explode('::', $currentRoute['_controller']));
+            $controller = current(explode('::', $request->attributes->get('_controller')));
 
-            return $currentController === CheckoutController::class;
+            return $controller === CheckoutController::class;
 
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
 
             $this->logger
                 ->error('An error occurred determining current controller', [
                     'exception' => $e,
-                    'request_stack' => $this->requestStack,
-                    'matched_route' => $currentRoute ?? null,
-                    'matched_controller' => $currentController ?? null,
+                    'request' => $request,
                 ]);
 
             // Make sure Shopware will behave normally in the case of an error.
