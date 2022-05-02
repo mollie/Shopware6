@@ -53,7 +53,6 @@ class MollieLimitsRemover
      * @param Container                             $container
      * @param SettingsService                       $pluginSettings
      * @param ActivePaymentMethodsProviderInterface $paymentMethodsProvider
-     * @param RouterInterface                       $router
      * @param RequestStack                          $requestStack
      * @param LoggerInterface                       $logger
      */
@@ -185,7 +184,7 @@ class MollieLimitsRemover
             $this->logger
                 ->error('An error occurred determining current controller', [
                     'exception' => $e,
-                    'request' => $request,
+                    'request' => $request ?? null,
                 ]);
 
             // Make sure Shopware will behave normally in the case of an error.
