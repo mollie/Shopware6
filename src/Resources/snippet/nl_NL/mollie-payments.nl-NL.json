@@ -48,11 +48,12 @@
       },
       "options": {
         "everyDay": "Elke dag",
-        "everyDays": "Elke %1% dagen",
+        "everyDays": "Elke %value% dagen",
         "everyWeek": "Elke week",
-        "everyWeeks": "Elke %1% weken",
+        "everyWeeks": "Elke %value% weken",
         "everyMonth": "Elke maand",
-        "everyMonths": "Elke %1% maanden"
+        "everyMonths": "Elke %value% maanden",
+        "repetitionCount": "%value% keer"
       },
       "account": {
         "mollieSubscriptionsLink": "Abonnementen",

@@ -48,11 +48,12 @@
       },
       "options": {
         "everyDay": "Every day",
-        "everyDays": "Every %1% days",
+        "everyDays": "Every %value% days",
         "everyWeek": "Every week",
-        "everyWeeks": "Every %1% weeks",
+        "everyWeeks": "Every %value% weeks",
         "everyMonth": "Every month",
-        "everyMonths": "Every %1% months"
+        "everyMonths": "Every %value% months",
+        "repetitionCount": "%value% time(s)"
       },
       "account": {
         "mollieSubscriptionsLink": "Subscriptions",

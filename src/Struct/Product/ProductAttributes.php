@@ -71,6 +71,39 @@ class ProductAttributes
     }
 
     /**
+     * @return bool
+     */
+    public function isSubscriptionProduct(): bool
+    {
+        return (bool)$this->subscriptionProduct;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getSubscriptionInterval()
+    {
+        return $this->subscriptionInterval;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getSubscriptionIntervalUnit()
+    {
+        return $this->subscriptionIntervalUnit;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getSubscriptionRepetitionCount()
+    {
+        return $this->subscriptionRepetitionCount;
+    }
+
+
+    /**
      * Gets a list of Mollie fields that can be removed from the
      * customFields because their value is NULL
      * @return array<mixed>
