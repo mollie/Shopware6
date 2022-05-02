@@ -121,11 +121,11 @@ class OrderStatusUpdater
                 break;
 
             case MolliePaymentStatus::MOLLIE_PAYMENT_FAILED:
-            case MolliePaymentStatus::MOLLIE_PAYMENT_EXPIRED:
                 $this->transactionTransitionService->failTransaction($transaction, $context);
                 break;
 
             case MolliePaymentStatus::MOLLIE_PAYMENT_CANCELED:
+            case MolliePaymentStatus::MOLLIE_PAYMENT_EXPIRED:
                 $this->transactionTransitionService->cancelTransaction($transaction, $context);
                 break;
 
@@ -176,13 +176,15 @@ class OrderStatusUpdater
                 $this->orderHandler->setOrderState($order, $settings->getOrderStateWithAPaidTransaction(), $context);
                 break;
 
-            case MolliePaymentStatus::MOLLIE_PAYMENT_EXPIRED:
             case MolliePaymentStatus::MOLLIE_PAYMENT_FAILED:
                 $this->orderHandler->setOrderState($order, $settings->getOrderStateWithAFailedTransaction(), $context);
                 break;
+
             case MolliePaymentStatus::MOLLIE_PAYMENT_CANCELED:
+            case MolliePaymentStatus::MOLLIE_PAYMENT_EXPIRED:
                 $this->orderHandler->setOrderState($order, $settings->getOrderStateWithACancelledTransaction(), $context);
                 break;
+
             case MolliePaymentStatus::MOLLIE_PAYMENT_CHARGEBACK:
                 $this->orderHandler->setOrderState($order, $settings->getOrderStateWithAChargebackTransaction(), $context);
                 break;
