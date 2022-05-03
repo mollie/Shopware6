@@ -79,7 +79,7 @@ class SubscriptionRemindedEvent extends Event implements CustomerAware, Business
      */
     public function getName(): string
     {
-        return 'mollie.subscription.renewal-reminder';
+        return 'mollie.subscription.renewal_reminder';
     }
 
     /**
