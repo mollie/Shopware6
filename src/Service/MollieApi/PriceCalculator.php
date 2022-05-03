@@ -41,15 +41,20 @@ class PriceCalculator
             $vatRate = 0.0;
         }
 
-        $unitPrice = $price->getUnitPrice();
+        # this can be the NET or GROSS price
+        # depending on the customer group setting
+        $unitPriceOriginal = $price->getUnitPrice();
 
-        // If the order is of type TAX_STATE_NET the $lineItemTotalPrice and unit price
-        // is a net price.
-        // For correct mollie api tax calculations we have to calculate the shopware gross
-        // price
+        # we need a gross price for Mollie
+        # let's first assume this is a gross price
+        $unitPriceGross = $price->getUnitPrice();
+
+
+        // If the order is of type TAX_STATE_NET the $lineItemTotalPrice and unit price is a net price.
+        // For correct mollie api tax calculations we have to calculate the shopware gross price
         if ($orderTaxType === CartPrice::TAX_STATE_NET) {
 
-            $unitPrice *= ((100 + $vatRate) / 100);
+            $unitPriceGross *= ((100 + $vatRate) / 100);
 
             if ($isVerticalTaxCalculation) {
                 /**
@@ -68,13 +73,13 @@ class PriceCalculator
                 $roundingRest = $correctGrossPrice - $lineItemTotalPrice;
                 $roundedVatRate = round($vatRate, self::MOLLIE_PRICE_PRECISION);
 
-                return new LineItemPriceStruct($unitPrice, $lineItemTotalPrice, $roundedTaxAmount, $roundedVatRate, $roundingRest);
+                return new LineItemPriceStruct($unitPriceGross, $lineItemTotalPrice, $roundedTaxAmount, $roundedVatRate, $roundingRest);
             }
 
             $lineItemTotalPrice += $taxCollection->getAmount();
         }
 
-        $unitPrice = round($unitPrice, self::MOLLIE_PRICE_PRECISION);
+        $unitPriceGross = round($unitPriceGross, self::MOLLIE_PRICE_PRECISION);
 
         $roundedLineItemTotalPrice = round($lineItemTotalPrice, self::MOLLIE_PRICE_PRECISION);
         $roundedVatRate = round($vatRate, self::MOLLIE_PRICE_PRECISION);
@@ -110,10 +115,18 @@ class PriceCalculator
             $fakeTaxRate = $vatAmount / $net * 100;
 
             $roundedVatRate = round($fakeTaxRate, 2);
+
+            # if we have a net price, then the calculated gross price is wrong.
+            # we now have a new mixed vat rate, which doesn't match our already calculated gross price.
+            if ($orderTaxType === CartPrice::TAX_STATE_NET) {
+                # the total amount is already correct,
+                # so we just divide it by the quantity, and that should work.
+                $unitPriceGross = round($roundedLineItemTotalPrice / $price->getQuantity(), 2);
+            }
         }
 
 
-        return new LineItemPriceStruct($unitPrice, $roundedLineItemTotalPrice, $roundedVatAmount, $roundedVatRate);
+        return new LineItemPriceStruct($unitPriceGross, $roundedLineItemTotalPrice, $roundedVatAmount, $roundedVatRate);
     }
 
     /**
