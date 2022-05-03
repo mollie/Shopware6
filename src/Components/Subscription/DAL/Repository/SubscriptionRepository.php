@@ -47,6 +47,7 @@ class SubscriptionRepository
     public function findById(string $id, Context $context): SubscriptionEntity
     {
         $criteria = new Criteria([$id]);
+        $criteria->addAssociation('customer');
 
         return $this->repoSubscriptions->search($criteria, $context)->first();
     }
@@ -79,6 +80,7 @@ class SubscriptionRepository
         $today = (new \DateTimeImmutable);
 
         $criteria = new Criteria();
+        $criteria->addAssociation('customer');
 
         # subscription is not canceled
         $criteria->addFilter(new EqualsFilter('canceledAt', null));
@@ -97,6 +99,8 @@ class SubscriptionRepository
     public function findPendingSubscriptions(string $orderId, Context $context): EntitySearchResult
     {
         $criteria = new Criteria();
+        $criteria->addAssociation('customer');
+
         $criteria->addFilter(new EqualsFilter('orderId', $orderId));
         $criteria->addFilter(new EqualsFilter('mollieId', null));
 

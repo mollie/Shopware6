@@ -216,6 +216,10 @@ class SubscriptionManager implements SubscriptionManagerInterface
                 (string)$mollieSubscription->nextPaymentDate,
                 $context->getContext()
             );
+
+            # FLOW BUILDER / BUSINESS EVENTS
+            $event = $this->flowBuilderEventFactory->buildSubscriptionStartedEvent($subscription->getCustomer(), $subscription, $context->getContext());
+            $this->flowBuilderDispatcher->dispatch($event);
         }
     }
 
@@ -310,8 +314,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
             throw new \Exception('Warning, trying to renew subscription based on a payment that does not belong to this subscription!');
         }
 
-        # first thing is,
-        # we have to update our new paymentAt of our local subscription.
+        # first thing is, we have to update our new paymentAt of our local subscription.
         # we do this immediately because we get the correct data from Mollie anyway
         $this->repoSubscriptions->updateNextPaymentAt(
             $swSubscriptionId,
@@ -319,7 +322,21 @@ class SubscriptionManager implements SubscriptionManagerInterface
             $context->getContext()
         );
 
-        return $this->renewingService->renewSubscription($swSubscription, $payment, $context);
+        $newOrder = $this->renewingService->renewSubscription($swSubscription, $payment, $context);
+
+        # --------------------------------------------------------------------------------------------------
+        # FLOW BUILDER / BUSINESS EVENTS
+
+        # if this was our last renewal, then send out
+        # a new event that the subscription has now ended
+        if ($mollieSubscription->timesRemaining !== null && $mollieSubscription->timesRemaining <= 0) {
+            $event = $this->flowBuilderEventFactory->buildSubscriptionEndedEvent($swSubscription->getCustomer(), $swSubscription, $context->getContext());
+            $this->flowBuilderDispatcher->dispatch($event);
+        }
+
+        # --------------------------------------------------------------------------------------------------
+
+        return $newOrder;
     }
 
     /**
@@ -347,6 +364,10 @@ class SubscriptionManager implements SubscriptionManagerInterface
         );
 
         $this->repoSubscriptions->cancelSubscription($subscriptionId, $context);
+
+        # FLOW BUILDER / BUSINESS EVENTS
+        $event = $this->flowBuilderEventFactory->buildSubscriptionCancelledEvent($subscription->getCustomer(), $subscription, $context);
+        $this->flowBuilderDispatcher->dispatch($event);
     }
 
 }
