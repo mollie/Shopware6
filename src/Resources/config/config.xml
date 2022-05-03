@@ -207,6 +207,17 @@
         <title lang="de-DE">Automatisch Order Status setzen</title>
         <title lang="nl-NL">Automatisch bestelstatus instellen</title>
 
+        <component name="sw-entity-single-select">
+            <name>orderStateFinalState</name>
+            <entity>state_machine_state</entity>
+            <label>Final order state</label>
+            <label lang="de-DE">Finaler Bestellstatus</label>
+            <label lang="nl-NL">Definitieve Bestelstatus</label>
+            <helpText>If enabled, the plugin will not transition to a new order state, if the final state is already set in the order. Use this feature in combination with plugins and systems if their workflows do not match the one from Mollie.</helpText>
+            <helpText lang="de-DE">Wenn aktiv, wechselt das Plugin nicht in einen neuen Bestellstatus, wenn der finale Status bereits in der Bestellung verwendet wird. Verwenden Sie diese Funktion in Kombination mit Plugins und -Systemen, wenn deren Workflows nicht mit denen von Mollie übereinstimmen.</helpText>
+            <helpText lang="nl-NL">Indien ingeschakeld, gaat de plug-in niet over naar een nieuwe bestelstatus, als de definitieve status al in de bestelling is ingesteld. Gebruik deze functie in combinatie met plug-ins en -systemen als hun workflows niet overeenkomen met die van Mollie.</helpText>
+        </component>
+
         <input-field type="single-select">
             <name>orderStateWithAPaidTransaction</name>
             <label>Order state with a paid transaction</label>
