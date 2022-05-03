@@ -11,7 +11,11 @@
       "mollie_webhook_received_status_completed": " Mollie Webhook Received (Completed)",
       "mollie_webhook_received_status_refunded": " Mollie Webhook Received (Refunded)",
       "mollie_webhook_received_status_partially_refunded": " Mollie Webhook Received (Partially Refunded)",
-      "mollie_refund_started": " Mollie Refund started"
+      "mollie_refund_started": " Mollie Refund started",
+      "mollie_subscription_started": " Mollie Subscription started",
+      "mollie_subscription_ended": " Mollie Subscription completed",
+      "mollie_subscription_cancelled": " Mollie Subscription cancelled",
+      "mollie_subscription_renewal_reminder": " Mollie reminder for subscription renewal"
     }
   },
   "mollie-payments": {
