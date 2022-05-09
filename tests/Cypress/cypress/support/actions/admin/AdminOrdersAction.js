@@ -56,8 +56,11 @@ export default class AdminOrdersAction {
 
         this.openOrders();
 
-        cy.wait(500);
-        cy.contains(repoOrdersList.getLatestOrderStatusLabelSelector(), status);
+        cy.wait(800);
+
+        // match with case insensitive option because shopware
+        // switched from "In progress" to "In Progress" with 6.4.11.0 for example
+        cy.contains(repoOrdersList.getLatestOrderStatusLabelSelector(), status, {matchCase: false});
     }
 
     /**
@@ -68,7 +71,7 @@ export default class AdminOrdersAction {
 
         this.openOrders();
 
-        cy.wait(500);
+        cy.wait(800);
         cy.contains(repoOrdersList.getLatestPaymentStatusLabelSelector(), status);
     }
 
