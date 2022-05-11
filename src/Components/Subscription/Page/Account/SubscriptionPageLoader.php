@@ -8,23 +8,25 @@ use Kiener\MolliePayments\Service\CustomerService;
 use Shopware\Core\Checkout\Cart\Exception\CustomerNotLoggedInException;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
+use Shopware\Core\System\Country\CountryCollection;
+use Shopware\Core\System\Country\SalesChannel\AbstractCountryRoute;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Shopware\Core\System\Salutation\SalesChannel\AbstractSalutationRoute;
+use Shopware\Core\System\Salutation\SalutationCollection;
+use Shopware\Core\System\Salutation\SalutationEntity;
 use Shopware\Storefront\Framework\Page\StorefrontSearchResult;
 use Shopware\Storefront\Page\GenericPageLoaderInterface;
 use Shopware\Storefront\Page\MetaInformation;
 use Symfony\Component\HttpFoundation\Request;
 
 
-class PageLoader
+class SubscriptionPageLoader
 {
-    /**
-     * @var EntityRepositoryInterface
-     */
-    private $mollieSubscriptionsRepository;
 
     /**
      * @var GenericPageLoaderInterface
@@ -32,21 +34,42 @@ class PageLoader
     private $genericLoader;
 
     /**
+     * @var EntityRepositoryInterface
+     */
+    private $repoSubscriptions;
+
+    /**
      * @var CustomerService
      */
     private $customerService;
 
     /**
-     * @param EntityRepositoryInterface $mollieSubscriptionsRepository
-     * @param GenericPageLoaderInterface $genericLoader
-     * @param CustomerService $customerService
+     * @var AbstractCountryRoute
      */
-    public function __construct(EntityRepositoryInterface $mollieSubscriptionsRepository, GenericPageLoaderInterface $genericLoader, CustomerService $customerService)
+    private $countryRoute;
+
+    /**
+     * @var AbstractSalutationRoute
+     */
+    private $salutationRoute;
+
+
+    /**
+     * @param GenericPageLoaderInterface $genericLoader
+     * @param EntityRepositoryInterface $repoSubscriptions
+     * @param CustomerService $customerService
+     * @param AbstractCountryRoute $countryRoute
+     * @param AbstractSalutationRoute $salutationRoute
+     */
+    public function __construct(GenericPageLoaderInterface $genericLoader, EntityRepositoryInterface $repoSubscriptions, CustomerService $customerService, AbstractCountryRoute $countryRoute, AbstractSalutationRoute $salutationRoute)
     {
-        $this->mollieSubscriptionsRepository = $mollieSubscriptionsRepository;
         $this->genericLoader = $genericLoader;
+        $this->repoSubscriptions = $repoSubscriptions;
         $this->customerService = $customerService;
+        $this->countryRoute = $countryRoute;
+        $this->salutationRoute = $salutationRoute;
     }
+
 
     /**
      * @param Request $request
@@ -81,6 +104,10 @@ class PageLoader
         $page->setDeepLinkCode($request->get('deepLinkCode'));
         $page->setTotal($subscriptions->getTotal());
 
+        $page->setSalutations($this->getSalutations($salesChannelContext));
+
+        $page->setCountries($this->getCountries($salesChannelContext));
+
         return $page;
     }
 
@@ -105,7 +132,7 @@ class PageLoader
         $criteria = $this->createCriteria($request, $customerId);
 
         /** @var StorefrontSearchResult<SubscriptionEntity> */
-        return $this->mollieSubscriptionsRepository->search($criteria, $context->getContext());
+        return $this->repoSubscriptions->search($criteria, $context->getContext());
     }
 
     /**
@@ -135,6 +162,37 @@ class PageLoader
         }
 
         return $criteria;
+    }
+
+    /**
+     * @param SalesChannelContext $salesChannelContext
+     * @return CountryCollection
+     */
+    private function getCountries(SalesChannelContext $salesChannelContext): CountryCollection
+    {
+        $criteria = (new Criteria())
+            ->addFilter(new EqualsFilter('country.active', true))
+            ->addAssociation('states');
+
+        $countries = $this->countryRoute->load(new Request(), $criteria, $salesChannelContext)->getCountries();
+
+        $countries->sortCountryAndStates();
+
+        return $countries;
+    }
+
+    /**
+     * @throws InconsistentCriteriaIdsException
+     */
+    private function getSalutations(SalesChannelContext $salesChannelContext): SalutationCollection
+    {
+        $salutations = $this->salutationRoute->load(new Request(), $salesChannelContext, new Criteria())->getSalutations();
+
+        $salutations->sort(function (SalutationEntity $a, SalutationEntity $b) {
+            return $b->getSalutationKey() <=> $a->getSalutationKey();
+        });
+
+        return $salutations;
     }
 
 }

@@ -3,6 +3,8 @@
 namespace Kiener\MolliePayments\Components\Subscription\Page\Account;
 
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
+use Shopware\Core\System\Country\CountryCollection;
+use Shopware\Core\System\Salutation\SalutationCollection;
 use Shopware\Storefront\Framework\Page\StorefrontSearchResult;
 use Shopware\Storefront\Page\Page;
 
@@ -23,6 +25,16 @@ class SubscriptionPage extends Page
      * @var int|null
      */
     protected $total;
+
+    /**
+     * @var CountryCollection
+     */
+    protected $countries;
+
+    /**
+     * @var SalutationCollection
+     */
+    protected $salutations;
 
 
     /**
@@ -71,6 +83,38 @@ class SubscriptionPage extends Page
     public function setTotal(?int $total): void
     {
         $this->total = $total;
+    }
+
+    /**
+     * @param CountryCollection $countries
+     */
+    public function setCountries(CountryCollection $countries): void
+    {
+        $this->countries = $countries;
+    }
+
+    /**
+     * @return CountryCollection
+     */
+    public function getCountries(): CountryCollection
+    {
+        return $this->countries;
+    }
+
+    /**
+     * @return SalutationCollection
+     */
+    public function getSalutations(): SalutationCollection
+    {
+        return $this->salutations;
+    }
+
+    /**
+     * @param SalutationCollection $salutations
+     */
+    public function setSalutations(SalutationCollection $salutations): void
+    {
+        $this->salutations = $salutations;
     }
 
 }

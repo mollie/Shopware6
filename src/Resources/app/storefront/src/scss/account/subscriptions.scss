@@ -7,6 +7,7 @@
   color: #fff;
   margin: 10px 0;
 }
+
 .order-item-status-badge.order-item-status-badge-canceled {
   background-color: #ffb100;
   color: #fff;
@@ -19,4 +20,42 @@
   font-weight: 400;
   margin-bottom: 1.5rem;
   width: 100%;
+}
+
+.subscription-toggle-button-wrapper {
+  padding: 0 !important;
+}
+
+.subscription-hide-btn {
+  margin-bottom: 25px;
+  float: right;
+
+  .subscription-hide-btn-text {
+    display: block;
+  }
+
+  .subscription-view-btn-text {
+    display: none;
+  }
+
+  &.collapsed {
+    .subscription-hide-btn-text {
+      display: none;
+    }
+
+    .subscription-view-btn-text {
+      display: block;
+    }
+  }
+}
+
+.subscription-item-detail {
+  padding: 0 !important;
+}
+
+.subscription-edit-shipping-address-modal,
+.subscription-edit-billing-address-modal {
+  .modal-dialog {
+    @extend .modal-lg;
+  }
 }

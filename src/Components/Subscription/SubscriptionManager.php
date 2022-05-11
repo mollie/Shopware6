@@ -340,12 +340,34 @@ class SubscriptionManager implements SubscriptionManagerInterface
     }
 
     /**
+     * @param string $subscriptionId
+     * @param string $street
+     * @param string $zipcode
+     * @param string $city
+     */
+    public function updateBillingAddress(string $subscriptionId, string $street, string $zipcode, string $city): void
+    {
+
+    }
+
+    /**
+     *
+     */
+    public function updateShippingAddress(): void
+    {
+
+    }
+
+    /**
      * @param OrderEntity $order
      * @param SalesChannelContext $context
      */
     public function cancelPendingSubscriptions(OrderEntity $order, SalesChannelContext $context): void
     {
         # does nothing for now, not necessary
+        # because it is not even confirmed yet.
+        # but maybe we should add an even in here....
+        # let's keep this for now to have it (speaking of the wrapper) fully implemented...
     }
 
     /**

@@ -5,7 +5,7 @@
     "mollie-payments-cart-error-paymentmethod-availability": "Not all payments methods are available when ordering subscription products.",
     "mollie-payments-cart-error-method-invalid": "The currently selected payment method is not available for subscription products."
   },
-  "error":{
+  "error": {
     "mollie-payments-cart-guest-account": "Guest Accounts cannot be used for subscription orders.",
     "mollie-payments-cart-error-mixedcart": "Your cart contains multiple items in combination with subscription items. Please note you can only purchase 1 subscription item at a time.",
     "mollie-payments-cart-error-paymentmethod-availability": "Not all payments methods are available when ordering subscription products.",
@@ -66,7 +66,13 @@
         "mollieSubscriptionNextPayment": "Next payment at",
         "mollieSubscriptionCancel": "Cancel",
         "mollieSubscriptionContextMenuReorder": "Repeat subscription",
-        "cancelSubscription": "Subscription has been canceled"
+        "cancelSubscription": "Subscription has been canceled",
+        "orderActionView": "View",
+        "orderActionHide": "Hide",
+        "headlineBillingAddress": "Billing address",
+        "btnEditBillingAddress": "edit billing address",
+        "headlineShippingAddress": "Shipping address",
+        "btnEditShippingAddress": "edit shipping address"
       }
     }
   }
