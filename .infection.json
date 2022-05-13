@@ -1,6 +1,6 @@
 {
   "bootstrap": "./phpunit.autoload.php",
-  "minMsi": 19,
+  "minMsi": 18,
   "minCoveredMsi": 20,
   "source": {
     "directories": [

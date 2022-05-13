@@ -67,12 +67,15 @@
         "mollieSubscriptionCancel": "Abbrechen",
         "mollieSubscriptionContextMenuReorder": "Abo wiederholen",
         "cancelSubscription": "Das Abonnement wurde gekündigt",
+        "successUpdateAddress": "Deine Adresse wurde erfolgreich aktualisiert",
+        "errorUpdateAddress": "Die Adresse konnte nicht aktualisiert werden",
         "orderActionView": "Anzeigen",
         "orderActionHide": "Ausblenden",
         "headlineBillingAddress": "Rechnungsadresse",
         "btnEditBillingAddress": "Rechnungsadresse bearbeiten",
         "headlineShippingAddress": "Lieferadresse",
-        "btnEditShippingAddress": "Lieferadresse bearbeiten"
+        "btnEditShippingAddress": "Lieferadresse bearbeiten",
+        "shippingEqualToBilling": "gleich wie Rechnungsadresse"
       }
     }
   }

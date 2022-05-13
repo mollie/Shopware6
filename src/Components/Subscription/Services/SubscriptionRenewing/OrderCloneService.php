@@ -53,18 +53,19 @@ class OrderCloneService
     /**
      * @param OrderEntity $existingOrder
      * @param string $newOrderNumber
+     * @param bool $needsSeparateShippingAddress
      * @param Context $context
      * @return string
      * @throws \Exception
      */
-    public function createNewOrder(OrderEntity $existingOrder, string $newOrderNumber, Context $context): string
+    public function createNewOrder(OrderEntity $existingOrder, string $newOrderNumber, bool $needsSeparateShippingAddress, Context $context): string
     {
         if (!$existingOrder->getAddresses() instanceof OrderAddressCollection) {
             throw new \Exception('Order does not have an address collection');
         }
 
         if (!$existingOrder->getOrderCustomer() instanceof OrderCustomerEntity) {
-            throw new \Exception('Order does not have an order customer assigend');
+            throw new \Exception('Order does not have an order customer assigned');
         }
 
         $newOrderId = Uuid::randomHex();
@@ -92,6 +93,11 @@ class OrderCloneService
         $orderData = $this->orderConverter->convertToOrder($cart, $salesChannelContext, $conversionContext);
 
 
+        # if we only have 1 billing address, but we need a separate
+        # shipping address, then we need to duplicate the existing one to
+        # have a separate shipping address
+        $duplicateShippingAddress = (count($existingOrder->getAddresses()) <= 1) && $needsSeparateShippingAddress;
+
         # -----------------------------------------------------------------
         # adjust the data so that it has new IDs and will be inserted again
 
@@ -100,7 +106,7 @@ class OrderCloneService
         $orderData['orderDateTime'] = new \DateTime();
 
         $orderData['orderCustomer'] = $this->getOrderCustomer($existingOrder->getOrderCustomer());
-        $orderData['addresses'] = $this->getOrderAddresses($existingOrder->getAddresses());
+        $orderData['addresses'] = $this->getOrderAddresses($existingOrder->getAddresses(), $duplicateShippingAddress);
 
         # only set our first transaction.
         # we don't need the history, but without this, we don't have any transaction at all
@@ -151,6 +157,12 @@ class OrderCloneService
                 $orderDelivery = $existingOrder->getDeliveries()->get($oldDeliveryId);
 
                 $orderData['deliveries'][$index]['shippingOrderAddressId'] = $mappingsAddressIDs[$orderDelivery->getShippingOrderAddressId()];
+
+                # if we have duplicated our billing address as shipping address
+                # then we use the second ID as shipping in our duplicated address
+                if ($duplicateShippingAddress) {
+                    $orderData['deliveries'][$index]['shippingOrderAddressId'] = $orderData['addresses'][1]['id'];
+                }
             }
         }
 
@@ -178,14 +190,16 @@ class OrderCloneService
 
     /**
      * @param OrderAddressCollection $addresses
+     * @param bool $duplicateAddress
      * @return array<mixed>
      */
-    private function getOrderAddresses(OrderAddressCollection $addresses): array
+    private function getOrderAddresses(OrderAddressCollection $addresses, bool $duplicateAddress): array
     {
         $addressData = [];
 
         foreach ($addresses as $address) {
-            $addressData[] = [
+
+            $data = [
                 'id' => $address->getId(),
                 'salutationId' => $address->getSalutationId(),
                 'firstName' => $address->getFirstName(),
@@ -203,6 +217,13 @@ class OrderCloneService
                 'countryId' => $address->getCountryId(),
                 'countryStateId' => $address->getCountryStateId(),
             ];
+
+            $addressData[] = $data;
+
+            if ($duplicateAddress) {
+                $data['id'] = Uuid::randomHex();
+                $addressData[] = $data;
+            }
         }
 
         return $addressData;

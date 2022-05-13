@@ -67,12 +67,15 @@
         "mollieSubscriptionCancel": "Annuleren",
         "mollieSubscriptionContextMenuReorder": "Herhaal abonnement",
         "cancelSubscription": "Abonnement is geannuleerd",
+        "successUpdateAddress": "Uw adres is succesvol bijgewerkt",
+        "errorUpdateAddress": "Er is een fout opgetreden bij het bijwerken van uw adres",
         "orderActionView": "Kijkje",
         "orderActionHide": "Verbergen",
         "headlineBillingAddress": "Facturatie adres",
         "btnEditBillingAddress": "factuuradres bewerken",
         "headlineShippingAddress": "Afleveradres",
-        "btnEditShippingAddress": "verzendadres bewerken"
+        "btnEditShippingAddress": "verzendadres bewerken",
+        "shippingEqualToBilling": "Gelijk aan factuuradres"
       }
     }
   }

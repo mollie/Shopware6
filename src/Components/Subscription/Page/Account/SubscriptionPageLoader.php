@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Components\Subscription\Page\Account;
 
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Service\CustomerService;
+use Kiener\MolliePayments\Service\SettingsService;
 use Shopware\Core\Checkout\Cart\Exception\CustomerNotLoggedInException;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -53,6 +54,10 @@ class SubscriptionPageLoader
      */
     private $salutationRoute;
 
+    /**
+     * @var SettingsService
+     */
+    private $settingsService;
 
     /**
      * @param GenericPageLoaderInterface $genericLoader
@@ -60,14 +65,16 @@ class SubscriptionPageLoader
      * @param CustomerService $customerService
      * @param AbstractCountryRoute $countryRoute
      * @param AbstractSalutationRoute $salutationRoute
+     * @param SettingsService $settingsService
      */
-    public function __construct(GenericPageLoaderInterface $genericLoader, EntityRepositoryInterface $repoSubscriptions, CustomerService $customerService, AbstractCountryRoute $countryRoute, AbstractSalutationRoute $salutationRoute)
+    public function __construct(GenericPageLoaderInterface $genericLoader, EntityRepositoryInterface $repoSubscriptions, CustomerService $customerService, AbstractCountryRoute $countryRoute, AbstractSalutationRoute $salutationRoute, SettingsService $settingsService)
     {
         $this->genericLoader = $genericLoader;
         $this->repoSubscriptions = $repoSubscriptions;
         $this->customerService = $customerService;
         $this->countryRoute = $countryRoute;
         $this->salutationRoute = $salutationRoute;
+        $this->settingsService = $settingsService;
     }
 
 
@@ -81,6 +88,9 @@ class SubscriptionPageLoader
         if (!$salesChannelContext->getCustomer() && $request->get('deepLinkCode', false) === false) {
             throw new CustomerNotLoggedInException();
         }
+
+        $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannelId());
+
 
         $page = $this->genericLoader->load($request, $salesChannelContext);
 
@@ -100,13 +110,19 @@ class SubscriptionPageLoader
         /** @var StorefrontSearchResult<SubscriptionEntity> $storefrontSubscriptions */
         $storefrontSubscriptions = StorefrontSearchResult::createFrom($subscriptions);
 
+        # ---------------------------------------------------------------------------------------------
+        # assign data for our page
+
         $page->setSubscriptions($storefrontSubscriptions);
         $page->setDeepLinkCode($request->get('deepLinkCode'));
         $page->setTotal($subscriptions->getTotal());
 
         $page->setSalutations($this->getSalutations($salesChannelContext));
-
         $page->setCountries($this->getCountries($salesChannelContext));
+
+        $page->setAllowAddressEditing($settings->isSubscriptionsAllowAddressEditing());
+
+        # ---------------------------------------------------------------------------------------------
 
         return $page;
     }

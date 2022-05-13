@@ -6,13 +6,12 @@ use Kiener\MolliePayments\Components\Subscription\Page\Account\SubscriptionPageL
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Page\Account\Mollie\AccountSubscriptionsPageLoader;
 use Kiener\MolliePayments\Service\Subscription\CancelSubscriptionsService;
-use Shopware\Core\Framework\Context;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Routing\Annotation\LoginRequired;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -33,15 +32,22 @@ class AccountController extends StorefrontController
      */
     private $subscriptionManager;
 
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
 
     /**
      * @param SubscriptionPageLoader $pageLoader
      * @param SubscriptionManager $subscriptionManager
+     * @param LoggerInterface $logger
      */
-    public function __construct(SubscriptionPageLoader $pageLoader, SubscriptionManager $subscriptionManager)
+    public function __construct(SubscriptionPageLoader $pageLoader, SubscriptionManager $subscriptionManager, LoggerInterface $logger)
     {
         $this->pageLoader = $pageLoader;
         $this->subscriptionManager = $subscriptionManager;
+        $this->logger = $logger;
     }
 
 
@@ -67,54 +73,128 @@ class AccountController extends StorefrontController
      *
      * @param string $subscriptionId
      * @param RequestDataBag $data
-     * @param Context $context
+     * @param SalesChannelContext $salesChannelContext
      * @return Response
      */
-    public function updateBilling(string $subscriptionId, RequestDataBag $data, Context $context): Response
+    public function updateBilling(string $subscriptionId, RequestDataBag $data, SalesChannelContext $salesChannelContext): Response
     {
-        $address = $data->get('address', null);
+        try {
 
-        if ($address === null) {
-            #   $this->addFlash(self::SUCCESS,
-            #   $this->trans('molliePayments.subscriptions.account.cancelSubscription',
-            #        ['%1%' => $subscriptionId]
-            #     )
-            #  );
+            $address = $data->get('address', null);
+
+            if (!$address instanceof RequestDataBag) {
+                throw new \Exception('Missing address data in request');
+            }
+
+            $salutationId = $address->get('salutationId', '');
+            $title = $address->get('title', '');
+            $firstName = $address->get('firstName', '');
+            $lastName = $address->get('lastName', '');
+            $company = $address->get('company', '');
+            $department = $address->get('department', '');
+            $additionalField1 = $address->get('additionalField1', '');
+            $additionalField2 = $address->get('additionalField2', '');
+            $phoneNumber = $address->get('phoneNumber', '');
+            $street = $address->get('street', '');
+            $zipcode = $address->get('zipcode', '');
+            $city = $address->get('city', '');
+            # COUNTRY change not allowed for billing
+            $countryStateId = $address->get('countryStateId', '');
+
+            $this->subscriptionManager->updateBillingAddress(
+                $subscriptionId,
+                $salutationId,
+                $title,
+                $firstName,
+                $lastName,
+                $company,
+                $department,
+                $additionalField1,
+                $additionalField2,
+                $phoneNumber,
+                $street,
+                $zipcode,
+                $city,
+                $countryStateId,
+                $salesChannelContext->getContext()
+            );
+
+            $this->addFlash(self::SUCCESS, $this->trans('molliePayments.subscriptions.account.successUpdateAddress'));
+
+            return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
+
+        } catch (\Throwable $exception) {
+
+            $this->logger->error('Error when updating billing address of subscription ' . $subscriptionId . ': ' . $exception->getMessage());
+
+            $this->addFlash(self::DANGER, $this->trans('molliePayments.subscriptions.account.errorUpdateAddress'));
             return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
         }
-
-        $firstName = $address['firstName'];
-        $lastName = $address['lastName'];
-        $company = $address['company'];
-        $department = $address['department'];
-        $street = $address['street'];
-        $zipcode = $address['zipcode'];
-        $city = $address['city'];
-
-
-        $this->subscriptionManager->updateBillingAddress(
-            $subscriptionId,
-            $street,
-            $zipcode,
-            $city
-        );
-
-        return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
     }
 
     /**
      * @LoginRequired()
      * @Route("/account/mollie/subscriptions/{subscriptionId}/shipping/update", name="frontend.account.mollie.subscriptions.shipping.update", methods={"POST"})
      *
+     * @param string $subscriptionId
      * @param RequestDataBag $data
-     * @param Context $context
-     * @return JsonResponse
+     * @param SalesChannelContext $salesChannelContext
+     * @return Response
      */
-    public function updateShipping(RequestDataBag $data, Context $context): JsonResponse
+    public function updateShipping(string $subscriptionId, RequestDataBag $data, SalesChannelContext $salesChannelContext): Response
     {
-        $this->subscriptionManager->updateShippingAddress();
+        try {
 
-        return new JsonResponse(['success' => true]);
+            $address = $data->get('address', null);
+
+            if (!$address instanceof RequestDataBag) {
+                throw new \Exception('Missing address data in request');
+            }
+
+            $salutationId = $address->get('salutationId', '');
+            $title = $address->get('title', '');
+            $firstName = $address->get('firstName', '');
+            $lastName = $address->get('lastName', '');
+            $company = $address->get('company', '');
+            $department = $address->get('department', '');
+            $additionalField1 = $address->get('additionalField1', '');
+            $additionalField2 = $address->get('additionalField2', '');
+            $phoneNumber = $address->get('phoneNumber', '');
+            $street = $address->get('street', '');
+            $zipcode = $address->get('zipcode', '');
+            $city = $address->get('city', '');
+            # COUNTRY change not allowed for billing
+            $countryStateId = $address->get('countryStateId', '');
+
+            $this->subscriptionManager->updateShippingAddress(
+                $subscriptionId,
+                $salutationId,
+                $title,
+                $firstName,
+                $lastName,
+                $company,
+                $department,
+                $additionalField1,
+                $additionalField2,
+                $phoneNumber,
+                $street,
+                $zipcode,
+                $city,
+                $countryStateId,
+                $salesChannelContext->getContext()
+            );
+
+            $this->addFlash(self::SUCCESS, $this->trans('molliePayments.subscriptions.account.successUpdateAddress'));
+
+            return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
+
+        } catch (\Throwable $exception) {
+
+            $this->logger->error('Error when updating shipping address of subscription ' . $subscriptionId . ': ' . $exception->getMessage());
+
+            $this->addFlash(self::DANGER, $this->trans('molliePayments.subscriptions.account.errorUpdateAddress'));
+            return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
+        }
     }
 
     /**

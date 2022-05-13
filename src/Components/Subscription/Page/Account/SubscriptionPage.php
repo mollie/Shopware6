@@ -36,6 +36,11 @@ class SubscriptionPage extends Page
      */
     protected $salutations;
 
+    /**
+     * @var bool
+     */
+    protected $allowAddressEditing;
+
 
     /**
      * @return StorefrontSearchResult<SubscriptionEntity>
@@ -115,6 +120,22 @@ class SubscriptionPage extends Page
     public function setSalutations(SalutationCollection $salutations): void
     {
         $this->salutations = $salutations;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowAddressEditing(): bool
+    {
+        return $this->allowAddressEditing;
+    }
+
+    /**
+     * @param bool $allowAddressEditing
+     */
+    public function setAllowAddressEditing(bool $allowAddressEditing): void
+    {
+        $this->allowAddressEditing = $allowAddressEditing;
     }
 
 }

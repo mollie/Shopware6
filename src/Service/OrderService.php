@@ -86,12 +86,24 @@ class OrderService implements OrderServiceInterface
         $criteria = new Criteria([$orderId]);
         $criteria->addAssociation('currency');
         $criteria->addAssociation('addresses');
+        $criteria->addAssociation('shippingAddress');   # important for subscription creation
+        $criteria->addAssociation('billingAddress');    # important for subscription creation
+        $criteria->addAssociation('billingAddress.country');
         $criteria->addAssociation('orderCustomer');
+        $criteria->addAssociation('orderCustomer.customer');
+        $criteria->addAssociation('orderCustomer.salutation');
+        $criteria->addAssociation('language');
         $criteria->addAssociation('language.locale');
+        $criteria->addAssociation('lineItems');
         $criteria->addAssociation('lineItems.product.media');
         $criteria->addAssociation('deliveries.shippingOrderAddress');
+        $criteria->addAssociation('deliveries.shippingOrderAddress.country');
         $criteria->addAssociation('deliveries.shippingMethod');
+        $criteria->addAssociation('deliveries.positions.orderLineItem');
         $criteria->addAssociation('transactions.paymentMethod');
+        $criteria->addAssociation('transactions.paymentMethod.appPaymentMethod.app');
+        $criteria->addAssociation('transactions.stateMachineState');
+
 
         /** @var OrderEntity $order */
         $order = $this->orderRepository->search($criteria, $context)->first();

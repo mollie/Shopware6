@@ -3,9 +3,11 @@
 namespace Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing;
 
 
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Service\OrderService;
 use Mollie\Api\Resources\Payment;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -27,7 +29,7 @@ class SubscriptionRenewing
     /**
      * @var EntityRepositoryInterface
      */
-    private $repoOrders;
+    private $repoOrderAddress;
 
     /**
      * @var OrderService
@@ -42,14 +44,14 @@ class SubscriptionRenewing
 
     /**
      * @param NumberRangeValueGeneratorInterface $numberRanges
-     * @param EntityRepositoryInterface $repoOrders
+     * @param EntityRepositoryInterface $repoOrderAddress
      * @param OrderService $orderService
      * @param OrderCloneService $orderCloneService
      */
-    public function __construct(NumberRangeValueGeneratorInterface $numberRanges, EntityRepositoryInterface $repoOrders, OrderService $orderService, OrderCloneService $orderCloneService)
+    public function __construct(NumberRangeValueGeneratorInterface $numberRanges, EntityRepositoryInterface $repoOrderAddress, OrderService $orderService, OrderCloneService $orderCloneService)
     {
         $this->numberRanges = $numberRanges;
-        $this->repoOrders = $repoOrders;
+        $this->repoOrderAddress = $repoOrderAddress;
         $this->orderService = $orderService;
         $this->orderCloneService = $orderCloneService;
     }
@@ -64,7 +66,7 @@ class SubscriptionRenewing
      */
     public function renewSubscription(SubscriptionEntity $subscription, Payment $molliePayment, SalesChannelContext $context): OrderEntity
     {
-        $order = $this->getOrder($subscription->getOrderId(), $context->getContext());
+        $order = $this->orderService->getOrder($subscription->getOrderId(), $context->getContext());
 
         if (!$order instanceof OrderEntity) {
             throw new EntityNotFoundException('order', $subscription->getOrderId());
@@ -73,10 +75,15 @@ class SubscriptionRenewing
         # get the next order number
         $newOrderNumber = $this->numberRanges->getValue('order', $context->getContext(), $subscription->getSalesChannelId());
 
-        # now let's clone our previous order and create a new one from it
-        $orderId = $this->orderCloneService->createNewOrder($order, $newOrderNumber, $context->getContext());
 
-        $order = $this->getOrder($orderId, $context->getContext());
+        # if we have a separate shipping address
+        # make sure that our cloned order also contains 2 addresses (1 for shipping)
+        $needsSeparateShippingAddress = ($subscription->getShippingAddress() instanceof SubscriptionAddressEntity);
+
+        # now let's clone our previous order and create a new one from it
+        $orderId = $this->orderCloneService->createNewOrder($order, $newOrderNumber, $needsSeparateShippingAddress, $context->getContext());
+
+        $order = $this->orderService->getOrder($orderId, $context->getContext());
 
         if (!$order instanceof OrderEntity) {
             throw new \Exception('Cannot renew subscription. Order with ID ' . $orderId . ' not found for subscription: ' . $subscription->getMollieId());
@@ -93,6 +100,61 @@ class SubscriptionRenewing
         }
 
 
+        $billing = $subscription->getBillingAddress();
+
+        # now update the billing and shipping address
+        if ($billing instanceof SubscriptionAddressEntity) {
+            $this->repoOrderAddress->update([
+                [
+                    'id' => $order->getBillingAddressId(),
+                    'salutationId' => $billing->getSalutationId(),
+                    'title' => $billing->getTitle(),
+                    'firstName' => $billing->getFirstName(),
+                    'lastName' => $billing->getLastName(),
+                    'company' => $billing->getCompany(),
+                    'department' => $billing->getDepartment(),
+                    'additionalAddressLine1' => $billing->getAdditionalAddressLine1(),
+                    'additionalAddressLine2' => $billing->getAdditionalAddressLine2(),
+                    'phoneNumber' => $billing->getPhoneNumber(),
+                    'street' => $billing->getStreet(),
+                    'zipcode' => $billing->getZipcode(),
+                    'city' => $billing->getCity(),
+                    'countryId' => $billing->getCountryId(),
+                    'countryStateId' => $billing->getCountryStateId(),
+                ]
+            ],
+                $context->getContext()
+            );
+        }
+
+        $shipping = $subscription->getShippingAddress();
+
+        if ($shipping instanceof SubscriptionAddressEntity && $order->getDeliveries() instanceof OrderDeliveryCollection) {
+            foreach ($order->getDeliveries() as $delivery) {
+                $this->repoOrderAddress->update([
+                    [
+                        'id' => $delivery->getShippingOrderAddressId(),
+                        'salutationId' => $shipping->getSalutationId(),
+                        'title' => $shipping->getTitle(),
+                        'firstName' => $shipping->getFirstName(),
+                        'lastName' => $shipping->getLastName(),
+                        'company' => $shipping->getCompany(),
+                        'department' => $shipping->getDepartment(),
+                        'additionalAddressLine1' => $billing->getAdditionalAddressLine1(),
+                        'additionalAddressLine2' => $billing->getAdditionalAddressLine2(),
+                        'phoneNumber' => $billing->getPhoneNumber(),
+                        'street' => $shipping->getStreet(),
+                        'zipcode' => $shipping->getZipcode(),
+                        'city' => $shipping->getCity(),
+                        'countryId' => $shipping->getCountryId(),
+                        'countryStateId' => $shipping->getCountryStateId(),
+                    ]
+                ],
+                    $context->getContext()
+                );
+            }
+        }
+
         # also make sure to update our metadata
         # that is stored in the custom fields of the
         # Shopware order and its transactions
@@ -106,36 +168,8 @@ class SubscriptionRenewing
             $context
         );
 
-        
+
         return $order;
     }
-
-    /**
-     * @param string|null $orderId
-     * @param Context $context
-     * @return OrderEntity|null
-     */
-    private function getOrder(?string $orderId, Context $context): ?OrderEntity
-    {
-        $criteria = (new Criteria([$orderId]));
-
-        $criteria->addAssociation('addresses');
-        $criteria->addAssociation('transactions.stateMachineState');
-        $criteria->addAssociation('transactions.paymentMethod');
-        $criteria->addAssociation('orderCustomer.customer');
-        $criteria->addAssociation('orderCustomer.salutation');
-        $criteria->addAssociation('transactions.paymentMethod.appPaymentMethod.app');
-        $criteria->addAssociation('language');
-        $criteria->addAssociation('currency');
-        $criteria->addAssociation('deliveries.positions.orderLineItem');
-        $criteria->addAssociation('deliveries.shippingOrderAddress');
-        $criteria->addAssociation('deliveries.shippingMethod');
-        $criteria->addAssociation('deliveries.shippingOrderAddress.country');
-        $criteria->addAssociation('billingAddress.country');
-        $criteria->addAssociation('lineItems');
-
-        return $this->repoOrders->search($criteria, $context)->get($orderId);
-    }
-
 
 }

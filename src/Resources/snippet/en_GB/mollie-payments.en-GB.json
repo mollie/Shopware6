@@ -67,12 +67,15 @@
         "mollieSubscriptionCancel": "Cancel",
         "mollieSubscriptionContextMenuReorder": "Repeat subscription",
         "cancelSubscription": "Subscription has been canceled",
+        "successUpdateAddress": "Your address has been updated successfully",
+        "errorUpdateAddress": "There was an error when updating your address",
         "orderActionView": "View",
         "orderActionHide": "Hide",
         "headlineBillingAddress": "Billing address",
         "btnEditBillingAddress": "edit billing address",
         "headlineShippingAddress": "Shipping address",
-        "btnEditShippingAddress": "edit shipping address"
+        "btnEditShippingAddress": "edit shipping address",
+        "shippingEqualToBilling": "Equal to billing address"
       }
     }
   }

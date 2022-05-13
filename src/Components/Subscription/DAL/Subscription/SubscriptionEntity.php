@@ -3,6 +3,8 @@
 namespace Kiener\MolliePayments\Components\Subscription\DAL\Subscription;
 
 
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressCollection;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\MollieLiveData;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
@@ -71,6 +73,16 @@ class SubscriptionEntity extends Entity
     protected $salesChannelId;
 
     /**
+     * @var ?string
+     */
+    protected $billingAddressId;
+
+    /**
+     * @var ?string
+     */
+    protected $shippingAddressId;
+
+    /**
      * @var array<mixed>|null
      */
     protected $metadata;
@@ -95,6 +107,25 @@ class SubscriptionEntity extends Entity
      */
     protected $mollieStatus;
 
+    # --------------------------------------------------------------------------------
+    # loaded entities
+
+    /**
+     * @var SubscriptionAddressCollection
+     */
+    protected $addresses;
+
+    /**
+     * @var SubscriptionAddressEntity|null
+     */
+    protected $billingAddress;
+
+    /**
+     * @var SubscriptionAddressEntity|null
+     */
+    protected $shippingAddress;
+
+    # --------------------------------------------------------------------------------
 
     /**
      * @param string $mollieCustomerId
@@ -341,6 +372,70 @@ class SubscriptionEntity extends Entity
     }
 
     /**
+     * @return SubscriptionAddressEntity|null
+     */
+    public function getBillingAddress(): ?SubscriptionAddressEntity
+    {
+        return $this->billingAddress;
+    }
+
+    /**
+     * @param SubscriptionAddressEntity|null $billingAddress
+     */
+    public function setBillingAddress(?SubscriptionAddressEntity $billingAddress): void
+    {
+        $this->billingAddress = $billingAddress;
+    }
+
+    /**
+     * @return SubscriptionAddressEntity|null
+     */
+    public function getShippingAddress(): ?SubscriptionAddressEntity
+    {
+        return $this->shippingAddress;
+    }
+
+    /**
+     * @param SubscriptionAddressEntity|null $shippingAddress
+     */
+    public function setShippingAddress(?SubscriptionAddressEntity $shippingAddress): void
+    {
+        $this->shippingAddress = $shippingAddress;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getBillingAddressId(): ?string
+    {
+        return $this->billingAddressId;
+    }
+
+    /**
+     * @param string|null $billingAddressId
+     */
+    public function setBillingAddressId(?string $billingAddressId): void
+    {
+        $this->billingAddressId = $billingAddressId;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getShippingAddressId(): ?string
+    {
+        return $this->shippingAddressId;
+    }
+
+    /**
+     * @param string|null $shippingAddressId
+     */
+    public function setShippingAddressId(?string $shippingAddressId): void
+    {
+        $this->shippingAddressId = $shippingAddressId;
+    }
+
+    /**
      * @return bool
      */
     public function isConfirmed(): bool
@@ -353,7 +448,7 @@ class SubscriptionEntity extends Entity
      */
     public function getMollieStatus(): string
     {
-        return $this->mollieStatus;
+        return (string)$this->mollieStatus;
     }
 
     /**
@@ -378,6 +473,22 @@ class SubscriptionEntity extends Entity
     public function setCustomer(CustomerEntity $customer): void
     {
         $this->customer = $customer;
+    }
+
+    /**
+     * @return SubscriptionAddressCollection
+     */
+    public function getAddresses(): SubscriptionAddressCollection
+    {
+        return $this->addresses;
+    }
+
+    /**
+     * @param SubscriptionAddressCollection $addresses
+     */
+    public function setAddresses(SubscriptionAddressCollection $addresses): void
+    {
+        $this->addresses = $addresses;
     }
 
 }

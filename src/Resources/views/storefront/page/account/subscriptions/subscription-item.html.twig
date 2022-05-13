@@ -110,9 +110,7 @@
 
                                     {% if(subscription.status != 'canceled') %}
                                         {% block page_account_subscriptions_item_context_menu_cancel_form %}
-                                            <form action="{{ cancelAction }}"
-                                                  id="subscriptionsDetailForm-{{ subscriptions.Id }}"
-                                                  method="post">
+                                            <form action="{{ cancelAction }}" id="subscriptionsDetailForm-{{ subscriptions.Id }}" method="post">
 
                                                 {% block page_account_subscriptions_item_context_menu_cancel_form_csrf %}
                                                     {{ sw_csrf('frontend.account.mollie.subscriptions.cancel') }}
@@ -130,7 +128,7 @@
                                                 {% endblock %}
 
                                                 {% block page_account_mollie_subscriptions_item_order_table_body_cell_toggle_subscription_details_button %}
-                                                    <button class="order-table-header-context-menu-content-link"
+                                                    <button class="order-table-header-context-menu-content-link btn-mollie-subscription-cancel"
                                                             type="submit">{{ "molliePayments.subscriptions.account.mollieSubscriptionCancel"|trans|sw_sanitize }}</button>
                                                 {% endblock %}
                                             </form>
@@ -175,7 +173,13 @@
                             <div class="subscription-detail-content">
 
                                 <div class="row">
-
+                                    {#
+                                    # ==========================================================================================================================
+                                    # ==========================================================================================================================
+                                    # BILLING ADDRESS
+                                    # ==========================================================================================================================
+                                    # ==========================================================================================================================
+                                    #}
                                     <div class="col-lg-6 card-col">
                                         <div class="card">
                                             <div class="card-body">
@@ -183,14 +187,16 @@
                                                     {{ "molliePayments.subscriptions.account.headlineBillingAddress" | trans | sw_sanitize }}
                                                 </h2>
                                                 <div class="address">
-                                                    {% sw_include '@Storefront/storefront/component/address/address.html.twig' with {'address': context.customer.defaultBillingAddress} %}
+                                                    {% sw_include '@Storefront/storefront/page/account/subscriptions/address/address.html.twig' with {'address': subscription.billingAddress} %}
                                                 </div>
                                                 <div class="card-actions">
-                                                    <button type="button" class="btn btn-primary"
-                                                            data-toggle="modal"
-                                                            data-target="#editBillingAddress{{ subscription.id }}">
-                                                        {{ "molliePayments.subscriptions.account.btnEditBillingAddress" | trans | sw_sanitize }}
-                                                    </button>
+                                                    {% if page.allowAddressEditing %}
+                                                        <button type="button" class="btn btn-primary"
+                                                                data-toggle="modal"
+                                                                data-target="#editBillingAddress{{ subscription.id }}">
+                                                            {{ "molliePayments.subscriptions.account.btnEditBillingAddress" | trans | sw_sanitize }}
+                                                        </button>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                         </div>
@@ -234,23 +240,11 @@
                                                                                 {% endblock %}
 
                                                                                 {% block component_address_subscribtion_billing_address_form_fields_include %}
-                                                                                    {% sw_include '@Storefront/storefront/component/address/address-personal.html.twig' with {
-                                                                                        'data': context.customer.defaultBillingAddress,
-                                                                                        'prefix': 'address',
-                                                                                        'idPrefix': typePrefix,
-                                                                                        'scope': 'parent',
-                                                                                        'parentSelector': 'form'
-                                                                                    } %}
-
-                                                                                    {% sw_include '@Storefront/storefront/component/address/address-form.html.twig' with {
-                                                                                        'data': context.customer.defaultBillingAddress,
-                                                                                        'prefix': 'address',
-                                                                                        'idPrefix': typePrefix,
+                                                                                    {% sw_include '@Storefront/storefront/page/account/subscriptions/address/address-form.html.twig' with {
+                                                                                        'data': subscription.billingAddress,
                                                                                         'scope': 'parent',
                                                                                         'parentSelector': 'form',
-                                                                                        'showFormCompany': true,
-                                                                                        'showNoShippingPostfix': true,
-                                                                                        'showVatIdField': false
+                                                                                        'editCountry' : false,
                                                                                     } %}
                                                                                 {% endblock %}
 
@@ -288,7 +282,13 @@
                                             </div>
                                         </div>
                                     </div>
-
+                                    {#
+                                    # ==========================================================================================================================
+                                    # ==========================================================================================================================
+                                    # SHIPPING ADDRESS
+                                    # ==========================================================================================================================
+                                    # ==========================================================================================================================
+                                    #}
                                     <div class="col-lg-6 card-col">
                                         <div class="card">
                                             <div class="card-body">
@@ -296,14 +296,20 @@
                                                     {{ "molliePayments.subscriptions.account.headlineShippingAddress" | trans | sw_sanitize }}
                                                 </h2>
                                                 <div class="address">
-                                                    {% sw_include '@Storefront/storefront/component/address/address.html.twig' with {'address': context.customer.defaultShippingAddress} %}
+                                                    {% if subscription.shippingAddress %}
+                                                        {% sw_include '@Storefront/storefront/page/account/subscriptions/address/address.html.twig' with {'address': subscription.shippingAddress} %}
+                                                    {% else %}
+                                                        {{ "molliePayments.subscriptions.account.shippingEqualToBilling" | trans | sw_sanitize }}
+                                                    {% endif %}
                                                 </div>
                                                 <div class="card-actions">
-                                                    <button type="button" class="btn btn-primary"
-                                                            data-toggle="modal"
-                                                            data-target="#editShippingAddress{{ subscription.id }}">
-                                                        {{ "molliePayments.subscriptions.account.btnEditShippingAddress" | trans | sw_sanitize }}
-                                                    </button>
+                                                    {% if page.allowAddressEditing %}
+                                                        <button type="button" class="btn btn-primary"
+                                                                data-toggle="modal"
+                                                                data-target="#editShippingAddress{{ subscription.id }}">
+                                                            {{ "molliePayments.subscriptions.account.btnEditShippingAddress" | trans | sw_sanitize }}
+                                                        </button>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                         </div>
@@ -334,55 +340,49 @@
                                                                     <div class="card-body">
                                                                         {% block component_address_subscribtion_shipping_address_form %}
                                                                             <form method="post"
+                                                                                  action="{{ path('frontend.account.mollie.subscriptions.shipping.update',
+                                                                                      {
+                                                                                          'subscriptionId': subscription.id,
+                                                                                      }
+                                                                                  ) }}">
 
-                                                                            {% block component_address_subscribtion_shipping_address_form_csrf %}
-                                                                            {% endblock %}
+                                                                                {% block component_address_subscribtion_shipping_address_form_csrf %}
+                                                                                    {{ sw_csrf('frontend.account.mollie.subscriptions.shipping.update') }}
+                                                                                {% endblock %}
 
-                                                                            {% block component_address_subscribtion_shipping_address_form_hidden_inputs %}
-                                                                            {% endblock %}
+                                                                                {% block component_address_subscribtion_shipping_address_form_hidden_inputs %}
+                                                                                {% endblock %}
 
-                                                                            {% block component_address_subscribtion_shipping_address_form_fields_include %}
-                                                                                {% sw_include '@Storefront/storefront/component/address/address-personal.html.twig' with {
-                                                                                    'data': context.customer.defaultShippingAddress,
-                                                                                    'prefix': 'address',
-                                                                                    'idPrefix': typePrefix,
-                                                                                    'scope': 'parent',
-                                                                                    'parentSelector': 'form'
-                                                                                } %}
+                                                                                {% block component_address_subscribtion_shipping_address_form_fields_include %}
+                                                                                    {% sw_include '@Storefront/storefront/page/account/subscriptions/address/address-form.html.twig' with {
+                                                                                        'data': subscription.shippingAddress,
+                                                                                        'scope': 'parent',
+                                                                                        'parentSelector': 'form',
+                                                                                        'editCountry' : false,
+                                                                                    } %}
+                                                                                {% endblock %}
 
-                                                                                {% sw_include '@Storefront/storefront/component/address/address-form.html.twig' with {
-                                                                                    'data': context.customer.defaultShippingAddress,
-                                                                                    'prefix': 'address',
-                                                                                    'idPrefix': typePrefix,
-                                                                                    'scope': 'parent',
-                                                                                    'parentSelector': 'form',
-                                                                                    'showFormCompany': true,
-                                                                                    'showNoShippingPostfix': true,
-                                                                                    'showVatIdField': feature('FEATURE_NEXT_15957') and changeBilling and context.customer and context.customer.guest ? true : false
-                                                                                } %}
-                                                                            {% endblock %}
+                                                                                {% block component_address_subscribtion_shipping_address_required_hint %}
+                                                                                    <p class="address-required-info required-fields">
+                                                                                        {% block component_address_subscribtion_shipping_address_required_hint_text %}
+                                                                                            {{ "general.requiredFields"|trans|sw_sanitize }}
+                                                                                        {% endblock %}
+                                                                                    </p>
+                                                                                {% endblock %}
 
-                                                                            {% block component_address_subscribtion_shipping_address_required_hint %}
-                                                                                <p class="address-required-info required-fields">
-                                                                                    {% block component_address_subscribtion_shipping_address_required_hint_text %}
-                                                                                        {{ "general.requiredFields"|trans|sw_sanitize }}
-                                                                                    {% endblock %}
-                                                                                </p>
-                                                                            {% endblock %}
-
-                                                                            {% block component_address_subscribtion_shipping_address_form_actions %}
-                                                                                <div class="address-form-actions">
-                                                                                    {% block component_address_subscribtion_shipping_address_form_actions_submit %}
-                                                                                        <button type="submit"
-                                                                                                class="address-form-submit btn btn-primary"
-                                                                                                title="{{ "account.addressSaveChange"|trans|striptags }}">
-                                                                                            {% block component_address_subscribtion_shipping_address_form_actions_submit_text %}
-                                                                                                {{ "account.addressSaveChange"|trans|sw_sanitize }}
-                                                                                            {% endblock %}
-                                                                                        </button>
-                                                                                    {% endblock %}
-                                                                                </div>
-                                                                            {% endblock %}
+                                                                                {% block component_address_subscribtion_shipping_address_form_actions %}
+                                                                                    <div class="address-form-actions">
+                                                                                        {% block component_address_subscribtion_shipping_address_form_actions_submit %}
+                                                                                            <button type="submit"
+                                                                                                    class="address-form-submit btn btn-primary"
+                                                                                                    title="{{ "account.addressSaveChange"|trans|striptags }}">
+                                                                                                {% block component_address_subscribtion_shipping_address_form_actions_submit_text %}
+                                                                                                    {{ "account.addressSaveChange"|trans|sw_sanitize }}
+                                                                                                {% endblock %}
+                                                                                            </button>
+                                                                                        {% endblock %}
+                                                                                    </div>
+                                                                                {% endblock %}
                                                                             </form>
                                                                         {% endblock %}
                                                                     </div>
