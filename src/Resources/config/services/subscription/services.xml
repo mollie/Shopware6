@@ -106,6 +106,9 @@
             <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing\SubscriptionRenewing"/>
             <argument type="service" id="sales_channel.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
             <argument type="service" id="mollie_payments.logger"/>
         </service>
 

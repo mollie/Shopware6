@@ -51,4 +51,15 @@ class FakeMollieGateway implements MollieGatewayInterface
         // TODO: Implement getSubscription() method.
     }
 
+    public function createPayment(array $data): Payment
+    {
+        // TODO: Implement createPayment() method.
+    }
+
+    public function updateSubscription(string $subscriptionId, string $customerId, string $mandateId): void
+    {
+        // TODO: Implement updateSubscription() method.
+    }
+
+
 }

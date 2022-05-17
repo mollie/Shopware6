@@ -41,6 +41,12 @@ interface MollieGatewayInterface
     public function getPayment(string $paymentId): Payment;
 
     /**
+     * @param array<mixed> $data
+     * @return Payment
+     */
+    public function createPayment(array $data): Payment;
+
+    /**
      * @param string $customerID
      * @param array<mixed> $data
      * @return Subscription
@@ -53,6 +59,13 @@ interface MollieGatewayInterface
      * @return void
      */
     public function cancelSubscription(string $subscriptionId, string $customerId): void;
+
+    /**
+     * @param string $subscriptionId
+     * @param string $customerId
+     * @param string $mandateId
+     */
+    public function updateSubscription(string $subscriptionId, string $customerId, string $mandateId): void;
 
     /**
      * @param string $subscriptionId

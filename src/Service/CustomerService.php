@@ -263,13 +263,14 @@ class CustomerService
      * @param string $salesChannelId
      * @param Context $context
      * @return string
+     * @throws CustomerCouldNotBeFoundException
      */
     public function getMollieCustomerId(string $customerId, string $salesChannelId, Context $context): string
     {
         $settings = $this->settingsService->getSettings($salesChannelId);
         $struct = $this->getCustomerStruct($customerId, $context);
 
-        return $struct->getCustomerId($settings->getProfileId(), $settings->isTestMode());
+        return $struct->getCustomerId((string)$settings->getProfileId(), $settings->isTestMode());
     }
 
     /**
@@ -523,7 +524,7 @@ class CustomerService
             return;
         }
 
-        if (!empty($struct->getCustomerId($settings->getProfileId(), $settings->isTestMode()))) {
+        if (!empty($struct->getCustomerId((string)$settings->getProfileId(), $settings->isTestMode()))) {
             return;
         }
 

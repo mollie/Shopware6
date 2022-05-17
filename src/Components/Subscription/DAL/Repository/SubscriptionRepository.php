@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Components\Subscription\DAL\Repository;
 
 use DateTime;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -37,6 +38,7 @@ class SubscriptionRepository
         $this->repoAddresses = $repoAddresses;
     }
 
+#region READ
 
     /**
      * @return EntityRepositoryInterface
@@ -114,6 +116,10 @@ class SubscriptionRepository
         return $this->repoSubscriptions->search($criteria, $context);
     }
 
+#endregion
+
+#region INSERT/UPDATE
+
     /**
      * @param SubscriptionEntity $subscription
      * @param Context $context
@@ -175,6 +181,24 @@ class SubscriptionRepository
                 'mollieId' => $mollieSubscriptionId,
                 'mollieCustomerId' => $mollieCustomerId,
                 'nextPaymentAt' => $nextPaymentDate,
+            ]
+        ],
+            $context
+        );
+    }
+
+    /**
+     * @param string $id
+     * @param SubscriptionMetadata $metadata
+     * @param Context $context
+     * @return void
+     */
+    public function updateSubscriptionMetadata(string $id, SubscriptionMetadata $metadata, Context $context): void
+    {
+        $this->repoSubscriptions->update([
+            [
+                'id' => $id,
+                'metadata' => $metadata->toArray(),
             ]
         ],
             $context
@@ -304,5 +328,7 @@ class SubscriptionRepository
             $context
         );
     }
+
+#endregion
 
 }

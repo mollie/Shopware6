@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Components\Subscription\Services\Builder;
 
 use Exception;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
@@ -87,10 +88,13 @@ class SubscriptionBuilder
         $subscriptionEntity->setSalesChannelId($order->getSalesChannelId());
 
         $subscriptionEntity->setMetadata(
-            $order->getOrderDateTime()->format('Y-m-d'),
-            $interval,
-            $intervalUnit,
-            $times
+            new SubscriptionMetadata(
+                $order->getOrderDateTime()->format('Y-m-d'),
+                $interval,
+                $intervalUnit,
+                $times,
+                ''
+            )
         );
 
         $orderAddress = $order->getBillingAddress();

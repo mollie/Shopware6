@@ -12,12 +12,18 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\Sub
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder;
 use Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder;
+use Kiener\MolliePayments\Components\Subscription\Services\PaymentMethodRemover\PaymentMethodRemover;
 use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionReminder\ReminderValidator;
 use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing\SubscriptionRenewing;
+use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Service\CustomerService;
+use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
+use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
+use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
+use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
@@ -95,6 +101,21 @@ class SubscriptionManager implements SubscriptionManagerInterface
     private $flowBuilderEventFactory;
 
     /**
+     * @var WebhookBuilder
+     */
+    private $routingBuilder;
+
+    /**
+     * @var MollieOrderPriceBuilder
+     */
+    private $priceBuilder;
+
+    /**
+     * @var OrderStatusConverter
+     */
+    private $statusConverter;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -112,9 +133,12 @@ class SubscriptionManager implements SubscriptionManagerInterface
      * @param MollieGatewayInterface $gatewayMollie
      * @param SubscriptionRenewing $renewingService
      * @param EntityRepositoryInterface $repoSalesChannel
+     * @param WebhookBuilder $webhookBuilder
+     * @param MollieOrderPriceBuilder $priceBuilder
+     * @param OrderStatusConverter $statusConverter
      * @param LoggerInterface $logger
      */
-    public function __construct(FlowBuilderFactoryInterface $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionRepository $repoSubscriptions, OrderService $orderService, SettingsService $settingsService, MollieDataBuilder $definitionBuilder, SubscriptionBuilder $subscriptionBuilder, CustomerService $customers, MollieGatewayInterface $gatewayMollie, SubscriptionRenewing $renewingService, EntityRepositoryInterface $repoSalesChannel, LoggerInterface $logger)
+    public function __construct(FlowBuilderFactoryInterface $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionRepository $repoSubscriptions, OrderService $orderService, SettingsService $settingsService, MollieDataBuilder $definitionBuilder, SubscriptionBuilder $subscriptionBuilder, CustomerService $customers, MollieGatewayInterface $gatewayMollie, SubscriptionRenewing $renewingService, EntityRepositoryInterface $repoSalesChannel, WebhookBuilder $webhookBuilder, MollieOrderPriceBuilder $priceBuilder, OrderStatusConverter $statusConverter, LoggerInterface $logger)
     {
         $this->pluginSettings = $settingsService;
         $this->repoSubscriptions = $repoSubscriptions;
@@ -125,6 +149,9 @@ class SubscriptionManager implements SubscriptionManagerInterface
         $this->renewingService = $renewingService;
         $this->repoSalesChannel = $repoSalesChannel;
         $this->orderService = $orderService;
+        $this->routingBuilder = $webhookBuilder;
+        $this->priceBuilder = $priceBuilder;
+        $this->statusConverter = $statusConverter;
         $this->logger = $logger;
 
         $this->flowBuilderEventFactory = $flowBuilderEventFactory;
@@ -456,6 +483,93 @@ class SubscriptionManager implements SubscriptionManagerInterface
         $address->setCountryStateId($countryStateId);
 
         $this->repoSubscriptions->assignShippingAddress($subscriptionId, $address, $context);
+    }
+
+    /**
+     * @param string $subscriptionId
+     * @param Context $context
+     * @return string
+     * @throws CustomerCouldNotBeFoundException
+     */
+    public function updatePaymentMethodStart(string $subscriptionId, Context $context): string
+    {
+        $subscription = $this->repoSubscriptions->findById($subscriptionId, $context);
+
+        $settings = $this->pluginSettings->getSettings($subscription->getSalesChannelId());
+
+        # first load our customer ID
+        # every subscription customer should have already a Mollie customer ID
+        $customerStruct = $this->customerService->getCustomerStruct($subscription->getCustomerId(), $context);
+        $customerId = $customerStruct->getCustomerId((string)$settings->getProfileId(), $settings->isTestMode());
+
+        # now create our payment.
+        # it's important to use a sequenceType first to allow 0,00 amount payment.
+        # this will be used to process the payment and get/create a new mandate inside the Mollie API systems.
+        $payment = $this->gwMollie->createPayment([
+            'sequenceType' => 'first',
+            'customerId' => $customerId,
+            'method' => PaymentMethodRemover::ALLOWED_METHODS,
+            'amount' => $this->priceBuilder->build(0, 'EUR'),
+            'description' => 'Update Subscription Payment: ' . $subscription->getDescription(),
+            'redirectUrl' => $this->routingBuilder->buildSubscriptionPaymentUpdated($subscriptionId),
+        ]);
+
+        # now update our metadata and set the temporary transaction ID.
+        # we need this in the redirectURL to verify if this
+        # payment was successful or if it failed.
+        $meta = $subscription->getMetadata();
+        $meta->setTmpTransaction($payment->id);
+        $this->repoSubscriptions->updateSubscriptionMetadata($subscription->getId(), $meta, $context);
+
+        # simply return the checkoutURL to redirect the customer
+        return (string)$payment->getCheckoutUrl();
+    }
+
+    /**
+     * @param string $subscriptionId
+     * @param Context $context
+     * @return void
+     * @throws Exception
+     */
+    public function updatePaymentMethodConfirm(string $subscriptionId, Context $context): void
+    {
+        $subscription = $this->repoSubscriptions->findById($subscriptionId, $context);
+
+        # load our latest tmp_transaction ID that was used
+        # to initialize the payment of the update.
+        # we have to verify if it was indeed successful
+        $latestTransactionId = $subscription->getMetadata()->getTmpTransaction();
+
+        if (empty($latestTransactionId)) {
+            throw new Exception('No temporary transaction existing for this subscription');
+        }
+
+        # load our Mollie Payment with this
+        # temporary transaction ID
+        $this->gwMollie->switchClient($subscription->getSalesChannelId());
+        $payment = $this->gwMollie->getPayment($latestTransactionId);
+
+        # now verify if the payment was indeed
+        # successful and that our subscription mandate can be updated
+        # based on the mandateId in this payment
+        $status = $this->statusConverter->getMolliePaymentStatus($payment);
+        if (!MolliePaymentStatus::isApprovedStatus($status)) {
+            throw new Exception('Payment failed when updating subscription payment method');
+        }
+
+        # now update our Mollie subscription
+        # with the new mandateId of the approved payment
+        $this->gwMollie->updateSubscription(
+            $subscription->getMollieId(),
+            $subscription->getMollieCustomerId(),
+            (string)$payment->mandateId
+        );
+
+        # after updating our mandate ID,
+        # make sure to remove our temporary transaction ID again
+        $meta = $subscription->getMetadata();
+        $meta->setTmpTransaction('');
+        $this->repoSubscriptions->updateSubscriptionMetadata($subscription->getId(), $meta, $context);
     }
 
     /**

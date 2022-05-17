@@ -86,4 +86,19 @@ class WebhookBuilder
         return $webhookUrl;
     }
 
+    /**
+     * @param string $subscriptionId
+     * @return string
+     */
+    public function buildSubscriptionPaymentUpdated(string $subscriptionId): string
+    {
+        $webhookUrl = $this->router->generate(
+            'frontend.account.mollie.subscriptions.payment.update-success',
+            ['subscriptionId' => $subscriptionId],
+            $this->router::ABSOLUTE_URL
+        );
+
+        return $webhookUrl;
+    }
+
 }

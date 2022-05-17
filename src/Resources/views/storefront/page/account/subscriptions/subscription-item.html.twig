@@ -89,8 +89,22 @@
                                             {% endblock %}
 
                                             {% block page_account_subscriptions_item_context_menu_reorder_form_button %}
-                                                <button class="order-table-header-context-menu-content-link"
-                                                        type="submit">{{ "molliePayments.subscriptions.account.mollieSubscriptionContextMenuReorder"|trans|sw_sanitize }}</button>
+                                                <button class="order-table-header-context-menu-content-link" type="submit">{{ "molliePayments.subscriptions.account.mollieSubscriptionContextMenuReorder"|trans|sw_sanitize }}</button>
+                                            {% endblock %}
+                                        </form>
+                                    {% endblock %}
+                                {% endblock %}
+
+                                {% block page_account_subscriptions_item_context_menu_update_payment %}
+                                    {% block page_account_subscriptions_item_context_menu_update_payment_form %}
+                                        <form action="{{ path('frontend.account.mollie.subscriptions.payment.update', { 'subscriptionId': subscription.id }) }}"
+                                              method="post"
+                                              class="order-table-header-context-menu-content-form">
+                                            {% block page_account_subscriptions_item_context_menu_update_payment_form_csrf %}
+                                                {{ sw_csrf('frontend.account.mollie.subscriptions.payment.update') }}
+                                            {% endblock %}
+                                            {% block page_account_subscriptions_item_context_menu_update_payment_form_button %}
+                                                <button class="order-table-header-context-menu-content-link" type="submit">Update Payment</button>
                                             {% endblock %}
                                         </form>
                                     {% endblock %}
