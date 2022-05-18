@@ -149,6 +149,11 @@ class MollieSettingStruct extends Struct
     /**
      * @var bool
      */
+    protected $subscriptionsAllowAddressEditing;
+
+    /**
+     * @var bool
+     */
     protected $subscriptionsReminderEnabled;
 
     /**
@@ -569,5 +574,20 @@ class MollieSettingStruct extends Struct
         return (int)$this->subscriptionsReminderDays;
     }
 
+    /**
+     * @return bool
+     */
+    public function isSubscriptionsAllowAddressEditing(): bool
+    {
+        return (bool)$this->subscriptionsAllowAddressEditing;
+    }
+
+    /**
+     * @param bool $subscriptionsAllowAddressEditing
+     */
+    public function setSubscriptionsAllowAddressEditing(bool $subscriptionsAllowAddressEditing): void
+    {
+        $this->subscriptionsAllowAddressEditing = $subscriptionsAllowAddressEditing;
+    }
 
 }

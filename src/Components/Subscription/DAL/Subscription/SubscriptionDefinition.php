@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Components\Subscription\DAL\Subscription;
 
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressDefinition;
 use Shopware\Core\Checkout\Customer\CustomerDefinition;
 use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Content\Product\ProductDefinition;
@@ -18,6 +19,8 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\IdField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\IntField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\JsonField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\ManyToOneAssociationField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\OneToManyAssociationField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\OneToOneAssociationField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\UpdatedAtField;
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
@@ -58,6 +61,7 @@ class SubscriptionDefinition extends EntityDefinition
     protected function defineFields(): FieldCollection
     {
         return new FieldCollection([
+
             (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
 
             # --------------------------------------------------------------------------------------------------------------------------
@@ -81,17 +85,24 @@ class SubscriptionDefinition extends EntityDefinition
             (new FkField('order_id', 'orderId', OrderDefinition::class))->addFlags(new ApiAware()),
             (new FkField('sales_channel_id', 'salesChannelId', SalesChannelDefinition::class))->addFlags(new ApiAware()),
 
-            new ManyToOneAssociationField('customer', 'customer_id', CustomerDefinition::class, 'id', false),
+            (new FkField('billing_address_id', 'billingAddressId', SalesChannelDefinition::class))->addFlags(new ApiAware()),
+            (new FkField('shipping_address_id', 'shippingAddressId', SalesChannelDefinition::class))->addFlags(new ApiAware()),
+
+            new CreatedAtField(),
+            new UpdatedAtField(),
 
             # --------------------------------------------------------------------------------------------------------------------------
             # RUNTIME LOADED
-
             (new StringField('mollieStatus', 'mollieStatus'))->addFlags(new Runtime(), new ApiAware()),
 
             # --------------------------------------------------------------------------------------------------------------------------
 
-            new CreatedAtField(),
-            new UpdatedAtField(),
+            new ManyToOneAssociationField('customer', 'customer_id', CustomerDefinition::class, 'id', false),
+
+            new OneToManyAssociationField('addresses', SubscriptionAddressDefinition::class, 'subscription_id'),
+            new OneToOneAssociationField('billingAddress', 'billing_address_id', 'id', SubscriptionAddressDefinition::class, true),
+            new OneToOneAssociationField('shippingAddress', 'shipping_address_id', 'id', SubscriptionAddressDefinition::class, true),
+
         ]);
     }
 }

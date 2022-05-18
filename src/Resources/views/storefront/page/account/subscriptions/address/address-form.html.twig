@@ -1,0 +1,239 @@
+<input type="hidden" name="address[id]" value="{{ data.get('id') }}">
+
+<div class="form-row">
+    <div class="form-group col-sm-6">
+        <label class="form-label" for="personalSalutation">
+            {{ "account.personalSalutationLabel"|trans|sw_sanitize }}{{ "general.required"|trans|sw_sanitize }}
+        </label>
+        <select id="personalSalutation"
+                class="custom-select"
+                name="address[salutationId]"
+                required="required">
+            {% if not data.get('salutationId') %}
+                <option disabled="disabled" selected="selected" value="">
+                    {{ "account.personalSalutationPlaceholder"|trans|sw_sanitize }}
+                </option>
+            {% endif %}
+            {% for salutation in page.salutations %}
+                <option {% if salutation.id == data.get('salutationId') %}
+                    selected="selected"
+                {% endif %}
+                        value="{{ salutation.id }}">
+                    {{ salutation.translated.displayName }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group col-sm-6">
+        <label class="form-label" for="personalTitle">
+            {{ "account.personalTitleLabel"|trans|sw_sanitize }}
+        </label>
+        <input type="text"
+               class="form-control"
+               autocomplete="section-personal title"
+               id="personalTitle"
+               placeholder="{{ "account.personalTitlePlaceholder"|trans|striptags }}"
+               name="address[title]"
+               value="{{ data.get('title') }}">
+    </div>
+</div>
+
+<div class="form-row">
+    <div class="form-group col-sm-6">
+        <label class="form-label" for="personalFirstName">
+            {{ "account.personalFirstNameLabel"|trans|sw_sanitize }}{{ "general.required"|trans|sw_sanitize }}
+        </label>
+        <input type="text"
+               class="form-control"
+               autocomplete="section-personal given-name"
+               id="personalFirstName"
+               placeholder="{{ "account.personalFirstNamePlaceholder"|trans|striptags }}"
+               name="address[firstName]"
+               value="{{ data.get('firstName') }}"
+               required="required">
+    </div>
+    <div class="form-group col-sm-6">
+        <label class="form-label" for="personalLastName">
+            {{ "account.personalLastNameLabel"|trans|sw_sanitize }}{{ "general.required"|trans|sw_sanitize }}
+        </label>
+        <input type="text"
+               class="form-control"
+               autocomplete="section-personal family-name"
+               id="personalLastName"
+               placeholder="{{ "account.personalLastNamePlaceholder"|trans|striptags }}"
+               name="address[lastName]"
+               value="{{ data.get('lastName') }}"
+               required="required">
+    </div>
+</div>
+
+<div class="form-row">
+    <div class="form-group col-md-6">
+        <label class="form-label" for="company">
+            {{ "address.companyNameLabel"|trans|sw_sanitize }}
+        </label>
+        <input type="text"
+               class="form-control"
+               id="company"
+               placeholder="{{ "address.companyNamePlaceholder"|trans|striptags }}"
+               name="address[company]"
+               value="{{ data.get('company') }}">
+    </div>
+    <div class="form-group col-md-6">
+        <label class="form-label" for="department">
+            {{ "address.companyDepartmentLabel"|trans|sw_sanitize }}
+        </label>
+        <input type="text"
+               class="form-control"
+               id="department"
+               placeholder="{{ "address.companyDepartmentPlaceholder"|trans|striptags }}"
+               name="address[department]"
+               value="{{ data.get('department') }}">
+    </div>
+</div>
+
+<div class="form-row">
+    {% if config('core.loginRegistration.showAdditionalAddressField1') %}
+        <div class="form-group col-md-6">
+            <label class="form-label" for="additionalField1">
+                {{ "address.additionalField1Label"|trans|sw_sanitize }}
+            </label>
+            <input type="text"
+                   class="form-control"
+                   id="additionalField1"
+                   placeholder="{{ "address.additionalField1Placeholder"|trans|striptags }}"
+                   name="address[additionalField1]"
+                   value="{{ data.get('additionalAddressLine1') }}">
+        </div>
+    {% endif %}
+    {% if config('core.loginRegistration.showAdditionalAddressField2') %}
+        <div class="form-group col-md-6">
+            <label class="form-label" for="additionalField2">
+                {{ "address.additionalField2Label"|trans|sw_sanitize }}
+            </label>
+            <input type="text"
+                   class="form-control"
+                   id="additionalField2"
+                   placeholder="{{ "address.additionalField2Placeholder"|trans|striptags }}"
+                   name="address[additionalField2]"
+                   value="{{ data.get('additionalAddressLine2') }}">
+        </div>
+    {% endif %}
+</div>
+
+<div class="form-row">
+    {% if config('core.loginRegistration.showPhoneNumberField') %}
+        <div class="form-group col-6">
+            <label class="form-label" for="phoneNumber">
+                {{ "address.phoneNumberLabel"|trans|sw_sanitize }}
+            </label>
+            <input type="text"
+                   class="form-control"
+                   id="phoneNumber"
+                   placeholder="{{ "address.phoneNumberPlaceholder"|trans|striptags }}"
+                   name="address[phoneNumber]"
+                   value="{{ data.get('phoneNumber') }}">
+        </div>
+    {% endif %}
+</div>
+
+<div class="form-row">
+    <div class="form-group col-md-6">
+        <label class="form-label" for="AddressStreet">
+            {{ "address.streetLabel"|trans|sw_sanitize }}{{ "general.required"|trans|sw_sanitize }}
+        </label>
+        <input type="text"
+               class="form-control"
+               id="AddressStreet"
+               placeholder="{{ "address.streetPlaceholder"|trans|striptags }}"
+               name="address[street]"
+               value="{{ data.get('street') }}"
+               required="required">
+    </div>
+    {% set zipcodeField %}
+        <label class="form-label" for="AddressZipcode">
+            {{ "address.zipcodeLabel"|trans|sw_sanitize }}{{ "general.required"|trans|sw_sanitize }}
+        </label>
+        <input type="text"
+               class="form-control"
+               id="AddressZipcode"
+               placeholder="{{ "address.zipcodePlaceholder"|trans|striptags }}"
+               name="address[zipcode]"
+               value="{{ data.get('zipcode') }}"
+               required="required">
+    {% endset %}
+    {% set cityField %}
+        <label class="form-label" for="AddressCity">
+            {{ "address.cityLabel"|trans|sw_sanitize }}{{ "general.required"|trans|sw_sanitize }}
+        </label>
+        <input type="text"
+               class="form-control"
+               id="AddressCity"
+               placeholder="{{ "address.cityPlaceholder"|trans|striptags }}"
+               name="address[city]"
+               value="{{ data.get('city') }}"
+               required="required">
+    {% endset %}
+    {% if config('core.address.showZipcodeInFrontOfCity') %}
+        <div class="form-group col-md-2 col-4">
+            {{ zipcodeField }}
+        </div>
+        <div class="form-group col-md-4 col-8">
+            {{ cityField }}
+        </div>
+    {% else %}
+        <div class="form-group col-md-4 col-8">
+            {{ cityField }}
+        </div>
+        <div class="form-group col-md-2 col-4">
+            {{ zipcodeField }}
+        </div>
+    {% endif %}
+</div>
+
+<div class="form-row country-and-state-form-elements" data-country-state-select="true">
+    <div class="form-group col-md-6">
+        {% set initialCountryId = null %}
+
+        {% if data.get('countryId') %}
+            {% set initialCountryId = data.get('countryId') %}
+        {% elseif page.countries|length == 1 %}
+            {% set initialCountryId = (page.countries|first).id %}
+        {% endif %}
+
+        <label class="form-label" for="AddressCountry">
+            {{ "address.countryLabel"|trans|sw_sanitize }}{{ "general.required"|trans|sw_sanitize }}
+        </label>
+        <select class="country-select custom-select"
+                id="AddressCountry"
+                name="address[countryId]"
+                {% if editCountry == false %}disabled="disabled"{% endif %}
+                required="required"
+                data-initial-country-id="{{ initialCountryId }}">
+            {% if not initialCountryId %}
+                <option disabled="disabled" value="" selected="selected">
+                    {{ "address.countryPlaceholder"|trans|sw_sanitize }}
+                </option>
+            {% endif %}
+            {% for country in page.countries %}
+                <option {% if country.id == initialCountryId %} selected="selected" {% endif %} value="{{ country.id }}">
+                    {{ country.translated.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group col-md-6 d-none">
+        <label class="form-label" for="AddressCountry">
+            {{ "address.countryStateLabel"|trans|sw_sanitize }}{{ "general.required"|trans|sw_sanitize }}
+        </label>
+        <select class="country-state-select custom-select"
+                disabled="disabled"
+                id="AddressCountryState"
+                name="address[countryStateId]"
+                data-initial-country-state-id="{{ data.get('countryStateId') }}">
+            <option value="" selected="selected" data-placeholder-option="true">
+                {{ "address.countryStatePlaceholder"|trans|sw_sanitize }}
+            </option>
+        </select>
+    </div>
+</div>

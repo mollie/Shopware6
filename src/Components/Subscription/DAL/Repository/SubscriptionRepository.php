@@ -4,15 +4,14 @@ namespace Kiener\MolliePayments\Components\Subscription\DAL\Repository;
 
 
 use DateTime;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
-use Kiener\MolliePayments\Service\ConfigService;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
-use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class SubscriptionRepository
 {
@@ -23,11 +22,19 @@ class SubscriptionRepository
     private $repoSubscriptions;
 
     /**
-     * @param EntityRepositoryInterface $repoSubscriptions
+     * @var EntityRepositoryInterface
      */
-    public function __construct(EntityRepositoryInterface $repoSubscriptions)
+    private $repoAddresses;
+
+
+    /**
+     * @param EntityRepositoryInterface $repoSubscriptions
+     * @param EntityRepositoryInterface $repoAddresses
+     */
+    public function __construct(EntityRepositoryInterface $repoSubscriptions, EntityRepositoryInterface $repoAddresses)
     {
         $this->repoSubscriptions = $repoSubscriptions;
+        $this->repoAddresses = $repoAddresses;
     }
 
 
@@ -124,6 +131,8 @@ class SubscriptionRepository
                 'mollieSubscriptionId' => null,
                 'lastRemindedAt' => null,
                 'canceledAt' => null,
+                'billingAddressId' => null,
+                'shippingAddressId' => null,
                 # ----------------------------------------------------------
                 'description' => $subscription->getDescription(),
                 'amount' => $subscription->getAmount(),
@@ -137,6 +146,18 @@ class SubscriptionRepository
         ],
             $context
         );
+
+        # now create and assign addresses if they are existing
+
+        if ($subscription->getBillingAddress() instanceof SubscriptionAddressEntity) {
+            $billing = $subscription->getBillingAddress();
+            $this->assignBillingAddress($subscription->getId(), $billing, $context);
+        }
+
+        if ($subscription->getShippingAddress() instanceof SubscriptionAddressEntity) {
+            $shipping = $subscription->getShippingAddress();
+            $this->assignShippingAddress($subscription->getId(), $shipping, $context);
+        }
     }
 
     /**
@@ -206,6 +227,80 @@ class SubscriptionRepository
                 'canceledAt' => new DateTime(),
             ]
         ],
+            $context
+        );
+    }
+
+    /**
+     * @param string $subscriptionId
+     * @param SubscriptionAddressEntity $address
+     * @param Context $context
+     * @return void
+     */
+    public function assignBillingAddress(string $subscriptionId, SubscriptionAddressEntity $address, Context $context): void
+    {
+        $this->upsertAddress($subscriptionId, $address, $context);
+
+        $this->repoSubscriptions->update([
+            [
+                'id' => $subscriptionId,
+                'billingAddressId' => $address->getId(),
+            ]
+        ],
+            $context
+        );
+    }
+
+    /**
+     * @param string $subscriptionId
+     * @param SubscriptionAddressEntity $address
+     * @param Context $context
+     * @return void
+     */
+    public function assignShippingAddress(string $subscriptionId, SubscriptionAddressEntity $address, Context $context): void
+    {
+        $this->upsertAddress($subscriptionId, $address, $context);
+
+        $this->repoSubscriptions->update([
+            [
+                'id' => $subscriptionId,
+                'shippingAddressId' => $address->getId(),
+            ]
+        ],
+            $context
+        );
+    }
+
+    /**
+     * @param string $subscriptionId
+     * @param SubscriptionAddressEntity $address
+     * @param Context $context
+     * @return void
+     */
+    private function upsertAddress(string $subscriptionId, SubscriptionAddressEntity $address, Context $context): void
+    {
+        $this->repoAddresses->upsert(
+            [
+                [
+                    'id' => $address->getId(),
+                    'subscriptionId' => $subscriptionId,
+                    'salutationId' => ($address->getSalutationId() === '') ? null : $address->getSalutationId(),
+                    'title' => $address->getTitle(),
+                    'firstName' => $address->getFirstName(),
+                    'lastName' => $address->getLastName(),
+                    'company' => $address->getCompany(),
+                    'department' => $address->getDepartment(),
+                    'vatId' => $address->getVatId(),
+                    'street' => $address->getStreet(),
+                    'zipcode' => $address->getZipcode(),
+                    'city' => $address->getCity(),
+                    'countryId' => ($address->getCountryId() === '') ? null : $address->getCountryId(),
+                    'countryStateId' => ($address->getCountryStateId() === '') ? null : $address->getCountryStateId(),
+                    'phoneNumber' => $address->getPhoneNumber(),
+                    'additionalAddressLine1' => $address->getAdditionalAddressLine1(),
+                    'additionalAddressLine2' => $address->getAdditionalAddressLine2(),
+                ],
+            ],
             $context
         );
     }

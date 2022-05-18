@@ -8,6 +8,7 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatche
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactoryInterface;
 use Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder;
 use Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder;
@@ -15,18 +16,19 @@ use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionReminder\
 use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing\SubscriptionRenewing;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Service\CustomerService;
+use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Shopware\Core\Framework\DataAbstractionLayer\Field\IdField;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class SubscriptionManager implements SubscriptionManagerInterface
@@ -56,6 +58,11 @@ class SubscriptionManager implements SubscriptionManagerInterface
      * @var EntityRepositoryInterface
      */
     private $repoSalesChannel;
+
+    /**
+     * @var OrderService
+     */
+    private $orderService;
 
     /**
      * @var MollieGatewayInterface
@@ -97,6 +104,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
      * @param FlowBuilderFactoryInterface $flowBuilderFactory
      * @param FlowBuilderEventFactory $flowBuilderEventFactory
      * @param SubscriptionRepository $repoSubscriptions
+     * @param OrderService $orderService
      * @param SettingsService $settingsService
      * @param MollieDataBuilder $definitionBuilder
      * @param SubscriptionBuilder $subscriptionBuilder
@@ -106,7 +114,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
      * @param EntityRepositoryInterface $repoSalesChannel
      * @param LoggerInterface $logger
      */
-    public function __construct(FlowBuilderFactoryInterface $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionRepository $repoSubscriptions, SettingsService $settingsService, MollieDataBuilder $definitionBuilder, SubscriptionBuilder $subscriptionBuilder, CustomerService $customers, MollieGatewayInterface $gatewayMollie, SubscriptionRenewing $renewingService, EntityRepositoryInterface $repoSalesChannel, LoggerInterface $logger)
+    public function __construct(FlowBuilderFactoryInterface $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionRepository $repoSubscriptions, OrderService $orderService, SettingsService $settingsService, MollieDataBuilder $definitionBuilder, SubscriptionBuilder $subscriptionBuilder, CustomerService $customers, MollieGatewayInterface $gatewayMollie, SubscriptionRenewing $renewingService, EntityRepositoryInterface $repoSalesChannel, LoggerInterface $logger)
     {
         $this->pluginSettings = $settingsService;
         $this->repoSubscriptions = $repoSubscriptions;
@@ -116,6 +124,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
         $this->gwMollie = $gatewayMollie;
         $this->renewingService = $renewingService;
         $this->repoSalesChannel = $repoSalesChannel;
+        $this->orderService = $orderService;
         $this->logger = $logger;
 
         $this->flowBuilderEventFactory = $flowBuilderEventFactory;
@@ -340,12 +349,125 @@ class SubscriptionManager implements SubscriptionManagerInterface
     }
 
     /**
+     * @param string $subscriptionId
+     * @param string $salutationId
+     * @param string $title
+     * @param string $firstname
+     * @param string $lastname
+     * @param string $company
+     * @param string $department
+     * @param string $additional1
+     * @param string $additional2
+     * @param string $phoneNumber
+     * @param string $street
+     * @param string $zipcode
+     * @param string $city
+     * @param string $countryStateId
+     * @param Context $context
+     * @throws Exception
+     */
+    public function updateBillingAddress(string $subscriptionId, string $salutationId, string $title, string $firstname, string $lastname, string $company, string $department, string $additional1, string $additional2, string $phoneNumber, string $street, string $zipcode, string $city, string $countryStateId, Context $context): void
+    {
+        $subscription = $this->repoSubscriptions->findById($subscriptionId, $context);
+
+        $settings = $this->pluginSettings->getSettings($subscription->getSalesChannelId());
+
+        if (!$settings->isSubscriptionsAllowAddressEditing()) {
+            throw new Exception('Editing of the billing address on running subscriptions is not allowed in the plugin configuration');
+        }
+
+        $address = $subscription->getBillingAddress();
+
+        if (!$address instanceof SubscriptionAddressEntity) {
+            $address = $this->createNewAddress($subscription, $context);
+        }
+
+        $address->setSalutationId($salutationId);
+        $address->setTitle($title);
+        $address->setFirstName($firstname);
+        $address->setLastName($lastname);
+
+        $address->setCompany($company);
+        $address->setDepartment($department);
+
+        $address->setAdditionalAddressLine1($additional1);
+        $address->setAdditionalAddressLine2($additional2);
+
+        $address->setPhoneNumber($phoneNumber);
+
+        $address->setStreet($street);
+        $address->setZipcode($zipcode);
+        $address->setCity($city);
+        $address->setCountryStateId($countryStateId);
+
+        $this->repoSubscriptions->assignBillingAddress($subscriptionId, $address, $context);
+    }
+
+    /**
+     * @param string $subscriptionId
+     * @param string $salutationId
+     * @param string $title
+     * @param string $firstname
+     * @param string $lastname
+     * @param string $company
+     * @param string $department
+     * @param string $additional1
+     * @param string $additional2
+     * @param string $phoneNumber
+     * @param string $street
+     * @param string $zipcode
+     * @param string $city
+     * @param string $countryStateId
+     * @param Context $context
+     * @throws Exception
+     */
+    public function updateShippingAddress(string $subscriptionId, string $salutationId, string $title, string $firstname, string $lastname, string $company, string $department, string $additional1, string $additional2, string $phoneNumber, string $street, string $zipcode, string $city, string $countryStateId, Context $context): void
+    {
+        $subscription = $this->repoSubscriptions->findById($subscriptionId, $context);
+
+        $settings = $this->pluginSettings->getSettings($subscription->getSalesChannelId());
+
+        if (!$settings->isSubscriptionsAllowAddressEditing()) {
+            throw new Exception('Editing of the shipping address on running subscriptions is not allowed in the plugin configuration');
+        }
+
+        $address = $subscription->getShippingAddress();
+
+        if (!$address instanceof SubscriptionAddressEntity) {
+            $address = $this->createNewAddress($subscription, $context);
+        }
+
+        $address->setSalutationId($salutationId);
+        $address->setTitle($title);
+        $address->setFirstName($firstname);
+        $address->setLastName($lastname);
+
+        $address->setCompany($company);
+        $address->setDepartment($department);
+
+        $address->setPhoneNumber($phoneNumber);
+
+        $address->setAdditionalAddressLine1($additional1);
+        $address->setAdditionalAddressLine2($additional2);
+
+        $address->setStreet($street);
+        $address->setZipcode($zipcode);
+        $address->setCity($city);
+        $address->setCountryStateId($countryStateId);
+
+        $this->repoSubscriptions->assignShippingAddress($subscriptionId, $address, $context);
+    }
+
+    /**
      * @param OrderEntity $order
      * @param SalesChannelContext $context
      */
     public function cancelPendingSubscriptions(OrderEntity $order, SalesChannelContext $context): void
     {
         # does nothing for now, not necessary
+        # because it is not even confirmed yet.
+        # but maybe we should add an even in here....
+        # let's keep this for now to have it (speaking of the wrapper) fully implemented...
     }
 
     /**
@@ -368,6 +490,35 @@ class SubscriptionManager implements SubscriptionManagerInterface
         # FLOW BUILDER / BUSINESS EVENTS
         $event = $this->flowBuilderEventFactory->buildSubscriptionCancelledEvent($subscription->getCustomer(), $subscription, $context);
         $this->flowBuilderDispatcher->dispatch($event);
+    }
+
+
+    /**
+     * @param SubscriptionEntity $subscription
+     * @param Context $context
+     * @return SubscriptionAddressEntity
+     * @throws Exception
+     */
+    private function createNewAddress(SubscriptionEntity $subscription, Context $context): SubscriptionAddressEntity
+    {
+        $initialOrder = $this->orderService->getOrder($subscription->getOrderId(), $context);
+
+        if (!$initialOrder instanceof OrderEntity) {
+            throw new Exception('No initial order found for subscription: ' . $subscription->getId());
+        }
+
+        $initialAddress = $initialOrder->getBillingAddress();
+
+        if (!$initialAddress instanceof OrderAddressEntity) {
+            throw new Exception('No address found for initial order');
+        }
+
+        $address = new SubscriptionAddressEntity();
+
+        $address->setId(Uuid::randomHex());
+        $address->setCountryId($initialAddress->getCountryId());
+
+        return $address;
     }
 
 }

@@ -9,10 +9,26 @@
         <!-- ============================================================================================== -->
 
         <service id="Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionDefinition">
-            <tag name="shopware.entity.definition" entity="mollie_subscription_to_product"/>
+            <tag name="shopware.entity.definition" entity="mollie_subscription"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressDefinition">
+            <tag name="shopware.entity.definition" entity="mollie_subscription_address"/>
         </service>
 
         <service id="Kiener\MolliePayments\Components\Subscription\DAL\Customer\CustomerExtension">
+            <tag name="shopware.entity.extension"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\DAL\Country\CountryExtension">
+            <tag name="shopware.entity.extension"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\DAL\Country\CountryStateExtension">
+            <tag name="shopware.entity.extension"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\DAL\Salutation\SalutationExtension">
             <tag name="shopware.entity.extension"/>
         </service>
 
@@ -23,6 +39,7 @@
 
         <service id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository">
             <argument type="service" id="mollie_subscription.repository"/>
+            <argument type="service" id="mollie_subscription_address.repository"/>
         </service>
 
         <!-- ============================================================================================== -->
@@ -54,8 +71,9 @@
         </service>
 
         <service id="Kiener\MolliePayments\Storefront\Controller\AccountController" public="true">
-            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Page\Account\PageLoader"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Page\Account\SubscriptionPageLoader"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
+            <argument type="service" id="mollie_payments.logger"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
@@ -64,10 +82,13 @@
             </call>
         </service>
 
-        <service id="Kiener\MolliePayments\Components\Subscription\Page\Account\PageLoader">
-            <argument type="service" id="mollie_subscription.repository"/>
+        <service id="Kiener\MolliePayments\Components\Subscription\Page\Account\SubscriptionPageLoader">
             <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+            <argument type="service" id="mollie_subscription.repository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+            <argument type="service" id="Shopware\Core\System\Country\SalesChannel\CountryRoute"/>
+            <argument type="service" id="Shopware\Core\System\Salutation\SalesChannel\SalutationRoute"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
         </service>
 
 
@@ -77,6 +98,7 @@
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder"/>
@@ -112,7 +134,7 @@
 
         <service id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing\SubscriptionRenewing">
             <argument type="service" id="Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface"/>
-            <argument type="service" id="order.repository"/>
+            <argument type="service" id="order_address.repository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing\OrderCloneService"/>
         </service>

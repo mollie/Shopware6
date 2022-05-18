@@ -426,6 +426,16 @@
             <helpText lang="nl-NL"></helpText>
         </input-field>
         <input-field type="bool">
+            <name>subscriptionsAllowAddressEditing</name>
+            <defaultValue>false</defaultValue>
+            <label>Allow customers to edit billing and shipping addresses for running subscriptions</label>
+            <label lang="de-DE">Kunden erlauben Rechnungs- und Lieferadresse zu bearbeiten</label>
+            <label lang="nl-NL"></label>
+            <helpText>If enabled, customers are allowed to edit their billing and shipping addresses in the shop. Countries are not allowed to be edited. Please consider that no new shipping costs will be calculated for modified addresses.</helpText>
+            <helpText lang="de-DE"></helpText>
+            <helpText lang="nl-NL"></helpText>
+        </input-field>
+        <input-field type="bool">
             <name>subscriptionsReminderEnabled</name>
             <defaultValue>false</defaultValue>
             <label>Enable Events for Renewal Reminders</label>

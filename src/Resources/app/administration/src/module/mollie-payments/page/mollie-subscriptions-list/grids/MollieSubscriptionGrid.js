@@ -77,6 +77,12 @@ export default class MollieSubscriptionGrid {
                 label: app.$tc('mollie-payments.subscriptions.list.columns.customer_id'),
                 allowResize: true,
             },
+            {
+                property: 'id',
+                dataIndex: 'id',
+                label: 'Id',
+                allowResize: true,
+            },
         ];
     }
 
