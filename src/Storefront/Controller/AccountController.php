@@ -6,12 +6,14 @@ use Kiener\MolliePayments\Components\Subscription\Page\Account\SubscriptionPageL
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Page\Account\Mollie\AccountSubscriptionsPageLoader;
 use Kiener\MolliePayments\Service\Subscription\CancelSubscriptionsService;
+use Shopware\Core\Framework\Context;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Routing\Annotation\LoginRequired;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;

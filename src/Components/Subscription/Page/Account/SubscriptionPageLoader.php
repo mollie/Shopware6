@@ -59,6 +59,7 @@ class SubscriptionPageLoader
      */
     private $settingsService;
 
+
     /**
      * @param GenericPageLoaderInterface $genericLoader
      * @param EntityRepositoryInterface $repoSubscriptions
@@ -91,7 +92,7 @@ class SubscriptionPageLoader
 
         $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannelId());
 
-
+        /** @var SubscriptionPage $page */
         $page = $this->genericLoader->load($request, $salesChannelContext);
 
         /** @var SubscriptionPage $page */
