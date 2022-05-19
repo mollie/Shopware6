@@ -9,6 +9,7 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFact
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactoryInterface;
 use Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\MollieStatus;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder;
 use Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder;
@@ -284,6 +285,11 @@ class SubscriptionManager implements SubscriptionManagerInterface
         /** @var SubscriptionEntity $subscription */
         foreach ($availableSubscriptions->getElements() as $subscription) {
 
+            # if it's not active in Mollie, then don't do anything
+            if ($subscription->getMollieStatus() !== MollieStatus::ACTIVE) {
+                continue;
+            }
+
             # now check if we are allowed to remind or if it was already done
             $shouldRemind = $this->reminderValidator->shouldRemind(
                 $subscription->getNextPaymentAt(),
@@ -327,11 +333,15 @@ class SubscriptionManager implements SubscriptionManagerInterface
      * @param string $molliePaymentId
      * @param SalesChannelContext $context
      * @return OrderEntity
-     * @throws \Exception
+     * @throws Exception
      */
     public function renewSubscription(string $swSubscriptionId, string $molliePaymentId, SalesChannelContext $context): OrderEntity
     {
         $swSubscription = $this->repoSubscriptions->findById($swSubscriptionId, $context->getContext());
+
+        if ($swSubscription->getMollieStatus() !== MollieStatus::ACTIVE) {
+            throw new Exception('Subscription is not active and cannot be edited');
+        }
 
         $this->gwMollie->switchClient($swSubscription->getSalesChannelId());
 
@@ -397,6 +407,10 @@ class SubscriptionManager implements SubscriptionManagerInterface
     {
         $subscription = $this->repoSubscriptions->findById($subscriptionId, $context);
 
+        if ($subscription->getMollieStatus() !== MollieStatus::ACTIVE) {
+            throw new Exception('Subscription is not active and cannot be edited');
+        }
+
         $settings = $this->pluginSettings->getSettings($subscription->getSalesChannelId());
 
         if (!$settings->isSubscriptionsAllowAddressEditing()) {
@@ -452,6 +466,10 @@ class SubscriptionManager implements SubscriptionManagerInterface
     {
         $subscription = $this->repoSubscriptions->findById($subscriptionId, $context);
 
+        if ($subscription->getMollieStatus() !== MollieStatus::ACTIVE) {
+            throw new Exception('Subscription is not active and cannot be edited');
+        }
+
         $settings = $this->pluginSettings->getSettings($subscription->getSalesChannelId());
 
         if (!$settings->isSubscriptionsAllowAddressEditing()) {
@@ -495,6 +513,10 @@ class SubscriptionManager implements SubscriptionManagerInterface
     {
         $subscription = $this->repoSubscriptions->findById($subscriptionId, $context);
 
+        if ($subscription->getMollieStatus() !== MollieStatus::ACTIVE) {
+            throw new Exception('Subscription is not active and cannot be edited');
+        }
+
         $settings = $this->pluginSettings->getSettings($subscription->getSalesChannelId());
 
         # first load our customer ID
@@ -534,6 +556,10 @@ class SubscriptionManager implements SubscriptionManagerInterface
     public function updatePaymentMethodConfirm(string $subscriptionId, Context $context): void
     {
         $subscription = $this->repoSubscriptions->findById($subscriptionId, $context);
+
+        if ($subscription->getMollieStatus() !== MollieStatus::ACTIVE) {
+            throw new Exception('Subscription is not active and cannot be edited');
+        }
 
         # load our latest tmp_transaction ID that was used
         # to initialize the payment of the update.

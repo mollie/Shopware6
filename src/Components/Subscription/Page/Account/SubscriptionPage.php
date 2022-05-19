@@ -123,6 +123,10 @@ class SubscriptionPage extends Page
     }
 
     /**
+     * ATTENTION: DON'T DELETE.
+     * The IDE says it's not used, but it's
+     * indeed used in the TWIG storefront :)
+     *
      * @return bool
      */
     public function isAllowAddressEditing(): bool

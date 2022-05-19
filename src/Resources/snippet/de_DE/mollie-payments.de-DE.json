@@ -67,6 +67,7 @@
         "mollieSubscriptionCancel": "Abonnement kündigen",
         "mollieSubscriptionContextMenuReorder": "Abo wiederholen",
         "cancelSubscription": "Das Abonnement wurde gekündigt",
+        "errorCancelSubscription": "Das Abonnement konnte aufgrund eines Fehlers nicht gekündigt werden. Bitte wenden Sie sich an unseren Support.",
         "successUpdateAddress": "Deine Adresse wurde erfolgreich aktualisiert",
         "errorUpdateAddress": "Die Adresse konnte nicht aktualisiert werden",
         "errorUpdatePayment": "Die Zahlungsart konnte nicht aktualisiert werden",

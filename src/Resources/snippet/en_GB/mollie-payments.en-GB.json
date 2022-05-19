@@ -67,6 +67,7 @@
         "mollieSubscriptionCancel": "Cancel Subscription",
         "mollieSubscriptionContextMenuReorder": "Repeat subscription",
         "cancelSubscription": "Subscription has been canceled",
+        "errorCancelSubscription": "The subscription could not be canceled due to an error. Please contact our support.",
         "successUpdateAddress": "Your address has been updated successfully",
         "errorUpdateAddress": "There was an error when updating your address",
         "errorUpdatePayment": "There was an error when updating your payment method",

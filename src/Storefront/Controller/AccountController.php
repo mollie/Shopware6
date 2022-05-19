@@ -256,15 +256,21 @@ class AccountController extends StorefrontController
      */
     public function cancelSubscription($subscriptionId, SalesChannelContext $context): Response
     {
-        $this->subscriptionManager->cancelSubscription($subscriptionId, $context->getContext());
+        try {
 
-        $this->addFlash(self::SUCCESS,
-            $this->trans('molliePayments.subscriptions.account.cancelSubscription',
-                ['%1%' => $subscriptionId]
-            )
-        );
+            $this->subscriptionManager->cancelSubscription($subscriptionId, $context->getContext());
 
-        return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
+            $this->addFlash(self::SUCCESS, $this->trans('molliePayments.subscriptions.account.cancelSubscription'));
+
+            return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
+
+        } catch (\Throwable $exception) {
+
+            $this->logger->error('Error when canceling subscription ' . $subscriptionId . ': ' . $exception->getMessage());
+
+            $this->addFlash(self::DANGER, $this->trans('molliePayments.subscriptions.account.errorCancelSubscription'));
+            return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
+        }
     }
 
 }

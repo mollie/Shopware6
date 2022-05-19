@@ -3,6 +3,7 @@
 namespace MolliePayments\Tests\Components\Subscription\DAL\Subscription;
 
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\IntervalType;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\MollieStatus;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEvents;
@@ -90,6 +91,42 @@ class SubscriptionEntityTest extends TestCase
         $subscription->setMollieId('sub_123');
 
         static::assertSame(true, $subscription->isConfirmed());
+    }
+
+    /**
+     * This test verifies that our isActive property is only returning TRUE
+     * if we have a status "active" set in the entity.
+     *
+     * @return void
+     */
+    public function testIsActive(): void
+    {
+        $subscription = new SubscriptionEntity();
+
+        $subscription->setCanceledAt(null);
+
+        # if we don't have a LIVE value
+        # then we act, as if it would be active, as long as no cancelled date is set.
+        # this is, because if the Mollie API is somehow not reachable, then we
+        # still need to let customers change things
+        static::assertSame(true, $subscription->isActive());
+
+        # let's change the cancelled
+        # and keep an empty string for the status
+        $subscription->setCanceledAt(new \DateTime());
+        static::assertSame(false, $subscription->isActive());
+
+        # now just revert to the cancelled
+        # and only check the mollie status
+        $subscription->setCanceledAt(null);
+
+        # set wrong status
+        $subscription->setMollieStatus(MollieStatus::CANCELED);
+        static::assertSame(false, $subscription->isActive());
+
+        # now set correct status
+        $subscription->setMollieStatus(MollieStatus::ACTIVE);
+        static::assertSame(true, $subscription->isActive());
     }
 
 }

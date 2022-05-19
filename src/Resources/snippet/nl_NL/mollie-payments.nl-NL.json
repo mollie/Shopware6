@@ -67,6 +67,7 @@
         "mollieSubscriptionCancel": "Abonnement annuleren",
         "mollieSubscriptionContextMenuReorder": "Herhaal abonnement",
         "cancelSubscription": "Abonnement is geannuleerd",
+        "errorCancelSubscription": "Door een fout kon het abonnement niet worden opgezegd. Neem dan contact op met onze ondersteuning.",
         "successUpdateAddress": "Uw adres is succesvol bijgewerkt",
         "errorUpdateAddress": "Er is een fout opgetreden bij het bijwerken van uw adres",
         "errorUpdatePayment": "Er is een fout opgetreden bij het updaten van uw betaalmethode",

@@ -6,6 +6,7 @@ namespace Kiener\MolliePayments\Components\Subscription\DAL\Subscription;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressCollection;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\MollieLiveData;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\MollieStatus;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
@@ -424,6 +425,20 @@ class SubscriptionEntity extends Entity
     public function isConfirmed(): bool
     {
         return (!empty($this->mollieId));
+    }
+
+    /**
+     * @return bool
+     */
+    public function isActive(): bool
+    {
+        if ($this->getMollieStatus() === '') {
+            # we might not have a live connection to Mollie
+            # we treat this as "active" as long as we don't have a cancelled date
+            return ($this->canceledAt === null);
+        }
+
+        return ($this->getMollieStatus() === MollieStatus::ACTIVE);
     }
 
     /**
