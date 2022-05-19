@@ -53,12 +53,13 @@
   padding: 0 !important;
 }
 
-.btn-mollie-subscription-cancel {
-  color: #e60909;
-}
 .subscription-edit-shipping-address-modal,
 .subscription-edit-billing-address-modal {
   .modal-dialog {
     @extend .modal-lg;
   }
+}
+
+.btn-mollie-subscription-cancel {
+  color: #e60909;
 }

@@ -128,29 +128,12 @@ class SubscriptionEntity extends Entity
     # --------------------------------------------------------------------------------
 
     /**
-     * @param string $mollieCustomerId
-     * @param string $mollieSubscriptionId
+     * @param SubscriptionMetadata $metadata
      * @return void
      */
-    public function setMollieData(string $mollieCustomerId, string $mollieSubscriptionId): void
+    public function setMetadata(SubscriptionMetadata $metadata): void
     {
-        $this->mollieCustomerId = $mollieCustomerId;
-        $this->mollieId = $mollieSubscriptionId;
-
-        $this->setMetadata('', 0, '', null);
-    }
-
-    /**
-     * @param string $startDate
-     * @param int $interval
-     * @param string $intervalUnit
-     * @param int|null $times
-     */
-    public function setMetadata(string $startDate, int $interval, string $intervalUnit, ?int $times): void
-    {
-        $meta = new SubscriptionMetadata($startDate, $interval, $intervalUnit, $times);
-
-        $this->metadata = $meta->toArray();
+        $this->metadata = $metadata->toArray();
     }
 
     /**

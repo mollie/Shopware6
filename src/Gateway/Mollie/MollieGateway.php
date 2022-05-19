@@ -11,7 +11,6 @@ use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\Profile;
 use Mollie\Api\Resources\Subscription;
-use Mollie\Api\Resources\SubscriptionCollection;
 
 
 class MollieGateway implements MollieGatewayInterface
@@ -29,11 +28,11 @@ class MollieGateway implements MollieGatewayInterface
 
 
     /**
-     * @param MollieApiFactory $clientFactory
+     * @param MollieApiFactory $factory
      */
-    public function __construct(MollieApiFactory $clientFactory)
+    public function __construct(MollieApiFactory $factory)
     {
-        $this->factory = $clientFactory;
+        $this->factory = $factory;
     }
 
 
@@ -117,6 +116,16 @@ class MollieGateway implements MollieGatewayInterface
     }
 
     /**
+     * @param array<mixed> $data
+     * @return Payment
+     * @throws \Mollie\Api\Exceptions\ApiException
+     */
+    public function createPayment(array $data): Payment
+    {
+        return $this->apiClient->payments->create($data);
+    }
+
+    /**
      * @param string $customerID
      * @param array<mixed> $data
      * @return Subscription
@@ -138,6 +147,23 @@ class MollieGateway implements MollieGatewayInterface
         $this->apiClient->subscriptions->cancelForId(
             $customerId,
             $subscriptionId
+        );
+    }
+
+    /**
+     * @param string $subscriptionId
+     * @param string $customerId
+     * @param string $mandateId
+     * @throws \Mollie\Api\Exceptions\ApiException
+     */
+    public function updateSubscription(string $subscriptionId, string $customerId, string $mandateId): void
+    {
+        $this->apiClient->subscriptions->update(
+            $customerId,
+            $subscriptionId,
+            [
+                'mandateId' => $mandateId,
+            ]
         );
     }
 

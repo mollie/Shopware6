@@ -6,6 +6,7 @@ use Kiener\MolliePayments\Components\Subscription\Page\Account\SubscriptionPageL
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Page\Account\Mollie\AccountSubscriptionsPageLoader;
 use Kiener\MolliePayments\Service\Subscription\CancelSubscriptionsService;
+use Shopware\Core\Framework\Context;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Routing\Annotation\LoginRequired;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
@@ -193,6 +194,58 @@ class AccountController extends StorefrontController
             $this->logger->error('Error when updating shipping address of subscription ' . $subscriptionId . ': ' . $exception->getMessage());
 
             $this->addFlash(self::DANGER, $this->trans('molliePayments.subscriptions.account.errorUpdateAddress'));
+            return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
+        }
+    }
+
+    /**
+     * @LoginRequired()
+     * @Route("/account/mollie/subscriptions/{subscriptionId}/payment/update", name="frontend.account.mollie.subscriptions.payment.update", methods={"POST"})
+     *
+     * @param string $subscriptionId
+     * @param SalesChannelContext $salesChannelContext
+     * @return Response
+     */
+    public function updatePaymentStart(string $subscriptionId, SalesChannelContext $salesChannelContext): Response
+    {
+        try {
+
+            $checkoutUrl = $this->subscriptionManager->updatePaymentMethodStart($subscriptionId, $salesChannelContext->getContext());
+
+            return $this->redirect($checkoutUrl);
+
+        } catch (\Throwable $exception) {
+
+            $this->logger->error('Error when updating payment method of subscription ' . $subscriptionId . ': ' . $exception->getMessage());
+
+            $this->addFlash(self::DANGER, $this->trans('molliePayments.subscriptions.account.errorUpdatePayment'));
+            return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
+        }
+    }
+
+    /**
+     * @LoginRequired()
+     * @Route("/account/mollie/subscriptions/{subscriptionId}/payment/update/finish", name="frontend.account.mollie.subscriptions.payment.update-success", methods={"GET", "POST"})
+     *
+     * @param string $subscriptionId
+     * @param SalesChannelContext $salesChannelContext
+     * @return Response
+     */
+    public function updatePaymentFinish(string $subscriptionId, SalesChannelContext $salesChannelContext): Response
+    {
+        try {
+
+            $this->subscriptionManager->updatePaymentMethodConfirm($subscriptionId, $salesChannelContext->getContext());
+
+            $this->addFlash(self::SUCCESS, $this->trans('molliePayments.subscriptions.account.successUpdatePayment'));
+
+            return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
+
+        } catch (\Throwable $exception) {
+
+            $this->logger->error('Error when updating payment method of subscription ' . $subscriptionId . ': ' . $exception->getMessage());
+
+            $this->addFlash(self::DANGER, $this->trans('molliePayments.subscriptions.account.errorUpdatePayment'));
             return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
         }
     }
