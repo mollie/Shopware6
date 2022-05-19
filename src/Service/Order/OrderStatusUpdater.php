@@ -189,8 +189,6 @@ class OrderStatusUpdater
 
             case MolliePaymentStatus::MOLLIE_PAYMENT_OPEN:
             case MolliePaymentStatus::MOLLIE_PAYMENT_PENDING:
-            case MolliePaymentStatus::MOLLIE_PAYMENT_REFUNDED:
-            case MolliePaymentStatus::MOLLIE_PAYMENT_PARTIALLY_REFUNDED:
                 break;
 
             case MolliePaymentStatus::MOLLIE_PAYMENT_AUTHORIZED:
@@ -209,6 +207,14 @@ class OrderStatusUpdater
             case MolliePaymentStatus::MOLLIE_PAYMENT_CANCELED:
             case MolliePaymentStatus::MOLLIE_PAYMENT_EXPIRED:
                 $this->orderHandler->setOrderState($order, $settings->getOrderStateWithACancelledTransaction(), $context);
+                break;
+
+            case MolliePaymentStatus::MOLLIE_PAYMENT_PARTIALLY_REFUNDED:
+                $this->orderHandler->setOrderState($order, $settings->getOrderStateWithPartialRefundTransaction(), $context);
+                break;
+
+            case MolliePaymentStatus::MOLLIE_PAYMENT_REFUNDED:
+                $this->orderHandler->setOrderState($order, $settings->getOrderStateWithRefundTransaction(), $context);
                 break;
 
             case MolliePaymentStatus::MOLLIE_PAYMENT_CHARGEBACK:
