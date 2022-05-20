@@ -339,7 +339,10 @@ class SubscriptionManager implements SubscriptionManagerInterface
     {
         $swSubscription = $this->repoSubscriptions->findById($swSubscriptionId, $context->getContext());
 
-        if ($swSubscription->getMollieStatus() !== MollieStatus::ACTIVE) {
+        # only renew active subscriptions
+        # however, if it's the last time, then it's unfortunately already "completed"
+        # so we also need to allow this.
+        if ($swSubscription->getMollieStatus() !== MollieStatus::ACTIVE && $swSubscription->getMollieStatus() !== MollieStatus::COMPLETED) {
             throw new Exception('Subscription is not active and cannot be edited');
         }
 
