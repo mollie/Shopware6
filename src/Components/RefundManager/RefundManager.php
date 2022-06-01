@@ -29,6 +29,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 
 class RefundManager implements RefundManagerInterface
 {
@@ -73,6 +74,11 @@ class RefundManager implements RefundManagerInterface
      */
     private $logger;
 
+    /**
+     * @var EntityRepositoryInterface
+     */
+    private $orderLineItemRepository;
+
 
     /**
      * @param RefundDataBuilder $refundDataBuilder
@@ -83,9 +89,10 @@ class RefundManager implements RefundManagerInterface
      * @param FlowBuilderEventFactory $flowBuilderEventFactory
      * @param StockManagerInterface $stockUpdater
      * @param LoggerInterface $logger
+     * @param EntityRepositoryInterface $orderLineItemRepository
      * @throws \Exception
      */
-    public function __construct(RefundDataBuilder $refundDataBuilder, OrderServiceInterface $orderService, RefundServiceInterface $refundService, Order $mollieOrder, FlowBuilderFactoryInterface $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, StockManagerInterface $stockUpdater, LoggerInterface $logger)
+    public function __construct(RefundDataBuilder $refundDataBuilder, OrderServiceInterface $orderService, RefundServiceInterface $refundService, Order $mollieOrder, FlowBuilderFactoryInterface $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, StockManagerInterface $stockUpdater, LoggerInterface $logger, EntityRepositoryInterface $orderLineItemRepository)
     {
         $this->builderData = $refundDataBuilder;
         $this->orderService = $orderService;
@@ -93,10 +100,9 @@ class RefundManager implements RefundManagerInterface
         $this->refundService = $refundService;
         $this->stockManager = $stockUpdater;
         $this->logger = $logger;
-
         $this->flowBuilderEventFactory = $flowBuilderEventFactory;
-
         $this->flowBuilderDispatcher = $flowBuilderFactory->createDispatcher();
+        $this->orderLineItemRepository = $orderLineItemRepository;
     }
 
 
@@ -215,6 +221,19 @@ class RefundManager implements RefundManagerInterface
                     $refund->id
                 );
             }
+            # also add reset stock to order line item, so we can retrieve it through API
+            # multiple refunds for a single line item are possible, so if previous reset stock exists, increase it
+            $alreadyResetStock = $orderItem->getCustomFields()['mollie_payments_stock']['reset_stock_quantity'] ?? 0;
+            $this->orderLineItemRepository->update([
+                [
+                    'id' => $orderItem->getId(),
+                    'customFields' => [
+                        'mollie_payments_stock' => [
+                            'reset_stock_quantity' => $alreadyResetStock + $item->getStockIncreaseQty()
+                        ]
+                    ]
+                ],
+            ], $context);
         }
 
         return $refund;

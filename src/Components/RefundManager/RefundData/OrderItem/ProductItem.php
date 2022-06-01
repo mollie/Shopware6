@@ -68,6 +68,8 @@ class ProductItem extends AbstractItem
      */
     public function toArray(): array
     {
+        $resetStock = $this->lineItem->getCustomFields()['mollie_payments_stock']['reset_stock_quantity'] ?? 0;
+
         return $this->buildArray(
             $this->lineItem->getId(),
             $this->lineItem->getLabel(),
@@ -79,7 +81,8 @@ class ProductItem extends AbstractItem
             $this->lineItem->getTotalPrice(),
             $this->promotionDiscount,
             $this->promotionAffectedQuantity,
-            $this->alreadyRefundedQty
+            $this->alreadyRefundedQty,
+            $resetStock
         );
     }
 
