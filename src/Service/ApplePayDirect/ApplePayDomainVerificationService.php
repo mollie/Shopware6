@@ -2,8 +2,6 @@
 
 namespace Kiener\MolliePayments\Service\ApplePayDirect;
 
-use League\Flysystem\FilesystemInterface;
-
 class ApplePayDomainVerificationService
 {
 
@@ -17,21 +15,21 @@ class ApplePayDomainVerificationService
      * This is the local path where the file needs to be stored and will
      * be accessed by Apple. It is a relative path from the DocRoot.
      */
-    public const LOCAL_FILE = '/.well-known/apple-developer-merchantid-domain-association';
+    public const LOCAL_FILE = '/public/.well-known/apple-developer-merchantid-domain-association';
 
 
     /**
-     * @var FilesystemInterface
+     * @var string
      */
-    private $filesystem;
+    private $publicDirectory;
 
 
     /**
-     * @param FilesystemInterface $filesystem
+     * @param string $rootDirectory
      */
-    public function __construct(FilesystemInterface $filesystem)
+    public function __construct(string $rootDirectory)
     {
-        $this->filesystem = $filesystem;
+        $this->publicDirectory = $rootDirectory;
     }
 
     /**
@@ -42,7 +40,13 @@ class ApplePayDomainVerificationService
     {
         $content = file_get_contents(self::URL_FILE);
 
-        $this->filesystem->put(self::LOCAL_FILE, $content);
+        $dirWellKnown = $this->publicDirectory . '/public/.well-known';
+
+        if (!file_exists($dirWellKnown)) {
+            mkdir($dirWellKnown);
+        }
+
+        file_put_contents($this->publicDirectory . self::LOCAL_FILE, $content);
     }
 
 }

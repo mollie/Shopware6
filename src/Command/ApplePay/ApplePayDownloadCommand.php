@@ -67,7 +67,7 @@ class ApplePayDownloadCommand extends Command
 
             $this->applePayService->downloadDomainAssociationFile();
 
-            $io->success('New Apple Pay Domain Verification file has been downloaded into your ./public/.well-known folder');
+            $io->success('New Apple Pay Domain Verification file has been downloaded as ' . ApplePayDomainVerificationService::LOCAL_FILE);
 
             return 0;
 

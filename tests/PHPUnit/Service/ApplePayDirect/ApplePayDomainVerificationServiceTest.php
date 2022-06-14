@@ -28,7 +28,7 @@ class ApplePayDomainVerificationServiceTest extends TestCase
     public function testLocalFile(): void
     {
         self::assertEquals(
-            '/.well-known/apple-developer-merchantid-domain-association',
+            '/public/.well-known/apple-developer-merchantid-domain-association',
             ApplePayDomainVerificationService::LOCAL_FILE
         );
     }

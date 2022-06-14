@@ -61,7 +61,7 @@
         </service>
 
         <service id="Kiener\MolliePayments\Service\ApplePayDirect\ApplePayDomainVerificationService" public="true">
-            <argument type="service" id="shopware.filesystem.public"/>
+            <argument>%kernel.project_dir%</argument>
         </service>
 
         <service id="Kiener\MolliePayments\Service\DeliveryService" class="Kiener\MolliePayments\Service\DeliveryService">
