@@ -123,6 +123,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
                 'Error when starting Mollie payment: ' . $exception->getMessage(),
                 [
                     'function' => 'order-prepare',
+                    'exception' => $exception
                 ]
             );
 

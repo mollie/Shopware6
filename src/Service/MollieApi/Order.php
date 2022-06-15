@@ -108,15 +108,15 @@ class Order
         try {
             return $apiClient->orders->create($orderData);
         } catch (ApiException $e) {
-
             $this->logger->critical(
-                $e->getMessage(),
+                'Could not create Mollie order',
                 [
                     'function' => 'finalize-payment',
+                    'exception' => $e
                 ]
             );
 
-            throw new RuntimeException(sprintf('Could not create Mollie order, error: %s', $e->getMessage()));
+            throw new RuntimeException('Could not create Mollie order', $e->getCode(), $e);
         }
     }
 
