@@ -141,6 +141,17 @@ class MollieSettingStruct extends Struct
     protected $orderStateWithAChargebackTransaction = self::ORDER_STATE_SKIP;
 
     /**
+     * @var string
+     */
+    protected $orderStateWithPartialRefundTransaction = self::ORDER_STATE_SKIP;
+
+    /**
+     * @var string
+     */
+    protected $orderStateWithRefundTransaction = self::ORDER_STATE_SKIP;
+
+
+    /**
      * @return string
      */
     public function getLiveApiKey(): string
@@ -535,5 +546,38 @@ class MollieSettingStruct extends Struct
     {
         $this->orderStateFinalState = $orderStateFinalState;
     }
+
+    /**
+     * @return string
+     */
+    public function getOrderStateWithPartialRefundTransaction(): string
+    {
+        return $this->orderStateWithPartialRefundTransaction;
+    }
+
+    /**
+     * @param string $orderStateWithPartialRefundTransaction
+     */
+    public function setOrderStateWithPartialRefundTransaction(string $orderStateWithPartialRefundTransaction): void
+    {
+        $this->orderStateWithPartialRefundTransaction = $orderStateWithPartialRefundTransaction;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrderStateWithRefundTransaction(): string
+    {
+        return $this->orderStateWithRefundTransaction;
+    }
+
+    /**
+     * @param string $orderStateWithRefundTransaction
+     */
+    public function setOrderStateWithRefundTransaction(string $orderStateWithRefundTransaction): void
+    {
+        $this->orderStateWithRefundTransaction = $orderStateWithRefundTransaction;
+    }
+
 
 }
