@@ -126,6 +126,14 @@
             .summary-item-value {
                 text-align: right;
                 padding-right: 0;
+
+                &.heading {
+                    font-weight: bold;
+                }
+
+                &.no-border {
+                    border-bottom-color: transparent;
+                }
             }
 
             .summary-item-value-remaining {
