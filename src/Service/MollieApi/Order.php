@@ -3,6 +3,8 @@
 namespace Kiener\MolliePayments\Service\MollieApi;
 
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieOrderException;
+use Kiener\MolliePayments\Exception\MollieOrderCancelledException;
+use Kiener\MolliePayments\Exception\MollieOrderExpiredException;
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\PaymentHandler;
@@ -14,6 +16,7 @@ use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\PaymentCollection;
 use Mollie\Api\Types\OrderLineType;
+use Mollie\Api\Types\OrderStatus;
 use Mollie\Api\Types\PaymentStatus;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -136,6 +139,14 @@ class Order
         # fetch the current Mollie order including
         # all its existing payments and transactions
         $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelContext->getSalesChannel()->getId(), ['embed' => 'payments']);
+
+        # We cannot reuse this order if it's cancelled or expired.
+        switch($mollieOrder->status) {
+            case OrderStatus::STATUS_CANCELED:
+                throw new MollieOrderCancelledException($mollieOrderId);
+            case OrderStatus::STATUS_EXPIRED:
+                throw new MollieOrderExpiredException($mollieOrderId);
+        }
 
         # now search for an open payment
         # if it's still open, then we just reuse this one
