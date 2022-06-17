@@ -143,7 +143,9 @@
       },
       "summary": {
         "dataLoading": "Gegevens worden geladen...",
-        "captionTotal": "Totaal incl. belasting",
+        "headerExcludingVat": "Excl. BTW",
+        "headerIncludingVat": "Incl. BTW",
+        "captionTotal": "Totaal",
         "captionTotalTaxFree": "Totaal",
         "captionPendingRefunds": "Wachtend op terugbetaling",
         "captionVouchers": "Voucher bedrag",

@@ -227,13 +227,19 @@
                         </sw-loader>
                     </div>
                     {# --------------------------------------------------------------------------------------------- #}
-                    <sw-description-list v-if="!isRefundDataLoading" grid="2fr 1fr" class="summary-content">
+                    <sw-description-list v-if="!isRefundDataLoading" grid="2fr 1fr 1fr" class="summary-content">
                         {% block sw_order_line_items_grid_refund_summary %}
+                            <dt></dt>
+                            <dd class="summary-item-value heading">{{ $tc('mollie-payments.refund-manager.summary.headerExcludingVat') }}</dd>
+                            <dd class="summary-item-value heading">{{ $tc('mollie-payments.refund-manager.summary.headerIncludingVat') }}</dd>
                             {% block sw_order_line_items_grid_refund_summary_amount_total %}
                                 <template v-if="order.price.taxStatus !== 'tax-free'">
                                     <dt>
                                         {{ $tc('mollie-payments.refund-manager.summary.captionTotal') }}
                                     </dt>
+                                    <dd class="summary-item-value">
+                                        {{ order.amountNet | currency(order.currency.shortName) }}
+                                    </dd>
                                     <dd class="summary-item-value">
                                         {{ order.amountTotal | currency(order.currency.shortName) }}
                                     </dd>
@@ -244,6 +250,7 @@
                                     <dt>
                                         {{ $tc('mollie-payments.refund-manager.summary.captionTotalTaxFree') }}
                                     </dt>
+                                    <dd class="summary-item-value"></dd>
                                     <dd class="summary-item-value">
                                         {{ order.positionPrice | currency(order.currency.translated.shortName) }}
                                     </dd>
@@ -254,6 +261,7 @@
                                     <dt>
                                         {{ $tc('mollie-payments.refund-manager.summary.captionVouchers') }}
                                     </dt>
+                                    <dd class="summary-item-value"></dd>
                                     <dd class="summary-item-value">
                                         - {{ voucherAmount | currency(order.currency.shortName) }}
                                     </dd>
@@ -263,6 +271,7 @@
                                 <dt>
                                     {{ $tc('mollie-payments.refund-manager.summary.captionPendingRefunds') }}
                                 </dt>
+                                <dd class="summary-item-value"></dd>
                                 <dd class="summary-item-value">
                                     - {{ pendingRefunds | currency(order.currency.shortName) }}
                                 </dd>
@@ -271,6 +280,7 @@
                                 <dt>
                                     {{ $tc('mollie-payments.refund-manager.summary.captionRefunded') }}
                                 </dt>
+                                <dd class="summary-item-value"></dd>
                                 <dd class="summary-item-value">
                                     - {{ refundedAmount | currency(order.currency.shortName) }}
                                 </dd>
@@ -279,6 +289,7 @@
                                 <dt>
                                     {{ $tc('mollie-payments.refund-manager.summary.captionRemaining') }}
                                 </dt>
+                                <dd class="summary-item-value no-border"></dd>
                                 <dd class="summary-item-value">
                                     <sw-label variant="neutral"
                                               size="medium"

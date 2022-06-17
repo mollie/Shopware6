@@ -143,7 +143,9 @@
       },
       "summary": {
         "dataLoading": "Data is loading...",
-        "captionTotal": "Total incl. taxes",
+        "headerExcludingVat": "Excl. VAT",
+        "headerIncludingVat": "Incl. VAT",
+        "captionTotal": "Total",
         "captionTotalTaxFree": "Total",
         "captionPendingRefunds": "Waiting to be refunded",
         "captionVouchers": "Voucher amount",
