@@ -406,16 +406,6 @@
         <title lang="de-DE">Abonnements</title>
         <title lang="nl-NL">Abonnementen</title>
         <input-field type="bool">
-            <name>subscriptionsEnableBeta</name>
-            <defaultValue>false</defaultValue>
-            <label>Enable Subscriptions BETA</label>
-            <label lang="de-DE">Abonnements BETA aktivieren</label>
-            <label lang="nl-NL">Abonnementen BETA inschakelen</label>
-            <helpText>Enables the new BETA version of the subscriptions in the plugin.</helpText>
-            <helpText lang="de-DE"></helpText>
-            <helpText lang="nl-NL"></helpText>
-        </input-field>
-        <input-field type="bool">
             <name>subscriptionsShowIndicator</name>
             <defaultValue>true</defaultValue>
             <label>Show Subscription Indicator</label>

@@ -139,11 +139,6 @@ class MollieSettingStruct extends Struct
     /**
      * @var bool
      */
-    protected $subscriptionsEnableBeta;
-
-    /**
-     * @var bool
-     */
     protected $subscriptionsShowIndicator;
 
     /**
@@ -540,14 +535,6 @@ class MollieSettingStruct extends Struct
     public function setRefundManagerShowInstructions(bool $refundManagerShowInstructions): void
     {
         $this->refundManagerShowInstructions = $refundManagerShowInstructions;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isSubscriptionsEnableBeta(): bool
-    {
-        return (bool)$this->subscriptionsEnableBeta;
     }
 
     /**

@@ -57,13 +57,6 @@ class PaymentMethodRemover
      */
     public function removePaymentMethods(PaymentMethodRouteResponse $originalData, SalesChannelContext $context): PaymentMethodRouteResponse
     {
-        $settings = $this->pluginSettings->getSettings($context->getSalesChannelId());
-
-
-        if (!$settings->isSubscriptionsEnableBeta()) {
-            return $originalData;
-        }
-
         $cart = $this->getCartServiceLazy()->getCart($context->getToken(), $context);
 
         if (!$this->isSubscriptionCart($cart)) {

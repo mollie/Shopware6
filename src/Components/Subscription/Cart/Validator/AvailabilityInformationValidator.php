@@ -39,13 +39,6 @@ class AvailabilityInformationValidator implements CartValidatorInterface
      */
     public function validate(Cart $cart, ErrorCollection $errorCollection, SalesChannelContext $salesChannelContext): void
     {
-        $settings = $this->pluginSettings->getSettings($salesChannelContext->getSalesChannelId());
-
-        if (!$settings->isSubscriptionsEnableBeta()) {
-            return;
-        }
-
-
         $foundSubscriptionItem = null;
 
         foreach ($cart->getLineItems()->getFlat() as $lineItem) {

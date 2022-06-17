@@ -44,13 +44,6 @@ class SubscriptionCartValidator implements CartValidatorInterface
         # always clear previous errors first
         $this->clearError($cart);
 
-
-        $settings = $this->pluginSettings->getSettings($salesChannelContext->getSalesChannelId());
-
-        if (!$settings->isSubscriptionsEnableBeta()) {
-            return;
-        }
-
         # --------------------------------------------------------------------------------------------
         # first verify if we have a customer
         # if we do not have one yet, then we do NOT block the cart

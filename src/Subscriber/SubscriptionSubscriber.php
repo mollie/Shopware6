@@ -59,7 +59,6 @@ class SubscriptionSubscriber implements EventSubscriberInterface
     {
         $settings = $this->settingsService->getSettings($event->getSalesChannelContext()->getSalesChannel()->getId());
 
-        $event->setParameter('mollie_subscriptions_enabled_beta', $settings->isSubscriptionsEnableBeta());
         $event->setParameter('mollie_subscriptions_indicator_enabled', $settings->isSubscriptionsShowIndicator());
     }
 
@@ -74,7 +73,7 @@ class SubscriptionSubscriber implements EventSubscriberInterface
         $page = $event->getPage();
 
 
-        if ($settings->isSubscriptionsEnableBeta() && $page instanceof ProductPage) {
+        if ($page instanceof ProductPage) {
 
             $product = $event->getPage()->getProduct();
             $productAttributes = new ProductAttributes($product);
@@ -92,7 +91,7 @@ class SubscriptionSubscriber implements EventSubscriberInterface
         }
 
 
-        if ($settings->isSubscriptionsEnableBeta() && $page instanceof CheckoutConfirmPage) {
+        if ($page instanceof CheckoutConfirmPage) {
 
             foreach ($page->getCart()->getLineItems()->getFlat() as $lineItem) {
 

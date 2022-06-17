@@ -6,8 +6,8 @@ use Kiener\MolliePayments\Components\Subscription\Page\Account\SubscriptionPageL
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Page\Account\Mollie\AccountSubscriptionsPageLoader;
 use Kiener\MolliePayments\Service\Subscription\CancelSubscriptionsService;
-use Shopware\Core\Framework\Context;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Routing\Annotation\LoginRequired;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
