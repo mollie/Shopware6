@@ -14,6 +14,7 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionE
 use Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder;
 use Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder;
 use Kiener\MolliePayments\Components\Subscription\Services\PaymentMethodRemover\PaymentMethodRemover;
+use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionCancellation\CancellationValidator;
 use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionReminder\ReminderValidator;
 use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing\SubscriptionRenewing;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
@@ -80,6 +81,11 @@ class SubscriptionManager implements SubscriptionManagerInterface
      * @var ReminderValidator
      */
     private $reminderValidator;
+
+    /**
+     * @var CancellationValidator
+     */
+    private $cancellationValidator;
 
     /**
      * @var CustomerService
@@ -159,6 +165,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
         $this->flowBuilderDispatcher = $flowBuilderFactory->createDispatcher();
 
         $this->reminderValidator = new ReminderValidator();
+        $this->cancellationValidator = new CancellationValidator();
     }
 
     /**
@@ -612,10 +619,30 @@ class SubscriptionManager implements SubscriptionManagerInterface
     /**
      * @param string $subscriptionId
      * @param Context $context
+     * @return void
+     * @throws Exception
      */
     public function cancelSubscription(string $subscriptionId, Context $context): void
     {
         $subscription = $this->repoSubscriptions->findById($subscriptionId, $context);
+
+        $settings = $this->pluginSettings->getSettings($subscription->getSalesChannelId());
+
+        $cancellationDays = $settings->getSubscriptionsCancellationDays();
+
+        # now verify if we are in a valid range to cancel the subscription
+        # depending on the plugin configuration it might only be possible
+        # up until a few days before the renewal
+        $allowCancellation = $this->cancellationValidator->isCancellationAllowed(
+            $subscription->getNextPaymentAt(),
+            $cancellationDays,
+            new DateTime()
+        );
+
+        if (!$allowCancellation) {
+            throw new Exception('Cancellation of the subscription is not possible anymore. You can only cancel subscriptions ' . $cancellationDays . ' days before the renewal!');
+        }
+
 
         $this->gwMollie->switchClient($subscription->getSalesChannelId());
 

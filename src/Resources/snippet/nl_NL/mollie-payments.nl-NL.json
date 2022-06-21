@@ -64,6 +64,7 @@
         "mollieSubscriptionId": "Id",
         "mollieSubscriptionAmount": "Hoeveelheid",
         "mollieSubscriptionNextPayment": "Volgende betaling bij",
+        "mollieSubscriptionCancelUntil" : "Annulering mogelijk tot",
         "mollieSubscriptionCancel": "Abonnement annuleren",
         "mollieSubscriptionContextMenuReorder": "Herhaal abonnement",
         "cancelSubscription": "Abonnement is geannuleerd",

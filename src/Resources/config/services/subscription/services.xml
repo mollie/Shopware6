@@ -33,6 +33,7 @@
         </service>
 
         <service id="Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Enricher\LiveDataEnricher">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
             <tag name="kernel.event_subscriber"/>
         </service>

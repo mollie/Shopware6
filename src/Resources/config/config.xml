@@ -428,10 +428,20 @@
         <input-field type="int">
             <name>subscriptionsReminderDays</name>
             <defaultValue>2</defaultValue>
-            <label>Remind days before renewal</label>
+            <label>Reminder days before renewal</label>
             <label lang="de-DE"></label>
             <label lang="nl-NL"></label>
             <helpText>Set the days in prior to the actual renewal for sending renewal reminder events in the system.</helpText>
+            <helpText lang="de-DE"></helpText>
+            <helpText lang="nl-NL"></helpText>
+        </input-field>
+        <input-field type="int">
+            <name>subscriptionsCancellationDays</name>
+            <defaultValue>0</defaultValue>
+            <label>Cancellation days before renewal</label>
+            <label lang="de-DE"></label>
+            <label lang="nl-NL"></label>
+            <helpText>Allow customers to only cancel their subscriptions (x) days until the renewal will happen. Use "0" to always allow cancellations.</helpText>
             <helpText lang="de-DE"></helpText>
             <helpText lang="nl-NL"></helpText>
         </input-field>

@@ -64,6 +64,7 @@
         "mollieSubscriptionId": "Id",
         "mollieSubscriptionAmount": "Amount",
         "mollieSubscriptionNextPayment": "Next payment at",
+        "mollieSubscriptionCancelUntil" : "Cancellation possible until",
         "mollieSubscriptionCancel": "Cancel Subscription",
         "mollieSubscriptionContextMenuReorder": "Repeat subscription",
         "cancelSubscription": "Subscription has been canceled",

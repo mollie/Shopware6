@@ -151,6 +151,11 @@ class MollieSettingStruct extends Struct
      */
     protected $subscriptionsReminderDays;
 
+    /**
+     * @var int
+     */
+    protected $subscriptionsCancellationDays;
+
 
     /**
      * @return string
@@ -546,6 +551,14 @@ class MollieSettingStruct extends Struct
     public function getSubscriptionsReminderDays(): int
     {
         return (int)$this->subscriptionsReminderDays;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSubscriptionsCancellationDays(): int
+    {
+        return (int)$this->subscriptionsCancellationDays;
     }
 
     /**

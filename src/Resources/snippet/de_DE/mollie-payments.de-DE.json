@@ -64,6 +64,7 @@
         "mollieSubscriptionId": "Id",
         "mollieSubscriptionAmount": "Betragen",
         "mollieSubscriptionNextPayment": "Nächste Zahlung um",
+        "mollieSubscriptionCancelUntil" : "Kündbar bis",
         "mollieSubscriptionCancel": "Abonnement kündigen",
         "mollieSubscriptionContextMenuReorder": "Abo wiederholen",
         "cancelSubscription": "Das Abonnement wurde gekündigt",

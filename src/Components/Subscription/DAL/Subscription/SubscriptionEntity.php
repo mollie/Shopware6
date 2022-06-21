@@ -103,10 +103,18 @@ class SubscriptionEntity extends Entity
      */
     protected $canceledAt;
 
+    # --------------------------------------------------------------------------------
+    # manually loaded data
+
     /**
      * @var string
      */
     protected $mollieStatus;
+
+    /**
+     * @var \DateTimeInterface|null
+     */
+    protected $cancelUntil;
 
     # --------------------------------------------------------------------------------
     # loaded entities
@@ -441,6 +449,18 @@ class SubscriptionEntity extends Entity
         return ($this->getMollieStatus() === MollieStatus::ACTIVE);
     }
 
+
+
+    # -----------------------------------------------------------------------------------------------------
+    # manually loaded data
+    /**
+     * @param string $mollieStatus
+     */
+    public function setMollieStatus(string $mollieStatus): void
+    {
+        $this->mollieStatus = $mollieStatus;
+    }
+
     /**
      * @return string
      */
@@ -450,12 +470,23 @@ class SubscriptionEntity extends Entity
     }
 
     /**
-     * @param string $mollieStatus
+     * @param \DateTimeInterface|null $cancelUntil
+     * @return void
      */
-    public function setMollieStatus(string $mollieStatus): void
+    public function setCancelUntil(?\DateTimeInterface $cancelUntil): void
     {
-        $this->mollieStatus = $mollieStatus;
+        $this->cancelUntil = $cancelUntil;
     }
+
+    /**
+     * @return \DateTimeInterface|null
+     */
+    public function getCancelUntil(): ?\DateTimeInterface
+    {
+        return $this->cancelUntil;
+    }
+
+    # -----------------------------------------------------------------------------------------------------
 
     /**
      * @return CustomerEntity

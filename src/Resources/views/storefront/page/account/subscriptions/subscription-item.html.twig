@@ -171,7 +171,10 @@
                                 <span class="order-table-body-value d-block">{{ "molliePayments.subscriptions.account.mollieSubscriptionAmount"|trans|sw_sanitize }}: {{ subscription.amount|currency(currencyIsoCode) }}</span>
                             {% endblock %}
                             {% block page_account_mollie_subscriptions_item_next_payment %}
-                                <span class="order-table-body-value d-block">{{ "molliePayments.subscriptions.account.mollieSubscriptionNextPayment"|trans|sw_sanitize }} {{ subscription.nextPaymentDate| format_date('short', locale=app.request.locale) }}</span>
+                                <span class="order-table-body-value d-block">{{ "molliePayments.subscriptions.account.mollieSubscriptionNextPayment"|trans|sw_sanitize }} {{ subscription.nextPaymentAt| format_date('short', locale=app.request.locale) }}</span>
+                            {% endblock %}
+                            {% block page_account_mollie_subscriptions_item_cancel_until %}
+                                <span class="order-table-body-value d-block">{{ "molliePayments.subscriptions.account.mollieSubscriptionCancelUntil"|trans|sw_sanitize }} {{ subscription.cancelUntil| format_date('short', locale=app.request.locale) }}</span>
                             {% endblock %}
                         </div>
                     {% endblock %}
