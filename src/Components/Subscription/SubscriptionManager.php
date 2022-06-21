@@ -270,10 +270,6 @@ class SubscriptionManager implements SubscriptionManagerInterface
         # TODO this is not yet done. in theory we have a different setting in other sales channels..which would mean we would need to iterate channels here!!!
         $settings = $this->pluginSettings->getSettings();
 
-        if (!$settings->isSubscriptionsReminderEnabled()) {
-            $this->logger->debug('Skipping Subscription renewal reminder. Feature is disabled in plugin configuration.');
-            return 0;
-        }
 
         $today = new DateTime();
         $daysOffset = $settings->getSubscriptionsReminderDays();

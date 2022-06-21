@@ -425,16 +425,6 @@
             <helpText lang="de-DE"></helpText>
             <helpText lang="nl-NL"></helpText>
         </input-field>
-        <input-field type="bool">
-            <name>subscriptionsReminderEnabled</name>
-            <defaultValue>false</defaultValue>
-            <label>Enable Events for Renewal Reminders</label>
-            <label lang="de-DE">Events für Aboverlängerungen aktivieren</label>
-            <label lang="nl-NL"></label>
-            <helpText>If enabled, the plugin will automatically fire renewal reminder events for Flow Builder and Business Events that can be used to send out emails to customers or other actions.</helpText>
-            <helpText lang="de-DE"></helpText>
-            <helpText lang="nl-NL"></helpText>
-        </input-field>
         <input-field type="int">
             <name>subscriptionsReminderDays</name>
             <defaultValue>2</defaultValue>
