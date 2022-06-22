@@ -1,0 +1,16 @@
+Dear {{ customer.firstName }}
+
+Good news!
+
+We are getting your subscription ready for you.
+
+Subscription: {{ subscription.description }}
+Next Renewal: {{ subscription.nextPaymentAt | date("m / d / Y", false) }}.
+Total Amount: {{ subscription.amount }} {{ subscription.currency }}
+
+This e-mail is just to inform you that the payment is going to be captured on this date.
+
+For any changes, you can log in to your account on {{ salesChannel.name }} and pause or cancel the subscription at any time.
+
+Thanks you
+{{ salesChannel.name }}

@@ -8,6 +8,11 @@ class ConfigService
 {
     public const SYSTEM_CONFIG_DOMAIN = 'MolliePayments.config.';
 
+    public const ENABLE_SUBSCRIPTION = 'enableSubscriptions';
+    public const PRE_PAYMENT_REMINDER_EMAIL = 'prePaymentReminderEmail';
+    public const EMAIL_TEMPLATE = 'emailTemplate';
+    public const DAYS_BEFORE_REMINDER = 'daysBeforeReminder';
+
     /** @var SystemConfigService $systemConfigService */
     private $systemConfigService;
 

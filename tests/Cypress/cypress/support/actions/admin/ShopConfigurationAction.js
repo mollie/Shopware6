@@ -67,8 +67,11 @@ export default class ShopConfigurationAction {
     /**
      *
      * @param voucherValue
+     * @param subscriptionEnabled
+     * @param subscriptionInterval
+     * @param subscriptionIntervalUnit
      */
-    updateProducts(voucherValue) {
+    updateProducts(voucherValue, subscriptionEnabled, subscriptionInterval, subscriptionIntervalUnit) {
 
         if (voucherValue === 'eco') {
             voucherValue = '1';
@@ -80,15 +83,23 @@ export default class ShopConfigurationAction {
             voucherValue = '0';
         }
 
+        if (subscriptionInterval === '') {
+            subscriptionInterval = null;
+        }
+
+
+
         let customFields = null;
 
         if (voucherValue !== '') {
             customFields = {
-                'mollie_payments': {
-                    'voucher_type': voucherValue,
-                }
+                'mollie_payments_product_voucher_type': voucherValue,
+                'mollie_payments_product_subscription_enabled': subscriptionEnabled,
+                'mollie_payments_product_subscription_interval': subscriptionInterval,
+                'mollie_payments_product_subscription_interval_unit': subscriptionIntervalUnit,
             }
         }
+
 
 
         this.apiClient.get('/product').then(products => {

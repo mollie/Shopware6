@@ -5,6 +5,7 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+
         <service id="Kiener\MolliePayments\Subscriber\OrderDeliverySubscriber">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Facade\MollieShipment"/>
@@ -34,6 +35,12 @@
 
         <service id="Kiener\MolliePayments\Subscriber\ApplePayDirectSubscriber">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Subscriber\SubscriptionSubscriber">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="translator"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 

@@ -6,6 +6,7 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
+use Shopware\Core\Content\MailTemplate\MailTemplateEntity;
 use Shopware\Core\Framework\Struct\Struct;
 
 class MollieSettingStruct extends Struct
@@ -149,6 +150,26 @@ class MollieSettingStruct extends Struct
      * @var string
      */
     protected $orderStateWithRefundTransaction = self::ORDER_STATE_SKIP;
+
+    /**
+     * @var bool
+     */
+    protected $subscriptionsShowIndicator;
+
+    /**
+     * @var bool
+     */
+    protected $subscriptionsAllowAddressEditing;
+
+    /**
+     * @var int
+     */
+    protected $subscriptionsReminderDays;
+
+    /**
+     * @var int
+     */
+    protected $subscriptionsCancellationDays;
 
 
     /**
@@ -579,5 +600,44 @@ class MollieSettingStruct extends Struct
         $this->orderStateWithRefundTransaction = $orderStateWithRefundTransaction;
     }
 
+    /**
+     * @return bool
+     */
+    public function isSubscriptionsShowIndicator(): bool
+    {
+        return (bool)$this->subscriptionsShowIndicator;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSubscriptionsReminderDays(): int
+    {
+        return (int)$this->subscriptionsReminderDays;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSubscriptionsCancellationDays(): int
+    {
+        return (int)$this->subscriptionsCancellationDays;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSubscriptionsAllowAddressEditing(): bool
+    {
+        return (bool)$this->subscriptionsAllowAddressEditing;
+    }
+
+    /**
+     * @param bool $subscriptionsAllowAddressEditing
+     */
+    public function setSubscriptionsAllowAddressEditing(bool $subscriptionsAllowAddressEditing): void
+    {
+        $this->subscriptionsAllowAddressEditing = $subscriptionsAllowAddressEditing;
+    }
 
 }

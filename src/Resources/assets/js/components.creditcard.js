@@ -144,8 +144,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 const fetchUrl = '[shop_url]/mollie/components/store-card-token/' + customerId.getAttribute('value') + '/' + token;
 
-                console.log(fetchUrl);
-
                 // Store the token on the customer
                 fetch(fetchUrl, { headers: { "Content-Type": "application/json; charset=utf-8" }})
                     .then(res => res.json())
