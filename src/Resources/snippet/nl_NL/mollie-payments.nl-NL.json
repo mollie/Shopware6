@@ -1,15 +1,15 @@
 {
   "checkout": {
-    "mollie-payments-cart-guest-account": "Guest Accounts cannot be used for subscription orders.",
-    "mollie-payments-cart-error-mixedcart": "Your cart contains multiple items in combination with subscription items. Please note you can only purchase 1 subscription item at a time.",
-    "mollie-payments-cart-error-paymentmethod-availability": "Not all payments methods are available when ordering subscription products.",
-    "mollie-payments-cart-error-method-invalid": "The currently selected payment method is not available for subscription products."
+    "mollie-payments-cart-guest-account": "Gastaccounts kunnen niet worden gebruikt voor abonnementsbestellingen.",
+    "mollie-payments-cart-error-mixedcart": "Uw winkelwagen bevat meerdere artikelen in combinatie met abonnementsartikelen. Houd er rekening mee dat u slechts 1 abonnementsartikel tegelijk kunt kopen.",
+    "mollie-payments-cart-error-paymentmethod-availability": "Niet alle betaalmethoden zijn beschikbaar bij het bestellen van abonnementsproducten.",
+    "mollie-payments-cart-error-method-invalid": "De actueel geselecteerde betaalmethode is niet beschikbaar voor abonnementsproducten."
   },
   "error": {
-    "mollie-payments-cart-guest-account": "Guest Accounts cannot be used for subscription orders.",
-    "mollie-payments-cart-error-mixedcart": "Your cart contains multiple items in combination with subscription items. Please note you can only purchase 1 subscription item at a time.",
-    "mollie-payments-cart-error-paymentmethod-availability": "Not all payments methods are available when ordering subscription products.",
-    "mollie-payments-cart-error-method-invalid": "The currently selected payment method is not available for subscription products."
+    "mollie-payments-cart-guest-account": "Gastaccounts kunnen niet worden gebruikt voor abonnementsbestellingen.",
+    "mollie-payments-cart-error-mixedcart": "Uw winkelwagen bevat meerdere artikelen in combinatie met abonnementsartikelen. Houd er rekening mee dat u slechts 1 abonnementsartikel tegelijk kunt kopen.",
+    "mollie-payments-cart-error-paymentmethod-availability": "Niet alle betaalmethoden zijn beschikbaar bij het bestellen van abonnementsproducten.",
+    "mollie-payments-cart-error-method-invalid": "De actueel geselecteerde betaalmethode is niet beschikbaar voor abonnementsproducten."
   },
   "molliePayments": {
     "testMode": {

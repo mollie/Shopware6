@@ -246,11 +246,11 @@
     },
     "subscriptions": {
       "status": {
-        "pending": "Pending",
-        "active": "Active",
-        "canceled": "Canceled",
-        "suspended": "Suspended",
-        "completed": "Completed"
+        "pending": "In afwachting",
+        "active": "Actief",
+        "canceled": "Geannuleerd",
+        "suspended": "Gepauzeerd",
+        "completed": "Voltooid"
       },
       "navigation": {
         "title": "Mollie Abonnementen"
@@ -268,10 +268,10 @@
           "canceledAt": "",
           "description": "Beschrijving",
           "createdAt": "Gemaakt bij",
-          "amount": "Hoeveelheid",
-          "quantity": "",
-          "nextPaymentAt": "",
-          "prePaymentReminder": "",
+          "amount": "Betrag",
+          "quantity": "Hoeveelheid",
+          "nextPaymentAt": "Volgende betaling",
+          "prePaymentReminder": "Herinnerd aan",
           "action": {
             "cancel": "Annuleer abonnement",
             "success": "Het abonnement is opgezegd.",
@@ -296,7 +296,7 @@
       "columns": {
         "mollie": "Mollie"
       },
-      "badgeSubscription": "Abo Bestellung"
+      "badgeSubscription": "Abonnement"
     }
   },
   "sw-order": {
