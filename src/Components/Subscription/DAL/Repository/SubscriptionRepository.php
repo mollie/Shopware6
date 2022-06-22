@@ -76,7 +76,7 @@ class SubscriptionRepository
      * @param int $daysOffset
      * @param string $salesChannelId
      * @param Context $context
-     * @return EntitySearchResult
+     * @return EntitySearchResult<SubscriptionEntity>
      * @throws \Exception
      */
     public function findByReminderRangeReached(int $daysOffset, string $salesChannelId, Context $context): EntitySearchResult
