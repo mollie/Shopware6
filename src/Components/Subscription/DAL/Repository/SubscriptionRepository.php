@@ -74,11 +74,12 @@ class SubscriptionRepository
 
     /**
      * @param int $daysOffset
+     * @param string $salesChannelId
      * @param Context $context
-     * @return EntitySearchResult<SubscriptionEntity>
+     * @return EntitySearchResult
      * @throws \Exception
      */
-    public function findByReminderRangeReached(int $daysOffset, Context $context): EntitySearchResult
+    public function findByReminderRangeReached(int $daysOffset, string $salesChannelId, Context $context): EntitySearchResult
     {
         # let's use our current date and remove the
         # provided number of offset days.
@@ -93,6 +94,7 @@ class SubscriptionRepository
 
         # subscription is not canceled
         $criteria->addFilter(new EqualsFilter('canceledAt', null));
+        $criteria->addFilter(new EqualsFilter('salesChannelId', $salesChannelId));
 
         # payment has to be in the future
         $criteria->addFilter(new RangeFilter('nextPaymentAt', ['gte' => $today->format('Y-m-d H:i:s')]));

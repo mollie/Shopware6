@@ -38,6 +38,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class SubscriptionManager implements SubscriptionManagerInterface
 {
@@ -274,58 +275,60 @@ class SubscriptionManager implements SubscriptionManagerInterface
      */
     public function remindSubscriptionRenewal(Context $context): int
     {
-        # TODO this is not yet done. in theory we have a different setting in other sales channels..which would mean we would need to iterate channels here!!!
-        $settings = $this->pluginSettings->getSettings();
-
-
-        $today = new DateTime();
-        $daysOffset = $settings->getSubscriptionsReminderDays();
-
-        $availableSubscriptions = $this->repoSubscriptions->findByReminderRangeReached($daysOffset, $context);
-
         $remindedCount = 0;
 
-        /** @var SubscriptionEntity $subscription */
-        foreach ($availableSubscriptions->getElements() as $subscription) {
+        $today = new DateTime();
 
-            # if it's not active in Mollie, then don't do anything
-            if ($subscription->getMollieStatus() !== MollieStatus::ACTIVE) {
-                continue;
+        $salesChannels = $this->repoSalesChannel->search(new Criteria(), $context);
+
+
+        /** @var SalesChannelEntity $salesChannel */
+        foreach ($salesChannels as $salesChannel) {
+
+            $settings = $this->pluginSettings->getSettings($salesChannel->getId());
+
+            $daysOffset = $settings->getSubscriptionsReminderDays();
+
+            $availableSubscriptions = $this->repoSubscriptions->findByReminderRangeReached($daysOffset, $salesChannel->getId(), $context);
+
+            /** @var SubscriptionEntity $subscription */
+            foreach ($availableSubscriptions->getElements() as $subscription) {
+
+                # if it's not active in Mollie, then don't do anything
+                if ($subscription->getMollieStatus() !== MollieStatus::ACTIVE) {
+                    continue;
+                }
+
+                # now check if we are allowed to remind or if it was already done
+                $shouldRemind = $this->reminderValidator->shouldRemind(
+                    $subscription->getNextPaymentAt(),
+                    $today,
+                    $daysOffset,
+                    $subscription->getLastRemindedAt()
+                );
+
+                if (!$shouldRemind) {
+                    continue;
+                }
+
+                $customer = $this->customerService->getCustomer($subscription->getCustomerId(), $context);
+
+                if (!$customer instanceof CustomerEntity) {
+                    throw new Exception('Shopware Customer not found for Subscription! Cannot remind anyone!');
+                }
+
+                # --------------------------------------------------------------------------------------------------
+                # FLOW BUILDER / BUSINESS EVENTS
+
+                $event = $this->flowBuilderEventFactory->buildSubscriptionRemindedEvent($customer, $subscription, $salesChannel, $context);
+                $this->flowBuilderDispatcher->dispatch($event);
+
+                # --------------------------------------------------------------------------------------------------
+
+                $this->repoSubscriptions->markReminded($subscription->getId(), $context);
+
+                $remindedCount++;
             }
-
-            # now check if we are allowed to remind or if it was already done
-            $shouldRemind = $this->reminderValidator->shouldRemind(
-                $subscription->getNextPaymentAt(),
-                $today,
-                $daysOffset,
-                $subscription->getLastRemindedAt()
-            );
-
-            if (!$shouldRemind) {
-                continue;
-            }
-
-            $customer = $this->customerService->getCustomer($subscription->getCustomerId(), $context);
-
-            if (!$customer instanceof CustomerEntity) {
-                throw new Exception('Shopware Customer not found for Subscription! Cannot remind anyone!');
-            }
-
-            $criteria = new Criteria([$subscription->getSalesChannelId()]);
-
-            $salesChannel = $this->repoSalesChannel->search($criteria, $context)->first();
-
-            # --------------------------------------------------------------------------------------------------
-            # FLOW BUILDER / BUSINESS EVENTS
-
-            $event = $this->flowBuilderEventFactory->buildSubscriptionRemindedEvent($customer, $subscription, $salesChannel, $context);
-            $this->flowBuilderDispatcher->dispatch($event);
-
-            # --------------------------------------------------------------------------------------------------
-
-            $this->repoSubscriptions->markReminded($subscription->getId(), $context);
-
-            $remindedCount++;
         }
 
         return $remindedCount;

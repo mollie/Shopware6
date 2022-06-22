@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionE
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEvents;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Service\SettingsService;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -24,15 +25,22 @@ class LiveDataEnricher implements EventSubscriberInterface
      */
     private $gwMollie;
 
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
 
     /**
      * @param SettingsService $pluginSettings
      * @param MollieGatewayInterface $gwMollie
+     * @param LoggerInterface $logger
      */
-    public function __construct(SettingsService $pluginSettings, MollieGatewayInterface $gwMollie)
+    public function __construct(SettingsService $pluginSettings, MollieGatewayInterface $gwMollie, LoggerInterface $logger)
     {
         $this->pluginSettings = $pluginSettings;
         $this->gwMollie = $gwMollie;
+        $this->logger = $logger;
     }
 
 
@@ -88,7 +96,12 @@ class LiveDataEnricher implements EventSubscriberInterface
                 $subscription->setMollieStatus($mollieSubscription->status);
 
             } catch (\Throwable $ex) {
-                # todo
+
+                $this->logger->error('Error when enriching Subscription with additional data',
+                    [
+                        'exception' => $ex,
+                    ]
+                );
             }
         }
     }
