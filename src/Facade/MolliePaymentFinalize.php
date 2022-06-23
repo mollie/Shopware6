@@ -8,11 +8,13 @@ use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
 use Kiener\MolliePayments\Service\MollieApi\Order;
+use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
 use Kiener\MolliePayments\Service\Order\OrderStatusUpdater;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Service\UpdateOrderTransactionCustomFields;
+use Kiener\MolliePayments\Struct\CreditCardStruct;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderTransaction\OrderTransactionAttributes;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
@@ -110,9 +112,18 @@ class MolliePaymentFinalize
             $salesChannelContext->getSalesChannel()->getId(),
             ['embed' => 'payments']
         );
+
+        $payment = $this->mollieOrderService->getPaidPayment($mollieOrder);
+
+        if ($payment->method==="creditcard"){
+            //Add the creditcard data to the customFieldStruct
+            $customFieldsStruct->setCreditCardDetails($payment->details);
+            //Save it on the order
+            $this->updateOrderCustomFields->updateOrder($order->getId(),$customFieldsStruct,$salesChannelContext);
+        }
+
         $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
         $paymentStatus = $this->orderStatusConverter->getMollieOrderStatus($mollieOrder);
-
 
         # Attention
         # Our payment status will either be set by us, or automatically by Shopware using exceptions below.
