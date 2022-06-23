@@ -1,0 +1,148 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <!-- ============================================================================================== -->
+
+        <service id="Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionDefinition">
+            <tag name="shopware.entity.definition" entity="mollie_subscription"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressDefinition">
+            <tag name="shopware.entity.definition" entity="mollie_subscription_address"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\DAL\Customer\CustomerExtension">
+            <tag name="shopware.entity.extension"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\DAL\Country\CountryExtension">
+            <tag name="shopware.entity.extension"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\DAL\Country\CountryStateExtension">
+            <tag name="shopware.entity.extension"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\DAL\Salutation\SalutationExtension">
+            <tag name="shopware.entity.extension"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Enricher\LiveDataEnricher">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
+            <argument type="service" id="mollie_payments.logger"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository">
+            <argument type="service" id="mollie_subscription.repository"/>
+            <argument type="service" id="mollie_subscription_address.repository"/>
+        </service>
+
+        <!-- ============================================================================================== -->
+
+        <service id="Kiener\MolliePayments\Components\Subscription\Rule\LineItemSubscriptionRule">
+            <tag name="shopware.rule.definition"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\Rule\CartSubscriptionRule">
+            <tag name="shopware.rule.definition"/>
+        </service>
+
+        <!-- ============================================================================================== -->
+
+        <service id="Kiener\MolliePayments\Components\Subscription\Services\Installer\MailTemplateInstaller" public="true">
+            <argument type="service" id="Doctrine\DBAL\Connection"/>
+            <argument type="service" id="mail_template_type.repository"/>
+            <argument type="service" id="mail_template.repository"/>
+            <argument type="service" id="sales_channel.repository"/>
+        </service>
+
+        <!-- ============================================================================================== -->
+
+        <service id="Kiener\MolliePayments\Controller\Api\SubscriptionController" public="true">
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+
+        <service id="Kiener\MolliePayments\Storefront\Controller\AccountController" public="true">
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Page\Account\SubscriptionPageLoader"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
+            <argument type="service" id="mollie_payments.logger"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+            <call method="setTwig">
+                <argument type="service" id="twig"/>
+            </call>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\Page\Account\SubscriptionPageLoader">
+            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+            <argument type="service" id="mollie_subscription.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+            <argument type="service" id="Shopware\Core\System\Country\SalesChannel\CountryRoute"/>
+            <argument type="service" id="Shopware\Core\System\Salutation\SalesChannel\SalutationRoute"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+        </service>
+
+
+        <!-- ============================================================================================== -->
+
+        <service id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager">
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+            <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing\SubscriptionRenewing"/>
+            <argument type="service" id="sales_channel.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
+            <argument type="service" id="mollie_payments.logger"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder">
+            <argument type="service" id="Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder">
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\Cart\Validator\AvailabilityInformationValidator">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <tag name="shopware.cart.validator"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\Cart\Validator\SubscriptionCartValidator">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <tag name="shopware.cart.validator"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing\OrderCloneService">
+            <argument type="service" id="order.repository"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\Order\OrderConverter"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\Processor"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing\SubscriptionRenewing">
+            <argument type="service" id="Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface"/>
+            <argument type="service" id="order_address.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing\OrderCloneService"/>
+        </service>
+
+    </services>
+</container>

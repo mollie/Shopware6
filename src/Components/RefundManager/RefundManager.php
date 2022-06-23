@@ -20,6 +20,7 @@ use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
 use Kiener\MolliePayments\Service\Refund\RefundService;
 use Kiener\MolliePayments\Service\Refund\RefundServiceInterface;
 use Kiener\MolliePayments\Service\Stock\StockManager;
+use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Refund;
@@ -119,8 +120,19 @@ class RefundManager implements RefundManagerInterface
      */
     public function refund(OrderEntity $order, RefundRequest $request, Context $context): Refund
     {
-        $mollieOrderId = $this->orderService->getMollieOrderId($order);
-        $mollieOrder = $this->mollie->getMollieOrder($mollieOrderId, $order->getSalesChannelId());
+        $orderAttributes = new OrderAttributes($order);
+
+        /** @var \Mollie\Api\Resources\Order|null $mollieOrder */
+        $mollieOrder = null;
+
+        if ($orderAttributes->isTypeSubscription()) {
+            # pure subscription orders do not
+            # have a real mollie order
+        } else {
+            # first thing is, we have to fetch the matching Mollie order for this Shopware order
+            $mollieOrderId = $this->orderService->getMollieOrderId($order);
+            $mollieOrder = $this->mollie->getMollieOrder($mollieOrderId, $order->getSalesChannelId());
+        }
 
         $this->logger->info('Starting refund for order: ' . $order->getOrderNumber());
 
@@ -138,6 +150,7 @@ class RefundManager implements RefundManagerInterface
         $refund = null;
 
         if ($request->isFullRefundAmountOnly()) {
+
             # we have a full refund, but only with amount
             # and no items. to make sure that we have clean data
             # we have to extract all items, so that they will be added to the metadata
@@ -147,12 +160,25 @@ class RefundManager implements RefundManagerInterface
             # convert again
             $serviceItems = $this->convertToRefundItems($request, $order, $mollieOrder);
 
-            $refund = $this->refundService->refundFull(
-                $order,
-                $request->getDescription(),
-                $serviceItems,
-                $context
-            );
+
+            if ($orderAttributes->isTypeSubscription()) {
+                # we only have a transaction in the case of a subscription
+                $refund = $this->refundService->refundPartial(
+                    $order,
+                    $request->getDescription(),
+                    $order->getAmountTotal(),
+                    $serviceItems,
+                    $context
+                );
+            } else {
+
+                $refund = $this->refundService->refundFull(
+                    $order,
+                    $request->getDescription(),
+                    $serviceItems,
+                    $context
+                );
+            }
 
         } else if ($request->isFullRefundWithItems($order)) {
             $refund = $this->refundService->refundFull(
@@ -182,7 +208,7 @@ class RefundManager implements RefundManagerInterface
 
         if (!$refund instanceof Refund) {
             # a problem happened, lets finish with an exception
-            throw new CouldNotCreateMollieRefundException($mollieOrderId, (string)$order->getOrderNumber());
+            throw new CouldNotCreateMollieRefundException('', (string)$order->getOrderNumber());
         }
 
         $refundAmount = (float)$refund->amount->value;
@@ -297,10 +323,10 @@ class RefundManager implements RefundManagerInterface
     /**
      * @param RefundRequest $request
      * @param OrderEntity $order
-     * @param \Mollie\Api\Resources\Order $mollieOrder
+     * @param ?\Mollie\Api\Resources\Order $mollieOrder
      * @return RefundItem[]
      */
-    private function convertToRefundItems(RefundRequest $request, OrderEntity $order, \Mollie\Api\Resources\Order $mollieOrder): array
+    private function convertToRefundItems(RefundRequest $request, OrderEntity $order, ?\Mollie\Api\Resources\Order $mollieOrder): array
     {
         $serviceItems = [];
 
@@ -327,7 +353,7 @@ class RefundManager implements RefundManagerInterface
             } else {
 
                 # yeah i know complexity...but for now lets keep it compact :)
-                if ($order->getDeliveries() instanceof OrderDeliveryCollection) {
+                if ($order->getDeliveries() instanceof OrderDeliveryCollection && $mollieOrder instanceof \Mollie\Api\Resources\Order) {
                     # if we do not have an item
                     # then it might be a delivery in Shopware
                     foreach ($order->getDeliveries() as $delivery) {

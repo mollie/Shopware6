@@ -53,7 +53,6 @@ context("Order Refunds", () => {
 
             createOrderAndOpenAdmin();
 
-
             const REFUND_DESCRIPTION = 'full refund with Cypress';
 
             // -------------------------------------------------------------------------------

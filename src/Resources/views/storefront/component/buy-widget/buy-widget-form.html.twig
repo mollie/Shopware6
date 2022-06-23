@@ -1,7 +1,14 @@
 {% sw_extends '@Storefront/storefront/component/buy-widget/buy-widget-form.html.twig' %}
 
 {% block buy_widget_buy_container %}
-    {{ parent() }}
+
+    {% if product.customFields.mollie_payments_product_subscription_enabled %}
+        <button class="btn btn-primary btn-block btn-buy" title="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}" aria-label="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}">
+            {{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}
+        </button>
+    {% else %}
+        {{ parent() }}
+    {% endif %}
 
     {% block page_product_detail_buy_container_apple_direct %}
         {# this is for Shopware < 6.4 #}

@@ -6,7 +6,7 @@ use Kiener\MolliePayments\Exception\PaymentUrlException;
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Facade\MolliePaymentFinalize;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
-use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
+use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Mollie\Api\Exceptions\ApiException;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -161,7 +161,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
     {
         $this->loadServices();
 
-        $orderAttributes = new MollieOrderCustomFieldsStruct($transaction->getOrder()->getCustomFields());
+        $orderAttributes = new OrderAttributes($transaction->getOrder());
         $molliedID = $orderAttributes->getMollieOrderId();
 
         $this->logger->info(

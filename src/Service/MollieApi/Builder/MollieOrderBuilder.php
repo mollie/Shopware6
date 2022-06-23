@@ -12,6 +12,8 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Struct\MollieLineItem;
+use Kiener\MolliePayments\Struct\Order\OrderAttributes;
+use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
@@ -105,8 +107,9 @@ class MollieOrderBuilder
      * @param VerticalTaxLineItemFixer $verticalTaxLineItemFixer
      * @param MollieLineItemHydrator $mollieLineItemHydrator
      * @param EventDispatcherInterface $eventDispatcher
+     * @param WebhookBuilder $webhookBuilder
      */
-    public function __construct(SettingsService $settingsService, OrderDataExtractor $extractor, RouterInterface $router, MollieOrderPriceBuilder $priceBuilder, MollieLineItemBuilder $lineItemBuilder, MollieOrderAddressBuilder $addressBuilder, MollieOrderCustomerEnricher $customerEnricher, LoggerInterface $loggerService, MollieShippingLineItemBuilder $shippingLineItemBuilder, VerticalTaxLineItemFixer $verticalTaxLineItemFixer, MollieLineItemHydrator $mollieLineItemHydrator, EventDispatcherInterface $eventDispatcher)
+    public function __construct(SettingsService $settingsService, OrderDataExtractor $extractor, RouterInterface $router, MollieOrderPriceBuilder $priceBuilder, MollieLineItemBuilder $lineItemBuilder, MollieOrderAddressBuilder $addressBuilder, MollieOrderCustomerEnricher $customerEnricher, LoggerInterface $loggerService, MollieShippingLineItemBuilder $shippingLineItemBuilder, VerticalTaxLineItemFixer $verticalTaxLineItemFixer, MollieLineItemHydrator $mollieLineItemHydrator, EventDispatcherInterface $eventDispatcher, WebhookBuilder $webhookBuilder)
     {
         $this->settingsService = $settingsService;
         $this->logger = $loggerService;
@@ -120,8 +123,7 @@ class MollieOrderBuilder
         $this->verticalTaxLineItemFixer = $verticalTaxLineItemFixer;
         $this->mollieLineItemHydrator = $mollieLineItemHydrator;
         $this->eventDispatcher = $eventDispatcher;
-
-        $this->webhookBuilder = new WebhookBuilder($router);
+        $this->webhookBuilder = $webhookBuilder;
     }
 
 
@@ -165,21 +167,20 @@ class MollieOrderBuilder
 
         $orderData['redirectUrl'] = $redirectUrl;
 
-
         $webhookUrl = $this->webhookBuilder->buildWebhook($transactionId);
         $orderData['webhookUrl'] = $webhookUrl;
         $orderData['payment']['webhookUrl'] = $webhookUrl;
-
+        if ($this->isSubscriptions($order->getLineItems())) {
+            $orderData['payment']['sequenceType'] = 'first';
+        }
 
         $isVerticalTaxCalculation = $this->isVerticalTaxCalculation($salesChannelContext);
-
 
         $lines = $this->lineItemBuilder->buildLineItems(
             $order->getTaxStatus(),
             $order->getNestedLineItems(),
             $isVerticalTaxCalculation
         );
-
 
         $deliveries = $order->getDeliveries();
 
@@ -208,7 +209,7 @@ class MollieOrderBuilder
 
 
         /** @var MollieSettingStruct $settings */
-        $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
+        $settings = $this->settingsService->getSettings($order->getSalesChannelId());
 
         // set order lifetime like configured
         $dueDate = $settings->getOrderLifetimeDate();
@@ -230,7 +231,12 @@ class MollieOrderBuilder
         }
 
         // enrich data with create customer at mollie
-        $orderData = $this->customerEnricher->enrich($orderData, $customer, $settings, $salesChannelContext);
+        $orderAttributes = new OrderAttributes($order);
+
+        if ($orderAttributes->isTypeSubscription() ||$settings->createCustomersAtMollie()) {
+            $orderData = $this->customerEnricher->enrich($orderData, $customer, $settings, $salesChannelContext);
+        }
+
 
         $this->logger->debug(
             sprintf('Preparing Shopware Order %s to be sent to Mollie', $order->getOrderNumber()),
@@ -277,6 +283,24 @@ class MollieOrderBuilder
         }
 
         return $salesChannel->getTaxCalculationType() === SalesChannelDefinition::CALCULATION_TYPE_VERTICAL;
+    }
+
+    /**
+     * @param $lines
+     * @return bool
+     */
+    private function isSubscriptions($lines): bool
+    {
+        foreach ($lines as $line) {
+
+            $attributes = new OrderLineItemEntityAttributes($line);
+
+            if ($attributes->isSubscriptionProduct()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

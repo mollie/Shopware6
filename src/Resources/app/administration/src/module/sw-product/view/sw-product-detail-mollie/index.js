@@ -5,7 +5,7 @@ import StringUtils from '../../../../core/service/utils/string-utils.service';
 import ProductService from '../../../../core/service/product/product.service';
 
 // eslint-disable-next-line no-undef
-const {mapState} = Shopware.Component.getComponentHelper();
+const {mapState, mapGetters} = Shopware.Component.getComponentHelper();
 
 // eslint-disable-next-line no-undef
 Shopware.Component.register('sw-product-detail-mollie', {
@@ -22,8 +22,21 @@ Shopware.Component.register('sw-product-detail-mollie', {
 
     data() {
         return {
+            productEntity: null,
+            // --------------------------------------
             parentVoucherType: '',
+            parentIsSubscription: false,
+            parentSubscriptionInterval: '',
+            parentSubscriptionIntervalUnit: '',
+            parentSubscriptionRepetition: '',
+            parentSubscriptionRepetitionType: '',
+            // --------------------------------------
             productVoucherType: '',
+            productIsSubscription: false,
+            productSubscriptionInterval: '',
+            productSubscriptionIntervalUnit: '',
+            productSubscriptionRepetition: '',
+            // --------------------------------------
         }
     },
 
@@ -32,15 +45,26 @@ Shopware.Component.register('sw-product-detail-mollie', {
     },
 
     computed: {
-
         ...mapState('swProductDetail', [
             'product',
+        ]),
+
+        ...mapGetters('swProductDetail', [
+            'isLoading',
+        ]),
+
+        ...mapGetters('context', [
+            'isSystemDefaultLanguage',
         ]),
 
         ...mapState('context', {
             languageId: state => state.api.languageId,
             systemLanguageId: state => state.api.systemLanguageId,
         }),
+
+        productId() {
+            return this.$route.params.id;
+        },
 
         /**
          *
@@ -59,8 +83,20 @@ Shopware.Component.register('sw-product-detail-mollie', {
          *
          * @returns {string}
          */
-        typeNONE() {
+        voucherTypeNONE() {
             return '0';
+        },
+
+        /**
+         *
+         * @returns {[{label, value: string},{label, value: string},{label, value: string}]}
+         */
+        subscriptionIntervalTypes() {
+            return [
+                {value: 'days', label: this.$tc('mollie-payments.subscriptions.TYPE_DAYS')},
+                {value: 'weeks', label: this.$tc('mollie-payments.subscriptions.TYPE_WEEKS')},
+                {value: 'months', label: this.$tc('mollie-payments.subscriptions.TYPE_MONTHS')},
+            ];
         },
 
         /**
@@ -116,11 +152,43 @@ Shopware.Component.register('sw-product-detail-mollie', {
         },
 
         /**
-         *
          * @param newValue
          */
         onVoucherChanged(newValue) {
-            this.updateData(newValue);
+            this.productVoucherType = newValue;
+            this.updateProductData();
+        },
+
+        /**
+         * @param newValue
+         */
+        onIsSubscriptionChanged(newValue) {
+            this.productIsSubscription = newValue;
+            this.updateProductData();
+        },
+
+        /**
+         * @param newValue
+         */
+        onSubscriptionIntervalChanged(newValue) {
+            this.productSubscriptionInterval = newValue;
+            this.updateProductData();
+        },
+
+        /**
+         * @param newValue
+         */
+        onSubscriptionIntervalUnitChanged(newValue) {
+            this.productSubscriptionIntervalUnit = newValue;
+            this.updateProductData();
+        },
+
+        /**
+         * @param newValue
+         */
+        onSubscriptionRepetitionChanged(newValue) {
+            this.productSubscriptionRepetition = newValue;
+            this.updateProductData();
         },
 
         /**
@@ -148,17 +216,20 @@ Shopware.Component.register('sw-product-detail-mollie', {
             // if we have a parent, use its value
             // otherwise just 0 "None".
             if (!this.stringUtils.isNullOrEmpty(this.parentVoucherType)) {
-                this.updateData(this.parentVoucherType);
+                this.productVoucherType = this.parentVoucherType;
             } else {
-                this.updateData(this.typeNONE);
+                this.productVoucherType = this.typeNONE;
             }
+
+            this.updateProductData();
         },
 
         /**
          *
          */
         restoreInheritance() {
-            this.updateData('');
+            this.productVoucherType = '';
+            this.updateProductData();
         },
 
         /**
@@ -167,32 +238,59 @@ Shopware.Component.register('sw-product-detail-mollie', {
         readMollieData() {
 
             this.parentVoucherType = '';
-            this.productVoucherType = '';
+            this.parentIsSubscription = false;
+            this.parentSubscriptionInterval = '';
+            this.parentSubscriptionIntervalUnit = '';
+            this.parentSubscriptionRepetition = '';
 
-            if (!this.product) {
-                return;
-            }
+            this.productVoucherType = '';
+            this.productIsSubscription = false;
+            this.productSubscriptionInterval = '';
+            this.productSubscriptionIntervalUnit = '';
+            this.productSubscriptionRepetition = '';
+
 
             // if we do have a parent, then fetch that product
             // and read its voucher type for our local variable
             if (this.hasParentProduct) {
+
+                if (!this.product) {
+                    return;
+                }
+
                 // eslint-disable-next-line no-undef
                 this.productRepository.get(this.product.parentId, Shopware.Context.api).then(parent => {
-                    const parentAtts = new ProductAttributes(parent);
-                    this.parentVoucherType = parentAtts.getVoucherType();
 
-                    // if we have a parent, and its nothing, that it should
-                    // at least display NONE
+                    const parentAtts = new ProductAttributes(parent);
+
+                    this.parentVoucherType = parentAtts.getVoucherType();
+                    this.parentIsSubscription = parentAtts.isSubscriptionProduct();
+                    this.parentSubscriptionInterval = parentAtts.getSubscriptionInterval();
+                    this.parentSubscriptionIntervalUnit = parentAtts.getSubscriptionIntervalUnit();
+                    this.parentSubscriptionRepetition = parentAtts.getSubscriptionRepetition();
+
+                    // FALLBACK on EMPTY VALUES
+                    // if we have a parent, and it's nothing, that it should at least display NONE for vouchers
                     if (this.stringUtils.isNullOrEmpty(this.parentVoucherType)) {
                         this.parentVoucherType = this.typeNONE;
                     }
                 });
             }
 
-            const mollieAttributes = new ProductAttributes(this.product);
+            // eslint-disable-next-line no-undef
+            this.productRepository.get(this.productId, Shopware.Context.api).then(product => {
 
-            this.productVoucherType = mollieAttributes.getVoucherType();
+                const productAtts = new ProductAttributes(product);
 
+                this.productVoucherType = productAtts.getVoucherType();
+                this.productIsSubscription = productAtts.isSubscriptionProduct();
+                this.productSubscriptionInterval = productAtts.getSubscriptionInterval();
+                this.productSubscriptionIntervalUnit = productAtts.getSubscriptionIntervalUnit();
+                this.productSubscriptionRepetition = productAtts.getSubscriptionRepetition();
+            });
+
+
+            // FALLBACK on EMPTY VALUES
             // if we have no parent, and also not yet something assigned
             // then make sure we have a NONE value
             if (!this.hasParentProduct && this.stringUtils.isNullOrEmpty(this.productVoucherType)) {
@@ -203,9 +301,7 @@ Shopware.Component.register('sw-product-detail-mollie', {
         /**
          *
          */
-        updateData(newProductVoucherType) {
-
-            this.productVoucherType = newProductVoucherType;
+        updateProductData() {
 
             if (!this.product) {
                 return;
@@ -213,15 +309,35 @@ Shopware.Component.register('sw-product-detail-mollie', {
 
             const mollieAttributes = new ProductAttributes(this.product)
 
-            if (newProductVoucherType !== '') {
-                mollieAttributes.setVoucherType(newProductVoucherType);
+
+            if (this.productVoucherType !== '') {
+                mollieAttributes.setVoucherType(this.productVoucherType);
             } else {
                 mollieAttributes.clearVoucherType();
+            }
+
+            mollieAttributes.setSubscriptionProduct(this.productIsSubscription);
+
+            if (this.productSubscriptionInterval !== '') {
+                mollieAttributes.setSubscriptionInterval(this.productSubscriptionInterval);
+            } else {
+                mollieAttributes.clearSubscriptionInterval();
+            }
+
+            if (this.productSubscriptionIntervalUnit !== '') {
+                mollieAttributes.setSubscriptionIntervalUnit(this.productSubscriptionIntervalUnit);
+            } else {
+                mollieAttributes.clearSubscriptionIntervalUnit();
+            }
+
+            if (this.productSubscriptionRepetition !== '') {
+                mollieAttributes.setSubscriptionRepetition(this.productSubscriptionRepetition);
+            } else {
+                mollieAttributes.clearSubscriptionRepetition();
             }
 
             // now update our product data
             this.productService.updateCustomFields(this.product, mollieAttributes);
         },
     },
-
 });

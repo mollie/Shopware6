@@ -61,7 +61,7 @@ describe('Voucher Payments', () => {
 
             it('Voucher hidden if product is not configured', () => {
 
-                configAction.updateProducts('');
+                configAction.updateProducts('', false, '', '');
 
                 scenarioDummyBasket.execute();
 
@@ -75,17 +75,17 @@ describe('Voucher Payments', () => {
             })
 
             it('Voucher available for ECO products', () => {
-                configAction.updateProducts('eco');
+                configAction.updateProducts('eco', false, '', '');
                 testVoucherPayment();
             })
 
             it('Voucher available for MEAL products', () => {
-                configAction.updateProducts('meal');
+                configAction.updateProducts('meal', false, '', '');
                 testVoucherPayment();
             })
 
             it('Voucher available for GIFT products', () => {
-                configAction.updateProducts('gift');
+                configAction.updateProducts('gift', false, '', '');
                 testVoucherPayment();
             })
 

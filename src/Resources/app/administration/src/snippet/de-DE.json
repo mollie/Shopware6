@@ -11,16 +11,22 @@
       "mollie_webhook_received_status_completed": " Mollie Webhook empfangen (Komplett)",
       "mollie_webhook_received_status_refunded": " Mollie Webhook empfangen (Rückerstattet)",
       "mollie_webhook_received_status_partially_refunded": " Mollie Webhook empfangen (Teilweise Rückerstattet)",
-      "mollie_refund_started": " Mollie Rückerstattung gestartet"
+      "mollie_refund_started": " Mollie Rückerstattung gestartet",
+      "mollie_subscription_started": " Mollie Abonnement gestartet",
+      "mollie_subscription_ended": " Mollie Abonnement abgeschlossen",
+      "mollie_subscription_cancelled": " Mollie Abonnement abgebrochen",
+      "mollie_subscription_renewal_reminder": " Mollie Erinnerung zur Abonnement Erneuerung"
     }
   },
   "mollie-payments": {
+    "pluginTitle": "Mollie",
+    "pluginDescription": "Mollie Module",
     "general": {
       "mainMenuItemGeneral": "Mollie Payments Zahlungen",
       "descriptionTextModule": "Mollie Payments Zahlungen",
       "btnMollieActions": "Mollie Aktionen",
       "refundThroughMollie": "Rückerstattung über Mollie",
-      "shipThroughMollie": "Versand bei Mollie melden"
+      "shipThroughMollie": "Versand melden"
     },
     "config": {
       "info": {
@@ -83,6 +89,10 @@
         "success": "Die Supportanfrage wurde erfolgreich versendet. Wir geben unser Bestes für eine schnelle Antwort.",
         "error": "Es gab leider ein Problem beim Versand über Shopware. Bitte probieren Sie es erneut oder kontaktieren uns direkt per E-Mail."
       }
+    },
+    "rules": {
+      "itemSubscriptionRule": "Item is subscription (Mollie)",
+      "cartSubscriptionRule": "Cart has subscription items (Mollie)"
     },
     "refunds": {
       "status": {
@@ -184,6 +194,18 @@
         }
       }
     },
+    "vouchers": {
+      "CARD_TITLE": "Gutscheine",
+      "VOUCHER_INFO_TITLE": "Gutschein Bezahlung",
+      "VOUCHER_INFO_DESCRIPTION": "Mit Mollie können Sie ganz einfach Zahlungen in Ihrem Online-Shop mit Öko-, Geschenk- und Essensgutscheinen akzeptieren – eine clevere Wahl, um den Umsatz zu steigern und Ihre Kunden zufrieden zu stellen. Die Zahlungsmethode \"Gutschein\" ist nur sichtbar, wenn Sie mindestens 1 Produkt in Ihrem Warenkorb haben, das mit einem konfigurierten Gutscheintyp berechtigt ist.",
+      "VOUCHER_INFO_DEFAULTLANGUAGE": "Bitte beachten Sie, dass diese Konfiguration nur in der Standard Sprache durchgeführt werden kann. Ändern Sie die hier angezeigte Sprache um den Gutscheintyp verändern zu können.",
+      "VOUCHER_BTN_READMORE": "Mehr lesen",
+      "VOUCHER_TYPE_CAPTION": "Gutschein Typ für Produkt",
+      "VOUCHER_TYPE_VALUE_NONE": "Kein Gutschein Typ",
+      "VOUCHER_TYPE_VALUE_ECO": "Öko",
+      "VOUCHER_TYPE_VALUE_MEAL": "Mahlzeit",
+      "VOUCHER_TYPE_VALUE_VOUCHER": "Geschenk"
+    },
     "modals": {
       "shipping": {
         "title": "Versand an Mollie melden",
@@ -248,6 +270,60 @@
           "automaticShipping": "Automatischer Versand in Plugin Konfiguration"
         }
       }
+    },
+    "subscriptions": {
+      "status": {
+        "pending": "Ausstehend",
+        "active": "Aktiv",
+        "canceled": "Abgebrochen",
+        "suspended": "Ausgesetzt",
+        "completed": "Abgeschlossen"
+      },
+      "navigation": {
+        "title": "Mollie Abonnements"
+      },
+      "TYPE_DAYS": "Tage",
+      "TYPE_WEEKS": "Woche(n)",
+      "TYPE_MONTHS": "Monat(e)",
+      "list": {
+        "title": "Abonnements",
+        "columns": {
+          "customer": "Kunde",
+          "subscription_id": "Mollie ID",
+          "customer_id": "Mollie Kunde",
+          "status": "Status",
+          "description": "Beschreibung",
+          "amount": "Betrag",
+          "quantity": "Anzahl",
+          "nextPaymentAt": "Nächste Zahlung",
+          "prePaymentReminder": "Erinnert am",
+          "canceledAt": "Gekündigt",
+          "createdAt": "Erstellt",
+          "action": {
+            "cancel": "Abo kündigen",
+            "success": "Das Abonnement wurde gekündigt.",
+            "error": "Fehler bei der Kündigung des Abonnements. Weitere Informationen in den Protokollen."
+          }
+        }
+      },
+      "product": {
+        "card-title": "Abonnement",
+        "title": "Mollie-Abonnements",
+        "description": "Die Verwaltung Ihrer wiederkehrenden Zahlungen ist mit unseren hilfreichen Funktionen einfacher denn je. Bringen Sie Ihr Unternehmen mit effizienten Tracking-Optionen, einfachen Integrationen und mehr auf die nächste Stufe. Mit Mollie-Abonnements können Sie ganz einfach Abonnementprodukte erstellen und wiederkehrende Zahlungen so planen, dass sie im konfigurierten Intervall und Zeitraum stattfinden.",
+        "mollieSubscriptionProduct": "Ist das ein Abo-Produkt?",
+        "mollieSubscriptionIntervalAmount": "Zahlung wiederholen alle",
+        "mollieSubscriptionIntervalType": "Abonnement-Intervall-Typ",
+        "mollieSubscriptionRepetitionAmount": "Zahlung wiederholen",
+        "mollieSubscriptionRepetitionPlaceholder": "Nummer eingeben oder leer lassen",
+        "infoDefaultLanguage": "Bitte beachten Sie, dass diese Konfiguration nur in Ihrer Standardsprache bearbeitet werden kann. Bitte ändern Sie Ihre Sprache, um die Abonnementeinstellungen dieses Produkts zu ändern.",
+        "btnReadMore": "Mehr lesen"
+      }
+    },
+    "sw-order-list": {
+      "columns": {
+        "mollie": "Mollie"
+      },
+      "badgeSubscription": "Abo Bestellung"
     }
   },
   "sw-order": {
@@ -262,6 +338,7 @@
       "totalRemaining": "Rückerstattbar",
       "totalVouchers": "Gutscheine",
       "totalShipments": "Versandte Menge ({quantity} Stück)",
+      "subscriptionBadge": "Abo Bestellung",
       "refundManager": {
         "title": "Rückerstattung über Mollie",
         "btnOpenRefundManager": "Refund Manager öffnen",

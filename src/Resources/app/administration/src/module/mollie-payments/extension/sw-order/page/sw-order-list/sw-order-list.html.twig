@@ -1,0 +1,16 @@
+{% block sw_order_list_grid_columns %}
+    {% parent %}
+    {% block sw_order_list_grid_columns_mollie_abo %}
+        <template #column-mollie="{ item }">
+            <sw-label v-if="isMollieSubscription(item)"
+                      variant="info"
+                      size="default"
+                      appearance="pill"
+                      :ghost="false"
+                      :caps="false"
+                      :dismissable="true">
+                {{ $tc('mollie-payments.sw-order-list.badgeSubscription') }}
+            </sw-label>
+        </template>
+    {% endblock %}
+{% endblock %}

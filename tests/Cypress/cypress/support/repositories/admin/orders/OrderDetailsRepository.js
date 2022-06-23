@@ -24,4 +24,12 @@ export default class OrdersListRepository {
         return cy.get('.sw-order-line-items-grid__actions-refund-btn');
     }
 
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getSubscriptionBadge() {
+        return cy.get('.mollie-order-user-card-subscription-badge');
+    }
+
 }

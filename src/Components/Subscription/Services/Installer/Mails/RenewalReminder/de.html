@@ -1,0 +1,16 @@
+Sehr geehrte(r) {{ customer.firstName }}<br/>
+<br/>
+Gute Nachrichten!<br/>
+<br/>
+Wir bereiten Ihr Abonnement für Sie vor.<br />
+<br />
+<strong>Abonnement</strong>: {{ subscription.description }}<br />
+<strong>Nächste Verlängerung</strong>: {{ subscription.nextPaymentAt | date("m / d / Y", false) }}.<br />
+<strong>Gesamtbetrag</strong>: {{ subscription.amount }} {{ subscription.currency }}<br />
+<br />
+Diese E-Mail soll Sie nur darüber informieren, dass die Zahlung an diesem Datum erfasst wird.<br/>
+<br/>
+Für Änderungen können Sie sich bei Ihrem Konto auf {{ salesChannel.name }} anmelden und das Abonnement jederzeit pausieren oder kündigen.<br/>
+<br/>
+Danke<br/>
+{{ salesChannel.name }}

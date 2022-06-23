@@ -16,6 +16,7 @@ use Kiener\MolliePayments\Service\Refund\Item\RefundItemType;
 use Kiener\MolliePayments\Service\Refund\Mollie\RefundMetadata;
 use Kiener\MolliePayments\Service\Refund\RefundService;
 use Kiener\MolliePayments\Service\Refund\RefundServiceInterface;
+use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Refund;
@@ -61,10 +62,19 @@ class RefundDataBuilder
      */
     public function buildRefundData(OrderEntity $order, Context $context): RefundData
     {
-        # first thing is
-        # we have to fetch the matching Mollie order for this Shopware order
-        $mollieOrderId = $this->orderService->getMollieOrderId($order);
-        $mollieOrder = $this->mollie->getMollieOrder($mollieOrderId, $order->getSalesChannelId());
+        $orderAttributes = new OrderAttributes($order);
+
+        /** @var \Mollie\Api\Resources\Order|null $mollieOrder */
+        $mollieOrder = null;
+
+        if ($orderAttributes->isTypeSubscription()) {
+            # pure subscription orders do not
+            # have a real mollie order
+        } else {
+            # first thing is, we have to fetch the matching Mollie order for this Shopware order
+            $mollieOrderId = $this->orderService->getMollieOrderId($order);
+            $mollieOrder = $this->mollie->getMollieOrder($mollieOrderId, $order->getSalesChannelId());
+        }
 
 
         try {
@@ -92,8 +102,13 @@ class RefundDataBuilder
                 $mollieOrderLineId = $lineItemAttribute->getMollieOrderLineID();
 
                 # extract how many of this item have already been refunded
-                # form all kinds of sources we have within Mollie
-                $alreadyRefundedQty = $this->getRefundedQuantity($mollieOrderLineId, $mollieOrder, $refunds);
+                # form all kinds of sources we have within Mollie.
+                # subscriptions have no order, so no quantity is available
+                $alreadyRefundedQty = 0;
+
+                if (!$orderAttributes->isTypeSubscription() && $mollieOrder instanceof \Mollie\Api\Resources\Order) {
+                    $alreadyRefundedQty = $this->getRefundedQuantity($mollieOrderLineId, $mollieOrder, $refunds);
+                }
 
                 # this is just a way to move the
                 # promotions to the last positions of our array
@@ -112,19 +127,25 @@ class RefundDataBuilder
         if ($order->getDeliveries() !== null) {
             foreach ($order->getDeliveries() as $delivery) {
 
-                $mollieLineID = '';
+                $alreadyRefundedQty = 0;
 
-                # search the mollie line id for the order
-                # because we don't have this in our order items
-                /** @var OrderLine $line */
-                foreach ($mollieOrder->lines as $line) {
-                    if ($line->metadata->orderLineItemId === $delivery->getId()) {
-                        $mollieLineID = $line->id;
-                        break;
+                # remember, subscriptions have no order
+                if (!$orderAttributes->isTypeSubscription() && $mollieOrder instanceof \Mollie\Api\Resources\Order) {
+
+                    # search the mollie line id for the order
+                    # because we don't have this in our order items.
+                    $mollieLineID = '';
+
+                    /** @var OrderLine $line */
+                    foreach ($mollieOrder->lines as $line) {
+                        if ($line->metadata->orderLineItemId === $delivery->getId()) {
+                            $mollieLineID = $line->id;
+                            break;
+                        }
                     }
-                }
 
-                $alreadyRefundedQty = $this->getRefundedQuantity($mollieLineID, $mollieOrder, $refunds);
+                    $alreadyRefundedQty = $this->getRefundedQuantity($mollieLineID, $mollieOrder, $refunds);
+                }
 
                 $refundDeliveryItems[] = new DeliveryItem($delivery, $alreadyRefundedQty);
             }
@@ -148,7 +169,7 @@ class RefundDataBuilder
             $pendingRefundAmount = $this->getPendingRefundAmount($refunds);
 
         } catch (PaymentNotFoundException $ex) {
-            # if we dont have a payment,
+            # if we don't have a payment,
             # then there are no values
             $remaining = 0;
             $refundedTotal = 0;

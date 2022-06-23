@@ -6,12 +6,14 @@ namespace Kiener\MolliePayments\Facade\Notifications;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatcherAdapterInterface;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
+use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
 use Kiener\MolliePayments\Service\Order\OrderStatusUpdater;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
+use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
 use Mollie\Api\Resources\Order;
 use Psr\Log\LoggerInterface;
@@ -59,11 +61,6 @@ class NotificationFacade
     private $repoOrderTransactions;
 
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @var FlowBuilderDispatcherAdapterInterface
      */
     private $flowBuilderDispatcher;
@@ -72,6 +69,16 @@ class NotificationFacade
      * @var FlowBuilderEventFactory
      */
     private $flowBuilderEventFactory;
+
+    /**
+     * @var SubscriptionManager
+     */
+    private $subscriptionManager;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
 
     /**
@@ -82,10 +89,11 @@ class NotificationFacade
      * @param EntityRepositoryInterface $repoOrderTransactions
      * @param FlowBuilderFactory $flowBuilderFactory
      * @param FlowBuilderEventFactory $flowBuilderEventFactory
+     * @param SubscriptionManager $subscription
      * @param LoggerInterface $logger
      * @throws \Exception
      */
-    public function __construct(MollieGatewayInterface $gatewayMollie, OrderStatusConverter $statusConverter, OrderStatusUpdater $statusUpdater, EntityRepositoryInterface $repoPaymentMethods, EntityRepositoryInterface $repoOrderTransactions, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, LoggerInterface $logger)
+    public function __construct(MollieGatewayInterface $gatewayMollie, OrderStatusConverter $statusConverter, OrderStatusUpdater $statusUpdater, EntityRepositoryInterface $repoPaymentMethods, EntityRepositoryInterface $repoOrderTransactions, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionManager $subscription, LoggerInterface $logger)
     {
         $this->gatewayMollie = $gatewayMollie;
         $this->statusConverter = $statusConverter;
@@ -93,6 +101,7 @@ class NotificationFacade
         $this->repoPaymentMethods = $repoPaymentMethods;
         $this->repoOrderTransactions = $repoOrderTransactions;
         $this->flowBuilderEventFactory = $flowBuilderEventFactory;
+        $this->subscriptionManager = $subscription;
         $this->logger = $logger;
 
         $this->flowBuilderDispatcher = $flowBuilderFactory->createDispatcher();
@@ -103,6 +112,7 @@ class NotificationFacade
      * @param string $transactionId
      * @param MollieSettingStruct $settings
      * @param SalesChannelContext $contextSC
+     * @return void
      * @throws \Exception
      */
     public function onNotify(string $transactionId, MollieSettingStruct $settings, SalesChannelContext $contextSC): void
@@ -122,8 +132,6 @@ class NotificationFacade
         if (!$swOrder instanceof OrderEntity) {
             throw new OrderNotFoundException('Shopware Order not found for transaction: ' . $transactionId);
         }
-
-        $mollieOrderId = $this->getMollieId($swOrder);
 
         # now get the latest transaction of that order
         # we always need to make sure to use the latest one, because this
@@ -147,15 +155,36 @@ class NotificationFacade
 
         # --------------------------------------------------------------------------------------------
 
+        $orderAttributes = new OrderAttributes($swOrder);
+
+        $mollieOrderId = $orderAttributes->getMollieOrderId();
+
+
         $this->gatewayMollie->switchClient($contextSC->getSalesChannel()->getId());
 
-        # fetch the order of our mollie ID
-        # from our sales channel mollie profile
-        $mollieOrder = $this->gatewayMollie->getOrder($mollieOrderId);
+        $molliePayment = null;
+        $mollieOrder = null;
+
+
+        if (!empty($orderAttributes->getMollieOrderId())) {
+
+            # fetch the order of our mollie ID
+            # from our sales channel mollie profile
+            $mollieOrder = $this->gatewayMollie->getOrder($mollieOrderId);
+            $status = $this->statusConverter->getMollieOrderStatus($mollieOrder);
+
+        } else if ($orderAttributes->isTypeSubscription()) {
+
+            # subscriptions are automatically charged using a payment ID
+            # so we do not have an order, but a payment instead
+            $molliePayment = $this->gatewayMollie->getPayment($orderAttributes->getMolliePaymentId());
+            $status = $this->statusConverter->getMolliePaymentStatus($molliePayment);
+
+        } else {
+            throw new \Exception('Order is neither a Mollie order nor a subscription order: ' . $swOrder->getOrderNumber());
+        }
 
         # --------------------------------------------------------------------------------------------
-
-        $status = $this->statusConverter->getMollieOrderStatus($mollieOrder);
 
         $this->logger->info('Webhook for order ' . $swOrder->getOrderNumber() . ' and Mollie ID: ' . $mollieOrderId . ' has been received with Status: ' . $status);
 
@@ -170,8 +199,27 @@ class NotificationFacade
         # then we want to update the one inside Shopware
         # If our order is Apple Pay, then DO NOT CONVERT THIS TO CREDIT CARD!
         # we want to keep apple pay as payment method
-        if ($transaction->getPaymentMethod() instanceof PaymentMethodEntity && $transaction->getPaymentMethod()->getHandlerIdentifier() !== ApplePayPayment::class) {
+        if ($mollieOrder instanceof Order && $transaction->getPaymentMethod() instanceof PaymentMethodEntity && $transaction->getPaymentMethod()->getHandlerIdentifier() !== ApplePayPayment::class) {
             $this->updatePaymentMethod($transaction, $mollieOrder, $contextSC->getContext());
+        }
+
+        # --------------------------------------------------------------------------------------------
+        # SUBSCRIPTION
+        # this will confirm our created subscriptions in all cases of successful payments.
+        # that path will create the actual subscription inside Mollie which will be used for recurring.
+        # if our payment expired, then we can also expire our local subscription in the database.
+
+        switch ($status) {
+
+            case MolliePaymentStatus::MOLLIE_PAYMENT_PAID:
+            case MolliePaymentStatus::MOLLIE_PAYMENT_PENDING:
+            case MolliePaymentStatus::MOLLIE_PAYMENT_AUTHORIZED:
+                $this->subscriptionManager->confirmSubscription($swOrder, $contextSC);
+                break;
+
+            case MolliePaymentStatus::MOLLIE_PAYMENT_EXPIRED:
+                $this->subscriptionManager->cancelPendingSubscriptions($swOrder, $contextSC);
+                break;
         }
 
         # --------------------------------------------------------------------------------------------
@@ -194,6 +242,8 @@ class NotificationFacade
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('id', $transactionId));
         $criteria->addAssociation('order');
+        $criteria->addAssociation('order.lineItems');
+        $criteria->addAssociation('order.currency');
         $criteria->addAssociation('paymentMethod');
 
         return $this->repoOrderTransactions->search($criteria, $context)->first();
@@ -204,7 +254,7 @@ class NotificationFacade
      * @param Context $context
      * @return EntitySearchResult<OrderTransactionEntity>
      */
-    private function getOrderTransactions(string $orderID, Context $context): EntitySearchResult
+    public function getOrderTransactions(string $orderID, Context $context): EntitySearchResult
     {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('order.id', $orderID));
