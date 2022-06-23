@@ -51,6 +51,7 @@ const payments = [
     {key: 'banktransfer', name: 'Banktransfer'},
     {key: 'giftcard', name: 'Gift cards'},
     {key: 'voucher', name: 'Voucher'},
+    {key: 'in3', name: 'in3'},
 ];
 
 
