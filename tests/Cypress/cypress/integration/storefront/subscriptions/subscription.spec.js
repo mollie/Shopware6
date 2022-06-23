@@ -62,7 +62,7 @@ describe('Subscription', () => {
                 session.resetBrowserSession();
             });
 
-            it('Subscription Configuration available in Administration', () => {
+            it('C6917: Subscription Configuration available in Administration', () => {
 
                 adminLogin.login();
 
@@ -75,7 +75,7 @@ describe('Subscription', () => {
                 repoProductDetailsAdmin.getSubscriptionToggle().check();
             })
 
-            it('Purchasing Subscription and verifying it in the Administration', () => {
+            it('C6918: Purchasing Subscription and verifying it in the Administration', () => {
 
                 configAction.updateProducts('', true, 3, 'weeks');
 

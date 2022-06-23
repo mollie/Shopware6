@@ -35,6 +35,7 @@ describe('Voucher Payments', () => {
     before(function () {
         devices.setDevice(devices.getFirstDevice());
         configAction.setupShop(true, false, false);
+        configAction.updateProducts('', false, 0, '');
     })
 
     testDevices.forEach(device => {
@@ -46,7 +47,7 @@ describe('Voucher Payments', () => {
                 session.resetBrowserSession();
             });
 
-            it('Voucher Configuration available in Administration', () => {
+            it('C6925: Voucher Configuration available in Administration', () => {
 
                 adminLogin.login();
 
@@ -59,7 +60,7 @@ describe('Voucher Payments', () => {
                 repoProductDetailsAdmin.getVoucherTypeDropdown().should('be.visible');
             })
 
-            it('Voucher hidden if product is not configured', () => {
+            it('C5687: Voucher hidden if product is not configured', () => {
 
                 configAction.updateProducts('', false, '', '');
 
@@ -74,17 +75,17 @@ describe('Voucher Payments', () => {
                 cy.contains('checkout-container', 'Voucher').should('not.exist');
             })
 
-            it('Voucher available for ECO products', () => {
+            it('C5684: Voucher available for ECO products', () => {
                 configAction.updateProducts('eco', false, '', '');
                 testVoucherPayment();
             })
 
-            it('Voucher available for MEAL products', () => {
+            it('C5685: Voucher available for MEAL products', () => {
                 configAction.updateProducts('meal', false, '', '');
                 testVoucherPayment();
             })
 
-            it('Voucher available for GIFT products', () => {
+            it('C5686: Voucher available for GIFT products', () => {
                 configAction.updateProducts('gift', false, '', '');
                 testVoucherPayment();
             })

@@ -34,9 +34,10 @@ describe('SEPA Bank Transfer', () => {
                 devices.setDevice(device);
                 session.resetBrowserSession();
                 configAction.setupShop(false, false, false);
+                configAction.updateProducts('', false, 0, '');
             });
 
-            it('Payment status "open" leads to succesful order', () => {
+            it('C6927: Payment status "open" leads to successful order', () => {
 
                 scenarioDummyBasket.execute();
 

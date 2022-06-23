@@ -34,9 +34,10 @@ describe('PayPal', () => {
                 devices.setDevice(device);
                 session.resetBrowserSession();
                 configAction.setupShop(false, false, false);
+                configAction.updateProducts('', false, 0, '');
             });
 
-            it('Payment status "pending" leads to succesful order', () => {
+            it('C6926: Payment status "pending" leads to successful order', () => {
 
                 scenarioDummyBasket.execute();
 

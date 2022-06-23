@@ -36,22 +36,22 @@ const device = devices.getFirstDevice();
 
 
 const payments = [
-    {key: 'paypal', name: 'PayPal'},
-    {key: 'klarnapaynow', name: 'Pay now'},
-    {key: 'klarnapaylater', name: 'Pay later'},
-    {key: 'klarnasliceit', name: 'Slice it'},
-    {key: 'ideal', name: 'iDEAL'},
-    {key: 'sofort', name: 'SOFORT'},
-    {key: 'eps', name: 'eps'},
-    {key: 'giropay', name: 'Giropay'},
-    {key: 'mistercash', name: 'Bancontact'},
-    {key: 'przelewy24', name: 'Przelewy24'},
-    {key: 'kbc', name: 'KBC'},
-    {key: 'belfius', name: 'Belfius'},
-    {key: 'banktransfer', name: 'Banktransfer'},
-    {key: 'giftcard', name: 'Gift cards'},
-    {key: 'voucher', name: 'Voucher'},
-    {key: 'in3', name: 'in3'},
+    {caseId: 'C5404', key: 'paypal', name: 'PayPal'},
+    {caseId: 'C5861', key: 'klarnapaynow', name: 'Pay now'},
+    {caseId: 'C5406', key: 'klarnapaylater', name: 'Pay later'},
+    {caseId: 'C5404', key: 'klarnasliceit', name: 'Slice it'},
+    {caseId: 'C5407', key: 'ideal', name: 'iDEAL'},
+    {caseId: 'C5408', key: 'sofort', name: 'SOFORT'},
+    {caseId: 'C5409', key: 'eps', name: 'eps'},
+    {caseId: 'C5410', key: 'giropay', name: 'Giropay'},
+    {caseId: 'C5411', key: 'mistercash', name: 'Bancontact'},
+    {caseId: 'C5412', key: 'przelewy24', name: 'Przelewy24'},
+    {caseId: 'C5413', key: 'kbc', name: 'KBC'},
+    {caseId: 'C5414', key: 'belfius', name: 'Belfius'},
+    {caseId: 'C5415', key: 'banktransfer', name: 'Banktransfer'},
+    {caseId: 'C5860', key: 'giftcard', name: 'Gift cards'},
+    {caseId: 'C6924', key: 'voucher', name: 'Voucher'},
+    {caseId: 'C6916', key: 'in3', name: 'in3'},
 ];
 
 
@@ -75,7 +75,7 @@ context("Checkout Tests", () => {
         context(devices.getDescription(device), () => {
             payments.forEach(payment => {
 
-                it('Pay with ' + payment.name, () => {
+                it(payment.caseId + ': Pay with ' + payment.name, () => {
 
                     scenarioDummyBasket.execute();
 

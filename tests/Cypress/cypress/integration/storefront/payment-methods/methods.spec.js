@@ -33,7 +33,7 @@ context('Payment Methods', () => {
                 session.resetBrowserSession();
             });
 
-            it('Mollie Payment Methods are available', () => {
+            it('C5423: Mollie Payment Methods show test mode', () => {
 
                 scenarioDummyBasket.execute();
 
