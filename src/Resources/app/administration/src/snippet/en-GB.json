@@ -256,6 +256,7 @@
       "columnRefunded": "Refunded",
       "columnShipped": "Shipped",
       "labelMollieOrderId": "Mollie Order ID",
+      "labelMollieThirdPartyPaymentId": "Third party payment ID",
       "labelMolliePaymentLink": "Mollie Checkout URL",
       "totalRefunds": "Refunded amount",
       "totalRefundsPending": "Waiting to be refunded",

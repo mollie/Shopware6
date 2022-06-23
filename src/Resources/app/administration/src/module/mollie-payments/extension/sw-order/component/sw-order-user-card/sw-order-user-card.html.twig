@@ -5,6 +5,11 @@
         <dt>{{ $tc('sw-order.detailExtended.labelMollieOrderId') }}</dt>
         <dd>{{ mollieOrderId }}</dd>
 
+        <template v-if="mollieThirdPartyPaymentId">
+            <dt>{{ $tc('sw-order.detailExtended.labelMollieThirdPartyPaymentId') }}</dt>
+            <dd>{{ mollieThirdPartyPaymentId }}</dd>
+        </template>
+
         <dt>{{ $tc('sw-order.detailExtended.labelMolliePaymentLink') }}</dt>
         <dd>
             <sw-button-process size="x-small"
