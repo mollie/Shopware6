@@ -68,26 +68,6 @@ class LineItemAttributesTest extends TestCase
     }
 
     /**
-     * This test verifies that we have default values
-     * if our mollie data struct is empty.
-     */
-    public function testEmptyMolliePayments()
-    {
-        $item = new LineItem('', '');
-        $item->setPayload([
-            'customFields' => [
-                'mollie_payments' => [
-
-                ]
-            ]
-        ]);
-
-        $attributes = new LineItemAttributes($item);
-
-        $this->assertEquals('', $attributes->getVoucherType());
-    }
-
-    /**
      * This test verifies that an existing voucher type entry
      * is correctly loaded from our attributes class.
      */
@@ -96,9 +76,7 @@ class LineItemAttributesTest extends TestCase
         $item = new LineItem('', '');
         $item->setPayload([
             'customFields' => [
-                'mollie_payments' => [
-                    'voucher_type' => VoucherType::TYPE_MEAL,
-                ]
+                'mollie_payments_product_voucher_type' => VoucherType::TYPE_MEAL,
             ]
         ]);
 
@@ -116,16 +94,14 @@ class LineItemAttributesTest extends TestCase
         $item = new LineItem('', '');
         $item->setPayload([
             'customFields' => [
-                'mollie_payments' => [
-                    'voucher_type' => VoucherType::TYPE_MEAL,
-                ]
+                'mollie_payments_product_voucher_type' => VoucherType::TYPE_MEAL,
             ]
         ]);
 
         $attributes = new LineItemAttributes($item);
 
         $expected = [
-            'voucher_type' => VoucherType::TYPE_MEAL
+            'mollie_payments_product_voucher_type' => VoucherType::TYPE_MEAL
         ];
 
         $this->assertEquals($expected, $attributes->toArray());

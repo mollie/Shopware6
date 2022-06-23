@@ -1,7 +1,10 @@
 import template from './sw-order-user-card.html.twig';
+import './sw-order-user-card.scss';
+import OrderAttributes from '../../../../../../core/models/OrderAttributes';
+
 
 // eslint-disable-next-line no-undef
-const { Component } = Shopware;
+const {Component} = Shopware;
 
 Component.override('sw-order-user-card', {
     template,
@@ -17,14 +20,21 @@ Component.override('sw-order-user-card', {
     },
 
     computed: {
+
+        /**
+         *
+         * @returns {null|string|*}
+         */
         mollieOrderId() {
-            if (
-                !!this.currentOrder
-                && !!this.currentOrder.customFields
-                && !!this.currentOrder.customFields.mollie_payments
-                && !!this.currentOrder.customFields.mollie_payments.order_id
-            ) {
-                return this.currentOrder.customFields.mollie_payments.order_id;
+
+            const orderAttributes = new OrderAttributes(this.currentOrder);
+
+            if (orderAttributes.getOrderId() !== '') {
+                return orderAttributes.getOrderId();
+            }
+
+            if (orderAttributes.getPaymentId() !== '') {
+                return orderAttributes.getPaymentId();
             }
 
             return null;
@@ -42,6 +52,23 @@ Component.override('sw-order-user-card', {
             return null;
         },
 
+        /**
+         *
+         * @returns {null|*}
+         */
+        isSubscription() {
+            const orderAttributes = new OrderAttributes(this.currentOrder);
+            return (orderAttributes.getSwSubscriptionId() !== '');
+        },
+
+        /**
+         *
+         * @returns {boolean}
+         */
+        hasPaymentLink() {
+            return this.molliePaymentUrl !== '';
+        },
+
     },
 
     created() {
@@ -52,12 +79,14 @@ Component.override('sw-order-user-card', {
         createdComponent() {
             this.$super('createdComponent');
 
-            if(this.mollieOrderId) {
+            this.molliePaymentUrl = '';
+
+            if (this.mollieOrderId) {
                 this.isMolliePaymentUrlLoading = true;
 
                 this.MolliePaymentsOrderService.getPaymentUrl({orderId: this.currentOrder.id})
                     .then(response => {
-                        this.molliePaymentUrl = response.url;
+                        this.molliePaymentUrl = (response.url !== null) ? response.url : '';
                     })
                     .finally(() => {
                         this.isMolliePaymentUrlLoading = false;
@@ -74,5 +103,28 @@ Component.override('sw-order-user-card', {
         onMolliePaymentUrlProcessFinished(value) {
             this.molliePaymentUrlCopied = value;
         },
+
+        /**
+         *
+         * @returns {{voucher_type: *}|*|null}
+         */
+        getMollieData() {
+            if (this.currentOrder === undefined || this.currentOrder === null) {
+                return null;
+            }
+
+            if (this.currentOrder.customFields === undefined || this.currentOrder.customFields === null) {
+                return null;
+            }
+
+            const customFields = this.currentOrder.customFields;
+
+            if (customFields.mollie_payments === undefined || customFields.mollie_payments === null) {
+                return null;
+            }
+
+            return customFields.mollie_payments;
+        },
+
     },
 });

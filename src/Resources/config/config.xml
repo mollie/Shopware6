@@ -4,7 +4,7 @@
 
     <card>
         <title>
-            
+
         </title>
         <component name="mollie-pluginconfig-section-info">
             <name>molliePluginConfigSectionInfo</name>
@@ -483,6 +483,53 @@
             <helpText lang="de-DE">Wenn aktiv, wechselt das Plugin nicht in einen neuen Bestellstatus, wenn der finale Status bereits in der Bestellung verwendet wird. Verwenden Sie diese Funktion in Kombination mit Plugins und -Systemen, wenn deren Workflows nicht mit denen von Mollie übereinstimmen.</helpText>
             <helpText lang="nl-NL">Indien ingeschakeld, gaat de plug-in niet over naar een nieuwe bestelstatus, als de definitieve status al in de bestelling is ingesteld. Gebruik deze functie in combinatie met plug-ins en -systemen als hun workflows niet overeenkomen met die van Mollie.</helpText>
         </component>
+
+    </card>
+
+    <card>
+        <title>Subscriptions</title>
+        <title lang="de-DE">Abonnements</title>
+        <title lang="nl-NL">Abonnementen</title>
+        <input-field type="bool">
+            <name>subscriptionsShowIndicator</name>
+            <defaultValue>true</defaultValue>
+            <label>Show Subscription Indicator</label>
+            <label lang="de-DE">Abonnementetikett auf Produktseite anzeigen</label>
+            <label lang="nl-NL">Label Abonnementen weergeven op productpagina</label>
+            <helpText>Shows a subscription indicator on the product detail page of a subscription product.</helpText>
+            <helpText lang="de-DE">Zeigt einen Abonnementhinweis auf der Produktdetailseite an.</helpText>
+            <helpText lang="nl-NL">Toont een abonnement indicator op de productpagina van een abonnement product.</helpText>
+        </input-field>
+        <input-field type="bool">
+            <name>subscriptionsAllowAddressEditing</name>
+            <defaultValue>false</defaultValue>
+            <label>Allow customers to edit billing and shipping addresses for running subscriptions</label>
+            <label lang="de-DE">Kunden erlauben Rechnungs- und Lieferadresse zu bearbeiten</label>
+            <label lang="nl-NL">Klanten toelaten om factuur- en verzendadressen voor lopende abonnementen te bewerken</label>
+            <helpText>If enabled, customers are allowed to edit their billing and shipping addresses in the shop. Please consider that no new shipping costs will be calculated for modified addresses. Countries are not allowed to be edited.</helpText>
+            <helpText lang="de-DE">Wenn aktiv, dürfen Kunden ihre Rechnungs- und Lieferadressen im Shop bearbeiten. Bitte beachten Sie, dass für geänderte Adressen keine neuen Versandkosten berechnet werden. Länder dürfen nicht bearbeitet werden.</helpText>
+            <helpText lang="nl-NL">Indien ingeschakeld, mogen klanten hun factuur- en verzendadres in de shop bewerken. Houd er rekening mee dat er geen nieuwe verzendkosten worden berekend voor gewijzigde adressen. Landen mogen niet worden bewerkt.</helpText>
+        </input-field>
+        <input-field type="int">
+            <name>subscriptionsReminderDays</name>
+            <defaultValue>2</defaultValue>
+            <label>Reminder period before renewal (days)</label>
+            <label lang="de-DE">Erinnerungszeitpunkt vor Erneuerung (Tage)</label>
+            <label lang="nl-NL">Herinneringsperiode voor verlenging (dagen)</label>
+            <helpText>Set the days in prior to the renewal for sending renewal reminder events in the system (Flow Builder, Business Events, ...).</helpText>
+            <helpText lang="de-DE">Legen Sie die Tage vor der Verlängerung für das Senden von Verlängerungs-Erinnerungsereignissen im System fest (Flow Builder, Business Events, ...).</helpText>
+            <helpText lang="nl-NL">Stel de dagen voorafgaand aan de verlenging in voor het verzenden van herinneringsgebeurtenissen in het systeem (Flow Builder, Business Events, ...)</helpText>
+        </input-field>
+        <input-field type="int">
+            <name>subscriptionsCancellationDays</name>
+            <defaultValue>0</defaultValue>
+            <label>Latest notice period before renewal (days)</label>
+            <label lang="de-DE">Letzter Kündigungstermin vor Verlängerung (Tagen)</label>
+            <label lang="nl-NL">Laatste opzegtermijn voor verlenging (dagen)</label>
+            <helpText>Set a notice period for customers before renewing the subscription. If a subscription renews on Friday and you use "2", then it can be cancelled with latest Wednesday. Use "0" to always allow cancellations.</helpText>
+            <helpText lang="de-DE">Legen Sie eine Kündigungsfrist für Verlänägerungen von Abonnements fest. Wenn sich ein Abonnement am Freitag verlängert und Sie "2" verwenden, kann es bis spätestens Mittwoch gekündigt werden. Verwenden Sie "0", um Stornierungen immer zuzulassen.</helpText>
+            <helpText lang="nl-NL">Stel een opzegtermijn in voor klanten voordat ze het abonnement verlengen. Als een abonnement op vrijdag wordt verlengd en je gebruikt "2", dan kan het uiterlijk woensdag worden opgezegd. Gebruik "0" om annuleringen altijd toe te staan</helpText>
+        </input-field>
 
     </card>
 </config>

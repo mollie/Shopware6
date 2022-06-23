@@ -51,6 +51,7 @@ const payments = [
     {key: 'banktransfer', name: 'Banktransfer'},
     {key: 'giftcard', name: 'Gift cards'},
     {key: 'voucher', name: 'Voucher'},
+    {key: 'in3', name: 'in3'},
 ];
 
 
@@ -62,7 +63,7 @@ context("Checkout Tests", () => {
         // configure our shop
         configAction.setupShop(true, false, false);
         // configure our products for vouchers
-        configAction.updateProducts('eco');
+        configAction.updateProducts('eco', false, '', '');
     })
 
     beforeEach(() => {

@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Service\MollieApi;
 
+use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException as CustomerCouldNotBeFoundExceptionAlias;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
@@ -9,11 +10,16 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class MollieOrderCustomerEnricher
 {
+
     /**
      * @var CustomerService
      */
     private $customerService;
 
+
+    /**
+     * @param CustomerService $customerService
+     */
     public function __construct(CustomerService $customerService)
     {
         $this->customerService = $customerService;
@@ -25,22 +31,14 @@ class MollieOrderCustomerEnricher
      * @param MollieSettingStruct $settings
      * @param SalesChannelContext $salesChannelContext
      * @return array
+     * @throws CustomerCouldNotBeFoundExceptionAlias
      */
-    public function enrich(
-        array $orderData,
-        CustomerEntity $customer,
-        MollieSettingStruct $settings,
-        SalesChannelContext $salesChannelContext
-    ): array
+    public function enrich(array $orderData, CustomerEntity $customer, MollieSettingStruct $settings, SalesChannelContext $salesChannelContext): array
     {
-        if (!$settings->createCustomersAtMollie()) {
-            return $orderData;
-        }
-
         $customerStruct = $this->customerService->getCustomerStruct($customer->getId(), $salesChannelContext->getContext());
         $customerId = $customerStruct->getCustomerId((string)$settings->getProfileId(), $settings->isTestMode());
 
-        if(empty($customerId)) {
+        if (empty($customerId)) {
             return $orderData;
         }
 
@@ -48,4 +46,5 @@ class MollieOrderCustomerEnricher
 
         return $orderData;
     }
+
 }

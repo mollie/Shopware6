@@ -1,0 +1,15 @@
+{% sw_extends '@Storefront/storefront/component/delivery-information.html.twig' %}
+
+{% block component_delivery_information %}
+    {{ parent() }}
+
+    {% if  page.extensions.mollieSubscription.isSubscriptionProduct %}
+        <div class="product-mollie-subscriptions-information">
+            <p class="delivery-information mollie-subscriptions">
+                <span class="delivery-status-indicator bg-info"></span>
+                {{ "molliePayments.subscriptions.product.information"|trans|sw_sanitize }}, {{ page.extensions.mollieSubscription.translatedInterval }}
+            </p>
+        </div>
+    {% endif %}
+
+{% endblock %}

@@ -3,23 +3,35 @@
 
     <template v-if="mollieOrderId">
         <dt>{{ $tc('sw-order.detailExtended.labelMollieOrderId') }}</dt>
-        <dd>{{ mollieOrderId }}</dd>
+        <dd>
+            {{ mollieOrderId }}
+            <div v-if="isSubscription">
+                <sw-label class="mollie-order-user-card-subscription-badge"
+                          variant="info" size="medium" appearance="pill" :ghost="true" :caps="true"
+                          :dismissable="false">
+                    {{ $tc('sw-order.detailExtended.subscriptionBadge') }}
+                </sw-label>
+            </div>
+        </dd>
 
         <template v-if="mollieThirdPartyPaymentId">
             <dt>{{ $tc('sw-order.detailExtended.labelMollieThirdPartyPaymentId') }}</dt>
             <dd>{{ mollieThirdPartyPaymentId }}</dd>
         </template>
 
-        <dt>{{ $tc('sw-order.detailExtended.labelMolliePaymentLink') }}</dt>
-        <dd>
-            <sw-button-process size="x-small"
-                               variant="context"
-                               :disabled="!molliePaymentUrl"
-                               :processSuccess="molliePaymentUrlCopied"
-                               :isLoading="isLoading || isMolliePaymentUrlLoading"
-                               @click="copyPaymentUrlToClipboard" @process-finish="onMolliePaymentUrlProcessFinished">
-                {{ $tc('sw-order.detailExtended.buttonMolliePaymentLink') }}
-            </sw-button-process>
-        </dd>
+        <div v-if="hasPaymentLink">
+            <dt>{{ $tc('sw-order.detailExtended.labelMolliePaymentLink') }}</dt>
+            <dd>
+                <sw-button-process size="x-small"
+                                   :disabled="!molliePaymentUrl"
+                                   :processSuccess="molliePaymentUrlCopied"
+                                   :isLoading="isLoading || isMolliePaymentUrlLoading"
+                                   @click="copyPaymentUrlToClipboard"
+                                   @process-finish="onMolliePaymentUrlProcessFinished">
+                    {{ $tc('sw-order.detailExtended.buttonMolliePaymentLink') }}
+                </sw-button-process>
+            </dd>
+        </div>
+
     </template>
 {% endblock %}

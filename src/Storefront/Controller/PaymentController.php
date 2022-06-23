@@ -17,7 +17,7 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\TransactionService;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
-use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
+use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Order;
 use Psr\Log\LoggerInterface;
@@ -140,7 +140,7 @@ class PaymentController extends StorefrontController
             throw new MissingOrderInTransactionException($transactionId);
         }
 
-        $orderAttributes = new MollieOrderCustomFieldsStruct($order->getCustomFields());
+        $orderAttributes = new OrderAttributes($order);
 
         $this->logger->debug(
             'Customer is returning to Shopware for order: ' . $order->getOrderNumber() . ' and Mollie ID: ' . $orderAttributes->getMollieOrderId(),
@@ -152,7 +152,7 @@ class PaymentController extends StorefrontController
         // TODO: Possibly refactor to use Service/OrderService::getMollieOrderId
         $customFieldArray = $order->getCustomFields() ?? [];
 
-        $customFields = new MollieOrderCustomFieldsStruct($customFieldArray);
+        $customFields = new OrderAttributes($order);
 
         $mollieOrderId = $customFields->getMollieOrderId();
 
@@ -215,7 +215,7 @@ class PaymentController extends StorefrontController
 
     private function returnFailedRedirect(SalesChannelContext $salesChannelContext, string $redirectUrl, OrderEntity $order, Order $mollieOrder, string $transactionId): Response
     {
-        $orderAttributes = new MollieOrderCustomFieldsStruct($order->getCustomFields());
+        $orderAttributes = new OrderAttributes($order);
 
         $this->logger->info(
             'Payment failed with Mollie failure mode for order ' . $order->getOrderNumber() . ' and Mollie ID: ' . $orderAttributes->getMollieOrderId(),
@@ -295,7 +295,7 @@ class PaymentController extends StorefrontController
             throw new OrderNotFoundException($transaction->getOrderId());
         }
 
-        $orderAttributes = new MollieOrderCustomFieldsStruct($order->getCustomFields());
+        $orderAttributes = new OrderAttributes($order);
 
         $this->logger->info(
             'Retry failed payment with Mollie failure mode for order ' . $order->getOrderNumber() . ' and Mollie ID: ' . $orderAttributes->getMollieOrderId(),

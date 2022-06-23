@@ -176,6 +176,8 @@ trait PaymentBuilderTrait
         $order->setLineItems($lineItems);
         $order->setOrderNumber($orderNumber);
 
+        $order->setSalesChannelId(Uuid::randomHex());
+
         return $order;
     }
 }

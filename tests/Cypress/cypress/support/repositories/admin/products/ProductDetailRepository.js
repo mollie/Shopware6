@@ -10,10 +10,10 @@ export default class ProductDetailRepository {
 
     /**
      *
-     * @returns {string}
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getMollieTab() {
-        return cy.contains('Mollie');
+        return cy.get('.product-tab-mollie');
     }
 
     /**
@@ -22,6 +22,14 @@ export default class ProductDetailRepository {
      */
     getVoucherTypeDropdown() {
         return cy.get('.mollie-voucher-type > div > select');
+    }
+
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getSubscriptionToggle() {
+        return cy.get('.mollie-subscription-enabled > div > div >input');
     }
 
 }

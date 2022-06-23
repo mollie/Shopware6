@@ -6,6 +6,11 @@
 
     <services>
 
+        <service id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Subscriber\BusinessEventCollectorSubscriber">
+            <argument type="service" id="Shopware\Core\Framework\Event\BusinessEventCollector"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"
                  class="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory">
             <argument>%kernel.shopware_version%</argument>
