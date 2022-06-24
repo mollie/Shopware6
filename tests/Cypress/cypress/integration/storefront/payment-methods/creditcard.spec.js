@@ -128,7 +128,7 @@ describe('Credit Card Components', () => {
             assertComponentErrors(true, false, true, true);
         })
 
-        it('6930: Invalid Expiry Date', () => {
+        it('C6930: Invalid Expiry Date', () => {
 
             setUp();
 
