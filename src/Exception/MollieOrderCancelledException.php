@@ -6,6 +6,11 @@ use Shopware\Core\Framework\ShopwareHttpException;
 
 class MollieOrderCancelledException extends ShopwareHttpException
 {
+    /**
+     * @param string               $mollieOrderID
+     * @param array<string, mixed> $parameters
+     * @param \Throwable|null      $e
+     */
     public function __construct(string $mollieOrderID, array $parameters = [], ?\Throwable $e = null)
     {
         $message = 'Mollie order {mollieId} is cancelled';
