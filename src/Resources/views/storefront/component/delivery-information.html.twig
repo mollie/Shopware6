@@ -3,7 +3,7 @@
 {% block component_delivery_information %}
     {{ parent() }}
 
-    {% if  page.extensions.mollieSubscription.isSubscriptionProduct %}
+    {% if  page.extensions.mollieSubscription.isSubscriptionProduct and page.extensions.mollieSubscription.showIndicator %}
         <div class="product-mollie-subscriptions-information">
             <p class="delivery-information mollie-subscriptions">
                 <span class="delivery-status-indicator bg-info"></span>

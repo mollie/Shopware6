@@ -223,7 +223,7 @@ describe('Status Tests', () => {
         devices.setDevice(devices.getFirstDevice());
         // turn off credit card components
         // to speed up a few  things
-        configAction.setupPlugin(false, false, false);
+        configAction.setupPlugin(false, false, false, false);
 
     })
 

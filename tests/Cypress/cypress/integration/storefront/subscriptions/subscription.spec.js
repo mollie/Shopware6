@@ -75,6 +75,35 @@ describe('Subscription', () => {
                 repoProductDetailsAdmin.getSubscriptionToggle().check();
             })
 
+            it('C6942: Subscription Indicator on PDP can be turned ON', () => {
+
+                configAction.updateProducts('', true, 3, 'weeks');
+                configAction.setupPlugin(true, false, false, true);
+
+                cy.visit('/');
+                topMenu.clickOnClothing();
+                listing.clickOnFirstProduct();
+
+                // we have to see the subscription indicator
+                cy.contains('Subscription product');
+                // we also want to see the translated interval
+                cy.contains('Every 3 weeks');
+            })
+
+            it('C6943: Subscription Indicator on PDP can be turned OFF', () => {
+
+                configAction.updateProducts('', true, 3, 'weeks');
+                configAction.setupPlugin(true, false, false, false);
+
+                cy.visit('/');
+
+                topMenu.clickOnClothing();
+                listing.clickOnFirstProduct();
+
+                cy.contains('Subscription product').should('not.exist');
+
+            })
+
             it('C6918: Purchasing Subscription and verifying it in the Administration', () => {
 
                 configAction.updateProducts('', true, 3, 'weeks');

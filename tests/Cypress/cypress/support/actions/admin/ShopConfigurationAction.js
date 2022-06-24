@@ -32,7 +32,7 @@ export default class ShopConfigurationAction {
 
         cy.wait(500);
 
-        this.setupPlugin(mollieFailureMode, creditCardComponents, applePayDirect);
+        this.setupPlugin(mollieFailureMode, creditCardComponents, applePayDirect, false);
 
         // let's just wait a bit
         cy.wait(10000);
@@ -46,8 +46,9 @@ export default class ShopConfigurationAction {
      * @param mollieFailureMode
      * @param creditCardComponents
      * @param applePayDirect
+     * @param subscriptionIndicator
      */
-    setupPlugin(mollieFailureMode, creditCardComponents, applePayDirect) {
+    setupPlugin(mollieFailureMode, creditCardComponents, applePayDirect, subscriptionIndicator) {
 
         // assign all payment methods to
         // all available sales channels
@@ -59,7 +60,7 @@ export default class ShopConfigurationAction {
 
             channels.forEach(channel => {
                 this._configureSalesChannel(channel.id);
-                this._configureMolliePlugin(channel.id, mollieFailureMode, creditCardComponents, applePayDirect);
+                this._configureMolliePlugin(channel.id, mollieFailureMode, creditCardComponents, applePayDirect, subscriptionIndicator);
             });
         });
     }
@@ -88,7 +89,6 @@ export default class ShopConfigurationAction {
         }
 
 
-
         let customFields = null;
 
         if (voucherValue !== '') {
@@ -99,7 +99,6 @@ export default class ShopConfigurationAction {
                 'mollie_payments_product_subscription_interval_unit': subscriptionIntervalUnit,
             }
         }
-
 
 
         this.apiClient.get('/product').then(products => {
@@ -129,9 +128,10 @@ export default class ShopConfigurationAction {
      * @param mollieFailureMode
      * @param creditCardComponents
      * @param applePayDirect
+     * @param subscriptionIndicator
      * @private
      */
-    _configureMolliePlugin(channelId, mollieFailureMode, creditCardComponents, applePayDirect) {
+    _configureMolliePlugin(channelId, mollieFailureMode, creditCardComponents, applePayDirect, subscriptionIndicator) {
         const data = {};
 
         data[channelId] = {
@@ -148,6 +148,8 @@ export default class ShopConfigurationAction {
             "MolliePayments.config.orderStateWithAPaidTransaction": 'completed',
             "MolliePayments.config.orderStateWithAFailedTransaction": 'open',
             "MolliePayments.config.orderStateWithACancelledTransaction": 'cancelled',
+            // ------------------------------------------------------------------
+            "MolliePayments.config.subscriptionsShowIndicator": subscriptionIndicator,
         };
 
         this.apiClient.post('/_action/system-config/batch', data);
