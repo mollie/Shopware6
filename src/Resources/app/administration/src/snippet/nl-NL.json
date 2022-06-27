@@ -332,6 +332,7 @@
       "columnRefunded": "Terugbetaald",
       "columnShipped": "Verzonden",
       "labelMollieOrderId": "Mollie Order ID",
+      "labelMollieThirdPartyPaymentId": "Payment ID derde partij",
       "labelMolliePaymentLink": "Mollie Checkout URL",
       "totalRefunds": "Terugbetaald bedrag",
       "totalRefundsPending": "Wachtend op terugbetaling",

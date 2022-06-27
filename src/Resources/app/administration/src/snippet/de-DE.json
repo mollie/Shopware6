@@ -332,6 +332,7 @@
       "columnRefunded": "Rückerstattet",
       "columnShipped": "Versandt",
       "labelMollieOrderId": "Mollie Bestell ID",
+      "labelMollieThirdPartyPaymentId": "Drittanbieter-Zahlungs-ID",
       "labelMolliePaymentLink": "Mollie Checkout URL",
       "totalRefunds": "Rückerstattete Menge",
       "totalRefundsPending": "Warten auf Rückerstattung",
