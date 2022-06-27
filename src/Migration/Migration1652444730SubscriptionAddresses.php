@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Migration;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Shopware\Core\Framework\Migration\MigrationStep;
 
 class Migration1652444730SubscriptionAddresses extends MigrationStep
@@ -47,14 +48,15 @@ class Migration1652444730SubscriptionAddresses extends MigrationStep
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
                 ");
 
-        $connection->exec('CREATE INDEX `idx.mollie_subscription_address.id` ON mollie_subscription_address (id);');
-        $connection->exec('CREATE INDEX `idx.mollie_subscription_address.subscription_id` ON mollie_subscription_address (subscription_id);');
 
-        $connection->exec('ALTER TABLE mollie_subscription ADD billing_address_id binary(16)');
-        $connection->exec('ALTER TABLE mollie_subscription ADD shipping_address_id binary(16)');
+        $this->createColumn('mollie_subscription', 'billing_address_id', 'binary(16)', $connection);
+        $this->createColumn('mollie_subscription', 'shipping_address_id', 'binary(16)', $connection);
 
-        $connection->exec('CREATE INDEX `idx.mollie_subscription.billing_address_id` ON mollie_subscription (billing_address_id);');
-        $connection->exec('CREATE INDEX `idx.mollie_subscription.shipping_address_id` ON mollie_subscription (shipping_address_id);');
+        $this->buildIndex('mollie_subscription', 'idx.mollie_subscription.billing_address_id', 'billing_address_id', $connection);
+        $this->buildIndex('mollie_subscription', 'idx.mollie_subscription.shipping_address_id', 'shipping_address_id', $connection);
+
+        $this->buildIndex('mollie_subscription_address', 'idx.mollie_subscription_address.id', 'id', $connection);
+        $this->buildIndex('mollie_subscription_address', 'idx.mollie_subscription_address.subscription_id', 'subscription_id', $connection);
     }
 
     /**
@@ -63,6 +65,46 @@ class Migration1652444730SubscriptionAddresses extends MigrationStep
     public function updateDestructive(Connection $connection): void
     {
         // implement update destructive
+    }
+
+    /**
+     * @param string $table
+     * @param string $column
+     * @param string $type
+     * @param Connection $connection
+     * @return void
+     * @throws Exception
+     */
+    private function createColumn(string $table, string $column, string $type, Connection $connection): void
+    {
+        $colQuery = $connection->executeQuery("SHOW COLUMNS FROM " . $table . " LIKE '" . $column . "'")->fetch();
+
+        if ($colQuery === false) {
+            $connection->exec("ALTER TABLE " . $table . " ADD " . $column . " " . $type);
+        }
+    }
+
+    /**
+     * @param string $table
+     * @param string $indexName
+     * @param string $targetField
+     * @param Connection $connection
+     * @return void
+     * @throws Exception
+     */
+    private function buildIndex(string $table, string $indexName, string $targetField, Connection $connection): void
+    {
+        $indexExistsCheck = $connection->executeQuery("
+            SELECT COUNT(1) indexIsThere 
+            FROM INFORMATION_SCHEMA.STATISTICS 
+            WHERE table_schema=DATABASE() AND table_name='" . $table . "' AND index_name='" . $indexName . "';
+        ")->fetch();
+
+        $isExisting = ((int)$indexExistsCheck['indexIsThere'] === 1);
+
+        if (!$isExisting) {
+            $connection->exec("CREATE INDEX `" . $indexName . "` ON " . $table . " (" . $targetField . ");");
+        }
     }
 
 }

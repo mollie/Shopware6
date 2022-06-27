@@ -49,12 +49,12 @@ class Migration1644753635CreateSubscription extends MigrationStep
                 "
         );
 
-        $connection->exec('CREATE INDEX `idx.mollie_subscription.id` ON mollie_subscription (id);');
-        $connection->exec('CREATE INDEX `idx.mollie_subscription.customer_id` ON mollie_subscription (customer_id);');
-        $connection->exec('CREATE INDEX `idx.mollie_subscription.product_id` ON mollie_subscription (product_id);');
-        $connection->exec('CREATE INDEX `idx.mollie_subscription.canceled_at` ON mollie_subscription (canceled_at);');
-        $connection->exec('CREATE INDEX `idx.mollie_subscription.next_payment_at` ON mollie_subscription (next_payment_at);');
-        $connection->exec('CREATE INDEX `idx.mollie_subscription.sales_channel_id` ON mollie_subscription (sales_channel_id);');
+        $this->buildIndex('mollie_subscription', 'idx.mollie_subscription.id', 'id', $connection);
+        $this->buildIndex('mollie_subscription', 'idx.mollie_subscription.customer_id', 'customer_id', $connection);
+        $this->buildIndex('mollie_subscription', 'idx.mollie_subscription.product_id', 'product_id', $connection);
+        $this->buildIndex('mollie_subscription', 'idx.mollie_subscription.canceled_at', 'canceled_at', $connection);
+        $this->buildIndex('mollie_subscription', 'idx.mollie_subscription.next_payment_at', 'next_payment_at', $connection);
+        $this->buildIndex('mollie_subscription', 'idx.mollie_subscription.sales_channel_id', 'sales_channel_id', $connection);
     }
 
     /**
@@ -65,5 +65,27 @@ class Migration1644753635CreateSubscription extends MigrationStep
     {
     }
 
+    /**
+     * @param string $table
+     * @param string $indexName
+     * @param string $targetField
+     * @param Connection $connection
+     * @return void
+     * @throws Exception
+     */
+    private function buildIndex(string $table, string $indexName, string $targetField, Connection $connection): void
+    {
+        $indexExistsCheck = $connection->executeQuery("
+            SELECT COUNT(1) indexIsThere 
+            FROM INFORMATION_SCHEMA.STATISTICS 
+            WHERE table_schema=DATABASE() AND table_name='" . $table . "' AND index_name='" . $indexName . "';
+        ")->fetch();
+
+        $isExisting = ((int)$indexExistsCheck['indexIsThere'] === 1);
+
+        if (!$isExisting) {
+            $connection->exec("CREATE INDEX `" . $indexName . "` ON " . $table . " (" . $targetField . ");");
+        }
+    }
 
 }
