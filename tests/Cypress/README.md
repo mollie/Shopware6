@@ -35,6 +35,15 @@ Cypress will then test your local or remote shop with the tests of the provided 
 make run shopware=6.x url=https://my-local-or-remote-domain 
 ```
 
+
+### TestRail Integration
+This Cypress project integrates with our TestRail project.
+TestRail is a software to manage test cases keep track on their statuses.
+
+You could, in theory, configure your own TestRail credentials (Cypress.env.json), but unfortunately the mapped test cases
+will not match your IDs, so it will probably not work. This is only for our QA team at the moment.
+
+
 ### Troubleshooting
 
 Shopware 6.4.4.0 introduced LAX cookies.
