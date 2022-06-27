@@ -68,16 +68,23 @@ class SubscriptionSubscriber implements EventSubscriberInterface
             $product = $event->getPage()->getProduct();
             $productAttributes = new ProductAttributes($product);
 
-            $interval = (int)$productAttributes->getSubscriptionInterval();
-            $unit = (string)$productAttributes->getSubscriptionIntervalUnit();
-            $repetition = (int)$productAttributes->getSubscriptionRepetitionCount();
+            $isSubscription = $productAttributes->isSubscriptionProduct();
 
-            $translatedInterval = $this->getTranslatedInterval($interval, $unit, $repetition);
-
-            $showIndicator = $settings->isSubscriptionsShowIndicator();
+            # only load our data if we really
+            # have a subscription product
+            if ($isSubscription) {
+                $interval = (int)$productAttributes->getSubscriptionInterval();
+                $unit = (string)$productAttributes->getSubscriptionIntervalUnit();
+                $repetition = (int)$productAttributes->getSubscriptionRepetitionCount();
+                $translatedInterval = $this->getTranslatedInterval($interval, $unit, $repetition);
+                $showIndicator = $settings->isSubscriptionsShowIndicator();
+            } else {
+                $translatedInterval = '';
+                $showIndicator = false;
+            }
 
             $struct = new SubscriptionDataExtensionStruct(
-                true,
+                $isSubscription,
                 $translatedInterval,
                 $showIndicator
             );
@@ -93,7 +100,9 @@ class SubscriptionSubscriber implements EventSubscriberInterface
 
                 $lineItemAttributes = new LineItemAttributes($lineItem);
 
-                if ($lineItemAttributes->isSubscriptionProduct()) {
+                $isSubscription = $lineItemAttributes->isSubscriptionProduct();
+
+                if ($isSubscription) {
 
                     $interval = (int)$lineItemAttributes->getSubscriptionInterval();
                     $unit = (string)$lineItemAttributes->getSubscriptionIntervalUnit();
@@ -101,7 +110,11 @@ class SubscriptionSubscriber implements EventSubscriberInterface
 
                     $translatedInterval = $this->getTranslatedInterval($interval, $unit, $repetition);
 
-                    $struct = new SubscriptionDataExtensionStruct(true, $translatedInterval, false);
+                    $struct = new SubscriptionDataExtensionStruct(
+                        $isSubscription,
+                        $translatedInterval,
+                        false
+                    );
 
                     $lineItem->addExtension('mollieSubscription', $struct);
                 }
