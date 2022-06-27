@@ -101,7 +101,7 @@ class SubscriptionSubscriber implements EventSubscriberInterface
 
                     $translatedInterval = $this->getTranslatedInterval($interval, $unit, $repetition);
 
-                    $struct = new SubscriptionDataExtensionStruct(true, $translatedInterval);
+                    $struct = new SubscriptionDataExtensionStruct(true, $translatedInterval, false);
 
                     $lineItem->addExtension('mollieSubscription', $struct);
                 }
