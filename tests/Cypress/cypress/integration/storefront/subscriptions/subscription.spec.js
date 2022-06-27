@@ -96,7 +96,7 @@ describe('Subscription', () => {
                 configAction.setupShop(true, false, false);
 
                 configAction.updateProducts('', true, 3, 'weeks');
-                configAction.setupPlugin(true, false, false, false);
+                configAction.setupPlugin(true, false, false, true);
 
                 cy.visit('/');
 
