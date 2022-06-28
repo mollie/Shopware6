@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund\Refund
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionCancelledEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionEndedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionRemindedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionRenewedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionStartedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookReceivedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedAuthorizedEvent;
@@ -80,7 +81,8 @@ class BusinessEventCollectorSubscriber implements EventSubscriberInterface
             SubscriptionStartedEvent::class,
             SubscriptionEndedEvent::class,
             SubscriptionCancelledEvent::class,
-            SubscriptionRemindedEvent::class
+            SubscriptionRemindedEvent::class,
+            SubscriptionRenewedEvent::class,
         ];
 
         foreach ($events as $event) {

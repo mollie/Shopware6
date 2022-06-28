@@ -15,6 +15,7 @@
       "mollie_subscription_started": " Mollie Abonnement gestartet",
       "mollie_subscription_ended": " Mollie Abonnement abgeschlossen",
       "mollie_subscription_cancelled": " Mollie Abonnement abgebrochen",
+      "mollie_subscription_renewed": " Mollie Abonnement erneuert",
       "mollie_subscription_renewal_reminder": " Mollie Erinnerung zur Abonnement Erneuerung"
     }
   },

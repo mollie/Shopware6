@@ -15,6 +15,7 @@
       "mollie_subscription_started": " Mollie Abonnement gestart",
       "mollie_subscription_ended": " Mollie Subscription voltooid",
       "mollie_subscription_cancelled": " Mollie Subscription opgezegd",
+      "mollie_subscription_renewed": " Mollie Subscription verlengd",
       "mollie_subscription_renewal_reminder": " Mollie herinnering voor abonnementsverlenging"
     }
   },

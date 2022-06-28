@@ -382,6 +382,9 @@ class SubscriptionManager implements SubscriptionManagerInterface
         # --------------------------------------------------------------------------------------------------
         # FLOW BUILDER / BUSINESS EVENTS
 
+        $event = $this->flowBuilderEventFactory->buildSubscriptionRenewedEvent($swSubscription->getCustomer(), $swSubscription, $context->getContext());
+        $this->flowBuilderDispatcher->dispatch($event);
+
         # if this was our last renewal, then send out
         # a new event that the subscription has now ended
         if ($mollieSubscription->timesRemaining !== null && $mollieSubscription->timesRemaining <= 0) {
