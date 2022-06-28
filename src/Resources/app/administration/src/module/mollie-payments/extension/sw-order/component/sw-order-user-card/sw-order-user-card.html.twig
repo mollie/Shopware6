@@ -15,8 +15,12 @@
         </dd>
 
         <template v-if="mollieThirdPartyPaymentId">
-            <dt>{{ $tc('sw-order.detailExtended.labelMollieThirdPartyPaymentId') }}</dt>
-            <dd>{{ mollieThirdPartyPaymentId }}</dd>
+            <dt class="mollie-order-user-card-payment-reference-title">
+                {{ $tc('sw-order.detailExtended.labelMollieThirdPartyPaymentId') }}
+            </dt>
+            <dd class="mollie-order-user-card-payment-reference-value">
+                {{ mollieThirdPartyPaymentId }}
+            </dd>
         </template>
 
         <div v-if="hasPaymentLink">
