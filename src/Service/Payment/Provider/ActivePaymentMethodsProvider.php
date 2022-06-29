@@ -53,15 +53,15 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
      * @param array<string> $salesChannelIDs
      * @return array<Method>
      */
-    public function getActivePaymentMethodsForAmount(Cart $cart, string $currency, array $salesChannelIDs): array
+    public function getActivePaymentMethodsForAmount(float $price, string $currency, array $salesChannelIDs): array
     {
-        if($cart->getPrice()->getTotalPrice() < 0.01) {
+        if($price < 0.01) {
             return [];
         }
 
         $params = [
             'amount' => [
-                'value' => $this->priceFormatter->formatValue($cart->getPrice()->getTotalPrice()),
+                'value' => $this->priceFormatter->formatValue($price),
                 'currency' => strtoupper($currency),
             ]
         ];

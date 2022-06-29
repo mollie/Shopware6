@@ -90,7 +90,7 @@ class MollieLimitsRemover
 
 
         $availableMolliePayments = $this->paymentMethodsProvider->getActivePaymentMethodsForAmount(
-            $cart,
+            $cart->getPrice()->getTotalPrice(),
             $context->getCurrency()->getIsoCode(),
             [
                 $context->getSalesChannel()->getId(),
