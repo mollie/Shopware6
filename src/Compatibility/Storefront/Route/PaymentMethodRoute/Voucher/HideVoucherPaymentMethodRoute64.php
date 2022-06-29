@@ -62,7 +62,6 @@ class HideVoucherPaymentMethodRoute64 extends AbstractPaymentMethodRoute
      */
     public function load(Request $request, SalesChannelContext $context, Criteria $criteria): PaymentMethodRouteResponse
     {
-        dd($request);
         $originalData = $this->corePaymentMethodRoute->load($request, $context, $criteria);
 
         $cartService = $this->getCartServiceLazy();
@@ -70,7 +69,6 @@ class HideVoucherPaymentMethodRoute64 extends AbstractPaymentMethodRoute
 
         $voucherPermitted = (bool)$cart->getData()->get(VoucherCartCollector::VOUCHER_PERMITTED);
 
-        dd($voucherPermitted);
         # if voucher is allowed, then simply continue.
         # we don't have to remove a payment method in that case
         if ($voucherPermitted) {
