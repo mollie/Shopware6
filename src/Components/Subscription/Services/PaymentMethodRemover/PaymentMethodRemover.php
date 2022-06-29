@@ -11,6 +11,7 @@ use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRouteResponse;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class PaymentMethodRemover
 {
@@ -33,16 +34,16 @@ class PaymentMethodRemover
     private $pluginSettings;
 
     /**
-     * @var Container
+     * @var ContainerInterface
      */
     private $container;
 
 
     /**
-     * @param Container $container
+     * @param ContainerInterface $container
      * @param SettingsService $pluginSettings
      */
-    public function __construct(Container $container, SettingsService $pluginSettings)
+    public function __construct(ContainerInterface $container, SettingsService $pluginSettings)
     {
         $this->container = $container;
         $this->pluginSettings = $pluginSettings;

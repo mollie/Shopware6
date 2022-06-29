@@ -10,6 +10,7 @@ use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRouteResponse;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 
@@ -27,17 +28,17 @@ class HideVoucherPaymentMethodRoute64 extends AbstractPaymentMethodRoute
     private $voucherService;
 
     /**
-     * @var Container
+     * @var ContainerInterface
      */
     private $container;
 
 
     /**
      * @param AbstractPaymentMethodRoute $corePaymentMethodRoute
-     * @param Container $container
+     * @param ContainerInterface $container
      * @param VoucherService $voucherService
      */
-    public function __construct(AbstractPaymentMethodRoute $corePaymentMethodRoute, Container $container, VoucherService $voucherService)
+    public function __construct(AbstractPaymentMethodRoute $corePaymentMethodRoute, ContainerInterface $container, VoucherService $voucherService)
     {
         $this->corePaymentMethodRoute = $corePaymentMethodRoute;
         $this->container = $container;
@@ -61,6 +62,7 @@ class HideVoucherPaymentMethodRoute64 extends AbstractPaymentMethodRoute
      */
     public function load(Request $request, SalesChannelContext $context, Criteria $criteria): PaymentMethodRouteResponse
     {
+        dd($request);
         $originalData = $this->corePaymentMethodRoute->load($request, $context, $criteria);
 
         $cartService = $this->getCartServiceLazy();
@@ -68,6 +70,7 @@ class HideVoucherPaymentMethodRoute64 extends AbstractPaymentMethodRoute
 
         $voucherPermitted = (bool)$cart->getData()->get(VoucherCartCollector::VOUCHER_PERMITTED);
 
+        dd($voucherPermitted);
         # if voucher is allowed, then simply continue.
         # we don't have to remove a payment method in that case
         if ($voucherPermitted) {

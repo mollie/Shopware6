@@ -10,6 +10,7 @@ use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRouteResponse;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class SubscriptionPaymentMethodRoute64 extends AbstractPaymentMethodRoute
@@ -29,10 +30,10 @@ class SubscriptionPaymentMethodRoute64 extends AbstractPaymentMethodRoute
 
     /**
      * @param AbstractPaymentMethodRoute $corePaymentMethodRoute
-     * @param Container $container
+     * @param ContainerInterface $container
      * @param SettingsService $pluginSettings
      */
-    public function __construct(AbstractPaymentMethodRoute $corePaymentMethodRoute, Container $container, SettingsService $pluginSettings)
+    public function __construct(AbstractPaymentMethodRoute $corePaymentMethodRoute, ContainerInterface $container, SettingsService $pluginSettings)
     {
         $this->corePaymentMethodRoute = $corePaymentMethodRoute;
 
