@@ -154,20 +154,6 @@ class ProductAttributes
             $foundValue = (array_key_exists($fullKey, $customFields)) ? $customFields[$fullKey] : null;
         }
 
-        # ---------------------------------------------------------------------------
-        # check if old structure exists
-        # and load, but we migrate to the new one
-        # check if we have customFields
-
-        if ($foundValue === '' || $foundValue === null) {
-            if ($customFields !== null && array_key_exists('mollie_payments', $customFields)) {
-                # load the mollie entry
-                $mollieData = $customFields['mollie_payments'];
-                # assign our value if we have it
-                $foundValue = (array_key_exists($keyName, $mollieData)) ? $mollieData[$keyName] : null;
-            }
-        }
-
         return $foundValue;
     }
 }
