@@ -10,6 +10,7 @@ use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRouteResponse;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 
@@ -27,17 +28,17 @@ class HideVoucherPaymentMethodRoute64 extends AbstractPaymentMethodRoute
     private $voucherService;
 
     /**
-     * @var Container
+     * @var ContainerInterface
      */
     private $container;
 
 
     /**
      * @param AbstractPaymentMethodRoute $corePaymentMethodRoute
-     * @param Container $container
+     * @param ContainerInterface $container
      * @param VoucherService $voucherService
      */
-    public function __construct(AbstractPaymentMethodRoute $corePaymentMethodRoute, Container $container, VoucherService $voucherService)
+    public function __construct(AbstractPaymentMethodRoute $corePaymentMethodRoute, ContainerInterface $container, VoucherService $voucherService)
     {
         $this->corePaymentMethodRoute = $corePaymentMethodRoute;
         $this->container = $container;
