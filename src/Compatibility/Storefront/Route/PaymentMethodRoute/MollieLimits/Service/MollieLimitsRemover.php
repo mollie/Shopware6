@@ -12,11 +12,11 @@ use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRouteResponse;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Shopware\Storefront\Controller\AccountOrderController;
 use Shopware\Storefront\Controller\CheckoutController;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\RouterInterface;
 use Throwable;
 
 
@@ -177,7 +177,10 @@ class MollieLimitsRemover
 
             $controller = current(explode('::', $request->attributes->get('_controller')));
 
-            return $controller === CheckoutController::class;
+            return in_array($controller, [
+                CheckoutController::class, // Checkout pages: confirm, cart, etc.
+                AccountOrderController::class, // e.g. Edit order after failed payment
+            ]);
 
         } catch (Throwable $e) {
 
