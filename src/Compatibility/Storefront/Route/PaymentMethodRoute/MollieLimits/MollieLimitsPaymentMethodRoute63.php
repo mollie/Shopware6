@@ -2,13 +2,10 @@
 
 namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\MollieLimits;
 
-use Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\MollieLimits\Service\MollieLimitsRemover;
-use Kiener\MolliePayments\Service\Payment\Provider\ActivePaymentMethodsProviderInterface;
-use Kiener\MolliePayments\Service\SettingsService;
+use Kiener\MolliePayments\Service\Payment\Remover\PaymentMethodRemoverInterface;
 use Shopware\Core\Checkout\Payment\SalesChannel\AbstractPaymentMethodRoute;
 use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRouteResponse;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 
 
@@ -21,18 +18,16 @@ class MollieLimitsPaymentMethodRoute63 extends AbstractPaymentMethodRoute
     private $corePaymentMethodRoute;
 
     /**
-     * @var MollieLimitsRemover
+     * @var PaymentMethodRemoverInterface
      */
     private $mollieLimits;
 
 
     /**
-     * @param AbstractPaymentMethodRoute $corePaymentMethodRoute
-     * @param Container $container
-     * @param SettingsService $pluginSettings
-     * @param ActivePaymentMethodsProviderInterface $paymentMethodsProvider
+     * @param AbstractPaymentMethodRoute    $corePaymentMethodRoute
+     * @param PaymentMethodRemoverInterface $mollieLimits
      */
-    public function __construct(AbstractPaymentMethodRoute $corePaymentMethodRoute, MollieLimitsRemover $mollieLimits)
+    public function __construct(AbstractPaymentMethodRoute $corePaymentMethodRoute, PaymentMethodRemoverInterface $mollieLimits)
     {
         $this->corePaymentMethodRoute = $corePaymentMethodRoute;
         $this->mollieLimits = $mollieLimits;
@@ -49,7 +44,7 @@ class MollieLimitsPaymentMethodRoute63 extends AbstractPaymentMethodRoute
 
 
     /**
-     * @param Request $request
+     * @param Request             $request
      * @param SalesChannelContext $context
      * @return PaymentMethodRouteResponse
      * @throws \Exception

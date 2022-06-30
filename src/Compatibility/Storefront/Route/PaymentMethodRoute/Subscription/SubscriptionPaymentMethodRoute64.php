@@ -2,7 +2,7 @@
 
 namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\Subscription;
 
-use Kiener\MolliePayments\Components\Subscription\Services\PaymentMethodRemover\SubscriptionRemover;
+use Kiener\MolliePayments\Service\Payment\Remover\PaymentMethodRemoverInterface;
 use Kiener\MolliePayments\Service\SettingsService;
 use Shopware\Core\Checkout\Payment\SalesChannel\AbstractPaymentMethodRoute;
 use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRouteResponse;
@@ -20,7 +20,7 @@ class SubscriptionPaymentMethodRoute64 extends AbstractPaymentMethodRoute
     private $corePaymentMethodRoute;
 
     /**
-     * @var SubscriptionRemover
+     * @var PaymentMethodRemoverInterface
      */
     private $paymentMethodRemover;
 
@@ -29,7 +29,7 @@ class SubscriptionPaymentMethodRoute64 extends AbstractPaymentMethodRoute
      * @param ContainerInterface         $container
      * @param SettingsService            $pluginSettings
      */
-    public function __construct(AbstractPaymentMethodRoute $corePaymentMethodRoute, SubscriptionRemover $paymentMethodRemover)
+    public function __construct(AbstractPaymentMethodRoute $corePaymentMethodRoute, PaymentMethodRemoverInterface $paymentMethodRemover)
     {
         $this->corePaymentMethodRoute = $corePaymentMethodRoute;
         $this->paymentMethodRemover = $paymentMethodRemover;
@@ -55,6 +55,8 @@ class SubscriptionPaymentMethodRoute64 extends AbstractPaymentMethodRoute
     {
         $originalData = $this->corePaymentMethodRoute->load($request, $context, $criteria);
 
+        $newData = $this->paymentMethodRemover->removePaymentMethods($originalData, $context);
+//        dd('stop', $newData);
         return $this->paymentMethodRemover->removePaymentMethods($originalData, $context);
     }
 
