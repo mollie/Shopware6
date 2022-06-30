@@ -40,10 +40,15 @@ class VoucherRemover extends PaymentMethodRemover
      */
     public function removePaymentMethods(PaymentMethodRouteResponse $originalData, SalesChannelContext $context): PaymentMethodRouteResponse
     {
-        $cartService = $this->getCartServiceLazy();
-        $cart = $cartService->getCart($context->getToken(), $context);
+        if($this->isCartRoute()) {
+            $cart = $this->getCartServiceLazy()->getCart($context->getToken(), $context);
 
-        $voucherPermitted = (bool)$cart->getData()->get(VoucherCartCollector::VOUCHER_PERMITTED);
+            $voucherPermitted = (bool)$cart->getData()->get(VoucherCartCollector::VOUCHER_PERMITTED);
+        }
+
+        if(!isset($voucherPermitted)) {
+            $voucherPermitted = false;
+        }
 
         # if voucher is allowed, then simply continue.
         # we don't have to remove a payment method in that case

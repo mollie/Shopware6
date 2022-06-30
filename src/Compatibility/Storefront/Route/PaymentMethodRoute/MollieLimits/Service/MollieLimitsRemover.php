@@ -60,28 +60,18 @@ class MollieLimitsRemover extends PaymentMethodRemover
             return $originalData;
         }
 
-        if ($this->isCartAwareRoute()) {
-            $cartService = $this->getCartServiceLazy();
-            $cart = $cartService->getCart($context->getToken(), $context);
+        if ($this->isCartRoute()) {
+            $cart = $this->getCart($context);
 
             $price = $cart->getPrice()->getTotalPrice();
         }
 
-        if ($this->isOrderAwareRoute()) {
-            $request = $this->requestStack->getCurrentRequest();
-            $orderId = $request->attributes->get('orderId');
-
-            if (!$orderId) {
-                return $originalData;
-            }
-
+        if ($this->isOrderRoute()) {
             try {
-                $order = $this->orderService->getOrder($orderId, $context->getContext());
+                $order = $this->getOrder($context->getContext());
             } catch (OrderNotFoundException $e) {
                 $this->logger->error($e->getMessage(), [
                     'exception' => $e,
-                    'orderId' => $orderId,
-                    'paymentMethods' => $originalData,
                 ]);
                 return $originalData;
             }

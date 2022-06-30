@@ -8,23 +8,18 @@ use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Cart\Cart;
+use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
+use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Framework\Context;
+use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface
+abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, CartAwareRouteInterface, OrderAwareRouteInterface
 {
-    public const CART_ROUTES = [
-        'frontend.checkout.cart.page',
-        'frontend.checkout.confirm.page',
-        'frontend.checkout.finish.page',
-        'frontend.cart.offcanvas',
-    ];
-
-    public const ORDER_ROUTES = [
-        'frontend.account.edit-order.page',
-    ];
-
     /**
      * @var ContainerInterface
      */
@@ -67,34 +62,12 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface
     }
 
     /**
-     * We have to use lazy loading for this. Otherwise, there are plugin compatibilities
-     * with a circular reference...even though XML looks fine.
-     *
-     * @return CartService
-     * @throws \Exception
-     */
-    protected function getCartServiceLazy(): CartService
-    {
-        $service = $this->container->get('Shopware\Core\Checkout\Cart\SalesChannel\CartService');
-
-        if (!$service instanceof CartService) {
-            throw new \Exception('CartService of Shopware not found!');
-        }
-
-        return $service;
-    }
-
-    /**
      * @return bool
      */
     protected function isAllowedRoute(): bool
     {
         try {
-            $request = $this->requestStack->getCurrentRequest();
-
-            if (!$request instanceof Request) {
-                throw new MissingRequestException();
-            }
+            $request = $this->getRequestFromStack();
 
             # we also need to allow removing for store-api calls
             # this is for the headless approach
@@ -104,8 +77,8 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface
 
             $route = $this->getRouteFromRequest();
 
-            return $this->isCartAwareRoute($route) || $this->isOrderAwareRoute($route);
-        } catch (MissingRequestException | MissingRouteException $e) {
+            return $this->isCartRoute($route) || $this->isOrderRoute($route);
+        } catch (MissingRequestException|MissingRouteException $e) {
 
             $this->logger
                 ->error('Could not determine if the current route is allowed to remove payment methods', [
@@ -124,13 +97,36 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface
      * @throws MissingRequestException
      * @throws MissingRouteException
      */
-    protected function isCartAwareRoute(string $route = ""): bool
+    public function isCartRoute(string $route = ""): bool
     {
-        if(empty($route)) {
+        if (empty($route)) {
             $route = $this->getRouteFromRequest();
         }
 
-        return in_array($route, self::CART_ROUTES);
+        return in_array($route, CartAwareRouteInterface::CART_ROUTES);
+    }
+
+    public function getCart(SalesChannelContext $context): Cart
+    {
+        return $this->getCartServiceLazy()->getCart($context->getToken(), $context);
+    }
+
+    /**
+     * We have to use lazy loading for this. Otherwise, there are plugin compatibilities
+     * with a circular reference...even though XML looks fine.
+     *
+     * @return CartService
+     * @throws \Exception
+     */
+    protected function getCartServiceLazy(): CartService
+    {
+        $service = $this->container->get('Shopware\Core\Checkout\Cart\SalesChannel\CartService');
+
+        if (!$service instanceof CartService) {
+            throw new \Exception('CartService of Shopware not found!');
+        }
+
+        return $service;
     }
 
     /**
@@ -139,13 +135,47 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface
      * @throws MissingRequestException
      * @throws MissingRouteException
      */
-    protected function isOrderAwareRoute(string $route = ""): bool
+    public function isOrderRoute(string $route = ""): bool
     {
-        if(empty($route)) {
+        if (empty($route)) {
             $route = $this->getRouteFromRequest();
         }
 
-        return in_array($route, self::ORDER_ROUTES);
+        return in_array($route, OrderAwareRouteInterface::ORDER_ROUTES);
+    }
+
+    /**
+     * @param Context $context
+     * @return OrderEntity
+     * @throws BadRequestException
+     * @throws MissingRequestException
+     * @throws OrderNotFoundException
+     */
+    public function getOrder(Context $context): OrderEntity
+    {
+        $request = $this->getRequestFromStack();
+        $orderId = $request->attributes->get('orderId');
+
+        if (!$orderId) {
+            throw new BadRequestException();
+        }
+
+        return $this->orderService->getOrder($orderId, $context);
+    }
+
+    /**
+     * @return Request
+     * @throws MissingRequestException
+     */
+    protected function getRequestFromStack(): Request
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if ($request instanceof Request) {
+            return $request;
+        }
+
+        throw new MissingRequestException();
     }
 
     /**
@@ -153,13 +183,9 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface
      * @throws MissingRequestException
      * @throws MissingRouteException
      */
-    private function getRouteFromRequest():string
+    protected function getRouteFromRequest(): string
     {
-        $request = $this->requestStack->getCurrentRequest();
-
-        if (!$request instanceof Request) {
-            throw new MissingRequestException();
-        }
+        $request = $this->getRequestFromStack();
 
         $route = $request->attributes->get('_route');
 
