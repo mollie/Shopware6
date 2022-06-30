@@ -5,56 +5,25 @@ namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRout
 use Exception;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\Payment\Provider\ActivePaymentMethodsProviderInterface;
+use Kiener\MolliePayments\Service\Payment\Remover\PaymentMethodRemover;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
 use Mollie\Api\Resources\Method;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
-use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRouteResponse;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Shopware\Storefront\Controller\AccountOrderController;
-use Shopware\Storefront\Controller\CheckoutController;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Throwable;
 
 
-class MollieLimitsRemover
+class MollieLimitsRemover extends PaymentMethodRemover
 {
-
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
-
-    /**
-     * @var SettingsService
-     */
-    private $settingsService;
-
-    /**(
-     * @var OrderService
-     */
-    private $orderService;
-
     /**
      * @var ActivePaymentMethodsProviderInterface
      */
     private $paymentMethodsProvider;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
 
     /**
      * @param ContainerInterface                    $container
@@ -64,14 +33,11 @@ class MollieLimitsRemover
      * @param RequestStack                          $requestStack
      * @param LoggerInterface                       $logger
      */
-    public function __construct(ContainerInterface $container, SettingsService $settingsService, OrderService $orderService, ActivePaymentMethodsProviderInterface $paymentMethodsProvider, RequestStack $requestStack, LoggerInterface $logger)
+    public function __construct(ContainerInterface $container, RequestStack $requestStack, OrderService $orderService, SettingsService $settingsService, ActivePaymentMethodsProviderInterface $paymentMethodsProvider, LoggerInterface $logger)
     {
-        $this->container = $container;
-        $this->settingsService = $settingsService;
-        $this->orderService = $orderService;
+        parent::__construct($container, $requestStack, $orderService, $settingsService, $logger);
+
         $this->paymentMethodsProvider = $paymentMethodsProvider;
-        $this->requestStack = $requestStack;
-        $this->logger = $logger;
     }
 
     /**
@@ -90,18 +56,24 @@ class MollieLimitsRemover
             return $originalData;
         }
 
-        if (!$this->isRemovingAllowedInContext()) {
+        if (!$this->isAllowedRoute()) {
             return $originalData;
         }
 
-        if ($this->isRequestForController(CheckoutController::class)) {
+        if ($this->isCartAwareRoute()) {
             $cartService = $this->getCartServiceLazy();
             $cart = $cartService->getCart($context->getToken(), $context);
 
             $price = $cart->getPrice()->getTotalPrice();
-        } else if ($this->isRequestForController(AccountOrderController::class)) {
+        }
+
+        if ($this->isOrderAwareRoute()) {
             $request = $this->requestStack->getCurrentRequest();
             $orderId = $request->attributes->get('orderId');
+
+            if (!$orderId) {
+                return $originalData;
+            }
 
             try {
                 $order = $this->orderService->getOrder($orderId, $context->getContext());
@@ -115,7 +87,9 @@ class MollieLimitsRemover
             }
 
             $price = $order->getAmountTotal();
-        } else {
+        }
+
+        if (!isset($price)) {
             return $originalData;
         }
 
@@ -158,78 +132,5 @@ class MollieLimitsRemover
         }
 
         return $originalData;
-    }
-
-    /**
-     * We have to use lazy loading for this. Otherwise there are plugin compatibilities
-     * with a circular reference...even though XML looks fine.
-     *
-     * @return CartService
-     * @throws Exception
-     */
-    private function getCartServiceLazy(): CartService
-    {
-        $service = $this->container->get('Shopware\Core\Checkout\Cart\SalesChannel\CartService');
-
-        if (!$service instanceof CartService) {
-            throw new Exception('CartService of Shopware not found!');
-        }
-
-        return $service;
-    }
-
-    /**
-     * This tries to get the current route/controller from the current request to determine if we're in the checkout.
-     * The CheckoutController encompasses the following routes:
-     * GET /checkout/cart
-     * GET /checkout/confirm
-     * GET /checkout/finish
-     * POST /checkout/order
-     * GET /widgets/checkout/info
-     * GET /checkout/offcanvas
-     *
-     * @return bool
-     */
-    private function isRemovingAllowedInContext(): bool
-    {
-        try {
-            $request = $this->requestStack->getCurrentRequest();
-
-            if (!$request instanceof Request) {
-                return false;
-            }
-
-            # we also need to allow removing for store-api calls
-            # this is for the headless approach
-            if (strpos($request->getPathInfo(), '/store-api') === 0) {
-                return true;
-            }
-            return $this->isRequestForController(CheckoutController::class) // Checkout pages: confirm, cart, etc.
-                || $this->isRequestForController(AccountOrderController::class); // e.g. Edit order after failed payment
-
-        } catch (Throwable $e) {
-
-            $this->logger
-                ->error('An error occurred determining current controller', [
-                    'exception' => $e,
-                    'request' => $request ?? null,
-                ]);
-
-            // Make sure Shopware will behave normally in the case of an error.
-            return false;
-        }
-    }
-
-    private function isRequestForController(string $controllerClass): bool
-    {
-        $request = $this->requestStack->getCurrentRequest();
-
-        if (!$request instanceof Request) {
-            return false;
-        }
-
-        $controller = current(explode('::', $request->attributes->get('_controller')));
-
-        return $controller === $controllerClass;
     }
 }
