@@ -23,8 +23,7 @@
         <service id="Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\Subscription\SubscriptionPaymentMethodRoute63"
                  decorates="Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRoute">
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\Voucher\HideVoucherPaymentMethodRoute63.inner"/>
-            <argument type="service" id="service_container"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\PaymentMethodRemover\SubscriptionRemover"/>
         </service>
 
     </services>

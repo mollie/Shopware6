@@ -142,12 +142,13 @@
             <argument type="service" id="order_address.repository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing\OrderCloneService"/>
+        </service>
 
         <service id="Kiener\MolliePayments\Components\Subscription\Services\PaymentMethodRemover\SubscriptionRemover">
             <argument type="service" id="service_container"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="request_stack"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="mollie_payments.logger"/>
         </service>
 
