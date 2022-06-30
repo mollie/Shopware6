@@ -29,9 +29,8 @@ class HideVoucherPaymentMethodRoute64 extends AbstractPaymentMethodRoute
     private $paymentMethodRemover;
 
     /**
-     * @param AbstractPaymentMethodRoute $corePaymentMethodRoute
-     * @param ContainerInterface $container
-     * @param VoucherService $voucherService
+     * @param AbstractPaymentMethodRoute    $corePaymentMethodRoute
+     * @param PaymentMethodRemoverInterface $paymentMethodRemover
      */
     public function __construct(AbstractPaymentMethodRoute $corePaymentMethodRoute, PaymentMethodRemoverInterface $paymentMethodRemover)
     {
