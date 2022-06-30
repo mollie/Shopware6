@@ -27,10 +27,10 @@ class MollieLimitsRemover extends PaymentMethodRemover
 
     /**
      * @param ContainerInterface                    $container
-     * @param SettingsService                       $settingsService
-     * @param OrderService                          $orderService
-     * @param ActivePaymentMethodsProviderInterface $paymentMethodsProvider
      * @param RequestStack                          $requestStack
+     * @param OrderService                          $orderService
+     * @param SettingsService                       $settingsService
+     * @param ActivePaymentMethodsProviderInterface $paymentMethodsProvider
      * @param LoggerInterface                       $logger
      */
     public function __construct(ContainerInterface $container, RequestStack $requestStack, OrderService $orderService, SettingsService $settingsService, ActivePaymentMethodsProviderInterface $paymentMethodsProvider, LoggerInterface $logger)
