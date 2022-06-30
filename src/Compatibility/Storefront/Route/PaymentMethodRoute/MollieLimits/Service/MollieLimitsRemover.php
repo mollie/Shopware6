@@ -3,18 +3,20 @@
 namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\MollieLimits\Service;
 
 use Exception;
+use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\Payment\Provider\ActivePaymentMethodsProviderInterface;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
 use Mollie\Api\Resources\Method;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRouteResponse;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\AccountOrderController;
 use Shopware\Storefront\Controller\CheckoutController;
-use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Throwable;
@@ -24,14 +26,19 @@ class MollieLimitsRemover
 {
 
     /**
-     * @var Container
+     * @var ContainerInterface
      */
     private $container;
 
     /**
      * @var SettingsService
      */
-    private $pluginSettings;
+    private $settingsService;
+
+    /**(
+     * @var OrderService
+     */
+    private $orderService;
 
     /**
      * @var ActivePaymentMethodsProviderInterface
@@ -50,16 +57,18 @@ class MollieLimitsRemover
 
 
     /**
-     * @param Container                             $container
-     * @param SettingsService                       $pluginSettings
+     * @param ContainerInterface                    $container
+     * @param SettingsService                       $settingsService
+     * @param OrderService                          $orderService
      * @param ActivePaymentMethodsProviderInterface $paymentMethodsProvider
      * @param RequestStack                          $requestStack
      * @param LoggerInterface                       $logger
      */
-    public function __construct(Container $container, SettingsService $pluginSettings, ActivePaymentMethodsProviderInterface $paymentMethodsProvider, RequestStack $requestStack, LoggerInterface $logger)
+    public function __construct(ContainerInterface $container, SettingsService $settingsService, OrderService $orderService, ActivePaymentMethodsProviderInterface $paymentMethodsProvider, RequestStack $requestStack, LoggerInterface $logger)
     {
         $this->container = $container;
-        $this->pluginSettings = $pluginSettings;
+        $this->settingsService = $settingsService;
+        $this->orderService = $orderService;
         $this->paymentMethodsProvider = $paymentMethodsProvider;
         $this->requestStack = $requestStack;
         $this->logger = $logger;
@@ -73,7 +82,7 @@ class MollieLimitsRemover
      */
     public function removePaymentMethods(PaymentMethodRouteResponse $originalData, SalesChannelContext $context): PaymentMethodRouteResponse
     {
-        $settings = $this->pluginSettings->getSettings($context->getSalesChannelId());
+        $settings = $this->settingsService->getSettings($context->getSalesChannelId());
 
         # if we do not use the limits
         # then just return everything
@@ -85,12 +94,33 @@ class MollieLimitsRemover
             return $originalData;
         }
 
-        $cartService = $this->getCartServiceLazy();
-        $cart = $cartService->getCart($context->getToken(), $context);
+        if ($this->isRequestForController(CheckoutController::class)) {
+            $cartService = $this->getCartServiceLazy();
+            $cart = $cartService->getCart($context->getToken(), $context);
 
+            $price = $cart->getPrice()->getTotalPrice();
+        } else if ($this->isRequestForController(AccountOrderController::class)) {
+            $request = $this->requestStack->getCurrentRequest();
+            $orderId = $request->attributes->get('orderId');
+
+            try {
+                $order = $this->orderService->getOrder($orderId, $context->getContext());
+            } catch (OrderNotFoundException $e) {
+                $this->logger->error($e->getMessage(), [
+                    'exception' => $e,
+                    'orderId' => $orderId,
+                    'paymentMethods' => $originalData,
+                ]);
+                return $originalData;
+            }
+
+            $price = $order->getAmountTotal();
+        } else {
+            return $originalData;
+        }
 
         $availableMolliePayments = $this->paymentMethodsProvider->getActivePaymentMethodsForAmount(
-            $cart->getPrice()->getTotalPrice(),
+            $price,
             $context->getCurrency()->getIsoCode(),
             [
                 $context->getSalesChannel()->getId(),
@@ -174,13 +204,8 @@ class MollieLimitsRemover
             if (strpos($request->getPathInfo(), '/store-api') === 0) {
                 return true;
             }
-
-            $controller = current(explode('::', $request->attributes->get('_controller')));
-
-            return in_array($controller, [
-                CheckoutController::class, // Checkout pages: confirm, cart, etc.
-                AccountOrderController::class, // e.g. Edit order after failed payment
-            ]);
+            return $this->isRequestForController(CheckoutController::class) // Checkout pages: confirm, cart, etc.
+                || $this->isRequestForController(AccountOrderController::class); // e.g. Edit order after failed payment
 
         } catch (Throwable $e) {
 
@@ -195,4 +220,16 @@ class MollieLimitsRemover
         }
     }
 
+    private function isRequestForController(string $controllerClass): bool
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if (!$request instanceof Request) {
+            return false;
+        }
+
+        $controller = current(explode('::', $request->attributes->get('_controller')));
+
+        return $controller === $controllerClass;
+    }
 }
