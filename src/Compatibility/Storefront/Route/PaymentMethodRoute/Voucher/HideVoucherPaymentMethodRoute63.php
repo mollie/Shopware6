@@ -57,23 +57,4 @@ class HideVoucherPaymentMethodRoute63 extends AbstractPaymentMethodRoute
 
         return $this->paymentMethodRemover->removePaymentMethods($originalData, $context);
     }
-
-    /**
-     * We have to use lazy loading for this. Otherwise there are plugin compatibilities
-     * with a circular reference...even though XML looks fine.
-     *
-     * @return CartService
-     * @throws \Exception
-     */
-    private function getCartServiceLazy(): CartService
-    {
-        $service = $this->container->get('Shopware\Core\Checkout\Cart\SalesChannel\CartService');
-
-        if (!$service instanceof CartService) {
-            throw new \Exception('CartService of Shopware not found!');
-        }
-
-        return $service;
-    }
-
 }
