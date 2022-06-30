@@ -9,8 +9,7 @@
         <service id="Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\Voucher\HideVoucherPaymentMethodRoute63"
                  decorates="Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRoute">
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\Voucher\HideVoucherPaymentMethodRoute63.inner"/>
-            <argument type="service" id="service_container"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Voucher\VoucherService"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Voucher\Service\VoucherRemover"/>
         </service>
 
         <service id="mollie_payments.mail_service" class="Kiener\MolliePayments\Service\Mail\MailService63">
