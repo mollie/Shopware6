@@ -89,6 +89,11 @@ class VoucherRemover extends PaymentMethodRemover
         return $originalData;
     }
 
+    /**
+     * @param OrderEntity $order
+     * @param Context     $context
+     * @return bool
+     */
     private function isVoucherOrder(OrderEntity $order, Context $context): bool
     {
         $lineItems = $this->orderDataExtractor->extractLineItems($order, $context);
