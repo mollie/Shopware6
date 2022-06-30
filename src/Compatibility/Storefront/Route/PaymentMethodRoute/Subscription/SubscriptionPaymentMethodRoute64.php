@@ -2,20 +2,17 @@
 
 namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\Subscription;
 
-use Kiener\MolliePayments\Components\Subscription\Services\PaymentMethodRemover\PaymentMethodRemover;
-use Kiener\MolliePayments\Service\Payment\Provider\ActivePaymentMethodsProviderInterface;
+use Kiener\MolliePayments\Components\Subscription\Services\PaymentMethodRemover\SubscriptionRemover;
 use Kiener\MolliePayments\Service\SettingsService;
 use Shopware\Core\Checkout\Payment\SalesChannel\AbstractPaymentMethodRoute;
 use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRouteResponse;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class SubscriptionPaymentMethodRoute64 extends AbstractPaymentMethodRoute
 {
-
 
     /**
      * @var AbstractPaymentMethodRoute
@@ -23,24 +20,19 @@ class SubscriptionPaymentMethodRoute64 extends AbstractPaymentMethodRoute
     private $corePaymentMethodRoute;
 
     /**
-     * @var PaymentMethodRemover
+     * @var SubscriptionRemover
      */
-    private $subscriptionRemover;
-
+    private $paymentMethodRemover;
 
     /**
      * @param AbstractPaymentMethodRoute $corePaymentMethodRoute
-     * @param ContainerInterface $container
-     * @param SettingsService $pluginSettings
+     * @param ContainerInterface         $container
+     * @param SettingsService            $pluginSettings
      */
-    public function __construct(AbstractPaymentMethodRoute $corePaymentMethodRoute, ContainerInterface $container, SettingsService $pluginSettings)
+    public function __construct(AbstractPaymentMethodRoute $corePaymentMethodRoute, SubscriptionRemover $paymentMethodRemover)
     {
         $this->corePaymentMethodRoute = $corePaymentMethodRoute;
-
-        $this->subscriptionRemover = new PaymentMethodRemover(
-            $container,
-            $pluginSettings
-        );
+        $this->paymentMethodRemover = $paymentMethodRemover;
     }
 
 
@@ -53,9 +45,9 @@ class SubscriptionPaymentMethodRoute64 extends AbstractPaymentMethodRoute
     }
 
     /**
-     * @param Request $request
+     * @param Request             $request
      * @param SalesChannelContext $context
-     * @param Criteria $criteria
+     * @param Criteria            $criteria
      * @return PaymentMethodRouteResponse
      * @throws \Exception
      */
@@ -63,7 +55,7 @@ class SubscriptionPaymentMethodRoute64 extends AbstractPaymentMethodRoute
     {
         $originalData = $this->corePaymentMethodRoute->load($request, $context, $criteria);
 
-        return $this->subscriptionRemover->removePaymentMethods($originalData, $context);
+        return $this->paymentMethodRemover->removePaymentMethods($originalData, $context);
     }
 
 }

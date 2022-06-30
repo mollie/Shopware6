@@ -3,7 +3,7 @@
 
 namespace MolliePayments\Tests\Components\Subscription\Services\PaymentMethodRemover;
 
-use Kiener\MolliePayments\Components\Subscription\Services\PaymentMethodRemover\PaymentMethodRemover;
+use Kiener\MolliePayments\Components\Subscription\Services\PaymentMethodRemover\SubscriptionRemover;
 use PHPUnit\Framework\TestCase;
 
 class PaymentMethodRemoverTest extends TestCase
@@ -29,7 +29,7 @@ class PaymentMethodRemoverTest extends TestCase
             'paypal',
         ];
 
-        $this->assertEquals($expected, PaymentMethodRemover::ALLOWED_METHODS);
+        $this->assertEquals($expected, SubscriptionRemover::ALLOWED_METHODS);
     }
 
 }

@@ -6,7 +6,7 @@ namespace Kiener\MolliePayments\Components\Subscription\Cart\Validator;
 use Kiener\MolliePayments\Components\Subscription\Cart\Error\InvalidGuestAccountError;
 use Kiener\MolliePayments\Components\Subscription\Cart\Error\InvalidPaymentMethodError;
 use Kiener\MolliePayments\Components\Subscription\Cart\Error\MixedCartBlockError;
-use Kiener\MolliePayments\Components\Subscription\Services\PaymentMethodRemover\PaymentMethodRemover;
+use Kiener\MolliePayments\Components\Subscription\Services\PaymentMethodRemover\SubscriptionRemover;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
@@ -81,7 +81,7 @@ class SubscriptionCartValidator implements CartValidatorInterface
         $paymentMethod = $salesChannelContext->getPaymentMethod();
         $paymentAttributes = new PaymentMethodAttributes($paymentMethod);
 
-        $isAllowed = in_array($paymentAttributes->getMollieIdentifier(), PaymentMethodRemover::ALLOWED_METHODS);
+        $isAllowed = in_array($paymentAttributes->getMollieIdentifier(), SubscriptionRemover::ALLOWED_METHODS);
 
         if (!$isAllowed) {
             $errorCollection->add(new InvalidPaymentMethodError());

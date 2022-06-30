@@ -3,17 +3,19 @@
 namespace Kiener\MolliePayments\Components\Subscription\Services\PaymentMethodRemover;
 
 
+use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRouteResponse;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
-class PaymentMethodRemover
+class SubscriptionRemover
 {
 
     public const ALLOWED_METHODS = [
@@ -29,24 +31,44 @@ class PaymentMethodRemover
 
 
     /**
-     * @var SettingsService
-     */
-    private $pluginSettings;
-
-    /**
      * @var ContainerInterface
      */
     private $container;
 
+    /**
+     * @var SettingsService
+     */
+    private $settingsService;
+
+    /**
+     * @var OrderService
+     */
+    private $orderService;
+
+    /**
+     * @var RequestStack
+     */
+    private $requestStack;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
      * @param ContainerInterface $container
-     * @param SettingsService $pluginSettings
+     * @param SettingsService    $settingsService
+     * @param OrderService       $orderService
+     * @param RequestStack       $requestStack
+     * @param LoggerInterface    $logger
      */
-    public function __construct(ContainerInterface $container, SettingsService $pluginSettings)
+    public function __construct(ContainerInterface $container, SettingsService $settingsService, OrderService $orderService, RequestStack $requestStack, LoggerInterface $logger)
     {
         $this->container = $container;
-        $this->pluginSettings = $pluginSettings;
+        $this->settingsService = $settingsService;
+        $this->orderService = $orderService;
+        $this->requestStack = $requestStack;
+        $this->logger = $logger;
     }
 
 
