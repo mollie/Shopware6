@@ -3,6 +3,8 @@
 namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\MollieLimits\Service;
 
 use Exception;
+use Kiener\MolliePayments\Exception\MissingCartServiceException;
+use Kiener\MolliePayments\Exception\MissingRequestException;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\Payment\Provider\ActivePaymentMethodsProviderInterface;
 use Kiener\MolliePayments\Service\Payment\Remover\PaymentMethodRemover;
@@ -15,6 +17,7 @@ use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRouteResponse;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 
@@ -61,7 +64,15 @@ class MollieLimitsRemover extends PaymentMethodRemover
         }
 
         if ($this->isCartRoute()) {
-            $cart = $this->getCart($context);
+            try {
+                $cart = $this->getCart($context);
+            } catch (MissingCartServiceException $e) {
+
+                $this->logger->error($e->getMessage(), [
+                    'exception' => $e,
+                ]);
+                return $originalData;
+            }
 
             $price = $cart->getPrice()->getTotalPrice();
         }
@@ -69,7 +80,8 @@ class MollieLimitsRemover extends PaymentMethodRemover
         if ($this->isOrderRoute()) {
             try {
                 $order = $this->getOrder($context->getContext());
-            } catch (OrderNotFoundException $e) {
+            } catch (BadRequestException|MissingRequestException|OrderNotFoundException $e) {
+                
                 $this->logger->error($e->getMessage(), [
                     'exception' => $e,
                 ]);

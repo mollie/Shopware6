@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Service\Payment\Remover;
 
+use Kiener\MolliePayments\Exception\MissingCartServiceException;
 use Kiener\MolliePayments\Exception\MissingRequestException;
 use Kiener\MolliePayments\Exception\MissingRouteException;
 use Kiener\MolliePayments\Service\OrderService;
@@ -106,6 +107,11 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
         return in_array($route, CartAwareRouteInterface::CART_ROUTES);
     }
 
+    /**
+     * @param SalesChannelContext $context
+     * @return Cart
+     * @throws MissingCartServiceException
+     */
     public function getCart(SalesChannelContext $context): Cart
     {
         return $this->getCartServiceLazy()->getCart($context->getToken(), $context);
@@ -116,14 +122,14 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
      * with a circular reference...even though XML looks fine.
      *
      * @return CartService
-     * @throws \Exception
+     * @throws MissingCartServiceException
      */
     protected function getCartServiceLazy(): CartService
     {
         $service = $this->container->get('Shopware\Core\Checkout\Cart\SalesChannel\CartService');
 
         if (!$service instanceof CartService) {
-            throw new \Exception('CartService of Shopware not found!');
+            throw new MissingCartServiceException();
         }
 
         return $service;
