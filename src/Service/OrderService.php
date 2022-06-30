@@ -80,6 +80,7 @@ class OrderService implements OrderServiceInterface
      * @param string $orderId
      * @param Context $context
      * @return OrderEntity|null
+     * @throws OrderNotFoundException
      */
     public function getOrder(string $orderId, Context $context): OrderEntity
     {
