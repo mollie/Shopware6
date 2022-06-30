@@ -65,7 +65,7 @@ phpunit: ## Starts all PHPUnit Tests
 	@XDEBUG_MODE=coverage php vendor/bin/phpunit --configuration=phpunit.xml --coverage-html ../../../public/.reports/mollie/coverage
 
 infection: ## Starts all Infection/Mutation tests
-	@XDEBUG_MODE=coverage php vendor/bin/infection --configuration=./.infection.json
+	phpdbg -qrr vendor/bin/infection --configuration=./.infection.json --log-verbosity=all --debug
 
 insights: ## Starts the PHPInsights Analyser
 	@php vendor/bin/phpinsights analyse --no-interaction

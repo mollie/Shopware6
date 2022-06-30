@@ -1,7 +1,7 @@
 {
   "bootstrap": "./phpunit.autoload.php",
-  "minMsi": 18,
-  "minCoveredMsi": 20,
+  "minMsi": 15,
+  "minCoveredMsi": 60,
   "source": {
     "directories": [
       "src"
@@ -15,6 +15,10 @@
   },
   "mutators": {
     "@default": true
+  },
+  "logs": {
+    "text": ".reports/infection/infection.log",
+    "summary": ".reports/infection/summary.log"
   },
   "$schema": "vendor/infection/infection/resources/schema.json"
 }
