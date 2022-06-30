@@ -108,6 +108,8 @@ describe('Subscription', () => {
 
             it('C6918: Purchasing Subscription and verifying it in the Administration', () => {
 
+                configAction.setupShop(true, false, false);
+
                 configAction.updateProducts('', true, 3, 'weeks');
 
                 dummyUserScenario.execute();
@@ -147,17 +149,7 @@ describe('Subscription', () => {
                     paymentAction.openPaymentsModal();
                 }
 
-                cy.contains('Pay later').should('not.exist');
-                cy.contains('paysafecard').should('not.exist');
-
-                cy.contains('iDEAL').should('exist');
-                cy.contains('Credit card').should('exist');
-                cy.contains('SOFORT').should('exist');
-                cy.contains('eps').should('exist');
-                cy.contains('Bancontact').should('exist');
-                cy.contains('Belfius').should('exist');
-                cy.contains('Giropay').should('exist');
-                cy.contains('PayPal').should('exist');
+                assertAvailablePaymentMethods();
 
                 if (shopware.isVersionLower(6.4)) {
                     paymentAction.closePaymentsModal();
@@ -190,7 +182,69 @@ describe('Subscription', () => {
                 adminSubscriptions.openSubscriptions();
                 repoAdminSubscriptions.getLatestSubscription().should('exist');
             })
+
+            it('C6963: Subscription Payment methods are limited on editOrder page', () => {
+
+                configAction.setupShop(false, false, false);
+
+                configAction.updateProducts('', true, 3, 'weeks');
+
+                dummyUserScenario.execute();
+
+                cy.visit('/');
+
+                topMenu.clickOnClothing();
+                listing.clickOnFirstProduct();
+
+                cy.contains('.btn', 'Subscribe');
+
+                pdp.addToCart(1);
+
+                checkout.goToCheckoutInOffCanvas();
+
+                // now open our payment methods and verify
+                // that some of them are not available
+                // this is a check to at least see that it does something
+                // we also verify that we see all available methods (just to also check if mollie is even configured correctly).
+                if (shopware.isVersionGreaterEqual(6.4)) {
+                    paymentAction.showAllPaymentMethods();
+                } else {
+                    paymentAction.openPaymentsModal();
+                }
+
+                paymentAction.switchPaymentMethod('Credit card');
+
+                shopware.prepareDomainChange();
+                checkout.placeOrderOnConfirm();
+
+                molliePayment.initSandboxCookie();
+                molliePayment.selectFailed();
+
+                if (shopware.isVersionGreaterEqual(6.4)) {
+                    paymentAction.showAllPaymentMethods();
+                } else {
+                    paymentAction.openPaymentsModal();
+                }
+
+                assertAvailablePaymentMethods();
+            })
+
+
         })
     })
 })
 
+
+function assertAvailablePaymentMethods() {
+    cy.contains('Pay later').should('not.exist');
+    cy.contains('paysafecard').should('not.exist');
+
+    cy.contains('iDEAL').should('exist');
+    cy.contains('Credit card').should('exist');
+    cy.contains('SOFORT').should('exist');
+    cy.contains('eps').should('exist');
+    cy.contains('Bancontact').should('exist');
+    cy.contains('Belfius').should('exist');
+    cy.contains('Giropay').should('exist');
+    cy.contains('PayPal').should('exist');
+}
