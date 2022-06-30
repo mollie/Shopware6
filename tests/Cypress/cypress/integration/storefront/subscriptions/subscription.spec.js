@@ -93,10 +93,8 @@ describe('Subscription', () => {
 
             it('C6943: Subscription Indicator on PDP can be turned OFF', () => {
 
-                configAction.setupShop(true, false, false);
-
                 configAction.updateProducts('', true, 3, 'weeks');
-                configAction.setupPlugin(true, false, false, true);
+                configAction.setupPlugin(true, false, false, false);
 
                 cy.visit('/');
 
@@ -109,7 +107,7 @@ describe('Subscription', () => {
             it('C6918: Purchasing Subscription and verifying it in the Administration', () => {
 
                 configAction.setupShop(true, false, false);
-
+                configAction.setupPlugin(true, false, false, true);
                 configAction.updateProducts('', true, 3, 'weeks');
 
                 dummyUserScenario.execute();
