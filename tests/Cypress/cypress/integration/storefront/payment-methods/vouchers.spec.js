@@ -10,6 +10,7 @@ import CheckoutAction from "Actions/storefront/checkout/CheckoutAction";
 import AdminLoginAction from "Actions/admin/AdminLoginAction";
 import AdminProductsAction from "Actions/admin/AdminProductsAction";
 import ProductDetailRepository from "Repositories/admin/products/ProductDetailRepository";
+import PaymentScreenAction from "Actions/mollie/PaymentScreenAction";
 
 
 const devices = new Devices();
@@ -19,9 +20,13 @@ const shopware = new Shopware();
 const configAction = new ShopConfigurationAction();
 const paymentAction = new PaymentAction();
 const checkout = new CheckoutAction();
+const molliePayment = new PaymentScreenAction();
 
 const adminLogin = new AdminLoginAction();
 const adminProducts = new AdminProductsAction();
+
+const payment = new PaymentAction();
+
 
 const repoProductDetailsAdmin = new ProductDetailRepository();
 
@@ -34,7 +39,7 @@ describe('Voucher Payments', () => {
 
     before(function () {
         devices.setDevice(devices.getFirstDevice());
-        configAction.setupShop(true, false, false);
+        configAction.setupShop(false, false, false);
         configAction.updateProducts('', false, 0, '');
     })
 
@@ -65,6 +70,23 @@ describe('Voucher Payments', () => {
                 configAction.updateProducts('', false, '', '');
 
                 scenarioDummyBasket.execute();
+
+                if (shopware.isVersionGreaterEqual(6.4)) {
+                    paymentAction.showAllPaymentMethods();
+                } else {
+                    paymentAction.openPaymentsModal();
+                }
+
+                cy.contains('.checkout-container', 'Voucher').should('not.exist');
+
+                // now also check the edit order page
+                payment.switchPaymentMethod('PayPal');
+
+                shopware.prepareDomainChange();
+                checkout.placeOrderOnConfirm();
+
+                molliePayment.initSandboxCookie();
+                molliePayment.selectFailed();
 
                 if (shopware.isVersionGreaterEqual(6.4)) {
                     paymentAction.showAllPaymentMethods();
