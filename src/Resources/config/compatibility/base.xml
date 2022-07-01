@@ -16,14 +16,5 @@
             <factory service="Kiener\MolliePayments\Compatibility\CompatibilityFactory" method="createGateway"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\MollieLimits\Service\MollieLimitsRemover">
-            <argument type="service" id="service_container"/>
-            <argument type="service" id="request_stack"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Payment\Provider\ActivePaymentMethodsProvider"/>
-            <argument type="service" id="mollie_payments.logger"/>
-        </service>
-
     </services>
 </container>

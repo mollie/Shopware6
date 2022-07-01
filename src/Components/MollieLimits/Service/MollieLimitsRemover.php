@@ -1,6 +1,6 @@
 <?php
 
-namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\MollieLimits\Service;
+namespace Kiener\MolliePayments\Components\MollieLimits\Service;
 
 use Exception;
 use Kiener\MolliePayments\Exception\MissingCartServiceException;
@@ -81,7 +81,7 @@ class MollieLimitsRemover extends PaymentMethodRemover
             try {
                 $order = $this->getOrder($context->getContext());
             } catch (BadRequestException|MissingRequestException|OrderNotFoundException $e) {
-                
+
                 $this->logger->error($e->getMessage(), [
                     'exception' => $e,
                 ]);
