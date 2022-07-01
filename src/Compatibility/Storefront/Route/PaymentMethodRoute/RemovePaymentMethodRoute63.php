@@ -1,6 +1,6 @@
 <?php
 
-namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\MollieLimits;
+namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute;
 
 use Kiener\MolliePayments\Service\Payment\Remover\PaymentMethodRemoverInterface;
 use Shopware\Core\Checkout\Payment\SalesChannel\AbstractPaymentMethodRoute;
@@ -8,31 +8,27 @@ use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRouteResponse;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\Request;
 
-
-class MollieLimitsPaymentMethodRoute63 extends AbstractPaymentMethodRoute
+class RemovePaymentMethodRoute63 extends AbstractPaymentMethodRoute
 {
-
     /**
      * @var AbstractPaymentMethodRoute
      */
     private $corePaymentMethodRoute;
 
     /**
-     * @var PaymentMethodRemoverInterface
+     * @var PaymentMethodRemoverInterface[]
      */
-    private $mollieLimits;
-
+    private $paymentMethodRemovers;
 
     /**
-     * @param AbstractPaymentMethodRoute    $corePaymentMethodRoute
-     * @param PaymentMethodRemoverInterface $mollieLimits
+     * @param AbstractPaymentMethodRoute $corePaymentMethodRoute
+     * @param \Traversable               $paymentMethodRemovers
      */
-    public function __construct(AbstractPaymentMethodRoute $corePaymentMethodRoute, PaymentMethodRemoverInterface $mollieLimits)
+    public function __construct(AbstractPaymentMethodRoute $corePaymentMethodRoute, \Traversable $paymentMethodRemovers)
     {
         $this->corePaymentMethodRoute = $corePaymentMethodRoute;
-        $this->mollieLimits = $mollieLimits;
+        $this->paymentMethodRemovers = iterator_to_array($paymentMethodRemovers);
     }
-
 
     /**
      * @return AbstractPaymentMethodRoute
@@ -42,18 +38,19 @@ class MollieLimitsPaymentMethodRoute63 extends AbstractPaymentMethodRoute
         return $this->corePaymentMethodRoute;
     }
 
-
     /**
      * @param Request             $request
      * @param SalesChannelContext $context
      * @return PaymentMethodRouteResponse
-     * @throws \Exception
      */
     public function load(Request $request, SalesChannelContext $context): PaymentMethodRouteResponse
     {
         $originalData = $this->corePaymentMethodRoute->load($request, $context);
 
-        return $this->mollieLimits->removePaymentMethods($originalData, $context);
-    }
+        foreach ($this->paymentMethodRemovers as $paymentMethodRemover) {
+            $originalData = $paymentMethodRemover->removePaymentMethods($originalData, $context);
+        }
 
+        return $originalData;
+    }
 }

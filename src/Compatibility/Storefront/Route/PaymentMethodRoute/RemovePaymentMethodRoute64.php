@@ -1,39 +1,35 @@
 <?php
 
-namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\Subscription;
+namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute;
 
 use Kiener\MolliePayments\Service\Payment\Remover\PaymentMethodRemoverInterface;
-use Kiener\MolliePayments\Service\SettingsService;
 use Shopware\Core\Checkout\Payment\SalesChannel\AbstractPaymentMethodRoute;
 use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRouteResponse;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class SubscriptionPaymentMethodRoute64 extends AbstractPaymentMethodRoute
+class RemovePaymentMethodRoute64 extends AbstractPaymentMethodRoute
 {
-
     /**
      * @var AbstractPaymentMethodRoute
      */
     private $corePaymentMethodRoute;
 
     /**
-     * @var PaymentMethodRemoverInterface
+     * @var PaymentMethodRemoverInterface[]
      */
-    private $paymentMethodRemover;
+    private $paymentMethodRemovers;
 
     /**
      * @param AbstractPaymentMethodRoute    $corePaymentMethodRoute
-     * @param PaymentMethodRemoverInterface $paymentMethodRemover
+     * @param \Traversable $paymentMethodRemovers
      */
-    public function __construct(AbstractPaymentMethodRoute $corePaymentMethodRoute, PaymentMethodRemoverInterface $paymentMethodRemover)
+    public function __construct(AbstractPaymentMethodRoute $corePaymentMethodRoute, \Traversable $paymentMethodRemovers)
     {
         $this->corePaymentMethodRoute = $corePaymentMethodRoute;
-        $this->paymentMethodRemover = $paymentMethodRemover;
+        $this->paymentMethodRemovers = iterator_to_array($paymentMethodRemovers);
     }
-
 
     /**
      * @return AbstractPaymentMethodRoute
@@ -48,15 +44,15 @@ class SubscriptionPaymentMethodRoute64 extends AbstractPaymentMethodRoute
      * @param SalesChannelContext $context
      * @param Criteria            $criteria
      * @return PaymentMethodRouteResponse
-     * @throws \Exception
      */
     public function load(Request $request, SalesChannelContext $context, Criteria $criteria): PaymentMethodRouteResponse
     {
         $originalData = $this->corePaymentMethodRoute->load($request, $context, $criteria);
 
-        $newData = $this->paymentMethodRemover->removePaymentMethods($originalData, $context);
-//        dd('stop', $newData);
-        return $this->paymentMethodRemover->removePaymentMethods($originalData, $context);
-    }
+        foreach ($this->paymentMethodRemovers as $paymentMethodRemover) {
+            $originalData = $paymentMethodRemover->removePaymentMethods($originalData, $context);
+        }
 
+        return $originalData;
+    }
 }
