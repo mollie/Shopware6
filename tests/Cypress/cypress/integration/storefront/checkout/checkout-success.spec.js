@@ -51,7 +51,8 @@ const payments = [
     {caseId: 'C5415', key: 'banktransfer', name: 'Banktransfer'},
     {caseId: 'C5860', key: 'giftcard', name: 'Gift cards'},
     {caseId: 'C6924', key: 'voucher', name: 'Voucher'},
-    {caseId: 'C6916', key: 'in3', name: 'in3'},
+    // unfortunately address and product prices need to match, so we cannot do in3 automatically for now
+    // {caseId: 'C6916', key: 'in3', name: 'in3'},
 ];
 
 
