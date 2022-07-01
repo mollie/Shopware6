@@ -21,8 +21,8 @@ class RemovePaymentMethodRoute63 extends AbstractPaymentMethodRoute
     private $paymentMethodRemovers;
 
     /**
-     * @param AbstractPaymentMethodRoute $corePaymentMethodRoute
-     * @param \Traversable               $paymentMethodRemovers
+     * @param AbstractPaymentMethodRoute                  $corePaymentMethodRoute
+     * @param \Traversable<PaymentMethodRemoverInterface> $paymentMethodRemovers
      */
     public function __construct(AbstractPaymentMethodRoute $corePaymentMethodRoute, \Traversable $paymentMethodRemovers)
     {
