@@ -143,6 +143,5 @@
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing\OrderCloneService"/>
         </service>
-
     </services>
 </container>

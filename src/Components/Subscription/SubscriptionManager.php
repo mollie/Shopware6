@@ -13,7 +13,7 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\Mollie
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder;
 use Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder;
-use Kiener\MolliePayments\Components\Subscription\Services\PaymentMethodRemover\PaymentMethodRemover;
+use Kiener\MolliePayments\Components\Subscription\Services\PaymentMethodRemover\SubscriptionRemover;
 use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionCancellation\CancellationValidator;
 use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionReminder\ReminderValidator;
 use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing\SubscriptionRenewing;
@@ -542,7 +542,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
         $payment = $this->gwMollie->createPayment([
             'sequenceType' => 'first',
             'customerId' => $customerId,
-            'method' => PaymentMethodRemover::ALLOWED_METHODS,
+            'method' => SubscriptionRemover::ALLOWED_METHODS,
             'amount' => $this->priceBuilder->build(0, 'EUR'),
             'description' => 'Update Subscription Payment: ' . $subscription->getDescription(),
             'redirectUrl' => $this->routingBuilder->buildSubscriptionPaymentUpdated($subscriptionId),
