@@ -155,6 +155,12 @@
             <tag name="shopware.payment.method.async"/>
         </service>
 
+        <!-- in3 PaymentHandler -->
+        <service id="Kiener\MolliePayments\Handler\Method\In3Payment" class="Kiener\MolliePayments\Handler\Method\In3Payment">
+            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="service_container"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
 
     </services>
 </container>

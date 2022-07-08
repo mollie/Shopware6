@@ -3,10 +3,13 @@
 namespace Kiener\MolliePayments\Service\MollieApi;
 
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieOrderException;
+use Kiener\MolliePayments\Exception\MollieOrderCancelledException;
+use Kiener\MolliePayments\Exception\MollieOrderExpiredException;
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\MollieApi\Payment as PaymentApiService;
+use Kiener\MolliePayments\Service\MollieApi\Payment as PaymentService;
 use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Order as MollieOrder;
@@ -14,6 +17,7 @@ use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\PaymentCollection;
 use Mollie\Api\Types\OrderLineType;
+use Mollie\Api\Types\OrderStatus;
 use Mollie\Api\Types\PaymentStatus;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -45,14 +49,18 @@ class Order
     private $logger;
 
 
-
-    public function __construct(MollieApiFactory $clientFactory, PaymentApiService $paymentApiService, RouterInterface $router, LoggerInterface $logger)
+    /**
+     * @param MollieApiFactory $clientFactory
+     * @param PaymentService $paymentApiService
+     * @param WebhookBuilder $webhookBuilder
+     * @param LoggerInterface $logger
+     */
+    public function __construct(MollieApiFactory $clientFactory, PaymentApiService $paymentApiService,  WebhookBuilder $webhookBuilder, LoggerInterface $logger)
     {
         $this->clientFactory = $clientFactory;
         $this->logger = $logger;
         $this->paymentApiService = $paymentApiService;
-
-        $this->webhookBuilder = new WebhookBuilder($router);
+        $this->webhookBuilder = $webhookBuilder;
     }
 
     /**
@@ -108,15 +116,15 @@ class Order
         try {
             return $apiClient->orders->create($orderData);
         } catch (ApiException $e) {
-
             $this->logger->critical(
-                $e->getMessage(),
+                'Could not create Mollie order',
                 [
                     'function' => 'finalize-payment',
+                    'exception' => $e
                 ]
             );
 
-            throw new RuntimeException(sprintf('Could not create Mollie order, error: %s', $e->getMessage()));
+            throw new RuntimeException('Could not create Mollie order', $e->getCode(), $e);
         }
     }
 
@@ -136,6 +144,14 @@ class Order
         # fetch the current Mollie order including
         # all its existing payments and transactions
         $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelContext->getSalesChannel()->getId(), ['embed' => 'payments']);
+
+        # We cannot reuse this order if it's cancelled or expired.
+        switch($mollieOrder->status) {
+            case OrderStatus::STATUS_CANCELED:
+                throw new MollieOrderCancelledException($mollieOrderId);
+            case OrderStatus::STATUS_EXPIRED:
+                throw new MollieOrderExpiredException($mollieOrderId);
+        }
 
         # now search for an open payment
         # if it's still open, then we just reuse this one

@@ -33,7 +33,7 @@ class MolliePaymentExtractor
 
         // sort all transactions chronological
         $collection->sort(static function (OrderTransactionEntity $a, OrderTransactionEntity $b) {
-            return $a->getCreatedAt() > $b->getCreatedAt();
+            return $a->getCreatedAt() <=> $b->getCreatedAt();
         });
 
         $lastTransaction = $collection->last();

@@ -8,16 +8,10 @@ help:
 # ---------------------------------------------------------------------------------------------
 
 install: ## Installs all dependencies
-	npm install cypress --save-dev --save .
-	npm install webpack@4.18.1 --save-dev --save .
-	npm install @cypress/webpack-preprocessor --save-dev --save .
-	npm install @cucumber/tag-expressions --save-dev --save .
-	npm install axios --save-dev --save .
+	npm install
 
 clean: ## Clean all dependencies
-	rm -rf node_modules 
-	rm -rf package.json
-	rm -rf package-lock.json
+	rm -rf node_modules
 
 # ---------------------------------------------------------------------------------------------
 

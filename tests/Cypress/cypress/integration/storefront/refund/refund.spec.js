@@ -40,6 +40,7 @@ context("Order Refunds", () => {
 
     before(function () {
         configAction.setupShop(false, false, false);
+        configAction.updateProducts('', false, 0, '');
     })
 
     beforeEach(() => {
@@ -49,10 +50,9 @@ context("Order Refunds", () => {
 
     context(devices.getDescription(device), () => {
 
-        it('Create full refund and cancel it', () => {
+        it('C6490: Create full refund and cancel it', () => {
 
             createOrderAndOpenAdmin();
-
 
             const REFUND_DESCRIPTION = 'full refund with Cypress';
 
@@ -82,7 +82,7 @@ context("Order Refunds", () => {
         })
 
 
-        it('Create partial refund and cancel it', () => {
+        it('C6489: Create partial refund and cancel it', () => {
 
             createOrderAndOpenAdmin();
 

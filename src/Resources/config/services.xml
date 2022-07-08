@@ -13,6 +13,7 @@
         <import resource="services/gateways.xml"/>
         <import resource="services/hydrators.xml"/>
         <import resource="services/repositories.xml"/>
+        <import resource="services/payment.xml"/>
         <import resource="services/services.xml"/>
         <import resource="services/snippets.xml"/>
         <import resource="services/subscriber.xml"/>
@@ -20,6 +21,9 @@
         <import resource="services/builder.xml"/>
         <import resource="services/controller.xml"/>
         <import resource="services/handlers.xml"/>
+        <import resource="services/scheduled_tasks.xml"/>
+
+        <import resource="services/subscription/services.xml"/>
     </imports>
 
     <services>
@@ -28,6 +32,15 @@
         <service id="Kiener\MolliePayments\Service\ConfigService" class="Kiener\MolliePayments\Service\ConfigService">
             <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
         </service>
+
+
+        <service id="Kiener\MolliePayments\Components\Installer\PluginInstaller" public="true">
+            <argument type="service" id="Kiener\MolliePayments\Service\Installer\CustomFieldsInstaller"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\PaymentMethodService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\ApplePayDirect\ApplePayDomainVerificationService"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Installer\MailTemplateInstaller"/>
+        </service>
+
 
         <!-- Helpers -->
         <service id="Kiener\MolliePayments\Helper\DeliveryStateHelper" class="Kiener\MolliePayments\Helper\DeliveryStateHelper">
@@ -66,6 +79,11 @@
 
         <service id="Kiener\MolliePayments\Service\DeliveryService" class="Kiener\MolliePayments\Service\DeliveryService">
             <argument type="service" id="order_delivery.repository"/>
+        </service>
+
+
+        <service id="Kiener\MolliePayments\Service\Installer\CustomFieldsInstaller" public="true">
+            <argument type="service" id="custom_field_set.repository"/>
         </service>
 
 
@@ -144,12 +162,14 @@
             <argument type="service" id="order_transaction.repository"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
             <argument type="service" id="mollie_payments.logger"/>
         </service>
 
         <service id="Kiener\MolliePayments\Storefront\Controller\WebhookController" public="true">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Facade\Notifications\NotificationFacade"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
             <argument type="service" id="mollie_payments.logger"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>

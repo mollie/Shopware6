@@ -19,10 +19,12 @@ use Kiener\MolliePayments\Service\MollieApi\PriceCalculator;
 use Kiener\MolliePayments\Service\MollieApi\VerticalTaxLineItemFixer;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
+use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
 use MolliePayments\Tests\Fakes\FakeCompatibilityGateway;
 use MolliePayments\Tests\Fakes\FakeEventDispatcher;
+use MolliePayments\Tests\Fakes\FakePluginSettings;
 use MolliePayments\Tests\Traits\OrderTrait;
 use MolliePayments\Tests\Utils\Traits\PaymentBuilderTrait;
 use PHPUnit\Framework\TestCase;
@@ -166,7 +168,8 @@ abstract class AbstractMollieOrderBuilder extends TestCase
             new MollieShippingLineItemBuilder(new PriceCalculator(), new MollieOrderPriceBuilder()),
             new VerticalTaxLineItemFixer($this->loggerService),
             new MollieLineItemHydrator(new MollieOrderPriceBuilder()),
-            new FakeEventDispatcher()
+            new FakeEventDispatcher(),
+            new WebhookBuilder($this->router, new FakePluginSettings(''))
         );
     }
 

@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="Kiener\MolliePayments\ScheduledTask\ScheduledTaskFactory">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\ScheduledTask\Subscription\RenewalReminder\RenewalReminderTask">
+            <factory service="Kiener\MolliePayments\ScheduledTask\ScheduledTaskFactory" method="createRenewalReminderTask"/>
+            <tag name="shopware.scheduled.task"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\ScheduledTask\Subscription\RenewalReminder\RenewalReminderTaskHandler">
+            <argument type="service" id="scheduled_task.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
+            <argument type="service" id="mollie_payments.logger"/>
+            <tag name="messenger.message_handler"/>
+        </service>
+
+    </services>
+</container>

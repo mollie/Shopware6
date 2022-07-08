@@ -11,10 +11,17 @@
       "mollie_webhook_received_status_completed": " Mollie Webhook Received (Completed)",
       "mollie_webhook_received_status_refunded": " Mollie Webhook Received (Refunded)",
       "mollie_webhook_received_status_partially_refunded": " Mollie Webhook Received (Partially Refunded)",
-      "mollie_refund_started": " Mollie Refund started"
+      "mollie_refund_started": " Mollie Refund started",
+      "mollie_subscription_started": " Mollie Subscription started",
+      "mollie_subscription_ended": " Mollie Subscription completed",
+      "mollie_subscription_cancelled": " Mollie Subscription cancelled",
+      "mollie_subscription_renewed": " Mollie Subscription renewed",
+      "mollie_subscription_renewal_reminder": " Mollie reminder for subscription renewal"
     }
   },
   "mollie-payments": {
+    "pluginTitle": "Mollie",
+    "pluginDescription": "Mollie Modul",
     "general": {
       "mainMenuItemGeneral": "Mollie Payments",
       "descriptionTextModule": "Mollie Payments",
@@ -84,6 +91,10 @@
         "error": "There was a problem when sending the mail through Shopware. Please try it again or contact us directly per e-mail."
       }
     },
+    "rules": {
+      "itemSubscriptionRule": "Item is subscription (Mollie)",
+      "cartSubscriptionRule": "Cart with subscriptions (Mollie)"
+    },
     "refunds": {
       "status": {
         "queued": "Queued",
@@ -143,7 +154,9 @@
       },
       "summary": {
         "dataLoading": "Data is loading...",
-        "captionTotal": "Total incl. taxes",
+        "headerExcludingVat": "Excl. VAT",
+        "headerIncludingVat": "Incl. VAT",
+        "captionTotal": "Total",
         "captionTotalTaxFree": "Total",
         "captionPendingRefunds": "Waiting to be refunded",
         "captionVouchers": "Voucher amount",
@@ -181,6 +194,18 @@
           "refund-canceled": "There was a problem when cancelling the pending refund. Please try it again in the Mollie Dashboard."
         }
       }
+    },
+    "vouchers": {
+      "CARD_TITLE": "Voucher",
+      "VOUCHER_INFO_TITLE": "Voucher Payments",
+      "VOUCHER_INFO_DESCRIPTION": "Mollie lets you easily accept payments in your online shop using Eco-, gift- and meal vouchers—a smart choice for boosting sales and satisfying your customers. The payment method \"voucher\" is only visible, if you have at least 1 product with an assigned voucher type in the cart.",
+      "VOUCHER_INFO_DEFAULTLANGUAGE": "Please note, this configuration can only be edited in your default language. Please change your language to modify the voucher type of this product.",
+      "VOUCHER_BTN_READMORE": "Read more",
+      "VOUCHER_TYPE_CAPTION": "Voucher type of product",
+      "VOUCHER_TYPE_VALUE_NONE": "None",
+      "VOUCHER_TYPE_VALUE_ECO": "Eco",
+      "VOUCHER_TYPE_VALUE_MEAL": "Meal",
+      "VOUCHER_TYPE_VALUE_VOUCHER": "Gift"
     },
     "modals": {
       "shipping": {
@@ -246,6 +271,60 @@
           "automaticShipping": "Automatic shipping in plugin configuration"
         }
       }
+    },
+    "subscriptions": {
+      "status": {
+        "pending": "Pending",
+        "active": "Active",
+        "canceled": "Canceled",
+        "suspended": "Suspended",
+        "completed": "Completed"
+      },
+      "navigation": {
+        "title": "Mollie Subscriptions"
+      },
+      "TYPE_DAYS": "Day(s)",
+      "TYPE_WEEKS": "Week(s)",
+      "TYPE_MONTHS": "Month(s)",
+      "list": {
+        "title": "Subscriptions",
+        "columns": {
+          "customer": "Customer",
+          "subscription_id": "Mollie ID",
+          "customer_id": "Mollie Customer",
+          "status": "Status",
+          "canceledAt": "Canceled at",
+          "description": "Description",
+          "createdAt": "Created at",
+          "amount": "Amount",
+          "quantity": "Quantity",
+          "nextPaymentAt": "Next Payment",
+          "prePaymentReminder": "Reminded at",
+          "action": {
+            "cancel": "Cancel subscription",
+            "success": "The subscription has been canceled",
+            "error": "Error in cancel subscription. More information in the logs."
+          }
+        }
+      },
+      "product": {
+        "card-title": "Subscription",
+        "title": "Mollie Subscriptions",
+        "description": "Managing your recurring payments is easier than ever with our helpful features. Take your business to the next level with efficient tracking options, simple integrations, and more. With Mollie subscriptions, you can easily create subscription products and schedule recurring payments to take place at the configured interval and period.",
+        "mollieSubscriptionProduct": "Subscription Product",
+        "mollieSubscriptionIntervalAmount": "Repeat Payment every",
+        "mollieSubscriptionIntervalType": "Interval Unit",
+        "mollieSubscriptionRepetitionAmount": "Number or repetitions",
+        "mollieSubscriptionRepetitionPlaceholder": "Enter number or leave empty",
+        "infoDefaultLanguage": "Please note, this configuration can only be edited in your default language. Please change your language to modify the subscription settings of this product.",
+        "btnReadMore": "Read more"
+      }
+    },
+    "sw-order-list": {
+      "columns": {
+        "mollie": "Mollie"
+      },
+      "badgeSubscription": "Subscription"
     }
   },
   "sw-order": {
@@ -254,12 +333,14 @@
       "columnRefunded": "Refunded",
       "columnShipped": "Shipped",
       "labelMollieOrderId": "Mollie Order ID",
+      "labelMollieThirdPartyPaymentId": "Payment Reference",
       "labelMolliePaymentLink": "Mollie Checkout URL",
       "totalRefunds": "Refunded amount",
       "totalRefundsPending": "Waiting to be refunded",
       "totalRemaining": "Refundable amount",
       "totalVouchers": "Voucher amount",
       "totalShipments": "Shipped amount ({quantity} items)",
+      "subscriptionBadge" : "Subscription Order",
       "refundManager": {
         "title": "Mollie Refund Manager",
         "btnOpenRefundManager": "Open Refund Manager",

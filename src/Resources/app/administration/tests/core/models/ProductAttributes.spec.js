@@ -20,14 +20,45 @@ test('Attributes do not crash if our Mollie root node does not exist', () => {
     expect(attributes.getVoucherType()).toBe('');
 });
 
+test('Missing Attributes are not added if no Mollie data exists initially', () => {
+    const customFields = {
+        'other_data': 'sample',
+    };
+
+    const attributes = new ProductAttributes(customFields);
+
+    expect(attributes.toArray(customFields)).toBe(customFields);
+});
+
+test('Mollie Attributes are added if configured using a setter', () => {
+    const customFields = {
+        'other_data': 'sample',
+    };
+
+    const attributes = new ProductAttributes(customFields);
+    attributes.setVoucherType('1');
+
+    const expected = {
+        'mollie_payments_product_voucher_type': '1',
+        'mollie_payments_product_subscription_enabled': null,
+        'mollie_payments_product_subscription_interval': null,
+        'mollie_payments_product_subscription_interval_unit': null,
+        'mollie_payments_product_subscription_repetition': null,
+        'other_data': 'sample',
+    };
+
+    expect(attributes.toArray(customFields)).toStrictEqual(expected);
+});
+
+
+// --------------------------------------------------------------------------------------------------
+
 test('VoucherType is correctly loaded from custom fields', () => {
 
     const product = {
         customFields: {
-            'mollie_payments': {
-                'voucher_type': '2',
-            }
-        }
+            'mollie_payments_product_voucher_type': '2',
+        },
     };
 
     const attributes = new ProductAttributes(product);
@@ -58,10 +89,8 @@ test('VoucherType can be cleared again', () => {
 
     const product = {
         customFields: {
-            'mollie_payments': {
-                'voucher_type': '2',
-            }
-        }
+            'mollie_payments_product_voucher_type': '2',
+        },
     };
 
     const attributes = new ProductAttributes(product);
@@ -84,4 +113,46 @@ test('Product Attributes hasData works correctly', () => {
     attributes.clearVoucherType();
 
     expect(attributes.hasData()).toBe(false);
+});
+
+// --------------------------------------------------------------------------------------------------
+
+test('Subscription data is correctly loaded from custom fields', () => {
+
+    const product = {
+        customFields: {
+            'mollie_payments_product_subscription_enabled': true,
+            'mollie_payments_product_subscription_interval': 3,
+            'mollie_payments_product_subscription_interval_unit': 'weeks',
+            'mollie_payments_product_subscription_repetition': 2,
+        },
+    };
+
+    const attributes = new ProductAttributes(product);
+
+    expect(attributes.isSubscriptionProduct()).toBe(true);
+    expect(attributes.getSubscriptionInterval()).toBe(3);
+    expect(attributes.getSubscriptionIntervalUnit()).toBe('weeks');
+    expect(attributes.getSubscriptionRepetition()).toBe(2);
+});
+
+test('Subscription data can be cleared again', () => {
+
+    const attributes = new ProductAttributes({});
+
+    attributes.setSubscriptionInterval(3);
+    attributes.setSubscriptionIntervalUnit('weeks');
+    attributes.setSubscriptionRepetition(2);
+
+    expect(attributes.getSubscriptionInterval()).toBe(3);
+    expect(attributes.getSubscriptionIntervalUnit()).toBe('weeks');
+    expect(attributes.getSubscriptionRepetition()).toBe(2);
+
+    attributes.clearSubscriptionInterval();
+    attributes.clearSubscriptionIntervalUnit();
+    attributes.clearSubscriptionRepetition();
+
+    expect(attributes.getSubscriptionInterval()).toBe('');
+    expect(attributes.getSubscriptionIntervalUnit()).toBe('');
+    expect(attributes.getSubscriptionRepetition()).toBe('');
 });

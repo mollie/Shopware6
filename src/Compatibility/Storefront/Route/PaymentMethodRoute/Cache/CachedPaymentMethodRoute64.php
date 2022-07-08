@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRout
 
 use Kiener\MolliePayments\Service\Cart\Voucher\VoucherCartCollector;
 use Kiener\MolliePayments\Service\SettingsService;
+use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Payment\Event\PaymentMethodRouteCacheKeyEvent;
@@ -61,6 +62,7 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
 
         $parts = $this->addVoucherKey($cart, $parts);
         $parts = $this->addMollieLimitsKey($parts);
+        $parts = $this->addSubscriptionKey($cart, $parts);
 
         $event->setParts($parts);
     }
@@ -99,6 +101,43 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
         }
 
         return $parts;
+    }
+
+    /**
+     * @param Cart $cart
+     * @param array<mixed> $parts
+     *
+     * @return array<mixed>
+     */
+    private function addSubscriptionKey(Cart $cart, array $parts): array
+    {
+        $hasSubscriptionItems = $this->isSubscriptionCart($cart);
+
+        if ($hasSubscriptionItems) {
+            $parts[] = 'with-subscription';
+        } else {
+            $parts[] = 'without-subscription';
+        }
+
+        return $parts;
+    }
+
+    /**
+     * @param Cart $cart
+     * @return bool
+     */
+    private function isSubscriptionCart(Cart $cart): bool
+    {
+        foreach ($cart->getLineItems() as $lineItem) {
+
+            $attribute = new LineItemAttributes($lineItem);
+
+            if ($attribute->isSubscriptionProduct()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

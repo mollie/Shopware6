@@ -34,6 +34,7 @@ describe('Credit Card Components', () => {
         // we need the Shopware failure mode for some tests in this file
         // so let's just do this here once
         configAction.setupShop(false, true, false);
+        configAction.updateProducts('', false, 0, '');
     })
 
     beforeEach(() => {
@@ -44,7 +45,7 @@ describe('Credit Card Components', () => {
 
     context(devices.getDescription(devices.getFirstDevice()), () => {
 
-        it('Successful card payment', () => {
+        it('C5421: Successful card payment', () => {
 
             setUp();
 
@@ -73,7 +74,7 @@ describe('Credit Card Components', () => {
             cy.contains('Thank you for your order');
         })
 
-        it('Invalid Card Holder (Empty)', () => {
+        it('C5420: Invalid Card Holder (Empty)', () => {
 
             setUp();
 
@@ -90,7 +91,7 @@ describe('Credit Card Components', () => {
             assertComponentErrors(false, true, true, true);
         })
 
-        it('Invalid Card Holder (Invalid Value)', () => {
+        it('C6928: Invalid Card Holder (Invalid Value)', () => {
 
             setUp();
 
@@ -110,7 +111,7 @@ describe('Credit Card Components', () => {
             cy.contains("Failed to submit card data");
         })
 
-        it('Invalid Card Number', () => {
+        it('C6929: Invalid Card Number', () => {
 
             setUp();
 
@@ -127,7 +128,7 @@ describe('Credit Card Components', () => {
             assertComponentErrors(true, false, true, true);
         })
 
-        it('Invalid Expiry Date', () => {
+        it('C6930: Invalid Expiry Date', () => {
 
             setUp();
 
@@ -144,7 +145,7 @@ describe('Credit Card Components', () => {
             assertComponentErrors(true, true, false, true);
         })
 
-        it('Invalid CVC Code', () => {
+        it('C6931: Invalid CVC Code', () => {
 
             setUp();
 
@@ -161,7 +162,7 @@ describe('Credit Card Components', () => {
             assertComponentErrors(true, true, true, false);
         })
 
-        it('Components work on edit order page', () => {
+        it('C6147: Components work on edit order page', () => {
 
             scenarioDummyBasket.execute();
 
@@ -222,7 +223,7 @@ describe('Status Tests', () => {
         devices.setDevice(devices.getFirstDevice());
         // turn off credit card components
         // to speed up a few  things
-        configAction.setupPlugin(false, false, false);
+        configAction.setupPlugin(false, false, false, false);
 
     })
 

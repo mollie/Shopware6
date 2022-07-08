@@ -1,4 +1,16 @@
 {
+  "checkout": {
+    "mollie-payments-cart-guest-account": "Guest Accounts cannot be used for subscription orders.",
+    "mollie-payments-cart-error-mixedcart": "Your cart contains multiple items in combination with subscription items. Please note you can only purchase 1 subscription item at a time.",
+    "mollie-payments-cart-error-paymentmethod-availability": "Not all payments methods are available when ordering subscription products.",
+    "mollie-payments-cart-error-method-invalid": "The currently selected payment method is not available for subscription products."
+  },
+  "error": {
+    "mollie-payments-cart-guest-account": "Guest Accounts cannot be used for subscription orders.",
+    "mollie-payments-cart-error-mixedcart": "Your cart contains multiple items in combination with subscription items. Please note you can only purchase 1 subscription item at a time.",
+    "mollie-payments-cart-error-paymentmethod-availability": "Not all payments methods are available when ordering subscription products.",
+    "mollie-payments-cart-error-method-invalid": "The currently selected payment method is not available for subscription products."
+  },
   "molliePayments": {
     "testMode": {
       "label": "Test mode"
@@ -27,6 +39,47 @@
         "captionSubtotal": "Subtotal",
         "captionTaxes": "Taxes",
         "paymentError": "The payment with Apple Pay failed."
+      }
+    },
+    "subscriptions": {
+      "product": {
+        "information": "Subscription product",
+        "addToCartText": "Subscribe"
+      },
+      "options": {
+        "everyDay": "Every day",
+        "everyDays": "Every %value% days",
+        "everyWeek": "Every week",
+        "everyWeeks": "Every %value% weeks",
+        "everyMonth": "Every month",
+        "everyMonths": "Every %value% months",
+        "repetitionCount": "%value% time(s)"
+      },
+      "account": {
+        "mollieSubscriptionsLink": "Subscriptions",
+        "mollieSubscriptionsTitle": "Subscriptions",
+        "mollieSubscriptionsWelcome": "Your recent subscriptions:",
+        "mollieSubscriptionsInfoEmpty": "You have no subscriptions yet.",
+        "mollieSubscriptionsHeadline": "Subscription:",
+        "mollieSubscriptionId": "Id",
+        "mollieSubscriptionAmount": "Amount",
+        "mollieSubscriptionNextPayment": "Next payment at",
+        "mollieSubscriptionCancelUntil" : "Cancellation possible until",
+        "mollieSubscriptionCancel": "Cancel Subscription",
+        "mollieSubscriptionContextMenuReorder": "Repeat subscription",
+        "cancelSubscription": "Subscription has been canceled",
+        "errorCancelSubscription": "The subscription could not be canceled due to an error. Please contact our support.",
+        "successUpdateAddress": "Your address has been updated successfully",
+        "errorUpdateAddress": "There was an error when updating your address",
+        "errorUpdatePayment": "There was an error when updating your payment method",
+        "successUpdatePayment": "Your payment method has been updated successfully",
+        "orderActionView": "View",
+        "orderActionHide": "Hide",
+        "headlineBillingAddress": "Billing address",
+        "btnEditBillingAddress": "edit billing address",
+        "headlineShippingAddress": "Shipping address",
+        "btnEditShippingAddress": "edit shipping address",
+        "shippingEqualToBilling": "Equal to billing address"
       }
     }
   }

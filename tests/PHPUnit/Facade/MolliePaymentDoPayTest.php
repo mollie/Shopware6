@@ -14,6 +14,7 @@ use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
+use MolliePayments\Tests\Fakes\FakeSubscriptionManager;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
@@ -90,6 +91,7 @@ class MolliePaymentDoPayTest extends TestCase
             $settingsService,
             $this->createMock(UpdateOrderCustomFields::class),
             $this->createMock(UpdateOrderLineItems::class),
+            new FakeSubscriptionManager(),
             new NullLogger()
         );
     }

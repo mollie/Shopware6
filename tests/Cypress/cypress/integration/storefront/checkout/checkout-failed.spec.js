@@ -31,6 +31,7 @@ context("Checkout Failure Tests", () => {
 
         before(function () {
             configAction.setupShop(true, false, false);
+            configAction.updateProducts('', false, 0, '');
         })
 
         beforeEach(() => {
@@ -40,7 +41,7 @@ context("Checkout Failure Tests", () => {
 
         context(devices.getDescription(device), () => {
 
-            it('Paypal failed and retry with Giropay', () => {
+            it('C5395: Paypal failed and retry with Giropay', () => {
 
                 scenarioDummyBasket.execute();
                 paymentAction.switchPaymentMethod('PayPal');
@@ -72,7 +73,7 @@ context("Checkout Failure Tests", () => {
                 cy.contains('Thank you for your order');
             })
 
-            it('Paypal failed and continue shopping', () => {
+            it('C5396: Paypal failed and continue shopping', () => {
 
                 scenarioDummyBasket.execute();
                 paymentAction.switchPaymentMethod('PayPal');
@@ -113,7 +114,7 @@ context("Checkout Failure Tests", () => {
 
         context(devices.getDescription(device), () => {
 
-            it('Paypal failed and retry with Giropay', () => {
+            it('C5397: Paypal failed and retry with Giropay', () => {
 
                 scenarioDummyBasket.execute();
                 paymentAction.switchPaymentMethod('PayPal');
@@ -147,7 +148,7 @@ context("Checkout Failure Tests", () => {
                 cy.contains('Thank you for updating your order');
             })
 
-            it('Paypal cancelled and retry with Paypal', () => {
+            it('C5791: Paypal cancelled and retry with Paypal', () => {
 
                 scenarioDummyBasket.execute();
                 paymentAction.switchPaymentMethod('PayPal');

@@ -17,7 +17,7 @@ const repoPDP = new PDPRepository();
 
 describe('Apple Pay Direct - Functional', () => {
 
-    it('Domain Verification file has been downloaded', () => {
+    it('C5418: Domain Verification file has been downloaded', () => {
         cy.request('/.well-known/apple-developer-merchantid-domain-association');
     })
 })
@@ -38,20 +38,9 @@ describe('Apple Pay Direct - UI Tests', () => {
 
         describe('PDP', () => {
 
-            it('Apple Pay Direct not visible if available (PDP)', () => {
+            it('C5419: Apple Pay Direct not visible if available but not configured (PDP)', () => {
 
                 applePayFactory.registerApplePay(true);
-
-                cy.visit('/');
-                topMenu.clickOnClothing();
-                listing.clickOnFirstProduct();
-
-                repoPDP.getApplePayDirectButton().should('not.exist');
-            })
-
-            it('Apple Pay Direct not visible if not available (PDP)', () => {
-
-                applePayFactory.registerApplePay(false);
 
                 cy.visit('/');
                 topMenu.clickOnClothing();
@@ -77,7 +66,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
         describe('PDP', () => {
 
-            it('Apple Pay Direct visible if available (PDP)', () => {
+            it('C6920: Apple Pay Direct visible if available and configured (PDP)', () => {
 
                 applePayFactory.registerApplePay(true);
 
@@ -88,7 +77,7 @@ describe('Apple Pay Direct - UI Tests', () => {
                 repoPDP.getApplePayDirectButton().should('not.have.class', 'd-none');
             })
 
-            it('Apple Pay Direct hidden if not available (PDP)', () => {
+            it('C6921: Apple Pay Direct hidden if not available but configured (PDP)', () => {
 
                 applePayFactory.registerApplePay(false);
 

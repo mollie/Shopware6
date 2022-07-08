@@ -1,4 +1,16 @@
 {
+  "checkout": {
+    "mollie-payments-cart-guest-account": "Gäste Konten können nicht für Bestellungen von Abonnements benutzt werden.",
+    "mollie-payments-cart-error-mixedcart": "Ihr Warenkorb enthält mehrere Artikel in Kombination mit Abonnementartikeln. Bitte beachten Sie, dass Sie jeweils nur 1 Abonnementartikel kaufen können.",
+    "mollie-subscription-line-item-notice": "Bei der Bestellung von Abonnementprodukten sind nicht alle Zahlungsmethoden verfügbar.",
+    "mollie-payments-cart-error-method-invalid": "Die aktuell gewählte Zahlungsmethode ist nicht für Abonnementprodukte verfügbar."
+  },
+  "error": {
+    "mollie-payments-cart-guest-account": "Gäste Konten können nicht für Bestellungen von Abonnements benutzt werden.",
+    "mollie-payments-cart-error-mixedcart": "Ihr Warenkorb enthält mehrere Artikel in Kombination mit Abonnementartikeln. Bitte beachten Sie, dass Sie jeweils nur 1 Abonnementartikel kaufen können.",
+    "mollie-subscription-line-item-notice": "Bei der Bestellung von Abonnementprodukten sind nicht alle Zahlungsmethoden verfügbar.",
+    "mollie-payments-cart-error-method-invalid": "Die aktuell gewählte Zahlungsmethode ist nicht für Abonnementprodukte verfügbar."
+  },
   "molliePayments": {
     "testMode": {
       "label": "Testmodus"
@@ -27,6 +39,47 @@
         "captionSubtotal": "Zwischensumme",
         "captionTaxes": "Steuern",
         "paymentError": "Die Zahlung mit Apple Pay ist fehlgeschlagen."
+      }
+    },
+    "subscriptions": {
+      "product": {
+        "information": "Abonnementprodukt",
+        "addToCartText": "Abonnieren"
+      },
+      "options": {
+        "everyDay": "Jeden Tag",
+        "everyDays": "Alle %value% Tage",
+        "everyWeek": "Jede Woche",
+        "everyWeeks": "Alle %value% Wochen",
+        "everyMonth": "Jeden Monat",
+        "everyMonths": "Alle %value% Monate",
+        "repetitionCount": "%value% mal"
+      },
+      "account": {
+        "mollieSubscriptionsLink": "Abonnements",
+        "mollieSubscriptionsTitle": "Abonnements",
+        "mollieSubscriptionsWelcome": "Ihre letzten Abonnements:",
+        "mollieSubscriptionsInfoEmpty": "Sie haben noch keine Abonnements.",
+        "mollieSubscriptionsHeadline": "Abonnement:",
+        "mollieSubscriptionId": "Id",
+        "mollieSubscriptionAmount": "Betragen",
+        "mollieSubscriptionNextPayment": "Nächste Zahlung um",
+        "mollieSubscriptionCancelUntil" : "Kündbar bis",
+        "mollieSubscriptionCancel": "Abonnement kündigen",
+        "mollieSubscriptionContextMenuReorder": "Abo wiederholen",
+        "cancelSubscription": "Das Abonnement wurde gekündigt",
+        "errorCancelSubscription": "Das Abonnement konnte aufgrund eines Fehlers nicht gekündigt werden. Bitte wenden Sie sich an unseren Support.",
+        "successUpdateAddress": "Deine Adresse wurde erfolgreich aktualisiert",
+        "errorUpdateAddress": "Die Adresse konnte nicht aktualisiert werden",
+        "errorUpdatePayment": "Die Zahlungsart konnte nicht aktualisiert werden",
+        "successUpdatePayment": "Die Zahlungsart konnte erfolgreich aktualisiert werden",
+        "orderActionView": "Anzeigen",
+        "orderActionHide": "Ausblenden",
+        "headlineBillingAddress": "Rechnungsadresse",
+        "btnEditBillingAddress": "Rechnungsadresse bearbeiten",
+        "headlineShippingAddress": "Lieferadresse",
+        "btnEditShippingAddress": "Lieferadresse bearbeiten",
+        "shippingEqualToBilling": "gleich wie Rechnungsadresse"
       }
     }
   }

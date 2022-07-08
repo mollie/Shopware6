@@ -1,0 +1,400 @@
+{% block mollie_subscription_component_address_form_elements %}
+
+    {% block mollie_subscription_component_address_form_data %}
+        <input type="hidden" name="address[id]" value="{{ data.get('id') }}">
+    {% endblock %}
+
+    {% block mollie_subscription_component_address_form_salutation %}
+        <div class="form-row">
+
+            {% block mollie_subscription_component_address_form_salutation_col %}
+                <div class="form-group col-sm-6">
+                    {% block mollie_subscription_component_address_form_salutation_label %}
+                        <label class="form-label" for="personalSalutation">
+                            {{ "account.personalSalutationLabel"|trans|sw_sanitize }}{{ "general.required"|trans|sw_sanitize }}
+                        </label>
+                    {% endblock %}
+
+                    {% block mollie_subscription_component_address_form_salutation_select %}
+                        <select id="personalSalutation"
+                                class="custom-select"
+                                name="address[salutationId]"
+                                required="required">
+                            {% if not data.get('salutationId') %}
+                                <option disabled="disabled" selected="selected" value="">
+                                    {{ "account.personalSalutationPlaceholder"|trans|sw_sanitize }}
+                                </option>
+                            {% endif %}
+
+                            {% for salutation in page.salutations %}
+                                <option {% if salutation.id == data.get('salutationId') %}
+                                    selected="selected"
+                                {% endif %}
+                                        value="{{ salutation.id }}">
+                                    {{ salutation.translated.displayName }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    {% endblock %}
+                </div>
+            {% endblock %}
+
+            {% block mollie_subscription_component_address_form_personal_title_col %}
+                <div class="form-group col-sm-6">
+                    {% block mollie_subscription_component_address_form_personal_title_label %}
+                        <label class="form-label" for="personalTitle">
+                            {{ "account.personalTitleLabel"|trans|sw_sanitize }}
+                        </label>
+                    {% endblock %}
+
+                    {% block mollie_subscription_component_address_form_personal_title_input %}
+                        <input type="text"
+                               class="form-control"
+                               autocomplete="section-personal title"
+                               id="personalTitle"
+                               placeholder="{{ "account.personalTitlePlaceholder"|trans|striptags }}"
+                               name="address[title]"
+                               value="{{ data.get('title') }}">
+                    {% endblock %}
+                </div>
+            {% endblock %}
+        </div>
+    {% endblock %}
+
+    {% block mollie_subscription_component_address_form_name %}
+        <div class="form-row">
+
+            {% block mollie_subscription_component_address_form_first_name_col %}
+                <div class="form-group col-sm-6">
+                    {% block mollie_subscription_component_address_form_first_name_label %}
+                        <label class="form-label" for="personalFirstName">
+                            {{ "account.personalFirstNameLabel"|trans|sw_sanitize }}{{ "general.required"|trans|sw_sanitize }}
+                        </label>
+                    {% endblock %}
+
+                    {% block mollie_subscription_component_address_form_first_name_input %}
+                        <input type="text"
+                               class="form-control"
+                               autocomplete="section-personal given-name"
+                               id="personalFirstName"
+                               placeholder="{{ "account.personalFirstNamePlaceholder"|trans|striptags }}"
+                               name="address[firstName]"
+                               value="{{ data.get('firstName') }}"
+                               required="required">
+                    {% endblock %}
+
+                </div>
+            {% endblock %}
+
+            {% block mollie_subscription_component_address_form_last_name_col %}
+                <div class="form-group col-sm-6">
+                    {% block mollie_subscription_component_address_form_last_name_label %}
+                        <label class="form-label" for="personalLastName">
+                            {{ "account.personalLastNameLabel"|trans|sw_sanitize }}{{ "general.required"|trans|sw_sanitize }}
+                        </label>
+                    {% endblock %}
+
+                    {% block mollie_subscription_component_address_form_last_name_input %}
+                        <input type="text"
+                               class="form-control"
+                               autocomplete="section-personal family-name"
+                               id="personalLastName"
+                               placeholder="{{ "account.personalLastNamePlaceholder"|trans|striptags }}"
+                               name="address[lastName]"
+                               value="{{ data.get('lastName') }}"
+                               required="required">
+                    {% endblock %}
+                </div>
+            {% endblock %}
+        </div>
+    {% endblock %}
+
+    {% block mollie_subscription_component_address_form_company %}
+        <div class="form-row">
+
+            {% block mollie_subscription_component_address_form_company_col %}
+                <div class="form-group col-md-6">
+                    {% block mollie_subscription_component_address_form_company_label %}
+                        <label class="form-label" for="company">
+                            {{ "address.companyNameLabel"|trans|sw_sanitize }}
+                        </label>
+                    {% endblock %}
+
+                    {% block mollie_subscription_component_address_form_company_input %}
+                        <input type="text"
+                               class="form-control"
+                               id="company"
+                               placeholder="{{ "address.companyNamePlaceholder"|trans|striptags }}"
+                               name="address[company]"
+                               value="{{ data.get('company') }}">
+                    {% endblock %}
+                </div>
+            {% endblock %}
+
+            {% block mollie_subscription_component_address_form_department_col %}
+                <div class="form-group col-md-6">
+                    {% block mollie_subscription_component_address_form_department_label %}
+                        <label class="form-label" for="department">
+                            {{ "address.companyDepartmentLabel"|trans|sw_sanitize }}
+                        </label>
+                    {% endblock %}
+
+                    {% block mollie_subscription_component_address_form_department_input %}
+                        <input type="text"
+                               class="form-control"
+                               id="department"
+                               placeholder="{{ "address.companyDepartmentPlaceholder"|trans|striptags }}"
+                               name="address[department]"
+                               value="{{ data.get('department') }}">
+                    {% endblock %}
+
+                </div>
+            {% endblock %}
+        </div>
+    {% endblock %}
+
+    {% block mollie_subscription_component_address_form_additional_field %}
+        <div class="form-row">
+
+            {% block mollie_subscription_component_address_form_additional_field_first_config %}
+                {% if config('core.loginRegistration.showAdditionalAddressField1') %}
+
+                    {% block mollie_subscription_component_address_form_additional_field_first_col %}
+                        <div class="form-group col-md-6">
+                            {% block mollie_subscription_component_address_form_additional_field_first_label %}
+                                <label class="form-label" for="additionalField1">
+                                    {{ "address.additionalField1Label"|trans|sw_sanitize }}
+                                </label>
+                            {% endblock %}
+
+                            {% block mollie_subscription_component_address_form_additional_field_first_input %}
+                                <input type="text"
+                                       class="form-control"
+                                       id="additionalField1"
+                                       placeholder="{{ "address.additionalField1Placeholder"|trans|striptags }}"
+                                       name="address[additionalField1]"
+                                       value="{{ data.get('additionalAddressLine1') }}">
+                            {% endblock %}
+                        </div>
+                    {% endblock %}
+
+                {% endif %}
+            {% endblock %}
+
+            {% block mollie_subscription_component_address_form_additional_field_second_config %}
+                {% if config('core.loginRegistration.showAdditionalAddressField2') %}
+
+                    {% block mollie_subscription_component_address_form_additional_field_second_col %}
+                        <div class="form-group col-md-6">
+                            {% block mollie_subscription_component_address_form_additional_field_second_label %}
+                                <label class="form-label" for="additionalField2">
+                                    {{ "address.additionalField2Label"|trans|sw_sanitize }}
+                                </label>
+                            {% endblock %}
+
+                            {% block mollie_subscription_component_address_form_additional_field_second_input %}
+                                <input type="text"
+                                       class="form-control"
+                                       id="additionalField2"
+                                       placeholder="{{ "address.additionalField2Placeholder"|trans|striptags }}"
+                                       name="address[additionalField2]"
+                                       value="{{ data.get('additionalAddressLine2') }}">
+                            {% endblock %}
+                        </div>
+                    {% endblock %}
+
+                {% endif %}
+            {% endblock %}
+        </div>
+    {% endblock %}
+
+    {% block mollie_subscription_component_address_form_phone_number %}
+        <div class="form-row">
+            {% block mollie_subscription_component_address_form_phone_number_config %}
+                {% if config('core.loginRegistration.showPhoneNumberField') %}
+
+                    {% block mollie_subscription_component_address_form_phone_number_col %}
+                        <div class="form-group col-6">
+                            {% block mollie_subscription_component_address_form_phone_number_label %}
+                                <label class="form-label" for="phoneNumber">
+                                    {{ "address.phoneNumberLabel"|trans|sw_sanitize }}
+                                </label>
+                            {% endblock %}
+
+                            {% block mollie_subscription_component_address_form_phone_number_input %}
+                                <input type="text"
+                                       class="form-control"
+                                       id="phoneNumber"
+                                       placeholder="{{ "address.phoneNumberPlaceholder"|trans|striptags }}"
+                                       name="address[phoneNumber]"
+                                       value="{{ data.get('phoneNumber') }}">
+                            {% endblock %}
+                        </div>
+                    {% endblock %}
+
+                {% endif %}
+            {% endblock %}
+        </div>
+    {% endblock %}
+
+    {% block mollie_subscription_component_address_form_street %}
+        <div class="form-row">
+
+            {% block mollie_subscription_component_address_form_street_col %}
+                <div class="form-group col-md-6">
+                    {% block mollie_subscription_component_address_form_street_label %}
+                        <label class="form-label" for="AddressStreet">
+                            {{ "address.streetLabel"|trans|sw_sanitize }}{{ "general.required"|trans|sw_sanitize }}
+                        </label>
+                    {% endblock %}
+
+                    {% block mollie_subscription_component_address_form_street_input %}
+                        <input type="text"
+                               class="form-control"
+                               id="AddressStreet"
+                               placeholder="{{ "address.streetPlaceholder"|trans|striptags }}"
+                               name="address[street]"
+                               value="{{ data.get('street') }}"
+                               required="required">
+                    {% endblock %}
+
+                </div>
+            {% endblock %}
+
+            {% set zipcodeField %}
+                {% block mollie_subscription_component_address_form_zip_code_label %}
+                    <label class="form-label" for="AddressZipcode">
+                        {{ "address.zipcodeLabel"|trans|sw_sanitize }}{{ "general.required"|trans|sw_sanitize }}
+                    </label>
+                {% endblock %}
+
+                {% block mollie_subscription_component_address_form_zip_code_input %}
+                    <input type="text"
+                           class="form-control"
+                           id="AddressZipcode"
+                           placeholder="{{ "address.zipcodePlaceholder"|trans|striptags }}"
+                           name="address[zipcode]"
+                           value="{{ data.get('zipcode') }}"
+                           required="required">
+                {% endblock %}
+
+            {% endset %}
+
+            {% set cityField %}
+                {% block mollie_subscription_component_address_form_city_label %}
+                    <label class="form-label" for="AddressCity">
+                        {{ "address.cityLabel"|trans|sw_sanitize }}{{ "general.required"|trans|sw_sanitize }}
+                    </label>
+                {% endblock %}
+
+                {% block mollie_subscription_component_address_form_city_input %}
+                    <input type="text"
+                           class="form-control"
+                           id="AddressCity"
+                           placeholder="{{ "address.cityPlaceholder"|trans|striptags }}"
+                           name="address[city]"
+                           value="{{ data.get('city') }}"
+                           required="required">
+                {% endblock %}
+            {% endset %}
+
+            {% block mollie_subscription_component_address_form_zip_code_position %}
+                {% if config('core.address.showZipcodeInFrontOfCity') %}
+                    {% block mollie_subscription_component_address_form_zip_code_in_front_of_city_zip_code %}
+                        <div class="form-group col-md-2 col-4">
+                            {{ zipcodeField }}
+                        </div>
+                    {% endblock %}
+
+                    {% block mollie_subscription_component_address_form_zip_code_in_front_of_city_city %}
+                        <div class="form-group col-md-4 col-8">
+                            {{ cityField }}
+                        </div>
+                    {% endblock %}
+                {% else %}
+                    {% block mollie_subscription_component_address_form_city_in_front_of_zip_code_city %}
+                        <div class="form-group col-md-4 col-8">
+                            {{ cityField }}
+                        </div>
+                    {% endblock %}
+
+                    {% block mollie_subscription_component_address_form_city_in_front_of_zip_code_zip_code %}
+                        <div class="form-group col-md-2 col-4">
+                            {{ zipcodeField }}
+                        </div>
+                    {% endblock %}
+                {% endif %}
+            {% endblock %}
+        </div>
+    {% endblock %}
+
+    {% block mollie_subscription_component_address_form_contry_state %}
+        <div class="form-row country-and-state-form-elements" data-country-state-select="true">
+
+            {% block mollie_subscription_component_address_form_country_col %}
+                <div class="form-group col-md-6">
+
+                    {% block mollie_subscription_component_address_form_country_id %}
+                        {% set initialCountryId = null %}
+
+                        {% if data.get('countryId') %}
+                            {% set initialCountryId = data.get('countryId') %}
+                        {% elseif page.countries|length == 1 %}
+                            {% set initialCountryId = (page.countries|first).id %}
+                        {% endif %}
+                    {% endblock %}
+
+                    {% block mollie_subscription_component_address_form_country_label %}
+                        <label class="form-label" for="AddressCountry">
+                            {{ "address.countryLabel"|trans|sw_sanitize }}{{ "general.required"|trans|sw_sanitize }}
+                        </label>
+                    {% endblock %}
+
+                    {% block mollie_subscription_component_address_form_country_select %}
+                        <select class="country-select custom-select"
+                                id="AddressCountry"
+                                name="address[countryId]"
+                                {% if editCountry == false %}disabled="disabled"{% endif %}
+                                required="required"
+                                data-initial-country-id="{{ initialCountryId }}">
+                            {% if not initialCountryId %}
+                                <option disabled="disabled" value="" selected="selected">
+                                    {{ "address.countryPlaceholder"|trans|sw_sanitize }}
+                                </option>
+                            {% endif %}
+
+                            {% for country in page.countries %}
+                                <option {% if country.id == initialCountryId %} selected="selected" {% endif %}
+                                        value="{{ country.id }}">
+                                    {{ country.translated.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    {% endblock %}
+                </div>
+            {% endblock %}
+
+            {% block mollie_subscription_component_address_form_country_state_col %}
+                <div class="form-group col-md-6 d-none">
+                    {% block mollie_subscription_component_address_form_country_state_label %}
+                        <label class="form-label" for="AddressCountry">
+                            {{ "address.countryStateLabel"|trans|sw_sanitize }}{{ "general.required"|trans|sw_sanitize }}
+                        </label>
+                    {% endblock %}
+
+                    {% block mollie_subscription_component_address_form_country_state_select %}
+                        <select class="country-state-select custom-select"
+                                disabled="disabled"
+                                id="AddressCountryState"
+                                name="address[countryStateId]"
+                                data-initial-country-state-id="{{ data.get('countryStateId') }}">
+                            <option value="" selected="selected" data-placeholder-option="true">
+                                {{ "address.countryStatePlaceholder"|trans|sw_sanitize }}
+                            </option>
+                        </select>
+                    {% endblock %}
+                </div>
+            {% endblock %}
+        </div>
+    {% endblock %}
+{% endblock %}

@@ -1,0 +1,513 @@
+{% block page_account_mollie_subscriptions_item_overview %}
+    <div class="order-wrapper">
+        <div class="order-item-header">
+            <div class="row flex-wrap">
+                {% block page_account_mollie_subscriptions_item_heading %}
+                    <h3 class="col-auto order-table-header-heading heading-mollie-subscriptions">
+                        {{ "molliePayments.subscriptions.account.mollieSubscriptionsHeadline"|trans|sw_sanitize }}
+                        {{ subscription.createdAt | format_date('short', locale=app.request.locale) }}
+                    </h3>
+                {% endblock %}
+
+                {% block page_account_mollie_subscriptions_item_status_col %}
+                    <div class="col-12 col-sm">
+                        {% block page_account_mollie_subscriptions_item_status %}
+                            <div class="order-table-header-order-status">
+                                {% block page_account_mollie_subscriptions_item_status_badge %}
+                                    <span class="badge badge-lg order-item-status-badge order-item-status-badge-{{ subscription.mollieStatus }}">
+                                            {{ subscription.mollieStatus }}
+                                        </span>
+                                {% endblock %}
+                            </div>
+                        {% endblock %}
+                    </div>
+                {% endblock %}
+
+                {% block page_account_subscriptions_item_context_menu_col %}
+                    <div class="col-1 order-table-header-context-menu-wrapper">
+
+                        {% block page_account_subscriptions_item_context_menu %}
+
+                            {% block page_account_subscriptions_item_context_menu_button %}
+                                <button class="btn dropdown-toggle order-table-header-context-menu"
+                                        type="button"
+                                        id="accountOrderDropdown"
+                                        data-toggle="dropdown"
+                                        aria-haspopup="true"
+                                        aria-expanded="false">
+                                    {% sw_icon 'more-horizontal' %}
+                                </button>
+                            {% endblock %}
+
+                            {% block page_account_subscriptions_item_context_menu_content %}
+                                <div class="dropdown-menu dropdown-menu-right order-table-header-context-menu-content"
+                                aria-labelledby="accountOrderDropdown">
+
+                                {% block page_account_subscriptions_item_context_menu_reorder %}
+                                    {% set action %}
+                                        {% block page_account_subscriptions_item_context_menu_reorder_form_action %}
+                                            {{ path('frontend.checkout.line-item.add') }}
+                                        {% endblock %}
+                                    {% endset %}
+
+                                    {% block page_account_subscriptions_item_context_menu_reorder_form %}
+                                        <form action="{{ action }}"
+                                              id="subscriptionsDetailForm-{{ subscriptions.Id }}"
+                                              method="post"
+                                              class="order-table-header-context-menu-content-form"
+                                              data-add-to-cart="true">
+
+                                            {% block page_account_subscriptions_item_context_menu_reorder_form_csrf %}
+                                                {{ sw_csrf('frontend.checkout.line-item.add') }}
+                                            {% endblock %}
+
+                                            {% block page_account_subscriptions_item_context_menu_reorder_form_redirect %}
+                                                <input type="hidden" name="redirectTo" value="frontend.cart.offcanvas"/>
+                                            {% endblock %}
+
+                                            {% block page_account_subscriptions_item_context_menu_reorder_form_line_items_input %}
+                                                {% block page_account_subscriptions_item_context_menu_reorder_form_line_item_input %}
+                                                    <input type="hidden"
+                                                           name="lineItems[{{ subscription.productId }}][id]"
+                                                           value="{{ subscription.productId }}">
+                                                    <input type="hidden"
+                                                           name="lineItems[{{ subscription.productId }}][referencedId]"
+                                                           value="{{ subscription.productId }}">
+                                                    <input type="hidden"
+                                                           name="lineItems[{{ subscription.productId }}][type]"
+                                                           value="product">
+                                                    <input type="hidden"
+                                                           name="lineItems[{{ subscription.productId }}][stackable]"
+                                                           value="1">
+                                                    <input type="hidden"
+                                                           name="lineItems[{{ subscription.productId }}][removable]"
+                                                           value="1">
+                                                    <input type="hidden"
+                                                           name="lineItems[{{ subscription.productId }}][quantity]"
+                                                           value="1">
+                                                {% endblock %}
+                                            {% endblock %}
+
+                                            {% block page_account_subscriptions_item_context_menu_reorder_form_button %}
+                                                <button class="order-table-header-context-menu-content-link"
+                                                        type="submit">{{ "molliePayments.subscriptions.account.mollieSubscriptionContextMenuReorder"|trans|sw_sanitize }}</button>
+                                            {% endblock %}
+                                        </form>
+                                    {% endblock %}
+                                {% endblock %}
+
+                                {% block page_account_subscriptions_item_context_menu_update_payment %}
+                                    {% if(subscription.isActive) %}
+                                        {% block page_account_subscriptions_item_context_menu_update_payment_form %}
+                                            <form action="{{ path('frontend.account.mollie.subscriptions.payment.update', { 'subscriptionId': subscription.id }) }}"
+                                                  method="post"
+                                                  class="order-table-header-context-menu-content-form">
+                                                {% block page_account_subscriptions_item_context_menu_update_payment_form_csrf %}
+                                                    {{ sw_csrf('frontend.account.mollie.subscriptions.payment.update') }}
+                                                {% endblock %}
+                                                {% block page_account_subscriptions_item_context_menu_update_payment_form_button %}
+                                                    <button class="order-table-header-context-menu-content-link"
+                                                            type="submit">Update Payment
+                                                    </button>
+                                                {% endblock %}
+                                            </form>
+                                        {% endblock %}
+                                    {% endif %}
+                                {% endblock %}
+
+                                {% block page_account_subscriptions_item_context_menu_cancel %}
+                                    {% set cancelAction %}
+                                        {% block page_account_subscriptions_item_context_menu_cancel_form_action %}
+                                            {{ path('frontend.account.mollie.subscriptions.cancel',
+                                                {
+                                                    'subscriptionId': subscription.id,
+                                                }
+                                            ) }}
+                                        {% endblock %}
+                                    {% endset %}
+
+                                    {% if(subscription.isActive) %}
+                                        {% block page_account_subscriptions_item_context_menu_cancel_form %}
+                                            <form action="{{ cancelAction }}"
+                                                  id="subscriptionsDetailForm-{{ subscriptions.Id }}" method="post">
+
+                                                {% block page_account_subscriptions_item_context_menu_cancel_form_csrf %}
+                                                    {{ sw_csrf('frontend.account.mollie.subscriptions.cancel') }}
+                                                {% endblock %}
+
+                                                {% block page_account_subscriptions_item_context_menu_cancel_form_line_items_input %}
+                                                    {% block page_account_subscriptions_item_context_menu_cancel_form_line_item_input %}
+                                                        <input type="hidden"
+                                                               name="mollie[subscription_id]"
+                                                               value="{{ subscription.subscriptionId }}">
+                                                        <input type="hidden"
+                                                               name="mollie[customer_id]"
+                                                               value="{{ subscription.mollieCustomerId }}">
+                                                    {% endblock %}
+                                                {% endblock %}
+
+                                                {% block page_account_mollie_subscriptions_item_order_table_body_cell_toggle_subscription_details_button %}
+                                                    <button class="order-table-header-context-menu-content-link btn-mollie-subscription-cancel"
+                                                            type="submit">{{ "molliePayments.subscriptions.account.mollieSubscriptionCancel"|trans|sw_sanitize }}</button>
+                                                {% endblock %}
+                                            </form>
+                                        {% endblock %}
+                                    {% endif %}
+                                {% endblock %}
+                            {% endblock %}
+                            </div>
+                        {% endblock %}
+                    </div>
+                {% endblock %}
+
+                {% block page_account_mollie_subscriptions_item_description_col %}
+
+                    {% block page_account_mollie_subscriptions_order_table_header_description_col %}
+                        <div class="col-12 order-table-header-description mb-2">
+                            {% block page_account_mollie_subscriptions_item_description %}
+                                <span class="order-table-body-value d-block">{{ subscription.description }}</span>
+                            {% endblock %}
+                            {% block page_account_mollie_subscriptions_item_price %}
+                                <span class="order-table-body-value d-block">{{ "molliePayments.subscriptions.account.mollieSubscriptionAmount"|trans|sw_sanitize }}: {{ subscription.amount|currency(currencyIsoCode) }}</span>
+                            {% endblock %}
+                            {% block page_account_mollie_subscriptions_item_next_payment %}
+                                <span class="order-table-body-value d-block">{{ "molliePayments.subscriptions.account.mollieSubscriptionNextPayment"|trans|sw_sanitize }} {{ subscription.nextPaymentAt| format_date('short', locale=app.request.locale) }}</span>
+                            {% endblock %}
+                            {% block page_account_mollie_subscriptions_item_cancel_until %}
+                                <span class="order-table-body-value d-block">{{ "molliePayments.subscriptions.account.mollieSubscriptionCancelUntil"|trans|sw_sanitize }} {{ subscription.cancelUntil| format_date('short', locale=app.request.locale) }}</span>
+                            {% endblock %}
+                        </div>
+                    {% endblock %}
+
+                    {% block page_account_mollie_subscriptions_order_table_toggle_button %}
+                        <div class="col-12 subscription-toggle-button-wrapper">
+                            <button class="btn btn-light btn-sm subscription-hide-btn collapsed"
+                                    type="submit"
+                                    data-toggle="collapse"
+                                    data-target="#subscription{{ subscription.id }}"
+                                    aria-expanded="false"
+                                    aria-controls="collapseExample">
+                                {% block page_account_subscription_item_subscription_table_body_cell_toggle_subscription_details_button_text %}
+                                    <span class="subscription-hide-btn-text">{{ "molliePayments.subscriptions.account.orderActionHide"|trans|sw_sanitize }}</span>
+                                    <span class="subscription-view-btn-text">{{ "molliePayments.subscriptions.account.orderActionView"|trans|sw_sanitize }}</span>
+                                {% endblock %}
+                            </button>
+                        </div>
+                    {% endblock %}
+
+                    {% block page_account_mollie_subscriptions_item_detail %}
+                        <div class="col-12 subscription-item-detail">
+                            {% block page_account_mollie_subscriptions_item_detail_collapse %}
+                                <div class="collapse" id="subscription{{ subscription.id }}">
+                                    {% block page_account_mollie_subscriptions_item_detail_content %}
+                                        <div class="subscription-detail-content">
+
+                                            <div class="row">
+                                                {#
+                                                # ==========================================================================================================================
+                                                # ==========================================================================================================================
+                                                # BILLING ADDRESS
+                                                # ==========================================================================================================================
+                                                # ==========================================================================================================================
+                                                #}
+                                                {% block page_account_mollie_subscriptions_item_detail_content_billing_address_col %}
+                                                    <div class="col-lg-6 card-col">
+
+                                                        {% block page_account_mollie_subscriptions_item_detail_content_billing_address_card %}
+                                                            <div class="card">
+                                                                {% block page_account_mollie_subscriptions_item_detail_content_billing_address_card_body %}
+                                                                    <div class="card-body">
+                                                                        {% block page_account_mollie_subscriptions_item_detail_content_billing_address_card_title %}
+                                                                            <h2 class="card-title">
+                                                                                {{ "molliePayments.subscriptions.account.headlineBillingAddress" | trans | sw_sanitize }}
+                                                                            </h2>
+                                                                        {% endblock %}
+
+                                                                        {% block page_account_mollie_subscriptions_item_detail_content_billing_address_include %}
+                                                                            <div class="address">
+                                                                                {% sw_include '@Storefront/storefront/page/account/subscriptions/address/address.html.twig' with {'address': subscription.billingAddress} %}
+                                                                            </div>
+                                                                        {% endblock %}
+
+                                                                        {% block page_account_mollie_subscriptions_item_detail_content_billing_address_card_actions %}
+                                                                            <div class="card-actions">
+
+                                                                                {% block page_account_mollie_subscriptions_item_detail_content_billing_address_button %}
+                                                                                    {% if page.allowAddressEditing %}
+                                                                                        <button type="button"
+                                                                                                class="btn btn-primary"
+                                                                                                data-toggle="modal"
+                                                                                                data-target="#editBillingAddress{{ subscription.id }}">
+                                                                                            {{ "molliePayments.subscriptions.account.btnEditBillingAddress" | trans | sw_sanitize }}
+                                                                                        </button>
+                                                                                    {% endif %}
+                                                                                {% endblock %}
+                                                                            </div>
+                                                                        {% endblock %}
+                                                                    </div>
+                                                                {% endblock %}
+                                                            </div>
+                                                        {% endblock %}
+
+                                                        {% block page_account_mollie_subscriptions_item_detail_content_billing_address_modal %}
+                                                            <div class="modal fade subscription-edit-billing-address-modal"
+                                                                 id="editBillingAddress{{ subscription.id }}"
+                                                                 tabindex="-1" role="dialog"
+                                                                 aria-labelledby="editBillingAddressLabel{{ subscription.id }}"
+                                                                 aria-hidden="true">
+
+                                                                {% block page_account_mollie_subscriptions_item_detail_content_billing_address_modal_dialog %}
+                                                                    <div class="modal-dialog" role="document">
+                                                                        {% block page_account_mollie_subscriptions_item_detail_content_billing_address_modal_content %}
+                                                                            <div class="modal-content">
+                                                                                {% block page_account_mollie_subscriptions_item_detail_content_billing_address_modal_header %}
+                                                                                    <div class="modal-header">
+
+                                                                                    {% block page_account_mollie_subscriptions_item_detail_content_billing_address_modal_title %}
+                                                                                        <h5 class="modal-title"
+                                                                                            id="editBillingAddressLabel{{ subscription.id }}">
+                                                                                            {{ "molliePayments.subscriptions.account.btnEditBillingAddress" | trans | sw_sanitize }}
+                                                                                        </h5>
+                                                                                    {% endblock %}
+
+                                                                                    {% block page_account_mollie_subscriptions_item_detail_content_billing_address_modal_button %}
+                                                                                        <button type="button"
+                                                                                                class="close"
+                                                                                                data-dismiss="modal"
+                                                                                                aria-label="Close">
+                                                                                            <span aria-hidden="true">&times;</span>
+                                                                                        </button>
+                                                                                        </div>
+                                                                                    {% endblock %}
+                                                                                {% endblock %}
+
+                                                                                {% block page_account_mollie_subscriptions_item_detail_content_billing_address_modal_body %}
+                                                                                    <div class="modal-body">
+
+                                                                                        {% block component_address_subscription_billing_address_wrapper %}
+                                                                                            <div class="card address-editor-create-address-wrapper">
+                                                                                                {% set formAjaxSubmitOptions = {} %}
+
+                                                                                                {% block component_address_subscription_billing_address_card_body %}
+                                                                                                    <div class="card-body">
+                                                                                                        {% block component_address_subscription_billing_address_form %}
+                                                                                                            <form method="post"
+                                                                                                                  action="{{ path('frontend.account.mollie.subscriptions.billing.update',
+                                                                                                                      {
+                                                                                                                          'subscriptionId': subscription.id,
+                                                                                                                      }
+                                                                                                                  ) }}">
+
+                                                                                                                {% block component_address_subscription_billing_address_form_csrf %}
+                                                                                                                    {{ sw_csrf('frontend.account.mollie.subscriptions.billing.update') }}
+                                                                                                                {% endblock %}
+
+                                                                                                                {% block component_address_subscription_billing_address_form_hidden_inputs %}
+                                                                                                                {% endblock %}
+
+                                                                                                                {% block component_address_subscription_billing_address_form_fields_include %}
+                                                                                                                    {% sw_include '@Storefront/storefront/page/account/subscriptions/address/address-form.html.twig' with {
+                                                                                                                        'data': subscription.billingAddress,
+                                                                                                                        'scope': 'parent',
+                                                                                                                        'parentSelector': 'form',
+                                                                                                                        'editCountry' : false,
+                                                                                                                    } %}
+                                                                                                                {% endblock %}
+
+                                                                                                                {% block component_address_subscription_billing_address_required_hint %}
+                                                                                                                    <p class="address-required-info required-fields">
+                                                                                                                        {% block component_address_subscription_billing_address_required_hint_text %}
+                                                                                                                            {{ "general.requiredFields"|trans|sw_sanitize }}
+                                                                                                                        {% endblock %}
+                                                                                                                    </p>
+                                                                                                                {% endblock %}
+
+                                                                                                                {% block component_address_subscription_billing_address_form_actions %}
+                                                                                                                    <div class="address-form-actions">
+                                                                                                                        {% block component_address_subscription_billing_address_form_actions_submit %}
+                                                                                                                            <button type="submit"
+                                                                                                                                    class="address-form-submit btn btn-primary"
+                                                                                                                                    title="{{ "account.addressSaveChange"|trans|striptags }}">
+                                                                                                                                {% block component_address_subscription_billing_address_form_actions_submit_text %}
+                                                                                                                                    {{ "account.addressSaveChange"|trans|sw_sanitize }}
+                                                                                                                                {% endblock %}
+                                                                                                                            </button>
+                                                                                                                        {% endblock %}
+                                                                                                                    </div>
+                                                                                                                {% endblock %}
+                                                                                                            </form>
+                                                                                                        {% endblock %}
+                                                                                                    </div>
+                                                                                                {% endblock %}
+                                                                                            </div>
+                                                                                        {% endblock %}
+                                                                                    </div>
+                                                                                {% endblock %}
+                                                                            </div>
+                                                                        {% endblock %}
+                                                                    </div>
+                                                                {% endblock %}
+                                                            </div>
+                                                        {% endblock %}
+                                                    </div>
+                                                {% endblock %}
+
+                                                {#
+                                                # ==========================================================================================================================
+                                                # ==========================================================================================================================
+                                                # SHIPPING ADDRESS
+                                                # ==========================================================================================================================
+                                                # ==========================================================================================================================
+                                                #}
+                                                {% block page_account_mollie_subscriptions_item_detail_content_shipping_address_col %}
+                                                    <div class="col-lg-6 card-col">
+                                                        {% block page_account_mollie_subscriptions_item_detail_content_shipping_address_card %}
+                                                            <div class="card">
+                                                                {% block page_account_mollie_subscriptions_item_detail_content_shipping_address_card_body %}
+                                                                    <div class="card-body">
+                                                                        {% block page_account_mollie_subscriptions_item_detail_content_shipping_address_card_title %}
+                                                                            <h2 class="card-title">
+                                                                                {{ "molliePayments.subscriptions.account.headlineShippingAddress" | trans | sw_sanitize }}
+                                                                            </h2>
+                                                                        {% endblock %}
+
+                                                                        {% block page_account_mollie_subscriptions_item_detail_content_shipping_address_include %}
+                                                                            <div class="address">
+                                                                                {% if subscription.shippingAddress %}
+                                                                                    {% sw_include '@Storefront/storefront/page/account/subscriptions/address/address.html.twig' with {'address': subscription.shippingAddress} %}
+                                                                                {% else %}
+                                                                                    {{ "molliePayments.subscriptions.account.shippingEqualToBilling" | trans | sw_sanitize }}
+                                                                                {% endif %}
+                                                                            </div>
+                                                                        {% endblock %}
+
+                                                                        {% block page_account_mollie_subscriptions_item_detail_content_shipping_address_card_actions %}
+                                                                            <div class="card-actions">
+                                                                                {% if page.allowAddressEditing %}
+                                                                                    <button type="button"
+                                                                                            class="btn btn-primary"
+                                                                                            data-toggle="modal"
+                                                                                            data-target="#editShippingAddress{{ subscription.id }}">
+                                                                                        {{ "molliePayments.subscriptions.account.btnEditShippingAddress" | trans | sw_sanitize }}
+                                                                                    </button>
+                                                                                {% endif %}
+                                                                            </div>
+                                                                        {% endblock %}
+                                                                    </div>
+                                                                {% endblock %}
+                                                            </div>
+                                                        {% endblock %}
+
+                                                        {% block page_account_mollie_subscriptions_item_detail_content_shipping_address_modal %}
+                                                            <div class="modal fade subscription-edit-shipping-address-modal"
+                                                                 id="editShippingAddress{{ subscription.id }}"
+                                                                 tabindex="-1" role="dialog"
+                                                                 aria-labelledby="editShippingAddressLabel{{ subscription.id }}"
+                                                                 aria-hidden="true">
+
+                                                                {% block page_account_mollie_subscriptions_item_detail_content_shipping_address_modal_dialog %}
+                                                                    <div class="modal-dialog" role="document">
+                                                                        {% block page_account_mollie_subscriptions_item_detail_content_shipping_address_modal_content %}
+                                                                            <div class="modal-content">
+                                                                                {% block page_account_mollie_subscriptions_item_detail_content_shipping_address_modal_header %}
+                                                                                    <div class="modal-header">
+                                                                                        {% block page_account_mollie_subscriptions_item_detail_content_shipping_address_modal_title %}
+                                                                                            <h5 class="modal-title"
+                                                                                                id="editShippingAddressLabel{{ subscription.id }}">
+                                                                                                {{ "molliePayments.subscriptions.account.btnEditShippingAddress" | trans | sw_sanitize }}
+                                                                                            </h5>
+                                                                                        {% endblock %}
+
+                                                                                        {% block page_account_mollie_subscriptions_item_detail_content_shipping_address_modal_button %}
+                                                                                            <button type="button"
+                                                                                                    class="close"
+                                                                                                    data-dismiss="modal"
+                                                                                                    aria-label="Close">
+                                                                                                <span aria-hidden="true">&times;</span>
+                                                                                            </button>
+                                                                                        {% endblock %}
+                                                                                    </div>
+                                                                                {% endblock %}
+
+                                                                                {% block page_account_mollie_subscriptions_item_detail_content_shipping_address_modal_body %}
+                                                                                    <div class="modal-body">
+
+                                                                                        {% block component_address_subscription_shipping_address_wrapper %}
+                                                                                            <div class="card address-editor-create-address-wrapper">
+                                                                                                {% set formAjaxSubmitOptions = {} %}
+
+                                                                                                {% block component_address_subscription_shipping_address_card_body %}
+                                                                                                    <div class="card-body">
+                                                                                                        {% block component_address_subscription_shipping_address_form %}
+                                                                                                            <form method="post"
+                                                                                                                  action="{{ path('frontend.account.mollie.subscriptions.shipping.update',
+                                                                                                                      {
+                                                                                                                          'subscriptionId': subscription.id,
+                                                                                                                      }
+                                                                                                                  ) }}">
+
+                                                                                                                {% block component_address_subscription_shipping_address_form_csrf %}
+                                                                                                                    {{ sw_csrf('frontend.account.mollie.subscriptions.shipping.update') }}
+                                                                                                                {% endblock %}
+
+                                                                                                                {% block component_address_subscription_shipping_address_form_hidden_inputs %}
+                                                                                                                {% endblock %}
+
+                                                                                                                {% block component_address_subscription_shipping_address_form_fields_include %}
+                                                                                                                    {% sw_include '@Storefront/storefront/page/account/subscriptions/address/address-form.html.twig' with {
+                                                                                                                        'data': subscription.shippingAddress,
+                                                                                                                        'scope': 'parent',
+                                                                                                                        'parentSelector': 'form',
+                                                                                                                        'editCountry' : false,
+                                                                                                                    } %}
+                                                                                                                {% endblock %}
+
+                                                                                                                {% block component_address_subscription_shipping_address_required_hint %}
+                                                                                                                    <p class="address-required-info required-fields">
+                                                                                                                        {% block component_address_subscription_shipping_address_required_hint_text %}
+                                                                                                                            {{ "general.requiredFields"|trans|sw_sanitize }}
+                                                                                                                        {% endblock %}
+                                                                                                                    </p>
+                                                                                                                {% endblock %}
+
+                                                                                                                {% block component_address_subscription_shipping_address_form_actions %}
+                                                                                                                    <div class="address-form-actions">
+                                                                                                                        {% block component_address_subscription_shipping_address_form_actions_submit %}
+                                                                                                                            <button type="submit"
+                                                                                                                                    class="address-form-submit btn btn-primary"
+                                                                                                                                    title="{{ "account.addressSaveChange"|trans|striptags }}">
+                                                                                                                                {% block component_address_subscription_shipping_address_form_actions_submit_text %}
+                                                                                                                                    {{ "account.addressSaveChange"|trans|sw_sanitize }}
+                                                                                                                                {% endblock %}
+                                                                                                                            </button>
+                                                                                                                        {% endblock %}
+                                                                                                                    </div>
+                                                                                                                {% endblock %}
+                                                                                                            </form>
+                                                                                                        {% endblock %}
+                                                                                                    </div>
+                                                                                                {% endblock %}
+                                                                                            </div>
+                                                                                        {% endblock %}
+                                                                                    </div>
+                                                                                {% endblock %}
+                                                                            </div>
+                                                                        {% endblock %}
+                                                                    </div>
+                                                                {% endblock %}
+                                                            </div>
+                                                        {% endblock %}
+                                                    </div>
+                                                {% endblock %}
+                                            </div>
+                                        </div>
+                                    {% endblock %}
+                                </div>
+                            {% endblock %}
+                        </div>
+                    {% endblock %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

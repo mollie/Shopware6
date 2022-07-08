@@ -13,12 +13,18 @@ help:
 # ------------------------------------------------------------------------------------------------------------
 
 install: ## Installs all production dependencies
+	# do not switch to production composer PROD, otherwise it would
+	# also install shopware in here -> we just need it for the release composer.json file
+	# so just switch to our dev dependency variant
+	php switch-composer.php dev
+	# ----------------------------------------------------------------
 	@composer validate
 	@composer install --no-dev
 	cd src/Resources/app/administration && npm install --production
 	cd src/Resources/app/storefront && npm install --production
 
 dev: ## Installs all dev dependencies
+	php switch-composer.php dev
 	@composer validate
 	@composer install
 	cd src/Resources/app/administration && npm install
@@ -59,7 +65,7 @@ phpunit: ## Starts all PHPUnit Tests
 	@XDEBUG_MODE=coverage php vendor/bin/phpunit --configuration=phpunit.xml --coverage-html ../../../public/.reports/mollie/coverage
 
 infection: ## Starts all Infection/Mutation tests
-	@XDEBUG_MODE=coverage php vendor/bin/infection --configuration=./.infection.json
+	@XDEBUG_MODE=coverage php vendor/bin/infection --configuration=./.infection.json --log-verbosity=all --debug
 
 insights: ## Starts the PHPInsights Analyser
 	@php vendor/bin/phpinsights analyse --no-interaction
@@ -90,5 +96,6 @@ pr: ## Prepares everything for a Pull Request
 	@make stylelint -B
 
 release: ## Creates a new ZIP package
+	php switch-composer.php prod
 	@cd .. && rm -rf MolliePayments-$(PLUGIN_VERSION).zip
 	@cd .. && zip -qq -r -0 MolliePayments-$(PLUGIN_VERSION).zip MolliePayments/ -x '*.editorconfig' '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*' '*/makefile' '*.DS_Store' '*/phpunit.xml' '*/.infection.json' '*/phpunit.autoload.php' '*/.phpstan*' '*/.php_cs.php' '*/phpinsights.php'

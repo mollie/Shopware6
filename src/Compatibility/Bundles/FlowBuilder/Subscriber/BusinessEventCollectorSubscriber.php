@@ -4,6 +4,11 @@ namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Subscriber;
 
 
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund\RefundStartedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionCancelledEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionEndedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionRemindedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionRenewedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionStartedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookReceivedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedAuthorizedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedCancelledEvent;
@@ -15,6 +20,7 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatus
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedPartialRefundedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedPendingEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedRefundedEvent;
+use Kiener\MolliePayments\Components\Subscription\BusinessEvent\RenewalReminderEvent;
 use Shopware\Core\Framework\Event\BusinessEventCollector;
 use Shopware\Core\Framework\Event\BusinessEventCollectorEvent;
 use Shopware\Core\Framework\Event\BusinessEventDefinition;
@@ -56,54 +62,34 @@ class BusinessEventCollectorSubscriber implements EventSubscriberInterface
     {
         $collection = $event->getCollection();
 
-        /** @var BusinessEventDefinition $definition */
-        $definition = $this->businessEventCollector->define(WebhookReceivedEvent::class);
-        $collection->set($definition->getName(), $definition);
+        $events = [
+            WebhookReceivedEvent::class,
+            # --------------------------------------------
+            WebhookReceivedPaidEvent::class,
+            WebhookReceivedFailedEvent::class,
+            WebhookReceivedExpiredEvent::class,
+            WebhookReceivedCancelledEvent::class,
+            WebhookReceivedPendingEvent::class,
+            WebhookReceivedCompletedEvent::class,
+            WebhookReceivedAuthorizedEvent::class,
+            WebhookReceivedChargebackEvent::class,
+            WebhookReceivedRefundedEvent::class,
+            WebhookReceivedPartialRefundedEvent::class,
+            # --------------------------------------------
+            RefundStartedEvent::class,
+            # --------------------------------------------
+            SubscriptionStartedEvent::class,
+            SubscriptionEndedEvent::class,
+            SubscriptionCancelledEvent::class,
+            SubscriptionRemindedEvent::class,
+            SubscriptionRenewedEvent::class,
+        ];
 
-        /** @var BusinessEventDefinition $definition */
-        $definition = $this->businessEventCollector->define(WebhookReceivedPaidEvent::class);
-        $collection->set($definition->getName(), $definition);
-
-        /** @var BusinessEventDefinition $definition */
-        $definition = $this->businessEventCollector->define(WebhookReceivedFailedEvent::class);
-        $collection->set($definition->getName(), $definition);
-
-        /** @var BusinessEventDefinition $definition */
-        $definition = $this->businessEventCollector->define(WebhookReceivedExpiredEvent::class);
-        $collection->set($definition->getName(), $definition);
-
-        /** @var BusinessEventDefinition $definition */
-        $definition = $this->businessEventCollector->define(WebhookReceivedCancelledEvent::class);
-        $collection->set($definition->getName(), $definition);
-
-        /** @var BusinessEventDefinition $definition */
-        $definition = $this->businessEventCollector->define(WebhookReceivedPendingEvent::class);
-        $collection->set($definition->getName(), $definition);
-
-        /** @var BusinessEventDefinition $definition */
-        $definition = $this->businessEventCollector->define(WebhookReceivedCompletedEvent::class);
-        $collection->set($definition->getName(), $definition);
-
-        /** @var BusinessEventDefinition $definition */
-        $definition = $this->businessEventCollector->define(WebhookReceivedAuthorizedEvent::class);
-        $collection->set($definition->getName(), $definition);
-
-        /** @var BusinessEventDefinition $definition */
-        $definition = $this->businessEventCollector->define(WebhookReceivedChargebackEvent::class);
-        $collection->set($definition->getName(), $definition);
-
-        /** @var BusinessEventDefinition $definition */
-        $definition = $this->businessEventCollector->define(RefundStartedEvent::class);
-        $collection->set($definition->getName(), $definition);
-
-        /** @var BusinessEventDefinition $definition */
-        $definition = $this->businessEventCollector->define(WebhookReceivedRefundedEvent::class);
-        $collection->set($definition->getName(), $definition);
-
-        /** @var BusinessEventDefinition $definition */
-        $definition = $this->businessEventCollector->define(WebhookReceivedPartialRefundedEvent::class);
-        $collection->set($definition->getName(), $definition);
-
+        foreach ($events as $event) {
+            /** @var BusinessEventDefinition $definition */
+            $definition = $this->businessEventCollector->define($event);
+            $collection->set($definition->getName(), $definition);
+        }
     }
 
 }
