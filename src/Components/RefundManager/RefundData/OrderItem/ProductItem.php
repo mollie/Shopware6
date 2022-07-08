@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem;
 
+use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 
 class ProductItem extends AbstractItem
@@ -68,7 +69,8 @@ class ProductItem extends AbstractItem
      */
     public function toArray(): array
     {
-        $resetStock = $this->lineItem->getCustomFields()['mollie_payments_stock']['reset_stock_quantity'] ?? 0;
+        $lineItemAttributes = new OrderLineItemEntityAttributes($this->lineItem);
+        $resetStockQuantity = $lineItemAttributes->getResetStockQuantity();
 
         return $this->buildArray(
             $this->lineItem->getId(),
@@ -82,7 +84,7 @@ class ProductItem extends AbstractItem
             $this->promotionDiscount,
             $this->promotionAffectedQuantity,
             $this->alreadyRefundedQty,
-            $resetStock
+            $resetStockQuantity
         );
     }
 

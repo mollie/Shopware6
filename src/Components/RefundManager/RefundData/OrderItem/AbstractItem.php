@@ -17,10 +17,10 @@ abstract class AbstractItem
      * @param float $promotionDiscount
      * @param int $promotionAffectedQty
      * @param int $refundedQty
-     * @param int $resetStock
+     * @param int $resetStockQuantity
      * @return array<mixed>
      */
-    protected function buildArray(string $id, string $label, string $referenceNumber, bool $isPromotion, bool $isDelivery, float $unitPrice, int $quantity, float $totalPrice, float $promotionDiscount, int $promotionAffectedQty, int $refundedQty, int $resetStock): array
+    protected function buildArray(string $id, string $label, string $referenceNumber, bool $isPromotion, bool $isDelivery, float $unitPrice, int $quantity, float $totalPrice, float $promotionDiscount, int $promotionAffectedQty, int $refundedQty, int $resetStockQuantity): array
     {
         return [
             'refunded' => $refundedQty,
@@ -38,7 +38,7 @@ abstract class AbstractItem
                 ],
                 'isPromotion' => $isPromotion,
                 'isDelivery' => $isDelivery,
-                'resetStock' => $resetStock
+                'resetStockQuantity' => $resetStockQuantity
             ],
         ];
     }

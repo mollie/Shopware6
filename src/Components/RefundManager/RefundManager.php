@@ -249,17 +249,19 @@ class RefundManager implements RefundManagerInterface
             }
             # also add reset stock to order line item, so we can retrieve it through API
             # multiple refunds for a single line item are possible, so if previous reset stock exists, increase it
-            $alreadyResetStock = $orderItem->getCustomFields()['mollie_payments_stock']['reset_stock_quantity'] ?? 0;
-            $this->orderLineItemRepository->update([
-                [
-                    'id' => $orderItem->getId(),
-                    'customFields' => [
-                        'mollie_payments_stock' => [
-                            'reset_stock_quantity' => $alreadyResetStock + $item->getStockIncreaseQty()
-                        ]
-                    ]
-                ],
-            ], $context);
+            $lineItemAttributes = new OrderLineItemEntityAttributes($orderItem);
+            $alreadyResetStock = $lineItemAttributes->getResetStockQuantity() ?? 0;
+
+            #todo: The mollieOrderLineID always gets removed when upserting/updating the repository, for now update the array
+            $customFields = $orderItem->getCustomFields();
+            $customFields['mollie_payments']['reset_stock_quantity'] = $alreadyResetStock + $item->getStockIncreaseQty();
+
+            $data = [
+                'id' => $orderItem->getId(),
+                'customFields' => $customFields
+            ];
+
+            $this->orderLineItemRepository->upsert([$data], $context);
         }
 
         return $refund;
