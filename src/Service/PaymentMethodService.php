@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Handler\Method\BanContactPayment;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Kiener\MolliePayments\Handler\Method\BelfiusPayment;
 use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
+use Kiener\MolliePayments\Handler\Method\DirectDebitPayment;
 use Kiener\MolliePayments\Handler\Method\EpsPayment;
 use Kiener\MolliePayments\Handler\Method\GiftCardPayment;
 use Kiener\MolliePayments\Handler\Method\GiroPayPayment;
@@ -375,7 +376,7 @@ class PaymentMethodService
             BankTransferPayment::class,
             BelfiusPayment::class,
             CreditCardPayment::class,
-            // DirectDebitPayment::class,   // Is removed for now because it's only used for recurring
+            DirectDebitPayment::class,
             EpsPayment::class,
             GiftCardPayment::class,
             GiroPayPayment::class,

@@ -58,7 +58,6 @@ class DirectDebitOrderBuilderTest extends AbstractMollieOrderBuilder
             'orderNumber' => $orderNumber,
             'payment' => [
                 'webhookUrl' => $redirectWebhookUrl,
-                'consumerName' => sprintf('%s %s', $firstName, $lastName)
             ],
             'redirectUrl' => $redirectWebhookUrl,
             'webhookUrl' => $redirectWebhookUrl,

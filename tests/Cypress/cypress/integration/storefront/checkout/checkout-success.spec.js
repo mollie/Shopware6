@@ -29,7 +29,7 @@ const mollieGiftCards = new GiftCardsScreenAction();
 const molliePaymentMethods = new PaymentMethodsScreenAction();
 
 
-const scenarioDummyBasket = new DummyBasketScenario(3);
+const scenarioDummyBasket = new DummyBasketScenario(2);
 
 
 const device = devices.getFirstDevice();
@@ -47,8 +47,9 @@ const payments = [
     {caseId: 'C5411', key: 'mistercash', name: 'Bancontact'},
     {caseId: 'C5412', key: 'przelewy24', name: 'Przelewy24'},
     {caseId: 'C5413', key: 'kbc', name: 'KBC'},
-    {caseId: 'C5414', key: 'belfius', name: 'Belfius'},
     {caseId: 'C5415', key: 'banktransfer', name: 'Banktransfer'},
+    {caseId: 'C6965', key: 'directdebit', name: 'SEPA Direct Debit'},
+    {caseId: 'C5414', key: 'belfius', name: 'Belfius'},
     {caseId: 'C5860', key: 'giftcard', name: 'Gift cards'},
     {caseId: 'C6924', key: 'voucher', name: 'Voucher'},
     // unfortunately address and product prices need to match, so we cannot do in3 automatically for now

@@ -3,7 +3,25 @@
 namespace Kiener\MolliePayments\Tests\Service;
 
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
+use Kiener\MolliePayments\Handler\Method\BanContactPayment;
+use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
+use Kiener\MolliePayments\Handler\Method\BelfiusPayment;
+use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
+use Kiener\MolliePayments\Handler\Method\DirectDebitPayment;
+use Kiener\MolliePayments\Handler\Method\EpsPayment;
+use Kiener\MolliePayments\Handler\Method\GiftCardPayment;
+use Kiener\MolliePayments\Handler\Method\GiroPayPayment;
 use Kiener\MolliePayments\Handler\Method\iDealPayment;
+use Kiener\MolliePayments\Handler\Method\In3Payment;
+use Kiener\MolliePayments\Handler\Method\KbcPayment;
+use Kiener\MolliePayments\Handler\Method\KlarnaPayLaterPayment;
+use Kiener\MolliePayments\Handler\Method\KlarnaPayNowPayment;
+use Kiener\MolliePayments\Handler\Method\KlarnaSliceItPayment;
+use Kiener\MolliePayments\Handler\Method\PayPalPayment;
+use Kiener\MolliePayments\Handler\Method\PaySafeCardPayment;
+use Kiener\MolliePayments\Handler\Method\Przelewy24Payment;
+use Kiener\MolliePayments\Handler\Method\SofortPayment;
+use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Kiener\MolliePayments\Service\PaymentMethodService;
 use MolliePayments\Tests\Fakes\FakeEntityRepository;
 use PHPUnit\Framework\TestCase;
@@ -59,6 +77,41 @@ class PaymentMethodServiceTest extends TestCase
         );
     }
 
+    /**
+     * This test verifies that our list of officially supported payment
+     * methods is not touched without recognizing it.
+     * @return void
+     */
+    public function testSupportedMethods(): void
+    {
+        $expected = [
+            ApplePayPayment::class,
+            BanContactPayment::class,
+            BankTransferPayment::class,
+            BelfiusPayment::class,
+            CreditCardPayment::class,
+            DirectDebitPayment::class,
+            EpsPayment::class,
+            GiftCardPayment::class,
+            GiroPayPayment::class,
+            iDealPayment::class,
+            KbcPayment::class,
+            KlarnaPayLaterPayment::class,
+            KlarnaPayNowPayment::class,
+            KlarnaSliceItPayment::class,
+            PayPalPayment::class,
+            PaySafeCardPayment::class,
+            Przelewy24Payment::class,
+            SofortPayment::class,
+            VoucherPayment::class,
+            In3Payment::class
+        ];
+
+        $handlers = $this->paymentMethodService->getPaymentHandlers();
+
+        $this->assertEquals($expected, $handlers);
+    }
+
     public function setUpInstalledPaymentMethodsSearchReturn(array $paymentMethodHandlers): void
     {
         $paymentMethodIdentifier = 1;
@@ -66,7 +119,7 @@ class PaymentMethodServiceTest extends TestCase
 
         foreach ($paymentMethodHandlers as $paymentMethodHandler) {
             $paymentMethod = $this->createConfiguredMock(PaymentMethodEntity::class, [
-                'getUniqueIdentifier' => (string) $paymentMethodIdentifier,
+                'getUniqueIdentifier' => (string)$paymentMethodIdentifier,
                 'getHandlerIdentifier' => $paymentMethodHandler,
             ]);
 
@@ -155,7 +208,7 @@ class PaymentMethodServiceTest extends TestCase
 
         $hasNonMolliePaymentMethods = false;
 
-        foreach($installedPaymentMethodHandlers as $paymentMethodHandler) {
+        foreach ($installedPaymentMethodHandlers as $paymentMethodHandler) {
             if (!in_array($paymentMethodHandler, $this->paymentMethodService->getPaymentHandlers(), true)) {
                 $hasNonMolliePaymentMethods = true;
             }
