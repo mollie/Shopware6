@@ -354,11 +354,9 @@ class SubscriptionManager implements SubscriptionManagerInterface
 
         $this->gwMollie->switchClient($swSubscription->getSalesChannelId());
 
-        # grab our mollie payment and
-        # also the mollie subscription
+        # grab our mollie payment and also the mollie subscription
         $payment = $this->gwMollie->getPayment($molliePaymentId);
         $mollieSubscription = $this->gwMollie->getSubscription($swSubscription->getMollieId(), $swSubscription->getMollieCustomerId());
-
 
         $devMode = $this->pluginSettings->getEnvMollieDevMode();
 
@@ -367,6 +365,12 @@ class SubscriptionManager implements SubscriptionManagerInterface
         # in DEV mode, we allow this, otherwise we cannot test this!
         if (!$devMode && (string)$payment->subscriptionId !== $swSubscription->getMollieId()) {
             throw new \Exception('Warning, trying to renew subscription based on a payment that does not belong to this subscription!');
+        }
+
+        # verify if the amount is higher than 0,00
+        # we just want to ensure that a "payment method update" does not lead to this webhook (it felt as if it was in 1 case)
+        if ((float)$payment->amount->value <= 0) {
+            throw new \Exception('Warning, trying to renew subscription based on a 0,00 payment. Mollie should actually not call the renew-webhook for this!');
         }
 
         # first thing is, we have to update our new paymentAt of our local subscription.
