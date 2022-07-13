@@ -6,6 +6,12 @@ use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
 
 class RefundMetadata
 {
+
+    /**
+     * @var DataCompressor
+     */
+    private $dataCompression;
+
     /**
      * @var string
      */
@@ -17,6 +23,7 @@ class RefundMetadata
     private $items;
 
 
+
     /**
      * @param string $type
      * @param RefundItem[] $items
@@ -25,6 +32,8 @@ class RefundMetadata
     {
         $this->type = $type;
         $this->items = $items;
+
+        $this->dataCompression = new DataCompressor();
     }
 
     /**
@@ -81,8 +90,10 @@ class RefundMetadata
                 continue;
             }
 
+            $swLineId = $this->dataCompression->compress($item->getShopwareLineID());
+
             $data['composition'][] = [
-                'swLineId' => $item->getShopwareLineID(),
+                'swLineId' => $swLineId,
                 'mollieLineId' => $item->getMollieLineID(),
                 'swReference' => $item->getShopwareReference(),
                 'quantity' => $item->getQuantity(),
