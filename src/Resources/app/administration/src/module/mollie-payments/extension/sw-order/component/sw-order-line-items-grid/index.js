@@ -15,6 +15,7 @@ Component.override('sw-order-line-items-grid', {
     ],
 
     inject: [
+        'MolliePaymentsConfigService',
         'MolliePaymentsShippingService',
     ],
 
@@ -27,6 +28,7 @@ Component.override('sw-order-line-items-grid', {
         return {
             isLoading: false,
             // ---------------------------------
+            configShowRefundManager: true,
             showRefundModal: false,
             // ---------------------------------
             isShipOrderLoading: false,
@@ -109,6 +111,14 @@ Component.override('sw-order-line-items-grid', {
 
         /**
          *
+         * @returns {boolean}
+         */
+        isRefundManagerPossible() {
+            return this.configShowRefundManager;
+        },
+
+        /**
+         *
          * @returns {number}
          */
         possibleActionsCount() {
@@ -118,10 +128,9 @@ Component.override('sw-order-line-items-grid', {
                 count += 1;
             }
 
-            // always +1 for refunds
-            // which is now (with the new refund manager)
-            // always available
-            count += 1;
+            if (this.isRefundManagerPossible) {
+                count += 1;
+            }
 
             return count;
         },
@@ -138,6 +147,12 @@ Component.override('sw-order-line-items-grid', {
             // or it will trigger an exception in the API.
             if (this.isMollieOrder) {
                 this.getShippingStatus();
+
+                const me = this;
+
+                this.MolliePaymentsConfigService.getRefundManagerConfig(this.order.salesChannelId).then((response) => {
+                    me.configShowRefundManager = response.enabled;
+                });
             }
         },
 
