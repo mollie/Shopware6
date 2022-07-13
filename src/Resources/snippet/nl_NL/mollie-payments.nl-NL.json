@@ -32,6 +32,9 @@
         "cardExpiryDateLabel": "MM/JJ",
         "cardVerificationCodeLabel": "CVV",
         "creditCardTagLine": "Betaling verzekerd en verzorgd door"
+      },
+      "ideal": {
+        "selectBank": "Selecteer bank"
       }
     },
     "payments": {
