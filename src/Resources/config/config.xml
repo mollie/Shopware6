@@ -106,6 +106,16 @@
         <title lang="de-DE">Refund Manager</title>
         <title lang="nl-NL">Refund Manager</title>
         <input-field type="bool">
+            <name>refundManagerEnabled</name>
+            <defaultValue>true</defaultValue>
+            <label>Enable Refund Manager</label>
+            <label lang="de-DE">Refund Manager aktivieren</label>
+            <label lang="nl-NL">Refund Manager inschakelen</label>
+            <helpText>Enable or disable the Refund Manager in the Administration</helpText>
+            <helpText lang="de-DE">Aktivieren oder deaktivieren Sie den Refund Manager in der Administration</helpText>
+            <helpText lang="nl-NL">Schakel de Refund Manager in of uit in de administratie</helpText>
+        </input-field>
+        <input-field type="bool">
             <name>refundManagerAutoStockReset</name>
             <defaultValue>true</defaultValue>
             <label>Automatically include Stock-Reset</label>

@@ -206,6 +206,7 @@ class ConfigController extends AbstractController
         }
 
         return new JsonResponse([
+            'enabled' => $config->isRefundManagerEnabled(),
             'autoStockReset' => $config->isRefundManagerAutoStockReset(),
             'verifyRefund' => $config->isRefundManagerVerifyRefund(),
             'showInstructions' => $config->isRefundManagerShowInstructions(),
