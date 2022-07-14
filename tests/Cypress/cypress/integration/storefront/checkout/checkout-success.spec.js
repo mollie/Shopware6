@@ -83,6 +83,10 @@ context("Checkout Tests", () => {
 
                     paymentAction.switchPaymentMethod(payment.name);
 
+                    if (payment.key === 'ideal') {
+                        paymentAction.selectIDealIssuer('bunq');
+                    }
+
                     // grab the total sum of our order from the confirm page.
                     // we also want to test what the user has to pay in Mollie.
                     // this has to match!
