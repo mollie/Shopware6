@@ -114,8 +114,8 @@ class MolliePaymentFinalize
         );
 
         $payment = $this->mollieOrderService->getPaidPayment($mollieOrder);
-
-        if ($payment->method==="creditcard"){
+        
+        if ($payment instanceof Payment && $payment->method==="creditcard"){
             //Add the creditcard data to the customFieldStruct
             $customFieldsStruct->setCreditCardDetails($payment->details);
             //Save it on the order

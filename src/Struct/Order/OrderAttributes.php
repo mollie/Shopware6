@@ -312,8 +312,11 @@ class OrderAttributes
         $this->creditCardFeeRegion = $creditCardFeeRegion;
     }
 
-
-    public function setCreditCardDetails(stdClass $details)
+    /**
+     * @param stdClass|null $details
+     * @return void
+     */
+    public function setCreditCardDetails(?stdClass $details)
     {
         if (!empty($details->cardNumber)) {
             $this->creditCardNumber = $details->cardNumber;
