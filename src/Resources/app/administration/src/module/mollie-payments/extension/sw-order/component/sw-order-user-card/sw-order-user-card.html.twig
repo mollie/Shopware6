@@ -2,12 +2,25 @@
     {% parent %}
 
     <template v-if="mollieOrderId">
+        <div v-if="hasCreditCardData">
+            <dt>Credit Card Data</dt>
+            <dd>
+                <mollie-credit-card-logo :creditCardCompany="creditCardLabel">{{ creditCardLabel }}</mollie-credit-card-logo>
+            </dd>
+            <dd>
+                {{ creditCardNumber }}
+            </dd>
+            <dd>
+                {{ creditCardHolder }}
+            </dd>
+        </div>
         <dt>{{ $tc('sw-order.detailExtended.labelMollieOrderId') }}</dt>
         <dd>
             {{ mollieOrderId }}
             <div v-if="isSubscription">
                 <sw-label class="mollie-order-user-card-subscription-badge"
-                          variant="info" size="medium" appearance="pill" :ghost="true" :caps="true" :dismissable="false">
+                          variant="info" size="medium" appearance="pill" :ghost="true" :caps="true"
+                          :dismissable="false">
                     {{ $tc('sw-order.detailExtended.subscriptionBadge') }}
                 </sw-label>
             </div>

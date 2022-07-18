@@ -20,6 +20,29 @@ Component.override('sw-order-user-card', {
     },
 
     computed: {
+        /**
+         *
+         * @returns {string|*}
+         */
+        creditCardLabel() {
+            return this._creditCardData().getLabel()
+        },
+
+        /**
+         *
+         * @returns {string|*}
+         */
+        creditCardNumber() {
+            return '**** **** **** ' + this._creditCardData().getNumber()
+        },
+
+        /**
+         *
+         * @returns {string|*}
+         */
+        creditCardHolder() {
+            return this._creditCardData().getHolder()
+        },
 
         /**
          *
@@ -57,6 +80,10 @@ Component.override('sw-order-user-card', {
             return this.molliePaymentUrl !== '';
         },
 
+        hasCreditCardData() {
+            return this._creditCardData().hasCreditCardData();
+        },
+
     },
 
     created() {
@@ -64,6 +91,15 @@ Component.override('sw-order-user-card', {
     },
 
     methods: {
+        /**
+         *
+         * @returns {CreditcardAttributes|*}
+         */
+        _creditCardData() {
+            const orderAttributes = new OrderAttributes(this.currentOrder);
+            return orderAttributes.getCreditCardAttributes();
+        },
+
         createdComponent() {
             this.$super('createdComponent');
 
