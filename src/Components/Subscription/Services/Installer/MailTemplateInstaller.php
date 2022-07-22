@@ -162,9 +162,8 @@ class MailTemplateInstaller
         $englishName = 'Subscription Renewal Reminder (Mollie)';
         $germanName = 'Erinnerung der Abonnementverlängerung (Mollie)';
 
-        $defaultLangId = $this->getLanguageIdByLocale($connection, 'en-GB');
+        $enLangId = $this->getLanguageIdByLocale($connection, 'en-GB');
         $deLangId = $this->getLanguageIdByLocale($connection, 'de-DE');
-
 
         # -----------------------------------------------------------------------------------------------------
 
@@ -181,29 +180,32 @@ class MailTemplateInstaller
 
         # -----------------------------------------------------------------------------------------------------
 
-        if ($defaultLangId !== $deLangId) {
+        // If we have an english language ID then insert the english translation
+        if (!empty($enLangId)) {
             $connection->insert('mail_template_type_translation', [
                 'mail_template_type_id' => Uuid::fromHexToBytes($mailTemplateTypeId),
-                'language_id' => $defaultLangId,
+                'language_id' => $enLangId,
                 'name' => $englishName,
                 'created_at' => (new \DateTime())->format(Defaults::STORAGE_DATE_TIME_FORMAT),
             ]);
         }
 
-        if ($defaultLangId !== Uuid::fromHexToBytes(Defaults::LANGUAGE_SYSTEM)) {
-            $connection->insert('mail_template_type_translation', [
-                'mail_template_type_id' => Uuid::fromHexToBytes($mailTemplateTypeId),
-                'language_id' => Uuid::fromHexToBytes(Defaults::LANGUAGE_SYSTEM),
-                'name' => $englishName,
-                'created_at' => (new \DateTime())->format(Defaults::STORAGE_DATE_TIME_FORMAT),
-            ]);
-        }
-
-        if ($deLangId) {
+        // If we have a german language ID then insert the german translation
+        if (!empty($deLangId)) {
             $connection->insert('mail_template_type_translation', [
                 'mail_template_type_id' => Uuid::fromHexToBytes($mailTemplateTypeId),
                 'language_id' => $deLangId,
                 'name' => $germanName,
+                'created_at' => (new \DateTime())->format(Defaults::STORAGE_DATE_TIME_FORMAT),
+            ]);
+        }
+
+        // If the system default language is not english OR german, insert the english translation for it
+        if (!in_array(Uuid::fromHexToBytes(Defaults::LANGUAGE_SYSTEM), [$enLangId, $deLangId])) {
+            $connection->insert('mail_template_type_translation', [
+                'mail_template_type_id' => Uuid::fromHexToBytes($mailTemplateTypeId),
+                'language_id' => Uuid::fromHexToBytes(Defaults::LANGUAGE_SYSTEM),
+                'name' => $englishName,
                 'created_at' => (new \DateTime())->format(Defaults::STORAGE_DATE_TIME_FORMAT),
             ]);
         }
@@ -235,7 +237,7 @@ class MailTemplateInstaller
 
         # -----------------------------------------------------------------------------------------------------
 
-        $defaultLangId = $this->getLanguageIdByLocale($connection, 'en-GB');
+        $enLangId = $this->getLanguageIdByLocale($connection, 'en-GB');
         $deLangId = $this->getLanguageIdByLocale($connection, 'de-DE');
 
         # -----------------------------------------------------------------------------------------------------
@@ -249,10 +251,11 @@ class MailTemplateInstaller
 
         # -----------------------------------------------------------------------------------------------------
 
-        if ($defaultLangId !== $deLangId) {
+        // If we have an english language ID then insert the english translation
+        if (!empty($enLangId)) {
             $connection->insert('mail_template_translation', [
                 'mail_template_id' => Uuid::fromHexToBytes($mailTemplateId),
-                'language_id' => $defaultLangId,
+                'language_id' => $enLangId,
                 'sender_name' => $sender,
                 'subject' => $subjectEN,
                 'description' => $descriptionEN,
@@ -264,22 +267,8 @@ class MailTemplateInstaller
 
         # -----------------------------------------------------------------------------------------------------
 
-        if ($defaultLangId !== Uuid::fromHexToBytes(Defaults::LANGUAGE_SYSTEM)) {
-            $connection->insert('mail_template_translation', [
-                'mail_template_id' => Uuid::fromHexToBytes($mailTemplateId),
-                'language_id' => Uuid::fromHexToBytes(Defaults::LANGUAGE_SYSTEM),
-                'sender_name' => $sender,
-                'subject' => $subjectEN,
-                'description' => $descriptionEN,
-                'content_html' => $contentHtmlEN,
-                'content_plain' => $contentPlainEN,
-                'created_at' => (new \DateTime())->format(Defaults::STORAGE_DATE_TIME_FORMAT),
-            ]);
-        }
-
-        # -----------------------------------------------------------------------------------------------------
-
-        if ($deLangId) {
+        // If we have a german language ID then insert the german translation
+        if (!empty($deLangId)) {
             $connection->insert('mail_template_translation', [
                 'mail_template_id' => Uuid::fromHexToBytes($mailTemplateId),
                 'language_id' => $deLangId,
@@ -288,6 +277,22 @@ class MailTemplateInstaller
                 'description' => $descriptionDE,
                 'content_html' => $contentHtmlDE,
                 'content_plain' => $contentPlainDE,
+                'created_at' => (new \DateTime())->format(Defaults::STORAGE_DATE_TIME_FORMAT),
+            ]);
+        }
+
+        # -----------------------------------------------------------------------------------------------------
+
+        // If the system default language is not english OR german, insert the english translation for it
+        if (!in_array(Uuid::fromHexToBytes(Defaults::LANGUAGE_SYSTEM), [$enLangId, $deLangId])) {
+            $connection->insert('mail_template_translation', [
+                'mail_template_id' => Uuid::fromHexToBytes($mailTemplateId),
+                'language_id' => Uuid::fromHexToBytes(Defaults::LANGUAGE_SYSTEM),
+                'sender_name' => $sender,
+                'subject' => $subjectEN,
+                'description' => $descriptionEN,
+                'content_html' => $contentHtmlEN,
+                'content_plain' => $contentPlainEN,
                 'created_at' => (new \DateTime())->format(Defaults::STORAGE_DATE_TIME_FORMAT),
             ]);
         }
@@ -309,15 +314,10 @@ class MailTemplateInstaller
                 ";
 
         $languageId = $connection->executeQuery($sql, ['code' => $locale])->fetchColumn();
-        if (!$languageId && $locale !== 'en-GB') {
-            return null;
-        }
-
         if (!$languageId) {
-            return Uuid::fromHexToBytes(Defaults::LANGUAGE_SYSTEM);
+            return null;
         }
 
         return $languageId;
     }
-
 }
