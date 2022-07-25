@@ -68,6 +68,22 @@ class LineItemAttributesTest extends TestCase
     }
 
     /**
+     * This test verifies that nothing breaks
+     * if we have NULL for the customFields
+     */
+    public function testNullCustomFields()
+    {
+        $item = new LineItem('', '');
+        $item->setPayload([
+            'customFields' => null
+        ]);
+
+        $attributes = new LineItemAttributes($item);
+
+        $this->assertEquals('', $attributes->getVoucherType());
+    }
+
+    /**
      * This test verifies that an existing voucher type entry
      * is correctly loaded from our attributes class.
      */
