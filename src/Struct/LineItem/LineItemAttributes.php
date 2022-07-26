@@ -199,8 +199,10 @@ class LineItemAttributes
 
                 # ---------------------------------------------------------------------------
                 # search in new structure
-                $fullKey = 'mollie_payments_product_' . $keyName;
-                $foundValue = (array_key_exists($fullKey, $customFields)) ? (string)$customFields[$fullKey] : '';
+                if (is_array($customFields)) {
+                    $fullKey = 'mollie_payments_product_' . $keyName;
+                    $foundValue = (array_key_exists($fullKey, $customFields)) ? (string)$customFields[$fullKey] : '';
+                }
 
                 # ---------------------------------------------------------------------------
                 # check if old structure exists
