@@ -72,7 +72,7 @@
             <label>Use Shopware standard behaviour for failed payments</label>
             <label lang="de-DE">Shopware Standardverhalten für fehlerhafte Zahlungen verwenden</label>
             <label lang="nl-NL">Gebruik de standaard Shopware instelling voor mislukte betalingen</label>
-            <defaultValue>false</defaultValue>
+            <defaultValue>true</defaultValue>
             <helpText>Use the default Shopware behaviour on failed payments. If disabled, Mollie will automatically provide a way to retry the payment by redirecting the user to the Mollie payments page.</helpText>
             <helpText lang="de-DE">Aktiviert das Standardverhalten von Shopware für fehlerhafte Zahlungen. Wenn nicht aktiv, kümmert sich das Mollie Plugin um einen erneuten Versuch der Zahlung und leitet den Käufer auf die externe Mollie Zahlungsauswahl.</helpText>
             <helpText lang="nl-NL">Gebruik de standaard Shopware instelling voor mislukte betalingen. Indien uitgeschakeld, zal Mollie automatisch een manier aanbieden om de betaling opnieuw te proberen door de user om te leiden naar de Mollie betalingspagina.</helpText>
