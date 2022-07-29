@@ -20,7 +20,7 @@ class MollieOrderAddressBuilder
             'familyName' => $address->getLastName(),
             'email' => $email,
             'streetAndNumber' => $address->getStreet(),
-            'streetAdditional' => $address->getAdditionalAddressLine1(),
+            'streetAdditional' => trim($address->getAdditionalAddressLine1()) ?? null,
             'postalCode' => $address->getZipCode(),
             'city' => $address->getCity(),
             'country' => $address->getCountry() !== null ? $address->getCountry()->getIso() : self::MOLLIE_DEFAULT_COUNTRY_ISO,
