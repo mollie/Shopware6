@@ -1,0 +1,15 @@
+<!-- This is just a copy from the sw-internal-link component in Shopware 6.4 -->
+
+<router-link
+    :to="routerLink"
+    :target="target"
+    class="mollie-internal-link"
+    :class="componentClasses"
+>
+
+    <slot></slot>
+    <sw-icon
+        :name="icon"
+        small
+    />
+</router-link>

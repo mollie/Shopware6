@@ -7,6 +7,7 @@ import './components/mollie-pluginconfig-support-modal';
 import './components/mollie-tracking-info';
 import './components/mollie-refund-manager';
 import './components/mollie-external-link';
+import './components/mollie-internal-link';
 import './page/mollie-subscriptions-list';
 
 
