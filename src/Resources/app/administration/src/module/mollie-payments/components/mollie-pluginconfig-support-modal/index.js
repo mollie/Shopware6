@@ -1,6 +1,8 @@
 import template from './mollie-pluginconfig-support-modal.html.twig';
 import './mollie-pluginconfig-support-modal.scss';
 
+const VersionCompare = require("../../../../core/service/utils/version-compare.utils").default;
+
 // eslint-disable-next-line no-undef
 const {Application, Component, Context, Mixin, State} = Shopware;
 // eslint-disable-next-line no-undef
@@ -121,12 +123,12 @@ Component.register('mollie-pluginconfig-support-modal', {
 
         mollieVersion() {
             return this.molliePlugin
-                ? this.humanReadableVersion(this.molliePlugin.version)
+                ? VersionCompare.getHumanReadableVersion(this.molliePlugin.version)
                 : '';
         },
 
         shopwareVersion() {
-            return this.humanReadableVersion(Context.app.config.version);
+            return VersionCompare.getHumanReadableVersion(Context.app.config.version);
         },
     },
 
@@ -197,43 +199,6 @@ Component.register('mollie-pluginconfig-support-modal', {
                     this._showNotificationError(response);
                 })
                 .finally(() => this.isSubmitting = false)
-        },
-
-        humanReadableVersion(version) {
-            const match = version.match(/(\d+\.?\d+\.?\d+\.?\d*)-?([a-z]+)?(\d+(.\d+)*)?/i);
-
-            if (match === null) {
-                return version;
-            }
-
-            let output = `v${match[1]}`;
-
-            if (match[2]) {
-                output += ` ${this.getHumanReadableText(match[2])}`;
-            } else {
-                output += ' Stable Version';
-            }
-
-            if (match[3]) {
-                output += ` ${match[3]}`;
-            }
-
-            return output;
-        },
-
-        getHumanReadableText(text) {
-            switch (text) {
-                case 'dp':
-                    return 'Developer Preview';
-                case 'rc':
-                    return 'Release Candidate';
-                case 'dev':
-                    return 'Developer Version';
-                case 'ea':
-                    return 'Early Access';
-                default:
-                    return text;
-            }
         },
 
         /**
