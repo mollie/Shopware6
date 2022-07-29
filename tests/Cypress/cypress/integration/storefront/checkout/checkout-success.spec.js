@@ -1,17 +1,19 @@
 import Devices from "Services/utils/Devices";
 import Session from "Services/utils/Session"
 import Shopware from "Services/shopware/Shopware"
-import PaymentScreenAction from 'Actions/mollie/PaymentScreenAction';
-import IssuerScreenAction from 'Actions/mollie/IssuerScreenAction';
-import GiftCardsScreenAction from "Actions/mollie/GiftCardsScreenAction";
 // ------------------------------------------------------
 import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
 // ------------------------------------------------------
 import CheckoutAction from 'Actions/storefront/checkout/CheckoutAction';
 import PaymentAction from "Actions/storefront/checkout/PaymentAction";
 import DummyBasketScenario from "Scenarios/DummyBasketScenario";
-import VoucherScreenAction from "Actions/mollie/VoucherScreenAction";
-import PaymentMethodsScreenAction from "Actions/mollie/PaymentMethodsScreenAction";
+// ------------------------------------------------------
+import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
+import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
+import VoucherScreenAction from "cypress-mollie/src/actions/screens/VoucherScreen";
+import PaymentMethodsScreenAction from "cypress-mollie/src/actions/screens/PaymentListScreen";
+import IssuerScreenAction from "cypress-mollie/src/actions/screens/IssuerScreen";
+import GiftCardsScreenAction from "cypress-mollie/src/actions/screens/GiftCardsScreen";
 
 
 const devices = new Devices();
@@ -22,6 +24,7 @@ const configAction = new ShopConfigurationAction();
 const checkout = new CheckoutAction();
 const paymentAction = new PaymentAction();
 
+const mollieSandbox = new MollieSandbox();
 const molliePayment = new PaymentScreenAction();
 const mollieIssuer = new IssuerScreenAction();
 const mollieVoucher = new VoucherScreenAction();
@@ -112,7 +115,7 @@ context("Checkout Tests", () => {
                     })
 
 
-                    molliePayment.initSandboxCookie();
+                    mollieSandbox.initSandboxCookie();
 
                     if (payment.key === 'klarnapaylater' || payment.key === 'klarnapaynow' || payment.key === 'klarnasliceit') {
 

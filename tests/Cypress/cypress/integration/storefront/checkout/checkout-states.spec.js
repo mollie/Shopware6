@@ -1,7 +1,6 @@
 import Devices from "Services/utils/Devices";
 import Session from "Services/utils/Session"
 import Shopware from "Services/shopware/Shopware";
-import PaymentScreenAction from 'Actions/mollie/PaymentScreenAction';
 // ------------------------------------------------------
 import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
 // ------------------------------------------------------
@@ -10,6 +9,9 @@ import PaymentAction from "Actions/storefront/checkout/PaymentAction";
 import DummyBasketScenario from "Scenarios/DummyBasketScenario";
 import AdminOrdersAction from "Actions/admin/AdminOrdersAction";
 import AdminLoginAction from "Actions/admin/AdminLoginAction";
+// ------------------------------------------------------
+import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
+import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
 
 
 const devices = new Devices();
@@ -21,6 +23,8 @@ const paymentAction = new PaymentAction();
 const molliePayment = new PaymentScreenAction();
 const adminOrders = new AdminOrdersAction();
 const adminLogin = new AdminLoginAction();
+
+const mollieSandbox = new MollieSandbox();
 
 const scenarioDummyBasket = new DummyBasketScenario(1);
 
@@ -57,7 +61,7 @@ context("Order Status Mapping Tests", () => {
             shopware.prepareDomainChange();
             checkout.placeOrderOnConfirm();
 
-            molliePayment.initSandboxCookie();
+            mollieSandbox.initSandboxCookie();
             molliePayment.selectOpen();
 
             adminLogin.login();

@@ -1,13 +1,15 @@
 import Devices from "Services/utils/Devices";
 import Shopware from "Services/shopware/Shopware"
 import Session from "Services/utils/Session"
-import PaymentScreenAction from 'Actions/mollie/PaymentScreenAction';
 // ------------------------------------------------------
 import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
 // ------------------------------------------------------
 import CheckoutAction from 'Actions/storefront/checkout/CheckoutAction';
 import PaymentAction from "Actions/storefront/checkout/PaymentAction";
 import DummyBasketScenario from "Scenarios/DummyBasketScenario";
+// ------------------------------------------------------
+import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
+import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
 
 
 const devices = new Devices();
@@ -17,6 +19,7 @@ const shopware = new Shopware();
 const configAction = new ShopConfigurationAction();
 const checkout = new CheckoutAction();
 const paymentAction = new PaymentAction();
+const mollieSandbox = new MollieSandbox();
 const molliePayment = new PaymentScreenAction();
 
 const scenarioDummyBasket = new DummyBasketScenario(1);
@@ -49,7 +52,7 @@ context("Checkout Failure Tests", () => {
                 shopware.prepareDomainChange();
                 checkout.placeOrderOnConfirm();
 
-                molliePayment.initSandboxCookie();
+                mollieSandbox.initSandboxCookie();
                 molliePayment.selectFailed();
 
                 // verify that we are back in our shop
@@ -65,7 +68,7 @@ context("Checkout Failure Tests", () => {
                 cy.url().should('include', '/checkout/select-method/');
 
                 // select giro pay and mark it as "paid"
-                molliePayment.initSandboxCookie();
+                mollieSandbox.initSandboxCookie();
                 molliePayment.selectGiropay();
                 molliePayment.selectPaid();
 
@@ -81,7 +84,7 @@ context("Checkout Failure Tests", () => {
                 shopware.prepareDomainChange();
                 checkout.placeOrderOnConfirm();
 
-                molliePayment.initSandboxCookie();
+                mollieSandbox.initSandboxCookie();
                 molliePayment.selectFailed();
 
                 // verify that we are back in our shop
@@ -122,7 +125,7 @@ context("Checkout Failure Tests", () => {
                 shopware.prepareDomainChange();
                 checkout.placeOrderOnConfirm();
 
-                molliePayment.initSandboxCookie();
+                mollieSandbox.initSandboxCookie();
                 molliePayment.selectFailed();
 
                 // we are now back in our shop
@@ -141,7 +144,7 @@ context("Checkout Failure Tests", () => {
 
                 checkout.placeOrderOnEdit();
 
-                molliePayment.initSandboxCookie();
+                mollieSandbox.initSandboxCookie();
                 molliePayment.selectPaid();
 
                 cy.url().should('include', '/checkout/finish');
@@ -156,7 +159,7 @@ context("Checkout Failure Tests", () => {
                 shopware.prepareDomainChange();
                 checkout.placeOrderOnConfirm();
 
-                molliePayment.initSandboxCookie();
+                mollieSandbox.initSandboxCookie();
                 molliePayment.selectCancelled();
 
                 // we are now back in our shop
@@ -175,7 +178,7 @@ context("Checkout Failure Tests", () => {
 
                 checkout.placeOrderOnEdit();
 
-                molliePayment.initSandboxCookie();
+                mollieSandbox.initSandboxCookie();
                 molliePayment.selectPaid();
 
                 cy.url().should('include', '/checkout/finish');

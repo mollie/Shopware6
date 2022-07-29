@@ -7,10 +7,12 @@ import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
 import PaymentAction from "Actions/storefront/checkout/PaymentAction";
 import DummyBasketScenario from "Scenarios/DummyBasketScenario";
 import CheckoutAction from "Actions/storefront/checkout/CheckoutAction";
-import PaymentScreenAction from "Actions/mollie/PaymentScreenAction";
 import OrderDetailsRepository from "Repositories/admin/orders/OrderDetailsRepository";
 import AdminOrdersAction from "Actions/admin/AdminOrdersAction";
 import AdminLoginAction from "Actions/admin/AdminLoginAction";
+// ------------------------------------------------------
+import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
+import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
 
 
 const devices = new Devices();
@@ -25,6 +27,7 @@ const checkout = new CheckoutAction();
 const adminOrders = new AdminOrdersAction();
 const adminLogin = new AdminLoginAction();
 
+const mollieSandbox = new MollieSandbox();
 const molliePayment = new PaymentScreenAction();
 
 const testDevices = [devices.getFirstDevice()];
@@ -53,7 +56,7 @@ describe('SEPA Bank Transfer', () => {
                 shopware.prepareDomainChange();
                 checkout.placeOrderOnConfirm();
 
-                molliePayment.initSandboxCookie();
+                mollieSandbox.initSandboxCookie();
                 molliePayment.selectOpen();
 
                 cy.url().should('include', '/checkout/finish');
@@ -69,7 +72,7 @@ describe('SEPA Bank Transfer', () => {
                 shopware.prepareDomainChange();
                 checkout.placeOrderOnConfirm();
 
-                molliePayment.initSandboxCookie();
+                mollieSandbox.initSandboxCookie();
                 molliePayment.selectPaid();
 
                 adminLogin.login();

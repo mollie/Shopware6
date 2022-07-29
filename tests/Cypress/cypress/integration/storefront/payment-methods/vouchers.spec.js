@@ -10,7 +10,9 @@ import CheckoutAction from "Actions/storefront/checkout/CheckoutAction";
 import AdminLoginAction from "Actions/admin/AdminLoginAction";
 import AdminProductsAction from "Actions/admin/AdminProductsAction";
 import ProductDetailRepository from "Repositories/admin/products/ProductDetailRepository";
-import PaymentScreenAction from "Actions/mollie/PaymentScreenAction";
+// ------------------------------------------------------
+import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
+import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
 
 
 const devices = new Devices();
@@ -20,6 +22,7 @@ const shopware = new Shopware();
 const configAction = new ShopConfigurationAction();
 const paymentAction = new PaymentAction();
 const checkout = new CheckoutAction();
+const mollieSandbox = new MollieSandbox();
 const molliePayment = new PaymentScreenAction();
 
 const adminLogin = new AdminLoginAction();
@@ -91,7 +94,7 @@ describe('Voucher Payments', () => {
                 shopware.prepareDomainChange();
                 checkout.placeOrderOnConfirm();
 
-                molliePayment.initSandboxCookie();
+                mollieSandbox.initSandboxCookie();
                 molliePayment.selectFailed();
 
                 if (shopware.isVersionGreaterEqual(6.4)) {

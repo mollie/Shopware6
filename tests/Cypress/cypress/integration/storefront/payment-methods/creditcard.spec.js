@@ -5,16 +5,19 @@ import Shopware from "Services/shopware/Shopware";
 import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
 // ------------------------------------------------------
 import CheckoutAction from 'Actions/storefront/checkout/CheckoutAction';
-import PaymentScreenAction from "Actions/mollie/PaymentScreenAction";
-import PaymentAction from "Actions/storefront/checkout/PaymentAction";
 import DummyBasketScenario from "Scenarios/DummyBasketScenario";
-import CreditCardScreenAction from "Actions/mollie/CreditCardScreenAction";
+import PaymentAction from "Actions/storefront/checkout/PaymentAction";
+// ------------------------------------------------------
+import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
+import CreditCardScreenAction from "cypress-mollie/src/actions/screens/CreditCardScreen";
+import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
 
 
 const devices = new Devices();
 const session = new Session();
 const shopware = new Shopware();
 
+const mollieSandbox = new MollieSandbox();
 const molliePayment = new PaymentScreenAction();
 const mollieCreditCardForm = new CreditCardScreenAction();
 
@@ -69,7 +72,7 @@ describe('Credit Card Components', () => {
             // been used by comparing the last 4 digits
             cy.contains('**** ' + validCardNumber.substr(validCardNumber.length - 4));
 
-            molliePayment.initSandboxCookie();
+            mollieSandbox.initSandboxCookie();
 
             molliePayment.selectPaid();
 
@@ -178,7 +181,7 @@ describe('Credit Card Components', () => {
             shopware.prepareDomainChange();
             checkout.placeOrderOnConfirm();
 
-            molliePayment.initSandboxCookie();
+            mollieSandbox.initSandboxCookie();
             molliePayment.selectFailed();
 
             cy.url().should('include', '/account/order/edit');
@@ -205,7 +208,7 @@ describe('Credit Card Components', () => {
             shopware.prepareDomainChange();
             checkout.placeOrderOnEdit();
 
-            molliePayment.initSandboxCookie();
+            mollieSandbox.initSandboxCookie();
 
             // verify that our component card is really
             // been used by comparing the last 4 digits
@@ -249,7 +252,7 @@ describe('Status Tests', () => {
         shopware.prepareDomainChange();
         checkout.placeOrderOnConfirm();
 
-        molliePayment.initSandboxCookie();
+        mollieSandbox.initSandboxCookie();
 
         mollieCreditCardForm.enterValidCard();
         mollieCreditCardForm.submitForm();
