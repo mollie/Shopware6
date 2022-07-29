@@ -8,6 +8,7 @@ import CheckoutAction from 'Actions/storefront/checkout/CheckoutAction';
 import PaymentScreenAction from "Actions/mollie/PaymentScreenAction";
 import PaymentAction from "Actions/storefront/checkout/PaymentAction";
 import DummyBasketScenario from "Scenarios/DummyBasketScenario";
+import CreditCardScreenAction from "Actions/mollie/CreditCardScreenAction";
 
 
 const devices = new Devices();
@@ -15,6 +16,8 @@ const session = new Session();
 const shopware = new Shopware();
 
 const molliePayment = new PaymentScreenAction();
+const mollieCreditCardForm = new CreditCardScreenAction();
+
 const configAction = new ShopConfigurationAction();
 const checkout = new CheckoutAction();
 const payment = new PaymentAction();
@@ -247,6 +250,10 @@ describe('Status Tests', () => {
         checkout.placeOrderOnConfirm();
 
         molliePayment.initSandboxCookie();
+
+        mollieCreditCardForm.enterValidCard();
+        mollieCreditCardForm.submitForm();
+
         molliePayment.selectOpen();
 
         cy.url().should('include', '/account/order/edit');
