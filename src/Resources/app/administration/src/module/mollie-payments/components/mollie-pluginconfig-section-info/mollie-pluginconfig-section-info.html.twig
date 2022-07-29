@@ -19,7 +19,8 @@
                 </li>
                 <li class="list-item">
                     {{ $tc('mollie-payments.config.info.onboardingStep3') }}<br/>
-                    <mollie-internal-link inline :routerLink="{ name:'sw.sales.channel.list'}">
+                    <mollie-internal-link inline :routerLink="{ name:'sw.sales.channel.list'}"
+                                          v-if="hasSalesChannelList">
                         {{ $tc('mollie-payments.config.info.onboardingStep3Link') }}
                     </mollie-internal-link>
                 </li>
