@@ -77,7 +77,7 @@ context("Order Status Mapping Tests", () => {
             shopware.prepareDomainChange();
             checkout.placeOrderOnConfirm();
 
-            molliePayment.initSandboxCookie();
+            mollieSandbox.initSandboxCookie();
             molliePayment.selectPaid();
 
             adminLogin.login();
@@ -93,7 +93,7 @@ context("Order Status Mapping Tests", () => {
             shopware.prepareDomainChange();
             checkout.placeOrderOnConfirm();
 
-            molliePayment.initSandboxCookie();
+            mollieSandbox.initSandboxCookie();
             molliePayment.selectAuthorized();
 
             adminLogin.login();
@@ -113,7 +113,7 @@ context("Order Status Mapping Tests", () => {
             shopware.prepareDomainChange();
             checkout.placeOrderOnConfirm();
 
-            molliePayment.initSandboxCookie();
+            mollieSandbox.initSandboxCookie();
             molliePayment.selectFailed();
 
             adminLogin.login();
@@ -129,7 +129,7 @@ context("Order Status Mapping Tests", () => {
             shopware.prepareDomainChange();
             checkout.placeOrderOnConfirm();
 
-            molliePayment.initSandboxCookie();
+            mollieSandbox.initSandboxCookie();
             molliePayment.selectCancelled();
 
             adminLogin.login();
