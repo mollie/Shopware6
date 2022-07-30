@@ -4,7 +4,7 @@
     "@cypress/webpack-preprocessor": "^5.12.0",
     "axios": "^0.21.4",
     "cypress": "^8.7.0",
-    "cypress-mollie": "^1.0.0",
+    "cypress-mollie": "1.1.0",
     "cypress-testrail": "^1.1.0",
     "webpack": "^4.46.0"
   },

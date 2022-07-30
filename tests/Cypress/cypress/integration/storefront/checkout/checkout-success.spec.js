@@ -12,7 +12,8 @@ import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
 import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
 import VoucherScreenAction from "cypress-mollie/src/actions/screens/VoucherScreen";
 import PaymentMethodsScreenAction from "cypress-mollie/src/actions/screens/PaymentListScreen";
-import IssuerScreenAction from "cypress-mollie/src/actions/screens/IssuerScreen";
+import KBCScreen from "cypress-mollie/src/actions/screens/KBCScreen";
+import iDealScreen from "cypress-mollie/src/actions/screens/IDealScreen";
 import GiftCardsScreenAction from "cypress-mollie/src/actions/screens/GiftCardsScreen";
 
 
@@ -26,7 +27,8 @@ const paymentAction = new PaymentAction();
 
 const mollieSandbox = new MollieSandbox();
 const molliePayment = new PaymentScreenAction();
-const mollieIssuer = new IssuerScreenAction();
+const mollieKBC = new KBCScreen();
+const mollieiDEAL = new IDealScreen();
 const mollieVoucher = new VoucherScreenAction();
 const mollieGiftCards = new GiftCardsScreenAction();
 const molliePaymentMethods = new PaymentMethodsScreenAction();
@@ -142,7 +144,7 @@ context("Checkout Tests", () => {
                     } else {
 
                         if (payment.key === 'kbc') {
-                            mollieIssuer.selectKBC();
+                            mollieKBC.selectKBC();
                         }
 
                         molliePayment.selectPaid();

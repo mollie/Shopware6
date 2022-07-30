@@ -9,7 +9,8 @@ import PaymentAction from "Actions/storefront/checkout/PaymentAction";
 import DummyBasketScenario from "Scenarios/DummyBasketScenario";
 // ------------------------------------------------------
 import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
-import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
+import PaymentStatusScreen from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
+import PaymentListScreen from "cypress-mollie/src/actions/screens/PaymentListScreen";
 
 
 const devices = new Devices();
@@ -20,7 +21,8 @@ const configAction = new ShopConfigurationAction();
 const checkout = new CheckoutAction();
 const paymentAction = new PaymentAction();
 const mollieSandbox = new MollieSandbox();
-const molliePayment = new PaymentScreenAction();
+const molliePaymentStatus = new PaymentStatusScreen();
+const molliePaymentList = new PaymentListScreen();
 
 const scenarioDummyBasket = new DummyBasketScenario(1);
 
@@ -53,7 +55,7 @@ context("Checkout Failure Tests", () => {
                 checkout.placeOrderOnConfirm();
 
                 mollieSandbox.initSandboxCookie();
-                molliePayment.selectFailed();
+                molliePaymentStatus.selectFailed();
 
                 // verify that we are back in our shop
                 // if the payment fails, the order is finished but
@@ -69,8 +71,8 @@ context("Checkout Failure Tests", () => {
 
                 // select giro pay and mark it as "paid"
                 mollieSandbox.initSandboxCookie();
-                molliePayment.selectGiropay();
-                molliePayment.selectPaid();
+                molliePaymentList.selectGiropay();
+                molliePaymentStatus.selectPaid();
 
                 cy.url().should('include', '/checkout/finish');
                 cy.contains('Thank you for your order');
@@ -85,7 +87,7 @@ context("Checkout Failure Tests", () => {
                 checkout.placeOrderOnConfirm();
 
                 mollieSandbox.initSandboxCookie();
-                molliePayment.selectFailed();
+                molliePaymentStatus.selectFailed();
 
                 // verify that we are back in our shop
                 // if the payment fails, the order is finished but
@@ -126,7 +128,7 @@ context("Checkout Failure Tests", () => {
                 checkout.placeOrderOnConfirm();
 
                 mollieSandbox.initSandboxCookie();
-                molliePayment.selectFailed();
+                molliePaymentStatus.selectFailed();
 
                 // we are now back in our shop
                 // the payment failed, so shopware says the order is complete
@@ -145,7 +147,7 @@ context("Checkout Failure Tests", () => {
                 checkout.placeOrderOnEdit();
 
                 mollieSandbox.initSandboxCookie();
-                molliePayment.selectPaid();
+                molliePaymentStatus.selectPaid();
 
                 cy.url().should('include', '/checkout/finish');
                 cy.contains('Thank you for updating your order');
@@ -160,7 +162,7 @@ context("Checkout Failure Tests", () => {
                 checkout.placeOrderOnConfirm();
 
                 mollieSandbox.initSandboxCookie();
-                molliePayment.selectCancelled();
+                molliePaymentStatus.selectCancelled();
 
                 // we are now back in our shop
                 // the payment failed, so shopware says the order is complete
@@ -179,7 +181,7 @@ context("Checkout Failure Tests", () => {
                 checkout.placeOrderOnEdit();
 
                 mollieSandbox.initSandboxCookie();
-                molliePayment.selectPaid();
+                molliePaymentStatus.selectPaid();
 
                 cy.url().should('include', '/checkout/finish');
                 cy.contains('Thank you for updating your order');
