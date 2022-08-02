@@ -19,6 +19,7 @@ import SubscriptionsListRepository from "Repositories/admin/subscriptions/Subscr
 // ------------------------------------------------------
 import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
 import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
+import CreditCardScreenAction from "cypress-mollie/src/actions/screens/CreditCardScreen";
 
 
 const devices = new Devices();
@@ -37,6 +38,7 @@ const pdp = new PDPAction();
 const checkout = new CheckoutAction();
 const paymentAction = new PaymentAction();
 const molliePayment = new PaymentScreenAction();
+const mollieCreditCardForm = new CreditCardScreenAction();
 const adminOrders = new AdminOrdersAction();
 const adminLogin = new AdminLoginAction();
 const adminSubscriptions = new AdminSubscriptionsAction();
@@ -161,6 +163,7 @@ describe('Subscription', () => {
                 checkout.placeOrderOnConfirm();
 
                 mollieSandbox.initSandboxCookie();
+                mollieCreditCardForm.enterValidCard();
                 molliePayment.selectPaid();
 
                 cy.url().should('include', '/checkout/finish');
@@ -224,6 +227,7 @@ describe('Subscription', () => {
                 checkout.placeOrderOnConfirm();
 
                 mollieSandbox.initSandboxCookie();
+                mollieCreditCardForm.enterValidCard();
                 molliePayment.selectFailed();
 
                 if (shopware.isVersionGreaterEqual(6.4)) {
