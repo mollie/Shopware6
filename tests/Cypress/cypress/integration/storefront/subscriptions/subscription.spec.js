@@ -164,6 +164,7 @@ describe('Subscription', () => {
 
                 mollieSandbox.initSandboxCookie();
                 mollieCreditCardForm.enterValidCard();
+                mollieCreditCardForm.submitForm();
                 molliePayment.selectPaid();
 
                 cy.url().should('include', '/checkout/finish');
@@ -228,6 +229,7 @@ describe('Subscription', () => {
 
                 mollieSandbox.initSandboxCookie();
                 mollieCreditCardForm.enterValidCard();
+                mollieCreditCardForm.submitForm();
                 molliePayment.selectFailed();
 
                 if (shopware.isVersionGreaterEqual(6.4)) {
