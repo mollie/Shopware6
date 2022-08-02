@@ -36,6 +36,10 @@ clean: ## Cleans all dependencies
 	rm -rf ./src/Resources/app/administration/node_modules/*
 	rm -rf ./src/Resources/app/storefront/node_modules/*
 
+fixtures: ## Installs all available testing fixtures of the Mollie plugin
+	cd /var/www/html && php bin/console cache:clear
+	cd /var/www/html && php bin/console fixture:load
+
 build: ## Installs the plugin, and builds the artifacts using the Shopware build commands (requires Shopware)
 	cd /var/www/html && php bin/console plugin:refresh
 	cd /var/www/html && php bin/console plugin:install MolliePayments --activate | true
