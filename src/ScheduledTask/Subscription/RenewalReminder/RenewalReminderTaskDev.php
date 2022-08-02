@@ -22,5 +22,4 @@ class RenewalReminderTaskDev extends ScheduledTask
     {
         return 60; // 1 minute
     }
-
 }

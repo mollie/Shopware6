@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Service;
 
-
 class TokenAnonymizer
 {
     const TOKEN_ANONYMIZER_PLACEHOLDER_SYMBOL = '*';

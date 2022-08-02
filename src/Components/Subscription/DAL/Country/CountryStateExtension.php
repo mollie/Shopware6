@@ -28,5 +28,4 @@ class CountryStateExtension extends EntityExtension
     {
         $collection->add((new OneToManyAssociationField('subscriptionAddress', SubscriptionAddressDefinition::class, 'country_state_id'))->addFlags(new CascadeDelete()));
     }
-
 }

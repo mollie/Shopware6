@@ -133,10 +133,10 @@ class MollieOrderBuilder
      * @param string $paymentMethod
      * @param string $returnUrl
      * @param SalesChannelContext $salesChannelContext
-     * @param PaymentHandler|null $handler
+     * @param null|PaymentHandler $handler
      * @param array $paymentData
-     * @return array
      * @throws \Exception
+     * @return array
      */
     public function build(OrderEntity $order, string $transactionId, string $paymentMethod, string $returnUrl, SalesChannelContext $salesChannelContext, ?PaymentHandler $handler, array $paymentData = []): array
     {
@@ -185,7 +185,6 @@ class MollieOrderBuilder
         $deliveries = $order->getDeliveries();
 
         if ($deliveries instanceof OrderDeliveryCollection) {
-
             $shippingLineItems = $this->shippingLineItemBuilder->buildShippingLineItems(
                 $order->getTaxStatus(),
                 $deliveries,
@@ -221,7 +220,6 @@ class MollieOrderBuilder
 
         // add payment specific data
         if ($handler instanceof PaymentHandler) {
-
             $orderData = $handler->processPaymentMethodSpecificParameters(
                 $orderData,
                 $order,
@@ -292,7 +290,6 @@ class MollieOrderBuilder
     private function isSubscriptions($lines): bool
     {
         foreach ($lines as $line) {
-
             $attributes = new OrderLineItemEntityAttributes($line);
 
             if ($attributes->isSubscriptionProduct()) {
@@ -302,5 +299,4 @@ class MollieOrderBuilder
 
         return false;
     }
-
 }

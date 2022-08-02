@@ -3,7 +3,6 @@
 
 namespace Kiener\MolliePayments\Helper;
 
-
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\MollieApiClient;
 

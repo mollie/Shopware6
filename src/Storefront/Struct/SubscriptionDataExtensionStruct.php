@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Storefront\Struct;
 
 use Shopware\Core\Framework\Struct\Struct;
 
-
 class SubscriptionDataExtensionStruct extends Struct
 {
 
@@ -60,5 +59,4 @@ class SubscriptionDataExtensionStruct extends Struct
     {
         return $this->showIndicator;
     }
-
 }

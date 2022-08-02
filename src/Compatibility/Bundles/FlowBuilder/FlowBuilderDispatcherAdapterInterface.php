@@ -10,5 +10,4 @@ interface FlowBuilderDispatcherAdapterInterface
      * @return mixed
      */
     public function dispatch($event);
-
 }

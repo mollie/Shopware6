@@ -26,8 +26,8 @@ interface RefundServiceInterface
      * @param float $amount
      * @param RefundItem[] $lineItems
      * @param Context $context
-     * @return Refund
      * @throws ApiException
+     * @return Refund
      */
     public function refundPartial(OrderEntity $order, string $description, float $amount, array $lineItems, Context $context): Refund;
 

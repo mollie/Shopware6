@@ -21,12 +21,12 @@ class SubscriptionAddressEntity extends Entity
     protected $subscriptionId;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     protected $salutationId;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     protected $title;
 
@@ -41,17 +41,17 @@ class SubscriptionAddressEntity extends Entity
     protected $lastName;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     protected $company;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     protected $department;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     protected $vatId;
 
@@ -76,32 +76,32 @@ class SubscriptionAddressEntity extends Entity
     protected $countryId;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     protected $countryStateId;
 
     /**
-     * @var CountryEntity|null
+     * @var null|CountryEntity
      */
     protected $country;
 
     /**
-     * @var CountryStateEntity|null
+     * @var null|CountryStateEntity
      */
     protected $countryState;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     protected $phoneNumber;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     protected $additionalAddressLine1;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     protected $additionalAddressLine2;
 
@@ -109,12 +109,12 @@ class SubscriptionAddressEntity extends Entity
     # loaded entities
 
     /**
-     * @var SubscriptionEntity|null
+     * @var null|SubscriptionEntity
      */
     protected $subscription;
 
     /**
-     * @var SalutationEntity|null
+     * @var null|SalutationEntity
      */
     protected $salutation;
 
@@ -147,7 +147,7 @@ class SubscriptionAddressEntity extends Entity
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getSalutationId(): ?string
     {
@@ -155,7 +155,7 @@ class SubscriptionAddressEntity extends Entity
     }
 
     /**
-     * @param string|null $salutationId
+     * @param null|string $salutationId
      */
     public function setSalutationId(?string $salutationId): void
     {
@@ -163,7 +163,7 @@ class SubscriptionAddressEntity extends Entity
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getTitle(): ?string
     {
@@ -171,7 +171,7 @@ class SubscriptionAddressEntity extends Entity
     }
 
     /**
-     * @param string|null $title
+     * @param null|string $title
      */
     public function setTitle(?string $title): void
     {
@@ -211,7 +211,7 @@ class SubscriptionAddressEntity extends Entity
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getCompany(): ?string
     {
@@ -219,7 +219,7 @@ class SubscriptionAddressEntity extends Entity
     }
 
     /**
-     * @param string|null $company
+     * @param null|string $company
      */
     public function setCompany(?string $company): void
     {
@@ -227,7 +227,7 @@ class SubscriptionAddressEntity extends Entity
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getDepartment(): ?string
     {
@@ -235,7 +235,7 @@ class SubscriptionAddressEntity extends Entity
     }
 
     /**
-     * @param string|null $department
+     * @param null|string $department
      */
     public function setDepartment(?string $department): void
     {
@@ -307,7 +307,7 @@ class SubscriptionAddressEntity extends Entity
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getCountryStateId(): ?string
     {
@@ -315,7 +315,7 @@ class SubscriptionAddressEntity extends Entity
     }
 
     /**
-     * @param string|null $countryStateId
+     * @param null|string $countryStateId
      */
     public function setCountryStateId(?string $countryStateId): void
     {
@@ -323,7 +323,7 @@ class SubscriptionAddressEntity extends Entity
     }
 
     /**
-     * @return CountryEntity|null
+     * @return null|CountryEntity
      */
     public function getCountry(): ?CountryEntity
     {
@@ -331,7 +331,7 @@ class SubscriptionAddressEntity extends Entity
     }
 
     /**
-     * @param CountryEntity|null $country
+     * @param null|CountryEntity $country
      */
     public function setCountry(?CountryEntity $country): void
     {
@@ -339,7 +339,7 @@ class SubscriptionAddressEntity extends Entity
     }
 
     /**
-     * @return CountryStateEntity|null
+     * @return null|CountryStateEntity
      */
     public function getCountryState(): ?CountryStateEntity
     {
@@ -347,7 +347,7 @@ class SubscriptionAddressEntity extends Entity
     }
 
     /**
-     * @param CountryStateEntity|null $countryState
+     * @param null|CountryStateEntity $countryState
      */
     public function setCountryState(?CountryStateEntity $countryState): void
     {
@@ -355,7 +355,7 @@ class SubscriptionAddressEntity extends Entity
     }
 
     /**
-     * @return SubscriptionEntity|null
+     * @return null|SubscriptionEntity
      */
     public function getSubscription(): ?SubscriptionEntity
     {
@@ -363,7 +363,7 @@ class SubscriptionAddressEntity extends Entity
     }
 
     /**
-     * @param SubscriptionEntity|null $subscription
+     * @param null|SubscriptionEntity $subscription
      */
     public function setSubscription(?SubscriptionEntity $subscription): void
     {
@@ -371,7 +371,7 @@ class SubscriptionAddressEntity extends Entity
     }
 
     /**
-     * @return SalutationEntity|null
+     * @return null|SalutationEntity
      */
     public function getSalutation(): ?SalutationEntity
     {
@@ -379,7 +379,7 @@ class SubscriptionAddressEntity extends Entity
     }
 
     /**
-     * @param SalutationEntity|null $salutation
+     * @param null|SalutationEntity $salutation
      */
     public function setSalutation(?SalutationEntity $salutation): void
     {
@@ -387,7 +387,7 @@ class SubscriptionAddressEntity extends Entity
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getVatId(): ?string
     {
@@ -395,7 +395,7 @@ class SubscriptionAddressEntity extends Entity
     }
 
     /**
-     * @param string|null $vatId
+     * @param null|string $vatId
      */
     public function setVatId(?string $vatId): void
     {
@@ -403,7 +403,7 @@ class SubscriptionAddressEntity extends Entity
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getPhoneNumber(): ?string
     {
@@ -411,7 +411,7 @@ class SubscriptionAddressEntity extends Entity
     }
 
     /**
-     * @param string|null $phoneNumber
+     * @param null|string $phoneNumber
      */
     public function setPhoneNumber(?string $phoneNumber): void
     {
@@ -419,7 +419,7 @@ class SubscriptionAddressEntity extends Entity
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getAdditionalAddressLine1(): ?string
     {
@@ -427,7 +427,7 @@ class SubscriptionAddressEntity extends Entity
     }
 
     /**
-     * @param string|null $additionalAddressLine1
+     * @param null|string $additionalAddressLine1
      */
     public function setAdditionalAddressLine1(?string $additionalAddressLine1): void
     {
@@ -435,7 +435,7 @@ class SubscriptionAddressEntity extends Entity
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getAdditionalAddressLine2(): ?string
     {
@@ -443,7 +443,7 @@ class SubscriptionAddressEntity extends Entity
     }
 
     /**
-     * @param string|null $additionalAddressLine2
+     * @param null|string $additionalAddressLine2
      */
     public function setAdditionalAddressLine2(?string $additionalAddressLine2): void
     {
@@ -481,5 +481,4 @@ class SubscriptionAddressEntity extends Entity
     {
         $this->shippingSubscription = $shippingSubscription;
     }
-
 }

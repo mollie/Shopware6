@@ -65,8 +65,7 @@ class PaymentMethodService
         EntityRepositoryInterface $mediaRepository,
         EntityRepositoryInterface $paymentRepository,
         PluginIdProvider          $pluginIdProvider
-    )
-    {
+    ) {
         $this->mediaService = $mediaService;
         $this->mediaRepository = $mediaRepository;
         $this->paymentRepository = $paymentRepository;
@@ -127,7 +126,6 @@ class PaymentMethodService
         $upsertData = [];
 
         foreach ($paymentMethods as $paymentMethod) {
-
             $identifier = $paymentMethod['handler'];
 
             // Upload icon to the media repository
@@ -161,7 +159,6 @@ class PaymentMethodService
                 ];
 
                 $upsertData[] = $paymentMethodData;
-
             } else {
 
                 # let's create a full parameter list of everything
@@ -276,8 +273,7 @@ class PaymentMethodService
         string  $paymentMethodId,
         bool    $active,
         Context $context
-    ): EntityWrittenContainerEvent
-    {
+    ): EntityWrittenContainerEvent {
         return $this->paymentRepository->upsert(
             [
                 [
@@ -293,8 +289,8 @@ class PaymentMethodService
      * Get payment method by ID.
      *
      * @param $id
-     * @return PaymentMethodEntity
      * @throws InconsistentCriteriaIdsException
+     * @return PaymentMethodEntity
      */
     public function getPaymentMethodById($id): ?PaymentMethodEntity
     {
@@ -345,7 +341,7 @@ class PaymentMethodService
      * @param $handlerIdentifier
      * @param Context $context
      *
-     * @return PaymentMethodEntity|null
+     * @return null|PaymentMethodEntity
      */
     private function getPaymentMethod($handlerIdentifier, Context $context): ?PaymentMethodEntity
     {

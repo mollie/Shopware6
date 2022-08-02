@@ -10,7 +10,7 @@ class MollieOrderCouldNotBeFetchedException extends ShopwareHttpException
     /**
      * @param string $mollieOrderID
      * @param array<string,mixed> $parameters
-     * @param \Throwable|null $previous
+     * @param null|\Throwable $previous
      */
     public function __construct(string $mollieOrderID, array $parameters = [], \Throwable $previous = null)
     {

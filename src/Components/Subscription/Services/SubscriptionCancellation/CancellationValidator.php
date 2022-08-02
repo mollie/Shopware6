@@ -2,20 +2,18 @@
 
 namespace Kiener\MolliePayments\Components\Subscription\Services\SubscriptionCancellation;
 
-
 use DateTime;
 use DateTimeInterface;
-
 
 class CancellationValidator
 {
 
     /**
-     * @param DateTimeInterface|null $nextRenewal
+     * @param null|DateTimeInterface $nextRenewal
      * @param int $maxCancellationDays
      * @param DateTimeInterface $today
-     * @return bool
      * @throws \Exception
+     * @return bool
      */
     public function isCancellationAllowed(?DateTimeInterface $nextRenewal, int $maxCancellationDays, DateTimeInterface $today): bool
     {
@@ -32,5 +30,4 @@ class CancellationValidator
 
         return false;
     }
-
 }

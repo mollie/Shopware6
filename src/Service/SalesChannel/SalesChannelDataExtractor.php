@@ -12,11 +12,10 @@ class SalesChannelDataExtractor
     {
         $paymentMethods = $salesChannelEntity->getPaymentMethods();
 
-        if($paymentMethods instanceof PaymentMethodCollection) {
+        if ($paymentMethods instanceof PaymentMethodCollection) {
             return $paymentMethods;
         }
 
         throw new SalesChannelPaymentMethodsException($salesChannelEntity->getName());
     }
-
 }

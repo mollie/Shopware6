@@ -9,5 +9,4 @@ interface FlowBuilderFactoryInterface
      * @return FlowBuilderDispatcherAdapterInterface
      */
     public function createDispatcher(): FlowBuilderDispatcherAdapterInterface;
-
 }

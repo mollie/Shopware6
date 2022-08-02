@@ -8,7 +8,6 @@ use Shopware\Core\System\Salutation\SalutationCollection;
 use Shopware\Storefront\Framework\Page\StorefrontSearchResult;
 use Shopware\Storefront\Page\Page;
 
-
 class SubscriptionPage extends Page
 {
     /**
@@ -17,12 +16,12 @@ class SubscriptionPage extends Page
     protected $subscriptions;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     protected $deepLinkCode;
 
     /**
-     * @var int|null
+     * @var null|int
      */
     protected $total;
 
@@ -59,7 +58,7 @@ class SubscriptionPage extends Page
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getDeepLinkCode(): ?string
     {
@@ -67,7 +66,7 @@ class SubscriptionPage extends Page
     }
 
     /**
-     * @param string|null $deepLinkCode
+     * @param null|string $deepLinkCode
      */
     public function setDeepLinkCode(?string $deepLinkCode): void
     {
@@ -75,7 +74,7 @@ class SubscriptionPage extends Page
     }
 
     /**
-     * @return int|null
+     * @return null|int
      */
     public function getTotal(): ?int
     {
@@ -83,7 +82,7 @@ class SubscriptionPage extends Page
     }
 
     /**
-     * @param int|null $total
+     * @param null|int $total
      */
     public function setTotal(?int $total): void
     {
@@ -141,5 +140,4 @@ class SubscriptionPage extends Page
     {
         $this->allowAddressEditing = $allowAddressEditing;
     }
-
 }

@@ -51,13 +51,11 @@ class BankTransferPayment extends PaymentHandler
         OrderEntity         $orderEntity,
         SalesChannelContext $salesChannelContext,
         CustomerEntity      $customer
-    ): array
-    {
+    ): array {
         $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
         $dueDate = $settings->getPaymentMethodBankTransferDueDate();
 
         if (!empty($dueDate)) {
-
             $orderData['expiresAt'] = $dueDate;
         }
 

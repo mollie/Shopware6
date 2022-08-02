@@ -24,8 +24,7 @@ class PayPalPayment extends PaymentHandler
         OrderEntity $orderEntity,
         SalesChannelContext $salesChannelContext,
         CustomerEntity $customer
-    ): array
-    {
+    ): array {
         return $orderData;
 
         // @todo find error and fix it

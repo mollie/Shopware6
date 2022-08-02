@@ -4,5 +4,4 @@ namespace Kiener\MolliePayments\Exception;
 
 class CouldNotSetRefundAtMollieException extends \Exception
 {
-
 }

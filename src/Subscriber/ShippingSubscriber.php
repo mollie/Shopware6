@@ -23,8 +23,7 @@ class ShippingSubscriber implements EventSubscriberInterface
     public function __construct(
         MollieShipment  $shipmentFacade,
         LoggerInterface $logger
-    )
-    {
+    ) {
         $this->shipmentFacade = $shipmentFacade;
         $this->logger = $logger;
     }

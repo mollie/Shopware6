@@ -4,10 +4,8 @@ namespace Kiener\MolliePayments\Exception;
 
 use Shopware\Core\Checkout\Payment\Exception\PaymentProcessException;
 
-
 class PaymentUrlException extends PaymentProcessException
 {
-
     public function __construct(string $orderTransactionId, string $errorMessage)
     {
         parent::__construct(
@@ -21,5 +19,4 @@ class PaymentUrlException extends PaymentProcessException
     {
         return 'CHECKOUT__MOLLIE_COULD_NOT_CREATE_PAYMENT_URL';
     }
-
 }

@@ -43,7 +43,6 @@ class VoucherPayment extends PaymentHandler
         # add the category as mentioned here
         # https://docs.mollie.com/reference/v2/orders-api/create-order
         foreach ($lineItems as &$line) {
-
             $orderLineItemID = $line['metadata']['orderLineItemId'];
 
             $category = $this->getProductCategory($orderEntity, $orderLineItemID);
@@ -67,7 +66,6 @@ class VoucherPayment extends PaymentHandler
     {
         /** @var OrderLineItemEntity $lineItem */
         foreach ($orderEntity->getLineItems() as $lineItem) {
-
             if (!$lineItem->getId() === $lineItemId) {
                 continue;
             }

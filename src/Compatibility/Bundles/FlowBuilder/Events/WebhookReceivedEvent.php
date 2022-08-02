@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events;
 
-
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Shopware\Core\Checkout\Customer\CustomerDefinition;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
@@ -16,7 +15,6 @@ use Shopware\Core\Framework\Event\EventData\EventDataCollection;
 use Shopware\Core\Framework\Event\EventData\ScalarValueType;
 use Shopware\Core\Framework\Event\OrderAware;
 use Symfony\Contracts\EventDispatcher\Event;
-
 
 class WebhookReceivedEvent extends Event implements OrderAware, BusinessEventInterface
 {
@@ -98,5 +96,4 @@ class WebhookReceivedEvent extends Event implements OrderAware, BusinessEventInt
     {
         return $this->context;
     }
-
 }

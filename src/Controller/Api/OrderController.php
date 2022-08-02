@@ -22,8 +22,7 @@ class OrderController extends AbstractController
     public function __construct(
         OrderService $orderService,
         Order $mollieOrderService
-    )
-    {
+    ) {
         $this->orderService = $orderService;
         $this->mollieOrderService = $mollieOrderService;
     }

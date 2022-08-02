@@ -43,7 +43,7 @@ class SettingsService implements PluginSettingsServiceInterface
     /**
      * Get Mollie settings from configuration.
      *
-     * @param string|null $salesChannelId
+     * @param null|string $salesChannelId
      * @return MollieSettingStruct
      */
     public function getSettings(?string $salesChannelId = null): MollieSettingStruct
@@ -86,7 +86,7 @@ class SettingsService implements PluginSettingsServiceInterface
     /**
      * @param string $key
      * @param $value
-     * @param string|null $salesChannelId
+     * @param null|string $salesChannelId
      */
     public function set(string $key, $value, ?string $salesChannelId = null): void
     {
@@ -95,7 +95,7 @@ class SettingsService implements PluginSettingsServiceInterface
 
     /**
      * @param string $key
-     * @param string|null $salesChannelId
+     * @param null|string $salesChannelId
      */
     public function delete(string $key, ?string $salesChannelId = null): void
     {
@@ -103,8 +103,8 @@ class SettingsService implements PluginSettingsServiceInterface
     }
 
     /**
-     * @param string|null $profileId
-     * @param string|null $salesChannelId
+     * @param null|string $profileId
+     * @param null|string $salesChannelId
      * @param bool $testMode
      */
     public function setProfileId(?string $profileId, ?string $salesChannelId = null, bool $testMode = false): void
@@ -141,5 +141,4 @@ class SettingsService implements PluginSettingsServiceInterface
         $devMode = trim((string)getenv('MOLLIE_DEV_MODE'));
         return ($devMode === '1');
     }
-
 }

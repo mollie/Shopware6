@@ -16,14 +16,13 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Currency\CurrencyEntity;
 
-
 class SubscriptionBuilder
 {
 
     /**
      * @param OrderEntity $order
-     * @return SubscriptionEntity
      * @throws Exception
+     * @return SubscriptionEntity
      */
     public function buildSubscription(OrderEntity $order): SubscriptionEntity
     {
@@ -43,8 +42,8 @@ class SubscriptionBuilder
     /**
      * @param OrderLineItemEntity $lineItem
      * @param OrderEntity $order
-     * @return SubscriptionEntity
      * @throws Exception
+     * @return SubscriptionEntity
      */
     private function buildItemSubscription(OrderLineItemEntity $lineItem, OrderEntity $order): SubscriptionEntity
     {
@@ -125,7 +124,6 @@ class SubscriptionBuilder
 
         if ($order->getDeliveries() instanceof OrderDeliveryCollection) {
             foreach ($order->getDeliveries() as $delivery) {
-
                 $shippingAddress = $delivery->getShippingOrderAddress();
 
                 # if we have a different shipping address
@@ -157,5 +155,4 @@ class SubscriptionBuilder
 
         return $subscriptionEntity;
     }
-
 }

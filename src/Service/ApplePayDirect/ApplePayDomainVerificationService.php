@@ -44,5 +44,4 @@ class ApplePayDomainVerificationService
 
         $this->filesystem->put(self::LOCAL_FILE, $content);
     }
-
 }

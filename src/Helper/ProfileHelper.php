@@ -3,7 +3,6 @@
 
 namespace Kiener\MolliePayments\Helper;
 
-
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
@@ -33,7 +32,7 @@ class ProfileHelper
      * @param MollieApiClient     $apiClient
      * @param MollieSettingStruct $settings
      *
-     * @return Profile|null
+     * @return null|Profile
      */
     public static function getProfile(MollieApiClient $apiClient, MollieSettingStruct $settings): ?Profile
     {

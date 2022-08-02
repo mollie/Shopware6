@@ -93,11 +93,9 @@ class CancelMollieOrderSubscriber implements EventSubscriberInterface
                 $this->apiClient->orders->cancel($mollieOrderId);
             }
         } catch (ApiException $e) {
-
             $this->logger->warning(
                 $e->getMessage()
             );
         }
-
     }
 }

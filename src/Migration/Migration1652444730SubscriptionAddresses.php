@@ -46,7 +46,8 @@ class Migration1652444730SubscriptionAddresses extends MigrationStep
                       `updated_at` datetime(3) DEFAULT NULL,
                       PRIMARY KEY (id)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-                ");
+                "
+        );
 
 
         $this->createColumn('mollie_subscription', 'billing_address_id', 'binary(16)', $connection);
@@ -72,8 +73,8 @@ class Migration1652444730SubscriptionAddresses extends MigrationStep
      * @param string $column
      * @param string $type
      * @param Connection $connection
-     * @return void
      * @throws Exception
+     * @return void
      */
     private function createColumn(string $table, string $column, string $type, Connection $connection): void
     {
@@ -89,8 +90,8 @@ class Migration1652444730SubscriptionAddresses extends MigrationStep
      * @param string $indexName
      * @param string $targetField
      * @param Connection $connection
-     * @return void
      * @throws Exception
+     * @return void
      */
     private function buildIndex(string $table, string $indexName, string $targetField, Connection $connection): void
     {
@@ -106,5 +107,4 @@ class Migration1652444730SubscriptionAddresses extends MigrationStep
             $connection->exec("CREATE INDEX `" . $indexName . "` ON " . $table . " (" . $targetField . ");");
         }
     }
-
 }

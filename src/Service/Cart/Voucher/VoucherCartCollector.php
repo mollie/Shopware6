@@ -20,7 +20,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class VoucherCartCollector implements CartDataCollectorInterface
 {
-
     public const VOUCHER_PERMITTED = 'mollie-voucher-permitted';
 
     /**
@@ -63,7 +62,7 @@ class VoucherCartCollector implements CartDataCollectorInterface
         # we try to improve this as first step, by only verifying our products
         # if we even have the voucher payment method assigned to our Sales Channel.
         # if it's not assigned anyway, then we can simply skip that step
-        /** @var string[]|null $paymentMethodIDs */
+        /** @var null|string[] $paymentMethodIDs */
         $paymentMethodIDs = $context->getSalesChannel()->getPaymentMethodIds();
 
         if (is_array($paymentMethodIDs)) {
@@ -85,7 +84,6 @@ class VoucherCartCollector implements CartDataCollectorInterface
                 # then we have to update the actual line item,
                 # because the current one might be empty, if only our PARENT would be configured.
                 if (VoucherType::isVoucherProduct($voucherType)) {
-
                     $cartHasVoucher = true;
 
                     # load current custom fields data of mollie
@@ -106,7 +104,7 @@ class VoucherCartCollector implements CartDataCollectorInterface
 
 
     /**
-     * @param Context|null $context
+     * @param null|Context $context
      * @return array|string
      */
     private function getVoucherID(Context $context)
@@ -119,5 +117,4 @@ class VoucherCartCollector implements CartDataCollectorInterface
 
         return $paymentMethods[0];
     }
-
 }

@@ -54,10 +54,10 @@ class MollieApiFactory
 
     /**
      * Create a new instance of the Mollie API client.
-     * @param string|null $salesChannelId
+     * @param null|string $salesChannelId
      *
-     * @return MollieApiClient
      * @throws IncompatiblePlatform
+     * @return MollieApiClient
      * @deprecated please use the getClient option in the future
      */
     public function createClient(?string $salesChannelId = null): MollieApiClient
@@ -71,7 +71,7 @@ class MollieApiFactory
     /**
      * Returns a new instance of the Mollie API client.
      *
-     * @param string|null $salesChannelId
+     * @param null|string $salesChannelId
      *
      * @return MollieApiClient
      */
@@ -127,7 +127,6 @@ class MollieApiFactory
             $this->apiClient->addVersionString('Shopware/' . $this->shopwareVersion);
 
             $this->apiClient->addVersionString('MollieShopware6/' . MolliePayments::PLUGIN_VERSION);
-
         } catch (Exception $e) {
             $this->logger->error($e->getMessage(), [$e]);
         }
@@ -135,6 +134,4 @@ class MollieApiFactory
         # TODO we should change to fail-fast one day, but not at this time!
         return $this->apiClient;
     }
-
-
 }

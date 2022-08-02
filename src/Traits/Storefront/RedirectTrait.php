@@ -51,5 +51,4 @@ trait RedirectTrait
             $router::ABSOLUTE_URL
         );
     }
-
 }

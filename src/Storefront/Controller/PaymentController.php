@@ -101,8 +101,8 @@ class PaymentController extends StorefrontController
      * @param SalesChannelContext $salesChannelContext
      * @param                     $transactionId
      *
-     * @return Response|RedirectResponse
      * @throws ApiException
+     * @return RedirectResponse|Response
      */
     public function payment(SalesChannelContext $salesChannelContext, $transactionId): ?Response
     {
@@ -120,7 +120,6 @@ class PaymentController extends StorefrontController
         );
 
         if (!$transaction instanceof OrderTransactionEntity) {
-
             $this->logger->critical(
                 sprintf('Transaction with id %s could not be read from database', $transactionId)
             );
@@ -132,7 +131,6 @@ class PaymentController extends StorefrontController
 
         // TODO: Refactor to use Service/OrderService::getOrder if $order does not exist.
         if (!$order instanceof OrderEntity) {
-
             $this->logger->critical(
                 sprintf('Could not fetch order from transaction with id %s', $transactionId)
             );
@@ -157,7 +155,6 @@ class PaymentController extends StorefrontController
         $mollieOrderId = $customFields->getMollieOrderId();
 
         if (empty($mollieOrderId)) {
-
             $this->logger->critical(
                 sprintf('Could not fetch mollie order id from order with number %s', $order->getOrderNumber())
             );
@@ -168,15 +165,12 @@ class PaymentController extends StorefrontController
         // TODO: Refactor to use Service/MollieApi/Order::getMollieOrder
         /** @var Order $mollieOrder */
         try {
-
             $apiClient = $this->apiFactory->getClient($this->compatibilityGateway->getSalesChannelID($salesChannelContext));
 
             $mollieOrder = $apiClient->orders->get($mollieOrderId, [
                 'embed' => 'payments'
             ]);
-
         } catch (ApiException $e) {
-
             $this->logger->critical(
                 sprintf('Could not fetch order at mollie with id %s', $mollieOrderId)
             );
@@ -186,12 +180,10 @@ class PaymentController extends StorefrontController
 
         // if configuration is shopware payment flow we could redirect now
         if ($settings->isShopwareFailedPaymentMethod()) {
-
             return $this->returnRedirect($salesChannelContext, $customFields->getTransactionReturnUrl(), $order, $mollieOrder);
         }
 
         if (!$this->molliePaymentFlow->process($transaction, $order, $mollieOrder, $salesChannelContext)) {
-
             return $this->returnFailedRedirect($salesChannelContext, $mollieOrder->getCheckoutUrl(), $order, $mollieOrder, $transactionId);
         }
 
@@ -251,8 +243,8 @@ class PaymentController extends StorefrontController
      *
      * @param SalesChannelContext $context
      * @param                     $transactionId
-     * @return Response|RedirectResponse
      * @throws Exception
+     * @return RedirectResponse|Response
      */
     public function retry(SalesChannelContext $context, $transactionId): RedirectResponse
     {

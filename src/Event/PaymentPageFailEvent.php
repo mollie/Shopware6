@@ -17,22 +17,22 @@ class PaymentPageFailEvent extends Event
     private $context;
 
     /**
-     * @var OrderEntity|null
+     * @var null|OrderEntity
      */
     private $shopwareOrder;
 
     /**
-     * @var Order|null
+     * @var null|Order
      */
     private $mollieOrder;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $salesChannelId;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $redirectUrl;
 
@@ -42,8 +42,7 @@ class PaymentPageFailEvent extends Event
         ?Order $mollieOrder = null,
         ?string $salesChannelId = null,
         ?string $redirectUrl = null
-    )
-    {
+    ) {
         $this->context = $context;
         $this->shopwareOrder = $shopwareOrder;
         $this->mollieOrder = $mollieOrder;

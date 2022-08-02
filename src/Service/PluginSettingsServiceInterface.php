@@ -20,5 +20,4 @@ interface PluginSettingsServiceInterface
      * @return bool
      */
     public function getEnvMollieDevMode(): bool;
-
 }

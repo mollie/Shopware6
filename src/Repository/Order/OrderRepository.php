@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Repository\Order;
 
-
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 
@@ -37,5 +36,4 @@ class OrderRepository
             ]
         ], $context);
     }
-
 }

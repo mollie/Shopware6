@@ -8,7 +8,6 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
-
 class DependencyLoader
 {
 
@@ -61,20 +60,15 @@ class DependencyLoader
 
         # load other data
         if ($versionCompare->gte('6.4')) {
-
             $loader->load('compatibility/services_6.4.xml');
-
-        } else if ($versionCompare->gte('6.3.5.0')) {
-
+        } elseif ($versionCompare->gte('6.3.5.0')) {
             $loader->load('compatibility/services_6.3.5.0.xml');
-
         }
 
 
         $composerDevReqsInstalled = file_exists(__DIR__ . '/../../vendor/bin/phpunit');
 
         if ($composerDevReqsInstalled) {
-
             $dirFixtures = __DIR__ . '/../../tests/Fixtures';
 
             if (is_dir($dirFixtures)) {
@@ -87,7 +81,5 @@ class DependencyLoader
                 $loader->load('services/fixtures/fixtures.xml');
             }
         }
-
     }
-
 }

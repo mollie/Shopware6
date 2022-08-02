@@ -9,10 +9,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-
 class ApplePayDownloadCommand extends Command
 {
-
     public static $defaultName = 'mollie:applepay:download-verification';
 
 
@@ -45,7 +43,6 @@ class ApplePayDownloadCommand extends Command
      */
     protected function configure(): void
     {
-
         $this
             ->setName((string)self::$defaultName)
             ->setDescription('Download the latest Apple Pay Domain Verification File of Mollie.');
@@ -62,7 +59,6 @@ class ApplePayDownloadCommand extends Command
         $io->title('MOLLIE Apple Pay Domain Verification file download');
 
         try {
-
             $this->logger->info('Downloading new Apple Pay Domain Verification file from CLI command');
 
             $this->applePayService->downloadDomainAssociationFile();
@@ -70,9 +66,7 @@ class ApplePayDownloadCommand extends Command
             $io->success('New Apple Pay Domain Verification file has been downloaded into your ./public/.well-known folder');
 
             return 0;
-
         } catch (\Throwable $exception) {
-
             $this->logger->critical('Error when downloading Apple Pay Domain Verification file on CLI: ' . $exception->getMessage());
 
             $io->error($exception->getMessage());
@@ -80,5 +74,4 @@ class ApplePayDownloadCommand extends Command
             return 1;
         }
     }
-
 }

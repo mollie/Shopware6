@@ -20,7 +20,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-
 class MollieLimitsRemover extends PaymentMethodRemover
 {
     /**
@@ -46,8 +45,8 @@ class MollieLimitsRemover extends PaymentMethodRemover
     /**
      * @param PaymentMethodRouteResponse $originalData
      * @param SalesChannelContext        $context
-     * @return PaymentMethodRouteResponse
      * @throws Exception
+     * @return PaymentMethodRouteResponse
      */
     public function removePaymentMethods(PaymentMethodRouteResponse $originalData, SalesChannelContext $context): PaymentMethodRouteResponse
     {
@@ -67,7 +66,6 @@ class MollieLimitsRemover extends PaymentMethodRemover
             try {
                 $cart = $this->getCart($context);
             } catch (MissingCartServiceException $e) {
-
                 $this->logger->error($e->getMessage(), [
                     'exception' => $e,
                 ]);
@@ -81,7 +79,6 @@ class MollieLimitsRemover extends PaymentMethodRemover
             try {
                 $order = $this->getOrder($context->getContext());
             } catch (BadRequestException|MissingRequestException|OrderNotFoundException $e) {
-
                 $this->logger->error($e->getMessage(), [
                     'exception' => $e,
                 ]);
@@ -106,7 +103,6 @@ class MollieLimitsRemover extends PaymentMethodRemover
 
         /** @var PaymentMethodEntity $paymentMethod */
         foreach ($originalData->getPaymentMethods() as $paymentMethod) {
-
             $mollieAttributes = new PaymentMethodAttributes($paymentMethod);
 
             # check if we have even a mollie payment

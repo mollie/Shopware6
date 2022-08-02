@@ -59,9 +59,7 @@ class VoucherService
             # some plugins (custom products, easycoupon) use not-existing product numbers in the line items.
             # in that case, we just ignore this, and return voucher type NOT_SET (in the exception)
             $currentProduct = $this->getProductByNumber($attributes->getProductNumber(), $context);
-
         } catch (ProductNumberNotFoundException $ex) {
-
             $this->logger->notice(
                 'VoucherService could not find product: ' . $attributes->getProductNumber() . '. This might be a custom product, or voucher. If so, you can just ignore this message! If not, something is going wrong in here!'
             );
@@ -77,7 +75,6 @@ class VoucherService
         # if we don't have a voucher type in our current product,
         # but we do have a parent product, then check if that one is a voucher.
         if ($voucherType === VoucherType::TYPE_NOTSET && !empty($currentProduct->getParentId())) {
-
             $parentProduct = $this->getProductById($currentProduct->getParentId(), $context);
             $parentAttributes = new ProductAttributes($parentProduct);
 
@@ -133,5 +130,4 @@ class VoucherService
 
         return array_shift($products);
     }
-
 }

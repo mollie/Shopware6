@@ -70,5 +70,4 @@ class ApplePayLineItem
     {
         return $this->price;
     }
-    
 }

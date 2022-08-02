@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Components\RefundManager\RefundData;
 
-
 use Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem\AbstractItem;
 use Mollie\Api\Resources\Refund;
 
@@ -130,5 +129,4 @@ class RefundData
             'refunds' => $this->refunds,
         ];
     }
-
 }

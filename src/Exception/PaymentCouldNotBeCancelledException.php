@@ -10,7 +10,7 @@ class PaymentCouldNotBeCancelledException extends ShopwareHttpException
     /**
      * @param string $molliePaymentId
      * @param array<string,mixed> $parameters
-     * @param \Throwable|null $previous
+     * @param null|\Throwable $previous
      */
     public function __construct(string $molliePaymentId, array $parameters = [], \Throwable $previous = null)
     {

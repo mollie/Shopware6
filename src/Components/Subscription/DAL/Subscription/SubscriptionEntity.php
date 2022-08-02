@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Components\Subscription\DAL\Subscription;
 
-
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressCollection;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\MollieLiveData;
@@ -14,7 +13,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
 
 class SubscriptionEntity extends Entity
 {
-
     use EntityIdTrait;
 
 
@@ -84,22 +82,22 @@ class SubscriptionEntity extends Entity
     protected $shippingAddressId;
 
     /**
-     * @var array<mixed>|null
+     * @var null|array<mixed>
      */
     protected $metadata;
 
     /**
-     * @var \DateTimeInterface|null
+     * @var null|\DateTimeInterface
      */
     protected $lastRemindedAt;
 
     /**
-     * @var \DateTimeInterface|null
+     * @var null|\DateTimeInterface
      */
     protected $nextPaymentAt;
 
     /**
-     * @var \DateTimeInterface|null
+     * @var null|\DateTimeInterface
      */
     protected $canceledAt;
 
@@ -112,7 +110,7 @@ class SubscriptionEntity extends Entity
     protected $mollieStatus;
 
     /**
-     * @var \DateTimeInterface|null
+     * @var null|\DateTimeInterface
      */
     protected $cancelUntil;
 
@@ -125,12 +123,12 @@ class SubscriptionEntity extends Entity
     protected $addresses;
 
     /**
-     * @var SubscriptionAddressEntity|null
+     * @var null|SubscriptionAddressEntity
      */
     protected $billingAddress;
 
     /**
-     * @var SubscriptionAddressEntity|null
+     * @var null|SubscriptionAddressEntity
      */
     protected $shippingAddress;
 
@@ -316,7 +314,7 @@ class SubscriptionEntity extends Entity
     }
 
     /**
-     * @return \DateTimeInterface|null
+     * @return null|\DateTimeInterface
      */
     public function getLastRemindedAt(): ?\DateTimeInterface
     {
@@ -324,7 +322,7 @@ class SubscriptionEntity extends Entity
     }
 
     /**
-     * @param \DateTimeInterface|null $lastRemindedAt
+     * @param null|\DateTimeInterface $lastRemindedAt
      */
     public function setLastRemindedAt(?\DateTimeInterface $lastRemindedAt): void
     {
@@ -332,7 +330,7 @@ class SubscriptionEntity extends Entity
     }
 
     /**
-     * @return \DateTimeInterface|null
+     * @return null|\DateTimeInterface
      */
     public function getNextPaymentAt(): ?\DateTimeInterface
     {
@@ -340,7 +338,7 @@ class SubscriptionEntity extends Entity
     }
 
     /**
-     * @param \DateTimeInterface|null $nextPaymentAt
+     * @param null|\DateTimeInterface $nextPaymentAt
      */
     public function setNextPaymentAt(?\DateTimeInterface $nextPaymentAt): void
     {
@@ -348,7 +346,7 @@ class SubscriptionEntity extends Entity
     }
 
     /**
-     * @return \DateTimeInterface|null
+     * @return null|\DateTimeInterface
      */
     public function getCanceledAt(): ?\DateTimeInterface
     {
@@ -356,7 +354,7 @@ class SubscriptionEntity extends Entity
     }
 
     /**
-     * @param \DateTimeInterface|null $canceledAt
+     * @param null|\DateTimeInterface $canceledAt
      */
     public function setCanceledAt(?\DateTimeInterface $canceledAt): void
     {
@@ -364,7 +362,7 @@ class SubscriptionEntity extends Entity
     }
 
     /**
-     * @return SubscriptionAddressEntity|null
+     * @return null|SubscriptionAddressEntity
      */
     public function getBillingAddress(): ?SubscriptionAddressEntity
     {
@@ -372,7 +370,7 @@ class SubscriptionEntity extends Entity
     }
 
     /**
-     * @param SubscriptionAddressEntity|null $billingAddress
+     * @param null|SubscriptionAddressEntity $billingAddress
      */
     public function setBillingAddress(?SubscriptionAddressEntity $billingAddress): void
     {
@@ -380,7 +378,7 @@ class SubscriptionEntity extends Entity
     }
 
     /**
-     * @return SubscriptionAddressEntity|null
+     * @return null|SubscriptionAddressEntity
      */
     public function getShippingAddress(): ?SubscriptionAddressEntity
     {
@@ -388,7 +386,7 @@ class SubscriptionEntity extends Entity
     }
 
     /**
-     * @param SubscriptionAddressEntity|null $shippingAddress
+     * @param null|SubscriptionAddressEntity $shippingAddress
      */
     public function setShippingAddress(?SubscriptionAddressEntity $shippingAddress): void
     {
@@ -396,7 +394,7 @@ class SubscriptionEntity extends Entity
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getBillingAddressId(): ?string
     {
@@ -404,7 +402,7 @@ class SubscriptionEntity extends Entity
     }
 
     /**
-     * @param string|null $billingAddressId
+     * @param null|string $billingAddressId
      */
     public function setBillingAddressId(?string $billingAddressId): void
     {
@@ -412,7 +410,7 @@ class SubscriptionEntity extends Entity
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getShippingAddressId(): ?string
     {
@@ -420,7 +418,7 @@ class SubscriptionEntity extends Entity
     }
 
     /**
-     * @param string|null $shippingAddressId
+     * @param null|string $shippingAddressId
      */
     public function setShippingAddressId(?string $shippingAddressId): void
     {
@@ -470,7 +468,7 @@ class SubscriptionEntity extends Entity
     }
 
     /**
-     * @param \DateTimeInterface|null $cancelUntil
+     * @param null|\DateTimeInterface $cancelUntil
      * @return void
      */
     public function setCancelUntil(?\DateTimeInterface $cancelUntil): void
@@ -479,7 +477,7 @@ class SubscriptionEntity extends Entity
     }
 
     /**
-     * @return \DateTimeInterface|null
+     * @return null|\DateTimeInterface
      */
     public function getCancelUntil(): ?\DateTimeInterface
     {
@@ -519,5 +517,4 @@ class SubscriptionEntity extends Entity
     {
         $this->addresses = $addresses;
     }
-
 }

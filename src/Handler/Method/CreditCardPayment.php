@@ -31,8 +31,7 @@ class CreditCardPayment extends PaymentHandler
         LoggerInterface $logger,
         ContainerInterface         $container,
         CustomerService $customerService
-    )
-    {
+    ) {
         parent::__construct($logger, $container);
         $this->customerService = $customerService;
     }
@@ -42,8 +41,7 @@ class CreditCardPayment extends PaymentHandler
         OrderEntity         $orderEntity,
         SalesChannelContext $salesChannelContext,
         CustomerEntity      $customer
-    ): array
-    {
+    ): array {
         $customFields = $customer->getCustomFields() ?? [];
         $cardToken = $customFields['mollie_payments']['credit_card_token'] ?? '';
 

@@ -3,7 +3,6 @@
 
 namespace Kiener\MolliePayments\Exception;
 
-
 use Shopware\Core\Framework\ShopwareHttpException;
 use Symfony\Component\HttpFoundation\Response;
 

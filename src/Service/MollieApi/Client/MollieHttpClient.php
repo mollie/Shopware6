@@ -7,7 +7,6 @@ use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\HttpAdapter\MollieHttpAdapterInterface;
 use Mollie\Api\MollieApiClient;
 
-
 class MollieHttpClient implements MollieHttpAdapterInterface
 {
 
@@ -43,8 +42,8 @@ class MollieHttpClient implements MollieHttpAdapterInterface
      * @param string $url
      * @param array<mixed> $headers
      * @param string $httpBody
-     * @return \stdClass|null
      * @throws ApiException
+     * @return null|\stdClass
      */
     public function send($httpMethod, $url, $headers, $httpBody)
     {
@@ -98,7 +97,7 @@ class MollieHttpClient implements MollieHttpAdapterInterface
 
     /**
      * The version number for the underlying http client, if available.
-     * @return string|null
+     * @return null|string
      * @example Guzzle/6.3
      *
      */
@@ -111,8 +110,8 @@ class MollieHttpClient implements MollieHttpAdapterInterface
      * @param string $response
      * @param int $statusCode
      * @param string $httpBody
-     * @return \stdClass|null
      * @throws \Mollie\Api\Exceptions\ApiException
+     * @return null|\stdClass
      */
     protected function parseResponseBody($response, $statusCode, $httpBody)
     {
@@ -172,6 +171,4 @@ class MollieHttpClient implements MollieHttpAdapterInterface
 
         return $result;
     }
-
-
 }

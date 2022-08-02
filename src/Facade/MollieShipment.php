@@ -93,7 +93,7 @@ class MollieShipment implements MollieShipmentInterface
      *
      * @param string $orderDeliveryId
      * @param Context $context
-     * @return OrderEntity|null
+     * @return null|OrderEntity
      */
     public function isMollieOrder(string $orderDeliveryId, Context $context): ?OrderEntity
     {
@@ -128,7 +128,6 @@ class MollieShipment implements MollieShipmentInterface
         $delivery = $this->orderDeliveryService->getDelivery($orderDeliveryId, $context);
 
         if (!$delivery instanceof OrderDeliveryEntity) {
-
             $this->logger->warning(
                 sprintf('Order delivery with id %s could not be found in database', $orderDeliveryId)
             );
@@ -139,7 +138,6 @@ class MollieShipment implements MollieShipmentInterface
         $order = $delivery->getOrder();
 
         if (!$order instanceof OrderEntity) {
-
             $this->logger->warning(
                 sprintf('Loaded delivery with id %s does not have an order in database', $orderDeliveryId)
             );
@@ -151,7 +149,6 @@ class MollieShipment implements MollieShipmentInterface
         $mollieOrderId = $customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY] ?? null;
 
         if (!$mollieOrderId) {
-
             $this->logger->warning(
                 sprintf('Mollie orderId does not exist in shopware order (%s)', (string)$order->getOrderNumber())
             );
@@ -163,7 +160,6 @@ class MollieShipment implements MollieShipmentInterface
         $lastTransaction = $this->extractor->extractLastMolliePayment($order->getTransactions());
 
         if (!$lastTransaction instanceof OrderTransactionEntity) {
-
             $this->logger->info(
                 sprintf(
                     'The last transaction of the order (%s) is not a mollie payment! No shipment will be sent to mollie',
@@ -198,8 +194,7 @@ class MollieShipment implements MollieShipmentInterface
         string $trackingCode,
         string $trackingUrl,
         Context $context
-    ): \Mollie\Api\Resources\Shipment
-    {
+    ): \Mollie\Api\Resources\Shipment {
         $order = $this->orderService->getOrder($orderId, $context);
         return $this->shipOrder(
             $order,
@@ -224,8 +219,7 @@ class MollieShipment implements MollieShipmentInterface
         string $trackingCode,
         string $trackingUrl,
         Context $context
-    ): \Mollie\Api\Resources\Shipment
-    {
+    ): \Mollie\Api\Resources\Shipment {
         $order = $this->orderService->getOrderByNumber($orderNumber, $context);
         return $this->shipOrder(
             $order,
@@ -250,8 +244,7 @@ class MollieShipment implements MollieShipmentInterface
         string $trackingCode,
         string $trackingUrl,
         Context $context
-    ): \Mollie\Api\Resources\Shipment
-    {
+    ): \Mollie\Api\Resources\Shipment {
         $mollieOrderId = $this->orderService->getMollieOrderId($order);
 
         $shipment = $this->mollieApiShipmentService->shipOrder(
@@ -285,8 +278,7 @@ class MollieShipment implements MollieShipmentInterface
         string $trackingCode,
         string $trackingUrl,
         Context $context
-    ): \Mollie\Api\Resources\Shipment
-    {
+    ): \Mollie\Api\Resources\Shipment {
         $order = $this->orderService->getOrder($orderId, $context);
         return $this->shipItem(
             $order,
@@ -317,8 +309,7 @@ class MollieShipment implements MollieShipmentInterface
         string $trackingCode,
         string $trackingUrl,
         Context $context
-    ): \Mollie\Api\Resources\Shipment
-    {
+    ): \Mollie\Api\Resources\Shipment {
         $order = $this->orderService->getOrderByNumber($orderNumber, $context);
         return $this->shipItem(
             $order,
@@ -349,9 +340,7 @@ class MollieShipment implements MollieShipmentInterface
         string $trackingCode,
         string $trackingUrl,
         Context $context
-    ): \Mollie\Api\Resources\Shipment
-    {
-
+    ): \Mollie\Api\Resources\Shipment {
         $mollieOrderId = $this->orderService->getMollieOrderId($order);
 
         $lineItems = $this->findMatchingLineItems($order, $itemIdentifier, $context);
@@ -479,17 +468,16 @@ class MollieShipment implements MollieShipmentInterface
         string $trackingCarrier,
         string $trackingCode,
         string $trackingUrl
-    ): ?ShipmentTrackingInfoStruct
-    {
-        if(empty($trackingCarrier) && empty($trackingCode)) {
+    ): ?ShipmentTrackingInfoStruct {
+        if (empty($trackingCarrier) && empty($trackingCode)) {
             return null;
         }
 
-        if(empty($trackingCarrier) && !empty($trackingCode)) {
+        if (empty($trackingCarrier) && !empty($trackingCode)) {
             throw new \InvalidArgumentException('Missing Argument for Tracking Carrier!');
         }
 
-        if(!empty($trackingCarrier) && empty($trackingCode)) {
+        if (!empty($trackingCarrier) && empty($trackingCode)) {
             throw new \InvalidArgumentException('Missing Argument for Tracking Code!');
         }
 

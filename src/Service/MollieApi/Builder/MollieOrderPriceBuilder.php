@@ -17,8 +17,8 @@ class MollieOrderPriceBuilder
 
 
     /**
-     * @param float|null $price
-     * @param string|null $currency
+     * @param null|float $price
+     * @param null|string $currency
      * @return array
      */
     public function build(?float $price, ?string $currency): array
@@ -34,7 +34,7 @@ class MollieOrderPriceBuilder
     }
 
     /**
-     * @param float|null $price
+     * @param null|float $price
      * @return string
      */
     public function formatValue(?float $price)
@@ -45,5 +45,4 @@ class MollieOrderPriceBuilder
 
         return number_format(round($price, self::MOLLIE_PRICE_PRECISION), self::MOLLIE_PRICE_PRECISION, '.', '');
     }
-
 }

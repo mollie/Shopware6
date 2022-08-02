@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Service\ApplePayDirect\Services;
 
-
 use Kiener\MolliePayments\Service\ApplePayDirect\Models\ApplePayCart;
 use Kiener\MolliePayments\Service\ApplePayDirect\Models\ApplePayLineItem;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
@@ -129,5 +128,4 @@ class ApplePayFormatter
 
         return round($value, $countDecimals);
     }
-
 }

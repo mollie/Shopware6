@@ -35,8 +35,7 @@ class TestModeNotificationSubscriber implements EventSubscriberInterface
      */
     public function __construct(
         SettingsService $settingsService
-    )
-    {
+    ) {
         $this->settingsService = $settingsService;
     }
 

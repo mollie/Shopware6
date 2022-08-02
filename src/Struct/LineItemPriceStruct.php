@@ -85,5 +85,4 @@ class LineItemPriceStruct
     {
         return $this->roundingRest;
     }
-
 }

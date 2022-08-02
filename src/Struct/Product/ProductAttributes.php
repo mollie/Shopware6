@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Struct\Product;
 
-
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Kiener\MolliePayments\Struct\Voucher\VoucherType;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
@@ -79,7 +78,7 @@ class ProductAttributes
     }
 
     /**
-     * @return int|null
+     * @return null|int
      */
     public function getSubscriptionInterval()
     {
@@ -87,7 +86,7 @@ class ProductAttributes
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getSubscriptionIntervalUnit()
     {
@@ -95,7 +94,7 @@ class ProductAttributes
     }
 
     /**
-     * @return int|null
+     * @return null|int
      */
     public function getSubscriptionRepetitionCount()
     {

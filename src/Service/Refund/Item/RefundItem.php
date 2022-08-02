@@ -87,5 +87,4 @@ class RefundItem
     {
         return $this->mollieLineID;
     }
-
 }

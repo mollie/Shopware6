@@ -248,6 +248,4 @@ class CustomFieldsInstaller
             ]
         ], $context);
     }
-
 }
-

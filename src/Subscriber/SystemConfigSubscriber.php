@@ -62,7 +62,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface
     /**
      * @param string $key
      * @param $value
-     * @param string|null $salesChannelId
+     * @param null|string $salesChannelId
      * @param Context $context
      */
     private function checkSystemConfigChange(string $key, $value, ?string $salesChannelId, Context $context)
@@ -95,7 +95,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface
 
     /**
      * @param $value
-     * @param string|null $salesChannelId
+     * @param null|string $salesChannelId
      * @param bool $testMode
      * @param Context $context
      */
@@ -136,7 +136,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface
 
         $profile = ProfileHelper::getProfile($this->apiClient, new MollieSettingStruct());
 
-        if(!$profile instanceof Profile) {
+        if (!$profile instanceof Profile) {
             $this->logger->error(
                 'Could not get profile using these settings',
                 [
@@ -171,7 +171,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface
      *
      * @param string $key
      * @param $value
-     * @param string|null $salesChannelId
+     * @param null|string $salesChannelId
      * @param bool $testMode
      * @param Context $context
      */
@@ -198,7 +198,6 @@ class SystemConfigSubscriber implements EventSubscriberInterface
             // If we haven't stored the profile ID from Mollie, but we are getting a value here from the admin,
             // then we no longer need to store this key, so delete it.
             if ($value) {
-
                 $this->logger->debug(
                     "Removing profile ID",
                     [

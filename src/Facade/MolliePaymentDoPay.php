@@ -119,8 +119,8 @@ class MolliePaymentDoPay
      * @param AsyncPaymentTransactionStruct $transactionStruct
      * @param SalesChannelContext $salesChannelContext
      * @param PaymentHandler $paymentHandler
-     * @return MolliePaymentPrepareData
      * @throws ApiException
+     * @return MolliePaymentPrepareData
      */
     public function startMolliePayment(string $paymentMethod, AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext, PaymentHandler $paymentHandler): MolliePaymentPrepareData
     {
@@ -162,7 +162,7 @@ class MolliePaymentDoPay
                     $salesChannelContext,
                     $paymentHandler
                 );
-            } catch(MollieOrderCancelledException | MollieOrderExpiredException $e) {
+            } catch (MollieOrderCancelledException | MollieOrderExpiredException $e) {
                 # Warn about cancelled/expired order, but otherwise do nothing and let it create a new order.
                 $this->logger->warning($e->getMessage(), [
                     'orderNumber' => $order->getOrderNumber(),
@@ -228,7 +228,6 @@ class MolliePaymentDoPay
     public function createCustomerAtMollie(OrderEntity $order, SalesChannelContext $salesChannelContext): void
     {
         try {
-
             $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
 
             $orderAttributes = new OrderAttributes($order);
@@ -245,7 +244,6 @@ class MolliePaymentDoPay
                     $salesChannelContext->getContext()
                 );
             }
-
         } catch (CouldNotCreateMollieCustomerException|CustomerCouldNotBeFoundException $e) {
 
             # TODO do we really need to catch this? shouldnt it fail fast?
@@ -269,8 +267,8 @@ class MolliePaymentDoPay
      * @param AsyncPaymentTransactionStruct $transactionStruct
      * @param SalesChannelContext $salesChannelContext
      * @param PaymentHandler $paymentHandler
-     * @return MolliePaymentPrepareData
      * @throws ApiException
+     * @return MolliePaymentPrepareData
      */
     private function handleNextPaymentAttempt(OrderEntity $order, string $swOrderTransactionID, OrderAttributes $orderCustomFields, string $mollieOrderId, string $paymentMethod, AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext, PaymentHandler $paymentHandler): MolliePaymentPrepareData
     {
@@ -324,8 +322,8 @@ class MolliePaymentDoPay
      * @param AsyncPaymentTransactionStruct $transactionStruct
      * @param SalesChannelContext $salesChannelContext
      * @param PaymentHandler $paymentHandler
-     * @return MollieOrder
      * @throws \Exception
+     * @return MollieOrder
      */
     private function createMollieOrder(OrderEntity $orderEntity, string $paymentMethod, AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext, PaymentHandler $paymentHandler): \Mollie\Api\Resources\Order
     {
@@ -346,5 +344,4 @@ class MolliePaymentDoPay
             $salesChannelContext
         );
     }
-
 }

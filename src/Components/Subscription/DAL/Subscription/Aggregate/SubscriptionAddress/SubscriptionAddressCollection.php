@@ -10,9 +10,9 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
  * @method void set(string $key, SubscriptionEntity $entity)
  * @method SubscriptionAddressEntity[]     getIterator()
  * @method SubscriptionAddressEntity[]     getElements()
- * @method SubscriptionAddressEntity|null  get(string $key)
- * @method SubscriptionAddressEntity|null  first()
- * @method SubscriptionAddressEntity|null  last()
+ * @method null|SubscriptionAddressEntity  get(string $key)
+ * @method null|SubscriptionAddressEntity  first()
+ * @method null|SubscriptionAddressEntity  last()
  */
 class SubscriptionAddressCollection extends EntityCollection
 {

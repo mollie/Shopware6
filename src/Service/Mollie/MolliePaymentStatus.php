@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Service\Mollie;
 
-
 class MolliePaymentStatus
 {
     const MOLLIE_PAYMENT_UNKNOWN = 'unknown';
@@ -76,5 +75,4 @@ class MolliePaymentStatus
 
         return (in_array($status, $list, true));
     }
-
 }

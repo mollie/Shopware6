@@ -44,6 +44,5 @@ abstract class AbstractItem
     /**
      * @return array<mixed>
      */
-    public abstract function toArray(): array;
-
+    abstract public function toArray(): array;
 }

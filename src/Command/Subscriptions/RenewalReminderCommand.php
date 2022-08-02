@@ -10,10 +10,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-
 class RenewalReminderCommand extends Command
 {
-
     public static $defaultName = 'mollie:subscriptions:renewal-reminder';
 
 
@@ -62,7 +60,6 @@ class RenewalReminderCommand extends Command
         $io->title('MOLLIE Subscription Renewal Reminders');
 
         try {
-
             $this->logger->info('Starting Subscription Renewal Reminder on CLI');
 
             $context = Context::createDefaultContext();
@@ -74,9 +71,7 @@ class RenewalReminderCommand extends Command
             $io->success($remindedCount . ' subscriptions renewal reminders have been processed successfully!');
 
             return 0;
-
         } catch (\Throwable $exception) {
-
             $this->logger->critical('Error when processing subscription renewal reminders on CLI: ' . $exception->getMessage());
 
             $io->error($exception->getMessage());
@@ -84,5 +79,4 @@ class RenewalReminderCommand extends Command
             return 1;
         }
     }
-
 }
