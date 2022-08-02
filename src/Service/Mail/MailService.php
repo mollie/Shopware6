@@ -35,8 +35,7 @@ class MailService extends AbstractMailService
         AbstractMailFactory $mailFactory,
         AbstractMailSender  $mailSender,
         LoggerInterface     $logger
-    )
-    {
+    ) {
         $this->dataValidator = $dataValidator;
         $this->mailFactory = $mailFactory;
         $this->mailSender = $mailSender;

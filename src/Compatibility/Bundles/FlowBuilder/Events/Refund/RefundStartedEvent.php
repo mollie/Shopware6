@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund;
 
-
 use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
@@ -92,5 +91,4 @@ class RefundStartedEvent extends Event implements OrderAware, BusinessEventInter
     {
         return $this->context;
     }
-
 }

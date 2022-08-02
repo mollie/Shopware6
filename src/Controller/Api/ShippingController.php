@@ -33,7 +33,6 @@ class ShippingController extends AbstractController
      */
     public function __construct(MollieShipment $shipmentFacade, LoggerInterface $logger)
     {
-
         $this->shipmentFacade = $shipmentFacade;
         $this->logger = $logger;
     }
@@ -87,8 +86,8 @@ class ShippingController extends AbstractController
      *
      * @param QueryDataBag $query
      * @param Context $context
-     * @return JsonResponse
      * @throws \Exception
+     * @return JsonResponse
      */
     public function shipItemApi(QueryDataBag $query, Context $context): JsonResponse
     {
@@ -234,8 +233,7 @@ class ShippingController extends AbstractController
         string  $trackingCode,
         string  $trackingUrl,
         Context $context
-    ): JsonResponse
-    {
+    ): JsonResponse {
         try {
             if (empty($orderId)) {
                 throw new \InvalidArgumentException('Missing Argument for Order ID!');
@@ -324,8 +322,7 @@ class ShippingController extends AbstractController
         string  $trackingCode,
         string  $trackingUrl,
         Context $context
-    ): JsonResponse
-    {
+    ): JsonResponse {
         try {
             if (empty($orderId)) {
                 throw new \InvalidArgumentException('Missing Argument for Order ID!');

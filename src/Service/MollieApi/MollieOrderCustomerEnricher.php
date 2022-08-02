@@ -30,8 +30,8 @@ class MollieOrderCustomerEnricher
      * @param CustomerEntity $customer
      * @param MollieSettingStruct $settings
      * @param SalesChannelContext $salesChannelContext
-     * @return array
      * @throws CustomerCouldNotBeFoundExceptionAlias
+     * @return array
      */
     public function enrich(array $orderData, CustomerEntity $customer, MollieSettingStruct $settings, SalesChannelContext $salesChannelContext): array
     {
@@ -46,5 +46,4 @@ class MollieOrderCustomerEnricher
 
         return $orderData;
     }
-
 }

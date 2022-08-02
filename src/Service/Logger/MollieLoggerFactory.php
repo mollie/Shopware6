@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Service\Logger;
 
-
 use Kiener\MolliePayments\Service\SettingsService;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
@@ -10,7 +9,6 @@ use Monolog\Processor\PsrLogMessageProcessor;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Session\Session;
-
 
 class MollieLoggerFactory
 {
@@ -72,5 +70,4 @@ class MollieLoggerFactory
             $sessionID
         );
     }
-
 }

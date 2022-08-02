@@ -8,7 +8,6 @@ use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Migration\MigrationStep;
 use Shopware\Core\Framework\Uuid\Uuid;
 
-
 class Migration1644753635CreateSubscription extends MigrationStep
 {
     /**
@@ -70,8 +69,8 @@ class Migration1644753635CreateSubscription extends MigrationStep
      * @param string $indexName
      * @param string $targetField
      * @param Connection $connection
-     * @return void
      * @throws Exception
+     * @return void
      */
     private function buildIndex(string $table, string $indexName, string $targetField, Connection $connection): void
     {
@@ -87,5 +86,4 @@ class Migration1644753635CreateSubscription extends MigrationStep
             $connection->exec("CREATE INDEX `" . $indexName . "` ON " . $table . " (" . $targetField . ");");
         }
     }
-
 }

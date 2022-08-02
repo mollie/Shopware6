@@ -111,7 +111,6 @@ class RefundController extends AbstractController
     public function refundManagerData(RequestDataBag $data, Context $context): JsonResponse
     {
         try {
-
             $orderId = $data->getAlnum('orderId');
 
             $order = $this->orderService->getOrder($orderId, $context);
@@ -119,14 +118,10 @@ class RefundController extends AbstractController
             $data = $this->refundManager->getData($order, $context);
 
             return $this->json($data->toArray());
-
         } catch (ShopwareHttpException $e) {
-
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
-
         } catch (\Throwable $e) {
-
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], 500);
         }
@@ -280,20 +275,15 @@ class RefundController extends AbstractController
     private function listRefundsAction(string $orderId, Context $context): JsonResponse
     {
         try {
-
             $order = $this->orderService->getOrder($orderId, $context);
 
             $refunds = $this->refundService->getRefunds($order);
 
             return $this->json($refunds);
-
         } catch (ShopwareHttpException $e) {
-
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
-
         } catch (\Throwable $e) {
-
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], 500);
         }
@@ -307,7 +297,6 @@ class RefundController extends AbstractController
     private function listTotalAction(string $orderId, Context $context): JsonResponse
     {
         try {
-
             $order = $this->orderService->getOrder($orderId, $context);
 
             $data = $this->refundManager->getData($order, $context);
@@ -320,12 +309,9 @@ class RefundController extends AbstractController
             ];
 
             return $this->json($json);
-
         } catch (ShopwareHttpException $e) {
-
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
-
         } catch (PaymentNotFoundException $e) {
 
             # This indicates there is no completed payment for this order, so there are no refunds yet.
@@ -337,9 +323,7 @@ class RefundController extends AbstractController
             ];
 
             return $this->json($totals);
-
         } catch (\Throwable $e) {
-
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], 500);
         }
@@ -349,7 +333,7 @@ class RefundController extends AbstractController
      * @param string $orderId
      * @param string $orderNumber
      * @param string $description
-     * @param float|null $amount
+     * @param null|float $amount
      * @param array $items
      * @param Context $context
      * @return JsonResponse
@@ -357,13 +341,9 @@ class RefundController extends AbstractController
     private function refundAction(string $orderId, string $orderNumber, string $description, ?float $amount, array $items, Context $context): JsonResponse
     {
         try {
-
             if (!empty($orderId)) {
-
                 $order = $this->orderService->getOrder($orderId, $context);
-
             } else {
-
                 if (empty($orderNumber)) {
                     throw new \InvalidArgumentException('Missing Argument for Order ID or order number!');
                 }
@@ -397,15 +377,14 @@ class RefundController extends AbstractController
                 'success' => true,
                 'refundId' => $refund->id
             ]);
-
         } catch (\Throwable $e) {
-
             $this->logger->error($e->getMessage());
 
-            return $this->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ],
+            return $this->json(
+                [
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ],
                 500
             );
         }
@@ -420,9 +399,7 @@ class RefundController extends AbstractController
     private function cancelRefundAction(string $orderId, string $refundId, Context $context): JsonResponse
     {
         try {
-
             $success = $this->refundManager->cancelRefund($orderId, $refundId, $context);
-
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
@@ -435,5 +412,4 @@ class RefundController extends AbstractController
             'success' => $success
         ]);
     }
-
 }

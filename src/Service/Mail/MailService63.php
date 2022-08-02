@@ -33,8 +33,8 @@ class MailService63 extends AbstractMailService
         DataValidator   $dataValidator,
         MessageFactory  $mailFactory, // @phpstan-ignore-line
         MailSender      $mailSender, // @phpstan-ignore-line
-        LoggerInterface $logger)
-    {
+        LoggerInterface $logger
+    ) {
         $this->dataValidator = $dataValidator;
         $this->mailFactory = $mailFactory;
         $this->mailSender = $mailSender;

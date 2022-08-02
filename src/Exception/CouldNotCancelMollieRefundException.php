@@ -9,9 +9,9 @@ class CouldNotCancelMollieRefundException extends \RuntimeException
         string $orderNumber,
         string $refundId,
         ?\Throwable $previous = null
-    )
-    {
-        $message = sprintf("Could not cancel the refund with id %s for order %s (Order number %s)",
+    ) {
+        $message = sprintf(
+            "Could not cancel the refund with id %s for order %s (Order number %s)",
             $refundId,
             $mollieOrderId,
             $orderNumber

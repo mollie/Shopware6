@@ -10,7 +10,7 @@ class OrderLineItemsNotFoundException extends ShopwareHttpException
     /**
      * @param string $id
      * @param array<string,mixed> $parameters
-     * @param \Throwable|null $previous
+     * @param null|\Throwable $previous
      */
     public function __construct(string $id, array $parameters = [], \Throwable $previous = null)
     {

@@ -19,8 +19,8 @@ class ApiKeyValidator
 
     /**
      * @param string $key
-     * @return bool
      * @throws \Mollie\Api\Exceptions\ApiException
+     * @return bool
      */
     public function validate(string $key): bool
     {

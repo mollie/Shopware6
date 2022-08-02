@@ -2,14 +2,12 @@
 
 namespace Kiener\MolliePayments\Components\Subscription\Rule;
 
-
 use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\Rule\LineItemScope;
 use Shopware\Core\Framework\Rule\Rule;
 use Shopware\Core\Framework\Rule\RuleScope;
 use Symfony\Component\Validator\Constraints\Type;
-
 
 class LineItemSubscriptionRule extends Rule
 {
@@ -73,14 +71,11 @@ class LineItemSubscriptionRule extends Rule
     private function isItemSubscription(LineItem $lineItem): bool
     {
         try {
-
             $attributes = new LineItemAttributes($lineItem);
 
             return $attributes->isSubscriptionProduct();
-
         } catch (\Exception $e) {
             return false;
         }
     }
-
 }

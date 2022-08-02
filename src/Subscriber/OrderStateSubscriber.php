@@ -3,7 +3,6 @@
 
 namespace Kiener\MolliePayments\Subscriber;
 
-
 use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\PaymentMethodService;
@@ -36,8 +35,7 @@ class OrderStateSubscriber implements EventSubscriberInterface
         MollieApiClient $apiClient,
         OrderService $orderService,
         PaymentMethodService $paymentMethodService
-    )
-    {
+    ) {
         $this->apiClient = $apiClient;
         $this->orderService = $orderService;
         $this->paymentMethodService = $paymentMethodService;
@@ -45,7 +43,7 @@ class OrderStateSubscriber implements EventSubscriberInterface
 
     public function onKlarnaOrderCancelledAsAdmin(StateMachineStateChangeEvent $event)
     {
-        if(!($event->getContext()->getSource() instanceof AdminApiSource)) {
+        if (!($event->getContext()->getSource() instanceof AdminApiSource)) {
             return;
         }
 
@@ -56,7 +54,7 @@ class OrderStateSubscriber implements EventSubscriberInterface
             OrderStates::STATE_CANCELLED
         ]);
 
-        if($event->getStateEventName() !== $orderStateCancelled) {
+        if ($event->getStateEventName() !== $orderStateCancelled) {
             return;
         }
 

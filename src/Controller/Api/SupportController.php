@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Controller\Api;
 
-
 use Kiener\MolliePayments\Facade\MollieSupportFacade;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\MailTemplate\Exception\MailTransportFailedException;
@@ -99,7 +98,7 @@ class SupportController extends AbstractController
     /**
      * @param string $name
      * @param string $email
-     * @param string|null $recipientLocale
+     * @param null|string $recipientLocale
      * @param string $host
      * @param string $subject
      * @param string $message
@@ -109,7 +108,6 @@ class SupportController extends AbstractController
     private function sendSupportRequest(string $name, string $email, ?string $recipientLocale, string $host, string $subject, string $message, Context $context): JsonResponse
     {
         try {
-
             $this->logger->info('Sending Support Request to Mollie: ' . $subject);
 
             $this->supportFacade->sendSupportRequest(
@@ -127,9 +125,7 @@ class SupportController extends AbstractController
                     'success' => true,
                 ]
             );
-
         } catch (ConstraintViolationException|MailTransportFailedException $e) {
-
             $this->logger->error(
                 $e->getMessage(),
                 [
@@ -142,9 +138,7 @@ class SupportController extends AbstractController
                 'success' => false,
                 'error' => $e->getMessage()
             ]);
-
         } catch (\Throwable $e) {
-
             $this->logger->error(
                 $e->getMessage(),
                 [
@@ -156,8 +150,6 @@ class SupportController extends AbstractController
                 'success' => false,
                 'error' => $e->getMessage()
             ]);
-
         }
     }
-
 }

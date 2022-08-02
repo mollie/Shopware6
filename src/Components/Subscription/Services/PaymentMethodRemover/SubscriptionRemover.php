@@ -21,7 +21,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class SubscriptionRemover extends PaymentMethodRemover
 {
-
     public const ALLOWED_METHODS = [
         'ideal',
         'bancontact',
@@ -56,8 +55,8 @@ class SubscriptionRemover extends PaymentMethodRemover
     /**
      * @param PaymentMethodRouteResponse $originalData
      * @param SalesChannelContext        $context
-     * @return PaymentMethodRouteResponse
      * @throws \Exception
+     * @return PaymentMethodRouteResponse
      */
     public function removePaymentMethods(PaymentMethodRouteResponse $originalData, SalesChannelContext $context): PaymentMethodRouteResponse
     {
@@ -71,16 +70,15 @@ class SubscriptionRemover extends PaymentMethodRemover
             $isSubscription = $this->isSubscriptionOrder($order, $context->getContext());
         }
 
-        if(!isset($isSubscription)) {
+        if (!isset($isSubscription)) {
             $isSubscription = false;
         }
 
-        if(!$isSubscription) {
+        if (!$isSubscription) {
             return $originalData;
         }
 
         foreach ($originalData->getPaymentMethods() as $key => $paymentMethod) {
-
             $attributes = new PaymentMethodAttributes($paymentMethod);
 
             $paymentMethodName = $attributes->getMollieIdentifier();
@@ -100,7 +98,6 @@ class SubscriptionRemover extends PaymentMethodRemover
     private function isSubscriptionCart(Cart $cart): bool
     {
         foreach ($cart->getLineItems() as $lineItem) {
-
             $attribute = new LineItemAttributes($lineItem);
 
             if ($attribute->isSubscriptionProduct()) {
@@ -124,7 +121,7 @@ class SubscriptionRemover extends PaymentMethodRemover
         foreach ($lineItems as $lineItem) {
             $attributes = new OrderLineItemEntityAttributes($lineItem);
 
-            if($attributes->isSubscriptionProduct()) {
+            if ($attributes->isSubscriptionProduct()) {
                 return true;
             }
         }

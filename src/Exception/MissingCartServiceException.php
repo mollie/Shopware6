@@ -8,7 +8,6 @@ use Throwable;
 
 class MissingCartServiceException extends ShopwareHttpException
 {
-
     public function __construct(Throwable $previous = null)
     {
         $message = 'CartService of Shopware not found!';

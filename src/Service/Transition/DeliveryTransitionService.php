@@ -45,7 +45,6 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
         $availableTransitions = $this->getAvailableTransitions($delivery, $context);
 
         if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_REOPEN, $availableTransitions)) {
-
             $this->loggerService->error(
                 sprintf(
                     'It is not allowed to change status to open from %s. Aborting reopen transition',

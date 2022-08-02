@@ -73,8 +73,8 @@ class OrderStatusUpdater
      * @param OrderTransactionEntity $transaction
      * @param string $targetShopwareStatusKey
      * @param Context $context
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function updatePaymentStatus(OrderTransactionEntity $transaction, string $targetShopwareStatusKey, Context $context): void
     {
@@ -162,13 +162,11 @@ class OrderStatusUpdater
         # let's check if we have configured a final order state.
         # if so, we need to verify, if a transition is even allowed
         if (!empty($settings->getOrderStateFinalState())) {
-
             $currentId = $order->getStateMachineState()->getId();
 
             # test if our current order does already have
             # our configured final order state
             if ($currentId === $settings->getOrderStateFinalState()) {
-
                 $allowedList = [
                     MolliePaymentStatus::MOLLIE_PAYMENT_REFUNDED,
                     MolliePaymentStatus::MOLLIE_PAYMENT_PARTIALLY_REFUNDED,
@@ -225,5 +223,4 @@ class OrderStatusUpdater
                 throw new \Exception('Updating Order Status of Order not possible for status: ' . $status);
         }
     }
-
 }

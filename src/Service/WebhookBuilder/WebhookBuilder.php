@@ -6,7 +6,6 @@ use Kiener\MolliePayments\Service\PluginSettingsServiceInterface;
 use Kiener\MolliePayments\Service\SettingsService;
 use Symfony\Component\Routing\RouterInterface;
 
-
 class WebhookBuilder
 {
     /**
@@ -51,7 +50,6 @@ class WebhookBuilder
         $customDomain = $this->pluginSettings->getEnvMollieShopDomain();
 
         if ($customDomain !== '') {
-
             $components = parse_url($webhookUrl);
 
             # replace old domain with new custom domain
@@ -76,7 +74,6 @@ class WebhookBuilder
         $customDomain = $this->pluginSettings->getEnvMollieShopDomain();
 
         if ($customDomain !== '') {
-
             $components = parse_url($webhookUrl);
 
             # replace old domain with new custom domain
@@ -100,5 +97,4 @@ class WebhookBuilder
 
         return $webhookUrl;
     }
-
 }

@@ -21,8 +21,7 @@ abstract class AbstractSalesChannelGenerator implements GeneratorInterface
      */
     public function __construct(
         EntityRepositoryInterface $salesChannelRepository
-    )
-    {
+    ) {
         $this->salesChannelRepository = $salesChannelRepository;
     }
 

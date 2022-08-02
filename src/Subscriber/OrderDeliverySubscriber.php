@@ -89,5 +89,4 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
 
         $this->mollieShipment->setShipment($event->getTransition()->getEntityId(), $event->getContext());
     }
-
 }

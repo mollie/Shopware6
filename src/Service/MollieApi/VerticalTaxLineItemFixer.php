@@ -48,7 +48,6 @@ class VerticalTaxLineItemFixer
         $firstLineItem = $filteredRoundingLineItems->first();
 
         if (!$firstLineItem instanceof MollieLineItem) {
-
             $this->logger->critical('Got a rounding rest but cannot filter for items !');
 
             throw new \RuntimeException('Got a rounding rest but cannot filter for items !');
@@ -62,5 +61,4 @@ class VerticalTaxLineItemFixer
 
         $firstLineItem->setPrice($fixedPriceStruct);
     }
-
 }

@@ -47,8 +47,7 @@ class ConfigController extends AbstractController
         SettingsService $settings,
         SnippetFinderInterface $snippetFinder,
         ApiKeyValidator $apiKeyValidator
-    )
-    {
+    ) {
         $this->settings = $settings;
         $this->snippetFinder = $snippetFinder;
         $this->apiKeyValidator = $apiKeyValidator;
@@ -247,5 +246,4 @@ class ConfigController extends AbstractController
 
         return '';
     }
-
 }

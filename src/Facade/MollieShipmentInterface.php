@@ -79,5 +79,4 @@ interface MollieShipmentInterface
      * @return Shipment
      */
     public function shipItem(OrderEntity $order, string $itemIdentifier, int $quantity, string $trackingCarrier, string $trackingCode, string $trackingUrl, Context $context): Shipment;
-
 }

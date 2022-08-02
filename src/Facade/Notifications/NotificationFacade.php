@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Facade\Notifications;
 
-
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatcherAdapterInterface;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
@@ -30,7 +29,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-
 
 class NotificationFacade
 {
@@ -112,8 +110,8 @@ class NotificationFacade
      * @param string $transactionId
      * @param MollieSettingStruct $settings
      * @param SalesChannelContext $contextSC
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function onNotify(string $transactionId, MollieSettingStruct $settings, SalesChannelContext $contextSC): void
     {
@@ -172,14 +170,12 @@ class NotificationFacade
             # from our sales channel mollie profile
             $mollieOrder = $this->gatewayMollie->getOrder($mollieOrderId);
             $status = $this->statusConverter->getMollieOrderStatus($mollieOrder);
-
-        } else if ($orderAttributes->isTypeSubscription()) {
+        } elseif ($orderAttributes->isTypeSubscription()) {
 
             # subscriptions are automatically charged using a payment ID
             # so we do not have an order, but a payment instead
             $molliePayment = $this->gatewayMollie->getPayment($orderAttributes->getMolliePaymentId());
             $status = $this->statusConverter->getMolliePaymentStatus($molliePayment);
-
         } else {
             throw new \Exception('Order is neither a Mollie order nor a subscription order: ' . $swOrder->getOrderNumber());
         }
@@ -228,14 +224,13 @@ class NotificationFacade
         # not yet supported in this shopware version, then
         # this only triggers a dummy dispatcher ;)
         $this->fireFlowBuilderEvents($swOrder, $status, $contextSC->getContext());
-
     }
 
 
     /**
      * @param string $transactionId
      * @param Context $context
-     * @return OrderTransactionEntity|null
+     * @return null|OrderTransactionEntity
      */
     private function getTransaction(string $transactionId, Context $context): ?OrderTransactionEntity
     {
@@ -293,7 +288,9 @@ class NotificationFacade
     {
         $criteria = new Criteria();
         $criteria->addFilter(
-            new MultiFilter('AND', [
+            new MultiFilter(
+                'AND',
+                [
                     new ContainsFilter('handlerIdentifier', 'Kiener\MolliePayments\Handler\Method'),
                     new EqualsFilter('customFields.mollie_payment_method_name', $mollieOrder->method)
                 ]
@@ -311,12 +308,13 @@ class NotificationFacade
 
         $transaction->setPaymentMethodId($shopwarePaymentId);
 
-        $this->repoOrderTransactions->update([
+        $this->repoOrderTransactions->update(
             [
-                'id' => $transaction->getUniqueIdentifier(),
-                'paymentMethodId' => $shopwarePaymentId
-            ]
-        ],
+                [
+                    'id' => $transaction->getUniqueIdentifier(),
+                    'paymentMethodId' => $shopwarePaymentId
+                ]
+            ],
             $context
         );
     }
@@ -349,7 +347,7 @@ class NotificationFacade
                 $paymentEvent = $this->flowBuilderEventFactory->buildWebhookReceivedExpiredEvent($swOrder, $context);
                 break;
 
-            case MolliePaymentStatus::MOLLIE_PAYMENT_PENDING;
+            case MolliePaymentStatus::MOLLIE_PAYMENT_PENDING:
                 $paymentEvent = $this->flowBuilderEventFactory->buildWebhookReceivedPendingEvent($swOrder, $context);
                 break;
 
@@ -381,7 +379,5 @@ class NotificationFacade
         if ($paymentEvent !== null) {
             $this->flowBuilderDispatcher->dispatch($paymentEvent);
         }
-
     }
-
 }

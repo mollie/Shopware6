@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Compatibility;
 
-
 class VersionCompare
 {
 
@@ -38,5 +37,4 @@ class VersionCompare
     {
         return version_compare($this->swVersion, $version, '<');
     }
-
 }

@@ -2,9 +2,7 @@
 
 namespace Kiener\MolliePayments\Service\Refund\Mollie;
 
-
 use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
-
 
 class RefundMetadata
 {
@@ -41,7 +39,6 @@ class RefundMetadata
         $items = [];
 
         foreach ($composition as $compItem) {
-
             $items[] = new RefundItem(
                 $compItem['swLineId'],
                 $compItem['mollieLineId'],
@@ -80,7 +77,6 @@ class RefundMetadata
         ];
 
         foreach ($this->items as $item) {
-
             if ($item->getQuantity() <= 0) {
                 continue;
             }
@@ -96,5 +92,4 @@ class RefundMetadata
 
         return json_encode($data);
     }
-
 }

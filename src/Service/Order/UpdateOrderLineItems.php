@@ -34,7 +34,6 @@ class UpdateOrderLineItems
     {
         /** @var OrderLine $orderLine */
         foreach ($mollieOrder->lines() as $orderLine) {
-
             if ($orderLine->type === OrderLineType::TYPE_SHIPPING_FEE) {
                 continue;
             }
@@ -57,6 +56,4 @@ class UpdateOrderLineItems
             $this->orderLineRepository->update([$data], $salesChannelContext->getContext());
         }
     }
-
-
 }

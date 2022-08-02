@@ -5,7 +5,6 @@ namespace Kiener\MolliePayments\Event;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
-
 class MollieOrderBuildEvent
 {
 
@@ -98,5 +97,4 @@ class MollieOrderBuildEvent
     {
         $this->metadata = $metadata;
     }
-
 }

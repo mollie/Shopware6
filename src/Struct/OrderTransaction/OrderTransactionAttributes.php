@@ -2,22 +2,21 @@
 
 namespace Kiener\MolliePayments\Struct\OrderTransaction;
 
-
 class OrderTransactionAttributes
 {
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $mollieOrderId;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $molliePaymentId;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $thirdPartyPaymentId;
 
@@ -33,7 +32,7 @@ class OrderTransactionAttributes
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getMollieOrderId(): ?string
     {
@@ -41,7 +40,7 @@ class OrderTransactionAttributes
     }
 
     /**
-     * @param string|null $mollieOrderId
+     * @param null|string $mollieOrderId
      */
     public function setMollieOrderId(?string $mollieOrderId): void
     {
@@ -49,7 +48,7 @@ class OrderTransactionAttributes
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getMolliePaymentId(): ?string
     {
@@ -57,7 +56,7 @@ class OrderTransactionAttributes
     }
 
     /**
-     * @param string|null $molliePaymentId
+     * @param null|string $molliePaymentId
      */
     public function setMolliePaymentId(?string $molliePaymentId): void
     {
@@ -65,7 +64,7 @@ class OrderTransactionAttributes
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getThirdPartyPaymentId(): ?string
     {
@@ -73,7 +72,7 @@ class OrderTransactionAttributes
     }
 
     /**
-     * @param string|null $thirdPartyPaymentId
+     * @param null|string $thirdPartyPaymentId
      */
     public function setThirdPartyPaymentId(?string $thirdPartyPaymentId): void
     {

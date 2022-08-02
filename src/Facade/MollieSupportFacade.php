@@ -34,7 +34,7 @@ class MollieSupportFacade
     /**
      * @param string $replyToName
      * @param string $replyToEmail
-     * @param string|null $recipientLocale
+     * @param null|string $recipientLocale
      * @param string $noReplyHost
      * @param string $subject
      * @param string $contentHtml
@@ -68,5 +68,4 @@ class MollieSupportFacade
 
         $this->mailService->send($data, $attachments);
     }
-
 }

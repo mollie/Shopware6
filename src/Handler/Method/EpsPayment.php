@@ -22,8 +22,7 @@ class EpsPayment extends PaymentHandler
         OrderEntity $orderEntity,
         SalesChannelContext $salesChannelContext,
         CustomerEntity $customer
-    ): array
-    {
+    ): array {
         return $orderData;
     }
 }

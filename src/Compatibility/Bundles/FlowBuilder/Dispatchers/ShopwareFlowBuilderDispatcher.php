@@ -5,7 +5,6 @@ namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Dispatchers;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatcherAdapterInterface;
 use Shopware\Core\Framework\Event\BusinessEventDispatcher;
 
-
 class ShopwareFlowBuilderDispatcher implements FlowBuilderDispatcherAdapterInterface
 {
 
@@ -31,5 +30,4 @@ class ShopwareFlowBuilderDispatcher implements FlowBuilderDispatcherAdapterInter
     {
         $this->dispatcher->dispatch($event);
     }
-
 }

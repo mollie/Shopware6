@@ -9,7 +9,7 @@ class SalesChannelPaymentMethodsException extends ShopwareHttpException
     /**
      * @param string $salesChannelName
      * @param array<mixed> $parameters
-     * @param \Throwable|null $previous
+     * @param null|\Throwable $previous
      */
     public function __construct(string $salesChannelName, array $parameters = [], ?\Throwable $previous = null)
     {

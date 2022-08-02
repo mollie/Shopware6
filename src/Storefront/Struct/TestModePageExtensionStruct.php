@@ -8,7 +8,8 @@ class TestModePageExtensionStruct extends Struct
 {
     protected $testMode = true;
 
-    public function __construct(bool $testMode) {
+    public function __construct(bool $testMode)
+    {
         $this->testMode = $testMode;
     }
 

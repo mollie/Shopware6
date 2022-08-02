@@ -12,7 +12,6 @@ use Shopware\Core\Checkout\Cart\Error\ErrorCollection;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
-
 class AvailabilityInformationValidator implements CartValidatorInterface
 {
 
@@ -42,7 +41,6 @@ class AvailabilityInformationValidator implements CartValidatorInterface
         $foundSubscriptionItem = null;
 
         foreach ($cart->getLineItems()->getFlat() as $lineItem) {
-
             $attributes = new LineItemAttributes($lineItem);
 
             if (!$attributes->isSubscriptionProduct()) {
@@ -67,7 +65,6 @@ class AvailabilityInformationValidator implements CartValidatorInterface
         $list = new ErrorCollection();
 
         foreach ($cart->getErrors() as $error) {
-
             if (!$error instanceof PaymentMethodAvailabilityNotice) {
                 $list->add($error);
             }
@@ -75,5 +72,4 @@ class AvailabilityInformationValidator implements CartValidatorInterface
 
         $cart->setErrors($list);
     }
-
 }

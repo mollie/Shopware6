@@ -52,5 +52,4 @@ interface OrderServiceInterface
      * @return string
      */
     public function getMollieOrderLineId(OrderLineItemEntity $lineItem): string;
-
 }

@@ -48,5 +48,4 @@ class SubscriptionController extends AbstractController
 
         return new JsonResponse(['success' => true]);
     }
-
 }

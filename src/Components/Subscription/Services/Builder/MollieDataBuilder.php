@@ -5,7 +5,6 @@ namespace Kiener\MolliePayments\Components\Subscription\Services\Builder;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
 
-
 class MollieDataBuilder
 {
 
@@ -49,5 +48,4 @@ class MollieDataBuilder
             'times' => $times,
         ];
     }
-
 }

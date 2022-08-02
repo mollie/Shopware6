@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Service;
 
-
 class DomainExtractor
 {
 
@@ -22,5 +21,4 @@ class DomainExtractor
         # and without any sub shop urls
         return parse_url($url, PHP_URL_HOST);
     }
-
 }

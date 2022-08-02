@@ -172,8 +172,8 @@ class SubscriptionManager implements SubscriptionManagerInterface
     /**
      * @param OrderEntity $order
      * @param SalesChannelContext $context
-     * @return string
      * @throws Exception
+     * @return string
      */
     public function createSubscription(OrderEntity $order, SalesChannelContext $context): string
     {
@@ -270,8 +270,8 @@ class SubscriptionManager implements SubscriptionManagerInterface
 
     /**
      * @param Context $context
-     * @return int
      * @throws Exception
+     * @return int
      */
     public function remindSubscriptionRenewal(Context $context): int
     {
@@ -284,7 +284,6 @@ class SubscriptionManager implements SubscriptionManagerInterface
 
         /** @var SalesChannelEntity $salesChannel */
         foreach ($salesChannels as $salesChannel) {
-
             $settings = $this->pluginSettings->getSettings($salesChannel->getId());
 
             $daysOffset = $settings->getSubscriptionsReminderDays();
@@ -338,8 +337,8 @@ class SubscriptionManager implements SubscriptionManagerInterface
      * @param string $swSubscriptionId
      * @param string $molliePaymentId
      * @param SalesChannelContext $context
-     * @return OrderEntity
      * @throws Exception
+     * @return OrderEntity
      */
     public function renewSubscription(string $swSubscriptionId, string $molliePaymentId, SalesChannelContext $context): OrderEntity
     {
@@ -522,8 +521,8 @@ class SubscriptionManager implements SubscriptionManagerInterface
     /**
      * @param string $subscriptionId
      * @param Context $context
-     * @return string
      * @throws CustomerCouldNotBeFoundException
+     * @return string
      */
     public function updatePaymentMethodStart(string $subscriptionId, Context $context): string
     {
@@ -566,8 +565,8 @@ class SubscriptionManager implements SubscriptionManagerInterface
     /**
      * @param string $subscriptionId
      * @param Context $context
-     * @return void
      * @throws Exception
+     * @return void
      */
     public function updatePaymentMethodConfirm(string $subscriptionId, Context $context): void
     {
@@ -629,8 +628,8 @@ class SubscriptionManager implements SubscriptionManagerInterface
     /**
      * @param string $subscriptionId
      * @param Context $context
-     * @return void
      * @throws Exception
+     * @return void
      */
     public function cancelSubscription(string $subscriptionId, Context $context): void
     {
@@ -672,8 +671,8 @@ class SubscriptionManager implements SubscriptionManagerInterface
     /**
      * @param SubscriptionEntity $subscription
      * @param Context $context
-     * @return SubscriptionAddressEntity
      * @throws Exception
+     * @return SubscriptionAddressEntity
      */
     private function createNewAddress(SubscriptionEntity $subscription, Context $context): SubscriptionAddressEntity
     {
@@ -696,5 +695,4 @@ class SubscriptionManager implements SubscriptionManagerInterface
 
         return $address;
     }
-
 }

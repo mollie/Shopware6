@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Service;
 
-
 use Kiener\MolliePayments\Struct\OrderTransaction\OrderTransactionAttributes;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -40,5 +39,4 @@ class UpdateOrderTransactionCustomFields
 
         $this->repoTransactions->update([$data], $salesChannelContext->getContext());
     }
-
 }

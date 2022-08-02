@@ -28,7 +28,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelDefinition;
 
 class SubscriptionDefinition extends EntityDefinition
 {
-
     public const ENTITY_NAME = 'mollie_subscription';
 
     /**

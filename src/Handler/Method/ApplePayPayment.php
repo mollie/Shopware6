@@ -24,8 +24,7 @@ class ApplePayPayment extends PaymentHandler
         OrderEntity $orderEntity,
         SalesChannelContext $salesChannelContext,
         CustomerEntity $customer
-    ): array
-    {
+    ): array {
         if (!empty($this->token)) {
             $orderData['payment']['applePayPaymentToken'] = $this->token;
         }

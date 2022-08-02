@@ -10,10 +10,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-
 class SetupCommand extends Command
 {
-
     public static $defaultName = 'mollie:configuration:setup';
 
 
@@ -46,7 +44,6 @@ class SetupCommand extends Command
      */
     protected function configure(): void
     {
-
         $this
             ->setName((string)self::$defaultName)
             ->setDescription('Installs and configures the plugin without the need to disable and activate it again.');
@@ -63,7 +60,6 @@ class SetupCommand extends Command
         $io->title('MOLLIE Plugin Setup');
 
         try {
-
             $this->logger->info('Starting plugin setup from CLI command');
 
             $context = Context::createDefaultContext();
@@ -72,9 +68,7 @@ class SetupCommand extends Command
             $io->success('Plugin setup successfully finished. Data should now be existing as expected');
 
             return 0;
-
         } catch (\Throwable $exception) {
-
             $this->logger->critical('Error when starting plugin setup on CLI: ' . $exception->getMessage());
 
             $io->error($exception->getMessage());
@@ -82,5 +76,4 @@ class SetupCommand extends Command
             return 1;
         }
     }
-
 }

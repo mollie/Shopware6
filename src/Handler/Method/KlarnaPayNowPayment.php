@@ -34,5 +34,4 @@ class KlarnaPayNowPayment extends PaymentHandler
     {
         return $orderData;
     }
-
 }

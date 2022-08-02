@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Service\Cart;
 
-
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
@@ -101,5 +100,4 @@ class CartBackupService
         $this->cartService->setCart($backupCart);
         $this->cartService->recalculate($backupCart, $context);
     }
-
 }

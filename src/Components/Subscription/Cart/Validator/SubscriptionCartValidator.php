@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Components\Subscription\Cart\Validator;
 
-
 use Kiener\MolliePayments\Components\Subscription\Cart\Error\InvalidGuestAccountError;
 use Kiener\MolliePayments\Components\Subscription\Cart\Error\InvalidPaymentMethodError;
 use Kiener\MolliePayments\Components\Subscription\Cart\Error\MixedCartBlockError;
@@ -86,7 +85,6 @@ class SubscriptionCartValidator implements CartValidatorInterface
         if (!$isAllowed) {
             $errorCollection->add(new InvalidPaymentMethodError());
         }
-
     }
 
     /**
@@ -97,7 +95,6 @@ class SubscriptionCartValidator implements CartValidatorInterface
         $list = new ErrorCollection();
 
         foreach ($cart->getErrors() as $error) {
-
             if (!$error instanceof InvalidGuestAccountError &&
                 !$error instanceof MixedCartBlockError &&
                 !$error instanceof InvalidPaymentMethodError) {
@@ -116,7 +113,6 @@ class SubscriptionCartValidator implements CartValidatorInterface
     private function isSubscriptionCart(Cart $cart): bool
     {
         foreach ($cart->getLineItems() as $lineItem) {
-
             $attribute = new LineItemAttributes($lineItem);
 
             if ($attribute->isSubscriptionProduct()) {
@@ -138,7 +134,6 @@ class SubscriptionCartValidator implements CartValidatorInterface
         $isMixedCart = false;
 
         foreach ($cart->getLineItems()->getFlat() as $lineItem) {
-
             $attributes = new LineItemAttributes($lineItem);
 
             if ($attributes->isSubscriptionProduct()) {
@@ -164,5 +159,4 @@ class SubscriptionCartValidator implements CartValidatorInterface
 
         return false;
     }
-
 }

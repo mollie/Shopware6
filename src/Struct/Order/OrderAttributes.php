@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Struct\Order;
 
-
 use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Shopware\Core\Checkout\Cart\Cart;
@@ -10,16 +9,15 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 
-
 class OrderAttributes
 {
     /**
-     * @var string|null
+     * @var null|string
      */
     private $mollieOrderId;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $molliePaymentId;
 
@@ -34,17 +32,17 @@ class OrderAttributes
     private $mollieSubscriptionId;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $thirdPartyPaymentId;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $transactionReturnUrl;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $molliePaymentUrl;
 
@@ -78,7 +76,7 @@ class OrderAttributes
     }
 
     /**
-     * @param string|null $mollieOrderId
+     * @param null|string $mollieOrderId
      */
     public function setMollieOrderId(?string $mollieOrderId): void
     {
@@ -94,7 +92,7 @@ class OrderAttributes
     }
 
     /**
-     * @param string|null $molliePaymentId
+     * @param null|string $molliePaymentId
      */
     public function setMolliePaymentId(?string $molliePaymentId): void
     {
@@ -102,7 +100,7 @@ class OrderAttributes
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getThirdPartyPaymentId(): ?string
     {
@@ -110,7 +108,7 @@ class OrderAttributes
     }
 
     /**
-     * @param string|null $thirdPartyPaymentId
+     * @param null|string $thirdPartyPaymentId
      */
     public function setThirdPartyPaymentId(?string $thirdPartyPaymentId): void
     {
@@ -118,7 +116,7 @@ class OrderAttributes
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getTransactionReturnUrl(): ?string
     {
@@ -126,7 +124,7 @@ class OrderAttributes
     }
 
     /**
-     * @param string|null $transactionReturnUrl
+     * @param null|string $transactionReturnUrl
      */
     public function setTransactionReturnUrl(?string $transactionReturnUrl): void
     {
@@ -144,7 +142,7 @@ class OrderAttributes
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getMolliePaymentUrl(): ?string
     {
@@ -152,7 +150,7 @@ class OrderAttributes
     }
 
     /**
-     * @param string|null $molliePaymentUrl
+     * @param null|string $molliePaymentUrl
      */
     public function setMolliePaymentUrl(?string $molliePaymentUrl): void
     {

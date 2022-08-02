@@ -72,13 +72,12 @@ class OrderStateService
 
             return true;
         } catch (Exception $e) {
-
             $this->logger->error(
-                $e->getMessage(), [
+                $e->getMessage(),
+                [
                     'function' => 'payment-automate-order-state',
                 ]
             );
-
         }
 
         return false;

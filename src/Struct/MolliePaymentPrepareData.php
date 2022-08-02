@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Struct;
 
-
 class MolliePaymentPrepareData
 {
 
@@ -41,5 +40,4 @@ class MolliePaymentPrepareData
     {
         return $this->mollieID;
     }
-
 }

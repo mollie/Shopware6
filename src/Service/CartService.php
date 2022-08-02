@@ -166,5 +166,4 @@ class CartService
 
         return $this->compatibilityGateway->getSalesChannelContext($scID, $context->getToken());
     }
-
 }

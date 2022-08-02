@@ -6,7 +6,6 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Dispatchers\DummyFlo
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Dispatchers\ShopwareFlowBuilderDispatcher;
 use Kiener\MolliePayments\Compatibility\VersionCompare;
 
-
 class FlowBuilderFactory implements FlowBuilderFactoryInterface
 {
 
@@ -21,7 +20,7 @@ class FlowBuilderFactory implements FlowBuilderFactoryInterface
     private $versionCompare;
 
     /**
-     * @var \Shopware\Core\Framework\Event\BusinessEventDispatcher|null
+     * @var null|\Shopware\Core\Framework\Event\BusinessEventDispatcher
      */
     private $businessEventDispatcher;
 
@@ -38,8 +37,8 @@ class FlowBuilderFactory implements FlowBuilderFactoryInterface
 
 
     /**
-     * @return FlowBuilderDispatcherAdapterInterface
      * @throws \Exception
+     * @return FlowBuilderDispatcherAdapterInterface
      */
     public function createDispatcher(): FlowBuilderDispatcherAdapterInterface
     {
@@ -53,5 +52,4 @@ class FlowBuilderFactory implements FlowBuilderFactoryInterface
 
         return new ShopwareFlowBuilderDispatcher($this->businessEventDispatcher);
     }
-
 }

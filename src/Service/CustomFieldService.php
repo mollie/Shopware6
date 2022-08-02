@@ -33,8 +33,7 @@ class CustomFieldService
     public function __construct(
         $container,
         EntityRepositoryInterface $customFieldSetRepository
-    )
-    {
+    ) {
         $this->container = $container;
         $this->customFieldSetRepository = $customFieldSetRepository;
     }

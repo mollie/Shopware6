@@ -53,7 +53,6 @@ class PriceCalculator
         // If the order is of type TAX_STATE_NET the $lineItemTotalPrice and unit price is a net price.
         // For correct mollie api tax calculations we have to calculate the shopware gross price
         if ($orderTaxType === CartPrice::TAX_STATE_NET) {
-
             $unitPriceGross *= ((100 + $vatRate) / 100);
 
             if ($isVerticalTaxCalculation) {
@@ -134,7 +133,7 @@ class PriceCalculator
      * one taxRate that will fit for the lineItem
      *
      * @param CalculatedTaxCollection $taxCollection
-     * @return CalculatedTax|null
+     * @return null|CalculatedTax
      */
     public function getHighestTax(CalculatedTaxCollection $taxCollection): ?CalculatedTax
     {
@@ -152,5 +151,4 @@ class PriceCalculator
 
         return $taxCollection->first();
     }
-
 }

@@ -2,21 +2,19 @@
 
 namespace Kiener\MolliePayments\Components\Subscription\Services\SubscriptionReminder;
 
-
 use DateTime;
 use DateTimeInterface;
-
 
 class ReminderValidator
 {
 
     /**
-     * @param DateTimeInterface|null $nextRenewal
+     * @param null|DateTimeInterface $nextRenewal
      * @param DateTimeInterface $today
      * @param int $daysDiff
-     * @param DateTimeInterface|null $lastReminded
-     * @return bool
+     * @param null|DateTimeInterface $lastReminded
      * @throws \Exception
+     * @return bool
      */
     public function shouldRemind(?DateTimeInterface $nextRenewal, DateTimeInterface $today, int $daysDiff, ?DateTimeInterface $lastReminded): bool
     {
@@ -54,5 +52,4 @@ class ReminderValidator
 
         return true;
     }
-
 }

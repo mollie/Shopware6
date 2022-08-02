@@ -8,7 +8,6 @@ use Throwable;
 
 class MissingMollieOrderIdException extends ShopwareHttpException
 {
-
     public function __construct(string $orderNumber, Throwable $previous = null)
     {
         $message = sprintf('The Mollie id for order %s could not be found', $orderNumber);

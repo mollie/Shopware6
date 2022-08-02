@@ -8,7 +8,6 @@ use Throwable;
 
 class MissingRequestException extends ShopwareHttpException
 {
-
     public function __construct(Throwable $previous = null)
     {
         $message = 'No request available on the stack.';

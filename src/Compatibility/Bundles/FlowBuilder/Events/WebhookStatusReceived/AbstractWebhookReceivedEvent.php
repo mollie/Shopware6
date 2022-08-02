@@ -15,7 +15,6 @@ use Shopware\Core\Framework\Event\EventData\ScalarValueType;
 use Shopware\Core\Framework\Event\OrderAware;
 use Symfony\Contracts\EventDispatcher\Event;
 
-
 abstract class AbstractWebhookReceivedEvent extends Event implements OrderAware, BusinessEventInterface
 {
 
@@ -77,7 +76,7 @@ abstract class AbstractWebhookReceivedEvent extends Event implements OrderAware,
     /**
      * @return string
      */
-    public abstract function getMollieStatus(): string;
+    abstract public function getMollieStatus(): string;
 
     /**
      * @return Context
@@ -86,5 +85,4 @@ abstract class AbstractWebhookReceivedEvent extends Event implements OrderAware,
     {
         return $this->context;
     }
-
 }

@@ -44,8 +44,7 @@ class MollieOrderPaymentFlow
         PaymentMethodService $paymentMethodService,
         EntityRepositoryInterface $paymentMethodRepository,
         EntityRepositoryInterface $orderTransactionRepository
-    )
-    {
+    ) {
         $this->orderStatusConverter = $orderStatusConverter;
         $this->orderStatusUpdater = $orderStatusUpdater;
         $this->settingsService = $settingsService;
@@ -71,7 +70,9 @@ class MollieOrderPaymentFlow
             $molliePaymentMethodId = $this->paymentMethodRepository->searchIds(
                 (new Criteria())
                     ->addFilter(
-                        new MultiFilter('AND', [
+                        new MultiFilter(
+                            'AND',
+                            [
                                 new ContainsFilter('handlerIdentifier', 'Kiener\MolliePayments\Handler\Method'),
                                 new EqualsFilter('customFields.mollie_payment_method_name', $currentCustomerSelectedPaymentMethod)
                             ]
@@ -91,7 +92,6 @@ class MollieOrderPaymentFlow
                             'paymentMethodId' => $molliePaymentMethodId
                         ]
                     ],
-
                     $salesChannelContext->getContext()
                 );
             }

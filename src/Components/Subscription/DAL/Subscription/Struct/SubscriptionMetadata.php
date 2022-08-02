@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct;
 
-
 class SubscriptionMetadata
 {
 
@@ -24,7 +23,7 @@ class SubscriptionMetadata
     /**
      * Total number of charges for the subscription to complete.
      * Leave empty for an ongoing subscription.
-     * @var int|null
+     * @var null|int
      */
     private $times;
 
@@ -38,7 +37,7 @@ class SubscriptionMetadata
      * @param string $startDate
      * @param int $interval
      * @param string $intervalUnit
-     * @param int|null $times
+     * @param null|int $times
      * @param string $tmpTransactionId
      */
     public function __construct(string $startDate, int $interval, string $intervalUnit, ?int $times, string $tmpTransactionId)
@@ -115,7 +114,7 @@ class SubscriptionMetadata
     }
 
     /**
-     * @return int|null
+     * @return null|int
      */
     public function getTimes(): ?int
     {
@@ -137,5 +136,4 @@ class SubscriptionMetadata
     {
         $this->tmpTransaction = $tmpTransaction;
     }
-
 }

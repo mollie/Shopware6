@@ -46,5 +46,4 @@ class IsOrderTotalRoundingActivated
 
         return $roundForNet;
     }
-
 }

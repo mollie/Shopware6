@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Components\RefundManager;
 
-
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatcherAdapterInterface;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
@@ -115,14 +114,14 @@ class RefundManager implements RefundManagerInterface
      * @param OrderEntity $order
      * @param RefundRequest $request
      * @param Context $context
-     * @return Refund
      * @throws \Mollie\Api\Exceptions\ApiException
+     * @return Refund
      */
     public function refund(OrderEntity $order, RefundRequest $request, Context $context): Refund
     {
         $orderAttributes = new OrderAttributes($order);
 
-        /** @var \Mollie\Api\Resources\Order|null $mollieOrder */
+        /** @var null|\Mollie\Api\Resources\Order $mollieOrder */
         $mollieOrder = null;
 
         if ($orderAttributes->isTypeSubscription()) {
@@ -171,7 +170,6 @@ class RefundManager implements RefundManagerInterface
                     $context
                 );
             } else {
-
                 $refund = $this->refundService->refundFull(
                     $order,
                     $request->getDescription(),
@@ -179,15 +177,14 @@ class RefundManager implements RefundManagerInterface
                     $context
                 );
             }
-
-        } else if ($request->isFullRefundWithItems($order)) {
+        } elseif ($request->isFullRefundWithItems($order)) {
             $refund = $this->refundService->refundFull(
                 $order,
                 $request->getDescription(),
                 $serviceItems,
                 $context
             );
-        } else if ($request->isPartialAmountOnly()) {
+        } elseif ($request->isPartialAmountOnly()) {
             $refund = $this->refundService->refundPartial(
                 $order,
                 $request->getDescription(),
@@ -331,7 +328,6 @@ class RefundManager implements RefundManagerInterface
         $serviceItems = [];
 
         foreach ($request->getItems() as $requestItem) {
-
             $mollieLineID = '';
             $shopwareReferenceID = '';
 
@@ -340,7 +336,6 @@ class RefundManager implements RefundManagerInterface
             # if we have a real line item, then extract
             # the external Mollie Line ID from it
             if ($orderItem instanceof OrderLineItemEntity) {
-
                 $orderItemAttributes = new OrderLineItemEntityAttributes($orderItem);
                 $mollieLineID = $orderItemAttributes->getMollieOrderLineID();
 
@@ -349,7 +344,6 @@ class RefundManager implements RefundManagerInterface
                 } else {
                     $shopwareReferenceID = (string)$orderItem->getReferencedId();
                 }
-
             } else {
 
                 # yeah i know complexity...but for now lets keep it compact :)
@@ -395,5 +389,4 @@ class RefundManager implements RefundManagerInterface
 
         return $serviceItems;
     }
-
 }

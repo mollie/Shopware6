@@ -28,8 +28,7 @@ class Przelewy24Payment extends PaymentHandler
         OrderEntity $orderEntity,
         SalesChannelContext $salesChannelContext,
         CustomerEntity $customer
-    ): array
-    {
+    ): array {
         return $orderData;
     }
 }

@@ -216,7 +216,7 @@ class MollieSettingStruct extends Struct
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getProfileId(): ?string
     {
@@ -354,7 +354,6 @@ class MollieSettingStruct extends Struct
     public function getPaymentMethodBankTransferDueDateDays(): ?int
     {
         if (!$this->paymentMethodBankTransferDueDateDays) {
-
             return null;
         }
 
@@ -370,14 +369,13 @@ class MollieSettingStruct extends Struct
     /**
      * returns bank transfer due date in YYYY-MM-DD format or null
      *
-     * @return string|null
      * @throws Exception
+     * @return null|string
      */
     public function getPaymentMethodBankTransferDueDate(): ?string
     {
         $dueDate = $this->getPaymentMethodBankTransferDueDateDays();
         if (!$dueDate) {
-
             return null;
         }
 
@@ -405,8 +403,8 @@ class MollieSettingStruct extends Struct
     }
 
     /**
-     * @return string
      * @throws Exception
+     * @return string
      */
     public function getOrderLifetimeDate(): ?string
     {
@@ -660,5 +658,4 @@ class MollieSettingStruct extends Struct
     {
         $this->subscriptionsAllowAddressEditing = $subscriptionsAllowAddressEditing;
     }
-
 }

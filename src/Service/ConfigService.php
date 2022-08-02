@@ -23,13 +23,12 @@ class ConfigService
      * Creates a new instance of the config service.
      *
      * @param SystemConfigService $systemConfigService
-     * @param string|null         $salesChannelId
+     * @param null|string         $salesChannelId
      */
     public function __construct(
         SystemConfigService $systemConfigService,
         ?string $salesChannelId = null
-    )
-    {
+    ) {
         $this->systemConfigService = $systemConfigService;
         $this->salesChannelId = $salesChannelId;
     }
@@ -48,9 +47,9 @@ class ConfigService
      * Gets a variable from the system config service.
      *
      * @param string      $name
-     * @param string|null $salesChannelId
+     * @param null|string $salesChannelId
      *
-     * @return array|mixed|null
+     * @return null|array|mixed
      */
     public function get(string $name, ?string $salesChannelId = null)
     {
@@ -65,7 +64,7 @@ class ConfigService
      *
      * @param string      $name
      * @param string      $value
-     * @param string|null $salesChannelId
+     * @param null|string $salesChannelId
      */
     public function set(string $name, string $value, ?string $salesChannelId = null): void
     {
@@ -80,7 +79,7 @@ class ConfigService
      * Deletes a variable in the system config service.
      *
      * @param string      $name
-     * @param string|null $salesChannelId
+     * @param null|string $salesChannelId
      */
     public function delete(string $name, ?string $salesChannelId = null): void
     {

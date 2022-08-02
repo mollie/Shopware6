@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Components\Subscription\DAL\Repository;
 
-
 use DateTime;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
@@ -38,7 +37,7 @@ class SubscriptionRepository
         $this->repoAddresses = $repoAddresses;
     }
 
-#region READ
+    #region READ
 
     /**
      * @return EntityRepositoryInterface
@@ -76,8 +75,8 @@ class SubscriptionRepository
      * @param int $daysOffset
      * @param string $salesChannelId
      * @param Context $context
-     * @return EntitySearchResult<SubscriptionEntity>
      * @throws \Exception
+     * @return EntitySearchResult<SubscriptionEntity>
      */
     public function findByReminderRangeReached(int $daysOffset, string $salesChannelId, Context $context): EntitySearchResult
     {
@@ -118,9 +117,9 @@ class SubscriptionRepository
         return $this->repoSubscriptions->search($criteria, $context);
     }
 
-#endregion
+    #endregion
 
-#region INSERT/UPDATE
+    #region INSERT/UPDATE
 
     /**
      * @param SubscriptionEntity $subscription
@@ -128,30 +127,31 @@ class SubscriptionRepository
      */
     public function insertSubscription(SubscriptionEntity $subscription, Context $context): void
     {
-        $this->repoSubscriptions->create([
+        $this->repoSubscriptions->create(
             [
-                'id' => $subscription->getId(),
-                'customerId' => $subscription->getCustomerId(),
-                # ----------------------------------------------------------
-                # new subscriptions have NULL for the external
-                # mollie data. this means the payment is not confirmed yet.
-                'mollieCustomerId' => null,
-                'mollieSubscriptionId' => null,
-                'lastRemindedAt' => null,
-                'canceledAt' => null,
-                'billingAddressId' => null,
-                'shippingAddressId' => null,
-                # ----------------------------------------------------------
-                'description' => $subscription->getDescription(),
-                'amount' => $subscription->getAmount(),
-                'quantity' => $subscription->getQuantity(),
-                'currency' => $subscription->getCurrency(),
-                'metadata' => $subscription->getMetadata()->toArray(),
-                'productId' => $subscription->getProductId(),
-                'orderId' => $subscription->getOrderId(),
-                'salesChannelId' => $subscription->getSalesChannelId(),
-            ]
-        ],
+                [
+                    'id' => $subscription->getId(),
+                    'customerId' => $subscription->getCustomerId(),
+                    # ----------------------------------------------------------
+                    # new subscriptions have NULL for the external
+                    # mollie data. this means the payment is not confirmed yet.
+                    'mollieCustomerId' => null,
+                    'mollieSubscriptionId' => null,
+                    'lastRemindedAt' => null,
+                    'canceledAt' => null,
+                    'billingAddressId' => null,
+                    'shippingAddressId' => null,
+                    # ----------------------------------------------------------
+                    'description' => $subscription->getDescription(),
+                    'amount' => $subscription->getAmount(),
+                    'quantity' => $subscription->getQuantity(),
+                    'currency' => $subscription->getCurrency(),
+                    'metadata' => $subscription->getMetadata()->toArray(),
+                    'productId' => $subscription->getProductId(),
+                    'orderId' => $subscription->getOrderId(),
+                    'salesChannelId' => $subscription->getSalesChannelId(),
+                ]
+            ],
             $context
         );
 
@@ -177,14 +177,15 @@ class SubscriptionRepository
      */
     public function confirmSubscription(string $id, string $mollieSubscriptionId, string $mollieCustomerId, string $nextPaymentDate, Context $context): void
     {
-        $this->repoSubscriptions->update([
+        $this->repoSubscriptions->update(
             [
-                'id' => $id,
-                'mollieId' => $mollieSubscriptionId,
-                'mollieCustomerId' => $mollieCustomerId,
-                'nextPaymentAt' => $nextPaymentDate,
-            ]
-        ],
+                [
+                    'id' => $id,
+                    'mollieId' => $mollieSubscriptionId,
+                    'mollieCustomerId' => $mollieCustomerId,
+                    'nextPaymentAt' => $nextPaymentDate,
+                ]
+            ],
             $context
         );
     }
@@ -197,12 +198,13 @@ class SubscriptionRepository
      */
     public function updateSubscriptionMetadata(string $id, SubscriptionMetadata $metadata, Context $context): void
     {
-        $this->repoSubscriptions->update([
+        $this->repoSubscriptions->update(
             [
-                'id' => $id,
-                'metadata' => $metadata->toArray(),
-            ]
-        ],
+                [
+                    'id' => $id,
+                    'metadata' => $metadata->toArray(),
+                ]
+            ],
             $context
         );
     }
@@ -215,12 +217,13 @@ class SubscriptionRepository
      */
     public function updateNextPaymentAt(string $id, string $nextPaymentDate, Context $context): void
     {
-        $this->repoSubscriptions->update([
+        $this->repoSubscriptions->update(
             [
-                'id' => $id,
-                'nextPaymentAt' => $nextPaymentDate,
-            ]
-        ],
+                [
+                    'id' => $id,
+                    'nextPaymentAt' => $nextPaymentDate,
+                ]
+            ],
             $context
         );
     }
@@ -231,12 +234,13 @@ class SubscriptionRepository
      */
     public function markReminded(string $id, Context $context): void
     {
-        $this->repoSubscriptions->update([
+        $this->repoSubscriptions->update(
             [
-                'id' => $id,
-                'lastRemindedAt' => new DateTime(),
-            ]
-        ],
+                [
+                    'id' => $id,
+                    'lastRemindedAt' => new DateTime(),
+                ]
+            ],
             $context
         );
     }
@@ -247,12 +251,13 @@ class SubscriptionRepository
      */
     public function cancelSubscription(string $id, Context $context): void
     {
-        $this->repoSubscriptions->update([
+        $this->repoSubscriptions->update(
             [
-                'id' => $id,
-                'canceledAt' => new DateTime(),
-            ]
-        ],
+                [
+                    'id' => $id,
+                    'canceledAt' => new DateTime(),
+                ]
+            ],
             $context
         );
     }
@@ -267,12 +272,13 @@ class SubscriptionRepository
     {
         $this->upsertAddress($subscriptionId, $address, $context);
 
-        $this->repoSubscriptions->update([
+        $this->repoSubscriptions->update(
             [
-                'id' => $subscriptionId,
-                'billingAddressId' => $address->getId(),
-            ]
-        ],
+                [
+                    'id' => $subscriptionId,
+                    'billingAddressId' => $address->getId(),
+                ]
+            ],
             $context
         );
     }
@@ -287,12 +293,13 @@ class SubscriptionRepository
     {
         $this->upsertAddress($subscriptionId, $address, $context);
 
-        $this->repoSubscriptions->update([
+        $this->repoSubscriptions->update(
             [
-                'id' => $subscriptionId,
-                'shippingAddressId' => $address->getId(),
-            ]
-        ],
+                [
+                    'id' => $subscriptionId,
+                    'shippingAddressId' => $address->getId(),
+                ]
+            ],
             $context
         );
     }
@@ -331,6 +338,5 @@ class SubscriptionRepository
         );
     }
 
-#endregion
-
+    #endregion
 }

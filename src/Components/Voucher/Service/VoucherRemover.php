@@ -54,19 +54,19 @@ class VoucherRemover extends PaymentMethodRemover
      */
     public function removePaymentMethods(PaymentMethodRouteResponse $originalData, SalesChannelContext $context): PaymentMethodRouteResponse
     {
-        if($this->isCartRoute()) {
+        if ($this->isCartRoute()) {
             $cart = $this->getCartServiceLazy()->getCart($context->getToken(), $context);
 
             $voucherPermitted = (bool)$cart->getData()->get(VoucherCartCollector::VOUCHER_PERMITTED);
         }
 
-        if($this->isOrderRoute()) {
+        if ($this->isOrderRoute()) {
             $order = $this->getOrder($context->getContext());
 
             $voucherPermitted = $this->isVoucherOrder($order, $context->getContext());
         }
 
-        if(!isset($voucherPermitted)) {
+        if (!isset($voucherPermitted)) {
             $voucherPermitted = false;
         }
 
@@ -79,7 +79,6 @@ class VoucherRemover extends PaymentMethodRemover
         # now search for our voucher payment method
         # so that we can remove it from our list
         foreach ($originalData->getPaymentMethods() as $paymentMethod) {
-
             if ($this->voucherService->isVoucherPaymentMethod($paymentMethod)) {
                 $originalData->getPaymentMethods()->remove($paymentMethod->getId());
                 break;
@@ -102,7 +101,7 @@ class VoucherRemover extends PaymentMethodRemover
         foreach ($lineItems as $lineItem) {
             $attributes = new OrderLineItemEntityAttributes($lineItem);
 
-            if(VoucherType::isVoucherProduct($attributes->getVoucherType())) {
+            if (VoucherType::isVoucherProduct($attributes->getVoucherType())) {
                 return true;
             }
         }

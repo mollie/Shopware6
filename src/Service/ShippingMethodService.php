@@ -26,8 +26,7 @@ class ShippingMethodService
      */
     public function __construct(
         EntityRepositoryInterface $shippingMethodRepository
-    )
-    {
+    ) {
         $this->shippingMethodRepository = $shippingMethodRepository;
     }
 
@@ -35,7 +34,7 @@ class ShippingMethodService
      * @param string $shippingMethodId
      * @param SalesChannelContext $salesChannelContext
      *
-     * @return ShippingMethodEntity|null
+     * @return null|ShippingMethodEntity
      */
     public function getShippingMethodById(string $shippingMethodId, SalesChannelContext $salesChannelContext): ?ShippingMethodEntity
     {
@@ -68,5 +67,4 @@ class ShippingMethodService
 
         return $shippingMethods->filterByActiveRules($salesChannelContext);
     }
-
 }

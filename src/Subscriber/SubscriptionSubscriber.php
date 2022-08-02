@@ -64,7 +64,6 @@ class SubscriptionSubscriber implements EventSubscriberInterface
 
 
         if ($page instanceof ProductPage) {
-
             $product = $event->getPage()->getProduct();
             $productAttributes = new ProductAttributes($product);
 
@@ -95,15 +94,12 @@ class SubscriptionSubscriber implements EventSubscriberInterface
 
 
         if ($page instanceof CheckoutConfirmPage) {
-
             foreach ($page->getCart()->getLineItems()->getFlat() as $lineItem) {
-
                 $lineItemAttributes = new LineItemAttributes($lineItem);
 
                 $isSubscription = $lineItemAttributes->isSubscriptionProduct();
 
                 if ($isSubscription) {
-
                     $interval = (int)$lineItemAttributes->getSubscriptionInterval();
                     $unit = (string)$lineItemAttributes->getSubscriptionIntervalUnit();
                     $repetition = (int)$lineItemAttributes->getSubscriptionRepetition();
@@ -120,7 +116,6 @@ class SubscriptionSubscriber implements EventSubscriberInterface
                 }
             }
         }
-
     }
 
     /**
@@ -144,7 +139,7 @@ class SubscriptionSubscriber implements EventSubscriberInterface
                 }
                 break;
 
-            case IntervalType::WEEKS;
+            case IntervalType::WEEKS:
                 {
                     if ($interval === 1) {
                         $snippetKey = 'molliePayments.subscriptions.options.everyWeek';
@@ -173,5 +168,4 @@ class SubscriptionSubscriber implements EventSubscriberInterface
 
         return $mainText;
     }
-
 }

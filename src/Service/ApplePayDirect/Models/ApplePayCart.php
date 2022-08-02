@@ -41,7 +41,7 @@ class ApplePayCart
     }
 
     /**
-     * @return ApplePayLineItem|null
+     * @return null|ApplePayLineItem
      */
     public function getTaxes(): ?ApplePayLineItem
     {
