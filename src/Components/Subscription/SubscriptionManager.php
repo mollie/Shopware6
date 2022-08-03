@@ -216,27 +216,23 @@ class SubscriptionManager implements SubscriptionManagerInterface
 
     /**
      * @param OrderEntity $order
+     * @param string $mandateId
      * @param SalesChannelContext $context
-     * @throws \Exception
+     * @throws CustomerCouldNotBeFoundException
      */
-    public function confirmSubscription(OrderEntity $order, SalesChannelContext $context): void
+    public function confirmSubscription(OrderEntity $order, string $mandateId, SalesChannelContext $context): void
     {
         if (!$order->getOrderCustomer() instanceof OrderCustomerEntity) {
             throw new \Exception('Order: ' . $order->getOrderNumber() . ' does not have a linked customer');
         }
 
-        $this->logger->debug('Confirming pending subscription for order: ' . $order->getOrderNumber());
-
-
-        $orderSalesChannelId = $order->getSalesChannelId();
-
         # first get our mollie customer ID from the order.
         # this is required to create a subscription
-        $mollieCustomerId = $this->customerService->getMollieCustomerId((string)$order->getOrderCustomer()->getCustomerId(), $orderSalesChannelId, $context->getContext());
+        $mollieCustomerId = $this->customerService->getMollieCustomerId((string)$order->getOrderCustomer()->getCustomerId(), $order->getSalesChannelId(), $context->getContext());
 
 
         # switch out client to the correct sales channel
-        $this->gwMollie->switchClient($orderSalesChannelId);
+        $this->gwMollie->switchClient($order->getSalesChannelId());
 
 
         # load all pending subscriptions of the order.
@@ -244,13 +240,27 @@ class SubscriptionManager implements SubscriptionManagerInterface
         # prepare everything for recurring payments.
         $pendingSubscriptions = $this->repoSubscriptions->findPendingSubscriptions($order->getId(), $context->getContext());
 
+        # if we have nothing to confirm
+        # then just return
+        if (count($pendingSubscriptions) <= 0) {
+            return;
+        }
+
+        # if we have something to confirm (and create) but we don't
+        # have a valid mandate ID, then throw an exception
+        if (empty($mandateId)) {
+            throw new \Exception('Cannot confirm subscription for order: ' . $order->getOrderNumber() . '! Provided mandate ID of payment is empty!');
+        }
+
+        $this->logger->debug('Confirming pending subscription for order: ' . $order->getOrderNumber());
+
         foreach ($pendingSubscriptions as $subscription) {
 
             # convert our subscription into a mollie definition
-            $mollieData = $this->mollieRequestBuilder->buildDefinition($subscription);
+            $jsonPayload = $this->mollieRequestBuilder->buildRequestPayload($subscription, $mandateId);
             # create the subscription in Mollie.
             # this is important to really start the subscription process
-            $mollieSubscription = $this->gwMollie->createSubscription($mollieCustomerId, $mollieData);
+            $mollieSubscription = $this->gwMollie->createSubscription($mollieCustomerId, $jsonPayload);
 
             # confirm the subscription in our local database
             # by adding the missing external Mollie IDs
