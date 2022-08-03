@@ -25,9 +25,10 @@ class MollieDataBuilder
 
     /**
      * @param SubscriptionEntity $subscription
+     * @param string $mandateId
      * @return array<mixed>
      */
-    public function buildDefinition(SubscriptionEntity $subscription): array
+    public function buildRequestPayload(SubscriptionEntity $subscription, string $mandateId): array
     {
         $metadata = $subscription->getMetadata();
 
@@ -46,6 +47,7 @@ class MollieDataBuilder
             'startDate' => $startDate,
             'interval' => $interval,
             'times' => $times,
+            'mandateId' => $mandateId,
         ];
     }
 }
