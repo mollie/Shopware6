@@ -45,37 +45,37 @@ class OrderAttributes
     private $molliePaymentUrl;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $creditCardNumber;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $creditCardHolder;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $creditCardAudience;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $creditCardLabel;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $creditCardCountryCode;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $creditCardSecurity;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $creditCardFeeRegion;
 
@@ -106,7 +106,6 @@ class OrderAttributes
         $this->creditCardCountryCode = $this->getCustomFieldValue($order, 'creditCardCountryCode');
         $this->creditCardSecurity = $this->getCustomFieldValue($order, 'creditCardSecurity');
         $this->creditCardFeeRegion = $this->getCustomFieldValue($order, 'creditCardFeeRegion');
-
     }
 
     /**
@@ -200,7 +199,7 @@ class OrderAttributes
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getCreditCardNumber(): ?string
     {
@@ -208,7 +207,7 @@ class OrderAttributes
     }
 
     /**
-     * @param string|null $creditCardNumber
+     * @param null|string $creditCardNumber
      */
     public function setCreditCardNumber(?string $creditCardNumber): void
     {
@@ -216,7 +215,7 @@ class OrderAttributes
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getCreditCardHolder(): ?string
     {
@@ -224,7 +223,7 @@ class OrderAttributes
     }
 
     /**
-     * @param string|null $creditCardHolder
+     * @param null|string $creditCardHolder
      */
     public function setCreditCardHolder(?string $creditCardHolder): void
     {
@@ -232,7 +231,7 @@ class OrderAttributes
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getCreditCardAudience(): ?string
     {
@@ -240,7 +239,7 @@ class OrderAttributes
     }
 
     /**
-     * @param string|null $creditCardAudience
+     * @param null|string $creditCardAudience
      */
     public function setCreditCardAudience(?string $creditCardAudience): void
     {
@@ -248,7 +247,7 @@ class OrderAttributes
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getCreditCardLabel(): ?string
     {
@@ -256,7 +255,7 @@ class OrderAttributes
     }
 
     /**
-     * @param string|null $creditCardLabel
+     * @param null|string $creditCardLabel
      */
     public function setCreditCardLabel(?string $creditCardLabel): void
     {
@@ -264,7 +263,7 @@ class OrderAttributes
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getCreditCardCountryCode(): ?string
     {
@@ -272,7 +271,7 @@ class OrderAttributes
     }
 
     /**
-     * @param string|null $creditCardCountryCode
+     * @param null|string $creditCardCountryCode
      */
     public function setCreditCardCountryCode(?string $creditCardCountryCode): void
     {
@@ -280,7 +279,7 @@ class OrderAttributes
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getCreditCardSecurity(): ?string
     {
@@ -288,7 +287,7 @@ class OrderAttributes
     }
 
     /**
-     * @param string|null $creditCardSecurity
+     * @param null|string $creditCardSecurity
      */
     public function setCreditCardSecurity(?string $creditCardSecurity): void
     {
@@ -296,7 +295,7 @@ class OrderAttributes
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getCreditCardFeeRegion(): ?string
     {
@@ -304,7 +303,7 @@ class OrderAttributes
     }
 
     /**
-     * @param string|null $creditCardFeeRegion
+     * @param null|string $creditCardFeeRegion
      */
     public function setCreditCardFeeRegion(?string $creditCardFeeRegion): void
     {
@@ -312,7 +311,7 @@ class OrderAttributes
     }
 
     /**
-     * @param stdClass|null $details
+     * @param null|stdClass $details
      * @return void
      */
     public function setCreditCardDetails(?stdClass $details)

@@ -212,7 +212,7 @@ class Order
 
     /**
      * @param MollieOrder $mollieOrder
-     * @return Payment|null
+     * @return null|Payment
      */
     public function getPaidPayment(MollieOrder $mollieOrder): ?Payment
     {
@@ -225,7 +225,6 @@ class Order
         /** @var Payment $payment */
         foreach ($payments as $payment) {
             if ($payment->isPaid()) {
-
                 return $payment;
             }
         }

@@ -229,11 +229,9 @@ class OrderService implements OrderServiceInterface
             }
 
             # check for creditcard
-            if (isset($molliePayment->method, $molliePayment->details) && $molliePayment->method === "creditcard"){
+            if (isset($molliePayment->method, $molliePayment->details) && $molliePayment->method === "creditcard") {
                 $creditCardDetails = $molliePayment->details;
             }
-
-
         } catch (PaymentNotFoundException $ex) {
             # some orders like OPEN bank transfer have no completed payments
             # so this is a usual case, where we just need to skip this process
