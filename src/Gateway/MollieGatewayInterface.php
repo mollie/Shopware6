@@ -2,13 +2,11 @@
 
 namespace Kiener\MolliePayments\Gateway;
 
-
 use Kiener\MolliePayments\Gateway\Mollie\Model\SubscriptionDefinitionInterface;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\Subscription;
 use Mollie\Api\Resources\SubscriptionCollection;
-
 
 interface MollieGatewayInterface
 {
@@ -73,5 +71,4 @@ interface MollieGatewayInterface
      * @return Subscription
      */
     public function getSubscription(string $subscriptionId, string $customerId): Subscription;
-
 }

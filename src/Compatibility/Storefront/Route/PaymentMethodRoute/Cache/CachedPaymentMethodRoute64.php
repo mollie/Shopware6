@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\Cache;
 
-
 use Kiener\MolliePayments\Service\Cart\Voucher\VoucherCartCollector;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
@@ -10,7 +9,6 @@ use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Payment\Event\PaymentMethodRouteCacheKeyEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 
 class CachedPaymentMethodRoute64 implements EventSubscriberInterface
 {
@@ -129,7 +127,6 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
     private function isSubscriptionCart(Cart $cart): bool
     {
         foreach ($cart->getLineItems() as $lineItem) {
-
             $attribute = new LineItemAttributes($lineItem);
 
             if ($attribute->isSubscriptionProduct()) {
@@ -139,5 +136,4 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
 
         return false;
     }
-
 }

@@ -32,4 +32,20 @@ export default class OrdersListRepository {
         return cy.get('.mollie-order-user-card-subscription-badge');
     }
 
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getPaymentReferenceTitle() {
+        return cy.get('.mollie-order-user-card-payment-reference-title');
+    }
+
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getPaymentReferenceValue() {
+        return cy.get('.mollie-order-user-card-payment-reference-value');
+    }
+
 }

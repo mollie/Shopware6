@@ -1,7 +1,6 @@
 import Devices from "Services/utils/Devices";
 import Session from "Services/utils/Session"
 import Shopware from "Services/shopware/Shopware";
-import PaymentScreenAction from 'Actions/mollie/PaymentScreenAction';
 // ------------------------------------------------------
 import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
 // ------------------------------------------------------
@@ -10,6 +9,9 @@ import PaymentAction from "Actions/storefront/checkout/PaymentAction";
 import DummyBasketScenario from "Scenarios/DummyBasketScenario";
 import AdminOrdersAction from "Actions/admin/AdminOrdersAction";
 import AdminLoginAction from "Actions/admin/AdminLoginAction";
+// ------------------------------------------------------
+import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
+import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
 
 
 const devices = new Devices();
@@ -22,6 +24,8 @@ const molliePayment = new PaymentScreenAction();
 const adminOrders = new AdminOrdersAction();
 const adminLogin = new AdminLoginAction();
 
+const mollieSandbox = new MollieSandbox();
+
 const scenarioDummyBasket = new DummyBasketScenario(1);
 
 
@@ -33,6 +37,7 @@ context("Order Status Mapping Tests", () => {
 
     before(function () {
         configAction.setupShop(false, false, false);
+        configAction.updateProducts('', false, 0, '');
     })
 
     beforeEach(() => {
@@ -42,7 +47,7 @@ context("Order Status Mapping Tests", () => {
 
     context(devices.getDescription(device), () => {
 
-        it('Test Status Open stays In-Progress', () => {
+        it('C6919: Test Status Open stays In-Progress', () => {
 
             // we create a SEPA bank transfer payment
             // the payment status will be IN PROGRESS then in Shopware.
@@ -56,7 +61,7 @@ context("Order Status Mapping Tests", () => {
             shopware.prepareDomainChange();
             checkout.placeOrderOnConfirm();
 
-            molliePayment.initSandboxCookie();
+            mollieSandbox.initSandboxCookie();
             molliePayment.selectOpen();
 
             adminLogin.login();
@@ -64,7 +69,7 @@ context("Order Status Mapping Tests", () => {
             adminOrders.assertLatestPaymentStatus('In Progress');
         })
 
-        it('Test Status Paid', () => {
+        it('C5398: Test Status Paid', () => {
 
             scenarioDummyBasket.execute();
             paymentAction.switchPaymentMethod('PayPal');
@@ -72,7 +77,7 @@ context("Order Status Mapping Tests", () => {
             shopware.prepareDomainChange();
             checkout.placeOrderOnConfirm();
 
-            molliePayment.initSandboxCookie();
+            mollieSandbox.initSandboxCookie();
             molliePayment.selectPaid();
 
             adminLogin.login();
@@ -80,7 +85,7 @@ context("Order Status Mapping Tests", () => {
             adminOrders.assertLatestPaymentStatus('Paid');
         })
 
-        it('Test Status Authorized', () => {
+        it('C5399: Test Status Authorized', () => {
 
             scenarioDummyBasket.execute();
             paymentAction.switchPaymentMethod('Pay later');
@@ -88,7 +93,7 @@ context("Order Status Mapping Tests", () => {
             shopware.prepareDomainChange();
             checkout.placeOrderOnConfirm();
 
-            molliePayment.initSandboxCookie();
+            mollieSandbox.initSandboxCookie();
             molliePayment.selectAuthorized();
 
             adminLogin.login();
@@ -100,7 +105,7 @@ context("Order Status Mapping Tests", () => {
             adminOrders.assertLatestPaymentStatus(expectedPaymentStatus);
         })
 
-        it('Test Status Failed', () => {
+        it('C5400: Test Status Failed', () => {
 
             scenarioDummyBasket.execute();
             paymentAction.switchPaymentMethod('PayPal');
@@ -108,7 +113,7 @@ context("Order Status Mapping Tests", () => {
             shopware.prepareDomainChange();
             checkout.placeOrderOnConfirm();
 
-            molliePayment.initSandboxCookie();
+            mollieSandbox.initSandboxCookie();
             molliePayment.selectFailed();
 
             adminLogin.login();
@@ -116,7 +121,7 @@ context("Order Status Mapping Tests", () => {
             adminOrders.assertLatestPaymentStatus('Failed');
         })
 
-        it('Test Status Cancelled', () => {
+        it('C5401: Test Status Cancelled', () => {
 
             scenarioDummyBasket.execute();
             paymentAction.switchPaymentMethod('PayPal');
@@ -124,7 +129,7 @@ context("Order Status Mapping Tests", () => {
             shopware.prepareDomainChange();
             checkout.placeOrderOnConfirm();
 
-            molliePayment.initSandboxCookie();
+            mollieSandbox.initSandboxCookie();
             molliePayment.selectCancelled();
 
             adminLogin.login();

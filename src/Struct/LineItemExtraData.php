@@ -10,18 +10,17 @@ class LineItemExtraData
     private $sku;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $imageUrl;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $productUrl;
 
     public function __construct(string $sku, ?string $imageUrl, ?string $productUrl)
     {
-
         $this->sku = $sku;
         $this->imageUrl = $imageUrl;
         $this->productUrl = $productUrl;
@@ -44,7 +43,7 @@ class LineItemExtraData
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getImageUrl(): ?string
     {
@@ -60,7 +59,7 @@ class LineItemExtraData
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getProductUrl(): ?string
     {
@@ -74,6 +73,4 @@ class LineItemExtraData
     {
         $this->productUrl = $productUrl;
     }
-
-
 }

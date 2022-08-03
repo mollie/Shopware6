@@ -20,8 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class MolliePayments extends Plugin
 {
-
-    const PLUGIN_VERSION = '2.2.2';
+    const PLUGIN_VERSION = '2.3.1';
 
 
     /**
@@ -72,8 +71,8 @@ class MolliePayments extends Plugin
 
     /**
      * @param UpdateContext $context
-     * @return void
      * @throws \Doctrine\DBAL\Exception
+     * @return void
      */
     public function update(UpdateContext $context): void
     {
@@ -109,8 +108,8 @@ class MolliePayments extends Plugin
 
     /**
      * @param ActivateContext $context
-     * @return void
      * @throws \Doctrine\DBAL\Exception
+     * @return void
      */
     public function activate(ActivateContext $context): void
     {
@@ -150,5 +149,4 @@ class MolliePayments extends Plugin
     {
         $migrationCollection->migrateInPlace();
     }
-
 }

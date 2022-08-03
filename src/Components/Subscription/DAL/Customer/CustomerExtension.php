@@ -28,5 +28,4 @@ class CustomerExtension extends EntityExtension
     {
         $collection->add((new OneToManyAssociationField('subscriptions', SubscriptionDefinition::class, 'customer_id'))->addFlags(new CascadeDelete()));
     }
-
 }

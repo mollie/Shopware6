@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Components\RefundManager\Request;
 
-
 use Shopware\Core\Checkout\Order\OrderEntity;
 
 class RefundRequest
@@ -32,7 +31,7 @@ class RefundRequest
     /**
      * @param string $orderNumber
      * @param string $description
-     * @param float|null $amount
+     * @param null|float $amount
      */
     public function __construct(string $orderNumber, string $description, ?float $amount)
     {
@@ -142,7 +141,6 @@ class RefundRequest
         }
 
         return true;
-
     }
 
     /**
@@ -179,7 +177,6 @@ class RefundRequest
 
         /** @var RefundRequestItem $item */
         foreach ($this->items as $item) {
-
             if ($item->getQuantity() <= 0 && $item->getAmount() <= 0) {
                 continue;
             }
@@ -216,7 +213,6 @@ class RefundRequest
     private function hasRefundableItemInstructions(): bool
     {
         foreach ($this->items as $item) {
-
             if ($item->getQuantity() > 0 || $item->getAmount() > 0) {
                 return true;
             }
@@ -224,5 +220,4 @@ class RefundRequest
 
         return false;
     }
-
 }

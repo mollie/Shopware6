@@ -17,5 +17,10 @@
 .confirm-payment {
     .mollie-ideal-issuer {
         margin-top: 15px;
+
+        .custom-select:invalid {
+            border: 1px solid red;
+        }
     }
 }
+

@@ -80,7 +80,6 @@ class AccountController extends StorefrontController
     public function updateBilling(string $subscriptionId, RequestDataBag $data, SalesChannelContext $salesChannelContext): Response
     {
         try {
-
             $address = $data->get('address', null);
 
             if (!$address instanceof RequestDataBag) {
@@ -123,9 +122,7 @@ class AccountController extends StorefrontController
             $this->addFlash(self::SUCCESS, $this->trans('molliePayments.subscriptions.account.successUpdateAddress'));
 
             return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
-
         } catch (\Throwable $exception) {
-
             $this->logger->error('Error when updating billing address of subscription ' . $subscriptionId . ': ' . $exception->getMessage());
 
             $this->addFlash(self::DANGER, $this->trans('molliePayments.subscriptions.account.errorUpdateAddress'));
@@ -145,7 +142,6 @@ class AccountController extends StorefrontController
     public function updateShipping(string $subscriptionId, RequestDataBag $data, SalesChannelContext $salesChannelContext): Response
     {
         try {
-
             $address = $data->get('address', null);
 
             if (!$address instanceof RequestDataBag) {
@@ -188,9 +184,7 @@ class AccountController extends StorefrontController
             $this->addFlash(self::SUCCESS, $this->trans('molliePayments.subscriptions.account.successUpdateAddress'));
 
             return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
-
         } catch (\Throwable $exception) {
-
             $this->logger->error('Error when updating shipping address of subscription ' . $subscriptionId . ': ' . $exception->getMessage());
 
             $this->addFlash(self::DANGER, $this->trans('molliePayments.subscriptions.account.errorUpdateAddress'));
@@ -209,13 +203,10 @@ class AccountController extends StorefrontController
     public function updatePaymentStart(string $subscriptionId, SalesChannelContext $salesChannelContext): Response
     {
         try {
-
             $checkoutUrl = $this->subscriptionManager->updatePaymentMethodStart($subscriptionId, $salesChannelContext->getContext());
 
             return $this->redirect($checkoutUrl);
-
         } catch (\Throwable $exception) {
-
             $this->logger->error('Error when updating payment method of subscription ' . $subscriptionId . ': ' . $exception->getMessage());
 
             $this->addFlash(self::DANGER, $this->trans('molliePayments.subscriptions.account.errorUpdatePayment'));
@@ -234,15 +225,12 @@ class AccountController extends StorefrontController
     public function updatePaymentFinish(string $subscriptionId, SalesChannelContext $salesChannelContext): Response
     {
         try {
-
             $this->subscriptionManager->updatePaymentMethodConfirm($subscriptionId, $salesChannelContext->getContext());
 
             $this->addFlash(self::SUCCESS, $this->trans('molliePayments.subscriptions.account.successUpdatePayment'));
 
             return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
-
         } catch (\Throwable $exception) {
-
             $this->logger->error('Error when updating payment method of subscription ' . $subscriptionId . ': ' . $exception->getMessage());
 
             $this->addFlash(self::DANGER, $this->trans('molliePayments.subscriptions.account.errorUpdatePayment'));
@@ -253,24 +241,21 @@ class AccountController extends StorefrontController
     /**
      * @LoginRequired()
      * @Route("/account/mollie/subscriptions/{subscriptionId}/cancel", name="frontend.account.mollie.subscriptions.cancel", methods={"POST"})
+     * @param mixed $subscriptionId
      */
     public function cancelSubscription($subscriptionId, SalesChannelContext $context): Response
     {
         try {
-
             $this->subscriptionManager->cancelSubscription($subscriptionId, $context->getContext());
 
             $this->addFlash(self::SUCCESS, $this->trans('molliePayments.subscriptions.account.cancelSubscription'));
 
             return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
-
         } catch (\Throwable $exception) {
-
             $this->logger->error('Error when canceling subscription ' . $subscriptionId . ': ' . $exception->getMessage());
 
             $this->addFlash(self::DANGER, $this->trans('molliePayments.subscriptions.account.errorCancelSubscription'));
             return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
         }
     }
-
 }

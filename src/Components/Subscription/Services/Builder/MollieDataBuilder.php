@@ -5,7 +5,6 @@ namespace Kiener\MolliePayments\Components\Subscription\Services\Builder;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
 
-
 class MollieDataBuilder
 {
 
@@ -26,9 +25,10 @@ class MollieDataBuilder
 
     /**
      * @param SubscriptionEntity $subscription
+     * @param string $mandateId
      * @return array<mixed>
      */
-    public function buildDefinition(SubscriptionEntity $subscription): array
+    public function buildRequestPayload(SubscriptionEntity $subscription, string $mandateId): array
     {
         $metadata = $subscription->getMetadata();
 
@@ -47,7 +47,7 @@ class MollieDataBuilder
             'startDate' => $startDate,
             'interval' => $interval,
             'times' => $times,
+            'mandateId' => $mandateId,
         ];
     }
-
 }

@@ -13,6 +13,7 @@
         <import resource="services/gateways.xml"/>
         <import resource="services/hydrators.xml"/>
         <import resource="services/repositories.xml"/>
+        <import resource="services/payment.xml"/>
         <import resource="services/services.xml"/>
         <import resource="services/snippets.xml"/>
         <import resource="services/subscriber.xml"/>

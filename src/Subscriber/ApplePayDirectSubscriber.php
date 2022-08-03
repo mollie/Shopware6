@@ -45,5 +45,4 @@ class ApplePayDirectSubscriber implements EventSubscriberInterface
         $event->setParameter('mollie_applepaydirect_enabled', $applePayDirectEnabled);
         $event->setParameter('mollie_applepaydirect_restrictions', $settings->getRestrictApplePayDirect());
     }
-
 }

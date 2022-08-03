@@ -7,7 +7,6 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 
 class CustomerStruct extends Struct
 {
-
     const LIVE_MODE = 'live';
     const TEST_MODE = 'test';
 
@@ -43,7 +42,7 @@ class CustomerStruct extends Struct
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getLegacyCustomerId(): ?string
     {
@@ -51,7 +50,7 @@ class CustomerStruct extends Struct
     }
 
     /**
-     * @param string|null $legacyCustomerId
+     * @param null|string $legacyCustomerId
      */
     public function setLegacyCustomerId(?string $legacyCustomerId): void
     {
@@ -95,7 +94,7 @@ class CustomerStruct extends Struct
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getPreferredIdealIssuer(): ?string
     {
@@ -103,7 +102,7 @@ class CustomerStruct extends Struct
     }
 
     /**
-     * @param string|null $preferredIdealIssuer
+     * @param null|string $preferredIdealIssuer
      */
     public function setPreferredIdealIssuer(?string $preferredIdealIssuer): void
     {
@@ -111,7 +110,7 @@ class CustomerStruct extends Struct
     }
 
     /**
-     * @param string|null $creditCardToken
+     * @param null|string $creditCardToken
      */
     public function setCreditCardToken(?string $creditCardToken): void
     {
@@ -132,7 +131,6 @@ class CustomerStruct extends Struct
 
 
         foreach ($this->customerIds as $profileID => $values) {
-
             $liveKey = (array_key_exists(self::LIVE_MODE, $values)) ? $values[self::LIVE_MODE] : '';
             $testKey = (array_key_exists(self::TEST_MODE, $values)) ? $values[self::TEST_MODE] : '';
 
@@ -166,11 +164,10 @@ class CustomerStruct extends Struct
         # if its neither of those, just don't add it
         if ($legacyCustomerIdShouldBeRemoved) {
             $fullCustomField['customer_id'] = null;
-        } else if (!empty($oldLegacyCustomerID)) {
+        } elseif (!empty($oldLegacyCustomerID)) {
             $fullCustomField['customer_id'] = $oldLegacyCustomerID;
         }
 
         return $fullCustomField;
     }
-
 }

@@ -24,5 +24,4 @@ class DoesOpenPaymentExist
 
         return count($filteredPayments) > 0;
     }
-
 }

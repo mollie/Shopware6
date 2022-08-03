@@ -5,7 +5,6 @@ namespace Kiener\MolliePayments\Hydrator;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Kiener\MolliePayments\Struct\MollieLineItemCollection;
 
-
 class MollieLineItemHydrator
 {
 
@@ -54,5 +53,4 @@ class MollieLineItemHydrator
 
         return $lines;
     }
-
 }

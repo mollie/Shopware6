@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription;
 
-
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionDefinition;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Shopware\Core\Checkout\Customer\CustomerDefinition;
@@ -14,7 +13,6 @@ use Shopware\Core\Framework\Event\EventData\EntityType;
 use Shopware\Core\Framework\Event\EventData\EventDataCollection;
 use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 use Symfony\Contracts\EventDispatcher\Event;
-
 
 class SubscriptionCancelledEvent extends Event implements CustomerAware, BusinessEventInterface
 {
@@ -99,5 +97,4 @@ class SubscriptionCancelledEvent extends Event implements CustomerAware, Busines
     {
         return $this->customer;
     }
-
 }

@@ -46,21 +46,11 @@ class SubscriptionSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            StorefrontRenderEvent::class => 'onStorefrontRender',
             ProductPageLoadedEvent::class => 'addSubscriptionData',
             CheckoutConfirmPageLoadedEvent::class => 'addSubscriptionData',
         ];
     }
 
-    /**
-     * @param StorefrontRenderEvent $event
-     */
-    public function onStorefrontRender(StorefrontRenderEvent $event)
-    {
-        $settings = $this->settingsService->getSettings($event->getSalesChannelContext()->getSalesChannel()->getId());
-
-        $event->setParameter('mollie_subscriptions_indicator_enabled', $settings->isSubscriptionsShowIndicator());
-    }
 
     /**
      * @param PageLoadedEvent $event
@@ -74,17 +64,29 @@ class SubscriptionSubscriber implements EventSubscriberInterface
 
 
         if ($page instanceof ProductPage) {
-
             $product = $event->getPage()->getProduct();
             $productAttributes = new ProductAttributes($product);
 
-            $interval = (int)$productAttributes->getSubscriptionInterval();
-            $unit = (string)$productAttributes->getSubscriptionIntervalUnit();
-            $repetition = (int)$productAttributes->getSubscriptionRepetitionCount();
+            $isSubscription = $productAttributes->isSubscriptionProduct();
 
-            $translatedInterval = $this->getTranslatedInterval($interval, $unit, $repetition);
+            # only load our data if we really
+            # have a subscription product
+            if ($isSubscription) {
+                $interval = (int)$productAttributes->getSubscriptionInterval();
+                $unit = (string)$productAttributes->getSubscriptionIntervalUnit();
+                $repetition = (int)$productAttributes->getSubscriptionRepetitionCount();
+                $translatedInterval = $this->getTranslatedInterval($interval, $unit, $repetition);
+                $showIndicator = $settings->isSubscriptionsShowIndicator();
+            } else {
+                $translatedInterval = '';
+                $showIndicator = false;
+            }
 
-            $struct = new SubscriptionDataExtensionStruct(true, $translatedInterval);
+            $struct = new SubscriptionDataExtensionStruct(
+                $isSubscription,
+                $translatedInterval,
+                $showIndicator
+            );
 
             $event->getPage()->addExtension('mollieSubscription', $struct);
             return;
@@ -92,26 +94,28 @@ class SubscriptionSubscriber implements EventSubscriberInterface
 
 
         if ($page instanceof CheckoutConfirmPage) {
-
             foreach ($page->getCart()->getLineItems()->getFlat() as $lineItem) {
-
                 $lineItemAttributes = new LineItemAttributes($lineItem);
 
-                if ($lineItemAttributes->isSubscriptionProduct()) {
+                $isSubscription = $lineItemAttributes->isSubscriptionProduct();
 
+                if ($isSubscription) {
                     $interval = (int)$lineItemAttributes->getSubscriptionInterval();
                     $unit = (string)$lineItemAttributes->getSubscriptionIntervalUnit();
                     $repetition = (int)$lineItemAttributes->getSubscriptionRepetition();
 
                     $translatedInterval = $this->getTranslatedInterval($interval, $unit, $repetition);
 
-                    $struct = new SubscriptionDataExtensionStruct(true, $translatedInterval);
+                    $struct = new SubscriptionDataExtensionStruct(
+                        $isSubscription,
+                        $translatedInterval,
+                        false
+                    );
 
                     $lineItem->addExtension('mollieSubscription', $struct);
                 }
             }
         }
-
     }
 
     /**
@@ -135,7 +139,7 @@ class SubscriptionSubscriber implements EventSubscriberInterface
                 }
                 break;
 
-            case IntervalType::WEEKS;
+            case IntervalType::WEEKS:
                 {
                     if ($interval === 1) {
                         $snippetKey = 'molliePayments.subscriptions.options.everyWeek';
@@ -164,5 +168,4 @@ class SubscriptionSubscriber implements EventSubscriberInterface
 
         return $mainText;
     }
-
 }

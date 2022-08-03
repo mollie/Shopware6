@@ -141,23 +141,17 @@ class MolliePaymentFinalize
         # or make sure to throw an exception for Shopware in case
         # of failed payments.
         if (!MolliePaymentStatus::isFailedStatus($molliePaymentMethodKey, $paymentStatus)) {
-
             $this->orderStatusUpdater->updatePaymentStatus($transactionStruct->getOrderTransaction(), $paymentStatus, $salesChannelContext->getContext());
-
         } else {
-
             $orderTransactionID = $transactionStruct->getOrderTransaction()->getUniqueIdentifier();
 
             # let's also create a different handling, if the customer either cancelled
             # or if the payment really failed. this will lead to a different order payment status in the end.
             if ($paymentStatus === MolliePaymentStatus::MOLLIE_PAYMENT_CANCELED) {
-
                 $message = sprintf('Payment for order %s (%s) was cancelled by the customer.', $order->getOrderNumber(), $mollieOrder->id);
 
                 throw new CustomerCanceledAsyncPaymentException($orderTransactionID, $message);
-
             } else {
-
                 $message = sprintf('Payment for order %s (%s) failed. The Mollie payment status was not successful for this payment attempt.', $order->getOrderNumber(), $mollieOrder->id);
 
                 throw new AsyncPaymentFinalizeException($orderTransactionID, $message);
@@ -173,7 +167,5 @@ class MolliePaymentFinalize
             $transactionStruct->getOrderTransaction()->getId(),
             $salesChannelContext
         );
-
     }
-
 }

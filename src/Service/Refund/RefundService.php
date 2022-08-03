@@ -66,8 +66,8 @@ class RefundService implements RefundServiceInterface
      * @param string $description
      * @param RefundItem[] $refundItems
      * @param Context $context
-     * @return Refund
      * @throws ApiException
+     * @return Refund
      */
     public function refundFull(OrderEntity $order, string $description, array $refundItems, Context $context): Refund
     {
@@ -83,7 +83,6 @@ class RefundService implements RefundServiceInterface
         ];
 
         if (count($refundItems) > 0) {
-
             $lines = [];
 
             foreach ($refundItems as $item) {
@@ -118,8 +117,8 @@ class RefundService implements RefundServiceInterface
      * @param float $amount
      * @param RefundItem[] $lineItems
      * @param Context $context
-     * @return Refund
      * @throws ApiException
+     * @return Refund
      */
     public function refundPartial(OrderEntity $order, string $description, float $amount, array $lineItems, Context $context): Refund
     {
@@ -146,11 +145,11 @@ class RefundService implements RefundServiceInterface
     /**
      * @param OrderEntity $order
      * @param string $refundId
-     * @return bool
      * @throws CouldNotCancelMollieRefundException
      * @throws CouldNotExtractMollieOrderIdException
      * @throws CouldNotFetchMollieOrderException
      * @throws PaymentNotFoundException
+     * @return bool
      */
     public function cancel(OrderEntity $order, string $refundId): bool
     {
@@ -184,11 +183,11 @@ class RefundService implements RefundServiceInterface
 
     /**
      * @param OrderEntity $order
-     * @return array<mixed>
      * @throws CouldNotExtractMollieOrderIdException
      * @throws CouldNotFetchMollieOrderException
      * @throws CouldNotFetchMollieRefundsException
      * @throws PaymentNotFoundException
+     * @return array<mixed>
      */
     public function getRefunds(OrderEntity $order): array
     {
@@ -211,10 +210,10 @@ class RefundService implements RefundServiceInterface
 
     /**
      * @param OrderEntity $order
-     * @return float
      * @throws CouldNotExtractMollieOrderIdException
      * @throws CouldNotFetchMollieOrderException
      * @throws PaymentNotFoundException
+     * @return float
      */
     public function getRemainingAmount(OrderEntity $order): float
     {
@@ -251,10 +250,10 @@ class RefundService implements RefundServiceInterface
 
     /**
      * @param OrderEntity $order
-     * @return float
      * @throws CouldNotExtractMollieOrderIdException
      * @throws CouldNotFetchMollieOrderException
      * @throws PaymentNotFoundException
+     * @return float
      */
     public function getRefundedAmount(OrderEntity $order): float
     {
@@ -277,7 +276,6 @@ class RefundService implements RefundServiceInterface
             $this->gwMollie->switchClient($order->getSalesChannelId());
 
             return $this->gwMollie->getPayment($orderAttributes->getMolliePaymentId());
-
         }
 
         return $this->mollie->getCompletedPayment(
@@ -285,5 +283,4 @@ class RefundService implements RefundServiceInterface
             $order->getSalesChannelId()
         );
     }
-
 }

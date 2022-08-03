@@ -16,7 +16,6 @@ use Shopware\Core\Framework\Event\EventData\ScalarValueType;
 use Shopware\Core\Framework\Event\OrderAware;
 use Symfony\Contracts\EventDispatcher\Event;
 
-
 class WebhookReceivedPaidEvent extends AbstractWebhookReceivedEvent
 {
 
@@ -27,5 +26,4 @@ class WebhookReceivedPaidEvent extends AbstractWebhookReceivedEvent
     {
         return MolliePaymentStatus::MOLLIE_PAYMENT_PAID;
     }
-
 }

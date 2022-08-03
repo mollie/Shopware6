@@ -33,5 +33,4 @@ interface RefundManagerInterface
      * @return bool
      */
     public function cancelRefund(string $orderId, string $refundId, Context $context): bool;
-
 }

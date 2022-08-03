@@ -38,8 +38,7 @@ class DeliveryStateHelper
     public function __construct(
         DeliveryService $deliveryService,
         StateMachineRegistry $stateMachineRegistry
-    )
-    {
+    ) {
         $this->deliveryService = $deliveryService;
         $this->stateMachineRegistry = $stateMachineRegistry;
     }
@@ -57,8 +56,7 @@ class DeliveryStateHelper
         OrderEntity $order,
         Order $mollieOrder,
         Context $context
-    ): void
-    {
+    ): void {
         /** @var OrderDeliveryEntity $orderDelivery */
         $orderDelivery = $this->deliveryService
             ->getDeliveryByOrderId($order->getId(), $order->getVersionId());

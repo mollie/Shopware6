@@ -15,6 +15,7 @@
       "mollie_subscription_started": " Mollie Subscription started",
       "mollie_subscription_ended": " Mollie Subscription completed",
       "mollie_subscription_cancelled": " Mollie Subscription cancelled",
+      "mollie_subscription_renewed": " Mollie Subscription renewed",
       "mollie_subscription_renewal_reminder": " Mollie reminder for subscription renewal"
     }
   },
@@ -332,6 +333,7 @@
       "columnRefunded": "Refunded",
       "columnShipped": "Shipped",
       "labelMollieOrderId": "Mollie Order ID",
+      "labelMollieThirdPartyPaymentId": "Payment Reference",
       "labelMolliePaymentLink": "Mollie Checkout URL",
       "totalRefunds": "Refunded amount",
       "totalRefundsPending": "Waiting to be refunded",

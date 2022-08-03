@@ -77,9 +77,7 @@ class VoucherServiceTest extends TestCase
         $foundProduct = new ProductEntity();
         $foundProduct->setId('ID-123');
         $foundProduct->setCustomFields([
-            'mollie_payments' => [
-                'voucher_type' => VoucherType::TYPE_MEAL,
-            ]
+            'mollie_payments_product_voucher_type' => VoucherType::TYPE_MEAL,
         ]);
 
         # build a repo that would return nothing...just in case ;)
@@ -129,9 +127,7 @@ class VoucherServiceTest extends TestCase
         $foundParentProduct = new ProductEntity();
         $foundParentProduct->setId('ID-456');
         $foundParentProduct->setCustomFields([
-            'mollie_payments' => [
-                'voucher_type' => VoucherType::TYPE_GIFT,
-            ]
+            'mollie_payments_product_voucher_type' => VoucherType::TYPE_GIFT,
         ]);
 
 

@@ -19,7 +19,6 @@ class TransitionService implements TransitionServiceInterface
      */
     public function __construct(StateMachineRegistry $stateMachineRegistry)
     {
-
         $this->stateMachineRegistry = $stateMachineRegistry;
     }
 

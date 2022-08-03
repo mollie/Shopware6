@@ -10,11 +10,10 @@ interface ActivePaymentMethodsProviderInterface
 {
 
     /**
-     * @param Cart $cart
-     * @param string $currency
+     * @param float         $price
+     * @param string        $currency
      * @param array<string> $salesChannelIDs
      * @return array<Method>
      */
-    public function getActivePaymentMethodsForAmount(Cart $cart, string $currency, array $salesChannelIDs): array;
-
+    public function getActivePaymentMethodsForAmount(float $price, string $currency, array $salesChannelIDs): array;
 }

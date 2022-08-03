@@ -36,8 +36,7 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         TransitionServiceInterface $transitionService,
         CompatibilityFactory $compatibilityFactory,
         LoggerInterface $loggerService
-    )
-    {
+    ) {
         $this->transitionService = $transitionService;
         $this->compatibilityFactory = $compatibilityFactory;
         $this->logger = $loggerService;
@@ -56,7 +55,6 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         $technicalName = $transaction->getStateMachineState()->getTechnicalName();
 
         if ($this->isFinalOrTargetStatus($technicalName, [OrderTransactionStates::STATE_IN_PROGRESS])) {
-
             return;
         }
 
@@ -75,7 +73,6 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         $currentStatus = $transaction->getStateMachineState()->getTechnicalName();
 
         if ($this->isFinalOrTargetStatus($currentStatus, [OrderTransactionStates::STATE_OPEN])) {
-
             return;
         }
 
@@ -83,7 +80,6 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         $availableTransitions = $this->getAvailableTransitions($entityId, $context);
 
         if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_REOPEN, $availableTransitions)) {
-
             $this->logger->error(
                 sprintf(
                     'It is not allowed to change status to open from %s. Aborting reopen transition',
@@ -128,7 +124,6 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         $currentStatus = $transaction->getStateMachineState()->getTechnicalName();
 
         if ($this->isFinalOrTargetStatus($currentStatus, [OrderTransactionStates::STATE_CANCELLED])) {
-
             return;
         }
 
@@ -154,7 +149,6 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         $currentStatus = $transaction->getStateMachineState()->getTechnicalName();
 
         if ($this->isFinalOrTargetStatus($currentStatus, [OrderTransactionStates::STATE_CANCELLED, OrderTransactionStates::STATE_FAILED])) {
-
             return;
         }
 
@@ -182,7 +176,6 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         $currentStatus = $transaction->getStateMachineState()->getTechnicalName();
 
         if ($this->isFinalOrTargetStatus($currentStatus, [$authorizedState, OrderTransactionStates::STATE_PAID])) {
-
             return;
         }
 
@@ -201,7 +194,6 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         $currentStatus = $transaction->getStateMachineState()->getTechnicalName();
 
         if ($this->isFinalOrTargetStatus($currentStatus, [OrderTransactionStates::STATE_REFUNDED])) {
-
             return;
         }
 
@@ -220,7 +212,6 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         $currentStatus = $transaction->getStateMachineState()->getTechnicalName();
 
         if ($this->isFinalOrTargetStatus($currentStatus, [OrderTransactionStates::STATE_PARTIALLY_REFUNDED])) {
-
             return;
         }
 
@@ -245,7 +236,7 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
             return;
         }
 
-        if($chargebackState !== 'chargeback') {
+        if ($chargebackState !== 'chargeback') {
             $this->processTransaction($transaction, $context);
             return;
         }

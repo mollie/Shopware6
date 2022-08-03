@@ -3,7 +3,6 @@ import Session from "Services/utils/Session"
 import Shopware from "Services/shopware/Shopware"
 // ------------------------------------------------------
 import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
-// ------------------------------------------------------
 import AdminLoginAction from "Actions/admin/AdminLoginAction";
 import AdminProductsAction from "Actions/admin/AdminProductsAction";
 import ProductDetailRepository from "Repositories/admin/products/ProductDetailRepository";
@@ -13,11 +12,14 @@ import ListingAction from "Actions/storefront/products/ListingAction";
 import PDPAction from "Actions/storefront/products/PDPAction";
 import CheckoutAction from "Actions/storefront/checkout/CheckoutAction";
 import PaymentAction from "Actions/storefront/checkout/PaymentAction";
-import PaymentScreenAction from "Actions/mollie/PaymentScreenAction";
 import AdminOrdersAction from "Actions/admin/AdminOrdersAction";
 import OrderDetailsRepository from "Repositories/admin/orders/OrderDetailsRepository";
 import AdminSubscriptionsAction from "Actions/admin/AdminSubscriptionsAction";
 import SubscriptionsListRepository from "Repositories/admin/subscriptions/SubscriptionsListRepository";
+// ------------------------------------------------------
+import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
+import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
+import CreditCardScreenAction from "cypress-mollie/src/actions/screens/CreditCardScreen";
 
 
 const devices = new Devices();
@@ -36,10 +38,12 @@ const pdp = new PDPAction();
 const checkout = new CheckoutAction();
 const paymentAction = new PaymentAction();
 const molliePayment = new PaymentScreenAction();
+const mollieCreditCardForm = new CreditCardScreenAction();
 const adminOrders = new AdminOrdersAction();
 const adminLogin = new AdminLoginAction();
 const adminSubscriptions = new AdminSubscriptionsAction();
 
+const mollieSandbox = new MollieSandbox();
 
 const dummyUserScenario = new DummyUserScenario();
 
@@ -50,7 +54,6 @@ describe('Subscription', () => {
 
     before(function () {
         devices.setDevice(devices.getFirstDevice());
-        configAction.setupShop(true, false, false);
     })
 
     testDevices.forEach(device => {
@@ -62,7 +65,9 @@ describe('Subscription', () => {
                 session.resetBrowserSession();
             });
 
-            it('Subscription Configuration available in Administration', () => {
+            it('C6917: Subscription Configuration available in Administration', () => {
+
+                configAction.setupShop(true, false, false);
 
                 adminLogin.login();
 
@@ -75,8 +80,38 @@ describe('Subscription', () => {
                 repoProductDetailsAdmin.getSubscriptionToggle().check();
             })
 
-            it('Purchasing Subscription and verifying it in the Administration', () => {
+            it('C6942: Subscription Indicator on PDP can be turned ON', () => {
 
+                configAction.updateProducts('', true, 3, 'weeks');
+                configAction.setupPlugin(true, false, false, true);
+
+                cy.visit('/');
+                topMenu.clickOnClothing();
+                listing.clickOnFirstProduct();
+
+                // we have to see the subscription indicator
+                cy.contains('Subscription product');
+                // we also want to see the translated interval
+                cy.contains('Every 3 weeks');
+            })
+
+            it('C6943: Subscription Indicator on PDP can be turned OFF', () => {
+
+                configAction.updateProducts('', true, 3, 'weeks');
+                configAction.setupPlugin(true, false, false, false);
+
+                cy.visit('/');
+
+                topMenu.clickOnClothing();
+                listing.clickOnFirstProduct();
+
+                cy.contains('Subscription product').should('not.exist');
+            })
+
+            it('C6918: Purchasing Subscription and verifying it in the Administration', () => {
+
+                configAction.setupShop(true, false, false);
+                configAction.setupPlugin(true, false, false, true);
                 configAction.updateProducts('', true, 3, 'weeks');
 
                 dummyUserScenario.execute();
@@ -116,17 +151,7 @@ describe('Subscription', () => {
                     paymentAction.openPaymentsModal();
                 }
 
-                cy.contains('Pay later').should('not.exist');
-                cy.contains('paysafecard').should('not.exist');
-
-                cy.contains('iDEAL').should('exist');
-                cy.contains('Credit card').should('exist');
-                cy.contains('SOFORT').should('exist');
-                cy.contains('eps').should('exist');
-                cy.contains('Bancontact').should('exist');
-                cy.contains('Belfius').should('exist');
-                cy.contains('Giropay').should('exist');
-                cy.contains('PayPal').should('exist');
+                assertAvailablePaymentMethods();
 
                 if (shopware.isVersionLower(6.4)) {
                     paymentAction.closePaymentsModal();
@@ -137,7 +162,9 @@ describe('Subscription', () => {
                 shopware.prepareDomainChange();
                 checkout.placeOrderOnConfirm();
 
-                molliePayment.initSandboxCookie();
+                mollieSandbox.initSandboxCookie();
+                mollieCreditCardForm.enterValidCard();
+                mollieCreditCardForm.submitForm();
                 molliePayment.selectPaid();
 
                 cy.url().should('include', '/checkout/finish');
@@ -159,7 +186,77 @@ describe('Subscription', () => {
                 adminSubscriptions.openSubscriptions();
                 repoAdminSubscriptions.getLatestSubscription().should('exist');
             })
+
+            it('C6963: Subscription Payment methods are limited on editOrder page', () => {
+
+                // hiding of payment methods does not work
+                // belo Shopware 6.4 in the way we have to do it (Storefront + API), so it's not supported
+                if (shopware.isVersionLower(6.4)) {
+                    return;
+                }
+
+                configAction.setupShop(false, false, false);
+
+                configAction.updateProducts('', true, 3, 'weeks');
+
+                dummyUserScenario.execute();
+
+                cy.visit('/');
+
+                topMenu.clickOnClothing();
+                listing.clickOnFirstProduct();
+
+                cy.contains('.btn', 'Subscribe');
+
+                pdp.addToCart(1);
+
+                checkout.goToCheckoutInOffCanvas();
+
+                // now open our payment methods and verify
+                // that some of them are not available
+                // this is a check to at least see that it does something
+                // we also verify that we see all available methods (just to also check if mollie is even configured correctly).
+                if (shopware.isVersionGreaterEqual(6.4)) {
+                    paymentAction.showAllPaymentMethods();
+                } else {
+                    paymentAction.openPaymentsModal();
+                }
+
+                paymentAction.switchPaymentMethod('Credit card');
+
+                shopware.prepareDomainChange();
+                checkout.placeOrderOnConfirm();
+
+                mollieSandbox.initSandboxCookie();
+                mollieCreditCardForm.enterValidCard();
+                mollieCreditCardForm.submitForm();
+                molliePayment.selectFailed();
+
+                if (shopware.isVersionGreaterEqual(6.4)) {
+                    paymentAction.showAllPaymentMethods();
+                } else {
+                    paymentAction.openPaymentsModal();
+                }
+
+                assertAvailablePaymentMethods();
+            })
+
+
         })
     })
 })
 
+
+function assertAvailablePaymentMethods() {
+    cy.contains('Pay later').should('not.exist');
+    cy.contains('paysafecard').should('not.exist');
+
+    cy.contains('iDEAL').should('exist');
+    cy.contains('Credit card').should('exist');
+    cy.contains('SOFORT').should('exist');
+    cy.contains('eps').should('exist');
+    cy.contains('Bancontact').should('exist');
+    cy.contains('Belfius').should('exist');
+    cy.contains('Giropay').should('exist');
+    cy.contains('PayPal').should('exist');
+}

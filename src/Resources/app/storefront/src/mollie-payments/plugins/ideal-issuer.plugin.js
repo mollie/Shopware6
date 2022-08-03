@@ -48,7 +48,7 @@ export default class MollieIDealIssuer extends Plugin {
 
         // update the visibility of our
         // issuer dropdown list
-        this.updateIssuerVisibility(this._iDealRadioInput, this._container)
+        this.updateIssuerVisibility(this._iDealRadioInput, this._container, this._issuersDropdown)
 
         // if we do not have the old modal form, but
         // the new inline form, then automatically set the
@@ -117,7 +117,7 @@ export default class MollieIDealIssuer extends Plugin {
         // when switching payment methods
         allRadioInputs.forEach((element) => {
             element.addEventListener('change', () => {
-                this.updateIssuerVisibility(iDealRadioInput, container)
+                this.updateIssuerVisibility(iDealRadioInput, container, issuersDropdown)
             });
         });
 
@@ -147,12 +147,23 @@ export default class MollieIDealIssuer extends Plugin {
 
     /**
      *
+     * @param iDealRadio
+     * @param container
+     * @param dropdown
      */
-    updateIssuerVisibility(iDealRadio, container) {
+    updateIssuerVisibility(iDealRadio, container, dropdown) {
+
+        let issuerRequired = false;
+
         if (iDealRadio === undefined || iDealRadio.checked === false) {
             container.classList.add('d-none');
         } else {
             container.classList.remove('d-none');
+            issuerRequired = true;
+        }
+
+        if (dropdown !== undefined) {
+            dropdown.required = issuerRequired;
         }
     }
 

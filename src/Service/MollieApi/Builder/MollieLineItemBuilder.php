@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Service\MollieApi\Builder;
 
-
 use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGatewayInterface;
 use Kiener\MolliePayments\Exception\MissingPriceLineItem;
 use Kiener\MolliePayments\Exception\MissingPriceLineItemException;
@@ -65,7 +64,7 @@ class MollieLineItemBuilder
 
     /**
      * @param string $taxStatus
-     * @param OrderLineItemCollection|null $lineItems
+     * @param null|OrderLineItemCollection $lineItems
      * @param bool $isVerticalTaxCalculation
      * @return MollieLineItemCollection
      */
@@ -79,7 +78,6 @@ class MollieLineItemBuilder
 
         /** @var OrderLineItemEntity $item */
         foreach ($lineItems as $item) {
-
             $this->orderLineItemValidator->validate($item);
             $extraData = $this->lineItemDataExtractor->extractExtraData($item);
             $itemPrice = $item->getPrice();
@@ -116,7 +114,7 @@ class MollieLineItemBuilder
      * Return the type of the line item.
      *
      * @param OrderLineItemEntity $item
-     * @return string|null
+     * @return null|string
      */
     public function getLineItemType(OrderLineItemEntity $item): ?string
     {

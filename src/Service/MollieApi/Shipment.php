@@ -28,8 +28,7 @@ class Shipment
     public function getShipments(
         string $mollieOrderId,
         string $salesChannelId
-    ): ShipmentCollection
-    {
+    ): ShipmentCollection {
         $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId, ['embed' => 'shipments']);
         return $mollieOrder->shipments();
     }
@@ -37,15 +36,14 @@ class Shipment
     /**
      * @param string $mollieOrderId
      * @param string $salesChannelId
-     * @param ShipmentTrackingInfoStruct|null $tracking
+     * @param null|ShipmentTrackingInfoStruct $tracking
      * @return MollieShipment
      */
     public function shipOrder(
         string                      $mollieOrderId,
         string                      $salesChannelId,
         ?ShipmentTrackingInfoStruct $tracking = null
-    ): MollieShipment
-    {
+    ): MollieShipment {
         try {
             $options = [];
             if ($tracking instanceof ShipmentTrackingInfoStruct) {
@@ -70,7 +68,7 @@ class Shipment
      * @param string $salesChannelId
      * @param string $mollieOrderLineId
      * @param int $quantity
-     * @param ShipmentTrackingInfoStruct|null $tracking
+     * @param null|ShipmentTrackingInfoStruct $tracking
      * @return MollieShipment
      */
     public function shipItem(
@@ -79,8 +77,7 @@ class Shipment
         string                      $mollieOrderLineId,
         int                         $quantity,
         ?ShipmentTrackingInfoStruct $tracking = null
-    ): MollieShipment
-    {
+    ): MollieShipment {
         try {
             $options = [
                 'lines' => [

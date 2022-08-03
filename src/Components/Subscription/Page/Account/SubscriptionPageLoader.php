@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Components\Subscription\Page\Account;
 
-
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\SettingsService;
@@ -24,7 +23,6 @@ use Shopware\Storefront\Framework\Page\StorefrontSearchResult;
 use Shopware\Storefront\Page\GenericPageLoaderInterface;
 use Shopware\Storefront\Page\MetaInformation;
 use Symfony\Component\HttpFoundation\Request;
-
 
 class SubscriptionPageLoader
 {
@@ -154,7 +152,7 @@ class SubscriptionPageLoader
 
     /**
      * @param Request $request
-     * @param string|null $customerId
+     * @param null|string $customerId
      * @return Criteria
      */
     private function createCriteria(Request $request, string $customerId = null): Criteria
@@ -211,5 +209,4 @@ class SubscriptionPageLoader
 
         return $salutations;
     }
-
 }

@@ -17,8 +17,7 @@ class ComponentsController extends StorefrontController
 
     public function __construct(
         CustomerService $customerService
-    )
-    {
+    ) {
         $this->customerService = $customerService;
     }
 

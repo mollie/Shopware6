@@ -10,7 +10,7 @@ class OrderLineItemFoundManyException extends ShopwareHttpException
     /**
      * @param string $identifier
      * @param array<string,mixed> $parameters
-     * @param \Throwable|null $previous
+     * @param null|\Throwable $previous
      */
     public function __construct(string $identifier, array $parameters = [], \Throwable $previous = null)
     {

@@ -5,16 +5,22 @@ import Shopware from "Services/shopware/Shopware";
 import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
 // ------------------------------------------------------
 import CheckoutAction from 'Actions/storefront/checkout/CheckoutAction';
-import PaymentScreenAction from "Actions/mollie/PaymentScreenAction";
-import PaymentAction from "Actions/storefront/checkout/PaymentAction";
 import DummyBasketScenario from "Scenarios/DummyBasketScenario";
+import PaymentAction from "Actions/storefront/checkout/PaymentAction";
+// ------------------------------------------------------
+import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
+import CreditCardScreenAction from "cypress-mollie/src/actions/screens/CreditCardScreen";
+import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
 
 
 const devices = new Devices();
 const session = new Session();
 const shopware = new Shopware();
 
+const mollieSandbox = new MollieSandbox();
 const molliePayment = new PaymentScreenAction();
+const mollieCreditCardForm = new CreditCardScreenAction();
+
 const configAction = new ShopConfigurationAction();
 const checkout = new CheckoutAction();
 const payment = new PaymentAction();
@@ -34,6 +40,7 @@ describe('Credit Card Components', () => {
         // we need the Shopware failure mode for some tests in this file
         // so let's just do this here once
         configAction.setupShop(false, true, false);
+        configAction.updateProducts('', false, 0, '');
     })
 
     beforeEach(() => {
@@ -44,7 +51,7 @@ describe('Credit Card Components', () => {
 
     context(devices.getDescription(devices.getFirstDevice()), () => {
 
-        it('Successful card payment', () => {
+        it('C5421: Successful card payment', () => {
 
             setUp();
 
@@ -65,7 +72,7 @@ describe('Credit Card Components', () => {
             // been used by comparing the last 4 digits
             cy.contains('**** ' + validCardNumber.substr(validCardNumber.length - 4));
 
-            molliePayment.initSandboxCookie();
+            mollieSandbox.initSandboxCookie();
 
             molliePayment.selectPaid();
 
@@ -73,7 +80,7 @@ describe('Credit Card Components', () => {
             cy.contains('Thank you for your order');
         })
 
-        it('Invalid Card Holder (Empty)', () => {
+        it('C5420: Invalid Card Holder (Empty)', () => {
 
             setUp();
 
@@ -90,7 +97,7 @@ describe('Credit Card Components', () => {
             assertComponentErrors(false, true, true, true);
         })
 
-        it('Invalid Card Holder (Invalid Value)', () => {
+        it('C6928: Invalid Card Holder (Invalid Value)', () => {
 
             setUp();
 
@@ -110,7 +117,7 @@ describe('Credit Card Components', () => {
             cy.contains("Failed to submit card data");
         })
 
-        it('Invalid Card Number', () => {
+        it('C6929: Invalid Card Number', () => {
 
             setUp();
 
@@ -127,7 +134,7 @@ describe('Credit Card Components', () => {
             assertComponentErrors(true, false, true, true);
         })
 
-        it('Invalid Expiry Date', () => {
+        it('C6930: Invalid Expiry Date', () => {
 
             setUp();
 
@@ -144,7 +151,7 @@ describe('Credit Card Components', () => {
             assertComponentErrors(true, true, false, true);
         })
 
-        it('Invalid CVC Code', () => {
+        it('C6931: Invalid CVC Code', () => {
 
             setUp();
 
@@ -161,7 +168,7 @@ describe('Credit Card Components', () => {
             assertComponentErrors(true, true, true, false);
         })
 
-        it('Components work on edit order page', () => {
+        it('C6147: Components work on edit order page', () => {
 
             scenarioDummyBasket.execute();
 
@@ -174,7 +181,7 @@ describe('Credit Card Components', () => {
             shopware.prepareDomainChange();
             checkout.placeOrderOnConfirm();
 
-            molliePayment.initSandboxCookie();
+            mollieSandbox.initSandboxCookie();
             molliePayment.selectFailed();
 
             cy.url().should('include', '/account/order/edit');
@@ -201,7 +208,7 @@ describe('Credit Card Components', () => {
             shopware.prepareDomainChange();
             checkout.placeOrderOnEdit();
 
-            molliePayment.initSandboxCookie();
+            mollieSandbox.initSandboxCookie();
 
             // verify that our component card is really
             // been used by comparing the last 4 digits
@@ -222,7 +229,7 @@ describe('Status Tests', () => {
         devices.setDevice(devices.getFirstDevice());
         // turn off credit card components
         // to speed up a few  things
-        configAction.setupPlugin(false, false, false);
+        configAction.setupPlugin(false, false, false, false);
 
     })
 
@@ -245,7 +252,11 @@ describe('Status Tests', () => {
         shopware.prepareDomainChange();
         checkout.placeOrderOnConfirm();
 
-        molliePayment.initSandboxCookie();
+        mollieSandbox.initSandboxCookie();
+
+        mollieCreditCardForm.enterValidCard();
+        mollieCreditCardForm.submitForm();
+
         molliePayment.selectOpen();
 
         cy.url().should('include', '/account/order/edit');

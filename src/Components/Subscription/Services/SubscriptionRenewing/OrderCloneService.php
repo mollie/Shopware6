@@ -55,8 +55,8 @@ class OrderCloneService
      * @param string $newOrderNumber
      * @param bool $needsSeparateShippingAddress
      * @param Context $context
-     * @return string
      * @throws \Exception
+     * @return string
      */
     public function createNewOrder(OrderEntity $existingOrder, string $newOrderNumber, bool $needsSeparateShippingAddress, Context $context): string
     {
@@ -123,7 +123,6 @@ class OrderCloneService
 
 
         foreach ($orderData['addresses'] as $index => $address) {
-
             $oldAddressId = $orderData['addresses'][$index]['id'];
             $newAddressId = Uuid::randomHex();
 
@@ -145,7 +144,6 @@ class OrderCloneService
         }
 
         foreach ($orderData['deliveries'] as $index => $delivery) {
-
             $oldDeliveryId = $orderData['deliveries'][$index]['id'];
             $newDeliveryId = Uuid::randomHex();
 
@@ -198,7 +196,6 @@ class OrderCloneService
         $addressData = [];
 
         foreach ($addresses as $address) {
-
             $data = [
                 'id' => $address->getId(),
                 'salutationId' => $address->getSalutationId(),
@@ -228,5 +225,4 @@ class OrderCloneService
 
         return $addressData;
     }
-
 }

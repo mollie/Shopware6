@@ -22,8 +22,7 @@ class iDealPayment extends PaymentHandler
         OrderEntity $orderEntity,
         SalesChannelContext $salesChannelContext,
         CustomerEntity $customer
-    ): array
-    {
+    ): array {
         $customFields = $customer->getCustomFields() ?? [];
 
         $issuer = $customFields['mollie_payments']['preferred_ideal_issuer'] ?? '';

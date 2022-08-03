@@ -24,8 +24,7 @@ class DeliveryService
      */
     public function __construct(
         EntityRepositoryInterface $orderDeliveryRepository
-    )
-    {
+    ) {
         $this->orderDeliveryRepository = $orderDeliveryRepository;
     }
 
@@ -44,15 +43,14 @@ class DeliveryService
      *
      * @param $deliveryId
      * @param $versionId
-     * @param Context|null $context
-     * @return OrderDeliveryEntity|null
+     * @param null|Context $context
+     * @return null|OrderDeliveryEntity
      */
     public function getDeliveryById(
         $deliveryId,
         $versionId = null,
         Context $context = null
-    ): ?OrderDeliveryEntity
-    {
+    ): ?OrderDeliveryEntity {
         $deliveryCriteria = new Criteria([$deliveryId]);
 
         if ($versionId !== null) {
@@ -69,17 +67,16 @@ class DeliveryService
      * Returns a delivery by an order id.
      *
      * @param string       $orderId
-     * @param string|null  $orderVersionId
-     * @param Context|null $context
+     * @param null|string  $orderVersionId
+     * @param null|Context $context
      *
-     * @return OrderDeliveryEntity|null
+     * @return null|OrderDeliveryEntity
      */
     public function getDeliveryByOrderId(
         string $orderId,
         string $orderVersionId = null,
         Context $context = null
-    ): ?OrderDeliveryEntity
-    {
+    ): ?OrderDeliveryEntity {
         $deliveryCriteria = new Criteria();
         $deliveryCriteria->addFilter(new EqualsFilter('orderId', $orderId));
 
@@ -116,14 +113,13 @@ class DeliveryService
      * Updates a delivery in the database.
      *
      * @param array $data
-     * @param Context|null $context
+     * @param null|Context $context
      * @return EntityWrittenContainerEvent
      */
     public function updateDelivery(
         array $data,
         Context $context = null
-    ): EntityWrittenContainerEvent
-    {
+    ): EntityWrittenContainerEvent {
         return $this->getRepository()->update(
             [$data],
             $context ?? Context::createDefaultContext()

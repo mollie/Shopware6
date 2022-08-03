@@ -52,7 +52,7 @@
             <label>Enable Credit Card Components</label>
             <label lang="de-DE">Kreditkarten Komponenten aktivieren</label>
             <label lang="nl-NL">Credit Card componenten activeren</label>
-            <defaultValue>false</defaultValue>
+            <defaultValue>true</defaultValue>
             <helpText>Show credit card input fields directly within your Shopware shop. If disabled, Mollie will show the forms on the Mollie payment page.</helpText>
             <helpText lang="de-DE">Zeigt Kreditkartenfelder direkt im Shopware shop an. Wenn nicht aktiviert, dann zeigt Mollie diese Felder direkt auf der externen Mollie Zahlungsseite.</helpText>
             <helpText lang="nl-NL">Toon credit card invoervelden direct in jouw Shopware shop. Indien uitgeschakeld, zal Mollie de formulieren tonen op de Mollie betaalpagina.</helpText>
@@ -72,7 +72,7 @@
             <label>Use Shopware standard behaviour for failed payments</label>
             <label lang="de-DE">Shopware Standardverhalten für fehlerhafte Zahlungen verwenden</label>
             <label lang="nl-NL">Gebruik de standaard Shopware instelling voor mislukte betalingen</label>
-            <defaultValue>false</defaultValue>
+            <defaultValue>true</defaultValue>
             <helpText>Use the default Shopware behaviour on failed payments. If disabled, Mollie will automatically provide a way to retry the payment by redirecting the user to the Mollie payments page.</helpText>
             <helpText lang="de-DE">Aktiviert das Standardverhalten von Shopware für fehlerhafte Zahlungen. Wenn nicht aktiv, kümmert sich das Mollie Plugin um einen erneuten Versuch der Zahlung und leitet den Käufer auf die externe Mollie Zahlungsauswahl.</helpText>
             <helpText lang="nl-NL">Gebruik de standaard Shopware instelling voor mislukte betalingen. Indien uitgeschakeld, zal Mollie automatisch een manier aanbieden om de betaling opnieuw te proberen door de user om te leiden naar de Mollie betalingspagina.</helpText>
@@ -105,6 +105,16 @@
         <title>Refund Manager</title>
         <title lang="de-DE">Refund Manager</title>
         <title lang="nl-NL">Refund Manager</title>
+        <input-field type="bool">
+            <name>refundManagerEnabled</name>
+            <defaultValue>true</defaultValue>
+            <label>Enable Refund Manager</label>
+            <label lang="de-DE">Refund Manager aktivieren</label>
+            <label lang="nl-NL">Refund Manager inschakelen</label>
+            <helpText>Enable or disable the Refund Manager in the Administration</helpText>
+            <helpText lang="de-DE">Aktivieren oder deaktivieren Sie den Refund Manager in der Administration</helpText>
+            <helpText lang="nl-NL">Schakel de Refund Manager in of uit in de administratie</helpText>
+        </input-field>
         <input-field type="bool">
             <name>refundManagerAutoStockReset</name>
             <defaultValue>true</defaultValue>

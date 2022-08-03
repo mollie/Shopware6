@@ -79,7 +79,8 @@ class OrderService implements OrderServiceInterface
      *
      * @param string $orderId
      * @param Context $context
-     * @return OrderEntity|null
+     * @throws OrderNotFoundException
+     * @return null|OrderEntity
      */
     public function getOrder(string $orderId, Context $context): OrderEntity
     {
@@ -143,8 +144,8 @@ class OrderService implements OrderServiceInterface
 
     /**
      * @param OrderEntity $order
-     * @return string
      * @throws CouldNotExtractMollieOrderIdException
+     * @return string
      */
     public function getMollieOrderId(OrderEntity $order): string
     {
@@ -232,6 +233,7 @@ class OrderService implements OrderServiceInterface
                 $creditCardDetails = $molliePayment->details;
             }
 
+
         } catch (PaymentNotFoundException $ex) {
             # some orders like OPEN bank transfer have no completed payments
             # so this is a usual case, where we just need to skip this process
@@ -266,7 +268,6 @@ class OrderService implements OrderServiceInterface
             $orderTransactionCustomFields,
             $scContext
         );
-
     }
 
 
@@ -319,7 +320,5 @@ class OrderService implements OrderServiceInterface
             $orderTransactionCustomFields,
             $context
         );
-
     }
-
 }

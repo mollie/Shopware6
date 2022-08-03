@@ -26,10 +26,10 @@ abstract class AbstractMailService
     /**
      * @param array<string, mixed> $data
      * @param array<array<string, mixed>> $attachments
-     * @return void
      * @throws ConstraintViolationException
+     * @return void
      */
-    public abstract function send(array $data, array $attachments = []): void;
+    abstract public function send(array $data, array $attachments = []): void;
 
     /**
      * @param array $data
@@ -37,7 +37,7 @@ abstract class AbstractMailService
      */
     protected function getNoReplyAddress(array $data): array
     {
-        if(!array_key_exists('noReplyHost', $data)) {
+        if (!array_key_exists('noReplyHost', $data)) {
             $request = Request::createFromGlobals();
             $data['noReplyHost'] = $request->getHost();
         }
@@ -48,7 +48,7 @@ abstract class AbstractMailService
     }
 
     /**
-     * @param string|null $locale
+     * @param null|string $locale
      * @return string[]
      */
     protected function getRecipients(?string $locale = null): array

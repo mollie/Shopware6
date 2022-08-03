@@ -28,8 +28,7 @@ class ReadablePluginConfigurationGenerator extends AbstractPluginConfigurationGe
         EntityRepositoryInterface $salesChannelRepository,
         SettingsService           $settingsService,
         ApiKeyValidator           $apiKeyValidator
-    )
-    {
+    ) {
         $this->apiKeyValidator = $apiKeyValidator;
 
         parent::__construct($configurationService, $salesChannelRepository, $settingsService);

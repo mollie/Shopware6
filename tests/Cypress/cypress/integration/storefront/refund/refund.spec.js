@@ -2,7 +2,6 @@ import Devices from "Services/utils/Devices";
 import Session from "Services/utils/Session"
 import Element from "Services/utils/Element";
 import Shopware from "Services/shopware/Shopware";
-import PaymentScreenAction from 'Actions/mollie/PaymentScreenAction';
 // ------------------------------------------------------
 import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
 // ------------------------------------------------------
@@ -13,6 +12,9 @@ import AdminOrdersAction from "Actions/admin/AdminOrdersAction";
 import AdminLoginAction from "Actions/admin/AdminLoginAction";
 import RefundManagerAction from "Actions/admin/RefundManagerAction";
 import RefundManagerRepository from "Repositories/admin/refund-manager/RefundManagerRepository";
+// ------------------------------------------------------
+import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
+import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
 
 
 const devices = new Devices();
@@ -24,6 +26,7 @@ const shopware = new Shopware();
 const configAction = new ShopConfigurationAction();
 const checkout = new CheckoutAction();
 const paymentAction = new PaymentAction();
+const mollieSandbox = new MollieSandbox();
 const molliePayment = new PaymentScreenAction();
 const adminOrders = new AdminOrdersAction();
 const adminLogin = new AdminLoginAction();
@@ -40,6 +43,7 @@ context("Order Refunds", () => {
 
     before(function () {
         configAction.setupShop(false, false, false);
+        configAction.updateProducts('', false, 0, '');
     })
 
     beforeEach(() => {
@@ -49,7 +53,7 @@ context("Order Refunds", () => {
 
     context(devices.getDescription(device), () => {
 
-        it('Create full refund and cancel it', () => {
+        it('C6490: Create full refund and cancel it', () => {
 
             createOrderAndOpenAdmin();
 
@@ -81,7 +85,7 @@ context("Order Refunds", () => {
         })
 
 
-        it('Create partial refund and cancel it', () => {
+        it('C6489: Create partial refund and cancel it', () => {
 
             createOrderAndOpenAdmin();
 
@@ -130,7 +134,7 @@ function createOrderAndOpenAdmin() {
     shopware.prepareDomainChange();
     checkout.placeOrderOnConfirm();
 
-    molliePayment.initSandboxCookie();
+    mollieSandbox.initSandboxCookie();
     molliePayment.selectPaid();
 
     adminLogin.login();

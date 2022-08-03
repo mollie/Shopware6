@@ -8,8 +8,7 @@ class CouldNotCreateMollieCustomerException extends \Exception
         string $customerNumber,
         string $customerName,
         ?\Throwable $previous = null
-    )
-    {
+    ) {
         $message = sprintf(
             "Could not create a customer at Mollie for customer %s (%s)",
             $customerNumber,

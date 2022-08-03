@@ -19,7 +19,6 @@ class LineItemDataExtractor
 
         // extra data is not needed for successful orders
         if (!$product instanceof ProductEntity) {
-
             return new LineItemExtraData($lineItem->getId(), null, null);
         }
 

@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund\Refund
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionCancelledEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionEndedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionRemindedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionRenewedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionStartedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookReceivedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedAuthorizedEvent;
@@ -274,4 +275,18 @@ class FlowBuilderEventFactory
         return new SubscriptionCancelledEvent($subscription, $customer, $context);
     }
 
+    /**
+     * @param CustomerEntity $customer
+     * @param SubscriptionEntity $subscription
+     * @param Context $context
+     * @return DummyEvent|SubscriptionRenewedEvent
+     */
+    public function buildSubscriptionRenewedEvent(CustomerEntity $customer, SubscriptionEntity $subscription, Context $context)
+    {
+        if ($this->versionCompare->lt(FlowBuilderFactory::FLOW_BUILDER_MIN_VERSION)) {
+            return new DummyEvent();
+        }
+
+        return new SubscriptionRenewedEvent($subscription, $customer, $context);
+    }
 }

@@ -11,7 +11,6 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-
 class LiveDataEnricher implements EventSubscriberInterface
 {
 
@@ -61,7 +60,6 @@ class LiveDataEnricher implements EventSubscriberInterface
     {
         /** @var SubscriptionEntity $subscription */
         foreach ($event->getEntities() as $subscription) {
-
             try {
 
                 # ----------------------------------------------------------------------------------------------------
@@ -94,10 +92,9 @@ class LiveDataEnricher implements EventSubscriberInterface
                 $mollieSubscription = $this->gwMollie->getSubscription($subscription->getMollieId(), $subscription->getMollieCustomerId());
 
                 $subscription->setMollieStatus($mollieSubscription->status);
-
             } catch (\Throwable $ex) {
-
-                $this->logger->error('Error when enriching Subscription with additional data',
+                $this->logger->error(
+                    'Error when enriching Subscription with additional data',
                     [
                         'exception' => $ex,
                     ]
@@ -106,4 +103,3 @@ class LiveDataEnricher implements EventSubscriberInterface
         }
     }
 }
-

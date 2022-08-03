@@ -1,7 +1,7 @@
 <?php
 
 
-namespace MolliePayments\Tests\Components\Subscription\Services\SubscriptionValidator;
+namespace MolliePayments\Tests\Components\Subscription\Services\SubscriptionCancellation;
 
 use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionCancellation\CancellationValidator;
 use PHPUnit\Framework\TestCase;

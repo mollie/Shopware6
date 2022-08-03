@@ -13,7 +13,7 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\Mollie
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder;
 use Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder;
-use Kiener\MolliePayments\Components\Subscription\Services\PaymentMethodRemover\PaymentMethodRemover;
+use Kiener\MolliePayments\Components\Subscription\Services\PaymentMethodRemover\SubscriptionRemover;
 use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionCancellation\CancellationValidator;
 use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionReminder\ReminderValidator;
 use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing\SubscriptionRenewing;
@@ -172,8 +172,8 @@ class SubscriptionManager implements SubscriptionManagerInterface
     /**
      * @param OrderEntity $order
      * @param SalesChannelContext $context
-     * @return string
      * @throws Exception
+     * @return string
      */
     public function createSubscription(OrderEntity $order, SalesChannelContext $context): string
     {
@@ -216,27 +216,23 @@ class SubscriptionManager implements SubscriptionManagerInterface
 
     /**
      * @param OrderEntity $order
+     * @param string $mandateId
      * @param SalesChannelContext $context
-     * @throws \Exception
+     * @throws CustomerCouldNotBeFoundException
      */
-    public function confirmSubscription(OrderEntity $order, SalesChannelContext $context): void
+    public function confirmSubscription(OrderEntity $order, string $mandateId, SalesChannelContext $context): void
     {
         if (!$order->getOrderCustomer() instanceof OrderCustomerEntity) {
             throw new \Exception('Order: ' . $order->getOrderNumber() . ' does not have a linked customer');
         }
 
-        $this->logger->debug('Confirming pending subscription for order: ' . $order->getOrderNumber());
-
-
-        $orderSalesChannelId = $order->getSalesChannelId();
-
         # first get our mollie customer ID from the order.
         # this is required to create a subscription
-        $mollieCustomerId = $this->customerService->getMollieCustomerId((string)$order->getOrderCustomer()->getCustomerId(), $orderSalesChannelId, $context->getContext());
+        $mollieCustomerId = $this->customerService->getMollieCustomerId((string)$order->getOrderCustomer()->getCustomerId(), $order->getSalesChannelId(), $context->getContext());
 
 
         # switch out client to the correct sales channel
-        $this->gwMollie->switchClient($orderSalesChannelId);
+        $this->gwMollie->switchClient($order->getSalesChannelId());
 
 
         # load all pending subscriptions of the order.
@@ -244,13 +240,27 @@ class SubscriptionManager implements SubscriptionManagerInterface
         # prepare everything for recurring payments.
         $pendingSubscriptions = $this->repoSubscriptions->findPendingSubscriptions($order->getId(), $context->getContext());
 
+        # if we have nothing to confirm
+        # then just return
+        if (count($pendingSubscriptions) <= 0) {
+            return;
+        }
+
+        # if we have something to confirm (and create) but we don't
+        # have a valid mandate ID, then throw an exception
+        if (empty($mandateId)) {
+            throw new \Exception('Cannot confirm subscription for order: ' . $order->getOrderNumber() . '! Provided mandate ID of payment is empty!');
+        }
+
+        $this->logger->debug('Confirming pending subscription for order: ' . $order->getOrderNumber());
+
         foreach ($pendingSubscriptions as $subscription) {
 
             # convert our subscription into a mollie definition
-            $mollieData = $this->mollieRequestBuilder->buildDefinition($subscription);
+            $jsonPayload = $this->mollieRequestBuilder->buildRequestPayload($subscription, $mandateId);
             # create the subscription in Mollie.
             # this is important to really start the subscription process
-            $mollieSubscription = $this->gwMollie->createSubscription($mollieCustomerId, $mollieData);
+            $mollieSubscription = $this->gwMollie->createSubscription($mollieCustomerId, $jsonPayload);
 
             # confirm the subscription in our local database
             # by adding the missing external Mollie IDs
@@ -270,8 +280,8 @@ class SubscriptionManager implements SubscriptionManagerInterface
 
     /**
      * @param Context $context
-     * @return int
      * @throws Exception
+     * @return int
      */
     public function remindSubscriptionRenewal(Context $context): int
     {
@@ -284,7 +294,6 @@ class SubscriptionManager implements SubscriptionManagerInterface
 
         /** @var SalesChannelEntity $salesChannel */
         foreach ($salesChannels as $salesChannel) {
-
             $settings = $this->pluginSettings->getSettings($salesChannel->getId());
 
             $daysOffset = $settings->getSubscriptionsReminderDays();
@@ -338,8 +347,8 @@ class SubscriptionManager implements SubscriptionManagerInterface
      * @param string $swSubscriptionId
      * @param string $molliePaymentId
      * @param SalesChannelContext $context
-     * @return OrderEntity
      * @throws Exception
+     * @return OrderEntity
      */
     public function renewSubscription(string $swSubscriptionId, string $molliePaymentId, SalesChannelContext $context): OrderEntity
     {
@@ -354,11 +363,9 @@ class SubscriptionManager implements SubscriptionManagerInterface
 
         $this->gwMollie->switchClient($swSubscription->getSalesChannelId());
 
-        # grab our mollie payment and
-        # also the mollie subscription
+        # grab our mollie payment and also the mollie subscription
         $payment = $this->gwMollie->getPayment($molliePaymentId);
         $mollieSubscription = $this->gwMollie->getSubscription($swSubscription->getMollieId(), $swSubscription->getMollieCustomerId());
-
 
         $devMode = $this->pluginSettings->getEnvMollieDevMode();
 
@@ -367,6 +374,12 @@ class SubscriptionManager implements SubscriptionManagerInterface
         # in DEV mode, we allow this, otherwise we cannot test this!
         if (!$devMode && (string)$payment->subscriptionId !== $swSubscription->getMollieId()) {
             throw new \Exception('Warning, trying to renew subscription based on a payment that does not belong to this subscription!');
+        }
+
+        # verify if the amount is higher than 0,00
+        # we just want to ensure that a "payment method update" does not lead to this webhook (it felt as if it was in 1 case)
+        if ((float)$payment->amount->value <= 0) {
+            throw new \Exception('Warning, trying to renew subscription based on a 0,00 payment. Mollie should actually not call the renew-webhook for this!');
         }
 
         # first thing is, we have to update our new paymentAt of our local subscription.
@@ -381,6 +394,9 @@ class SubscriptionManager implements SubscriptionManagerInterface
 
         # --------------------------------------------------------------------------------------------------
         # FLOW BUILDER / BUSINESS EVENTS
+
+        $event = $this->flowBuilderEventFactory->buildSubscriptionRenewedEvent($swSubscription->getCustomer(), $swSubscription, $context->getContext());
+        $this->flowBuilderDispatcher->dispatch($event);
 
         # if this was our last renewal, then send out
         # a new event that the subscription has now ended
@@ -515,8 +531,8 @@ class SubscriptionManager implements SubscriptionManagerInterface
     /**
      * @param string $subscriptionId
      * @param Context $context
-     * @return string
      * @throws CustomerCouldNotBeFoundException
+     * @return string
      */
     public function updatePaymentMethodStart(string $subscriptionId, Context $context): string
     {
@@ -539,7 +555,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
         $payment = $this->gwMollie->createPayment([
             'sequenceType' => 'first',
             'customerId' => $customerId,
-            'method' => PaymentMethodRemover::ALLOWED_METHODS,
+            'method' => SubscriptionRemover::ALLOWED_METHODS,
             'amount' => $this->priceBuilder->build(0, 'EUR'),
             'description' => 'Update Subscription Payment: ' . $subscription->getDescription(),
             'redirectUrl' => $this->routingBuilder->buildSubscriptionPaymentUpdated($subscriptionId),
@@ -559,8 +575,8 @@ class SubscriptionManager implements SubscriptionManagerInterface
     /**
      * @param string $subscriptionId
      * @param Context $context
-     * @return void
      * @throws Exception
+     * @return void
      */
     public function updatePaymentMethodConfirm(string $subscriptionId, Context $context): void
     {
@@ -622,8 +638,8 @@ class SubscriptionManager implements SubscriptionManagerInterface
     /**
      * @param string $subscriptionId
      * @param Context $context
-     * @return void
      * @throws Exception
+     * @return void
      */
     public function cancelSubscription(string $subscriptionId, Context $context): void
     {
@@ -665,8 +681,8 @@ class SubscriptionManager implements SubscriptionManagerInterface
     /**
      * @param SubscriptionEntity $subscription
      * @param Context $context
-     * @return SubscriptionAddressEntity
      * @throws Exception
+     * @return SubscriptionAddressEntity
      */
     private function createNewAddress(SubscriptionEntity $subscription, Context $context): SubscriptionAddressEntity
     {
@@ -689,5 +705,4 @@ class SubscriptionManager implements SubscriptionManagerInterface
 
         return $address;
     }
-
 }

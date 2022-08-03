@@ -65,13 +65,11 @@ class PaymentMethodController extends AbstractController
     private function updatePaymentMethodsAction(Context $context): JsonResponse
     {
         try {
-
             $this->paymentMethodService->installAndActivatePaymentMethods($context);
 
             return $this->json([
                 'success' => true,
             ]);
-
         } catch (Throwable $exception) {
             $this->logger->error($exception->getMessage());
 
@@ -81,6 +79,4 @@ class PaymentMethodController extends AbstractController
             );
         }
     }
-
 }
-

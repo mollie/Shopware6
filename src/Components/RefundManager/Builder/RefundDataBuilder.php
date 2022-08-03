@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Components\RefundManager\Builder;
 
-
 use Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem\DeliveryItem;
 use Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem\ProductItem;
 use Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem\PromotionItem;
@@ -64,7 +63,7 @@ class RefundDataBuilder
     {
         $orderAttributes = new OrderAttributes($order);
 
-        /** @var \Mollie\Api\Resources\Order|null $mollieOrder */
+        /** @var null|\Mollie\Api\Resources\Order $mollieOrder */
         $mollieOrder = null;
 
         if ($orderAttributes->isTypeSubscription()) {
@@ -78,9 +77,7 @@ class RefundDataBuilder
 
 
         try {
-
             $refunds = $this->refundService->getRefunds($order);
-
         } catch (PaymentNotFoundException $ex) {
             # if we dont have a payment, then theres also no refunds
             # we still need our data, only with an empty list of refunds
@@ -97,7 +94,6 @@ class RefundDataBuilder
 
         if ($order->getLineItems() !== null) {
             foreach ($order->getLineItems() as $item) {
-
                 $lineItemAttribute = new OrderLineItemEntityAttributes($item);
                 $mollieOrderLineId = $lineItemAttribute->getMollieOrderLineID();
 
@@ -126,7 +122,6 @@ class RefundDataBuilder
         # they are saved in a separate delivery collection
         if ($order->getDeliveries() !== null) {
             foreach ($order->getDeliveries() as $delivery) {
-
                 $alreadyRefundedQty = 0;
 
                 # remember, subscriptions have no order
@@ -161,13 +156,11 @@ class RefundDataBuilder
         # TODO: these API calls should be removed one day, once I have more time (this refund manager is indeed huge) for now it's fine
         # ----------------------------------------------------------------------------
         try {
-
             $remaining = $this->refundService->getRemainingAmount($order);
             $refundedTotal = $this->refundService->getRefundedAmount($order);
             $voucherAmount = $this->refundService->getVoucherPaidAmount($order);
             # ----------------------------------------------------------------------------
             $pendingRefundAmount = $this->getPendingRefundAmount($refunds);
-
         } catch (PaymentNotFoundException $ex) {
             # if we don't have a payment,
             # then there are no values
@@ -269,7 +262,6 @@ class RefundDataBuilder
 
         /** @var array<mixed> $refund */
         foreach ($refunds as $refund) {
-
             if (!isset($refund['metadata'])) {
                 continue;
             }
@@ -298,6 +290,4 @@ class RefundDataBuilder
 
         return $refundedQty;
     }
-
-
 }

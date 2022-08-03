@@ -13,8 +13,8 @@ class MolliePaymentExtractor
     /**
      * method extracts last created transaction if it is a mollie payment transaction.
      *
-     * @param OrderTransactionCollection|null $collection
-     * @return OrderTransactionEntity|null
+     * @param null|OrderTransactionCollection $collection
+     * @return null|OrderTransactionEntity
      */
     public function extractLastMolliePayment(?OrderTransactionCollection $collection): ?OrderTransactionEntity
     {

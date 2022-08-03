@@ -10,9 +10,9 @@ use Shopware\Core\Framework\Struct\StructCollection;
  * @method void                set(string $key, MollieLineItem $entity)
  * @method MollieLineItem[]    getIterator()
  * @method MollieLineItem[]    getElements()
- * @method MollieLineItem|null get(string $key)
- * @method MollieLineItem|null first()
- * @method MollieLineItem|null last()
+ * @method null|MollieLineItem get(string $key)
+ * @method null|MollieLineItem first()
+ * @method null|MollieLineItem last()
  */
 class MollieLineItemCollection extends StructCollection
 {
@@ -23,9 +23,7 @@ class MollieLineItemCollection extends StructCollection
 
     public function filterByRoundingRest(): self
     {
-
         return $this->filter(function (MollieLineItem $lineItem) {
-
             return $lineItem->hasRoundingRest();
         });
     }
@@ -33,7 +31,6 @@ class MollieLineItemCollection extends StructCollection
     public function filterByProductType(): self
     {
         return $this->filter(function (MollieLineItem $lineItem) {
-
             return $lineItem->getType() === OrderLineType::TYPE_PHYSICAL;
         });
     }

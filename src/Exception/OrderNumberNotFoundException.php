@@ -10,7 +10,7 @@ class OrderNumberNotFoundException extends ShopwareHttpException
     /**
      * @param string $orderNumber
      * @param array<string,mixed> $parameters
-     * @param \Throwable|null $previous
+     * @param null|\Throwable $previous
      */
     public function __construct(string $orderNumber, array $parameters = [], \Throwable $previous = null)
     {

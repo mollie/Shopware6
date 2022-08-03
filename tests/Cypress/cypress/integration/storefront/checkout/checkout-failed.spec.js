@@ -1,13 +1,16 @@
 import Devices from "Services/utils/Devices";
 import Shopware from "Services/shopware/Shopware"
 import Session from "Services/utils/Session"
-import PaymentScreenAction from 'Actions/mollie/PaymentScreenAction';
 // ------------------------------------------------------
 import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
 // ------------------------------------------------------
 import CheckoutAction from 'Actions/storefront/checkout/CheckoutAction';
 import PaymentAction from "Actions/storefront/checkout/PaymentAction";
 import DummyBasketScenario from "Scenarios/DummyBasketScenario";
+// ------------------------------------------------------
+import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
+import PaymentStatusScreen from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
+import PaymentListScreen from "cypress-mollie/src/actions/screens/PaymentListScreen";
 
 
 const devices = new Devices();
@@ -17,7 +20,9 @@ const shopware = new Shopware();
 const configAction = new ShopConfigurationAction();
 const checkout = new CheckoutAction();
 const paymentAction = new PaymentAction();
-const molliePayment = new PaymentScreenAction();
+const mollieSandbox = new MollieSandbox();
+const molliePaymentStatus = new PaymentStatusScreen();
+const molliePaymentList = new PaymentListScreen();
 
 const scenarioDummyBasket = new DummyBasketScenario(1);
 
@@ -31,6 +36,7 @@ context("Checkout Failure Tests", () => {
 
         before(function () {
             configAction.setupShop(true, false, false);
+            configAction.updateProducts('', false, 0, '');
         })
 
         beforeEach(() => {
@@ -40,7 +46,7 @@ context("Checkout Failure Tests", () => {
 
         context(devices.getDescription(device), () => {
 
-            it('Paypal failed and retry with Giropay', () => {
+            it('C5395: Paypal failed and retry with Giropay', () => {
 
                 scenarioDummyBasket.execute();
                 paymentAction.switchPaymentMethod('PayPal');
@@ -48,8 +54,8 @@ context("Checkout Failure Tests", () => {
                 shopware.prepareDomainChange();
                 checkout.placeOrderOnConfirm();
 
-                molliePayment.initSandboxCookie();
-                molliePayment.selectFailed();
+                mollieSandbox.initSandboxCookie();
+                molliePaymentStatus.selectFailed();
 
                 // verify that we are back in our shop
                 // if the payment fails, the order is finished but
@@ -64,15 +70,15 @@ context("Checkout Failure Tests", () => {
                 cy.url().should('include', '/checkout/select-method/');
 
                 // select giro pay and mark it as "paid"
-                molliePayment.initSandboxCookie();
-                molliePayment.selectGiropay();
-                molliePayment.selectPaid();
+                mollieSandbox.initSandboxCookie();
+                molliePaymentList.selectGiropay();
+                molliePaymentStatus.selectPaid();
 
                 cy.url().should('include', '/checkout/finish');
                 cy.contains('Thank you for your order');
             })
 
-            it('Paypal failed and continue shopping', () => {
+            it('C5396: Paypal failed and continue shopping', () => {
 
                 scenarioDummyBasket.execute();
                 paymentAction.switchPaymentMethod('PayPal');
@@ -80,8 +86,8 @@ context("Checkout Failure Tests", () => {
                 shopware.prepareDomainChange();
                 checkout.placeOrderOnConfirm();
 
-                molliePayment.initSandboxCookie();
-                molliePayment.selectFailed();
+                mollieSandbox.initSandboxCookie();
+                molliePaymentStatus.selectFailed();
 
                 // verify that we are back in our shop
                 // if the payment fails, the order is finished but
@@ -113,7 +119,7 @@ context("Checkout Failure Tests", () => {
 
         context(devices.getDescription(device), () => {
 
-            it('Paypal failed and retry with Giropay', () => {
+            it('C5397: Paypal failed and retry with Giropay', () => {
 
                 scenarioDummyBasket.execute();
                 paymentAction.switchPaymentMethod('PayPal');
@@ -121,8 +127,8 @@ context("Checkout Failure Tests", () => {
                 shopware.prepareDomainChange();
                 checkout.placeOrderOnConfirm();
 
-                molliePayment.initSandboxCookie();
-                molliePayment.selectFailed();
+                mollieSandbox.initSandboxCookie();
+                molliePaymentStatus.selectFailed();
 
                 // we are now back in our shop
                 // the payment failed, so shopware says the order is complete
@@ -140,14 +146,14 @@ context("Checkout Failure Tests", () => {
 
                 checkout.placeOrderOnEdit();
 
-                molliePayment.initSandboxCookie();
-                molliePayment.selectPaid();
+                mollieSandbox.initSandboxCookie();
+                molliePaymentStatus.selectPaid();
 
                 cy.url().should('include', '/checkout/finish');
                 cy.contains('Thank you for updating your order');
             })
 
-            it('Paypal cancelled and retry with Paypal', () => {
+            it('C5791: Paypal cancelled and retry with Paypal', () => {
 
                 scenarioDummyBasket.execute();
                 paymentAction.switchPaymentMethod('PayPal');
@@ -155,8 +161,8 @@ context("Checkout Failure Tests", () => {
                 shopware.prepareDomainChange();
                 checkout.placeOrderOnConfirm();
 
-                molliePayment.initSandboxCookie();
-                molliePayment.selectCancelled();
+                mollieSandbox.initSandboxCookie();
+                molliePaymentStatus.selectCancelled();
 
                 // we are now back in our shop
                 // the payment failed, so shopware says the order is complete
@@ -174,8 +180,8 @@ context("Checkout Failure Tests", () => {
 
                 checkout.placeOrderOnEdit();
 
-                molliePayment.initSandboxCookie();
-                molliePayment.selectPaid();
+                mollieSandbox.initSandboxCookie();
+                molliePaymentStatus.selectPaid();
 
                 cy.url().should('include', '/checkout/finish');
                 cy.contains('Thank you for updating your order');

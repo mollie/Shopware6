@@ -6,7 +6,6 @@ use Shopware\Core\Checkout\Cart\Error\Error;
 
 class InvalidGuestAccountError extends Error
 {
-
     private const KEY = 'mollie-payments-cart-guest-account';
 
 
@@ -49,5 +48,4 @@ class InvalidGuestAccountError extends Error
     {
         return [];
     }
-
 }

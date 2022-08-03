@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Service\Stock;
 
-
 use Doctrine\DBAL\Connection;
 use Kiener\MolliePayments\Components\RefundManager\Integrators\StockManagerInterface;
 use Mollie\Api\Resources\Refund;
@@ -10,7 +9,6 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\DataAbstractionLayer\Doctrine\RetryableQuery;
 use Shopware\Core\Framework\Uuid\Uuid;
-
 
 class StockManager implements StockManagerInterface
 {
@@ -33,8 +31,8 @@ class StockManager implements StockManagerInterface
      * @param OrderLineItemEntity $lineItem
      * @param int $quantity
      * @param string $mollieRefundID
-     * @return void
      * @throws \Doctrine\DBAL\Exception
+     * @return void
      */
     public function increaseStock(OrderLineItemEntity $lineItem, int $quantity, string $mollieRefundID): void
     {
@@ -62,5 +60,4 @@ class StockManager implements StockManagerInterface
             ]
         );
     }
-
 }

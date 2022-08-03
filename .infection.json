@@ -1,20 +1,22 @@
 {
-  "bootstrap": "./phpunit.autoload.php",
-  "minMsi": 18,
-  "minCoveredMsi": 20,
+  "bootstrap": "./vendor/autoload.php",
+  "minMsi": 15,
+  "minCoveredMsi": 60,
   "source": {
     "directories": [
       "src"
     ],
     "excludes": [
       "Resources",
-      "Compatibility/Storefront/Route/PaymentMethodRoute/Voucher",
-      "Compatibility/Storefront/Route/PaymentMethodRoute/MollieLimits",
-      "Compatibility/Storefront/Route/PaymentMethodRoute/Subscription"
+      "Compatibility/Storefront/Route/PaymentMethodRoute"
     ]
   },
   "mutators": {
     "@default": true
+  },
+  "logs": {
+    "text": ".reports/infection/infection.log",
+    "summary": ".reports/infection/summary.log"
   },
   "$schema": "vendor/infection/infection/resources/schema.json"
 }

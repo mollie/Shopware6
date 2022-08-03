@@ -9,5 +9,4 @@ interface MollieStatus
     public const SUSPENDED = 'suspended';
     public const COMPLETED = 'completed';
     public const CANCELED = 'canceled';
-
 }

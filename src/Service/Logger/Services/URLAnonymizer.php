@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Service\Logger\Services;
 
-
 class URLAnonymizer implements URLAnonymizerInterface
 {
 
@@ -20,5 +19,4 @@ class URLAnonymizer implements URLAnonymizerInterface
 
         return (string)$url;
     }
-
 }

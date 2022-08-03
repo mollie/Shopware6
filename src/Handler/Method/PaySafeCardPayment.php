@@ -21,8 +21,7 @@ class PaySafeCardPayment extends PaymentHandler
         OrderEntity $orderEntity,
         SalesChannelContext $salesChannelContext,
         CustomerEntity $customer
-    ): array
-    {
+    ): array {
         $reference = $orderData['payment']['customerReference'] ?? '';
 
         if (empty($reference)) {

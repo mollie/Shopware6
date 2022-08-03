@@ -55,8 +55,7 @@ class MollieLineItem extends Struct
         string              $sku,
         string              $imageUrl,
         string              $productUrl
-    )
-    {
+    ) {
         $this->type = $type;
         $this->name = $name;
         $this->quantity = $quantity;
@@ -199,5 +198,4 @@ class MollieLineItem extends Struct
     {
         return $this->price->getRoundingRest() !== 0.0;
     }
-
 }

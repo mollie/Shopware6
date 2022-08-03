@@ -22,8 +22,7 @@ class KlarnaSliceItPayment extends PaymentHandler
         OrderEntity $orderEntity,
         SalesChannelContext $salesChannelContext,
         CustomerEntity $customer
-    ): array
-    {
+    ): array {
         return $orderData;
     }
 }

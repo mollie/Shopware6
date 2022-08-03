@@ -3,6 +3,8 @@
 namespace Kiener\MolliePayments\Service\MollieApi;
 
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieOrderException;
+use Kiener\MolliePayments\Exception\MollieOrderCancelledException;
+use Kiener\MolliePayments\Exception\MollieOrderExpiredException;
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\PaymentHandler;
@@ -15,6 +17,7 @@ use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\PaymentCollection;
 use Mollie\Api\Types\OrderLineType;
+use Mollie\Api\Types\OrderStatus;
 use Mollie\Api\Types\PaymentStatus;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -52,7 +55,7 @@ class Order
      * @param WebhookBuilder $webhookBuilder
      * @param LoggerInterface $logger
      */
-    public function __construct(MollieApiFactory $clientFactory, PaymentApiService $paymentApiService,  WebhookBuilder $webhookBuilder, LoggerInterface $logger)
+    public function __construct(MollieApiFactory $clientFactory, PaymentApiService $paymentApiService, WebhookBuilder $webhookBuilder, LoggerInterface $logger)
     {
         $this->clientFactory = $clientFactory;
         $this->logger = $logger;
@@ -62,10 +65,10 @@ class Order
 
     /**
      * @param string $mollieOrderId
-     * @param string|null $salesChannelId
+     * @param null|string $salesChannelId
      * @param array $parameters
-     * @return MollieOrder
      * @throws CouldNotFetchMollieOrderException
+     * @return MollieOrder
      */
     public function getMollieOrder(string $mollieOrderId, string $salesChannelId, array $parameters = []): MollieOrder
     {
@@ -74,7 +77,6 @@ class Order
 
             return $apiClient->orders->get($mollieOrderId, $parameters);
         } catch (ApiException $e) {
-
             $this->logger->error(
                 sprintf(
                     'API error occurred when fetching mollie order %s with message %s',
@@ -91,15 +93,14 @@ class Order
      * @param string $mollieOrderId
      * @param string $mollieOrderLineId
      * @param string $salesChannelId
-     * @return OrderLine
      * @throws CouldNotFetchMollieOrderException
+     * @return OrderLine
      */
     public function getMollieOrderLine(
         string $mollieOrderId,
         string $mollieOrderLineId,
         string $salesChannelId
-    ): OrderLine
-    {
+    ): OrderLine {
         return $this->getMollieOrder($mollieOrderId, $salesChannelId)->lines()->get($mollieOrderLineId);
     }
 
@@ -133,14 +134,22 @@ class Order
      * @param OrderEntity $order
      * @param CustomerEntity $customer
      * @param SalesChannelContext $salesChannelContext
-     * @return Payment
      * @throws ApiException
+     * @return Payment
      */
     public function createOrReusePayment(string $mollieOrderId, string $paymentMethod, string $swOrderTransactionID, PaymentHandler $paymentHandler, OrderEntity $order, CustomerEntity $customer, SalesChannelContext $salesChannelContext): Payment
     {
         # fetch the current Mollie order including
         # all its existing payments and transactions
         $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelContext->getSalesChannel()->getId(), ['embed' => 'payments']);
+
+        # We cannot reuse this order if it's cancelled or expired.
+        switch ($mollieOrder->status) {
+            case OrderStatus::STATUS_CANCELED:
+                throw new MollieOrderCancelledException($mollieOrderId);
+            case OrderStatus::STATUS_EXPIRED:
+                throw new MollieOrderExpiredException($mollieOrderId);
+        }
 
         # now search for an open payment
         # if it's still open, then we just reuse this one
@@ -156,7 +165,8 @@ class Order
 
         if (!$existingOpenPayment instanceof Payment) {
             return $this->createNewOrderPayment(
-                $mollieOrder, $paymentMethod,
+                $mollieOrder,
+                $paymentMethod,
                 $swOrderTransactionID,
                 $paymentHandler,
                 $order,
@@ -171,7 +181,6 @@ class Order
         # if we can, better to these, just to have some nice and clean data.
         # we will then create a new payment for our attempt.
         if ($existingOpenPayment->isCancelable) {
-
             $this->paymentApiService->delete(
                 $existingOpenPayment->id,
                 $salesChannelContext->getSalesChannel()->getId()
@@ -226,7 +235,7 @@ class Order
 
     /**
      * @param MollieOrder $mollieOrder
-     * @return Payment|null
+     * @return null|Payment
      */
     private function getOpenPayment(MollieOrder $mollieOrder): ?Payment
     {
@@ -239,7 +248,6 @@ class Order
         /** @var Payment $payment */
         foreach ($payments as $payment) {
             if ($payment->isOpen()) {
-
                 return $payment;
             }
         }
@@ -251,8 +259,8 @@ class Order
      * @param Payment $payment
      * @param string $newPaymnetMethod
      * @param string $salesChannelID
-     * @return Payment
      * @throws ApiException
+     * @return Payment
      */
     private function updateExistingPayment(Payment $payment, string $newPaymnetMethod, string $salesChannelID): Payment
     {
@@ -276,8 +284,8 @@ class Order
      * @param OrderEntity $order
      * @param CustomerEntity $customer
      * @param SalesChannelContext $salesChannelContext
-     * @return Payment
      * @throws ApiException
+     * @return Payment
      */
     private function createNewOrderPayment(MollieOrder $mollieOrder, string $paymentMethod, string $swOrderTransactionID, PaymentHandler $paymentHandler, OrderEntity $order, CustomerEntity $customer, SalesChannelContext $salesChannelContext): Payment
     {
@@ -344,8 +352,8 @@ class Order
     /**
      * @param string $mollieOrderId
      * @param string $salesChannelId
-     * @return bool
      * @throws CouldNotFetchMollieOrderException
+     * @return bool
      */
     public function isCompletelyShipped(string $mollieOrderId, string $salesChannelId): bool
     {
@@ -369,7 +377,7 @@ class Order
 
     /**
      * @param string $mollieOrderId
-     * @param string|null $salesChannelId
+     * @param null|string $salesChannelId
      * @return Payment
      */
     public function getCompletedPayment(string $mollieOrderId, ?string $salesChannelId): Payment

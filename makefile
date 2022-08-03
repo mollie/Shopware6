@@ -36,6 +36,10 @@ clean: ## Cleans all dependencies
 	rm -rf ./src/Resources/app/administration/node_modules/*
 	rm -rf ./src/Resources/app/storefront/node_modules/*
 
+fixtures: ## Installs all available testing fixtures of the Mollie plugin
+	cd /var/www/html && php bin/console cache:clear
+	cd /var/www/html && php bin/console fixture:load
+
 build: ## Installs the plugin, and builds the artifacts using the Shopware build commands (requires Shopware)
 	cd /var/www/html && php bin/console plugin:refresh
 	cd /var/www/html && php bin/console plugin:install MolliePayments --activate | true
@@ -65,7 +69,7 @@ phpunit: ## Starts all PHPUnit Tests
 	@XDEBUG_MODE=coverage php vendor/bin/phpunit --configuration=phpunit.xml --coverage-html ../../../public/.reports/mollie/coverage
 
 infection: ## Starts all Infection/Mutation tests
-	@XDEBUG_MODE=coverage php vendor/bin/infection --configuration=./.infection.json
+	@XDEBUG_MODE=coverage php vendor/bin/infection --configuration=./.infection.json --log-verbosity=all --debug
 
 insights: ## Starts the PHPInsights Analyser
 	@php vendor/bin/phpinsights analyse --no-interaction
@@ -95,7 +99,11 @@ pr: ## Prepares everything for a Pull Request
 	@make eslint -B
 	@make stylelint -B
 
-release: ## Creates a new ZIP package
+release: ## Builds a PROD version and creates a ZIP file
+	make clean -B
+	make install -B
+	make build -B
 	php switch-composer.php prod
-	@cd .. && rm -rf MolliePayments-$(PLUGIN_VERSION).zip
-	@cd .. && zip -qq -r -0 MolliePayments-$(PLUGIN_VERSION).zip MolliePayments/ -x '*.editorconfig' '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*' '*/makefile' '*.DS_Store' '*/phpunit.xml' '*/.infection.json' '*/phpunit.autoload.php' '*/.phpstan*' '*/.php_cs.php' '*/phpinsights.php'
+	cd .. && rm -rf MolliePayments-$(PLUGIN_VERSION).zip
+	cd .. && zip -qq -r -0 MolliePayments-$(PLUGIN_VERSION).zip MolliePayments/ -x '*.editorconfig' '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*' '*/makefile' '*.DS_Store' '*/switch-composer.php' '*/phpunit.xml' '*/.infection.json' '*/phpunit.autoload.php' '*/.phpstan*' '*/.php_cs.php' '*/phpinsights.php'
+	php switch-composer.php dev

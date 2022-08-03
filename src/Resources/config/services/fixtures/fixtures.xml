@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="MolliePayments\Fixtures\Category\CategoryFixture">
+            <argument type="service" id="Basecom\FixturePlugin\FixtureHelper"/>
+            <argument type="service" id="category.repository"/>
+            <tag name="basecom.fixture"/>
+        </service>
+
+        <service id="MolliePayments\Fixtures\Customer\CustomerFixture">
+            <argument type="service" id="Basecom\FixturePlugin\FixtureHelper"/>
+            <argument type="service" id="customer.repository"/>
+            <tag name="basecom.fixture"/>
+        </service>
+
+        <service id="MolliePayments\Fixtures\Product\SubscriptionFixture">
+            <argument type="service" id="Basecom\FixturePlugin\FixtureHelper"/>
+            <argument type="service" id="product.repository"/>
+            <tag name="basecom.fixture"/>
+        </service>
+
+        <service id="MolliePayments\Fixtures\Product\VoucherFixture">
+            <argument type="service" id="Basecom\FixturePlugin\FixtureHelper"/>
+            <argument type="service" id="product.repository"/>
+            <tag name="basecom.fixture"/>
+        </service>
+
+    </services>
+</container>

@@ -32,6 +32,9 @@
         "cardExpiryDateLabel": "Expiry date",
         "cardVerificationCodeLabel": "CVC/CVV",
         "creditCardTagLine": "Payment secured and powered by"
+      },
+      "ideal": {
+        "selectBank": "Select bank"
       }
     },
     "payments": {

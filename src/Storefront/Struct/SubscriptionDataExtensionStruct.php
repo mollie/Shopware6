@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Storefront\Struct;
 
 use Shopware\Core\Framework\Struct\Struct;
 
-
 class SubscriptionDataExtensionStruct extends Struct
 {
 
@@ -14,19 +13,28 @@ class SubscriptionDataExtensionStruct extends Struct
     protected $subscriptionProduct = false;
 
     /**
-     * @var string string
+     * @var string
      */
     protected $translatedInterval = '';
 
     /**
+     * @var bool
+     */
+    protected $showIndicator = false;
+
+
+    /**
      * @param bool $subscriptionProduct
      * @param string $translatedInterval
+     * @param bool $showIndicator
      */
-    public function __construct(bool $subscriptionProduct, string $translatedInterval)
+    public function __construct(bool $subscriptionProduct, string $translatedInterval, bool $showIndicator)
     {
         $this->subscriptionProduct = $subscriptionProduct;
         $this->translatedInterval = $translatedInterval;
+        $this->showIndicator = $showIndicator;
     }
+
 
     /**
      * @return bool
@@ -44,4 +52,11 @@ class SubscriptionDataExtensionStruct extends Struct
         return $this->translatedInterval;
     }
 
+    /**
+     * @return bool
+     */
+    public function isShowIndicator(): bool
+    {
+        return $this->showIndicator;
+    }
 }

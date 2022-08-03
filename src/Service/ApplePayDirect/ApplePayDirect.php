@@ -56,7 +56,6 @@ class ApplePayDirect
 
         /** @var LineItem $item */
         foreach ($cart->getLineItems() as $item) {
-
             $grossPrice = $item->getPrice()->getUnitPrice();
 
             $appleCart->addItem(
@@ -69,7 +68,6 @@ class ApplePayDirect
 
         /** @var Delivery $delivery */
         foreach ($cart->getDeliveries() as $delivery) {
-
             $grossPrice = $delivery->getShippingCosts()->getUnitPrice();
 
             if ($grossPrice > 0) {
@@ -92,8 +90,8 @@ class ApplePayDirect
     /**
      * @param string $countryCode
      * @param SalesChannelContext $context
-     * @return array
      * @throws \Exception
+     * @return array
      */
     public function getShippingMethods(string $countryID, SalesChannelContext $context): array
     {
@@ -157,5 +155,4 @@ class ApplePayDirect
     {
         return $this->formatter->formatCart($cart, $context->getSalesChannel(), $isTestMode);
     }
-
 }

@@ -48,8 +48,8 @@ class PluginInstaller
 
     /**
      * @param Context $context
-     * @return void
      * @throws \Doctrine\DBAL\Exception
+     * @return void
      */
     public function install(Context $context): void
     {
@@ -61,5 +61,4 @@ class PluginInstaller
 
         $this->applePayDomainService->downloadDomainAssociationFile();
     }
-
 }

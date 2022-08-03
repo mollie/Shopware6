@@ -38,8 +38,7 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
         MollieApiFactory          $apiFactory,
         EntityRepositoryInterface $paymentMethodRepository,
         SalesChannelDataExtractor $salesChannelDataExtractor
-    )
-    {
+    ) {
         parent::__construct($salesChannelRepository);
 
         $this->apiFactory = $apiFactory;

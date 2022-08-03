@@ -13,18 +13,21 @@ class DirectDebitPayment extends PaymentHandler
     public const PAYMENT_METHOD_NAME = PaymentMethod::DIRECTDEBIT;
     public const PAYMENT_METHOD_DESCRIPTION = 'SEPA Direct Debit';
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $paymentMethod = self::PAYMENT_METHOD_NAME;
 
-    public function processPaymentMethodSpecificParameters(
-        array $orderData,
-        OrderEntity $orderEntity,
-        SalesChannelContext $salesChannelContext,
-        CustomerEntity $customer
-    ): array
-    {
-        $orderData['payment']['consumerName'] = sprintf('%s %s', $customer->getFirstName(), $customer->getLastName());
 
+    /**
+     * @param array $orderData
+     * @param OrderEntity $orderEntity
+     * @param SalesChannelContext $salesChannelContext
+     * @param CustomerEntity $customer
+     * @return array
+     */
+    public function processPaymentMethodSpecificParameters(array $orderData, OrderEntity $orderEntity, SalesChannelContext $salesChannelContext, CustomerEntity $customer): array
+    {
         return $orderData;
     }
 }

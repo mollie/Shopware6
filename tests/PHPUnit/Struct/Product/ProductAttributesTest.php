@@ -28,25 +28,6 @@ class ProductAttributesTest extends TestCase
     /**
      * This test verifies that a valid voucher type
      * is correctly assigned and returned later on.
-     * This is our legacy structure, which should still lead to data.
-     */
-    public function testVoucherTypeLegacy()
-    {
-        $method = new ProductEntity();
-        $method->setCustomFields([
-            'mollie_payments' => [
-                'voucher_type' => VoucherType::TYPE_MEAL
-            ]
-        ]);
-
-        $attributes = new ProductAttributes($method);
-
-        $this->assertEquals(VoucherType::TYPE_MEAL, $attributes->getVoucherType());
-    }
-
-    /**
-     * This test verifies that a valid voucher type
-     * is correctly assigned and returned later on.
      * If we have a new type of data, then we read that data and skip the legacy one.
      */
     public function testVoucherType()

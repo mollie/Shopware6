@@ -6,7 +6,6 @@ use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway;
 use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGatewayInterface;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextServiceInterface;
 
-
 class CompatibilityFactory
 {
 
@@ -41,5 +40,4 @@ class CompatibilityFactory
             $this->salesChannelContextService
         );
     }
-
 }

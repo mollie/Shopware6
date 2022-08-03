@@ -1,41 +1,35 @@
 <?php
 
-namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\MollieLimits;
+namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute;
 
-use Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\MollieLimits\Service\MollieLimitsRemover;
-use Kiener\MolliePayments\Service\Payment\Provider\ActivePaymentMethodsProviderInterface;
-use Kiener\MolliePayments\Service\SettingsService;
+use Kiener\MolliePayments\Service\Payment\Remover\PaymentMethodRemoverInterface;
 use Shopware\Core\Checkout\Payment\SalesChannel\AbstractPaymentMethodRoute;
 use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRouteResponse;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 
-
-class MollieLimitsPaymentMethodRoute64 extends AbstractPaymentMethodRoute
+class RemovePaymentMethodRoute64 extends AbstractPaymentMethodRoute
 {
-
     /**
      * @var AbstractPaymentMethodRoute
      */
     private $corePaymentMethodRoute;
 
     /**
-     * @var MollieLimitsRemover
+     * @var PaymentMethodRemoverInterface[]
      */
-    private $mollieLimits;
+    private $paymentMethodRemovers;
 
     /**
-     * @param AbstractPaymentMethodRoute $corePaymentMethodRoute
-     * @param MollieLimitsRemover $mollieLimits
+     * @param AbstractPaymentMethodRoute                  $corePaymentMethodRoute
+     * @param \Traversable<PaymentMethodRemoverInterface> $paymentMethodRemovers
      */
-    public function __construct(AbstractPaymentMethodRoute $corePaymentMethodRoute, MollieLimitsRemover $mollieLimits)
+    public function __construct(AbstractPaymentMethodRoute $corePaymentMethodRoute, \Traversable $paymentMethodRemovers)
     {
         $this->corePaymentMethodRoute = $corePaymentMethodRoute;
-        $this->mollieLimits = $mollieLimits;
+        $this->paymentMethodRemovers = iterator_to_array($paymentMethodRemovers);
     }
-
 
     /**
      * @return AbstractPaymentMethodRoute
@@ -46,17 +40,19 @@ class MollieLimitsPaymentMethodRoute64 extends AbstractPaymentMethodRoute
     }
 
     /**
-     * @param Request $request
+     * @param Request             $request
      * @param SalesChannelContext $context
-     * @param Criteria $criteria
+     * @param Criteria            $criteria
      * @return PaymentMethodRouteResponse
-     * @throws \Exception
      */
     public function load(Request $request, SalesChannelContext $context, Criteria $criteria): PaymentMethodRouteResponse
     {
         $originalData = $this->corePaymentMethodRoute->load($request, $context, $criteria);
 
-        return $this->mollieLimits->removePaymentMethods($originalData, $context);
-    }
+        foreach ($this->paymentMethodRemovers as $paymentMethodRemover) {
+            $originalData = $paymentMethodRemover->removePaymentMethods($originalData, $context);
+        }
 
+        return $originalData;
+    }
 }

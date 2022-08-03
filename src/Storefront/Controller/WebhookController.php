@@ -66,15 +66,12 @@ class WebhookController extends StorefrontController
     public function webhookCall(SalesChannelContext $context, $transactionId): JsonResponse
     {
         try {
-
             $settings = $this->settingsService->getSettings($context->getSalesChannel()->getId());
 
             $this->notificationFacade->onNotify($transactionId, $settings, $context);
 
             return new JsonResponse(['success' => true]);
-
         } catch (\Throwable $ex) {
-
             $this->logger->error(
                 'Error in Mollie Webhook for Transaction ' . $transactionId,
                 [
@@ -114,7 +111,6 @@ class WebhookController extends StorefrontController
         $mollieSubscriptionId = (string)$requestData->get('subscriptionId');
 
         try {
-
             $allParams = $request->query->all();
 
             if (empty($molliePaymentId) && isset($allParams['id'])) {
@@ -142,9 +138,7 @@ class WebhookController extends StorefrontController
             # that handles the full order, validates the payment and
             # starts to trigger things.
             return $this->webhookCall($context, $latestTransaction->getId());
-
         } catch (\Throwable $ex) {
-
             $this->logger->error(
                 'Error in Mollie Webhook for Subscription ' . $swSubscriptionId,
                 [
@@ -165,5 +159,4 @@ class WebhookController extends StorefrontController
             );
         }
     }
-
 }

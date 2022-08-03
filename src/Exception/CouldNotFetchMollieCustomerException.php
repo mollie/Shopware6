@@ -8,8 +8,7 @@ class CouldNotFetchMollieCustomerException extends \Exception
         string $mollieCustomerId,
         string $salesChannelId,
         ?\Throwable $previous = null
-    )
-    {
+    ) {
         $message = sprintf(
             "Could not fetch the Mollie customer ID %s for sales channel %s",
             $mollieCustomerId,

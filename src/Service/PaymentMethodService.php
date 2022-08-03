@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Handler\Method\BanContactPayment;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Kiener\MolliePayments\Handler\Method\BelfiusPayment;
 use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
+use Kiener\MolliePayments\Handler\Method\DirectDebitPayment;
 use Kiener\MolliePayments\Handler\Method\EpsPayment;
 use Kiener\MolliePayments\Handler\Method\GiftCardPayment;
 use Kiener\MolliePayments\Handler\Method\GiroPayPayment;
@@ -64,8 +65,7 @@ class PaymentMethodService
         EntityRepositoryInterface $mediaRepository,
         EntityRepositoryInterface $paymentRepository,
         PluginIdProvider          $pluginIdProvider
-    )
-    {
+    ) {
         $this->mediaService = $mediaService;
         $this->mediaRepository = $mediaRepository;
         $this->paymentRepository = $paymentRepository;
@@ -126,7 +126,6 @@ class PaymentMethodService
         $upsertData = [];
 
         foreach ($paymentMethods as $paymentMethod) {
-
             $identifier = $paymentMethod['handler'];
 
             // Upload icon to the media repository
@@ -160,7 +159,6 @@ class PaymentMethodService
                 ];
 
                 $upsertData[] = $paymentMethodData;
-
             } else {
 
                 # let's create a full parameter list of everything
@@ -275,8 +273,7 @@ class PaymentMethodService
         string  $paymentMethodId,
         bool    $active,
         Context $context
-    ): EntityWrittenContainerEvent
-    {
+    ): EntityWrittenContainerEvent {
         return $this->paymentRepository->upsert(
             [
                 [
@@ -292,8 +289,8 @@ class PaymentMethodService
      * Get payment method by ID.
      *
      * @param $id
-     * @return PaymentMethodEntity
      * @throws InconsistentCriteriaIdsException
+     * @return PaymentMethodEntity
      */
     public function getPaymentMethodById($id): ?PaymentMethodEntity
     {
@@ -344,7 +341,7 @@ class PaymentMethodService
      * @param $handlerIdentifier
      * @param Context $context
      *
-     * @return PaymentMethodEntity|null
+     * @return null|PaymentMethodEntity
      */
     private function getPaymentMethod($handlerIdentifier, Context $context): ?PaymentMethodEntity
     {
@@ -375,7 +372,7 @@ class PaymentMethodService
             BankTransferPayment::class,
             BelfiusPayment::class,
             CreditCardPayment::class,
-            // DirectDebitPayment::class,   // Is removed for now because it's only used for recurring
+            DirectDebitPayment::class,
             EpsPayment::class,
             GiftCardPayment::class,
             GiroPayPayment::class,

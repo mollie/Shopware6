@@ -1,17 +1,19 @@
 import Devices from "Services/utils/Devices";
 import Session from "Services/utils/Session"
 import Shopware from "Services/shopware/Shopware"
-import PaymentScreenAction from 'Actions/mollie/PaymentScreenAction';
-import IssuerScreenAction from 'Actions/mollie/IssuerScreenAction';
-import GiftCardsScreenAction from "Actions/mollie/GiftCardsScreenAction";
 // ------------------------------------------------------
 import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
 // ------------------------------------------------------
 import CheckoutAction from 'Actions/storefront/checkout/CheckoutAction';
 import PaymentAction from "Actions/storefront/checkout/PaymentAction";
 import DummyBasketScenario from "Scenarios/DummyBasketScenario";
-import VoucherScreenAction from "Actions/mollie/VoucherScreenAction";
-import PaymentMethodsScreenAction from "Actions/mollie/PaymentMethodsScreenAction";
+// ------------------------------------------------------
+import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
+import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
+import VoucherScreenAction from "cypress-mollie/src/actions/screens/VoucherScreen";
+import PaymentMethodsScreenAction from "cypress-mollie/src/actions/screens/PaymentListScreen";
+import KBCScreen from "cypress-mollie/src/actions/screens/KBCScreen";
+import GiftCardsScreenAction from "cypress-mollie/src/actions/screens/GiftCardsScreen";
 
 
 const devices = new Devices();
@@ -22,36 +24,39 @@ const configAction = new ShopConfigurationAction();
 const checkout = new CheckoutAction();
 const paymentAction = new PaymentAction();
 
+const mollieSandbox = new MollieSandbox();
 const molliePayment = new PaymentScreenAction();
-const mollieIssuer = new IssuerScreenAction();
+const mollieKBC = new KBCScreen();
 const mollieVoucher = new VoucherScreenAction();
 const mollieGiftCards = new GiftCardsScreenAction();
 const molliePaymentMethods = new PaymentMethodsScreenAction();
 
 
-const scenarioDummyBasket = new DummyBasketScenario(3);
+const scenarioDummyBasket = new DummyBasketScenario(2);
 
 
 const device = devices.getFirstDevice();
 
 
 const payments = [
-    {key: 'paypal', name: 'PayPal'},
-    {key: 'klarnapaynow', name: 'Pay now'},
-    {key: 'klarnapaylater', name: 'Pay later'},
-    {key: 'klarnasliceit', name: 'Slice it'},
-    {key: 'ideal', name: 'iDEAL'},
-    {key: 'sofort', name: 'SOFORT'},
-    {key: 'eps', name: 'eps'},
-    {key: 'giropay', name: 'Giropay'},
-    {key: 'mistercash', name: 'Bancontact'},
-    {key: 'przelewy24', name: 'Przelewy24'},
-    {key: 'kbc', name: 'KBC'},
-    {key: 'belfius', name: 'Belfius'},
-    {key: 'banktransfer', name: 'Banktransfer'},
-    {key: 'giftcard', name: 'Gift cards'},
-    {key: 'voucher', name: 'Voucher'},
-    {key: 'in3', name: 'in3'},
+    {caseId: 'C5404', key: 'paypal', name: 'PayPal'},
+    {caseId: 'C5861', key: 'klarnapaynow', name: 'Pay now'},
+    {caseId: 'C5406', key: 'klarnapaylater', name: 'Pay later'},
+    {caseId: 'C5404', key: 'klarnasliceit', name: 'Slice it'},
+    {caseId: 'C5407', key: 'ideal', name: 'iDEAL'},
+    {caseId: 'C5408', key: 'sofort', name: 'SOFORT'},
+    {caseId: 'C5409', key: 'eps', name: 'eps'},
+    {caseId: 'C5410', key: 'giropay', name: 'Giropay'},
+    {caseId: 'C5411', key: 'mistercash', name: 'Bancontact'},
+    {caseId: 'C5412', key: 'przelewy24', name: 'Przelewy24'},
+    {caseId: 'C5413', key: 'kbc', name: 'KBC'},
+    {caseId: 'C5415', key: 'banktransfer', name: 'Banktransfer'},
+    {caseId: 'C6965', key: 'directdebit', name: 'SEPA Direct Debit'},
+    {caseId: 'C5414', key: 'belfius', name: 'Belfius'},
+    {caseId: 'C5860', key: 'giftcard', name: 'Gift cards'},
+    {caseId: 'C6924', key: 'voucher', name: 'Voucher'},
+    // unfortunately address and product prices need to match, so we cannot do in3 automatically for now
+    // {caseId: 'C6916', key: 'in3', name: 'in3'},
 ];
 
 
@@ -75,11 +80,15 @@ context("Checkout Tests", () => {
         context(devices.getDescription(device), () => {
             payments.forEach(payment => {
 
-                it('Pay with ' + payment.name, () => {
+                it(payment.caseId + ': Pay with ' + payment.name, () => {
 
                     scenarioDummyBasket.execute();
 
                     paymentAction.switchPaymentMethod(payment.name);
+
+                    if (payment.key === 'ideal') {
+                        paymentAction.selectIDealIssuer('bunq');
+                    }
 
                     // grab the total sum of our order from the confirm page.
                     // we also want to test what the user has to pay in Mollie.
@@ -106,7 +115,7 @@ context("Checkout Tests", () => {
                     })
 
 
-                    molliePayment.initSandboxCookie();
+                    mollieSandbox.initSandboxCookie();
 
                     if (payment.key === 'klarnapaylater' || payment.key === 'klarnapaynow' || payment.key === 'klarnasliceit') {
 
@@ -133,7 +142,7 @@ context("Checkout Tests", () => {
                     } else {
 
                         if (payment.key === 'kbc') {
-                            mollieIssuer.selectKBC();
+                            mollieKBC.selectKBC();
                         }
 
                         molliePayment.selectPaid();

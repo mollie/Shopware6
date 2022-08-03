@@ -114,5 +114,4 @@ class ProductItem extends AbstractItem
 
         return $productNumber;
     }
-
 }

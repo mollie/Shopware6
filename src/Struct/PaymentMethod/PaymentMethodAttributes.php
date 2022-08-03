@@ -2,13 +2,11 @@
 
 namespace Kiener\MolliePayments\Struct\PaymentMethod;
 
-
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 
 class PaymentMethodAttributes
 {
-
     public const MOLLIE_PAYMENT_HANDLER_NAMESPACE = 'Kiener\MolliePayments\Handler\Method';
 
 
@@ -53,12 +51,9 @@ class PaymentMethodAttributes
     public function getMollieIdentifier(): string
     {
         try {
-
             return constant($this->handlerIdentifier . '::PAYMENT_METHOD_NAME') ?? '';
-
         } catch (\Throwable $ex) {
             return '-';
         }
     }
-
 }
