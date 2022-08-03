@@ -84,6 +84,7 @@ describe('Subscription', () => {
 
                 configAction.updateProducts('', true, 3, 'weeks');
                 configAction.setupPlugin(true, false, false, true);
+                cy.wait(2000);
 
                 cy.visit('/');
                 topMenu.clickOnClothing();
@@ -99,6 +100,7 @@ describe('Subscription', () => {
 
                 configAction.updateProducts('', true, 3, 'weeks');
                 configAction.setupPlugin(true, false, false, false);
+                cy.wait(2000);
 
                 cy.visit('/');
 
