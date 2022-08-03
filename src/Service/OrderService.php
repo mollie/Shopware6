@@ -207,6 +207,7 @@ class OrderService implements OrderServiceInterface
 
         $thirdPartyPaymentId = '';
         $molliePaymentID = '';
+        $creditCardDetails = null;
 
         try {
 
@@ -226,6 +227,11 @@ class OrderService implements OrderServiceInterface
                 $thirdPartyPaymentId = $molliePayment->details->transferReference;
             }
 
+            # check for creditcard
+            if (isset($molliePayment->method, $molliePayment->details) && $molliePayment->method === "creditcard"){
+                $creditCardDetails = $molliePayment->details;
+            }
+
         } catch (PaymentNotFoundException $ex) {
             # some orders like OPEN bank transfer have no completed payments
             # so this is a usual case, where we just need to skip this process
@@ -238,6 +244,7 @@ class OrderService implements OrderServiceInterface
 
         $customFieldsStruct->setMolliePaymentId($molliePaymentID);
         $customFieldsStruct->setThirdPartyPaymentId($thirdPartyPaymentId);
+        $customFieldsStruct->setCreditCardDetails($creditCardDetails);
 
         $this->updateOrderCustomFields->updateOrder(
             $order->getId(),
