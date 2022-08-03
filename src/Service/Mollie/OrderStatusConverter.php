@@ -90,10 +90,11 @@ class OrderStatusConverter
     }
 
     /**
+     * @TODO we should move this somewhere else, but i had to (re)use this for now - so it's now public
      * @param Order $order
      * @return null|Payment
      */
-    private function getLatestPayment(Order $order): ?Payment
+    public function getLatestPayment(Order $order): ?Payment
     {
         $latestPayment = null;
 
