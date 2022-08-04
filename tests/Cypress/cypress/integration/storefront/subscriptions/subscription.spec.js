@@ -112,7 +112,6 @@ describe('Subscription', () => {
 
             it('C6918: Purchasing Subscription and verifying it in the Administration', () => {
 
-                configAction.setupShop(true, false, false);
                 configAction.setupPlugin(true, false, false, true);
                 configAction.updateProducts('', true, 3, 'weeks');
 
