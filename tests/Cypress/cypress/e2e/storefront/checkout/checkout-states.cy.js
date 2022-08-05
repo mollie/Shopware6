@@ -47,7 +47,7 @@ context("Order Status Mapping Tests", () => {
 
     context(devices.getDescription(device), () => {
 
-        it('C6919: Test Status Open stays In-Progress', () => {
+        it('C4028: Test Status Open stays In-Progress', () => {
 
             // we create a SEPA bank transfer payment
             // the payment status will be IN PROGRESS then in Shopware.
@@ -69,7 +69,7 @@ context("Order Status Mapping Tests", () => {
             adminOrders.assertLatestPaymentStatus('In Progress');
         })
 
-        it('C5398: Test Status Paid', () => {
+        it('C4023: Test Status Paid', () => {
 
             scenarioDummyBasket.execute();
             paymentAction.switchPaymentMethod('PayPal');
@@ -85,7 +85,7 @@ context("Order Status Mapping Tests", () => {
             adminOrders.assertLatestPaymentStatus('Paid');
         })
 
-        it('C5399: Test Status Authorized', () => {
+        it('C4024: Test Status Authorized', () => {
 
             scenarioDummyBasket.execute();
             paymentAction.switchPaymentMethod('Pay later');
@@ -105,7 +105,7 @@ context("Order Status Mapping Tests", () => {
             adminOrders.assertLatestPaymentStatus(expectedPaymentStatus);
         })
 
-        it('C5400: Test Status Failed', () => {
+        it('C4025: Test Status Failed', () => {
 
             scenarioDummyBasket.execute();
             paymentAction.switchPaymentMethod('PayPal');
@@ -121,7 +121,7 @@ context("Order Status Mapping Tests", () => {
             adminOrders.assertLatestPaymentStatus('Failed');
         })
 
-        it('C5401: Test Status Cancelled', () => {
+        it('C4026: Test Status Cancelled', () => {
 
             scenarioDummyBasket.execute();
             paymentAction.switchPaymentMethod('PayPal');

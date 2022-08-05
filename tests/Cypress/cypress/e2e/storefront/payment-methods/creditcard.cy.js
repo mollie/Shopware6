@@ -51,7 +51,7 @@ describe('Credit Card Components', () => {
 
     context(devices.getDescription(devices.getFirstDevice()), () => {
 
-        it('C5421: Successful card payment', () => {
+        it('C4102: Successful card payment', () => {
 
             setUp();
 
@@ -80,7 +80,7 @@ describe('Credit Card Components', () => {
             cy.contains('Thank you for your order');
         })
 
-        it('C5420: Invalid Card Holder (Empty)', () => {
+        it('C4105: Invalid Card Holder (Empty)', () => {
 
             setUp();
 
@@ -97,7 +97,7 @@ describe('Credit Card Components', () => {
             assertComponentErrors(false, true, true, true);
         })
 
-        it('C6928: Invalid Card Holder (Invalid Value)', () => {
+        it('C4107: Invalid Card Holder (Invalid Value)', () => {
 
             setUp();
 
@@ -117,7 +117,7 @@ describe('Credit Card Components', () => {
             cy.contains("Failed to submit card data");
         })
 
-        it('C6929: Invalid Card Number', () => {
+        it('C4108: Invalid Card Number', () => {
 
             setUp();
 
@@ -134,7 +134,7 @@ describe('Credit Card Components', () => {
             assertComponentErrors(true, false, true, true);
         })
 
-        it('C6930: Invalid Expiry Date', () => {
+        it('C4109: Invalid Expiry Date', () => {
 
             setUp();
 
@@ -151,7 +151,7 @@ describe('Credit Card Components', () => {
             assertComponentErrors(true, true, false, true);
         })
 
-        it('C6931: Invalid CVC Code', () => {
+        it('C4110: Invalid CVC Code', () => {
 
             setUp();
 
@@ -168,7 +168,7 @@ describe('Credit Card Components', () => {
             assertComponentErrors(true, true, true, false);
         })
 
-        it('C6147: Components work on edit order page', () => {
+        it('C4106: Components work on edit order page', () => {
 
             scenarioDummyBasket.execute();
 
@@ -239,7 +239,7 @@ describe('Status Tests', () => {
         session.resetBrowserSession();
     });
 
-    it('Open Credit Card payment leads to failure', () => {
+    it('C4266: Open Credit Card payment leads to failure', () => {
 
         setUp();
 

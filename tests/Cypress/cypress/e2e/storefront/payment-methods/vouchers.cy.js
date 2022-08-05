@@ -55,7 +55,7 @@ describe('Voucher Payments', () => {
                 session.resetBrowserSession();
             });
 
-            it('C6925: Voucher Configuration available in Administration', () => {
+            it('C4144: Voucher Configuration available in Administration', () => {
 
                 adminLogin.login();
 
@@ -68,7 +68,7 @@ describe('Voucher Payments', () => {
                 repoProductDetailsAdmin.getVoucherTypeDropdown().should('be.visible');
             })
 
-            it('C5687: Voucher hidden if product is not configured', () => {
+            it('C4139: Voucher hidden if product is not configured', () => {
 
                 // hiding of payment methods does not work
                 // belo Shopware 6.4 in the way we have to do it (Storefront + API), so it's not supported
@@ -106,17 +106,17 @@ describe('Voucher Payments', () => {
                 cy.contains('.checkout-container', 'Voucher').should('not.exist');
             })
 
-            it('C5684: Voucher available for ECO products', () => {
+            it('C4136: Voucher available for ECO products', () => {
                 configAction.updateProducts('eco', false, '', '');
                 testVoucherPayment();
             })
 
-            it('C5685: Voucher available for MEAL products', () => {
+            it('C4137: Voucher available for MEAL products', () => {
                 configAction.updateProducts('meal', false, '', '');
                 testVoucherPayment();
             })
 
-            it('C5686: Voucher available for GIFT products', () => {
+            it('C4138: Voucher available for GIFT products', () => {
                 configAction.updateProducts('gift', false, '', '');
                 testVoucherPayment();
             })

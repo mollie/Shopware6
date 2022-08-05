@@ -47,7 +47,7 @@ describe('PayPal', () => {
                 configAction.updateProducts('', false, 0, '');
             });
 
-            it('C6926: Payment status "pending" leads to successful order', () => {
+            it('C4112: Payment status "pending" leads to successful order', () => {
 
                 scenarioDummyBasket.execute();
 
@@ -63,7 +63,7 @@ describe('PayPal', () => {
                 cy.contains('Thank you for your order');
             })
 
-            it('C6960: Paypal Reference Number is visible in Administration', () => {
+            it('C4113: Paypal Reference Number is visible in Administration', () => {
 
                 scenarioDummyBasket.execute();
 

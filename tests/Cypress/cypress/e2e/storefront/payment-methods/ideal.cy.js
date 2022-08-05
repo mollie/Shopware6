@@ -33,7 +33,7 @@ describe('iDEAL Issuers', () => {
                 session.resetBrowserSession();
             });
 
-            it('C5422: Issuer List on payment selection page', () => {
+            it('C4119: Issuer List on payment selection page', () => {
 
                 scenarioDummyBasket.execute();
 

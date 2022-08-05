@@ -47,7 +47,7 @@ describe('SEPA Bank Transfer', () => {
                 configAction.updateProducts('', false, 0, '');
             });
 
-            it('C6927: Payment status "open" leads to successful order', () => {
+            it('C4129: Payment status "open" leads to successful order', () => {
 
                 scenarioDummyBasket.execute();
 
@@ -63,7 +63,7 @@ describe('SEPA Bank Transfer', () => {
                 cy.contains('Thank you for your order');
             })
 
-            it('C6961: Banktransfer Reference Number is visible in Administration', () => {
+            it('C4130: Banktransfer Reference Number is visible in Administration', () => {
 
                 scenarioDummyBasket.execute();
 

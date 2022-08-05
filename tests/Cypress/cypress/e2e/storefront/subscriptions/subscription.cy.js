@@ -65,7 +65,7 @@ describe('Subscription', () => {
                 session.resetBrowserSession();
             });
 
-            it('C6917: Subscription Configuration available in Administration', () => {
+            it('C4065: Subscription Configuration available in Administration', () => {
 
                 configAction.setupShop(true, false, false);
 
@@ -80,7 +80,7 @@ describe('Subscription', () => {
                 repoProductDetailsAdmin.getSubscriptionToggle().check();
             })
 
-            it('C6942: Subscription Indicator on PDP can be turned ON', () => {
+            it('C4067: Subscription Indicator on PDP can be turned ON', () => {
 
                 configAction.updateProducts('', true, 3, 'weeks');
                 configAction.setupPlugin(true, false, false, true);
@@ -96,7 +96,7 @@ describe('Subscription', () => {
                 cy.contains('Every 3 weeks');
             })
 
-            it('C6943: Subscription Indicator on PDP can be turned OFF', () => {
+            it('C4068: Subscription Indicator on PDP can be turned OFF', () => {
 
                 configAction.updateProducts('', true, 3, 'weeks');
                 configAction.setupPlugin(true, false, false, false);
@@ -110,7 +110,7 @@ describe('Subscription', () => {
                 cy.contains('Subscription product').should('not.exist');
             })
 
-            it('C6918: Purchasing Subscription and verifying it in the Administration', () => {
+            it('C4066: Purchasing Subscription and verifying it in the Administration', () => {
 
                 configAction.setupPlugin(true, false, false, true);
                 configAction.updateProducts('', true, 3, 'weeks');
@@ -189,7 +189,7 @@ describe('Subscription', () => {
                 repoAdminSubscriptions.getLatestSubscription().should('exist');
             })
 
-            it('C6963: Subscription Payment methods are limited on editOrder page', () => {
+            it('C4077: Subscription Payment methods are limited on editOrder page', () => {
 
                 // hiding of payment methods does not work
                 // belo Shopware 6.4 in the way we have to do it (Storefront + API), so it's not supported
