@@ -164,6 +164,7 @@ describe('Subscription', () => {
                 checkout.placeOrderOnConfirm();
 
                 mollieSandbox.initSandboxCookie();
+                cy.wait(1000);
                 mollieCreditCardForm.enterValidCard();
                 mollieCreditCardForm.submitForm();
                 molliePayment.selectPaid();
