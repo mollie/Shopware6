@@ -5,105 +5,143 @@ namespace MolliePayments\Tests\Service\MollieApi\Builder;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderAddressBuilder;
 use MolliePayments\Tests\Traits\OrderTrait;
 use PHPUnit\Framework\TestCase;
+use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 
 class MollieOrderAddressBuilderTest extends TestCase
 {
     use OrderTrait;
 
+    /**
+     * @var MollieOrderAddressBuilder
+     */
+    private $builder;
+
+    /**
+     *
+     */
+    protected function setUp(): void
+    {
+        $this->builder = new MollieOrderAddressBuilder();
+    }
+
+    /**
+     *
+     */
     public function testConstants(): void
     {
         self::assertSame('NL', MollieOrderAddressBuilder::MOLLIE_DEFAULT_COUNTRY_ISO);
     }
 
+    /**
+     *
+     */
     public function testBuildWithNullAddress(): void
     {
-        self::assertSame([], (new MollieOrderAddressBuilder())->build('foo', null));
+        self::assertSame([], $this->builder->build('foo', null));
     }
 
+    /**
+     * This test verifies that our address data for Mollie
+     * can be built correctly.
+     */
     public function testBuild(): void
     {
-        $salutation = 'Mr';
-        $firstName = 'foo';
-        $lastName = 'bar';
-        $street = 'foostreet';
-        $additional = 'additional';
-        $zip = '12345';
-        $city = 'city';
-        $country = 'DE';
+        $customerAddress = $this->buildFixture('Mr', 'DE', 'great street');
 
-        $customerAddress = $this->getCustomerAddressEntity($firstName, $lastName, $street, $zip, $city, $salutation, $country, $additional);
-        $email = 'baz';
+        $addressData = $this->builder->build('test@mollie.com', $customerAddress);
 
         $expected = [
-            'title' => $salutation,
-            'givenName' => $firstName,
-            'familyName' => $lastName,
-            'email' => $email,
-            'streetAndNumber' => $street,
-            'streetAdditional' => $additional,
-            'postalCode' => $zip,
-            'city' => $city,
-            'country' => $country,
+            'title' => 'Mr',
+            'givenName' => 'Mollie',
+            'familyName' => 'HQ',
+            'email' => 'test@mollie.com',
+            'streetAndNumber' => 'Keizersgracht 126',
+            'postalCode' => '1015 CW',
+            'city' => 'Amsterdam',
+            'country' => 'DE',
+            'streetAdditional' => 'great street',
         ];
 
-        self::assertSame($expected, (new MollieOrderAddressBuilder())->build($email, $customerAddress));
+        self::assertSame($expected, $addressData);
     }
 
+    /**
+     * This test verifies that the value of a missing salutation
+     * leads to a title with NULL as value.
+     */
     public function testBuildWithMissingSalutation(): void
     {
-        $salutation = null;
-        $firstName = 'foo';
-        $lastName = 'bar';
-        $street = 'foostreet';
-        $additional = 'additional';
-        $zip = '12345';
-        $city = 'city';
-        $country = 'DE';
+        $customerAddress = $this->buildFixture(null, 'DE', '');
 
-        $customerAddress = $this->getCustomerAddressEntity($firstName, $lastName, $street, $zip, $city, $salutation, $country, $additional);
-        $email = 'baz';
+        $addressData = $this->builder->build('test@mollie.com', $customerAddress);
 
-        $expected = [
-            'title' => $salutation,
-            'givenName' => $firstName,
-            'familyName' => $lastName,
-            'email' => $email,
-            'streetAndNumber' => $street,
-            'streetAdditional' => $additional,
-            'postalCode' => $zip,
-            'city' => $city,
-            'country' => $country,
-        ];
-
-        self::assertSame($expected, (new MollieOrderAddressBuilder())->build($email, $customerAddress));
+        self::assertNull($addressData['title']);
     }
 
+    /**
+     * This test verifies that the country should have NL as default value
+     * if no ISO2 code has been provided (null)
+     */
     public function testBuildWithMissingCountry(): void
     {
-        $salutation = 'Mr';
-        $firstName = 'foo';
-        $lastName = 'bar';
-        $street = 'foostreet';
-        $additional = 'additional';
-        $zip = '12345';
-        $city = 'city';
-        $country = null;
+        $customerAddress = $this->buildFixture('Mr', null, '');
 
-        $customerAddress = $this->getCustomerAddressEntity($firstName, $lastName, $street, $zip, $city, $salutation, $country, $additional);
-        $email = 'baz';
+        $addressData = $this->builder->build('test@mollie.com', $customerAddress);
 
-        $expected = [
-            'title' => $salutation,
-            'givenName' => $firstName,
-            'familyName' => $lastName,
-            'email' => $email,
-            'streetAndNumber' => $street,
-            'streetAdditional' => $additional,
-            'postalCode' => $zip,
-            'city' => $city,
-            'country' => MollieOrderAddressBuilder::MOLLIE_DEFAULT_COUNTRY_ISO,
-        ];
-
-        self::assertSame($expected, (new MollieOrderAddressBuilder())->build($email, $customerAddress));
+        self::assertSame(MollieOrderAddressBuilder::MOLLIE_DEFAULT_COUNTRY_ISO, $addressData['country']);
     }
+
+    /**
+     * This test verifies that a missing additional street is not even
+     * added to the array (Mollie doesn't allow this)
+     */
+    public function testBuildWithMissingAdditionalStreetNull(): void
+    {
+        $customerAddress = $this->buildFixture('Mr', 'DE', null);
+
+        $addressData = $this->builder->build('test@mollie.com', $customerAddress);
+
+        self::assertArrayNotHasKey('streetAdditional', $addressData);
+    }
+
+    /**
+     * This test verifies that an empty additional street with only whitespaces is not even
+     * added to the array (Mollie doesn't allow this)
+     */
+    public function testBuildWithMissingAdditionalStreetSpace(): void
+    {
+        $additional = ' ';
+        $customerAddress = $this->buildFixture('Mr', 'DE', $additional);
+
+        $addressData = $this->builder->build('test@mollie.com', $customerAddress);
+
+        self::assertArrayNotHasKey('streetAdditional', $addressData);
+    }
+
+    /**
+     * @param string|null $salutation
+     * @param string|null $countryISO
+     * @param string|null $additional
+     * @return CustomerAddressEntity
+     */
+    private function buildFixture(?string $salutation, ?string $countryISO, ?string $additional): CustomerAddressEntity
+    {
+        $firstName = 'Mollie';
+        $lastName = 'HQ';
+        $street = 'Keizersgracht 126';
+        $zip = '1015 CW';
+        $city = 'Amsterdam';
+
+        return $this->getCustomerAddressEntity(
+            $firstName,
+            $lastName,
+            $street,
+            $zip,
+            $city,
+            $salutation,
+            $countryISO,
+            $additional
+        );
+    }
+
 }
