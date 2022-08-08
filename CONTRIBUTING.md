@@ -118,6 +118,20 @@ make dev
 These tools will be described later in this document.
 
 
+#### Dev Fixtures
+We have prepared all kinds of development data fixtures for you.
+Subscription Products, Voucher Products and more.
+
+To use these fixtures, please install and activate this FixturePlugin (https://github.com/basecom/FixturesPlugin).
+
+Then simply install the "dev" dependencies of the Mollie plugin using `make dev` and run the following command.
+
+```bash 
+php bin/console fixture:load
+```
+
+Congratulations, you should now see all kinds of products in your Shopware shop.
+
 
 #### Local Webhooks
 
