@@ -45,37 +45,37 @@ class OrderAttributes
     private $molliePaymentUrl;
 
     /**
-     * @var null|string
+     * @var string
      */
     private $creditCardNumber;
 
     /**
-     * @var null|string
+     * @var string
      */
     private $creditCardHolder;
 
     /**
-     * @var null|string
+     * @var string
      */
     private $creditCardAudience;
 
     /**
-     * @var null|string
+     * @var string
      */
     private $creditCardLabel;
 
     /**
-     * @var null|string
+     * @var string
      */
     private $creditCardCountryCode;
 
     /**
-     * @var null|string
+     * @var string
      */
     private $creditCardSecurity;
 
     /**
-     * @var null|string
+     * @var string
      */
     private $creditCardFeeRegion;
 
@@ -199,113 +199,113 @@ class OrderAttributes
     }
 
     /**
-     * @return null|string
+     * @return string
      */
-    public function getCreditCardNumber(): ?string
+    public function getCreditCardNumber(): string
     {
         return $this->creditCardNumber;
     }
 
     /**
-     * @param null|string $creditCardNumber
+     * @param string $creditCardNumber
      */
-    public function setCreditCardNumber(?string $creditCardNumber): void
+    public function setCreditCardNumber(string $creditCardNumber): void
     {
         $this->creditCardNumber = $creditCardNumber;
     }
 
     /**
-     * @return null|string
+     * @return string
      */
-    public function getCreditCardHolder(): ?string
+    public function getCreditCardHolder(): string
     {
         return $this->creditCardHolder;
     }
 
     /**
-     * @param null|string $creditCardHolder
+     * @param string $creditCardHolder
      */
-    public function setCreditCardHolder(?string $creditCardHolder): void
+    public function setCreditCardHolder(string $creditCardHolder): void
     {
         $this->creditCardHolder = $creditCardHolder;
     }
 
     /**
-     * @return null|string
+     * @return string
      */
-    public function getCreditCardAudience(): ?string
+    public function getCreditCardAudience(): string
     {
         return $this->creditCardAudience;
     }
 
     /**
-     * @param null|string $creditCardAudience
+     * @param string $creditCardAudience
      */
-    public function setCreditCardAudience(?string $creditCardAudience): void
+    public function setCreditCardAudience(string $creditCardAudience): void
     {
         $this->creditCardAudience = $creditCardAudience;
     }
 
     /**
-     * @return null|string
+     * @return string
      */
-    public function getCreditCardLabel(): ?string
+    public function getCreditCardLabel(): string
     {
         return $this->creditCardLabel;
     }
 
     /**
-     * @param null|string $creditCardLabel
+     * @param string $creditCardLabel
      */
-    public function setCreditCardLabel(?string $creditCardLabel): void
+    public function setCreditCardLabel(string $creditCardLabel): void
     {
         $this->creditCardLabel = $creditCardLabel;
     }
 
     /**
-     * @return null|string
+     * @return string
      */
-    public function getCreditCardCountryCode(): ?string
+    public function getCreditCardCountryCode(): string
     {
         return $this->creditCardCountryCode;
     }
 
     /**
-     * @param null|string $creditCardCountryCode
+     * @param string $creditCardCountryCode
      */
-    public function setCreditCardCountryCode(?string $creditCardCountryCode): void
+    public function setCreditCardCountryCode(string $creditCardCountryCode): void
     {
         $this->creditCardCountryCode = $creditCardCountryCode;
     }
 
     /**
-     * @return null|string
+     * @return string
      */
-    public function getCreditCardSecurity(): ?string
+    public function getCreditCardSecurity(): string
     {
         return $this->creditCardSecurity;
     }
 
     /**
-     * @param null|string $creditCardSecurity
+     * @param string $creditCardSecurity
      */
-    public function setCreditCardSecurity(?string $creditCardSecurity): void
+    public function setCreditCardSecurity(string $creditCardSecurity): void
     {
         $this->creditCardSecurity = $creditCardSecurity;
     }
 
     /**
-     * @return null|string
+     * @return string
      */
-    public function getCreditCardFeeRegion(): ?string
+    public function getCreditCardFeeRegion(): string
     {
         return $this->creditCardFeeRegion;
     }
 
     /**
-     * @param null|string $creditCardFeeRegion
+     * @param string $creditCardFeeRegion
      */
-    public function setCreditCardFeeRegion(?string $creditCardFeeRegion): void
+    public function setCreditCardFeeRegion(string $creditCardFeeRegion): void
     {
         $this->creditCardFeeRegion = $creditCardFeeRegion;
     }

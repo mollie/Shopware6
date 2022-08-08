@@ -10,6 +10,7 @@ use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderTransaction\OrderTransactionAttributes;
 use Mollie\Api\Resources\Payment;
+use Mollie\Api\Types\PaymentMethod;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
@@ -229,7 +230,7 @@ class OrderService implements OrderServiceInterface
             }
 
             # check for creditcard
-            if (isset($molliePayment->method, $molliePayment->details) && $molliePayment->method === "creditcard") {
+            if (isset($molliePayment->method, $molliePayment->details) && $molliePayment->method === PaymentMethod::CREDITCARD) {
                 $creditCardDetails = $molliePayment->details;
             }
         } catch (PaymentNotFoundException $ex) {
