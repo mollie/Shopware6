@@ -21,7 +21,7 @@ const testDevices = [devices.getFirstDevice()];
 const scenarioDummyBasket = new DummyBasketScenario(1);
 
 
-describe('iDEAL Issuers', () => {
+context('Payment Methods', () => {
 
     testDevices.forEach(device => {
 
@@ -33,18 +33,20 @@ describe('iDEAL Issuers', () => {
                 session.resetBrowserSession();
             });
 
-            it('C5422: Issuer List on payment selection page', () => {
+            it('C3996: Mollie Payment Methods show test mode', () => {
 
                 scenarioDummyBasket.execute();
 
                 if (shopware.isVersionGreaterEqual(6.4)) {
                     paymentAction.showAllPaymentMethods();
                 } else {
-                    paymentAction.openPaymentsModal();
+                    paymentAction.openPaymentsModal()
                 }
 
-                paymentAction.selectPaymentMethod('iDEAL');
-                paymentAction.selectIDealIssuer('bunq');
+                // yes we require test mode, but this is
+                // the only chance to see if the plugin is being used, because
+                // every merchant might have different payment methods ;)
+                cy.contains('(Test mode)');
             })
         })
     })

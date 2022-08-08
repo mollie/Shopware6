@@ -46,7 +46,7 @@ context("Checkout Failure Tests", () => {
 
         context(devices.getDescription(device), () => {
 
-            it('C5395: Paypal failed and retry with Giropay', () => {
+            it('C4009: Retry failed payment with Mollie Failure Mode', () => {
 
                 scenarioDummyBasket.execute();
                 paymentAction.switchPaymentMethod('PayPal');
@@ -78,7 +78,7 @@ context("Checkout Failure Tests", () => {
                 cy.contains('Thank you for your order');
             })
 
-            it('C5396: Paypal failed and continue shopping', () => {
+            it('C4010: Continue Shopping after failed payment in Mollie Failure Mode', () => {
 
                 scenarioDummyBasket.execute();
                 paymentAction.switchPaymentMethod('PayPal');
@@ -119,7 +119,7 @@ context("Checkout Failure Tests", () => {
 
         context(devices.getDescription(device), () => {
 
-            it('C5397: Paypal failed and retry with Giropay', () => {
+            it('C4011: Retry failed payment with Shopware Failure Mode', () => {
 
                 scenarioDummyBasket.execute();
                 paymentAction.switchPaymentMethod('PayPal');
@@ -153,7 +153,7 @@ context("Checkout Failure Tests", () => {
                 cy.contains('Thank you for updating your order');
             })
 
-            it('C5791: Paypal cancelled and retry with Paypal', () => {
+            it('C4012: Retry cancelled payment with Shopware Failure Mode', () => {
 
                 scenarioDummyBasket.execute();
                 paymentAction.switchPaymentMethod('PayPal');

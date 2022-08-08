@@ -41,15 +41,26 @@ class CategoryFixture extends Fixture
      */
     public function load(FixtureBag $bag): void
     {
+        $this->createCategory('0d8eefdd6d12456335280e2ff42431b9', "Voucher");
+        $this->createCategory('0d9eefdd6d12456335280e2ff42431b9', "Testing Failures");
+    }
+
+    /**
+     * @param string $id
+     * @param string $name
+     * @return void
+     */
+    private function createCategory(string $id, string $name): void
+    {
         $this->categoryRepository->upsert([
             [
-                'id' => '0d8eefdd6d12456335280e2ff42431b9',
+                'id' => $id,
                 'translations' => [
                     'de-DE' => [
-                        'name' => 'Gutscheine'
+                        'name' => $name,
                     ],
                     'en-GB' => [
-                        'name' => 'Voucher',
+                        'name' => $name,
                     ],
                 ],
                 'productAssignmentType' => 'product',
@@ -59,11 +70,10 @@ class CategoryFixture extends Fixture
                 'visible' => true,
                 'type' => 'page',
                 'cmsPageId' => $this->helper->Cms()->getDefaultCategoryLayout()->getId(),
-                'afterCategoryId' => null,
                 'parentId' => $this->helper->Category()->getByName('Catalogue #1')->getId(),
+                'afterCategoryId' => null,
             ],
         ], Context::createDefaultContext());
-
     }
 
 }

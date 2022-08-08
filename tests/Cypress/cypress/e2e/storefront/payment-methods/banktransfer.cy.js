@@ -7,9 +7,9 @@ import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
 import PaymentAction from "Actions/storefront/checkout/PaymentAction";
 import DummyBasketScenario from "Scenarios/DummyBasketScenario";
 import CheckoutAction from "Actions/storefront/checkout/CheckoutAction";
+import OrderDetailsRepository from "Repositories/admin/orders/OrderDetailsRepository";
 import AdminOrdersAction from "Actions/admin/AdminOrdersAction";
 import AdminLoginAction from "Actions/admin/AdminLoginAction";
-import OrderDetailsRepository from "Repositories/admin/orders/OrderDetailsRepository";
 // ------------------------------------------------------
 import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
 import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
@@ -34,7 +34,7 @@ const testDevices = [devices.getFirstDevice()];
 const scenarioDummyBasket = new DummyBasketScenario(1);
 
 
-describe('PayPal', () => {
+describe('SEPA Bank Transfer', () => {
 
     testDevices.forEach(device => {
 
@@ -47,27 +47,27 @@ describe('PayPal', () => {
                 configAction.updateProducts('', false, 0, '');
             });
 
-            it('C6926: Payment status "pending" leads to successful order', () => {
+            it('C4129: Payment status "open" leads to successful order', () => {
 
                 scenarioDummyBasket.execute();
 
-                paymentAction.switchPaymentMethod('PayPal');
+                paymentAction.switchPaymentMethod('Banktransfer');
 
                 shopware.prepareDomainChange();
                 checkout.placeOrderOnConfirm();
 
                 mollieSandbox.initSandboxCookie();
-                molliePayment.selectPending();
+                molliePayment.selectOpen();
 
                 cy.url().should('include', '/checkout/finish');
                 cy.contains('Thank you for your order');
             })
 
-            it('C6960: Paypal Reference Number is visible in Administration', () => {
+            it('C4130: Banktransfer Reference Number is visible in Administration', () => {
 
                 scenarioDummyBasket.execute();
 
-                paymentAction.switchPaymentMethod('PayPal');
+                paymentAction.switchPaymentMethod('Banktransfer');
 
                 shopware.prepareDomainChange();
                 checkout.placeOrderOnConfirm();

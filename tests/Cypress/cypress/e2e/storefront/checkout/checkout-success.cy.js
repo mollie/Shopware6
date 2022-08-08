@@ -39,24 +39,24 @@ const device = devices.getFirstDevice();
 
 
 const payments = [
-    {caseId: 'C5404', key: 'paypal', name: 'PayPal'},
-    {caseId: 'C5861', key: 'klarnapaynow', name: 'Pay now'},
-    {caseId: 'C5406', key: 'klarnapaylater', name: 'Pay later'},
-    {caseId: 'C5404', key: 'klarnasliceit', name: 'Slice it'},
-    {caseId: 'C5407', key: 'ideal', name: 'iDEAL'},
-    {caseId: 'C5408', key: 'sofort', name: 'SOFORT'},
-    {caseId: 'C5409', key: 'eps', name: 'eps'},
-    {caseId: 'C5410', key: 'giropay', name: 'Giropay'},
-    {caseId: 'C5411', key: 'mistercash', name: 'Bancontact'},
-    {caseId: 'C5412', key: 'przelewy24', name: 'Przelewy24'},
-    {caseId: 'C5413', key: 'kbc', name: 'KBC'},
-    {caseId: 'C5415', key: 'banktransfer', name: 'Banktransfer'},
-    {caseId: 'C6965', key: 'directdebit', name: 'SEPA Direct Debit'},
-    {caseId: 'C5414', key: 'belfius', name: 'Belfius'},
-    {caseId: 'C5860', key: 'giftcard', name: 'Gift cards'},
-    {caseId: 'C6924', key: 'voucher', name: 'Voucher'},
+    {caseId: 'C4111', key: 'paypal', name: 'PayPal'},
+    {caseId: 'C4114', key: 'klarnapaynow', name: 'Pay now'},
+    {caseId: 'C4115', key: 'klarnapaylater', name: 'Pay later'},
+    {caseId: 'C4117', key: 'klarnasliceit', name: 'Slice it'},
+    {caseId: 'C4118', key: 'ideal', name: 'iDEAL'},
+    {caseId: 'C4116', key: 'sofort', name: 'SOFORT'},
+    {caseId: 'C4120', key: 'eps', name: 'eps'},
+    {caseId: 'C4122', key: 'giropay', name: 'Giropay'},
+    {caseId: 'C4123', key: 'mistercash', name: 'Bancontact'},
+    {caseId: 'C4125', key: 'przelewy24', name: 'Przelewy24'},
+    {caseId: 'C4126', key: 'kbc', name: 'KBC'},
+    {caseId: 'C4128', key: 'banktransfer', name: 'Banktransfer'},
+    {caseId: 'C4131', key: 'directdebit', name: 'SEPA Direct Debit'},
+    {caseId: 'C4127', key: 'belfius', name: 'Belfius'},
+    {caseId: 'C4121', key: 'giftcard', name: 'Gift cards'},
+    {caseId: 'C4143', key: 'voucher', name: 'Voucher'},
     // unfortunately address and product prices need to match, so we cannot do in3 automatically for now
-    // {caseId: 'C6916', key: 'in3', name: 'in3'},
+    // {caseId: '', key: 'in3', name: 'in3'},
 ];
 
 
@@ -86,9 +86,6 @@ context("Checkout Tests", () => {
 
                     paymentAction.switchPaymentMethod(payment.name);
 
-                    if (payment.key === 'ideal') {
-                        paymentAction.selectIDealIssuer('bunq');
-                    }
 
                     // grab the total sum of our order from the confirm page.
                     // we also want to test what the user has to pay in Mollie.

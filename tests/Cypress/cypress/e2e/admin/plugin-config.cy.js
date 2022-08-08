@@ -26,7 +26,7 @@ context("Plugin Config", () => {
 
     context(devices.getDescription(device), () => {
 
-        it('C6697: Smart Contact Form is responding properly', () => {
+        it('C4001: Smart Contact Form is responding properly', () => {
 
             adminLogin.login();
 
