@@ -5,7 +5,7 @@
     "axios": "^0.21.4",
     "cypress": "10.4.0",
     "cypress-mollie": "1.2.0",
-    "cypress-testrail": "1.1.0",
+    "cypress-testrail": "2.0.0",
     "webpack": "^4.46.0"
   },
   "dependencies": {}
