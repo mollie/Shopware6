@@ -15,13 +15,14 @@ trait ProductFixtureTrait
      * @param string $name
      * @param string $number
      * @param string $categoryName
+     * @param string $description
      * @param float $price
      * @param string $image
      * @param array $customFields
      * @param EntityRepositoryInterface $repoProducts
      * @param FixtureHelper $helper
      */
-    protected function createProduct(string $id, string $name, string $number, string $categoryName, float $price, string $image, array $customFields, EntityRepositoryInterface $repoProducts, FixtureHelper $helper): void
+    protected function createProduct(string $id, string $name, string $number, string $categoryName, string $description, float $price, string $image, array $customFields, EntityRepositoryInterface $repoProducts, FixtureHelper $helper): void
     {
         # just reuse the product one ;)
         $mediaId = $id;
@@ -52,7 +53,7 @@ trait ProductFixtureTrait
                 'name' => $name,
                 'taxId' => $helper->SalesChannel()->getTax19()->getId(),
                 'productNumber' => $number,
-                'description' => 'Mollie Product for testing purpose in development environment. Use "failed" on the Mollie Payment Sandbox page to force the special error reason of this product.',
+                'description' => $description,
                 'visibilities' => [
                     [
                         'id' => $visibilityID,

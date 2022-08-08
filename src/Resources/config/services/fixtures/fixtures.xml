@@ -30,7 +30,7 @@
             <tag name="basecom.fixture"/>
         </service>
 
-        <service id="MolliePayments\Fixtures\Product\TestingFailureProducts">
+        <service id="MolliePayments\Fixtures\Product\FailureProducts">
             <argument type="service" id="Basecom\FixturePlugin\FixtureHelper"/>
             <argument type="service" id="product.repository"/>
             <tag name="basecom.fixture"/>

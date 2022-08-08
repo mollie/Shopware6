@@ -44,6 +44,7 @@ class VoucherFixture extends Fixture
     {
         $category = 'Voucher';
         $image = 'tshirt-white.png';
+        $description = 'Mollie Voucher Product for testing purpose in development environment.';
 
         $customFieldsEco = [
             'mollie_payments_product_voucher_type' => '1',
@@ -57,8 +58,8 @@ class VoucherFixture extends Fixture
             'mollie_payments_product_voucher_type' => '3',
         ];
 
-        $this->createProduct('4d1eeedd6d22436385580e2ff42431b9', 'Voucher ECO', 'MOL_VOUCHER_1', $category, 19, $image, $customFieldsEco, $this->repoProducts, $this->helper);
-        $this->createProduct('5d1eeedd6d22436385580e2ff42431b9', 'Voucher MEAL', 'MOL_VOUCHER_2', $category, 19, 'champagne.png', $customFieldsMeal, $this->repoProducts, $this->helper);
-        $this->createProduct('6d1eeedd6d22436385580e2ff42431b9', 'Voucher GIFT', 'MOL_VOUCHER_3', $category, 19, $image, $customFieldsGift, $this->repoProducts, $this->helper);
+        $this->createProduct('4d1eeedd6d22436385580e2ff42431b9', 'Voucher ECO', 'MOL_VOUCHER_1', $category, $description, 19, $image, $customFieldsEco, $this->repoProducts, $this->helper);
+        $this->createProduct('5d1eeedd6d22436385580e2ff42431b9', 'Voucher MEAL', 'MOL_VOUCHER_2', $category, $description, 19, 'champagne.png', $customFieldsMeal, $this->repoProducts, $this->helper);
+        $this->createProduct('6d1eeedd6d22436385580e2ff42431b9', 'Voucher GIFT', 'MOL_VOUCHER_3', $category, $description, 19, $image, $customFieldsGift, $this->repoProducts, $this->helper);
     }
 }
