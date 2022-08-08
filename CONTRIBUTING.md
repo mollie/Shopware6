@@ -287,7 +287,7 @@ This is your main makefile for everything related to Cypress. It helps you to ge
 make install
 
 # Open Cypress UI to easily view and create tests
-make open-ui url=https://your-domain-xxx.com
+make open-ui shopware=6.x.y.z url=https://your-domain-xxx.com
 
 # Automatically run all E2E tests in your terminal
 make run shopware=6.x.y.z url=https://your-domain-xxx.com

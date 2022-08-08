@@ -24,8 +24,7 @@ module.exports = defineConfig({
             name: 'iPad (Landscape)',
             width: 1024,
             height: 768,
-            userAgent:
-                'Mozilla/5.0 (iPad; CPU OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9B176 Safari/7534.48.3',
+            userAgent: 'Mozilla/5.0 (iPad; CPU OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9B176 Safari/7534.48.3',
         },
     ],
     e2e: {
