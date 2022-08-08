@@ -35,10 +35,10 @@ trait PaymentBuilderTrait
             'familyName' => $address->getLastName(),
             'email' => $email,
             'streetAndNumber' => $address->getStreet(),
-            'streetAdditional' => $address->getAdditionalAddressLine1(),
             'postalCode' => $address->getZipcode(),
             'city' => $address->getCity(),
             'country' => $address->getCountry()->getIso(),
+            'streetAdditional' => $address->getAdditionalAddressLine1(),
         ];
     }
 
