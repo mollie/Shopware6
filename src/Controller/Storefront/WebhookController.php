@@ -1,6 +1,6 @@
 <?php
 
-namespace Kiener\MolliePayments\Storefront\Controller;
+namespace Kiener\MolliePayments\Controller\Storefront;
 
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Facade\Notifications\NotificationFacade;

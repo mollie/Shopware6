@@ -1,6 +1,6 @@
 <?php
 
-namespace Kiener\MolliePayments\Storefront\Controller;
+namespace Kiener\MolliePayments\Controller\Storefront;
 
 use Exception;
 use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGatewayInterface;

@@ -5,7 +5,10 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <!-- API Controller -->
+
+
+        <!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+        <!-- Admin API Controller -->
 
         <service id="Kiener\MolliePayments\Controller\Api\ConfigController" public="true">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
@@ -63,8 +66,54 @@
             </call>
         </service>
 
-        <!-- Controllers -->
-        <service id="Kiener\MolliePayments\Storefront\Controller\ApplePayDirectController" public="true">
+        <!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+        <!-- Storefront Controller -->
+
+        <service id="Kiener\MolliePayments\Controller\Storefront\PaymentController" public="true">
+            <argument type="service" id="router"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
+            <argument type="service" id="Shopware\Core\Framework\Event\BusinessEventDispatcher"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStateService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\TransactionService"/>
+            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MollieOrderPaymentFlow"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+
+        <service id="Kiener\MolliePayments\Controller\Storefront\WebhookController" public="true">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\Notifications\NotificationFacade"/>
+            <argument type="service" id="mollie_payments.logger"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+
+        <service id="Kiener\MolliePayments\Controller\Storefront\ComponentsController" public="true">
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+
+        <service id="Kiener\MolliePayments\Controller\Storefront\IDealIssuerController" public="true">
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+
+        <service id="Kiener\MolliePayments\Controller\Storefront\ApplePayDirectController" public="true">
+            <argument type="service" id="Kiener\MolliePayments\Controller\Routes\ApplePayDirect\IsEnabledRoute"/>
+            <argument type="service" id="Kiener\MolliePayments\Controller\Routes\ApplePayDirect\PaymentIdRoute"/>
+            <argument type="service" id="Kiener\MolliePayments\Controller\Routes\ApplePayDirect\AddProductRoute"/>
+            <argument type="service" id="Kiener\MolliePayments\Controller\Routes\ApplePayDirect\CreateSessionRoute"/>
+            <argument type="service" id="Kiener\MolliePayments\Controller\Routes\ApplePayDirect\ShippingMethodRoute"/>
             <argument type="service" id="Kiener\MolliePayments\Service\ApplePayDirect\ApplePayDirect"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CartService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
@@ -86,6 +135,20 @@
             </call>
         </service>
 
+        <!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+        <!-- Store API Controller -->
+
+        <service id="Kiener\MolliePayments\Controller\StoreApi\ApplePayDirectController" public="true">
+            <argument type="service" id="Kiener\MolliePayments\Controller\Routes\ApplePayDirect\IsEnabledRoute"/>
+            <argument type="service" id="Kiener\MolliePayments\Controller\Routes\ApplePayDirect\PaymentIdRoute"/>
+            <argument type="service" id="Kiener\MolliePayments\Controller\Routes\ApplePayDirect\AddProductRoute"/>
+            <argument type="service" id="Kiener\MolliePayments\Controller\Routes\ApplePayDirect\CreateSessionRoute"/>
+            <argument type="service" id="Kiener\MolliePayments\Controller\Routes\ApplePayDirect\ShippingMethodRoute"/>
+            <argument type="service" id="mollie_payments.logger"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
 
     </services>
 </container>

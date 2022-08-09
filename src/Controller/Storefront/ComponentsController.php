@@ -1,22 +1,16 @@
 <?php
 
-namespace Kiener\MolliePayments\Storefront\Controller;
+namespace Kiener\MolliePayments\Controller\Storefront;
 
 use Kiener\MolliePayments\Service\CustomerService;
-use Kiener\MolliePayments\Service\SettingsService;
-use Kiener\MolliePayments\Setting\MollieSettingStruct;
-use Mollie\Api\Exceptions\ApiException;
-use Mollie\Api\MollieApiClient;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Routing\Router;
 
-class IDealIssuerController extends StorefrontController
+class ComponentsController extends StorefrontController
 {
     /** @var CustomerService */
     private $customerService;
@@ -29,15 +23,15 @@ class IDealIssuerController extends StorefrontController
 
     /**
      * @RouteScope(scopes={"storefront"})
-     * @Route("/mollie/ideal/store-issuer/{customerId}/{issuerId}", name="frontend.mollie.ideal.storeIssuer", options={"seo"="false"}, methods={"GET"})
+     * @Route("/mollie/components/store-card-token/{customerId}/{cardToken}", name="frontend.mollie.components.storeCardToken", options={"seo"="false"}, methods={"GET"})
      *
      * @param SalesChannelContext $context
      * @param string              $customerId
-     * @param string              $issuerId
+     * @param string              $cardToken
      *
      * @return JsonResponse
      */
-    public function storeIDealIssuer(SalesChannelContext $context, string $customerId, string $issuerId): JsonResponse
+    public function storeCardToken(SalesChannelContext $context, string $customerId, string $cardToken): JsonResponse
     {
         $result = null;
 
@@ -45,9 +39,9 @@ class IDealIssuerController extends StorefrontController
         $customer = $this->customerService->getCustomer($customerId, $context->getContext());
 
         if ($customer !== null) {
-            $result = $this->customerService->setIDealIssuer(
+            $result = $this->customerService->setCardToken(
                 $customer,
-                $issuerId,
+                $cardToken,
                 $context->getContext()
             );
         }

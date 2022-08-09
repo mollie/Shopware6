@@ -2,6 +2,7 @@ openapi: "3.0.0"
 
 info:
   title: "Mollie Headless API"
+  version: "1.0"
   description: "This is a Swagger Template for all Headless cases of the Mollie plugin.<br /><br />Instructions:<ol><li>Configure the correct server domain, where your Shopware Store API ist available.</li><li>Click on Authorize and fill in the Access Key from your Sales Channel.</li><li>Then use the Cart request for Shopware to retrieve an Access-Token</li><li>Just copy the Access-Token and use it in the global authorize section too.</li></ol><br />Congratulations, you can now use the API requests."
 
 servers:
@@ -78,6 +79,93 @@ paths:
                   default: "true"
                 associations:
                   type: array
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/mollie/apple-pay/enabled:
+    get:
+      tags:
+        - "Apple Pay Direct"
+      summary: ""
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/mollie/apple-pay/id:
+    get:
+      tags:
+        - "Apple Pay Direct"
+      summary: ""
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/mollie/apple-pay/add-product:
+    post:
+      tags:
+        - "Apple Pay Direct"
+      summary: ""
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                productId:
+                  default: ""
+                quantity:
+                  default: 1
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/mollie/apple-pay/validate:
+    post:
+      tags:
+        - "Apple Pay Direct"
+      summary: ""
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                validationUrl:
+                  default: ""
+                quantity:
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/mollie/apple-pay/shipping-methods:
+    post:
+      tags:
+        - "Apple Pay Direct"
+      summary: ""
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                countryCode:
+                  default: ""
       responses:
         "200":
           description: "successful operation"
