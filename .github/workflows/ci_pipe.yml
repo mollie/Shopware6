@@ -307,7 +307,7 @@ jobs:
         run: cd tests/Cypress && make install -B
 
       - name: Start Cypress
-        run: cd tests/Cypress && make run shopware=${{ matrix.shopware }} url=https://local.mollie.shop
+        run: cd tests/Cypress && CYPRESS_TESTRAIL_DOMAIN=${{ secrets.TESTRAIL_DOMAIN }} CYPRESS_TESTRAIL_USERNAME=${{ secrets.TESTRAIL_USERNAME }} CYPRESS_TESTRAIL_PASSWORD=${{ secrets.TESTRAIL_PASSWORD }} CYPRESS_TESTRAIL_PROJECT_ID=7 CYPRESS_TESTRAIL_RUN_NAME="Github Shopware ${{ matrix.shopware }}, ${{ github.event.head_commit.message }}" make run shopware=${{ matrix.shopware }} url=https://local.mollie.shop
 
       - name: Download Logs
         if: ${{ always() }}
