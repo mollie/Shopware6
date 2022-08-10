@@ -9,8 +9,8 @@ on:
 jobs:
 
 
-  jest:
-    name: Jest Tests
+  build_dev_release:
+    name: Build DEV Release
     runs-on: ubuntu-latest
     steps:
       - name: Clone Code
@@ -23,6 +23,26 @@ jobs:
 
       - name: Install Dependencies
         run: make dev -B
+
+      - name: Store ZIP file in Github
+        uses: actions/upload-artifact@v2
+        with:
+          name: MolliePaymentsDevCache
+          path: |
+            $(pwd)
+
+
+  jest:
+    name: Jest Tests
+    runs-on: ubuntu-latest
+    needs: build_dev_release
+    steps:
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: MolliePaymentsDevCache
 
       - name: Run Jest
         run: make jest -B
