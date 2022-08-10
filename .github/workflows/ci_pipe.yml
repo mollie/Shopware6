@@ -1,17 +1,15 @@
 name: CI Pipeline
 
+
 on:
   push:
     branches:
       - master
-      - beta/subscription
   workflow_dispatch:
-    branches:
-      - master
-      - beta/subscription
+
+
 
 jobs:
-
 
   jest:
     name: Jest Tests
@@ -327,3 +325,9 @@ jobs:
             tests/Cypress/cypress/logs
             tests/Cypress/cypress/videos
             tests/Cypress/cypress/screenshots
+
+  # ------------------------------------------------------------------------------------------------------------------------
+
+  release:
+    uses: ./.github/workflows/release.yml
+    needs: [stylelint, phpcsfixer, e2e]
