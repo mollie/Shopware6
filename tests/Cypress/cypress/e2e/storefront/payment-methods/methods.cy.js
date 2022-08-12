@@ -33,7 +33,7 @@ context('Payment Methods', () => {
                 session.resetBrowserSession();
             });
 
-            it('C3996: Mollie Payment Methods show test mode', () => {
+            it('C3996: Mollie Payment Methods show test mode @core', () => {
 
                 scenarioDummyBasket.execute();
 

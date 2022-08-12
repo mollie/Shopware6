@@ -65,7 +65,7 @@ describe('Subscription', () => {
                 session.resetBrowserSession();
             });
 
-            it('C4065: Subscription Configuration available in Administration', () => {
+            it('C4065: Subscription Configuration available in Administration @core', () => {
 
                 configAction.setupShop(true, false, false);
 
@@ -80,7 +80,7 @@ describe('Subscription', () => {
                 repoProductDetailsAdmin.getSubscriptionToggle().check();
             })
 
-            it('C4067: Subscription Indicator on PDP can be turned ON', () => {
+            it('C4067: Subscription Indicator on PDP can be turned ON @core', () => {
 
                 configAction.updateProducts('', true, 3, 'weeks');
                 configAction.setupPlugin(true, false, false, true);
@@ -96,7 +96,7 @@ describe('Subscription', () => {
                 cy.contains('Every 3 weeks');
             })
 
-            it('C4068: Subscription Indicator on PDP can be turned OFF', () => {
+            it('C4068: Subscription Indicator on PDP can be turned OFF @core', () => {
 
                 configAction.updateProducts('', true, 3, 'weeks');
                 configAction.setupPlugin(true, false, false, false);

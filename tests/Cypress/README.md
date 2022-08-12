@@ -36,6 +36,24 @@ make run shopware=6.x url=https://my-local-or-remote-domain
 ```
 
 
+### Tags
+You can run a subsegment of tests by providing tags when running Cypress.
+These tags need to exist in the title of a test. 
+We recommend the prefix @, su like '@core'.
+
+```ruby 
+make run shopware=6.x url=https://my-local-or-remote-domain tags='@core @smoke'
+```
+
+Here is a list of currently allowed tags.
+Please use them if appropriate.
+
+
+| Tag   | Description |
+|-------| --- |
+| @core | Indicates that the test does not require a Mollie API key. These tests will also run in the PR pipeline before something is merged. |
+
+
 ### TestRail Integration
 This Cypress project integrates with our TestRail project.
 TestRail is a software to manage test cases keep track on their statuses.

@@ -17,7 +17,7 @@ const repoPDP = new PDPRepository();
 
 describe('Apple Pay Direct - Functional', () => {
 
-    it('C4084: Domain Verification file has been downloaded', () => {
+    it('C4084: Domain Verification file has been downloaded @core', () => {
         cy.request('/.well-known/apple-developer-merchantid-domain-association');
     })
 })
@@ -38,7 +38,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
         describe('PDP', () => {
 
-            it('C4100: Apple Pay Direct hidden if available but not configured (PDP)', () => {
+            it('C4100: Apple Pay Direct hidden if available but not configured (PDP) @core', () => {
 
                 applePayFactory.registerApplePay(true);
 
@@ -66,7 +66,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
         describe('PDP', () => {
 
-            it('C4099: Apple Pay Direct visible if available and configured (PDP)', () => {
+            it('C4099: Apple Pay Direct visible if available and configured (PDP) @core', () => {
 
                 applePayFactory.registerApplePay(true);
 
@@ -77,7 +77,7 @@ describe('Apple Pay Direct - UI Tests', () => {
                 repoPDP.getApplePayDirectButton().should('not.have.class', 'd-none');
             })
 
-            it('C4085: Apple Pay Direct hidden if not available but configured (PDP)', () => {
+            it('C4085: Apple Pay Direct hidden if not available but configured (PDP) @core', () => {
 
                 applePayFactory.registerApplePay(false);
 
