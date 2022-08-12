@@ -223,7 +223,7 @@ jobs:
   # ------------------------------------------------------------------------------------------------------------------------
 
   e2e:
-    name: E2E Tests (Core Tests))
+    name: E2E Tests (Core Tests)
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
