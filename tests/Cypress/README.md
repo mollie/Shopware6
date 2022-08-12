@@ -49,6 +49,8 @@ Here is a list of currently allowed tags.
 Please use them if appropriate.
 
 
+
+
 | Tag   | Description |
 |-------| --- |
 | @core | Indicates that the test does not require a Mollie API key. These tests will also run in the PR pipeline before something is merged. |
