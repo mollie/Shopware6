@@ -68,7 +68,7 @@ describe('Voucher Payments', () => {
                 repoProductDetailsAdmin.getVoucherTypeDropdown().should('be.visible');
             })
 
-            it('C4139: Voucher hidden if product is not configured @core', () => {
+            it('C4139: Voucher hidden if product is not configured', () => {
 
                 // hiding of payment methods does not work
                 // belo Shopware 6.4 in the way we have to do it (Storefront + API), so it's not supported
