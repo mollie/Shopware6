@@ -115,6 +115,18 @@ class PaymentMethodService
     }
 
     /**
+     * @param Context $context
+     */
+    public function deactivatePaymentMethods(Context $context): void
+    {
+        $installedPaymentMethodHandlers = $this->getInstalledPaymentMethodHandlers($this->getPaymentHandlers(), $context);
+
+        foreach ($installedPaymentMethodHandlers as $installedPaymentMethodHandler) {
+            $this->disablePaymentMethod($installedPaymentMethodHandler, $context);
+        }
+    }
+
+    /**
      * @param array $paymentMethods
      * @param Context $context
      */

@@ -61,4 +61,15 @@ class PluginInstaller
 
         $this->applePayDomainService->downloadDomainAssociationFile();
     }
+
+    /**
+     * @param Context $context
+     * @return void
+     */
+    public function deactivate(Context $context):void
+    {
+        // Deactivation because removal is not possible because they might be attached to an order
+        $this->paymentMethodService->deactivatePaymentMethods($context);
+
+    }
 }

@@ -126,6 +126,8 @@ class MolliePayments extends Plugin
     public function deactivate(DeactivateContext $context): void
     {
         parent::deactivate($context);
+
+        $this->deactivatePlugin($context->getContext());
     }
 
 
@@ -148,5 +150,17 @@ class MolliePayments extends Plugin
     private function runDbMigrations(MigrationCollection $migrationCollection): void
     {
         $migrationCollection->migrateInPlace();
+    }
+
+    /**
+     * @param Context $context
+     * @return void
+     */
+    private function deactivatePlugin(Context $context):void
+    {
+        /** @var PluginInstaller $pluginInstaller */
+        $pluginInstaller = $this->container->get(PluginInstaller::class);
+
+        $pluginInstaller->deactivate($context);
     }
 }
