@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Compatibility\Gateway;
 use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGatewayInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
+use Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextServiceInterface;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextServiceParameters;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -23,15 +24,21 @@ class CompatibilityGateway implements CompatibilityGatewayInterface
      */
     private $contextService;
 
+    /**
+     * @var SalesChannelContextPersister
+     */
+    private $contextPersister;
 
     /**
      * @param string $swVersion
      * @param SalesChannelContextServiceInterface $contextService
+     * @param SalesChannelContextPersister $contextPersister
      */
-    public function __construct(string $swVersion, SalesChannelContextServiceInterface $contextService)
+    public function __construct(string $swVersion, SalesChannelContextServiceInterface $contextService, SalesChannelContextPersister $contextPersister)
     {
         $this->swVersion = $swVersion;
         $this->contextService = $contextService;
+        $this->contextPersister = $contextPersister;
     }
 
 
@@ -60,6 +67,46 @@ class CompatibilityGateway implements CompatibilityGatewayInterface
         $context = $this->contextService->get($salesChannelID, $token, null);
 
         return $context;
+    }
+
+    public function persistSalesChannelContext(string $token, string $salesChannelId, string $customerId): void
+    {
+        // Persist the new token
+        if (version_compare($this->swVersion, '6.3.3', '<')) {
+            // Shopware 6.3.2.x and lower
+            $this->contextPersister->save(
+                $token,
+                [
+                    'customerId' => $customerId,
+                    'billingAddressId' => null,
+                    'shippingAddressId' => null,
+                ]
+            );
+        } elseif (version_compare($this->swVersion, '6.3.4', '<')
+            && version_compare($this->swVersion, '6.3.3', '>=')) {
+            // Shopware 6.3.3.x
+            $this->contextPersister->save(
+                $token,
+                [
+                    'customerId' => $customerId,
+                    'billingAddressId' => null,
+                    'shippingAddressId' => null,
+                ],
+                $customerId
+            );
+        } else {
+            // Shopware 6.3.4+
+            $this->contextPersister->save(
+                $token,
+                [
+                    'customerId' => $customerId,
+                    'billingAddressId' => null,
+                    'shippingAddressId' => null,
+                ],
+                $salesChannelId,
+                $customerId
+            );
+        }
     }
 
     /**
