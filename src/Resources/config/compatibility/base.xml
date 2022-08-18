@@ -9,7 +9,7 @@
         <service id="Kiener\MolliePayments\Compatibility\CompatibilityFactory" class="Kiener\MolliePayments\Compatibility\CompatibilityFactory">
             <argument>%kernel.shopware_version%</argument>
             <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextService"/>
-            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
+            <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister"/>
         </service>
 
         <service id="Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway" class="Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway">
