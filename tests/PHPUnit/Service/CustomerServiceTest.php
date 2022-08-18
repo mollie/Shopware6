@@ -17,22 +17,32 @@ use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEve
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister;
+use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CustomerServiceTest extends TestCase
 {
+    /** @var CustomerService */
+    private $customerService;
+
+    # Mock objects
+    /** @var CompatibilityGateway */
+    private $compatibilityGateway;
+
     /** @var EntityRepositoryInterface */
     private $customerRepository;
 
-    /** @var CustomerService */
-    private $customerService;
+    /** @var SalesChannelContextPersister */
+    private $salesChannelContextPersister;
 
     /** @var SettingsService */
     private $settingsService;
 
     public function setUp(): void
     {
+        $this->compatibilityGateway = $this->createMock(CompatibilityGateway::class);
         $this->customerRepository = new FakeEntityRepository(new CustomerDefinition());
+        $this->salesChannelContextPersister = $this->createMock(SalesChannelContextPersister::class);
         $this->settingsService = $this->createMock(SettingsService::class);
 
         $this->customerService = new CustomerService(
@@ -41,20 +51,43 @@ class CustomerServiceTest extends TestCase
             $this->createMock(Customer::class),
             $this->createMock(EventDispatcherInterface::class),
             new NullLogger(),
-            $this->createMock(SalesChannelContextPersister::class),
+            $this->salesChannelContextPersister,
             $this->createMock(EntityRepositoryInterface::class),
             $this->settingsService,
             $this->createMock(NumberRangeValueGeneratorInterface::class),
-            $this->createMock(CompatibilityGateway::class)
+            $this->compatibilityGateway
         );
 
+    }
+
+    /**
+     * @return void
+     */
+    public function testCustomerLogin()
+    {
+        $this->compatibilityGateway->method('getSalesChannelID')->willReturn('foo');
+
+        $customer = $this->createConfiguredMock(CustomerEntity::class, [
+            'getId'    => 'bar',
+            'getEmail' => 'foo@bar.baz',
+        ]);
+
+        $context = $this->createConfiguredMock(SalesChannelContext::class, [
+            'getToken' => 'baz',
+        ]);
+
+        $this->salesChannelContextPersister->method('replace')->willReturn('token');
+
+        $this->compatibilityGateway->expects($this->once())->method('persistSalesChannelContext')->with('token', 'foo', 'bar');
+
+        $this->customerService->customerLogin($customer, $context);
     }
 
     /**
      * @param string $customerId
      * @param string $mollieCustomerId
      * @param string $profileId
-     * @param bool $testMode
+     * @param bool   $testMode
      * @dataProvider setMollieCustomerIdTestData
      */
     public function testSetMollieCustomerId(
@@ -67,11 +100,11 @@ class CustomerServiceTest extends TestCase
     )
     {
         $customer = $this->createConfiguredMock(CustomerEntity::class, [
-            'getCustomFields' => $existingCustomFields
+            'getCustomFields' => $existingCustomFields,
         ]);
 
         $search = $this->createConfiguredMock(EntitySearchResult::class, [
-            'first' => $customer
+            'first' => $customer,
         ]);
 
         $this->customerRepository->entitySearchResults = [$search];
