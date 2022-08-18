@@ -67,6 +67,12 @@ class CompatibilityGateway implements CompatibilityGatewayInterface
         return $context;
     }
 
+    /**
+     * @param string $token
+     * @param string $salesChannelId
+     * @param string $customerId
+     * @return void
+     */
     public function persistSalesChannelContext(string $token, string $salesChannelId, string $customerId): void
     {
         // Shopware 6.3.4+

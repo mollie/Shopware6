@@ -3,7 +3,7 @@
 namespace Kiener\MolliePayments\Service;
 
 use Exception;
-use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway;
+use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGatewayInterface;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
@@ -14,7 +14,6 @@ use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Customer\Event\CustomerBeforeLoginEvent;
 use Shopware\Core\Checkout\Customer\Event\CustomerLoginEvent;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
-use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
@@ -59,22 +58,22 @@ class CustomerService
     /** @var NumberRangeValueGeneratorInterface */
     private $valueGenerator;
 
-    /** @var CompatibilityGateway */
+    /** @var CompatibilityGatewayInterface */
     private $compatibilityGateway;
 
     /**
      * Creates a new instance of the customer service.
      *
-     * @param EntityRepositoryInterface $countryRepository
-     * @param EntityRepositoryInterface $customerRepository
-     * @param Customer $customerApiService
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param LoggerInterface $logger
-     * @param SalesChannelContextPersister $salesChannelContextPersister
-     * @param EntityRepositoryInterface $salutationRepository
-     * @param SettingsService $settingsService
-     * @param string $shopwareVersion
+     * @param EntityRepositoryInterface          $countryRepository
+     * @param EntityRepositoryInterface          $customerRepository
+     * @param Customer                           $customerApiService
+     * @param EventDispatcherInterface           $eventDispatcher
+     * @param LoggerInterface                    $logger
+     * @param SalesChannelContextPersister       $salesChannelContextPersister
+     * @param EntityRepositoryInterface          $salutationRepository
+     * @param SettingsService                    $settingsService
      * @param NumberRangeValueGeneratorInterface $valueGenerator
+     * @param CompatibilityGatewayInterface      $compatibilityGateway
      */
     public function __construct(
         EntityRepositoryInterface          $countryRepository,
@@ -86,7 +85,7 @@ class CustomerService
         EntityRepositoryInterface          $salutationRepository,
         SettingsService                    $settingsService,
         NumberRangeValueGeneratorInterface $valueGenerator,
-        CompatibilityGateway $compatibilityGateway
+        CompatibilityGatewayInterface $compatibilityGateway
     ) {
         $this->countryRepository = $countryRepository;
         $this->customerRepository = $customerRepository;
