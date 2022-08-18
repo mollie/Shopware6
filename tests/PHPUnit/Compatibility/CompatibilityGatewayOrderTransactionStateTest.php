@@ -3,17 +3,21 @@
 namespace MolliePayments\Tests\Compatibility;
 
 use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway;
+use Kiener\MolliePayments\Compatibility\VersionCompare;
+use PharIo\Version\Version;
 use PHPUnit\Framework\TestCase;
+use Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 
 class CompatibilityGatewayOrderTransactionStateTest extends TestCase
 {
     private $salesChannelContextService;
-
+    private $salesChannelContextPersister;
 
     protected function setUp(): void
     {
         $this->salesChannelContextService = $this->createMock(SalesChannelContextService::class);
+        $this->salesChannelContextPersister = $this->createMock(SalesChannelContextPersister::class);
     }
 
     /**
@@ -22,7 +26,11 @@ class CompatibilityGatewayOrderTransactionStateTest extends TestCase
      * @dataProvider getChargebackStateTestData
      */
     public function testGetChargebackState($swVersion, $expectedState) {
-        $compatibilityGateway = new CompatibilityGateway($swVersion, $this->salesChannelContextService);
+        $compatibilityGateway = new CompatibilityGateway(
+            new VersionCompare($swVersion),
+            $this->salesChannelContextService,
+            $this->salesChannelContextPersister
+        );
 
         $actualState = $compatibilityGateway->getChargebackOrderTransactionState();
 
