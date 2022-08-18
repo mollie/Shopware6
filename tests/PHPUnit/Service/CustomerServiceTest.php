@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Tests\Service;
 
+use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
 use Kiener\MolliePayments\Service\SettingsService;
@@ -43,8 +44,8 @@ class CustomerServiceTest extends TestCase
             $this->createMock(SalesChannelContextPersister::class),
             $this->createMock(EntityRepositoryInterface::class),
             $this->settingsService,
-            'does.not.matter.here',
-            $this->createMock(NumberRangeValueGeneratorInterface::class)
+            $this->createMock(NumberRangeValueGeneratorInterface::class),
+            $this->createMock(CompatibilityGateway::class)
         );
 
     }
