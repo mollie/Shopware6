@@ -110,25 +110,19 @@ class CustomerService
      */
     public function customerLogin(CustomerEntity $customer, SalesChannelContext $context): ?string
     {
-        /** @var null|string $newToken */
-        $newToken = null;
-
-        /** @var CustomerBeforeLoginEvent $event */
-        $event = new CustomerBeforeLoginEvent($context, $customer->getEmail());
-
         // Dispatch the before login event
-        $this->eventDispatcher->dispatch($event);
+        $this->eventDispatcher->dispatch(new CustomerBeforeLoginEvent($context, $customer->getEmail()));
 
-        /** @var string $newToken */
         $newToken = $this->salesChannelContextPersister->replace($context->getToken(), $context);
 
-        $this->compatibilityGateway->persistSalesChannelContext($newToken, $this->compatibilityGateway->getSalesChannelID($context), $customer->getId());
-        
-        /** @var CustomerLoginEvent $event */
-        $event = new CustomerLoginEvent($context, $customer, $newToken);
+        $this->compatibilityGateway->persistSalesChannelContext(
+            $newToken,
+            $this->compatibilityGateway->getSalesChannelID($context),
+            $customer->getId()
+        );
 
         // Dispatch the customer login event
-        $this->eventDispatcher->dispatch($event);
+        $this->eventDispatcher->dispatch(new CustomerLoginEvent($context, $customer, $newToken));
 
         return $newToken;
     }
