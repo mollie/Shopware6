@@ -2,22 +2,20 @@
 
 namespace Kiener\MolliePayments\Compatibility\Gateway;
 
-use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGatewayInterface;
+use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextServiceInterface;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextServiceParameters;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 
 class CompatibilityGateway implements CompatibilityGatewayInterface
 {
-
     /**
-     * @var string
+     * @var VersionCompare
      */
-    private $swVersion;
+    private $versionCompare;
 
     /**
      * @var SalesChannelContextServiceInterface
@@ -30,13 +28,13 @@ class CompatibilityGateway implements CompatibilityGatewayInterface
     private $contextPersister;
 
     /**
-     * @param string $swVersion
+     * @param string                              $swVersion
      * @param SalesChannelContextServiceInterface $contextService
-     * @param SalesChannelContextPersister $contextPersister
+     * @param SalesChannelContextPersister        $contextPersister
      */
-    public function __construct(string $swVersion, SalesChannelContextServiceInterface $contextService, SalesChannelContextPersister $contextPersister)
+    public function __construct(VersionCompare $versionCompare, SalesChannelContextServiceInterface $contextService, SalesChannelContextPersister $contextPersister)
     {
-        $this->swVersion = $swVersion;
+        $this->versionCompare = $versionCompare;
         $this->contextService = $contextService;
         $this->contextPersister = $contextPersister;
     }
@@ -58,7 +56,7 @@ class CompatibilityGateway implements CompatibilityGatewayInterface
      */
     public function getSalesChannelContext(string $salesChannelID, string $token): SalesChannelContext
     {
-        if ($this->versionGTE('6.4')) {
+        if ($this->versionCompare->gte('6.4')) {
             $params = new SalesChannelContextServiceParameters($salesChannelID, $token);
             return $this->contextService->get($params);
         }
@@ -71,42 +69,46 @@ class CompatibilityGateway implements CompatibilityGatewayInterface
 
     public function persistSalesChannelContext(string $token, string $salesChannelId, string $customerId): void
     {
-        // Persist the new token
-        if (version_compare($this->swVersion, '6.3.3', '<')) {
-            // Shopware 6.3.2.x and lower
+        // Shopware 6.3.4+
+        if ($this->versionCompare->gte('6.3.4')) {
             $this->contextPersister->save(
                 $token,
                 [
-                    'customerId' => $customerId,
-                    'billingAddressId' => null,
-                    'shippingAddressId' => null,
-                ]
-            );
-        } elseif (version_compare($this->swVersion, '6.3.4', '<')
-            && version_compare($this->swVersion, '6.3.3', '>=')) {
-            // Shopware 6.3.3.x
-            $this->contextPersister->save(
-                $token,
-                [
-                    'customerId' => $customerId,
-                    'billingAddressId' => null,
-                    'shippingAddressId' => null,
-                ],
-                $customerId
-            );
-        } else {
-            // Shopware 6.3.4+
-            $this->contextPersister->save(
-                $token,
-                [
-                    'customerId' => $customerId,
-                    'billingAddressId' => null,
+                    'customerId'        => $customerId,
+                    'billingAddressId'  => null,
                     'shippingAddressId' => null,
                 ],
                 $salesChannelId,
                 $customerId
             );
+
+            return;
         }
+
+        // Shopware 6.3.3.x
+        if ($this->versionCompare->gte('6.3.3')) {
+            $this->contextPersister->save(
+                $token,
+                [
+                    'customerId'        => $customerId,
+                    'billingAddressId'  => null,
+                    'shippingAddressId' => null,
+                ],
+                $customerId
+            );
+
+            return;
+        }
+
+        // Shopware 6.3.2.x and lower
+        $this->contextPersister->save(
+            $token,
+            [
+                'customerId'        => $customerId,
+                'billingAddressId'  => null,
+                'shippingAddressId' => null,
+            ]
+        );
     }
 
     /**
@@ -127,12 +129,12 @@ class CompatibilityGateway implements CompatibilityGatewayInterface
     public function getChargebackOrderTransactionState(): string
     {
         // In progress state did not exist before 6.2, so set to open instead.
-        if (!$this->versionGTE('6.2')) {
+        if (!$this->versionCompare->gte('6.2')) {
             return OrderTransactionStates::STATE_OPEN;
         }
 
         // Chargeback state did not exist before 6.2.3, so set to in progress instead.
-        if (!$this->versionGTE('6.2.3')) {
+        if (!$this->versionCompare->gte('6.2.3')) {
             return OrderTransactionStates::STATE_IN_PROGRESS;
         }
 
@@ -145,12 +147,4 @@ class CompatibilityGateway implements CompatibilityGatewayInterface
         return 'chargeback';
     }
 
-    /**
-     * @param string $version
-     * @return bool
-     */
-    private function versionGTE(string $version): bool
-    {
-        return version_compare($this->swVersion, $version, '>=');
-    }
 }

@@ -26,7 +26,7 @@ class CompatibilityFactory
     private $salesChannelContextPersister;
 
     /**
-     * @param string $shopwareVersion
+     * @param string                              $shopwareVersion
      * @param SalesChannelContextServiceInterface $salesChannelContextService
      * @param SalesChannelContextPersister        $salesChannelContextPersister
      */
@@ -43,7 +43,7 @@ class CompatibilityFactory
     public function createGateway(): CompatibilityGatewayInterface
     {
         return new CompatibilityGateway(
-            $this->shopwareVersion,
+            new VersionCompare($this->shopwareVersion),
             $this->salesChannelContextService,
             $this->salesChannelContextPersister
         );
