@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Service;
 
 use Exception;
+use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
@@ -55,11 +56,11 @@ class CustomerService
     /** @var SettingsService */
     private $settingsService;
 
-    /** @var string */
-    private $shopwareVersion;
-
     /** @var NumberRangeValueGeneratorInterface */
     private $valueGenerator;
+
+    /** @var CompatibilityGateway */
+    private $compatibilityGateway;
 
     /**
      * Creates a new instance of the customer service.
@@ -84,8 +85,8 @@ class CustomerService
         SalesChannelContextPersister       $salesChannelContextPersister,
         EntityRepositoryInterface          $salutationRepository,
         SettingsService                    $settingsService,
-        string                             $shopwareVersion,
-        NumberRangeValueGeneratorInterface $valueGenerator
+        NumberRangeValueGeneratorInterface $valueGenerator,
+        CompatibilityGateway $compatibilityGateway
     ) {
         $this->countryRepository = $countryRepository;
         $this->customerRepository = $customerRepository;
@@ -95,8 +96,8 @@ class CustomerService
         $this->salesChannelContextPersister = $salesChannelContextPersister;
         $this->salutationRepository = $salutationRepository;
         $this->settingsService = $settingsService;
-        $this->shopwareVersion = $shopwareVersion;
         $this->valueGenerator = $valueGenerator;
+        $this->compatibilityGateway = $compatibilityGateway;
     }
 
     /**
@@ -121,43 +122,8 @@ class CustomerService
         /** @var string $newToken */
         $newToken = $this->salesChannelContextPersister->replace($context->getToken(), $context);
 
-        // Persist the new token
-        if (version_compare($this->shopwareVersion, '6.3.3', '<')) {
-            // Shopware 6.3.2.x and lower
-            $this->salesChannelContextPersister->save(
-                $newToken,
-                [
-                    'customerId' => $customer->getId(),
-                    'billingAddressId' => null,
-                    'shippingAddressId' => null,
-                ]
-            );
-        } elseif (version_compare($this->shopwareVersion, '6.3.4', '<')
-            && version_compare($this->shopwareVersion, '6.3.3', '>=')) {
-            // Shopware 6.3.3.x
-            $this->salesChannelContextPersister->save(
-                $newToken,
-                [
-                    'customerId' => $customer->getId(),
-                    'billingAddressId' => null,
-                    'shippingAddressId' => null,
-                ],
-                $customer->getId()
-            );
-        } else {
-            // Shopware 6.3.4+
-            $this->salesChannelContextPersister->save(
-                $newToken,
-                [
-                    'customerId' => $customer->getId(),
-                    'billingAddressId' => null,
-                    'shippingAddressId' => null,
-                ],
-                $context->getSalesChannel()->getId(),
-                $customer->getId()
-            );
-        }
-
+        $this->compatibilityGateway->persistSalesChannelContext($newToken, $this->compatibilityGateway->getSalesChannelID($context), $customer->getId());
+        
         /** @var CustomerLoginEvent $event */
         $event = new CustomerLoginEvent($context, $customer, $newToken);
 

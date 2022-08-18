@@ -28,7 +28,7 @@ class CompatibilityGateway implements CompatibilityGatewayInterface
     private $contextPersister;
 
     /**
-     * @param string                              $swVersion
+     * @param VersionCompare                      $versionCompare
      * @param SalesChannelContextServiceInterface $contextService
      * @param SalesChannelContextPersister        $contextPersister
      */
@@ -101,6 +101,7 @@ class CompatibilityGateway implements CompatibilityGatewayInterface
         }
 
         // Shopware 6.3.2.x and lower
+        /* @phpstan-ignore-next-line */
         $this->contextPersister->save(
             $token,
             [
