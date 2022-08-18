@@ -28,6 +28,10 @@ class FakeCompatibilityGateway implements CompatibilityGatewayInterface
     {
     }
 
+    public function persistSalesChannelContext(string $token, string $salesChannelId, string $customerId): void
+    {
+    }
+
     /**
      * @return string
      */
