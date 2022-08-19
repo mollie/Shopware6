@@ -11,10 +11,13 @@ use Shopware\Core\Framework\Event\BusinessEventInterface;
 use Shopware\Core\Framework\Event\CustomerAware;
 use Shopware\Core\Framework\Event\EventData\EntityType;
 use Shopware\Core\Framework\Event\EventData\EventDataCollection;
+use Shopware\Core\Framework\Event\EventData\MailRecipientStruct;
+use Shopware\Core\Framework\Event\MailAware;
+use Shopware\Core\Framework\Event\SalesChannelAware;
 use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class SubscriptionCancelledEvent extends Event implements CustomerAware, BusinessEventInterface
+class SubscriptionCancelledEvent extends Event implements CustomerAware, MailAware, SalesChannelAware, BusinessEventInterface
 {
     use JsonSerializableTrait;
 
@@ -96,5 +99,17 @@ class SubscriptionCancelledEvent extends Event implements CustomerAware, Busines
     public function getCustomer(): CustomerEntity
     {
         return $this->customer;
+    }
+
+    public function getMailStruct(): MailRecipientStruct
+    {
+        return new MailRecipientStruct([
+            $this->customer->getEmail() => sprintf('%s %s', $this->customer->getFirstName(), $this->customer->getLastName()),
+        ]);
+    }
+
+    public function getSalesChannelId(): string
+    {
+        return $this->customer->getSalesChannelId();
     }
 }
