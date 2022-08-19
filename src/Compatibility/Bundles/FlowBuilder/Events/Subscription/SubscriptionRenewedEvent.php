@@ -101,6 +101,9 @@ class SubscriptionRenewedEvent extends Event implements CustomerAware, MailAware
         return $this->customer;
     }
 
+    /**
+     * @return MailRecipientStruct
+     */
     public function getMailStruct(): MailRecipientStruct
     {
         return new MailRecipientStruct([
@@ -108,6 +111,9 @@ class SubscriptionRenewedEvent extends Event implements CustomerAware, MailAware
         ]);
     }
 
+    /**
+     * @return string
+     */
     public function getSalesChannelId(): string
     {
         return $this->customer->getSalesChannelId();

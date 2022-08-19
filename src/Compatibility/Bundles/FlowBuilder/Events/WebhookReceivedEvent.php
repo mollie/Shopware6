@@ -100,7 +100,10 @@ class WebhookReceivedEvent extends Event implements OrderAware, MailAware, Sales
     {
         return $this->context;
     }
-    
+
+    /**
+     * @return MailRecipientStruct
+     */
     public function getMailStruct(): MailRecipientStruct
     {
         $customer = $this->order->getOrderCustomer();
@@ -114,6 +117,9 @@ class WebhookReceivedEvent extends Event implements OrderAware, MailAware, Sales
         ]);
     }
 
+    /**
+     * @return string
+     */
     public function getSalesChannelId(): string
     {
         return $this->order->getSalesChannelId();

@@ -95,6 +95,9 @@ class RefundStartedEvent extends Event implements OrderAware, MailAware, SalesCh
         return $this->context;
     }
 
+    /**
+     * @return MailRecipientStruct
+     */
     public function getMailStruct(): MailRecipientStruct
     {
         $customer = $this->order->getOrderCustomer();
@@ -108,6 +111,9 @@ class RefundStartedEvent extends Event implements OrderAware, MailAware, SalesCh
         ]);
     }
 
+    /**
+     * @return string
+     */
     public function getSalesChannelId(): string
     {
         return $this->order->getSalesChannelId();

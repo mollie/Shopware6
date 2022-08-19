@@ -90,6 +90,9 @@ abstract class AbstractWebhookReceivedEvent extends Event implements OrderAware,
         return $this->context;
     }
 
+    /**
+     * @return MailRecipientStruct
+     */
     public function getMailStruct(): MailRecipientStruct
     {
         $customer = $this->order->getOrderCustomer();
@@ -103,6 +106,9 @@ abstract class AbstractWebhookReceivedEvent extends Event implements OrderAware,
         ]);
     }
 
+    /**
+     * @return string
+     */
     public function getSalesChannelId(): string
     {
         return $this->order->getSalesChannelId();
