@@ -153,5 +153,4 @@ class CompatibilityGateway implements CompatibilityGatewayInterface
         // so return it as string instead.
         return 'chargeback';
     }
-
 }
