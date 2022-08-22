@@ -2,11 +2,11 @@
 
 namespace Kiener\MolliePayments\Gateway;
 
-use Kiener\MolliePayments\Gateway\Mollie\Model\SubscriptionDefinitionInterface;
+
+use Kiener\MolliePayments\Gateway\Mollie\Model\Issuer;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\Subscription;
-use Mollie\Api\Resources\SubscriptionCollection;
 
 interface MollieGatewayInterface
 {
@@ -31,6 +31,11 @@ interface MollieGatewayInterface
      * @return Order
      */
     public function getOrder(string $orderId): Order;
+
+    /**
+     * @return Issuer[]
+     */
+    public function getIDealIssuers(): array;
 
     /**
      * @param string $paymentId

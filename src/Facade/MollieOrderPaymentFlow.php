@@ -10,6 +10,7 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Mollie\Api\Resources\Order;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
@@ -53,13 +54,23 @@ class MollieOrderPaymentFlow
         $this->orderTransactionRepository = $orderTransactionRepository;
     }
 
-    public function process(OrderTransactionEntity $transaction, OrderEntity $order, Order $mollieOrder, SalesChannelContext $salesChannelContext): bool
+
+    /**
+     * @param OrderTransactionEntity $transaction
+     * @param OrderEntity $order
+     * @param Order $mollieOrder
+     * @param string $salesChannelId
+     * @param Context $context
+     * @return bool
+     * @throws \Mollie\Api\Exceptions\ApiException
+     */
+    public function process(OrderTransactionEntity $transaction, OrderEntity $order, Order $mollieOrder, string $salesChannelId, Context  $context): bool
     {
         $paymentStatus = $this->orderStatusConverter->getMollieOrderStatus($mollieOrder);
-        $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
+        $settings = $this->settingsService->getSettings($salesChannelId);
         // this is only mollie payment flow here we are doing failed management here
-        $this->orderStatusUpdater->updatePaymentStatus($transaction, $paymentStatus, $salesChannelContext->getContext());
-        $this->orderStatusUpdater->updateOrderStatus($order, $paymentStatus, $settings, $salesChannelContext->getContext());
+        $this->orderStatusUpdater->updatePaymentStatus($transaction, $paymentStatus, $context);
+        $this->orderStatusUpdater->updateOrderStatus($order, $paymentStatus, $settings, $context);
 
         //now check if payment method has changed, but only in case that it is no paid apple pay (apple pay returns credit card as method)
         if (!$this->paymentMethodService->isPaidApplePayTransaction($transaction, $mollieOrder)) {
@@ -78,7 +89,7 @@ class MollieOrderPaymentFlow
                             ]
                         )
                     ),
-                $salesChannelContext->getContext()
+                $context
             )->firstId();
 
             // if payment method has changed, update it
@@ -92,7 +103,8 @@ class MollieOrderPaymentFlow
                             'paymentMethodId' => $molliePaymentMethodId
                         ]
                     ],
-                    $salesChannelContext->getContext()
+
+                    $context
                 );
             }
         }

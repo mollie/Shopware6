@@ -4,8 +4,16 @@ namespace MolliePayments\Tests\Service\WebhookBuilder;
 
 use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
 use MolliePayments\Tests\Fakes\FakePluginSettings;
+use Kiener\MolliePayments\Service\MolliePaymentExtractor;
+use Kiener\MolliePayments\Service\Router\RoutingBuilder;
+use Kiener\MolliePayments\Service\Router\RoutingDetector;
 use MolliePayments\Tests\Fakes\FakeRouter;
 use PHPUnit\Framework\TestCase;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
+use Shopware\Core\Framework\Uuid\Uuid;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 
 class WebhookBuilderTest extends TestCase
@@ -34,10 +42,11 @@ class WebhookBuilderTest extends TestCase
     public function testRouterIsUsed(): void
     {
         $fakeRouter = new FakeRouter('https://local.mollie.shop/notify/123');
+        $builder = new RoutingBuilder($fakeRouter, new RoutingDetector(new RequestStack()));
         $builder = new WebhookBuilder($fakeRouter, new FakePluginSettings(''));
 
 
-        $url = $builder->buildWebhook('-');
+        $url = $builder->buildWebhookURL('-');
 
         $this->assertEquals('https://local.mollie.shop/notify/123', $url);
     }
@@ -57,8 +66,9 @@ class WebhookBuilderTest extends TestCase
 
         $fakeRouter = new FakeRouter('https://local.mollie.shop/notify/123');
         $builder = new WebhookBuilder($fakeRouter, $fakeSettings);
+        $builder = new RoutingBuilder($fakeRouter, new RoutingDetector(new RequestStack()));
 
-        $url = $builder->buildWebhook('-');
+        $url = $builder->buildWebhookURL('-');
 
         $this->assertEquals('https://123.eu.ngrok.io/notify/123', $url);
     }

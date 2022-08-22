@@ -11,6 +11,8 @@ use Kiener\MolliePayments\Service\MollieApi\Order as MollieOrderApi;
 use Kiener\MolliePayments\Service\MollieApi\Payment as MolliePaymentApi;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\Refund\RefundService;
+use Kiener\MolliePayments\Service\Router\RoutingBuilder;
+use Kiener\MolliePayments\Service\Router\RoutingDetector;
 use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Service\UpdateOrderTransactionCustomFields;
 use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
@@ -31,6 +33,7 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\System\Currency\CurrencyEntity;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 
 class RefundsServiceTest extends TestCase
@@ -71,6 +74,15 @@ class RefundsServiceTest extends TestCase
             new WebhookBuilder($router, new FakePluginSettings('')),
             new NullLogger()
         );
+
+        $routingBuilder = new RoutingBuilder(
+            $router,
+            new RoutingDetector(new RequestStack())
+        );
+
+        $mollieOrderApiMock = new MollieOrderApi($apiFactoryMock, $paymentApiService, $router, $routingBuilder, $loggerServiceMock);
+        $mollieOrderApiMock = new MollieOrderApi($apiFactoryMock, $paymentApiService, $router, $routingBuilder, $loggerServiceMock);
+
 
         $this->refundService = new RefundService(
             $mollieOrderApiMock,

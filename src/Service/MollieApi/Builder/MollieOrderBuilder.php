@@ -8,8 +8,8 @@ use Kiener\MolliePayments\Hydrator\MollieLineItemHydrator;
 use Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher;
 use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\VerticalTaxLineItemFixer;
+use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 use Kiener\MolliePayments\Service\SettingsService;
-use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Struct\MollieLineItem;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
@@ -74,9 +74,9 @@ class MollieOrderBuilder
     private $shippingLineItemBuilder;
 
     /**
-     * @var WebhookBuilder
+     * @var RoutingBuilder
      */
-    private $webhookBuilder;
+    private $urlBuilder;
 
     /**
      * @var VerticalTaxLineItemFixer
@@ -107,9 +107,9 @@ class MollieOrderBuilder
      * @param VerticalTaxLineItemFixer $verticalTaxLineItemFixer
      * @param MollieLineItemHydrator $mollieLineItemHydrator
      * @param EventDispatcherInterface $eventDispatcher
-     * @param WebhookBuilder $webhookBuilder
+     * @param RoutingBuilder $routingBuilder
      */
-    public function __construct(SettingsService $settingsService, OrderDataExtractor $extractor, RouterInterface $router, MollieOrderPriceBuilder $priceBuilder, MollieLineItemBuilder $lineItemBuilder, MollieOrderAddressBuilder $addressBuilder, MollieOrderCustomerEnricher $customerEnricher, LoggerInterface $loggerService, MollieShippingLineItemBuilder $shippingLineItemBuilder, VerticalTaxLineItemFixer $verticalTaxLineItemFixer, MollieLineItemHydrator $mollieLineItemHydrator, EventDispatcherInterface $eventDispatcher, WebhookBuilder $webhookBuilder)
+    public function __construct(SettingsService $settingsService, OrderDataExtractor $extractor, RouterInterface $router, MollieOrderPriceBuilder $priceBuilder, MollieLineItemBuilder $lineItemBuilder, MollieOrderAddressBuilder $addressBuilder, MollieOrderCustomerEnricher $customerEnricher, LoggerInterface $loggerService, MollieShippingLineItemBuilder $shippingLineItemBuilder, VerticalTaxLineItemFixer $verticalTaxLineItemFixer, MollieLineItemHydrator $mollieLineItemHydrator, EventDispatcherInterface $eventDispatcher, RoutingBuilder $routingBuilder)
     {
         $this->settingsService = $settingsService;
         $this->logger = $loggerService;
@@ -123,7 +123,7 @@ class MollieOrderBuilder
         $this->verticalTaxLineItemFixer = $verticalTaxLineItemFixer;
         $this->mollieLineItemHydrator = $mollieLineItemHydrator;
         $this->eventDispatcher = $eventDispatcher;
-        $this->webhookBuilder = $webhookBuilder;
+        $this->urlBuilder = $routingBuilder;
     }
 
 
@@ -131,14 +131,13 @@ class MollieOrderBuilder
      * @param OrderEntity $order
      * @param string $transactionId
      * @param string $paymentMethod
-     * @param string $returnUrl
      * @param SalesChannelContext $salesChannelContext
      * @param null|PaymentHandler $handler
      * @param array $paymentData
      * @throws \Exception
      * @return array
      */
-    public function build(OrderEntity $order, string $transactionId, string $paymentMethod, string $returnUrl, SalesChannelContext $salesChannelContext, ?PaymentHandler $handler, array $paymentData = []): array
+    public function build(OrderEntity $order, string $transactionId, string $paymentMethod, SalesChannelContext $salesChannelContext, ?PaymentHandler $handler, array $paymentData = []): array
     {
         $customer = $this->extractor->extractCustomer($order, $salesChannelContext);
         $currency = $this->extractor->extractCurrency($order, $salesChannelContext);
@@ -156,18 +155,10 @@ class MollieOrderBuilder
         $orderData['payment'] = $paymentData;
 
         // create urls
-        $redirectUrl = $this->router->generate(
-            'frontend.mollie.payment',
-            [
-                'transactionId' => $transactionId
-            ],
-            $this->router::ABSOLUTE_URL
-        );
-
-
+        $redirectUrl = $this->urlBuilder->buildRedirectURL($transactionId);
         $orderData['redirectUrl'] = $redirectUrl;
 
-        $webhookUrl = $this->webhookBuilder->buildWebhook($transactionId);
+        $webhookUrl = $this->urlBuilder->buildWebhookURL($transactionId);
         $orderData['webhookUrl'] = $webhookUrl;
         $orderData['payment']['webhookUrl'] = $webhookUrl;
         if ($this->isSubscriptions($order->getLineItems())) {

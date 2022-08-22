@@ -256,7 +256,7 @@ class MollieSettingStruct extends Struct
     /**
      * @return bool
      */
-    public function isShopwareFailedPaymentMethod(): bool
+    public function isShopwareStandardFailureMode(): bool
     {
         return (bool)$this->shopwareFailedPayment;
     }

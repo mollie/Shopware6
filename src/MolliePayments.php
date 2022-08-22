@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments;
 
 use Exception;
 use Kiener\MolliePayments\Compatibility\DependencyLoader;
+use Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect;
 use Kiener\MolliePayments\Components\Installer\PluginInstaller;
 use Kiener\MolliePayments\Service\CustomFieldService;
 use KlarnaPayment\Installer\Modules\CustomFieldInstaller;
@@ -21,7 +22,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class MolliePayments extends Plugin
 {
     const PLUGIN_VERSION = '2.5.0';
-
 
     /**
      * @param ContainerBuilder $container

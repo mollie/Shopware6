@@ -333,7 +333,6 @@ class MolliePaymentDoPay
             $orderEntity,
             $transactionStruct->getOrderTransaction()->getId(),
             $paymentMethod,
-            $transactionStruct->getReturnUrl(),
             $salesChannelContext,
             $paymentHandler
         );

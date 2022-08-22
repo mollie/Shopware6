@@ -233,20 +233,6 @@ paths:
           description: "successful operation"
 
 
-  /mollie/webhook/{transactionId}:
-    post:
-      tags:
-        - "Webhooks"
-      summary: "Sends a payment status update webhook to Shopware"
-      parameters:
-        - in: "path"
-          name: "transactionId"
-          description: "ID of the Shopware Transaction that will be updated"
-          required: true
-      responses:
-        "200":
-          description: "successful operation"
-
   /mollie/webhook/subscription/{subscriptionId}/renew:
       post:
         tags:
@@ -269,6 +255,20 @@ paths:
         responses:
           "200":
             description: "successful operation"
+
+  /api/mollie/webhook/{transactionId}:
+    post:
+      tags:
+        - "Webhooks"
+      summary: "Sends a payment status update webhook to Shopware"
+      parameters:
+        - in: "path"
+          name: "transactionId"
+          description: "ID of the Shopware Transaction that will be updated"
+          required: true
+      responses:
+        "200":
+          description: "successful operation"
 
 components:
   securitySchemes:

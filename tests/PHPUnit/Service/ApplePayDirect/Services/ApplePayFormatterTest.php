@@ -2,8 +2,8 @@
 
 namespace Kiener\MolliePayments\Tests\Service\ApplePayDirect\Models;
 
-use Kiener\MolliePayments\Service\ApplePayDirect\Models\ApplePayCart;
-use Kiener\MolliePayments\Service\ApplePayDirect\Services\ApplePayFormatter;
+use Kiener\MolliePayments\Components\ApplePayDirect\Models\ApplePayCart;
+use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayFormatter;
 use MolliePayments\Tests\Fakes\FakeTranslator;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;

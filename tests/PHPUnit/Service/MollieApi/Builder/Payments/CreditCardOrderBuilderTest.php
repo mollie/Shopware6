@@ -46,7 +46,7 @@ class CreditCardOrderBuilderTest extends AbstractMollieOrderBuilder
 
         $order = $this->getOrderEntity($amountTotal, $taxStatus, $currency, $lineItems, $orderNumber);
 
-        $actual = $this->builder->build($order, $transactionId, $paymentMethod, 'https://foo', $this->salesChannelContext, $this->paymentHandler, []);
+        $actual = $this->builder->build($order, $transactionId, $paymentMethod, $this->salesChannelContext, $this->paymentHandler, []);
 
         $expectedOrderLifeTime = (new DateTime())->setTimezone(new DateTimeZone('UTC'))
             ->modify(sprintf('+%d day', $this->expiresAt))
@@ -101,7 +101,7 @@ class CreditCardOrderBuilderTest extends AbstractMollieOrderBuilder
 
         $order = $this->getOrderEntity($amountTotal, $taxStatus, $currency, $lineItems, $orderNumber);
 
-        $actual = $this->builder->build($order, $transactionId, $paymentMethod, 'https://foo', $this->salesChannelContext, $this->paymentHandler, []);
+        $actual = $this->builder->build($order, $transactionId, $paymentMethod, $this->salesChannelContext, $this->paymentHandler, []);
 
         $expectedOrderLifeTime = (new \DateTime())->setTimezone(new DateTimeZone('UTC'))
             ->modify(sprintf('+%d day', $this->expiresAt))

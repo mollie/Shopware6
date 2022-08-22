@@ -11,6 +11,7 @@ use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\MollieApi\Payment as PaymentApiService;
 use Kiener\MolliePayments\Service\MollieApi\Payment as PaymentService;
 use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
+use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Order as MollieOrder;
 use Mollie\Api\Resources\OrderLine;
@@ -24,7 +25,7 @@ use RuntimeException;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Symfony\Component\Routing\RouterInterface;
+
 
 class Order
 {
@@ -39,7 +40,7 @@ class Order
     private $paymentApiService;
 
     /**
-     * @var WebhookBuilder
+     * @var RoutingBuilder
      */
     private $webhookBuilder;
 
@@ -49,18 +50,12 @@ class Order
     private $logger;
 
 
-    /**
-     * @param MollieApiFactory $clientFactory
-     * @param PaymentService $paymentApiService
-     * @param WebhookBuilder $webhookBuilder
-     * @param LoggerInterface $logger
-     */
-    public function __construct(MollieApiFactory $clientFactory, PaymentApiService $paymentApiService, WebhookBuilder $webhookBuilder, LoggerInterface $logger)
+    public function __construct(MollieApiFactory $clientFactory, PaymentApiService $paymentApiService, RoutingBuilder $routingBuilder, LoggerInterface $logger)
     {
         $this->clientFactory = $clientFactory;
         $this->logger = $logger;
         $this->paymentApiService = $paymentApiService;
-        $this->webhookBuilder = $webhookBuilder;
+        $this->webhookBuilder = $routingBuilder;
     }
 
     /**
@@ -237,8 +232,8 @@ class Order
      * @param Payment $payment
      * @param string $newPaymnetMethod
      * @param string $salesChannelID
-     * @throws ApiException
      * @return Payment
+     * @throws ApiException
      */
     private function updateExistingPayment(Payment $payment, string $newPaymnetMethod, string $salesChannelID): Payment
     {
@@ -262,12 +257,12 @@ class Order
      * @param OrderEntity $order
      * @param CustomerEntity $customer
      * @param SalesChannelContext $salesChannelContext
-     * @throws ApiException
      * @return Payment
+     * @throws ApiException
      */
     private function createNewOrderPayment(MollieOrder $mollieOrder, string $paymentMethod, string $swOrderTransactionID, PaymentHandler $paymentHandler, OrderEntity $order, CustomerEntity $customer, SalesChannelContext $salesChannelContext): Payment
     {
-        $webhookUrl = $this->webhookBuilder->buildWebhook($swOrderTransactionID);
+        $webhookUrl = $this->webhookBuilder->buildWebhookURL($swOrderTransactionID);
 
 
         # let's create a new order body
@@ -330,8 +325,8 @@ class Order
     /**
      * @param string $mollieOrderId
      * @param string $salesChannelId
-     * @throws CouldNotFetchMollieOrderException
      * @return bool
+     * @throws CouldNotFetchMollieOrderException
      */
     public function isCompletelyShipped(string $mollieOrderId, string $salesChannelId): bool
     {

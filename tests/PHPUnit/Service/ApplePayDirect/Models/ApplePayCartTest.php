@@ -2,7 +2,8 @@
 
 namespace Kiener\MolliePayments\Tests\Service\ApplePayDirect\Models;
 
-use Kiener\MolliePayments\Service\ApplePayDirect\Models\ApplePayCart;
+
+use Kiener\MolliePayments\Components\ApplePayDirect\Models\ApplePayCart;
 use PHPUnit\Framework\TestCase;
 
 class ApplePayCartTest extends TestCase

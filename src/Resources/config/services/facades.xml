@@ -40,6 +40,17 @@
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Facade\Controller\PaymentReturnFacade">
+            <argument type="service" id="router"/>
+            <argument type="service" id="Shopware\Core\Framework\Event\BusinessEventDispatcher"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\TransactionService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MollieOrderPaymentFlow"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Router\RoutingDetector"/>
+        </service>
+
         <service id="Kiener\MolliePayments\Facade\MollieOrderPaymentFlow">
             <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater"/>

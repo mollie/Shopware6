@@ -91,11 +91,7 @@
             <argument type="service" id="order_line_item.repository"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\ApplePayDirect\ApplePayDirect">
-            <argument type="service" id="Kiener\MolliePayments\Service\CartService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\ShippingMethodService"/>
-            <argument type="service" id="translator"/>
-        </service>
+
 
         <service id="Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher">
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>

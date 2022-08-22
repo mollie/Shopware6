@@ -12,7 +12,7 @@ use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Shopware\Core\System\SalesChannel\SalesChannel\SalesChannelContextSwitcher;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
-class CartService
+class CartService implements CartServiceInterface
 {
     /**
      * @var SalesChannelCartService
