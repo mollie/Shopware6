@@ -16,8 +16,10 @@
 // Import commands.js using ES2015 syntax:
 import './commands'
 import axios from "axios";
-import 'cypress-testrail';
-import Tags from './services/utils/Tags';
+
+
+const CypressFilters = require('cypress-filters');
+new CypressFilters().register();
 
 
 Cypress.on('uncaught:exception', (err, runnable) => {
@@ -26,11 +28,3 @@ Cypress.on('uncaught:exception', (err, runnable) => {
     // cause an error in the console which stops the test
     return false
 })
-
-
-beforeEach(() => {
-    const test = Cypress.mocha.getRunner().suite.ctx.currentTest;
-
-    const tags = new Tags();
-    tags.verifyTest(test);
-});
