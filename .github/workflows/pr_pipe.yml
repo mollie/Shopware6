@@ -270,7 +270,7 @@ jobs:
         run: cd tests/Cypress && make install -B
 
       - name: Start Cypress Core Tests
-        run: cd tests/Cypress && make run shopware=${{ matrix.shopware }} url=https://local.mollie.shop storeApiKey=SWSCOVFSNKLBYUTKS1VSOEDTUQ tags='@core'
+        run: cd tests/Cypress && make run shopware=${{ matrix.shopware }} url=https://local.mollie.shop storeApiKey=SWSCOVFSNKLBYUTKS1VSOEDTUQ filters='@core'
 
   # ------------------------------------------------------------------------------------------------------------------------
 
