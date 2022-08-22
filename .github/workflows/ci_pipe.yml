@@ -275,7 +275,7 @@ jobs:
 
       - name: Start Docker
         run: |
-          docker run --rm -p 443:443 --name shop --env PHP_VERSION=${{ matrix.php }} -d dockware/dev:${{ matrix.shopware }}
+          docker run --rm -p 443:443 --name shop --env PHP_VERSION=${{ matrix.php }} --env SW_API_ACCESS_KEY=SWSCOVFSNKLBYUTKS1VSOEDTUQ -d dockware/dev:${{ matrix.shopware }}
           sleep 30
           docker logs shop
           # now change the domain of our shop, mollie doesn't work with localhost
@@ -305,7 +305,7 @@ jobs:
         run: cd tests/Cypress && make install -B
 
       - name: Start Cypress
-        run: cd tests/Cypress && CYPRESS_TESTRAIL_DOMAIN=${{ secrets.TESTRAIL_DOMAIN }} CYPRESS_TESTRAIL_USERNAME=${{ secrets.TESTRAIL_USERNAME }} CYPRESS_TESTRAIL_PASSWORD=${{ secrets.TESTRAIL_PASSWORD }} CYPRESS_TESTRAIL_PROJECT_ID=7 CYPRESS_TESTRAIL_MILESTONE_ID=15 CYPRESS_TESTRAIL_RUN_NAME="Github Workflow __datetime__, ${{ github.event.head_commit.message }}, Shopware ${{ matrix.shopware }}" make run shopware=${{ matrix.shopware }} url=https://local.mollie.shop
+        run: cd tests/Cypress && CYPRESS_TESTRAIL_DOMAIN=${{ secrets.TESTRAIL_DOMAIN }} CYPRESS_TESTRAIL_USERNAME=${{ secrets.TESTRAIL_USERNAME }} CYPRESS_TESTRAIL_PASSWORD=${{ secrets.TESTRAIL_PASSWORD }} CYPRESS_TESTRAIL_PROJECT_ID=7 CYPRESS_TESTRAIL_MILESTONE_ID=15 CYPRESS_TESTRAIL_RUN_NAME="Github Workflow __datetime__, ${{ github.event.head_commit.message }}, Shopware ${{ matrix.shopware }}" make run shopware=${{ matrix.shopware }} url=https://local.mollie.shop storeApiKey=SWSCOVFSNKLBYUTKS1VSOEDTUQ
 
       - name: Download Logs
         if: ${{ always() }}

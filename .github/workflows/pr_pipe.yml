@@ -242,7 +242,7 @@ jobs:
 
       - name: Start Docker
         run: |
-          docker run --rm -p 443:443 --name shop --env PHP_VERSION=${{ matrix.php }} -d dockware/dev:${{ matrix.shopware }}
+          docker run --rm -p 443:443 --name shop --env PHP_VERSION=${{ matrix.php }} --env SW_API_ACCESS_KEY=SWSCOVFSNKLBYUTKS1VSOEDTUQ -d dockware/dev:${{ matrix.shopware }}
           sleep 30
           docker logs shop
           # now change the domain of our shop, mollie doesn't work with localhost
@@ -270,7 +270,7 @@ jobs:
         run: cd tests/Cypress && make install -B
 
       - name: Start Cypress Core Tests
-        run: cd tests/Cypress && make run shopware=${{ matrix.shopware }} url=https://local.mollie.shop tags='@core'
+        run: cd tests/Cypress && make run shopware=${{ matrix.shopware }} url=https://local.mollie.shop storeApiKey=SWSCOVFSNKLBYUTKS1VSOEDTUQ tags='@core'
 
   # ------------------------------------------------------------------------------------------------------------------------
 
