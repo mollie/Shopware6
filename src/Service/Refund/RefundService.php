@@ -82,6 +82,7 @@ class RefundService implements RefundServiceInterface
             'metadata' => $metadata->toString(),
         ];
 
+
         if (count($refundItems) > 0) {
             $lines = [];
 
