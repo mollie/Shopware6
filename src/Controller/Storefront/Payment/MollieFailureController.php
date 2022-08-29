@@ -9,10 +9,8 @@ use Kiener\MolliePayments\Exception\CouldNotFetchTransactionException;
 use Kiener\MolliePayments\Exception\MissingMollieOrderIdException;
 use Kiener\MolliePayments\Exception\MissingOrderInTransactionException;
 use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeFetchedException;
-use Kiener\MolliePayments\Facade\MollieOrderPaymentFlow;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\Order\OrderStateService;
-use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\TransactionService;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
@@ -64,11 +62,6 @@ class MollieFailureController extends StorefrontController
     private $orderStateService;
 
     /**
-     * @var SettingsService
-     */
-    private $settingsService;
-
-    /**
      * @var TransactionService
      */
     private $transactionService;
@@ -90,19 +83,17 @@ class MollieFailureController extends StorefrontController
      * @param MollieApiFactory $apiFactory
      * @param BusinessEventDispatcher $eventDispatcher
      * @param OrderStateService $orderStateService
-     * @param SettingsService $settingsService
      * @param TransactionService $transactionService
      * @param LoggerInterface $logger
      * @param TransactionTransitionServiceInterface $transactionTransitionService
      */
-    public function __construct(RouterInterface $router, CompatibilityGatewayInterface $compatibilityGateway, MollieApiFactory $apiFactory, BusinessEventDispatcher $eventDispatcher, OrderStateService $orderStateService, SettingsService $settingsService, TransactionService $transactionService, LoggerInterface $logger, TransactionTransitionServiceInterface $transactionTransitionService)
+    public function __construct(RouterInterface $router, CompatibilityGatewayInterface $compatibilityGateway, MollieApiFactory $apiFactory, BusinessEventDispatcher $eventDispatcher, OrderStateService $orderStateService, TransactionService $transactionService, LoggerInterface $logger, TransactionTransitionServiceInterface $transactionTransitionService)
     {
         $this->router = $router;
         $this->compatibilityGateway = $compatibilityGateway;
         $this->apiFactory = $apiFactory;
         $this->eventDispatcher = $eventDispatcher;
         $this->orderStateService = $orderStateService;
-        $this->settingsService = $settingsService;
         $this->transactionService = $transactionService;
         $this->logger = $logger;
         $this->transactionTransitionService = $transactionTransitionService;
@@ -120,8 +111,6 @@ class MollieFailureController extends StorefrontController
      */
     public function paymentFailedAction(SalesChannelContext $salesChannelContext, string $transactionId): ?Response
     {
-        $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
-
         /**
          * Get the transaction from the order transaction repository. With the
          * transaction we can fetch the order from the database.
@@ -178,7 +167,7 @@ class MollieFailureController extends StorefrontController
             (string)$mollieOrder->getCheckoutUrl(),
             $order,
             $mollieOrder,
-            $salesChannelContext->getSalesChannel()->getId()
+            $transactionId
         );
     }
 
