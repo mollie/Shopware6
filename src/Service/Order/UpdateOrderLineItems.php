@@ -38,7 +38,7 @@ class UpdateOrderLineItems
                 continue;
             }
 
-            $shopwareLineItemId = (string)$orderLine->metadata->orderLineItemId ?? '';
+            $shopwareLineItemId = (string)$orderLine->metadata->orderLineItemId;
 
             if (empty($shopwareLineItemId)) {
                 continue;

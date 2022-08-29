@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Service;
 
 use Kiener\MolliePayments\Struct\OrderTransaction\OrderTransactionAttributes;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
@@ -25,10 +26,10 @@ class UpdateOrderTransactionCustomFields
     /**
      * @param string $shopwareOrderTransactionId
      * @param OrderTransactionAttributes $struct
-     * @param SalesChannelContext $salesChannelContext
+     * @param Context $context
      * @return void
      */
-    public function updateOrderTransaction(string $shopwareOrderTransactionId, OrderTransactionAttributes $struct, SalesChannelContext $salesChannelContext): void
+    public function updateOrderTransaction(string $shopwareOrderTransactionId, OrderTransactionAttributes $struct, Context $context): void
     {
         $data = [
             'id' => $shopwareOrderTransactionId,
@@ -37,6 +38,6 @@ class UpdateOrderTransactionCustomFields
             ]
         ];
 
-        $this->repoTransactions->update([$data], $salesChannelContext->getContext());
+        $this->repoTransactions->update([$data], $context);
     }
 }

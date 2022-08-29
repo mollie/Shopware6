@@ -12,7 +12,7 @@ use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Shopware\Core\System\SalesChannel\SalesChannel\SalesChannelContextSwitcher;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
-class CartService
+class CartService implements CartServiceInterface
 {
     /**
      * @var SalesChannelCartService
@@ -93,18 +93,6 @@ class CartService
         return $cart->getDeliveries()->getShippingCosts()->sum()->getTotalPrice();
     }
 
-    /**
-     * Converts a cart to an order.
-     *
-     * @param Cart $cart
-     * @param SalesChannelContext $salesChannelContext
-     *
-     * @return string
-     */
-    public function order(Cart $cart, SalesChannelContext $salesChannelContext): string
-    {
-        return $this->swCartService->order($cart, $salesChannelContext, null);
-    }
 
     /**
      * @param SalesChannelContext $context

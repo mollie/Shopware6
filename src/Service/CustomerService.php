@@ -124,16 +124,15 @@ class CustomerService
         // Persist the new token
         if (version_compare($this->shopwareVersion, '6.3.3', '<')) {
             // Shopware 6.3.2.x and lower
-            $this->salesChannelContextPersister->save(
-                $newToken,
-                [
-                    'customerId' => $customer->getId(),
-                    'billingAddressId' => null,
-                    'shippingAddressId' => null,
-                ]
-            );
-        } elseif (version_compare($this->shopwareVersion, '6.3.4', '<')
-            && version_compare($this->shopwareVersion, '6.3.3', '>=')) {
+            $params = [
+                'customerId' => $customer->getId(),
+                'billingAddressId' => null,
+                'shippingAddressId' => null,
+            ];
+
+            /** @phpstan-ignore-next-line */
+            $this->salesChannelContextPersister->save($newToken, $params);
+        } elseif (version_compare($this->shopwareVersion, '6.3.4', '<') && version_compare($this->shopwareVersion, '6.3.3', '>=')) {
             // Shopware 6.3.3.x
             $this->salesChannelContextPersister->save(
                 $newToken,
@@ -211,15 +210,12 @@ class CustomerService
     }
 
     /**
-     * Stores the custom fields.
-     *
      * @param string $customerID
-     * @param array $customFields
+     * @param array<mixed> $customFields
      * @param Context $context
-     *
      * @return EntityWrittenContainerEvent
      */
-    public function saveCustomerCustomFields(string $customerID, array $customFields, Context $context)
+    public function saveCustomerCustomFields(string $customerID, array $customFields, Context $context): EntityWrittenContainerEvent
     {
         // Store the custom fields on the customer
         return $this->customerRepository->update([[
@@ -280,7 +276,7 @@ class CustomerService
      * @param Context $context
      * @throws CustomerCouldNotBeFoundException
      */
-    public function setMollieCustomerId(string $customerId, string $mollieCustomerId, string $profileId, bool $testMode, Context $context)
+    public function setMollieCustomerId(string $customerId, string $mollieCustomerId, string $profileId, bool $testMode, Context $context): void
     {
         $existingStruct = $this->getCustomerStruct($customerId, $context);
 
@@ -352,11 +348,11 @@ class CustomerService
     /**
      * Return an array of address data.
      *
-     * @param CustomerAddressEntity|OrderAddressEntity $address
+     * @param null|CustomerAddressEntity|OrderAddressEntity $address
      * @param CustomerEntity $customer
-     * @return array
+     * @return array<mixed>
      */
-    public function getAddressArray($address, CustomerEntity $customer)
+    public function getAddressArray($address, CustomerEntity $customer): array
     {
         if ($address === null) {
             return [];
@@ -453,9 +449,10 @@ class CustomerService
             $criteria->addFilter(new EqualsFilter('iso', strtoupper($countryCode)));
 
             // Get countries
-            $countries = $this->countryRepository->searchIds($criteria, $context ?? Context::createDefaultContext())->getIds();
+            /** @var string[] $countries */
+            $countries = $this->countryRepository->searchIds($criteria, $context)->getIds();
 
-            return !empty($countries) ? $countries[0] : null;
+            return !empty($countries) ? (string)$countries[0] : null;
         } catch (Exception $e) {
             return null;
         }
@@ -475,9 +472,10 @@ class CustomerService
             $criteria->addFilter(new EqualsFilter('salutationKey', 'not_specified'));
 
             // Get salutations
-            $salutations = $this->salutationRepository->searchIds($criteria, $context ?? Context::createDefaultContext())->getIds();
+            /** @var string[] $salutations */
+            $salutations = $this->salutationRepository->searchIds($criteria, $context)->getIds();
 
-            return !empty($salutations) ? $salutations[0] : null;
+            return !empty($salutations) ? (string)$salutations[0] : null;
         } catch (Exception $e) {
             return null;
         }
@@ -507,7 +505,7 @@ class CustomerService
         if ($this->customerApiService->isLegacyCustomerValid($struct->getLegacyCustomerId(), $salesChannelId)) {
             $this->setMollieCustomerId(
                 $customerId,
-                $struct->getLegacyCustomerId(),
+                (string)$struct->getLegacyCustomerId(),
                 $settings->getProfileId(),
                 $settings->isTestMode(),
                 $context

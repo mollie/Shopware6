@@ -101,6 +101,6 @@ class RefundMetadata
             ];
         }
 
-        return json_encode($data);
+        return (string)json_encode($data);
     }
 }

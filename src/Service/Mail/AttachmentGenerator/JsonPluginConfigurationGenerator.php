@@ -8,6 +8,9 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class JsonPluginConfigurationGenerator extends AbstractPluginConfigurationGenerator
 {
+    /**
+     * @var string[]
+     */
     protected $ignoreKeys = [
         'extensions',
         'liveApiKey',
@@ -18,13 +21,13 @@ class JsonPluginConfigurationGenerator extends AbstractPluginConfigurationGenera
     ];
 
     /**
-     * @inheritDoc
+     * @param Context $context
+     * @return array<mixed>
      */
     public function generate(Context $context): array
     {
         $configs = [];
 
-        /** @var SalesChannelEntity $salesChannel */
         foreach ($this->getSalesChannels($context) as $salesChannel) {
             $vars = $this->settingsService->getSettings($salesChannel->getId())->getVars();
 

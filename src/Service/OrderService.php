@@ -80,7 +80,7 @@ class OrderService implements OrderServiceInterface
      * @param string $orderId
      * @param Context $context
      * @throws OrderNotFoundException
-     * @return null|OrderEntity
+     * @return OrderEntity
      */
     public function getOrder(string $orderId, Context $context): OrderEntity
     {
@@ -106,7 +106,6 @@ class OrderService implements OrderServiceInterface
         $criteria->addAssociation('transactions.stateMachineState');
 
 
-        /** @var OrderEntity $order */
         $order = $this->orderRepository->search($criteria, $context)->first();
 
         if ($order instanceof OrderEntity) {
@@ -149,10 +148,16 @@ class OrderService implements OrderServiceInterface
      */
     public function getMollieOrderId(OrderEntity $order): string
     {
-        $mollieOrderId = $order->getCustomFields()[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY] ?? '';
+        $customFields = $order->getCustomFields();
+
+        $mollieOrderId = '';
+
+        if ($customFields !== null) {
+            $mollieOrderId = $customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY] ?? '';
+        }
 
         if (empty($mollieOrderId)) {
-            throw new CouldNotExtractMollieOrderIdException($order->getOrderNumber());
+            throw new CouldNotExtractMollieOrderIdException((string)$order->getOrderNumber());
         }
 
         return $mollieOrderId;
@@ -164,7 +169,13 @@ class OrderService implements OrderServiceInterface
      */
     public function getMollieOrderLineId(OrderLineItemEntity $lineItem): string
     {
-        $mollieOrderLineId = $lineItem->getCustomFields()[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_LINE_KEY] ?? '';
+        $customFields = $lineItem->getCustomFields();
+
+        $mollieOrderLineId = '';
+
+        if ($customFields !== null) {
+            $mollieOrderLineId = $customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_LINE_KEY] ?? '';
+        }
 
         if (empty($mollieOrderLineId)) {
             throw new CouldNotExtractMollieOrderLineIdException($lineItem->getId());
@@ -198,10 +209,8 @@ class OrderService implements OrderServiceInterface
      * @param string $orderTransactionId
      * @param SalesChannelContext $scContext
      */
-    public function updateMollieDataCustomFields(OrderEntity $order, string $mollieOrderID, string $orderTransactionId, SalesChannelContext $scContext)
+    public function updateMollieDataCustomFields(OrderEntity $order, string $mollieOrderID, string $orderTransactionId, SalesChannelContext $scContext): void
     {
-        $customFields = $order->getCustomFields() ?? [];
-
         $customFieldsStruct = new OrderAttributes($order);
         $customFieldsStruct->setMollieOrderId($mollieOrderID); # TODO i dont like that this is an optional SETTER in here!
 
@@ -242,7 +251,7 @@ class OrderService implements OrderServiceInterface
         $this->updateOrderCustomFields->updateOrder(
             $order->getId(),
             $customFieldsStruct,
-            $scContext
+            $scContext->getContext()
         );
 
         # ----------------------------------
@@ -257,7 +266,7 @@ class OrderService implements OrderServiceInterface
         $this->updateOrderTransactionCustomFields->updateOrderTransaction(
             $orderTransactionId,
             $orderTransactionCustomFields,
-            $scContext
+            $scContext->getContext()
         );
     }
 
@@ -269,9 +278,10 @@ class OrderService implements OrderServiceInterface
      * @param string $swSubscriptionId
      * @param string $mollieSubscriptionId
      * @param Payment $molliePayment
-     * @param SalesChannelContext $context
+     * @param Context $context
+     * @return void
      */
-    public function updateMollieData(OrderEntity $order, string $orderTransactionId, string $mollieOrderID, string $swSubscriptionId, string $mollieSubscriptionId, Payment $molliePayment, SalesChannelContext $context)
+    public function updateMollieData(OrderEntity $order, string $orderTransactionId, string $mollieOrderID, string $swSubscriptionId, string $mollieSubscriptionId, Payment $molliePayment, Context $context)
     {
         $thirdPartyPaymentId = '';
 

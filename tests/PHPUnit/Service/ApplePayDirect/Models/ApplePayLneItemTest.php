@@ -2,7 +2,8 @@
 
 namespace Kiener\MolliePayments\Tests\Service\ApplePayDirect\Models;
 
-use Kiener\MolliePayments\Service\ApplePayDirect\Models\ApplePayLineItem;
+
+use Kiener\MolliePayments\Components\ApplePayDirect\Models\ApplePayLineItem;
 use PHPUnit\Framework\TestCase;
 
 class ApplePayLineItemTest extends TestCase

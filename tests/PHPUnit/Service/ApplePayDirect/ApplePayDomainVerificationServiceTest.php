@@ -2,7 +2,7 @@
 
 namespace Kiener\MolliePayments\Tests\Service\ApplePayDirect;
 
-use Kiener\MolliePayments\Service\ApplePayDirect\ApplePayDomainVerificationService;
+use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDomainVerificationService;
 use PHPUnit\Framework\TestCase;
 
 class ApplePayDomainVerificationServiceTest extends TestCase

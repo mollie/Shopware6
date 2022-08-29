@@ -6,6 +6,7 @@ use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\OrderStates;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 
 class OrderTransitionService implements OrderTransitionServiceInterface
@@ -29,7 +30,9 @@ class OrderTransitionService implements OrderTransitionServiceInterface
      */
     public function openOrder(OrderEntity $order, Context $context): void
     {
-        if ($order->getStateMachineState()->getTechnicalName() === OrderStates::STATE_OPEN) {
+        $statusTechnical = ($order->getStateMachineState() instanceof StateMachineStateEntity) ? $order->getStateMachineState()->getTechnicalName() : '';
+
+        if ($statusTechnical === OrderStates::STATE_OPEN) {
             return;
         }
 
@@ -51,7 +54,9 @@ class OrderTransitionService implements OrderTransitionServiceInterface
      */
     public function processOrder(OrderEntity $order, Context $context): void
     {
-        if ($order->getStateMachineState()->getTechnicalName() === OrderStates::STATE_IN_PROGRESS) {
+        $statusTechnical = ($order->getStateMachineState() instanceof StateMachineStateEntity) ? $order->getStateMachineState()->getTechnicalName() : '';
+
+        if ($statusTechnical === OrderStates::STATE_IN_PROGRESS) {
             return;
         }
 
@@ -73,7 +78,9 @@ class OrderTransitionService implements OrderTransitionServiceInterface
      */
     public function completeOrder(OrderEntity $order, Context $context): void
     {
-        if ($order->getStateMachineState()->getTechnicalName() === OrderStates::STATE_COMPLETED) {
+        $statusTechnical = ($order->getStateMachineState() instanceof StateMachineStateEntity) ? $order->getStateMachineState()->getTechnicalName() : '';
+
+        if ($statusTechnical === OrderStates::STATE_COMPLETED) {
             return;
         }
 
@@ -95,7 +102,9 @@ class OrderTransitionService implements OrderTransitionServiceInterface
      */
     public function cancelOrder(OrderEntity $order, Context $context): void
     {
-        if ($order->getStateMachineState()->getTechnicalName() === OrderStates::STATE_CANCELLED) {
+        $statusTechnical = ($order->getStateMachineState() instanceof StateMachineStateEntity) ? $order->getStateMachineState()->getTechnicalName() : '';
+
+        if ($statusTechnical === OrderStates::STATE_CANCELLED) {
             return;
         }
 
@@ -124,7 +133,7 @@ class OrderTransitionService implements OrderTransitionServiceInterface
      * Checks if the requested transition is allowed for the current order state
      *
      * @param string $transition
-     * @param array $availableTransitions
+     * @param array<mixed> $availableTransitions
      * @return bool
      */
     private function transitionIsAllowed(string $transition, array $availableTransitions): bool

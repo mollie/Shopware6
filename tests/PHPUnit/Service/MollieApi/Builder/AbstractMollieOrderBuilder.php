@@ -17,9 +17,10 @@ use Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher;
 use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\PriceCalculator;
 use Kiener\MolliePayments\Service\MollieApi\VerticalTaxLineItemFixer;
+use Kiener\MolliePayments\Service\Router\RoutingBuilder;
+use Kiener\MolliePayments\Service\Router\RoutingDetector;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
-use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
 use MolliePayments\Tests\Fakes\FakeCompatibilityGateway;
@@ -35,6 +36,8 @@ use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Locale\LocaleEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -150,13 +153,15 @@ abstract class AbstractMollieOrderBuilder extends TestCase
         /** @var TransactionTransitionServiceInterface $transitionService */
         $this->transitionService = $this->getMockBuilder(TransactionTransitionServiceInterface::class)->disableOriginalConstructor()->getMock();
 
+
+        $routingDetector = new RoutingDetector(new RequestStack(new Request()));
+        $routingBuilder = new RoutingBuilder($this->router, $routingDetector, new FakePluginSettings(''));
+
         $this->builder = new MollieOrderBuilder(
             $this->settingsService,
             $this->orderDataExtractor,
-            $this->router,
             new MollieOrderPriceBuilder(),
             new MollieLineItemBuilder(
-                new MollieOrderPriceBuilder(),
                 new IsOrderLineItemValid(),
                 new PriceCalculator(),
                 new LineItemDataExtractor(),
@@ -169,7 +174,7 @@ abstract class AbstractMollieOrderBuilder extends TestCase
             new VerticalTaxLineItemFixer($this->loggerService),
             new MollieLineItemHydrator(new MollieOrderPriceBuilder()),
             new FakeEventDispatcher(),
-            new WebhookBuilder($this->router, new FakePluginSettings(''))
+            $routingBuilder
         );
     }
 

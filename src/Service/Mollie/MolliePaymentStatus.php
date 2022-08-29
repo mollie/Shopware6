@@ -61,7 +61,7 @@ class MolliePaymentStatus
      * This means that the order is approved.
      * This does not mean that its already completely paid.
      *
-     * @param $status
+     * @param string $status
      * @return bool
      */
     public static function isApprovedStatus($status)

@@ -11,25 +11,23 @@ use Mollie\Api\Resources\Profile;
 class ProfileHelper
 {
     /**
-     * Returns the current profile for Mollie.
-     *
-     * @param array               $data
-     * @param MollieApiClient     $apiClient
+     * @param array<mixed> $data
+     * @param MollieApiClient $apiClient
      * @param MollieSettingStruct $settings
      */
     public static function addProfileToData(array &$data, MollieApiClient $apiClient, MollieSettingStruct $settings): void
     {
         $profile = self::getProfile($apiClient, $settings);
 
-        if ($profile !== null && isset($profile->id)) {
-            $data['profileId'] = $profile->id;
+        if ($profile instanceof Profile) {
+            $data['profileId'] = (string)$profile->id;
         }
     }
 
     /**
      * Returns the current profile for Mollie's API.
      *
-     * @param MollieApiClient     $apiClient
+     * @param MollieApiClient $apiClient
      * @param MollieSettingStruct $settings
      *
      * @return null|Profile

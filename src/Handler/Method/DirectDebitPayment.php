@@ -20,11 +20,11 @@ class DirectDebitPayment extends PaymentHandler
 
 
     /**
-     * @param array $orderData
+     * @param array<mixed> $orderData
      * @param OrderEntity $orderEntity
      * @param SalesChannelContext $salesChannelContext
      * @param CustomerEntity $customer
-     * @return array
+     * @return array<mixed>
      */
     public function processPaymentMethodSpecificParameters(array $orderData, OrderEntity $orderEntity, SalesChannelContext $salesChannelContext, CustomerEntity $customer): array
     {

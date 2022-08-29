@@ -2,7 +2,7 @@
 
 namespace Kiener\MolliePayments\Command\ApplePay;
 
-use Kiener\MolliePayments\Service\ApplePayDirect\ApplePayDomainVerificationService;
+use Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,9 +15,9 @@ class ApplePayDownloadCommand extends Command
 
 
     /**
-     * @var ApplePayDomainVerificationService
+     * @var ApplePayDirect
      */
-    private $applePayService;
+    private $applePay;
 
     /**
      * @var LoggerInterface
@@ -26,13 +26,13 @@ class ApplePayDownloadCommand extends Command
 
 
     /**
-     * @param ApplePayDomainVerificationService $applePayService
+     * @param ApplePayDirect $applePay
      * @param LoggerInterface $logger
      */
-    public function __construct(ApplePayDomainVerificationService $applePayService, LoggerInterface $logger)
+    public function __construct(ApplePayDirect $applePay, LoggerInterface $logger)
     {
+        $this->applePay = $applePay;
         $this->logger = $logger;
-        $this->applePayService = $applePayService;
 
         parent::__construct();
     }
@@ -61,7 +61,7 @@ class ApplePayDownloadCommand extends Command
         try {
             $this->logger->info('Downloading new Apple Pay Domain Verification file from CLI command');
 
-            $this->applePayService->downloadDomainAssociationFile();
+            $this->applePay->downloadDomainAssociationFile();
 
             $io->success('New Apple Pay Domain Verification file has been downloaded into your ./public/.well-known folder');
 

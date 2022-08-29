@@ -49,11 +49,11 @@ class SupportController extends AbstractController
     {
         $data = $request->request;
 
-        $name = $data->get('name');
-        $email = $data->get('email');
-        $recipientLocale = $data->get('recipientLocale');
-        $subject = $data->get('subject');
-        $message = $data->get('message');
+        $name = (string)$data->get('name');
+        $email = (string)$data->get('email');
+        $recipientLocale = (string)$data->get('recipientLocale');
+        $subject = (string)$data->get('subject');
+        $message = (string)$data->get('message');
 
         return $this->sendSupportRequest(
             $name,
@@ -78,11 +78,11 @@ class SupportController extends AbstractController
     {
         $data = $request->request;
 
-        $name = $data->get('name');
-        $email = $data->get('email');
-        $recipientLocale = $data->get('recipientLocale');
-        $subject = $data->get('subject');
-        $message = $data->get('message');
+        $name = (string)$data->get('name');
+        $email = (string)$data->get('email');
+        $recipientLocale = (string)$data->get('recipientLocale');
+        $subject = (string)$data->get('subject');
+        $message = (string)$data->get('message');
 
         return $this->sendSupportRequest(
             $name,

@@ -52,6 +52,8 @@ class MolliePaymentExtractor
             preg_quote(self::MOLLIE_PAYMENT_HANDLER_NAMESPACE)
         );
 
-        return preg_match($pattern, $transaction->getPaymentMethod()->getHandlerIdentifier()) === 1;
+        $handlerID = ($transaction->getPaymentMethod() instanceof PaymentMethodEntity) ? $transaction->getPaymentMethod()->getHandlerIdentifier() : '';
+
+        return preg_match($pattern, $handlerID) === 1;
     }
 }

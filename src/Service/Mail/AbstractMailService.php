@@ -32,7 +32,7 @@ abstract class AbstractMailService
     abstract public function send(array $data, array $attachments = []): void;
 
     /**
-     * @param array $data
+     * @param array<mixed> $data
      * @return string[]
      */
     protected function getNoReplyAddress(array $data): array
@@ -61,8 +61,8 @@ abstract class AbstractMailService
     }
 
     /**
-     * @param array $data
-     * @return array
+     * @param array<mixed> $data
+     * @return array<mixed>
      */
     protected function buildContents(array $data): array
     {
@@ -75,8 +75,8 @@ abstract class AbstractMailService
     }
 
     /**
-     * @param array $attachments
-     * @return array
+     * @param array<mixed> $attachments
+     * @return array<mixed>
      */
     protected function filterFileAttachments(array $attachments = []): array
     {
@@ -87,8 +87,8 @@ abstract class AbstractMailService
     }
 
     /**
-     * @param array $attachments
-     * @return array
+     * @param array<mixed> $attachments
+     * @return array<mixed>
      */
     protected function filterBinaryAttachments(array $attachments = []): array
     {

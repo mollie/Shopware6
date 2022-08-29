@@ -78,7 +78,6 @@ trait PaymentBuilderTrait
         $expectedLineItems = [];
 
         $mollieLineItemBuilder = new MollieLineItemBuilder(
-            new MollieOrderPriceBuilder(),
             new IsOrderLineItemValid(),
             new PriceCalculator(),
             new LineItemDataExtractor(),

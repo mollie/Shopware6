@@ -2,11 +2,23 @@
 
 namespace Kiener\MolliePayments\Tests\Service\ApplePayDirect;
 
-use Kiener\MolliePayments\Service\ApplePayDirect\ApplePayDirect;
-use Kiener\MolliePayments\Service\ApplePayDirect\ApplePayDomainVerificationService;
-use Kiener\MolliePayments\Service\CartService;
+
+use Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect;
+use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDomainVerificationService;
+use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayFormatter;
+use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingBuilder;
+use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
+use Kiener\MolliePayments\Factory\MollieApiFactory;
+use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
+use Kiener\MolliePayments\Repository\Order\OrderAddressRepository;
+use Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepository;
+use Kiener\MolliePayments\Service\Cart\CartBackupService;
+use Kiener\MolliePayments\Service\CustomerService;
+use Kiener\MolliePayments\Service\OrderService;
+use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\ShippingMethodService;
-use MolliePayments\Tests\Fakes\FakeTranslator;
+use Kiener\MolliePayments\Service\ShopService;
+use MolliePayments\Tests\Fakes\FakeCartService;
 use MolliePayments\Tests\Traits\MockTrait;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Cart\Cart;
@@ -19,16 +31,12 @@ use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
-use Shopware\Core\Checkout\Cart\Price\Struct\ListPrice;
-use Shopware\Core\Checkout\Cart\Price\Struct\ReferencePrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTax;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
-use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
-use Shopware\Core\System\Country\Aggregate\CountryState\CountryStateEntity;
 use Shopware\Core\System\Country\CountryEntity;
-use Symfony\Component\Validator\Constraints\Country;
+use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class ApplePayDirectTest extends TestCase
 {
@@ -41,17 +49,75 @@ class ApplePayDirectTest extends TestCase
      */
     public function testBuildApplePayCart(): void
     {
-        /** @var CartService $cartService */
-        $cartService = $this->createDummyMock(CartService::class, $this);
+        $swCart = $this->buildShopwareCart();
+
+        /** @var SalesChannelContext $scContext */
+        $scContext = $this->createDummyMock(SalesChannelContext::class, $this);
+
+
+        $fakeCartService = new FakeCartService($swCart, $scContext);
+
         /** @var ShippingMethodService $shippingMethodService */
         $shippingMethodService = $this->createDummyMock(ShippingMethodService::class, $this);
 
-        $applePay = new ApplePayDirect($cartService, $shippingMethodService, new FakeTranslator());
+        /** @var ApplePayDomainVerificationService $domainVerification */
+        $domainVerification = $this->createDummyMock(ApplePayDomainVerificationService::class, $this);
+
+        /** @var ApplePayPayment $payment */
+        $payment = $this->createDummyMock(ApplePayPayment::class, $this);
+
+        /** @var MolliePaymentDoPay $doPay */
+        $doPay = $this->createDummyMock(MolliePaymentDoPay::class, $this);
+
+        /** @var ApplePayFormatter $formatter */
+        $formatter = $this->createDummyMock(ApplePayFormatter::class, $this);
+
+        /** @var ApplePayShippingBuilder $shippingBuilder */
+        $shippingBuilder = $this->createDummyMock(ApplePayShippingBuilder::class, $this);
+
+        /** @var SettingsService $settingsService */
+        $settingsService = $this->createDummyMock(SettingsService::class, $this);
+
+        /** @var CustomerService $customerService */
+        $customerService = $this->createDummyMock(CustomerService::class, $this);
+
+        /** @var PaymentMethodRepository $repoPaymentMethods */
+        $repoPaymentMethods = $this->createDummyMock(PaymentMethodRepository::class, $this);
+
+        /** @var CartBackupService $cartBackupService */
+        $cartBackupService = $this->createDummyMock(CartBackupService::class, $this);
+
+        /** @var MollieApiFactory $apiFactory */
+        $apiFactory = $this->createDummyMock(MollieApiFactory::class, $this);
+
+        /** @var ShopService $shopService */
+        $shopService = $this->createDummyMock(ShopService::class, $this);
+
+        /** @var OrderService $orderService */
+        $orderService = $this->createDummyMock(OrderService::class, $this);
+
+        /** @var OrderAddressRepository $repoOrderAdresses */
+        $repoOrderAdresses = $this->createDummyMock(OrderAddressRepository::class, $this);
 
 
-        $swCart = $this->buildShopwareCart();
+        $applePay = new ApplePayDirect(
+            $domainVerification,
+            $payment,
+            $doPay,
+            $fakeCartService,
+            $formatter,
+            $shippingBuilder,
+            $settingsService,
+            $customerService,
+            $repoPaymentMethods,
+            $cartBackupService,
+            $apiFactory,
+            $shopService,
+            $orderService,
+            $repoOrderAdresses
+        );
 
-        $apCart = $applePay->buildApplePayCart($swCart);
+        $apCart = $applePay->getCart($scContext);
 
         $this->assertEquals(34.99, $apCart->getAmount());
         $this->assertEquals(5, $apCart->getTaxes()->getPrice());

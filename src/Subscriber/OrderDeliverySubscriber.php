@@ -42,7 +42,7 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public static function getSubscribedEvents(): array
     {

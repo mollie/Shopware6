@@ -30,11 +30,6 @@ class MolliePaymentFinalize
 {
 
     /**
-     * @var MollieApiFactory
-     */
-    private $mollieApiFactory;
-
-    /**
      * @var OrderStatusConverter
      */
     private $orderStatusConverter;
@@ -47,14 +42,6 @@ class MolliePaymentFinalize
      */
     private $settingsService;
     /**
-     * @var UpdateOrderCustomFields
-     */
-    private $updateOrderCustomFields;
-    /**
-     * @var UpdateOrderTransactionCustomFields
-     */
-    private $updateOrderTransactionCustomFields;
-    /**
      * @var Order
      */
     private $mollieOrderService;
@@ -66,23 +53,17 @@ class MolliePaymentFinalize
 
 
     /**
-     * @param MollieApiFactory $mollieApiFactory
      * @param OrderStatusConverter $orderStatusConverter
      * @param OrderStatusUpdater $orderStatusUpdater
      * @param SettingsService $settingsService
-     * @param UpdateOrderCustomFields $updateOrderCustomFields
-     * @param UpdateOrderTransactionCustomFields $updateOrderTransactionCustomFields
      * @param Order $mollieOrderService
      * @param OrderService $orderService
      */
-    public function __construct(MollieApiFactory $mollieApiFactory, OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, UpdateOrderCustomFields $updateOrderCustomFields, UpdateOrderTransactionCustomFields $updateOrderTransactionCustomFields, Order $mollieOrderService, OrderService $orderService)
+    public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, Order $mollieOrderService, OrderService $orderService)
     {
-        $this->mollieApiFactory = $mollieApiFactory;
         $this->orderStatusConverter = $orderStatusConverter;
         $this->orderStatusUpdater = $orderStatusUpdater;
         $this->settingsService = $settingsService;
-        $this->updateOrderCustomFields = $updateOrderCustomFields;
-        $this->updateOrderTransactionCustomFields = $updateOrderTransactionCustomFields;
         $this->mollieOrderService = $mollieOrderService;
         $this->orderService = $orderService;
     }

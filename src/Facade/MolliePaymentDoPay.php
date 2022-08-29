@@ -162,7 +162,7 @@ class MolliePaymentDoPay
                     $salesChannelContext,
                     $paymentHandler
                 );
-            } catch (MollieOrderCancelledException | MollieOrderExpiredException $e) {
+            } catch (MollieOrderCancelledException|MollieOrderExpiredException $e) {
                 # Warn about cancelled/expired order, but otherwise do nothing and let it create a new order.
                 $this->logger->warning($e->getMessage(), [
                     'orderNumber' => $order->getOrderNumber(),
@@ -209,7 +209,7 @@ class MolliePaymentDoPay
 
         # we save that data in both, the order and
         # the order line items
-        $this->updaterOrderCustomFields->updateOrder($order->getId(), $orderCustomFields, $salesChannelContext);
+        $this->updaterOrderCustomFields->updateOrder($order->getId(), $orderCustomFields, $salesChannelContext->getContext());
         $this->updaterLineItemCustomFields->updateOrderLineItems($mollieOrder, $salesChannelContext);
 
 
@@ -267,7 +267,7 @@ class MolliePaymentDoPay
      * @param AsyncPaymentTransactionStruct $transactionStruct
      * @param SalesChannelContext $salesChannelContext
      * @param PaymentHandler $paymentHandler
-     * @throws ApiException
+     * @throws ApiException|MollieOrderCancelledException|MollieOrderExpiredException
      * @return MolliePaymentPrepareData
      */
     private function handleNextPaymentAttempt(OrderEntity $order, string $swOrderTransactionID, OrderAttributes $orderCustomFields, string $mollieOrderId, string $paymentMethod, AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext, PaymentHandler $paymentHandler): MolliePaymentPrepareData
@@ -311,7 +311,7 @@ class MolliePaymentDoPay
         // save custom fields because shopware return url could have changed
         // e.g. if changedPayment Parameter has to be added the shopware payment token changes
         $orderCustomFields->setMolliePaymentUrl($payment->getCheckoutUrl());
-        $this->updaterOrderCustomFields->updateOrder($order->getId(), $orderCustomFields, $salesChannelContext);
+        $this->updaterOrderCustomFields->updateOrder($order->getId(), $orderCustomFields, $salesChannelContext->getContext());
 
         return new MolliePaymentPrepareData($payment->getCheckoutUrl(), $mollieOrderId);
     }
@@ -333,7 +333,6 @@ class MolliePaymentDoPay
             $orderEntity,
             $transactionStruct->getOrderTransaction()->getId(),
             $paymentMethod,
-            $transactionStruct->getReturnUrl(),
             $salesChannelContext,
             $paymentHandler
         );

@@ -38,19 +38,13 @@ class TransactionService
     }
 
     /**
-     * Finds a transaction by id.
-     *
-     * @param $transactionId
-     * @param $versionId
+     * @param string $transactionId
+     * @param null|string $versionId
      * @param null|Context $context
-     * @throws InconsistentCriteriaIdsException
      * @return null|OrderTransactionEntity
      */
-    public function getTransactionById(
-        $transactionId,
-        $versionId = null,
-        Context $context = null
-    ): ?OrderTransactionEntity {
+    public function getTransactionById($transactionId, $versionId = null, Context $context = null): ?OrderTransactionEntity
+    {
         $transactionCriteria = new Criteria();
         $transactionCriteria->addFilter(new EqualsFilter('id', $transactionId));
 
@@ -82,7 +76,7 @@ class TransactionService
      */
     public function updateTransaction(
         OrderTransactionEntity $transaction,
-        Context $context = null
+        Context                $context = null
     ): EntityWrittenContainerEvent {
         return $this->getRepository()->update(
             [$transaction->getVars()],

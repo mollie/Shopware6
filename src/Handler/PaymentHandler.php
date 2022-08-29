@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Handler;
 use Kiener\MolliePayments\Exception\PaymentUrlException;
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Facade\MolliePaymentFinalize;
+use Kiener\MolliePayments\Service\Transition\TransactionTransitionService;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Mollie\Api\Exceptions\ApiException;
@@ -31,7 +32,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
     /** @var string */
     protected $paymentMethod;
 
-    /** @var array */
+    /** @var array<mixed> */
     protected $paymentMethodData = [];
 
     /** @var LoggerInterface */
@@ -64,11 +65,11 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
 
 
     /**
-     * @param array $orderData
+     * @param array<mixed> $orderData
      * @param OrderEntity $orderEntity
      * @param SalesChannelContext $salesChannelContext
      * @param CustomerEntity $customer
-     * @return array
+     * @return array<mixed>
      */
     public function processPaymentMethodSpecificParameters(array $orderData, OrderEntity $orderEntity, SalesChannelContext $salesChannelContext, CustomerEntity $customer): array
     {
@@ -207,10 +208,18 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
     private function loadServices(): void
     {
         /** @var \Symfony\Component\DependencyInjection\Container $container */
-        $container = $this->container;#
+        $container = $this->container;
 
-        $this->payFacade = $container->get('Kiener\MolliePayments\Facade\MolliePaymentDoPay');
-        $this->finalizeFacade = $container->get('Kiener\MolliePayments\Facade\MolliePaymentFinalize');
-        $this->transactionTransitionService = $container->get('Kiener\MolliePayments\Service\Transition\TransactionTransitionService');
+        /** @var MolliePaymentDoPay $payFacade */
+        $payFacade = $container->get('Kiener\MolliePayments\Facade\MolliePaymentDoPay');
+        $this->payFacade = $payFacade;
+
+        /** @var MolliePaymentFinalize $finalizeFacade */
+        $finalizeFacade = $container->get('Kiener\MolliePayments\Facade\MolliePaymentFinalize');
+        $this->finalizeFacade = $finalizeFacade;
+
+        /** @var TransactionTransitionService $transactionTransitionService */
+        $transactionTransitionService = $container->get('Kiener\MolliePayments\Service\Transition\TransactionTransitionService');
+        $this->transactionTransitionService = $transactionTransitionService;
     }
 }
