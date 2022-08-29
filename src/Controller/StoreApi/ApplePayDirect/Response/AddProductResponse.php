@@ -2,10 +2,8 @@
 
 namespace Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Response;
 
-
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
-
 
 class AddProductResponse extends StoreApiResponse
 {
@@ -24,5 +22,4 @@ class AddProductResponse extends StoreApiResponse
 
         parent::__construct($this->object);
     }
-
 }

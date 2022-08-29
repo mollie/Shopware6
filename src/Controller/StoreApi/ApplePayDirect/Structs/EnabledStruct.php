@@ -2,9 +2,7 @@
 
 namespace Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Structs;
 
-
 use Shopware\Core\Framework\Struct\Struct;
-
 
 class EnabledStruct extends Struct
 {
@@ -20,7 +18,7 @@ class EnabledStruct extends Struct
 
 
     /**
-     * @param bool $id
+     * @param bool $enabled
      * @param string $apiAlias
      */
     public function __construct(bool $enabled, string $apiAlias)
@@ -52,5 +50,4 @@ class EnabledStruct extends Struct
     {
         return $this->apiAlias;
     }
-
 }

@@ -37,15 +37,13 @@ class ProductService
     /**
      * Finds a product by id.
      *
-     * @param $productId
+     * @param string $productId
      * @param null|Context $context
      * @throws InconsistentCriteriaIdsException
      * @return null|ProductEntity
      */
-    public function getProductById(
-        $productId,
-        Context $context = null
-    ): ?ProductEntity {
+    public function getProductById($productId, Context $context = null): ?ProductEntity
+    {
         $criteria = new Criteria([$productId]);
 
         return $this->getRepository()->search(

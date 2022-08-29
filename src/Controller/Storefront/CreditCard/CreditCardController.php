@@ -10,7 +10,6 @@ use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
-
 /**
  * @RouteScope(scopes={"storefront"})
  */
@@ -48,18 +47,18 @@ class CreditCardController extends StorefrontController
         $customer = $this->customerService->getCustomer($customerId, $context->getContext());
 
         if ($customer instanceof CustomerEntity) {
-            $result = $this->customerService->setCardToken(
+            $writtenEvent = $this->customerService->setCardToken(
                 $customer,
                 $cardToken,
                 $context->getContext()
             );
+            $result = $writtenEvent->getErrors();
         }
 
         return new JsonResponse([
             'success' => (bool)$result,
             'customerId' => $customerId,
-            'result' => $result->getErrors()
+            'result' => $result
         ]);
     }
-
 }

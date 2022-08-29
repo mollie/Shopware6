@@ -2,8 +2,8 @@
 
 namespace Kiener\MolliePayments\Service\Router;
 
+use Kiener\MolliePayments\Service\PluginSettingsServiceInterface;
 use Symfony\Component\Routing\RouterInterface;
-
 
 class RoutingBuilder
 {
@@ -12,10 +12,30 @@ class RoutingBuilder
      *
      */
     private const ADMIN_DOMAIN_ENV_KEY = 'APP_URL';
+
     /**
-     *
+     * This has to match the parameter from the Return Route annotations.
+     * Otherwise, an exception is being thrown.
      */
-    private const CUSTOM_DOMAIN_ENV_KEY = 'MOLLIE_SHOP_DOMAIN';
+    private const ROUTE_PARAM_RETURN_ID = 'swTransactionId';
+
+    /**
+     * This has to match the parameter from the Webhook Route annotations.
+     * Otherwise, an exception is being thrown.
+     */
+    private const ROUTE_PARAM_WEBHOOK_ID = 'swTransactionId';
+
+    /**
+     * This has to match the parameter from the Subscription Renewal Route annotations.
+     * Otherwise, an exception is being thrown.
+     */
+    private const ROUTE_PARAM_SUBSCRIPTION_RENEW_ID = 'swSubscriptionId';
+
+    /**
+     * This has to match the parameter from the Subscription Update Payment Route annotations.
+     * Otherwise, an exception is being thrown.
+     */
+    private const ROUTE_PARAM_SUBSCRIPTION_UPDATE_PAYMENT_ID = 'swSubscriptionId';
 
 
     /**
@@ -28,15 +48,22 @@ class RoutingBuilder
      */
     private $routingDetector;
 
+    /**
+     * @var PluginSettingsServiceInterface
+     */
+    private $pluginSettings;
+
 
     /**
      * @param RouterInterface $router
      * @param RoutingDetector $routingDetector
+     * @param PluginSettingsServiceInterface $pluginSettings
      */
-    public function __construct(RouterInterface $router, RoutingDetector $routingDetector)
+    public function __construct(RouterInterface $router, RoutingDetector $routingDetector, PluginSettingsServiceInterface $pluginSettings)
     {
         $this->router = $router;
         $this->routingDetector = $routingDetector;
+        $this->pluginSettings = $pluginSettings;
     }
 
 
@@ -44,12 +71,12 @@ class RoutingBuilder
      * @param string $transactionId
      * @return string
      */
-    public function buildRedirectURL(string $transactionId): string
+    public function buildReturnUrl(string $transactionId): string
     {
         $isStoreApiCall = $this->routingDetector->isStoreApiRoute();
 
         $params = [
-            'transactionId' => $transactionId
+            self::ROUTE_PARAM_RETURN_ID => $transactionId
         ];
 
         # only go to an API domain if we are working in headless scopes.
@@ -76,7 +103,7 @@ class RoutingBuilder
         $isStoreApiCall = $this->routingDetector->isStoreApiRoute();
 
         $params = [
-            'transactionId' => $transactionId
+            self::ROUTE_PARAM_WEBHOOK_ID => $transactionId
         ];
 
         # if we are in headless, then we use the api webhook
@@ -94,6 +121,43 @@ class RoutingBuilder
         $webhookUrl = $this->applyCustomDomain($webhookUrl);
 
         return $webhookUrl;
+    }
+
+    /**
+     * @param string $subscriptionId
+     * @return string
+     */
+    public function buildSubscriptionWebhook(string $subscriptionId): string
+    {
+        $isStoreApiCall = $this->routingDetector->isStoreApiRoute();
+
+        $params = [
+            self::ROUTE_PARAM_SUBSCRIPTION_RENEW_ID => $subscriptionId
+        ];
+
+        if ($isStoreApiCall) {
+            $webhookUrl = $this->router->generate('api.mollie.webhook_subscription_renew', $params, $this->router::ABSOLUTE_URL);
+            $webhookUrl = $this->applyAdminDomain($webhookUrl);
+        } else {
+            $webhookUrl = $this->router->generate('frontend.mollie.webhook.subscription.renew', $params, $this->router::ABSOLUTE_URL);
+        }
+
+        $webhookUrl = $this->applyCustomDomain($webhookUrl);
+
+        return $webhookUrl;
+    }
+
+    /**
+     * @param string $subscriptionId
+     * @return string
+     */
+    public function buildSubscriptionPaymentUpdated(string $subscriptionId): string
+    {
+        $params = [
+            self::ROUTE_PARAM_SUBSCRIPTION_UPDATE_PAYMENT_ID => $subscriptionId
+        ];
+
+        return $this->router->generate('frontend.account.mollie.subscriptions.payment.update-success', $params, $this->router::ABSOLUTE_URL);
     }
 
     /**
@@ -116,8 +180,9 @@ class RoutingBuilder
 
         if ($replaceDomain !== '') {
             $components = parse_url($url);
+            $host = (is_array($components) && isset($components['host'])) ? (string)$components['host'] : '';
             # replace old domain with new custom domain
-            $url = str_replace((string)$components['host'], $replaceDomain, $url);
+            $url = str_replace($host, $replaceDomain, $url);
         }
 
         return $url;
@@ -129,23 +194,17 @@ class RoutingBuilder
      */
     private function applyCustomDomain(string $url): string
     {
-        $customDomain = trim((string)getenv(self::CUSTOM_DOMAIN_ENV_KEY));
-
-        $replaceDomain = '';
+        $customDomain = trim($this->pluginSettings->getEnvMollieShopDomain());
 
         # if we still have a custom domain in the .ENV
         # then always use this one and override existing ones
         if ($customDomain !== '') {
-            $replaceDomain = $customDomain;
-        }
-
-        if ($replaceDomain !== '') {
             $components = parse_url($url);
+            $host = (is_array($components) && isset($components['host'])) ? (string)$components['host'] : '';
             # replace old domain with new custom domain
-            $url = str_replace((string)$components['host'], $replaceDomain, $url);
+            $url = str_replace($host, $customDomain, $url);
         }
 
         return $url;
     }
-
 }

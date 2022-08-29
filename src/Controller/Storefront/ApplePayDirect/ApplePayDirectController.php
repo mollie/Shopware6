@@ -3,22 +3,10 @@
 namespace Kiener\MolliePayments\Controller\Storefront\ApplePayDirect;
 
 use Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect;
-use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
-use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
-use Kiener\MolliePayments\Repository\Order\OrderAddressRepository;
 use Kiener\MolliePayments\Service\Cart\CartBackupService;
-use Kiener\MolliePayments\Service\CartService;
-use Kiener\MolliePayments\Service\CustomerService;
-use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Traits\Storefront\RedirectTrait;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
-use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
-use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -29,7 +17,6 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\RouterInterface;
 use Throwable;
-
 
 /**
  * @RouteScope(scopes={"storefront"})
@@ -50,49 +37,14 @@ class ApplePayDirectController extends StorefrontController
     private $applePay;
 
     /**
-     * @var CartService
-     */
-    private $cartService;
-
-    /**
      * @var CartBackupService
      */
     private $cartBackupService;
 
     /**
-     * @var OrderService
-     */
-    private $orderService;
-
-    /**
-     * @var CustomerService
-     */
-    private $customerService;
-
-    /**
-     * @var ApplePayPayment
-     */
-    private $paymentHandler;
-
-    /**
      * @var RouterInterface
      */
     private $router;
-
-    /**
-     * @var MolliePaymentDoPay
-     */
-    private $molliePayments;
-
-    /**
-     * @var OrderAddressRepository
-     */
-    private $repoOrderAdresses;
-
-    /**
-     * @var EntityRepositoryInterface
-     */
-    private $repoPaymentMethods;
 
     /**
      * @var FlashBag
@@ -107,31 +59,16 @@ class ApplePayDirectController extends StorefrontController
 
     /**
      * @param ApplePayDirect $applePay
-     * @param CartService $cartService
-     * @param CustomerService $customerService
-     * @param OrderService $orderService
-     * @param ApplePayPayment $paymentHandler
-     * @param EntityRepositoryInterface $paymentMethodRepository
      * @param RouterInterface $router
-     * @param MolliePaymentDoPay $molliePaymentDoPay
      * @param LoggerInterface $logger
      * @param CartBackupService $cartBackup
-     * @param OrderAddressRepository $repoOrderAdresses
-     * @param CompatibilityGatewayInterface $compatibilityGateway
      * @param FlashBag $sessionFlashBag
      */
-    public function __construct(IsEnabledRoute $routeApplePayDirectEnabled, PaymentIdRoute $routeApplePayDirectId, AddProductRoute $routeApplePayAddProduct, CreateSessionRoute $routeApplePayCreateSession, ShippingMethodRoute $routeShippingMethod, ApplePayDirect $applePay, CartService $cartService, CustomerService $customerService, ShopService $shopService, OrderService $orderService, ApplePayPayment $paymentHandler, EntityRepositoryInterface $paymentMethodRepository, RouterInterface $router, SettingsService $settingsService, MolliePaymentDoPay $molliePaymentDoPay, MollieApiFactory $mollieApiFactory, LoggerInterface $logger, CartBackupService $cartBackup, OrderAddressRepository $repoOrderAdresses, CompatibilityGatewayInterface $compatibilityGateway, FlashBag $sessionFlashBag)
+    public function __construct(ApplePayDirect $applePay, RouterInterface $router, LoggerInterface $logger, CartBackupService $cartBackup, FlashBag $sessionFlashBag)
     {
         $this->applePay = $applePay;
-        $this->cartService = $cartService;
-        $this->customerService = $customerService;
-        $this->orderService = $orderService;
-        $this->paymentHandler = $paymentHandler;
-        $this->repoPaymentMethods = $paymentMethodRepository;
         $this->router = $router;
-        $this->molliePayments = $molliePaymentDoPay;
         $this->logger = $logger;
-        $this->repoOrderAdresses = $repoOrderAdresses;
         $this->flashBag = $sessionFlashBag;
         $this->cartBackupService = $cartBackup;
     }
@@ -146,15 +83,12 @@ class ApplePayDirectController extends StorefrontController
     public function isPaymentAvailable(SalesChannelContext $context): JsonResponse
     {
         try {
-
             $isEnabled = $this->applePay->isApplePayDirectEnabled($context);
 
             return new JsonResponse([
                 'available' => $isEnabled,
             ]);
-
         } catch (\Throwable $ex) {
-
             $this->logger->error('Apple Pay Direct available: ' . $ex->getMessage());
 
             return new JsonResponse([
@@ -179,15 +113,12 @@ class ApplePayDirectController extends StorefrontController
     public function getApplePayID(SalesChannelContext $context): JsonResponse
     {
         try {
-
             $id = $this->applePay->getActiveApplePayID($context);
 
             return new JsonResponse([
                 'id' => $id,
             ]);
-
         } catch (\Throwable $ex) {
-
             $this->logger->error('Apple Pay Direct ID: ' . $ex->getMessage());
 
             return new JsonResponse([
@@ -205,17 +136,23 @@ class ApplePayDirectController extends StorefrontController
      */
     public function addProduct(SalesChannelContext $context, Request $request): JsonResponse
     {
-        try {
-            $content = json_decode($request->getContent(), true);
+        # we do only allow a few errors from within here
+        # the rest should only be visible in the LOG files
+        $allowErrorMessage = false;
 
-            $productId = (string)$content['id'];
-            $quantity = (int)$content['quantity'];
+        try {
+            $content = json_decode((string)$request->getContent(), true);
+
+            $productId = (isset($content['id'])) ? (string)$content['id'] : '';
+            $quantity = (isset($content['quantity'])) ? (int)$content['quantity'] : 0;
 
             if (empty($productId)) {
+                $allowErrorMessage = true;
                 throw new \Exception('Please provide a product ID!');
             }
 
             if ($quantity <= 0) {
+                $allowErrorMessage = true;
                 throw new \Exception('Please provide a valid quantity > 0!');
             }
 
@@ -225,7 +162,13 @@ class ApplePayDirectController extends StorefrontController
         } catch (\Throwable $ex) {
             $this->logger->error('Apple Pay Direct error when adding product: ' . $ex->getMessage());
 
-            return new JsonResponse(['success' => false,], 500);
+            $viewJson = ['success' => false];
+
+            if ($allowErrorMessage) {
+                $viewJson['error'] = $ex->getMessage();
+            }
+
+            return new JsonResponse($viewJson, 500);
         }
     }
 
@@ -234,14 +177,13 @@ class ApplePayDirectController extends StorefrontController
      *
      * @param SalesChannelContext $context
      * @param Request $request
-     * @throws ApiException
      * @return JsonResponse
      * @return JsonResponse
      */
     public function createPaymentSession(SalesChannelContext $context, Request $request): JsonResponse
     {
         try {
-            $content = json_decode($request->getContent(), true);
+            $content = json_decode((string)$request->getContent(), true);
 
             $validationURL = (string)$content['validationUrl'];
 
@@ -266,12 +208,15 @@ class ApplePayDirectController extends StorefrontController
      */
     public function getShippingMethods(SalesChannelContext $context, Request $request): JsonResponse
     {
-        try {
-            $content = json_decode($request->getContent(), true);
+        $allowErrorMessage = false;
 
-            $countryCode = (string)$content['countryCode'];
+        try {
+            $content = json_decode((string)$request->getContent(), true);
+
+            $countryCode = (isset($content['countryCode'])) ? (string)$content['countryCode'] : '';
 
             if (empty($countryCode)) {
+                $allowErrorMessage = true;
                 throw new \Exception('No Country Code provided!');
             }
 
@@ -286,7 +231,13 @@ class ApplePayDirectController extends StorefrontController
         } catch (\Throwable $ex) {
             $this->logger->error('Apple Pay Direct error when loading shipping methods: ' . $ex->getMessage());
 
-            return new JsonResponse(['success' => false,], 500);
+            $viewJson = ['success' => false];
+
+            if ($allowErrorMessage) {
+                $viewJson['error'] = $ex->getMessage();
+            }
+
+            return new JsonResponse($viewJson, 500);
         }
     }
 
@@ -299,11 +250,15 @@ class ApplePayDirectController extends StorefrontController
      */
     public function setShippingMethod(SalesChannelContext $context, Request $request): JsonResponse
     {
+        $allowErrorMessage = false;
+
         try {
-            $json = json_decode($request->getContent(), true);
-            $shippingMethodID = (string)$json['identifier'];
+            $json = json_decode((string)$request->getContent(), true);
+
+            $shippingMethodID = (isset($json['identifier'])) ? (string)$json['identifier'] : '';
 
             if (empty($shippingMethodID)) {
+                $allowErrorMessage = true;
                 throw new \Exception('Please provide a Shipping Method identifier!');
             }
 
@@ -318,7 +273,13 @@ class ApplePayDirectController extends StorefrontController
         } catch (\Throwable $ex) {
             $this->logger->error('Apple Pay Direct error when setting shipping method: ' . $ex->getMessage());
 
-            return new JsonResponse(['success' => false,], 500);
+            $viewJson = ['success' => false];
+
+            if ($allowErrorMessage) {
+                $viewJson['error'] = $ex->getMessage();
+            }
+
+            return new JsonResponse($viewJson, 500);
         }
     }
 
@@ -339,64 +300,33 @@ class ApplePayDirectController extends StorefrontController
             $this->cartBackupService->clearBackup($context);
 
 
-            $email = $request->get('email', '');
-            $firstname = $request->get('firstname', '');
-            $lastname = $request->get('lastname', '');
-            $street = $request->get('street', '');
-            $zipcode = $request->get('postalCode', '');
-            $city = $request->get('city', '');
-            $countryCode = $request->get('countryCode', '');
-            $paymentToken = $request->get('paymentToken', '');
+            $email = (string)$request->get('email', '');
+            $firstname = (string)$request->get('firstname', '');
+            $lastname = (string)$request->get('lastname', '');
+            $street = (string)$request->get('street', '');
+            $zipcode = (string)$request->get('postalCode', '');
+            $city = (string)$request->get('city', '');
+            $countryCode = (string)$request->get('countryCode', '');
+
+            $paymentToken = (string)$request->get('paymentToken', '');
 
             if (empty($paymentToken)) {
                 throw new \Exception('PaymentToken not found!');
             }
 
-            $applePayID = $this->getActiveApplePayID($context->getContext());
 
+            $this->applePay->prepareCustomer(
+                $firstname,
+                $lastname,
+                $email,
+                $street,
+                $zipcode,
+                $city,
+                $countryCode,
+                $paymentToken,
+                $context
+            );
 
-            # if we are not logged in,
-            # then we have to create a new guest customer for our express order
-            if (!$this->customerService->isCustomerLoggedIn($context)) {
-
-                $this->applePay->prepareCustomer(
-                    $firstname,
-                    $lastname,
-                    $email,
-                    $street,
-                    $zipcode,
-                    $city,
-                    $countryCode,
-                    $paymentToken,
-                    $context
-                );
-
-
-      ##         $customer = $this->customerService->createApplePayDirectCustomer(
-      ##             $firstname,
-      ##             $lastname,
-      ##             $email,
-      ##             '',
-      ##             $street,
-      ##             $zipcode,
-      ##             $city,
-      ##             $countryCode,
-      ##             $applePayID,
-      ##             $context
-      ##         );
-
-      ##         if (!$customer instanceof CustomerEntity) {
-      ##             throw new \Exception('Error when creating customer!');
-      ##         }
-
-      ##         # now start the login of our customer.
-      ##         # Our SalesChannelContext will be correctly updated after our
-      ##         # forward to the finish-payment page.
-      ##         $this->customerService->customerLogin($customer, $context);
-            }
-
-            # also update our payment method to use ApplePay
-            $context = $this->cartService->updatePaymentMethod($context, $applePayID);
 
             # forward to the finish-payment page,
             # where our customer is correctly known, and where we
@@ -417,12 +347,11 @@ class ApplePayDirectController extends StorefrontController
     /**
      * @Route("/mollie/apple-pay/finish-payment", defaults={"XmlHttpRequest"=true, "csrf_protected"=false}, name="frontend.mollie.apple-pay.finish-payment", options={"seo"="false"}, methods={"GET"})
      *
-     * @param RequestDataBag $data
      * @param SalesChannelContext $context
      * @param Request $request
      * @return RedirectResponse
      */
-    public function finishPayment(RequestDataBag $data, SalesChannelContext $context, Request $request): RedirectResponse
+    public function finishPayment(SalesChannelContext $context, Request $request): RedirectResponse
     {
         $firstname = $request->get('firstname', '');
         $lastname = $request->get('lastname', '');
@@ -436,13 +365,11 @@ class ApplePayDirectController extends StorefrontController
         # ----------------------------------------------------------------------------
         # STEP 1: Create Order
         try {
-
             if (empty($paymentToken)) {
                 throw new \Exception('PaymentToken not found!');
             }
 
             $order = $this->applePay->createOrder($context);
-
         } catch (Throwable $ex) {
             $this->logger->error('Apple Pay Direct error when finishing payment: ' . $ex->getMessage());
 
@@ -458,8 +385,9 @@ class ApplePayDirectController extends StorefrontController
         # ----------------------------------------------------------------------------
         # STEP 2: Start Payment (CHECKPOINT: we have a valid shopware order now)
         try {
+            $returnUrl = $this->getCheckoutFinishPage($order->getId(), $this->router);
 
-            $returnUrl = $this->applePay->createPayment(
+            $this->applePay->createPayment(
                 $order,
                 $this->getCheckoutFinishPage($order->getId(), $this->router),
                 $firstname,
@@ -472,14 +400,7 @@ class ApplePayDirectController extends StorefrontController
                 $context
             );
 
-            # now also update the custom fields of our order
-            # we want to have the mollie meta data in the
-            # custom fields in Shopware too
-            $this->orderService->updateMollieDataCustomFields($order, $paymentData->getMollieID(), $transaction->getId(), $context);
-
-
             return new RedirectResponse($returnUrl);
-
         } catch (Throwable $ex) {
             $this->logger->error('Apple Pay Direct error when finishing Mollie payment: ' . $ex->getMessage());
 
@@ -503,11 +424,7 @@ class ApplePayDirectController extends StorefrontController
     public function restoreCart(SalesChannelContext $context): JsonResponse
     {
         try {
-            if ($this->cartBackupService->isBackupExisting($context)) {
-                $this->cartBackupService->restoreCart($context);
-            }
-
-            $this->cartBackupService->clearBackup($context);
+            $this->applePay->restoreCart($context);
 
             return new JsonResponse(['success' => true,]);
         } catch (\Throwable $ex) {
@@ -515,33 +432,5 @@ class ApplePayDirectController extends StorefrontController
 
             return new JsonResponse(['success' => false,], 500);
         }
-    }
-
-
-    /**
-     * @param SalesChannelContext $context
-     * @return bool
-     */
-    private function isMollieTestMode(SalesChannelContext $context): bool
-    {
-        $scID = $this->compatibilityGateway->getSalesChannelID($context);
-
-        return $this->settingsService->getSettings($scID)->isTestMode();
-    }
-
-    /**
-     * @param null|Context $context
-     * @return array|string
-     */
-    private function getActiveApplePayID(Context $context = null)
-    {
-        $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('handlerIdentifier', ApplePayPayment::class));
-        $criteria->addFilter(new EqualsFilter('active', true));
-
-        // Get payment methods
-        $paymentMethods = $this->repoPaymentMethods->searchIds($criteria, $context ?? Context::createDefaultContext())->getIds();
-
-        return $paymentMethods[0];
     }
 }

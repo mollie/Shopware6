@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Service\Mollie;
 
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\Payment;
+use Mollie\Api\Resources\PaymentCollection;
 
 class OrderStatusConverter
 {
@@ -98,7 +99,13 @@ class OrderStatusConverter
     {
         $latestPayment = null;
 
-        foreach ($order->payments() as $payment) {
+        $payments = $order->payments();
+
+        if (!$payments instanceof PaymentCollection) {
+            return null;
+        }
+
+        foreach ($payments as $payment) {
             $currentCreated = strtotime($payment->createdAt);
 
             if ($latestPayment === null) {

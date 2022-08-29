@@ -28,20 +28,23 @@ class CreditCardPayment extends PaymentHandler
     private $customerService;
 
     public function __construct(
-        LoggerInterface $logger,
-        ContainerInterface         $container,
-        CustomerService $customerService
+        LoggerInterface    $logger,
+        ContainerInterface $container,
+        CustomerService    $customerService
     ) {
         parent::__construct($logger, $container);
         $this->customerService = $customerService;
     }
 
-    public function processPaymentMethodSpecificParameters(
-        array               $orderData,
-        OrderEntity         $orderEntity,
-        SalesChannelContext $salesChannelContext,
-        CustomerEntity      $customer
-    ): array {
+    /**
+     * @param array<mixed> $orderData
+     * @param OrderEntity $orderEntity
+     * @param SalesChannelContext $salesChannelContext
+     * @param CustomerEntity $customer
+     * @return array<mixed>
+     */
+    public function processPaymentMethodSpecificParameters(array $orderData, OrderEntity $orderEntity, SalesChannelContext $salesChannelContext, CustomerEntity $customer): array
+    {
         $customFields = $customer->getCustomFields() ?? [];
         $cardToken = $customFields['mollie_payments']['credit_card_token'] ?? '';
 

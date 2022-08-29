@@ -64,7 +64,7 @@ class SubscriptionSubscriber implements EventSubscriberInterface
 
 
         if ($page instanceof ProductPage) {
-            $product = $event->getPage()->getProduct();
+            $product = $page->getProduct();
             $productAttributes = new ProductAttributes($product);
 
             $isSubscription = $productAttributes->isSubscriptionProduct();

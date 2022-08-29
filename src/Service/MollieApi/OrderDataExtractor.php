@@ -56,7 +56,7 @@ class OrderDataExtractor
         }
 
         $enrichedCustomer = $this->customerService->getCustomer(
-            $orderCustomer->getCustomerId(),
+            (string)$orderCustomer->getCustomerId(),
             $salesChannelContext->getContext()
         );
 

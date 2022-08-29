@@ -11,7 +11,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-
 /**
  * @RouteScope(scopes={"api"})
  */
@@ -34,29 +33,28 @@ class ReturnController extends AbstractController
 
 
     /**
-     * @Route("/api/mollie/payment/return/{transactionId}", defaults={"auth_required"=false, "auth_enabled"=false}, name="api.mollie.payment-return", methods={"GET", "POST"})
+     * @Route("/api/mollie/payment/return/{swTransactionId}", defaults={"auth_required"=false, "auth_enabled"=false}, name="api.mollie.payment-return", methods={"GET", "POST"})
      *
-     * @param string $transactionId
+     * @param string $swTransactionId
      * @param Context $context
-     * @return Response|null
      * @throws ApiException
+     * @return null|Response
      */
-    public function returnAction(string $transactionId, Context $context): ?Response
+    public function returnAction(string $swTransactionId, Context $context): ?Response
     {
-        return $this->returnFacade->returnAction($transactionId, $context);
+        return $this->returnFacade->returnAction($swTransactionId, $context);
     }
 
     /**
-     * @Route("/api/v{version}/mollie/payment/return/{transactionId}", defaults={"auth_required"=false, "auth_enabled"=false}, name="api.mollie.payment-return-legacy", methods={"GET", "POST"})
+     * @Route("/api/v{version}/mollie/payment/return/{swTransactionId}", defaults={"auth_required"=false, "auth_enabled"=false}, name="api.mollie.payment-return-legacy", methods={"GET", "POST"})
      *
-     * @param string $transactionId
+     * @param string $swTransactionId
      * @param Context $context
-     * @return JsonResponse
      * @throws ApiException
+     * @return null|Response
      */
-    public function returnActionLegacy(string $transactionId, Context $context): ?Response
+    public function returnActionLegacy(string $swTransactionId, Context $context): ?Response
     {
-        return $this->returnFacade->returnAction($transactionId, $context);
+        return $this->returnFacade->returnAction($swTransactionId, $context);
     }
-
 }

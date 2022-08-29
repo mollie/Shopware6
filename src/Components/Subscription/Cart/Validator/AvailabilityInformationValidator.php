@@ -15,20 +15,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 class AvailabilityInformationValidator implements CartValidatorInterface
 {
 
-    /**
-     * @var SettingsService
-     */
-    private $pluginSettings;
-
-
-    /**
-     * @param SettingsService $pluginSettings
-     */
-    public function __construct(SettingsService $pluginSettings)
-    {
-        $this->pluginSettings = $pluginSettings;
-    }
-
 
     /**
      * @param Cart $cart

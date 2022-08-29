@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Repository\PaymentMethod;
 
-
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -28,8 +27,8 @@ class PaymentMethodRepository
 
     /**
      * @param Context $context
-     * @return string
      * @throws \Exception
+     * @return string
      */
     public function getActiveApplePayID(Context $context): string
     {
@@ -46,5 +45,4 @@ class PaymentMethodRepository
 
         return (string)$paymentMethods[0];
     }
-
 }

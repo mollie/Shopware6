@@ -73,10 +73,11 @@ class SettingsService implements PluginSettingsServiceInterface
     {
         $allConfigs = [];
 
-        $result = $this->repoSalesChannels->searchIds(new Criteria(), $context);
+        /** @var string[] $resultIDs */
+        $resultIDs = $this->repoSalesChannels->searchIds(new Criteria(), $context)->getIds();
 
-        foreach ($result->getIds() as $scID) {
-            $allConfigs[$scID] = $this->getSettings($scID);
+        foreach ($resultIDs as $scID) {
+            $allConfigs[(string)$scID] = $this->getSettings((string)$scID);
         }
 
         return $allConfigs;
@@ -85,7 +86,7 @@ class SettingsService implements PluginSettingsServiceInterface
 
     /**
      * @param string $key
-     * @param $value
+     * @param mixed $value
      * @param null|string $salesChannelId
      */
     public function set(string $key, $value, ?string $salesChannelId = null): void

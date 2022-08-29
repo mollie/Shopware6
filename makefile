@@ -63,7 +63,6 @@ csfix: ## Starts the PHP CS Fixer
 
 stan: ## Starts the PHPStan Analyser
 	@php vendor/bin/phpstan analyse -c ./.phpstan.neon
-	@php vendor/bin/phpstan analyse -c ./.phpstan.lvl8.neon
 
 phpunit: ## Starts all PHPUnit Tests
 	@XDEBUG_MODE=coverage php vendor/bin/phpunit --configuration=phpunit.xml --coverage-html ../../../public/.reports/mollie/coverage

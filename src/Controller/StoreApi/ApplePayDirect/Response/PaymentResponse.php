@@ -5,11 +5,11 @@ namespace Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Response;
 use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
-class FinishPaymentResponse extends StoreApiResponse
+class PaymentResponse extends StoreApiResponse
 {
 
     /**
-     * @var ArrayStruct
+     * @var ArrayStruct<mixed, mixed>
      */
     protected $object;
 
@@ -27,10 +27,9 @@ class FinishPaymentResponse extends StoreApiResponse
                 'url' => $redirectUrl,
                 'message' => $message,
             ],
-            'mollie_payments_applepay_direct_finish_payment'
+            'mollie_payments_applepay_direct_payment'
         );
 
         parent::__construct($this->object);
     }
-
 }

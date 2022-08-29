@@ -17,6 +17,7 @@ use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttribut
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\Locale\LocaleEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -42,11 +43,6 @@ class MollieOrderBuilder
      * @var OrderDataExtractor
      */
     private $extractor;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
 
     /**
      * @var MollieOrderPriceBuilder
@@ -97,7 +93,6 @@ class MollieOrderBuilder
     /**
      * @param SettingsService $settingsService
      * @param OrderDataExtractor $extractor
-     * @param RouterInterface $router
      * @param MollieOrderPriceBuilder $priceBuilder
      * @param MollieLineItemBuilder $lineItemBuilder
      * @param MollieOrderAddressBuilder $addressBuilder
@@ -109,12 +104,11 @@ class MollieOrderBuilder
      * @param EventDispatcherInterface $eventDispatcher
      * @param RoutingBuilder $routingBuilder
      */
-    public function __construct(SettingsService $settingsService, OrderDataExtractor $extractor, RouterInterface $router, MollieOrderPriceBuilder $priceBuilder, MollieLineItemBuilder $lineItemBuilder, MollieOrderAddressBuilder $addressBuilder, MollieOrderCustomerEnricher $customerEnricher, LoggerInterface $loggerService, MollieShippingLineItemBuilder $shippingLineItemBuilder, VerticalTaxLineItemFixer $verticalTaxLineItemFixer, MollieLineItemHydrator $mollieLineItemHydrator, EventDispatcherInterface $eventDispatcher, RoutingBuilder $routingBuilder)
+    public function __construct(SettingsService $settingsService, OrderDataExtractor $extractor, MollieOrderPriceBuilder $priceBuilder, MollieLineItemBuilder $lineItemBuilder, MollieOrderAddressBuilder $addressBuilder, MollieOrderCustomerEnricher $customerEnricher, LoggerInterface $loggerService, MollieShippingLineItemBuilder $shippingLineItemBuilder, VerticalTaxLineItemFixer $verticalTaxLineItemFixer, MollieLineItemHydrator $mollieLineItemHydrator, EventDispatcherInterface $eventDispatcher, RoutingBuilder $routingBuilder)
     {
         $this->settingsService = $settingsService;
         $this->logger = $loggerService;
         $this->extractor = $extractor;
-        $this->router = $router;
         $this->priceBuilder = $priceBuilder;
         $this->lineItemBuilder = $lineItemBuilder;
         $this->addressBuilder = $addressBuilder;
@@ -133,9 +127,9 @@ class MollieOrderBuilder
      * @param string $paymentMethod
      * @param SalesChannelContext $salesChannelContext
      * @param null|PaymentHandler $handler
-     * @param array $paymentData
+     * @param array<mixed> $paymentData
      * @throws \Exception
-     * @return array
+     * @return array<mixed>
      */
     public function build(OrderEntity $order, string $transactionId, string $paymentMethod, SalesChannelContext $salesChannelContext, ?PaymentHandler $handler, array $paymentData = []): array
     {
@@ -155,13 +149,16 @@ class MollieOrderBuilder
         $orderData['payment'] = $paymentData;
 
         // create urls
-        $redirectUrl = $this->urlBuilder->buildRedirectURL($transactionId);
-        $orderData['redirectUrl'] = $redirectUrl;
+        $orderData['redirectUrl'] = $this->urlBuilder->buildReturnUrl($transactionId);
 
         $webhookUrl = $this->urlBuilder->buildWebhookURL($transactionId);
         $orderData['webhookUrl'] = $webhookUrl;
         $orderData['payment']['webhookUrl'] = $webhookUrl;
-        if ($this->isSubscriptions($order->getLineItems())) {
+
+
+        $lineItems = $order->getLineItems();
+
+        if ($lineItems instanceof OrderLineItemCollection && $this->isSubscriptions($lineItems->getElements())) {
             $orderData['payment']['sequenceType'] = 'first';
         }
 
@@ -222,7 +219,7 @@ class MollieOrderBuilder
         // enrich data with create customer at mollie
         $orderAttributes = new OrderAttributes($order);
 
-        if ($orderAttributes->isTypeSubscription() ||$settings->createCustomersAtMollie()) {
+        if ($orderAttributes->isTypeSubscription() || $settings->createCustomersAtMollie()) {
             $orderData = $this->customerEnricher->enrich($orderData, $customer, $settings, $salesChannelContext);
         }
 
@@ -253,7 +250,7 @@ class MollieOrderBuilder
         # now check if we have metadata
         # and add it to our order if existing
         if (!empty($event->getMetadata())) {
-            $orderData['metadata'] = json_encode($event->getMetadata());
+            $orderData['metadata'] = (string)json_encode($event->getMetadata());
         }
 
         return $orderData;
@@ -275,7 +272,7 @@ class MollieOrderBuilder
     }
 
     /**
-     * @param $lines
+     * @param array<mixed> $lines
      * @return bool
      */
     private function isSubscriptions($lines): bool

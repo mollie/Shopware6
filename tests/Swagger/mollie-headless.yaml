@@ -281,11 +281,11 @@ paths:
         "200":
           description: "successful operation"
 
-  /store-api/mollie/applepay/start-payment:
+  /store-api/mollie/applepay/pay:
     post:
       tags:
         - "Apple Pay Direct"
-      summary: "Use this to start the payment process after getting the Apple Pay payment token and customer data"
+      summary: "Use this to create an order and start the payment process after getting the Apple Pay payment token and customer data"
       security:
         - AccessKey: [ ]
         - AccessToken: [ ]
@@ -311,18 +311,10 @@ paths:
                   default: ""
                 paymentToken:
                   default: ""
-      responses:
-        "200":
-          description: "successful operation"
-
-  /store-api/mollie/applepay/finish-payment:
-    post:
-      tags:
-        - "Apple Pay Direct"
-      summary: "After the starting did work successfully, call this route to finish the payment"
-      security:
-        - AccessKey: [ ]
-        - AccessToken: [ ]
+                finishUrl:
+                  default: ""
+                errorUrl:
+                  default: ""
       responses:
         "200":
           description: "successful operation"
@@ -335,6 +327,45 @@ paths:
       security:
         - AccessKey: [ ]
         - AccessToken: [ ]
+      responses:
+        "200":
+          description: "successful operation"
+
+
+
+  /api/mollie/webhook/{transactionId}:
+    post:
+      tags:
+        - "Webhooks"
+      summary: "Sends a payment status update webhook to Shopware"
+      parameters:
+        - in: "path"
+          name: "transactionId"
+          description: "ID of the Shopware Transaction that will be updated"
+          required: true
+      responses:
+        "200":
+          description: "successful operation"
+
+  /api/mollie/webhook/subscription/{subscriptionId}/renew:
+    post:
+      tags:
+        - "Webhooks"
+      summary: "Sends a subscription renewal webhook to Shopware"
+      parameters:
+        - in: "path"
+          name: "subscriptionId"
+          description: "ID of the Shopware Subscription that should be renewed"
+          required: true
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: "The matching transaction ID of Mollie that was captured. tr_xyz, ..."
       responses:
         "200":
           description: "successful operation"

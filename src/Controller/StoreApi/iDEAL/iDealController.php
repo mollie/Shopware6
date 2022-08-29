@@ -13,7 +13,6 @@ use Shopware\Core\System\SalesChannel\StoreApiResponse;
 use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\Routing\Annotation\Route;
 
-
 /**
  * @RouteScope(scopes={"store-api"})
  */
@@ -77,12 +76,11 @@ class iDealController
      * @param string $customerId
      * @param string $issuerId
      * @param SalesChannelContext $context
-     * @return StoreApiResponse
      * @throws \Exception
+     * @return StoreApiResponse
      */
     public function saveIssuer(string $customerId, string $issuerId, SalesChannelContext $context): StoreApiResponse
     {
-        /** @var CustomerEntity $customer */
         $customer = $this->customerService->getCustomer($customerId, $context->getContext());
 
         if (!$customer instanceof CustomerEntity) {
@@ -97,5 +95,4 @@ class iDealController
 
         return new StoreIssuerResponse($result !== null);
     }
-
 }

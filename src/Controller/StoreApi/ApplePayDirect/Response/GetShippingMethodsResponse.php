@@ -2,10 +2,8 @@
 
 namespace Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Response;
 
-
 use Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Structs\ShippingMethodsStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
-
 
 class GetShippingMethodsResponse extends StoreApiResponse
 {
@@ -17,7 +15,7 @@ class GetShippingMethodsResponse extends StoreApiResponse
 
 
     /**
-     * @param array $shippingMethods
+     * @param array<mixed> $shippingMethods
      */
     public function __construct(array $shippingMethods)
     {
@@ -28,5 +26,4 @@ class GetShippingMethodsResponse extends StoreApiResponse
 
         parent::__construct($this->object);
     }
-
 }

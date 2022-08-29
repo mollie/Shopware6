@@ -1,11 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Storefront\Controller;
+namespace Kiener\MolliePayments\Controller\Storefront;
 
 use Kiener\MolliePayments\Components\Subscription\Page\Account\SubscriptionPageLoader;
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
-use Kiener\MolliePayments\Page\Account\Mollie\AccountSubscriptionsPageLoader;
-use Kiener\MolliePayments\Service\Subscription\CancelSubscriptionsService;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Routing\Annotation\LoginRequired;
@@ -70,7 +68,7 @@ class AccountController extends StorefrontController
 
     /**
      * @LoginRequired()
-     * @Route("/account/mollie/subscriptions/{subscriptionId}/billing/update", name="frontend.account.mollie.subscriptions.billing.update", methods={"POST"})
+     * @Route("/account/mollie/subscriptions/{swSubscriptionId}/billing/update", name="frontend.account.mollie.subscriptions.billing.update", methods={"POST"})
      *
      * @param string $subscriptionId
      * @param RequestDataBag $data

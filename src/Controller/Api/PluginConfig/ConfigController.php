@@ -44,9 +44,9 @@ class ConfigController extends AbstractController
      * @param SnippetFinderInterface $snippetFinder
      */
     public function __construct(
-        SettingsService $settings,
+        SettingsService        $settings,
         SnippetFinderInterface $snippetFinder,
-        ApiKeyValidator $apiKeyValidator
+        ApiKeyValidator        $apiKeyValidator
     ) {
         $this->settings = $settings;
         $this->snippetFinder = $snippetFinder;
@@ -142,7 +142,6 @@ class ConfigController extends AbstractController
      */
     private function testApiKeysAction(string $liveApiKey, string $testApiKey): JsonResponse
     {
-        /** @var array $keys */
         $keys = [
             [
                 'key' => $liveApiKey,
@@ -154,7 +153,6 @@ class ConfigController extends AbstractController
             ]
         ];
 
-        /** @var array $results */
         $results = [];
 
         foreach ($keys as $key) {

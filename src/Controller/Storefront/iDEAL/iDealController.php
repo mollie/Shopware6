@@ -52,18 +52,19 @@ class iDealController extends StorefrontController
         $customer = $this->customerService->getCustomer($customerId, $context->getContext());
 
         if ($customer instanceof CustomerEntity) {
-            $result = $this->customerService->setIDealIssuer(
+            $writtenEvent = $this->customerService->setIDealIssuer(
                 $customer,
                 $issuerId,
                 $context->getContext()
             );
+
+            $result = $writtenEvent->getErrors();
         }
 
         return new JsonResponse([
             'success' => (bool)$result,
             'customerId' => $customerId,
-            'result' => $result->getErrors()
+            'result' => $result,
         ]);
     }
-
 }

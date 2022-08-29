@@ -1,8 +1,7 @@
 <?php declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service\WebhookBuilder;
+namespace MolliePayments\Tests\Service\Routing;
 
-use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
 use MolliePayments\Tests\Fakes\FakePluginSettings;
 use Kiener\MolliePayments\Service\MolliePaymentExtractor;
 use Kiener\MolliePayments\Service\Router\RoutingBuilder;
@@ -13,10 +12,11 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionColl
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Uuid\Uuid;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 
-class WebhookBuilderTest extends TestCase
+class RoutingBuilderTest extends TestCase
 {
 
     /**
@@ -41,10 +41,7 @@ class WebhookBuilderTest extends TestCase
      */
     public function testRouterIsUsed(): void
     {
-        $fakeRouter = new FakeRouter('https://local.mollie.shop/notify/123');
-        $builder = new RoutingBuilder($fakeRouter, new RoutingDetector(new RequestStack()));
-        $builder = new WebhookBuilder($fakeRouter, new FakePluginSettings(''));
-
+        $builder = $this->createBuilder('https://local.mollie.shop/notify/123', '');
 
         $url = $builder->buildWebhookURL('-');
 
@@ -62,15 +59,25 @@ class WebhookBuilderTest extends TestCase
         # prepare our fake server data
         # assign a current domain to replace.
         # also configure our environment variable
-        $fakeSettings = new FakePluginSettings('123.eu.ngrok.io');
-
-        $fakeRouter = new FakeRouter('https://local.mollie.shop/notify/123');
-        $builder = new WebhookBuilder($fakeRouter, $fakeSettings);
-        $builder = new RoutingBuilder($fakeRouter, new RoutingDetector(new RequestStack()));
+        $builder = $this->createBuilder('https://local.mollie.shop/notify/123', '123.eu.ngrok.io');
 
         $url = $builder->buildWebhookURL('-');
 
         $this->assertEquals('https://123.eu.ngrok.io/notify/123', $url);
+    }
+
+
+    /**
+     * @param string $fakeURL
+     * @param string $fakeEnvDomain
+     * @return RoutingBuilder
+     */
+    private function createBuilder(string $fakeURL, string $fakeEnvDomain): RoutingBuilder
+    {
+        $fakeRouter = new FakeRouter($fakeURL);
+        $routingDetector = new RoutingDetector(new RequestStack(new Request()));
+
+        return new RoutingBuilder($fakeRouter, $routingDetector, new FakePluginSettings($fakeEnvDomain));
     }
 
 }

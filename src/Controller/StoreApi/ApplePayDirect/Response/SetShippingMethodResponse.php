@@ -25,5 +25,4 @@ class SetShippingMethodResponse extends StoreApiResponse
 
         parent::__construct($this->object);
     }
-
 }

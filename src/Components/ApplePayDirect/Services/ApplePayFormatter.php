@@ -2,11 +2,9 @@
 
 namespace Kiener\MolliePayments\Components\ApplePayDirect\Services;
 
-
 use Kiener\MolliePayments\Components\ApplePayDirect\Models\ApplePayCart;
 use Kiener\MolliePayments\Components\ApplePayDirect\Models\ApplePayLineItem;
-use Kiener\MolliePayments\Service\ApplePayDirect\Models\ApplePayCart;
-use Kiener\MolliePayments\Service\ApplePayDirect\Models\ApplePayLineItem;
+use Kiener\MolliePayments\Service\Router\RoutingDetector;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -19,13 +17,19 @@ class ApplePayFormatter
      */
     private $translator;
 
+    /**
+     * @var RoutingDetector
+     */
+    private $routingDetector;
 
     /**
      * @param TranslatorInterface $translator
+     * @param RoutingDetector $routingDetector
      */
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(TranslatorInterface $translator, RoutingDetector $routingDetector)
     {
         $this->translator = $translator;
+        $this->routingDetector = $routingDetector;
     }
 
     /**
@@ -59,8 +63,12 @@ class ApplePayFormatter
     {
         $shopName = $shop->getName();
 
+        # snippets in headless somehow do not work, weird..so let's do a static translation
+        $isStoreApiScope = $this->routingDetector->isStoreApiRoute();
+
         if ($isTestMode) {
-            $shopName .= ' (' . $this->translator->trans('molliePayments.testMode.label') . ')';
+            $snippetTestMode = ($isStoreApiScope) ? 'Test Mode' : $this->translator->trans('molliePayments.testMode.label');
+            $shopName .= ' (' . $snippetTestMode . ')';
         }
 
         # -----------------------------------------------------
@@ -75,8 +83,9 @@ class ApplePayFormatter
         # -----------------------------------------------------
         # SUBTOTAL
         # -----------------------------------------------------
+        $snippetCaptionSubtotal = ($isStoreApiScope) ? 'Subtotal' : $this->translator->trans('molliePayments.payments.applePayDirect.captionSubtotal');
         $data['items'][] = [
-            'label' => $this->translator->trans('molliePayments.payments.applePayDirect.captionSubtotal'),
+            'label' => $snippetCaptionSubtotal,
             'type' => 'final',
             'amount' => $this->prepareFloat($cart->getProductAmount()),
         ];
@@ -96,8 +105,9 @@ class ApplePayFormatter
         # TAXES DATA
         # -----------------------------------------------------
         if ($cart->getTaxes() instanceof ApplePayLineItem) {
+            $snippetCaptionTaxes = ($isStoreApiScope) ? 'Taxes' : $this->translator->trans('molliePayments.payments.applePayDirect.captionTaxes');
             $data['items'][] = [
-                'label' => $this->translator->trans('molliePayments.payments.applePayDirect.captionTaxes'),
+                'label' => $snippetCaptionTaxes,
                 'type' => 'final',
                 'amount' => $this->prepareFloat($cart->getTaxes()->getPrice()),
             ];
@@ -122,12 +132,12 @@ class ApplePayFormatter
      * the value by rounding the number up to the number
      * of decimals we find here!
      *
-     * @param string $value
+     * @param float $value
      * @return float
      */
-    private function prepareFloat(string $value)
+    private function prepareFloat(float $value)
     {
-        $countDecimals = strlen(substr(strrchr($value, "."), 1));
+        $countDecimals = strlen((string)substr((string)strrchr((string)$value, "."), 1));
 
         return round($value, $countDecimals);
     }

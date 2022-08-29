@@ -5,7 +5,6 @@ namespace Kiener\MolliePayments\Controller\StoreApi\CreditCard\Response;
 use Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Structs\SuccessStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
-
 class StoreCardTokenResponse extends StoreApiResponse
 {
 
@@ -27,5 +26,4 @@ class StoreCardTokenResponse extends StoreApiResponse
 
         parent::__construct($this->object);
     }
-
 }

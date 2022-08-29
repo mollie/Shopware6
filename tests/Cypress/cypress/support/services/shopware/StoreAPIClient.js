@@ -13,7 +13,8 @@ export default class StoreAPIClient {
         this.basePath = '';
 
         this.client = axios.create({
-            baseURL: `${Cypress.config('baseUrl')}/store-api`
+            baseURL: `${Cypress.config('baseUrl')}/store-api`,
+            timeout: 10000,
         });
     }
 

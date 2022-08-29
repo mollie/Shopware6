@@ -31,7 +31,6 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
     private $logger;
 
 
-
     /**
      * @param MollieApiFactory $mollieApiFactory
      * @param MollieOrderPriceBuilder $priceFormatter
@@ -48,10 +47,10 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
     /**
      * Returns an array of active payment methods for a given amount in a specific sales channel.
      *
-     * @param Cart $cart
+     * @param float $price
      * @param string $currency
-     * @param array<string> $salesChannelIDs
-     * @return array<Method>
+     * @param array<mixed> $salesChannelIDs
+     * @return Method[]
      */
     public function getActivePaymentMethodsForAmount(float $price, string $currency, array $salesChannelIDs): array
     {
@@ -88,7 +87,6 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
             try {
                 $shopMethods = $this->requestMollieMethods($channelId, $parameters);
 
-                /** @var Method $shopMethod */
                 foreach ($shopMethods as $shopMethod) {
                     $found = false;
 
@@ -121,7 +119,7 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
      * Returns an array of active payment methods for a specific sales channel.
      *
      * @param string $salesChannelId
-     * @param array $parameters
+     * @param array<mixed> $parameters
      * @throws ApiException
      * @return array<Method>
      */

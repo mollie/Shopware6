@@ -1,8 +1,7 @@
 <?php declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Controller\Api;
+namespace Kiener\MolliePayments\Controller\Api\Subscription;
 
-use Kiener\MolliePayments\Components\Subscription\CancelSubscriptionsService;
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
@@ -32,7 +31,6 @@ class SubscriptionController extends AbstractController
     }
 
     /**
-     * @RouteScope(scopes={"api"})
      * @Route("/api/_action/mollie/subscriptions/cancel", defaults={"auth_enabled"=true}, name="api.action.mollie.subscription.cancel", methods={"POST"})
      *
      * @param RequestDataBag $data

@@ -61,8 +61,8 @@ class MollieOrderPaymentFlow
      * @param Order $mollieOrder
      * @param string $salesChannelId
      * @param Context $context
-     * @return bool
      * @throws \Mollie\Api\Exceptions\ApiException
+     * @return bool
      */
     public function process(OrderTransactionEntity $transaction, OrderEntity $order, Order $mollieOrder, string $salesChannelId, Context  $context): bool
     {
@@ -103,7 +103,6 @@ class MollieOrderPaymentFlow
                             'paymentMethodId' => $molliePaymentMethodId
                         ]
                     ],
-
                     $context
                 );
             }

@@ -2,11 +2,12 @@
 
 namespace Kiener\MolliePayments\Components\ApplePayDirect\Services;
 
-
+use Kiener\MolliePayments\Components\ApplePayDirect\Models\ApplePayCart;
 use Kiener\MolliePayments\Service\CartService;
 use Kiener\MolliePayments\Service\ShippingMethodService;
+use Shopware\Core\Checkout\Cart\Cart;
+use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ApplePayShippingBuilder
 {
@@ -31,14 +32,13 @@ class ApplePayShippingBuilder
     /**
      * @param CartService $cartService
      * @param ShippingMethodService $shippingMethodService
-     * @param TranslatorInterface $translator
+     * @param ApplePayFormatter $applePayFormatter
      */
-    public function __construct(CartService $cartService, ShippingMethodService $shippingMethodService, TranslatorInterface $translator)
+    public function __construct(CartService $cartService, ShippingMethodService $shippingMethodService, ApplePayFormatter $applePayFormatter)
     {
         $this->cartService = $cartService;
         $this->shippingMethods = $shippingMethodService;
-
-        $this->formatter = new ApplePayFormatter($translator);
+        $this->formatter = $applePayFormatter;
     }
 
 
@@ -50,27 +50,23 @@ class ApplePayShippingBuilder
     {
         $appleCart = new ApplePayCart();
 
-        /** @var LineItem $item */
         foreach ($cart->getLineItems() as $item) {
-
-            $grossPrice = $item->getPrice()->getUnitPrice();
-
-            $appleCart->addItem(
-                $item->getReferencedId(),
-                $item->getLabel(),
-                $item->getQuantity(),
-                $grossPrice
-            );
+            if ($item->getPrice() instanceof CalculatedPrice) {
+                $appleCart->addItem(
+                    (string)$item->getReferencedId(),
+                    (string)$item->getLabel(),
+                    $item->getQuantity(),
+                    $item->getPrice()->getUnitPrice()
+                );
+            }
         }
 
-        /** @var Delivery $delivery */
         foreach ($cart->getDeliveries() as $delivery) {
-
             $grossPrice = $delivery->getShippingCosts()->getUnitPrice();
 
             if ($grossPrice > 0) {
                 $appleCart->addShipping(
-                    $delivery->getShippingMethod()->getName(),
+                    (string)$delivery->getShippingMethod()->getName(),
                     $grossPrice
                 );
             }
@@ -86,7 +82,7 @@ class ApplePayShippingBuilder
     }
 
     /**
-     * @param string $countryCode
+     * @param string $countryID
      * @param SalesChannelContext $context
      * @return array<mixed>
      */
@@ -145,7 +141,7 @@ class ApplePayShippingBuilder
      * @param ApplePayCart $cart
      * @param bool $isTestMode
      * @param SalesChannelContext $context
-     * @return array
+     * @return array<mixed>
      */
     public function format(ApplePayCart $cart, bool $isTestMode, SalesChannelContext $context): array
     {

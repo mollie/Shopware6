@@ -6,6 +6,7 @@ use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Kiener\MolliePayments\Struct\Voucher\VoucherType;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -30,11 +31,11 @@ class VoucherPayment extends PaymentHandler
 
 
     /**
-     * @param array $orderData
+     * @param array<mixed> $orderData
      * @param OrderEntity $orderEntity
      * @param SalesChannelContext $salesChannelContext
      * @param CustomerEntity $customer
-     * @return array
+     * @return array<mixed>
      */
     public function processPaymentMethodSpecificParameters(array $orderData, OrderEntity $orderEntity, SalesChannelContext $salesChannelContext, CustomerEntity $customer): array
     {
@@ -58,15 +59,22 @@ class VoucherPayment extends PaymentHandler
     }
 
     /**
+     *
      * Searches the order line item with the provided ID and tries
      * to find out if any voucherType has been set for that product.
      * Depending on the configuration, a matching category for Mollie will be returned.
+     * @param OrderEntity $orderEntity
+     * @param string $lineItemId
+     * @return string
      */
     private function getProductCategory(OrderEntity $orderEntity, string $lineItemId): string
     {
-        /** @var OrderLineItemEntity $lineItem */
+        if (!$orderEntity->getLineItems() instanceof OrderLineItemCollection) {
+            return '';
+        }
+
         foreach ($orderEntity->getLineItems() as $lineItem) {
-            if (!$lineItem->getId() === $lineItemId) {
+            if ($lineItem->getId() !== $lineItemId) {
                 continue;
             }
 

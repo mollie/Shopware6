@@ -24,8 +24,8 @@ use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Kiener\MolliePayments\Service\OrderService;
+use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 use Kiener\MolliePayments\Service\SettingsService;
-use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
@@ -109,7 +109,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
     private $flowBuilderEventFactory;
 
     /**
-     * @var WebhookBuilder
+     * @var RoutingBuilder
      */
     private $routingBuilder;
 
@@ -141,12 +141,11 @@ class SubscriptionManager implements SubscriptionManagerInterface
      * @param MollieGatewayInterface $gatewayMollie
      * @param SubscriptionRenewing $renewingService
      * @param EntityRepositoryInterface $repoSalesChannel
-     * @param WebhookBuilder $webhookBuilder
      * @param MollieOrderPriceBuilder $priceBuilder
      * @param OrderStatusConverter $statusConverter
      * @param LoggerInterface $logger
      */
-    public function __construct(FlowBuilderFactoryInterface $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionRepository $repoSubscriptions, OrderService $orderService, SettingsService $settingsService, MollieDataBuilder $definitionBuilder, SubscriptionBuilder $subscriptionBuilder, CustomerService $customers, MollieGatewayInterface $gatewayMollie, SubscriptionRenewing $renewingService, EntityRepositoryInterface $repoSalesChannel, WebhookBuilder $webhookBuilder, MollieOrderPriceBuilder $priceBuilder, OrderStatusConverter $statusConverter, LoggerInterface $logger)
+    public function __construct(FlowBuilderFactoryInterface $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionRepository $repoSubscriptions, OrderService $orderService, SettingsService $settingsService, MollieDataBuilder $definitionBuilder, SubscriptionBuilder $subscriptionBuilder, CustomerService $customers, MollieGatewayInterface $gatewayMollie, SubscriptionRenewing $renewingService, EntityRepositoryInterface $repoSalesChannel, RoutingBuilder $routingBuilder, MollieOrderPriceBuilder $priceBuilder, OrderStatusConverter $statusConverter, LoggerInterface $logger)
     {
         $this->pluginSettings = $settingsService;
         $this->repoSubscriptions = $repoSubscriptions;
@@ -157,7 +156,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
         $this->renewingService = $renewingService;
         $this->repoSalesChannel = $repoSalesChannel;
         $this->orderService = $orderService;
-        $this->routingBuilder = $webhookBuilder;
+        $this->routingBuilder = $routingBuilder;
         $this->priceBuilder = $priceBuilder;
         $this->statusConverter = $statusConverter;
         $this->logger = $logger;
@@ -217,10 +216,11 @@ class SubscriptionManager implements SubscriptionManagerInterface
     /**
      * @param OrderEntity $order
      * @param string $mandateId
-     * @param SalesChannelContext $context
+     * @param Context $context
      * @throws CustomerCouldNotBeFoundException
+     * @return void
      */
-    public function confirmSubscription(OrderEntity $order, string $mandateId, SalesChannelContext $context): void
+    public function confirmSubscription(OrderEntity $order, string $mandateId, Context $context): void
     {
         if (!$order->getOrderCustomer() instanceof OrderCustomerEntity) {
             throw new \Exception('Order: ' . $order->getOrderNumber() . ' does not have a linked customer');
@@ -228,7 +228,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
 
         # first get our mollie customer ID from the order.
         # this is required to create a subscription
-        $mollieCustomerId = $this->customerService->getMollieCustomerId((string)$order->getOrderCustomer()->getCustomerId(), $order->getSalesChannelId(), $context->getContext());
+        $mollieCustomerId = $this->customerService->getMollieCustomerId((string)$order->getOrderCustomer()->getCustomerId(), $order->getSalesChannelId(), $context);
 
 
         # switch out client to the correct sales channel
@@ -238,7 +238,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
         # load all pending subscriptions of the order.
         # we will now make sure to create Mollie subscriptions and
         # prepare everything for recurring payments.
-        $pendingSubscriptions = $this->repoSubscriptions->findPendingSubscriptions($order->getId(), $context->getContext());
+        $pendingSubscriptions = $this->repoSubscriptions->findPendingSubscriptions($order->getId(), $context);
 
         # if we have nothing to confirm
         # then just return
@@ -269,11 +269,11 @@ class SubscriptionManager implements SubscriptionManagerInterface
                 (string)$mollieSubscription->id,
                 (string)$mollieSubscription->customerId,
                 (string)$mollieSubscription->nextPaymentDate,
-                $context->getContext()
+                $context
             );
 
             # FLOW BUILDER / BUSINESS EVENTS
-            $event = $this->flowBuilderEventFactory->buildSubscriptionStartedEvent($subscription->getCustomer(), $subscription, $context->getContext());
+            $event = $this->flowBuilderEventFactory->buildSubscriptionStartedEvent($subscription->getCustomer(), $subscription, $context);
             $this->flowBuilderDispatcher->dispatch($event);
         }
     }
@@ -346,13 +346,19 @@ class SubscriptionManager implements SubscriptionManagerInterface
     /**
      * @param string $swSubscriptionId
      * @param string $molliePaymentId
-     * @param SalesChannelContext $context
+     * @param Context $context
      * @throws Exception
      * @return OrderEntity
      */
-    public function renewSubscription(string $swSubscriptionId, string $molliePaymentId, SalesChannelContext $context): OrderEntity
+    public function renewSubscription(string $swSubscriptionId, string $molliePaymentId, Context $context): OrderEntity
     {
-        $swSubscription = $this->repoSubscriptions->findById($swSubscriptionId, $context->getContext());
+        # we need a custom exception here
+        # to avoid errors like "Return value of...not instance of SubscriptionEntity
+        try {
+            $swSubscription = $this->repoSubscriptions->findById($swSubscriptionId, $context);
+        } catch (\Throwable $ex) {
+            throw new Exception('Subscription with ID ' . $swSubscriptionId . ' not found in Shopware');
+        }
 
         # only renew active subscriptions
         # however, if it's the last time, then it's unfortunately already "completed"
@@ -387,7 +393,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
         $this->repoSubscriptions->updateNextPaymentAt(
             $swSubscriptionId,
             (string)$mollieSubscription->nextPaymentDate,
-            $context->getContext()
+            $context
         );
 
         $newOrder = $this->renewingService->renewSubscription($swSubscription, $payment, $context);
@@ -395,13 +401,13 @@ class SubscriptionManager implements SubscriptionManagerInterface
         # --------------------------------------------------------------------------------------------------
         # FLOW BUILDER / BUSINESS EVENTS
 
-        $event = $this->flowBuilderEventFactory->buildSubscriptionRenewedEvent($swSubscription->getCustomer(), $swSubscription, $context->getContext());
+        $event = $this->flowBuilderEventFactory->buildSubscriptionRenewedEvent($swSubscription->getCustomer(), $swSubscription, $context);
         $this->flowBuilderDispatcher->dispatch($event);
 
         # if this was our last renewal, then send out
         # a new event that the subscription has now ended
         if ($mollieSubscription->timesRemaining !== null && $mollieSubscription->timesRemaining <= 0) {
-            $event = $this->flowBuilderEventFactory->buildSubscriptionEndedEvent($swSubscription->getCustomer(), $swSubscription, $context->getContext());
+            $event = $this->flowBuilderEventFactory->buildSubscriptionEndedEvent($swSubscription->getCustomer(), $swSubscription, $context);
             $this->flowBuilderDispatcher->dispatch($event);
         }
 
@@ -625,9 +631,10 @@ class SubscriptionManager implements SubscriptionManagerInterface
 
     /**
      * @param OrderEntity $order
-     * @param SalesChannelContext $context
+     * @param Context $context
+     * @return void
      */
-    public function cancelPendingSubscriptions(OrderEntity $order, SalesChannelContext $context): void
+    public function cancelPendingSubscriptions(OrderEntity $order, Context $context): void
     {
         # does nothing for now, not necessary
         # because it is not even confirmed yet.

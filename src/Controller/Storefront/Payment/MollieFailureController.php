@@ -15,9 +15,7 @@ use Kiener\MolliePayments\Service\Order\OrderStateService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\TransactionService;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
-use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
-use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Order;
 use Psr\Log\LoggerInterface;
@@ -33,7 +31,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\RouterInterface;
-
 
 /**
  * @RouteScope(scopes={"storefront"})
@@ -86,11 +83,6 @@ class MollieFailureController extends StorefrontController
      */
     private $transactionTransitionService;
 
-    /**
-     * @var MollieOrderPaymentFlow
-     */
-    private $molliePaymentFlow;
-
 
     /**
      * @param RouterInterface $router
@@ -102,9 +94,8 @@ class MollieFailureController extends StorefrontController
      * @param TransactionService $transactionService
      * @param LoggerInterface $logger
      * @param TransactionTransitionServiceInterface $transactionTransitionService
-     * @param MollieOrderPaymentFlow $molliePaymentFlow
      */
-    public function __construct(RouterInterface $router, CompatibilityGatewayInterface $compatibilityGateway, MollieApiFactory $apiFactory, BusinessEventDispatcher $eventDispatcher, OrderStateService $orderStateService, SettingsService $settingsService, TransactionService $transactionService, LoggerInterface $logger, TransactionTransitionServiceInterface $transactionTransitionService, MollieOrderPaymentFlow $molliePaymentFlow)
+    public function __construct(RouterInterface $router, CompatibilityGatewayInterface $compatibilityGateway, MollieApiFactory $apiFactory, BusinessEventDispatcher $eventDispatcher, OrderStateService $orderStateService, SettingsService $settingsService, TransactionService $transactionService, LoggerInterface $logger, TransactionTransitionServiceInterface $transactionTransitionService)
     {
         $this->router = $router;
         $this->compatibilityGateway = $compatibilityGateway;
@@ -115,7 +106,6 @@ class MollieFailureController extends StorefrontController
         $this->transactionService = $transactionService;
         $this->logger = $logger;
         $this->transactionTransitionService = $transactionTransitionService;
-        $this->molliePaymentFlow = $molliePaymentFlow;
     }
 
     /**
@@ -123,10 +113,9 @@ class MollieFailureController extends StorefrontController
      *
      * @param SalesChannelContext $salesChannelContext
      * @param string $transactionId
-     * @return Response|null
-     * @param                     $transactionId
      *
      * @throws ApiException
+     * @return null|Response
      * @return RedirectResponse|Response
      */
     public function paymentFailedAction(SalesChannelContext $salesChannelContext, string $transactionId): ?Response
@@ -170,17 +159,15 @@ class MollieFailureController extends StorefrontController
 
         if (empty($mollieOrderId)) {
             $this->logger->critical(sprintf('Could not fetch mollie order id from order with number %s', $order->getOrderNumber()));
-            throw new MissingMollieOrderIdException($order->getOrderNumber());
+            throw new MissingMollieOrderIdException((string)$order->getOrderNumber());
         }
 
         // TODO: Refactor to use Service/MollieApi/Order::getMollieOrder
-        /** @var Order $mollieOrder */
+
         try {
             $apiClient = $this->apiFactory->getClient($this->compatibilityGateway->getSalesChannelID($salesChannelContext));
 
-            $mollieOrder = $apiClient->orders->get($mollieOrderId, [
-                'embed' => 'payments'
-            ]);
+            $mollieOrder = $apiClient->orders->get($mollieOrderId, ['embed' => 'payments']);
         } catch (ApiException $e) {
             $this->logger->critical(sprintf('Could not fetch order at mollie with id %s', $mollieOrderId));
             throw new MollieOrderCouldNotBeFetchedException($mollieOrderId, [], $e);
@@ -188,7 +175,7 @@ class MollieFailureController extends StorefrontController
 
         return $this->returnFailedRedirect(
             $salesChannelContext,
-            $mollieOrder->getCheckoutUrl(),
+            (string)$mollieOrder->getCheckoutUrl(),
             $order,
             $mollieOrder,
             $salesChannelContext->getSalesChannel()->getId()
@@ -201,10 +188,8 @@ class MollieFailureController extends StorefrontController
      *
      * @param SalesChannelContext $context
      * @param string $transactionId
-     * @return Response|RedirectResponse
-     * @param                     $transactionId
      * @throws Exception
-     * @return RedirectResponse|Response
+     * @return RedirectResponse
      */
     public function retry(SalesChannelContext $context, string $transactionId): RedirectResponse
     {
@@ -235,8 +220,6 @@ class MollieFailureController extends StorefrontController
          * Get the order entity from the transaction. With the order entity, we can
          * retrieve the Mollie ID from its custom fields and fetch the payment
          * status from Mollie's Orders API.
-         *
-         * @var OrderEntity $order
          */
         if ($transaction !== null) {
             $order = $transaction->getOrder();
@@ -280,7 +263,7 @@ class MollieFailureController extends StorefrontController
      */
     private function returnFailedRedirect(SalesChannelContext $salesChannelContext, string $redirectUrl, OrderEntity $order, Order $mollieOrder, string $transactionId): Response
     {
-        $orderAttributes = new MollieOrderCustomFieldsStruct($order->getCustomFields());
+        $orderAttributes = new OrderAttributes($order);
 
         $this->logger->info(
             'Payment failed with Mollie failure mode for order ' . $order->getOrderNumber() . ' and Mollie ID: ' . $orderAttributes->getMollieOrderId(),
@@ -307,5 +290,4 @@ class MollieFailureController extends StorefrontController
             'displayUrl' => $redirectUrl,
         ]);
     }
-
 }

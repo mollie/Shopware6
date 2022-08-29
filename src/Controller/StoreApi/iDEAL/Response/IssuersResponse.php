@@ -2,22 +2,20 @@
 
 namespace Kiener\MolliePayments\Controller\StoreApi\iDEAL\Response;
 
-
 use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
-
 
 class IssuersResponse extends StoreApiResponse
 {
 
     /**
-     * @var ArrayStruct
+     * @var ArrayStruct<mixed, mixed>
      */
     protected $object;
 
 
     /**
-     * @param array $issuers
+     * @param array<mixed> $issuers
      */
     public function __construct(array $issuers)
     {
@@ -30,5 +28,4 @@ class IssuersResponse extends StoreApiResponse
 
         parent::__construct($this->object);
     }
-
 }

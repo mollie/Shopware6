@@ -1,11 +1,9 @@
 <?php
 
-namespace Kiener\MolliePayments\Controller\StoreApi\Response;
+namespace Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Response;
 
-use Kiener\MolliePayments\Controller\Routes\ApplePayDirect\Struct\ApplePaySession;
 use Kiener\MolliePayments\Struct\StringStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
-
 
 class CreateSessionResponse extends StoreApiResponse
 {
@@ -28,5 +26,4 @@ class CreateSessionResponse extends StoreApiResponse
 
         parent::__construct($this->object);
     }
-
 }

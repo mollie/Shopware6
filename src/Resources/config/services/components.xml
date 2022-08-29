@@ -43,11 +43,12 @@
         <service id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingBuilder">
             <argument type="service" id="Kiener\MolliePayments\Service\CartService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\ShippingMethodService"/>
-            <argument type="service" id="translator"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayFormatter"/>
         </service>
 
         <service id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayFormatter">
             <argument type="service" id="translator"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Router\RoutingDetector"/>
         </service>
 
         <service id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDomainVerificationService">

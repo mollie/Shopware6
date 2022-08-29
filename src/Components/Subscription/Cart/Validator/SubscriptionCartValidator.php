@@ -18,21 +18,6 @@ class SubscriptionCartValidator implements CartValidatorInterface
 {
 
     /**
-     * @var SettingsService
-     */
-    private $pluginSettings;
-
-
-    /**
-     * @param SettingsService $pluginSettings
-     */
-    public function __construct(SettingsService $pluginSettings)
-    {
-        $this->pluginSettings = $pluginSettings;
-    }
-
-
-    /**
      * @param Cart $cart
      * @param ErrorCollection $errorCollection
      * @param SalesChannelContext $salesChannelContext

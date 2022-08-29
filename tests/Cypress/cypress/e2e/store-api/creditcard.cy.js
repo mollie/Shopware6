@@ -6,10 +6,12 @@ const shopware = new Shopware();
 
 const client = new StoreAPIClient(shopware.getStoreApiToken());
 
+const storeApiPrefix = '/store-api';
 
-context("/mollie/creditcard/store-token", () => {
 
-    it('invalid customer id', () => {
+context(storeApiPrefix +"/mollie/creditcard/store-token", () => {
+
+    it('invalid customer id @core', () => {
 
         const request = new Promise((resolve) => {
             client.post('/mollie/creditcard/store-token/cust-123/tk_123').then(response => {

@@ -4,7 +4,9 @@ import ListingAction from "Actions/storefront/products/ListingAction";
 import Devices from "Services/utils/Devices";
 import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
 import PDPRepository from "Repositories/storefront/products/PDPRepository";
+import StorefrontClient from "Services/shopware/StorefrontClient";
 
+const storefrontClient = new StorefrontClient();
 
 const devices = new Devices();
 const configAction = new ShopConfigurationAction();
@@ -15,13 +17,153 @@ const listing = new ListingAction();
 const repoPDP = new PDPRepository();
 
 
-describe('Apple Pay Direct - Functional', () => {
+describe('Apple Pay Direct - Storefront Routes', () => {
 
-    it('C4084: Domain Verification file has been downloaded @core', () => {
-        cy.request('/.well-known/apple-developer-merchantid-domain-association');
+    describe('Functional', () => {
+
+        it('C4084: Domain Verification file has been downloaded @core', () => {
+            cy.request('/.well-known/apple-developer-merchantid-domain-association');
+        })
+    })
+
+    describe('Routes', () => {
+
+        it('/mollie/apple-pay/available @core', () => {
+
+            const request = new Promise((resolve) => {
+                storefrontClient.get('/mollie/apple-pay/available').then(response => {
+                    resolve({'data': response.data});
+                });
+            })
+
+            cy.wrap(request).its('data').then(data => {
+                cy.wrap(data).its('available').should('exist', true)
+            });
+        })
+
+        it('/mollie/apple-pay/applepay-id @core', () => {
+
+            const request = new Promise((resolve) => {
+                storefrontClient.get('/mollie/apple-pay/applepay-id').then(response => {
+                    resolve({'data': response.data});
+                });
+            })
+
+            cy.wrap(request).its('data').then(data => {
+                cy.wrap(data).its('id').should('not.eq', '')
+            });
+        })
+
+        it('/mollie/apple-pay/add-product without product ID @core', () => {
+
+            const request = new Promise((resolve) => {
+                storefrontClient.post('/mollie/apple-pay/add-product', {}).then(response => {
+                    resolve({'data': response.data.data});
+                });
+            })
+
+            cy.wrap(request).its('data').then(data => {
+                cy.wrap(data).its('success').should('eq', false)
+                cy.wrap(data).its('error').should('contain', 'Please provide a product ID');
+            });
+        })
+
+        it('/mollie/apple-pay/validate without data @core', () => {
+
+            const request = new Promise((resolve) => {
+                storefrontClient.post('/mollie/apple-pay/validate').then(response => {
+                    resolve({'data': response.data.data});
+                });
+            })
+
+            cy.wrap(request).its('data').then(data => {
+                cy.wrap(data).its('success').should('eq', false)
+            });
+        })
+
+        it('/mollie/apple-pay/shipping-methods @core', () => {
+
+            const request = new Promise((resolve) => {
+                storefrontClient.post('/mollie/apple-pay/shipping-methods', {'countryCode': 'DE'}).then(response => {
+                    resolve({'data': response.data});
+                });
+            })
+
+            cy.wrap(request).its('data').then(data => {
+                cy.wrap(data).its('success').should('eq', true)
+                cy.wrap(data).its('shippingmethods').its('length').should('be.gt', 0)
+            });
+        })
+
+        it('/mollie/apple-pay/shipping-methods without country code @core', () => {
+
+            const request = new Promise((resolve) => {
+                storefrontClient.post('/mollie/apple-pay/shipping-methods', {}).then(response => {
+                    resolve({'data': response.data.data});
+                });
+            })
+
+            cy.wrap(request).its('data').then(data => {
+                cy.wrap(data).its('success').should('eq', false)
+                cy.wrap(data).its('error').should('contain', 'No Country Code provided');
+            });
+        })
+
+        it('/mollie/apple-pay/set-shipping without identifier @core', () => {
+
+            const request = new Promise((resolve) => {
+                storefrontClient.post('/mollie/apple-pay/set-shipping').then(response => {
+                    resolve({'data': response.data.data});
+                });
+            })
+
+            cy.wrap(request).its('data').then(data => {
+                cy.wrap(data).its('success').should('eq', false)
+                cy.wrap(data).its('error').should('contain', 'Please provide a Shipping Method identifier');
+            });
+        })
+
+        it('/mollie/apple-pay/start-payment redirects to cart with invalid data @core', () => {
+
+            const request = new Promise((resolve) => {
+                storefrontClient.post('/mollie/apple-pay/start-payment').then(response => {
+                    console.log(response);
+                    resolve({'data': response});
+                });
+            })
+
+            cy.wrap(request).its('data').then(data => {
+                cy.wrap(data).its('request.responseURL').should('contain', '/checkout/cart');
+            });
+        })
+
+        it('/mollie/apple-pay/finish-payment redirects to cart with invalid data @core', () => {
+
+            const request = new Promise((resolve) => {
+                storefrontClient.get('/mollie/apple-pay/finish-payment').then(response => {
+                    resolve({'data': response});
+                });
+            })
+
+            cy.wrap(request).its('data').then(data => {
+                cy.wrap(data).its('request.responseURL').should('contain', '/checkout/cart');
+            });
+        })
+
+        it('/mollie/apple-pay/restore-cart @core', () => {
+
+            const request = new Promise((resolve) => {
+                storefrontClient.post('/mollie/apple-pay/restore-cart').then(response => {
+                    resolve({'data': response.data});
+                });
+            })
+
+            cy.wrap(request).its('data').then(data => {
+                cy.wrap(data).its('success').should('eq', true)
+            });
+        })
     })
 })
-
 
 describe('Apple Pay Direct - UI Tests', () => {
 

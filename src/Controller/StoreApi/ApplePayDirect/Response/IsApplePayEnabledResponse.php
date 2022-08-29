@@ -5,7 +5,6 @@ namespace Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Response;
 use Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Structs\EnabledStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
-
 class IsApplePayEnabledResponse extends StoreApiResponse
 {
 
@@ -27,5 +26,4 @@ class IsApplePayEnabledResponse extends StoreApiResponse
 
         parent::__construct($this->object);
     }
-
 }

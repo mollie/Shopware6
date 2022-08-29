@@ -14,31 +14,27 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class CustomFieldService
 {
-    public const CUSTOM_FIELDS_KEY = 'customFields';
     public const CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS = 'mollie_payments';
 
-    /** @var ContainerInterface */
-    private $container;
-
-    /** @var EntityRepositoryInterface */
-    private $customFieldSetRepository;
 
     /**
-     * CustomFieldService constructor.
-     *
-     * @param ContainerInterface $container
-     * @param EntityRepositoryInterface $customFieldSetRepository
-     * @param LoggerInterface $logger
+     * @var EntityRepositoryInterface
      */
-    public function __construct(
-        $container,
-        EntityRepositoryInterface $customFieldSetRepository
-    ) {
-        $this->container = $container;
+    private $customFieldSetRepository;
+
+
+    /**
+     * @param EntityRepositoryInterface $customFieldSetRepository
+     */
+    public function __construct(EntityRepositoryInterface $customFieldSetRepository)
+    {
         $this->customFieldSetRepository = $customFieldSetRepository;
     }
 
-    public function addCustomFields(Context $context)
+    /**
+     * @param Context $context
+     */
+    public function addCustomFields(Context $context): void
     {
         try {
             $mollieOrderFieldId = Uuid::randomHex();

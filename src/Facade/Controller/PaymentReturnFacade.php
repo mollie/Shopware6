@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Facade\Controller;
 
-
 use Kiener\MolliePayments\Event\PaymentPageRedirectEvent;
 use Kiener\MolliePayments\Exception\CouldNotFetchTransactionException;
 use Kiener\MolliePayments\Exception\MissingMollieOrderIdException;
@@ -12,7 +11,7 @@ use Kiener\MolliePayments\Service\MollieApi\Order as MollieServiceOrder;
 use Kiener\MolliePayments\Service\Router\RoutingDetector;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\TransactionService;
-use Kiener\MolliePayments\Struct\MollieOrderCustomFieldsStruct;
+use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Mollie\Api\Resources\Order;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
@@ -93,8 +92,8 @@ class PaymentReturnFacade
     /**
      * @param string $transactionId
      * @param Context $context
-     * @return Response|null
      * @throws \Mollie\Api\Exceptions\ApiException
+     * @return null|Response
      */
     public function returnAction(string $transactionId, Context $context): ?Response
     {
@@ -117,17 +116,13 @@ class PaymentReturnFacade
             throw new MissingOrderInTransactionException($transactionId);
         }
 
-        $swOrderCustomFields = $swOrder->getCustomFields() ?? [];
 
-        $orderAttributes = new MollieOrderCustomFieldsStruct($swOrderCustomFields);
+        $orderAttributes = new OrderAttributes($swOrder);
 
         $this->logger->debug('Customer is returning to Shopware for order: ' . $swOrder->getOrderNumber() . ' and Mollie ID: ' . $orderAttributes->getMollieOrderId());
 
 
-        // TODO: Possibly refactor to use Service/OrderService::getMollieOrderId
-        $customFields = new MollieOrderCustomFieldsStruct($swOrderCustomFields);
-
-        $mollieOrderId = $customFields->getMollieOrderId();
+        $mollieOrderId = $orderAttributes->getMollieOrderId();
 
         if (empty($mollieOrderId)) {
             $this->logger->critical(sprintf('Could not fetch mollie order id from order with number %s', $swOrder->getOrderNumber()));
@@ -143,7 +138,6 @@ class PaymentReturnFacade
 
 
         try {
-
             $mollieOrder = $this->orders->getMollieOrder(
                 $mollieOrderId,
                 $salesChannelId,
@@ -151,7 +145,6 @@ class PaymentReturnFacade
                     'embed' => 'payments'
                 ]
             );
-
         } catch (\Exception $e) {
             $this->logger->critical(sprintf('Could not fetch order at mollie with id %s', $mollieOrderId));
             throw $e;
@@ -167,9 +160,8 @@ class PaymentReturnFacade
         $useShopwareDefault = ($this->routingDetector->isAdminApiRoute() || $settings->isShopwareStandardFailureMode());
 
         if ($useShopwareDefault) {
-
             return $this->navigateShopwareStandardRoute(
-                (string)$customFields->getTransactionReturnUrl(),
+                (string)$orderAttributes->getTransactionReturnUrl(),
                 $swOrder,
                 $mollieOrder,
                 $salesChannelId,
@@ -186,7 +178,7 @@ class PaymentReturnFacade
 
         if ($success) {
             return $this->navigateShopwareStandardRoute(
-                (string)$customFields->getTransactionReturnUrl(),
+                (string)$orderAttributes->getTransactionReturnUrl(),
                 $swOrder,
                 $mollieOrder,
                 $salesChannelId,
@@ -238,5 +230,4 @@ class PaymentReturnFacade
 
         return new RedirectResponse($redirectUrl);
     }
-
 }

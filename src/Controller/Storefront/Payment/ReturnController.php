@@ -10,7 +10,6 @@ use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-
 /**
  * @RouteScope(scopes={"storefront"})
  */
@@ -32,16 +31,15 @@ class ReturnController extends StorefrontController
     }
 
     /**
-     * @Route("/mollie/payment/{transactionId}", defaults={"csrf_protected"=false}, name="frontend.mollie.payment", options={"seo"="false"}, methods={"GET", "POST"})
+     * @Route("/mollie/payment/{swTransactionId}", defaults={"csrf_protected"=false}, name="frontend.mollie.payment", options={"seo"="false"}, methods={"GET", "POST"})
      *
      * @param SalesChannelContext $salesChannelContext
-     * @param string $transactionId
-     * @return Response|null
+     * @param string $swTransactionId
      * @throws ApiException
+     * @return null|Response
      */
-    public function payment(SalesChannelContext $salesChannelContext, string $transactionId): ?Response
+    public function payment(SalesChannelContext $salesChannelContext, string $swTransactionId): ?Response
     {
-        return $this->returnFacade->returnAction($transactionId, $salesChannelContext->getContext());
+        return $this->returnFacade->returnAction($swTransactionId, $salesChannelContext->getContext());
     }
-
 }

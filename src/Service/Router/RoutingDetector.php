@@ -6,7 +6,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 
-
 class RoutingDetector
 {
 
@@ -57,4 +56,11 @@ class RoutingDetector
         return $isStoreApi;
     }
 
+    /**
+     * @return bool
+     */
+    public function isStorefrontRoute(): bool
+    {
+        return (!$this->isAdminApiRoute() && !$this->isStoreApiRoute());
+    }
 }

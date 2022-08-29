@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Structs;
 
 use Shopware\Core\Framework\Struct\Struct;
 
-
 class ShippingMethodsStruct extends Struct
 {
 
@@ -21,7 +20,7 @@ class ShippingMethodsStruct extends Struct
 
 
     /**
-     * @param array $shippingMethods
+     * @param array<mixed> $shippingMethods
      * @param string $apiAlias
      */
     public function __construct(array $shippingMethods, string $apiAlias)
@@ -37,5 +36,4 @@ class ShippingMethodsStruct extends Struct
     {
         return $this->apiAlias;
     }
-
 }

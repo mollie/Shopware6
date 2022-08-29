@@ -7,8 +7,10 @@ const shopware = new Shopware();
 
 const client = new StoreAPIClient(shopware.getStoreApiToken());
 
+const storeApiPrefix = '/store-api';
 
-context("/mollie/ideal/issuers", () => {
+
+context(storeApiPrefix +"/mollie/ideal/issuers", () => {
 
     it('fetch issuers', () => {
 
@@ -26,9 +28,9 @@ context("/mollie/ideal/issuers", () => {
 
 })
 
-context("/mollie/ideal/store-issuer", () => {
+context(storeApiPrefix +"/mollie/ideal/store-issuer", () => {
 
-    it('invalid customer id', () => {
+    it('invalid customer id @core', () => {
 
         const request = new Promise((resolve) => {
             client.post('/mollie/ideal/store-issuer/cust-123/ideal_ABNANL2A').then(response => {

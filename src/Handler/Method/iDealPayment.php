@@ -17,12 +17,16 @@ class iDealPayment extends PaymentHandler
     /** @var string */
     protected $paymentMethod = self::PAYMENT_METHOD_NAME;
 
-    public function processPaymentMethodSpecificParameters(
-        array $orderData,
-        OrderEntity $orderEntity,
-        SalesChannelContext $salesChannelContext,
-        CustomerEntity $customer
-    ): array {
+
+    /**
+     * @param array<mixed> $orderData
+     * @param OrderEntity $orderEntity
+     * @param SalesChannelContext $salesChannelContext
+     * @param CustomerEntity $customer
+     * @return array<mixed>
+     */
+    public function processPaymentMethodSpecificParameters(array $orderData, OrderEntity $orderEntity, SalesChannelContext $salesChannelContext, CustomerEntity $customer): array
+    {
         $customFields = $customer->getCustomFields() ?? [];
 
         $issuer = $customFields['mollie_payments']['preferred_ideal_issuer'] ?? '';

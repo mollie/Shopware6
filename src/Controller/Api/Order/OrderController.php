@@ -21,7 +21,7 @@ class OrderController extends AbstractController
 
     public function __construct(
         OrderService $orderService,
-        Order $mollieOrderService
+        Order        $mollieOrderService
     ) {
         $this->orderService = $orderService;
         $this->mollieOrderService = $mollieOrderService;
@@ -63,7 +63,9 @@ class OrderController extends AbstractController
     {
         $order = $this->orderService->getOrder($orderId, $context);
 
-        $mollieOrderId = $order->getCustomFields()['mollie_payments']['order_id'] ?? null;
+        $customFields = $order->getCustomFields();
+
+        $mollieOrderId = ($customFields !== null && isset($customFields['mollie_payments']['order_id'])) ? $customFields['mollie_payments']['order_id'] : null;
 
         if (is_null($mollieOrderId)) {
             return $this->json([], 404);

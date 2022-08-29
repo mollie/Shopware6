@@ -22,14 +22,15 @@ use Kiener\MolliePayments\Service\ShopService;
 use Mollie\Api\Exceptions\ApiException;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
+use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Framework\Validation\DataBag\DataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-
 
 class ApplePayDirect
 {
@@ -151,8 +152,8 @@ class ApplePayDirect
 
     /**
      * @param SalesChannelContext $context
-     * @return string
      * @throws \Exception
+     * @return string
      */
     public function getActiveApplePayID(SalesChannelContext $context): string
     {
@@ -161,20 +162,19 @@ class ApplePayDirect
 
     /**
      * @param SalesChannelContext $context
-     * @return bool
      * @throws \Exception
+     * @return bool
      */
     public function isApplePayDirectEnabled(SalesChannelContext $context): bool
     {
         $settings = $this->pluginSettings->getSettings($context->getSalesChannel()->getId());
 
-        /** @var array|null $salesChannelPaymentIDs */
+        /** @var null|array<mixed> $salesChannelPaymentIDs */
         $salesChannelPaymentIDs = $context->getSalesChannel()->getPaymentMethodIds();
 
         $enabled = false;
 
         if (is_array($salesChannelPaymentIDs) && $settings->isEnableApplePayDirect()) {
-
             $applePayMethodID = $this->repoPaymentMethods->getActiveApplePayID($context->getContext());
 
             foreach ($salesChannelPaymentIDs as $tempID) {
@@ -224,8 +224,8 @@ class ApplePayDirect
      * @param string $productId
      * @param int $quantity
      * @param SalesChannelContext $context
-     * @return Cart
      * @throws \Exception
+     * @return Cart
      */
     public function addProduct(string $productId, int $quantity, SalesChannelContext $context): Cart
     {
@@ -263,8 +263,8 @@ class ApplePayDirect
     /**
      * @param string $validationURL
      * @param SalesChannelContext $context
-     * @return string
      * @throws ApiException
+     * @return string
      */
     public function createPaymentSession(string $validationURL, SalesChannelContext $context): string
     {
@@ -279,20 +279,23 @@ class ApplePayDirect
         # the rest will be done with our test API key (if test mode active), or also Live API key (no test mode)
         $liveClient = $this->mollieApiFactory->getLiveClient($context->getSalesChannel()->getId());
 
-        return $liveClient->wallets->requestApplePayPaymentSession($domain, $validationURL);
+        /** @var null|string $session */
+        $session = $liveClient->wallets->requestApplePayPaymentSession($domain, $validationURL);
+
+        return (string)$session;
     }
 
     /**
      * @param string $countryCode
      * @param SalesChannelContext $context
-     * @return array<mixed>
      * @throws \Exception
+     * @return array<mixed>
      */
     public function getShippingMethods(string $countryCode, SalesChannelContext $context): array
     {
         $currentMethodID = $context->getShippingMethod()->getId();
 
-        $countryID = $this->customerService->getCountryId($countryCode, $context->getContext());
+        $countryID = (string)$this->customerService->getCountryId($countryCode, $context->getContext());
 
         # get all available shipping methods of
         # our current country for Apple Pay
@@ -328,8 +331,9 @@ class ApplePayDirect
      * @param string $paymentToken
      * @param SalesChannelContext $context
      * @throws \Exception
+     * @return SalesChannelContext
      */
-    public function prepareCustomer(string $firstname, string $lastname, string $email, string $street, string $zipcode, string $city, string $countryCode, string $paymentToken, SalesChannelContext $context): void
+    public function prepareCustomer(string $firstname, string $lastname, string $email, string $street, string $zipcode, string $city, string $countryCode, string $paymentToken, SalesChannelContext $context): SalesChannelContext
     {
         if (empty($paymentToken)) {
             throw new \Exception('PaymentToken not found!');
@@ -347,7 +351,6 @@ class ApplePayDirect
         # if we are not logged in,
         # then we have to create a new guest customer for our express order
         if (!$this->customerService->isCustomerLoggedIn($context)) {
-
             $customer = $this->customerService->createApplePayDirectCustomer(
                 $firstname,
                 $lastname,
@@ -372,7 +375,7 @@ class ApplePayDirect
         }
 
         # also (always) update our payment method to use Apple Pay for our cart
-        $this->cartService->updatePaymentMethod($context, $applePayID);
+        return $this->cartService->updatePaymentMethod($context, $applePayID);
     }
 
     /**
@@ -403,30 +406,32 @@ class ApplePayDirect
      * @param string $countryCode
      * @param string $paymentToken
      * @param SalesChannelContext $context
-     * @return string
      * @throws ApiException
+     * @return string
      */
     public function createPayment(OrderEntity $order, string $shopwareReturnUrl, string $firstname, string $lastname, string $street, string $zipcode, string $city, string $countryCode, string $paymentToken, SalesChannelContext $context): string
     {
         # immediately try to get the country of the buyer.
         # maybe this could lead to an exception if that country is not possible.
         # that's why we do it within these first steps.
-        $countryID = $this->customerService->getCountryId($countryCode, $context->getContext());
+        $countryID = (string)$this->customerService->getCountryId($countryCode, $context->getContext());
 
 
         # always make sure to use the correct address from Apple Pay
         # and never the one from the customer (if already existing)
-        foreach ($order->getAddresses() as $address) {
-            $this->repoOrderAdresses->updateAddress(
-                $address->getId(),
-                $firstname,
-                $lastname,
-                $street,
-                $zipcode,
-                $city,
-                $countryID,
-                $context->getContext()
-            );
+        if ($order->getAddresses() instanceof OrderAddressCollection) {
+            foreach ($order->getAddresses() as $address) {
+                $this->repoOrderAdresses->updateAddress(
+                    $address->getId(),
+                    $firstname,
+                    $lastname,
+                    $street,
+                    $zipcode,
+                    $city,
+                    $countryID,
+                    $context->getContext()
+                );
+            }
         }
 
 
@@ -451,7 +456,7 @@ class ApplePayDirect
         $paymentData = $this->molliePayments->startMolliePayment(ApplePayPayment::PAYMENT_METHOD_NAME, $asyncPaymentTransition, $context, $this->paymentHandler);
 
         if (empty($paymentData->getCheckoutURL())) {
-            throw new \Exception('Error when creating Apple Pay order in Mollie');
+            throw new \Exception('Error when creating Apple Pay Direct order in Mollie');
         }
 
 
@@ -461,7 +466,7 @@ class ApplePayDirect
         $this->orderService->updateMollieDataCustomFields($order, $paymentData->getMollieID(), $transaction->getId(), $context);
 
 
-        return $shopwareReturnUrl;
+        return $paymentData->getMollieID();
     }
 
     /**
@@ -473,24 +478,20 @@ class ApplePayDirect
         $appleCart = new ApplePayCart();
 
         foreach ($cart->getLineItems() as $item) {
-
-            $grossPrice = $item->getPrice()->getUnitPrice();
-
-            $appleCart->addItem(
-                $item->getReferencedId(),
-                $item->getLabel(),
-                $item->getQuantity(),
-                $grossPrice
-            );
+            if ($item->getPrice() instanceof CalculatedPrice) {
+                $appleCart->addItem(
+                    (string)$item->getReferencedId(),
+                    (string)$item->getLabel(),
+                    $item->getQuantity(),
+                    $item->getPrice()->getUnitPrice()
+                );
+            }
         }
 
         foreach ($cart->getDeliveries() as $delivery) {
-
-            $grossPrice = $delivery->getShippingCosts()->getUnitPrice();
-
             $appleCart->addShipping(
-                $delivery->getShippingMethod()->getName(),
-                $grossPrice
+                (string)$delivery->getShippingMethod()->getName(),
+                $delivery->getShippingCosts()->getUnitPrice()
             );
         }
 
@@ -502,5 +503,4 @@ class ApplePayDirect
 
         return $appleCart;
     }
-
 }

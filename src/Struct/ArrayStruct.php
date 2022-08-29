@@ -2,9 +2,7 @@
 
 namespace Kiener\MolliePayments\Struct;
 
-
 use Shopware\Core\Framework\Struct\Struct;
-
 
 class ArrayStruct extends Struct
 {
@@ -52,5 +50,4 @@ class ArrayStruct extends Struct
     {
         return $this->apiAlias;
     }
-
 }

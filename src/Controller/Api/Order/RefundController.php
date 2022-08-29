@@ -168,7 +168,6 @@ class RefundController extends AbstractController
         $amount = $data->get('amount', null);
         $items = [];
 
-        /** @var RequestDataBag $items */
         $itemsBag = $data->get('items', []);
 
         if ($itemsBag instanceof RequestDataBag) {
@@ -334,7 +333,7 @@ class RefundController extends AbstractController
      * @param string $orderNumber
      * @param string $description
      * @param null|float $amount
-     * @param array $items
+     * @param array<mixed> $items
      * @param Context $context
      * @return JsonResponse
      */
@@ -353,7 +352,7 @@ class RefundController extends AbstractController
 
 
             $refundRequest = new RefundRequest(
-                $order->getOrderNumber(),
+                (string)$order->getOrderNumber(),
                 $description,
                 $amount
             );

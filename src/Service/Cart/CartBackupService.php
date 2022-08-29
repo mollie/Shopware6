@@ -75,7 +75,7 @@ class CartBackupService
 
         # create a new "old" original cart (to avoid foreign reference problems)
         # and set the items from our backup
-        $newCart = $this->cartService->createNew($context->getToken(), $context->getSalesChannel()->getName());
+        $newCart = $this->cartService->createNew($context->getToken(), (string)$context->getSalesChannel()->getName());
         $newCart->setLineItems($backupCart->getLineItems());
 
         # set and persist

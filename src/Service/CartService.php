@@ -93,18 +93,6 @@ class CartService implements CartServiceInterface
         return $cart->getDeliveries()->getShippingCosts()->sum()->getTotalPrice();
     }
 
-    /**
-     * Converts a cart to an order.
-     *
-     * @param Cart $cart
-     * @param SalesChannelContext $salesChannelContext
-     *
-     * @return string
-     */
-    public function order(Cart $cart, SalesChannelContext $salesChannelContext): string
-    {
-        return $this->swCartService->order($cart, $salesChannelContext, null);
-    }
 
     /**
      * @param SalesChannelContext $context

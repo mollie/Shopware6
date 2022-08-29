@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Service;
 
-
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
@@ -33,14 +32,7 @@ interface CartServiceInterface
      * @return float
      */
     public function getShippingCosts(Cart $cart): float;
-
-    /**
-     * @param Cart $cart
-     * @param SalesChannelContext $salesChannelContext
-     * @return string
-     */
-    public function order(Cart $cart, SalesChannelContext $salesChannelContext): string;
-
+    
     /**
      * @param SalesChannelContext $context
      * @param string $countryID
@@ -61,5 +53,4 @@ interface CartServiceInterface
      * @return SalesChannelContext
      */
     public function updatePaymentMethod(SalesChannelContext $context, string $paymentMethodID): SalesChannelContext;
-
 }

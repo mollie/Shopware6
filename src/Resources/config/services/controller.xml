@@ -74,6 +74,7 @@
 
         <service id="Kiener\MolliePayments\Controller\Api\Webhook\WebhookController" public="true">
             <argument type="service" id="Kiener\MolliePayments\Controller\Storefront\Webhook\NotificationFacade"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
             <argument type="service" id="mollie_payments.logger"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
@@ -100,7 +101,6 @@
             <argument type="service" id="Kiener\MolliePayments\Service\TransactionService"/>
             <argument type="service" id="mollie_payments.logger"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
-            <argument type="service" id="Kiener\MolliePayments\Facade\MollieOrderPaymentFlow"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
@@ -131,19 +131,31 @@
 
         <service id="Kiener\MolliePayments\Controller\Storefront\ApplePayDirect\ApplePayDirectController" public="true">
             <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\CartService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
-            <argument type="service" id="Kiener\MolliePayments\Handler\Method\ApplePayPayment"/>
-            <argument type="service" id="payment_method.repository"/>
             <argument type="service" id="router"/>
-            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
             <argument type="service" id="mollie_payments.logger"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Cart\CartBackupService"/>
-            <argument type="service" id="Kiener\MolliePayments\Repository\Order\OrderAddressRepository"/>
             <argument type="service" id="session.flash_bag"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
+            </call>
+        </service>
+
+        <service id="Kiener\MolliePayments\Controller\Api\Subscription\SubscriptionController" public="true">
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+
+        <service id="Kiener\MolliePayments\Controller\Storefront\AccountController" public="true">
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Page\Account\SubscriptionPageLoader"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
+            <argument type="service" id="mollie_payments.logger"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+            <call method="setTwig">
+                <argument type="service" id="twig"/>
             </call>
         </service>
 
@@ -152,6 +164,7 @@
 
         <service id="Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\ApplePayDirectController" public="true">
             <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect"/>
+            <argument type="service" id="mollie_payments.logger"/>
         </service>
 
         <service id="Kiener\MolliePayments\Controller\StoreApi\CreditCard\CreditCardController" public="true">

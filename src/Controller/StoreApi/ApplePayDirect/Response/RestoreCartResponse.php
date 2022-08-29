@@ -25,5 +25,4 @@ class RestoreCartResponse extends StoreApiResponse
 
         parent::__construct($this->object);
     }
-
 }

@@ -6,9 +6,21 @@ use Shopware\Core\Framework\Context;
 
 class LogFileArchiveGenerator implements GeneratorInterface
 {
+    /**
+     * @var string
+     */
     protected $logDirectory;
+
+    /**
+     * @var string
+     */
     protected $logFilePrefix;
 
+
+    /**
+     * @param string $logDirectory
+     * @param string $logFilePrefix
+     */
     public function __construct(string $logDirectory, string $logFilePrefix = '')
     {
         $this->logDirectory = $logDirectory;
@@ -16,7 +28,8 @@ class LogFileArchiveGenerator implements GeneratorInterface
     }
 
     /**
-     * @inheritDoc
+     * @param Context $context
+     * @return array<mixed>
      */
     public function generate(Context $context): array
     {
@@ -42,7 +55,6 @@ class LogFileArchiveGenerator implements GeneratorInterface
             // Don't leave any evidence.
             \unlink($fullPath);
         }
-
 
         return [
             'content' => $content,

@@ -23,7 +23,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface
     /** @var MollieApiClient */
     private $apiClient;
 
-    /** @var array */
+    /** @var array<mixed> */
     private $profileIdStorage = [];
 
 
@@ -47,7 +47,10 @@ class SystemConfigSubscriber implements EventSubscriberInterface
     }
 
 
-    public function onSystemConfigWritten(EntityWrittenEvent $event)
+    /**
+     * @param EntityWrittenEvent $event
+     */
+    public function onSystemConfigWritten(EntityWrittenEvent $event): void
     {
         foreach ($event->getPayloads() as $payload) {
             $this->checkSystemConfigChange(
@@ -61,11 +64,11 @@ class SystemConfigSubscriber implements EventSubscriberInterface
 
     /**
      * @param string $key
-     * @param $value
+     * @param mixed $value
      * @param null|string $salesChannelId
      * @param Context $context
      */
-    private function checkSystemConfigChange(string $key, $value, ?string $salesChannelId, Context $context)
+    private function checkSystemConfigChange(string $key, $value, ?string $salesChannelId, Context $context): void
     {
         if (in_array($key, [
             SettingsService::SYSTEM_CONFIG_DOMAIN . SettingsService::LIVE_PROFILE_ID,
@@ -94,12 +97,13 @@ class SystemConfigSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param $value
+     * @param mixed $value
      * @param null|string $salesChannelId
      * @param bool $testMode
      * @param Context $context
+     * @throws \Mollie\Api\Exceptions\ApiException
      */
-    private function fetchProfileIdForApiKey($value, ?string $salesChannelId, bool $testMode, Context $context)
+    private function fetchProfileIdForApiKey($value, ?string $salesChannelId, bool $testMode, Context $context): void
     {
         $profileKey = SettingsService::SYSTEM_CONFIG_DOMAIN .
             ($testMode ?
@@ -170,12 +174,12 @@ class SystemConfigSubscriber implements EventSubscriberInterface
      * and then Shopware overwrites it with the old one afterwards.
      *
      * @param string $key
-     * @param $value
+     * @param mixed $value
      * @param null|string $salesChannelId
      * @param bool $testMode
      * @param Context $context
      */
-    private function fixProfileIdAfterChange(string $key, $value, ?string $salesChannelId, bool $testMode, Context $context)
+    private function fixProfileIdAfterChange(string $key, $value, ?string $salesChannelId, bool $testMode, Context $context): void
     {
         if (isset($this->profileIdStorage[$salesChannelId . $key])) {
             // If the old $value is the same as the new profile ID in storage, then dont set it again

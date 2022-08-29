@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Controller\Api\Order;
 
+use Exception;
 use Kiener\MolliePayments\Facade\MollieShipment;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Shipment;
@@ -163,7 +164,12 @@ class ShippingController extends AbstractController
         ]);
     }
 
-    private function exceptionToJson(\Exception $e, array $additionalData = []): JsonResponse
+    /**
+     * @param Exception $e
+     * @param array<mixed> $additionalData
+     * @return JsonResponse
+     */
+    private function exceptionToJson(Exception $e, array $additionalData = []): JsonResponse
     {
         $this->logger->error(
             $e->getMessage(),

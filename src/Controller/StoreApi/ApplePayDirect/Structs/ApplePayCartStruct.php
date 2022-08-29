@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Structs;
 
 use Shopware\Core\Framework\Struct\Struct;
 
-
 class ApplePayCartStruct extends Struct
 {
 
@@ -40,11 +39,10 @@ class ApplePayCartStruct extends Struct
 
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public function getApplePayCart(): array
     {
         return $this->cart;
     }
-
 }

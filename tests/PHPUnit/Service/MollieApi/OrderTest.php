@@ -9,7 +9,6 @@ use Kiener\MolliePayments\Service\MollieApi\Payment as MolliePaymentApi;
 use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 use Kiener\MolliePayments\Service\Router\RoutingDetector;
 use Kiener\MolliePayments\Service\SettingsService;
-use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
 use Mollie\Api\Endpoints\OrderEndpoint;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
@@ -18,16 +17,21 @@ use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\OrderLineCollection;
 use Mollie\Api\Types\OrderLineType;
 use MolliePayments\Tests\Fakes\FakePluginSettings;
+use MolliePayments\Tests\Traits\BuilderTestTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Test\TestBuilderTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 
 class OrderTest extends TestCase
 {
+    use BuilderTestTrait;
+
+
     /**
      * @var MollieApiClient
      */
@@ -64,13 +68,10 @@ class OrderTest extends TestCase
         $this->paymentApiService = new MolliePaymentApi($apiFactoryMock);
         $this->router = $this->getMockBuilder(RouterInterface::class)->disableOriginalConstructor()->getMock();
 
-        $routingDetector = new RoutingDetector(new RequestStack(new Request()));
-
-
         $this->orderApiService = new MollieOrderApi(
             $apiFactoryMock,
             $this->paymentApiService,
-            new RoutingBuilder($this->router, $routingDetector),
+            $this->buildRoutingBuilder($this, ''),
             new NullLogger()
         );
     }

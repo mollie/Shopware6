@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Gateway\Mollie\Model;
 
-
 class Issuer
 {
 
@@ -87,5 +86,4 @@ class Issuer
     {
         return $this->svg;
     }
-
 }

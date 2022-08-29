@@ -47,7 +47,8 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
     }
 
     /**
-     * @inheritDoc
+     * @param Context $context
+     * @return array<mixed>
      */
     public function generate(Context $context): array
     {
@@ -66,6 +67,10 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
         ];
     }
 
+    /**
+     * @param Context $context
+     * @return array<mixed>
+     */
     public function getShopwarePaymentMethodStatus($context): array
     {
         $fileContent = [];
@@ -87,6 +92,10 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
         return $fileContent;
     }
 
+    /**
+     * @param SalesChannelEntity $salesChannel
+     * @return array<mixed>
+     */
     public function getSalesChannelPaymentMethodAssignments(SalesChannelEntity $salesChannel): array
     {
         $fileContent = [];
@@ -99,10 +108,9 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
             $paymentMethods = $this->salesChannelDataExtractor->extractPaymentMethods($salesChannel);
 
             $paymentMethods->sort(function (PaymentMethodEntity $a, PaymentMethodEntity $b) {
-                return strnatcmp($a->getPluginId(), $b->getPluginId()) ?: strnatcmp($a->getName(), $b->getName());
+                return strnatcmp((string)$a->getPluginId(), (string)$b->getPluginId()) ?: strnatcmp((string)$a->getName(), (string)$b->getName());
             });
 
-            /** @var PaymentMethodEntity $paymentMethod */
             foreach ($paymentMethods as $paymentMethod) {
                 $fileContent[] = $paymentMethod->getName() . ($paymentMethod->getId() === $salesChannel->getPaymentMethodId() ? ' (Default)' : '');
             }
@@ -118,6 +126,10 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
         return $fileContent;
     }
 
+    /**
+     * @param SalesChannelEntity $salesChannel
+     * @return array<mixed>
+     */
     protected function getLivePaymentMethodData(SalesChannelEntity $salesChannel): array
     {
         $fileContent = [];
@@ -127,6 +139,10 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
         return array_merge($fileContent, $this->getMolliePaymentMethodStatus($apiClient));
     }
 
+    /**
+     * @param SalesChannelEntity $salesChannel
+     * @return array<mixed>
+     */
     protected function getTestPaymentMethodData(SalesChannelEntity $salesChannel): array
     {
         $fileContent = [];
@@ -136,6 +152,10 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
         return array_merge($fileContent, $this->getMolliePaymentMethodStatus($apiClient));
     }
 
+    /**
+     * @param MollieApiClient $apiClient
+     * @return array<mixed>
+     */
     protected function getMolliePaymentMethodStatus(MollieApiClient $apiClient): array
     {
         $fileContent = [];
@@ -144,7 +164,7 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
 
             /** @var Method $method */
             foreach ($methods as $method) {
-                $fileContent[] = sprintf('%s: %s', $method->description, $method->status ?? 'Unknown');
+                $fileContent[] = sprintf('%s: %s', $method->description, (string)$method->status);
             }
         } catch (ApiException $e) {
             $fileContent[] = 'Could not get payment methods from Mollie, perhaps the API key is invalid';

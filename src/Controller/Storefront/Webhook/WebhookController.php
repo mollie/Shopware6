@@ -2,9 +2,7 @@
 
 namespace Kiener\MolliePayments\Controller\Storefront\Webhook;
 
-
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
-use Kiener\MolliePayments\Facade\Notifications\NotificationFacade;
 use Kiener\MolliePayments\Service\SettingsService;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
@@ -15,7 +13,6 @@ use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-
 
 /**
  * @RouteScope(scopes={"storefront"})
@@ -44,7 +41,7 @@ class WebhookController extends StorefrontController
      * @param SubscriptionManager $subscriptionManager
      * @param LoggerInterface $logger
      */
-    public function __construct( NotificationFacade $notificationFacade, SubscriptionManager $subscriptionManager, LoggerInterface $logger)
+    public function __construct(NotificationFacade $notificationFacade, SubscriptionManager $subscriptionManager, LoggerInterface $logger)
     {
         $this->logger = $logger;
         $this->subscriptions = $subscriptionManager;
@@ -52,23 +49,21 @@ class WebhookController extends StorefrontController
     }
 
     /**
-     * @Route("/mollie/webhook/{transactionId}", defaults={"csrf_protected"=false}, name="frontend.mollie.webhook", options={"seo"="false"}, methods={"GET", "POST"})
+     * @Route("/mollie/webhook/{swTransactionId}", defaults={"csrf_protected"=false}, name="frontend.mollie.webhook", options={"seo"="false"}, methods={"GET", "POST"})
      *
      * @param SalesChannelContext $context
-     * @param string $transactionId
+     * @param string $swTransactionId
      * @return JsonResponse
      */
-    public function onWebhookReceived(SalesChannelContext $context, string $transactionId): JsonResponse
+    public function onWebhookReceived(SalesChannelContext $context, string $swTransactionId): JsonResponse
     {
         try {
-
-
-            $this->notificationFacade->onNotify($transactionId, $context->getContext());
+            $this->notificationFacade->onNotify($swTransactionId, $context->getContext());
 
             return new JsonResponse(['success' => true]);
         } catch (\Throwable $ex) {
             $this->logger->error(
-                'Error in Mollie Webhook for Transaction ' . $transactionId,
+                'Error in Mollie Webhook for Transaction ' . $swTransactionId,
                 [
                     'error' => $ex->getMessage()
                 ]
@@ -85,8 +80,6 @@ class WebhookController extends StorefrontController
     }
 
     /**
-     *
-     * @RouteScope(scopes={"storefront"})
      * @Route("/mollie/webhook/subscription/{swSubscriptionId}/renew", defaults={"csrf_protected"=false}, name="frontend.mollie.webhook.subscription.renew", options={"seo"="false"}, methods={"GET", "POST"})
      *
      * @param string $swSubscriptionId
@@ -123,7 +116,7 @@ class WebhookController extends StorefrontController
             # we first start by renewing our subscription.
             # this will create a new order, just like the
             # user would do in the checkout process.
-            $newOrder = $this->subscriptions->renewSubscription($swSubscriptionId, $molliePaymentId, $context);
+            $newOrder = $this->subscriptions->renewSubscription($swSubscriptionId, $molliePaymentId, $context->getContext());
 
             # now lets grab the latest order transaction of our new order
             /** @var OrderTransactionEntity $latestTransaction */
@@ -132,7 +125,7 @@ class WebhookController extends StorefrontController
             # now simply redirect to the official webhook
             # that handles the full order, validates the payment and
             # starts to trigger things.
-            return $this->webhookCall($context, $latestTransaction->getId());
+            return $this->onWebhookReceived($context, $latestTransaction->getId());
         } catch (\Throwable $ex) {
             $this->logger->error(
                 'Error in Mollie Webhook for Subscription ' . $swSubscriptionId,

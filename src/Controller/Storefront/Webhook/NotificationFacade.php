@@ -6,6 +6,7 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatche
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
+use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentDetails;
@@ -126,16 +127,15 @@ class NotificationFacade
 
     /**
      * @param string $swTransactionId
-     * @param MollieSettingStruct $settings
-     * @param SalesChannelContext $contextSC
-     * @throws \Exception
+     * @param Context $context
+     * @throws CustomerCouldNotBeFoundException
      * @return void
      */
-    public function onNotify(string $swTransactionId, MollieSettingStruct $settings, SalesChannelContext $contextSC): void
+    public function onNotify(string $swTransactionId, Context $context): void
     {
         # -----------------------------------------------------------------------------------------------------
         # LOAD TRANSACTION
-        $swTransaction = $this->getTransaction($swTransactionId, $contextSC->getContext());
+        $swTransaction = $this->getTransaction($swTransactionId, $context);
 
         if (!$swTransaction instanceof OrderTransactionEntity) {
             throw new \Exception('Transaction ' . $swTransactionId . ' not found in Shopware');
@@ -159,8 +159,6 @@ class NotificationFacade
         $this->gatewayMollie->switchClient($swOrder->getSalesChannelId());
 
         # --------------------------------------------------------------------------------------------
-
-        $mollieOrderId = $this->getMollieId($swOrder);
 
         # now get the latest transaction of that order
         # we always need to make sure to use the latest one, because this
@@ -189,11 +187,10 @@ class NotificationFacade
         $mollieOrderId = $orderAttributes->getMollieOrderId();
 
 
-        $this->gatewayMollie->switchClient($contextSC->getSalesChannel()->getId());
+        $this->gatewayMollie->switchClient($swOrder->getSalesChannelId());
 
         $molliePayment = null;
         $mollieOrder = null;
-
 
         if (!empty($orderAttributes->getMollieOrderId())) {
 
@@ -214,7 +211,6 @@ class NotificationFacade
 
         # --------------------------------------------------------------------------------------------
 
-        $status = $this->statusConverter->getMollieOrderStatus($mollieOrder);
 
         $this->logger->info('Webhook for order ' . $swOrder->getOrderNumber() . ' and Mollie ID: ' . $mollieOrderId . ' has been received with Status: ' . $status);
 
@@ -231,7 +227,7 @@ class NotificationFacade
         # If our order is Apple Pay, then DO NOT CONVERT THIS TO CREDIT CARD!
         # we want to keep Apple Pay as payment method
         if ($swTransaction->getPaymentMethod() instanceof PaymentMethodEntity && $mollieOrder instanceof Order && $swTransaction->getPaymentMethod() instanceof PaymentMethodEntity && $swTransaction->getPaymentMethod()->getHandlerIdentifier() !== ApplePayPayment::class) {
-            $this->updatePaymentMethod($swTransaction, $mollieOrder, $contextSC->getContext());
+            $this->updatePaymentMethod($swTransaction, $mollieOrder, $context);
         }
 
         # --------------------------------------------------------------------------------------------
@@ -249,11 +245,11 @@ class NotificationFacade
                 # for the subscription, because a customer could have different mandates!
                 # keep in mind, this might be empty here...our confirm endpoint does the final checks
                 $mandateId = $this->molliePaymentDetails->getMandateId($molliePayment);
-                $this->subscriptionManager->confirmSubscription($swOrder, $mandateId, $contextSC);
+                $this->subscriptionManager->confirmSubscription($swOrder, $mandateId, $context);
                 break;
 
             case MolliePaymentStatus::MOLLIE_PAYMENT_EXPIRED:
-                $this->subscriptionManager->cancelPendingSubscriptions($swOrder, $contextSC);
+                $this->subscriptionManager->cancelPendingSubscriptions($swOrder, $context);
                 break;
         }
 
@@ -263,7 +259,6 @@ class NotificationFacade
         # not yet supported in this shopware version, then
         # this only triggers a dummy dispatcher ;)
         $this->fireFlowBuilderEvents($swOrder, $status, $context);
-
     }
 
 

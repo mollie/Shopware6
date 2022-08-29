@@ -2,9 +2,7 @@
 
 namespace Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Structs;
 
-
 use Shopware\Core\Framework\Struct\Struct;
-
 
 class SuccessStruct extends Struct
 {
@@ -52,5 +50,4 @@ class SuccessStruct extends Struct
     {
         return $this->apiAlias;
     }
-
 }

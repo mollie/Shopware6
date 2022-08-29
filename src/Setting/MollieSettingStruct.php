@@ -220,7 +220,15 @@ class MollieSettingStruct extends Struct
      */
     public function getProfileId(): ?string
     {
-        return $this->profileId ?? ($this->isTestMode() ? $this->testProfileId : $this->liveProfileId);
+        if ($this->profileId !== null) {
+            return $this->profileId;
+        }
+
+        if ($this->isTestMode()) {
+            return $this->testProfileId;
+        }
+
+        return $this->liveProfileId;
     }
 
     /**

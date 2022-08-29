@@ -15,7 +15,7 @@ class GetCartResponse extends StoreApiResponse
 
 
     /**
-     * @param array $formattedCart
+     * @param array<mixed> $formattedCart
      */
     public function __construct(array $formattedCart)
     {
@@ -26,5 +26,4 @@ class GetCartResponse extends StoreApiResponse
 
         parent::__construct($this->object);
     }
-
 }

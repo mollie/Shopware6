@@ -4,10 +4,8 @@ namespace Kiener\MolliePayments;
 
 use Exception;
 use Kiener\MolliePayments\Compatibility\DependencyLoader;
-use Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect;
 use Kiener\MolliePayments\Components\Installer\PluginInstaller;
 use Kiener\MolliePayments\Service\CustomFieldService;
-use KlarnaPayment\Installer\Modules\CustomFieldInstaller;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\Migration\MigrationCollection;
@@ -22,6 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class MolliePayments extends Plugin
 {
     const PLUGIN_VERSION = '2.5.0';
+
 
     /**
      * @param ContainerBuilder $container
@@ -59,10 +58,7 @@ class MolliePayments extends Plugin
         $customFieldRepository = $this->container->get('custom_field_set.repository');
 
         // Add custom fields
-        $customFieldService = new CustomFieldService(
-            $this->container,
-            $customFieldRepository
-        );
+        $customFieldService = new CustomFieldService($customFieldRepository);
 
         $customFieldService->addCustomFields($context->getContext());
 
@@ -122,6 +118,7 @@ class MolliePayments extends Plugin
 
     /**
      * @param DeactivateContext $context
+     * @return void
      */
     public function deactivate(DeactivateContext $context): void
     {

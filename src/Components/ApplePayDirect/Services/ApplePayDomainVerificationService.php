@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Components\ApplePayDirect\Services;
 
-
 use League\Flysystem\FilesystemInterface;
 
 class ApplePayDomainVerificationService
