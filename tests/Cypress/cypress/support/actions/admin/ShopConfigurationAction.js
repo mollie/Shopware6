@@ -50,6 +50,8 @@ export default class ShopConfigurationAction {
      */
     setupPlugin(mollieFailureMode, creditCardComponents, applePayDirect, subscriptionIndicator) {
 
+        cy.wait(2000);
+
         // assign all payment methods to
         // all available sales channels
         this.apiClient.get('/sales-channel').then(channels => {
@@ -73,6 +75,8 @@ export default class ShopConfigurationAction {
      * @param subscriptionIntervalUnit
      */
     updateProducts(voucherValue, subscriptionEnabled, subscriptionInterval, subscriptionIntervalUnit) {
+
+        cy.wait(2000);
 
         if (voucherValue === 'eco') {
             voucherValue = '1';
