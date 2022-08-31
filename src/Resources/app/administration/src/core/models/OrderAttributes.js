@@ -1,3 +1,5 @@
+import CreditcardAttributes from './CreditcardAttributes';
+
 export default class OrderAttributes {
 
     /**
@@ -9,6 +11,7 @@ export default class OrderAttributes {
         this._orderId = '';
         this._paymentId = '';
         this._swSubscriptionId = '';
+        this._creditCardAttributes = null;
 
         if (orderEntity === null) {
             return;
@@ -29,6 +32,15 @@ export default class OrderAttributes {
         this._orderId = this._convertString(mollieData['order_id']);
         this._paymentId = this._convertString(mollieData['payment_id']);
         this._swSubscriptionId = this._convertString(mollieData['swSubscriptionId']);
+        this._creditCardAttributes = new CreditcardAttributes(mollieData);
+    }
+
+    /**
+     *
+     * @returns {null|CreditcardAttributes|*}
+     */
+    getCreditCardAttributes() {
+        return this._creditCardAttributes;
     }
 
     /**

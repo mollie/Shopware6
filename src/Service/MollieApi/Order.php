@@ -212,6 +212,27 @@ class Order
         return $existingOpenPayment;
     }
 
+    /**
+     * @param MollieOrder $mollieOrder
+     * @return null|Payment
+     */
+    public function getPaidPayment(MollieOrder $mollieOrder): ?Payment
+    {
+        $payments = $mollieOrder->payments();
+
+        if (!$payments instanceof PaymentCollection) {
+            return null;
+        }
+
+        /** @var Payment $payment */
+        foreach ($payments as $payment) {
+            if ($payment->isPaid()) {
+                return $payment;
+            }
+        }
+
+        return null;
+    }
 
     /**
      * @param MollieOrder $mollieOrder

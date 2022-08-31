@@ -3,7 +3,6 @@
 namespace Kiener\MolliePayments\Facade;
 
 use Kiener\MolliePayments\Exception\MissingMollieOrderIdException;
-use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
@@ -13,13 +12,9 @@ use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Service\UpdateOrderTransactionCustomFields;
+use Kiener\MolliePayments\Struct\CreditCardStruct;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
-use Kiener\MolliePayments\Struct\OrderTransaction\OrderTransactionAttributes;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
-use Mollie\Api\Exceptions\ApiException;
-use Mollie\Api\Exceptions\IncompatiblePlatform;
-use Mollie\Api\Resources\Payment;
-use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\Exception\AsyncPaymentFinalizeException;
 use Shopware\Core\Checkout\Payment\Exception\CustomerCanceledAsyncPaymentException;
@@ -91,9 +86,9 @@ class MolliePaymentFinalize
             $salesChannelContext->getSalesChannel()->getId(),
             ['embed' => 'payments']
         );
+
         $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
         $paymentStatus = $this->orderStatusConverter->getMollieOrderStatus($mollieOrder);
-
 
         # Attention
         # Our payment status will either be set by us, or automatically by Shopware using exceptions below.

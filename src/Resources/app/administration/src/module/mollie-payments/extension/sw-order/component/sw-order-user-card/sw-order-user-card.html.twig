@@ -2,6 +2,18 @@
     {% parent %}
 
     <template v-if="mollieOrderId">
+        <div v-if="hasCreditCardData">
+            <dt>Credit Card Data</dt>
+            <dd>
+                <mollie-credit-card-logo :creditCardCompany="creditCardLabel">{{ creditCardLabel }}</mollie-credit-card-logo>
+            </dd>
+            <dd>
+                {{ creditCardNumber }}
+            </dd>
+            <dd>
+                {{ creditCardHolder }}
+            </dd>
+        </div>
         <dt>{{ $tc('sw-order.detailExtended.labelMollieOrderId') }}</dt>
         <dd>
             {{ mollieOrderId }}

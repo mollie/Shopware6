@@ -1,7 +1,9 @@
 import './init/api-service.init';
+import './init/credit-card-components.init'
 import './extension/sw-flow-sequence-action';
 import './component/flow-sequence/action-order-ship-modal';
 import './component/flow-sequence/action-order-refund-modal';
+import './component/credit-card-logo'
 import './module/mollie-payments';
 import './module/sw-product';
 

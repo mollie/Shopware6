@@ -10,6 +10,7 @@ use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderTransaction\OrderTransactionAttributes;
 use Mollie\Api\Resources\Payment;
+use Mollie\Api\Types\PaymentMethod;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
@@ -217,6 +218,7 @@ class OrderService implements OrderServiceInterface
 
         $thirdPartyPaymentId = '';
         $molliePaymentID = '';
+        $creditCardDetails = null;
 
         try {
 
@@ -235,6 +237,11 @@ class OrderService implements OrderServiceInterface
             if (isset($molliePayment->details, $molliePayment->details->transferReference)) {
                 $thirdPartyPaymentId = $molliePayment->details->transferReference;
             }
+
+            # check for creditcard
+            if (isset($molliePayment->method, $molliePayment->details) && $molliePayment->method === PaymentMethod::CREDITCARD) {
+                $creditCardDetails = $molliePayment->details;
+            }
         } catch (PaymentNotFoundException $ex) {
             # some orders like OPEN bank transfer have no completed payments
             # so this is a usual case, where we just need to skip this process
@@ -247,6 +254,7 @@ class OrderService implements OrderServiceInterface
 
         $customFieldsStruct->setMolliePaymentId($molliePaymentID);
         $customFieldsStruct->setThirdPartyPaymentId($thirdPartyPaymentId);
+        $customFieldsStruct->setCreditCardDetails($creditCardDetails);
 
         $this->updateOrderCustomFields->updateOrder(
             $order->getId(),
