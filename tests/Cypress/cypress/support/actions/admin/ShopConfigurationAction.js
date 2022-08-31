@@ -39,11 +39,7 @@ export default class ShopConfigurationAction {
 
         this._clearCache();
 
-        // yes we should definitely improve this with some interceptions and alias-waits...
-        // but let's be honest, I don't have time for this right now.
-        // If you read this and want to contribute, please do so *haha
-        // We need a simple controlled "wait for all setup xhr requests" in here, thanks :)
-        cy.wait(10000);
+        cy.wait(1000);
     }
 
 
@@ -127,7 +123,7 @@ export default class ShopConfigurationAction {
         });
 
         // let's just wait a bit
-        cy.wait(5000);
+        cy.wait(3000);
 
         this._clearCache();
     }
