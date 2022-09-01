@@ -23,6 +23,7 @@
         "eslint-plugin-standard": "^5.0.0",
         "flow-bin": "^0.160.0",
         "jest": "^27.1.1",
+        "raw-loader": "^4.0.2",
         "stylelint": "^14.1.0",
         "stylelint-config-standard": "^24.0.0",
         "stylelint-scss": "^4.0.1"
