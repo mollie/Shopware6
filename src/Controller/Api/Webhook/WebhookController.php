@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Controller\Api\Webhook;
 
+use Kiener\MolliePayments\Components\Subscription\Exception\SubscriptionSkippedException;
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Controller\Storefront\Webhook\NotificationFacade;
 use Psr\Log\LoggerInterface;
@@ -145,6 +146,17 @@ class WebhookController extends AbstractController
             # that handles the full order, validates the payment and
             # starts to trigger things.
             return $this->webhookAction($latestTransaction->getId(), $request, $context);
+        } catch (SubscriptionSkippedException $ex) {
+            # if we skip a new subscription, then we need to respond with
+            # 200 OK so that Mollie will not try it again.
+            $this->logger->info($ex->getMessage());
+            return new JsonResponse(
+                [
+                    'success' => true,
+                    'message' => $ex->getMessage()
+                ],
+                200
+            );
         } catch (\Throwable $ex) {
             $this->logger->error(
                 'Error in Mollie Webhook for Subscription ' . $swSubscriptionId,

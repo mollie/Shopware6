@@ -11,6 +11,7 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRep
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\MollieStatus;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
+use Kiener\MolliePayments\Components\Subscription\Exception\SubscriptionSkippedException;
 use Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder;
 use Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder;
 use Kiener\MolliePayments\Components\Subscription\Services\PaymentMethodRemover\SubscriptionRemover;
@@ -386,6 +387,21 @@ class SubscriptionManager implements SubscriptionManagerInterface
         # we just want to ensure that a "payment method update" does not lead to this webhook (it felt as if it was in 1 case)
         if ((float)$payment->amount->value <= 0) {
             throw new \Exception('Warning, trying to renew subscription based on a 0,00 payment. Mollie should actually not call the renew-webhook for this!');
+        }
+
+
+        $salesChannelSettings = $this->pluginSettings->getSettings($swSubscription->getSalesChannelId());
+
+        # It's possible to automatically skip failed payments and avoid that new orders are created. This is a plugin configuration.
+        # If skipping is enabled, and the payment status is not approved, then we throw an error and skip the renewal (for this payment attempt).
+        if ($salesChannelSettings->isSubscriptionSkipRenewalsOnFailedPayments()) {
+            $status = $this->statusConverter->getMolliePaymentStatus($payment);
+
+            if (!MolliePaymentStatus::isApprovedStatus($status)) {
+                # let's throw a specific exception, because we need to
+                # handle the response for Mollie with 200 OK
+                throw new SubscriptionSkippedException($swSubscriptionId, $payment->id);
+            }
         }
 
         # first thing is, we have to update our new paymentAt of our local subscription.
