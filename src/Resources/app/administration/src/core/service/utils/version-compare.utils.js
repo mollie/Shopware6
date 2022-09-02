@@ -87,16 +87,16 @@ export default {
                 return partsA.build < partsB.build;
             case '<=':
             case 'lte':
-                if(partsA.major > partsB.major) {
-                    return false;
+                if(partsB.major > partsA.major) {
+                    return true;
                 }
-                if(partsA.minor > partsB.minor) {
-                    return false;
+                if(partsB.minor > partsA.minor) {
+                    return true;
                 }
-                if(partsA.patch > partsB.patch) {
-                    return false;
+                if(partsB.patch > partsA.patch) {
+                    return true;
                 }
-                return partsA.build <= partsB.build;
+                return partsB.build >= partsA.build;
         }
 
         return false;
