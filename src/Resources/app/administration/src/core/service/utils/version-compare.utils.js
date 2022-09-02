@@ -38,11 +38,17 @@ export default {
             case '==':
             case '===':
             case 'eq':
-                return partsA.version === partsB.version;
+                return partsA.major === partsB.major
+                    && partsA.minor === partsB.minor
+                    && partsA.patch === partsB.patch
+                    && partsA.build === partsB.build
             case '!=':
             case '!==':
             case 'neq':
-                return partsA.version !== partsB.version;
+                return !(partsA.major === partsB.major
+                    && partsA.minor === partsB.minor
+                    && partsA.patch === partsB.patch
+                    && partsA.build === partsB.build)
             case '>':
             case 'gt':
                 if(partsA.major > partsB.major) {
