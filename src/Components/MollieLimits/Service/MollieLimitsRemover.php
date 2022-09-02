@@ -62,16 +62,19 @@ class MollieLimitsRemover extends PaymentMethodRemover
             return $originalData;
         }
 
-        try {
-            $cart = $this->getCart($context);
-        } catch (MissingCartServiceException $e) {
-            $this->logger->error($e->getMessage(), [
-                'exception' => $e,
-            ]);
-            return $originalData;
-        }
+        if ($this->isCartRoute()) {
+            try {
+                $cart = $this->getCart($context);
+            }
+            catch (MissingCartServiceException $e) {
+                $this->logger->error($e->getMessage(), [
+                    'exception' => $e,
+                ]);
+                return $originalData;
+            }
 
-        $price = $cart->getPrice()->getTotalPrice();
+            $price = $cart->getPrice()->getTotalPrice();
+        }
 
         if ($this->isOrderRoute()) {
             try {
