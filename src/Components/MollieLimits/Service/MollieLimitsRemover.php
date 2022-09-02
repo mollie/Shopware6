@@ -86,9 +86,6 @@ class MollieLimitsRemover extends PaymentMethodRemover
             $price = $order->getAmountTotal();
         }
 
-        if (!isset($price)) {
-            return $originalData;
-        }
 
         $availableMolliePayments = $this->paymentMethodsProvider->getActivePaymentMethodsForAmount(
             $price,
