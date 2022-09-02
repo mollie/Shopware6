@@ -1,9 +1,14 @@
 const {defineConfig} = require('cypress')
 
+// when running in parallel in Github with multiple instances
+// it's somehow flaky...but this might only be because of a performance on the docker image?!
+// it usually runs really good offline, so let's just try couple of retries in runMode for now
+// and yes I know, this is not perfect...but it might work
+
 module.exports = defineConfig({
     chromeWebSecurity: false,
     retries: {
-        "runMode": 1,
+        "runMode": 3,
         "openMode": 0
     },
     watchForFileChanges: false,
