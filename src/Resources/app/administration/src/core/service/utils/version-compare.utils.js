@@ -18,17 +18,18 @@ export default {
         return this.compare(versionA, versionB, '<=');
     },
 
+    /**
+     * Compare functions do not take into account prerelease versions
+     * @param versionA
+     * @param versionB
+     * @param comparator
+     * @returns {boolean}
+     */
     compare(versionA, versionB, comparator = '=') {
         const partsA = this.matchVersion(versionA);
         const partsB = this.matchVersion(versionB);
 
-        if(partsA === null) {
-            console.warn(`${versionA} is not a valid version string.`);
-            return false;
-        }
-
-        if(partsB === null) {
-            console.warn(`${versionA} is not a valid version string.`);
+        if(partsA === null || partsB === null) {
             return false;
         }
 
@@ -37,66 +38,79 @@ export default {
             case '==':
             case '===':
             case 'eq':
-                return partsA.groups.version === partsB.groups.version;
+                return partsA.version === partsB.version;
             case '!=':
             case '!==':
             case 'neq':
-                return partsA.groups.version !== partsB.groups.version;
+                return partsA.version !== partsB.version;
             case '>':
             case 'gt':
-                if(partsA.groups.major > partsB.groups.major) {
+                if(partsA.major > partsB.major) {
                     return true;
                 }
-                if(partsA.groups.minor > partsB.groups.minor) {
+                if(partsA.minor > partsB.minor) {
                     return true;
                 }
-                if(partsA.groups.patch > partsB.groups.patch) {
+                if(partsA.patch > partsB.patch) {
                     return true;
                 }
-                return partsA.groups.build > partsB.groups.build;
+                return partsA.build > partsB.build;
             case '>=':
             case 'gte':
-                if(partsA.groups.major < partsB.groups.major) {
+                if(partsA.major < partsB.major) {
                     return false;
                 }
-                if(partsA.groups.minor < partsB.groups.minor) {
+                if(partsA.minor < partsB.minor) {
                     return false;
                 }
-                if(partsA.groups.patch < partsB.groups.patch) {
+                if(partsA.patch < partsB.patch) {
                     return false;
                 }
-                return partsA.groups.build >= partsB.groups.build;
+                return partsA.build >= partsB.build;
             case '<':
             case 'lt':
-                if(partsA.groups.major < partsB.groups.major) {
+                if(partsA.major < partsB.major) {
                     return true;
                 }
-                if(partsA.groups.minor < partsB.groups.minor) {
+                if(partsA.minor < partsB.minor) {
                     return true;
                 }
-                if(partsA.groups.patch < partsB.groups.patch) {
+                if(partsA.patch < partsB.patch) {
                     return true;
                 }
-                return partsA.groups.build < partsB.groups.build;
+                return partsA.build < partsB.build;
             case '<=':
             case 'lte':
-                if(partsA.groups.major > partsB.groups.major) {
+                if(partsA.major > partsB.major) {
                     return false;
                 }
-                if(partsA.groups.minor > partsB.groups.minor) {
+                if(partsA.minor > partsB.minor) {
                     return false;
                 }
-                if(partsA.groups.patch > partsB.groups.patch) {
+                if(partsA.patch > partsB.patch) {
                     return false;
                 }
-                return partsA.groups.build <= partsB.groups.build;
+                return partsA.build <= partsB.build;
         }
 
         return false;
     },
 
     matchVersion(version) {
-        return version.match(/(?<version>(?<major>\d+)\.?(?<minor>\d+)\.?(?<patch>\d+)\.?(?<build>\d*))-?(?<prerelease>[a-z]+)?\.?(?<prereleaseDigits>\d+(?:.\d+)*)?/i);
+        const match = version.match(/(?<version>(?<major>\d+)\.?(?<minor>\d+)\.?(?<patch>\d+)\.?(?<build>\d*))-?(?<prerelease>[a-z]+)?\.?(?<prereleaseDigits>\d+(?:.\d+)*)?/i);
+
+        if(match === null) {
+            console.warn(`${version} is not a valid version string.`);
+            return null;
+        }
+
+        const groups = match.groups;
+
+        ['major', 'minor', 'patch', 'build'].forEach(part => {
+            groups[part] = parseInt(groups[part]) || 0;
+        })
+
+        return groups;
     },
 
     getHumanReadableVersion(version) {
@@ -106,16 +120,16 @@ export default {
             return version;
         }
 
-        let output = `v${match.groups.version}`;
+        let output = `v${match.version}`;
 
-        if (match.groups.prerelease) {
-            output += ` ${this.getHumanReadablePrereleaseText(match.groups.prerelease)}`;
+        if (match.prerelease) {
+            output += ` ${this.getHumanReadablePrereleaseText(match.prerelease)}`;
         } else {
             output += ' Stable Version';
         }
 
-        if (match.groups.prereleaseDigits) {
-            output += ` ${match.groups.prereleaseDigits}`;
+        if (match.prereleaseDigits) {
+            output += ` ${match.prereleaseDigits}`;
         }
 
         return output;
