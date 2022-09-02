@@ -11,9 +11,10 @@ use Kiener\MolliePayments\Service\MollieApi\Order as MollieOrderApi;
 use Kiener\MolliePayments\Service\MollieApi\Payment as MolliePaymentApi;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\Refund\RefundService;
+use Kiener\MolliePayments\Service\Router\RoutingBuilder;
+use Kiener\MolliePayments\Service\Router\RoutingDetector;
 use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Service\UpdateOrderTransactionCustomFields;
-use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
 use Mollie\Api\Endpoints\OrderEndpoint;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order;
@@ -25,16 +26,21 @@ use Mollie\Api\Types\PaymentStatus;
 use Mollie\Api\Types\RefundStatus;
 use MolliePayments\Tests\Fakes\FakeMollieGateway;
 use MolliePayments\Tests\Fakes\FakePluginSettings;
+use MolliePayments\Tests\Traits\BuilderTestTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\System\Currency\CurrencyEntity;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 
 class RefundsServiceTest extends TestCase
 {
+    use BuilderTestTrait;
+
+
     private $clientMock;
 
     private $orderService;
@@ -65,12 +71,19 @@ class RefundsServiceTest extends TestCase
         $paymentApiService = new MolliePaymentApi($apiFactoryMock);
         $router = $this->getMockBuilder(RouterInterface::class)->disableOriginalConstructor()->getMock();
 
+        $routingBuilder = $this->buildRoutingBuilder($this, '');
+
         $mollieOrderApiMock = new MollieOrderApi(
             $apiFactoryMock,
             $paymentApiService,
-            new WebhookBuilder($router, new FakePluginSettings('')),
+            $routingBuilder,
             new NullLogger()
         );
+
+
+        $mollieOrderApiMock = new MollieOrderApi($apiFactoryMock, $paymentApiService, $routingBuilder, $loggerServiceMock);
+        $mollieOrderApiMock = new MollieOrderApi($apiFactoryMock, $paymentApiService, $routingBuilder, $loggerServiceMock);
+
 
         $this->refundService = new RefundService(
             $mollieOrderApiMock,

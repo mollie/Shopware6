@@ -9,7 +9,6 @@ use Throwable;
 
 class MissingRouteException extends ShopwareHttpException
 {
-
     public function __construct(Request $request, Throwable $previous = null)
     {
         $message = 'Could not determine the route';

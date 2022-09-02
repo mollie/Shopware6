@@ -7,6 +7,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryDefinition
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryStates;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 
 class DeliveryTransitionService implements DeliveryTransitionServiceInterface
@@ -38,18 +39,20 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
      */
     public function reOpenDelivery(OrderDeliveryEntity $delivery, Context $context): void
     {
-        if ($delivery->getStateMachineState()->getTechnicalName() === OrderDeliveryStates::STATE_OPEN) {
+        $statusTechnical = $this->getStatusTechnicalName($delivery);
+        $statusName = $this->getStatusName($delivery);
+
+        if ($statusTechnical === OrderDeliveryStates::STATE_OPEN) {
             return;
         }
 
         $availableTransitions = $this->getAvailableTransitions($delivery, $context);
 
         if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_REOPEN, $availableTransitions)) {
-
             $this->loggerService->error(
                 sprintf(
                     'It is not allowed to change status to open from %s. Aborting reopen transition',
-                    $delivery->getStateMachineState()->getName()
+                    $statusName
                 )
             );
 
@@ -65,7 +68,9 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
      */
     public function cancelDelivery(OrderDeliveryEntity $delivery, Context $context): void
     {
-        if ($delivery->getStateMachineState()->getTechnicalName() === OrderDeliveryStates::STATE_CANCELLED) {
+        $statusTechnical = $this->getStatusTechnicalName($delivery);
+
+        if ($statusTechnical === OrderDeliveryStates::STATE_CANCELLED) {
             return;
         }
 
@@ -84,7 +89,9 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
      */
     public function shipDelivery(OrderDeliveryEntity $delivery, Context $context): void
     {
-        if ($delivery->getStateMachineState()->getTechnicalName() === OrderDeliveryStates::STATE_SHIPPED) {
+        $statusTechnical = $this->getStatusTechnicalName($delivery);
+
+        if ($statusTechnical === OrderDeliveryStates::STATE_SHIPPED) {
             return;
         }
 
@@ -103,7 +110,9 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
      */
     public function partialShipDelivery(OrderDeliveryEntity $delivery, Context $context): void
     {
-        if ($delivery->getStateMachineState()->getTechnicalName() === OrderDeliveryStates::STATE_PARTIALLY_SHIPPED) {
+        $statusTechnical = $this->getStatusTechnicalName($delivery);
+
+        if ($statusTechnical === OrderDeliveryStates::STATE_PARTIALLY_SHIPPED) {
             return;
         }
 
@@ -122,7 +131,9 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
      */
     public function returnDelivery(OrderDeliveryEntity $delivery, Context $context): void
     {
-        if ($delivery->getStateMachineState()->getTechnicalName() === OrderDeliveryStates::STATE_RETURNED) {
+        $statusTechnical = $this->getStatusTechnicalName($delivery);
+
+        if ($statusTechnical === OrderDeliveryStates::STATE_RETURNED) {
             return;
         }
 
@@ -142,7 +153,9 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
      */
     public function partialReturnDelivery(OrderDeliveryEntity $delivery, Context $context): void
     {
-        if ($delivery->getStateMachineState()->getTechnicalName() === OrderDeliveryStates::STATE_PARTIALLY_RETURNED) {
+        $statusTechnical = $this->getStatusTechnicalName($delivery);
+
+        if ($statusTechnical === OrderDeliveryStates::STATE_PARTIALLY_RETURNED) {
             return;
         }
 
@@ -184,11 +197,37 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
      * Checks if the requested transition is allowed for the current delivery state
      *
      * @param string $transition
-     * @param array $availableTransitions
+     * @param array<mixed> $availableTransitions
      * @return bool
      */
     private function transitionIsAllowed(string $transition, array $availableTransitions): bool
     {
         return $this->transitionService->transitionIsAllowed($transition, $availableTransitions);
+    }
+
+    /**
+     * @param OrderDeliveryEntity $delivery
+     * @return string
+     */
+    private function getStatusName(OrderDeliveryEntity $delivery): string
+    {
+        if ($delivery->getStateMachineState() instanceof StateMachineStateEntity) {
+            return $delivery->getStateMachineState()->getName();
+        }
+
+        return '';
+    }
+
+    /**
+     * @param OrderDeliveryEntity $delivery
+     * @return string
+     */
+    private function getStatusTechnicalName(OrderDeliveryEntity $delivery): string
+    {
+        if ($delivery->getStateMachineState() instanceof StateMachineStateEntity) {
+            return $delivery->getStateMachineState()->getTechnicalName();
+        }
+
+        return '';
     }
 }

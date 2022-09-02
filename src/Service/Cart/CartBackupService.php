@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Service\Cart;
 
-
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
@@ -76,7 +75,7 @@ class CartBackupService
 
         # create a new "old" original cart (to avoid foreign reference problems)
         # and set the items from our backup
-        $newCart = $this->cartService->createNew($context->getToken(), $context->getSalesChannel()->getName());
+        $newCart = $this->cartService->createNew($context->getToken(), (string)$context->getSalesChannel()->getName());
         $newCart->setLineItems($backupCart->getLineItems());
 
         # set and persist
@@ -101,5 +100,4 @@ class CartBackupService
         $this->cartService->setCart($backupCart);
         $this->cartService->recalculate($backupCart, $context);
     }
-
 }

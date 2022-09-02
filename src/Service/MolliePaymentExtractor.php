@@ -13,8 +13,8 @@ class MolliePaymentExtractor
     /**
      * method extracts last created transaction if it is a mollie payment transaction.
      *
-     * @param OrderTransactionCollection|null $collection
-     * @return OrderTransactionEntity|null
+     * @param null|OrderTransactionCollection $collection
+     * @return null|OrderTransactionEntity
      */
     public function extractLastMolliePayment(?OrderTransactionCollection $collection): ?OrderTransactionEntity
     {
@@ -52,6 +52,8 @@ class MolliePaymentExtractor
             preg_quote(self::MOLLIE_PAYMENT_HANDLER_NAMESPACE)
         );
 
-        return preg_match($pattern, $transaction->getPaymentMethod()->getHandlerIdentifier()) === 1;
+        $handlerID = ($transaction->getPaymentMethod() instanceof PaymentMethodEntity) ? $transaction->getPaymentMethod()->getHandlerIdentifier() : '';
+
+        return preg_match($pattern, $handlerID) === 1;
     }
 }

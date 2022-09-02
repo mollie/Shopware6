@@ -29,7 +29,6 @@ class MollieLineItemBuilderTest extends TestCase
     public function setUp(): void
     {
         $this->builder = new MollieLineItemBuilder(
-            (new MollieOrderPriceBuilder()),
             (new IsOrderLineItemValid()),
             (new PriceCalculator()),
             (new LineItemDataExtractor()),

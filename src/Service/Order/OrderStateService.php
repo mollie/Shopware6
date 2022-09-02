@@ -9,6 +9,7 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\OrderStates;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity;
 
 class OrderStateService
 {
@@ -45,7 +46,7 @@ class OrderStateService
             return false;
         }
 
-        $currentStatus = $order->getStateMachineState()->getTechnicalName();
+        $currentStatus = ($order->getStateMachineState() instanceof StateMachineStateEntity) ? $order->getStateMachineState()->getTechnicalName() : '';
 
         // if current state is same as status that should be set, we don't need to do a transition
         if ($currentStatus === $orderState) {
@@ -72,13 +73,12 @@ class OrderStateService
 
             return true;
         } catch (Exception $e) {
-
             $this->logger->error(
-                $e->getMessage(), [
+                $e->getMessage(),
+                [
                     'function' => 'payment-automate-order-state',
                 ]
             );
-
         }
 
         return false;

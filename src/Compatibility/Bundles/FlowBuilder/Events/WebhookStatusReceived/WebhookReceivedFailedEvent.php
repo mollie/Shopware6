@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived;
 
-
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Shopware\Core\Checkout\Customer\CustomerDefinition;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
@@ -17,7 +16,6 @@ use Shopware\Core\Framework\Event\EventData\ScalarValueType;
 use Shopware\Core\Framework\Event\OrderAware;
 use Symfony\Contracts\EventDispatcher\Event;
 
-
 class WebhookReceivedFailedEvent extends AbstractWebhookReceivedEvent
 {
 
@@ -28,5 +26,4 @@ class WebhookReceivedFailedEvent extends AbstractWebhookReceivedEvent
     {
         return MolliePaymentStatus::MOLLIE_PAYMENT_FAILED;
     }
-
 }

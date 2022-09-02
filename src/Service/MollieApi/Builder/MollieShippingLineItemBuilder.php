@@ -67,5 +67,4 @@ class MollieShippingLineItemBuilder
 
         return $lines;
     }
-
 }

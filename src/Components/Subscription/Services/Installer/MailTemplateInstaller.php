@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Components\Subscription\Services\Installer;
 
-
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
@@ -14,7 +13,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
-
 
 class MailTemplateInstaller
 {
@@ -96,16 +94,17 @@ class MailTemplateInstaller
         $customer->setLastName('Doe');
 
 
-        $this->repoMailTypes->update([
+        $this->repoMailTypes->update(
             [
-                'id' => $reminderTypeID,
-                'templateData' => [
-                    'customer' => $customer,
-                    'subscription' => $subscription,
-                    'salesChannel' => $salesChannel,
+                [
+                    'id' => $reminderTypeID,
+                    'templateData' => [
+                        'customer' => $customer,
+                        'subscription' => $subscription,
+                        'salesChannel' => $salesChannel,
+                    ]
                 ]
-            ]
-        ],
+            ],
             $context
         );
     }
@@ -150,8 +149,8 @@ class MailTemplateInstaller
 
     /**
      * @param Connection $connection
-     * @return string
      * @throws Exception
+     * @return string
      */
     private function createMailTemplateType(Connection $connection): string
     {
@@ -216,8 +215,8 @@ class MailTemplateInstaller
     /**
      * @param Connection $connection
      * @param string $mailTemplateTypeId
-     * @return void
      * @throws Exception
+     * @return void
      */
     private function createMailTemplate(Connection $connection, string $mailTemplateTypeId): void
     {
@@ -301,8 +300,8 @@ class MailTemplateInstaller
     /**
      * @param Connection $connection
      * @param string $locale
-     * @return string|null
      * @throws Exception
+     * @return null|string
      */
     private function getLanguageIdByLocale(Connection $connection, string $locale): ?string
     {

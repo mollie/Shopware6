@@ -11,7 +11,9 @@ use Monolog\Processor\UidProcessor;
 use Monolog\Processor\WebProcessor;
 use Psr\Log\LoggerInterface;
 
-
+/**
+ * @phpstan-import-type Record from \Monolog\Logger
+ */
 class MollieLogger implements LoggerInterface
 {
 
@@ -48,12 +50,12 @@ class MollieLogger implements LoggerInterface
 
 
     /**
-     * @param $filename
-     * @param $retentionDays
-     * @param $logLevel
-     * @param $sessionId
+     * @param string $filename
+     * @param string $retentionDays
+     * @param string $logLevel
+     * @param string $sessionId
      */
-    public function __construct($filename, $retentionDays, $logLevel, $sessionId)
+    public function __construct(string $filename, string $retentionDays, string $logLevel, string $sessionId)
     {
         $this->sessionId = $sessionId;
 
@@ -67,7 +69,8 @@ class MollieLogger implements LoggerInterface
 
         # create a new file handler that creates a new file every day
         # it also makes sure, to only keep logs for the provided number of days
-        $fileHandler = new RotatingFileHandler($filename, $retentionDays, $logLevel);
+        /** @phpstan-ignore-next-line */
+        $fileHandler = new RotatingFileHandler($filename, (int)$retentionDays, $logLevel);
 
         # create our monolog instance that will be used to log messages
         $this->logger = new Logger(self::CHANNEL, [$fileHandler]);
@@ -76,7 +79,8 @@ class MollieLogger implements LoggerInterface
     /**
      * @param mixed $level
      * @param string $message
-     * @param array $context
+     * @param array<mixed> $context
+     * @return void
      */
     public function log($level, $message, array $context = [])
     {
@@ -84,145 +88,157 @@ class MollieLogger implements LoggerInterface
 
     /**
      * @param string $message
-     * @param array $context
+     * @param array<mixed> $context
      * @return void
      */
     public function debug($message, array $context = [])
     {
-        $record = $this->buildProcessorRecord(Logger::DEBUG);
+        $record = $this->buildProcessorRecord((string)Logger::DEBUG);
 
         $this->logger->debug(
             $this->modifyMessage($message),
+            /** @phpstan-ignore-next-line */
             $this->extendInfoData($context, $record)
         );
     }
 
     /**
      * @param string $message
-     * @param array $context
+     * @param array<mixed> $context
      * @return void
      */
     public function info($message, array $context = [])
     {
-        $record = $this->buildProcessorRecord(Logger::INFO);
+        $record = $this->buildProcessorRecord((string)Logger::INFO);
 
         $this->logger->info(
             $this->modifyMessage($message),
+            /** @phpstan-ignore-next-line */
             $this->extendInfoData($context, $record)
         );
     }
 
     /**
      * @param string $message
-     * @param array $context
+     * @param array<mixed> $context
      * @return void
      */
     public function notice($message, array $context = [])
     {
-        $record = $this->buildProcessorRecord(Logger::NOTICE);
+        $record = $this->buildProcessorRecord((string)Logger::NOTICE);
 
         $this->logger->notice(
             $this->modifyMessage($message),
+            /** @phpstan-ignore-next-line */
             $this->extendInfoData($context, $record)
         );
     }
 
     /**
      * @param string $message
-     * @param array $context
+     * @param array<mixed> $context
      * @return void
      */
     public function warning($message, array $context = [])
     {
-        $record = $this->buildProcessorRecord(Logger::WARNING);
+        $record = $this->buildProcessorRecord((string)Logger::WARNING);
 
         $this->logger->warning(
             $this->modifyMessage($message),
+            /** @phpstan-ignore-next-line */
             $this->extendInfoData($context, $record)
         );
     }
 
     /**
      * @param string $message
-     * @param array $context
+     * @param array<mixed> $context
      * @return void
      */
     public function error($message, array $context = [])
     {
-        $record = $this->buildProcessorRecord(Logger::ERROR);
+        $record = $this->buildProcessorRecord((string)Logger::ERROR);
 
         # we have to run introspection exactly 1 function hierarchy
         # below our actual call. so lets do it here
+        /** @phpstan-ignore-next-line */
         $introspection = $this->processorIntrospection->__invoke($record)['extra'];
 
         $this->logger->error(
             $this->modifyMessage($message),
+            /** @phpstan-ignore-next-line */
             $this->extendErrorData($context, $introspection, $record)
         );
     }
 
     /**
      * @param string $message
-     * @param array $context
+     * @param array<mixed> $context
      * @return void
      */
     public function critical($message, array $context = [])
     {
-        $record = $this->buildProcessorRecord(Logger::CRITICAL);
+        $record = $this->buildProcessorRecord((string)Logger::CRITICAL);
 
         # we have to run introspection exactly 1 function hierarchy
         # below our actual call. so lets do it here
+        /** @phpstan-ignore-next-line */
         $introspection = $this->processorIntrospection->__invoke($record)['extra'];
 
         $this->logger->critical(
             $this->modifyMessage($message),
+            /** @phpstan-ignore-next-line */
             $this->extendErrorData($context, $introspection, $record)
         );
     }
 
     /**
      * @param string $message
-     * @param array $context
+     * @param array<mixed> $context
      * @return void
      */
     public function alert($message, array $context = [])
     {
-        $record = $this->buildProcessorRecord(Logger::ALERT);
+        $record = $this->buildProcessorRecord((string)Logger::ALERT);
 
         # we have to run introspection exactly 1 function hierarchy
         # below our actual call. so lets do it here
+        /** @phpstan-ignore-next-line */
         $introspection = $this->processorIntrospection->__invoke($record)['extra'];
 
         $this->logger->alert(
             $this->modifyMessage($message),
+            /** @phpstan-ignore-next-line */
             $this->extendErrorData($context, $introspection, $record)
         );
     }
 
     /**
      * @param string $message
-     * @param array $context
+     * @param array<mixed> $context
      * @return void
      */
     public function emergency($message, array $context = [])
     {
-        $record = $this->buildProcessorRecord(Logger::EMERGENCY);
+        $record = $this->buildProcessorRecord((string)Logger::EMERGENCY);
 
         # we have to run introspection exactly 1 function hierarchy
         # below our actual call. so lets do it here
+        /** @phpstan-ignore-next-line */
         $introspection = $this->processorIntrospection->__invoke($record)['extra'];
 
         $this->logger->emergency(
             $this->modifyMessage($message),
+            /** @phpstan-ignore-next-line */
             $this->extendErrorData($context, $introspection, $record)
         );
     }
 
     /**
-     * @param $logLevel
-     * @return array
+     * @param string $logLevel
+     * @return array<mixed>
      */
-    private function buildProcessorRecord($logLevel)
+    private function buildProcessorRecord($logLevel): array
     {
         return [
             'level' => $logLevel,
@@ -231,10 +247,10 @@ class MollieLogger implements LoggerInterface
     }
 
     /**
-     * @param $message
+     * @param string $message
      * @return string
      */
-    private function modifyMessage($message)
+    private function modifyMessage($message): string
     {
         $sessionPart = substr($this->sessionId, 0, 4) . '...';
 
@@ -242,9 +258,9 @@ class MollieLogger implements LoggerInterface
     }
 
     /**
-     * @param array $context
-     * @param array $record
-     * @return array
+     * @param array<mixed> $context
+     * @phpstan-param  Record $record
+     * @return array<mixed>
      */
     private function extendInfoData(array $context, array $record)
     {
@@ -260,12 +276,12 @@ class MollieLogger implements LoggerInterface
     }
 
     /**
-     * @param array $context
-     * @param array $introspection
-     * @param array $record
-     * @return array
+     * @param array<mixed> $context
+     * @param array<mixed> $introspection
+     * @phpstan-param  Record $record
+     * @return array<mixed>
      */
-    private function extendErrorData(array $context, array $introspection, array $record)
+    private function extendErrorData(array $context, array $introspection, array $record): array
     {
         $additional = [
             'session' => $this->sessionId,
@@ -278,5 +294,4 @@ class MollieLogger implements LoggerInterface
 
         return array_merge_recursive($context, $additional);
     }
-
 }

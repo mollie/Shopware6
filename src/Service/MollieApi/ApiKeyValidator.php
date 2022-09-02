@@ -19,8 +19,8 @@ class ApiKeyValidator
 
     /**
      * @param string $key
-     * @return bool
      * @throws \Mollie\Api\Exceptions\ApiException
+     * @return bool
      */
     public function validate(string $key): bool
     {
@@ -29,6 +29,10 @@ class ApiKeyValidator
         /** @var Profile $profile */
         $profile = $apiClient->profiles->getCurrent();
 
-        return ($profile instanceof Profile && isset($profile->id));
+        if (!$profile instanceof Profile) {
+            return false;
+        }
+
+        return !empty($profile->id);
     }
 }

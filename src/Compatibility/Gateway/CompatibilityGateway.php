@@ -10,7 +10,6 @@ use Shopware\Core\System\SalesChannel\Context\SalesChannelContextServiceParamete
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 
-
 class CompatibilityGateway implements CompatibilityGatewayInterface
 {
 
@@ -81,12 +80,12 @@ class CompatibilityGateway implements CompatibilityGatewayInterface
     public function getChargebackOrderTransactionState(): string
     {
         // In progress state did not exist before 6.2, so set to open instead.
-        if(!$this->versionGTE('6.2')) {
+        if (!$this->versionGTE('6.2')) {
             return OrderTransactionStates::STATE_OPEN;
         }
 
         // Chargeback state did not exist before 6.2.3, so set to in progress instead.
-        if(!$this->versionGTE('6.2.3')) {
+        if (!$this->versionGTE('6.2.3')) {
             return OrderTransactionStates::STATE_IN_PROGRESS;
         }
 
@@ -107,5 +106,4 @@ class CompatibilityGateway implements CompatibilityGatewayInterface
     {
         return version_compare($this->swVersion, $version, '>=');
     }
-
 }

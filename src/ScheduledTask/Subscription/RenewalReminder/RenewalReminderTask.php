@@ -22,5 +22,4 @@ class RenewalReminderTask extends ScheduledTask
     {
         return 60 * 60; // 1 hour
     }
-
 }

@@ -2,16 +2,16 @@
 
 namespace Kiener\MolliePayments\Gateway\Mollie;
 
-
 use Kiener\MolliePayments\Factory\MollieApiFactory;
-use Kiener\MolliePayments\Gateway\Mollie\Model\SubscriptionDefinitionInterface;
+use Kiener\MolliePayments\Gateway\Mollie\Model\Issuer;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Mollie\Api\MollieApiClient;
+use Mollie\Api\Resources\Method;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\Profile;
 use Mollie\Api\Resources\Subscription;
-
+use Mollie\Api\Types\PaymentMethod;
 
 class MollieGateway implements MollieGatewayInterface
 {
@@ -46,8 +46,8 @@ class MollieGateway implements MollieGatewayInterface
     }
 
     /**
-     * @return string
      * @throws \Mollie\Api\Exceptions\ApiException
+     * @return string
      */
     public function getProfileId(): string
     {
@@ -61,8 +61,8 @@ class MollieGateway implements MollieGatewayInterface
     }
 
     /**
-     * @return string
      * @throws \Mollie\Api\Exceptions\ApiException
+     * @return string
      */
     public function getOrganizationId(): string
     {
@@ -89,9 +89,38 @@ class MollieGateway implements MollieGatewayInterface
     }
 
     /**
-     * @param string $orderId
-     * @return Order
      * @throws \Mollie\Api\Exceptions\ApiException
+     * @return Issuer[]
+     */
+    public function getIDealIssuers(): array
+    {
+        $parameters = [
+            'include' => 'issuers',
+        ];
+
+        /** @var Method $iDeal */
+        $iDeal = $this->apiClient->methods->get(PaymentMethod::IDEAL, $parameters);
+
+        $issuers = [];
+
+        /** @var \Mollie\Api\Resources\Issuer $issuer */
+        foreach ($iDeal->issuers as $issuer) {
+            $issuers[] = new Issuer(
+                $issuer->id,
+                $issuer->name,
+                $issuer->image->size1x,
+                $issuer->image->size2x,
+                $issuer->image->svg
+            );
+        }
+
+        return $issuers;
+    }
+
+    /**
+     * @param string $orderId
+     * @throws \Mollie\Api\Exceptions\ApiException
+     * @return Order
      */
     public function getOrder(string $orderId): Order
     {
@@ -107,8 +136,8 @@ class MollieGateway implements MollieGatewayInterface
 
     /**
      * @param string $paymentId
-     * @return Payment
      * @throws \Mollie\Api\Exceptions\ApiException
+     * @return Payment
      */
     public function getPayment(string $paymentId): Payment
     {
@@ -117,8 +146,8 @@ class MollieGateway implements MollieGatewayInterface
 
     /**
      * @param array<mixed> $data
-     * @return Payment
      * @throws \Mollie\Api\Exceptions\ApiException
+     * @return Payment
      */
     public function createPayment(array $data): Payment
     {
@@ -128,8 +157,8 @@ class MollieGateway implements MollieGatewayInterface
     /**
      * @param string $customerID
      * @param array<mixed> $data
-     * @return Subscription
      * @throws \Mollie\Api\Exceptions\ApiException
+     * @return Subscription
      */
     public function createSubscription(string $customerID, array $data): Subscription
     {
@@ -139,8 +168,8 @@ class MollieGateway implements MollieGatewayInterface
     /**
      * @param string $subscriptionId
      * @param string $customerId
-     * @return void
      * @throws \Mollie\Api\Exceptions\ApiException
+     * @return void
      */
     public function cancelSubscription(string $subscriptionId, string $customerId): void
     {
@@ -170,12 +199,11 @@ class MollieGateway implements MollieGatewayInterface
     /**
      * @param string $subscriptionId
      * @param string $customerId
-     * @return Subscription
      * @throws \Mollie\Api\Exceptions\ApiException
+     * @return Subscription
      */
     public function getSubscription(string $subscriptionId, string $customerId): Subscription
     {
         return $this->apiClient->subscriptions->getForId($customerId, $subscriptionId);
     }
-
 }

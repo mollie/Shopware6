@@ -2,6 +2,7 @@ openapi: "3.0.0"
 
 info:
   title: "Mollie Headless API"
+  version: "1.0"
   description: "This is a Swagger Template for all Headless cases of the Mollie plugin.<br /><br />Instructions:<ol><li>Configure the correct server domain, where your Shopware Store API ist available.</li><li>Click on Authorize and fill in the Access Key from your Sales Channel.</li><li>Then use the Cart request for Shopware to retrieve an Access-Token</li><li>Just copy the Access-Token and use it in the global authorize section too.</li></ol><br />Congratulations, you can now use the API requests."
 
 servers:
@@ -25,8 +26,8 @@ paths:
         - "Cart"
       summary: "Get your current cart"
       security:
-        - AccessKey: []
-        - AccessToken: []
+        - AccessKey: [ ]
+        - AccessToken: [ ]
       responses:
         "200":
           description: "successful operation"
@@ -37,8 +38,8 @@ paths:
         - "Cart"
       summary: "Add a line item to your cart"
       security:
-        - AccessKey: []
-        - AccessToken: []
+        - AccessKey: [ ]
+        - AccessToken: [ ]
       requestBody:
         content:
           application/json:
@@ -57,17 +58,17 @@ paths:
                       quantity:
                         default: "1"
       responses:
-          "200":
-            description: "successful operation"
+        "200":
+          description: "successful operation"
 
   /store-api/payment-method:
     post:
       tags:
-        - "Payment Methods"
-      summary: "Loads all available payment methods"
+        - "Cart"
+      summary: "Loads all available payment methods for your cart"
       security:
-        - AccessKey: []
-        - AccessToken: []
+        - AccessKey: [ ]
+        - AccessToken: [ ]
       requestBody:
         content:
           application/json:
@@ -81,6 +82,295 @@ paths:
       responses:
         "200":
           description: "successful operation"
+
+  /store-api/checkout/order:
+    post:
+      tags:
+        - "Cart"
+      summary: "Places the order"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/handle-payment:
+    post:
+      tags:
+        - "Cart"
+      summary: "Starts a payment for the previously placed order"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/mollie/creditcard/store-token/{customerId}/{cardToken}:
+    post:
+      tags:
+        - "Credit Card"
+      summary: "Save the card token from Mollie for an upcoming payment in Shopware"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      parameters:
+        - name: "customerId"
+          in: "path"
+          description: "Shopware Customer ID"
+          required: true
+        - name: "cardToken"
+          in: "path"
+          description: "Credit Card Token from the Mollie API Response"
+          required: true
+      responses:
+        "200":
+          description: "successful operation"
+
+
+  /store-api/mollie/ideal/issuers:
+    get:
+      tags:
+        - "iDEAL"
+      summary: "Gets a list of available iDEAL issuers"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/mollie/ideal/store-issuer/{customerId}/{issuerId}:
+    post:
+      tags:
+        - "iDEAL"
+      summary: "Save the selected issuer for an upcoming payment in Shopware"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      parameters:
+        - name: "customerId"
+          in: "path"
+          description: "Shopware Customer ID"
+          required: true
+        - name: "issuerId"
+          in: "path"
+          description: "Mollie Issuer ID of Mollie, e.g. ideal_ABNANL2A, ..."
+          required: true
+      responses:
+        "200":
+          description: "successful operation"
+
+
+  /store-api/mollie/applepay/enabled:
+    get:
+      tags:
+        - "Apple Pay Direct"
+      summary: "Gets if Apple Pay Direct is enabled and available for this Sales Channel"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/mollie/applepay/id:
+    get:
+      tags:
+        - "Apple Pay Direct"
+      summary: "Gets the ID of Apple Pay Direct in case you need to hide it"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/mollie/applepay/add-product:
+    post:
+      tags:
+        - "Apple Pay Direct"
+      summary: "Adds a new product to the Apple Pay Direct cart"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                productId:
+                  default: ""
+                quantity:
+                  default: 1
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/mollie/applepay/cart:
+    get:
+      tags:
+        - "Apple Pay Direct"
+      summary: "Gets the current prepared and formatted Apple Pay Direct cart"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/mollie/applepay/validate:
+    post:
+      tags:
+        - "Apple Pay Direct"
+      summary: "Should be used in the Apple Pay form as a merchant validation route"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                validationUrl:
+                  default: ""
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/mollie/applepay/shipping-methods:
+    post:
+      tags:
+        - "Apple Pay Direct"
+      summary: "Gets a list of available and formatted Apple Pay Direct shipping methods"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                countryCode:
+                  default: ""
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/mollie/applepay/shipping-method:
+    post:
+      tags:
+        - "Apple Pay Direct"
+      summary: "Sets a provided shipping method for the Apple Pay Direct cart"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                identifier:
+                  default: ""
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/mollie/applepay/pay:
+    post:
+      tags:
+        - "Apple Pay Direct"
+      summary: "Use this to create an order and start the payment process after getting the Apple Pay payment token and customer data"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  default: ""
+                firstname:
+                  default: ""
+                lastname:
+                  default: ""
+                street:
+                  default: ""
+                city:
+                  default: ""
+                postalCode:
+                  default: ""
+                countryCode:
+                  default: ""
+                paymentToken:
+                  default: ""
+                finishUrl:
+                  default: ""
+                errorUrl:
+                  default: ""
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/mollie/applepay/restore-cart:
+    post:
+      tags:
+        - "Apple Pay Direct"
+      summary: "Restores the original Shopware cart. Use this on Apple Pay cancellation events"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      responses:
+        "200":
+          description: "successful operation"
+
+
+
+  /api/mollie/webhook/{transactionId}:
+    post:
+      tags:
+        - "Webhooks"
+      summary: "Sends a payment status update webhook to Shopware"
+      parameters:
+        - in: "path"
+          name: "transactionId"
+          description: "ID of the Shopware Transaction that will be updated"
+          required: true
+      responses:
+        "200":
+          description: "successful operation"
+
+  /api/mollie/webhook/subscription/{subscriptionId}/renew:
+    post:
+      tags:
+        - "Webhooks"
+      summary: "Sends a subscription renewal webhook to Shopware"
+      parameters:
+        - in: "path"
+          name: "subscriptionId"
+          description: "ID of the Shopware Subscription that should be renewed"
+          required: true
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: "The matching transaction ID of Mollie that was captured. tr_xyz, ..."
+      responses:
+        "200":
+          description: "successful operation"
+
+
 
 components:
   securitySchemes:

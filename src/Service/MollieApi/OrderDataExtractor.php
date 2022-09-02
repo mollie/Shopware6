@@ -48,7 +48,6 @@ class OrderDataExtractor
         $orderCustomer = $order->getOrderCustomer();
 
         if (!$orderCustomer instanceof OrderCustomerEntity) {
-
             $this->logger->critical(
                 sprintf('Could not fetch customer from order with id %s', $order->getId())
             );
@@ -57,12 +56,11 @@ class OrderDataExtractor
         }
 
         $enrichedCustomer = $this->customerService->getCustomer(
-            $orderCustomer->getCustomerId(),
+            (string)$orderCustomer->getCustomerId(),
             $salesChannelContext->getContext()
         );
 
         if (!$enrichedCustomer instanceof CustomerEntity) {
-
             $this->logger->critical(
                 sprintf('Could not find customer with id %s in database', $order->getId())
             );
@@ -78,7 +76,6 @@ class OrderDataExtractor
         $currency = $orderEntity->getCurrency();
 
         if (!$currency instanceof CurrencyEntity) {
-
             $this->logger->critical(
                 sprintf('Could not fetch currency from order with id %s', $orderEntity->getId())
             );
@@ -112,7 +109,6 @@ class OrderDataExtractor
         $deliveries = $orderEntity->getDeliveries();
 
         if (!$deliveries instanceof OrderDeliveryCollection) {
-
             $this->logger->critical(
                 sprintf('Could not fetch deliveries from order with id %s', $orderEntity->getId())
             );
@@ -134,7 +130,6 @@ class OrderDataExtractor
         $delivery = $deliveries->first();
 
         if (!$delivery instanceof OrderDeliveryEntity) {
-
             $this->logger->critical(
                 sprintf('Could not fetch deliveries from order with id %s', $orderEntity->getId())
             );
@@ -150,7 +145,6 @@ class OrderDataExtractor
         $lineItems = $orderEntity->getLineItems();
 
         if (!$lineItems instanceof OrderLineItemCollection) {
-
             $this->logger->critical(
                 sprintf('Could not fetch line items from order with id %s', $orderEntity->getId())
             );

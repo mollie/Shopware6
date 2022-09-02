@@ -14,6 +14,14 @@ export default class Shopware {
     }
 
     /**
+     *
+     * @returns {string}
+     */
+    getStoreApiToken() {
+        return Cypress.env().STORE_APIKEY;
+    }
+
+    /**
      * This function makes sure to prepare our Shopware session
      * before leaving our domain for now.
      * When we get back, our session should still be the same

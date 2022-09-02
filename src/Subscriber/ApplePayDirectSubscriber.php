@@ -36,7 +36,7 @@ class ApplePayDirectSubscriber implements EventSubscriberInterface
     /**
      * @param StorefrontRenderEvent $event
      */
-    public function onStorefrontRender(StorefrontRenderEvent $event)
+    public function onStorefrontRender(StorefrontRenderEvent $event) : void
     {
         $settings = $this->settingsService->getSettings($event->getSalesChannelContext()->getSalesChannel()->getId());
 
@@ -45,5 +45,4 @@ class ApplePayDirectSubscriber implements EventSubscriberInterface
         $event->setParameter('mollie_applepaydirect_enabled', $applePayDirectEnabled);
         $event->setParameter('mollie_applepaydirect_restrictions', $settings->getRestrictApplePayDirect());
     }
-
 }

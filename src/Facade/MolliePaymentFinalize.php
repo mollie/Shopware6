@@ -3,7 +3,6 @@
 namespace Kiener\MolliePayments\Facade;
 
 use Kiener\MolliePayments\Exception\MissingMollieOrderIdException;
-use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
@@ -13,13 +12,9 @@ use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Service\UpdateOrderTransactionCustomFields;
+use Kiener\MolliePayments\Struct\CreditCardStruct;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
-use Kiener\MolliePayments\Struct\OrderTransaction\OrderTransactionAttributes;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
-use Mollie\Api\Exceptions\ApiException;
-use Mollie\Api\Exceptions\IncompatiblePlatform;
-use Mollie\Api\Resources\Payment;
-use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\Exception\AsyncPaymentFinalizeException;
 use Shopware\Core\Checkout\Payment\Exception\CustomerCanceledAsyncPaymentException;
@@ -28,11 +23,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class MolliePaymentFinalize
 {
-
-    /**
-     * @var MollieApiFactory
-     */
-    private $mollieApiFactory;
 
     /**
      * @var OrderStatusConverter
@@ -47,14 +37,6 @@ class MolliePaymentFinalize
      */
     private $settingsService;
     /**
-     * @var UpdateOrderCustomFields
-     */
-    private $updateOrderCustomFields;
-    /**
-     * @var UpdateOrderTransactionCustomFields
-     */
-    private $updateOrderTransactionCustomFields;
-    /**
      * @var Order
      */
     private $mollieOrderService;
@@ -66,23 +48,17 @@ class MolliePaymentFinalize
 
 
     /**
-     * @param MollieApiFactory $mollieApiFactory
      * @param OrderStatusConverter $orderStatusConverter
      * @param OrderStatusUpdater $orderStatusUpdater
      * @param SettingsService $settingsService
-     * @param UpdateOrderCustomFields $updateOrderCustomFields
-     * @param UpdateOrderTransactionCustomFields $updateOrderTransactionCustomFields
      * @param Order $mollieOrderService
      * @param OrderService $orderService
      */
-    public function __construct(MollieApiFactory $mollieApiFactory, OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, UpdateOrderCustomFields $updateOrderCustomFields, UpdateOrderTransactionCustomFields $updateOrderTransactionCustomFields, Order $mollieOrderService, OrderService $orderService)
+    public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, Order $mollieOrderService, OrderService $orderService)
     {
-        $this->mollieApiFactory = $mollieApiFactory;
         $this->orderStatusConverter = $orderStatusConverter;
         $this->orderStatusUpdater = $orderStatusUpdater;
         $this->settingsService = $settingsService;
-        $this->updateOrderCustomFields = $updateOrderCustomFields;
-        $this->updateOrderTransactionCustomFields = $updateOrderTransactionCustomFields;
         $this->mollieOrderService = $mollieOrderService;
         $this->orderService = $orderService;
     }
@@ -110,9 +86,9 @@ class MolliePaymentFinalize
             $salesChannelContext->getSalesChannel()->getId(),
             ['embed' => 'payments']
         );
+
         $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
         $paymentStatus = $this->orderStatusConverter->getMollieOrderStatus($mollieOrder);
-
 
         # Attention
         # Our payment status will either be set by us, or automatically by Shopware using exceptions below.
@@ -146,23 +122,17 @@ class MolliePaymentFinalize
         # or make sure to throw an exception for Shopware in case
         # of failed payments.
         if (!MolliePaymentStatus::isFailedStatus($molliePaymentMethodKey, $paymentStatus)) {
-
             $this->orderStatusUpdater->updatePaymentStatus($transactionStruct->getOrderTransaction(), $paymentStatus, $salesChannelContext->getContext());
-
         } else {
-
             $orderTransactionID = $transactionStruct->getOrderTransaction()->getUniqueIdentifier();
 
             # let's also create a different handling, if the customer either cancelled
             # or if the payment really failed. this will lead to a different order payment status in the end.
             if ($paymentStatus === MolliePaymentStatus::MOLLIE_PAYMENT_CANCELED) {
-
                 $message = sprintf('Payment for order %s (%s) was cancelled by the customer.', $order->getOrderNumber(), $mollieOrder->id);
 
                 throw new CustomerCanceledAsyncPaymentException($orderTransactionID, $message);
-
             } else {
-
                 $message = sprintf('Payment for order %s (%s) failed. The Mollie payment status was not successful for this payment attempt.', $order->getOrderNumber(), $mollieOrder->id);
 
                 throw new AsyncPaymentFinalizeException($orderTransactionID, $message);
@@ -178,7 +148,5 @@ class MolliePaymentFinalize
             $transactionStruct->getOrderTransaction()->getId(),
             $salesChannelContext
         );
-
     }
-
 }

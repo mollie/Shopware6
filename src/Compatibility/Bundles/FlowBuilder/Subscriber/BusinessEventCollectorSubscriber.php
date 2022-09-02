@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Subscriber;
 
-
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund\RefundStartedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionCancelledEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionEndedEvent;
@@ -26,7 +25,6 @@ use Shopware\Core\Framework\Event\BusinessEventCollectorEvent;
 use Shopware\Core\Framework\Event\BusinessEventDefinition;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-
 class BusinessEventCollectorSubscriber implements EventSubscriberInterface
 {
 
@@ -45,7 +43,7 @@ class BusinessEventCollectorSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @return array[]
+     * @return array<mixed>
      */
     public static function getSubscribedEvents()
     {
@@ -91,5 +89,4 @@ class BusinessEventCollectorSubscriber implements EventSubscriberInterface
             $collection->set($definition->getName(), $definition);
         }
     }
-
 }

@@ -24,8 +24,8 @@ class Customer
     /**
      * @param string $customerId
      * @param string $salesChannelId
-     * @return MollieCustomer
      * @throws CouldNotFetchMollieCustomerException
+     * @return MollieCustomer
      */
     public function getMollieCustomerById(string $customerId, string $salesChannelId): MollieCustomer
     {
@@ -40,8 +40,8 @@ class Customer
 
     /**
      * @param CustomerEntity $customer
-     * @return MollieCustomer
      * @throws CouldNotCreateMollieCustomerException
+     * @return MollieCustomer
      */
     public function createCustomerAtMollie(CustomerEntity $customer): MollieCustomer
     {
@@ -66,7 +66,7 @@ class Customer
 
     public function isLegacyCustomerValid(?string $legacyCustomerId, string $salesChannelId): bool
     {
-        if(empty($legacyCustomerId)) {
+        if (empty($legacyCustomerId)) {
             return false;
         }
 

@@ -2,24 +2,20 @@
 
 namespace Kiener\MolliePayments\Struct\Order;
 
-
-use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
-use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
-use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
-
+use stdClass;
 
 class OrderAttributes
 {
     /**
-     * @var string|null
+     * @var null|string
      */
     private $mollieOrderId;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $molliePaymentId;
 
@@ -34,19 +30,55 @@ class OrderAttributes
     private $mollieSubscriptionId;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $thirdPartyPaymentId;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $transactionReturnUrl;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $molliePaymentUrl;
+
+    /**
+     * @var string
+     */
+    private $creditCardNumber;
+
+    /**
+     * @var string
+     */
+    private $creditCardHolder;
+
+    /**
+     * @var string
+     */
+    private $creditCardAudience;
+
+    /**
+     * @var string
+     */
+    private $creditCardLabel;
+
+    /**
+     * @var string
+     */
+    private $creditCardCountryCode;
+
+    /**
+     * @var string
+     */
+    private $creditCardSecurity;
+
+    /**
+     * @var string
+     */
+    private $creditCardFeeRegion;
+
 
     /**
      * @var OrderEntity
@@ -67,6 +99,13 @@ class OrderAttributes
         $this->thirdPartyPaymentId = $this->getCustomFieldValue($order, 'third_party_payment_id');
         $this->transactionReturnUrl = $this->getCustomFieldValue($order, 'transactionReturnUrl');
         $this->molliePaymentUrl = $this->getCustomFieldValue($order, 'molliePaymentUrl');
+        $this->creditCardNumber = $this->getCustomFieldValue($order, 'creditCardNumber');
+        $this->creditCardHolder = $this->getCustomFieldValue($order, 'creditCardHolder');
+        $this->creditCardAudience = $this->getCustomFieldValue($order, 'creditCardAudience');
+        $this->creditCardLabel = $this->getCustomFieldValue($order, 'creditCardLabel');
+        $this->creditCardCountryCode = $this->getCustomFieldValue($order, 'creditCardCountryCode');
+        $this->creditCardSecurity = $this->getCustomFieldValue($order, 'creditCardSecurity');
+        $this->creditCardFeeRegion = $this->getCustomFieldValue($order, 'creditCardFeeRegion');
     }
 
     /**
@@ -78,7 +117,7 @@ class OrderAttributes
     }
 
     /**
-     * @param string|null $mollieOrderId
+     * @param null|string $mollieOrderId
      */
     public function setMollieOrderId(?string $mollieOrderId): void
     {
@@ -94,7 +133,7 @@ class OrderAttributes
     }
 
     /**
-     * @param string|null $molliePaymentId
+     * @param null|string $molliePaymentId
      */
     public function setMolliePaymentId(?string $molliePaymentId): void
     {
@@ -102,7 +141,7 @@ class OrderAttributes
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getThirdPartyPaymentId(): ?string
     {
@@ -110,7 +149,7 @@ class OrderAttributes
     }
 
     /**
-     * @param string|null $thirdPartyPaymentId
+     * @param null|string $thirdPartyPaymentId
      */
     public function setThirdPartyPaymentId(?string $thirdPartyPaymentId): void
     {
@@ -118,7 +157,7 @@ class OrderAttributes
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getTransactionReturnUrl(): ?string
     {
@@ -126,7 +165,7 @@ class OrderAttributes
     }
 
     /**
-     * @param string|null $transactionReturnUrl
+     * @param null|string $transactionReturnUrl
      */
     public function setTransactionReturnUrl(?string $transactionReturnUrl): void
     {
@@ -144,7 +183,7 @@ class OrderAttributes
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getMolliePaymentUrl(): ?string
     {
@@ -152,12 +191,154 @@ class OrderAttributes
     }
 
     /**
-     * @param string|null $molliePaymentUrl
+     * @param null|string $molliePaymentUrl
      */
     public function setMolliePaymentUrl(?string $molliePaymentUrl): void
     {
         $this->molliePaymentUrl = $molliePaymentUrl;
     }
+
+    /**
+     * @return string
+     */
+    public function getCreditCardNumber(): string
+    {
+        return $this->creditCardNumber;
+    }
+
+    /**
+     * @param string $creditCardNumber
+     */
+    public function setCreditCardNumber(string $creditCardNumber): void
+    {
+        $this->creditCardNumber = $creditCardNumber;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCreditCardHolder(): string
+    {
+        return $this->creditCardHolder;
+    }
+
+    /**
+     * @param string $creditCardHolder
+     */
+    public function setCreditCardHolder(string $creditCardHolder): void
+    {
+        $this->creditCardHolder = $creditCardHolder;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCreditCardAudience(): string
+    {
+        return $this->creditCardAudience;
+    }
+
+    /**
+     * @param string $creditCardAudience
+     */
+    public function setCreditCardAudience(string $creditCardAudience): void
+    {
+        $this->creditCardAudience = $creditCardAudience;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCreditCardLabel(): string
+    {
+        return $this->creditCardLabel;
+    }
+
+    /**
+     * @param string $creditCardLabel
+     */
+    public function setCreditCardLabel(string $creditCardLabel): void
+    {
+        $this->creditCardLabel = $creditCardLabel;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCreditCardCountryCode(): string
+    {
+        return $this->creditCardCountryCode;
+    }
+
+    /**
+     * @param string $creditCardCountryCode
+     */
+    public function setCreditCardCountryCode(string $creditCardCountryCode): void
+    {
+        $this->creditCardCountryCode = $creditCardCountryCode;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCreditCardSecurity(): string
+    {
+        return $this->creditCardSecurity;
+    }
+
+    /**
+     * @param string $creditCardSecurity
+     */
+    public function setCreditCardSecurity(string $creditCardSecurity): void
+    {
+        $this->creditCardSecurity = $creditCardSecurity;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCreditCardFeeRegion(): string
+    {
+        return $this->creditCardFeeRegion;
+    }
+
+    /**
+     * @param string $creditCardFeeRegion
+     */
+    public function setCreditCardFeeRegion(string $creditCardFeeRegion): void
+    {
+        $this->creditCardFeeRegion = $creditCardFeeRegion;
+    }
+
+    /**
+     * @param null|stdClass $details
+     * @return void
+     */
+    public function setCreditCardDetails(?stdClass $details)
+    {
+        if (!empty($details->cardNumber)) {
+            $this->creditCardNumber = $details->cardNumber;
+        }
+        if (!empty($details->cardHolder)) {
+            $this->creditCardHolder = $details->cardHolder;
+        }
+        if (!empty($details->cardAudience)) {
+            $this->creditCardAudience = $details->cardAudience;
+        }
+        if (!empty($details->cardLabel)) {
+            $this->creditCardLabel = $details->cardLabel;
+        }
+        if (!empty($details->cardCountryCode)) {
+            $this->creditCardCountryCode = $details->cardCountryCode;
+        }
+        if (!empty($details->cardSecurity)) {
+            $this->creditCardSecurity = $details->cardSecurity;
+        }
+        if (!empty($details->feeRegion)) {
+            $this->creditCardFeeRegion = $details->feeRegion;
+        }
+    }
+
 
     /**
      * @return array<string,mixed>
@@ -194,6 +375,34 @@ class OrderAttributes
 
         if ((string)$this->molliePaymentUrl !== '') {
             $mollieData['molliePaymentUrl'] = $this->molliePaymentUrl;
+        }
+
+        if ((string)$this->creditCardNumber !== '') {
+            $mollieData['creditCardNumber'] = $this->creditCardNumber;
+        }
+
+        if ((string)$this->creditCardHolder !== '') {
+            $mollieData['creditCardHolder'] = $this->creditCardHolder;
+        }
+
+        if ((string)$this->creditCardAudience !== '') {
+            $mollieData['creditCardAudience'] = $this->creditCardAudience;
+        }
+
+        if ((string)$this->creditCardLabel !== '') {
+            $mollieData['creditCardLabel'] = $this->creditCardLabel;
+        }
+
+        if ((string)$this->creditCardCountryCode !== '') {
+            $mollieData['creditCardCountryCode'] = $this->creditCardCountryCode;
+        }
+
+        if ((string)$this->creditCardSecurity !== '') {
+            $mollieData['creditCardSecurity'] = $this->creditCardSecurity;
+        }
+
+        if ((string)$this->creditCardFeeRegion !== '') {
+            $mollieData['creditCardFeeRegion'] = $this->creditCardFeeRegion;
         }
 
         return [

@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Handler;
 use Kiener\MolliePayments\Exception\PaymentUrlException;
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Facade\MolliePaymentFinalize;
+use Kiener\MolliePayments\Service\Transition\TransactionTransitionService;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Mollie\Api\Exceptions\ApiException;
@@ -31,7 +32,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
     /** @var string */
     protected $paymentMethod;
 
-    /** @var array */
+    /** @var array<mixed> */
     protected $paymentMethodData = [];
 
     /** @var LoggerInterface */
@@ -64,11 +65,11 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
 
 
     /**
-     * @param array $orderData
+     * @param array<mixed> $orderData
      * @param OrderEntity $orderEntity
      * @param SalesChannelContext $salesChannelContext
      * @param CustomerEntity $customer
-     * @return array
+     * @return array<mixed>
      */
     public function processPaymentMethodSpecificParameters(array $orderData, OrderEntity $orderEntity, SalesChannelContext $salesChannelContext, CustomerEntity $customer): array
     {
@@ -87,9 +88,9 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      * @param RequestDataBag $dataBag
      * @param SalesChannelContext $salesChannelContext
      *
+     * @throws ApiException
      * @return RedirectResponse @see AsyncPaymentProcessException exception if an error ocurres while processing the
      *                          payment
-     * @throws ApiException
      */
     public function pay(AsyncPaymentTransactionStruct $transaction, RequestDataBag $dataBag, SalesChannelContext $salesChannelContext): RedirectResponse
     {
@@ -107,7 +108,6 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
 
 
         try {
-
             $paymentData = $this->payFacade->startMolliePayment(
                 $this->paymentMethod,
                 $transaction,
@@ -116,9 +116,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             );
 
             $paymentUrl = $paymentData->getCheckoutURL();
-
         } catch (Throwable $exception) {
-
             $this->logger->error(
                 'Error when starting Mollie payment: ' . $exception->getMessage(),
                 [
@@ -136,9 +134,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             # we will process the order transaction, which means we set it to be IN PROGRESS.
             # this is just how it works at the moment, I did only add the comment for it here :)
             $this->transactionTransitionService->processTransaction($transaction->getOrderTransaction(), $salesChannelContext->getContext());
-
         } catch (\Exception $exception) {
-
             $this->logger->warning(
                 sprintf('Could not set payment to in progress. Got error %s', $exception->getMessage())
             );
@@ -166,18 +162,14 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
 
         $this->logger->info(
             'Finalizing Mollie payment for order ' . $transaction->getOrder()->getOrderNumber() . ' with payment: ' . $this->paymentMethod . ' and Mollie ID' . $molliedID,
-
             [
                 'saleschannel' => $salesChannelContext->getSalesChannel()->getName(),
             ]
         );
 
         try {
-
             $this->finalizeFacade->finalize($transaction, $salesChannelContext);
-
         } catch (AsyncPaymentFinalizeException|CustomerCanceledAsyncPaymentException $ex) {
-
             $this->logger->error(
                 'Error when finalizing order ' . $transaction->getOrder()->getOrderNumber() . ', Mollie ID: ' . $molliedID . ', ' . $ex->getMessage()
             );
@@ -185,7 +177,6 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             # these are already correct exceptions
             # that cancel the Shopware order in a coordinated way by Shopware
             throw $ex;
-
         } catch (Throwable $ex) {
 
             # this processes all unhandled exceptions.
@@ -211,17 +202,24 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      * construction and not already existing, so that a circular reference is occurring?
      * I have no clue, but lazy loading will fix this.
      *
-     * @return void
      * @throws \Exception
+     * @return void
      */
     private function loadServices(): void
     {
         /** @var \Symfony\Component\DependencyInjection\Container $container */
-        $container = $this->container;#
+        $container = $this->container;
 
-        $this->payFacade = $container->get('Kiener\MolliePayments\Facade\MolliePaymentDoPay');
-        $this->finalizeFacade = $container->get('Kiener\MolliePayments\Facade\MolliePaymentFinalize');
-        $this->transactionTransitionService = $container->get('Kiener\MolliePayments\Service\Transition\TransactionTransitionService');
+        /** @var MolliePaymentDoPay $payFacade */
+        $payFacade = $container->get('Kiener\MolliePayments\Facade\MolliePaymentDoPay');
+        $this->payFacade = $payFacade;
+
+        /** @var MolliePaymentFinalize $finalizeFacade */
+        $finalizeFacade = $container->get('Kiener\MolliePayments\Facade\MolliePaymentFinalize');
+        $this->finalizeFacade = $finalizeFacade;
+
+        /** @var TransactionTransitionService $transactionTransitionService */
+        $transactionTransitionService = $container->get('Kiener\MolliePayments\Service\Transition\TransactionTransitionService');
+        $this->transactionTransitionService = $transactionTransitionService;
     }
-
 }

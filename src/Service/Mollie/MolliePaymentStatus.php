@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Service\Mollie;
 
-
 class MolliePaymentStatus
 {
     const MOLLIE_PAYMENT_UNKNOWN = 'unknown';
@@ -62,7 +61,7 @@ class MolliePaymentStatus
      * This means that the order is approved.
      * This does not mean that its already completely paid.
      *
-     * @param $status
+     * @param string $status
      * @return bool
      */
     public static function isApprovedStatus($status)
@@ -76,5 +75,4 @@ class MolliePaymentStatus
 
         return (in_array($status, $list, true));
     }
-
 }

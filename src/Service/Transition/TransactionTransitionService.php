@@ -8,6 +8,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionDefi
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 
 class TransactionTransitionService implements TransactionTransitionServiceInterface
@@ -34,10 +35,9 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
      */
     public function __construct(
         TransitionServiceInterface $transitionService,
-        CompatibilityFactory $compatibilityFactory,
-        LoggerInterface $loggerService
-    )
-    {
+        CompatibilityFactory       $compatibilityFactory,
+        LoggerInterface            $loggerService
+    ) {
         $this->transitionService = $transitionService;
         $this->compatibilityFactory = $compatibilityFactory;
         $this->logger = $loggerService;
@@ -53,10 +53,9 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
             return;
         }
 
-        $technicalName = $transaction->getStateMachineState()->getTechnicalName();
+        $technicalName = ($transaction->getStateMachineState() instanceof StateMachineStateEntity) ? $transaction->getStateMachineState()->getTechnicalName() : '';
 
         if ($this->isFinalOrTargetStatus($technicalName, [OrderTransactionStates::STATE_IN_PROGRESS])) {
-
             return;
         }
 
@@ -72,10 +71,10 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
 
     public function reOpenTransaction(OrderTransactionEntity $transaction, Context $context): void
     {
-        $currentStatus = $transaction->getStateMachineState()->getTechnicalName();
+        $currentStatus = ($transaction->getStateMachineState() instanceof StateMachineStateEntity) ? $transaction->getStateMachineState()->getTechnicalName() : '';
+        $currentStatusName = ($transaction->getStateMachineState() instanceof StateMachineStateEntity) ? $transaction->getStateMachineState()->getName() : '';
 
         if ($this->isFinalOrTargetStatus($currentStatus, [OrderTransactionStates::STATE_OPEN])) {
-
             return;
         }
 
@@ -83,11 +82,10 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         $availableTransitions = $this->getAvailableTransitions($entityId, $context);
 
         if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_REOPEN, $availableTransitions)) {
-
             $this->logger->error(
                 sprintf(
                     'It is not allowed to change status to open from %s. Aborting reopen transition',
-                    $transaction->getStateMachineState()->getName()
+                    $currentStatusName
                 )
             );
 
@@ -107,7 +105,7 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
             $payActionName = StateMachineTransitionActions::ACTION_PAID;
         }
 
-        $currentStatus = $transaction->getStateMachineState()->getTechnicalName();
+        $currentStatus = ($transaction->getStateMachineState() instanceof StateMachineStateEntity) ? $transaction->getStateMachineState()->getTechnicalName() : '';
 
         if ($this->isFinalOrTargetStatus($currentStatus, [$payActionName])) {
             return;
@@ -125,10 +123,9 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
 
     public function cancelTransaction(OrderTransactionEntity $transaction, Context $context): void
     {
-        $currentStatus = $transaction->getStateMachineState()->getTechnicalName();
+        $currentStatus = ($transaction->getStateMachineState() instanceof StateMachineStateEntity) ? $transaction->getStateMachineState()->getTechnicalName() : '';
 
         if ($this->isFinalOrTargetStatus($currentStatus, [OrderTransactionStates::STATE_CANCELLED])) {
-
             return;
         }
 
@@ -151,10 +148,9 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
             return;
         }
 
-        $currentStatus = $transaction->getStateMachineState()->getTechnicalName();
+        $currentStatus = ($transaction->getStateMachineState() instanceof StateMachineStateEntity) ? $transaction->getStateMachineState()->getTechnicalName() : '';
 
         if ($this->isFinalOrTargetStatus($currentStatus, [OrderTransactionStates::STATE_CANCELLED, OrderTransactionStates::STATE_FAILED])) {
-
             return;
         }
 
@@ -179,10 +175,9 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
 
         $authorizedState = OrderTransactionStates::STATE_AUTHORIZED;
 
-        $currentStatus = $transaction->getStateMachineState()->getTechnicalName();
+        $currentStatus = ($transaction->getStateMachineState() instanceof StateMachineStateEntity) ? $transaction->getStateMachineState()->getTechnicalName() : '';
 
         if ($this->isFinalOrTargetStatus($currentStatus, [$authorizedState, OrderTransactionStates::STATE_PAID])) {
-
             return;
         }
 
@@ -198,10 +193,9 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
 
     public function refundTransaction(OrderTransactionEntity $transaction, Context $context): void
     {
-        $currentStatus = $transaction->getStateMachineState()->getTechnicalName();
+        $currentStatus = ($transaction->getStateMachineState() instanceof StateMachineStateEntity) ? $transaction->getStateMachineState()->getTechnicalName() : '';
 
         if ($this->isFinalOrTargetStatus($currentStatus, [OrderTransactionStates::STATE_REFUNDED])) {
-
             return;
         }
 
@@ -217,10 +211,9 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
 
     public function partialRefundTransaction(OrderTransactionEntity $transaction, Context $context): void
     {
-        $currentStatus = $transaction->getStateMachineState()->getTechnicalName();
+        $currentStatus = ($transaction->getStateMachineState() instanceof StateMachineStateEntity) ? $transaction->getStateMachineState()->getTechnicalName() : '';
 
         if ($this->isFinalOrTargetStatus($currentStatus, [OrderTransactionStates::STATE_PARTIALLY_REFUNDED])) {
-
             return;
         }
 
@@ -239,13 +232,14 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         $compatibilityGateway = $this->compatibilityFactory->createGateway();
 
         $chargebackState = $compatibilityGateway->getChargebackOrderTransactionState();
-        $currentState = $transaction->getStateMachineState()->getTechnicalName();
+
+        $currentState = ($transaction->getStateMachineState() instanceof StateMachineStateEntity) ? $transaction->getStateMachineState()->getTechnicalName() : '';
 
         if ($this->isFinalOrTargetStatus($currentState, [$chargebackState])) {
             return;
         }
 
-        if($chargebackState !== 'chargeback') {
+        if ($chargebackState !== 'chargeback') {
             $this->processTransaction($transaction, $context);
             return;
         }
@@ -260,6 +254,11 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         $this->performTransition($entityId, StateMachineTransitionActions::ACTION_CHARGEBACK, $context);
     }
 
+    /**
+     * @param string $currentStatus
+     * @param array<mixed> $targetStatus
+     * @return bool
+     */
     private function isFinalOrTargetStatus(string $currentStatus, array $targetStatus): bool
     {
         if ($this->isFinalStatus($currentStatus)) {
@@ -274,11 +273,21 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         return $orderTransactionStatus === OrderTransactionStates::STATE_REFUNDED;
     }
 
+    /**
+     * @param string $transition
+     * @param array<mixed> $availableTransitions
+     * @return bool
+     */
     private function transitionIsAllowed(string $transition, array $availableTransitions): bool
     {
         return $this->transitionService->transitionIsAllowed($transition, $availableTransitions);
     }
 
+    /**
+     * @param string $entityId
+     * @param Context $context
+     * @return array<mixed>
+     */
     private function getAvailableTransitions(string $entityId, Context $context): array
     {
         return $this->transitionService->getAvailableTransitions(OrderTransactionDefinition::ENTITY_NAME, $entityId, $context);

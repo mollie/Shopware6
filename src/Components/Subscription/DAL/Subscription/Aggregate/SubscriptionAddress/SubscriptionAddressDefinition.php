@@ -23,10 +23,8 @@ use Shopware\Core\System\Country\Aggregate\CountryState\CountryStateDefinition;
 use Shopware\Core\System\Country\CountryDefinition;
 use Shopware\Core\System\Salutation\SalutationDefinition;
 
-
 class SubscriptionAddressDefinition extends EntityDefinition
 {
-
     public const ENTITY_NAME = 'mollie_subscription_address';
 
     /**
@@ -98,5 +96,4 @@ class SubscriptionAddressDefinition extends EntityDefinition
 
         ]);
     }
-
 }

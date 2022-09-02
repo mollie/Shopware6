@@ -25,22 +25,17 @@ class MailService extends AbstractMailService
      */
     private $mailSender;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
 
-    public function __construct(
-        DataValidator       $dataValidator,
-        AbstractMailFactory $mailFactory,
-        AbstractMailSender  $mailSender,
-        LoggerInterface     $logger
-    )
+    /**
+     * @param DataValidator $dataValidator
+     * @param AbstractMailFactory $mailFactory
+     * @param AbstractMailSender $mailSender
+     */
+    public function __construct(DataValidator $dataValidator, AbstractMailFactory $mailFactory, AbstractMailSender $mailSender)
     {
         $this->dataValidator = $dataValidator;
         $this->mailFactory = $mailFactory;
         $this->mailSender = $mailSender;
-        $this->logger = $logger;
     }
 
     /**
@@ -70,8 +65,8 @@ class MailService extends AbstractMailService
 
     /**
      * Copied from MailFactory
-     * @param array $addresses
-     * @return array
+     * @param array<mixed> $addresses
+     * @return array<mixed>
      */
     private function formatMailAddresses(array $addresses): array
     {

@@ -1,10 +1,11 @@
 {
   "devDependencies": {
-    "@cucumber/tag-expressions": "^3.0.1",
     "@cypress/webpack-preprocessor": "^5.12.0",
     "axios": "^0.21.4",
-    "cypress": "^8.7.0",
-    "cypress-testrail": "^1.1.0",
+    "cypress": "10.4.0",
+    "cypress-filters": "1.2.3",
+    "cypress-mollie": "1.3.0",
+    "cypress-testrail": "2.1.1",
     "webpack": "^4.46.0"
   },
   "dependencies": {}

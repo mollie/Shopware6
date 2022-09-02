@@ -10,7 +10,7 @@ class MollieOrderCouldNotBeShippedException extends ShopwareHttpException
     /**
      * @param string $mollieOrderID
      * @param array<string,mixed> $parameters
-     * @param \Throwable|null $e
+     * @param null|\Throwable $e
      */
     public function __construct(string $mollieOrderID, array $parameters = [], ?\Throwable $e = null)
     {

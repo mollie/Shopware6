@@ -38,8 +38,7 @@ class MollieOrderShipmentTrackingEvent
         string  $trackingCarrier,
         string  $trackingCode,
         string  $trackingUrl
-    )
-    {
+    ) {
         $this->orderId = $orderId;
         $this->context = $context;
         $this->trackingCarrier = $trackingCarrier;

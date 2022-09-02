@@ -2,10 +2,7 @@
 
 namespace Kiener\MolliePayments\Components\Subscription\Cart\Error;
 
-
 use Shopware\Core\Checkout\Cart\Error\Error;
-
-
 
 class PaymentMethodAvailabilityNotice extends Error
 {

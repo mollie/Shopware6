@@ -31,7 +31,6 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
     private $logger;
 
 
-
     /**
      * @param MollieApiFactory $mollieApiFactory
      * @param MollieOrderPriceBuilder $priceFormatter
@@ -48,14 +47,14 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
     /**
      * Returns an array of active payment methods for a given amount in a specific sales channel.
      *
-     * @param Cart $cart
+     * @param float $price
      * @param string $currency
-     * @param array<string> $salesChannelIDs
-     * @return array<Method>
+     * @param array<mixed> $salesChannelIDs
+     * @return Method[]
      */
     public function getActivePaymentMethodsForAmount(float $price, string $currency, array $salesChannelIDs): array
     {
-        if($price < 0.01) {
+        if ($price < 0.01) {
             return [];
         }
 
@@ -85,14 +84,10 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
         }
 
         foreach ($salesChannelIDs as $channelId) {
-
             try {
-
                 $shopMethods = $this->requestMollieMethods($channelId, $parameters);
 
-                /** @var Method $shopMethod */
                 foreach ($shopMethods as $shopMethod) {
-
                     $found = false;
 
                     /** @var Method $method */
@@ -107,7 +102,6 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
                         $allFoundMethods[] = $shopMethod;
                     }
                 }
-
             } catch (Exception $e) {
                 $this->logger->error(
                     'Error when loading active payment methods from Mollie for storefront: ' . $channelId,
@@ -125,9 +119,9 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
      * Returns an array of active payment methods for a specific sales channel.
      *
      * @param string $salesChannelId
-     * @param array $parameters
-     * @return array<Method>
+     * @param array<mixed> $parameters
      * @throws ApiException
+     * @return array<Method>
      */
     private function requestMollieMethods(string $salesChannelId, array $parameters): array
     {
@@ -145,5 +139,4 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
             ->allActive($parameters)
             ->getArrayCopy();
     }
-
 }

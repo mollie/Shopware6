@@ -16,6 +16,9 @@ class ReadablePluginConfigurationGenerator extends AbstractPluginConfigurationGe
      */
     protected $apiKeyValidator;
 
+    /**
+     * @var string[]
+     */
     protected $ignoreKeys = [
         'extensions',
         'profileId',
@@ -28,15 +31,16 @@ class ReadablePluginConfigurationGenerator extends AbstractPluginConfigurationGe
         EntityRepositoryInterface $salesChannelRepository,
         SettingsService           $settingsService,
         ApiKeyValidator           $apiKeyValidator
-    )
-    {
+    ) {
         $this->apiKeyValidator = $apiKeyValidator;
 
         parent::__construct($configurationService, $salesChannelRepository, $settingsService);
     }
 
     /**
-     * @inheritDoc
+     * @param Context $context
+     * @throws \Mollie\Api\Exceptions\ApiException
+     * @return array<mixed>
      */
     public function generate(Context $context): array
     {
@@ -82,6 +86,10 @@ class ReadablePluginConfigurationGenerator extends AbstractPluginConfigurationGe
         ];
     }
 
+    /**
+     * @param Context $context
+     * @return array<mixed>
+     */
     protected function getPluginConfiguration(Context $context): array
     {
         $global = $this->settingsService->getSettings(null)->getVars();

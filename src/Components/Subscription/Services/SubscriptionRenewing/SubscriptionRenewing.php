@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing;
 
-
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Service\OrderService;
@@ -60,20 +59,20 @@ class SubscriptionRenewing
     /**
      * @param SubscriptionEntity $subscription
      * @param Payment $molliePayment
-     * @param SalesChannelContext $context
-     * @return OrderEntity
+     * @param Context $context
      * @throws \Exception
+     * @return OrderEntity
      */
-    public function renewSubscription(SubscriptionEntity $subscription, Payment $molliePayment, SalesChannelContext $context): OrderEntity
+    public function renewSubscription(SubscriptionEntity $subscription, Payment $molliePayment, Context $context): OrderEntity
     {
-        $order = $this->orderService->getOrder($subscription->getOrderId(), $context->getContext());
+        $order = $this->orderService->getOrder($subscription->getOrderId(), $context);
 
         if (!$order instanceof OrderEntity) {
             throw new EntityNotFoundException('order', $subscription->getOrderId());
         }
 
         # get the next order number
-        $newOrderNumber = $this->numberRanges->getValue('order', $context->getContext(), $subscription->getSalesChannelId());
+        $newOrderNumber = $this->numberRanges->getValue('order', $context, $subscription->getSalesChannelId());
 
 
         # if we have a separate shipping address
@@ -81,9 +80,9 @@ class SubscriptionRenewing
         $needsSeparateShippingAddress = ($subscription->getShippingAddress() instanceof SubscriptionAddressEntity);
 
         # now let's clone our previous order and create a new one from it
-        $orderId = $this->orderCloneService->createNewOrder($order, $newOrderNumber, $needsSeparateShippingAddress, $context->getContext());
+        $orderId = $this->orderCloneService->createNewOrder($order, $newOrderNumber, $needsSeparateShippingAddress, $context);
 
-        $order = $this->orderService->getOrder($orderId, $context->getContext());
+        $order = $this->orderService->getOrder($orderId, $context);
 
         if (!$order instanceof OrderEntity) {
             throw new \Exception('Cannot renew subscription. Order with ID ' . $orderId . ' not found for subscription: ' . $subscription->getMollieId());
@@ -104,26 +103,27 @@ class SubscriptionRenewing
 
         # now update the billing and shipping address
         if ($billing instanceof SubscriptionAddressEntity) {
-            $this->repoOrderAddress->update([
+            $this->repoOrderAddress->update(
                 [
-                    'id' => $order->getBillingAddressId(),
-                    'salutationId' => $billing->getSalutationId(),
-                    'title' => $billing->getTitle(),
-                    'firstName' => $billing->getFirstName(),
-                    'lastName' => $billing->getLastName(),
-                    'company' => $billing->getCompany(),
-                    'department' => $billing->getDepartment(),
-                    'additionalAddressLine1' => $billing->getAdditionalAddressLine1(),
-                    'additionalAddressLine2' => $billing->getAdditionalAddressLine2(),
-                    'phoneNumber' => $billing->getPhoneNumber(),
-                    'street' => $billing->getStreet(),
-                    'zipcode' => $billing->getZipcode(),
-                    'city' => $billing->getCity(),
-                    'countryId' => $billing->getCountryId(),
-                    'countryStateId' => $billing->getCountryStateId(),
-                ]
-            ],
-                $context->getContext()
+                    [
+                        'id' => $order->getBillingAddressId(),
+                        'salutationId' => $billing->getSalutationId(),
+                        'title' => $billing->getTitle(),
+                        'firstName' => $billing->getFirstName(),
+                        'lastName' => $billing->getLastName(),
+                        'company' => $billing->getCompany(),
+                        'department' => $billing->getDepartment(),
+                        'additionalAddressLine1' => $billing->getAdditionalAddressLine1(),
+                        'additionalAddressLine2' => $billing->getAdditionalAddressLine2(),
+                        'phoneNumber' => $billing->getPhoneNumber(),
+                        'street' => $billing->getStreet(),
+                        'zipcode' => $billing->getZipcode(),
+                        'city' => $billing->getCity(),
+                        'countryId' => $billing->getCountryId(),
+                        'countryStateId' => $billing->getCountryStateId(),
+                    ]
+                ],
+                $context
             );
         }
 
@@ -131,26 +131,27 @@ class SubscriptionRenewing
 
         if ($shipping instanceof SubscriptionAddressEntity && $order->getDeliveries() instanceof OrderDeliveryCollection) {
             foreach ($order->getDeliveries() as $delivery) {
-                $this->repoOrderAddress->update([
+                $this->repoOrderAddress->update(
                     [
-                        'id' => $delivery->getShippingOrderAddressId(),
-                        'salutationId' => $shipping->getSalutationId(),
-                        'title' => $shipping->getTitle(),
-                        'firstName' => $shipping->getFirstName(),
-                        'lastName' => $shipping->getLastName(),
-                        'company' => $shipping->getCompany(),
-                        'department' => $shipping->getDepartment(),
-                        'additionalAddressLine1' => $shipping->getAdditionalAddressLine1(),
-                        'additionalAddressLine2' => $shipping->getAdditionalAddressLine2(),
-                        'phoneNumber' => $shipping->getPhoneNumber(),
-                        'street' => $shipping->getStreet(),
-                        'zipcode' => $shipping->getZipcode(),
-                        'city' => $shipping->getCity(),
-                        'countryId' => $shipping->getCountryId(),
-                        'countryStateId' => $shipping->getCountryStateId(),
-                    ]
-                ],
-                    $context->getContext()
+                        [
+                            'id' => $delivery->getShippingOrderAddressId(),
+                            'salutationId' => $shipping->getSalutationId(),
+                            'title' => $shipping->getTitle(),
+                            'firstName' => $shipping->getFirstName(),
+                            'lastName' => $shipping->getLastName(),
+                            'company' => $shipping->getCompany(),
+                            'department' => $shipping->getDepartment(),
+                            'additionalAddressLine1' => $shipping->getAdditionalAddressLine1(),
+                            'additionalAddressLine2' => $shipping->getAdditionalAddressLine2(),
+                            'phoneNumber' => $shipping->getPhoneNumber(),
+                            'street' => $shipping->getStreet(),
+                            'zipcode' => $shipping->getZipcode(),
+                            'city' => $shipping->getCity(),
+                            'countryId' => $shipping->getCountryId(),
+                            'countryStateId' => $shipping->getCountryStateId(),
+                        ]
+                    ],
+                    $context
                 );
             }
         }
@@ -171,5 +172,4 @@ class SubscriptionRenewing
 
         return $order;
     }
-
 }

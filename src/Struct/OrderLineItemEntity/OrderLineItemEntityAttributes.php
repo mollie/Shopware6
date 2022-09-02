@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Struct\OrderLineItemEntity;
 
-
 use Kiener\MolliePayments\Struct\Voucher\VoucherType;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 
@@ -106,7 +105,7 @@ class OrderLineItemEntityAttributes
     }
 
     /**
-     * @return int|null
+     * @return null|int
      */
     public function getSubscriptionRepetitionCount()
     {
@@ -176,5 +175,4 @@ class OrderLineItemEntityAttributes
 
         return $foundValue;
     }
-
 }

@@ -40,24 +40,19 @@ class BankTransferPayment extends PaymentHandler
     }
 
     /**
-     * @param array $orderData
+     * @param array<mixed> $orderData
+     * @param OrderEntity $orderEntity
      * @param SalesChannelContext $salesChannelContext
      * @param CustomerEntity $customer
-     *
-     * @return array
+     * @throws \Exception
+     * @return array<mixed>
      */
-    public function processPaymentMethodSpecificParameters(
-        array               $orderData,
-        OrderEntity         $orderEntity,
-        SalesChannelContext $salesChannelContext,
-        CustomerEntity      $customer
-    ): array
+    public function processPaymentMethodSpecificParameters(array $orderData, OrderEntity $orderEntity, SalesChannelContext $salesChannelContext, CustomerEntity $customer): array
     {
         $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
         $dueDate = $settings->getPaymentMethodBankTransferDueDate();
 
         if (!empty($dueDate)) {
-
             $orderData['expiresAt'] = $dueDate;
         }
 

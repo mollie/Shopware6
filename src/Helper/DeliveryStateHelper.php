@@ -32,14 +32,13 @@ class DeliveryStateHelper
     /**
      * PaymentStatusHelper constructor.
      *
-     * @param DeliveryService      $deliveryService
+     * @param DeliveryService $deliveryService
      * @param StateMachineRegistry $stateMachineRegistry
      */
     public function __construct(
-        DeliveryService $deliveryService,
+        DeliveryService      $deliveryService,
         StateMachineRegistry $stateMachineRegistry
-    )
-    {
+    ) {
         $this->deliveryService = $deliveryService;
         $this->stateMachineRegistry = $stateMachineRegistry;
     }
@@ -55,10 +54,9 @@ class DeliveryStateHelper
      */
     public function shipDelivery(
         OrderEntity $order,
-        Order $mollieOrder,
-        Context $context
-    ): void
-    {
+        Order       $mollieOrder,
+        Context     $context
+    ): void {
         /** @var OrderDeliveryEntity $orderDelivery */
         $orderDelivery = $this->deliveryService
             ->getDeliveryByOrderId($order->getId(), $order->getVersionId());
@@ -100,9 +98,11 @@ class DeliveryStateHelper
 
             // Add is shipped flag to custom fields
             if ($transitionName === 'ship') {
+                $customFields = $order->getCustomFields() ?? [];
+
                 $this->deliveryService->updateDelivery([
                     self::PARAM_ID => $orderDelivery->getId(),
-                    self::PARAM_CUSTOM_FIELDS => $this->deliveryService->addShippedToCustomFields($order->getCustomFields(), true),
+                    self::PARAM_CUSTOM_FIELDS => $this->deliveryService->addShippedToCustomFields($customFields, true),
                 ], $context);
             }
         }

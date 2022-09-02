@@ -1,9 +1,11 @@
 {
-    "name": "mollie-shopware6-administration-tests",
+    "name": "mollie-shopware6-administration",
     "version": "1.0.0",
     "description": "",
     "author": "Mollie B.V.",
-    "dependencies": {},
+    "dependencies": {
+        "raw-loader": "^4.0.2"
+    },
     "devDependencies": {
         "@babel/cli": "^7.5.5",
         "@babel/core": "^7.5.5",

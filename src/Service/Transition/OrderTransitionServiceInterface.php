@@ -3,7 +3,6 @@
 
 namespace Kiener\MolliePayments\Service\Transition;
 
-
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 

@@ -25,10 +25,13 @@ class Shipment
         $this->orderApiService = $orderApiService;
     }
 
-    public function getShipments(
-        string $mollieOrderId,
-        string $salesChannelId
-    ): ShipmentCollection
+    /**
+     * @param string $mollieOrderId
+     * @param string $salesChannelId
+     * @throws ApiException
+     * @return ShipmentCollection<\Mollie\Api\Resources\Shipment>
+     */
+    public function getShipments(string $mollieOrderId, string $salesChannelId): ShipmentCollection
     {
         $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId, ['embed' => 'shipments']);
         return $mollieOrder->shipments();
@@ -37,15 +40,14 @@ class Shipment
     /**
      * @param string $mollieOrderId
      * @param string $salesChannelId
-     * @param ShipmentTrackingInfoStruct|null $tracking
+     * @param null|ShipmentTrackingInfoStruct $tracking
      * @return MollieShipment
      */
     public function shipOrder(
         string                      $mollieOrderId,
         string                      $salesChannelId,
         ?ShipmentTrackingInfoStruct $tracking = null
-    ): MollieShipment
-    {
+    ): MollieShipment {
         try {
             $options = [];
             if ($tracking instanceof ShipmentTrackingInfoStruct) {
@@ -70,7 +72,7 @@ class Shipment
      * @param string $salesChannelId
      * @param string $mollieOrderLineId
      * @param int $quantity
-     * @param ShipmentTrackingInfoStruct|null $tracking
+     * @param null|ShipmentTrackingInfoStruct $tracking
      * @return MollieShipment
      */
     public function shipItem(
@@ -79,8 +81,7 @@ class Shipment
         string                      $mollieOrderLineId,
         int                         $quantity,
         ?ShipmentTrackingInfoStruct $tracking = null
-    ): MollieShipment
-    {
+    ): MollieShipment {
         try {
             $options = [
                 'lines' => [
@@ -156,11 +157,13 @@ class Shipment
         $totalQuantity = 0;
 
         foreach ($mollieOrder->lines() as $mollieOrderLine) {
+
             /** @var OrderLine $mollieOrderLine */
             if ($mollieOrderLine->type === OrderLineType::TYPE_SHIPPING_FEE) {
                 continue;
             }
 
+            /** @phpstan-ignore-next-line */
             if ($mollieOrderLine->amountShipped) {
                 $totalAmount += floatval($mollieOrderLine->amountShipped->value);
             }

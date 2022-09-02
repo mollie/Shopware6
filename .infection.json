@@ -1,5 +1,5 @@
 {
-  "bootstrap": "./phpunit.autoload.php",
+  "bootstrap": "./vendor/autoload.php",
   "minMsi": 15,
   "minCoveredMsi": 60,
   "source": {

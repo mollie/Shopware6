@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Service;
 
-
 class DomainExtractor
 {
 
@@ -20,7 +19,6 @@ class DomainExtractor
 
         # now extract the raw domain without protocol
         # and without any sub shop urls
-        return parse_url($url, PHP_URL_HOST);
+        return (string)parse_url($url, PHP_URL_HOST);
     }
-
 }

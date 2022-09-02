@@ -13,5 +13,4 @@ interface DeliveryTransitionServiceInterface
     public function partialShipDelivery(OrderDeliveryEntity $delivery, Context $context): void;
     public function returnDelivery(OrderDeliveryEntity $delivery, Context $context): void;
     public function partialReturnDelivery(OrderDeliveryEntity $delivery, Context $context): void;
-
 }

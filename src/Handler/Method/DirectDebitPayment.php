@@ -10,7 +10,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class DirectDebitPayment extends PaymentHandler
 {
-
     public const PAYMENT_METHOD_NAME = PaymentMethod::DIRECTDEBIT;
     public const PAYMENT_METHOD_DESCRIPTION = 'SEPA Direct Debit';
 
@@ -21,15 +20,14 @@ class DirectDebitPayment extends PaymentHandler
 
 
     /**
-     * @param array $orderData
+     * @param array<mixed> $orderData
      * @param OrderEntity $orderEntity
      * @param SalesChannelContext $salesChannelContext
      * @param CustomerEntity $customer
-     * @return array
+     * @return array<mixed>
      */
     public function processPaymentMethodSpecificParameters(array $orderData, OrderEntity $orderEntity, SalesChannelContext $salesChannelContext, CustomerEntity $customer): array
     {
         return $orderData;
     }
-
 }

@@ -65,8 +65,7 @@ class PaymentMethodService
         EntityRepositoryInterface $mediaRepository,
         EntityRepositoryInterface $paymentRepository,
         PluginIdProvider          $pluginIdProvider
-    )
-    {
+    ) {
         $this->mediaService = $mediaService;
         $this->mediaRepository = $mediaRepository;
         $this->paymentRepository = $paymentRepository;
@@ -116,7 +115,7 @@ class PaymentMethodService
     }
 
     /**
-     * @param array $paymentMethods
+     * @param array<mixed> $paymentMethods
      * @param Context $context
      */
     public function addPaymentMethods(array $paymentMethods, Context $context): void
@@ -127,7 +126,6 @@ class PaymentMethodService
         $upsertData = [];
 
         foreach ($paymentMethods as $paymentMethod) {
-
             $identifier = $paymentMethod['handler'];
 
             // Upload icon to the media repository
@@ -161,7 +159,6 @@ class PaymentMethodService
                 ];
 
                 $upsertData[] = $paymentMethodData;
-
             } else {
 
                 # let's create a full parameter list of everything
@@ -190,9 +187,9 @@ class PaymentMethodService
     }
 
     /**
-     * @param array $installableHandlers
+     * @param array<mixed> $installableHandlers
      * @param Context $context
-     * @return array
+     * @return array<mixed>
      */
     public function getInstalledPaymentMethodHandlers(array $installableHandlers, Context $context): array
     {
@@ -221,8 +218,8 @@ class PaymentMethodService
     /**
      * Activate payment methods in Shopware.
      *
-     * @param array $paymentMethods
-     * @param array $installedHandlers
+     * @param array<mixed> $paymentMethods
+     * @param array<mixed> $installedHandlers
      * @param Context $context
      */
     public function activatePaymentMethods(array $paymentMethods, array $installedHandlers, Context $context): void
@@ -276,8 +273,7 @@ class PaymentMethodService
         string  $paymentMethodId,
         bool    $active,
         Context $context
-    ): EntityWrittenContainerEvent
-    {
+    ): EntityWrittenContainerEvent {
         return $this->paymentRepository->upsert(
             [
                 [
@@ -292,9 +288,9 @@ class PaymentMethodService
     /**
      * Get payment method by ID.
      *
-     * @param $id
-     * @return PaymentMethodEntity
+     * @param string $id
      * @throws InconsistentCriteriaIdsException
+     * @return PaymentMethodEntity
      */
     public function getPaymentMethodById($id): ?PaymentMethodEntity
     {
@@ -315,18 +311,17 @@ class PaymentMethodService
     /**
      * Get an array of installable payment methods for Mollie.
      *
-     * @return array
+     * @return array<mixed>
      */
     public function getInstallablePaymentMethods(): array
     {
-        // Variables
-        $paymentMethods = [];
         $installablePaymentMethods = $this->getPaymentHandlers();
 
-        // Add payment methods to array
-        if ($installablePaymentMethods === null) {
-            return $paymentMethods;
+        if (count($installablePaymentMethods) <= 0) {
+            return [];
         }
+
+        $paymentMethods = [];
 
         foreach ($installablePaymentMethods as $installablePaymentMethod) {
             $paymentMethods[] = [
@@ -342,10 +337,10 @@ class PaymentMethodService
     /**
      * Get payment method ID by name.
      *
-     * @param $handlerIdentifier
+     * @param string $handlerIdentifier
      * @param Context $context
      *
-     * @return PaymentMethodEntity|null
+     * @return null|PaymentMethodEntity
      */
     private function getPaymentMethod($handlerIdentifier, Context $context): ?PaymentMethodEntity
     {
@@ -366,7 +361,7 @@ class PaymentMethodService
     /**
      * Returns an array of payment handlers.
      *
-     * @return array
+     * @return array<mixed>
      */
     public function getPaymentHandlers(): array
     {
@@ -398,7 +393,7 @@ class PaymentMethodService
     /**
      * Retrieve the icon from the database, or add it.
      *
-     * @param array $paymentMethod
+     * @param array<mixed> $paymentMethod
      * @param Context $context
      *
      * @return string
@@ -421,10 +416,10 @@ class PaymentMethodService
         // Add icon to the media library
         $iconMime = 'image/svg+xml';
         $iconExt = 'svg';
-        $iconBlob = file_get_contents('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.svg');
+        $iconBlob = (string)file_get_contents('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.svg');
 
         if (empty(trim($iconBlob))) {
-            $iconBlob = file_get_contents('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.png');
+            $iconBlob = (string)file_get_contents('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.png');
             $iconMime = 'image/png';
             $iconExt = 'png';
         }

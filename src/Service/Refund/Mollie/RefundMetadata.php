@@ -2,12 +2,16 @@
 
 namespace Kiener\MolliePayments\Service\Refund\Mollie;
 
-
 use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
-
 
 class RefundMetadata
 {
+
+    /**
+     * @var DataCompressor
+     */
+    private $dataCompression;
+
     /**
      * @var string
      */
@@ -19,6 +23,7 @@ class RefundMetadata
     private $items;
 
 
+
     /**
      * @param string $type
      * @param RefundItem[] $items
@@ -27,6 +32,8 @@ class RefundMetadata
     {
         $this->type = $type;
         $this->items = $items;
+
+        $this->dataCompression = new DataCompressor();
     }
 
     /**
@@ -41,7 +48,6 @@ class RefundMetadata
         $items = [];
 
         foreach ($composition as $compItem) {
-
             $items[] = new RefundItem(
                 $compItem['swLineId'],
                 $compItem['mollieLineId'],
@@ -80,13 +86,14 @@ class RefundMetadata
         ];
 
         foreach ($this->items as $item) {
-
             if ($item->getQuantity() <= 0) {
                 continue;
             }
 
+            $swLineId = $this->dataCompression->compress($item->getShopwareLineID());
+
             $data['composition'][] = [
-                'swLineId' => $item->getShopwareLineID(),
+                'swLineId' => $swLineId,
                 'mollieLineId' => $item->getMollieLineID(),
                 'swReference' => $item->getShopwareReference(),
                 'quantity' => $item->getQuantity(),
@@ -94,7 +101,6 @@ class RefundMetadata
             ];
         }
 
-        return json_encode($data);
+        return (string)json_encode($data);
     }
-
 }

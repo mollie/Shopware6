@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Actions;
 
-
 use Kiener\MolliePayments\Components\RefundManager\RefundManagerInterface;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Service\OrderServiceInterface;
@@ -10,7 +9,6 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Flow\Dispatching\Action\FlowAction;
 use Shopware\Core\Framework\Event\FlowEvent;
 use Shopware\Core\Framework\Event\OrderAware;
-
 
 class RefundOrderAction extends FlowAction
 {
@@ -100,7 +98,6 @@ class RefundOrderAction extends FlowAction
         $orderNumber = '';
 
         try {
-
             $orderId = $baseEvent->getOrderId();
 
             $order = $this->orderService->getOrder($orderId, $baseEvent->getContext());
@@ -116,17 +113,16 @@ class RefundOrderAction extends FlowAction
             );
 
             $this->refundManager->refund($order, $request, $baseEvent->getContext());
-
         } catch (\Exception $ex) {
-
-            $this->logger->error('Error when refunding order with Flow Builder Action',
+            $this->logger->error(
+                'Error when refunding order with Flow Builder Action',
                 [
                     'error' => $ex->getMessage(),
                     'order' => $orderNumber,
-                ]);
+                ]
+            );
 
             throw $ex;
         }
     }
-
 }

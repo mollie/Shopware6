@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Service;
 
-
 interface CustomFieldsInterface
 {
 
@@ -25,6 +24,4 @@ interface CustomFieldsInterface
      *
      */
     public const DELIVERY_SHIPPED = 'is_shipped';
-
-
 }

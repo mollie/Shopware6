@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Service\Mollie;
 
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\Payment;
+use Mollie\Api\Resources\PaymentCollection;
 
 class OrderStatusConverter
 {
@@ -18,7 +19,7 @@ class OrderStatusConverter
 
         // If the payment has been charged back, return immediately
         // to prevent status from being changed if order has been refunded.
-        if($targetStatus === MolliePaymentStatus::MOLLIE_PAYMENT_CHARGEBACK) {
+        if ($targetStatus === MolliePaymentStatus::MOLLIE_PAYMENT_CHARGEBACK) {
             return $targetStatus;
         }
 
@@ -54,7 +55,7 @@ class OrderStatusConverter
     }
 
     /**
-     * @param Payment|null $payment
+     * @param null|Payment $payment
      * @return string
      */
     public function getMolliePaymentStatus(?Payment $payment = null): string
@@ -63,7 +64,7 @@ class OrderStatusConverter
             return MolliePaymentStatus::MOLLIE_PAYMENT_UNKNOWN;
         }
 
-        if($payment->amountChargedBack && $payment->amountChargedBack->value > 0) {
+        if ($payment->amountChargedBack && $payment->amountChargedBack->value > 0) {
             return MolliePaymentStatus::MOLLIE_PAYMENT_CHARGEBACK;
         }
 
@@ -73,7 +74,7 @@ class OrderStatusConverter
             $status = MolliePaymentStatus::MOLLIE_PAYMENT_PAID;
         } elseif ($payment->isAuthorized()) {
             $status = MolliePaymentStatus::MOLLIE_PAYMENT_AUTHORIZED;
-        } else if ($payment->isPending()) {
+        } elseif ($payment->isPending()) {
             $status = MolliePaymentStatus::MOLLIE_PAYMENT_PENDING;
         } elseif ($payment->isOpen()) {
             $status = MolliePaymentStatus::MOLLIE_PAYMENT_OPEN;
@@ -90,14 +91,21 @@ class OrderStatusConverter
     }
 
     /**
+     * @TODO we should move this somewhere else, but i had to (re)use this for now - so it's now public
      * @param Order $order
-     * @return Payment|null
+     * @return null|Payment
      */
-    private function getLatestPayment(Order $order): ?Payment
+    public function getLatestPayment(Order $order): ?Payment
     {
         $latestPayment = null;
 
-        foreach ($order->payments() as $payment) {
+        $payments = $order->payments();
+
+        if (!$payments instanceof PaymentCollection) {
+            return null;
+        }
+
+        foreach ($payments as $payment) {
             $currentCreated = strtotime($payment->createdAt);
 
             if ($latestPayment === null) {
@@ -152,5 +160,4 @@ class OrderStatusConverter
         // both of them are strings, but that's totally fine
         return ($orderValue !== $refundedValue);
     }
-
 }

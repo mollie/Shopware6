@@ -61,5 +61,4 @@ class PromotionItem extends AbstractItem
         # this one is in the reference ID
         return (string)$this->lineItem->getReferencedId();
     }
-
 }

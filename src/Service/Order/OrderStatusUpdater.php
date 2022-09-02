@@ -28,44 +28,28 @@ class OrderStatusUpdater
     private $orderHandler;
 
     /**
-     * @var StateMachineRegistry
-     */
-    private $stateMachineRegistry;
-
-    /**
      * @var OrderRepository
      */
     private $repoOrders;
 
-
     /**
-     *
+     * @var TransactionTransitionServiceInterface
      */
-    private const STATE_REFUNDED = 'refunded';
-
-    /**
-     *
-     */
-    private const STATE_REFUNDED_PARTIALLY = 'refunded_partially';
-
-    /** @var TransactionTransitionServiceInterface */
     private $transactionTransitionService;
 
 
     /**
      * @param OrderTransactionStateHandler $transitionHandler
      * @param OrderStateService $orderHandler
-     * @param StateMachineRegistry $stateMachineRegistry
-     * @param TransactionTransitionServiceInterface $transactionTransitionService
      * @param OrderRepository $repoOrders
+     * @param TransactionTransitionServiceInterface $transactionTransitionService
      */
-    public function __construct(OrderTransactionStateHandler $transitionHandler, OrderStateService $orderHandler, StateMachineRegistry $stateMachineRegistry, TransactionTransitionServiceInterface $transactionTransitionService, OrderRepository $repoOrders)
+    public function __construct(OrderTransactionStateHandler $transitionHandler, OrderStateService $orderHandler, OrderRepository $repoOrders, TransactionTransitionServiceInterface $transactionTransitionService)
     {
         $this->transitionHandler = $transitionHandler;
         $this->orderHandler = $orderHandler;
-        $this->stateMachineRegistry = $stateMachineRegistry;
-        $this->transactionTransitionService = $transactionTransitionService;
         $this->repoOrders = $repoOrders;
+        $this->transactionTransitionService = $transactionTransitionService;
     }
 
 
@@ -73,14 +57,20 @@ class OrderStatusUpdater
      * @param OrderTransactionEntity $transaction
      * @param string $targetShopwareStatusKey
      * @param Context $context
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function updatePaymentStatus(OrderTransactionEntity $transaction, string $targetShopwareStatusKey, Context $context): void
     {
         $currentShopwareState = $transaction->getStateMachineState();
 
         if (!$currentShopwareState instanceof StateMachineStateEntity) {
+            return;
+        }
+
+        $order = $transaction->getOrder();
+
+        if (!$order instanceof OrderEntity) {
             return;
         }
 
@@ -144,10 +134,7 @@ class OrderStatusUpdater
         # last but not least,
         # also update the lastUpdated of the order itself
         # this is required for ERP systems and more (so they know something has changed).
-        $this->repoOrders->updateOrderLastUpdated(
-            $transaction->getOrder()->getId(),
-            $context
-        );
+        $this->repoOrders->updateOrderLastUpdated($order->getId(), $context);
     }
 
     /**
@@ -162,13 +149,11 @@ class OrderStatusUpdater
         # let's check if we have configured a final order state.
         # if so, we need to verify, if a transition is even allowed
         if (!empty($settings->getOrderStateFinalState())) {
-
-            $currentId = $order->getStateMachineState()->getId();
+            $currentId = ($order->getStateMachineState() instanceof StateMachineStateEntity) ? $order->getStateMachineState()->getId() : '';
 
             # test if our current order does already have
             # our configured final order state
             if ($currentId === $settings->getOrderStateFinalState()) {
-
                 $allowedList = [
                     MolliePaymentStatus::MOLLIE_PAYMENT_REFUNDED,
                     MolliePaymentStatus::MOLLIE_PAYMENT_PARTIALLY_REFUNDED,
@@ -225,5 +210,4 @@ class OrderStatusUpdater
                 throw new \Exception('Updating Order Status of Order not possible for status: ' . $status);
         }
     }
-
 }

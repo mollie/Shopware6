@@ -19,10 +19,14 @@ class TransitionService implements TransitionServiceInterface
      */
     public function __construct(StateMachineRegistry $stateMachineRegistry)
     {
-
         $this->stateMachineRegistry = $stateMachineRegistry;
     }
 
+    /**
+     * @param string $transition
+     * @param array<mixed> $availableTransitions
+     * @return bool
+     */
     public function transitionIsAllowed(string $transition, array $availableTransitions): bool
     {
         return in_array($transition, $availableTransitions);

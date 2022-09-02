@@ -6,7 +6,6 @@ use Exception;
 use Kiener\MolliePayments\Compatibility\DependencyLoader;
 use Kiener\MolliePayments\Components\Installer\PluginInstaller;
 use Kiener\MolliePayments\Service\CustomFieldService;
-use KlarnaPayment\Installer\Modules\CustomFieldInstaller;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\Migration\MigrationCollection;
@@ -20,8 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class MolliePayments extends Plugin
 {
-
-    const PLUGIN_VERSION = '2.3.0';
+    const PLUGIN_VERSION = '2.5.0';
 
 
     /**
@@ -60,10 +58,7 @@ class MolliePayments extends Plugin
         $customFieldRepository = $this->container->get('custom_field_set.repository');
 
         // Add custom fields
-        $customFieldService = new CustomFieldService(
-            $this->container,
-            $customFieldRepository
-        );
+        $customFieldService = new CustomFieldService($customFieldRepository);
 
         $customFieldService->addCustomFields($context->getContext());
 
@@ -72,8 +67,8 @@ class MolliePayments extends Plugin
 
     /**
      * @param UpdateContext $context
-     * @return void
      * @throws \Doctrine\DBAL\Exception
+     * @return void
      */
     public function update(UpdateContext $context): void
     {
@@ -109,8 +104,8 @@ class MolliePayments extends Plugin
 
     /**
      * @param ActivateContext $context
-     * @return void
      * @throws \Doctrine\DBAL\Exception
+     * @return void
      */
     public function activate(ActivateContext $context): void
     {
@@ -123,6 +118,7 @@ class MolliePayments extends Plugin
 
     /**
      * @param DeactivateContext $context
+     * @return void
      */
     public function deactivate(DeactivateContext $context): void
     {
@@ -150,5 +146,4 @@ class MolliePayments extends Plugin
     {
         $migrationCollection->migrateInPlace();
     }
-
 }

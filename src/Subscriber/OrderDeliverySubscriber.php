@@ -42,7 +42,7 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public static function getSubscribedEvents(): array
     {
@@ -89,5 +89,4 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
 
         $this->mollieShipment->setShipment($event->getTransition()->getEntityId(), $event->getContext());
     }
-
 }

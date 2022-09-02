@@ -20,7 +20,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class VoucherCartCollector implements CartDataCollectorInterface
 {
-
     public const VOUCHER_PERMITTED = 'mollie-voucher-permitted';
 
     /**
@@ -50,7 +49,7 @@ class VoucherCartCollector implements CartDataCollectorInterface
      * It will just calculate this once, and then offer that information
      * in the DATA field of the cart object.
      *
-     * @param CartDataCollection $data
+     * @param CartDataCollection<mixed> $data
      * @param Cart $original
      * @param SalesChannelContext $context
      * @param CartBehavior $behavior
@@ -63,7 +62,7 @@ class VoucherCartCollector implements CartDataCollectorInterface
         # we try to improve this as first step, by only verifying our products
         # if we even have the voucher payment method assigned to our Sales Channel.
         # if it's not assigned anyway, then we can simply skip that step
-        /** @var string[]|null $paymentMethodIDs */
+        /** @var null|string[] $paymentMethodIDs */
         $paymentMethodIDs = $context->getSalesChannel()->getPaymentMethodIds();
 
         if (is_array($paymentMethodIDs)) {
@@ -85,7 +84,6 @@ class VoucherCartCollector implements CartDataCollectorInterface
                 # then we have to update the actual line item,
                 # because the current one might be empty, if only our PARENT would be configured.
                 if (VoucherType::isVoucherProduct($voucherType)) {
-
                     $cartHasVoucher = true;
 
                     # load current custom fields data of mollie
@@ -106,18 +104,18 @@ class VoucherCartCollector implements CartDataCollectorInterface
 
 
     /**
-     * @param Context|null $context
-     * @return array|string
+     * @param Context $context
+     * @return string
      */
-    private function getVoucherID(Context $context)
+    private function getVoucherID(Context $context): string
     {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('handlerIdentifier', VoucherPayment::class));
 
         // Get payment methods
+        /** @var array<string> $paymentMethods */
         $paymentMethods = $this->repoPaymentMethods->searchIds($criteria, $context)->getIds();
 
-        return $paymentMethods[0];
+        return (string)$paymentMethods[0];
     }
-
 }

@@ -21,5 +21,4 @@ interface ProductRepositoryInterface
      * @return array<ProductEntity>
      */
     public function findByNumber(string $productNumber, SalesChannelContext $context): array;
-
 }

@@ -14,10 +14,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-
 class DALCleanupCommand extends Command
 {
-
     public static $defaultName = 'mollie:dal:cleanup';
 
 
@@ -57,7 +55,6 @@ class DALCleanupCommand extends Command
      */
     protected function configure(): void
     {
-
         $this
             ->setName((string)self::$defaultName)
             ->setDescription('Cleaning and compressing unused Mollie data in your database. Please create a backup before');
@@ -85,7 +82,6 @@ class DALCleanupCommand extends Command
 
 
         try {
-
             $context = Context::createDefaultContext();
 
             $criteria = new Criteria();
@@ -95,7 +91,6 @@ class DALCleanupCommand extends Command
 
             /** @var ProductEntity $product */
             foreach ($products->getEntities() as $product) {
-
                 $customFields = $product->getCustomFields();
 
                 if ($customFields === null) {
@@ -109,7 +104,6 @@ class DALCleanupCommand extends Command
                 $io->section($product->getProductNumber() . ' ' . $product->getName());
 
                 foreach ($removableFields as $field) {
-
                     $io->text('removing JSON key: ' . $field);
 
                     $productID = strtoupper($product->getId());
@@ -123,9 +117,7 @@ class DALCleanupCommand extends Command
             $io->success('Successfully cleaned and compressed Mollie data in your database');
 
             return 0;
-
         } catch (\Throwable $exception) {
-
             $this->logger->critical('Error when cleaning Mollie data in database: ' . $exception->getMessage());
 
             $io->error($exception->getMessage());
@@ -133,5 +125,4 @@ class DALCleanupCommand extends Command
             return 1;
         }
     }
-
 }

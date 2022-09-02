@@ -23,5 +23,37 @@
         </service>
 
 
+        <service id="Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect" public="true">
+            <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDomainVerificationService"/>
+            <argument type="service" id="Kiener\MolliePayments\Handler\Method\ApplePayPayment"/>
+            <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\CartService"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayFormatter"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Cart\CartBackupService"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\ShopService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\Order\OrderAddressRepository"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingBuilder">
+            <argument type="service" id="Kiener\MolliePayments\Service\CartService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\ShippingMethodService"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayFormatter"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayFormatter">
+            <argument type="service" id="translator"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Router\RoutingDetector"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDomainVerificationService">
+            <argument type="service" id="shopware.filesystem.public"/>
+        </service>
+
     </services>
 </container>

@@ -1,10 +1,6 @@
 name: PR Pipeline
 
-on:
-  pull_request:
-    branches:
-      - master
-      - beta/subscription
+on: [pull_request]
 
 jobs:
 
@@ -193,7 +189,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shopware: [ '6.4.10.0', '6.4.9.0', '6.4.8.2', '6.4.0.0', '6.3.0', '6.2.0', '6.1.0' ]
+        shopware: [ '6.4.14.0', '6.4.9.0', '6.4.8.2', '6.4.0.0', '6.3.0', '6.2.0', '6.1.0' ]
     steps:
 
       - name: Clone Code
@@ -223,3 +219,61 @@ jobs:
           docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make clean'
           docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make install'
           docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make build'
+
+  # ------------------------------------------------------------------------------------------------------------------------
+
+  e2e:
+    name: E2E Core Tests | Shopware ${{ matrix.shopware }}, PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - shopware: '6.4.14.0'
+            php: '8.1'
+    steps:
+
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Download Docker
+        run: |
+          docker pull dockware/dev:${{ matrix.shopware }}
+
+      - name: Start Docker
+        run: |
+          docker run --rm -p 443:443 --name shop --env PHP_VERSION=${{ matrix.php }} --env SW_API_ACCESS_KEY=SWSCOVFSNKLBYUTKS1VSOEDTUQ -d dockware/dev:${{ matrix.shopware }}
+          sleep 30
+          docker logs shop
+          # now change the domain of our shop, mollie doesn't work with localhost
+          sudo echo "127.0.0.1 local.mollie.shop" | sudo tee -a /etc/hosts
+          docker exec shop bash -c "mysql -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='https://local.mollie.shop' WHERE url NOT LIKE 'default.%';\""
+
+      - name: Upload into Docker
+        run: |
+          docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
+          docker exec shop bash -c 'sudo chown www-data:www-data /var/www/html/custom/plugins -R'
+
+      - name: Install and Build Artifacts
+        run: |
+          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make install -B'
+          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make build -B'
+
+      - name: Install/Configure Plugin
+        run: |
+          docker exec shop bash -c 'php bin/console plugin:refresh'
+          docker exec shop bash -c 'php bin/console plugin:install MolliePayments --activate'
+          docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.testMode true'
+          docker exec shop bash -c 'php bin/console cache:clear'
+
+      - name: Install Cypress
+        run: cd tests/Cypress && make install -B
+
+      - name: Start Cypress Core Tests
+        run: cd tests/Cypress && make run shopware=${{ matrix.shopware }} url=https://local.mollie.shop storeApiKey=SWSCOVFSNKLBYUTKS1VSOEDTUQ filters='@core'
+
+  # ------------------------------------------------------------------------------------------------------------------------
+
+  release:
+    uses: ./.github/workflows/release.yml
+    needs: [stylelint, phpcsfixer, integration, e2e]

@@ -55,9 +55,21 @@ export default class PaymentAction {
             // to see all payment methods
             this.showAllPaymentMethods();
             this.selectPaymentMethod(paymentName);
+
+            // we have to select an iDEAL issuer now (required)
+            if (paymentName === 'iDEAL') {
+                this.selectIDealIssuer('bunq');
+            }
+
         } else {
             this.openPaymentsModal();
             this.selectPaymentMethod(paymentName);
+
+            // we have to select an iDEAL issuer now (required)
+            if (paymentName === 'iDEAL') {
+                this.selectIDealIssuer('bunq');
+            }
+
             this.closePaymentsModal();
         }
     }

@@ -320,6 +320,7 @@ class DeliveryTransitionServiceTest extends TestCase
         $stateMachineState = new StateMachineStateEntity();
         $stateMachineState->setId('stateId');
         $stateMachineState->setTechnicalName($state);
+        $stateMachineState->setName($state);
 
         $delivery = new OrderDeliveryEntity();
         $delivery->setId('deliveryId');

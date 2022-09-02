@@ -10,6 +10,7 @@ use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderTransaction\OrderTransactionAttributes;
 use Mollie\Api\Resources\Payment;
+use Mollie\Api\Types\PaymentMethod;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
@@ -79,8 +80,8 @@ class OrderService implements OrderServiceInterface
      *
      * @param string $orderId
      * @param Context $context
-     * @return OrderEntity|null
      * @throws OrderNotFoundException
+     * @return OrderEntity
      */
     public function getOrder(string $orderId, Context $context): OrderEntity
     {
@@ -106,7 +107,6 @@ class OrderService implements OrderServiceInterface
         $criteria->addAssociation('transactions.stateMachineState');
 
 
-        /** @var OrderEntity $order */
         $order = $this->orderRepository->search($criteria, $context)->first();
 
         if ($order instanceof OrderEntity) {
@@ -144,15 +144,21 @@ class OrderService implements OrderServiceInterface
 
     /**
      * @param OrderEntity $order
-     * @return string
      * @throws CouldNotExtractMollieOrderIdException
+     * @return string
      */
     public function getMollieOrderId(OrderEntity $order): string
     {
-        $mollieOrderId = $order->getCustomFields()[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY] ?? '';
+        $customFields = $order->getCustomFields();
+
+        $mollieOrderId = '';
+
+        if ($customFields !== null) {
+            $mollieOrderId = $customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY] ?? '';
+        }
 
         if (empty($mollieOrderId)) {
-            throw new CouldNotExtractMollieOrderIdException($order->getOrderNumber());
+            throw new CouldNotExtractMollieOrderIdException((string)$order->getOrderNumber());
         }
 
         return $mollieOrderId;
@@ -164,7 +170,13 @@ class OrderService implements OrderServiceInterface
      */
     public function getMollieOrderLineId(OrderLineItemEntity $lineItem): string
     {
-        $mollieOrderLineId = $lineItem->getCustomFields()[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_LINE_KEY] ?? '';
+        $customFields = $lineItem->getCustomFields();
+
+        $mollieOrderLineId = '';
+
+        if ($customFields !== null) {
+            $mollieOrderLineId = $customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_LINE_KEY] ?? '';
+        }
 
         if (empty($mollieOrderLineId)) {
             throw new CouldNotExtractMollieOrderLineIdException($lineItem->getId());
@@ -198,16 +210,15 @@ class OrderService implements OrderServiceInterface
      * @param string $orderTransactionId
      * @param SalesChannelContext $scContext
      */
-    public function updateMollieDataCustomFields(OrderEntity $order, string $mollieOrderID, string $orderTransactionId, SalesChannelContext $scContext)
+    public function updateMollieDataCustomFields(OrderEntity $order, string $mollieOrderID, string $orderTransactionId, SalesChannelContext $scContext): void
     {
-        $customFields = $order->getCustomFields() ?? [];
-
         $customFieldsStruct = new OrderAttributes($order);
         $customFieldsStruct->setMollieOrderId($mollieOrderID); # TODO i dont like that this is an optional SETTER in here!
 
 
         $thirdPartyPaymentId = '';
         $molliePaymentID = '';
+        $creditCardDetails = null;
 
         try {
 
@@ -227,6 +238,10 @@ class OrderService implements OrderServiceInterface
                 $thirdPartyPaymentId = $molliePayment->details->transferReference;
             }
 
+            # check for creditcard
+            if (isset($molliePayment->method, $molliePayment->details) && $molliePayment->method === PaymentMethod::CREDITCARD) {
+                $creditCardDetails = $molliePayment->details;
+            }
         } catch (PaymentNotFoundException $ex) {
             # some orders like OPEN bank transfer have no completed payments
             # so this is a usual case, where we just need to skip this process
@@ -239,11 +254,12 @@ class OrderService implements OrderServiceInterface
 
         $customFieldsStruct->setMolliePaymentId($molliePaymentID);
         $customFieldsStruct->setThirdPartyPaymentId($thirdPartyPaymentId);
+        $customFieldsStruct->setCreditCardDetails($creditCardDetails);
 
         $this->updateOrderCustomFields->updateOrder(
             $order->getId(),
             $customFieldsStruct,
-            $scContext
+            $scContext->getContext()
         );
 
         # ----------------------------------
@@ -258,9 +274,8 @@ class OrderService implements OrderServiceInterface
         $this->updateOrderTransactionCustomFields->updateOrderTransaction(
             $orderTransactionId,
             $orderTransactionCustomFields,
-            $scContext
+            $scContext->getContext()
         );
-
     }
 
 
@@ -271,9 +286,10 @@ class OrderService implements OrderServiceInterface
      * @param string $swSubscriptionId
      * @param string $mollieSubscriptionId
      * @param Payment $molliePayment
-     * @param SalesChannelContext $context
+     * @param Context $context
+     * @return void
      */
-    public function updateMollieData(OrderEntity $order, string $orderTransactionId, string $mollieOrderID, string $swSubscriptionId, string $mollieSubscriptionId, Payment $molliePayment, SalesChannelContext $context)
+    public function updateMollieData(OrderEntity $order, string $orderTransactionId, string $mollieOrderID, string $swSubscriptionId, string $mollieSubscriptionId, Payment $molliePayment, Context $context)
     {
         $thirdPartyPaymentId = '';
 
@@ -313,7 +329,5 @@ class OrderService implements OrderServiceInterface
             $orderTransactionCustomFields,
             $context
         );
-
     }
-
 }

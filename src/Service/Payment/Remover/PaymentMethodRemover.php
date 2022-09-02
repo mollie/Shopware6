@@ -80,7 +80,6 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
 
             return $this->isCartRoute($route) || $this->isOrderRoute($route);
         } catch (MissingRequestException|MissingRouteException $e) {
-
             $this->logger
                 ->error('Could not determine if the current route is allowed to remove payment methods', [
                     'exception' => $e,
@@ -94,9 +93,9 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
 
     /**
      * @param string $route
-     * @return bool
      * @throws MissingRequestException
      * @throws MissingRouteException
+     * @return bool
      */
     public function isCartRoute(string $route = ""): bool
     {
@@ -109,8 +108,8 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
 
     /**
      * @param SalesChannelContext $context
-     * @return Cart
      * @throws MissingCartServiceException
+     * @return Cart
      */
     public function getCart(SalesChannelContext $context): Cart
     {
@@ -121,8 +120,8 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
      * We have to use lazy loading for this. Otherwise, there are plugin compatibilities
      * with a circular reference...even though XML looks fine.
      *
-     * @return CartService
      * @throws MissingCartServiceException
+     * @return CartService
      */
     protected function getCartServiceLazy(): CartService
     {
@@ -137,9 +136,9 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
 
     /**
      * @param string $route
-     * @return bool
      * @throws MissingRequestException
      * @throws MissingRouteException
+     * @return bool
      */
     public function isOrderRoute(string $route = ""): bool
     {
@@ -152,10 +151,10 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
 
     /**
      * @param Context $context
-     * @return OrderEntity
      * @throws BadRequestException
      * @throws MissingRequestException
      * @throws OrderNotFoundException
+     * @return OrderEntity
      */
     public function getOrder(Context $context): OrderEntity
     {
@@ -170,8 +169,8 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
     }
 
     /**
-     * @return Request
      * @throws MissingRequestException
+     * @return Request
      */
     protected function getRequestFromStack(): Request
     {
@@ -185,9 +184,9 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
     }
 
     /**
-     * @return string
      * @throws MissingRequestException
      * @throws MissingRouteException
+     * @return string
      */
     protected function getRouteFromRequest(): string
     {

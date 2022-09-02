@@ -118,6 +118,20 @@ make dev
 These tools will be described later in this document.
 
 
+#### Dev Fixtures
+We have prepared all kinds of development data fixtures for you.
+Subscription Products, Voucher Products and more.
+
+To use these fixtures, please install and activate this FixturePlugin (https://github.com/basecom/FixturesPlugin).
+
+Then simply install the "dev" dependencies of the Mollie plugin using `make dev` and run the following command.
+
+```bash 
+php bin/console fixture:load
+```
+
+Congratulations, you should now see all kinds of products in your Shopware shop.
+
 
 #### Local Webhooks
 
@@ -273,7 +287,7 @@ This is your main makefile for everything related to Cypress. It helps you to ge
 make install
 
 # Open Cypress UI to easily view and create tests
-make open-ui url=https://your-domain-xxx.com
+make open-ui shopware=6.x.y.z url=https://your-domain-xxx.com
 
 # Automatically run all E2E tests in your terminal
 make run shopware=6.x.y.z url=https://your-domain-xxx.com

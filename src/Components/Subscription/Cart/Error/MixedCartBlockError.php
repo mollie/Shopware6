@@ -4,11 +4,8 @@ namespace Kiener\MolliePayments\Components\Subscription\Cart\Error;
 
 use Shopware\Core\Checkout\Cart\Error\Error;
 
-
 class MixedCartBlockError extends Error
 {
-
-
     private const KEY = 'mollie-payments-cart-error-mixedcart';
 
 
@@ -51,5 +48,4 @@ class MixedCartBlockError extends Error
     {
         return [];
     }
-
 }

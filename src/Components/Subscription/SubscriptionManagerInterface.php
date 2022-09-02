@@ -14,5 +14,4 @@ interface SubscriptionManagerInterface
      * @return string
      */
     public function createSubscription(OrderEntity $order, SalesChannelContext $context): string;
-
 }

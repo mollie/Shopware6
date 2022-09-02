@@ -289,5 +289,4 @@ class FlowBuilderEventFactory
 
         return new SubscriptionRenewedEvent($subscription, $customer, $context);
     }
-
 }

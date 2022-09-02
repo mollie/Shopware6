@@ -23,8 +23,7 @@ class TransactionService
      */
     public function __construct(
         EntityRepositoryInterface $orderTransactionRepository
-    )
-    {
+    ) {
         $this->orderTransactionRepository = $orderTransactionRepository;
     }
 
@@ -39,19 +38,12 @@ class TransactionService
     }
 
     /**
-     * Finds a transaction by id.
-     *
-     * @param $transactionId
-     * @param $versionId
-     * @param Context|null $context
-     * @return OrderTransactionEntity|null
-     * @throws InconsistentCriteriaIdsException
+     * @param string $transactionId
+     * @param null|string $versionId
+     * @param null|Context $context
+     * @return null|OrderTransactionEntity
      */
-    public function getTransactionById(
-        $transactionId,
-        $versionId = null,
-        Context $context = null
-    ): ?OrderTransactionEntity
+    public function getTransactionById($transactionId, $versionId = null, Context $context = null): ?OrderTransactionEntity
     {
         $transactionCriteria = new Criteria();
         $transactionCriteria->addFilter(new EqualsFilter('id', $transactionId));
@@ -79,14 +71,13 @@ class TransactionService
      * Updates a transaction in the database.
      *
      * @param OrderTransactionEntity $transaction
-     * @param Context|null $context
+     * @param null|Context $context
      * @return EntityWrittenContainerEvent
      */
     public function updateTransaction(
         OrderTransactionEntity $transaction,
-        Context $context = null
-    ): EntityWrittenContainerEvent
-    {
+        Context                $context = null
+    ): EntityWrittenContainerEvent {
         return $this->getRepository()->update(
             [$transaction->getVars()],
             $context ?? Context::createDefaultContext()

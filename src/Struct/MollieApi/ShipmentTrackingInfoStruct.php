@@ -19,8 +19,7 @@ class ShipmentTrackingInfoStruct extends Struct
         string $carrier,
         string $code,
         string $url = ''
-    )
-    {
+    ) {
         $this->carrier = $carrier;
         $this->code = $code;
         $this->url = $url;
@@ -29,7 +28,8 @@ class ShipmentTrackingInfoStruct extends Struct
     /**
      * @return array<string, string>
      */
-    public function toArray() {
+    public function toArray()
+    {
         return [
             'carrier' => $this->getCarrier(),
             'code' => $this->getCode(),

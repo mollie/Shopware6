@@ -3,12 +3,14 @@
 
 namespace Kiener\MolliePayments\Subscriber;
 
-
 use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\PaymentMethodService;
 use Mollie\Api\MollieApiClient;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\Event\OrderStateMachineStateChangeEvent;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\OrderStates;
 use Shopware\Core\Framework\Api\Context\AdminApiSource;
 use Shopware\Core\System\StateMachine\Event\StateMachineStateChangeEvent;
@@ -33,19 +35,23 @@ class OrderStateSubscriber implements EventSubscriberInterface
     private $paymentMethodService;
 
     public function __construct(
-        MollieApiClient $apiClient,
-        OrderService $orderService,
+        MollieApiClient      $apiClient,
+        OrderService         $orderService,
         PaymentMethodService $paymentMethodService
-    )
-    {
+    ) {
         $this->apiClient = $apiClient;
         $this->orderService = $orderService;
         $this->paymentMethodService = $paymentMethodService;
     }
 
-    public function onKlarnaOrderCancelledAsAdmin(StateMachineStateChangeEvent $event)
+
+    /**
+     * @param StateMachineStateChangeEvent $event
+     * @throws \Mollie\Api\Exceptions\ApiException
+     */
+    public function onKlarnaOrderCancelledAsAdmin(StateMachineStateChangeEvent $event): void
     {
-        if(!($event->getContext()->getSource() instanceof AdminApiSource)) {
+        if (!($event->getContext()->getSource() instanceof AdminApiSource)) {
             return;
         }
 
@@ -56,18 +62,31 @@ class OrderStateSubscriber implements EventSubscriberInterface
             OrderStates::STATE_CANCELLED
         ]);
 
-        if($event->getStateEventName() !== $orderStateCancelled) {
+        if ($event->getStateEventName() !== $orderStateCancelled) {
             return;
         }
 
+
         $order = $this->orderService->getOrder($event->getTransition()->getEntityId(), $event->getContext());
+
+        if (!$order instanceof OrderEntity) {
+            return;
+        }
+
+        if (!$order->getTransactions() instanceof OrderTransactionCollection) {
+            return;
+        }
 
         // use filterByState(OrderTransactionStates::STATE_OPEN)?
         $lastTransaction = $order->getTransactions()->last();
 
+        if (!$lastTransaction instanceof OrderTransactionEntity) {
+            return;
+        }
+
         $paymentMethod = $lastTransaction->getPaymentMethod();
 
-        if (is_null($paymentMethod) && !is_null($lastTransaction->getPaymentMethodId())) {
+        if (is_null($paymentMethod) && $lastTransaction->getPaymentMethodId() !== '') {
             $paymentMethod = $this->paymentMethodService->getPaymentMethodById($lastTransaction->getPaymentMethodId());
         }
 

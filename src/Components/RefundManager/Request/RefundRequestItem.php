@@ -72,5 +72,4 @@ class RefundRequestItem
     {
         return $this->stockQty;
     }
-
 }

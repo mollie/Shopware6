@@ -21,6 +21,7 @@ use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\Refund;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\System\Currency\CurrencyEntity;
 
 class RefundService implements RefundServiceInterface
 {
@@ -66,8 +67,8 @@ class RefundService implements RefundServiceInterface
      * @param string $description
      * @param RefundItem[] $refundItems
      * @param Context $context
-     * @return Refund
      * @throws ApiException
+     * @return Refund
      */
     public function refundFull(OrderEntity $order, string $description, array $refundItems, Context $context): Refund
     {
@@ -82,8 +83,8 @@ class RefundService implements RefundServiceInterface
             'metadata' => $metadata->toString(),
         ];
 
-        if (count($refundItems) > 0) {
 
+        if (count($refundItems) > 0) {
             $lines = [];
 
             foreach ($refundItems as $item) {
@@ -106,7 +107,7 @@ class RefundService implements RefundServiceInterface
         $refund = $mollieOrder->refund($params);
 
         if (!$refund instanceof Refund) {
-            throw new CouldNotCreateMollieRefundException($mollieOrderId, $order->getOrderNumber());
+            throw new CouldNotCreateMollieRefundException($mollieOrderId, (string)$order->getOrderNumber());
         }
 
         return $refund;
@@ -118,8 +119,8 @@ class RefundService implements RefundServiceInterface
      * @param float $amount
      * @param RefundItem[] $lineItems
      * @param Context $context
-     * @return Refund
      * @throws ApiException
+     * @return Refund
      */
     public function refundPartial(OrderEntity $order, string $description, float $amount, array $lineItems, Context $context): Refund
     {
@@ -130,14 +131,14 @@ class RefundService implements RefundServiceInterface
         $refund = $payment->refund([
             'amount' => [
                 'value' => number_format($amount, 2, '.', ''),
-                'currency' => $order->getCurrency()->getIsoCode()
+                'currency' => ($order->getCurrency() instanceof CurrencyEntity) ? $order->getCurrency()->getIsoCode() : '',
             ],
             'description' => $description,
             'metadata' => $metadata->toString(),
         ]);
 
         if (!$refund instanceof Refund) {
-            throw new CouldNotCreateMollieRefundException('', $order->getOrderNumber());
+            throw new CouldNotCreateMollieRefundException('', (string)$order->getOrderNumber());
         }
 
         return $refund;
@@ -146,11 +147,11 @@ class RefundService implements RefundServiceInterface
     /**
      * @param OrderEntity $order
      * @param string $refundId
-     * @return bool
-     * @throws CouldNotCancelMollieRefundException
      * @throws CouldNotExtractMollieOrderIdException
      * @throws CouldNotFetchMollieOrderException
      * @throws PaymentNotFoundException
+     * @throws CouldNotCancelMollieRefundException
+     * @return bool
      */
     public function cancel(OrderEntity $order, string $refundId): bool
     {
@@ -161,7 +162,7 @@ class RefundService implements RefundServiceInterface
             // It is possible for it to throw an ApiException here if $refundId is incorrect.
             $refund = $payment->getRefund($refundId);
         } catch (ApiException $e) { // Invalid resource id
-            throw new CouldNotCancelMollieRefundException('', $order->getOrderNumber(), $refundId, $e);
+            throw new CouldNotCancelMollieRefundException('', (string)$order->getOrderNumber(), $refundId, $e);
         }
 
         // This payment does not have a refund with $refundId, so we cannot cancel it.
@@ -178,17 +179,17 @@ class RefundService implements RefundServiceInterface
             $refund->cancel();
             return true;
         } catch (ApiException $e) {
-            throw new CouldNotCancelMollieRefundException('', $order->getOrderNumber(), $refundId, $e);
+            throw new CouldNotCancelMollieRefundException('', (string)$order->getOrderNumber(), $refundId, $e);
         }
     }
 
     /**
      * @param OrderEntity $order
-     * @return array<mixed>
-     * @throws CouldNotExtractMollieOrderIdException
      * @throws CouldNotFetchMollieOrderException
      * @throws CouldNotFetchMollieRefundsException
      * @throws PaymentNotFoundException
+     * @throws CouldNotExtractMollieOrderIdException
+     * @return array<mixed>
      */
     public function getRefunds(OrderEntity $order): array
     {
@@ -205,16 +206,16 @@ class RefundService implements RefundServiceInterface
 
             return $refundsArray;
         } catch (ApiException $e) {
-            throw new CouldNotFetchMollieRefundsException($orderAttributes->getMollieOrderId(), $order->getOrderNumber(), $e);
+            throw new CouldNotFetchMollieRefundsException($orderAttributes->getMollieOrderId(), (string)$order->getOrderNumber(), $e);
         }
     }
 
     /**
      * @param OrderEntity $order
-     * @return float
-     * @throws CouldNotExtractMollieOrderIdException
      * @throws CouldNotFetchMollieOrderException
      * @throws PaymentNotFoundException
+     * @throws CouldNotExtractMollieOrderIdException
+     * @return float
      */
     public function getRemainingAmount(OrderEntity $order): float
     {
@@ -251,10 +252,10 @@ class RefundService implements RefundServiceInterface
 
     /**
      * @param OrderEntity $order
-     * @return float
-     * @throws CouldNotExtractMollieOrderIdException
      * @throws CouldNotFetchMollieOrderException
      * @throws PaymentNotFoundException
+     * @throws CouldNotExtractMollieOrderIdException
+     * @return float
      */
     public function getRefundedAmount(OrderEntity $order): float
     {
@@ -277,7 +278,6 @@ class RefundService implements RefundServiceInterface
             $this->gwMollie->switchClient($order->getSalesChannelId());
 
             return $this->gwMollie->getPayment($orderAttributes->getMolliePaymentId());
-
         }
 
         return $this->mollie->getCompletedPayment(
@@ -285,5 +285,4 @@ class RefundService implements RefundServiceInterface
             $order->getSalesChannelId()
         );
     }
-
 }

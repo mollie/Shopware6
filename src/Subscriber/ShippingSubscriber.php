@@ -23,8 +23,7 @@ class ShippingSubscriber implements EventSubscriberInterface
     public function __construct(
         MollieShipment  $shipmentFacade,
         LoggerInterface $logger
-    )
-    {
+    ) {
         $this->shipmentFacade = $shipmentFacade;
         $this->logger = $logger;
     }
@@ -36,7 +35,10 @@ class ShippingSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onShipOrderWithTracking(MollieOrderShipmentTrackingEvent $event)
+    /**
+     * @param MollieOrderShipmentTrackingEvent $event
+     */
+    public function onShipOrderWithTracking(MollieOrderShipmentTrackingEvent $event): void
     {
         try {
             $this->shipmentFacade->shipOrderByOrderId(

@@ -9,8 +9,7 @@ use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\MollieApi\Payment as PaymentApiService;
-use Kiener\MolliePayments\Service\MollieApi\Payment as PaymentService;
-use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
+use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Order as MollieOrder;
 use Mollie\Api\Resources\OrderLine;
@@ -24,7 +23,6 @@ use RuntimeException;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Symfony\Component\Routing\RouterInterface;
 
 class Order
 {
@@ -39,9 +37,9 @@ class Order
     private $paymentApiService;
 
     /**
-     * @var WebhookBuilder
+     * @var RoutingBuilder
      */
-    private $webhookBuilder;
+    private $routingBuilder;
 
     /**
      * @var LoggerInterface
@@ -49,26 +47,19 @@ class Order
     private $logger;
 
 
-    /**
-     * @param MollieApiFactory $clientFactory
-     * @param PaymentService $paymentApiService
-     * @param WebhookBuilder $webhookBuilder
-     * @param LoggerInterface $logger
-     */
-    public function __construct(MollieApiFactory $clientFactory, PaymentApiService $paymentApiService,  WebhookBuilder $webhookBuilder, LoggerInterface $logger)
+    public function __construct(MollieApiFactory $clientFactory, PaymentApiService $paymentApiService, RoutingBuilder $routingBuilder, LoggerInterface $logger)
     {
         $this->clientFactory = $clientFactory;
         $this->logger = $logger;
         $this->paymentApiService = $paymentApiService;
-        $this->webhookBuilder = $webhookBuilder;
+        $this->routingBuilder = $routingBuilder;
     }
 
     /**
      * @param string $mollieOrderId
-     * @param string|null $salesChannelId
-     * @param array $parameters
+     * @param string $salesChannelId
+     * @param array<mixed> $parameters
      * @return MollieOrder
-     * @throws CouldNotFetchMollieOrderException
      */
     public function getMollieOrder(string $mollieOrderId, string $salesChannelId, array $parameters = []): MollieOrder
     {
@@ -77,7 +68,6 @@ class Order
 
             return $apiClient->orders->get($mollieOrderId, $parameters);
         } catch (ApiException $e) {
-
             $this->logger->error(
                 sprintf(
                     'API error occurred when fetching mollie order %s with message %s',
@@ -94,18 +84,28 @@ class Order
      * @param string $mollieOrderId
      * @param string $mollieOrderLineId
      * @param string $salesChannelId
+     * @throws \Exception
      * @return OrderLine
-     * @throws CouldNotFetchMollieOrderException
      */
-    public function getMollieOrderLine(
-        string $mollieOrderId,
-        string $mollieOrderLineId,
-        string $salesChannelId
-    ): OrderLine
+    public function getMollieOrderLine(string $mollieOrderId, string $mollieOrderLineId, string $salesChannelId): OrderLine
     {
-        return $this->getMollieOrder($mollieOrderId, $salesChannelId)->lines()->get($mollieOrderLineId);
+        $order = $this->getMollieOrder($mollieOrderId, $salesChannelId);
+
+        $orderLine = $order->lines()->get($mollieOrderLineId);
+
+        if (!$orderLine instanceof OrderLine) {
+            throw new \Exception('No order line found for mollie order ' . $mollieOrderId);
+        }
+
+        return $orderLine;
     }
 
+    /**
+     * @param array<mixed> $orderData
+     * @param string $orderSalesChannelContextId
+     * @param SalesChannelContext $salesChannelContext
+     * @return MollieOrder
+     */
     public function createOrder(array $orderData, string $orderSalesChannelContextId, SalesChannelContext $salesChannelContext): MollieOrder
     {
         $apiClient = $this->clientFactory->getClient($orderSalesChannelContextId);
@@ -136,8 +136,8 @@ class Order
      * @param OrderEntity $order
      * @param CustomerEntity $customer
      * @param SalesChannelContext $salesChannelContext
-     * @return Payment
      * @throws ApiException
+     * @return Payment
      */
     public function createOrReusePayment(string $mollieOrderId, string $paymentMethod, string $swOrderTransactionID, PaymentHandler $paymentHandler, OrderEntity $order, CustomerEntity $customer, SalesChannelContext $salesChannelContext): Payment
     {
@@ -146,7 +146,7 @@ class Order
         $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelContext->getSalesChannel()->getId(), ['embed' => 'payments']);
 
         # We cannot reuse this order if it's cancelled or expired.
-        switch($mollieOrder->status) {
+        switch ($mollieOrder->status) {
             case OrderStatus::STATUS_CANCELED:
                 throw new MollieOrderCancelledException($mollieOrderId);
             case OrderStatus::STATUS_EXPIRED:
@@ -167,7 +167,8 @@ class Order
 
         if (!$existingOpenPayment instanceof Payment) {
             return $this->createNewOrderPayment(
-                $mollieOrder, $paymentMethod,
+                $mollieOrder,
+                $paymentMethod,
                 $swOrderTransactionID,
                 $paymentHandler,
                 $order,
@@ -182,7 +183,6 @@ class Order
         # if we can, better to these, just to have some nice and clean data.
         # we will then create a new payment for our attempt.
         if ($existingOpenPayment->isCancelable) {
-
             $this->paymentApiService->delete(
                 $existingOpenPayment->id,
                 $salesChannelContext->getSalesChannel()->getId()
@@ -212,10 +212,31 @@ class Order
         return $existingOpenPayment;
     }
 
+    /**
+     * @param MollieOrder $mollieOrder
+     * @return null|Payment
+     */
+    public function getPaidPayment(MollieOrder $mollieOrder): ?Payment
+    {
+        $payments = $mollieOrder->payments();
+
+        if (!$payments instanceof PaymentCollection) {
+            return null;
+        }
+
+        /** @var Payment $payment */
+        foreach ($payments as $payment) {
+            if ($payment->isPaid()) {
+                return $payment;
+            }
+        }
+
+        return null;
+    }
 
     /**
      * @param MollieOrder $mollieOrder
-     * @return Payment|null
+     * @return null|Payment
      */
     private function getOpenPayment(MollieOrder $mollieOrder): ?Payment
     {
@@ -228,7 +249,6 @@ class Order
         /** @var Payment $payment */
         foreach ($payments as $payment) {
             if ($payment->isOpen()) {
-
                 return $payment;
             }
         }
@@ -236,26 +256,6 @@ class Order
         return null;
     }
 
-    /**
-     * @param Payment $payment
-     * @param string $newPaymnetMethod
-     * @param string $salesChannelID
-     * @return Payment
-     * @throws ApiException
-     */
-    private function updateExistingPayment(Payment $payment, string $newPaymnetMethod, string $salesChannelID): Payment
-    {
-        #  NOT WORKING ? !damn
-        # but we need to update the payment method :D TODO
-        $apiClient = $this->clientFactory->getClient($salesChannelID);
-
-        return $apiClient->payments->update(
-            $payment->id,
-            [
-                'method' => $newPaymnetMethod,
-            ]
-        );
-    }
 
     /**
      * @param MollieOrder $mollieOrder
@@ -265,12 +265,12 @@ class Order
      * @param OrderEntity $order
      * @param CustomerEntity $customer
      * @param SalesChannelContext $salesChannelContext
-     * @return Payment
      * @throws ApiException
+     * @return Payment
      */
     private function createNewOrderPayment(MollieOrder $mollieOrder, string $paymentMethod, string $swOrderTransactionID, PaymentHandler $paymentHandler, OrderEntity $order, CustomerEntity $customer, SalesChannelContext $salesChannelContext): Payment
     {
-        $webhookUrl = $this->webhookBuilder->buildWebhook($swOrderTransactionID);
+        $webhookUrl = $this->routingBuilder->buildWebhookURL($swOrderTransactionID);
 
 
         # let's create a new order body
@@ -290,6 +290,7 @@ class Order
 
         # create our new payment with the
         # Mollie API for our existing order
+        /** @var Payment $payment */
         $payment = $mollieOrder->createPayment($finalPaymentData);
 
         # unfortunately the API has a bug at the moment.
@@ -333,8 +334,8 @@ class Order
     /**
      * @param string $mollieOrderId
      * @param string $salesChannelId
-     * @return bool
      * @throws CouldNotFetchMollieOrderException
+     * @return bool
      */
     public function isCompletelyShipped(string $mollieOrderId, string $salesChannelId): bool
     {
@@ -358,24 +359,29 @@ class Order
 
     /**
      * @param string $mollieOrderId
-     * @param string|null $salesChannelId
+     * @param null|string $salesChannelId
      * @return Payment
      */
     public function getCompletedPayment(string $mollieOrderId, ?string $salesChannelId): Payment
     {
-        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId, ['embed' => 'payments']);
+        $mollieOrder = $this->getMollieOrder($mollieOrderId, (string)$salesChannelId, ['embed' => 'payments']);
 
-        if ($mollieOrder->payments()->count() === 0) {
-            throw new PaymentNotFoundException($mollieOrderId);
-        }
+        $payments = $mollieOrder->payments();
 
-        /** @var Payment $payment */
-        foreach ($mollieOrder->payments()->getArrayCopy() as $payment) {
-            if (in_array($payment->status, [
+        if ($payments instanceof PaymentCollection) {
+            if ($payments->count() === 0) {
+                throw new PaymentNotFoundException($mollieOrderId);
+            }
+
+            $allowed = [
                 PaymentStatus::STATUS_PAID,
                 PaymentStatus::STATUS_AUTHORIZED // Klarna
-            ])) {
-                return $payment;
+            ];
+
+            foreach ($payments->getArrayCopy() as $payment) {
+                if (in_array($payment->status, $allowed)) {
+                    return $payment;
+                }
             }
         }
 

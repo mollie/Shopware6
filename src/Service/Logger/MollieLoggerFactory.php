@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Service\Logger;
 
-
 use Kiener\MolliePayments\Service\SettingsService;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
@@ -10,7 +9,6 @@ use Monolog\Processor\PsrLogMessageProcessor;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Session\Session;
-
 
 class MollieLoggerFactory
 {
@@ -39,10 +37,10 @@ class MollieLoggerFactory
     /**
      * @param SettingsService $settingsService
      * @param Session $session
-     * @param $filename
-     * @param $retentionDays
+     * @param string $filename
+     * @param string $retentionDays
      */
-    public function __construct(SettingsService $settingsService, Session $session, $filename, $retentionDays)
+    public function __construct(SettingsService $settingsService, Session $session, string $filename, string $retentionDays)
     {
         $this->settingsService = $settingsService;
         $this->session = $session;
@@ -53,7 +51,7 @@ class MollieLoggerFactory
     /**
      * @return MollieLogger
      */
-    public function createLogger()
+    public function createLogger(): LoggerInterface
     {
         $config = $this->settingsService->getSettings();
 
@@ -72,5 +70,4 @@ class MollieLoggerFactory
             $sessionID
         );
     }
-
 }

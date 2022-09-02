@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\ScheduledTask;
 
-
 use Kiener\MolliePayments\ScheduledTask\Subscription\RenewalReminder\RenewalReminderTask;
 use Kiener\MolliePayments\ScheduledTask\Subscription\RenewalReminder\RenewalReminderTaskDev;
 use Kiener\MolliePayments\Service\PluginSettingsServiceInterface;
@@ -37,5 +36,4 @@ class ScheduledTaskFactory
 
         return new RenewalReminderTask();
     }
-
 }

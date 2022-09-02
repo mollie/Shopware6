@@ -91,11 +91,7 @@
             <argument type="service" id="order_line_item.repository"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\ApplePayDirect\ApplePayDirect">
-            <argument type="service" id="Kiener\MolliePayments\Service\CartService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\ShippingMethodService"/>
-            <argument type="service" id="translator"/>
-        </service>
+
 
         <service id="Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher">
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
@@ -109,9 +105,8 @@
         <service id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater">
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStateService"/>
-            <argument type="service" id="Shopware\Core\System\StateMachine\StateMachineRegistry"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
             <argument type="service" id="Kiener\MolliePayments\Repository\Order\OrderRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\CartService" class="Kiener\MolliePayments\Service\CartService" public="true">

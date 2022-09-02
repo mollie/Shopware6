@@ -13,8 +13,8 @@ export default class LoginAction {
 
         cy.visit('/account');
 
-        repo.getEmail().clear().type(email);
-        repo.getPassword().clear().type(password);
+        repo.getEmail().clear().type(email, {'force': true});
+        repo.getPassword().clear().type(password, {'force': true});
 
         repo.getSubmitButton().click();
     }

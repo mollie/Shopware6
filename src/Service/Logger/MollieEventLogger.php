@@ -7,7 +7,6 @@ use Monolog\Logger;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 
-
 class MollieEventLogger
 {
 
@@ -27,7 +26,7 @@ class MollieEventLogger
 
     /**
      * @param string $message
-     * @param array $additionalData
+     * @param array<mixed> $additionalData
      * @param Context $context
      */
     public function info(string $message, array $additionalData, Context $context): void
@@ -37,7 +36,7 @@ class MollieEventLogger
 
     /**
      * @param string $message
-     * @param array $additionalData
+     * @param array<mixed> $additionalData
      * @param \Throwable $exception
      * @param Context $context
      */
@@ -54,7 +53,7 @@ class MollieEventLogger
     /**
      * @param string $message
      * @param int $logLevel
-     * @param array $additionalData
+     * @param array<mixed> $additionalData
      * @param Context $context
      */
     private function saveEntry(string $message, int $logLevel, array $additionalData, Context $context): void
@@ -72,5 +71,4 @@ class MollieEventLogger
 
         $this->logEntryRepository->create([$logEntry], $context);
     }
-
 }

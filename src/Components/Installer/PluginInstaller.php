@@ -2,8 +2,8 @@
 
 namespace Kiener\MolliePayments\Components\Installer;
 
+use Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect;
 use Kiener\MolliePayments\Components\Subscription\Services\Installer\MailTemplateInstaller;
-use Kiener\MolliePayments\Service\ApplePayDirect\ApplePayDomainVerificationService;
 use Kiener\MolliePayments\Service\Installer\CustomFieldsInstaller;
 use Kiener\MolliePayments\Service\PaymentMethodService;
 use Shopware\Core\Framework\Context;
@@ -17,9 +17,9 @@ class PluginInstaller
     private $customFieldsInstaller;
 
     /**
-     * @var ApplePayDomainVerificationService
+     * @var ApplePayDirect
      */
-    private $applePayDomainService;
+    private $applePayDirect;
 
     /**
      * @var PaymentMethodService
@@ -35,21 +35,21 @@ class PluginInstaller
     /**
      * @param CustomFieldsInstaller $customFieldsInstaller
      * @param PaymentMethodService $paymentMethodService
-     * @param ApplePayDomainVerificationService $applePayDomainService
+     * @param ApplePayDirect $applePay
      * @param MailTemplateInstaller $subscriptionMailInstaller
      */
-    public function __construct(CustomFieldsInstaller $customFieldsInstaller, PaymentMethodService $paymentMethodService, ApplePayDomainVerificationService $applePayDomainService, MailTemplateInstaller $subscriptionMailInstaller)
+    public function __construct(CustomFieldsInstaller $customFieldsInstaller, PaymentMethodService $paymentMethodService, ApplePayDirect $applePay, MailTemplateInstaller $subscriptionMailInstaller)
     {
         $this->customFieldsInstaller = $customFieldsInstaller;
         $this->paymentMethodService = $paymentMethodService;
-        $this->applePayDomainService = $applePayDomainService;
+        $this->applePayDirect = $applePay;
         $this->subscriptionMailInstaller = $subscriptionMailInstaller;
     }
 
     /**
      * @param Context $context
-     * @return void
      * @throws \Doctrine\DBAL\Exception
+     * @return void
      */
     public function install(Context $context): void
     {
@@ -59,7 +59,6 @@ class PluginInstaller
 
         $this->subscriptionMailInstaller->install($context);
 
-        $this->applePayDomainService->downloadDomainAssociationFile();
+        $this->applePayDirect->downloadDomainAssociationFile();
     }
-
 }

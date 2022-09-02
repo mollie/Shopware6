@@ -29,7 +29,7 @@ export default class MainMenuRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getCatalogues() {
-        return cy.get('.sw-catalogue');
+        return cy.get('.sw-catalogue', {timeout: 50000});
     }
 
     /**

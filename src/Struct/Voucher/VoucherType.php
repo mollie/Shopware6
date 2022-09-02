@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Struct\Voucher;
 
 class VoucherType
 {
-
     public const TYPE_NOTSET = '';
     public const TYPE_NONE = '0';
     public const TYPE_ECO = '1';
@@ -32,5 +31,4 @@ class VoucherType
 
         return false;
     }
-
 }

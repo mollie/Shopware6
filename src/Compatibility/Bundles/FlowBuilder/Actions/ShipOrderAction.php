@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Actions;
 
-
 use Kiener\MolliePayments\Facade\MollieShipment;
 use Kiener\MolliePayments\Facade\MollieShipmentInterface;
 use Kiener\MolliePayments\Service\OrderService;
@@ -11,7 +10,6 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Flow\Dispatching\Action\FlowAction;
 use Shopware\Core\Framework\Event\FlowEvent;
 use Shopware\Core\Framework\Event\OrderAware;
-
 
 class ShipOrderAction extends FlowAction
 {
@@ -101,7 +99,6 @@ class ShipOrderAction extends FlowAction
         $orderNumber = '';
 
         try {
-
             $orderId = $baseEvent->getOrderId();
 
             $order = $this->orderService->getOrder($orderId, $baseEvent->getContext());
@@ -117,17 +114,16 @@ class ShipOrderAction extends FlowAction
                 '',
                 $baseEvent->getContext()
             );
-
         } catch (\Exception $ex) {
-
-            $this->logger->error('Error when shipping order with Flow Builder Action',
+            $this->logger->error(
+                'Error when shipping order with Flow Builder Action',
                 [
                     'error' => $ex->getMessage(),
                     'order' => $orderNumber,
-                ]);
+                ]
+            );
 
             throw $ex;
         }
     }
-
 }

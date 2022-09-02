@@ -176,6 +176,11 @@ class MollieSettingStruct extends Struct
      */
     protected $subscriptionsCancellationDays;
 
+    /**
+     * @var bool
+     */
+    protected $subscriptionSkipRenewalsOnFailedPayments;
+
 
     /**
      * @return string
@@ -216,11 +221,19 @@ class MollieSettingStruct extends Struct
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getProfileId(): ?string
     {
-        return $this->profileId ?? ($this->isTestMode() ? $this->testProfileId : $this->liveProfileId);
+        if ($this->profileId !== null) {
+            return $this->profileId;
+        }
+
+        if ($this->isTestMode()) {
+            return $this->testProfileId;
+        }
+
+        return $this->liveProfileId;
     }
 
     /**
@@ -256,7 +269,7 @@ class MollieSettingStruct extends Struct
     /**
      * @return bool
      */
-    public function isShopwareFailedPaymentMethod(): bool
+    public function isShopwareStandardFailureMode(): bool
     {
         return (bool)$this->shopwareFailedPayment;
     }
@@ -354,7 +367,6 @@ class MollieSettingStruct extends Struct
     public function getPaymentMethodBankTransferDueDateDays(): ?int
     {
         if (!$this->paymentMethodBankTransferDueDateDays) {
-
             return null;
         }
 
@@ -370,14 +382,13 @@ class MollieSettingStruct extends Struct
     /**
      * returns bank transfer due date in YYYY-MM-DD format or null
      *
-     * @return string|null
      * @throws Exception
+     * @return null|string
      */
     public function getPaymentMethodBankTransferDueDate(): ?string
     {
         $dueDate = $this->getPaymentMethodBankTransferDueDateDays();
         if (!$dueDate) {
-
             return null;
         }
 
@@ -405,8 +416,8 @@ class MollieSettingStruct extends Struct
     }
 
     /**
-     * @return string
      * @throws Exception
+     * @return string
      */
     public function getOrderLifetimeDate(): ?string
     {
@@ -661,4 +672,19 @@ class MollieSettingStruct extends Struct
         $this->subscriptionsAllowAddressEditing = $subscriptionsAllowAddressEditing;
     }
 
+    /**
+     * @return bool
+     */
+    public function isSubscriptionSkipRenewalsOnFailedPayments(): bool
+    {
+        return (bool)$this->subscriptionSkipRenewalsOnFailedPayments;
+    }
+
+    /**
+     * @param bool $subscriptionSkipRenewalsOnFailedPayments
+     */
+    public function setSubscriptionSkipRenewalsOnFailedPayments(bool $subscriptionSkipRenewalsOnFailedPayments): void
+    {
+        $this->subscriptionSkipRenewalsOnFailedPayments = $subscriptionSkipRenewalsOnFailedPayments;
+    }
 }

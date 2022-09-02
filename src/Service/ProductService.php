@@ -20,8 +20,7 @@ class ProductService
      */
     public function __construct(
         EntityRepositoryInterface $productRepository
-    )
-    {
+    ) {
         $this->productRepository = $productRepository;
     }
 
@@ -38,15 +37,12 @@ class ProductService
     /**
      * Finds a product by id.
      *
-     * @param $productId
-     * @param Context|null $context
-     * @return ProductEntity|null
+     * @param string $productId
+     * @param null|Context $context
      * @throws InconsistentCriteriaIdsException
+     * @return null|ProductEntity
      */
-    public function getProductById(
-        $productId,
-        Context $context = null
-    ): ?ProductEntity
+    public function getProductById($productId, Context $context = null): ?ProductEntity
     {
         $criteria = new Criteria([$productId]);
 

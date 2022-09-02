@@ -11,7 +11,7 @@ interface TransitionServiceInterface
      * Checks if the requested transition is allowed for the current order state
      *
      * @param string $transition
-     * @param array $availableTransitions
+     * @param array<mixed> $availableTransitions
      * @return bool
      */
     public function transitionIsAllowed(string $transition, array $availableTransitions): bool;

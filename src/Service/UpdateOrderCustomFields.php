@@ -2,10 +2,9 @@
 
 namespace Kiener\MolliePayments\Service;
 
-
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class UpdateOrderCustomFields
 {
@@ -16,17 +15,22 @@ class UpdateOrderCustomFields
 
     public function __construct(EntityRepositoryInterface $orderRepository)
     {
-
         $this->orderRepository = $orderRepository;
     }
 
-    public function updateOrder(string $shopwareOrderId, OrderAttributes $struct, SalesChannelContext $salesChannelContext): void
+    /**
+     * @param string $shopwareOrderId
+     * @param OrderAttributes $struct
+     * @param Context $context
+     * @return void
+     */
+    public function updateOrder(string $shopwareOrderId, OrderAttributes $struct, Context $context): void
     {
         $data = [
             'id' => $shopwareOrderId,
             'customFields' => $struct->toArray()
         ];
 
-        $this->orderRepository->update([$data], $salesChannelContext->getContext());
+        $this->orderRepository->update([$data], $context);
     }
 }

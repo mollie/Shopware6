@@ -26,18 +26,18 @@ abstract class AbstractMailService
     /**
      * @param array<string, mixed> $data
      * @param array<array<string, mixed>> $attachments
-     * @return void
      * @throws ConstraintViolationException
+     * @return void
      */
-    public abstract function send(array $data, array $attachments = []): void;
+    abstract public function send(array $data, array $attachments = []): void;
 
     /**
-     * @param array $data
+     * @param array<mixed> $data
      * @return string[]
      */
     protected function getNoReplyAddress(array $data): array
     {
-        if(!array_key_exists('noReplyHost', $data)) {
+        if (!array_key_exists('noReplyHost', $data)) {
             $request = Request::createFromGlobals();
             $data['noReplyHost'] = $request->getHost();
         }
@@ -48,7 +48,7 @@ abstract class AbstractMailService
     }
 
     /**
-     * @param string|null $locale
+     * @param null|string $locale
      * @return string[]
      */
     protected function getRecipients(?string $locale = null): array
@@ -61,8 +61,8 @@ abstract class AbstractMailService
     }
 
     /**
-     * @param array $data
-     * @return array
+     * @param array<mixed> $data
+     * @return array<mixed>
      */
     protected function buildContents(array $data): array
     {
@@ -75,8 +75,8 @@ abstract class AbstractMailService
     }
 
     /**
-     * @param array $attachments
-     * @return array
+     * @param array<mixed> $attachments
+     * @return array<mixed>
      */
     protected function filterFileAttachments(array $attachments = []): array
     {
@@ -87,8 +87,8 @@ abstract class AbstractMailService
     }
 
     /**
-     * @param array $attachments
-     * @return array
+     * @param array<mixed> $attachments
+     * @return array<mixed>
      */
     protected function filterBinaryAttachments(array $attachments = []): array
     {

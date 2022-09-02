@@ -8,15 +8,19 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class SalesChannelDataExtractor
 {
+
+    /**
+     * @param SalesChannelEntity $salesChannelEntity
+     * @return PaymentMethodCollection
+     */
     public function extractPaymentMethods(SalesChannelEntity $salesChannelEntity): PaymentMethodCollection
     {
         $paymentMethods = $salesChannelEntity->getPaymentMethods();
 
-        if($paymentMethods instanceof PaymentMethodCollection) {
+        if ($paymentMethods instanceof PaymentMethodCollection) {
             return $paymentMethods;
         }
 
-        throw new SalesChannelPaymentMethodsException($salesChannelEntity->getName());
+        throw new SalesChannelPaymentMethodsException((string)$salesChannelEntity->getName());
     }
-
 }
