@@ -22,7 +22,7 @@ export default class ShopConfigurationAction {
     setupShop(mollieFailureMode, creditCardComponents, applePayDirect) {
 
         // this is flaky...maybe we just give a bit time?
-        cy.wait(2000);
+        cy.wait(3000);
 
         this._activatePaymentMethods();
 
@@ -35,9 +35,11 @@ export default class ShopConfigurationAction {
         this.setupPlugin(mollieFailureMode, creditCardComponents, applePayDirect, false);
 
         // let's just wait a bit
-        cy.wait(10000);
+        cy.wait(12000);
 
         this._clearCache();
+
+        cy.wait(1000);
     }
 
 
@@ -49,6 +51,8 @@ export default class ShopConfigurationAction {
      * @param subscriptionIndicator
      */
     setupPlugin(mollieFailureMode, creditCardComponents, applePayDirect, subscriptionIndicator) {
+
+        cy.wait(2000);
 
         // assign all payment methods to
         // all available sales channels
@@ -73,6 +77,8 @@ export default class ShopConfigurationAction {
      * @param subscriptionIntervalUnit
      */
     updateProducts(voucherValue, subscriptionEnabled, subscriptionInterval, subscriptionIntervalUnit) {
+
+        cy.wait(2000);
 
         if (voucherValue === 'eco') {
             voucherValue = '1';

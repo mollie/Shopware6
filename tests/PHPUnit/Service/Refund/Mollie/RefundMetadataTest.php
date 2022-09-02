@@ -84,4 +84,27 @@ class RefundMetadataTest extends TestCase
         $this->assertEquals($expected, $metadata->toString());
     }
 
+
+    /**
+     * This test verifies that our long IDs are correctly compressed
+     * and returned in our JSON output instead of the long IDs.
+     *
+     * @return void
+     */
+    public function testCompression()
+    {
+        $items = [];
+        $items[] = new RefundItem('2a88d9b59d474c7e869d8071649be43c', 'mol1', 'c7bca22753c84d08b6178a50052b4146', 2, 9.99);
+
+        $metadata = new RefundMetadata('FULL', $items);
+
+        $outputJson = json_decode($metadata->toString(), true);
+
+        $lineId = $outputJson['composition'][0]['swLineId'];
+        $swReference = $outputJson['composition'][0]['swReference'];
+
+        $this->assertEquals(8, strlen($lineId));
+        $this->assertEquals('2a88e43c', $lineId);
+    }
+
 }

@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Components\Subscription\Services\PaymentMethodRemover;
 
+use Kiener\MolliePayments\Exception\MissingCartServiceException;
 use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\Payment\Remover\PaymentMethodRemover;
@@ -39,11 +40,11 @@ class SubscriptionRemover extends PaymentMethodRemover
 
     /**
      * @param ContainerInterface $container
-     * @param RequestStack       $requestStack
-     * @param OrderService       $orderService
-     * @param SettingsService    $settingsService
+     * @param RequestStack $requestStack
+     * @param OrderService $orderService
+     * @param SettingsService $settingsService
      * @param OrderDataExtractor $orderDataExtractor
-     * @param LoggerInterface    $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(ContainerInterface $container, RequestStack $requestStack, OrderService $orderService, SettingsService $settingsService, OrderDataExtractor $orderDataExtractor, LoggerInterface $logger)
     {
@@ -54,25 +55,24 @@ class SubscriptionRemover extends PaymentMethodRemover
 
     /**
      * @param PaymentMethodRouteResponse $originalData
-     * @param SalesChannelContext        $context
+     * @param SalesChannelContext $context
      * @throws \Exception
      * @return PaymentMethodRouteResponse
      */
     public function removePaymentMethods(PaymentMethodRouteResponse $originalData, SalesChannelContext $context): PaymentMethodRouteResponse
     {
-        if ($this->isCartRoute()) {
-            $cart = $this->getCart($context);
-            $isSubscription = $this->isSubscriptionCart($cart);
+        if (!$this->isAllowedRoute()) {
+            return $originalData;
         }
 
         if ($this->isOrderRoute()) {
             $order = $this->getOrder($context->getContext());
             $isSubscription = $this->isSubscriptionOrder($order, $context->getContext());
+        } else {
+            $cart = $this->getCart($context);
+            $isSubscription = $this->isSubscriptionCart($cart);
         }
 
-        if (!isset($isSubscription)) {
-            $isSubscription = false;
-        }
 
         if (!$isSubscription) {
             return $originalData;
@@ -110,7 +110,7 @@ class SubscriptionRemover extends PaymentMethodRemover
 
     /**
      * @param OrderEntity $order
-     * @param Context     $context
+     * @param Context $context
      * @return bool
      */
     private function isSubscriptionOrder(OrderEntity $order, Context $context): bool

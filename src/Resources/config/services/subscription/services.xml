@@ -65,24 +65,6 @@
 
         <!-- ============================================================================================== -->
 
-        <service id="Kiener\MolliePayments\Controller\Api\SubscriptionController" public="true">
-            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-        </service>
-
-        <service id="Kiener\MolliePayments\Storefront\Controller\AccountController" public="true">
-            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Page\Account\SubscriptionPageLoader"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
-            <argument type="service" id="mollie_payments.logger"/>
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-            <call method="setTwig">
-                <argument type="service" id="twig"/>
-            </call>
-        </service>
 
         <service id="Kiener\MolliePayments\Components\Subscription\Page\Account\SubscriptionPageLoader">
             <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
@@ -108,26 +90,24 @@
             <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing\SubscriptionRenewing"/>
             <argument type="service" id="sales_channel.repository"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Router\RoutingBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
             <argument type="service" id="mollie_payments.logger"/>
         </service>
 
         <service id="Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder">
-            <argument type="service" id="Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Router\RoutingBuilder"/>
         </service>
 
         <service id="Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder">
         </service>
 
         <service id="Kiener\MolliePayments\Components\Subscription\Cart\Validator\AvailabilityInformationValidator">
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <tag name="shopware.cart.validator"/>
         </service>
 
         <service id="Kiener\MolliePayments\Components\Subscription\Cart\Validator\SubscriptionCartValidator">
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <tag name="shopware.cart.validator"/>
         </service>
 

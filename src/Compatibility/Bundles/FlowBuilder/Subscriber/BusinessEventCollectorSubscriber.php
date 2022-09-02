@@ -43,7 +43,7 @@ class BusinessEventCollectorSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @return array[]
+     * @return array<mixed>
      */
     public static function getSubscribedEvents()
     {

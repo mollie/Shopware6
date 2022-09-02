@@ -19,9 +19,8 @@ abstract class AbstractSalesChannelGenerator implements GeneratorInterface
     /**
      * @param EntityRepositoryInterface $salesChannelRepository
      */
-    public function __construct(
-        EntityRepositoryInterface $salesChannelRepository
-    ) {
+    public function __construct(EntityRepositoryInterface $salesChannelRepository)
+    {
         $this->salesChannelRepository = $salesChannelRepository;
     }
 
@@ -31,7 +30,6 @@ abstract class AbstractSalesChannelGenerator implements GeneratorInterface
      */
     protected function getSalesChannelIds(Context $context): array
     {
-        /** @var SalesChannelEntity $salesChannel */
         return $this->getSalesChannels($context)->map(function ($salesChannel) {
             return $salesChannel->getId();
         });

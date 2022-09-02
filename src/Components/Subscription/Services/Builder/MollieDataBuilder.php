@@ -3,23 +3,23 @@
 namespace Kiener\MolliePayments\Components\Subscription\Services\Builder;
 
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
-use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
+use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 
 class MollieDataBuilder
 {
 
     /**
-     * @var WebhookBuilder
+     * @var RoutingBuilder
      */
-    private $webhookBuilder;
+    private $routingBuilder;
 
 
     /**
-     * @param WebhookBuilder $webhookBuilder
+     * @param RoutingBuilder $routingBuilder
      */
-    public function __construct(WebhookBuilder $webhookBuilder)
+    public function __construct(RoutingBuilder $routingBuilder)
     {
-        $this->webhookBuilder = $webhookBuilder;
+        $this->routingBuilder = $routingBuilder;
     }
 
 
@@ -43,7 +43,7 @@ class MollieDataBuilder
             ],
             'description' => $subscription->getDescription(),
             'metadata' => [],
-            'webhookUrl' => $this->webhookBuilder->buildSubscriptionWebhook($subscription->getId()),
+            'webhookUrl' => $this->routingBuilder->buildSubscriptionWebhook($subscription->getId()),
             'startDate' => $startDate,
             'interval' => $interval,
             'times' => $times,

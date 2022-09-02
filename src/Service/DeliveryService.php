@@ -39,18 +39,13 @@ class DeliveryService
     }
 
     /**
-     * Returns a delivery by id and version.
-     *
-     * @param $deliveryId
-     * @param $versionId
+     * @param string $deliveryId
+     * @param null|string $versionId
      * @param null|Context $context
      * @return null|OrderDeliveryEntity
      */
-    public function getDeliveryById(
-        $deliveryId,
-        $versionId = null,
-        Context $context = null
-    ): ?OrderDeliveryEntity {
+    public function getDeliveryById($deliveryId, $versionId = null, Context $context = null): ?OrderDeliveryEntity
+    {
         $deliveryCriteria = new Criteria([$deliveryId]);
 
         if ($versionId !== null) {
@@ -64,19 +59,13 @@ class DeliveryService
     }
 
     /**
-     * Returns a delivery by an order id.
-     *
-     * @param string       $orderId
-     * @param null|string  $orderVersionId
+     * @param string $orderId
+     * @param null|string $orderVersionId
      * @param null|Context $context
-     *
      * @return null|OrderDeliveryEntity
      */
-    public function getDeliveryByOrderId(
-        string $orderId,
-        string $orderVersionId = null,
-        Context $context = null
-    ): ?OrderDeliveryEntity {
+    public function getDeliveryByOrderId(string $orderId, string $orderVersionId = null, Context $context = null): ?OrderDeliveryEntity
+    {
         $deliveryCriteria = new Criteria();
         $deliveryCriteria->addFilter(new EqualsFilter('orderId', $orderId));
 
@@ -91,12 +80,9 @@ class DeliveryService
     }
 
     /**
-     * Adds shipped variable to custom fields.
-     *
-     * @param array $customFields
-     * @param bool  $shipped
-     *
-     * @return array
+     * @param array<mixed> $customFields
+     * @param bool $shipped
+     * @return array<mixed>
      */
     public function addShippedToCustomFields(array $customFields, bool $shipped = false): array
     {
@@ -112,14 +98,12 @@ class DeliveryService
     /**
      * Updates a delivery in the database.
      *
-     * @param array $data
+     * @param array<mixed> $data
      * @param null|Context $context
      * @return EntityWrittenContainerEvent
      */
-    public function updateDelivery(
-        array $data,
-        Context $context = null
-    ): EntityWrittenContainerEvent {
+    public function updateDelivery(array $data, Context $context = null): EntityWrittenContainerEvent
+    {
         return $this->getRepository()->update(
             [$data],
             $context ?? Context::createDefaultContext()

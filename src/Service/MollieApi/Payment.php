@@ -30,6 +30,10 @@ class Payment
         }
     }
 
+    /**
+     * @param null|PaymentCollection<\Mollie\Api\Resources\Payment> $payments
+     * @param string $salesChannelContextId
+     */
     public function cancelOpenPayments(?PaymentCollection $payments, string $salesChannelContextId): void
     {
         if (!$payments instanceof PaymentCollection) {

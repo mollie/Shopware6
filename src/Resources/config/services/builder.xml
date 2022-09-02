@@ -6,15 +6,9 @@
 
     <services>
 
-        <service id="Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder">
-            <argument type="service" id="router"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-        </service>
-
         <service id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderBuilder">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor"/>
-            <argument type="service" id="router"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieLineItemBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderAddressBuilder"/>
@@ -24,7 +18,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\VerticalTaxLineItemFixer"/>
             <argument type="service" id="Kiener\MolliePayments\Hydrator\MollieLineItemHydrator"/>
             <argument type="service" id="event_dispatcher"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Router\RoutingBuilder"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieShippingLineItemBuilder">
@@ -34,7 +28,6 @@
         <service id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder"/>
 
         <service id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieLineItemBuilder">
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Validator\IsOrderLineItemValid"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\PriceCalculator"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor"/>

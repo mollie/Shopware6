@@ -28,6 +28,11 @@ class OrderDeliveryService
         return $result->first();
     }
 
+    /**
+     * @param OrderDeliveryEntity $delivery
+     * @param array<mixed> $values
+     * @param Context $context
+     */
     public function updateCustomFields(OrderDeliveryEntity $delivery, array $values, Context $context): void
     {
         if (empty($values)) {

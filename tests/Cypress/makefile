@@ -24,7 +24,10 @@ ifndef shopware
 	$(warning Please provide the Shopware Version as argument to Start Cypress!)
 	@exit 1
 endif
-	CYPRESS_BASE_URL=$(url) CYPRESS_SHOPWARE=$(shopware) ./node_modules/.bin/cypress open
+ifndef storeApiKey
+	storeApiKey=''
+endif
+	CYPRESS_BASE_URL=$(url) CYPRESS_SHOPWARE=$(shopware) CYPRESS_STORE_APIKEY=$(storeApiKey) ./node_modules/.bin/cypress open
 
 # ---------------------------------------------------------------------------------------------
 
@@ -37,5 +40,8 @@ ifndef shopware
 	$(warning Please provide the Shopware Version as argument to Start Cypress!)
 	@exit 1
 endif
-	CYPRESS_BASE_URL=$(url) CYPRESS_SHOPWARE=$(shopware) ./node_modules/.bin/cypress run --headless --env tags="$(tags)"
+ifndef storeApiKey
+	storeApiKey=''
+endif
+	CYPRESS_BASE_URL=$(url) CYPRESS_SHOPWARE=$(shopware) CYPRESS_STORE_APIKEY=$(storeApiKey) ./node_modules/.bin/cypress run --headless --env filters="$(filters)"
 

@@ -5,13 +5,20 @@ namespace PHPUnit\Components\Subscription\Services\Builder;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder;
-use Kiener\MolliePayments\Service\WebhookBuilder\WebhookBuilder;
+use Kiener\MolliePayments\Service\Router\RoutingBuilder;
+use Kiener\MolliePayments\Service\Router\RoutingDetector;
 use MolliePayments\Tests\Fakes\FakePluginSettings;
 use MolliePayments\Tests\Fakes\FakeRouter;
+use MolliePayments\Tests\Traits\BuilderTestTrait;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class MollieDataBuilderTest extends TestCase
 {
+
+    use BuilderTestTrait;
+
 
     /**
      * This test verifies that our builder creates a correct
@@ -20,10 +27,9 @@ class MollieDataBuilderTest extends TestCase
      */
     public function testBuildSubscriptionPayload()
     {
-        $fakeRouter = new FakeRouter('https://local.mollie.shop/mollie/webhook/subscription/abc/renew');
-        $webhookBuilder = new WebhookBuilder($fakeRouter, new FakePluginSettings(''));
-        $builder = new MollieDataBuilder($webhookBuilder);
+        $routingBuilder = $this->buildRoutingBuilder($this, 'https://local.mollie.shop/mollie/webhook/subscription/abc/renew');
 
+        $builder = new MollieDataBuilder($routingBuilder);
 
         $subscription = new SubscriptionEntity();
         $subscription->setId('ID123');

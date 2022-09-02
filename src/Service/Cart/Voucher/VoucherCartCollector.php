@@ -49,7 +49,7 @@ class VoucherCartCollector implements CartDataCollectorInterface
      * It will just calculate this once, and then offer that information
      * in the DATA field of the cart object.
      *
-     * @param CartDataCollection $data
+     * @param CartDataCollection<mixed> $data
      * @param Cart $original
      * @param SalesChannelContext $context
      * @param CartBehavior $behavior
@@ -104,17 +104,18 @@ class VoucherCartCollector implements CartDataCollectorInterface
 
 
     /**
-     * @param null|Context $context
-     * @return array|string
+     * @param Context $context
+     * @return string
      */
-    private function getVoucherID(Context $context)
+    private function getVoucherID(Context $context): string
     {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('handlerIdentifier', VoucherPayment::class));
 
         // Get payment methods
+        /** @var array<string> $paymentMethods */
         $paymentMethods = $this->repoPaymentMethods->searchIds($criteria, $context)->getIds();
 
-        return $paymentMethods[0];
+        return (string)$paymentMethods[0];
     }
 }

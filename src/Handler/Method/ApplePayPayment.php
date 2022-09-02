@@ -19,12 +19,15 @@ class ApplePayPayment extends PaymentHandler
     /** @var string */
     private $token;
 
-    public function processPaymentMethodSpecificParameters(
-        array $orderData,
-        OrderEntity $orderEntity,
-        SalesChannelContext $salesChannelContext,
-        CustomerEntity $customer
-    ): array {
+    /**
+     * @param array<mixed> $orderData
+     * @param OrderEntity $orderEntity
+     * @param SalesChannelContext $salesChannelContext
+     * @param CustomerEntity $customer
+     * @return array<mixed>
+     */
+    public function processPaymentMethodSpecificParameters(array $orderData, OrderEntity $orderEntity, SalesChannelContext $salesChannelContext, CustomerEntity $customer): array
+    {
         if (!empty($this->token)) {
             $orderData['payment']['applePayPaymentToken'] = $this->token;
         }

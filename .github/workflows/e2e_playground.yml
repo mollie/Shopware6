@@ -34,7 +34,7 @@ jobs:
 
       - name: Start Docker
         run: |
-          docker run --rm -p 443:443 --name shop --env PHP_VERSION=${{ github.event.inputs.phpVersion }} -d dockware/dev:${{ github.event.inputs.swVersion }}
+          docker run --rm -p 443:443 --name shop --env PHP_VERSION=${{ github.event.inputs.phpVersion }} --env SW_API_ACCESS_KEY=SWSCOVFSNKLBYUTKS1VSOEDTUQ -d dockware/dev:${{ github.event.inputs.swVersion }}
           sleep 30
           docker logs shop
           # now change the domain of our shop, mollie doesn't work with localhost
@@ -64,7 +64,7 @@ jobs:
         run: cd tests/Cypress && make install -B
 
       - name: Start Cypress
-        run: cd tests/Cypress && make run shopware=${{ github.event.inputs.swVersion }} url=https://local.mollie.shop
+        run: cd tests/Cypress && make run shopware=${{ github.event.inputs.swVersion }} url=https://local.mollie.shop storeApiKey=SWSCOVFSNKLBYUTKS1VSOEDTUQ
 
       - name: Download Logs
         if: ${{ always() }}

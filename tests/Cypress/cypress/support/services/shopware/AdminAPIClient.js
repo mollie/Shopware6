@@ -7,18 +7,17 @@ export default class AdminAPIClient {
      *
      */
     constructor() {
-        this.authInformation = {};
         this.basePath = '';
 
         this.client = axios.create({
-            baseURL: `${Cypress.config('baseUrl')}/api`
+            baseURL: `${Cypress.config('baseUrl')}/api`,
+            timeout: 10000,
         });
     }
 
     /**
      *
      * @param url
-     * @param data
      * @param params
      * @returns {*}
      */
@@ -49,7 +48,6 @@ export default class AdminAPIClient {
     /**
      *
      * @param url
-     * @param data
      * @param params
      * @returns {*}
      */
@@ -64,7 +62,6 @@ export default class AdminAPIClient {
     /**
      *
      * @param url
-     * @param data
      * @param params
      * @returns {*}
      */
@@ -79,7 +76,6 @@ export default class AdminAPIClient {
     /**
      *
      * @param url
-     * @param data
      * @param params
      * @returns {*}
      */
@@ -132,63 +128,81 @@ export default class AdminAPIClient {
      * @returns {*}
      */
     request({url, method, params, data}) {
-        return this.loginByUserName().then(() => {
-            const requestConfig = {
-                headers: this.getHeaders(),
-                url,
-                method,
-                params,
-                data
-            };
 
-            return this.client.request(requestConfig).then((response) => {
-                if (Array.isArray(response.data.data) && response.data.data.length === 1) {
-                    return response.data.data[0];
-                }
-                return response.data.data;
-            });
-        }).catch(({response}) => {
-            if (response && response.data && response.data.errors) {
-                console.log(response.data.errors);
-            } else {
-                console.log('problem with response?!');
+        return this.loginByUserName()
+            .then((token) => {
+
+                const requestConfig = {
+                    headers: {
+                        Accept: 'application/vnd.api+json',
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    url,
+                    method,
+                    params,
+                    data
+                };
+
+                return this.client.request(requestConfig).then((response) => {
+                    if (Array.isArray(response.data.data) && response.data.data.length === 1) {
+                        return response.data.data[0];
+                    }
+                    return response.data.data;
+                });
+            })
+            .catch(({response}) => {
                 console.log(response);
-            }
+            });
+    }
+
+
+    /**
+     *
+     * @param username
+     * @param password
+     * @returns {*}
+     */
+    loginByUserName(username = 'admin', password = 'shopware') {
+        return new Promise((resolve, reject) => {
+            this._getCachedToken().then((token) => {
+                if (token !== undefined && token !== null) {
+                    console.log("reuse Access Token: " + token);
+                    resolve(token);
+                    return;
+                }
+
+                const params = {
+                    grant_type: 'password',
+                    client_id: 'administration',
+                    scopes: 'write',
+                    username: username,
+                    password: password
+                };
+
+                this.client
+                    .post('/oauth/token', params)
+                    .then((response) => {
+                        const token = response.data.access_token;
+                        window.localStorage.setItem('cachedAccessToken', token);
+                        resolve(token);
+                    })
+                    .catch((err) => {
+                        reject(err);
+                    });
+            })
         });
     }
 
     /**
-     * Returns the necessary headers for the administration API requests
      *
-     * @returns {Object}
+     * @returns {*}
+     * @private
      */
-    getHeaders() {
-        return {
-            Accept: 'application/vnd.api+json',
-            Authorization: `Bearer ${this.authInformation.access_token}`,
-            'Content-Type': 'application/json'
-        };
-    }
-
-    /**
-     * Renders an header to stdout including information about the available flags.
-     *
-     * @param {String} username
-     * @param {String} password
-     * @returns {Object}
-     */
-    loginByUserName(username = 'admin', password = 'shopware') {
-        return this.client.post('/oauth/token', {
-            grant_type: 'password',
-            client_id: 'administration',
-            scopes: 'write',
-            username: username,
-            password: password
-        }).catch((err) => {
-            console.log(Promise.reject(err.data));
-        }).then((response) => {
-            this.authInformation = response.data;
-            return this.authInformation;
+    _getCachedToken() {
+        return new Promise((resolve, reject) => {
+            const value = window.localStorage.getItem('cachedAccessToken');
+            resolve(value);
         });
     }
 

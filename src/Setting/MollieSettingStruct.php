@@ -176,6 +176,11 @@ class MollieSettingStruct extends Struct
      */
     protected $subscriptionsCancellationDays;
 
+    /**
+     * @var bool
+     */
+    protected $subscriptionSkipRenewalsOnFailedPayments;
+
 
     /**
      * @return string
@@ -220,7 +225,15 @@ class MollieSettingStruct extends Struct
      */
     public function getProfileId(): ?string
     {
-        return $this->profileId ?? ($this->isTestMode() ? $this->testProfileId : $this->liveProfileId);
+        if ($this->profileId !== null) {
+            return $this->profileId;
+        }
+
+        if ($this->isTestMode()) {
+            return $this->testProfileId;
+        }
+
+        return $this->liveProfileId;
     }
 
     /**
@@ -256,7 +269,7 @@ class MollieSettingStruct extends Struct
     /**
      * @return bool
      */
-    public function isShopwareFailedPaymentMethod(): bool
+    public function isShopwareStandardFailureMode(): bool
     {
         return (bool)$this->shopwareFailedPayment;
     }
@@ -657,5 +670,21 @@ class MollieSettingStruct extends Struct
     public function setSubscriptionsAllowAddressEditing(bool $subscriptionsAllowAddressEditing): void
     {
         $this->subscriptionsAllowAddressEditing = $subscriptionsAllowAddressEditing;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSubscriptionSkipRenewalsOnFailedPayments(): bool
+    {
+        return (bool)$this->subscriptionSkipRenewalsOnFailedPayments;
+    }
+
+    /**
+     * @param bool $subscriptionSkipRenewalsOnFailedPayments
+     */
+    public function setSubscriptionSkipRenewalsOnFailedPayments(bool $subscriptionSkipRenewalsOnFailedPayments): void
+    {
+        $this->subscriptionSkipRenewalsOnFailedPayments = $subscriptionSkipRenewalsOnFailedPayments;
     }
 }

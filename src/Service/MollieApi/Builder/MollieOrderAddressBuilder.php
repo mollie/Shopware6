@@ -11,7 +11,7 @@ class MollieOrderAddressBuilder
     /**
      * @param string $email
      * @param null|CustomerAddressEntity $address
-     * @return array
+     * @return array<mixed>
      */
     public function build(string $email, ?CustomerAddressEntity $address): array
     {

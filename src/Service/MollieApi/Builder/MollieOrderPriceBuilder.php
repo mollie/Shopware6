@@ -19,7 +19,7 @@ class MollieOrderPriceBuilder
     /**
      * @param null|float $price
      * @param null|string $currency
-     * @return array
+     * @return array<mixed>
      */
     public function build(?float $price, ?string $currency): array
     {

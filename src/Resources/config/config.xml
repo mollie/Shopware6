@@ -501,6 +501,16 @@
         <title lang="de-DE">Abonnements</title>
         <title lang="nl-NL">Abonnementen</title>
         <input-field type="bool">
+            <name>subscriptionsEnabled</name>
+            <defaultValue>true</defaultValue>
+            <label>Enable Mollie Subscriptions</label>
+            <label lang="de-DE">Mollie Subscriptions aktivieren</label>
+            <label lang="nl-NL">Mollie Subscriptions activeren</label>
+            <helpText>Please reload the administration after changing this setting.</helpText>
+            <helpText lang="de-DE">Bitte laden Sie die Administration neu, nachdem Sie diese Einstellung geändert haben.</helpText>
+            <helpText lang="nl-NL">Herlaad de administratie na het wijzigen van deze instelling.</helpText>
+        </input-field>
+        <input-field type="bool">
             <name>subscriptionsShowIndicator</name>
             <defaultValue>true</defaultValue>
             <label>Show Subscription Indicator</label>
@@ -519,6 +529,16 @@
             <helpText>If enabled, customers are allowed to edit their billing and shipping addresses in the shop. Please consider that no new shipping costs will be calculated for modified addresses. Countries are not allowed to be edited.</helpText>
             <helpText lang="de-DE">Wenn aktiv, dürfen Kunden ihre Rechnungs- und Lieferadressen im Shop bearbeiten. Bitte beachten Sie, dass für geänderte Adressen keine neuen Versandkosten berechnet werden. Länder dürfen nicht bearbeitet werden.</helpText>
             <helpText lang="nl-NL">Indien ingeschakeld, mogen klanten hun factuur- en verzendadres in de shop bewerken. Houd er rekening mee dat er geen nieuwe verzendkosten worden berekend voor gewijzigde adressen. Landen mogen niet worden bewerkt.</helpText>
+        </input-field>
+        <input-field type="bool">
+            <name>subscriptionSkipRenewalsOnFailedPayments</name>
+            <defaultValue>false</defaultValue>
+            <label>Skip Subscription renewal if payment fails</label>
+            <label lang="de-DE">Abonnementverlängerung überspringen, wenn die Zahlung fehlschlägt</label>
+            <label lang="nl-NL">Abonnementverlenging overslaan als de betaling mislukt</label>
+            <helpText>If skipped, the plugin will not create new orders on subscription renewals, if the payment was not successful. If not skipped, then a new order is created and the customer can pay again within Shopware.</helpText>
+            <helpText lang="de-DE">Wenn es übersprungen wird, erstellt das Plugin keine neuen Bestellungen bei Abonnementverlängerungen, wenn die Zahlung nicht erfolgreich war. Wenn nicht übersprungen, wird eine neue Bestellung erstellt und der Kunde kann innerhalb von Shopware erneut bezahlen.</helpText>
+            <helpText lang="nl-NL">Indien overgeslagen, zal de plug-in geen nieuwe bestellingen maken bij abonnementsverlengingen, als de betaling niet succesvol was. Indien niet overgeslagen, dan wordt er een nieuwe bestelling aangemaakt en kan de klant opnieuw betalen binnen Shopware.</helpText>
         </input-field>
         <input-field type="int">
             <name>subscriptionsReminderDays</name>
@@ -540,6 +560,5 @@
             <helpText lang="de-DE">Legen Sie eine Kündigungsfrist für Verlänägerungen von Abonnements fest. Wenn sich ein Abonnement am Freitag verlängert und Sie "2" verwenden, kann es bis spätestens Mittwoch gekündigt werden. Verwenden Sie "0", um Stornierungen immer zuzulassen.</helpText>
             <helpText lang="nl-NL">Stel een opzegtermijn in voor klanten voordat ze het abonnement verlengen. Als een abonnement op vrijdag wordt verlengd en je gebruikt "2", dan kan het uiterlijk woensdag worden opgezegd. Gebruik "0" om annuleringen altijd toe te staan</helpText>
         </input-field>
-
     </card>
 </config>

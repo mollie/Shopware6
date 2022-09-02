@@ -270,6 +270,7 @@ paths:
           "200":
             description: "successful operation"
 
+
 components:
   securitySchemes:
     AdminAPI:

@@ -20,10 +20,6 @@ class MollieLineItemBuilder
 {
     public const LINE_ITEM_TYPE_CUSTOM_PRODUCTS = 'customized-products';
 
-    /**
-     * @var MollieOrderPriceBuilder
-     */
-    private $priceHydrator;
 
     /**
      * @var IsOrderLineItemValid
@@ -46,15 +42,13 @@ class MollieLineItemBuilder
     private $compatibilityGateway;
 
     /**
-     * @param MollieOrderPriceBuilder $priceHydrator
      * @param IsOrderLineItemValid $orderLineItemValidator
      * @param PriceCalculator $priceCalculator
      * @param LineItemDataExtractor $lineItemDataExtractor
      * @param CompatibilityGatewayInterface $compatibilityGateway
      */
-    public function __construct(MollieOrderPriceBuilder $priceHydrator, IsOrderLineItemValid $orderLineItemValidator, PriceCalculator $priceCalculator, LineItemDataExtractor $lineItemDataExtractor, CompatibilityGatewayInterface $compatibilityGateway)
+    public function __construct(IsOrderLineItemValid $orderLineItemValidator, PriceCalculator $priceCalculator, LineItemDataExtractor $lineItemDataExtractor, CompatibilityGatewayInterface $compatibilityGateway)
     {
-        $this->priceHydrator = $priceHydrator;
         $this->orderLineItemValidator = $orderLineItemValidator;
         $this->priceCalculator = $priceCalculator;
         $this->lineItemDataExtractor = $lineItemDataExtractor;
@@ -76,25 +70,25 @@ class MollieLineItemBuilder
             return $lines;
         }
 
-        /** @var OrderLineItemEntity $item */
+
         foreach ($lineItems as $item) {
             $this->orderLineItemValidator->validate($item);
             $extraData = $this->lineItemDataExtractor->extractExtraData($item);
             $itemPrice = $item->getPrice();
 
             if (!$itemPrice instanceof CalculatedPrice) {
-                throw new MissingPriceLineItemException($item->getProductId());
+                throw new MissingPriceLineItemException((string)$item->getProductId());
             }
 
             $price = $this->priceCalculator->calculateLineItemPrice(
-                $item->getPrice(),
+                $itemPrice,
                 $item->getTotalPrice(),
                 $taxStatus,
                 $isVerticalTaxCalculation
             );
 
             $mollieLineItem = new MollieLineItem(
-                $this->getLineItemType($item),
+                (string)$this->getLineItemType($item),
                 $item->getLabel(),
                 $item->getQuantity(),
                 $price,

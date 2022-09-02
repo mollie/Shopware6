@@ -35,7 +35,10 @@ class ShippingSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onShipOrderWithTracking(MollieOrderShipmentTrackingEvent $event)
+    /**
+     * @param MollieOrderShipmentTrackingEvent $event
+     */
+    public function onShipOrderWithTracking(MollieOrderShipmentTrackingEvent $event): void
     {
         try {
             $this->shipmentFacade->shipOrderByOrderId(

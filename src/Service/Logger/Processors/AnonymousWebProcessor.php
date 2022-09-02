@@ -6,6 +6,9 @@ use Kiener\MolliePayments\Service\Logger\Services\URLAnonymizerInterface;
 use Monolog\Processor\ProcessorInterface;
 use Symfony\Component\HttpFoundation\IpUtils;
 
+/**
+ * @phpstan-import-type Record from \Monolog\Logger
+ */
 class AnonymousWebProcessor
 {
 
@@ -31,8 +34,8 @@ class AnonymousWebProcessor
     }
 
     /**
-     * @param array $record
-     * @return array
+     * @phpstan-param  Record $record
+     * @return array<mixed>
      */
     public function __invoke(array $record)
     {
@@ -48,6 +51,7 @@ class AnonymousWebProcessor
                 $record['extra']['url'] = $this->urlAnonymizer->anonymize($record['extra']['url']);
             }
         }
+
         return $record;
     }
 }

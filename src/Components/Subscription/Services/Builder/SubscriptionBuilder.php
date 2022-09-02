@@ -20,6 +20,20 @@ class SubscriptionBuilder
 {
 
     /**
+     * @var SubscriptionStartDateBuilder
+     */
+    private $startDateBuilder;
+
+
+    /**
+     */
+    public function __construct()
+    {
+        $this->startDateBuilder = new SubscriptionStartDateBuilder();
+    }
+
+
+    /**
      * @param OrderEntity $order
      * @throws Exception
      * @return SubscriptionEntity
@@ -88,7 +102,7 @@ class SubscriptionBuilder
 
         $subscriptionEntity->setMetadata(
             new SubscriptionMetadata(
-                $order->getOrderDateTime()->format('Y-m-d'),
+                $this->startDateBuilder->buildStartDate($order->getOrderDateTime(), $interval, $intervalUnit),
                 $interval,
                 $intervalUnit,
                 $times,

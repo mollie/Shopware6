@@ -57,28 +57,9 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
      */
     private $localeRepositoryInterface;
 
-    /**
-     * @var ActivePaymentMethodsProvider
-     */
-    private $activePaymentMethodsProvider;
 
     /**
-     * Returns an array of event names this subscriber wants to listen to.
-     *
-     * The array keys are event names and the value can be:
-     *
-     * * The method name to call (priority defaults to 0)
-     * * An array composed of the method name to call and the priority
-     * * An array of arrays composed of the method names to call and respective
-     *   priorities, or 0 if unset
-     *
-     * For instance:
-     *
-     * * array('eventName' => 'methodName')
-     * * array('eventName' => array('methodName', $priority))
-     * * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
-     *
-     * @return array The event names to listen to
+     * @return array<mixed>>
      */
     public static function getSubscribedEvents(): array
     {
@@ -91,20 +72,17 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * CheckoutConfirmPageSubscriber constructor.
      * @param MollieApiFactory $apiFactory
      * @param SettingsService $settingsService
      * @param EntityRepositoryInterface $languageRepositoryInterface
      * @param EntityRepositoryInterface $localeRepositoryInterface
-     * @param ActivePaymentMethodsProvider $activePaymentMethodsProvider
      */
-    public function __construct(MollieApiFactory $apiFactory, SettingsService $settingsService, EntityRepositoryInterface $languageRepositoryInterface, EntityRepositoryInterface $localeRepositoryInterface, ActivePaymentMethodsProvider $activePaymentMethodsProvider)
+    public function __construct(MollieApiFactory $apiFactory, SettingsService $settingsService, EntityRepositoryInterface $languageRepositoryInterface, EntityRepositoryInterface $localeRepositoryInterface)
     {
         $this->apiFactory = $apiFactory;
         $this->settingsService = $settingsService;
         $this->languageRepositoryInterface = $languageRepositoryInterface;
         $this->localeRepositoryInterface = $localeRepositoryInterface;
-        $this->activePaymentMethodsProvider = $activePaymentMethodsProvider;
     }
 
 
@@ -172,22 +150,21 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
         $context = $args->getContext();
         $salesChannelContext = $args->getSalesChannelContext();
 
-        if ($context !== null && $salesChannelContext !== null) {
-            $salesChannel = $salesChannelContext->getSalesChannel();
-            if ($salesChannel !== null) {
-                $languageId = $salesChannel->getLanguageId();
-                if ($languageId !== null) {
-                    $languageCriteria = new Criteria();
-                    $languageCriteria->addFilter(new EqualsFilter('id', $languageId));
 
-                    $languages = $this->languageRepositoryInterface->search($languageCriteria, $args->getContext());
-                    $localeId = $languages->first()->getLocaleId();
-                    $localeCriteria = new Criteria();
-                    $localeCriteria->addFilter(new EqualsFilter('id', $localeId));
+        $salesChannel = $salesChannelContext->getSalesChannel();
+        if ($salesChannel !== null) {
+            $languageId = $salesChannel->getLanguageId();
+            if ($languageId !== null) {
+                $languageCriteria = new Criteria();
+                $languageCriteria->addFilter(new EqualsFilter('id', $languageId));
 
-                    $locales = $this->localeRepositoryInterface->search($localeCriteria, $args->getContext());
-                    $locale = $locales->first()->getCode();
-                }
+                $languages = $this->languageRepositoryInterface->search($languageCriteria, $args->getContext());
+                $localeId = $languages->first()->getLocaleId();
+                $localeCriteria = new Criteria();
+                $localeCriteria->addFilter(new EqualsFilter('id', $localeId));
+
+                $locales = $this->localeRepositoryInterface->search($localeCriteria, $args->getContext());
+                $locale = $locales->first()->getCode();
             }
         }
 
@@ -233,7 +210,6 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
      */
     private function addMollieProfileIdVariableToPage($args): void
     {
-        /** @var string $mollieProfileId */
         $mollieProfileId = '';
 
         /**
@@ -263,7 +239,7 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
      *
      * @param AccountEditOrderPageLoadedEvent|CheckoutConfirmPageLoadedEvent $args
      */
-    private function addMollieComponentsVariableToPage($args)
+    private function addMollieComponentsVariableToPage($args): void
     {
         $args->getPage()->assign([
             'enable_credit_card_components' => $this->settings->getEnableCreditCardComponents(),
@@ -275,18 +251,11 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
      *
      * @param AccountEditOrderPageLoadedEvent|CheckoutConfirmPageLoadedEvent $args
      */
-    private function addMollieIdealIssuersVariableToPage($args)
+    private function addMollieIdealIssuersVariableToPage($args): void
     {
-        /** @var array $customFields */
         $customFields = [];
-
-        /** @var Method $ideal */
         $ideal = null;
-
-        /** @var string $mollieProfileId */
         $mollieProfileId = '';
-
-        /** @var string $preferredIssuer */
         $preferredIssuer = '';
 
         /**
@@ -320,7 +289,7 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
             $preferredIssuer = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER];
         }
 
-        /** @var array $parameters */
+
         $parameters = [
             'include' => 'issuers',
         ];
@@ -337,7 +306,7 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
         }
 
         // Assign issuers to storefront
-        if ($ideal !== null) {
+        if ($ideal instanceof Method) {
             $args->getPage()->assign([
                 'ideal_issuers' => $ideal->issuers,
                 'preferred_issuer' => $preferredIssuer,

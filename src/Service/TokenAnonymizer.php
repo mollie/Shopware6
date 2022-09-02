@@ -12,6 +12,10 @@ class TokenAnonymizer
 
     const TOKEN_ANONYMIZER_COUNT_LAST_CHARACTERS = 4;
 
+    /**
+     * @param string $value
+     * @return string
+     */
     public function anonymize(string $value): string
     {
         $value = trim($value);
@@ -28,17 +32,11 @@ class TokenAnonymizer
         $lastChars = substr($value, -1 * self::TOKEN_ANONYMIZER_COUNT_LAST_CHARACTERS);
 
         return sprintf('%s%s%s', $firstChars, $this->getPlaceHolder(), $lastChars);
-
-        # only get the original value up to
-        # the allowed max length
-        $value = substr($value, 0, self::TOKEN_ANONYMIZER_MAX_LENGTH);
-
-        echo $value;
-
-        # replace the last 4 characters with our placeholders
-        return substr($value, 0, -4) . $this->getPlaceholder();
     }
 
+    /**
+     * @return string
+     */
     private function getPlaceHolder(): string
     {
         return str_repeat(self::TOKEN_ANONYMIZER_PLACEHOLDER_SYMBOL, self::TOKEN_ANONYMIZER_PLACEHOLDER_COUNT);

@@ -8,16 +8,24 @@ use Shopware\Core\Framework\Context;
 class AttachmentCollector
 {
     /**
-     * @var GeneratorInterface[]
+     * @var iterable<mixed>
      */
     protected $generators;
 
+
+    /**
+     * @param iterable<mixed> $generators
+     */
     public function __construct(iterable $generators)
     {
         $this->generators = $generators;
     }
 
-    public function collect(Context $context)
+    /**
+     * @param Context $context
+     * @return array<mixed>
+     */
+    public function collect(Context $context): array
     {
         $attachments = [];
 

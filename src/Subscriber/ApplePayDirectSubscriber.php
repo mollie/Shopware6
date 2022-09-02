@@ -36,7 +36,7 @@ class ApplePayDirectSubscriber implements EventSubscriberInterface
     /**
      * @param StorefrontRenderEvent $event
      */
-    public function onStorefrontRender(StorefrontRenderEvent $event)
+    public function onStorefrontRender(StorefrontRenderEvent $event) : void
     {
         $settings = $this->settingsService->getSettings($event->getSalesChannelContext()->getSalesChannel()->getId());
 

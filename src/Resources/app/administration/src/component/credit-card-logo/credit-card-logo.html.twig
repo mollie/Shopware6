@@ -1,0 +1,8 @@
+{% block credit_card_logo %}
+    <div>
+        <component :is="creditCardComponentName" class="mollie-credit-card-logo"></component>
+        <span class="mollie-credit-card-text">
+            <slot></slot>
+        </span>
+    </div>
+{% endblock %}

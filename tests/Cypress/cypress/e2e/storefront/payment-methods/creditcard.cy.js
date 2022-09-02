@@ -11,6 +11,8 @@ import PaymentAction from "Actions/storefront/checkout/PaymentAction";
 import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
 import CreditCardScreenAction from "cypress-mollie/src/actions/screens/CreditCardScreen";
 import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
+import AdminLoginAction from "Actions/admin/AdminLoginAction";
+import AdminOrdersAction from "Actions/admin/AdminOrdersAction";
 
 
 const devices = new Devices();
@@ -24,6 +26,9 @@ const mollieCreditCardForm = new CreditCardScreenAction();
 const configAction = new ShopConfigurationAction();
 const checkout = new CheckoutAction();
 const payment = new PaymentAction();
+
+const adminLogin = new AdminLoginAction();
+const adminOrders = new AdminOrdersAction();
 
 const scenarioDummyBasket = new DummyBasketScenario(1);
 
@@ -261,6 +266,54 @@ describe('Status Tests', () => {
 
         cy.url().should('include', '/account/order/edit');
         cy.contains('Complete payment');
+    })
+
+})
+
+
+describe('Administration Tests', () => {
+
+    before(function () {
+        devices.setDevice(devices.getFirstDevice());
+        configAction.setupPlugin(false, false, false, false);
+    })
+
+    beforeEach(() => {
+        devices.setDevice(devices.getFirstDevice());
+        session.resetSessionData();
+        session.resetBrowserSession();
+    });
+
+    it('C5520: Credit Card Data is shown in the Administration', () => {
+
+        setUp();
+
+        // we are still in our modal, so we
+        // have to close it in older versions
+        if (shopware.isVersionLower(6.4)) {
+            payment.closePaymentsModal();
+        }
+
+        shopware.prepareDomainChange();
+        checkout.placeOrderOnConfirm();
+
+        mollieSandbox.initSandboxCookie();
+
+        mollieCreditCardForm.enterValidCard();
+        mollieCreditCardForm.submitForm();
+
+        molliePayment.selectPaid();
+
+        adminLogin.login();
+        adminOrders.openLastOrder();
+
+        // our Mollie Sandbox data needs to be visible on our page
+        // that's the only thing we can verify for now, but speaking of the data
+        // the assertion should be very accurate and unique on our page.
+        cy.contains('Credit Card Data');
+        cy.contains('Mastercard');
+        cy.contains('**** **** **** 0005');
+        cy.contains('T. TEST');
     })
 
 })
