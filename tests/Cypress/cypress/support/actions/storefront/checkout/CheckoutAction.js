@@ -21,7 +21,7 @@ export default class CheckoutAction {
      */
     clearCart() {
         // open off canvas
-        cy.get('.header-cart-total').click();
+        cy.get('.header-cart-total').click({force: true});
 
         const btnRemoveItem = '.cart-item-remove > .btn';
 
