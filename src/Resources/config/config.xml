@@ -501,6 +501,16 @@
         <title lang="de-DE">Abonnements</title>
         <title lang="nl-NL">Abonnementen</title>
         <input-field type="bool">
+            <name>subscriptionsEnabled</name>
+            <defaultValue>true</defaultValue>
+            <label>Enable Mollie Subscriptions</label>
+            <label lang="de-DE">Mollie Subscriptions aktivieren</label>
+            <label lang="nl-NL">Mollie Subscriptions activeren</label>
+            <helpText>Please reload the administration after changing this setting.</helpText>
+            <helpText lang="de-DE">Bitte laden Sie die Administration neu, nachdem Sie diese Einstellung geändert haben.</helpText>
+            <helpText lang="nl-NL">Herlaad de administratie na het wijzigen van deze instelling.</helpText>
+        </input-field>
+        <input-field type="bool">
             <name>subscriptionsShowIndicator</name>
             <defaultValue>true</defaultValue>
             <label>Show Subscription Indicator</label>
