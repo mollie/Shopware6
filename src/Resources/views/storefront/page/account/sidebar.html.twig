@@ -2,7 +2,7 @@
 
 {% block page_account_sidebar_menu %}
     {{ parent() }}
-    {% if not context.customer.guest %}
+    {% if not context.customer.guest and mollie_subscriptions_enabled %}
         {% block page_account_sidebar_link_mollie_subscriptions %}
             <a href="{{ path('frontend.account.mollie.subscriptions.page') }}"
                title="{{ "molliePayments.subscriptions.account.mollieSubscriptionsLink"|trans|striptags }}"
