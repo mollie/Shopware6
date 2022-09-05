@@ -197,7 +197,6 @@ class ApplePayDirect
     public function getCart(SalesChannelContext $context): ApplePayCart
     {
         $currentMethodID = $context->getShippingMethod()->getId();
-
         $context = $this->cartService->updateShippingMethod($context, $currentMethodID);
 
         $swCart = $this->cartService->getCalculatedMainCart($context);
@@ -250,14 +249,11 @@ class ApplePayDirect
     /**
      * @param string $shippingMethodID
      * @param SalesChannelContext $context
+     * @return SalesChannelContext
      */
-    public function setShippingMethod(string $shippingMethodID, SalesChannelContext $context): void
+    public function setShippingMethod(string $shippingMethodID, SalesChannelContext $context): SalesChannelContext
     {
-        $this->cartService->updateShippingMethod($context, $shippingMethodID);
-
-        # this is important to persist changes by
-        # using the internal recalculation
-        $this->cartService->getCalculatedMainCart($context);
+        return $this->cartService->updateShippingMethod($context, $shippingMethodID);
     }
 
     /**
