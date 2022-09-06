@@ -40,6 +40,7 @@ Component.register('mollie-refund-manager', {
             // -------------------------------
             // basic view stuff
             isRefundDataLoading: false,
+            isRefunding: false,
             // -------------------------------
             // grids
             orderItems: [],
@@ -377,7 +378,7 @@ Component.register('mollie-refund-manager', {
                 itemData.push(data);
             });
 
-
+            this.isRefunding = true;
             this.MolliePaymentsRefundService.refund(
                 {
                     orderId: this.order.id,
@@ -390,6 +391,9 @@ Component.register('mollie-refund-manager', {
                 })
                 .catch((response) => {
                     this._showNotificationError(response.message);
+                })
+                .finally(() => {
+                    this.isRefunding = false;
                 });
         },
 
@@ -399,6 +403,7 @@ Component.register('mollie-refund-manager', {
          * but only do a full refund and stock reset.
          */
         btnRefundFull_Click() {
+            this.isRefunding = false;
             this.MolliePaymentsRefundService.refundAll(
                 {
                     orderId: this.order.id,
@@ -409,6 +414,9 @@ Component.register('mollie-refund-manager', {
                 })
                 .catch((response) => {
                     this._showNotificationError(response.message);
+                })
+                .finally(() => {
+                    this.isRefunding = false;
                 });
         },
 
@@ -643,7 +651,8 @@ Component.register('mollie-refund-manager', {
         },
 
 
-        _handleRefundSuccess(response){
+        _handleRefundSuccess(response) {
+            this.isRefunding = false;
 
             if (!response.success) {
                 this._showNotificationError(this.$tc('mollie-payments.refund-manager.notifications.error.refund-created'));
