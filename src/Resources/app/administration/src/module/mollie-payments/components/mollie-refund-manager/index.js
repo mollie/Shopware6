@@ -386,22 +386,7 @@ Component.register('mollie-refund-manager', {
                     items: itemData,
                 })
                 .then((response) => {
-
-                    if (!response.success) {
-                        this._showNotificationError(this.$tc('mollie-payments.refund-manager.notifications.error.refund-created'));
-                        return;
-                    }
-
-                    this._showNotificationSuccess(this.$tc('mollie-payments.refund-manager.notifications.success.refund-created'));
-
-                    this.$emit('refund-success');
-
-                    // fetch new data
-                    this._fetchFormData();
-
-                    // reset existing values
-                    this.btnResetCartForm_Click();
-
+                    this._handleRefundSuccess(response)
                 })
                 .catch((response) => {
                     this._showNotificationError(response.message);
@@ -420,21 +405,7 @@ Component.register('mollie-refund-manager', {
                     description: this.refundDescription,
                 })
                 .then((response) => {
-
-                    if (!response.success) {
-                        this._showNotificationError(this.$tc('mollie-payments.refund-manager.notifications.error.refund-created'));
-                        return;
-                    }
-
-                    this._showNotificationSuccess(this.$tc('mollie-payments.refund-manager.notifications.success.refund-created'));
-
-                    this.$emit('refund-success');
-
-                    // fetch new data
-                    this._fetchFormData();
-
-                    // reset existing values
-                    this.btnResetCartForm_Click();
+                    this._handleRefundSuccess(response)
                 })
                 .catch((response) => {
                     this._showNotificationError(response.message);
@@ -671,6 +642,24 @@ Component.register('mollie-refund-manager', {
             });
         },
 
+
+        _handleRefundSuccess(response){
+
+            if (!response.success) {
+                this._showNotificationError(this.$tc('mollie-payments.refund-manager.notifications.error.refund-created'));
+                return;
+            }
+
+            this._showNotificationSuccess(this.$tc('mollie-payments.refund-manager.notifications.success.refund-created'));
+
+            this.$emit('refund-success');
+
+            // fetch new data
+            this._fetchFormData();
+
+            // reset existing values
+            this.btnResetCartForm_Click();
+        },
         // ---------------------------------------------------------------------------------------------------------
         // </editor-fold>
         // ---------------------------------------------------------------------------------------------------------
