@@ -40,6 +40,22 @@ class OrderLineItemEntityTest extends TestCase
     }
 
     /**
+     * This test verifies that nothing breaks
+     * if we have NULL for the customFields
+     */
+    public function testNullCustomFields()
+    {
+        $item = new OrderLineItemEntity();
+        $item->setPayload([
+            'customFields' => null,
+        ]);
+
+        $attributes = new OrderLineItemEntityAttributes($item);
+
+        $this->assertEquals('', $attributes->getVoucherType());
+    }
+
+    /**
      * This test verifies that we have default values
      * if our mollie data struct is empty.
      */
