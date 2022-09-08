@@ -133,18 +133,20 @@ class OrderLineItemEntityAttributes
                 # load the custom fields
                 $customFields = $lineItem->getPayload()['customFields'];
 
-                # ---------------------------------------------------------------------------
-                # search in new structure
-                $fullKey = 'mollie_payments_product_' . $keyName;
-                $foundValue = (array_key_exists($fullKey, $customFields)) ? (string)$customFields[$fullKey] : '';
+                if (is_array($customFields)) {
+                    # ---------------------------------------------------------------------------
+                    # search in new structure
+                    $fullKey = 'mollie_payments_product_' . $keyName;
+                    $foundValue = (array_key_exists($fullKey, $customFields)) ? (string)$customFields[$fullKey] : '';
 
-                # old structure
-                # check if we have a mollie entry
-                if ($foundValue === '' && $customFields !== null && array_key_exists('mollie_payments', $customFields)) {
-                    # load the mollie entry
-                    $mollieData = $customFields['mollie_payments'];
-                    # assign our value if we have it
-                    $foundValue = (array_key_exists($keyName, $mollieData)) ? (string)$mollieData[$keyName] : '';
+                    # old structure
+                    # check if we have a mollie entry
+                    if ($foundValue === '' && array_key_exists('mollie_payments', $customFields)) {
+                        # load the mollie entry
+                        $mollieData = $customFields['mollie_payments'];
+                        # assign our value if we have it
+                        $foundValue = (array_key_exists($keyName, $mollieData)) ? (string)$mollieData[$keyName] : '';
+                    }
                 }
             }
         }

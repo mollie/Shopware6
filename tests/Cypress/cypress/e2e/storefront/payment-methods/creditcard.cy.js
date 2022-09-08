@@ -305,6 +305,7 @@ describe('Administration Tests', () => {
         molliePayment.selectPaid();
 
         adminLogin.login();
+        adminOrders.openOrders();
         adminOrders.openLastOrder();
 
         // our Mollie Sandbox data needs to be visible on our page

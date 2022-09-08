@@ -46,11 +46,22 @@ class SubscriptionSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
+            StorefrontRenderEvent::class => 'onStorefrontRender',
             ProductPageLoadedEvent::class => 'addSubscriptionData',
             CheckoutConfirmPageLoadedEvent::class => 'addSubscriptionData',
         ];
     }
 
+
+    /**
+     * @param StorefrontRenderEvent $event
+     */
+    public function onStorefrontRender(StorefrontRenderEvent $event): void
+    {
+        $settings = $this->settingsService->getSettings($event->getSalesChannelContext()->getSalesChannel()->getId());
+
+        $event->setParameter('mollie_subscriptions_enabled', $settings->isSubscriptionsEnabled());
+    }
 
     /**
      * @param PageLoadedEvent $event
@@ -59,6 +70,19 @@ class SubscriptionSubscriber implements EventSubscriberInterface
     public function addSubscriptionData(PageLoadedEvent $event): void
     {
         $settings = $this->settingsService->getSettings($event->getSalesChannelContext()->getSalesChannel()->getId());
+
+
+        if (!$settings->isSubscriptionsEnabled()) {
+            $struct = new SubscriptionDataExtensionStruct(
+                false,
+                '',
+                false
+            );
+
+            $event->getPage()->addExtension('mollieSubscription', $struct);
+            return;
+        }
+
 
         $page = $event->getPage();
 

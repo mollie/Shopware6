@@ -262,9 +262,9 @@ class ApplePayDirectController extends StorefrontController
                 throw new \Exception('Please provide a Shipping Method identifier!');
             }
 
-            $this->applePay->setShippingMethod($shippingMethodID, $context);
+            $newContext = $this->applePay->setShippingMethod($shippingMethodID, $context);
 
-            $cart = $this->applePay->getCartFormatted($context);
+            $cart = $this->applePay->getCartFormatted($newContext);
 
             return new JsonResponse([
                 'success' => true,
