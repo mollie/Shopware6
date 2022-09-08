@@ -65,8 +65,7 @@ class MollieLimitsRemover extends PaymentMethodRemover
         if ($this->isCartRoute()) {
             try {
                 $cart = $this->getCart($context);
-            }
-            catch (MissingCartServiceException $e) {
+            } catch (MissingCartServiceException $e) {
                 $this->logger->error($e->getMessage(), [
                     'exception' => $e,
                 ]);
@@ -89,6 +88,9 @@ class MollieLimitsRemover extends PaymentMethodRemover
             $price = $order->getAmountTotal();
         }
 
+        if (!isset($price)) {
+            return $originalData;
+        }
 
         $availableMolliePayments = $this->paymentMethodsProvider->getActivePaymentMethodsForAmount(
             $price,
@@ -97,7 +99,6 @@ class MollieLimitsRemover extends PaymentMethodRemover
                 $context->getSalesChannel()->getId(),
             ]
         );
-
 
         /** @var PaymentMethodEntity $paymentMethod */
         foreach ($originalData->getPaymentMethods() as $paymentMethod) {
