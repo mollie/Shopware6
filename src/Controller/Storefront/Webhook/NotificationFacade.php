@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Controller\Storefront\Webhook;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatcherAdapterInterface;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
+use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway;
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
@@ -13,6 +14,7 @@ use Kiener\MolliePayments\Service\Mollie\MolliePaymentDetails;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
 use Kiener\MolliePayments\Service\Order\OrderStatusUpdater;
+use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
@@ -33,6 +35,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
+use Shopware\Core\Framework\Util\Random;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class NotificationFacade
@@ -84,6 +87,16 @@ class NotificationFacade
     private $molliePaymentDetails;
 
     /**
+     * @var OrderService
+     */
+    private $orderService;
+
+    /**
+     * @var CompatibilityGateway
+     */
+    private $compatibilityGateway;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -104,10 +117,12 @@ class NotificationFacade
      * @param FlowBuilderEventFactory $flowBuilderEventFactory
      * @param SettingsService $serviceService
      * @param SubscriptionManager $subscription
+     * @param OrderService $orderService
+     * @param CompatibilityGateway $compatibilityGateway
      * @param LoggerInterface $logger
      * @throws \Exception
      */
-    public function __construct(MollieGatewayInterface $gatewayMollie, OrderStatusConverter $statusConverter, OrderStatusUpdater $statusUpdater, EntityRepositoryInterface $repoPaymentMethods, EntityRepositoryInterface $repoOrderTransactions, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SettingsService $serviceService, SubscriptionManager $subscription, LoggerInterface $logger)
+    public function __construct(MollieGatewayInterface $gatewayMollie, OrderStatusConverter $statusConverter, OrderStatusUpdater $statusUpdater, EntityRepositoryInterface $repoPaymentMethods, EntityRepositoryInterface $repoOrderTransactions, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SettingsService $serviceService, SubscriptionManager $subscription, OrderService $orderService, CompatibilityGateway $compatibilityGateway, LoggerInterface $logger)
     {
         $this->gatewayMollie = $gatewayMollie;
         $this->statusConverter = $statusConverter;
@@ -117,6 +132,8 @@ class NotificationFacade
         $this->flowBuilderEventFactory = $flowBuilderEventFactory;
         $this->subscriptionManager = $subscription;
         $this->settingsService = $serviceService;
+        $this->orderService = $orderService;
+        $this->compatibilityGateway = $compatibilityGateway;
         $this->logger = $logger;
 
         $this->molliePaymentDetails = new MolliePaymentDetails();
@@ -252,6 +269,16 @@ class NotificationFacade
                 $this->subscriptionManager->cancelPendingSubscriptions($swOrder, $context);
                 break;
         }
+
+        # now update the custom fields of the order
+        # we want to have as much information as possible in the shopware order
+        # this includes the Mollie Payment ID and maybe additional references
+        $this->orderService->updateMollieDataCustomFields(
+            $swOrder,
+            $mollieOrderId,
+            $swTransaction->getId(),
+            $this->compatibilityGateway->getSalesChannelContext($swOrder->getSalesChannelId(), Random::getAlphanumericString(32))
+        );
 
         # --------------------------------------------------------------------------------------------
         # FIRE FLOW BUILDER TRIGGER EVENT
