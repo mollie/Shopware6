@@ -170,6 +170,21 @@ class SubscriptionManager implements SubscriptionManagerInterface
     }
 
     /**
+     * @param string $id
+     * @param Context $context
+     * @throws Exception
+     * @return SubscriptionEntity
+     */
+    public function findSubscription(string $id, Context $context): SubscriptionEntity
+    {
+        try {
+            return $this->repoSubscriptions->findById($id, $context);
+        } catch (\Throwable $ex) {
+            throw new Exception('Subscription with ID ' . $id . ' not found in Shopware');
+        }
+    }
+
+    /**
      * @param OrderEntity $order
      * @param SalesChannelContext $context
      * @throws Exception
