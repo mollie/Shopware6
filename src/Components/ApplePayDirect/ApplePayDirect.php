@@ -459,7 +459,12 @@ class ApplePayDirect
         # now also update the custom fields of our order
         # we want to have the mollie metadata in the
         # custom fields in Shopware too
-        $this->orderService->updateMollieDataCustomFields($order, $paymentData->getMollieID(), $transaction->getId(), $context);
+        $this->orderService->updateMollieDataCustomFields(
+            $order,
+            $paymentData->getMollieID(),
+            $transaction->getId(),
+            $context->getContext()
+        );
 
 
         return $paymentData->getMollieID();
