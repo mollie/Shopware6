@@ -5,12 +5,12 @@ namespace Kiener\MolliePayments\Controller\Api\Webhook;
 use Kiener\MolliePayments\Components\Subscription\Exception\SubscriptionSkippedException;
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Controller\Storefront\Webhook\NotificationFacade;
+use Kiener\MolliePayments\Repository\Order\OrderRepository;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
-use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,6 +33,11 @@ class WebhookController extends AbstractController
     private $subscriptions;
 
     /**
+     * @var OrderRepository
+     */
+    private $repoOrders;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -41,12 +46,14 @@ class WebhookController extends AbstractController
     /**
      * @param NotificationFacade $notificationFacade
      * @param SubscriptionManager $subscriptions
+     * @param OrderRepository $repoOrders
      * @param LoggerInterface $logger
      */
-    public function __construct(NotificationFacade $notificationFacade, SubscriptionManager $subscriptions, LoggerInterface $logger)
+    public function __construct(NotificationFacade $notificationFacade, SubscriptionManager $subscriptions, OrderRepository $repoOrders, LoggerInterface $logger)
     {
         $this->notificationFacade = $notificationFacade;
         $this->subscriptions = $subscriptions;
+        $this->repoOrders = $repoOrders;
         $this->logger = $logger;
     }
 
@@ -133,14 +140,22 @@ class WebhookController extends AbstractController
                 throw new \Exception('Please provide a Mollie Payment ID with the payment that has been done for this subscription');
             }
 
-            # we first start by renewing our subscription.
-            # this will create a new order, just like the
-            # user would do in the checkout process.
-            $newOrder = $this->subscriptions->renewSubscription($swSubscriptionId, $molliePaymentId, $context);
+            $subscription = $this->subscriptions->findSubscription($swSubscriptionId, $context);
+
+            # first search if we already have an existing order
+            # with our Mollie ID. If we have one, then this is only an update webhook
+            # for that order. If we do not have one, then create a new Shopware order
+            $existingOrders = $this->repoOrders->findByMollieId($subscription->getCustomerId(), $molliePaymentId, $context);
+
+            if ($existingOrders->count() <= 0) {
+                $swOrder = $this->subscriptions->renewSubscription($swSubscriptionId, $molliePaymentId, $context);
+            } else {
+                $swOrder = $existingOrders->last();
+            }
 
             # now lets grab the latest order transaction of our new order
             /** @var OrderTransactionEntity $latestTransaction */
-            $latestTransaction = $this->notificationFacade->getOrderTransactions($newOrder->getId(), $context)->last();
+            $latestTransaction = $this->notificationFacade->getOrderTransactions($swOrder->getId(), $context)->last();
 
             # now simply redirect to the official webhook
             # that handles the full order, validates the payment and

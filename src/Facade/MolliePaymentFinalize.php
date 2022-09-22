@@ -146,7 +146,7 @@ class MolliePaymentFinalize
             $order,
             $mollieOrderId,
             $transactionStruct->getOrderTransaction()->getId(),
-            $salesChannelContext
+            $salesChannelContext->getContext()
         );
     }
 }

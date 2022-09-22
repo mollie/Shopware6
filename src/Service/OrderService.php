@@ -208,9 +208,9 @@ class OrderService implements OrderServiceInterface
      * @param OrderEntity $order
      * @param string $mollieOrderID
      * @param string $orderTransactionId
-     * @param SalesChannelContext $scContext
+     * @param Context $context
      */
-    public function updateMollieDataCustomFields(OrderEntity $order, string $mollieOrderID, string $orderTransactionId, SalesChannelContext $scContext): void
+    public function updateMollieDataCustomFields(OrderEntity $order, string $mollieOrderID, string $orderTransactionId, Context $context): void
     {
         $customFieldsStruct = new OrderAttributes($order);
         $customFieldsStruct->setMollieOrderId($mollieOrderID); # TODO i dont like that this is an optional SETTER in here!
@@ -224,7 +224,7 @@ class OrderService implements OrderServiceInterface
 
             // Add the transaction ID to the order's custom fields
             // We might need this later on for reconciliation
-            $molliePayment = $this->mollieOrderService->getCompletedPayment($mollieOrderID, $scContext->getSalesChannel()->getId());
+            $molliePayment = $this->mollieOrderService->getCompletedPayment($mollieOrderID, $order->getSalesChannelId());
 
             $molliePaymentID = $molliePayment->id;
 
@@ -259,7 +259,7 @@ class OrderService implements OrderServiceInterface
         $this->updateOrderCustomFields->updateOrder(
             $order->getId(),
             $customFieldsStruct,
-            $scContext->getContext()
+            $context
         );
 
         # ----------------------------------
@@ -274,7 +274,7 @@ class OrderService implements OrderServiceInterface
         $this->updateOrderTransactionCustomFields->updateOrderTransaction(
             $orderTransactionId,
             $orderTransactionCustomFields,
-            $scContext->getContext()
+            $context
         );
     }
 

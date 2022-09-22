@@ -18,6 +18,21 @@ class SubscriptionCartValidator implements CartValidatorInterface
 {
 
     /**
+     * @var SettingsService
+     */
+    private $pluginSettings;
+
+
+    /**
+     * @param SettingsService $pluginSettings
+     */
+    public function __construct(SettingsService $pluginSettings)
+    {
+        $this->pluginSettings = $pluginSettings;
+    }
+
+
+    /**
      * @param Cart $cart
      * @param ErrorCollection $errorCollection
      * @param SalesChannelContext $salesChannelContext
@@ -27,6 +42,13 @@ class SubscriptionCartValidator implements CartValidatorInterface
     {
         # always clear previous errors first
         $this->clearError($cart);
+
+
+        $settings = $this->pluginSettings->getSettings($salesChannelContext->getSalesChannelId());
+
+        if (!$settings->isSubscriptionsEnabled()) {
+            return;
+        }
 
         # --------------------------------------------------------------------------------------------
         # first verify if we have a customer

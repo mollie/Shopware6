@@ -68,7 +68,7 @@ class AccountController extends StorefrontController
 
     /**
      * @LoginRequired()
-     * @Route("/account/mollie/subscriptions/{swSubscriptionId}/billing/update", name="frontend.account.mollie.subscriptions.billing.update", methods={"POST"})
+     * @Route("/account/mollie/subscriptions/{subscriptionId}/billing/update", name="frontend.account.mollie.subscriptions.billing.update", methods={"POST"})
      *
      * @param string $subscriptionId
      * @param RequestDataBag $data

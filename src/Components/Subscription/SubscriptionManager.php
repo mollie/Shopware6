@@ -170,6 +170,21 @@ class SubscriptionManager implements SubscriptionManagerInterface
     }
 
     /**
+     * @param string $id
+     * @param Context $context
+     * @throws Exception
+     * @return SubscriptionEntity
+     */
+    public function findSubscription(string $id, Context $context): SubscriptionEntity
+    {
+        try {
+            return $this->repoSubscriptions->findById($id, $context);
+        } catch (\Throwable $ex) {
+            throw new Exception('Subscription with ID ' . $id . ' not found in Shopware');
+        }
+    }
+
+    /**
      * @param OrderEntity $order
      * @param SalesChannelContext $context
      * @throws Exception
@@ -177,6 +192,12 @@ class SubscriptionManager implements SubscriptionManagerInterface
      */
     public function createSubscription(OrderEntity $order, SalesChannelContext $context): string
     {
+        $settings = $this->pluginSettings->getSettings($context->getSalesChannelId());
+
+        if (!$settings->isSubscriptionsEnabled()) {
+            return '';
+        }
+
         if ($order->getLineItems() === null || $order->getLineItems()->count() > 1) {
             # Mixed carts are not allowed for subscriptions
             return '';
@@ -226,6 +247,13 @@ class SubscriptionManager implements SubscriptionManagerInterface
         if (!$order->getOrderCustomer() instanceof OrderCustomerEntity) {
             throw new \Exception('Order: ' . $order->getOrderNumber() . ' does not have a linked customer');
         }
+
+        $settings = $this->pluginSettings->getSettings($order->getSalesChannelId());
+
+        if (!$settings->isSubscriptionsEnabled()) {
+            return;
+        }
+
 
         # first get our mollie customer ID from the order.
         # this is required to create a subscription
@@ -297,6 +325,10 @@ class SubscriptionManager implements SubscriptionManagerInterface
         foreach ($salesChannels as $salesChannel) {
             $settings = $this->pluginSettings->getSettings($salesChannel->getId());
 
+            if (!$settings->isSubscriptionsEnabled()) {
+                continue;
+            }
+
             $daysOffset = $settings->getSubscriptionsReminderDays();
 
             $availableSubscriptions = $this->repoSubscriptions->findByReminderRangeReached($daysOffset, $salesChannel->getId(), $context);
@@ -359,6 +391,12 @@ class SubscriptionManager implements SubscriptionManagerInterface
             $swSubscription = $this->repoSubscriptions->findById($swSubscriptionId, $context);
         } catch (\Throwable $ex) {
             throw new Exception('Subscription with ID ' . $swSubscriptionId . ' not found in Shopware');
+        }
+
+        $settings = $this->pluginSettings->getSettings($swSubscription->getSalesChannelId());
+
+        if (!$settings->isSubscriptionsEnabled()) {
+            throw new Exception('Subscription with ID ' . $swSubscriptionId . ' not renewed. Subscriptions are disabled for this Sales Channel');
         }
 
         # only renew active subscriptions
@@ -460,6 +498,10 @@ class SubscriptionManager implements SubscriptionManagerInterface
 
         $settings = $this->pluginSettings->getSettings($subscription->getSalesChannelId());
 
+        if (!$settings->isSubscriptionsEnabled()) {
+            throw new Exception('Subscription Billing Address cannot be updated. Subscriptions are disabled for this Sales Channel');
+        }
+
         if (!$settings->isSubscriptionsAllowAddressEditing()) {
             throw new Exception('Editing of the billing address on running subscriptions is not allowed in the plugin configuration');
         }
@@ -519,6 +561,10 @@ class SubscriptionManager implements SubscriptionManagerInterface
 
         $settings = $this->pluginSettings->getSettings($subscription->getSalesChannelId());
 
+        if (!$settings->isSubscriptionsEnabled()) {
+            throw new Exception('Subscription Shipping Address cannot be updated. Subscriptions are disabled for this Sales Channel');
+        }
+
         if (!$settings->isSubscriptionsAllowAddressEditing()) {
             throw new Exception('Editing of the shipping address on running subscriptions is not allowed in the plugin configuration');
         }
@@ -565,6 +611,10 @@ class SubscriptionManager implements SubscriptionManagerInterface
         }
 
         $settings = $this->pluginSettings->getSettings($subscription->getSalesChannelId());
+
+        if (!$settings->isSubscriptionsEnabled()) {
+            throw new Exception('Subscription Payment Method cannot be updated. Subscriptions are disabled for this Sales Channel');
+        }
 
         # first load our customer ID
         # every subscription customer should have already a Mollie customer ID

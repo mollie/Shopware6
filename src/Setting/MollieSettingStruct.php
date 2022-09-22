@@ -181,6 +181,10 @@ class MollieSettingStruct extends Struct
      */
     protected $subscriptionSkipRenewalsOnFailedPayments;
 
+    /**
+     * @var bool
+     */
+    protected $subscriptionsEnabled;
 
     /**
      * @return string
@@ -686,5 +690,21 @@ class MollieSettingStruct extends Struct
     public function setSubscriptionSkipRenewalsOnFailedPayments(bool $subscriptionSkipRenewalsOnFailedPayments): void
     {
         $this->subscriptionSkipRenewalsOnFailedPayments = $subscriptionSkipRenewalsOnFailedPayments;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSubscriptionsEnabled(): bool
+    {
+        return (bool)$this->subscriptionsEnabled;
+    }
+
+    /**
+     * @param bool $subscriptionsEnabled
+     */
+    public function setSubscriptionsEnabled(bool $subscriptionsEnabled): void
+    {
+        $this->subscriptionsEnabled = $subscriptionsEnabled;
     }
 }

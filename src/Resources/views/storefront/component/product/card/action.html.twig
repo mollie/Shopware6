@@ -34,7 +34,7 @@
 
 {% block page_product_detail_product_buy_button %}
 
-    {% if product.customFields.mollie_payments_product_subscription_enabled %}
+    {% if mollie_subscriptions_enabled and product.customFields.mollie_payments_product_subscription_enabled %}
         <button class="btn btn-block btn-buy" title="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}">
             {{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}
         </button>

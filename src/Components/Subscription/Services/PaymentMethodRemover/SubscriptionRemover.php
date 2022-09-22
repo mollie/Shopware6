@@ -34,23 +34,31 @@ class SubscriptionRemover extends PaymentMethodRemover
     ];
 
     /**
+     * @var SettingsService
+     */
+    private $pluginSettings;
+
+    /**
      * @var OrderDataExtractor
      */
     private $orderDataExtractor;
 
+
     /**
      * @param ContainerInterface $container
      * @param RequestStack $requestStack
+     * @param SettingsService $pluginSettings
      * @param OrderService $orderService
      * @param SettingsService $settingsService
      * @param OrderDataExtractor $orderDataExtractor
      * @param LoggerInterface $logger
      */
-    public function __construct(ContainerInterface $container, RequestStack $requestStack, OrderService $orderService, SettingsService $settingsService, OrderDataExtractor $orderDataExtractor, LoggerInterface $logger)
+    public function __construct(ContainerInterface $container, RequestStack $requestStack, SettingsService $pluginSettings, OrderService $orderService, SettingsService $settingsService, OrderDataExtractor $orderDataExtractor, LoggerInterface $logger)
     {
         parent::__construct($container, $requestStack, $orderService, $settingsService, $logger);
 
         $this->orderDataExtractor = $orderDataExtractor;
+        $this->pluginSettings = $pluginSettings;
     }
 
     /**
@@ -64,6 +72,13 @@ class SubscriptionRemover extends PaymentMethodRemover
         if (!$this->isAllowedRoute()) {
             return $originalData;
         }
+
+        $settings = $this->pluginSettings->getSettings($context->getSalesChannelId());
+
+        if (!$settings->isSubscriptionsEnabled()) {
+            return $originalData;
+        }
+
 
         if ($this->isOrderRoute()) {
             $order = $this->getOrder($context->getContext());

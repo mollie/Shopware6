@@ -71,7 +71,8 @@
                     {{ item.refunded }} {{ $tc('mollie-payments.refund-manager.general.unitQuantity') }}
                 </template>
                 <template #column-inputQuantity="{ item }">
-                    <sw-icon v-if="!isItemRefundable(item)" name="default-basic-checkmark-circle" class="color-refunded"></sw-icon>
+                    <sw-icon v-if="!isItemRefundable(item)" name="default-basic-checkmark-circle"
+                             class="color-refunded"></sw-icon>
                     <sw-number-field numberType="float"
                                      v-model="item.refundQuantity"
                                      v-if="isItemRefundable(item)"
@@ -127,7 +128,8 @@
         <sw-card :hero="false" class="mollie-refund-manager-instructions-container" :large="true">
             <sw-container v-if="configShowInstructions" columns="1fr" gap="0px">
                 <div class="instructions-container-top">
-                    <sw-button variant="context" size="small" icon="default-basic-x-block" @click="btnResetTutorials_Click()">
+                    <sw-button variant="context" size="small" icon="default-basic-x-block"
+                               @click="btnResetTutorials_Click()">
                         {{ $tc('mollie-payments.refund-manager.instructions.linkResetTutorials') }}
                     </sw-button>
                 </div>
@@ -135,7 +137,8 @@
             <sw-container columns="4fr 4fr 3fr" gap="0px">
                 <sw-card-section v-if="configShowInstructions" class="instructions-container-content" divider="right">
                     <sw-container columns="1fr 20fr" class="instructions-block">
-                        <sw-icon name="default-money-cash" :small="false" class="instructions-block-icon color-refund"></sw-icon>
+                        <sw-icon name="default-money-cash" :small="false"
+                                 class="instructions-block-icon color-refund"></sw-icon>
                         <div>
                             <strong> {{ $tc('mollie-payments.refund-manager.instructions.titleFullRefund') }}</strong>
                             <br/>
@@ -148,7 +151,8 @@
                         </div>
                     </sw-container>
                     <sw-container columns="1fr 20fr" class="instructions-block">
-                        <sw-icon name="default-building-shop" :small="false" class="instructions-block-icon color-stock"></sw-icon>
+                        <sw-icon name="default-building-shop" :small="false"
+                                 class="instructions-block-icon color-stock"></sw-icon>
                         <div>
                             <strong>{{ $tc('mollie-payments.refund-manager.instructions.titleStockReset') }}</strong><br/>
                             {{ $tc('mollie-payments.refund-manager.instructions.textStockReset') }}
@@ -160,7 +164,8 @@
                         </div>
                     </sw-container>
                     <sw-container columns="1fr 20fr" class="instructions-block">
-                        <sw-icon name="default-package-open" :small="false" class="instructions-block-icon color-delivery"></sw-icon>
+                        <sw-icon name="default-package-open" :small="false"
+                                 class="instructions-block-icon color-delivery"></sw-icon>
                         <div>
                             <strong>{{ $tc('mollie-payments.refund-manager.instructions.titleShipping') }}</strong><br/>
                             {{ $tc('mollie-payments.refund-manager.instructions.textShipping') }}
@@ -176,7 +181,8 @@
                 {# --------------------------------------------------------------------------------------------- #}
                 <sw-card-section v-if="configShowInstructions" class="instructions-container-content" divider="right">
                     <sw-container columns="1fr 20fr" class="instructions-block">
-                        <sw-icon name="default-money-cash" :small="false" class="instructions-block-icon color-refund"></sw-icon>
+                        <sw-icon name="default-money-cash" :small="false"
+                                 class="instructions-block-icon color-refund"></sw-icon>
                         <div>
                             <strong>{{ $tc('mollie-payments.refund-manager.instructions.titlePartialAmount') }}</strong><br/>
                             {{ $tc('mollie-payments.refund-manager.instructions.textPartialAmount') }}
@@ -188,7 +194,8 @@
                         </div>
                     </sw-container>
                     <sw-container columns="1fr 20fr" class="instructions-block">
-                        <sw-icon name="default-money-cash" :small="false" class="instructions-block-icon color-refund"></sw-icon>
+                        <sw-icon name="default-money-cash" :small="false"
+                                 class="instructions-block-icon color-refund"></sw-icon>
                         <div>
                             <strong>{{ $tc('mollie-payments.refund-manager.instructions.titlePartialItems') }}</strong>
                             <br/>
@@ -201,7 +208,8 @@
                         </div>
                     </sw-container>
                     <sw-container columns="1fr 20fr" class="instructions-block">
-                        <sw-icon name="default-package-gift" :small="false" class="instructions-block-icon color-promotion"></sw-icon>
+                        <sw-icon name="default-package-gift" :small="false"
+                                 class="instructions-block-icon color-promotion"></sw-icon>
                         <div>
                             <strong>{{ $tc('mollie-payments.refund-manager.instructions.titlePartialPromotions') }}</strong><br/>
                             {{ $tc('mollie-payments.refund-manager.instructions.textPartialPromotions') }}
@@ -331,13 +339,15 @@
                                :block="true"
                                :disabled="configVerifyRefund && !checkVerifyRefund"
                                :class="{ 'tutorial-active' : tutorialPartialAmountRefundVisible || tutorialPartialQuantityVisible || tutorialPartialPromotionsVisible || tutorialResetStock || tutorialRefundShipping }"
-                               @click="btnRefund_Click()">
+                               @click="btnRefund_Click()"
+                               :isLoading="isRefunding">
                         {{ $tc('mollie-payments.refund-manager.summary.btnRefund') }}
                     </sw-button>
                     <hr style="margin-top:20px;margin-bottom:20px;"/>
                     <sw-button variant="danger" :block="true"
                                :disabled="configVerifyRefund && !checkVerifyRefund"
                                @click="btnRefundFull_Click()"
+                               :isLoading="isRefunding"
                                :class="{ 'tutorial-active' : tutorialFullRefundVisible || tutorialResetStock || tutorialRefundShipping }">
                         {{ $tc('mollie-payments.refund-manager.summary.btnFullRefund') }}
                     </sw-button>
@@ -347,7 +357,8 @@
         {# --------------------------------------------------------------------------------------------- #}
         {# --------------------------------------------------------------------------------------------- #}
         {# --------------------------------------------------------------------------------------------- #}
-        <sw-card :title="$tc('mollie-payments.refund-manager.refunds.title')" class="mollie-refund-manager-refunds" :hero="false" :large="true">
+        <sw-card :title="$tc('mollie-payments.refund-manager.refunds.title')" class="mollie-refund-manager-refunds"
+                 :hero="false" :large="true">
             <div class="instructions-bar">
                 <mollie-external-link href="https://docs.mollie.com/payments/refunds#refund-statuses">
                     {{ $tc('mollie-payments.refund-manager.refunds.linkMore') }}
