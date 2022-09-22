@@ -17,6 +17,7 @@ use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
+use Kiener\MolliePayments\Subscriber\MollieOrderBuildSubscriber;
 use Mollie\Api\Resources\Order;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
@@ -132,10 +133,11 @@ class NotificationFacade
     /**
      * @param string $swTransactionId
      * @param Context $context
-     * @throws CustomerCouldNotBeFoundException
+     * @param string $actionId
      * @return void
+     * @throws CustomerCouldNotBeFoundException
      */
-    public function onNotify(string $swTransactionId, Context $context): void
+    public function onNotify(string $swTransactionId, Context $context, string $actionId): void
     {
         # -----------------------------------------------------------------------------------------------------
         # LOAD TRANSACTION
@@ -196,7 +198,29 @@ class NotificationFacade
         $molliePayment = null;
         $mollieOrder = null;
 
-        if (!empty($orderAttributes->getMollieOrderId())) {
+        //TODO: also ord but only when no mollieOrderId
+        //TODO: tr for payment ord for order
+        if (empty($mollieOrderId)){
+            if (str_starts_with($actionId, 'tr')) {
+                $molliePayment = $this->gatewayMollie->getPayment($actionId);
+                $mollieOrder = $this->gatewayMollie->getOrder($molliePayment->orderId);
+                $metadata = json_decode($mollieOrder->metadata,true);
+                if ($metadata!=null){
+
+                    $metaShortId = $metadata[MollieOrderBuildSubscriber::METADATA_SHORT_TRANSACTION_ID_KEY];
+                    $transShortId = substr($swTransactionId,0,8);
+
+                    if ($metaShortId==$transShortId){
+                        $status = $this->statusConverter->getMollieOrderStatus($mollieOrder);
+                    }
+                }
+
+            }
+        }
+
+
+
+        if (!empty($mollieOrderId)) {
 
             # fetch the order of our mollie ID
             # from our sales channel mollie profile

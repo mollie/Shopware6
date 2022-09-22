@@ -61,12 +61,14 @@ class WebhookController extends StorefrontController
      *
      * @param SalesChannelContext $context
      * @param string $swTransactionId
+     * @param Request $request
      * @return JsonResponse
      */
-    public function onWebhookReceived(SalesChannelContext $context, string $swTransactionId): JsonResponse
+    public function onWebhookReceived(SalesChannelContext $context, string $swTransactionId, Request $request): JsonResponse
     {
+        $actionId = explode('=',$request->getContent())[1];
         try {
-            $this->notificationFacade->onNotify($swTransactionId, $context->getContext());
+            $this->notificationFacade->onNotify($swTransactionId, $context->getContext(),$actionId);
 
             return new JsonResponse(['success' => true]);
         } catch (\Throwable $ex) {

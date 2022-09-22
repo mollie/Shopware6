@@ -188,7 +188,7 @@ class MolliePaymentDoPay
         # let's create our real Mollie order
         # for this payment in Shopware.
         $mollieOrder = $this->createMollieOrder($order, $paymentMethod, $transactionStruct, $salesChannelContext, $paymentHandler);
-
+//        dd($mollieOrder);
         # now create subscriptions from our order for
         # all products that are configured to be a subscription.
         # this will prepare the subscriptions in our database.

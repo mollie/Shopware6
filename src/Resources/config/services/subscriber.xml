@@ -44,5 +44,9 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Subscriber\MollieOrderBuildSubscriber">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
     </services>
 </container>

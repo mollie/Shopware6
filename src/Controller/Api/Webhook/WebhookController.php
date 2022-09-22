@@ -68,8 +68,9 @@ class WebhookController extends AbstractController
      */
     public function webhookAction(string $swTransactionId, Request $request, Context $context): JsonResponse
     {
+        $actionId = explode('=',$request->getContent())[1];
         try {
-            $this->notificationFacade->onNotify($swTransactionId, $context);
+            $this->notificationFacade->onNotify($swTransactionId, $context,$actionId);
 
             return new JsonResponse([
                 'success' => true
