@@ -1,0 +1,100 @@
+<?php declare(strict_types=1);
+
+namespace Kiener\MolliePayments\Subscriber;
+
+use Kiener\MolliePayments\Service\TransactionService;
+use Kiener\MolliePayments\Struct\Order\OrderAttributes;
+use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Framework\Uuid\Uuid;
+use Shopware\Storefront\Framework\Twig\TwigDateRequestListener;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
+
+class WebhookTimezoneSubscriber implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents()
+    {
+        return [
+            # Route gets matched in a subscriber with priority 32, so we need to have a lower priority than that.
+            # But priority needs to be higher than 0 as Shopware's timezone listener will run at that priority.
+            KernelEvents::REQUEST => ['fixWebhookTimezone', 31],
+        ];
+    }
+
+    /**
+     * @var TransactionService
+     */
+    private $transactionService;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @param TransactionService $transactionService
+     * @param LoggerInterface    $logger
+     */
+    public function __construct(
+        TransactionService $transactionService,
+        LoggerInterface    $logger
+    )
+    {
+        $this->transactionService = $transactionService;
+        $this->logger = $logger;
+    }
+
+    public function fixWebhookTimezone(RequestEvent $event)
+    {
+        $request = $event->getRequest();
+
+        $route = $request->get('_route');
+        $routeParams = $request->get('_route_params');
+
+        $this->logger->debug("Starting Webhook Timezone Fixer", [
+            'route' => $route,
+            'routeParams' => $routeParams,
+        ]);
+
+        if ($route !== 'frontend.mollie.webhook') {
+            $this->logger->debug(sprintf("Aborted Webhook Timezone Fixer: Incorrect route %s", $route), [
+                'route' => $route,
+                'routeParams' => $routeParams,
+            ]);
+            return;
+        }
+
+        $transactionId = $routeParams['swTransactionId'] ?? '';
+
+        if (!Uuid::isValid($transactionId)) {
+            $this->logger->warning(sprintf('Webhook Timezone Fixer: TransactionId %s is not valid', $transactionId), [
+                'transactionId' => $transactionId,
+            ]);
+            return;
+        }
+
+        $transaction = $this->transactionService->getTransactionById($transactionId);
+
+        if (!$transaction instanceof OrderTransactionEntity) {
+            $this->logger->error(sprintf('Transaction for id %s does not exist', $transactionId));
+        }
+
+        $order = $transaction->getOrder();
+
+        if (!$order instanceof OrderEntity) {
+            $this->logger->error(sprintf('Could not get order from transaction %s', $transactionId));
+        }
+
+        $orderAttributes = new OrderAttributes($order);
+
+        if (empty($orderAttributes->getTimezone())) {
+            return;
+        }
+
+        // Set the timezone cookie on the request and let Shopware handle the rest.
+        $request->cookies->set(TwigDateRequestListener::TIMEZONE_COOKIE, $orderAttributes->getTimezone());
+    }
+}

@@ -26,6 +26,8 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Twig\Environment;
+use Twig\Extension\CoreExtension;
 
 class MolliePaymentDoPay
 {
@@ -74,24 +76,30 @@ class MolliePaymentDoPay
     private $subscriptionManager;
 
     /**
+     * @var Environment
+     */
+    private $twig;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
 
 
     /**
-     * @param OrderDataExtractor $extractor
-     * @param MollieOrderBuilder $orderBuilder
-     * @param OrderService $orderService
-     * @param Order $orderApiService
-     * @param CustomerService $customerService
-     * @param SettingsService $settingsService
-     * @param UpdateOrderCustomFields $updateOrderCustomFields
-     * @param UpdateOrderLineItems $updateOrderLineItems
+     * @param OrderDataExtractor           $extractor
+     * @param MollieOrderBuilder           $orderBuilder
+     * @param OrderService                 $orderService
+     * @param Order                        $orderApiService
+     * @param CustomerService              $customerService
+     * @param SettingsService              $settingsService
+     * @param UpdateOrderCustomFields      $updateOrderCustomFields
+     * @param UpdateOrderLineItems         $updateOrderLineItems
      * @param SubscriptionManagerInterface $subscriptionManager
-     * @param LoggerInterface $logger
+     * @param Environment                  $twig
+     * @param LoggerInterface              $logger
      */
-    public function __construct(OrderDataExtractor $extractor, MollieOrderBuilder $orderBuilder, OrderService $orderService, Order $orderApiService, CustomerService $customerService, SettingsService $settingsService, UpdateOrderCustomFields $updateOrderCustomFields, UpdateOrderLineItems $updateOrderLineItems, SubscriptionManagerInterface $subscriptionManager, LoggerInterface $logger)
+    public function __construct(OrderDataExtractor $extractor, MollieOrderBuilder $orderBuilder, OrderService $orderService, Order $orderApiService, CustomerService $customerService, SettingsService $settingsService, UpdateOrderCustomFields $updateOrderCustomFields, UpdateOrderLineItems $updateOrderLineItems, SubscriptionManagerInterface $subscriptionManager, Environment $twig, LoggerInterface $logger)
     {
         $this->extractor = $extractor;
         $this->orderBuilder = $orderBuilder;
@@ -102,6 +110,7 @@ class MolliePaymentDoPay
         $this->updaterOrderCustomFields = $updateOrderCustomFields;
         $this->updaterLineItemCustomFields = $updateOrderLineItems;
         $this->subscriptionManager = $subscriptionManager;
+        $this->twig = $twig;
         $this->logger = $logger;
     }
 
@@ -115,12 +124,12 @@ class MolliePaymentDoPay
      * if we do not get a payment url from mollie (may happen if credit card components are active, payment is successful in this cases), we
      * lead customer to transaction finalize url
      *
-     * @param string $paymentMethod
+     * @param string                        $paymentMethod
      * @param AsyncPaymentTransactionStruct $transactionStruct
-     * @param SalesChannelContext $salesChannelContext
-     * @param PaymentHandler $paymentHandler
-     * @throws ApiException
+     * @param SalesChannelContext           $salesChannelContext
+     * @param PaymentHandler                $paymentHandler
      * @return MolliePaymentPrepareData
+     * @throws ApiException
      */
     public function startMolliePayment(string $paymentMethod, AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext, PaymentHandler $paymentHandler): MolliePaymentPrepareData
     {
@@ -140,6 +149,13 @@ class MolliePaymentDoPay
         # object for this order
         $orderCustomFields = new OrderAttributes($order);
         $orderCustomFields->setTransactionReturnUrl($transactionStruct->getReturnUrl());
+
+        # Store current timezone in the order so we can fix the timezone during webhook calls.
+        if ($this->twig->hasExtension(CoreExtension::class)) {
+            /** @var CoreExtension $coreExtension */
+            $coreExtension = $this->twig->getExtension(CoreExtension::class);
+            $orderCustomFields->setTimezone($coreExtension->getTimezone()->getName());
+        }
 
         # extract the main Mollie Order ID "ord_xyz" that
         # we are working on in this case. this is empty for first orders
@@ -162,11 +178,12 @@ class MolliePaymentDoPay
                     $salesChannelContext,
                     $paymentHandler
                 );
-            } catch (MollieOrderCancelledException|MollieOrderExpiredException $e) {
+            }
+            catch (MollieOrderCancelledException|MollieOrderExpiredException $e) {
                 # Warn about cancelled/expired order, but otherwise do nothing and let it create a new order.
                 $this->logger->warning($e->getMessage(), [
-                    'orderNumber' => $order->getOrderNumber(),
-                    'mollieOrderId' => $mollieOrderId
+                    'orderNumber'   => $order->getOrderNumber(),
+                    'mollieOrderId' => $mollieOrderId,
                 ]);
             }
         }
@@ -174,8 +191,8 @@ class MolliePaymentDoPay
         $this->logger->debug(
             'Start first payment attempt for order: ' . $order->getOrderNumber(),
             [
-                'salesChannel' => $salesChannelContext->getSalesChannel()->getName(),
-                'mollieID' => '-',
+                'salesChannel'          => $salesChannelContext->getSalesChannel()->getName(),
+                'mollieID'              => '-',
                 'shopwareTransactionID' => $swOrderTransactionID,
             ]
         );
@@ -221,7 +238,7 @@ class MolliePaymentDoPay
     }
 
     /**
-     * @param OrderEntity $order
+     * @param OrderEntity         $order
      * @param SalesChannelContext $salesChannelContext
      * @return void
      */
@@ -244,7 +261,8 @@ class MolliePaymentDoPay
                     $salesChannelContext->getContext()
                 );
             }
-        } catch (CouldNotCreateMollieCustomerException|CustomerCouldNotBeFoundException $e) {
+        }
+        catch (CouldNotCreateMollieCustomerException|CustomerCouldNotBeFoundException $e) {
 
             # TODO do we really need to catch this? shouldnt it fail fast?
 
@@ -252,31 +270,31 @@ class MolliePaymentDoPay
                 $e->getMessage(),
                 [
                     'saleschannel' => $salesChannelContext->getSalesChannel()->getName(),
-                    'order' => $order->getOrderNumber(),
+                    'order'        => $order->getOrderNumber(),
                 ]
             );
         }
     }
 
     /**
-     * @param OrderEntity $order
-     * @param string $swOrderTransactionID
-     * @param OrderAttributes $orderCustomFields
-     * @param string $mollieOrderId
-     * @param string $paymentMethod
+     * @param OrderEntity                   $order
+     * @param string                        $swOrderTransactionID
+     * @param OrderAttributes               $orderCustomFields
+     * @param string                        $mollieOrderId
+     * @param string                        $paymentMethod
      * @param AsyncPaymentTransactionStruct $transactionStruct
-     * @param SalesChannelContext $salesChannelContext
-     * @param PaymentHandler $paymentHandler
-     * @throws ApiException|MollieOrderCancelledException|MollieOrderExpiredException
+     * @param SalesChannelContext           $salesChannelContext
+     * @param PaymentHandler                $paymentHandler
      * @return MolliePaymentPrepareData
+     * @throws ApiException|MollieOrderCancelledException|MollieOrderExpiredException
      */
     private function handleNextPaymentAttempt(OrderEntity $order, string $swOrderTransactionID, OrderAttributes $orderCustomFields, string $mollieOrderId, string $paymentMethod, AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext, PaymentHandler $paymentHandler): MolliePaymentPrepareData
     {
         $this->logger->debug(
             'Start additional payment attempt for order: ' . $order->getOrderNumber(),
             [
-                'salesChannel' => $salesChannelContext->getSalesChannel()->getName(),
-                'mollieID' => $mollieOrderId,
+                'salesChannel'          => $salesChannelContext->getSalesChannel()->getName(),
+                'mollieID'              => $mollieOrderId,
                 'shopwareTransactionID' => $swOrderTransactionID,
             ]
         );
@@ -317,13 +335,13 @@ class MolliePaymentDoPay
     }
 
     /**
-     * @param OrderEntity $orderEntity
-     * @param string $paymentMethod
+     * @param OrderEntity                   $orderEntity
+     * @param string                        $paymentMethod
      * @param AsyncPaymentTransactionStruct $transactionStruct
-     * @param SalesChannelContext $salesChannelContext
-     * @param PaymentHandler $paymentHandler
-     * @throws \Exception
+     * @param SalesChannelContext           $salesChannelContext
+     * @param PaymentHandler                $paymentHandler
      * @return MollieOrder
+     * @throws \Exception
      */
     private function createMollieOrder(OrderEntity $orderEntity, string $paymentMethod, AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext, PaymentHandler $paymentHandler): \Mollie\Api\Resources\Order
     {
