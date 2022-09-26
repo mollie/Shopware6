@@ -6,12 +6,10 @@
         {{ $tc('mollie-payments.config.payments.updatePaymentMethods.button') }}
     </sw-button>
 
-    <sw-external-link
-            :small="false" icon="small-arrow-small-external" rel="noopener"
+    <mollie-external-link
             class="mollie-pluginconfig-payments-link-limits"
-            href="https://help.mollie.com/hc/en-us/articles/115000667365-What-is-the-minimum-and-maximum-amount-per-payment-method-"
-            target="_blank">
+            href="https://help.mollie.com/hc/en-us/articles/115000667365-What-is-the-minimum-and-maximum-amount-per-payment-method-">
         {{ $tc('mollie-payments.config.payments.mollieLimits.link') }}
-    </sw-external-link>
+    </mollie-external-link>
 
 </sw-container>
