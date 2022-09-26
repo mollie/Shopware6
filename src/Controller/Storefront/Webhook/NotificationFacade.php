@@ -213,6 +213,7 @@ class NotificationFacade
                 throw new \Exception('No valid order has been found: ' . $swOrder->getOrderNumber());
             }
 
+            $mollieOrderId = $mollieOrder->id;
             $metadata = json_decode($mollieOrder->metadata, true);
 
             if ($metadata == null) {
