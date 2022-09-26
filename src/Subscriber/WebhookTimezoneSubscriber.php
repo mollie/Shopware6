@@ -80,12 +80,14 @@ class WebhookTimezoneSubscriber implements EventSubscriberInterface
 
         if (!$transaction instanceof OrderTransactionEntity) {
             $this->logger->error(sprintf('Transaction for id %s does not exist', $transactionId));
+            return;
         }
 
         $order = $transaction->getOrder();
 
         if (!$order instanceof OrderEntity) {
             $this->logger->error(sprintf('Could not get order from transaction %s', $transactionId));
+            return;
         }
 
         $orderAttributes = new OrderAttributes($order);
