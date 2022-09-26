@@ -41,13 +41,12 @@ class WebhookTimezoneSubscriber implements EventSubscriberInterface
     public function __construct(
         TransactionService $transactionService,
         LoggerInterface    $logger
-    )
-    {
+    ) {
         $this->transactionService = $transactionService;
         $this->logger = $logger;
     }
 
-    public function fixWebhookTimezone(RequestEvent $event)
+    public function fixWebhookTimezone(RequestEvent $event): void
     {
         $request = $event->getRequest();
 
