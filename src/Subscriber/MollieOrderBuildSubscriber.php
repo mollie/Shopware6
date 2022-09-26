@@ -13,9 +13,9 @@ class MollieOrderBuildSubscriber implements \Symfony\Component\EventDispatcher\E
      */
     public static function getSubscribedEvents()
     {
-       return [
-         MollieOrderBuildEvent::class => 'onMollieOrderBuilt'
-       ];
+        return [
+            MollieOrderBuildEvent::class => 'onMollieOrderBuilt'
+        ];
     }
 
     /**
@@ -27,8 +27,8 @@ class MollieOrderBuildSubscriber implements \Symfony\Component\EventDispatcher\E
     {
         $transactionId = $event->getTransactionId();
 
-        if (!empty($transactionId)){
-            $shortId = substr($transactionId,0,8);
+        if (!empty($transactionId)) {
+            $shortId = substr($transactionId, 0, 8);
             $event->setMetadata([self::METADATA_SHORT_TRANSACTION_ID_KEY =>$shortId]);
         }
     }

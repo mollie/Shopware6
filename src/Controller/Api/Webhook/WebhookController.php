@@ -68,9 +68,26 @@ class WebhookController extends AbstractController
      */
     public function webhookAction(string $swTransactionId, Request $request, Context $context): JsonResponse
     {
-        $actionId = explode('=',$request->getContent())[1];
+        $actionId='';
+        $requestContent = $request->getContent(false);
+        if (is_string($requestContent)) {
+            $explodedString = explode('=', $requestContent);
+            if (isset($explodedString[1])) {
+                $actionId = $explodedString[1];
+            }
+        }
+
+        if (empty($actionId)) {
+            $this->logger->error(
+                'Error in Mollie Webhook for Transaction no valid transaction id found' . $swTransactionId,
+                [
+                    'transactionId' => $swTransactionId
+                ]
+            );
+        }
+
         try {
-            $this->notificationFacade->onNotify($swTransactionId, $context,$actionId);
+            $this->notificationFacade->onNotify($swTransactionId, $context, $actionId);
 
             return new JsonResponse([
                 'success' => true

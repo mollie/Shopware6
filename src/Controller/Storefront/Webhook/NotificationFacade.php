@@ -198,29 +198,37 @@ class NotificationFacade
         $molliePayment = null;
         $mollieOrder = null;
 
-        //TODO: also ord but only when no mollieOrderId
-        //TODO: tr for payment ord for order
-        if (empty($mollieOrderId)){
-            if (str_starts_with($actionId, 'tr')) {
+        if (empty($mollieOrderId)) {
+            if (str_starts_with($actionId, 'ord')) {
+                $mollieOrder = $this->gatewayMollie->getOrder($actionId);
+                $molliePayment = $this->statusConverter->getLatestPayment($mollieOrder);
+            } elseif (str_starts_with($actionId, 'tr')) {
                 $molliePayment = $this->gatewayMollie->getPayment($actionId);
-                $mollieOrder = $this->gatewayMollie->getOrder($molliePayment->orderId);
-                $metadata = json_decode($mollieOrder->metadata,true);
-                if ($metadata!=null){
-
-                    $metaShortId = $metadata[MollieOrderBuildSubscriber::METADATA_SHORT_TRANSACTION_ID_KEY];
-                    $transShortId = substr($swTransactionId,0,8);
-
-                    if ($metaShortId==$transShortId){
-                        $status = $this->statusConverter->getMollieOrderStatus($mollieOrder);
-                    }
+                if ($molliePayment->orderId != null) {
+                    $mollieOrder = $this->gatewayMollie->getOrder($molliePayment->orderId);
                 }
-
             }
-        }
 
+            if ($mollieOrder == null) {
+                throw new \Exception('No valid order has been found: ' . $swOrder->getOrderNumber());
+            }
 
+            $metadata = json_decode($mollieOrder->metadata, true);
 
-        if (!empty($mollieOrderId)) {
+            if ($metadata == null) {
+                throw new \Exception('Order has no metadata: ' . $swOrder->getOrderNumber());
+            }
+
+            $metaShortId = $metadata[MollieOrderBuildSubscriber::METADATA_SHORT_TRANSACTION_ID_KEY];
+            $transShortId = substr($swTransactionId, 0, 8);
+
+            if ($metaShortId == $transShortId) {
+                $status = $this->statusConverter->getMollieOrderStatus($mollieOrder);
+            } else {
+                throw new \Exception('Order has failed the id check: ' . $swOrder->getOrderNumber());
+            }
+
+        } elseif (!empty($mollieOrderId)) {
 
             # fetch the order of our mollie ID
             # from our sales channel mollie profile
