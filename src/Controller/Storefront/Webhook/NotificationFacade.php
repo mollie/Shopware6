@@ -212,7 +212,7 @@ class NotificationFacade
             # so we do not have an order, but a payment instead
             $molliePayment = $this->gatewayMollie->getPayment($orderAttributes->getMolliePaymentId());
             $status = $this->statusConverter->getMolliePaymentStatus($molliePayment);
-        } elseif (!$orderAttributes->isTypeSubscription()) {
+        } elseif (!empty($mollieOrderId)&&!$orderAttributes->isTypeSubscription()) {
             if (str_starts_with($actionId, 'ord')) {
                 $mollieOrder = $this->gatewayMollie->getOrder($actionId);
                 $molliePayment = $this->statusConverter->getLatestPayment($mollieOrder);
