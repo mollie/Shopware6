@@ -199,6 +199,36 @@ class NotificationFacade
         $molliePayment = null;
         $mollieOrder = null;
 
+        if (empty($mollieOrderId)) {
+            if (str_starts_with($actionId, 'ord')) {
+                $mollieOrder = $this->gatewayMollie->getOrder($actionId);
+                $molliePayment = $this->statusConverter->getLatestPayment($mollieOrder);
+            }else if (str_starts_with($actionId, 'tr')) {
+                $molliePayment = $this->gatewayMollie->getPayment($actionId);
+                if ($molliePayment->orderId != null) {
+                    $mollieOrder = $this->gatewayMollie->getOrder($molliePayment->orderId);
+                }
+            }
+
+            if ($mollieOrder == null) {
+                throw new \Exception('No valid order has been found: ' . $swOrder->getOrderNumber());
+            }
+
+            $metadata = json_decode($mollieOrder->metadata, true);
+
+            if ($metadata == null) {
+                throw new \Exception('Order has no metadata: ' . $swOrder->getOrderNumber());
+            }
+
+            $metaShortId = $metadata[MollieOrderBuildSubscriber::METADATA_SHORT_TRANSACTION_ID_KEY];
+            $transShortId = substr($swTransactionId, 0, 8);
+
+            if ($metaShortId == $transShortId) {
+                $mollieOrderId = $mollieOrder->id;
+            }
+        }
+        
+
         if (!empty($mollieOrderId)) {
 
             # fetch the order of our mollie ID
@@ -212,38 +242,6 @@ class NotificationFacade
             # so we do not have an order, but a payment instead
             $molliePayment = $this->gatewayMollie->getPayment($orderAttributes->getMolliePaymentId());
             $status = $this->statusConverter->getMolliePaymentStatus($molliePayment);
-        } elseif (!empty($mollieOrderId)&&!$orderAttributes->isTypeSubscription()) {
-            if (str_starts_with($actionId, 'ord')) {
-                $mollieOrder = $this->gatewayMollie->getOrder($actionId);
-                $molliePayment = $this->statusConverter->getLatestPayment($mollieOrder);
-            }
-
-            if (str_starts_with($actionId, 'tr')) {
-                $molliePayment = $this->gatewayMollie->getPayment($actionId);
-                if ($molliePayment->orderId != null) {
-                    $mollieOrder = $this->gatewayMollie->getOrder($molliePayment->orderId);
-                }
-            }
-
-            if ($mollieOrder == null) {
-                throw new \Exception('No valid order has been found: ' . $swOrder->getOrderNumber());
-            }
-
-            $mollieOrderId = $mollieOrder->id;
-            $metadata = json_decode($mollieOrder->metadata, true);
-
-            if ($metadata == null) {
-                throw new \Exception('Order has no metadata: ' . $swOrder->getOrderNumber());
-            }
-
-            $metaShortId = $metadata[MollieOrderBuildSubscriber::METADATA_SHORT_TRANSACTION_ID_KEY];
-            $transShortId = substr($swTransactionId, 0, 8);
-
-            if ($metaShortId == $transShortId) {
-                $status = $this->statusConverter->getMollieOrderStatus($mollieOrder);
-            } else {
-                throw new \Exception('Order has failed the id check: ' . $swOrder->getOrderNumber());
-            }
         } else {
             throw new \Exception('Order is neither a Mollie order nor a subscription order: ' . $swOrder->getOrderNumber());
         }
