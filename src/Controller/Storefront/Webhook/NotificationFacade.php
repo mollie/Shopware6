@@ -134,8 +134,9 @@ class NotificationFacade
      * @param string $swTransactionId
      * @param Context $context
      * @param string $actionId
-     * @return void
+     * @throws \Exception
      * @throws CustomerCouldNotBeFoundException
+     * @return void
      */
     public function onNotify(string $swTransactionId, Context $context, string $actionId): void
     {
@@ -198,11 +199,26 @@ class NotificationFacade
         $molliePayment = null;
         $mollieOrder = null;
 
-        if (empty($mollieOrderId)) {
+        if (!empty($mollieOrderId)) {
+
+            # fetch the order of our mollie ID
+            # from our sales channel mollie profile
+            $mollieOrder = $this->gatewayMollie->getOrder($mollieOrderId);
+            $molliePayment = $this->statusConverter->getLatestPayment($mollieOrder);
+            $status = $this->statusConverter->getMollieOrderStatus($mollieOrder);
+        } elseif ($orderAttributes->isTypeSubscription()) {
+
+            # subscriptions are automatically charged using a payment ID
+            # so we do not have an order, but a payment instead
+            $molliePayment = $this->gatewayMollie->getPayment($orderAttributes->getMolliePaymentId());
+            $status = $this->statusConverter->getMolliePaymentStatus($molliePayment);
+        } elseif (!$orderAttributes->isTypeSubscription()) {
             if (str_starts_with($actionId, 'ord')) {
                 $mollieOrder = $this->gatewayMollie->getOrder($actionId);
                 $molliePayment = $this->statusConverter->getLatestPayment($mollieOrder);
-            } elseif (str_starts_with($actionId, 'tr')) {
+            }
+
+            if (str_starts_with($actionId, 'tr')) {
                 $molliePayment = $this->gatewayMollie->getPayment($actionId);
                 if ($molliePayment->orderId != null) {
                     $mollieOrder = $this->gatewayMollie->getOrder($molliePayment->orderId);
@@ -228,20 +244,6 @@ class NotificationFacade
             } else {
                 throw new \Exception('Order has failed the id check: ' . $swOrder->getOrderNumber());
             }
-
-        } elseif (!empty($mollieOrderId)) {
-
-            # fetch the order of our mollie ID
-            # from our sales channel mollie profile
-            $mollieOrder = $this->gatewayMollie->getOrder($mollieOrderId);
-            $molliePayment = $this->statusConverter->getLatestPayment($mollieOrder);
-            $status = $this->statusConverter->getMollieOrderStatus($mollieOrder);
-        } elseif ($orderAttributes->isTypeSubscription()) {
-
-            # subscriptions are automatically charged using a payment ID
-            # so we do not have an order, but a payment instead
-            $molliePayment = $this->gatewayMollie->getPayment($orderAttributes->getMolliePaymentId());
-            $status = $this->statusConverter->getMolliePaymentStatus($molliePayment);
         } else {
             throw new \Exception('Order is neither a Mollie order nor a subscription order: ' . $swOrder->getOrderNumber());
         }
