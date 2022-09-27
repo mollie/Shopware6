@@ -2,6 +2,7 @@
 
 namespace MolliePayments\Tests\Subscriber;
 
+use Kiener\MolliePayments\Service\Router\RoutingDetector;
 use Kiener\MolliePayments\Service\TransactionService;
 use Kiener\MolliePayments\Subscriber\WebhookTimezoneSubscriber;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -9,16 +10,18 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Storefront\Framework\Twig\TwigDateRequestListener;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class WebhookTimezoneSubscriberTest extends TestCase
 {
-    private const WEBHOOK_ROUTE = 'frontend.mollie.webhook';
+    private const STOREFRONT_WEBHOOK_ROUTE = 'frontend.mollie.webhook';
+    private const API_WEBHOOK_ROUTE = 'api.mollie.webhook';
     private const TRANSACTION_ID = 'abcdef0123456789abcdef0123456789';
+
     /**
      * @var WebhookTimezoneSubscriber
      */
@@ -34,11 +37,13 @@ class WebhookTimezoneSubscriberTest extends TestCase
      */
     protected $request;
 
+
+    /**
+     * @return void
+     */
     public function setUp(): void
     {
         $this->transactionService = $this->createMock(TransactionService::class);
-
-        $this->subscriber = new WebhookTimezoneSubscriber($this->transactionService, new NullLogger());
     }
 
     /**
@@ -51,12 +56,29 @@ class WebhookTimezoneSubscriberTest extends TestCase
      *
      * @return void
      */
-    public function testThatTimezoneIsCorrectlySet()
+    public function testThatTimezoneIsCorrectlySetInStorefront()
     {
         $expectedTimezone = 'Europe/Amsterdam';
 
         $this->setUpTransactionService($this->createTransactionWithOrder($expectedTimezone));
-        $event = $this->setUpRequest(self::WEBHOOK_ROUTE, self::TRANSACTION_ID);
+
+        $event = $this->initSubscriberRequests(self::STOREFRONT_WEBHOOK_ROUTE, self::TRANSACTION_ID);
+
+        $this->transactionService->expects($this->once())->method('getTransactionById');
+
+        $this->subscriber->fixWebhookTimezone($event);
+
+        $this->assertArrayHasKey(TwigDateRequestListener::TIMEZONE_COOKIE, $this->request->cookies->all());
+        $this->assertEquals($expectedTimezone, $this->request->cookies->get(TwigDateRequestListener::TIMEZONE_COOKIE));
+    }
+
+    public function testThatTimezoneIsCorrectlySetInApi()
+    {
+        $expectedTimezone = 'Europe/Amsterdam';
+
+        $this->setUpTransactionService($this->createTransactionWithOrder($expectedTimezone));
+
+        $event = $this->initSubscriberRequests(self::API_WEBHOOK_ROUTE, self::TRANSACTION_ID);
 
         $this->transactionService->expects($this->once())->method('getTransactionById');
 
@@ -75,7 +97,7 @@ class WebhookTimezoneSubscriberTest extends TestCase
         $orderTimezone = 'Europe/Amsterdam';
 
         $this->setUpTransactionService($this->createTransactionWithOrder($orderTimezone));
-        $event = $this->setUpRequest('some.random.route', self::TRANSACTION_ID);
+        $event = $this->initSubscriberRequests('some.random.route', self::TRANSACTION_ID);
 
         $this->transactionService->expects($this->never())->method('getTransactionById');
 
@@ -94,7 +116,7 @@ class WebhookTimezoneSubscriberTest extends TestCase
         $orderTimezone = 'Europe/Amsterdam';
 
         $this->setUpTransactionService($this->createTransactionWithOrder($orderTimezone));
-        $event = $this->setUpRequest(self::WEBHOOK_ROUTE);
+        $event = $this->initSubscriberRequests(self::STOREFRONT_WEBHOOK_ROUTE);
 
         $this->transactionService->expects($this->never())->method('getTransactionById');
 
@@ -113,7 +135,7 @@ class WebhookTimezoneSubscriberTest extends TestCase
         $orderTimezone = 'Europe/Amsterdam';
 
         $this->setUpTransactionService($this->createTransactionWithOrder($orderTimezone));
-        $event = $this->setUpRequest(self::WEBHOOK_ROUTE, 'foo');
+        $event = $this->initSubscriberRequests(self::STOREFRONT_WEBHOOK_ROUTE, 'foo');
 
         $this->transactionService->expects($this->never())->method('getTransactionById');
 
@@ -130,7 +152,7 @@ class WebhookTimezoneSubscriberTest extends TestCase
     public function testThatTimezoneIsNotSetWithoutATransaction()
     {
         $this->setUpTransactionService(null);
-        $event = $this->setUpRequest(self::WEBHOOK_ROUTE, self::TRANSACTION_ID);
+        $event = $this->initSubscriberRequests(self::STOREFRONT_WEBHOOK_ROUTE, self::TRANSACTION_ID);
 
         $this->transactionService->expects($this->once())->method('getTransactionById');
 
@@ -147,7 +169,7 @@ class WebhookTimezoneSubscriberTest extends TestCase
     public function testThatTimezoneIsNotSetWithoutAnOrder()
     {
         $this->setUpTransactionService($this->createMock(OrderTransactionEntity::class));
-        $event = $this->setUpRequest(self::WEBHOOK_ROUTE, self::TRANSACTION_ID);
+        $event = $this->initSubscriberRequests(self::STOREFRONT_WEBHOOK_ROUTE, self::TRANSACTION_ID);
 
         $this->transactionService->expects($this->once())->method('getTransactionById');
 
@@ -164,7 +186,7 @@ class WebhookTimezoneSubscriberTest extends TestCase
     public function testThatTimezoneIsNotSetWithoutATimezoneCustomField()
     {
         $this->setUpTransactionService($this->createTransactionWithOrder());
-        $event = $this->setUpRequest(self::WEBHOOK_ROUTE, self::TRANSACTION_ID);
+        $event = $this->initSubscriberRequests(self::STOREFRONT_WEBHOOK_ROUTE, self::TRANSACTION_ID);
 
         $this->transactionService->expects($this->once())->method('getTransactionById');
 
@@ -174,28 +196,6 @@ class WebhookTimezoneSubscriberTest extends TestCase
         $this->assertNull($this->request->cookies->get(TwigDateRequestListener::TIMEZONE_COOKIE));
     }
 
-    /**
-     * @param string $route
-     * @param string $transactionId
-     * @return RequestEvent
-     */
-    private function setUpRequest(string $route, string $transactionId = ''): RequestEvent
-    {
-        $this->request = new Request();
-        $this->request->attributes->set('_route', $route);
-
-        if(!empty($transactionId)) {
-            $this->request->attributes->set('_route_params', [
-                'swTransactionId' => $transactionId
-            ]);
-        }
-
-        return new RequestEvent(
-            $this->createMock(HttpKernelInterface::class),
-            $this->request,
-            HttpKernelInterface::MAIN_REQUEST
-        );
-    }
 
     /**
      * Set up the transaction service with the provided transaction
@@ -226,5 +226,35 @@ class WebhookTimezoneSubscriberTest extends TestCase
         return $this->createConfiguredMock(OrderTransactionEntity::class, [
             'getOrder' => $order,
         ]);
+    }
+
+    /**
+     * @param string $route
+     * @param string $transactionId
+     * @return RequestEvent
+     */
+    private function initSubscriberRequests(string $route, string $transactionId = ''): RequestEvent
+    {
+        $this->request = new Request();
+        $this->request->attributes->set('_route', $route);
+
+        if (!empty($transactionId)) {
+            $this->request->attributes->set('_route_params', [
+                'swTransactionId' => $transactionId
+            ]);
+        }
+
+        $requestStack = new RequestStack();
+        $requestStack->push($this->request);
+
+        $routingDetector = new RoutingDetector($requestStack);
+
+        $this->subscriber = new WebhookTimezoneSubscriber($this->transactionService, $routingDetector, new NullLogger());
+
+        return new RequestEvent(
+            $this->createMock(HttpKernelInterface::class),
+            $this->request,
+            HttpKernelInterface::MAIN_REQUEST
+        );
     }
 }

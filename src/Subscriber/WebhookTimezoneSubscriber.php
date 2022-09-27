@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Subscriber;
 
+use Kiener\MolliePayments\Service\Router\RoutingDetector;
 use Kiener\MolliePayments\Service\TransactionService;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Psr\Log\LoggerInterface;
@@ -30,41 +31,42 @@ class WebhookTimezoneSubscriber implements EventSubscriberInterface
     private $transactionService;
 
     /**
+     * @var RoutingDetector
+     */
+    private $routeDetector;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
 
     /**
      * @param TransactionService $transactionService
-     * @param LoggerInterface    $logger
+     * @param RoutingDetector $routeDetector
+     * @param LoggerInterface $logger
      */
-    public function __construct(
-        TransactionService $transactionService,
-        LoggerInterface    $logger
-    ) {
+    public function __construct(TransactionService $transactionService, RoutingDetector $routeDetector, LoggerInterface $logger)
+    {
         $this->transactionService = $transactionService;
+        $this->routeDetector = $routeDetector;
         $this->logger = $logger;
     }
 
+
+    /**
+     * @param RequestEvent $event
+     * @return void
+     */
     public function fixWebhookTimezone(RequestEvent $event): void
     {
-        $request = $event->getRequest();
-
-        $route = $request->get('_route');
-        $routeParams = $request->get('_route_params');
-
-        $this->logger->debug("Starting Webhook Timezone Fixer", [
-            'route' => $route,
-            'routeParams' => $routeParams,
-        ]);
-
-        if ($route !== 'frontend.mollie.webhook') {
-            $this->logger->debug(sprintf("Aborted Webhook Timezone Fixer: Incorrect route %s", $route), [
-                'route' => $route,
-                'routeParams' => $routeParams,
-            ]);
+        # we only fix the timezone when being called from the
+        # Storefront Webhook Route or API Webhook Route (headless).
+        if (!$this->routeDetector->isStorefrontWebhookRoute() && !$this->routeDetector->isApiWebhookRoute()) {
             return;
         }
+
+        $request = $event->getRequest();
+        $routeParams = $request->get('_route_params');
 
         $transactionId = $routeParams['swTransactionId'] ?? '';
 
