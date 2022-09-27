@@ -23,6 +23,7 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
+use Twig\Environment;
 
 class MolliePaymentDoPayTest extends TestCase
 {
@@ -92,6 +93,7 @@ class MolliePaymentDoPayTest extends TestCase
             $this->createMock(UpdateOrderCustomFields::class),
             $this->createMock(UpdateOrderLineItems::class),
             new FakeSubscriptionManager(),
+            $this->createMock(Environment::class),
             new NullLogger()
         );
     }

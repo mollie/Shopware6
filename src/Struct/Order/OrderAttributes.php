@@ -79,6 +79,10 @@ class OrderAttributes
      */
     private $creditCardFeeRegion;
 
+    /**
+     * @var string
+     */
+    private $timezone;
 
     /**
      * @var OrderEntity
@@ -106,6 +110,7 @@ class OrderAttributes
         $this->creditCardCountryCode = $this->getCustomFieldValue($order, 'creditCardCountryCode');
         $this->creditCardSecurity = $this->getCustomFieldValue($order, 'creditCardSecurity');
         $this->creditCardFeeRegion = $this->getCustomFieldValue($order, 'creditCardFeeRegion');
+        $this->timezone = $this->getCustomFieldValue($order, 'timezone');
     }
 
     /**
@@ -311,6 +316,22 @@ class OrderAttributes
     }
 
     /**
+     * @return string
+     */
+    public function getTimezone(): string
+    {
+        return $this->timezone;
+    }
+
+    /**
+     * @param string $timezone
+     */
+    public function setTimezone(string $timezone): void
+    {
+        $this->timezone = $timezone;
+    }
+
+    /**
      * @param null|stdClass $details
      * @return void
      */
@@ -403,6 +424,10 @@ class OrderAttributes
 
         if ((string)$this->creditCardFeeRegion !== '') {
             $mollieData['creditCardFeeRegion'] = $this->creditCardFeeRegion;
+        }
+
+        if ((string)$this->timezone !== '') {
+            $mollieData['timezone'] = $this->timezone;
         }
 
         return [

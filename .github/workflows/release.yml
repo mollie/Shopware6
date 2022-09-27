@@ -21,7 +21,7 @@ jobs:
 
       - name: Start Docker
         run: |
-          docker run --rm --name shop -d dockware/dev:6.4.15.0
+          docker run --rm --name shop -d dockware/dev:6.4.15.1
           sleep 30
           docker logs shop
 

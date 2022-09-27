@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Service;
 
 use Exception;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
+use Kiener\MolliePayments\Exception\CouldNotFetchMollieCustomerException;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
 use Kiener\MolliePayments\Struct\CustomerStruct;
@@ -13,7 +14,6 @@ use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Customer\Event\CustomerBeforeLoginEvent;
 use Shopware\Core\Checkout\Customer\Event\CustomerLoginEvent;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
-use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
@@ -521,8 +521,15 @@ class CustomerService
             return;
         }
 
-        if (!empty($struct->getCustomerId((string)$settings->getProfileId(), $settings->isTestMode()))) {
+        $mollieCustomerId = $struct->getCustomerId((string)$settings->getProfileId(), $settings->isTestMode());
+        try {
+            $this->customerApiService->getMollieCustomerById($mollieCustomerId, $salesChannelId);
             return;
+        } catch (CouldNotFetchMollieCustomerException $e) {
+            $this->logger->warning('No customer found for the current mollie id and sales channel combination, creating a new one.', [
+                'salesChannel' => $salesChannelId,
+                'mollieCustomerId' => $mollieCustomerId,
+            ]);
         }
 
         $customer = $this->getCustomer($customerId, $context);

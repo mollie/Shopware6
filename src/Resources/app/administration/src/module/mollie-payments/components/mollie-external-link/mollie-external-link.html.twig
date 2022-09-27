@@ -1,0 +1,31 @@
+<!-- This is just a copy from the sw-external-link component in Shopware 6.4 -->
+
+<a
+    v-if="$attrs.hasOwnProperty('href')"
+    v-bind="$attrs"
+    target="_blank"
+    :rel="rel"
+    class="mollie-external-link"
+    :class="classes"
+>
+    <slot></slot>
+    <sw-icon
+        class="mollie-external-link__icon"
+        :size="iconSize"
+        :name="icon"
+    />
+</a>
+<!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
+<span
+    v-else
+    class="mollie-external-link"
+    :class="classes"
+    @click="onClick"
+>
+    <slot></slot>
+    <sw-icon
+        class="mollie-external-link__icon"
+        :size="iconSize"
+        :name="icon"
+    />
+</span>
