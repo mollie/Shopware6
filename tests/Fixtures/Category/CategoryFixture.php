@@ -36,6 +36,18 @@ class CategoryFixture extends Fixture
         $this->categoryRepository = $categoryRepository;
     }
 
+
+    /**
+     * @return string[]
+     */
+    public function groups(): array
+    {
+        return [
+            'mollie',
+        ];
+    }
+
+
     /**
      * @param FixtureBag $bag
      * @return void

@@ -37,6 +37,16 @@ class SubscriptionFixture extends Fixture
     }
 
     /**
+     * @return string[]
+     */
+    public function groups(): array
+    {
+        return [
+            'mollie',
+        ];
+    }
+
+    /**
      * @param FixtureBag $bag
      * @return void
      */
@@ -58,8 +68,8 @@ class SubscriptionFixture extends Fixture
             'mollie_payments_product_subscription_interval_unit' => "week"
         ];
 
-        $this->createProduct('1d1eeedd6d22436385580e2ff42431b9', 'Subscription (1x Daily)', 'MOL_SUB_1', $category, $description,19, $image, $customFieldsDaily, $this->repoProducts, $this->helper);
-        $this->createProduct('1d2eeedd6d22436385580e2ff42431b9', 'Subscription (1x Weekly)', 'MOL_SUB_2', $category, $description,29, $image, $customFieldsWeekly, $this->repoProducts, $this->helper);
+        $this->createProduct('1d1eeedd6d22436385580e2ff42431b9', 'Subscription (1x Daily)', 'MOL_SUB_1', $category, $description, 19, $image, $customFieldsDaily, $this->repoProducts, $this->helper);
+        $this->createProduct('1d2eeedd6d22436385580e2ff42431b9', 'Subscription (1x Weekly)', 'MOL_SUB_2', $category, $description, 29, $image, $customFieldsWeekly, $this->repoProducts, $this->helper);
     }
 
 }

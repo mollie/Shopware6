@@ -38,7 +38,7 @@ clean: ## Cleans all dependencies
 
 fixtures: ## Installs all available testing fixtures of the Mollie plugin
 	cd /var/www/html && php bin/console cache:clear
-	cd /var/www/html && php bin/console fixture:load
+	cd /var/www/html && php bin/console fixture:load:group mollie
 
 build: ## Installs the plugin, and builds the artifacts using the Shopware build commands (requires Shopware)
 	cd /var/www/html && php bin/console plugin:refresh

@@ -37,6 +37,16 @@ class VoucherFixture extends Fixture
     }
 
     /**
+     * @return string[]
+     */
+    public function groups(): array
+    {
+        return [
+            'mollie',
+        ];
+    }
+
+    /**
      * @param FixtureBag $bag
      * @return void
      */

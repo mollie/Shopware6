@@ -127,7 +127,7 @@ To use these fixtures, please install and activate this FixturePlugin (https://g
 Then simply install the "dev" dependencies of the Mollie plugin using `make dev` and run the following command.
 
 ```bash 
-php bin/console fixture:load
+make fixtures
 ```
 
 Congratulations, you should now see all kinds of products in your Shopware shop.
