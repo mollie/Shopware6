@@ -203,7 +203,7 @@ class NotificationFacade
             if (str_starts_with($actionId, 'ord')) {
                 $mollieOrder = $this->gatewayMollie->getOrder($actionId);
                 $molliePayment = $this->statusConverter->getLatestPayment($mollieOrder);
-            }else if (str_starts_with($actionId, 'tr')) {
+            } elseif (str_starts_with($actionId, 'tr')) {
                 $molliePayment = $this->gatewayMollie->getPayment($actionId);
                 if ($molliePayment->orderId != null) {
                     $mollieOrder = $this->gatewayMollie->getOrder($molliePayment->orderId);
