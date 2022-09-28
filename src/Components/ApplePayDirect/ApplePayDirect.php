@@ -462,6 +462,7 @@ class ApplePayDirect
         $this->orderService->updateMollieDataCustomFields(
             $order,
             $paymentData->getMollieID(),
+            '',
             $transaction->getId(),
             $context->getContext()
         );

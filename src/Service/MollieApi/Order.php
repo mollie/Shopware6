@@ -81,6 +81,31 @@ class Order
     }
 
     /**
+     * @param string $paymentId
+     * @param string $salesChannelId
+     * @param array<mixed> $parameters
+     * @return Payment
+     */
+    public function getMolliePayment(string $paymentId, string $salesChannelId, array $parameters = []): Payment
+    {
+        try {
+            $apiClient = $this->clientFactory->getClient($salesChannelId);
+
+            return $apiClient->payments->get($paymentId, $parameters);
+        } catch (ApiException $e) {
+            $this->logger->error(
+                sprintf(
+                    'API error occurred when fetching mollie payment %s with message %s',
+                    $paymentId,
+                    $e->getMessage()
+                )
+            );
+
+            throw new CouldNotFetchMollieOrderException($paymentId, $e);
+        }
+    }
+
+    /**
      * @param string $mollieOrderId
      * @param string $mollieOrderLineId
      * @param string $salesChannelId
@@ -359,32 +384,49 @@ class Order
 
     /**
      * @param string $mollieOrderId
+     * @param string $molliePaymentId
      * @param null|string $salesChannelId
      * @return Payment
      */
-    public function getCompletedPayment(string $mollieOrderId, ?string $salesChannelId): Payment
+    public function getCompletedPayment(string $mollieOrderId, string $molliePaymentId, ?string $salesChannelId): Payment
     {
-        $mollieOrder = $this->getMollieOrder($mollieOrderId, (string)$salesChannelId, ['embed' => 'payments']);
+        $allowed = [
+            PaymentStatus::STATUS_PAID,
+            PaymentStatus::STATUS_AUTHORIZED // Klarna
+        ];
 
-        $payments = $mollieOrder->payments();
 
-        if ($payments instanceof PaymentCollection) {
-            if ($payments->count() === 0) {
-                throw new PaymentNotFoundException($mollieOrderId);
-            }
+        if (!empty($mollieOrderId)) {
 
-            $allowed = [
-                PaymentStatus::STATUS_PAID,
-                PaymentStatus::STATUS_AUTHORIZED // Klarna
-            ];
+            # ORDER_ID, ord_123
+            $mollieOrder = $this->getMollieOrder($mollieOrderId, (string)$salesChannelId, ['embed' => 'payments']);
 
-            foreach ($payments->getArrayCopy() as $payment) {
-                if (in_array($payment->status, $allowed)) {
-                    return $payment;
+            $payments = $mollieOrder->payments();
+
+            if ($payments instanceof PaymentCollection) {
+                if ($payments->count() === 0) {
+                    throw new PaymentNotFoundException($mollieOrderId);
+                }
+
+                foreach ($payments->getArrayCopy() as $payment) {
+                    if (in_array($payment->status, $allowed)) {
+                        return $payment;
+                    }
                 }
             }
-        }
 
-        throw new PaymentNotFoundException($mollieOrderId);
+            throw new PaymentNotFoundException($mollieOrderId);
+        } else {
+
+            # TRANSACTION_ID,.... tr_abc
+
+            $payment = $this->getMolliePayment($molliePaymentId, (string)$salesChannelId);
+
+            if (in_array($payment->status, $allowed)) {
+                return $payment;
+            }
+
+            throw new PaymentNotFoundException($molliePaymentId);
+        }
     }
 }

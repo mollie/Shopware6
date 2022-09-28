@@ -189,7 +189,7 @@ class NotificationFacade
         $orderAttributes = new OrderAttributes($swOrder);
 
         $mollieOrderId = $orderAttributes->getMollieOrderId();
-
+        $molliePaymentId = $orderAttributes->getMolliePaymentId();
 
         $this->gatewayMollie->switchClient($swOrder->getSalesChannelId());
 
@@ -207,7 +207,7 @@ class NotificationFacade
 
             # subscriptions are automatically charged using a payment ID
             # so we do not have an order, but a payment instead
-            $molliePayment = $this->gatewayMollie->getPayment($orderAttributes->getMolliePaymentId());
+            $molliePayment = $this->gatewayMollie->getPayment($molliePaymentId);
             $status = $this->statusConverter->getMolliePaymentStatus($molliePayment);
         } else {
             throw new \Exception('Order is neither a Mollie order nor a subscription order: ' . $swOrder->getOrderNumber());
@@ -216,7 +216,8 @@ class NotificationFacade
         # --------------------------------------------------------------------------------------------
 
 
-        $this->logger->info('Webhook for order ' . $swOrder->getOrderNumber() . ' and Mollie ID: ' . $mollieOrderId . ' has been received with Status: ' . $status);
+        $logId = (!empty($mollieOrderId)) ? $mollieOrderId : $molliePaymentId;
+        $this->logger->info('Webhook for order ' . $swOrder->getOrderNumber() . ' and Mollie ID: ' . $logId . ' has been received with Status: ' . $status);
 
 
         $this->statusUpdater->updatePaymentStatus($swTransaction, $status, $context);
@@ -263,6 +264,7 @@ class NotificationFacade
         $this->orderService->updateMollieDataCustomFields(
             $swOrder,
             $mollieOrderId,
+            $molliePaymentId,
             $swTransaction->getId(),
             $context
         );

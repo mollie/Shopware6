@@ -145,6 +145,7 @@ class MolliePaymentFinalize
         $this->orderService->updateMollieDataCustomFields(
             $order,
             $mollieOrderId,
+            '',
             $transactionStruct->getOrderTransaction()->getId(),
             $salesChannelContext->getContext()
         );
