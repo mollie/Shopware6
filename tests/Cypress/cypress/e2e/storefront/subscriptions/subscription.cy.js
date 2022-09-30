@@ -261,4 +261,5 @@ function assertAvailablePaymentMethods() {
     cy.contains('Belfius').should('exist');
     cy.contains('Giropay').should('exist');
     cy.contains('PayPal').should('exist');
+    cy.contains('SEPA Direct Debit').should('exist');
 }

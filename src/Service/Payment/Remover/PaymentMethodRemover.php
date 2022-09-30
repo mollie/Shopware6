@@ -5,13 +5,18 @@ namespace Kiener\MolliePayments\Service\Payment\Remover;
 use Kiener\MolliePayments\Exception\MissingCartServiceException;
 use Kiener\MolliePayments\Exception\MissingRequestException;
 use Kiener\MolliePayments\Exception\MissingRouteException;
+use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
+use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
+use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
+use Kiener\MolliePayments\Struct\Voucher\VoucherType;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -27,9 +32,10 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
     protected $container;
 
     /**
-     * @var SettingsService
+     * @var RequestStack
      */
-    protected $settingsService;
+    protected $requestStack;
+
 
     /**
      * @var OrderService
@@ -37,9 +43,14 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
     protected $orderService;
 
     /**
-     * @var RequestStack
+     * @var SettingsService
      */
-    protected $requestStack;
+    protected $settingsService;
+
+    /**
+     * @var OrderDataExtractor
+     */
+    private $orderDataExtractor;
 
     /**
      * @var LoggerInterface
@@ -48,19 +59,22 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
 
     /**
      * @param ContainerInterface $container
-     * @param SettingsService    $settingsService
-     * @param OrderService       $orderService
-     * @param RequestStack       $requestStack
-     * @param LoggerInterface    $logger
+     * @param RequestStack $requestStack
+     * @param OrderService $orderService
+     * @param SettingsService $settingsService
+     * @param OrderDataExtractor $orderDataExtractor
+     * @param LoggerInterface $logger
      */
-    public function __construct(ContainerInterface $container, RequestStack $requestStack, OrderService $orderService, SettingsService $settingsService, LoggerInterface $logger)
+    public function __construct(ContainerInterface $container, RequestStack $requestStack, OrderService $orderService, SettingsService $settingsService, OrderDataExtractor $orderDataExtractor, LoggerInterface $logger)
     {
         $this->container = $container;
         $this->requestStack = $requestStack;
         $this->orderService = $orderService;
         $this->settingsService = $settingsService;
+        $this->orderDataExtractor = $orderDataExtractor;
         $this->logger = $logger;
     }
+
 
     /**
      * @return bool
@@ -93,9 +107,9 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
 
     /**
      * @param string $route
-     * @throws MissingRequestException
-     * @throws MissingRouteException
      * @return bool
+     * @throws MissingRouteException
+     * @throws MissingRequestException
      */
     public function isCartRoute(string $route = ""): bool
     {
@@ -108,8 +122,8 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
 
     /**
      * @param SalesChannelContext $context
-     * @throws MissingCartServiceException
      * @return Cart
+     * @throws MissingCartServiceException
      */
     public function getCart(SalesChannelContext $context): Cart
     {
@@ -120,8 +134,8 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
      * We have to use lazy loading for this. Otherwise, there are plugin compatibilities
      * with a circular reference...even though XML looks fine.
      *
-     * @throws MissingCartServiceException
      * @return CartService
+     * @throws MissingCartServiceException
      */
     protected function getCartServiceLazy(): CartService
     {
@@ -136,9 +150,9 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
 
     /**
      * @param string $route
-     * @throws MissingRequestException
-     * @throws MissingRouteException
      * @return bool
+     * @throws MissingRouteException
+     * @throws MissingRequestException
      */
     public function isOrderRoute(string $route = ""): bool
     {
@@ -151,10 +165,10 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
 
     /**
      * @param Context $context
-     * @throws BadRequestException
+     * @return OrderEntity
      * @throws MissingRequestException
      * @throws OrderNotFoundException
-     * @return OrderEntity
+     * @throws BadRequestException
      */
     public function getOrder(Context $context): OrderEntity
     {
@@ -169,8 +183,8 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
     }
 
     /**
-     * @throws MissingRequestException
      * @return Request
+     * @throws MissingRequestException
      */
     protected function getRequestFromStack(): Request
     {
@@ -184,9 +198,9 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
     }
 
     /**
-     * @throws MissingRequestException
-     * @throws MissingRouteException
      * @return string
+     * @throws MissingRouteException
+     * @throws MissingRequestException
      */
     protected function getRouteFromRequest(): string
     {
@@ -200,4 +214,65 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
 
         throw new MissingRouteException($request);
     }
+
+
+    /**
+     * @param Cart $cart
+     * @return bool
+     */
+    protected function isSubscriptionCart(Cart $cart): bool
+    {
+        foreach ($cart->getLineItems() as $lineItem) {
+            $attribute = new LineItemAttributes($lineItem);
+
+            if ($attribute->isSubscriptionProduct()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param OrderEntity $order
+     * @param Context $context
+     * @return bool
+     */
+    protected function isSubscriptionOrder(OrderEntity $order, Context $context): bool
+    {
+        $lineItems = $this->orderDataExtractor->extractLineItems($order, $context);
+
+        /** @var OrderLineItemEntity $lineItem */
+        foreach ($lineItems as $lineItem) {
+            $attributes = new OrderLineItemEntityAttributes($lineItem);
+
+            if ($attributes->isSubscriptionProduct()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param OrderEntity $order
+     * @param Context $context
+     * @return bool
+     */
+    protected function isVoucherOrder(OrderEntity $order, Context $context): bool
+    {
+        $lineItems = $this->orderDataExtractor->extractLineItems($order, $context);
+
+        /** @var OrderLineItemEntity $lineItem */
+        foreach ($lineItems as $lineItem) {
+            $attributes = new OrderLineItemEntityAttributes($lineItem);
+
+            if (VoucherType::isVoucherProduct($attributes->getVoucherType())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 }

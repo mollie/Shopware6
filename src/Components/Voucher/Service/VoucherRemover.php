@@ -27,10 +27,6 @@ class VoucherRemover extends PaymentMethodRemover
      */
     private $voucherService;
 
-    /**
-     * @var OrderDataExtractor
-     */
-    private $orderDataExtractor;
 
     /**
      * @param ContainerInterface $container
@@ -43,10 +39,9 @@ class VoucherRemover extends PaymentMethodRemover
      */
     public function __construct(ContainerInterface $container, RequestStack $requestStack, OrderService $orderService, SettingsService $settingsService, VoucherService $voucherService, OrderDataExtractor $orderDataExtractor, LoggerInterface $logger)
     {
-        parent::__construct($container, $requestStack, $orderService, $settingsService, $logger);
+        parent::__construct($container, $requestStack, $orderService, $settingsService, $orderDataExtractor, $logger);
 
         $this->voucherService = $voucherService;
-        $this->orderDataExtractor = $orderDataExtractor;
     }
 
     /**
@@ -85,24 +80,4 @@ class VoucherRemover extends PaymentMethodRemover
         return $originalData;
     }
 
-    /**
-     * @param OrderEntity $order
-     * @param Context $context
-     * @return bool
-     */
-    private function isVoucherOrder(OrderEntity $order, Context $context): bool
-    {
-        $lineItems = $this->orderDataExtractor->extractLineItems($order, $context);
-
-        /** @var OrderLineItemEntity $lineItem */
-        foreach ($lineItems as $lineItem) {
-            $attributes = new OrderLineItemEntityAttributes($lineItem);
-
-            if (VoucherType::isVoucherProduct($attributes->getVoucherType())) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 }
