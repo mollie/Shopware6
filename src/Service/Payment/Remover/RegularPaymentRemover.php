@@ -39,35 +39,20 @@ class RegularPaymentRemover extends PaymentMethodRemover
         }
 
         foreach ($originalData->getPaymentMethods() as $key => $paymentMethod) {
-
             $attributes = new PaymentMethodAttributes($paymentMethod);
 
-            # if we have SEPA Direct Debit in the list
-            # then only allow it, if we have subscription products
+            # SEPA Direct Debit is only allowed when the customer updates a running subscription.
+            # this means, in our plugin, it's not allowed anymore
             if ($attributes->getMollieIdentifier() === PaymentMethod::DIRECTDEBIT) {
+                $originalData->getPaymentMethods()->remove($key);
+            }
 
-                if (!$this->hasSubscriptionData($context)) {
-                    $originalData->getPaymentMethods()->remove($key);
-                }
+            # ING HomePay is deprecated
+            if ($attributes->getMollieIdentifier() === PaymentMethod::INGHOMEPAY) {
+                $originalData->getPaymentMethods()->remove($key);
             }
         }
 
         return $originalData;
     }
-
-    /**
-     * @param SalesChannelContext $context
-     * @return bool
-     */
-    private function hasSubscriptionData(SalesChannelContext $context): bool
-    {
-        if ($this->isOrderRoute()) {
-            $order = $this->getOrder($context->getContext());
-            return $this->isSubscriptionOrder($order, $context->getContext());
-        } else {
-            $cart = $this->getCart($context);
-            return $this->isSubscriptionCart($cart);
-        }
-    }
-
 }

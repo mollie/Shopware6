@@ -52,8 +52,8 @@ class SubscriptionRemover extends PaymentMethodRemover
     /**
      * @param PaymentMethodRouteResponse $originalData
      * @param SalesChannelContext $context
-     * @return PaymentMethodRouteResponse
      * @throws \Exception
+     * @return PaymentMethodRouteResponse
      */
     public function removePaymentMethods(PaymentMethodRouteResponse $originalData, SalesChannelContext $context): PaymentMethodRouteResponse
     {
@@ -93,5 +93,4 @@ class SubscriptionRemover extends PaymentMethodRemover
 
         return $originalData;
     }
-
 }

@@ -48,8 +48,8 @@ class MollieLimitsRemover extends PaymentMethodRemover
     /**
      * @param PaymentMethodRouteResponse $originalData
      * @param SalesChannelContext $context
-     * @return PaymentMethodRouteResponse
      * @throws Exception
+     * @return PaymentMethodRouteResponse
      */
     public function removePaymentMethods(PaymentMethodRouteResponse $originalData, SalesChannelContext $context): PaymentMethodRouteResponse
     {

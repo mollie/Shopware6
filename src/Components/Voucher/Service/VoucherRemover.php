@@ -79,5 +79,4 @@ class VoucherRemover extends PaymentMethodRemover
 
         return $originalData;
     }
-
 }

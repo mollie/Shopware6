@@ -90,7 +90,6 @@ class PaymentMethodServiceTest extends TestCase
             BankTransferPayment::class,
             BelfiusPayment::class,
             CreditCardPayment::class,
-            DirectDebitPayment::class,
             EpsPayment::class,
             GiftCardPayment::class,
             GiroPayPayment::class,
