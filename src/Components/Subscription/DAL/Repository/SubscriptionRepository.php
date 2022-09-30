@@ -68,8 +68,12 @@ class SubscriptionRepository
     {
         $criteria = new Criteria();
 
-        return $this->repoSubscriptions->search($criteria, $context);
+        /** @var EntitySearchResult<SubscriptionEntity> $result */
+        $result = $this->repoSubscriptions->search($criteria, $context);
+
+        return $result;
     }
+
 
     /**
      * @param int $daysOffset
@@ -98,7 +102,10 @@ class SubscriptionRepository
         # payment has to be in the future
         $criteria->addFilter(new RangeFilter('nextPaymentAt', ['gte' => $today->format('Y-m-d H:i:s')]));
 
-        return $this->repoSubscriptions->search($criteria, $context);
+        /** @var EntitySearchResult<SubscriptionEntity> $result */
+        $result = $this->repoSubscriptions->search($criteria, $context);
+
+        return $result;
     }
 
     /**
@@ -114,7 +121,10 @@ class SubscriptionRepository
         $criteria->addFilter(new EqualsFilter('orderId', $orderId));
         $criteria->addFilter(new EqualsFilter('mollieId', null));
 
-        return $this->repoSubscriptions->search($criteria, $context);
+        /** @var EntitySearchResult<SubscriptionEntity> $result */
+        $result = $this->repoSubscriptions->search($criteria, $context);
+
+        return $result;
     }
 
     #endregion

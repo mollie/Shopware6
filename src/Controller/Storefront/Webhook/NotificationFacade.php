@@ -308,7 +308,10 @@ class NotificationFacade
         $criteria->addAssociation('paymentMethod');
         $criteria->addSorting(new FieldSorting('createdAt'));
 
-        return $this->repoOrderTransactions->search($criteria, $context);
+        /** @var EntitySearchResult<OrderTransactionEntity> $result */
+        $result = $this->repoOrderTransactions->search($criteria, $context);
+
+        return $result;
     }
 
     /**

@@ -6,6 +6,7 @@ use Mollie\Api\Types\OrderLineType;
 use Shopware\Core\Framework\Struct\StructCollection;
 
 /**
+ * @extends StructCollection<MollieLineItem>
  * @method void                add(MollieLineItem $entity)
  * @method void                set(string $key, MollieLineItem $entity)
  * @method MollieLineItem[]    getIterator()

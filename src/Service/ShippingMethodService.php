@@ -38,12 +38,14 @@ class ShippingMethodService
      */
     public function getShippingMethodById(string $shippingMethodId, SalesChannelContext $salesChannelContext): ?ShippingMethodEntity
     {
-        $criteria = (new Criteria([$shippingMethodId]))
-            ->addAssociation('prices');
+        $criteria = (new Criteria([$shippingMethodId]))->addAssociation('prices');
 
-        return $this->shippingMethodRepository
-            ->search($criteria, $salesChannelContext->getContext())
-            ->get($shippingMethodId);
+        $result = $this->shippingMethodRepository->search($criteria, $salesChannelContext->getContext());
+
+        /** @var null|ShippingMethodEntity $element */
+        $element = $result->get($shippingMethodId);
+
+        return $element;
     }
 
     /**

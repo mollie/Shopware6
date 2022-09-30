@@ -46,9 +46,11 @@ class ProductService
     {
         $criteria = new Criteria([$productId]);
 
-        return $this->getRepository()->search(
-            $criteria,
-            $context ?? Context::createDefaultContext()
-        )->get($productId);
+        $result = $this->getRepository()->search($criteria, $context ?? Context::createDefaultContext());
+
+        /** @var null|ProductEntity $product */
+        $product = $result->get($productId);
+
+        return $product;
     }
 }
