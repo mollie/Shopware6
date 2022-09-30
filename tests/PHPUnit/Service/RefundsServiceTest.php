@@ -9,6 +9,7 @@ use Kiener\MolliePayments\Hydrator\RefundHydrator;
 use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\MollieApi\Order as MollieOrderApi;
 use Kiener\MolliePayments\Service\MollieApi\Payment as MolliePaymentApi;
+use Kiener\MolliePayments\Service\MollieApi\RequestAnonymizer\MollieRequestAnonymizer;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\Refund\RefundService;
 use Kiener\MolliePayments\Service\Router\RoutingBuilder;
@@ -77,12 +78,13 @@ class RefundsServiceTest extends TestCase
             $apiFactoryMock,
             $paymentApiService,
             $routingBuilder,
+            new MollieRequestAnonymizer('*'),
             new NullLogger()
         );
 
 
-        $mollieOrderApiMock = new MollieOrderApi($apiFactoryMock, $paymentApiService, $routingBuilder, $loggerServiceMock);
-        $mollieOrderApiMock = new MollieOrderApi($apiFactoryMock, $paymentApiService, $routingBuilder, $loggerServiceMock);
+        $mollieOrderApiMock = new MollieOrderApi($apiFactoryMock, $paymentApiService, $routingBuilder, new MollieRequestAnonymizer('*'), $loggerServiceMock);
+        $mollieOrderApiMock = new MollieOrderApi($apiFactoryMock, $paymentApiService, $routingBuilder, new MollieRequestAnonymizer('*'), $loggerServiceMock);
 
 
         $this->refundService = new RefundService(

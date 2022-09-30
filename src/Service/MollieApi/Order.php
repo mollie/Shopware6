@@ -8,7 +8,9 @@ use Kiener\MolliePayments\Exception\MollieOrderExpiredException;
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\PaymentHandler;
+use Kiener\MolliePayments\Service\MollieApi\Payment as MolliePayment;
 use Kiener\MolliePayments\Service\MollieApi\Payment as PaymentApiService;
+use Kiener\MolliePayments\Service\MollieApi\RequestAnonymizer\MollieRequestAnonymizer;
 use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Order as MollieOrder;
@@ -42,17 +44,30 @@ class Order
     private $routingBuilder;
 
     /**
+     * @var MollieRequestAnonymizer
+     */
+    private $requestAnonymizer;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
 
 
-    public function __construct(MollieApiFactory $clientFactory, PaymentApiService $paymentApiService, RoutingBuilder $routingBuilder, LoggerInterface $logger)
+    /**
+     * @param MollieApiFactory $clientFactory
+     * @param MolliePayment $paymentApiService
+     * @param RoutingBuilder $routingBuilder
+     * @param MollieRequestAnonymizer $requestAnonymizer
+     * @param LoggerInterface $logger
+     */
+    public function __construct(MollieApiFactory $clientFactory, PaymentApiService $paymentApiService, RoutingBuilder $routingBuilder, MollieRequestAnonymizer $requestAnonymizer, LoggerInterface $logger)
     {
         $this->clientFactory = $clientFactory;
         $this->logger = $logger;
         $this->paymentApiService = $paymentApiService;
         $this->routingBuilder = $routingBuilder;
+        $this->requestAnonymizer = $requestAnonymizer;
     }
 
     /**
@@ -139,6 +154,15 @@ class Order
          * Create an order at Mollie based on the prepared array of order data.
          */
         try {
+            $anonymizedData = $this->requestAnonymizer->anonymize($orderData);
+
+            $this->logger->debug(
+                'Mollie Order Request',
+                [
+                    'body' => $anonymizedData
+                ]
+            );
+
             return $apiClient->orders->create($orderData);
         } catch (ApiException $e) {
             $this->logger->critical(
