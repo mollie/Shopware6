@@ -43,6 +43,7 @@ class VoucherFixture extends Fixture
     {
         return [
             'mollie',
+            'mollie-demodata',
         ];
     }
 

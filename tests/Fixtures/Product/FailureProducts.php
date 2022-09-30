@@ -43,6 +43,7 @@ class FailureProducts extends Fixture
     {
         return [
             'mollie',
+            'mollie-demodata',
         ];
     }
 

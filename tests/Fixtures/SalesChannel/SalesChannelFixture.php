@@ -8,6 +8,7 @@ use Basecom\FixturePlugin\FixtureBag;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 
 
 class SalesChannelFixture extends Fixture
@@ -42,6 +43,7 @@ class SalesChannelFixture extends Fixture
     {
         return [
             'mollie',
+            'mollie-setup',
         ];
     }
 
@@ -57,7 +59,34 @@ class SalesChannelFixture extends Fixture
         # of the specific sales channels
         $salesChannelIds = $this->repoSalesChannels->searchIds(new Criteria([]), $ctx)->getIds();
 
+        $this->activatePaymentMethods($ctx);
         $this->assignPaymentMethods($salesChannelIds, $ctx);
+    }
+
+    /**
+     * @param array<mixed> $salesChannelIds
+     * @param Context $ctx
+     * @return void
+     */
+    private function activatePaymentMethods(Context $ctx): void
+    {
+        $paymentUpdates = [];
+
+        $mollieCriteria = new Criteria();
+        $mollieCriteria->addFilter(
+            new ContainsFilter('handlerIdentifier', 'MolliePayments')
+        );
+
+        $molliePaymentMethodIds = $this->repoPaymentMethods->searchIds($mollieCriteria, $ctx)->getIds();
+
+        foreach ($molliePaymentMethodIds as $id) {
+            $paymentUpdates[] = [
+                'id' => $id,
+                'active' => true,
+            ];
+        }
+
+        $this->repoPaymentMethods->update($paymentUpdates, $ctx);
     }
 
     /**
@@ -89,6 +118,5 @@ class SalesChannelFixture extends Fixture
 
         $this->repoSalesChannels->update($paymentUpdates, $ctx);
     }
-
 
 }

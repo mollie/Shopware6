@@ -44,6 +44,7 @@ class CategoryFixture extends Fixture
     {
         return [
             'mollie',
+            'mollie-demodata',
         ];
     }
 

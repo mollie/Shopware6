@@ -43,6 +43,7 @@ class SubscriptionFixture extends Fixture
     {
         return [
             'mollie',
+            'mollie-demodata',
         ];
     }
 

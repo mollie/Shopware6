@@ -49,6 +49,7 @@ class CustomerFixture extends Fixture
     {
         return [
             'mollie',
+            'mollie-demodata',
         ];
     }
 
