@@ -76,20 +76,13 @@ class SubscriptionRepository
 
 
     /**
-     * @param int $daysOffset
      * @param string $salesChannelId
      * @param Context $context
      * @throws \Exception
      * @return EntitySearchResult<SubscriptionEntity>
      */
-    public function findByReminderRangeReached(int $daysOffset, string $salesChannelId, Context $context): EntitySearchResult
+    public function findByReminderRangeReached(string $salesChannelId, Context $context): EntitySearchResult
     {
-        # let's use our current date and remove the
-        # provided number of offset days.
-        # the final result is the days in advance
-        $interval = new \DateInterval('P' . $daysOffset . 'D');
-        $prepaymentDate = (new \DateTimeImmutable)->sub($interval);
-
         $today = (new \DateTimeImmutable);
 
         $criteria = new Criteria();

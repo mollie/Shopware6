@@ -331,7 +331,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
 
             $daysOffset = $settings->getSubscriptionsReminderDays();
 
-            $availableSubscriptions = $this->repoSubscriptions->findByReminderRangeReached($daysOffset, $salesChannel->getId(), $context);
+            $availableSubscriptions = $this->repoSubscriptions->findByReminderRangeReached($salesChannel->getId(), $context);
 
             /** @var SubscriptionEntity $subscription */
             foreach ($availableSubscriptions->getElements() as $subscription) {
