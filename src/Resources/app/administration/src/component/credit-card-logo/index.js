@@ -15,10 +15,31 @@ Component.register('mollie-credit-card-logo', {
         },
     },
 
+    methods: {
+        getImageNameForCreditcard(creditcard) {
+            switch (creditcard) {
+                case 'American Express':
+                    return 'amex'
+                case 'Carta Si':
+                    return 'cartasi'
+                case 'Carte Bleue':
+                    return 'cartebancaire'
+                case 'Maestro':
+                    return 'maestro'
+                case 'Mastercard':
+                    return 'mastercard'
+                case 'Visa':
+                    return 'visa'
+                default:
+                    return 'creditcard'
+            }
+        },
+    },
+
     computed: {
         creditCardComponentName() {
             const prefix = 'mollie-credit-card-logo-';
-            const creditCardCompany = this.creditCardCompany.toLowerCase();
+            const creditCardCompany = this.getImageNameForCreditcard(this.creditCardCompany);
             return `${prefix}${creditCardCompany}`;
         },
     },
