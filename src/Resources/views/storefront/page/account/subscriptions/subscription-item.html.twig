@@ -101,6 +101,7 @@
                                         {% block page_account_subscriptions_item_context_menu_update_payment_form %}
                                             <form action="{{ path('frontend.account.mollie.subscriptions.payment.update', { 'subscriptionId': subscription.id }) }}"
                                                   method="post"
+                                                  data-form-csrf-handler="true"
                                                   class="order-table-header-context-menu-content-form">
                                                 {% block page_account_subscriptions_item_context_menu_update_payment_form_csrf %}
                                                     {{ sw_csrf('frontend.account.mollie.subscriptions.payment.update') }}
@@ -129,7 +130,9 @@
                                     {% if(subscription.isActive) %}
                                         {% block page_account_subscriptions_item_context_menu_cancel_form %}
                                             <form action="{{ cancelAction }}"
-                                                  id="subscriptionsDetailForm-{{ subscriptions.Id }}" method="post">
+                                                  data-form-csrf-handler="true"
+                                                  id="subscriptionsDetailForm-{{ subscriptions.Id }}"
+                                                  method="post">
 
                                                 {% block page_account_subscriptions_item_context_menu_cancel_form_csrf %}
                                                     {{ sw_csrf('frontend.account.mollie.subscriptions.cancel') }}
@@ -292,6 +295,7 @@
                                                                                                     <div class="card-body">
                                                                                                         {% block component_address_subscription_billing_address_form %}
                                                                                                             <form method="post"
+                                                                                                                  data-form-csrf-handler="true"
                                                                                                                   action="{{ path('frontend.account.mollie.subscriptions.billing.update',
                                                                                                                       {
                                                                                                                           'subscriptionId': subscription.id,
@@ -440,6 +444,7 @@
                                                                                                     <div class="card-body">
                                                                                                         {% block component_address_subscription_shipping_address_form %}
                                                                                                             <form method="post"
+                                                                                                                  data-form-csrf-handler="true"
                                                                                                                   action="{{ path('frontend.account.mollie.subscriptions.shipping.update',
                                                                                                                       {
                                                                                                                           'subscriptionId': subscription.id,
