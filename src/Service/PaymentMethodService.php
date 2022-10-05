@@ -371,12 +371,10 @@ class PaymentMethodService
             BankTransferPayment::class,
             BelfiusPayment::class,
             CreditCardPayment::class,
-            DirectDebitPayment::class,
             EpsPayment::class,
             GiftCardPayment::class,
             GiroPayPayment::class,
             iDealPayment::class,
-            // IngHomePayPayment::class, // not allowed anymore
             KbcPayment::class,
             KlarnaPayLaterPayment::class,
             KlarnaPayNowPayment::class,
@@ -387,6 +385,8 @@ class PaymentMethodService
             SofortPayment::class,
             VoucherPayment::class,
             In3Payment::class
+            // IngHomePayPayment::class, // not allowed anymore
+            // DirectDebitPayment::class, // only allowed when updating subsriptions, aka => not allowed anymore
         ];
     }
 

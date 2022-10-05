@@ -155,6 +155,7 @@ export default class ShopConfigurationAction {
             "MolliePayments.config.orderStateWithAFailedTransaction": 'open',
             "MolliePayments.config.orderStateWithACancelledTransaction": 'cancelled',
             // ------------------------------------------------------------------
+            "MolliePayments.config.subscriptionsEnabled": true,
             "MolliePayments.config.subscriptionsShowIndicator": subscriptionIndicator,
         };
 

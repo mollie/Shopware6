@@ -27,6 +27,7 @@ class PaymentMethodRemoverTest extends TestCase
             'belfius',
             'creditcard',
             'paypal',
+            'directdebit',
         ];
 
         $this->assertEquals($expected, SubscriptionRemover::ALLOWED_METHODS);

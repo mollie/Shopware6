@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Components\MollieLimits\Service;
 use Exception;
 use Kiener\MolliePayments\Exception\MissingCartServiceException;
 use Kiener\MolliePayments\Exception\MissingRequestException;
+use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\Payment\Provider\ActivePaymentMethodsProviderInterface;
 use Kiener\MolliePayments\Service\Payment\Remover\PaymentMethodRemover;
@@ -27,24 +28,26 @@ class MollieLimitsRemover extends PaymentMethodRemover
      */
     private $paymentMethodsProvider;
 
+
     /**
-     * @param ContainerInterface                    $container
-     * @param RequestStack                          $requestStack
-     * @param OrderService                          $orderService
-     * @param SettingsService                       $settingsService
+     * @param ContainerInterface $container
+     * @param RequestStack $requestStack
+     * @param OrderService $orderService
+     * @param SettingsService $settingsService
      * @param ActivePaymentMethodsProviderInterface $paymentMethodsProvider
-     * @param LoggerInterface                       $logger
+     * @param OrderDataExtractor $orderDataExtractor
+     * @param LoggerInterface $logger
      */
-    public function __construct(ContainerInterface $container, RequestStack $requestStack, OrderService $orderService, SettingsService $settingsService, ActivePaymentMethodsProviderInterface $paymentMethodsProvider, LoggerInterface $logger)
+    public function __construct(ContainerInterface $container, RequestStack $requestStack, OrderService $orderService, SettingsService $settingsService, ActivePaymentMethodsProviderInterface $paymentMethodsProvider, OrderDataExtractor $orderDataExtractor, LoggerInterface $logger)
     {
-        parent::__construct($container, $requestStack, $orderService, $settingsService, $logger);
+        parent::__construct($container, $requestStack, $orderService, $settingsService, $orderDataExtractor, $logger);
 
         $this->paymentMethodsProvider = $paymentMethodsProvider;
     }
 
     /**
      * @param PaymentMethodRouteResponse $originalData
-     * @param SalesChannelContext        $context
+     * @param SalesChannelContext $context
      * @throws Exception
      * @return PaymentMethodRouteResponse
      */

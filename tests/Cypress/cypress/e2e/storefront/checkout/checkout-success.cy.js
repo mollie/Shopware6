@@ -51,7 +51,6 @@ const payments = [
     {caseId: 'C4125', key: 'przelewy24', name: 'Przelewy24'},
     {caseId: 'C4126', key: 'kbc', name: 'KBC'},
     {caseId: 'C4128', key: 'banktransfer', name: 'Banktransfer'},
-    {caseId: 'C4131', key: 'directdebit', name: 'SEPA Direct Debit'},
     {caseId: 'C4127', key: 'belfius', name: 'Belfius'},
     {caseId: 'C4121', key: 'giftcard', name: 'Gift cards'},
     {caseId: 'C4143', key: 'voucher', name: 'Voucher'},
