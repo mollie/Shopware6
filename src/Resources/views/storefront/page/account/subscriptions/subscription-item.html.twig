@@ -99,7 +99,7 @@
                                 {% block page_account_subscriptions_item_context_menu_update_payment %}
                                     {% if(subscription.isActive) %}
                                         {% block page_account_subscriptions_item_context_menu_update_payment_form %}
-                                            <form action="{{ path('frontend.account.mollie.subscriptions.payment.update', { 'subscriptionId': subscription.id }) }}"
+                                            <form action="{{ path('frontend.account.mollie.subscriptions.payment.update', { 'swSubscriptionId': subscription.id }) }}"
                                                   method="post"
                                                   data-form-csrf-handler="true"
                                                   class="order-table-header-context-menu-content-form">
