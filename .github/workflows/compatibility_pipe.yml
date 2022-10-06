@@ -20,7 +20,7 @@ on:
 jobs:
 
   e2e:
-    name: Plugin v${{ matrix.plugin }} | Shopware ${{ matrix.shopware }}
+    name: Plugin v${{ matrix.plugin }} | Shopware ${{ github.event.inputs.swVersion }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
