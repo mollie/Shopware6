@@ -69,7 +69,11 @@ jobs:
         run: cd tests/Cypress && make install -B
 
       - name: Start Cypress
-        run: cd tests/Cypress && make run shopware=${{ github.event.inputs.swVersion }} url=https://local.mollie.shop storeApiKey=SWSCOVFSNKLBYUTKS1VSOEDTUQ
+        run: |
+          # SEPA Direct Debit has been completely removed from Mollie. 
+          # So we have to remove that entry from the tests in old Cypress versions
+          sed -i "" "/key: 'directdebit'/d" ./tests/Cypress/cypress/e2e/storefront/checkout/checkout-success.cy.js
+          cd tests/Cypress && make run shopware=${{ github.event.inputs.swVersion }} url=https://local.mollie.shop storeApiKey=SWSCOVFSNKLBYUTKS1VSOEDTUQ
 
       - name: Download Logs
         if: ${{ always() }}
