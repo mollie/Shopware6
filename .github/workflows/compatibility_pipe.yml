@@ -72,9 +72,8 @@ jobs:
         run: |
           # SEPA Direct Debit has been completely removed from Mollie. 
           # So we have to remove that entry from the tests in old Cypress versions
-          ls -la tests/Cypress/cypress/e2e/storefront/checkout/
-          cat tests/Cypress/cypress/e2e/storefront/checkout/checkout-success.cy.js
-          sed -i "" "/key: 'directdebit'/d" tests/Cypress/cypress/e2e/storefront/checkout/checkout-success.cy.js
+          sed -i "" "/directdebit/d" tests/Cypress/cypress/integration/storefront/checkout/checkout-success.spec.js | true;
+          sed -i "" "/directdebit/d" tests/Cypress/cypress/e2e/storefront/checkout/checkout-success.cy.js | true;
           cd tests/Cypress && make run shopware=${{ github.event.inputs.swVersion }} url=https://local.mollie.shop storeApiKey=SWSCOVFSNKLBYUTKS1VSOEDTUQ
 
       - name: Download Logs
