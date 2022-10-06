@@ -21,7 +21,6 @@ jobs:
 
   e2e:
     name: Plugin v${{ matrix.plugin }} | Shopware ${{ matrix.shopware }}
-    needs: integration
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
