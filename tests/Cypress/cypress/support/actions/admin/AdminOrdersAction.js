@@ -34,8 +34,9 @@ export default class AdminOrdersAction {
      *
      */
     openRefundManager() {
+        cy.wait(1000);
         // forceClick because if a Shopware update exists, that dialog is above our button
-        repoOrdersDetails.getMollieActionsButton().click({force: true});
+        repoOrdersDetails.getMollieActionsButton().click({force: true, waitForAnimations: false});
         cy.wait(2000);
         repoOrdersDetails.getMollieRefundManagerButton().click();
         // here are automatic reloads and things as it seems

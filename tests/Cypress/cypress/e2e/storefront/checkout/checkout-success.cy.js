@@ -32,7 +32,7 @@ const mollieGiftCards = new GiftCardsScreenAction();
 const molliePaymentMethods = new PaymentMethodsScreenAction();
 
 
-const scenarioDummyBasket = new DummyBasketScenario(2);
+const scenarioDummyBasket = new DummyBasketScenario(4);
 
 
 const device = devices.getFirstDevice();
