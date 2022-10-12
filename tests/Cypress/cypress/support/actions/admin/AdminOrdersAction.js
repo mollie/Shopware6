@@ -34,7 +34,8 @@ export default class AdminOrdersAction {
      *
      */
     openRefundManager() {
-        repoOrdersDetails.getMollieActionsButton().click();
+        // forceClick because if a Showare update exists, that dialog is above our button
+        repoOrdersDetails.getMollieActionsButton().click({force: true});
         cy.wait(2000);
         repoOrdersDetails.getMollieRefundManagerButton().click();
         // here are automatic reloads and things as it seems
