@@ -1,4 +1,6 @@
 name: Compatibility Pipeline
+run-name: Shopware ${{ github.event.inputs.swVersion }}, PHP ${{ github.event.inputs.phpVersion }}
+
 
 
 on:
