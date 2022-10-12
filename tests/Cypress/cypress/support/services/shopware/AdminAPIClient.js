@@ -140,6 +140,7 @@ export default class AdminAPIClient {
                     },
                     url,
                     method,
+                    timeout: 10000,
                     params,
                     data
                 };
@@ -167,7 +168,7 @@ export default class AdminAPIClient {
         return new Promise((resolve, reject) => {
             this._getCachedToken().then((token) => {
                 if (token !== undefined && token !== null) {
-                    console.log("reuse Access Token: " + token);
+                    console.log("Use existing Access Token: " + token);
                     resolve(token);
                     return;
                 }
