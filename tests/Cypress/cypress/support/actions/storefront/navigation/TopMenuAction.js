@@ -14,8 +14,8 @@ export default class TopMenuAction {
     /**
      *
      */
-    clickOnClothing() {
-        repo.getClothingMenuItem().click();
+    clickOnSecondCategory() {
+        repo.getSecondMenuItem().click();
     }
 
     /**

@@ -34,7 +34,7 @@ export default class AdminOrdersAction {
      *
      */
     openRefundManager() {
-        // forceClick because if a Showare update exists, that dialog is above our button
+        // forceClick because if a Shopware update exists, that dialog is above our button
         repoOrdersDetails.getMollieActionsButton().click({force: true});
         cy.wait(2000);
         repoOrdersDetails.getMollieRefundManagerButton().click();

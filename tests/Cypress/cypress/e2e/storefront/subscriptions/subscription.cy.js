@@ -87,7 +87,7 @@ describe('Subscription', () => {
                 cy.wait(2000);
 
                 cy.visit('/');
-                topMenu.clickOnClothing();
+                topMenu.clickOnSecondCategory();
                 listing.clickOnFirstProduct();
 
                 // we have to see the subscription indicator
@@ -104,7 +104,7 @@ describe('Subscription', () => {
 
                 cy.visit('/');
 
-                topMenu.clickOnClothing();
+                topMenu.clickOnSecondCategory();
                 listing.clickOnFirstProduct();
 
                 cy.contains('Subscription product').should('not.exist');
@@ -119,7 +119,7 @@ describe('Subscription', () => {
 
                 cy.visit('/');
 
-                topMenu.clickOnClothing();
+                topMenu.clickOnSecondCategory();
                 listing.clickOnFirstProduct();
 
                 // we have to see the subscription indicator
@@ -205,7 +205,7 @@ describe('Subscription', () => {
 
                 cy.visit('/');
 
-                topMenu.clickOnClothing();
+                topMenu.clickOnSecondCategory();
                 listing.clickOnFirstProduct();
 
                 cy.contains('.btn', 'Subscribe');

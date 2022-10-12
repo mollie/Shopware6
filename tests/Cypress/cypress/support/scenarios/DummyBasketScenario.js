@@ -52,7 +52,7 @@ export default class DummyBasketScenario {
         // just refresh
         cy.visit('/');
 
-        topMenu.clickOnClothing();
+        topMenu.clickOnSecondCategory();
 
         listing.clickOnFirstProduct();
 

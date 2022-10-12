@@ -185,7 +185,7 @@ describe('Apple Pay Direct - UI Tests', () => {
                 applePayFactory.registerApplePay(true);
 
                 cy.visit('/');
-                topMenu.clickOnClothing();
+                topMenu.clickOnSecondCategory();
                 listing.clickOnFirstProduct();
 
                 repoPDP.getApplePayDirectButton().should('not.exist');
@@ -213,7 +213,7 @@ describe('Apple Pay Direct - UI Tests', () => {
                 applePayFactory.registerApplePay(true);
 
                 cy.visit('/');
-                topMenu.clickOnClothing();
+                topMenu.clickOnSecondCategory();
                 listing.clickOnFirstProduct();
 
                 repoPDP.getApplePayDirectButton().should('not.have.class', 'd-none');
@@ -224,7 +224,7 @@ describe('Apple Pay Direct - UI Tests', () => {
                 applePayFactory.registerApplePay(false);
 
                 cy.visit('/');
-                topMenu.clickOnClothing();
+                topMenu.clickOnSecondCategory();
                 listing.clickOnFirstProduct();
 
                 repoPDP.getApplePayDirectButton().should('have.class', 'd-none');
