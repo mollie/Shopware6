@@ -94,6 +94,7 @@ jobs:
           name: cypress_results_v${{ matrix.plugin }}
           retention-days: 1
           path: |
+            tests/Cypress/cypress/results
             tests/Cypress/cypress/logs
             tests/Cypress/cypress/videos
             tests/Cypress/cypress/screenshots

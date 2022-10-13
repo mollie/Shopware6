@@ -81,6 +81,7 @@ jobs:
           name: cypress_results_sw${{ github.event.inputs.swVersion }}_php${{ github.event.inputs.phpVersion }}
           retention-days: 1
           path: |
+            tests/Cypress/cypress/results
             tests/Cypress/cypress/logs
             tests/Cypress/cypress/videos
             tests/Cypress/cypress/screenshots
