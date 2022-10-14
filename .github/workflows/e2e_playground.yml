@@ -27,12 +27,19 @@ jobs:
         with:
           php-version: 7.4
 
-      - name: Mount NPM Admin Cache
-        id: cache-plugin
+      - name: Mount NPM Storefront Cache
+        id: cache-storefront
         uses: actions/cache@v3
         with:
-          key: cache-plugin
+          key: cache-storefront
           path: src/Resources/app/storefront/dist
+
+      - name: Mount Vendor Cache
+        id: cache-vendor
+        uses: actions/cache@v3
+        with:
+          key: cache-vendor
+          path: vendor
 
       - name: Install PROD Dependencies
         run: make install -B
@@ -75,14 +82,21 @@ jobs:
       - name: Clone Code
         uses: actions/checkout@v2
 
-      - name: Mount NPM Admin Cache
-        id: cache-plugin
+      - name: Mount NPM Storefront Cache
+        id: cache-storefront
         uses: actions/cache@v3
         with:
-          key: cache-plugin
+          key: cache-storefront
           path: src/Resources/app/storefront/dist
 
-      - name: Verify Build
+      - name: Mount Vendor Cache
+        id: cache-vendor
+        uses: actions/cache@v3
+        with:
+          key: cache-vendor
+          path: vendor
+
+      - name: Verify Cache
         run: |
           ls -la src/Resources/app/storefront/dist
 
