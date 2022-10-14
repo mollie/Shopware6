@@ -39,11 +39,14 @@ jobs:
 
       - name: Start Docker
         run: |
-          docker run --rm --name shop -v ${pwd}:/var/www/html/custom/plugins/MolliePayments -d dockware/dev:${{ github.event.inputs.swVersion }}
+          docker run --rm --name shop -d dockware/dev:${{ github.event.inputs.swVersion }}
           sleep 30
           docker logs shop
-          docker exec shop bash -c 'ls -la /var/www/html/custom/plugins'
-          docker exec shop bash -c 'ls -la /var/www/html/custom/plugins/MolliePayments'
+
+      - name: Upload into Docker
+        run: |
+          docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
+          docker exec shop bash -c 'sudo chown www-data:www-data /var/www/html/custom/plugins -R'
 
       - name: Install and Build Plugin
         run: |
@@ -51,6 +54,9 @@ jobs:
           docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make install'
           docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make build'
 
+      - name: Download from Docker
+        run: |
+          docker cp shop:/var/www/html/custom/plugins/MolliePayments/. $(pwd)/.
 
   e2e:
     name: E2E Tests | Shopware ${{ github.event.inputs.swVersion }}, PHP ${{ github.event.inputs.phpVersion }}
