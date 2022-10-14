@@ -29,12 +29,7 @@ module.exports = defineConfig({
             width: 1024,
             height: 768,
         },
-    ],
-    reporter: "junit",
-    reporterOptions: {
-        mochaFile: "cypress/results/junit.xml",
-        includePending: true
-    },
+    ], 
     e2e: {
         experimentalSessionAndOrigin: true,
         testIsolation: "strict",
