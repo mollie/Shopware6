@@ -10,23 +10,57 @@ on:
       phpVersion:
         description: 'PHP Version'
         required: true
-        options:
-          - 7.2
-          - 7.3
-          - 7.4
-          - 8.0
-          - 8.1
-
 
 jobs:
 
-  e2e:
-    name: E2E Tests | Shopware ${{ github.event.inputs.swVersion }}, PHP ${{ github.event.inputs.phpVersion }}
+  build:
+    name: Build Plugin
     runs-on: ubuntu-latest
     steps:
 
       - name: Clone Code
         uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+
+      - name: Mount NPM Admin Cache
+        id: cache-plugin
+        uses: actions/cache@v3
+        with:
+          key: cache-plugin
+          path: .
+
+      - name: Install PROD Dependencies
+        run: make install -B
+
+      - name: Start Docker
+        run: |
+          docker run --rm --name shop --v ${pwd}:/var/www/html/custom/plugins/MolliePayments -d dockware/dev:${{ github.event.inputs.swVersion }}
+          sleep 30
+          docker logs shop
+
+      - name: Install and Build Plugin
+        run: |
+          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make clean'
+          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make install'
+          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make build'
+
+
+  e2e:
+    name: E2E Tests | Shopware ${{ github.event.inputs.swVersion }}, PHP ${{ github.event.inputs.phpVersion }}
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Mount NPM Admin Cache
+        id: cache-plugin
+        uses: actions/cache@v3
+        with:
+          key: cache-plugin
+          path: .
 
       - name: Download Docker
         run: |
@@ -45,11 +79,6 @@ jobs:
         run: |
           docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
           docker exec shop bash -c 'sudo chown www-data:www-data /var/www/html/custom/plugins -R'
-
-      - name: Install and Build Artifacts
-        run: |
-          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make install -B'
-          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make build -B'
 
       - name: Install/Configure Plugin
         run: |
