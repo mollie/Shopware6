@@ -1,4 +1,5 @@
 name: E2E Playground
+run-name: Shopware ${{ github.event.inputs.swVersion }}, PHP ${{ github.event.inputs.phpVersion }}
 
 
 on:
