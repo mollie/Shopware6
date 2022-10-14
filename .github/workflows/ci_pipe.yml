@@ -47,6 +47,7 @@ jobs:
       - name: Install Dependencies
         run: make dev -B
 
+  # ------------------------------------------------------------------------------------------------------------------------
 
   jest:
     name: Jest Tests
@@ -173,8 +174,6 @@ jobs:
       - name: PHP Compatibility Checks
         run: make phpmin -B
 
-  # ------------------------------------------------------------------------------------------------------------------------
-
   phpunit:
     name: Unit Tests | PHP ${{ matrix.php }}
     needs: install
@@ -277,8 +276,49 @@ jobs:
 
   # ------------------------------------------------------------------------------------------------------------------------
 
-  integration:
-    name: Integration Tests | Shopware ${{ matrix.shopware }}
+  build:
+    name: Build Plugin
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+
+      - name: Mount NPM Admin Cache
+        id: cache-plugin
+        uses: actions/cache@v3
+        with:
+          key: cache-plugin
+          path: .
+
+      - name: Install PROD Dependencies
+        run: make install -B
+
+      - name: Start Docker
+        run: |
+          docker run --rm --name shop -d dockware/dev:6.4.16.0
+          sleep 30
+          docker logs shop
+
+      - name: Upload into Docker
+        run: |
+          docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
+          docker exec shop bash -c 'sudo chown www-data:www-data /var/www/html/custom/plugins -R'
+
+      - name: Install and Build Plugin
+        run: |
+          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make clean'
+          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make install'
+          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make build'
+
+
+  build_tests:
+    name: Building Tests | Shopware ${{ matrix.shopware }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -314,11 +354,12 @@ jobs:
           docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make install'
           docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make build'
 
+
   # ------------------------------------------------------------------------------------------------------------------------
 
   e2e:
     name: E2E Tests | Shopware ${{ matrix.shopware }}, PHP ${{ matrix.php }}
-    needs: integration
+    needs: build
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -358,8 +399,12 @@ jobs:
             php: '7.2'
     steps:
 
-      - name: Clone Code
-        uses: actions/checkout@v2
+      - name: Mount NPM Admin Cache
+        id: cache-plugin
+        uses: actions/cache@v3
+        with:
+          key: cache-plugin
+          path: .
 
       - name: Download Docker
         run: |
@@ -382,7 +427,6 @@ jobs:
       - name: Install and Build Artifacts
         run: |
           docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make install -B'
-          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make build -B'
 
       - name: Install/Configure Plugin
         run: |
@@ -418,6 +462,7 @@ jobs:
             tests/Cypress/cypress/logs
             tests/Cypress/cypress/videos
             tests/Cypress/cypress/screenshots
+
 
   # ------------------------------------------------------------------------------------------------------------------------
 
