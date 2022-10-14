@@ -32,7 +32,7 @@ jobs:
         uses: actions/cache@v3
         with:
           key: cache-plugin
-          path: .
+          path: src/Resources/app/storefront/dist
 
       - name: Install PROD Dependencies
         run: make install -B
@@ -80,7 +80,7 @@ jobs:
         uses: actions/cache@v3
         with:
           key: cache-plugin
-          path: .
+          path: src/Resources/app/storefront/dist
 
       - name: Verify Build
         run: |
