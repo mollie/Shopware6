@@ -42,7 +42,7 @@ jobs:
         id: composer
         with:
           key: composer
-          path: src/vendor
+          path: vendor
 
       - name: Install Dependencies
         run: make dev -B
@@ -168,7 +168,7 @@ jobs:
         id: composer
         with:
           key: composer
-          path: src/vendor
+          path: vendor
 
       - name: PHP Compatibility Checks
         run: make phpmin -B
@@ -196,7 +196,7 @@ jobs:
         id: composer
         with:
           key: composer
-          path: src/vendor
+          path: vendor
 
       - name: Run PHPUnit
         run: make phpunit -B
@@ -222,7 +222,7 @@ jobs:
         id: composer
         with:
           key: composer
-          path: src/vendor
+          path: vendor
 
       - name: Run Infection
         run: make infection -B
@@ -246,7 +246,7 @@ jobs:
         id: composer
         with:
           key: composer
-          path: src/vendor
+          path: vendor
 
       - name: Run PHPStan
         run: make stan -B
@@ -270,7 +270,7 @@ jobs:
         id: composer
         with:
           key: composer
-          path: src/vendor
+          path: vendor
 
       - name: Run PHP CS Fixer
         run: make csfix -B
