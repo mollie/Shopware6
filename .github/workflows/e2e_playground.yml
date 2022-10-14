@@ -38,7 +38,7 @@ jobs:
 
       - name: Start Docker
         run: |
-          docker run --rm --name shop --v ${pwd}:/var/www/html/custom/plugins/MolliePayments -d dockware/dev:${{ github.event.inputs.swVersion }}
+          docker run --rm --name shop -v ${pwd}:/var/www/html/custom/plugins/MolliePayments -d dockware/dev:${{ github.event.inputs.swVersion }}
           sleep 30
           docker logs shop
 
