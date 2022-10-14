@@ -317,8 +317,10 @@ jobs:
           docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make build'
 
 
+
   build_tests:
     name: Building Tests | Shopware ${{ matrix.shopware }}
+    needs: build
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -353,6 +355,7 @@ jobs:
           docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make clean'
           docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make install'
           docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make build'
+
 
 
   # ------------------------------------------------------------------------------------------------------------------------
@@ -408,7 +411,7 @@ jobs:
 
       - name: Download Docker
         run: |
-          docker pull dockware/dev:${{ matrix.shopware }}
+          docker pull dockware/play:${{ matrix.shopware }}
 
       - name: Start Docker
         run: |
@@ -424,9 +427,9 @@ jobs:
           docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
           docker exec shop bash -c 'sudo chown www-data:www-data /var/www/html/custom/plugins -R'
 
-      - name: Install and Build Artifacts
+      - name: Update Shopware Config
         run: |
-          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make install -B'
+          docker exec shop bash -c 'sed -i "s/APP_ENV=dev/APP_ENV=prod/g" /var/www/html/.env' || true;
 
       - name: Install/Configure Plugin
         run: |
