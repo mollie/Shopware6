@@ -42,6 +42,8 @@ jobs:
           docker run --rm --name shop -v ${pwd}:/var/www/html/custom/plugins/MolliePayments -d dockware/dev:${{ github.event.inputs.swVersion }}
           sleep 30
           docker logs shop
+          docker exec shop bash -c 'ls -la /var/www/html/custom/plugins'
+          docker exec shop bash -c 'ls -la /var/www/html/custom/plugins/MolliePayments'
 
       - name: Install and Build Plugin
         run: |
