@@ -12,7 +12,7 @@ on:
 jobs:
 
   install:
-    name: Jest Tests
+    name: Install Dependencies
     runs-on: ubuntu-latest
     steps:
       - name: Clone Code
@@ -23,11 +23,17 @@ jobs:
         with:
           php-version: 7.4
 
-      - name: Mount NPM Cache
+      - name: Mount NPM Admin Cache
         uses: actions/cache@v3
         with:
-          key: npm
-          path: ~/.npm
+          key: npm-admin
+          path: src/Resources/app/administration/node_modules
+
+      - name: Mount NPM Storefront Cache
+        uses: actions/cache@v3
+        with:
+          key: npm-storefront
+          path: src/Resources/app/storefront/node_modules
 
       - name: Mount Composer Cache
         uses: actions/cache@v3
@@ -52,11 +58,17 @@ jobs:
         with:
           php-version: 7.4
 
-      - name: Mount Cache
+      - name: Mount NPM Admin Cache
         uses: actions/cache@v3
         with:
-          key: npm
-          path: ~/.npm
+          key: npm-admin
+          path: src/Resources/app/administration/node_modules
+
+      - name: Mount NPM Storefront Cache
+        uses: actions/cache@v3
+        with:
+          key: npm-storefront
+          path: src/Resources/app/storefront/node_modules
 
       - name: Run Jest
         run: make jest -B
@@ -74,11 +86,17 @@ jobs:
         with:
           php-version: 7.4
 
-      - name: Mount Cache
+      - name: Mount NPM Admin Cache
         uses: actions/cache@v3
         with:
-          key: npm
-          path: ~/.npm
+          key: npm-admin
+          path: src/Resources/app/administration/node_modules
+
+      - name: Mount NPM Storefront Cache
+        uses: actions/cache@v3
+        with:
+          key: npm-storefront
+          path: src/Resources/app/storefront/node_modules
 
       - name: Run ESLint
         run: make eslint -B
@@ -96,11 +114,17 @@ jobs:
         with:
           php-version: 7.4
 
-      - name: Mount Cache
+      - name: Mount NPM Admin Cache
         uses: actions/cache@v3
         with:
-          key: npm
-          path: ~/.npm
+          key: npm-admin
+          path: src/Resources/app/administration/node_modules
+
+      - name: Mount NPM Storefront Cache
+        uses: actions/cache@v3
+        with:
+          key: npm-storefront
+          path: src/Resources/app/storefront/node_modules
 
       - name: Run Stylelint
         run: make stylelint -B
