@@ -24,14 +24,12 @@ jobs:
           php-version: 7.4
 
       - name: Mount NPM Cache
-        id: cache-vendor
         uses: actions/cache@v3
         with:
           key: npm
           path: ~/.npm
 
       - name: Mount Composer Cache
-        id: cache-vendor
         uses: actions/cache@v3
         with:
           key: composer
@@ -55,7 +53,6 @@ jobs:
           php-version: 7.4
 
       - name: Mount Cache
-        id: cache-vendor
         uses: actions/cache@v3
         with:
           key: npm
@@ -78,7 +75,6 @@ jobs:
           php-version: 7.4
 
       - name: Mount Cache
-        id: cache-vendor
         uses: actions/cache@v3
         with:
           key: npm
@@ -101,7 +97,6 @@ jobs:
           php-version: 7.4
 
       - name: Mount Cache
-        id: cache-vendor
         uses: actions/cache@v3
         with:
           key: npm
@@ -142,7 +137,6 @@ jobs:
           php-version: 7.4
 
       - name: Mount Cache
-        id: cache-vendor
         uses: actions/cache@v3
         with:
           key: composer
@@ -170,7 +164,6 @@ jobs:
           php-version: ${{ matrix.php }}
 
       - name: Mount Cache
-        id: cache-vendor
         uses: actions/cache@v3
         with:
           key: composer
@@ -196,7 +189,6 @@ jobs:
           php-version: ${{ matrix.php }}
 
       - name: Mount Cache
-        id: cache-vendor
         uses: actions/cache@v3
         with:
           key: composer
@@ -220,7 +212,6 @@ jobs:
           php-version: 7.4
 
       - name: Mount Cache
-        id: cache-vendor
         uses: actions/cache@v3
         with:
           key: composer
@@ -244,7 +235,6 @@ jobs:
           php-version: 7.4
 
       - name: Mount Cache
-        id: cache-vendor
         uses: actions/cache@v3
         with:
           key: composer
