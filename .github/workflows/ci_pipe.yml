@@ -11,7 +11,7 @@ on:
 
 jobs:
 
-  jest:
+  install:
     name: Jest Tests
     runs-on: ubuntu-latest
     steps:
@@ -23,16 +23,51 @@ jobs:
         with:
           php-version: 7.4
 
+      - name: Mount NPM Cache
+        id: cache-vendor
+        uses: actions/cache@v3
+        with:
+          key: npm
+          path: ~/.npm
+
+      - name: Mount Composer Cache
+        id: cache-vendor
+        uses: actions/cache@v3
+        with:
+          key: composer
+          path: src/vendor
+
       - name: Install Dependencies
         run: make dev -B
+
+
+  jest:
+    name: Jest Tests
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+
+      - name: Mount Cache
+        id: cache-vendor
+        uses: actions/cache@v3
+        with:
+          key: npm
+          path: ~/.npm
 
       - name: Run Jest
         run: make jest -B
 
   eslint:
     name: ESLint
+    needs: install
     runs-on: ubuntu-latest
-    needs: jest
     steps:
       - name: Clone Code
         uses: actions/checkout@v2
@@ -42,16 +77,20 @@ jobs:
         with:
           php-version: 7.4
 
-      - name: Install Dependencies
-        run: make dev -B
+      - name: Mount Cache
+        id: cache-vendor
+        uses: actions/cache@v3
+        with:
+          key: npm
+          path: ~/.npm
 
       - name: Run ESLint
         run: make eslint -B
 
   stylelint:
     name: Stylelint
+    needs: install
     runs-on: ubuntu-latest
-    needs: eslint
     steps:
       - name: Clone Code
         uses: actions/checkout@v2
@@ -61,8 +100,12 @@ jobs:
         with:
           php-version: 7.4
 
-      - name: Install Dependencies
-        run: make dev -B
+      - name: Mount Cache
+        id: cache-vendor
+        uses: actions/cache@v3
+        with:
+          key: npm
+          path: ~/.npm
 
       - name: Run Stylelint
         run: make stylelint -B
@@ -71,6 +114,7 @@ jobs:
 
   php_checks:
     name: PHP Syntax Checks
+    needs: install
     runs-on: ubuntu-latest
     steps:
       - name: Clone Code
@@ -86,7 +130,7 @@ jobs:
 
   php_min:
     name: PHP 7.2 Compatibility
-    needs: php_checks
+    needs: install
     runs-on: ubuntu-latest
     steps:
       - name: Clone Code
@@ -97,8 +141,12 @@ jobs:
         with:
           php-version: 7.4
 
-      - name: Install Dependencies
-        run: make dev -B
+      - name: Mount Cache
+        id: cache-vendor
+        uses: actions/cache@v3
+        with:
+          key: composer
+          path: src/vendor
 
       - name: PHP Compatibility Checks
         run: make phpmin -B
@@ -107,7 +155,7 @@ jobs:
 
   phpunit:
     name: Unit Tests | PHP ${{ matrix.php }}
-    needs: php_min
+    needs: install
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -121,15 +169,19 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
 
-      - name: Install Dependencies
-        run: make dev -B
+      - name: Mount Cache
+        id: cache-vendor
+        uses: actions/cache@v3
+        with:
+          key: composer
+          path: src/vendor
 
       - name: Run PHPUnit
         run: make phpunit -B
 
   infection:
     name: Mutation Tests | PHP ${{ matrix.php }}
-    needs: phpunit
+    needs: install
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -143,15 +195,19 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
 
-      - name: Install Dependencies
-        run: make dev -B
+      - name: Mount Cache
+        id: cache-vendor
+        uses: actions/cache@v3
+        with:
+          key: composer
+          path: src/vendor
 
       - name: Run Infection
         run: make infection -B
 
   phpstan:
     name: Static Analyzers
-    needs: infection
+    needs: install
     runs-on: ubuntu-latest
     steps:
 
@@ -163,15 +219,19 @@ jobs:
         with:
           php-version: 7.4
 
-      - name: Install Dependencies
-        run: make dev -B
+      - name: Mount Cache
+        id: cache-vendor
+        uses: actions/cache@v3
+        with:
+          key: composer
+          path: src/vendor
 
       - name: Run PHPStan
         run: make stan -B
 
   phpcsfixer:
     name: PHP CS Fixer
-    needs: phpstan
+    needs: install
     runs-on: ubuntu-latest
     steps:
 
@@ -183,8 +243,12 @@ jobs:
         with:
           php-version: 7.4
 
-      - name: Install Dependencies
-        run: make dev -B
+      - name: Mount Cache
+        id: cache-vendor
+        uses: actions/cache@v3
+        with:
+          key: composer
+          path: src/vendor
 
       - name: Run PHP CS Fixer
         run: make csfix -B
