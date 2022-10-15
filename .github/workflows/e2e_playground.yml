@@ -32,30 +32,18 @@ jobs:
 
       - name: Create Cache Directories
         run: |
-          mkdir -p ~/image-cache
-          mkdir -p $(pwd)/.build
-
-      - name: Mount Docker Cache
-        id: cache-docker
-        uses: actions/cache@v3
-        with:
-          key: cache-docker
-          path: ~/image-cache
+          mkdir -p ~/.build
 
       - name: Mount Build Cache
         id: cache-build
         uses: actions/cache@v3
         with:
           key: cache-plugin
-          path: .build
-
-      - if: steps.cache-docker.outputs.cache-hit == 'true'
-        run: docker load -i ~/image-cache/dockware-dev-${{ github.event.inputs.swVersion }}.tar
+          path: ~/.build
 
       - name: Download Docker
         run: |
           docker pull dockware/dev:${{ github.event.inputs.swVersion }}
-          docker save -o ~/image-cache/dockware-dev:${{ github.event.inputs.swVersion }}.tar dockware/dev:${{ github.event.inputs.swVersion }}
 
       - name: Start Docker
         run: |
@@ -78,7 +66,7 @@ jobs:
 
       - name: Download ZIP File
         run: |
-          docker cp shop:/var/www/html/custom/plugins/.build/MolliePayments.zip $(pwd)/.build/MolliePayments.zip
+          docker cp shop:/var/www/html/custom/plugins/.build/MolliePayments.zip ~/.build/MolliePayments.zip
 
   e2e:
     name: E2E Tests | Shopware ${{ github.event.inputs.swVersion }}, PHP ${{ github.event.inputs.phpVersion }}
@@ -94,7 +82,7 @@ jobs:
         uses: actions/cache@v3
         with:
           key: cache-plugin
-          path: .build
+          path: ~/.build
 
       - name: Download Docker
         run: |
@@ -116,7 +104,7 @@ jobs:
 
       - name: Upload ZIP File to Docker
         run: |
-          docker cp $(pwd)/.build/MolliePayments.zip shop:/var/www/html/custom/plugins/MolliePayments.zip
+          docker cp ~/.build/MolliePayments.zip shop:/var/www/html/custom/plugins/MolliePayments.zip
           docker exec shop bash -c 'cd /var/www/html/custom/plugins && unzip -o MolliePayments.zip'
 
       - name: Install/Configure Plugin
