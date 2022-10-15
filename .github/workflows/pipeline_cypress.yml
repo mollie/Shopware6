@@ -20,7 +20,7 @@ on:
 jobs:
 
   e2e:
-    name: E2E Core Tests | Shopware ${{ inputs.shopware }}, PHP ${{ inputs.php }}
+    name: E2E Tests | Shopware ${{ inputs.shopware }}, PHP ${{ inputs.php }}
     runs-on: ubuntu-latest
     steps:
 
