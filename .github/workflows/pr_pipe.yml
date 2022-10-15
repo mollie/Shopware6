@@ -3,14 +3,7 @@ name: PR Pipeline
 on: [pull_request, workflow_dispatch]
 
 
-
-env:
-  STORE_API_KEY: SWSCOVFSNKLBYUTKS1VSOEDTUQ
-  BUILD_SW_VERSION: 6.4.16.0
-
-
 jobs:
-
 
   install:
     name: Install Dev Dependencies
@@ -52,6 +45,10 @@ jobs:
 
   build:
     uses: ./.github/workflows/pipeline_build.yml
+    with:
+      shopware: 6.4.16.0
+
+  # ------------------------------------------------------------------------------------------------------------------------
 
   integration:
     name: Integration Tests | Shopware ${{ matrix.shopware }}
@@ -99,17 +96,12 @@ jobs:
           docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.testMode true'
           docker exec shop bash -c 'php bin/console cache:clear'
 
+
   # ------------------------------------------------------------------------------------------------------------------------
 
   e2e:
-    name: E2E Core Tests | Shopware ${{ matrix.shopware }}, PHP ${{ matrix.php }}
+    name: E2E Core Tests
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - shopware: '6.4.16.0'
-            php: '8.1'
     steps:
 
       - name: Clone Code
@@ -117,7 +109,6 @@ jobs:
 
       - uses: ./.github/workflows/pipeline_cypress.yml
         with:
-          shopware: ${{ matrix.shopware }}
-          php: ${{ matrix.php }}
-          storeApiKey: $STORE_API_KEY
+          shopware: 6.4.16.0
+          php: 8.1
           filter: "@core"

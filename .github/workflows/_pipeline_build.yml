@@ -2,10 +2,10 @@ name: _ Build Plugin
 
 on:
   workflow_call:
-
-
-env:
-  BUILD_SW_VERSION: 6.4.16.0
+    inputs:
+      shopware:
+        required: true
+        type: string
 
 
 jobs:
@@ -30,7 +30,7 @@ jobs:
 
       - name: Start Docker
         run: |
-          docker run --rm --name shop -d dockware/dev:$BUILD_SW_VERSION
+          docker run --rm --name shop -d dockware/dev:${{ inputs.shopware }}
           sleep 20
           docker logs shop
 

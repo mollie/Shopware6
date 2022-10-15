@@ -10,7 +10,7 @@ on:
 
 env:
   STORE_API_KEY: SWSCOVFSNKLBYUTKS1VSOEDTUQ
-  BUILD_SW_VERSION: 6.4.16.0
+
 
 jobs:
 
@@ -41,19 +41,21 @@ jobs:
   # ------------------------------------------------------------------------------------------------------------------------
 
   javascript:
-    uses: ./.github/workflows/pipeline_js.yml
+    uses: ./.github/workflows/_pipeline_js.yml
     needs: [ install ]
 
   # ------------------------------------------------------------------------------------------------------------------------
 
   php:
-    uses: ./.github/workflows/pipeline_php.yml
+    uses: ./.github/workflows/_pipeline_php.yml
     needs: [ install ]
 
   # ------------------------------------------------------------------------------------------------------------------------
 
   build:
-    uses: ./.github/workflows/pipeline_build.yml
+    uses: ./.github/workflows/_pipeline_build.yml
+    with:
+      shopware: 6.4.16.0
 
   e2e:
     name: E2E Tests | Shopware ${{ matrix.shopware }}, PHP ${{ matrix.php }}
@@ -165,6 +167,7 @@ jobs:
             tests/Cypress/cypress/screenshots
 
 
+
   build_tests:
     name: Building Tests | Shopware ${{ matrix.shopware }}
     needs: [ build, e2e ]
@@ -178,21 +181,9 @@ jobs:
       - name: Clone Code
         uses: actions/checkout@v2
 
-      - name: Start Docker
-        run: |
-          docker run --rm --name shop -d dockware/dev:${{ matrix.shopware }}
-          sleep 20
-          docker logs shop
+      - uses: ./.github/workflows/_pipeline_build.yml
+        with:
+          shopware: ${{ matrix.shopware }}
 
-      - name: Upload into Docker
-        run: |
-          docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
-          docker exec shop bash -c 'sudo chown www-data:www-data /var/www/html/custom/plugins -R'
-
-      - name: Install and Build Plugin
-        run: |
-          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make clean'
-          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make install'
-          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make build'
 
 

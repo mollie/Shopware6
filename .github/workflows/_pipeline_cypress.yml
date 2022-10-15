@@ -9,13 +9,12 @@ on:
       php:
         required: true
         type: string
-      storeApiKey:
-        required: true
-        type: string
       filter:
         required: true
         type: string
 
+env:
+  STORE_API_KEY: SWSCOVFSNKLBYUTKS1VSOEDTUQ
 
 jobs:
 
@@ -40,7 +39,7 @@ jobs:
 
       - name: Start Docker
         run: |
-          docker run --rm -p 443:443 --name shop --env PHP_VERSION=${{ inputs.php }} --env SW_API_ACCESS_KEY=${{ inputs.storeApiKey }} -d dockware/play:${{ inputs.shopware }}
+          docker run --rm -p 443:443 --name shop --env PHP_VERSION=${{ inputs.php }} --env SW_API_ACCESS_KEY=$STORE_API_KEY -d dockware/play:${{ inputs.shopware }}
           sleep 20
           docker logs shop
           # now change the domain of our shop, mollie doesn't work with localhost
