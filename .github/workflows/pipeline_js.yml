@@ -1,0 +1,64 @@
+name: Javascript Tests
+
+on:
+  workflow_call:
+
+
+jobs:
+
+  jest:
+    name: Jest Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Mount Dev-Dependencies Cache
+        uses: actions/cache@v3
+        with:
+          key: cache-dependencies
+          path: |
+            src/Resources/app/administration/node_modules
+            src/Resources/app/storefront/node_modules
+            vendor
+
+      - name: Run Jest
+        run: make jest -B
+
+  eslint:
+    name: ESLint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Mount Dev-Dependencies Cache
+        uses: actions/cache@v3
+        with:
+          key: cache-dependencies
+          path: |
+            src/Resources/app/administration/node_modules
+            src/Resources/app/storefront/node_modules
+            vendor
+
+      - name: Run ESLint
+        run: make eslint -B
+
+  stylelint:
+    name: Stylelint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Mount Dev-Dependencies Cache
+        uses: actions/cache@v3
+        with:
+          key: cache-dependencies
+          path: |
+            src/Resources/app/administration/node_modules
+            src/Resources/app/storefront/node_modules
+            vendor
+
+      - name: Run Stylelint
+        run: make stylelint -B

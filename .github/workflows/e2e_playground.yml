@@ -69,75 +69,11 @@ jobs:
           docker cp shop:/var/www/html/custom/plugins/.build/MolliePayments.zip ~/.build/MolliePayments.zip
 
   e2e:
-    name: E2E Tests | Shopware ${{ github.event.inputs.swVersion }}, PHP ${{ github.event.inputs.phpVersion }}
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
+    uses: ./.github/workflows/pipeline_cypress.yml
+    needs: [ build ]
+    with:
+      shopware: ${{ github.event.inputs.swVersion }}
+      php: ${{ github.event.inputs.phpVersion }}
+      storeApiKey: $STORE_API_KEY
+      filter: ""
 
-      - name: Clone Code
-        uses: actions/checkout@v2
-
-      - name: Mount Build Cache
-        id: cache-build
-        uses: actions/cache@v3
-        with:
-          key: cache-plugin
-          path: ~/.build
-
-      - name: Download Docker
-        run: |
-          docker pull dockware/play:${{ github.event.inputs.swVersion }}
-
-      - name: Start Docker
-        run: |
-          docker run --rm -p 443:443 --name shop --env PHP_VERSION=${{ github.event.inputs.phpVersion }} --env SW_API_ACCESS_KEY=$STORE_API_KEY -d dockware/play:${{ github.event.inputs.swVersion }}
-          sleep 20
-          docker logs shop
-          # now change the domain of our shop, Mollie doesn't work with localhost
-          sudo echo "127.0.0.1 local.mollie.shop" | sudo tee -a /etc/hosts
-          docker exec shop bash -c "mysql -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='https://local.mollie.shop' WHERE url NOT LIKE 'default.%';\""
-
-      - name: Update Shopware Config
-        run: |
-          # let's get rid of the PHP Warning outputs by changing to env PROD
-          docker exec shop bash -c 'sed -i "s/APP_ENV=dev/APP_ENV=prod/g" /var/www/html/.env' || true;
-
-      - name: Upload ZIP File to Docker
-        run: |
-          docker cp ~/.build/MolliePayments.zip shop:/var/www/html/custom/plugins/MolliePayments.zip
-          docker exec shop bash -c 'cd /var/www/html/custom/plugins && unzip -o MolliePayments.zip'
-
-      - name: Install/Configure Plugin
-        run: |
-          docker exec shop bash -c 'php bin/console plugin:refresh'
-          docker exec shop bash -c 'php bin/console plugin:install MolliePayments --activate'
-          docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.liveApiKey ${{ secrets.MOLLIE_APIKEY_TEST }}'
-          docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.testApiKey ${{ secrets.MOLLIE_APIKEY_TEST }}'
-          docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.testMode true'
-          docker exec shop bash -c 'php bin/console cache:clear'
-
-      - name: Install Cypress
-        run: cd tests/Cypress && make install -B
-
-      - name: Start Cypress
-        run: cd tests/Cypress && make run shopware=${{ github.event.inputs.swVersion }} url=https://local.mollie.shop storeApiKey=$STORE_API_KEY
-
-      - name: Download Logs
-        if: ${{ always() }}
-        run: |
-          mkdir -p $(pwd)/tests/Cypress/cypress/logs/shopware
-          mkdir -p $(pwd)/tests/Cypress/cypress/logs/apache
-          docker cp shop:/var/www/html/var/log/. $(pwd)/tests/Cypress/cypress/logs/shopware
-          docker cp shop:/var/log/php/. $(pwd)/tests/Cypress/cypress/logs/apache
-
-      - name: Store Cypress Results
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: cypress_results_sw${{ github.event.inputs.swVersion }}_php${{ github.event.inputs.phpVersion }}
-          retention-days: 2
-          path: |
-            tests/Cypress/cypress/results
-            tests/Cypress/cypress/logs
-            tests/Cypress/cypress/videos
-            tests/Cypress/cypress/screenshots

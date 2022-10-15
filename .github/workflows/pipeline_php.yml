@@ -74,30 +74,6 @@ jobs:
       - name: Run PHPUnit
         run: make phpunit -B
 
-  infection:
-    name: Mutation Tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Clone Code
-        uses: actions/checkout@v2
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 7.4
-
-      - name: Mount Dev-Dependencies Cache
-        uses: actions/cache@v3
-        with:
-          key: cache-dependencies
-          path: |
-            src/Resources/app/administration/node_modules
-            src/Resources/app/storefront/node_modules
-            vendor
-
-      - name: Run Infection
-        run: make infection -B
-
   phpstan:
     name: PHPStan
     runs-on: ubuntu-latest
@@ -147,3 +123,28 @@ jobs:
 
       - name: Run PHP CS Fixer
         run: make csfix -B
+
+  infection:
+    name: Mutation Tests
+    needs: phpunit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+
+      - name: Mount Dev-Dependencies Cache
+        uses: actions/cache@v3
+        with:
+          key: cache-dependencies
+          path: |
+            src/Resources/app/administration/node_modules
+            src/Resources/app/storefront/node_modules
+            vendor
+
+      - name: Run Infection
+        run: make infection -B

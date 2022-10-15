@@ -1,0 +1,90 @@
+name: Cypress Tests
+
+on:
+  workflow_call:
+    inputs:
+      shopware:
+        required: true
+        type: string
+      php:
+        required: true
+        type: string
+      storeApiKey:
+        required: true
+        type: string
+      filter:
+        required: true
+        type: string
+
+
+jobs:
+
+  e2e:
+    name: E2E Core Tests | Shopware ${{ inputs.shopware }}, PHP ${{ inputs.php }}
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Mount Build Cache
+        id: cache-build
+        uses: actions/cache@v3
+        with:
+          key: cache-plugin
+          path: ~/.build
+
+      - name: Download Docker
+        run: |
+          docker pull dockware/play:${{ inputs.shopware }}
+
+      - name: Start Docker
+        run: |
+          docker run --rm -p 443:443 --name shop --env PHP_VERSION=${{ inputs.php }} --env SW_API_ACCESS_KEY=${{ inputs.storeApiKey }} -d dockware/play:${{ inputs.shopware }}
+          sleep 20
+          docker logs shop
+          # now change the domain of our shop, mollie doesn't work with localhost
+          sudo echo "127.0.0.1 local.mollie.shop" | sudo tee -a /etc/hosts
+          docker exec shop bash -c "mysql -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='https://local.mollie.shop' WHERE url NOT LIKE 'default.%';\""
+
+      - name: Update Shopware Config
+        run: |
+          docker exec shop bash -c 'sed -i "s/APP_ENV=dev/APP_ENV=prod/g" /var/www/html/.env' || true;
+
+      - name: Upload ZIP File to Docker
+        run: |
+          docker cp ~/.build/MolliePayments.zip shop:/var/www/html/custom/plugins/MolliePayments.zip
+          docker exec shop bash -c 'cd /var/www/html/custom/plugins && unzip -o MolliePayments.zip'
+
+      - name: Install/Configure Plugin
+        run: |
+          docker exec shop bash -c 'php bin/console plugin:refresh'
+          docker exec shop bash -c 'php bin/console plugin:install MolliePayments --activate'
+          docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.testMode true'
+          docker exec shop bash -c 'php bin/console cache:clear'
+
+      - name: Install Cypress
+        run: cd tests/Cypress && make install -B
+
+      - name: Start Cypress Core Tests
+        run: cd tests/Cypress && make run shopware=${{ inputs.shopware }} url=https://local.mollie.shop storeApiKey=$STORE_API_KEY filters='${{ inputs.filter }}'
+
+      - name: Download Logs
+        if: ${{ always() }}
+        run: |
+          mkdir -p $(pwd)/tests/Cypress/cypress/logs/shopware
+          mkdir -p $(pwd)/tests/Cypress/cypress/logs/apache
+          docker cp shop:/var/www/html/var/log/. $(pwd)/tests/Cypress/cypress/logs/shopware
+          docker cp shop:/var/log/php/. $(pwd)/tests/Cypress/cypress/logs/apache
+
+      - name: Store Cypress Results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: cypress_results_sw_v${{ inputs.shopware }}
+          retention-days: 1
+          path: |
+            tests/Cypress/cypress/results
+            tests/Cypress/cypress/logs
+            tests/Cypress/cypress/videos
+            tests/Cypress/cypress/screenshots
