@@ -44,7 +44,7 @@ jobs:
   # ------------------------------------------------------------------------------------------------------------------------
 
   build:
-    uses: ./.github/workflows/pipeline_build.yml
+    uses: ./.github/workflows/_pipeline_build.yml
     with:
       shopware: 6.4.16.0
 

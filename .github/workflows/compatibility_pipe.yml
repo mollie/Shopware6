@@ -29,7 +29,7 @@ jobs:
           ref: refs/tags/v${{ matrix.plugin }}
 
       - name: Build Plugin
-        uses: ./.github/workflows/pipeline_build.yml
+        uses: ./.github/workflows/_pipeline_build.yml
         with:
           shopware: ${{ github.event.inputs.swVersion }}
 
