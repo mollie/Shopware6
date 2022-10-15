@@ -30,12 +30,19 @@ jobs:
         with:
           php-version: 7.4
 
-      - name: Mount Plugin Cache
-        id: cache-plugin
+      - name: Mount Storefront Cache
+        id: cache-storefront
         uses: actions/cache@v3
         with:
-          key: cache-plugin
-          path: .
+          key: cache-storefront
+          path: src/Resources/app/storefront/dist
+
+      - name: Mount Composer Cache
+        id: cache-composer
+        uses: actions/cache@v3
+        with:
+          key: cache-composer
+          path: vendor
 
       - name: Install PROD Dependencies
         run: make install -B
@@ -80,12 +87,19 @@ jobs:
       - name: Clone Code
         uses: actions/checkout@v2
 
-      - name: Mount Plugin Cache
-        id: cache-plugin
+      - name: Mount Storefront Cache
+        id: cache-storefront
         uses: actions/cache@v3
         with:
-          key: cache-plugin
-          path: .
+          key: cache-storefront
+          path: src/Resources/app/storefront/dist
+
+      - name: Mount Composer Cache
+        id: cache-composer
+        uses: actions/cache@v3
+        with:
+          key: cache-composer
+          path: vendor
 
       - name: Verify Build Artifacts
         run: |
