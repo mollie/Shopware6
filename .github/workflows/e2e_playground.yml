@@ -108,11 +108,11 @@ jobs:
 
       - name: Download Docker
         run: |
-          docker pull dockware/dev:${{ github.event.inputs.swVersion }}
+          docker pull dockware/play:${{ github.event.inputs.swVersion }}
 
       - name: Start Docker
         run: |
-          docker run --rm -p 443:443 --name shop --env PHP_VERSION=${{ github.event.inputs.phpVersion }} --env SW_API_ACCESS_KEY=$STORE_API_KEY -d dockware/dev:${{ github.event.inputs.swVersion }}
+          docker run --rm -p 443:443 --name shop --env PHP_VERSION=${{ github.event.inputs.phpVersion }} --env SW_API_ACCESS_KEY=$STORE_API_KEY -d dockware/play:${{ github.event.inputs.swVersion }}
           sleep 20
           docker logs shop
           # now change the domain of our shop, Mollie doesn't work with localhost
