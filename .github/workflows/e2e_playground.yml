@@ -12,6 +12,9 @@ on:
         description: 'PHP Version'
         required: true
 
+env:
+  STORE_API_KEY: SWSCOVFSNKLBYUTKS1VSOEDTUQ
+
 jobs:
 
   build:
@@ -27,19 +30,12 @@ jobs:
         with:
           php-version: 7.4
 
-      - name: Mount NPM Storefront Cache
-        id: cache-storefront
+      - name: Mount Plugin Cache
+        id: cache-plugin
         uses: actions/cache@v3
         with:
-          key: cache-storefront
-          path: src/Resources/app/storefront/dist
-
-      - name: Mount Vendor Cache
-        id: cache-vendor
-        uses: actions/cache@v3
-        with:
-          key: cache-vendor
-          path: vendor
+          key: cache-plugin
+          path: .
 
       - name: Install PROD Dependencies
         run: make install -B
@@ -71,7 +67,9 @@ jobs:
 
       - name: Verify Build
         run: |
-          ls -la src/Resources/app/storefront/dist
+          # the dist folder needs a storefront folder
+          # if existing, the build worked and has been downloaded from Docker
+          ls -la src/Resources/app/storefront/dist/storefront
 
   e2e:
     name: E2E Tests | Shopware ${{ github.event.inputs.swVersion }}, PHP ${{ github.event.inputs.phpVersion }}
@@ -82,23 +80,17 @@ jobs:
       - name: Clone Code
         uses: actions/checkout@v2
 
-      - name: Mount NPM Storefront Cache
-        id: cache-storefront
+      - name: Mount Plugin Cache
+        id: cache-plugin
         uses: actions/cache@v3
         with:
-          key: cache-storefront
-          path: src/Resources/app/storefront/dist
+          key: cache-plugin
+          path: .
 
-      - name: Mount Vendor Cache
-        id: cache-vendor
-        uses: actions/cache@v3
-        with:
-          key: cache-vendor
-          path: vendor
-
-      - name: Verify Cache
+      - name: Verify Build Artifacts
         run: |
-          ls -la src/Resources/app/storefront/dist
+          # only if this folder exists, then we have a buid artifact from our cache
+          ls -la src/Resources/app/storefront/dist/storefront
 
       - name: Download Docker
         run: |
@@ -106,10 +98,10 @@ jobs:
 
       - name: Start Docker
         run: |
-          docker run --rm -p 443:443 --name shop --env PHP_VERSION=${{ github.event.inputs.phpVersion }} --env SW_API_ACCESS_KEY=SWSCOVFSNKLBYUTKS1VSOEDTUQ -d dockware/dev:${{ github.event.inputs.swVersion }}
-          sleep 30
+          docker run --rm -p 443:443 --name shop --env PHP_VERSION=${{ github.event.inputs.phpVersion }} --env SW_API_ACCESS_KEY=$STORE_API_KEY -d dockware/dev:${{ github.event.inputs.swVersion }}
+          sleep 20
           docker logs shop
-          # now change the domain of our shop, mollie doesn't work with localhost
+          # now change the domain of our shop, Mollie doesn't work with localhost
           sudo echo "127.0.0.1 local.mollie.shop" | sudo tee -a /etc/hosts
           docker exec shop bash -c "mysql -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='https://local.mollie.shop' WHERE url NOT LIKE 'default.%';\""
 
@@ -120,6 +112,7 @@ jobs:
 
       - name: Update Shopware Config
         run: |
+          # let's get rid of the PHP Warning outputs by changing to env PROD
           docker exec shop bash -c 'sed -i "s/APP_ENV=dev/APP_ENV=prod/g" /var/www/html/.env' || true;
 
       - name: Install/Configure Plugin
@@ -135,7 +128,7 @@ jobs:
         run: cd tests/Cypress && make install -B
 
       - name: Start Cypress
-        run: cd tests/Cypress && make run shopware=${{ github.event.inputs.swVersion }} url=https://local.mollie.shop storeApiKey=SWSCOVFSNKLBYUTKS1VSOEDTUQ
+        run: cd tests/Cypress && make run shopware=${{ github.event.inputs.swVersion }} url=https://local.mollie.shop storeApiKey=$STORE_API_KEY
 
       - name: Download Logs
         if: ${{ always() }}
@@ -150,7 +143,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: cypress_results_sw${{ github.event.inputs.swVersion }}_php${{ github.event.inputs.phpVersion }}
-          retention-days: 1
+          retention-days: 2
           path: |
             tests/Cypress/cypress/results
             tests/Cypress/cypress/logs
