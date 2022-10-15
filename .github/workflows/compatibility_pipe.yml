@@ -1,8 +1,6 @@
 name: Compatibility Pipeline
 run-name: Shopware ${{ github.event.inputs.swVersion }}, PHP ${{ github.event.inputs.phpVersion }}
 
-
-
 on:
   workflow_dispatch:
     inputs:
@@ -25,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        plugin: [ '3.1.0', '3.0.0', '2.5.0' ]
+        plugin: [ '3.2.0', '3.1.0', '3.0.0', '2.5.0' ]
     steps:
 
       - name: Clone Code
