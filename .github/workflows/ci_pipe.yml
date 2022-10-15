@@ -8,6 +8,10 @@ on:
   workflow_dispatch:
 
 
+env:
+  STORE_API_KEY: SWSCOVFSNKLBYUTKS1VSOEDTUQ
+  BUILD_SW_VERSION: 6.4.16.0
+
 
 jobs:
 
@@ -284,39 +288,34 @@ jobs:
       - name: Clone Code
         uses: actions/checkout@v2
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 7.4
+      - name: Create Cache Directories
+        run: |
+          mkdir -p ~/.build
 
-      - name: Mount NPM Admin Cache
-        id: cache-plugin
+      - name: Mount Build Cache
+        id: cache-build
         uses: actions/cache@v3
         with:
           key: cache-plugin
-          path: .
-
-      - name: Install PROD Dependencies
-        run: make install -B
+          path: ~/.build
 
       - name: Start Docker
         run: |
-          docker run --rm --name shop -d dockware/dev:6.4.16.0
-          sleep 30
+          docker run --rm --name shop -d dockware/dev:$BUILD_SW_VERSION
+          sleep 20
           docker logs shop
 
-      - name: Upload into Docker
+      - name: Update Shopware Config
         run: |
-          docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
-          docker exec shop bash -c 'sudo chown www-data:www-data /var/www/html/custom/plugins -R'
+          docker exec shop bash -c 'sed -i "s/APP_ENV=dev/APP_ENV=prod/g" /var/www/html/.env' || true;
 
-      - name: Install and Build Plugin
+      - name: Build Plugin
         run: |
-          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make clean'
-          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make install'
-          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make build'
+          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make release'
 
-
+      - name: Download ZIP File
+        run: |
+          docker cp shop:/var/www/html/custom/plugins/.build/MolliePayments.zip ~/.build/MolliePayments.zip
 
   build_tests:
     name: Building Tests | Shopware ${{ matrix.shopware }}
@@ -331,18 +330,10 @@ jobs:
       - name: Clone Code
         uses: actions/checkout@v2
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 7.4
-
-      - name: Install PROD Dependencies
-        run: make install -B
-
       - name: Start Docker
         run: |
           docker run --rm --name shop -d dockware/dev:${{ matrix.shopware }}
-          sleep 30
+          sleep 20
           docker logs shop
 
       - name: Upload into Docker
@@ -402,12 +393,15 @@ jobs:
             php: '7.2'
     steps:
 
-      - name: Mount NPM Admin Cache
-        id: cache-plugin
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Mount Build Cache
+        id: cache-build
         uses: actions/cache@v3
         with:
           key: cache-plugin
-          path: .
+          path: ~/.build
 
       - name: Download Docker
         run: |
@@ -415,21 +409,21 @@ jobs:
 
       - name: Start Docker
         run: |
-          docker run --rm -p 443:443 --name shop --env PHP_VERSION=${{ matrix.php }} --env SW_API_ACCESS_KEY=SWSCOVFSNKLBYUTKS1VSOEDTUQ -d dockware/play:${{ matrix.shopware }}
-          sleep 30
+          docker run --rm -p 443:443 --name shop --env PHP_VERSION=${{ matrix.php }} --env SW_API_ACCESS_KEY=$STORE_API_KEY -d dockware/play:${{ matrix.shopware }}
+          sleep 20
           docker logs shop
           # now change the domain of our shop, mollie doesn't work with localhost
           sudo echo "127.0.0.1 local.mollie.shop" | sudo tee -a /etc/hosts
           docker exec shop bash -c "mysql -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='https://local.mollie.shop' WHERE url NOT LIKE 'default.%';\""
 
-      - name: Upload into Docker
-        run: |
-          docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
-          docker exec shop bash -c 'sudo chown www-data:www-data /var/www/html/custom/plugins -R'
-
       - name: Update Shopware Config
         run: |
           docker exec shop bash -c 'sed -i "s/APP_ENV=dev/APP_ENV=prod/g" /var/www/html/.env' || true;
+
+      - name: Upload ZIP File to Docker
+        run: |
+          docker cp ~/.build/MolliePayments.zip shop:/var/www/html/custom/plugins/MolliePayments.zip
+          docker exec shop bash -c 'cd /var/www/html/custom/plugins && unzip -o MolliePayments.zip'
 
       - name: Install/Configure Plugin
         run: |
@@ -444,7 +438,7 @@ jobs:
         run: cd tests/Cypress && make install -B
 
       - name: Start Cypress
-        run: cd tests/Cypress && CYPRESS_TESTRAIL_DOMAIN=${{ secrets.TESTRAIL_DOMAIN }} CYPRESS_TESTRAIL_USERNAME=${{ secrets.TESTRAIL_USERNAME }} CYPRESS_TESTRAIL_PASSWORD=${{ secrets.TESTRAIL_PASSWORD }} CYPRESS_TESTRAIL_PROJECT_ID=7 CYPRESS_TESTRAIL_MILESTONE_ID=15 CYPRESS_TESTRAIL_RUN_NAME="Github Workflow __datetime__, ${{ github.event.head_commit.message }}, Shopware ${{ matrix.shopware }}" CYPRESS_TESTRAIL_RUN_CLOSE=true make run shopware=${{ matrix.shopware }} url=https://local.mollie.shop storeApiKey=SWSCOVFSNKLBYUTKS1VSOEDTUQ
+        run: cd tests/Cypress && CYPRESS_TESTRAIL_DOMAIN=${{ secrets.TESTRAIL_DOMAIN }} CYPRESS_TESTRAIL_USERNAME=${{ secrets.TESTRAIL_USERNAME }} CYPRESS_TESTRAIL_PASSWORD=${{ secrets.TESTRAIL_PASSWORD }} CYPRESS_TESTRAIL_PROJECT_ID=7 CYPRESS_TESTRAIL_MILESTONE_ID=15 CYPRESS_TESTRAIL_RUN_NAME="Github Workflow __datetime__, ${{ github.event.head_commit.message }}, Shopware ${{ matrix.shopware }}" CYPRESS_TESTRAIL_RUN_CLOSE=true make run shopware=${{ matrix.shopware }} url=https://local.mollie.shop storeApiKey=$STORE_API_KEY
 
       - name: Download Logs
         if: ${{ always() }}
