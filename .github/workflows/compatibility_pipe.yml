@@ -12,12 +12,10 @@ on:
       phpVersion:
         description: 'PHP Version'
         required: true
-        options:
-          - 7.2
-          - 7.3
-          - 7.4
-          - 8.0
-          - 8.1
+
+env:
+  STORE_API_KEY: SWSCOVFSNKLBYUTKS1VSOEDTUQ
+
 
 jobs:
 
@@ -41,7 +39,7 @@ jobs:
 
       - name: Start Docker
         run: |
-          docker run --rm -p 443:443 --name shop --env PHP_VERSION=${{ github.event.inputs.phpVersion }} --env SW_API_ACCESS_KEY=SWSCOVFSNKLBYUTKS1VSOEDTUQ -d dockware/dev:${{ github.event.inputs.swVersion }}
+          docker run --rm -p 443:443 --name shop --env PHP_VERSION=${{ github.event.inputs.phpVersion }} --env SW_API_ACCESS_KEY=$STORE_API_KEY -d dockware/dev:${{ github.event.inputs.swVersion }}
           sleep 30
           docker logs shop
           # now change the domain of our shop, mollie doesn't work with localhost
@@ -77,7 +75,7 @@ jobs:
           sed -i "/key: 'directdebit'/g" $(pwd)/tests/Cypress/cypress/integration/storefront/checkout/checkout-success.spec.js || true
 
       - name: Start Cypress
-        run: cd tests/Cypress && make run shopware=${{ github.event.inputs.swVersion }} url=https://local.mollie.shop storeApiKey=SWSCOVFSNKLBYUTKS1VSOEDTUQ
+        run: cd tests/Cypress && make run shopware=${{ github.event.inputs.swVersion }} url=https://local.mollie.shop storeApiKey=$STORE_API_KEY
 
       - name: Download Logs
         if: ${{ always() }}
