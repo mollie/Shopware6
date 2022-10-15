@@ -70,32 +70,12 @@ jobs:
           key: cache-plugin
           path: ~/.build
 
-      - name: Download Docker
-        run: |
-          docker pull dockware/play:${{ matrix.shopware }}
-
-      - name: Start Docker
-        run: |
-          docker run --rm --name shop -d dockware/play:${{ matrix.shopware }}
-          sleep 20
-          docker logs shop
-
-      - name: Update Shopware Config
-        run: |
-          docker exec shop bash -c 'sed -i "s/APP_ENV=dev/APP_ENV=prod/g" /var/www/html/.env' || true;
-
-      - name: Upload ZIP File to Docker
-        run: |
-          docker cp ~/.build/MolliePayments.zip shop:/var/www/html/custom/plugins/MolliePayments.zip
-          docker exec shop bash -c 'cd /var/www/html/custom/plugins && unzip -o MolliePayments.zip'
-
-      - name: Install/Configure Plugin
-        run: |
-          docker exec shop bash -c 'php bin/console plugin:refresh'
-          docker exec shop bash -c 'php bin/console plugin:install MolliePayments --activate'
-          docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.testMode true'
-          docker exec shop bash -c 'php bin/console cache:clear'
-
+      - uses: ./.github/workflows/pipeline_docker.yml
+        with:
+          shopware: ${{ matrix.shopware }}
+          php: '8.1'
+          storeApiKey: ''
+          zipFile: '~/.build/MolliePayments.zip'
 
   # ------------------------------------------------------------------------------------------------------------------------
 
@@ -107,8 +87,24 @@ jobs:
       - name: Clone Code
         uses: actions/checkout@v2
 
-      - uses: ./.github/workflows/pipeline_cypress.yml
+      - name: Mount Build Cache
+        id: cache-build
+        uses: actions/cache@v3
         with:
-          shopware: 6.4.16.0
-          php: 8.1
-          filter: "@core"
+          key: cache-plugin
+          path: ~/.build
+
+      - uses: ./.github/workflows/_pipeline_docker.yml
+        with:
+          shopware: '6.4.16.0'
+          php: '8.1'
+          storeApiKey: 'SWSCOVFSNKLBYUTKS1VSOEDTUQ'
+          zipFile: '~/.build/MolliePayments.zip'
+
+      - uses: ./.github/workflows/_pipeline_cypress.yml
+        with:
+          shopware: '6.4.16.0'
+          php: '8.1'
+          storeApiKey: 'SWSCOVFSNKLBYUTKS1VSOEDTUQ'
+          filters: "@core"
+          testrail: false

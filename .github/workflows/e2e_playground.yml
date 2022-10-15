@@ -20,10 +20,36 @@ jobs:
       shopware: ${{ github.event.inputs.swVersion }}
 
   e2e:
-    uses: ./.github/workflows/_pipeline_cypress.yml
-    needs: [ build ]
-    with:
-      shopware: ${{ github.event.inputs.swVersion }}
-      php: ${{ github.event.inputs.phpVersion }}
-      filter: ""
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Mount Build Cache
+        id: cache-build
+        uses: actions/cache@v3
+        with:
+          key: cache-plugin
+          path: ~/.build
+
+      - uses: ./.github/workflows/_pipeline_docker.yml
+        with:
+          shopware: ${{ github.event.inputs.swVersion }}
+          php: ${{ github.event.inputs.phpVersion }}
+          storeApiKey: 'SWSCOVFSNKLBYUTKS1VSOEDTUQ'
+          zipFile: '~/.build/MolliePayments.zip'
+
+      - uses: ./.github/workflows/_pipeline_cypress.yml
+        with:
+          shopware: ${{ github.event.inputs.swVersion }}
+          php: ${{ github.event.inputs.phpVersion }}
+          storeApiKey: 'SWSCOVFSNKLBYUTKS1VSOEDTUQ'
+          filters: ""
+          testrail: false
+
+
+
+
 
