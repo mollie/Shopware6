@@ -9,14 +9,15 @@ on:
 
 
 env:
+  TEST_PHP_VERSION: 7.4
   STORE_API_KEY: SWSCOVFSNKLBYUTKS1VSOEDTUQ
   BUILD_SW_VERSION: 6.4.16.0
-
+  BUILD_RETENTION_DAYS: 4
 
 jobs:
 
   install:
-    name: Install Dependencies
+    name: Install Dev Dependencies
     runs-on: ubuntu-latest
     steps:
       - name: Clone Code
@@ -25,28 +26,16 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 7.4
+          php-version: $TEST_PHP_VERSION
 
-      - name: Mount NPM Admin Cache
-        id: npm-admin
+      - name: Mount Dev-Dependencies Cache
         uses: actions/cache@v3
         with:
-          key: npm-admin
-          path: src/Resources/app/administration/node_modules
-
-      - name: Mount NPM Storefront Cache
-        id: npm-storefront
-        uses: actions/cache@v3
-        with:
-          key: npm-storefront
-          path: src/Resources/app/storefront/node_modules
-
-      - name: Mount Composer Cache
-        uses: actions/cache@v3
-        id: composer
-        with:
-          key: composer
-          path: vendor
+          key: cache-dependencies
+          path: |
+            src/Resources/app/administration/node_modules
+            src/Resources/app/storefront/node_modules
+            vendor
 
       - name: Install Dependencies
         run: make dev -B
@@ -61,22 +50,14 @@ jobs:
       - name: Clone Code
         uses: actions/checkout@v2
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 7.4
-
-      - name: Mount NPM Admin Cache
+      - name: Mount Dev-Dependencies Cache
         uses: actions/cache@v3
         with:
-          key: npm-admin
-          path: src/Resources/app/administration/node_modules
-
-      - name: Mount NPM Storefront Cache
-        uses: actions/cache@v3
-        with:
-          key: npm-storefront
-          path: src/Resources/app/storefront/node_modules
+          key: cache-dependencies
+          path: |
+            src/Resources/app/administration/node_modules
+            src/Resources/app/storefront/node_modules
+            vendor
 
       - name: Run Jest
         run: make jest -B
@@ -89,22 +70,14 @@ jobs:
       - name: Clone Code
         uses: actions/checkout@v2
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 7.4
-
-      - name: Mount NPM Admin Cache
+      - name: Mount Dev-Dependencies Cache
         uses: actions/cache@v3
         with:
-          key: npm-admin
-          path: src/Resources/app/administration/node_modules
-
-      - name: Mount NPM Storefront Cache
-        uses: actions/cache@v3
-        with:
-          key: npm-storefront
-          path: src/Resources/app/storefront/node_modules
+          key: cache-dependencies
+          path: |
+            src/Resources/app/administration/node_modules
+            src/Resources/app/storefront/node_modules
+            vendor
 
       - name: Run ESLint
         run: make eslint -B
@@ -117,22 +90,14 @@ jobs:
       - name: Clone Code
         uses: actions/checkout@v2
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 7.4
-
-      - name: Mount NPM Admin Cache
+      - name: Mount Dev-Dependencies Cache
         uses: actions/cache@v3
         with:
-          key: npm-admin
-          path: src/Resources/app/administration/node_modules
-
-      - name: Mount NPM Storefront Cache
-        uses: actions/cache@v3
-        with:
-          key: npm-storefront
-          path: src/Resources/app/storefront/node_modules
+          key: cache-dependencies
+          path: |
+            src/Resources/app/administration/node_modules
+            src/Resources/app/storefront/node_modules
+            vendor
 
       - name: Run Stylelint
         run: make stylelint -B
@@ -150,7 +115,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 7.4
+          php-version: $TEST_PHP_VERSION
 
       - name: PHP Syntax Checks
         run: make phpcheck -B
@@ -166,14 +131,16 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 7.4
+          php-version: $TEST_PHP_VERSION
 
-      - name: Mount Composer Cache
+      - name: Mount Dev-Dependencies Cache
         uses: actions/cache@v3
-        id: composer
         with:
-          key: composer
-          path: vendor
+          key: cache-dependencies
+          path: |
+            src/Resources/app/administration/node_modules
+            src/Resources/app/storefront/node_modules
+            vendor
 
       - name: PHP Compatibility Checks
         run: make phpmin -B
@@ -182,9 +149,6 @@ jobs:
     name: Unit Tests | PHP ${{ matrix.php }}
     needs: install
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        php: [ '7.4' ]
     steps:
       - name: Clone Code
         uses: actions/checkout@v2
@@ -192,25 +156,24 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php }}
+          php-version: $TEST_PHP_VERSION
 
-      - name: Mount Composer Cache
+      - name: Mount Dev-Dependencies Cache
         uses: actions/cache@v3
-        id: composer
         with:
-          key: composer
-          path: vendor
+          key: cache-dependencies
+          path: |
+            src/Resources/app/administration/node_modules
+            src/Resources/app/storefront/node_modules
+            vendor
 
       - name: Run PHPUnit
         run: make phpunit -B
 
   infection:
     name: Mutation Tests | PHP ${{ matrix.php }}
-    needs: install
+    needs: phpunit
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        php: [ '7.4' ]
     steps:
       - name: Clone Code
         uses: actions/checkout@v2
@@ -218,14 +181,16 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php }}
+          php-version: $TEST_PHP_VERSION
 
-      - name: Mount Composer Cache
+      - name: Mount Dev-Dependencies Cache
         uses: actions/cache@v3
-        id: composer
         with:
-          key: composer
-          path: vendor
+          key: cache-dependencies
+          path: |
+            src/Resources/app/administration/node_modules
+            src/Resources/app/storefront/node_modules
+            vendor
 
       - name: Run Infection
         run: make infection -B
@@ -242,14 +207,16 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 7.4
+          php-version: $TEST_PHP_VERSION
 
-      - name: Mount Composer Cache
+      - name: Mount Dev-Dependencies Cache
         uses: actions/cache@v3
-        id: composer
         with:
-          key: composer
-          path: vendor
+          key: cache-dependencies
+          path: |
+            src/Resources/app/administration/node_modules
+            src/Resources/app/storefront/node_modules
+            vendor
 
       - name: Run PHPStan
         run: make stan -B
@@ -266,14 +233,16 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 7.4
+          php-version: $TEST_PHP_VERSION
 
-      - name: Mount Composer Cache
+      - name: Mount Dev-Dependencies Cache
         uses: actions/cache@v3
-        id: composer
         with:
-          key: composer
-          path: vendor
+          key: cache-dependencies
+          path: |
+            src/Resources/app/administration/node_modules
+            src/Resources/app/storefront/node_modules
+            vendor
 
       - name: Run PHP CS Fixer
         run: make csfix -B
@@ -284,7 +253,6 @@ jobs:
     name: Build Plugin
     runs-on: ubuntu-latest
     steps:
-
       - name: Clone Code
         uses: actions/checkout@v2
 
@@ -322,39 +290,12 @@ jobs:
         run: |
           docker cp shop:/var/www/html/custom/plugins/.build/MolliePayments.zip ~/.build/MolliePayments.zip
 
-  build_tests:
-    name: Building Tests | Shopware ${{ matrix.shopware }}
-    needs: build
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        shopware: [ '6.4.0.0', '6.3.0', '6.2.0', '6.1.0' ]
-    steps:
-
-      - name: Clone Code
-        uses: actions/checkout@v2
-
-      - name: Start Docker
-        run: |
-          docker run --rm --name shop -d dockware/dev:${{ matrix.shopware }}
-          sleep 20
-          docker logs shop
-
-      - name: Upload into Docker
-        run: |
-          docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
-          docker exec shop bash -c 'sudo chown www-data:www-data /var/www/html/custom/plugins -R'
-
-      - name: Install and Build Plugin
-        run: |
-          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make clean'
-          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make install'
-          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make build'
-
-
-
-  # ------------------------------------------------------------------------------------------------------------------------
+      - name: Store ZIP file in Github
+        uses: actions/upload-artifact@v2
+        with:
+          name: MolliePaymentsRelease
+          retention-days: $BUILD_RETENTION_DAYS
+          path: ~/.build
 
   e2e:
     name: E2E Tests | Shopware ${{ matrix.shopware }}, PHP ${{ matrix.php }}
@@ -466,8 +407,34 @@ jobs:
             tests/Cypress/cypress/screenshots
 
 
-  # ------------------------------------------------------------------------------------------------------------------------
+  build_tests:
+    name: Building Tests | Shopware ${{ matrix.shopware }}
+    needs: [ build, e2e ]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shopware: [ '6.4.0.0', '6.3.0', '6.2.0', '6.1.0' ]
+    steps:
 
-  release:
-    uses: ./.github/workflows/release.yml
-    needs: [stylelint, phpcsfixer, e2e]
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Start Docker
+        run: |
+          docker run --rm --name shop -d dockware/dev:${{ matrix.shopware }}
+          sleep 20
+          docker logs shop
+
+      - name: Upload into Docker
+        run: |
+          docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
+          docker exec shop bash -c 'sudo chown www-data:www-data /var/www/html/custom/plugins -R'
+
+      - name: Install and Build Plugin
+        run: |
+          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make clean'
+          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make install'
+          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make build'
+
+
