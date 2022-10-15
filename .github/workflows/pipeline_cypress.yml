@@ -1,4 +1,4 @@
-name: Cypress Tests
+name: _ Cypress Tests
 
 on:
   workflow_call:

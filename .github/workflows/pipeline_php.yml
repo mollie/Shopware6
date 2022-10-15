@@ -1,4 +1,4 @@
-name: PHP Tests
+name: _ PHP Tests
 
 on:
   workflow_call:

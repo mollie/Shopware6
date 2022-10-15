@@ -1,4 +1,4 @@
-name: Javascript Tests
+name: _ Javascript Tests
 
 on:
   workflow_call:
