@@ -1,4 +1,4 @@
-name: ≈Build Plugin
+name: _ Build Plugin
 
 on:
   workflow_call:
