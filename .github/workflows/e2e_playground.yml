@@ -50,12 +50,12 @@ jobs:
           path: .build
 
       - if: steps.cache-docker.outputs.cache-hit == 'true'
-        run: docker load -i ~/image-cache/dockware.tar
+        run: docker load -i ~/image-cache/dockware-dev-${{ github.event.inputs.swVersion }}.tar
 
       - name: Download Docker
         run: |
           docker pull dockware/dev:${{ github.event.inputs.swVersion }}
-          docker save -o ~/image-cache/dockware.tar dockware
+          docker save -o ~/image-cache/dockware/dev:${{ github.event.inputs.swVersion }}.tar dockware/dev:${{ github.event.inputs.swVersion }}
 
       - name: Start Docker
         run: |
