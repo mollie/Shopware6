@@ -103,6 +103,6 @@ release: ## Builds a PROD version and creates a ZIP file in plugins/.build
 	make install -B
 	make build -B
 	php switch-composer.php prod
-	cd .. && rm -rf ./.build/MolliePayments-* && mkdir -p ./.build
-	cd .. && zip -qq -r -0 ./.build/MolliePayments-$(PLUGIN_VERSION).zip MolliePayments/ -x '*.editorconfig' '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*' '*/makefile' '*.DS_Store' '*/switch-composer.php' '*/phpunit.xml' '*/.infection.json' '*/phpunit.autoload.php' '*/.phpstan*' '*/.php_cs.php' '*/phpinsights.php'
+	cd .. && rm -rf ./.build/MolliePayments* && mkdir -p ./.build
+	cd .. && zip -qq -r -0 ./.build/MolliePayments.zip MolliePayments/ -x '*.editorconfig' '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*' '*/makefile' '*.DS_Store' '*/switch-composer.php' '*/phpunit.xml' '*/.infection.json' '*/phpunit.autoload.php' '*/.phpstan*' '*/.php_cs.php' '*/phpinsights.php'
 	php switch-composer.php dev

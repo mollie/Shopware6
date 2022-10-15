@@ -30,29 +30,12 @@ jobs:
         with:
           php-version: 7.4
 
-      - name: Mount Storefront Cache
-        id: cache-storefront
+      - name: Mount Build Cache
+        id: cache-build
         uses: actions/cache@v3
         with:
-          key: cache-storefront
-          path: src/Resources/app/storefront/dist
-
-      - name: Mount Admin Cache
-        id: cache-admin
-        uses: actions/cache@v3
-        with:
-          key: cache-admin
-          path: src/Resources/app/administration/node_modules
-
-      - name: Mount Composer Cache
-        id: cache-composer
-        uses: actions/cache@v3
-        with:
-          key: cache-composer
-          path: vendor
-
-      - name: Install PROD Dependencies
-        run: make install -B
+          key: cache-plugin
+          path: .build
 
       - name: Start Docker
         run: |
@@ -69,21 +52,13 @@ jobs:
         run: |
           docker exec shop bash -c 'sed -i "s/APP_ENV=dev/APP_ENV=prod/g" /var/www/html/.env' || true;
 
-      - name: Install and Build Plugin
+      - name: Build Plugin
         run: |
-          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make clean'
-          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make install'
-          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make build'
+          docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make release'
 
-      - name: Download from Docker
+      - name: Download ZIP File
         run: |
-          docker cp shop:/var/www/html/custom/plugins/MolliePayments/. $(pwd)/.
-
-      - name: Verify Build
-        run: |
-          # the dist folder needs a storefront folder
-          # if existing, the build worked and has been downloaded from Docker
-          ls -la src/Resources/app/storefront/dist/storefront
+          docker cp shop:/var/www/html/custom/plugins/.build/MolliePayments.zip $(pwd)/.build/MolliePayments.zip
 
   e2e:
     name: E2E Tests | Shopware ${{ github.event.inputs.swVersion }}, PHP ${{ github.event.inputs.phpVersion }}
@@ -94,31 +69,12 @@ jobs:
       - name: Clone Code
         uses: actions/checkout@v2
 
-      - name: Mount Storefront Cache
-        id: cache-storefront
+      - name: Mount Build Cache
+        id: cache-build
         uses: actions/cache@v3
         with:
-          key: cache-storefront
-          path: src/Resources/app/storefront/dist
-
-      - name: Mount Admin Cache
-        id: cache-admin
-        uses: actions/cache@v3
-        with:
-          key: cache-admin
-          path: src/Resources/app/administration/node_modules
-          
-      - name: Mount Composer Cache
-        id: cache-composer
-        uses: actions/cache@v3
-        with:
-          key: cache-composer
-          path: vendor
-
-      - name: Verify Build Artifacts
-        run: |
-          # only if this folder exists, then we have a buid artifact from our cache
-          ls -la src/Resources/app/storefront/dist/storefront
+          key: cache-plugin
+          path: .build
 
       - name: Download Docker
         run: |
@@ -133,15 +89,15 @@ jobs:
           sudo echo "127.0.0.1 local.mollie.shop" | sudo tee -a /etc/hosts
           docker exec shop bash -c "mysql -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='https://local.mollie.shop' WHERE url NOT LIKE 'default.%';\""
 
-      - name: Upload into Docker
-        run: |
-          docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
-          docker exec shop bash -c 'sudo chown www-data:www-data /var/www/html/custom/plugins -R'
-
       - name: Update Shopware Config
         run: |
           # let's get rid of the PHP Warning outputs by changing to env PROD
           docker exec shop bash -c 'sed -i "s/APP_ENV=dev/APP_ENV=prod/g" /var/www/html/.env' || true;
+
+      - name: Upload ZIP File to Docker
+        run: |
+          docker cp $(pwd)/.build/MolliePayments.zip shop:/var/www/html/custom/plugins/MolliePayments.zip
+          docker exec shop bash -c 'cd /var/www/html/custom/plugins && unzip -o MolliePayments.zip'
 
       - name: Install/Configure Plugin
         run: |
