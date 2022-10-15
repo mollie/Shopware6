@@ -37,6 +37,13 @@ jobs:
           key: cache-storefront
           path: src/Resources/app/storefront/dist
 
+      - name: Mount Admin Cache
+        id: cache-admin
+        uses: actions/cache@v3
+        with:
+          key: cache-admin
+          path: src/Resources/app/administration/node_modules
+
       - name: Mount Composer Cache
         id: cache-composer
         uses: actions/cache@v3
@@ -94,6 +101,13 @@ jobs:
           key: cache-storefront
           path: src/Resources/app/storefront/dist
 
+      - name: Mount Admin Cache
+        id: cache-admin
+        uses: actions/cache@v3
+        with:
+          key: cache-admin
+          path: src/Resources/app/administration/node_modules
+          
       - name: Mount Composer Cache
         id: cache-composer
         uses: actions/cache@v3
