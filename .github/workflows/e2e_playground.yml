@@ -30,6 +30,18 @@ jobs:
         with:
           php-version: 7.4
 
+      - name: Create Cache Directories
+        run: |
+          mkdir -p ~/image-cache
+          mkdir -p $(pwd)/.build
+
+      - name: Mount Docker Cache
+        id: cache-docker
+        uses: actions/cache@v3
+        with:
+          key: cache-docker
+          path: ~/image-cache
+
       - name: Mount Build Cache
         id: cache-build
         uses: actions/cache@v3
@@ -37,10 +49,18 @@ jobs:
           key: cache-plugin
           path: .build
 
+      - if: steps.cache-docker.outputs.cache-hit == 'true'
+        run: docker load -i ~/image-cache/dockware.tar
+
+      - name: Download Docker
+        run: |
+          docker pull dockware/dev:${{ github.event.inputs.swVersion }}
+          docker save -o ~/image-cache/dockware.tar dockware
+
       - name: Start Docker
         run: |
           docker run --rm --name shop -d dockware/dev:${{ github.event.inputs.swVersion }}
-          sleep 30
+          sleep 20
           docker logs shop
 
       - name: Upload into Docker
