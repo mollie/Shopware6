@@ -9,10 +9,8 @@ on:
 
 
 env:
-  TEST_PHP_VERSION: 7.4
   STORE_API_KEY: SWSCOVFSNKLBYUTKS1VSOEDTUQ
   BUILD_SW_VERSION: 6.4.16.0
-  BUILD_RETENTION_DAYS: 4
 
 jobs:
 
@@ -26,7 +24,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: $TEST_PHP_VERSION
+          php-version: 7.4
 
       - name: Mount Dev-Dependencies Cache
         uses: actions/cache@v3
@@ -115,7 +113,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: $TEST_PHP_VERSION
+          php-version: 7.4
 
       - name: PHP Syntax Checks
         run: make phpcheck -B
@@ -131,7 +129,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: $TEST_PHP_VERSION
+          php-version: 7.4
 
       - name: Mount Dev-Dependencies Cache
         uses: actions/cache@v3
@@ -156,7 +154,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: $TEST_PHP_VERSION
+          php-version: 7.4
 
       - name: Mount Dev-Dependencies Cache
         uses: actions/cache@v3
@@ -181,7 +179,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: $TEST_PHP_VERSION
+          php-version: 7.4
 
       - name: Mount Dev-Dependencies Cache
         uses: actions/cache@v3
@@ -207,7 +205,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: $TEST_PHP_VERSION
+          php-version: 7.4
 
       - name: Mount Dev-Dependencies Cache
         uses: actions/cache@v3
@@ -233,7 +231,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: $TEST_PHP_VERSION
+          php-version: 7.4
 
       - name: Mount Dev-Dependencies Cache
         uses: actions/cache@v3
@@ -294,7 +292,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: MolliePaymentsRelease
-          retention-days: $BUILD_RETENTION_DAYS
+          retention-days: 4
           path: ~/.build
 
   e2e:
