@@ -165,7 +165,7 @@ jobs:
         run: make phpunit -B
 
   infection:
-    name: Mutation Tests
+    name: Infection Tests
     needs: phpunit
     runs-on: ubuntu-latest
     steps:
@@ -245,7 +245,6 @@ jobs:
 
   build:
     name: Build Plugin
-    needs: install
     runs-on: ubuntu-latest
     steps:
 
@@ -323,20 +322,20 @@ jobs:
       - name: E2E Tests
         uses: ./.github/actions/run-e2e
         with:
-          secrets: inherit
           shopware: ${{ matrix.shopware }}
           php: ${{ matrix.php }}
           # we want to send results to testrail here
           testrail: true
+          CYPRESS_TESTRAIL_DOMAIN: ${{ secrets.TESTRAIL_DOMAIN }}
 
-  build_tests:
-    name: Building Tests | Shopware ${{ matrix.shopware }}
-    needs: [ build, e2e ]
+  legacy_tests:
+    name: Installation Tests | Shopware ${{ matrix.shopware }}
+    needs: [ build ]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        shopware: [ '6.4.0.0', '6.3.0', '6.2.0', '6.1.0' ]
+        shopware: [ '6.3.0', '6.2.0', '6.1.0' ]
     steps:
 
       - name: Installation Tests
@@ -345,5 +344,7 @@ jobs:
           secrets: inherit
           shopware: ${{ matrix.shopware }}
           php: 8.1
-          # only do installation tests without cypress here
+          # only do installation tests without Cypress here
+          # this is just for old Shopware versions that do not
+          # support the API that we need for Cypress
           runCypress: false
