@@ -321,7 +321,7 @@ jobs:
           path: ~/.build
 
       - name: E2E Tests
-        uses: ./.github/workflows/action_e2e.yml
+        uses: ./.github/actions/run-e2e
         with:
           secrets: inherit
           shopware: ${{ matrix.shopware }}
