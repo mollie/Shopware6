@@ -1,9 +1,9 @@
 name: 'Build Plugin'
+description: "Builds the Plugin"
 
 inputs:
   shopware:
     description: "The Shopware version that is used to build the plugin"
-    type: string
     required: true
 
 runs:

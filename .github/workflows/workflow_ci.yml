@@ -264,7 +264,7 @@ jobs:
           path: ~/.build
 
       - name: Build Plugin
-        uses: ./.github/workflows/action_build.yml
+        uses: ./.github/actions/build-plugin
         with:
           shopware: 6.4.16.0
 
