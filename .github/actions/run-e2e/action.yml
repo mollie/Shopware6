@@ -118,12 +118,12 @@ runs:
     # --------------------------------------------------------------------------------------------------------------------------------------
 
     - name: Install Cypress
-      if: "${{ github.event.inputs.runCypress != '0' }}"
+      if: ${{ inputs.runCypress != '0' }}
       shell: bash
       run: cd tests/Cypress && make install -B
 
     - name: Remove deprecated Cypress Tests
-      if: "${{ github.event.inputs.runCypress != '0' && github.event.inputs.removeDeprecatedTests != '0' }}"
+      if: ${{ inputs.runCypress != '0' && inputs.removeDeprecatedTests != '0' }}
       shell: bash
       run: |
         # SEPA Direct Debit has been completely removed from Mollie. We have to remove that entry from the tests in old Cypress versions
@@ -131,14 +131,14 @@ runs:
         sed -i "/key: 'directdebit'/g" $(pwd)/tests/Cypress/cypress/integration/storefront/checkout/checkout-success.spec.js || true
 
     - name: Start Cypress
-      if: "${{ github.event.inputs.runCypress != '0' && github.event.inputs.testrail == '0' }}"
+      if: ${{ inputs.runCypress != '0' && inputs.testrail == '0' }}
       shell: bash
       run: |
         cd tests/Cypress && \
         make run shopware=${{ inputs.shopware }} storeApiKey=${{ inputs.storeApiKey }} url=https://${{ inputs.shopDomain }} filters="${{ inputs.filters }}"
 
     - name: Start Cypress with TestRail
-      if: "${{ github.event.inputs.runCypress != '0' && github.event.inputs.testrail != '0' }}"
+      if: ${{ inputs.runCypress != '0' && inputs.testrail != '0' }}
       shell: bash
       run: |
         cd tests/Cypress && \
@@ -154,7 +154,7 @@ runs:
     # --------------------------------------------------------------------------------------------------------------------------------------
 
     - name: Download Logs
-      if: "${{ github.event.inputs.runCypress != '0' && always() }}"
+      if: ${{ inputs.runCypress != '0' && always() }}
       shell: bash
       run: |
         mkdir -p $(pwd)/tests/Cypress/cypress/logs/shopware
@@ -163,7 +163,7 @@ runs:
         docker cp shop:/var/log/php/. $(pwd)/tests/Cypress/cypress/logs/apache
 
     - name: Store Cypress Results
-      if: "${{ github.event.inputs.runCypress != '0' && always() }}"
+      if: ${{ inputs.runCypress != '0' && always() }}
       uses: actions/upload-artifact@v2
       with:
         name: cypress_results_sw_v${{ inputs.shopware }}
