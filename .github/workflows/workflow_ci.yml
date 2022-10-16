@@ -327,6 +327,8 @@ jobs:
           # we want to send results to testrail here
           testrail: true
           CYPRESS_TESTRAIL_DOMAIN: ${{ secrets.TESTRAIL_DOMAIN }}
+          CYPRESS_TESTRAIL_USERNAME: ${{ secrets.TESTRAIL_USERNAME }}
+          CYPRESS_TESTRAIL_PASSWORD: ${{ secrets.TESTRAIL_PASSWORD }}
 
   legacy_tests:
     name: Installation Tests | Shopware ${{ matrix.shopware }}

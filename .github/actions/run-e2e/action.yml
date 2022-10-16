@@ -42,6 +42,14 @@ inputs:
     description: "The domain for the TestRail endpoint"
     default: ''
     required: false
+  TESTRAIL_USERNAME:
+    description: "The username for the TestRail endpoint"
+    default: ''
+    required: false
+  CYPRESS_TESTRAIL_PASSWORD:
+    description: "The password for the TestRail endpoint"
+    default: ''
+    required: false
   # ------------------------------------------------------------------------------------
   # ------------------------------------------------------------------------------------
   # PRIVATE CONSTANTS
@@ -135,8 +143,8 @@ runs:
       run: |
         cd tests/Cypress && \
         CYPRESS_TESTRAIL_DOMAIN=${{ inputs.CYPRESS_TESTRAIL_DOMAIN }} \
-        CYPRESS_TESTRAIL_USERNAME=${{ secrets.TESTRAIL_USERNAME }} \
-        CYPRESS_TESTRAIL_PASSWORD=${{ secrets.TESTRAIL_PASSWORD }} \
+        CYPRESS_TESTRAIL_USERNAME=${{ inputs.TESTRAIL_USERNAME }} \
+        CYPRESS_TESTRAIL_PASSWORD=${{ inputs.TESTRAIL_PASSWORD }} \
         CYPRESS_TESTRAIL_PROJECT_ID=7 \
         CYPRESS_TESTRAIL_MILESTONE_ID=15 \
         CYPRESS_TESTRAIL_RUN_NAME="Github Workflow __datetime__, ${{ github.event.head_commit.message }}, Shopware ${{ inputs.shopware }}" \
