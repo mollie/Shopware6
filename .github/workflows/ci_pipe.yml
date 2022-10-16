@@ -11,7 +11,7 @@ on:
 jobs:
 
   install:
-    uses: ./.github/workflows/pipeline_install_dev.yml
+    uses: ./.github/workflows/_pipeline_install_dev.yml
 
   # ------------------------------------------------------------------------------------------------------------------------
 
