@@ -53,8 +53,6 @@ runs:
   steps:
 
     - name: Mount Build Cache
-      shell: bash
-      id: cache-build
       uses: actions/cache@v3
       with:
         key: cache-plugin
