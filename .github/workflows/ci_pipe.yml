@@ -8,35 +8,10 @@ on:
   workflow_dispatch:
 
 
-env:
-  STORE_API_KEY: SWSCOVFSNKLBYUTKS1VSOEDTUQ
-
-
 jobs:
 
   install:
-    name: Install Dev Dependencies
-    runs-on: ubuntu-latest
-    steps:
-      - name: Clone Code
-        uses: actions/checkout@v2
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 7.4
-
-      - name: Mount Dev-Dependencies Cache
-        uses: actions/cache@v3
-        with:
-          key: cache-dependencies
-          path: |
-            src/Resources/app/administration/node_modules
-            src/Resources/app/storefront/node_modules
-            vendor
-
-      - name: Install Dependencies
-        run: make dev -B
+    uses: ./.github/workflows/pipeline_install_dev.yml
 
   # ------------------------------------------------------------------------------------------------------------------------
 
@@ -99,29 +74,12 @@ jobs:
             php: '7.2'
     steps:
 
-      - name: Clone Code
-        uses: actions/checkout@v2
-
-      - name: Mount Build Cache
-        id: cache-build
-        uses: actions/cache@v3
-        with:
-          key: cache-plugin
-          path: ~/.build
-
-      - uses: ./.github/workflows/_pipeline_docker.yml
+      - name: E2E Tests
+        uses: ./.github/workflows/_pipeline_cypress.yml
         with:
           shopware: ${{ matrix.shopware }}
           php: ${{ matrix.php }}
-          storeApiKey: 'SWSCOVFSNKLBYUTKS1VSOEDTUQ'
-          zipFile: '~/.build/MolliePayments.zip'
-
-      - uses: ./.github/workflows/_pipeline_cypress.yml
-        with:
-          shopware: ${{ matrix.shopware }}
-          php: ${{ matrix.php }}
-          storeApiKey: 'SWSCOVFSNKLBYUTKS1VSOEDTUQ'
-          filters: ""
+          # we want to send results to testrail here
           testrail: true
 
   build_tests:
@@ -134,12 +92,10 @@ jobs:
         shopware: [ '6.4.0.0', '6.3.0', '6.2.0', '6.1.0' ]
     steps:
 
-      - name: Clone Code
-        uses: actions/checkout@v2
-
-      - uses: ./.github/workflows/_pipeline_build.yml
+      - name: Installation Tests
+        uses: ./.github/workflows/_pipeline_cypress.yml
         with:
           shopware: ${{ matrix.shopware }}
-
-
-
+          php: 8.1
+          # only do installation tests without cypress here
+          runCypress: false

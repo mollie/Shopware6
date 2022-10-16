@@ -1,6 +1,8 @@
 name: Compatibility Pipeline
 run-name: Shopware ${{ github.event.inputs.swVersion }}, PHP ${{ github.event.inputs.phpVersion }}
 
+
+
 on:
   workflow_dispatch:
     inputs:
@@ -11,7 +13,6 @@ on:
         description: 'PHP Version'
         required: true
 
-
 jobs:
 
   e2e:
@@ -20,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        plugin: [ '3.2.0', '3.1.0', '3.0.0', '2.5.0' ]
+        plugin: [ '3.1.0', '3.0.0', '2.5.0' ]
     steps:
 
       - name: Clone Code
@@ -28,28 +29,19 @@ jobs:
         with:
           ref: refs/tags/v${{ matrix.plugin }}
 
-      - name: Build Plugin
+      - name: Build Plugin ${{ matrix.plugin }}
         uses: ./.github/workflows/_pipeline_build.yml
         with:
           shopware: ${{ github.event.inputs.swVersion }}
+          pluginVersion: ${{ matrix.plugin }}
 
-      - name: Remove deprecated Cypress Tests
-        run: |
-          # SEPA Direct Debit has been completely removed from Mollie. We have to remove that entry from the tests in old Cypress versions
-          sed -i "/key: 'directdebit'/g" $(pwd)/tests/Cypress/cypress/e2e/storefront/checkout/checkout-success.cy.js || true
-          sed -i "/key: 'directdebit'/g" $(pwd)/tests/Cypress/cypress/integration/storefront/checkout/checkout-success.spec.js || true
-
-      - uses: ./.github/workflows/_pipeline_docker.yml
+      - name: Run Cypress for Plugin ${{ matrix.plugin }}
+        uses: ./.github/workflows/_pipeline_cypress.yml
         with:
-          shopware: ${{ github.event.inputs.swVersion }}
-          php: ${{ github.event.inputs.phpVersion }}
-          storeApiKey: 'SWSCOVFSNKLBYUTKS1VSOEDTUQ'
-          zipFile: '~/.build/MolliePayments.zip'
-
-      - uses: ./.github/workflows/_pipeline_cypress.yml
-        with:
-          shopware: ${{ github.event.inputs.swVersion }}
-          php: ${{ github.event.inputs.phpVersion }}
-          storeApiKey: 'SWSCOVFSNKLBYUTKS1VSOEDTUQ'
-          filters: ""
-          testrail: false
+          shopware: ${{ matrix.shopware }}
+          php: 8.1
+          # make sure to use old cypress tests of that plugin version
+          pluginVersion: ${{ matrix.plugin }}
+          # we have to remove old tests from the history, because e.g.
+          # SEPA Direct Debit is not working anymore when being executed now...
+          removeDeprecatedTests: true

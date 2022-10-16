@@ -3,9 +3,15 @@ name: _ Build Plugin
 on:
   workflow_call:
     inputs:
-      shopware:
-        required: true
+      pluginVersion:
+        description: "An optional specific plugin version that will be used to checkout the source code"
         type: string
+        default: ''
+        required: false
+      shopware:
+        description: "The Shopware version that is used to run the Cypress tests."
+        type: string
+        required: true
 
 
 jobs:
@@ -14,8 +20,18 @@ jobs:
     name: Build Plugin
     runs-on: ubuntu-latest
     steps:
+
       - name: Clone Code
+        if: "${{ github.event.inputs.pluginVersion == '' }}"
         uses: actions/checkout@v2
+
+      - name: Clone Code for Plugin v${{ inputs.pluginVersion }}
+        if: "${{ github.event.inputs.pluginVersion != '' }}"
+        uses: actions/checkout@v2
+        with:
+          ref: refs/tags/v${{ inputs.pluginVersion }}
+
+      # --------------------------------------------------------------------------------------------------------------------------------------
 
       - name: Create Cache Directories
         run: |
@@ -27,6 +43,8 @@ jobs:
         with:
           key: cache-plugin
           path: ~/.build
+
+      # --------------------------------------------------------------------------------------------------------------------------------------
 
       - name: Start Docker
         run: |
@@ -43,9 +61,13 @@ jobs:
           docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
           docker exec shop bash -c 'sudo chown www-data:www-data /var/www/html/custom/plugins -R'
 
+      # --------------------------------------------------------------------------------------------------------------------------------------
+
       - name: Build Plugin
         run: |
           docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make release'
+
+      # --------------------------------------------------------------------------------------------------------------------------------------
 
       - name: Download ZIP File
         run: |
