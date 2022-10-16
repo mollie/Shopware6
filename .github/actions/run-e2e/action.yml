@@ -38,7 +38,7 @@ inputs:
     default: '0'
     required: false
   # ------------------------------------------------------------------------------------
-  CYPRESS_TESTRAIL_DOMAIN:
+  TESTRAIL_DOMAIN:
     description: "The domain for the TestRail endpoint"
     default: ''
     required: false
@@ -46,7 +46,7 @@ inputs:
     description: "The username for the TestRail endpoint"
     default: ''
     required: false
-  CYPRESS_TESTRAIL_PASSWORD:
+  TESTRAIL_PASSWORD:
     description: "The password for the TestRail endpoint"
     default: ''
     required: false
@@ -142,7 +142,7 @@ runs:
       shell: bash
       run: |
         cd tests/Cypress && \
-        CYPRESS_TESTRAIL_DOMAIN=${{ inputs.CYPRESS_TESTRAIL_DOMAIN }} \
+        CYPRESS_TESTRAIL_DOMAIN=${{ inputs.TESTRAIL_DOMAIN }} \
         CYPRESS_TESTRAIL_USERNAME=${{ inputs.TESTRAIL_USERNAME }} \
         CYPRESS_TESTRAIL_PASSWORD=${{ inputs.TESTRAIL_PASSWORD }} \
         CYPRESS_TESTRAIL_PROJECT_ID=7 \
