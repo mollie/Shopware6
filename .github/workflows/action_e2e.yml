@@ -55,18 +55,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Clone Code
-        if: "${{ github.event.inputs.pluginVersion == '' }}"
-        uses: actions/checkout@v2
-
-      - name: Clone Code for Plugin v${{ inputs.pluginVersion }}
-        if: "${{ github.event.inputs.pluginVersion != '' }}"
-        uses: actions/checkout@v2
-        with:
-          ref: refs/tags/v${{ inputs.pluginVersion }}
-
-      # --------------------------------------------------------------------------------------------------------------------------------------
-
       - name: Mount Build Cache
         id: cache-build
         uses: actions/cache@v3
@@ -141,8 +129,7 @@ jobs:
       # --------------------------------------------------------------------------------------------------------------------------------------
 
       - name: Download Logs
-        if: "${{ github.event.inputs.runCypress == true }}"
-        if: ${{ always() }}
+        if: "${{ github.event.inputs.runCypress == true && always() }}"
         run: |
           mkdir -p $(pwd)/tests/Cypress/cypress/logs/shopware
           mkdir -p $(pwd)/tests/Cypress/cypress/logs/apache
@@ -150,8 +137,7 @@ jobs:
           docker cp shop:/var/log/php/. $(pwd)/tests/Cypress/cypress/logs/apache
 
       - name: Store Cypress Results
-        if: "${{ github.event.inputs.runCypress == true }}"
-        if: ${{ always() }}
+        if: "${{ github.event.inputs.runCypress == true && always() }}"
         uses: actions/upload-artifact@v2
         with:
           name: cypress_results_sw_v${{ inputs.shopware }}

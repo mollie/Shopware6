@@ -1,0 +1,278 @@
+name: PR Pipeline
+
+on: [ pull_request, workflow_dispatch ]
+
+
+jobs:
+
+  install:
+    name: Install Dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+
+      - name: Mount Dev Dependency Cache
+        uses: actions/cache@v3
+        with:
+          key: cache-dev-dependencies
+          path: |
+            src/Resources/app/storefront/node_modules
+            src/Resources/app/administration/node_modules
+            vendor
+
+      - name: Install Dependencies
+        run: make dev -B
+
+  # ------------------------------------------------------------------------------------------------------------------------
+
+  jest:
+    name: Jest Tests
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Mount Dev Dependency Cache
+        uses: actions/cache@v3
+        with:
+          key: cache-dev-dependencies
+          path: |
+            src/Resources/app/storefront/node_modules
+            src/Resources/app/administration/node_modules
+            vendor
+
+      - name: Run Jest
+        run: make jest -B
+
+  eslint:
+    name: ESLint
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Mount Dev Dependency Cache
+        uses: actions/cache@v3
+        with:
+          key: cache-dev-dependencies
+          path: |
+            src/Resources/app/storefront/node_modules
+            src/Resources/app/administration/node_modules
+            vendor
+
+      - name: Run ESLint
+        run: make eslint -B
+
+  stylelint:
+    name: Stylelint
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Mount Dev Dependency Cache
+        uses: actions/cache@v3
+        with:
+          key: cache-dev-dependencies
+          path: |
+            src/Resources/app/storefront/node_modules
+            src/Resources/app/administration/node_modules
+            vendor
+
+      - name: Run Stylelint
+        run: make stylelint -B
+
+  # ------------------------------------------------------------------------------------------------------------------------
+
+  php_checks:
+    name: PHP Syntax Checks
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+
+      - name: PHP Syntax Checks
+        run: make phpcheck -B
+
+  php_min:
+    name: PHP 7.2 Compatibility
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+
+      - name: Mount Dev Dependency Cache
+        uses: actions/cache@v3
+        with:
+          key: cache-dev-dependencies
+          path: |
+            src/Resources/app/storefront/node_modules
+            src/Resources/app/administration/node_modules
+            vendor
+
+      - name: PHP Compatibility Checks
+        run: make phpmin -B
+
+  phpunit:
+    name: PHPUnit
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+
+      - name: Mount Dev Dependency Cache
+        uses: actions/cache@v3
+        with:
+          key: cache-dev-dependencies
+          path: |
+            src/Resources/app/storefront/node_modules
+            src/Resources/app/administration/node_modules
+            vendor
+
+      - name: Run PHPUnit
+        run: make phpunit -B
+
+  infection:
+    name: Mutation Tests
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+
+      - name: Mount Dev Dependency Cache
+        uses: actions/cache@v3
+        with:
+          key: cache-dev-dependencies
+          path: |
+            src/Resources/app/storefront/node_modules
+            src/Resources/app/administration/node_modules
+            vendor
+
+      - name: Run Infection
+        run: make infection -B
+
+  phpstan:
+    name: PHPStan
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+
+      - name: Mount Dev Dependency Cache
+        uses: actions/cache@v3
+        with:
+          key: cache-dev-dependencies
+          path: |
+            src/Resources/app/storefront/node_modules
+            src/Resources/app/administration/node_modules
+            vendor
+
+      - name: Run PHPStan
+        run: make stan -B
+
+  phpcsfixer:
+    name: PHP CS Fixer
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+
+      - name: Mount Dev Dependency Cache
+        uses: actions/cache@v3
+        with:
+          key: cache-dev-dependencies
+          path: |
+            src/Resources/app/storefront/node_modules
+            src/Resources/app/administration/node_modules
+            vendor
+
+      - name: Run PHP CS Fixer
+        run: make csfix -B
+
+  # ------------------------------------------------------------------------------------------------------------------------
+
+  build:
+    uses: ./.github/workflows/_pipeline_build.yml
+    with:
+      shopware: 6.4.16.0
+
+  # ------------------------------------------------------------------------------------------------------------------------
+
+  integration:
+    name: Integration Tests | Shopware ${{ matrix.shopware }}
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shopware: [ '6.4.16.0', '6.4.15.0', '6.4.9.0', '6.4.8.2', '6.4.0.0', '6.3.0', '6.2.0', '6.1.0' ]
+    steps:
+
+      - name: Installation Tests
+        uses: ./.github/workflows/_pipeline_cypress.yml
+        with:
+          shopware: ${{ matrix.shopware }}
+          php: 8.1
+          # only do installation tests, no cypress for this simple testing
+          runCypress: false
+
+  # ------------------------------------------------------------------------------------------------------------------------
+
+  e2e:
+    name: E2E Core Tests
+    needs: build
+    uses: ./.github/workflows/_pipeline_cypress.yml
+    with:
+      shopware: 6.4.16.0
+      php: 8.1
+      # only run @core tests, because we have no API key here
+      filters: "@core"
+      # do not send to testrail for PR tests
+      testrail: false

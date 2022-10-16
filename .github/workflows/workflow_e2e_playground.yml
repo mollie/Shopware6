@@ -1,0 +1,65 @@
+name: E2E Playground
+run-name: Shopware ${{ github.event.inputs.swVersion }}, PHP ${{ github.event.inputs.phpVersion }}
+
+
+on:
+  workflow_dispatch:
+    inputs:
+      swVersion:
+        description: 'Shopware Version'
+        required: true
+      phpVersion:
+        description: 'PHP Version'
+        required: true
+
+jobs:
+
+
+  build:
+    name: Build Plugin
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Create Cache Directories
+        run: |
+          mkdir -p ~/.build
+
+      - name: Mount Build Cache
+        id: cache-build
+        uses: actions/cache@v3
+        with:
+          key: cache-plugin
+          path: ~/.build
+
+      - name: Build Plugin
+        uses: ./.github/workflows/action_build.yml
+        with:
+          shopware: ${{ github.event.inputs.swVersion }}
+
+  e2e:
+    name: E2E Tests | Shopware ${{ github.event.inputs.swVersion }}, PHP ${{ github.event.inputs.phpVersion }}
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Mount Build Cache
+        id: cache-build
+        uses: actions/cache@v3
+        with:
+          key: cache-plugin
+          path: ~/.build
+
+      - name: E2E Tests
+        uses: ./.github/workflows/action_e2e.yml
+        with:
+          secrets: inherit
+          shopware: ${{ github.event.inputs.swVersion }}
+          php: ${{ github.event.inputs.phpVersion }}
+          testrail: false

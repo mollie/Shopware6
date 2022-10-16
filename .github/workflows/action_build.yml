@@ -3,13 +3,8 @@ name: _ Build Plugin
 on:
   workflow_call:
     inputs:
-      pluginVersion:
-        description: "An optional specific plugin version that will be used to checkout the source code"
-        type: string
-        default: ''
-        required: false
       shopware:
-        description: "The Shopware version that is used to run the Cypress tests."
+        description: "The Shopware version that is used to build the plugin"
         type: string
         required: true
 
@@ -20,31 +15,6 @@ jobs:
     name: Build Plugin
     runs-on: ubuntu-latest
     steps:
-
-      - name: Clone Code
-        if: "${{ github.event.inputs.pluginVersion == '' }}"
-        uses: actions/checkout@v2
-
-      - name: Clone Code for Plugin v${{ inputs.pluginVersion }}
-        if: "${{ github.event.inputs.pluginVersion != '' }}"
-        uses: actions/checkout@v2
-        with:
-          ref: refs/tags/v${{ inputs.pluginVersion }}
-
-      # --------------------------------------------------------------------------------------------------------------------------------------
-
-      - name: Create Cache Directories
-        run: |
-          mkdir -p ~/.build
-
-      - name: Mount Build Cache
-        id: cache-build
-        uses: actions/cache@v3
-        with:
-          key: cache-plugin
-          path: ~/.build
-
-      # --------------------------------------------------------------------------------------------------------------------------------------
 
       - name: Start Docker
         run: |
@@ -76,6 +46,6 @@ jobs:
       - name: Store ZIP file in Github
         uses: actions/upload-artifact@v2
         with:
-          name: MolliePaymentsRelease
+          name: MolliePayments-Shopware-${{ inputs.shopware }}
           retention-days: 4
           path: ~/.build

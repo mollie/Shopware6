@@ -29,15 +29,26 @@ jobs:
         with:
           ref: refs/tags/v${{ matrix.plugin }}
 
+      - name: Create Cache Directories
+        run: |
+          mkdir -p ~/.build
+
+      - name: Mount Build Cache
+        id: cache-build
+        uses: actions/cache@v3
+        with:
+          key: cache-plugin
+          path: ~/.build
+
       - name: Build Plugin ${{ matrix.plugin }}
-        uses: ./.github/workflows/_pipeline_build.yml
+        uses: ./.github/workflows/action_build.yml
         with:
           shopware: ${{ github.event.inputs.swVersion }}
-          pluginVersion: ${{ matrix.plugin }}
 
       - name: Run Cypress for Plugin ${{ matrix.plugin }}
-        uses: ./.github/workflows/_pipeline_cypress.yml
+        uses: ./.github/workflows/action_e2e.yml
         with:
+          secrets: inherit
           shopware: ${{ matrix.shopware }}
           php: 8.1
           # make sure to use old cypress tests of that plugin version
