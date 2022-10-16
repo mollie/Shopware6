@@ -166,7 +166,7 @@ jobs:
 
   infection:
     name: Mutation Tests
-    needs: install
+    needs: phpunit
     runs-on: ubuntu-latest
     steps:
       - name: Clone Code
