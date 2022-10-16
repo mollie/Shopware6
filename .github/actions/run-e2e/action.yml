@@ -2,6 +2,11 @@ name: 'Run E2E Tests'
 description: "Runs installation and Cypress tests"
 
 
+branding:
+  icon: 'award'
+  color: 'green'
+
+
 inputs:
   pluginVersion:
     description: "An optional specific plugin version that will be used to checkout the source code"
@@ -19,10 +24,6 @@ inputs:
     description: "An optional filter for the Cypress tests. Leave empty to run all tests"
     required: false
     default: ""
-  testrail:
-    description: "If enabled, all results will be sent to TestRail."
-    default: '0'
-    required: false
   runCypress:
     description: "If disabled, only the plugin installation will be tested"
     default: '0'
@@ -32,7 +33,18 @@ inputs:
     default: '0'
     required: false
   # ------------------------------------------------------------------------------------
+  testrail:
+    description: "If enabled, all results will be sent to TestRail."
+    default: '0'
+    required: false
   # ------------------------------------------------------------------------------------
+  CYPRESS_TESTRAIL_DOMAIN:
+    description: "The domain for the TestRail endpoint"
+    default: ''
+    required: false
+  # ------------------------------------------------------------------------------------
+  # ------------------------------------------------------------------------------------
+  # PRIVATE CONSTANTS
   shopDomain:
     description: ''
     default: 'local.mollie.shop'
@@ -122,7 +134,7 @@ runs:
       shell: bash
       run: |
         cd tests/Cypress && \
-        CYPRESS_TESTRAIL_DOMAIN=${{ secrets.TESTRAIL_DOMAIN }} \
+        CYPRESS_TESTRAIL_DOMAIN=${{ inputs.CYPRESS_TESTRAIL_DOMAIN }} \
         CYPRESS_TESTRAIL_USERNAME=${{ secrets.TESTRAIL_USERNAME }} \
         CYPRESS_TESTRAIL_PASSWORD=${{ secrets.TESTRAIL_PASSWORD }} \
         CYPRESS_TESTRAIL_PROJECT_ID=7 \
