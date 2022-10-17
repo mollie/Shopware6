@@ -117,6 +117,9 @@ runs:
 
     # --------------------------------------------------------------------------------------------------------------------------------------
 
+    - run: echo "Cypress Mode is ${{ inputs.runCypress }}"
+      shell: bash
+
     - name: Install Cypress
       if: ${{ inputs.runCypress != '0' }}
       shell: bash
