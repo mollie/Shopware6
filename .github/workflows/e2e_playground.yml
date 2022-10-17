@@ -54,7 +54,7 @@ jobs:
           key: cache-plugin
           path: ~/.build
 
-      - name: E2E Tests, Shopware ${{ matrix.shopware }}
+      - name: E2E Tests, Shopware {{ github.event.inputs.swVersion }}
         uses: ./.github/actions/run-e2e
         with:
           # -------------------------------------------
@@ -64,7 +64,4 @@ jobs:
           RUN_CYPRESS: true
           MOLLIE_APIKEY_TEST: ${{ secrets.MOLLIE_APIKEY_TEST }}
           # -------------------------------------------
-          TESTRAIL: true
-          TESTRAIL_DOMAIN: ${{ secrets.TESTRAIL_DOMAIN }}
-          TESTRAIL_USERNAME: ${{ secrets.TESTRAIL_USERNAME }}
-          TESTRAIL_PASSWORD: ${{ secrets.TESTRAIL_PASSWORD }}
+          TESTRAIL: false
