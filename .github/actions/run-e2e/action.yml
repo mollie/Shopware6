@@ -84,30 +84,6 @@ runs:
         key: cache-plugin
         path: ~/.build
 
-    - name: Debug Output
-      shell: bash
-      run: echo ${{ inputs.RUN_CYPRESS  }}
-
-    - name: Compare String directly
-      if: ${{ inputs.RUN_CYPRESS }} == 'true'
-      shell: bash
-      run: echo "compare with string directly"
-
-    - name: Compare String
-      if: ${{ inputs.RUN_CYPRESS == 'true' }}
-      shell: bash
-      run: echo "compare with string"
-
-    - name: Compare Bool
-      if: ${{ inputs.RUN_CYPRESS == true }}
-      shell: bash
-      run: echo "compare with bool"
-
-    - name: Compare Int
-      if: ${{ inputs.RUN_CYPRESS == 1 }}
-      shell: bash
-      run: echo "compare with int"
-
     # --------------------------------------------------------------------------------------------------------------------------------------
 
     - name: Download Docker
@@ -150,12 +126,12 @@ runs:
     # --------------------------------------------------------------------------------------------------------------------------------------
 
     - name: Install Cypress
-      if: ${{ inputs.RUN_CYPRESS == 'true' }}
+      if: ${{ inputs.RUN_CYPRESS }} == 'true'
       shell: bash
       run: cd tests/Cypress && make install -B
 
     - name: Remove deprecated Cypress Tests
-      if: ${{ inputs.RUN_CYPRESS == 'true' && inputs.REMOVE_DEPRECATED_TESTS == 'true' }}
+      if: ${{ inputs.RUN_CYPRESS }} == 'true' && ${{ inputs.REMOVE_DEPRECATED_TESTS }} == 'true'
       shell: bash
       run: |
         # SEPA Direct Debit has been completely removed from Mollie. We have to remove that entry from the tests in old Cypress versions
@@ -163,14 +139,14 @@ runs:
         sed -i "/key: 'directdebit'/g" $(pwd)/tests/Cypress/cypress/integration/storefront/checkout/checkout-success.spec.js || true
 
     - name: Start Cypress
-      if: ${{ inputs.RUN_CYPRESS == 'true' && inputs.TESTRAIL == 'false' }}
+      if: ${{ inputs.RUN_CYPRESS }} == 'true' && ${{ inputs.TESTRAIL }} == 'false'
       shell: bash
       run: |
         cd tests/Cypress && \
         make run shopware=${{ inputs.SHOPWARE }} storeApiKey=${{ inputs._STORE_API_KEY }} url=https://${{ inputs._SHOP_DOMAIN }} filters="${{ inputs.FILTERS }}"
 
     - name: Start Cypress with TestRail
-      if: ${{ inputs.RUN_CYPRESS == 'true' && inputs.TESTRAIL == 'true' }}
+      if: ${{ inputs.RUN_CYPRESS }} == 'true' && ${{ inputs.TESTRAIL }} == 'true'
       shell: bash
       run: |
         cd tests/Cypress && \
@@ -186,7 +162,7 @@ runs:
     # --------------------------------------------------------------------------------------------------------------------------------------
 
     - name: Download Logs
-      if: ${{ inputs.RUN_CYPRESS == 'true' && always() }}
+      if: ${{ inputs.RUN_CYPRESS }} == 'true' && always()
       shell: bash
       run: |
         mkdir -p $(pwd)/tests/Cypress/cypress/logs/shopware
@@ -195,7 +171,7 @@ runs:
         docker cp shop:/var/log/php/. $(pwd)/tests/Cypress/cypress/logs/apache
 
     - name: Store Cypress Results
-      if: ${{ inputs.RUN_CYPRESS == 'true' && always() }}
+      if: ${{ inputs.RUN_CYPRESS }} == 'true' && always()
       uses: actions/upload-artifact@v2
       with:
         name: cypress_results_sw_v${{ inputs.SHOPWARE }}
