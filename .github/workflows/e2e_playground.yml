@@ -17,7 +17,6 @@ jobs:
 
   build:
     name: Build Plugin
-    needs: install
     runs-on: ubuntu-latest
     steps:
 

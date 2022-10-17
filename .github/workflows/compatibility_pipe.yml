@@ -41,10 +41,10 @@ jobs:
           path: ~/.build
 
       - name: Build Plugin ${{ matrix.plugin }}
-        uses: ./.github/workflows/action_build.yml
+        uses: ./.github/actions/build-plugin
         with:
           shopware: ${{ github.event.inputs.swVersion }}
-
+          
       - name: Run Cypress for Plugin ${{ matrix.plugin }}
         uses: ./.github/workflows/action_e2e.yml
         with:

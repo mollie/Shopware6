@@ -362,3 +362,4 @@ jobs:
           # this is just for old Shopware versions that do not
           # support the API that we need for Cypress
           RUN_CYPRESS: false
+          MOLLIE_APIKEY_TEST: ${{ secrets.MOLLIE_APIKEY_TEST }}
