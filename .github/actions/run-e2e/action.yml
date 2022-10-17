@@ -136,13 +136,14 @@ runs:
       if: ${{ inputs.RUN_CYPRESS == 'true' && inputs.TESTRAIL == 'true' }}
       shell: bash
       run: |
+        printf -v escapedCommitMsg "%q\n" "${{ github.event.head_commit.message }}"
         cd tests/Cypress && \
         CYPRESS_TESTRAIL_DOMAIN=${{ inputs.TESTRAIL_DOMAIN }} \
         CYPRESS_TESTRAIL_USERNAME=${{ inputs.TESTRAIL_USERNAME }} \
         CYPRESS_TESTRAIL_PASSWORD=${{ inputs.TESTRAIL_PASSWORD }} \
         CYPRESS_TESTRAIL_PROJECT_ID=7 \
         CYPRESS_TESTRAIL_MILESTONE_ID=15 \
-        CYPRESS_TESTRAIL_RUN_NAME="Github Workflow __datetime__, ${{ github.event.head_commit.message }}, Shopware ${{ inputs.SHOPWARE }}" \
+        CYPRESS_TESTRAIL_RUN_NAME="Github Workflow __datetime__, $escapedCommitMsg, Shopware ${{ inputs.SHOPWARE }}" \
         CYPRESS_TESTRAIL_RUN_CLOSE=true \
         make run shopware=${{ inputs.SHOPWARE }} storeApiKey=${{ inputs._STORE_API_KEY }} url=https://${{ inputs._SHOP_DOMAIN }} 
 
