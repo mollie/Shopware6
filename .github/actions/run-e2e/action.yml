@@ -8,36 +8,42 @@ branding:
 
 
 inputs:
-  pluginVersion:
+  # ------------------------------------------------------------------------------------
+  # ENVIRONMENT SETTINGS
+  SHOPWARE:
+    description: "The Shopware version that is used to run the Cypress tests."
+    required: true
+  PHP:
+    description: "The PHP Version that is used for the Shopware container."
+    required: true
+  PLUGIN:
     description: "An optional specific plugin version that will be used to checkout the source code"
     default: ''
     required: false
   # ------------------------------------------------------------------------------------
-  shopware:
-    description: "The Shopware version that is used to run the Cypress tests."
-    required: true
-  php:
-    description: "The PHP Version that is used for the Shopware container."
-    required: true
-  # ------------------------------------------------------------------------------------
-  filters:
-    description: "An optional filter for the Cypress tests. Leave empty to run all tests"
-    required: false
-    default: ""
-  runCypress:
+  # CYPRESS SETTINGS
+  RUN_CYPRESS:
     description: "If disabled, only the plugin installation will be tested"
-    default: '1'
+    default: 'true'
     required: false
-  removeDeprecatedTests:
+  MOLLIE_APIKEY_TEST:
+    description: "The Mollie Test API key. Required if Cypress is being executed."
+    default: ''
+    required: false
+  FILTERS:
+    description: "An optional filter for the Cypress tests. Leave empty to run all tests"
+    default: ''
+    required: false
+  REMOVE_DEPRECATED_TESTS:
     description: "If enabled, tests that are marked es deprecated will be removed"
     default: '0'
     required: false
   # ------------------------------------------------------------------------------------
-  testrail:
+  # TESTRAIL SETTINGS
+  TESTRAIL:
     description: "If enabled, all results will be sent to TestRail."
-    default: '0'
+    default: 'false'
     required: false
-  # ------------------------------------------------------------------------------------
   TESTRAIL_DOMAIN:
     description: "The domain for the TestRail endpoint"
     default: ''
@@ -53,15 +59,15 @@ inputs:
   # ------------------------------------------------------------------------------------
   # ------------------------------------------------------------------------------------
   # PRIVATE CONSTANTS
-  shopDomain:
+  _SHOP_DOMAIN:
     description: ''
     default: 'local.mollie.shop'
     required: false
-  storeApiKey:
+  _STORE_API_KEY:
     description: ''
     default: 'SWSCOVFSNKLBYUTKS1VSOEDTUQ'
     required: false
-  zipFile:
+  _ZIP_FILE:
     description: ''
     default: '~/.build/MolliePayments.zip'
     required: false
@@ -82,17 +88,17 @@ runs:
 
     - name: Download Docker
       shell: bash
-      run: docker pull dockware/play:${{ inputs.shopware }}
+      run: docker pull dockware/play:${{ inputs.SHOPWARE }}
 
     - name: Start Docker
       shell: bash
       run: |
-        docker run -p 443:443 --name shop --env PHP_VERSION=${{ inputs.php }} --env SW_API_ACCESS_KEY=${{ inputs.storeApiKey }} -d dockware/play:${{ inputs.shopware }}
+        docker run -p 443:443 --name shop --env PHP_VERSION=${{ inputs.PHP }} --env SW_API_ACCESS_KEY=${{ inputs._STORE_API_KEY }} -d dockware/play:${{ inputs.SHOPWARE }}
         sleep 15
         docker logs shop
         # now change the domain of our shop, mollie doesn't work with localhost
-        sudo echo "127.0.0.1 ${{ inputs.shopDomain }}" | sudo tee -a /etc/hosts
-        docker exec shop bash -c "mysql -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='https://${{ inputs.shopDomain }}' WHERE url NOT LIKE 'default.%';\""
+        sudo echo "127.0.0.1 ${{ inputs._SHOP_DOMAIN }}" | sudo tee -a /etc/hosts
+        docker exec shop bash -c "mysql -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='https://${{ inputs._SHOP_DOMAIN }}' WHERE url NOT LIKE 'default.%';\""
 
     - name: Update Shopware Config
       shell: bash
@@ -104,7 +110,7 @@ runs:
     - name: Upload ZIP File to Docker
       shell: bash
       run: |
-        docker cp ${{ inputs.zipFile }} shop:/var/www/html/custom/plugins/MolliePayments.zip
+        docker cp ${{ inputs._ZIP_FILE }} shop:/var/www/html/custom/plugins/MolliePayments.zip
         docker exec shop bash -c 'cd /var/www/html/custom/plugins && unzip -qq -o MolliePayments.zip'
 
     - name: Install/Configure Plugin
@@ -113,17 +119,19 @@ runs:
         docker exec shop bash -c 'php bin/console plugin:refresh'
         docker exec shop bash -c 'php bin/console plugin:install MolliePayments --activate'
         docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.testMode true'
+        docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.liveApiKey ${{ inputs.MOLLIE_APIKEY_TEST }}'
+        docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.testApiKey ${{ inputs.MOLLIE_APIKEY_TEST }}'
         docker exec shop bash -c 'php bin/console cache:clear'
 
     # --------------------------------------------------------------------------------------------------------------------------------------
 
     - name: Install Cypress
-      if: ${{ inputs.runCypress != '0' }}
+      if: ${{ inputs.RUN_CYPRESS == 'true' }}
       shell: bash
       run: cd tests/Cypress && make install -B
 
     - name: Remove deprecated Cypress Tests
-      if: ${{ inputs.runCypress != '0' && inputs.removeDeprecatedTests != '0' }}
+      if: ${{ inputs.RUN_CYPRESS == 'true' && inputs.REMOVE_DEPRECATED_TESTS != '0' }}
       shell: bash
       run: |
         # SEPA Direct Debit has been completely removed from Mollie. We have to remove that entry from the tests in old Cypress versions
@@ -131,14 +139,14 @@ runs:
         sed -i "/key: 'directdebit'/g" $(pwd)/tests/Cypress/cypress/integration/storefront/checkout/checkout-success.spec.js || true
 
     - name: Start Cypress
-      if: ${{ inputs.runCypress != '0' && inputs.testrail == '0' }}
+      if: ${{ inputs.RUN_CYPRESS == 'true' && inputs.TESTRAIL != 'true' }}
       shell: bash
       run: |
         cd tests/Cypress && \
-        make run shopware=${{ inputs.shopware }} storeApiKey=${{ inputs.storeApiKey }} url=https://${{ inputs.shopDomain }} filters="${{ inputs.filters }}"
+        make run shopware=${{ inputs.SHOPWARE }} storeApiKey=${{ inputs._STORE_API_KEY }} url=https://${{ inputs._SHOP_DOMAIN }} filters="${{ inputs.FILTERS }}"
 
     - name: Start Cypress with TestRail
-      if: ${{ inputs.runCypress != '0' && inputs.testrail != '0' }}
+      if: ${{ inputs.RUN_CYPRESS == 'true' && inputs.TESTRAIL == 'true' }}
       shell: bash
       run: |
         cd tests/Cypress && \
@@ -147,14 +155,14 @@ runs:
         CYPRESS_TESTRAIL_PASSWORD=${{ inputs.TESTRAIL_PASSWORD }} \
         CYPRESS_TESTRAIL_PROJECT_ID=7 \
         CYPRESS_TESTRAIL_MILESTONE_ID=15 \
-        CYPRESS_TESTRAIL_RUN_NAME="Github Workflow __datetime__, ${{ github.event.head_commit.message }}, Shopware ${{ inputs.shopware }}" \
+        CYPRESS_TESTRAIL_RUN_NAME="Github Workflow __datetime__, ${{ github.event.head_commit.message }}, Shopware ${{ inputs.SHOPWARE }}" \
         CYPRESS_TESTRAIL_RUN_CLOSE=true \
-        make run shopware=${{ inputs.shopware }} storeApiKey=${{ inputs.storeApiKey }} url=https://${{ inputs.shopDomain }} 
+        make run shopware=${{ inputs.SHOPWARE }} storeApiKey=${{ inputs._STORE_API_KEY }} url=https://${{ inputs._SHOP_DOMAIN }} 
 
     # --------------------------------------------------------------------------------------------------------------------------------------
 
     - name: Download Logs
-      if: ${{ inputs.runCypress != '0' && always() }}
+      if: ${{ inputs.RUN_CYPRESS == 'true' && always() }}
       shell: bash
       run: |
         mkdir -p $(pwd)/tests/Cypress/cypress/logs/shopware
@@ -163,10 +171,10 @@ runs:
         docker cp shop:/var/log/php/. $(pwd)/tests/Cypress/cypress/logs/apache
 
     - name: Store Cypress Results
-      if: ${{ inputs.runCypress != '0' && always() }}
+      if: ${{ inputs.RUN_CYPRESS == 'true' && always() }}
       uses: actions/upload-artifact@v2
       with:
-        name: cypress_results_sw_v${{ inputs.shopware }}
+        name: cypress_results_sw_v${{ inputs.SHOPWARE }}
         retention-days: 1
         path: |
           tests/Cypress/cypress/results
