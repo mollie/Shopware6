@@ -80,14 +80,13 @@ runs:
 
     - name: Download Docker
       shell: bash
-      run: docker pull dockware/play:${{ inputs.SHOPWARE }}
+      run: docker pull -q dockware/play:${{ inputs.SHOPWARE }}
 
     - name: Start Docker
       shell: bash
       run: |
         docker run -p 443:443 --name shop --env PHP_VERSION=${{ inputs.PHP }} --env SW_API_ACCESS_KEY=${{ inputs._STORE_API_KEY }} -d dockware/play:${{ inputs.SHOPWARE }}
         sleep 15
-        docker logs shop
         # now change the domain of our shop, mollie doesn't work with localhost
         sudo echo "127.0.0.1 ${{ inputs._SHOP_DOMAIN }}" | sudo tee -a /etc/hosts
         docker exec shop bash -c "mysql -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='https://${{ inputs._SHOP_DOMAIN }}' WHERE url NOT LIKE 'default.%';\""

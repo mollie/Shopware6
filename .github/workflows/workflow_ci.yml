@@ -317,14 +317,14 @@ jobs:
           key: cache-plugin
           path: ~/.build
 
-      - name: E2E Tests
+      - name: E2E Tests, Shopware ${{ matrix.shopware }}
         uses: ./.github/actions/run-e2e
         with:
           # -------------------------------------------
           SHOPWARE: ${{ matrix.shopware }}
           PHP: ${{ matrix.php }}
           # -------------------------------------------
-          RUN_CYPRESS: true,
+          RUN_CYPRESS: true
           MOLLIE_APIKEY_TEST: ${{ secrets.MOLLIE_APIKEY_TEST }}
           # -------------------------------------------
           TESTRAIL: true
@@ -351,12 +351,12 @@ jobs:
           key: cache-plugin
           path: ~/.build
 
-      - name: Installation Tests
+      - name: Installation Tests, Shopware ${{ matrix.shopware }}
         uses: ./.github/actions/run-e2e
         with:
           # -------------------------------------------
           SHOPWARE: ${{ matrix.shopware }}
-          PHP: 8.1
+          PHP: 7.4
           # -------------------------------------------
           # only do installation tests without Cypress here
           # this is just for old Shopware versions that do not
