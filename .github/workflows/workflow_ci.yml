@@ -256,7 +256,6 @@ jobs:
           mkdir -p ~/.build
 
       - name: Mount Build Cache
-        id: cache-build
         uses: actions/cache@v3
         with:
           key: cache-plugin
@@ -313,7 +312,6 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Mount Build Cache
-        id: cache-build
         uses: actions/cache@v3
         with:
           key: cache-plugin
@@ -343,6 +341,15 @@ jobs:
       matrix:
         shopware: [ '6.3.0', '6.2.0', '6.1.0' ]
     steps:
+
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Mount Build Cache
+        uses: actions/cache@v3
+        with:
+          key: cache-plugin
+          path: ~/.build
 
       - name: Installation Tests
         uses: ./.github/actions/run-e2e
