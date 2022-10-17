@@ -88,6 +88,11 @@ runs:
       shell: bash
       run: echo ${{ inputs.RUN_CYPRESS  }}
 
+    - name: Compare String directly
+      if: ${{ inputs.RUN_CYPRESS }} == 'true'
+      shell: bash
+      run: echo "compare with string directly"
+
     - name: Compare String
       if: ${{ inputs.RUN_CYPRESS == 'true' }}
       shell: bash
