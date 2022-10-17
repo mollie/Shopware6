@@ -26,7 +26,7 @@ inputs:
     default: ""
   runCypress:
     description: "If disabled, only the plugin installation will be tested"
-    default: '0'
+    default: '1'
     required: false
   removeDeprecatedTests:
     description: "If enabled, tests that are marked es deprecated will be removed"
@@ -116,9 +116,6 @@ runs:
         docker exec shop bash -c 'php bin/console cache:clear'
 
     # --------------------------------------------------------------------------------------------------------------------------------------
-
-    - run: echo "Cypress Mode is ${{ inputs.runCypress }}"
-      shell: bash
 
     - name: Install Cypress
       if: ${{ inputs.runCypress != '0' }}
