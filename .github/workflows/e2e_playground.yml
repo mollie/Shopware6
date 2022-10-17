@@ -29,14 +29,13 @@ jobs:
           mkdir -p ~/.build
 
       - name: Mount Build Cache
-        id: cache-build
         uses: actions/cache@v3
         with:
           key: cache-plugin
           path: ~/.build
 
       - name: Build Plugin
-        uses: ./.github/workflows/action_build.yml
+        uses: ./.github/actions/build-plugin
         with:
           shopware: ${{ github.event.inputs.swVersion }}
 
@@ -56,10 +55,17 @@ jobs:
           key: cache-plugin
           path: ~/.build
 
-      - name: E2E Tests
-        uses: ./.github/workflows/action_e2e.yml
+      - name: E2E Tests, Shopware ${{ matrix.shopware }}
+        uses: ./.github/actions/run-e2e
         with:
-          secrets: inherit
-          shopware: ${{ github.event.inputs.swVersion }}
-          php: ${{ github.event.inputs.phpVersion }}
-          testrail: false
+          # -------------------------------------------
+          SHOPWARE: ${{ github.event.inputs.swVersion }}
+          PHP: ${{ github.event.inputs.phpVersion }}
+          # -------------------------------------------
+          RUN_CYPRESS: true
+          MOLLIE_APIKEY_TEST: ${{ secrets.MOLLIE_APIKEY_TEST }}
+          # -------------------------------------------
+          TESTRAIL: true
+          TESTRAIL_DOMAIN: ${{ secrets.TESTRAIL_DOMAIN }}
+          TESTRAIL_USERNAME: ${{ secrets.TESTRAIL_USERNAME }}
+          TESTRAIL_PASSWORD: ${{ secrets.TESTRAIL_PASSWORD }}

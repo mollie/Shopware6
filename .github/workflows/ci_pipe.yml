@@ -267,7 +267,7 @@ jobs:
           shopware: 6.4.16.0
 
   e2e:
-    name: E2E Tests | Shopware ${{ matrix.shopware }}, PHP ${{ matrix.php }}
+    name: E2E | Shopware ${{ matrix.shopware }}, PHP ${{ matrix.php }}
     needs: build
     runs-on: ubuntu-latest
     strategy:
@@ -332,14 +332,14 @@ jobs:
           TESTRAIL_USERNAME: ${{ secrets.TESTRAIL_USERNAME }}
           TESTRAIL_PASSWORD: ${{ secrets.TESTRAIL_PASSWORD }}
 
-  legacy_tests:
-    name: Installation Tests | Shopware ${{ matrix.shopware }}
+  install_tests:
+    name: Installation | Shopware ${{ matrix.shopware }}
     needs: [ build ]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        shopware: [ '6.3.0', '6.2.0', '6.1.0' ]
+        shopware: [ '6.3.5.1', '6.3.5.0', '6.3.4.0' ]
     steps:
 
       - name: Clone Code

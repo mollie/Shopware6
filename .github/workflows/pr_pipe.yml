@@ -239,14 +239,32 @@ jobs:
   # ------------------------------------------------------------------------------------------------------------------------
 
   build:
-    uses: ./.github/workflows/_pipeline_build.yml
-    with:
-      shopware: 6.4.16.0
+    name: Build Plugin
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Create Cache Directories
+        run: |
+          mkdir -p ~/.build
+
+      - name: Mount Build Cache
+        uses: actions/cache@v3
+        with:
+          key: cache-plugin
+          path: ~/.build
+
+      - name: Build Plugin
+        uses: ./.github/actions/build-plugin
+        with:
+          shopware: 6.4.16.0
 
   # ------------------------------------------------------------------------------------------------------------------------
 
   integration:
-    name: Integration Tests | Shopware ${{ matrix.shopware }}
+    name: Installation | Shopware ${{ matrix.shopware }}
     needs: build
     runs-on: ubuntu-latest
     strategy:
@@ -255,24 +273,51 @@ jobs:
         shopware: [ '6.4.16.0', '6.4.15.0', '6.4.9.0', '6.4.8.2', '6.4.0.0', '6.3.0', '6.2.0', '6.1.0' ]
     steps:
 
-      - name: Installation Tests
-        uses: ./.github/workflows/_pipeline_cypress.yml
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Mount Build Cache
+        uses: actions/cache@v3
         with:
-          shopware: ${{ matrix.shopware }}
-          php: 8.1
-          # only do installation tests, no cypress for this simple testing
-          runCypress: false
+          key: cache-plugin
+          path: ~/.build
+
+      - name: Installation Tests, Shopware ${{ matrix.shopware }}
+        uses: ./.github/actions/run-e2e
+        with:
+          # -------------------------------------------
+          SHOPWARE: ${{ matrix.shopware }}
+          PHP: 7.4
+          # -------------------------------------------
+          RUN_CYPRESS: false
 
   # ------------------------------------------------------------------------------------------------------------------------
 
   e2e:
     name: E2E Core Tests
     needs: build
-    uses: ./.github/workflows/_pipeline_cypress.yml
-    with:
-      shopware: 6.4.16.0
-      php: 8.1
-      # only run @core tests, because we have no API key here
-      filters: "@core"
-      # do not send to testrail for PR tests
-      testrail: false
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Clone Code
+        uses: actions/checkout@v2
+
+      - name: Mount Build Cache
+        uses: actions/cache@v3
+        with:
+          key: cache-plugin
+          path: ~/.build
+
+      - name: E2E Core Tests, Shopware ${{ matrix.shopware }}
+        uses: ./.github/actions/run-e2e
+        with:
+          # -------------------------------------------
+          SHOPWARE: 6.4.16.0
+          PHP: 8.1
+          # -------------------------------------------
+          RUN_CYPRESS: true
+          # only run @core tests, because we have no API key here
+          MOLLIE_APIKEY_TEST: ""
+          FILTERS: "@core"
+          # -------------------------------------------
+          TESTRAIL: false
