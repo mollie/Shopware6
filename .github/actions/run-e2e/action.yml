@@ -91,7 +91,7 @@ runs:
         sleep 15
         docker logs shop
         # now change the domain of our shop, mollie doesn't work with localhost
-        sudo echo "127.0.0.1 $SHOP_DOMAIN" | sudo tee -a /etc/hosts
+        sudo echo "127.0.0.1 ${{ inputs.shopDomain }}" | sudo tee -a /etc/hosts
         docker exec shop bash -c "mysql -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='https://${{ inputs.shopDomain }}' WHERE url NOT LIKE 'default.%';\""
 
     - name: Update Shopware Config
