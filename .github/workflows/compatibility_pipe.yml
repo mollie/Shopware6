@@ -1,8 +1,6 @@
 name: Compatibility Pipeline
 run-name: Shopware ${{ github.event.inputs.swVersion }}, PHP ${{ github.event.inputs.phpVersion }}
 
-
-
 on:
   workflow_dispatch:
     inputs:
@@ -44,15 +42,16 @@ jobs:
         uses: ./.github/actions/build-plugin
         with:
           shopware: ${{ github.event.inputs.swVersion }}
-          
+
       - name: Run Cypress for Plugin ${{ matrix.plugin }}
-        uses: ./.github/workflows/action_e2e.yml
+        uses: ./.github/actions/run-e2e
         with:
-          secrets: inherit
-          shopware: ${{ matrix.shopware }}
-          php: 8.1
-          # make sure to use old cypress tests of that plugin version
-          pluginVersion: ${{ matrix.plugin }}
+          # -------------------------------------------
+          SHOPWARE: ${{ matrix.shopware }}
+          PHP: 8.1
+          # -------------------------------------------
           # we have to remove old tests from the history, because e.g.
           # SEPA Direct Debit is not working anymore when being executed now...
-          removeDeprecatedTests: true
+          REMOVE_DEPRECATED_TESTS: true
+          # -------------------------------------------
+          TESTRAIL: false

@@ -16,10 +16,6 @@ inputs:
   PHP:
     description: "The PHP Version that is used for the Shopware container."
     required: true
-  PLUGIN:
-    description: "An optional specific plugin version that will be used to checkout the source code"
-    default: ''
-    required: false
   # ------------------------------------------------------------------------------------
   # CYPRESS SETTINGS
   RUN_CYPRESS:
