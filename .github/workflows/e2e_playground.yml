@@ -30,7 +30,7 @@ jobs:
       - name: Mount Build Cache
         uses: actions/cache@v3
         with:
-          key: cache-plugin
+          key: cache-plugin-${{ github.run_id }}
           path: ~/.build
 
       - name: Build Plugin
@@ -51,7 +51,7 @@ jobs:
         id: cache-build
         uses: actions/cache@v3
         with:
-          key: cache-plugin
+          key: cache-plugin-${{ github.run_id }}
           path: ~/.build
 
       - name: E2E Tests, Shopware {{ github.event.inputs.swVersion }}

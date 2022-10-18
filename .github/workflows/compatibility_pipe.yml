@@ -27,16 +27,9 @@ jobs:
         with:
           ref: refs/tags/v${{ matrix.plugin }}
 
-      - name: Create Cache Directories
+      - name: Create Build Directories
         run: |
           mkdir -p ~/.build
-
-      - name: Mount Build Cache
-        id: cache-build
-        uses: actions/cache@v3
-        with:
-          key: cache-plugin
-          path: ~/.build
 
       - name: Build Plugin ${{ matrix.plugin }}
         uses: ./.github/actions/build-plugin
