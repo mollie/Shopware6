@@ -1,0 +1,19 @@
+name: (On) Release Pipeline
+
+on:
+  workflow_dispatch:
+  release:
+    types: [ published ]
+
+jobs:
+
+  packagist:
+    name: Update Packagist
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v3
+
+      - name: Invoke Packagist Webhook
+        run: |
+          curl -XPOST -H'content-type:application/json' 'https://packagist.org/api/update-package?username=${{ secrets.PACKAGIST_USER }}&apiToken=${{ secrets.PACKAGIST_TOKEN }}' -d'{"repository":{"url":"https://packagist.org/packages/kiener/mollie-payments-plugin"}}'
