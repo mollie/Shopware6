@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Installer;
 
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Dispatchers\DummyFlowBuilderDispatcher;
+use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Kiener\MolliePayments\Struct\Voucher\VoucherType;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -24,19 +26,25 @@ class CustomFieldsInstaller
 
 
     /**
+     * @var VersionCompare
+     */
+    private $versionCompare;
+
+    /**
      * @var EntityRepositoryInterface
      */
     private $repoCustomFields;
 
 
     /**
+     * @param string $shopwareVersion
      * @param EntityRepositoryInterface $repoCustomFields
      */
-    public function __construct(EntityRepositoryInterface $repoCustomFields)
+    public function __construct(string $shopwareVersion, EntityRepositoryInterface $repoCustomFields)
     {
+        $this->versionCompare = new VersionCompare($shopwareVersion);
         $this->repoCustomFields = $repoCustomFields;
     }
-
 
     /**
      * @param Context $context
@@ -52,6 +60,13 @@ class CustomFieldsInstaller
      */
     private function installProductData(Context $context): void
     {
+        $boolType = CustomFieldTypes::BOOL;
+
+        # switch was introduced with 6.3.3
+        if ($this->versionCompare->gte('6.3.3')) {
+            $boolType = CustomFieldTypes::SWITCH;
+        }
+
         $this->repoCustomFields->upsert([
             [
                 'id' => self::ID_CUSTOM_FIELDSET,
@@ -128,7 +143,7 @@ class CustomFieldsInstaller
                         'id' => self::ID_SUBSCRIPTION_ENABLED,
                         'name' => 'mollie_payments_product_subscription_enabled',
                         'active' => true,
-                        'type' => CustomFieldTypes::SWITCH,
+                        'type' => $boolType,
                         'config' => [
                             'customFieldPosition' => 2,
                             "componentName" => "sw-field",

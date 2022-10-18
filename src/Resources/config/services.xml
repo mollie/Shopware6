@@ -78,6 +78,7 @@
 
 
         <service id="Kiener\MolliePayments\Service\Installer\CustomFieldsInstaller" public="true">
+            <argument>%kernel.shopware_version%</argument>
             <argument type="service" id="custom_field_set.repository"/>
         </service>
 

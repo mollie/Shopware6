@@ -57,7 +57,6 @@ class DependencyLoader
             $loader->load('compatibility/flowbuilder/6.4.6.0.xml');
         }
 
-
         # load other data
         if ($versionCompare->gte('6.4')) {
             $loader->load('compatibility/services_6.4.xml');

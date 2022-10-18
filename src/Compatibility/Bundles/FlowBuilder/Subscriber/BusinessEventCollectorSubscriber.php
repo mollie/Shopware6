@@ -19,9 +19,7 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatus
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedPartialRefundedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedPendingEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedRefundedEvent;
-use Kiener\MolliePayments\Components\Subscription\BusinessEvent\RenewalReminderEvent;
 use Shopware\Core\Framework\Event\BusinessEventCollector;
-use Shopware\Core\Framework\Event\BusinessEventCollectorEvent;
 use Shopware\Core\Framework\Event\BusinessEventDefinition;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -47,16 +45,23 @@ class BusinessEventCollectorSubscriber implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
+        # older Shopware versions do not work here.
+        # Problem is that we cannot compare Shopware versions because
+        # we are in a static class and do not yet have dependency data
+        if (!class_exists("\Shopware\Core\Framework\Event\BusinessEventCollectorEvent")) {
+            return [];
+        }
+
         return [
-            BusinessEventCollectorEvent::NAME => ['onAddEvent', 1000],
+            \Shopware\Core\Framework\Event\BusinessEventCollectorEvent::NAME => ['onAddEvent', 1000],
         ];
     }
 
     /**
-     * @param BusinessEventCollectorEvent $event
+     * @param \Shopware\Core\Framework\Event\BusinessEventCollectorEvent $event
      * @return void
      */
-    public function onAddEvent(BusinessEventCollectorEvent $event): void
+    public function onAddEvent(\Shopware\Core\Framework\Event\BusinessEventCollectorEvent $event): void
     {
         $collection = $event->getCollection();
 
