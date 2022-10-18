@@ -50,8 +50,9 @@ jobs:
           SHOPWARE: ${{ matrix.shopware }}
           PHP: 8.1
           # -------------------------------------------
+          MOLLIE_APIKEY_TEST: ${{ secrets.MOLLIE_APIKEY_TEST }}
+          # -------------------------------------------
+          TESTRAIL: false
           # we have to remove old tests from the history, because e.g.
           # SEPA Direct Debit is not working anymore when being executed now...
           REMOVE_DEPRECATED_TESTS: true
-          # -------------------------------------------
-          TESTRAIL: false

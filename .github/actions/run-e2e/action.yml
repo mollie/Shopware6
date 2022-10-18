@@ -16,15 +16,15 @@ inputs:
   PHP:
     description: "The PHP Version that is used for the Shopware container."
     required: true
+  MOLLIE_APIKEY_TEST:
+    description: "The Mollie Test API key. Required for the installation."
+    default: ''
+    required: true
   # ------------------------------------------------------------------------------------
   # CYPRESS SETTINGS
   RUN_CYPRESS:
     description: "If disabled, only the plugin installation will be tested"
     default: 'true'
-    required: false
-  MOLLIE_APIKEY_TEST:
-    description: "The Mollie Test API key. Required if Cypress is being executed."
-    default: ''
     required: false
   FILTERS:
     description: "An optional filter for the Cypress tests. Leave empty to run all tests"

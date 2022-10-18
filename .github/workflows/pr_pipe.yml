@@ -263,7 +263,7 @@ jobs:
 
   # ------------------------------------------------------------------------------------------------------------------------
 
-  integration:
+  installation:
     name: Installation | Shopware ${{ matrix.shopware }}
     needs: build
     runs-on: ubuntu-latest
@@ -288,6 +288,8 @@ jobs:
           # -------------------------------------------
           SHOPWARE: ${{ matrix.shopware }}
           PHP: 7.4
+          # -------------------------------------------
+          MOLLIE_APIKEY_TEST: "not-existing"
           # -------------------------------------------
           RUN_CYPRESS: false
 
@@ -315,9 +317,9 @@ jobs:
           SHOPWARE: 6.4.16.0
           PHP: 8.1
           # -------------------------------------------
-          RUN_CYPRESS: true
-          # only run @core tests, because we have no API key here
           MOLLIE_APIKEY_TEST: "not-existing"
-          FILTERS: "@core"
           # -------------------------------------------
+          RUN_CYPRESS: true
           TESTRAIL: false
+          # only run @core tests, because we have no API key here
+          FILTERS: "@core"

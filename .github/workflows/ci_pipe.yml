@@ -324,9 +324,9 @@ jobs:
           SHOPWARE: ${{ matrix.shopware }}
           PHP: ${{ matrix.php }}
           # -------------------------------------------
-          RUN_CYPRESS: true
           MOLLIE_APIKEY_TEST: ${{ secrets.MOLLIE_APIKEY_TEST }}
           # -------------------------------------------
+          RUN_CYPRESS: true
           TESTRAIL: true
           TESTRAIL_DOMAIN: ${{ secrets.TESTRAIL_DOMAIN }}
           TESTRAIL_USERNAME: ${{ secrets.TESTRAIL_USERNAME }}
@@ -358,8 +358,9 @@ jobs:
           SHOPWARE: ${{ matrix.shopware }}
           PHP: 7.4
           # -------------------------------------------
+          MOLLIE_APIKEY_TEST: ${{ secrets.MOLLIE_APIKEY_TEST }}
+          # -------------------------------------------
           # only do installation tests without Cypress here
           # this is just for old Shopware versions that do not
           # support the API that we need for Cypress
           RUN_CYPRESS: false
-          MOLLIE_APIKEY_TEST: ${{ secrets.MOLLIE_APIKEY_TEST }}
