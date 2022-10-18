@@ -20,7 +20,7 @@ jobs:
       - name: Mount Dev Dependency Cache
         uses: actions/cache@v3
         with:
-          key: cache-dev-dependencies
+          key: cache-dev-dependencies-${{ github.run_id }}
           path: |
             src/Resources/app/storefront/node_modules
             src/Resources/app/administration/node_modules
@@ -42,7 +42,7 @@ jobs:
       - name: Mount Dev Dependency Cache
         uses: actions/cache@v3
         with:
-          key: cache-dev-dependencies
+          key: cache-dev-dependencies-${{ github.run_id }}
           path: |
             src/Resources/app/storefront/node_modules
             src/Resources/app/administration/node_modules
@@ -62,7 +62,7 @@ jobs:
       - name: Mount Dev Dependency Cache
         uses: actions/cache@v3
         with:
-          key: cache-dev-dependencies
+          key: cache-dev-dependencies-${{ github.run_id }}
           path: |
             src/Resources/app/storefront/node_modules
             src/Resources/app/administration/node_modules
@@ -82,7 +82,7 @@ jobs:
       - name: Mount Dev Dependency Cache
         uses: actions/cache@v3
         with:
-          key: cache-dev-dependencies
+          key: cache-dev-dependencies-${{ github.run_id }}
           path: |
             src/Resources/app/storefront/node_modules
             src/Resources/app/administration/node_modules
@@ -125,7 +125,7 @@ jobs:
       - name: Mount Dev Dependency Cache
         uses: actions/cache@v3
         with:
-          key: cache-dev-dependencies
+          key: cache-dev-dependencies-${{ github.run_id }}
           path: |
             src/Resources/app/storefront/node_modules
             src/Resources/app/administration/node_modules
@@ -150,7 +150,7 @@ jobs:
       - name: Mount Dev Dependency Cache
         uses: actions/cache@v3
         with:
-          key: cache-dev-dependencies
+          key: cache-dev-dependencies-${{ github.run_id }}
           path: |
             src/Resources/app/storefront/node_modules
             src/Resources/app/administration/node_modules
@@ -175,7 +175,7 @@ jobs:
       - name: Mount Dev Dependency Cache
         uses: actions/cache@v3
         with:
-          key: cache-dev-dependencies
+          key: cache-dev-dependencies-${{ github.run_id }}
           path: |
             src/Resources/app/storefront/node_modules
             src/Resources/app/administration/node_modules
@@ -201,7 +201,7 @@ jobs:
       - name: Mount Dev Dependency Cache
         uses: actions/cache@v3
         with:
-          key: cache-dev-dependencies
+          key: cache-dev-dependencies-${{ github.run_id }}
           path: |
             src/Resources/app/storefront/node_modules
             src/Resources/app/administration/node_modules
@@ -227,7 +227,7 @@ jobs:
       - name: Mount Dev Dependency Cache
         uses: actions/cache@v3
         with:
-          key: cache-dev-dependencies
+          key: cache-dev-dependencies-${{ github.run_id }}
           path: |
             src/Resources/app/storefront/node_modules
             src/Resources/app/administration/node_modules
@@ -253,7 +253,7 @@ jobs:
       - name: Mount Build Cache
         uses: actions/cache@v3
         with:
-          key: cache-plugin
+          key: cache-build-${{ github.run_id }}
           path: ~/.build
 
       - name: Build Plugin
@@ -279,7 +279,7 @@ jobs:
       - name: Mount Build Cache
         uses: actions/cache@v3
         with:
-          key: cache-plugin
+          key: cache-build-${{ github.run_id }}
           path: ~/.build
 
       - name: Installation Tests, Shopware ${{ matrix.shopware }}
@@ -307,7 +307,7 @@ jobs:
       - name: Mount Build Cache
         uses: actions/cache@v3
         with:
-          key: cache-plugin
+          key: cache-build-${{ github.run_id }}
           path: ~/.build
 
       - name: E2E Core Tests, Shopware ${{ matrix.shopware }}
