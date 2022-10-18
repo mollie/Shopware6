@@ -289,7 +289,7 @@ jobs:
           SHOPWARE: ${{ matrix.shopware }}
           PHP: 7.4
           # -------------------------------------------
-          MOLLIE_APIKEY_TEST: "not-existing"
+          MOLLIE_APIKEY_TEST: ""
           # -------------------------------------------
           RUN_CYPRESS: false
 
@@ -317,7 +317,7 @@ jobs:
           SHOPWARE: 6.4.16.0
           PHP: 8.1
           # -------------------------------------------
-          MOLLIE_APIKEY_TEST: "not-existing"
+          MOLLIE_APIKEY_TEST: ""
           # -------------------------------------------
           RUN_CYPRESS: true
           TESTRAIL: false

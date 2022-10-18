@@ -100,11 +100,17 @@ runs:
         docker cp ${{ inputs._ZIP_FILE }} shop:/var/www/html/custom/plugins/MolliePayments.zip
         docker exec shop bash -c 'cd /var/www/html/custom/plugins && unzip -qq -o MolliePayments.zip'
 
-    - name: Install/Configure Plugin
+    - name: Install Plugin
       shell: bash
       run: |
         docker exec shop bash -c 'php bin/console plugin:refresh'
         docker exec shop bash -c 'php bin/console plugin:install MolliePayments --activate'
+        docker exec shop bash -c 'php bin/console cache:clear'
+
+    - name: Configure Plugin
+      if: ${{ inputs.MOLLIE_APIKEY_TEST != '' }}
+      shell: bash
+      run: |
         docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.testMode true'
         docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.liveApiKey ${{ inputs.MOLLIE_APIKEY_TEST }}'
         docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.testApiKey ${{ inputs.MOLLIE_APIKEY_TEST }}'
