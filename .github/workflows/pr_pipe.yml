@@ -317,7 +317,7 @@ jobs:
           # -------------------------------------------
           RUN_CYPRESS: true
           # only run @core tests, because we have no API key here
-          MOLLIE_APIKEY_TEST: ""
+          MOLLIE_APIKEY_TEST: "not-existing"
           FILTERS: "@core"
           # -------------------------------------------
           TESTRAIL: false
