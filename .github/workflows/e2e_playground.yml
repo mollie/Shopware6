@@ -54,7 +54,7 @@ jobs:
           key: cache-plugin-${{ github.run_id }}
           path: ~/.build
 
-      - name: E2E Tests, Shopware {{ github.event.inputs.swVersion }}
+      - name: E2E Tests, Shopware ${{ github.event.inputs.swVersion }}
         uses: ./.github/actions/run-e2e
         with:
           # -------------------------------------------
