@@ -19,7 +19,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        plugin: [ '3.1.0', '3.0.0', '2.5.0' ]
+        include:
+          - plugin: '3.2.0'
+            url: 'https://github.com/mollie/Shopware6/releases/download/v3.2.0/MolliePayments-v3.2.0.zip'
+          - plugin: '3.1.0'
+            url: 'https://github.com/mollie/Shopware6/releases/download/v3.1.0/MolliePayments-v3.1.0.zip'
+          - plugin: '3.0.0'
+            url: 'https://github.com/mollie/Shopware6/releases/download/v3.0.0/MolliePayments-v3.0.0.zip'
+          - plugin: '2.5.0'
+            url: 'https://github.com/mollie/Shopware6/releases/download/v2.5.0/MolliePayments-v2.5.0.zip'
     steps:
 
       - name: Clone Code
@@ -27,20 +35,13 @@ jobs:
         with:
           ref: refs/tags/v${{ matrix.plugin }}
 
-      - name: Create Cache Directories
+      - name: Create Build Directory
         run: |
           mkdir -p ~/.build
 
-      - name: Mount Build Cache, cache-plugin-${{ github.run_id }}-plugin-${{ matrix.plugin }}
-        uses: actions/cache@v3
-        with:
-          key: cache-plugin-${{ github.run_id }}-plugin-${{ matrix.plugin }}
-          path: ~/.build
-
-      - name: Build Plugin, Shopware ${{ github.event.inputs.swVersion }}
-        uses: ./.github/actions/build-plugin
-        with:
-          shopware: ${{ github.event.inputs.swVersion }}
+      - name: Download MolliePayments-${{ matrix.plugin }}.zip
+        run: |
+          curl ${{ matrix.url }} --output ~/.build/MolliePayments.zip
 
       - name: Run Cypress for Plugin ${{ matrix.plugin }}
         uses: ./.github/actions/run-e2e
