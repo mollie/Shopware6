@@ -2,10 +2,14 @@ name: CI Pipeline
 
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
-  workflow_dispatch:
+    paths-ignore:
+      - '.github/**'
+      - '**.md'
+      - 'makefile'
 
 
 jobs:
