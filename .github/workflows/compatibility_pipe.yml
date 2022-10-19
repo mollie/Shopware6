@@ -53,7 +53,8 @@ jobs:
 
       - name: Download MolliePayments-${{ matrix.plugin }}.zip
         run: |
-          curl ${{ matrix.url }} --output ~/.build/MolliePayments.zip
+          # -L is required, otherwise ZIP is corrupt
+          curl -L ${{ matrix.url }} --output ~/.build/MolliePayments.zip
 
       - name: Run Cypress for Plugin ${{ matrix.plugin }}
         uses: ./.github/actions/run-e2e
