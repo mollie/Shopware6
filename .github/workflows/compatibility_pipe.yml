@@ -30,10 +30,22 @@ jobs:
             url: 'https://github.com/mollie/Shopware6/releases/download/v2.5.0/MolliePayments-v2.5.0.zip'
     steps:
 
-      - name: Clone Code
+      - name: Clone Latest Code for Workflows
+        uses: actions/checkout@v3
+
+      - name: Clone specific plugin version for (old) Cypress tests
         uses: actions/checkout@v3
         with:
           ref: refs/tags/v${{ matrix.plugin }}
+          path: repo-old-version
+
+      - name: Replace latest Cypress folder with old one
+        run: |
+          # we want to run the latest workflow setups, but with the old Cypress tests
+          rm -rf ./tests/Cypress
+          mkdir ./tests/Cypress
+          cp ./repo-old-version/tests/Cypress/. ./tests/Cypress
+          rm -rf repo-old-version
 
       - name: Create Build Directory
         run: |
