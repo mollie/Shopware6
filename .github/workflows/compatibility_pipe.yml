@@ -27,7 +27,7 @@ jobs:
         with:
           ref: refs/tags/v${{ matrix.plugin }}
 
-      - name: Create Build Directories
+      - name: Create Cache Directories
         run: |
           mkdir -p ~/.build
 
@@ -40,8 +40,8 @@ jobs:
         uses: ./.github/actions/run-e2e
         with:
           # -------------------------------------------
-          SHOPWARE: ${{ matrix.shopware }}
-          PHP: 8.1
+          SHOPWARE: ${{ github.event.inputs.swVersion }}
+          PHP: ${{ github.event.inputs.phpVersion }}
           # -------------------------------------------
           MOLLIE_APIKEY_TEST: ${{ secrets.MOLLIE_APIKEY_TEST }}
           # -------------------------------------------
