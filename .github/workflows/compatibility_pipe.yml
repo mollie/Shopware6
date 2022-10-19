@@ -31,7 +31,13 @@ jobs:
         run: |
           mkdir -p ~/.build
 
-      - name: Build Plugin ${{ matrix.plugin }}
+      - name: Mount Build Cache, cache-plugin-${{ github.run_id }}-plugin-${{ matrix.plugin }}
+        uses: actions/cache@v3
+        with:
+          key: cache-plugin-${{ github.run_id }}-plugin-${{ matrix.plugin }}
+          path: ~/.build
+
+      - name: Build Plugin, Shopware ${{ github.event.inputs.swVersion }}
         uses: ./.github/actions/build-plugin
         with:
           shopware: ${{ github.event.inputs.swVersion }}
