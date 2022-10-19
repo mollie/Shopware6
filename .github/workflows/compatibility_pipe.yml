@@ -44,7 +44,7 @@ jobs:
           # we want to run the latest workflow setups, but with the old Cypress tests
           rm -rf ./tests/Cypress
           mkdir ./tests/Cypress
-          cp ./repo-old-version/tests/Cypress/. ./tests/Cypress
+          cp -r ./repo-old-version/tests/Cypress/. ./tests/Cypress
           rm -rf repo-old-version
 
       - name: Create Build Directory
