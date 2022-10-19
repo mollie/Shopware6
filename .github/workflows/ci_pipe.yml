@@ -339,7 +339,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shopware: [ '6.3.5.1', '6.3.5.0', '6.3.4.0' ]
+        shopware: [ '6.3.5.1', '6.3.5.0' ]
     steps:
 
       - name: Clone Code
