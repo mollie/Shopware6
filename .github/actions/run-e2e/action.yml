@@ -57,7 +57,7 @@ inputs:
   # PRIVATE VARIABLES
   _SHOP_DOMAIN:
     description: 'This domain will be used in Cypress as BASE_URL'
-    default: 'local.mollie.shop'
+    default: 'cypress.github.shop'
     required: false
   _STORE_API_KEY:
     description: 'This is the Store API Key that is used when launching our Shopware. Its not confidential, its just for here'
