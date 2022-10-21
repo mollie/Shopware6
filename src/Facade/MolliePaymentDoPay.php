@@ -228,7 +228,7 @@ class MolliePaymentDoPay
 
 
         # TODO: this condition somehow looks weird to me
-        $checkoutURL = $mollieOrder->getCheckoutUrl() ?? $orderCustomFields->getTransactionReturnUrl() ?? $transactionStruct->getReturnUrl();
+        $checkoutURL = $mollieOrder->getCheckoutUrl() ?? $transactionStruct->getReturnUrl();
 
         return new MolliePaymentPrepareData((string)$checkoutURL, (string)$mollieOrder->id);
     }
