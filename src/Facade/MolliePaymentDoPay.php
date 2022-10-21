@@ -171,7 +171,6 @@ class MolliePaymentDoPay
                 return $this->handleNextPaymentAttempt(
                     $order,
                     $swOrderTransactionID,
-                    $orderCustomFields,
                     $mollieOrderId,
                     $paymentMethod,
                     $transactionStruct,
@@ -277,7 +276,6 @@ class MolliePaymentDoPay
     /**
      * @param OrderEntity                   $order
      * @param string                        $swOrderTransactionID
-     * @param OrderAttributes               $orderCustomFields
      * @param string                        $mollieOrderId
      * @param string                        $paymentMethod
      * @param AsyncPaymentTransactionStruct $transactionStruct
@@ -286,7 +284,7 @@ class MolliePaymentDoPay
      * @throws ApiException|MollieOrderCancelledException|MollieOrderExpiredException
      * @return MolliePaymentPrepareData
      */
-    private function handleNextPaymentAttempt(OrderEntity $order, string $swOrderTransactionID, OrderAttributes $orderCustomFields, string $mollieOrderId, string $paymentMethod, AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext, PaymentHandler $paymentHandler): MolliePaymentPrepareData
+    private function handleNextPaymentAttempt(OrderEntity $order, string $swOrderTransactionID, string $mollieOrderId, string $paymentMethod, AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext, PaymentHandler $paymentHandler): MolliePaymentPrepareData
     {
         $this->logger->debug(
             'Start additional payment attempt for order: ' . $order->getOrderNumber(),
