@@ -21,7 +21,6 @@ class MollieOrderCustomFieldsStructTest extends TestCase
         $this->assertEquals('', $struct->getMollieOrderId());
         $this->assertEquals('', $struct->getMolliePaymentId());
         $this->assertEquals('', $struct->getTransactionReturnUrl());
-        $this->assertEquals('', $struct->getMolliePaymentUrl());
     }
 
     /**
@@ -38,7 +37,6 @@ class MollieOrderCustomFieldsStructTest extends TestCase
                     'payment_id' => 'payment_id',
                     'third_party_payment_id' => 'third_party_payment_id',
                     'transactionReturnUrl' => 'transactionReturnUrl',
-                    'molliePaymentUrl' => 'molliePaymentUrl',
                     'swSubscriptionId' => '12345',
                     'mollieSubscriptionId' => 'sub_123',
                 ],
@@ -54,7 +52,6 @@ class MollieOrderCustomFieldsStructTest extends TestCase
                 'payment_id' => 'payment_id',
                 'third_party_payment_id' => 'third_party_payment_id',
                 'transactionReturnUrl' => 'transactionReturnUrl',
-                'molliePaymentUrl' => 'molliePaymentUrl',
                 'swSubscriptionId' => '12345',
                 'mollieSubscriptionId' => 'sub_123',
             ]
@@ -63,7 +60,6 @@ class MollieOrderCustomFieldsStructTest extends TestCase
         $this->assertEquals('payment_id', $struct->getMolliePaymentId());
         $this->assertEquals('third_party_payment_id', $struct->getThirdPartyPaymentId());
         $this->assertEquals('transactionReturnUrl', $struct->getTransactionReturnUrl());
-        $this->assertEquals('molliePaymentUrl', $struct->getMolliePaymentUrl());
     }
 
     /**
