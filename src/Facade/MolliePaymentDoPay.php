@@ -214,7 +214,6 @@ class MolliePaymentDoPay
         # now update our custom struct values
         # and immediately set our Mollie Order ID and more
         $orderCustomFields->setMollieOrderId($mollieOrder->id);
-        $orderCustomFields->setMolliePaymentUrl($mollieOrder->getCheckoutUrl());
 
         # if we have a subscription, make sure
         # to remember the ID in our order
