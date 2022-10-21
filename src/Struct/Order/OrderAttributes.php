@@ -372,10 +372,6 @@ class OrderAttributes
             $mollieData['transactionReturnUrl'] = $this->transactionReturnUrl;
         }
 
-        if ((string)$this->molliePaymentUrl !== '') {
-            $mollieData['molliePaymentUrl'] = $this->molliePaymentUrl;
-        }
-
         if ((string)$this->creditCardNumber !== '') {
             $mollieData['creditCardNumber'] = $this->creditCardNumber;
         }
