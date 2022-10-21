@@ -3,6 +3,8 @@
 namespace Kiener\MolliePayments\Components\ApplePayDirect\Services;
 
 use League\Flysystem\FilesystemInterface;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestFactoryInterface;
 
 class ApplePayDomainVerificationService
 {
@@ -25,13 +27,27 @@ class ApplePayDomainVerificationService
      */
     private $filesystem;
 
+    /**
+     * @var ClientInterface
+     */
+    private $httpClient;
+
+    /**
+     * @var RequestFactoryInterface
+     */
+    private $httpRequestFactory;
 
     /**
      * @param FilesystemInterface $filesystem
      */
-    public function __construct(FilesystemInterface $filesystem)
-    {
+    public function __construct(
+        FilesystemInterface     $filesystem,
+        ClientInterface         $httpClient,
+        RequestFactoryInterface $httpRequestFactory
+    ) {
         $this->filesystem = $filesystem;
+        $this->httpClient = $httpClient;
+        $this->httpRequestFactory = $httpRequestFactory;
     }
 
     /**
@@ -40,8 +56,23 @@ class ApplePayDomainVerificationService
      */
     public function downloadDomainAssociationFile(): void
     {
-        $content = file_get_contents(self::URL_FILE);
+        try {
+            $response = $this->httpClient->sendRequest($this->httpRequestFactory->createRequest('GET', self::URL_FILE));
+        } catch (\Throwable $_) {
+            return;
+        }
 
-        $this->filesystem->put(self::LOCAL_FILE, (string)$content);
+        // the client should support follow redirect out of the box
+        if ($response->getStatusCode() >= 300) {
+            return;
+        }
+
+        // should never happen as PSR describes that 1XX should be managed by the HttpClient
+        if ($response->getStatusCode() < 200) {
+            return;
+        }
+
+        $body = (string) $response->getBody();
+        $this->filesystem->put(self::LOCAL_FILE, (string) $response->getBody());
     }
 }

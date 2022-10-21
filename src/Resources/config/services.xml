@@ -53,6 +53,8 @@
             <argument type="service" id="Kiener\MolliePayments\Service\Transition\OrderTransitionService"/>
         </service>
 
+        <service id="kiener.mollie_payments.guzzle" class="GuzzleHttp\Client"/>
+
         <!-- Services -->
 
         <service id="Kiener\MolliePayments\Service\CustomerService" class="Kiener\MolliePayments\Service\CustomerService">
@@ -87,6 +89,8 @@
             <argument type="service" id="media.repository"/>
             <argument type="service" id="payment_method.repository"/>
             <argument type="service" id="Shopware\Core\Framework\Plugin\Util\PluginIdProvider"/>
+            <argument type="service" id="kiener.mollie_payments.guzzle"/>
+            <argument type="service" id="Nyholm\Psr7\Factory\Psr17Factory"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\ProductService" class="Kiener\MolliePayments\Service\ProductService">
