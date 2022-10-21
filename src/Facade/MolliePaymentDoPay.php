@@ -324,11 +324,6 @@ class MolliePaymentDoPay
             throw new PaymentUrlException($transactionStruct->getOrderTransaction()->getId(), "Couldn't get Mollie payment CheckoutURL for " . $payment->id);
         }
 
-        // save custom fields because shopware return url could have changed
-        // e.g. if changedPayment Parameter has to be added the shopware payment token changes
-        $orderCustomFields->setMolliePaymentUrl($payment->getCheckoutUrl());
-        $this->updaterOrderCustomFields->updateOrder($order->getId(), $orderCustomFields, $salesChannelContext->getContext());
-
         return new MolliePaymentPrepareData($payment->getCheckoutUrl(), $mollieOrderId);
     }
 
