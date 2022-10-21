@@ -412,7 +412,7 @@ class PaymentMethodService
      *
      * @return string
      */
-    private function getMediaId(array $paymentMethod, Context $context): string
+    private function getMediaId(array $paymentMethod, Context $context): ?string
     {
         /** @var string $fileName */
         $fileName = $paymentMethod['name'] . '-icon';
@@ -436,6 +436,10 @@ class PaymentMethodService
             $iconBlob = $this->downloadFile('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.png');
             $iconMime = 'image/png';
             $iconExt = 'png';
+        }
+
+        if ($iconBlob === null) {
+            return null;
         }
 
         return $this->mediaService->saveFile(
