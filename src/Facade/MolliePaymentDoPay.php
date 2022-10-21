@@ -228,9 +228,8 @@ class MolliePaymentDoPay
         $this->updaterLineItemCustomFields->updateOrderLineItems($mollieOrder, $salesChannelContext);
 
 
-        # this condition somehow looks weird to me (TODO)
-        $checkoutURL = $orderCustomFields->getMolliePaymentUrl() ?? $orderCustomFields->getTransactionReturnUrl() ?? $transactionStruct->getReturnUrl();
-
+        # TODO: this condition somehow looks weird to me
+        $checkoutURL = $mollieOrder->getCheckoutUrl() ?? $orderCustomFields->getTransactionReturnUrl() ?? $transactionStruct->getReturnUrl();
 
         return new MolliePaymentPrepareData((string)$checkoutURL, (string)$mollieOrder->id);
     }
