@@ -448,7 +448,7 @@
         <input-field type="single-select">
             <name>orderStateWithPartialRefundTransaction</name>
             <label>Order state with a partial refund transaction</label>
-            <label lang="de-DE">Bestellstatus bei einer teilweise erstatetten Transaktion</label>
+            <label lang="de-DE">Bestellstatus bei einer teilweise erstatteten Transaktion</label>
             <label lang="nl-NL">Bestelstatus bij een gedeeltelijk terugbetaalde transactie</label>
             <options>
                 <option>
