@@ -50,10 +50,11 @@ class PaymentMethodAttributes
      */
     public function getMollieIdentifier(): string
     {
-        try {
-            return constant($this->handlerIdentifier . '::PAYMENT_METHOD_NAME') ?? '';
-        } catch (\Throwable $ex) {
+        if (!class_exists($this->handlerIdentifier)
+            || !defined("{$this->handlerIdentifier}::PAYMENT_METHOD_NAME")) {
             return '-';
         }
+
+        return constant($this->handlerIdentifier . '::PAYMENT_METHOD_NAME') ?? '';
     }
 }
