@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Service\MollieApi;
+namespace Kiener\MolliePayments\Service\MollieApi\Fixer;
 
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Kiener\MolliePayments\Struct\LineItemPriceStruct;

@@ -40,7 +40,7 @@ class MollieLineItemHydrator
                 'quantity' => $lineItem->getQuantity(),
                 'unitPrice' => $this->priceBuilder->build($price->getUnitPrice(), $currencyCode),
                 'totalAmount' => $this->priceBuilder->build($price->getTotalAmount(), $currencyCode),
-                'vatRate' => number_format($price->getVatRate(), MollieOrderPriceBuilder::MOLLIE_PRICE_PRECISION, '.', ''),
+                'vatRate' => $this->priceBuilder->formatValue($price->getVatRate()),
                 'vatAmount' => $this->priceBuilder->build($price->getVatAmount(), $currencyCode),
                 'sku' => $lineItem->getSku(),
                 'imageUrl' => $lineItem->getImageUrl(),

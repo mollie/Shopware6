@@ -12,11 +12,12 @@ use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderAddressBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieShippingLineItemBuilder;
+use Kiener\MolliePayments\Service\MollieApi\Fixer\OrderAmountDiffFixer;
 use Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher;
 use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\PriceCalculator;
-use Kiener\MolliePayments\Service\MollieApi\VerticalTaxLineItemFixer;
+use Kiener\MolliePayments\Service\MollieApi\Fixer\VerticalTaxLineItemFixer;
 use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 use Kiener\MolliePayments\Service\Router\RoutingDetector;
 use Kiener\MolliePayments\Service\SettingsService;
@@ -172,6 +173,7 @@ abstract class AbstractMollieOrderBuilder extends TestCase
             $this->loggerService,
             new MollieShippingLineItemBuilder(new PriceCalculator(), new MollieOrderPriceBuilder()),
             new VerticalTaxLineItemFixer($this->loggerService),
+            new OrderAmountDiffFixer(),
             new MollieLineItemHydrator(new MollieOrderPriceBuilder()),
             new FakeEventDispatcher(),
             $routingBuilder

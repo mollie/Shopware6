@@ -5,9 +5,10 @@ namespace Kiener\MolliePayments\Service\MollieApi\Builder;
 use Kiener\MolliePayments\Event\MollieOrderBuildEvent;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Hydrator\MollieLineItemHydrator;
+use Kiener\MolliePayments\Service\MollieApi\Fixer\OrderAmountDiffFixer;
+use Kiener\MolliePayments\Service\MollieApi\Fixer\VerticalTaxLineItemFixer;
 use Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher;
 use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
-use Kiener\MolliePayments\Service\MollieApi\VerticalTaxLineItemFixer;
 use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
@@ -80,6 +81,11 @@ class MollieOrderBuilder
     private $verticalTaxLineItemFixer;
 
     /**
+     * @var OrderAmountDiffFixer
+     */
+    private $orderAmountFixer;
+
+    /**
      * @var MollieLineItemHydrator
      */
     private $mollieLineItemHydrator;
@@ -100,11 +106,12 @@ class MollieOrderBuilder
      * @param LoggerInterface $loggerService
      * @param MollieShippingLineItemBuilder $shippingLineItemBuilder
      * @param VerticalTaxLineItemFixer $verticalTaxLineItemFixer
+     * @param OrderAmountDiffFixer $orderAmountDiffFixer
      * @param MollieLineItemHydrator $mollieLineItemHydrator
      * @param EventDispatcherInterface $eventDispatcher
      * @param RoutingBuilder $routingBuilder
      */
-    public function __construct(SettingsService $settingsService, OrderDataExtractor $extractor, MollieOrderPriceBuilder $priceBuilder, MollieLineItemBuilder $lineItemBuilder, MollieOrderAddressBuilder $addressBuilder, MollieOrderCustomerEnricher $customerEnricher, LoggerInterface $loggerService, MollieShippingLineItemBuilder $shippingLineItemBuilder, VerticalTaxLineItemFixer $verticalTaxLineItemFixer, MollieLineItemHydrator $mollieLineItemHydrator, EventDispatcherInterface $eventDispatcher, RoutingBuilder $routingBuilder)
+    public function __construct(SettingsService $settingsService, OrderDataExtractor $extractor, MollieOrderPriceBuilder $priceBuilder, MollieLineItemBuilder $lineItemBuilder, MollieOrderAddressBuilder $addressBuilder, MollieOrderCustomerEnricher $customerEnricher, LoggerInterface $loggerService, MollieShippingLineItemBuilder $shippingLineItemBuilder, VerticalTaxLineItemFixer $verticalTaxLineItemFixer, OrderAmountDiffFixer $orderAmountDiffFixer, MollieLineItemHydrator $mollieLineItemHydrator, EventDispatcherInterface $eventDispatcher, RoutingBuilder $routingBuilder)
     {
         $this->settingsService = $settingsService;
         $this->logger = $loggerService;
@@ -118,6 +125,7 @@ class MollieOrderBuilder
         $this->mollieLineItemHydrator = $mollieLineItemHydrator;
         $this->eventDispatcher = $eventDispatcher;
         $this->urlBuilder = $routingBuilder;
+        $this->orderAmountFixer = $orderAmountDiffFixer;
     }
 
 
@@ -133,42 +141,43 @@ class MollieOrderBuilder
      */
     public function build(OrderEntity $order, string $transactionId, string $paymentMethod, SalesChannelContext $salesChannelContext, ?PaymentHandler $handler, array $paymentData = []): array
     {
+        /** @var MollieSettingStruct $settings */
+        $settings = $this->settingsService->getSettings($order->getSalesChannelId());
+
         $customer = $this->extractor->extractCustomer($order, $salesChannelContext);
         $currency = $this->extractor->extractCurrency($order, $salesChannelContext);
         $locale = $this->extractor->extractLocale($order, $salesChannelContext);
         $localeCode = ($locale instanceof LocaleEntity) ? $locale->getCode() : self::MOLLIE_DEFAULT_LOCALE_CODE;
+        $lineItems = $order->getLineItems();
+        $webhookUrl = $this->urlBuilder->buildWebhookURL($transactionId);
+        $isVerticalTaxCalculation = $this->isVerticalTaxCalculation($salesChannelContext);
 
         $orderData = [];
-        $orderData['amount'] = $this->priceBuilder->build($order->getAmountTotal(), $currency->getIsoCode());
+
+
         if ($order->getTaxStatus() === CartPrice::TAX_STATE_FREE) {
             $orderData['amount'] = $this->priceBuilder->build($order->getAmountNet(), $currency->getIsoCode());
+        } else {
+            $orderData['amount'] = $this->priceBuilder->build($order->getAmountTotal(), $currency->getIsoCode());
         }
+
         $orderData['locale'] = $localeCode;
         $orderData['method'] = $paymentMethod;
         $orderData['orderNumber'] = $order->getOrderNumber();
         $orderData['payment'] = $paymentData;
 
-        // create urls
         $orderData['redirectUrl'] = $this->urlBuilder->buildReturnUrl($transactionId);
-
-        $webhookUrl = $this->urlBuilder->buildWebhookURL($transactionId);
         $orderData['webhookUrl'] = $webhookUrl;
         $orderData['payment']['webhookUrl'] = $webhookUrl;
 
-
-        $lineItems = $order->getLineItems();
 
         if ($lineItems instanceof OrderLineItemCollection && $this->isSubscriptions($lineItems->getElements())) {
             $orderData['payment']['sequenceType'] = 'first';
         }
 
-        $isVerticalTaxCalculation = $this->isVerticalTaxCalculation($salesChannelContext);
+        # ----------------------------------------------------------------------------------------------------------------------------
 
-        $lines = $this->lineItemBuilder->buildLineItems(
-            $order->getTaxStatus(),
-            $order->getNestedLineItems(),
-            $isVerticalTaxCalculation
-        );
+        $mollieOrderLines = $this->lineItemBuilder->buildLineItems($order->getTaxStatus(), $order->getNestedLineItems(), $isVerticalTaxCalculation);
 
         $deliveries = $order->getDeliveries();
 
@@ -179,24 +188,34 @@ class MollieOrderBuilder
                 $isVerticalTaxCalculation
             );
 
-            /** @var MollieLineItem $shipping */
             foreach ($shippingLineItems as $shipping) {
-                $lines->add($shipping);
+                $mollieOrderLines->add($shipping);
             }
         }
 
+        # with the vertical tax calculation
+        # it can be that there are larger diffs due to rounding
+        # this is a special treatment that is handled with our separate
+        # line item fixer class
         if ($isVerticalTaxCalculation) {
-            $this->verticalTaxLineItemFixer->fixLineItems($lines, $salesChannelContext);
+            $this->verticalTaxLineItemFixer->fixLineItems($mollieOrderLines, $salesChannelContext);
         }
 
-        $orderData['lines'] = $this->mollieLineItemHydrator->hydrate($lines, $currency->getIsoCode());
+        # in cases with items that have multiple decimals
+        # it can be that it's just not possible to calculate the correct amounts.
+        # Shopware shows 5 decimals in the checkout, while the total sum might be rounded to 2 decimals.
+        # If such a scenario happens, it can be that we have 1 cent off. In that case,
+        # we have a separate fixer that adjusts the line items of Mollie for this diff.
+        $orderTotalAmount = (float)$orderData['amount']['value'];
+        $mollieOrderLines = $this->orderAmountFixer->fixSmallAmountDiff($orderTotalAmount, $mollieOrderLines);
+
+
+        $orderData['lines'] = $this->mollieLineItemHydrator->hydrate($mollieOrderLines, $currency->getIsoCode());
+
+        # ----------------------------------------------------------------------------------------------------------------------------
 
         $orderData['billingAddress'] = $this->addressBuilder->build($customer->getEmail(), $customer->getDefaultBillingAddress());
         $orderData['shippingAddress'] = $this->addressBuilder->build($customer->getEmail(), $customer->getActiveShippingAddress());
-
-
-        /** @var MollieSettingStruct $settings */
-        $settings = $this->settingsService->getSettings($order->getSalesChannelId());
 
         // set order lifetime like configured
         $dueDate = $settings->getOrderLifetimeDate();
@@ -205,8 +224,7 @@ class MollieOrderBuilder
             $orderData['expiresAt'] = $dueDate;
         }
 
-
-        // add payment specific data
+        # add payment specific data
         if ($handler instanceof PaymentHandler) {
             $orderData = $handler->processPaymentMethodSpecificParameters(
                 $orderData,
@@ -216,6 +234,8 @@ class MollieOrderBuilder
             );
         }
 
+        # ----------------------------------------------------------------------------------------------------------------------------
+
         // enrich data with create customer at mollie
         $orderAttributes = new OrderAttributes($order);
 
@@ -223,6 +243,7 @@ class MollieOrderBuilder
             $orderData = $this->customerEnricher->enrich($orderData, $customer, $settings, $salesChannelContext);
         }
 
+        # ----------------------------------------------------------------------------------------------------------------------------
 
         $this->logger->debug(
             sprintf('Preparing Shopware Order %s to be sent to Mollie', $order->getOrderNumber()),
