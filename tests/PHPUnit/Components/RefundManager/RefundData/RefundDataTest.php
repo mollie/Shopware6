@@ -56,6 +56,11 @@ class RefundDataTest extends TestCase
         $lineItem->setTotalPrice(2 * 19.99);
         $lineItem->setReferencedId('product-id-1');
         $lineItem->setPayload(['productNumber' => 'P123']);
+        $lineItem->setCustomFields([
+            'mollie_payments' => [
+                'reset_stock_quantity' => 2
+            ],
+        ]);
 
         $items[] = new ProductItem($lineItem, [], 2);
 
@@ -78,6 +83,7 @@ class RefundDataTest extends TestCase
                     ],
                     'isPromotion' => false,
                     'isDelivery' => false,
+                    'resetStockQuantity' => 2
                 ],
             ]
         ];

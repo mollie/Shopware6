@@ -44,7 +44,8 @@ class PromotionItem extends AbstractItem
             $this->lineItem->getTotalPrice(),
             0,
             0,
-            $this->alreadyRefundedQty
+            $this->alreadyRefundedQty,
+            0
         );
     }
 

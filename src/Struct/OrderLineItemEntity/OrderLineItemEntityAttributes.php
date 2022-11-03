@@ -38,6 +38,11 @@ class OrderLineItemEntityAttributes
      */
     private $subscriptionRepetitionCount;
 
+    /**
+     * @var int
+     */
+    private $resetStockQuantity;
+
 
     /**
      * @param OrderLineItemEntity $lineItem
@@ -46,6 +51,7 @@ class OrderLineItemEntityAttributes
     {
         $this->voucherType = $this->getCustomFieldValue($lineItem, 'voucher_type');
         $this->mollieOrderLineID = $this->getCustomFieldValue($lineItem, 'order_line_id');
+        $this->resetStockQuantity = (int)$this->getCustomFieldValue($lineItem, 'reset_stock_quantity');
 
         $this->subscriptionProduct = (bool)$this->getCustomFieldValue($lineItem, 'subscription_enabled');
         $this->subscriptionInterval = (int)$this->getCustomFieldValue($lineItem, 'subscription_interval');
@@ -78,6 +84,14 @@ class OrderLineItemEntityAttributes
     public function getMollieOrderLineID(): string
     {
         return $this->mollieOrderLineID;
+    }
+
+    /**
+     * @return int
+     */
+    public function getResetStockQuantity(): int
+    {
+        return $this->resetStockQuantity;
     }
 
     /**

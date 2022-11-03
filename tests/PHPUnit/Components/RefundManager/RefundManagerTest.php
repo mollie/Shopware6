@@ -10,6 +10,7 @@ use Kiener\MolliePayments\Components\RefundManager\RefundManager;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
 use Kiener\MolliePayments\Service\MollieApi\Order;
+use MolliePayments\Tests\Fakes\FakeEntityRepository;
 use MolliePayments\Tests\Fakes\FakeOrderService;
 use MolliePayments\Tests\Fakes\FakeRefundService;
 use MolliePayments\Tests\Fakes\FlowBuilder\FakeFlowBuilderDispatcher;
@@ -19,6 +20,7 @@ use MolliePayments\Tests\Traits\MockTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemDefinition;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
@@ -60,6 +62,7 @@ class RefundManagerTest extends TestCase
 
         $fakeOrderService = new FakeOrderService($order);
         $fakeRefundService = new FakeRefundService('r-xyz-123', 9999);
+        $fakeOrderLineItemRepository = new FakeEntityRepository(new OrderLineItemDefinition());
         $this->fakeStockUpdater = new FakeStockManager();
 
         /** @var Order $fakeOrder */
@@ -77,7 +80,8 @@ class RefundManagerTest extends TestCase
             new FakeFlowBuilderFactory($this->fakeFlowBuilderDispatcher),
             $flowBuilderEventFactory,
             $this->fakeStockUpdater,
-            new NullLogger()
+            new NullLogger(),
+            $fakeOrderLineItemRepository
         );
     }
 
