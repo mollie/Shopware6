@@ -26,11 +26,11 @@ use Shopware\Core\System\Salutation\SalutationEntity;
 trait OrderTrait
 {
     public function getCustomerAddressEntity(
-        string $firstName,
-        string $lastName,
-        string $street,
-        string $zipCode,
-        string $city,
+        string  $firstName,
+        string  $lastName,
+        string  $street,
+        string  $zipCode,
+        string  $city,
         ?string $salutationName,
         ?string $countryISO,
         ?string $additional): CustomerAddressEntity
@@ -69,14 +69,14 @@ trait OrderTrait
         string $lineItemId,
         string $productNumber,
         string $label,
-        int $unit,
-        float $unitPrice,
-        float $taxRate,
-        float $taxAmount,
+        int    $unit,
+        float  $unitPrice,
+        float  $taxRate,
+        float  $taxAmount,
         string $lineItemType = LineItem::PRODUCT_LINE_ITEM_TYPE,
         string $seoUrl = '',
         string $imageUrl = '',
-        int $position = 1
+        int    $position = 1
     ): OrderLineItemEntity
     {
         $productId = Uuid::randomHex();
@@ -94,6 +94,7 @@ trait OrderTrait
         $lineItem->setQuantity($unit);
         $lineItem->setType($lineItemType);
         $lineItem->setPosition($position);
+        $lineItem->setUnitPrice($unitPrice);
 
         $product = new ProductEntity();
         $product->setId($productId);
@@ -117,6 +118,11 @@ trait OrderTrait
         }
 
         $lineItem->setProduct($product);
+
+
+        $lineItem->setPayload([
+            'productNumber' => $productNumber,
+        ]);
 
         return $lineItem;
     }
