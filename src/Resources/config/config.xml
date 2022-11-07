@@ -82,7 +82,7 @@
             <label>Create customers at Mollie</label>
             <label lang="de-DE">Kunden bei Mollie anlegen</label>
             <label lang="nl-NL">Klanten creëren bij Mollie</label>
-            <defaultValue>true</defaultValue>
+            <defaultValue>false</defaultValue>
             <helpText>Automatically have customers being created inside your Mollie Dashboard to see all payments of a specific customer.</helpText>
             <helpText lang="de-DE">Erstellt automatisch Kunden im Mollie Dashboard. Dadurch hat man einen zusätzlichen Überblick über alle Zahlungen dieses Kunden innerhalb von Mollie.</helpText>
             <helpText lang="nl-NL">Automatisch klanten laten aanmaken in het Mollie Dashboard om alle betalingen van een specifieke klant te zien.</helpText>
