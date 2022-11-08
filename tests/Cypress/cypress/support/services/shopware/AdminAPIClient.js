@@ -10,8 +10,7 @@ export default class AdminAPIClient {
         this.basePath = '';
 
         this.client = axios.create({
-            baseURL: `${Cypress.config('baseUrl')}/api`,
-            timeout: 10000,
+            baseURL: `${Cypress.config('baseUrl')}/api`
         });
     }
 
@@ -140,17 +139,20 @@ export default class AdminAPIClient {
                     },
                     url,
                     method,
-                    timeout: 10000,
+                    timeout: 20000,
                     params,
                     data
                 };
 
-                return this.client.request(requestConfig).then((response) => {
-                    if (Array.isArray(response.data.data) && response.data.data.length === 1) {
-                        return response.data.data[0];
-                    }
-                    return response.data.data;
-                });
+                return this.client.request(requestConfig)
+                    .then((response) => {
+                        if (Array.isArray(response.data.data) && response.data.data.length === 1) {
+                            return response.data.data[0];
+                        }
+                        return response.data.data;
+                    }).catch((error) => {
+                        console.log(error);
+                    });
             })
             .catch(({response}) => {
                 console.log(response);
