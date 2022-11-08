@@ -14,6 +14,7 @@ import VoucherScreenAction from "cypress-mollie/src/actions/screens/VoucherScree
 import PaymentMethodsScreenAction from "cypress-mollie/src/actions/screens/PaymentListScreen";
 import KBCScreen from "cypress-mollie/src/actions/screens/KBCScreen";
 import GiftCardsScreenAction from "cypress-mollie/src/actions/screens/GiftCardsScreen";
+import CreditCardScreen from "cypress-mollie/src/actions/screens/CreditCardScreen";
 
 
 const devices = new Devices();
@@ -30,7 +31,7 @@ const mollieKBC = new KBCScreen();
 const mollieVoucher = new VoucherScreenAction();
 const mollieGiftCards = new GiftCardsScreenAction();
 const molliePaymentMethods = new PaymentMethodsScreenAction();
-
+const mollieCreditCard = new CreditCardScreen();
 
 const scenarioDummyBasket = new DummyBasketScenario(4);
 
@@ -39,6 +40,7 @@ const device = devices.getFirstDevice();
 
 
 const payments = [
+    {caseId: 'C4101', key: 'credit-card', name: 'Credit card'},
     {caseId: 'C4111', key: 'paypal', name: 'PayPal'},
     {caseId: 'C4114', key: 'klarnapaynow', name: 'Pay now'},
     {caseId: 'C4115', key: 'klarnapaylater', name: 'Pay later'},
@@ -133,6 +135,12 @@ context("Checkout Tests", () => {
                         mollieGiftCards.selectBeautyCards();
                         molliePayment.selectPaid();
                         molliePaymentMethods.selectPaypal();
+                        molliePayment.selectPaid();
+
+                    } else if (payment.key === 'credit-card') {
+
+                        mollieCreditCard.enterValidCard();
+                        mollieCreditCard.submitForm();
                         molliePayment.selectPaid();
 
                     } else {
