@@ -23,9 +23,11 @@ export default class DummyBasketScenario {
     /**
      *
      * @param quantity
+     * @param lineItemCount
      */
-    constructor(quantity) {
+    constructor(quantity, lineItemCount = 1) {
         this.quantity = quantity;
+        this.lineItemCount = lineItemCount;
     }
 
     /**
@@ -52,11 +54,18 @@ export default class DummyBasketScenario {
         // just refresh
         cy.visit('/');
 
-        topMenu.clickOnSecondCategory();
 
-        listing.clickOnFirstProduct();
+        for (let i = 0; i < this.lineItemCount; i++) {
+            topMenu.clickOnSecondCategory();
 
-        pdp.addToCart(this.quantity);
+            listing.clickOnNthProduct(i + 1);
+
+            pdp.addToCart(this.quantity);
+
+            if (i < this.lineItemCount - 1) {
+                checkout.closeOffcanvasCart();
+            }
+        }
 
         checkout.goToCheckoutInOffCanvas();
     }

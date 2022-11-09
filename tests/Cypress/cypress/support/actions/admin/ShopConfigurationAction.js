@@ -244,7 +244,15 @@ export default class ShopConfigurationAction {
                                                 }
                                             ]
                                         }
-                                    ]
+                                    ],
+                                    "translations": {
+                                        "de-DE": {
+                                            "tracking_url": "https://www.carrier.com/de/tracking/%s"
+                                        },
+                                        "en-GB": {
+                                            "tracking_url": "https://www.carrier.com/en/tracking/%s"
+                                        }
+                                    }
                                 };
 
                                 this.apiClient.patch('/shipping-method/' + element.id, shippingData);

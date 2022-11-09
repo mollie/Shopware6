@@ -12,4 +12,15 @@ export default class ListingAction {
         repo.getFirstProduct().click();
     }
 
+    /**
+     *
+     * @param n
+     */
+    clickOnNthProduct(n) {
+
+        const repo = new ListingRepository();
+
+        repo.getNthProduct(n).click();
+    }
+
 }
