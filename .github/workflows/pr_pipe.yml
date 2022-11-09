@@ -51,6 +51,26 @@ jobs:
       - name: Run Jest
         run: make jest -B
 
+  stryker:
+    name: Stryker Tests
+    needs: jest
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Code
+        uses: actions/checkout@v3
+
+      - name: Mount Dev Dependency Cache
+        uses: actions/cache@v3
+        with:
+          key: cache-dev-dependencies-${{ github.run_id }}
+          path: |
+            src/Resources/app/storefront/node_modules
+            src/Resources/app/administration/node_modules
+            vendor
+
+      - name: Run Stryker
+        run: make stryker -B
+
   eslint:
     name: ESLint
     needs: install
