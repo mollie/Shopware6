@@ -74,8 +74,8 @@ insights: ## Starts the PHPInsights Analyser
 	@php vendor/bin/phpinsights analyse --no-interaction
 
 jest: ## Starts all Jest tests
-	cd ./src/Resources/app/administration && ./node_modules/.bin/jest --config=.jest.config.js
-	cd ./src/Resources/app/storefront && ./node_modules/.bin/jest --config=.jest.config.js
+	cd ./src/Resources/app/administration && ./node_modules/.bin/jest --config=.jest.config.js --coverage
+	cd ./src/Resources/app/storefront && ./node_modules/.bin/jest --config=.jest.config.js --coverage
 
 eslint: ## Starts the ESLinter
 	cd ./src/Resources/app/administration && ./node_modules/.bin/eslint --config ./.eslintrc.json ./src
