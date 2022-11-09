@@ -85,8 +85,6 @@ context("Order Refunds", () => {
             // open the ship through mollie action
             adminOrders.openShipThroughMollie();
 
-            cy.pause();
-
             // verify that the tracking code is present in ship through mollie
             cy.get('[style="place-items: stretch;"] > :nth-child(1) > .sw-button > .sw-button__content').contains('asdf123456789');
             cy.get('#sw-field--tracking-code').contains('asdf123456789');
@@ -107,17 +105,12 @@ context("Order Refunds", () => {
             adminOrders.openShipThroughMollieAtLineItem(1);
             adminOrders.addTrackingCodeToLineItem(1, 'Express', 'asdf123456789');
 
-            cy.pause();
-
             adminOrders.openShipThroughMollieAtLineItem(2);
             adminOrders.addTrackingCodeToLineItem(1, 'Express', 'fdsa987654321');
-            cy.pause();
             //adminOrders.setTrackingCodeAtLineItem('asdf123456789')
 
             // open the ship through mollie action
             adminOrders.openShipThroughMollie();
-
-            cy.pause();
 
             // verify that the tracking code is present in ship through mollie
             cy.get('[style="place-items: stretch;"] > :nth-child(1) > .sw-button > .sw-button__content').contains('asdf123456789');
