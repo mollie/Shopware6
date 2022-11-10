@@ -65,6 +65,11 @@
           "link": "Open betalingslimieten van Mollie"
         }
       },
+      "rounding": {
+        "info1": "Shopware kan valuta-instellingen gebruiken om te berekenen hoe het totaal van een bestelling wordt afgerond. Dit omvat het aantal decimalen in jouw productprijzen en het dichtstbijzijnde afrondingsinterval, zoals 0,50 of 1,00.",
+        "info2": "Deze instellingen kunnen leiden tot een andere totale som dan de totale som van lineitems. Wanneer Mollie deze bedragen kruiselings controleert en vaststelt dat ze niet overeenkomen, ontstaat er een fout bij het afrekenen.",
+        "info3": "Je kunt deze functie gebruiken om afrondingsproblemen bij het afrekenen te voorkomen. Indien ingeschakeld, voegt het een apart lineitem toe aan je Mollie Dashboard met het afrondingsverschil, en betalen je klanten de totale som zoals berekend door Shopware."
+      },
       "support": {
         "modalTitle": "Verzoek support van Mollie",
         "btnCancel": "Cancel",

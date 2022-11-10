@@ -34,7 +34,7 @@ context("Plugin Config", () => {
             cy.contains('Onboarding is easy with Mollie!');
         })
 
-        it('C147523: Update Payment Method button visible and triggers action @core', () => {
+        it('C147523: Update Payment Method triggers action @core', () => {
 
             adminLogin.login();
             pluginAction.openPluginConfiguration();
@@ -44,11 +44,17 @@ context("Plugin Config", () => {
             cy.contains('The payment methods are successfully updated.');
         })
 
+        it('C148986: Rounding Settings Information is visible @core', () => {
+
+            adminLogin.login();
+            pluginAction.openPluginConfiguration();
+
+            cy.contains('Shopware can use currency settings to calculate');
+        })
 
         it('C4001: Smart Contact Form is responding properly @core', () => {
 
             adminLogin.login();
-
             pluginAction.openPluginConfiguration();
 
             cy.get('.col-right > button.sw-button', {timeout: 10000}).click();

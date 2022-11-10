@@ -4,27 +4,21 @@ namespace Kiener\MolliePayments\Service\MollieApi\Builder;
 
 use Kiener\MolliePayments\Event\MollieOrderBuildEvent;
 use Kiener\MolliePayments\Handler\PaymentHandler;
-use Kiener\MolliePayments\Hydrator\MollieLineItemHydrator;
-use Kiener\MolliePayments\Service\MollieApi\Fixer\OrderAmountDiffFixer;
-use Kiener\MolliePayments\Service\MollieApi\Fixer\VerticalTaxLineItemFixer;
 use Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher;
 use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
 use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
-use Kiener\MolliePayments\Struct\MollieLineItem;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
-use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\Locale\LocaleEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\SalesChannel\SalesChannelDefinition;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Routing\RouterInterface;
 
 class MollieOrderBuilder
 {
@@ -34,11 +28,6 @@ class MollieOrderBuilder
      * @var SettingsService
      */
     private $settingsService;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
 
     /**
      * @var OrderDataExtractor
@@ -66,34 +55,19 @@ class MollieOrderBuilder
     private $customerEnricher;
 
     /**
-     * @var MollieShippingLineItemBuilder
-     */
-    private $shippingLineItemBuilder;
-
-    /**
      * @var RoutingBuilder
      */
     private $urlBuilder;
 
     /**
-     * @var VerticalTaxLineItemFixer
-     */
-    private $verticalTaxLineItemFixer;
-
-    /**
-     * @var OrderAmountDiffFixer
-     */
-    private $orderAmountFixer;
-
-    /**
-     * @var MollieLineItemHydrator
-     */
-    private $mollieLineItemHydrator;
-
-    /**
      * @var EventDispatcherInterface
      */
     private $eventDispatcher;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
 
     /**
@@ -103,29 +77,21 @@ class MollieOrderBuilder
      * @param MollieLineItemBuilder $lineItemBuilder
      * @param MollieOrderAddressBuilder $addressBuilder
      * @param MollieOrderCustomerEnricher $customerEnricher
-     * @param LoggerInterface $loggerService
-     * @param MollieShippingLineItemBuilder $shippingLineItemBuilder
-     * @param VerticalTaxLineItemFixer $verticalTaxLineItemFixer
-     * @param OrderAmountDiffFixer $orderAmountDiffFixer
-     * @param MollieLineItemHydrator $mollieLineItemHydrator
+     * @param RoutingBuilder $urlBuilder
      * @param EventDispatcherInterface $eventDispatcher
-     * @param RoutingBuilder $routingBuilder
+     * @param LoggerInterface $logger
      */
-    public function __construct(SettingsService $settingsService, OrderDataExtractor $extractor, MollieOrderPriceBuilder $priceBuilder, MollieLineItemBuilder $lineItemBuilder, MollieOrderAddressBuilder $addressBuilder, MollieOrderCustomerEnricher $customerEnricher, LoggerInterface $loggerService, MollieShippingLineItemBuilder $shippingLineItemBuilder, VerticalTaxLineItemFixer $verticalTaxLineItemFixer, OrderAmountDiffFixer $orderAmountDiffFixer, MollieLineItemHydrator $mollieLineItemHydrator, EventDispatcherInterface $eventDispatcher, RoutingBuilder $routingBuilder)
+    public function __construct(SettingsService $settingsService, OrderDataExtractor $extractor, MollieOrderPriceBuilder $priceBuilder, MollieLineItemBuilder $lineItemBuilder, MollieOrderAddressBuilder $addressBuilder, MollieOrderCustomerEnricher $customerEnricher, RoutingBuilder $urlBuilder, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger)
     {
         $this->settingsService = $settingsService;
-        $this->logger = $loggerService;
         $this->extractor = $extractor;
         $this->priceBuilder = $priceBuilder;
         $this->lineItemBuilder = $lineItemBuilder;
         $this->addressBuilder = $addressBuilder;
         $this->customerEnricher = $customerEnricher;
-        $this->shippingLineItemBuilder = $shippingLineItemBuilder;
-        $this->verticalTaxLineItemFixer = $verticalTaxLineItemFixer;
-        $this->mollieLineItemHydrator = $mollieLineItemHydrator;
+        $this->urlBuilder = $urlBuilder;
         $this->eventDispatcher = $eventDispatcher;
-        $this->urlBuilder = $routingBuilder;
-        $this->orderAmountFixer = $orderAmountDiffFixer;
+        $this->logger = $logger;
     }
 
 
@@ -177,40 +143,12 @@ class MollieOrderBuilder
 
         # ----------------------------------------------------------------------------------------------------------------------------
 
-        $mollieOrderLines = $this->lineItemBuilder->buildLineItems($order->getTaxStatus(), $order->getNestedLineItems(), $isVerticalTaxCalculation);
-
-        $deliveries = $order->getDeliveries();
-
-        if ($deliveries instanceof OrderDeliveryCollection) {
-            $shippingLineItems = $this->shippingLineItemBuilder->buildShippingLineItems(
-                $order->getTaxStatus(),
-                $deliveries,
-                $isVerticalTaxCalculation
-            );
-
-            foreach ($shippingLineItems as $shipping) {
-                $mollieOrderLines->add($shipping);
-            }
-        }
-
-        # with the vertical tax calculation
-        # it can be that there are larger diffs due to rounding
-        # this is a special treatment that is handled with our separate
-        # line item fixer class
-        if ($isVerticalTaxCalculation) {
-            $this->verticalTaxLineItemFixer->fixLineItems($mollieOrderLines, $salesChannelContext);
-        }
-
-        # in cases with items that have multiple decimals
-        # it can be that it's just not possible to calculate the correct amounts.
-        # Shopware shows 5 decimals in the checkout, while the total sum might be rounded to 2 decimals.
-        # If such a scenario happens, it can be that we have 1 cent off. In that case,
-        # we have a separate fixer that adjusts the line items of Mollie for this diff.
-        $orderTotalAmount = (float)$orderData['amount']['value'];
-        $mollieOrderLines = $this->orderAmountFixer->fixSmallAmountDiff($orderTotalAmount, $mollieOrderLines);
-
-
-        $orderData['lines'] = $this->mollieLineItemHydrator->hydrate($mollieOrderLines, $currency->getIsoCode());
+        $orderData['lines'] = $this->lineItemBuilder->buildLineItemPayload(
+            $order,
+            $currency->getIsoCode(),
+            $settings,
+            $isVerticalTaxCalculation
+        );
 
         # ----------------------------------------------------------------------------------------------------------------------------
 

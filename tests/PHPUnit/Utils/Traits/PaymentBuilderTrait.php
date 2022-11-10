@@ -6,6 +6,7 @@ use Kiener\MolliePayments\Hydrator\MollieLineItemHydrator;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieLineItemBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieShippingLineItemBuilder;
+use Kiener\MolliePayments\Service\MollieApi\Fixer\RoundingDifferenceFixer;
 use Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\PriceCalculator;
 use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
@@ -81,7 +82,10 @@ trait PaymentBuilderTrait
             new IsOrderLineItemValid(),
             new PriceCalculator(),
             new LineItemDataExtractor(),
-            new FakeCompatibilityGateway()
+            new FakeCompatibilityGateway(),
+            new RoundingDifferenceFixer(),
+            new MollieLineItemHydrator(new MollieOrderPriceBuilder()),
+            new MollieShippingLineItemBuilder(new PriceCalculator())
         );
 
         /** @var OrderLineItemEntity $item */
@@ -158,14 +162,20 @@ trait PaymentBuilderTrait
         return new OrderLineItemCollection([$lineItemOne, $lineItemTwo]);
     }
 
-    public function getOrderEntity(
-        float                   $amountTotal,
-        string                  $taxStatus,
-        CurrencyEntity          $currency,
-        OrderLineItemCollection $lineItems,
-        string                  $orderNumber
-    ): OrderEntity
+    /**
+     * @param float $amountTotal
+     * @param string $taxStatus
+     * @param string $currencyISO
+     * @param OrderLineItemCollection $lineItems
+     * @param string $orderNumber
+     * @return OrderEntity
+     */
+    public function getOrderEntity(float $amountTotal, string $taxStatus, string $currencyISO, OrderLineItemCollection $lineItems, string $orderNumber): OrderEntity
     {
+        $currency = new CurrencyEntity();
+        $currency->setId(Uuid::randomHex());
+        $currency->setIsoCode($currencyISO);
+
         $order = new OrderEntity();
         $order->setId(Uuid::randomHex());
 
@@ -179,4 +189,5 @@ trait PaymentBuilderTrait
 
         return $order;
     }
+
 }

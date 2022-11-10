@@ -561,4 +561,39 @@
             <helpText lang="nl-NL">Stel een opzegtermijn in voor klanten voordat ze het abonnement verlengen. Als een abonnement op vrijdag wordt verlengd en je gebruikt "2", dan kan het uiterlijk woensdag worden opgezegd. Gebruik "0" om annuleringen altijd toe te staan</helpText>
         </input-field>
     </card>
+
+    <card>
+        <title>Rounding</title>
+        <title lang="de-DE">Rundungen</title>
+        <title lang="nl-NL">Afrondingen</title>
+        <input-field type="bool">
+            <name>fixRoundingDiffEnabled</name>
+            <label>Create line item in Mollie Dashboard</label>
+            <label lang="de-DE">Erstelle Position in Mollie Dashboard</label>
+            <label lang="nl-NL">Item maken in Mollie Dashboard</label>
+            <defaultValue>false</defaultValue>
+        </input-field>
+        <input-field type="text">
+            <name>fixRoundingDiffName</name>
+            <label>Line item name (optional)</label>
+            <label lang="de-DE">Automatisches Beheben von Rundungsproblemen</label>
+            <label lang="nl-NL">Automatisches Beheben von Rundungsproblemen</label>
+            <helpText>Set a custom name for your separate line item. This helps if you need to identify it in another system.</helpText>
+            <helpText lang="de-DE">Lege einen benutzerdefinierten Namen für die separate Position fest. Dies hilft, wenn diese in einem anderen System identifiert werden muss.</helpText>
+            <helpText lang="nl-NL">Stel een aangepaste naam in voor uw afzonderlijke regelitem. Dit is handig als u het in een ander systeem moet identificeren.</helpText>
+        </input-field>
+        <input-field type="text">
+            <name>fixRoundingDiffSKU</name>
+            <label>Line item SKU (optional)</label>
+            <label lang="de-DE">Automatisches Beheben von Rundungsproblemen</label>
+            <label lang="nl-NL">Automatisches Beheben von Rundungsproblemen</label>
+            <helpText>Set a custom SKU value for your separate line item. This helps if you need to identify it in another system.</helpText>
+            <helpText lang="de-DE">Lege einen benutzerdefinierten SKU Wert für die separate Position fest. Dies hilft, wenn diese in einem anderen System identifiert werden muss.</helpText>
+            <helpText lang="nl-NL">Stel een aangepaste SKU in voor uw afzonderlijke regelitem. Dit is handig als u het in een ander systeem moet identificeren.</helpText>
+        </input-field>
+        <component name="mollie-pluginconfig-section-rounding">
+            <name>molliePluginConfigSectionRounding</name>
+        </component>
+    </card>
+
 </config>

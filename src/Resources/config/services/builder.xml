@@ -13,13 +13,9 @@
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieLineItemBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderAddressBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher"/>
-            <argument type="service" id="mollie_payments.logger"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieShippingLineItemBuilder"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Fixer\VerticalTaxLineItemFixer"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Fixer\OrderAmountDiffFixer"/>
-            <argument type="service" id="Kiener\MolliePayments\Hydrator\MollieLineItemHydrator"/>
-            <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Router\RoutingBuilder"/>
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="mollie_payments.logger"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieShippingLineItemBuilder">
@@ -33,15 +29,15 @@
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\PriceCalculator"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Fixer\RoundingDifferenceFixer"/>
+            <argument type="service" id="Kiener\MolliePayments\Hydrator\MollieLineItemHydrator"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieShippingLineItemBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderAddressBuilder"/>
 
-        <service id="Kiener\MolliePayments\Service\MollieApi\Fixer\VerticalTaxLineItemFixer">
-            <argument type="service" id="mollie_payments.logger"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Service\MollieApi\Fixer\OrderAmountDiffFixer">
+        <service id="Kiener\MolliePayments\Service\MollieApi\Fixer\RoundingDifferenceFixer">
         </service>
 
     </services>

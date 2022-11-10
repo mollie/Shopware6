@@ -187,6 +187,22 @@ class MollieSettingStruct extends Struct
     protected $subscriptionsEnabled;
 
     /**
+     * @var bool
+     */
+    protected $fixRoundingDiffEnabled = false;
+
+    /**
+     * @var string
+     */
+    protected $fixRoundingDiffName = '';
+
+    /**
+     * @var string
+     */
+    protected $fixRoundingDiffSKU = '';
+
+
+    /**
      * @return string
      */
     public function getLiveApiKey(): string
@@ -706,5 +722,53 @@ class MollieSettingStruct extends Struct
     public function setSubscriptionsEnabled(bool $subscriptionsEnabled): void
     {
         $this->subscriptionsEnabled = $subscriptionsEnabled;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFixRoundingDiffEnabled(): bool
+    {
+        return $this->fixRoundingDiffEnabled;
+    }
+
+    /**
+     * @param bool $fixRoundingDiffEnabled
+     */
+    public function setFixRoundingDiffEnabled(bool $fixRoundingDiffEnabled): void
+    {
+        $this->fixRoundingDiffEnabled = $fixRoundingDiffEnabled;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFixRoundingDiffName(): string
+    {
+        return $this->fixRoundingDiffName;
+    }
+
+    /**
+     * @param string $fixRoundingDiffName
+     */
+    public function setFixRoundingDiffName(string $fixRoundingDiffName): void
+    {
+        $this->fixRoundingDiffName = $fixRoundingDiffName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFixRoundingDiffSKU(): string
+    {
+        return $this->fixRoundingDiffSKU;
+    }
+
+    /**
+     * @param string $fixRoundingDiffSKU
+     */
+    public function setFixRoundingDiffSKU(string $fixRoundingDiffSKU): void
+    {
+        $this->fixRoundingDiffSKU = $fixRoundingDiffSKU;
     }
 }

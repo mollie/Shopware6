@@ -69,7 +69,7 @@ trait OrderTrait
         string $lineItemId,
         string $productNumber,
         string $label,
-        int    $unit,
+        int    $quantity,
         float  $unitPrice,
         float  $taxRate,
         float  $taxAmount,
@@ -80,18 +80,18 @@ trait OrderTrait
     ): OrderLineItemEntity
     {
         $productId = Uuid::randomHex();
-        $totalPrice = $unit * $unitPrice;
+        $totalPrice = $quantity * $unitPrice;
         $calculatedTax = new CalculatedTax($taxAmount, $taxRate, $totalPrice);
         $taxes = new CalculatedTaxCollection([$calculatedTax]);
         $rules = new TaxRuleCollection([]);
-        $price = new CalculatedPrice($unitPrice, $totalPrice, $taxes, $rules, $unit);
+        $price = new CalculatedPrice($unitPrice, $totalPrice, $taxes, $rules, $quantity);
 
         $lineItem = new OrderLineItemEntity();
         $lineItem->setId($lineItemId);
         $lineItem->setPrice($price);
         $lineItem->setTotalPrice($totalPrice);
         $lineItem->setLabel($label);
-        $lineItem->setQuantity($unit);
+        $lineItem->setQuantity($quantity);
         $lineItem->setType($lineItemType);
         $lineItem->setPosition($position);
         $lineItem->setUnitPrice($unitPrice);
