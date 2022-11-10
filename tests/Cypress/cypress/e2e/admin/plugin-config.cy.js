@@ -26,6 +26,13 @@ context("Plugin Config", () => {
 
     context(devices.getDescription(device), () => {
 
+        it('C147522: Onboarding Section is visible @core', () => {
+
+            adminLogin.login();
+            pluginAction.openPluginConfiguration();
+
+            cy.contains('Onboarding is easy with Mollie!');
+        })
         it('C4001: Smart Contact Form is responding properly @core', () => {
 
             adminLogin.login();
