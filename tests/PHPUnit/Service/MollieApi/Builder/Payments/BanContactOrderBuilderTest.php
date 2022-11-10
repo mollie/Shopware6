@@ -41,7 +41,7 @@ class BanContactOrderBuilderTest extends AbstractMollieOrderBuilder
         $orderNumber = 'foo number';
         $lineItems = $this->getDummyLineItems();
 
-        $order = $this->getOrderEntity($amountTotal, $taxStatus, $currency, $lineItems, $orderNumber);
+        $order = $this->getOrderEntity($amountTotal, $taxStatus, $currencyISO, $lineItems, $orderNumber);
 
         $actual = $this->builder->build($order, $transactionId, $paymentMethod, $this->salesChannelContext, $this->paymentHandler, []);
 

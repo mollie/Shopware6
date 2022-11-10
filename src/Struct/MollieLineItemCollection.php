@@ -48,4 +48,18 @@ class MollieLineItemCollection extends StructCollection
 
         return $roundingSum;
     }
+
+    /**
+     * @return float
+     */
+    public function getCartTotalAmount(): float
+    {
+        $sum = 0;
+
+        foreach ($this->getElements() as $item) {
+            $sum += $item->getPrice()->getTotalAmount();
+        }
+
+        return $sum;
+    }
 }

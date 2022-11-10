@@ -2,477 +2,285 @@
 
 namespace MolliePayments\Tests\Service\MollieApi\Builder;
 
-use Kiener\MolliePayments\Factory\CompatibilityFactory;
+
 use Kiener\MolliePayments\Hydrator\MollieLineItemHydrator;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieLineItemBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
+use Kiener\MolliePayments\Service\MollieApi\Builder\MollieShippingLineItemBuilder;
+use Kiener\MolliePayments\Service\MollieApi\Fixer\RoundingDifferenceFixer;
 use Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\PriceCalculator;
+use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
 use Mollie\Api\Types\OrderLineType;
 use MolliePayments\Tests\Fakes\FakeCompatibilityGateway;
 use MolliePayments\Tests\Traits\OrderTrait;
+use MolliePayments\Tests\Utils\Traits\PaymentBuilderTrait;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
-use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
-use Shopware\Core\Framework\Uuid\Uuid;
-use Shopware\Core\System\Currency\CurrencyEntity;
+
 
 class MollieLineItemBuilderTest extends TestCase
 {
     use OrderTrait;
+    use PaymentBuilderTrait;
 
-    /** @var MollieLineItemBuilder */
+    /**
+     * @var MollieLineItemBuilder
+     */
     private $builder;
 
+
+    /**
+     * @return void
+     */
     public function setUp(): void
     {
         $this->builder = new MollieLineItemBuilder(
             (new IsOrderLineItemValid()),
             (new PriceCalculator()),
             (new LineItemDataExtractor()),
-            new FakeCompatibilityGateway()
+            new FakeCompatibilityGateway(),
+            new RoundingDifferenceFixer(),
+            new MollieLineItemHydrator(new MollieOrderPriceBuilder()),
+            new MollieShippingLineItemBuilder(new PriceCalculator())
         );
     }
 
+
+    /**
+     * This test verifies that our constant for custom products is not touched.
+     *
+     * @return void
+     */
     public function testConstants(): void
     {
         self::assertSame('customized-products', MollieLineItemBuilder::LINE_ITEM_TYPE_CUSTOM_PRODUCTS);
     }
 
-    public function testBuildLineItemsWithEmptyLineItems(): void
+    /**
+     * This test verifies that an empty order item list leads to
+     * an empty array.
+     *
+     * @return void
+     */
+    public function testNoLineItems(): void
     {
-        $lineItems = new OrderLineItemCollection();
-        $currency = new CurrencyEntity();
-        $currency->setId(Uuid::randomHex());
-        $currency->setIsoCode('EUR');
-
-        $expected = [];
-
-        $hydrator = new MollieLineItemHydrator(new MollieOrderPriceBuilder());
-
-        $actual = $hydrator->hydrate(
-            $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, $lineItems),
-            $currency->getIsoCode()
+        $order = $this->getOrderEntity(
+            0,
+            '',
+            'EUR',
+            new OrderLineItemCollection([]),
+            ''
         );
 
-        self::assertSame($expected, $actual);
+        $settings = new MollieSettingStruct();
+
+        $lines = $this->builder->buildLineItemPayload($order, 'EUR', $settings, false);
+
+        self::assertEquals([], $lines);
     }
 
-    public function testBuildLineItemsWithNullLineItemCollection(): void
+    /**
+     * @return array<mixed>[]
+     */
+    public function getStructureData(): array
     {
-        $currency = new CurrencyEntity();
-        $currency->setId(Uuid::randomHex());
-        $currency->setIsoCode('EUR');
-
-        $expected = [];
-
-        $hydrator = new MollieLineItemHydrator(new MollieOrderPriceBuilder());
-
-        $actual = $hydrator->hydrate(
-            $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, null),
-            $currency->getIsoCode()
-        );
-
-        self::assertSame($expected, $actual);
+        return [
+            'PRODUCT Line Item is PHYSICAL' => [LineItem::PRODUCT_LINE_ITEM_TYPE, OrderLineType::TYPE_PHYSICAL],
+            'CREDIT Line Item is PHYSICAL' => [LineItem::CREDIT_LINE_ITEM_TYPE, OrderLineType::TYPE_STORE_CREDIT],
+            'PROMOTION Line Item is PHYSICAL' => [LineItem::PROMOTION_LINE_ITEM_TYPE, OrderLineType::TYPE_DISCOUNT],
+            'CUSTOM_PRODUCT Line Item is PHYSICAL' => [MollieLineItemBuilder::LINE_ITEM_TYPE_CUSTOM_PRODUCTS, OrderLineType::TYPE_PHYSICAL],
+            'Fallback Line Item is DIGITAL' => ['test', OrderLineType::TYPE_DIGITAL],
+        ];
     }
 
-    public function testWithOneLineItem(): void
+    /**
+     * This test verifies that our structure of a single line item is correct
+     * and working for the Mollie API as payload.
+     *
+     * @dataProvider getStructureData
+     *
+     * @param string $itemType
+     * @param string $mollieLineType
+     * @return void
+     */
+    public function testLineItemStructure(string $itemType, string $mollieLineType): void
     {
-        $lineItems = new OrderLineItemCollection();
-        $productNumber = 'foo';
-        $labelName = 'bar';
-        $quantity = 1;
-        $taxRate = 50.0;
-        $unitPrice = 15.0;
-        $lineItemId = Uuid::randomHex();
-        $seoUrl = 'http://seoUrl';
-        $imageUrl = 'http://imageUrl';
-
-        $isoCode = 'EUR';
-        $currency = new CurrencyEntity();
-        $currency->setId(Uuid::randomHex());
-        $currency->setIsoCode($isoCode);
-
-        $lineItem = $this->getOrderLineItem(
-            $lineItemId,
-            $productNumber,
-            $labelName,
-            $quantity,
-            $unitPrice,
-            $taxRate,
-            1.0,
-            LineItem::PRODUCT_LINE_ITEM_TYPE,
-            $seoUrl,
-            $imageUrl
+        $item1 = $this->getOrderLineItem(
+            'line-1',
+            'product-123',
+            'Product T-Shirt',
+            1,
+            4.9,
+            19,
+            0,
+            $itemType,
+            'https://phpunit.mollie.local/my-product-1',
+            'https://phpunit.mollie.local/my-product-1.png',
+            1
         );
 
-        $lineItems->add($lineItem);
+        $order = $this->getOrderEntity(
+            4.99,
+            '',
+            'EUR',
+            new OrderLineItemCollection([$item1]),
+            ''
+        );
 
-        $expected = [[
-            'type' => OrderLineType::TYPE_PHYSICAL,
-            'name' => $labelName,
-            'quantity' => $quantity,
+        $settings = new MollieSettingStruct();
+
+        $lineItems = $this->builder->buildLineItemPayload($order, 'EUR', $settings, false);
+
+        $expected = [
+            'type' => $mollieLineType,
+            'name' => $item1->getLabel(),
+            'quantity' => 1,
             'unitPrice' => [
-                'currency' => $isoCode,
-                'value' => '15.00'
+                'currency' => 'EUR',
+                'value' => '4.90'
             ],
             'totalAmount' => [
-                'currency' => $isoCode,
-                'value' => '15.00'
+                'currency' => 'EUR',
+                'value' => '4.90'
             ],
-            'vatRate' => '50.00',
+            'vatRate' => '19.00',
             'vatAmount' => [
-                'currency' => $isoCode,
-                'value' => '5.00'
+                'currency' => 'EUR',
+                'value' => '0.78'
             ],
-            'sku' => $productNumber,
-            'imageUrl' => urlencode($imageUrl),
-            'productUrl' => urlencode($seoUrl),
+            'sku' => 'product-123',
+            'imageUrl' => urlencode('https://phpunit.mollie.local/my-product-1.png'),
+            'productUrl' => urlencode('https://phpunit.mollie.local/my-product-1'),
             'metadata' => [
-                'orderLineItemId' => $lineItemId
+                'orderLineItemId' => 'line-1'
             ]
-        ]];
+        ];
 
-        $hydrator = new MollieLineItemHydrator(new MollieOrderPriceBuilder());
-
-        $actual = $hydrator->hydrate(
-            $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, $lineItems),
-            $currency->getIsoCode()
-        );
-
-        self::assertSame($expected, $actual);
+        self::assertCount(1, $lineItems);
+        self::assertEquals($expected, $lineItems[0]);
     }
 
-    public function testEmptySeoUrlAndImageUrl(): void
+    /**
+     * This test verifies that line items with a higher precision do also work.
+     * These need to be rounded to 2 decimals.
+     * Usually there is a rounding difference. This is why we also have to fix the rounding so that the final sum is correct.
+     * This is a real world scenario from a Github Issue: https://github.com/mollie/Shopware6/issues/439
+     *
+     * @return void
+     */
+    public function testLineItemsWithHigherPrecision(): void
     {
-        $lineItems = new OrderLineItemCollection();
-        $productNumber = 'foo';
-        $labelName = 'bar';
-        $quantity = 1;
-        $taxRate = 50.0;
-        $unitPrice = 15.0;
-        $lineItemId = Uuid::randomHex();
-        $seoUrl = '';
-        $imageUrl = '';
+        $item1 = $this->getOrderLineItem('1', '', '', 1, 2.7336, 19, 0, '', '', '', 1);
+        $item2 = $this->getOrderLineItem('2', '', '', 1, 2.9334, 19, 0, '', '', '', 1);
+        $item3 = $this->getOrderLineItem('3', '', '', 1, 1.6494, 19, 0, '', '', '', 1);
+        $item4 = $this->getOrderLineItem('4', '', '', 1, 7.5, 19, 0, '', '', '', 1);
 
-        $isoCode = 'USD';
-        $currency = new CurrencyEntity();
-        $currency->setId(Uuid::randomHex());
-        $currency->setIsoCode($isoCode);
-
-        $lineItem = $this->getOrderLineItem(
-            $lineItemId,
-            $productNumber,
-            $labelName,
-            $quantity,
-            $unitPrice,
-            $taxRate,
-            1.0,
-            LineItem::PRODUCT_LINE_ITEM_TYPE,
-            $seoUrl,
-            $imageUrl
+        $order = $this->getOrderEntity(
+            14.82,
+            '',
+            'EUR',
+            new OrderLineItemCollection([$item1, $item2, $item3, $item4]),
+            ''
         );
 
-        $lineItems->add($lineItem);
+        $settings = new MollieSettingStruct();
+        $settings->setFixRoundingDiffEnabled(true);
 
-        $expected = [[
-            'type' => OrderLineType::TYPE_PHYSICAL,
-            'name' => $labelName,
-            'quantity' => $quantity,
-            'unitPrice' => [
-                'currency' => $isoCode,
-                'value' => '15.00'
-            ],
-            'totalAmount' => [
-                'currency' => $isoCode,
-                'value' => '15.00'
-            ],
-            'vatRate' => '50.00',
-            'vatAmount' => [
-                'currency' => $isoCode,
-                'value' => '5.00'
-            ],
-            'sku' => $productNumber,
-            'imageUrl' => urlencode($imageUrl),
-            'productUrl' => urlencode($seoUrl),
-            'metadata' => [
-                'orderLineItemId' => $lineItemId
-            ]
-        ]];
+        $lineItems = $this->builder->buildLineItemPayload($order, 'EUR', $settings, false);
 
-        $hydrator = new MollieLineItemHydrator(new MollieOrderPriceBuilder());
 
-        $actual = $hydrator->hydrate(
-            $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, $lineItems),
-            $currency->getIsoCode()
-        );
+        $lineItemSum = 0;
+        foreach ($lineItems as $item) {
+            $lineItemSum += (float)$item['totalAmount']['value'];
+        }
 
-        self::assertSame($expected, $actual);
+        # make sure that our separate line items are correctly rounded
+        # Mollie only allows 2 decimals
+        $this->assertEquals('2.73', $lineItems[0]['totalAmount']['value']);
+        $this->assertEquals('2.93', $lineItems[1]['totalAmount']['value']);
+        $this->assertEquals('1.65', $lineItems[2]['totalAmount']['value']);
+        $this->assertEquals('7.50', $lineItems[3]['totalAmount']['value']);
+        $this->assertEquals('0.01', $lineItems[4]['totalAmount']['value']);
+
+        $this->assertEquals(14.82, $lineItemSum);
     }
 
-    public function testCreditLineItemType(): void
+
+    /**
+     * @return array[]
+     */
+    public function getRoundingFixerData(): array
     {
-        $lineItems = new OrderLineItemCollection();
-        $productNumber = 'foo';
-        $labelName = 'bar';
-        $quantity = 1;
-        $taxRate = 50.0;
-        $unitPrice = 15.0;
-        $lineItemId = Uuid::randomHex();
-        $seoUrl = '';
-        $imageUrl = '';
-
-        $lineItem = $this->getOrderLineItem(
-            $lineItemId,
-            $productNumber,
-            $labelName,
-            $quantity,
-            $unitPrice,
-            $taxRate,
-            1.0,
-            LineItem::CREDIT_LINE_ITEM_TYPE,
-            $seoUrl,
-            $imageUrl
-        );
-
-        $lineItems->add($lineItem);
-        $isoCode = 'USD';
-        $currency = new CurrencyEntity();
-        $currency->setId(Uuid::randomHex());
-        $currency->setIsoCode($isoCode);
-
-        $expected = [[
-            'type' => OrderLineType::TYPE_STORE_CREDIT,
-            'name' => $labelName,
-            'quantity' => $quantity,
-            'unitPrice' => [
-                'currency' => $isoCode,
-                'value' => '15.00'
-            ],
-            'totalAmount' => [
-                'currency' => $isoCode,
-                'value' => '15.00'
-            ],
-            'vatRate' => '50.00',
-            'vatAmount' => [
-                'currency' => $isoCode,
-                'value' => '5.00'
-            ],
-            'sku' => $productNumber,
-            'imageUrl' => urlencode($imageUrl),
-            'productUrl' => urlencode($seoUrl),
-            'metadata' => [
-                'orderLineItemId' => $lineItemId
-            ]
-        ]];
-
-        $hydrator = new MollieLineItemHydrator(new MollieOrderPriceBuilder());
-
-        $actual = $hydrator->hydrate(
-            $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, $lineItems),
-            $currency->getIsoCode()
-        );
-
-        self::assertSame($expected, $actual);
+        return [
+            "Enable Fixing, but not difference, items remain the same" => [true, 2.73, 2.73, 1, 2.73],
+            "Enable Fixing with difference, diff item is added" => [true, 2.73, 3.00, 2, 3.0],
+            "Disable Fixing with difference, items remain the same" => [false, 2.73, 3.00, 1, 2.73],
+        ];
     }
 
-    public function testPromotionLineItemType(): void
+    /**
+     * This test verifies that we use the fixer algorithm if enabled, and do not use it if disabled.
+     * The basic concept is that we either have a difference in the order-total compared to the line items,
+     * and depending on our fixing configuration, a new (diff) line item is then added or not.
+     * In the end the sum of the line items has to match our expected orderTotal amount.
+     *
+     * @dataProvider getRoundingFixerData
+     *
+     * @param bool $fixRoundingIssues
+     * @param float $swItemUnitPrice
+     * @param float $swOrderTotal
+     * @param int $lineItemCount
+     * @param float $expectedOrderSum
+     *
+     * @return void
+     */
+    public function testRoundingFixerIsUsedCorrectly(bool $fixRoundingIssues, float $swItemUnitPrice, float $swOrderTotal, int $lineItemCount, float $expectedOrderSum)
     {
-        $lineItems = new OrderLineItemCollection();
-        $productNumber = 'foo';
-        $labelName = 'bar';
-        $quantity = 1;
-        $taxRate = 50.0;
-        $unitPrice = 15.0;
-        $lineItemId = Uuid::randomHex();
-        $seoUrl = '';
-        $imageUrl = '';
+        $settings = new MollieSettingStruct();
+        $settings->setFixRoundingDiffEnabled($fixRoundingIssues);
 
-        $lineItem = $this->getOrderLineItem(
-            $lineItemId,
-            $productNumber,
-            $labelName,
-            $quantity,
-            $unitPrice,
-            $taxRate,
-            1.0,
-            LineItem::PROMOTION_LINE_ITEM_TYPE,
-            $seoUrl,
-            $imageUrl
+
+        $item1 = $this->getOrderLineItem(
+            '',
+            '',
+            '',
+            1,
+            $swItemUnitPrice,
+            19,
+            0,
+            '',
+            '',
+            '',
+            1
         );
 
-        $lineItems->add($lineItem);
-        $isoCode = 'USD';
-        $currency = new CurrencyEntity();
-        $currency->setId(Uuid::randomHex());
-        $currency->setIsoCode($isoCode);
-
-        $expected = [[
-            'type' => OrderLineType::TYPE_DISCOUNT,
-            'name' => $labelName,
-            'quantity' => $quantity,
-            'unitPrice' => [
-                'currency' => $isoCode,
-                'value' => '15.00'
-            ],
-            'totalAmount' => [
-                'currency' => $isoCode,
-                'value' => '15.00'
-            ],
-            'vatRate' => '50.00',
-            'vatAmount' => [
-                'currency' => $isoCode,
-                'value' => '5.00'
-            ],
-            'sku' => $productNumber,
-            'imageUrl' => urlencode($imageUrl),
-            'productUrl' => urlencode($seoUrl),
-            'metadata' => [
-                'orderLineItemId' => $lineItemId
-            ]
-        ]];
-
-        $hydrator = new MollieLineItemHydrator(new MollieOrderPriceBuilder());
-
-        $actual = $hydrator->hydrate(
-            $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, $lineItems),
-            $currency->getIsoCode()
+        $order = $this->getOrderEntity(
+            $swOrderTotal,
+            '',
+            '',
+            new OrderLineItemCollection([$item1]),
+            ''
         );
 
-        self::assertSame($expected, $actual);
+        $lineItems = $this->builder->buildLineItemPayload($order, 'EUR', $settings, true);
+
+
+        # check if we have the expected number of items
+        # this is either with, or without our diff-line-item
+        $this->assertCount($lineItemCount, $lineItems);
+
+
+        # now sum up the line items of the hydrated array
+        # this has to match the values that we expect to be.
+        $lineItemSum = 0;
+        foreach ($lineItems as $item) {
+            $lineItemSum += (float)$item['totalAmount']['value'];
+        }
+
+        $this->assertEquals($expectedOrderSum, $lineItemSum);
     }
 
-    public function testCustomProductsLineItemType(): void
-    {
-        $lineItems = new OrderLineItemCollection();
-        $productNumber = 'foo';
-        $labelName = 'bar';
-        $quantity = 1;
-        $taxRate = 50.0;
-        $unitPrice = 15.0;
-        $lineItemId = Uuid::randomHex();
-        $seoUrl = '';
-        $imageUrl = '';
-
-        $lineItem = $this->getOrderLineItem(
-            $lineItemId,
-            $productNumber,
-            $labelName,
-            $quantity,
-            $unitPrice,
-            $taxRate,
-            1.0,
-            MollieLineItemBuilder::LINE_ITEM_TYPE_CUSTOM_PRODUCTS,
-            $seoUrl,
-            $imageUrl
-        );
-
-        $lineItems->add($lineItem);
-        $isoCode = 'USD';
-        $currency = new CurrencyEntity();
-        $currency->setId(Uuid::randomHex());
-        $currency->setIsoCode($isoCode);
-
-        $expected = [[
-            'type' => OrderLineType::TYPE_PHYSICAL,
-            'name' => $labelName,
-            'quantity' => $quantity,
-            'unitPrice' => [
-                'currency' => $isoCode,
-                'value' => '15.00'
-            ],
-            'totalAmount' => [
-                'currency' => $isoCode,
-                'value' => '15.00'
-            ],
-            'vatRate' => '50.00',
-            'vatAmount' => [
-                'currency' => $isoCode,
-                'value' => '5.00'
-            ],
-            'sku' => $productNumber,
-            'imageUrl' => urlencode($imageUrl),
-            'productUrl' => urlencode($seoUrl),
-            'metadata' => [
-                'orderLineItemId' => $lineItemId
-            ]
-        ]];
-
-        $hydrator = new MollieLineItemHydrator(new MollieOrderPriceBuilder());
-
-        $actual = $hydrator->hydrate(
-            $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, $lineItems),
-            $currency->getIsoCode()
-        );
-
-        self::assertSame($expected, $actual);
-    }
-
-    public function testFallbackLineItemType(): void
-    {
-        $lineItems = new OrderLineItemCollection();
-        $productNumber = 'foo';
-        $labelName = 'bar';
-        $quantity = 1;
-        $taxRate = 50.0;
-        $unitPrice = 15.0;
-        $lineItemId = Uuid::randomHex();
-        $seoUrl = '';
-        $imageUrl = '';
-
-        $lineItem = $this->getOrderLineItem(
-            $lineItemId,
-            $productNumber,
-            $labelName,
-            $quantity,
-            $unitPrice,
-            $taxRate,
-            1.0,
-            'foo',
-            $seoUrl,
-            $imageUrl
-        );
-
-        $lineItems->add($lineItem);
-        $isoCode = 'USD';
-        $currency = new CurrencyEntity();
-        $currency->setId(Uuid::randomHex());
-        $currency->setIsoCode($isoCode);
-
-        $expected = [[
-            'type' => OrderLineType::TYPE_DIGITAL,
-            'name' => $labelName,
-            'quantity' => $quantity,
-            'unitPrice' => [
-                'currency' => $isoCode,
-                'value' => '15.00'
-            ],
-            'totalAmount' => [
-                'currency' => $isoCode,
-                'value' => '15.00'
-            ],
-            'vatRate' => '50.00',
-            'vatAmount' => [
-                'currency' => $isoCode,
-                'value' => '5.00'
-            ],
-            'sku' => $productNumber,
-            'imageUrl' => urlencode($imageUrl),
-            'productUrl' => urlencode($seoUrl),
-            'metadata' => [
-                'orderLineItemId' => $lineItemId
-            ]
-        ]];
-
-        $hydrator = new MollieLineItemHydrator(new MollieOrderPriceBuilder());
-
-        $actual = $hydrator->hydrate(
-            $this->builder->buildLineItems(CartPrice::TAX_STATE_GROSS, $lineItems),
-            $currency->getIsoCode()
-        );
-
-        self::assertSame($expected, $actual);
-    }
 }
