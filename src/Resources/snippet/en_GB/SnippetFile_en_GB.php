@@ -11,6 +11,14 @@ class SnippetFile_en_GB implements SnippetFileInterface
         return 'mollie-payments.en-GB';
     }
 
+    /**
+     * Required for deprecation warnings in Shopware 6.4.17.0
+     */
+    public function getTechnicalName(): string
+    {
+        return $this->getName();
+    }
+
     public function getPath(): string
     {
         return __DIR__ . '/mollie-payments.en-GB.json';

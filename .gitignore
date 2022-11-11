@@ -13,3 +13,4 @@ src/Resources/public/administration/css/
 src/Resources/public/administration/js/
 /tests/Cypress/Cypress.env.json
 /tests/Cypress/cypress/results
+/src/Resources/app/administration/.stryker-tmp

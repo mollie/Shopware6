@@ -60,6 +60,26 @@ jobs:
       - name: Run Jest
         run: make jest -B
 
+  stryker:
+    name: Stryker Tests
+    needs: jest
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Code
+        uses: actions/checkout@v3
+
+      - name: Mount Dev Dependency Cache
+        uses: actions/cache@v3
+        with:
+          key: cache-dev-dependencies-${{ github.run_id }}
+          path: |
+            src/Resources/app/storefront/node_modules
+            src/Resources/app/administration/node_modules
+            vendor
+
+      - name: Run Stryker
+        run: make stryker -B
+
   eslint:
     name: ESLint
     needs: install
@@ -268,7 +288,7 @@ jobs:
       - name: Build Plugin
         uses: ./.github/actions/build-plugin
         with:
-          shopware: 6.4.16.0
+          shopware: 6.4.17.0
 
   e2e:
     name: E2E | Shopware ${{ matrix.shopware }}, PHP ${{ matrix.php }}
@@ -278,7 +298,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - shopware: '6.4.16.0'
+          - shopware: '6.4.17.0'
+            php: '8.1'
+          - shopware: '6.4.16.1'
             php: '8.1'
           - shopware: '6.4.15.2'
             php: '8.1'

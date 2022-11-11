@@ -9,6 +9,12 @@ class OrderLineItemEntityAttributes
 {
 
     /**
+     * @var OrderLineItemEntity
+     */
+    private $item;
+
+
+    /**
      * @var string
      */
     private $voucherType;
@@ -44,6 +50,8 @@ class OrderLineItemEntityAttributes
      */
     public function __construct(OrderLineItemEntity $lineItem)
     {
+        $this->item = $lineItem;
+
         $this->voucherType = $this->getCustomFieldValue($lineItem, 'voucher_type');
         $this->mollieOrderLineID = $this->getCustomFieldValue($lineItem, 'order_line_id');
 
@@ -112,6 +120,27 @@ class OrderLineItemEntityAttributes
         return $this->subscriptionRepetitionCount;
     }
 
+
+    /**
+     * @return bool
+     */
+    public function isPromotion(): bool
+    {
+        if ($this->item->getPayload() === null) {
+            return false;
+        }
+
+        if (isset($this->item->getPayload()['composition'])) {
+            return true;
+        }
+
+        # shipping free has no composition, but we have a discount type
+        if (isset($this->item->getPayload()['discountType'])) {
+            return true;
+        }
+
+        return false;
+    }
 
     /**
      * Somehow there are 2 custom fields? in payload and custom fields?

@@ -26,14 +26,39 @@ context("Plugin Config", () => {
 
     context(devices.getDescription(device), () => {
 
+        it('C147522: Onboarding Section is visible @core', () => {
+
+            adminLogin.login();
+            pluginAction.openPluginConfiguration();
+
+            cy.contains('Onboarding is easy with Mollie!');
+        })
+
+        it('C147523: Update Payment Method triggers action @core', () => {
+
+            adminLogin.login();
+            pluginAction.openPluginConfiguration();
+
+            cy.get('.sw-system-config--field-mollie-payments-config-mollie-plugin-config-section-payments > .sw-container > .sw-button').click();
+
+            cy.contains('The payment methods are successfully updated.');
+        })
+
+        it('C148986: Rounding Settings Information is visible @core', () => {
+
+            adminLogin.login();
+            pluginAction.openPluginConfiguration();
+
+            cy.contains('Shopware can use currency settings to calculate');
+        })
+
         it('C4001: Smart Contact Form is responding properly @core', () => {
 
             adminLogin.login();
-
             pluginAction.openPluginConfiguration();
 
-            cy.get('.col-right > button.sw-button', { timeout: 10000 }).click();
-            
+            cy.get('.col-right > button.sw-button', {timeout: 10000}).click();
+
             // we have to see our modal popup
             cy.contains('Request support from Mollie');
 

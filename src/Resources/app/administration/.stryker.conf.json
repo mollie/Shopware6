@@ -1,0 +1,23 @@
+{
+  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "packageManager": "npm",
+  "coverageAnalysis": "perTest",
+  "testRunner": "jest",
+  "jest": {
+    "projectType": "custom",
+    "configFile": ".jest.config.js",
+    "enableFindRelatedTests": true
+  },
+  "reporters": [
+    "html",
+    "progress"
+  ],
+  "htmlReporter": {
+    "fileName": "./.reports/stryker/report.html"
+  },
+  "thresholds": {
+    "high": 80,
+    "low": 60,
+    "break": 10
+  }
+}

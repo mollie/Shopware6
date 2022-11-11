@@ -45,7 +45,7 @@ build: ## Installs the plugin, and builds the artifacts using the Shopware build
 	cd /var/www/html && php bin/console plugin:install MolliePayments --activate | true
 	cd /var/www/html && php bin/console plugin:refresh
 	cd /var/www/html && php bin/console theme:dump
-	cd /var/www/html && PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true ./bin/build-js.sh
+	cd /var/www/html && SHOPWARE_ADMIN_BUILD_ONLY_EXTENSIONS=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true DISABLE_ADMIN_COMPILATION_TYPECHECK=true ./bin/build-js.sh
 	cd /var/www/html && php bin/console theme:refresh
 	cd /var/www/html && php bin/console theme:compile
 	cd /var/www/html && php bin/console theme:refresh
@@ -74,8 +74,13 @@ insights: ## Starts the PHPInsights Analyser
 	@php vendor/bin/phpinsights analyse --no-interaction
 
 jest: ## Starts all Jest tests
-	cd ./src/Resources/app/administration && ./node_modules/.bin/jest --config=.jest.config.js
-	cd ./src/Resources/app/storefront && ./node_modules/.bin/jest --config=.jest.config.js
+	cd ./src/Resources/app/administration && ./node_modules/.bin/jest --config=.jest.config.js --coverage
+	cd ./src/Resources/app/storefront && ./node_modules/.bin/jest --config=.jest.config.js --coverage
+
+stryker: ## Starts the Stryker Jest Mutation Tests
+	cd ./src/Resources/app/administration && ./node_modules/.bin/stryker run .stryker.conf.json
+	@# Storefront has no tests at the momentcd ./src/Resources/app/storefront && ./node_modules/.bin/stryker run .stryker.conf.json
+	@# cd ./src/Resources/app/storefront && ./node_modules/.bin/stryker run .stryker.conf.json
 
 eslint: ## Starts the ESLinter
 	cd ./src/Resources/app/administration && ./node_modules/.bin/eslint --config ./.eslintrc.json ./src
@@ -95,6 +100,7 @@ pr: ## Prepares everything for a Pull Request
 	@make phpunit -B
 	@make infection -B
 	@make jest -B
+	@make stryker -B
 	@make eslint -B
 	@make stylelint -B
 

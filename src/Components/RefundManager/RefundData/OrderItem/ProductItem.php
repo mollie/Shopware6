@@ -83,35 +83,20 @@ class ProductItem extends AbstractItem
         );
     }
 
-    /**
-     * @return bool
-     */
-    public function isPromotion(): bool
-    {
-        if ($this->lineItem->getPayload() === null) {
-            return false;
-        }
-
-        return isset($this->lineItem->getPayload()['composition']);
-    }
 
     /**
      * @return string
      */
-    public function getProductNumber(): string
+    private function getProductNumber(): string
     {
         if ($this->lineItem->getPayload() === null) {
             return '';
         }
 
-        # for promotions we use the voucher code as number to display
-        # this one is in the reference ID
-        if ($this->isPromotion()) {
-            $productNumber = (string)$this->lineItem->getReferencedId();
-        } else {
-            $productNumber = (string)$this->lineItem->getPayload()['productNumber'];
+        if (!isset($this->lineItem->getPayload()['productNumber'])) {
+            return '';
         }
 
-        return $productNumber;
+        return (string)$this->lineItem->getPayload()['productNumber'];
     }
 }
