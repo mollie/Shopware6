@@ -9,6 +9,8 @@ const repoMainMenu = new MainMenuRepository();
 const repoOrdersList = new OrdersListRepository();
 const repoOrdersDetails = new OrderDetailsRepository();
 
+const forceOption = {force: true};
+
 export default class AdminOrdersAction {
 
     /**
@@ -70,6 +72,55 @@ export default class AdminOrdersAction {
 
         cy.wait(800);
         cy.contains(repoOrdersList.getLatestPaymentStatusLabelSelector(), status);
+    }
+
+    /**
+     *
+     */
+    openShipThroughMollie() {
+        repoOrdersDetails.getMollieActionsButton().click();
+        cy.wait(2000);
+        repoOrdersDetails.getMollieActionButtonShipThroughMollie().click();
+        // here are automatic reloads and things as it seems
+        // I really want to test the real UX, so we just wait like a human
+        cy.wait(4000);
+    }
+
+    /**
+     *
+     * @param nthItem
+     */
+    openLineItemShipping(nthItem) {
+        repoOrdersDetails.getLineItemActionsButton(nthItem).click()
+        cy.wait(2000);
+        repoOrdersDetails.getLineItemActionsButtonShipThroughMollie().click();
+        // here are automatic reloads and things as it seems
+        // I really want to test the real UX, so we just wait like a human
+        cy.wait(4000);
+    }
+
+    /**
+     *
+     * @param trackingCode
+     */
+    setTrackingCode(trackingCode) {
+        repoOrdersDetails.getEditButton().click();
+        repoOrdersDetails.getTrackingCode(trackingCode).type(trackingCode, forceOption);
+        repoOrdersDetails.getSaveButton().click();
+        // here are automatic reloads and things as it seems
+        // I really want to test the real UX, so we just wait like a human
+        cy.wait(4000);
+    }
+
+    addTrackingCodeToLineItem(quantity, shippingMethodName, trackingCode) {
+        cy.get('.sw-field--switch__content > .sw-field--switch__input').click();
+        cy.get('#sw-field--shipQuantity').type(quantity);
+        cy.get('#sw-field--tracking-carrier').type(shippingMethodName, forceOption);
+        cy.get('#sw-field--tracking-code').type(trackingCode, forceOption);
+        cy.get('.sw-modal__footer > .sw-button--primary').click();
+        // here are automatic reloads and things as it seems
+        // I really want to test the real UX, so we just wait like a human
+        cy.wait(4000);
     }
 
 }
