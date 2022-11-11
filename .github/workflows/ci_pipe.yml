@@ -288,7 +288,7 @@ jobs:
       - name: Build Plugin
         uses: ./.github/actions/build-plugin
         with:
-          shopware: 6.4.17.0
+          shopware: 6.4.17.1
 
   e2e:
     name: E2E | Shopware ${{ matrix.shopware }}, PHP ${{ matrix.php }}
@@ -298,7 +298,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - shopware: '6.4.17.0'
+          - shopware: '6.4.17.1'
             php: '8.1'
           - shopware: '6.4.16.1'
             php: '8.1'
