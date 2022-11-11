@@ -63,7 +63,7 @@ context("Order Shipping", () => {
             // verify delivery status and item shipped count
             assertShippingStatus('Shipped', 2);
 
-            repoOrderDetails.getMollieActionsButton().click();
+            repoOrderDetails.getMollieActionsButton().click({force: true});
             repoOrderDetails.getMollieActionButtonShipThroughMollie().should('have.class', 'is--disabled');
         })
 
@@ -88,7 +88,7 @@ context("Order Shipping", () => {
 
             assertShippingStatus('Shipped', 2);
 
-            repoOrderDetails.getMollieActionsButton().click();
+            repoOrderDetails.getMollieActionsButton().click({force: true});
             repoOrderDetails.getMollieActionButtonShipThroughMollie().should('have.class', 'is--disabled');
         })
 
@@ -131,7 +131,7 @@ context("Order Shipping", () => {
 
             assertShippingStatus('Shipped', 4);
 
-            repoOrderDetails.getMollieActionsButton().click();
+            repoOrderDetails.getMollieActionsButton().click({force: true});
             repoOrderDetails.getMollieActionButtonShipThroughMollie().should('have.class', 'is--disabled');
         })
 
@@ -225,6 +225,8 @@ function createOrderAndOpenAdmin(itemCount, itemQty) {
  * @param shippedItemsCount
  */
 function assertShippingStatus(statusLabel, shippedItemsCount) {
+
+    cy.wait(2000);
 
     repoOrderDetails.getDeliveryStatusTop().should('contain.text', statusLabel, {timeout: 6000});
 
