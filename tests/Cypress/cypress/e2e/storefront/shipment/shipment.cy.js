@@ -48,7 +48,7 @@ context("Order Refunds", () => {
 
     context(devices.getDescription(device), () => {
 
-        it('C4151: Ship through Mollie', () => {
+        it('CXXXX: Ship through Mollie', () => {
             // create an order with 2 line items
             createOrderAndOpenAdmin();
 
@@ -62,7 +62,7 @@ context("Order Refunds", () => {
             cy.get('.sw-order-detail__summary-data').contains('Shipped amount (2 items)').should('exist');
         })
 
-        it('C4152: Ship through Mollie at line item', () => {
+        it('CXXXX: Ship through Mollie at line item', () => {
             // create an order with 2 line items
             createOrderAndOpenAdmin();
 
@@ -77,7 +77,7 @@ context("Order Refunds", () => {
             cy.get('.sw-order-detail__summary-data').contains('Shipped amount (1 items)').should('exist');
         })
 
-        it('C4153: Ship through Mollie with tracking code', () => {
+        it('CXXXX: Ship through Mollie with tracking code', () => {
             // create an order with 2 line items
             createOrderAndOpenAdmin();
             adminOrders.setTrackingCode('asdf123456789')
@@ -99,7 +99,7 @@ context("Order Refunds", () => {
             cy.get(':nth-child(6) > .sw-button > .sw-button__content').contains('asdf123456789');
         })
 
-        it.only('C4153: Ship through Mollie with tracking code as line item', () => {
+        it.only('CXXXX: Ship through Mollie with tracking code as line item', () => {
             // create an order with 2 line items
             createOrderAndOpenAdmin();
             adminOrders.openShipThroughMollieAtLineItem(1);
