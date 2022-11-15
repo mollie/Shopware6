@@ -101,7 +101,9 @@ context("Order Shipping", () => {
 
             createOrderAndOpenAdmin(2, 2);
 
+
             adminOrders.openLineItemShipping(1);
+
 
             repoShippingItem.getShippedQuantity().should('contain.text', '0');
             repoShippingItem.getShippableQuantity().should('contain.text', '2');
@@ -218,6 +220,10 @@ function createOrderAndOpenAdmin(itemCount, itemQty) {
 
     mollieSandbox.initSandboxCookie();
     molliePayment.selectAuthorized();
+
+    // increase our viewport for admin
+    // otherwise we don't see a lot (page height)
+    cy.viewport(1920, 2000);
 
     adminLogin.login();
     adminOrders.openOrders();
