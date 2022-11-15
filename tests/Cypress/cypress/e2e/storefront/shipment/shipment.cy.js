@@ -14,17 +14,14 @@ import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatu
 import LineItemShippingRepository from "Repositories/admin/ship-through-mollie/LineItemShippingRepository";
 import OrderDetailsRepository from "Repositories/admin/orders/OrderDetailsRepository";
 import FullShippingRepository from "Repositories/admin/ship-through-mollie/FullShippingRepository";
+import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
 
 
 const devices = new Devices();
 const session = new Session();
 const shopware = new Shopware();
 
-
-const repoOrderDetails = new OrderDetailsRepository();
-const repoShippingFull = new FullShippingRepository();
-const repoShippingItem = new LineItemShippingRepository();
-
+const configAction = new ShopConfigurationAction();
 const checkout = new CheckoutAction();
 const paymentAction = new PaymentAction();
 const mollieSandbox = new MollieSandbox();
@@ -33,11 +30,19 @@ const adminOrders = new AdminOrdersAction();
 const adminLogin = new AdminLoginAction();
 const shippingAction = new ShipThroughMollieAction();
 
+const repoOrderDetails = new OrderDetailsRepository();
+const repoShippingFull = new FullShippingRepository();
+const repoShippingItem = new LineItemShippingRepository();
+
 
 const device = devices.getFirstDevice();
 
 
 context("Order Shipping", () => {
+
+    before(() => {
+        configAction.updateProducts('', false, '', '');
+    })
 
     beforeEach(() => {
         session.resetBrowserSession();
@@ -80,7 +85,7 @@ context("Order Shipping", () => {
             // verify that the tracking code is present in ship through mollie
             repoShippingFull.getAvailableTrackingCodes().contains(TRACKING_CODE);
 
-            repoShippingFull.getTrackingCarrier().should('have.value', 'Standard');
+            repoShippingFull.getTrackingCarrier().should('not.have.value', '');
             repoShippingFull.getTrackingCode().should('have.value', TRACKING_CODE);
             repoShippingFull.getTrackingUrl().should('have.value', '');
 
