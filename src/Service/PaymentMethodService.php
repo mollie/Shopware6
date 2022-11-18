@@ -25,6 +25,8 @@ use Kiener\MolliePayments\Handler\Method\SofortPayment;
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Kiener\MolliePayments\MolliePayments;
 use Mollie\Api\Resources\Order;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestFactoryInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Content\Media\MediaCollection;
@@ -52,6 +54,12 @@ class PaymentMethodService
     /** @var EntityRepositoryInterface */
     private $mediaRepository;
 
+    /** @var ClientInterface */
+    private $httpClient;
+
+    /** @var RequestFactoryInterface */
+    private $httpRequestFactory;
+
     /**
      * PaymentMethodService constructor.
      *
@@ -59,17 +67,23 @@ class PaymentMethodService
      * @param EntityRepositoryInterface $mediaRepository
      * @param EntityRepositoryInterface $paymentRepository
      * @param PluginIdProvider $pluginIdProvider
+     * @param ClientInterface $httpClient
+     * @param RequestFactoryInterface $httpRequestFactory
      */
     public function __construct(
         MediaService              $mediaService,
         EntityRepositoryInterface $mediaRepository,
         EntityRepositoryInterface $paymentRepository,
-        PluginIdProvider          $pluginIdProvider
+        PluginIdProvider          $pluginIdProvider,
+        ClientInterface           $httpClient,
+        RequestFactoryInterface   $httpRequestFactory
     ) {
         $this->mediaService = $mediaService;
         $this->mediaRepository = $mediaRepository;
         $this->paymentRepository = $paymentRepository;
         $this->pluginIdProvider = $pluginIdProvider;
+        $this->httpClient = $httpClient;
+        $this->httpRequestFactory = $httpRequestFactory;
     }
 
     /**
@@ -398,7 +412,7 @@ class PaymentMethodService
      *
      * @return string
      */
-    private function getMediaId(array $paymentMethod, Context $context): string
+    private function getMediaId(array $paymentMethod, Context $context): ?string
     {
         /** @var string $fileName */
         $fileName = $paymentMethod['name'] . '-icon';
@@ -416,12 +430,16 @@ class PaymentMethodService
         // Add icon to the media library
         $iconMime = 'image/svg+xml';
         $iconExt = 'svg';
-        $iconBlob = (string)file_get_contents('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.svg');
+        $iconBlob = $this->downloadFile('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.svg');
 
-        if (empty(trim($iconBlob))) {
-            $iconBlob = (string)file_get_contents('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.png');
+        if ($iconBlob === null) {
+            $iconBlob = $this->downloadFile('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.png');
             $iconMime = 'image/png';
             $iconExt = 'png';
+        }
+
+        if ($iconBlob === null) {
+            return null;
         }
 
         return $this->mediaService->saveFile(
@@ -452,5 +470,28 @@ class PaymentMethodService
         }
 
         return $paymentMethod->getHandlerIdentifier() === ApplePayPayment::class && $mollieOrder->isPaid() === true;
+    }
+
+    private function downloadFile(string $url): ?string
+    {
+        try {
+            $response = $this->httpClient->sendRequest($this->httpRequestFactory->createRequest('GET', $url));
+
+            // the client should support follow redirect out of the box
+            if ($response->getStatusCode() >= 300) {
+                return null;
+            }
+
+            // should never happen as PSR describes that 1XX should be managed by the HttpClient
+            if ($response->getStatusCode() < 200) {
+                return null;
+            }
+
+            $body = (string) $response->getBody();
+
+            return $body !== '' ? $body : null;
+        } catch (\Throwable $_) {
+            return null;
+        }
     }
 }
