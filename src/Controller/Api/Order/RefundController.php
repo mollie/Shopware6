@@ -383,8 +383,7 @@ class RefundController extends AbstractController
                 [
                     'success' => false,
                     'message' => $e->getMessage()
-                ],
-                500
+                ]
             );
         }
     }

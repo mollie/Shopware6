@@ -390,7 +390,7 @@ Component.register('mollie-refund-manager', {
                     this._handleRefundSuccess(response)
                 })
                 .catch((response) => {
-                    this._showNotificationError(response.message);
+                    this._showResponseErrorMessage(response);
                 })
                 .finally(() => {
                     this.isRefunding = false;
@@ -413,7 +413,7 @@ Component.register('mollie-refund-manager', {
                     this._handleRefundSuccess(response)
                 })
                 .catch((response) => {
-                    this._showNotificationError(response.message);
+                    this._showResponseErrorMessage(response);
                 })
                 .finally(() => {
                     this.isRefunding = false;
@@ -651,11 +651,21 @@ Component.register('mollie-refund-manager', {
         },
 
 
+        _showResponseErrorMessage(response) {
+            if (response.message) {
+                this._showNotificationError(response.message);
+                return;
+            }
+
+            this._showNotificationError(this.$tc('mollie-payments.refund-manager.notifications.error.refund-created'));
+        },
+
+
         _handleRefundSuccess(response) {
             this.isRefunding = false;
 
             if (!response.success) {
-                this._showNotificationError(this.$tc('mollie-payments.refund-manager.notifications.error.refund-created'));
+                this._showResponseErrorMessage(response)
                 return;
             }
 
