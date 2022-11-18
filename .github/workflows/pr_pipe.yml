@@ -334,7 +334,7 @@ jobs:
         uses: ./.github/actions/run-e2e
         with:
           # -------------------------------------------
-          SHOPWARE: 6.4.16.0
+          SHOPWARE: 6.4.17.2
           PHP: 8.1
           # -------------------------------------------
           MOLLIE_APIKEY_TEST: ""
