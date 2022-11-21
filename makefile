@@ -97,6 +97,7 @@ configcheck: ## Tests and verifies the plugin configuration file
 
 pr: ## Prepares everything for a Pull Request
 	@PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config=./.php_cs.php
+	@make configcheck -B
 	@make phpcheck -B
 	@make phpmin -B
 	@make stan -B
