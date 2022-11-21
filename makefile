@@ -59,7 +59,7 @@ phpmin: ## Starts the PHP compatibility checks
 	@php vendor/bin/phpcs -p --standard=PHPCompatibility --extensions=php --runtime-set testVersion 7.2 ./src
 
 csfix: ## Starts the PHP CS Fixer
-	@php vendor/bin/php-cs-fixer fix --config=./.php_cs.php --dry-run
+	@PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config=./.php_cs.php --dry-run
 
 stan: ## Starts the PHPStan Analyser
 	@php vendor/bin/phpstan analyse -c ./.phpstan.neon
@@ -93,7 +93,7 @@ stylelint: ## Starts the Stylelinter
 # ------------------------------------------------------------------------------------------------------------
 
 pr: ## Prepares everything for a Pull Request
-	@php vendor/bin/php-cs-fixer fix --config=./.php_cs.php
+	@PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config=./.php_cs.php
 	@make phpcheck -B
 	@make phpmin -B
 	@make stan -B

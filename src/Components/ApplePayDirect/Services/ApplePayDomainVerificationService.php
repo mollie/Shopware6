@@ -2,9 +2,8 @@
 
 namespace Kiener\MolliePayments\Components\ApplePayDirect\Services;
 
+use Kiener\MolliePayments\Service\HttpClient\HttpClientInterface;
 use League\Flysystem\FilesystemInterface;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestFactoryInterface;
 
 class ApplePayDomainVerificationService
 {
@@ -28,26 +27,19 @@ class ApplePayDomainVerificationService
     private $filesystem;
 
     /**
-     * @var ClientInterface
+     * @var HttpClientInterface
      */
     private $httpClient;
 
-    /**
-     * @var RequestFactoryInterface
-     */
-    private $httpRequestFactory;
 
     /**
      * @param FilesystemInterface $filesystem
+     * @param HttpClientInterface $httpClient
      */
-    public function __construct(
-        FilesystemInterface     $filesystem,
-        ClientInterface         $httpClient,
-        RequestFactoryInterface $httpRequestFactory
-    ) {
+    public function __construct(FilesystemInterface $filesystem, HttpClientInterface $httpClient)
+    {
         $this->filesystem = $filesystem;
         $this->httpClient = $httpClient;
-        $this->httpRequestFactory = $httpRequestFactory;
     }
 
     /**
@@ -56,23 +48,12 @@ class ApplePayDomainVerificationService
      */
     public function downloadDomainAssociationFile(): void
     {
-        try {
-            $response = $this->httpClient->sendRequest($this->httpRequestFactory->createRequest('GET', self::URL_FILE));
-        } catch (\Throwable $_) {
+        $response = $this->httpClient->sendRequest('GET', self::URL_FILE);
+
+        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
             return;
         }
 
-        // the client should support follow redirect out of the box
-        if ($response->getStatusCode() >= 300) {
-            return;
-        }
-
-        // should never happen as PSR describes that 1XX should be managed by the HttpClient
-        if ($response->getStatusCode() < 200) {
-            return;
-        }
-
-        $body = (string) $response->getBody();
-        $this->filesystem->put(self::LOCAL_FILE, (string) $response->getBody());
+        $this->filesystem->put(self::LOCAL_FILE, $response->getBody());
     }
 }

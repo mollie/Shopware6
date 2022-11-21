@@ -2,7 +2,7 @@
 
 namespace Kiener\MolliePayments\Tests\Service;
 
-use GuzzleHttp\Client;
+
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Handler\Method\BanContactPayment;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
@@ -23,9 +23,11 @@ use Kiener\MolliePayments\Handler\Method\PaySafeCardPayment;
 use Kiener\MolliePayments\Handler\Method\Przelewy24Payment;
 use Kiener\MolliePayments\Handler\Method\SofortPayment;
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
+use Kiener\MolliePayments\Service\HttpClient\Adapter\Curl\CurlClient;
 use Kiener\MolliePayments\Service\PaymentMethodService;
+use Mollie\Api\HttpAdapter\CurlMollieHttpAdapter;
 use MolliePayments\Tests\Fakes\FakeEntityRepository;
-use Nyholm\Psr7\Factory\Psr17Factory;
+use MolliePayments\Tests\Fakes\FakeHttpClient;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\CashPayment;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\DebitPayment;
@@ -76,8 +78,7 @@ class PaymentMethodServiceTest extends TestCase
             $this->mediaRepository,
             $this->paymentMethodRepository,
             $this->createMock(PluginIdProvider::class),
-            new Client(),
-            new Psr17Factory()
+            new FakeHttpClient()
         );
     }
 

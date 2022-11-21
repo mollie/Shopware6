@@ -7,7 +7,6 @@ use Kiener\MolliePayments\Handler\Method\BanContactPayment;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Kiener\MolliePayments\Handler\Method\BelfiusPayment;
 use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
-use Kiener\MolliePayments\Handler\Method\DirectDebitPayment;
 use Kiener\MolliePayments\Handler\Method\EpsPayment;
 use Kiener\MolliePayments\Handler\Method\GiftCardPayment;
 use Kiener\MolliePayments\Handler\Method\GiroPayPayment;
@@ -24,9 +23,8 @@ use Kiener\MolliePayments\Handler\Method\Przelewy24Payment;
 use Kiener\MolliePayments\Handler\Method\SofortPayment;
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Kiener\MolliePayments\MolliePayments;
+use Kiener\MolliePayments\Service\HttpClient\HttpClientInterface;
 use Mollie\Api\Resources\Order;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestFactoryInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Content\Media\MediaCollection;
@@ -54,36 +52,24 @@ class PaymentMethodService
     /** @var EntityRepositoryInterface */
     private $mediaRepository;
 
-    /** @var ClientInterface */
+    /** @var HttpClientInterface */
     private $httpClient;
 
-    /** @var RequestFactoryInterface */
-    private $httpRequestFactory;
 
     /**
-     * PaymentMethodService constructor.
-     *
      * @param MediaService $mediaService
      * @param EntityRepositoryInterface $mediaRepository
      * @param EntityRepositoryInterface $paymentRepository
      * @param PluginIdProvider $pluginIdProvider
-     * @param ClientInterface $httpClient
-     * @param RequestFactoryInterface $httpRequestFactory
+     * @param HttpClientInterface $httpClient
      */
-    public function __construct(
-        MediaService              $mediaService,
-        EntityRepositoryInterface $mediaRepository,
-        EntityRepositoryInterface $paymentRepository,
-        PluginIdProvider          $pluginIdProvider,
-        ClientInterface           $httpClient,
-        RequestFactoryInterface   $httpRequestFactory
-    ) {
+    public function __construct(MediaService $mediaService, EntityRepositoryInterface $mediaRepository, EntityRepositoryInterface $paymentRepository, PluginIdProvider $pluginIdProvider, HttpClientInterface $httpClient)
+    {
         $this->mediaService = $mediaService;
         $this->mediaRepository = $mediaRepository;
         $this->paymentRepository = $paymentRepository;
         $this->pluginIdProvider = $pluginIdProvider;
         $this->httpClient = $httpClient;
-        $this->httpRequestFactory = $httpRequestFactory;
     }
 
     /**
@@ -432,13 +418,13 @@ class PaymentMethodService
         $iconExt = 'svg';
         $iconBlob = $this->downloadFile('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.svg');
 
-        if ($iconBlob === null) {
+        if ($iconBlob === '') {
             $iconBlob = $this->downloadFile('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.png');
             $iconMime = 'image/png';
             $iconExt = 'png';
         }
 
-        if ($iconBlob === null) {
+        if ($iconBlob === '') {
             return null;
         }
 
@@ -472,26 +458,18 @@ class PaymentMethodService
         return $paymentMethod->getHandlerIdentifier() === ApplePayPayment::class && $mollieOrder->isPaid() === true;
     }
 
-    private function downloadFile(string $url): ?string
+    /**
+     * @param string $url
+     * @return string
+     */
+    private function downloadFile(string $url): string
     {
-        try {
-            $response = $this->httpClient->sendRequest($this->httpRequestFactory->createRequest('GET', $url));
+        $response = $this->httpClient->sendRequest('GET', $url);
 
-            // the client should support follow redirect out of the box
-            if ($response->getStatusCode() >= 300) {
-                return null;
-            }
-
-            // should never happen as PSR describes that 1XX should be managed by the HttpClient
-            if ($response->getStatusCode() < 200) {
-                return null;
-            }
-
-            $body = (string) $response->getBody();
-
-            return $body !== '' ? $body : null;
-        } catch (\Throwable $_) {
-            return null;
+        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+            return '';
         }
+
+        return $response->getBody();
     }
 }

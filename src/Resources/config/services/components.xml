@@ -53,7 +53,7 @@
 
         <service id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDomainVerificationService">
             <argument type="service" id="shopware.filesystem.public"/>
-            <argument type="service" id="kiener.mollie_payments.guzzle"/>
+            <argument type="service" id="kiener.mollie_payments.http.client"/>
             <argument type="service" id="Nyholm\Psr7\Factory\Psr17Factory"/>
         </service>
 
