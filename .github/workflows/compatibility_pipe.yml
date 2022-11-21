@@ -20,6 +20,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - plugin: '3.3.0'
+            url: 'https://github.com/mollie/Shopware6/releases/download/v3.3.0/MolliePayments-v3.3.0.zip'
           - plugin: '3.2.0'
             url: 'https://github.com/mollie/Shopware6/releases/download/v3.2.0/MolliePayments-v3.2.0.zip'
           - plugin: '3.1.0'
