@@ -79,6 +79,19 @@ class MollieOrderAddressBuilderTest extends TestCase
     }
 
     /**
+     * This test verifies that the value of a salutation (title in Mollies API)
+     * will never contain whitespace only.
+     */
+    public function testBuildWithWhitespaceSalutation(): void
+    {
+        $customerAddress = $this->buildFixture('  ', 'DE', '');
+
+        $addressData = $this->builder->build('test@mollie.com', $customerAddress);
+
+        self::assertEmpty($addressData['title']);
+    }
+
+    /**
      * This test verifies that the country should have NL as default value
      * if no ISO2 code has been provided (null)
      */
