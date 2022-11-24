@@ -227,7 +227,8 @@ class MolliePaymentDoPay
         $this->updaterLineItemCustomFields->updateOrderLineItems($mollieOrder, $salesChannelContext);
 
 
-        # TODO: this condition somehow looks weird to me
+        # getCheckoutUrl can technically return null, even though that should never happen.
+        # But we need to give a Shopware a URL to redirect to, so use the Shopware Return URL as fallback.
         $checkoutURL = $mollieOrder->getCheckoutUrl() ?? $transactionStruct->getReturnUrl();
 
         return new MolliePaymentPrepareData((string)$checkoutURL, (string)$mollieOrder->id);
