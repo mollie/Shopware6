@@ -29,6 +29,22 @@ jobs:
       - name: Test configuration
         run: make configcheck -B
 
+  snippets:
+    name: Test Plugin Snippets
+    runs-on: ubuntu-latest
+    needs: snippets
+    steps:
+      - name: Clone Code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+
+      - name: Test snippets
+        run: make snippetcheck -B
+
   # ------------------------------------------------------------------------------------------------------------------------
 
   install:

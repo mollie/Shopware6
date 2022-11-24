@@ -93,11 +93,15 @@ stylelint: ## Starts the Stylelinter
 configcheck: ## Tests and verifies the plugin configuration file
 	cd ./tests/Custom && php verify-plugin-config.php
 
+snippetcheck: ## Tests and verifies all plugin snippets
+	cd ./tests/Custom && php verify-plugin-snippets.php
+
 # ------------------------------------------------------------------------------------------------------------
 
 pr: ## Prepares everything for a Pull Request
 	@PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config=./.php_cs.php
 	@make configcheck -B
+	@make snippetcheck -B
 	@make phpcheck -B
 	@make phpmin -B
 	@make stan -B
