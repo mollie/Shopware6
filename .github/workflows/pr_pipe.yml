@@ -23,7 +23,7 @@ jobs:
   snippets:
     name: Test Plugin Snippets
     runs-on: ubuntu-latest
-    needs: snippets
+    needs: config
     steps:
       - name: Clone Code
         uses: actions/checkout@v3
