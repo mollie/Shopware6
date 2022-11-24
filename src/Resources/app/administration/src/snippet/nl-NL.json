@@ -298,7 +298,7 @@
           "subscription_id": "Mollie ID",
           "customer_id": "Mollie Klant",
           "status": "Toestand",
-          "canceledAt": "",
+          "canceledAt": "Geannuleerd om",
           "description": "Beschrijving",
           "createdAt": "Gemaakt bij",
           "amount": "Betrag",
