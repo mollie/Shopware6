@@ -57,8 +57,8 @@ class OrderStatusUpdater
      * @param OrderTransactionEntity $transaction
      * @param string $targetShopwareStatusKey
      * @param Context $context
-     * @throws \Exception
      * @return void
+     * @throws \Exception
      */
     public function updatePaymentStatus(OrderTransactionEntity $transaction, string $targetShopwareStatusKey, Context $context): void
     {
@@ -124,7 +124,7 @@ class OrderStatusUpdater
                 break;
 
             case MolliePaymentStatus::MOLLIE_PAYMENT_PARTIALLY_REFUNDED:
-                $this->transitionHandler->refundPartially($transaction->getId(), $context);
+                $this->transactionTransitionService->partialRefundTransaction($transaction, $context);
                 break;
 
             default:
