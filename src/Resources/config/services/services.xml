@@ -97,7 +97,6 @@
         </service>
 
 
-
         <service id="Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher">
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
         </service>
@@ -111,6 +110,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStateService"/>
             <argument type="service" id="Kiener\MolliePayments\Repository\Order\OrderRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
+            <argument type="service" id="mollie_payments.logger"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\CartService" class="Kiener\MolliePayments\Service\CartService" public="true">
