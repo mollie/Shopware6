@@ -108,7 +108,6 @@
 
 
         <service id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater">
-            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStateService"/>
             <argument type="service" id="Kiener\MolliePayments\Repository\Order\OrderRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>

@@ -7,20 +7,13 @@ use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity;
-use Shopware\Core\System\StateMachine\StateMachineRegistry;
 
 class OrderStatusUpdater
 {
-
-    /**
-     * @var OrderTransactionStateHandler
-     */
-    private $transitionHandler;
 
     /**
      * @var OrderStateService
@@ -39,14 +32,12 @@ class OrderStatusUpdater
 
 
     /**
-     * @param OrderTransactionStateHandler $transitionHandler
      * @param OrderStateService $orderHandler
      * @param OrderRepository $repoOrders
      * @param TransactionTransitionServiceInterface $transactionTransitionService
      */
-    public function __construct(OrderTransactionStateHandler $transitionHandler, OrderStateService $orderHandler, OrderRepository $repoOrders, TransactionTransitionServiceInterface $transactionTransitionService)
+    public function __construct(OrderStateService $orderHandler, OrderRepository $repoOrders, TransactionTransitionServiceInterface $transactionTransitionService)
     {
-        $this->transitionHandler = $transitionHandler;
         $this->orderHandler = $orderHandler;
         $this->repoOrders = $repoOrders;
         $this->transactionTransitionService = $transactionTransitionService;
