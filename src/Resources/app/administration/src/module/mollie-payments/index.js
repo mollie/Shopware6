@@ -1,3 +1,4 @@
+import './acl';
 import './extension/sw-customer';
 import './extension/sw-order';
 import './components/mollie-pluginconfig-section-info';

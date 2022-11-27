@@ -18,6 +18,7 @@ Component.register('mollie-refund-manager', {
     inject: [
         'MolliePaymentsConfigService',
         'MolliePaymentsRefundService',
+        'acl',
     ],
 
     props: {
@@ -103,6 +104,22 @@ Component.register('mollie-refund-manager', {
         gridMollieRefundsColumns() {
             const grid = new MollieRefundsGrid();
             return grid.buildColumns();
+        },
+
+        /**
+         *
+         * @returns {*}
+         */
+        isAclRefundAllowed() {
+            return this.acl.can('refund_manager:write');
+        },
+
+        /**
+         *
+         * @returns {*}
+         */
+        isAclCancelAllowed() {
+            return this.acl.can('refund_manager:delete');
         },
 
     },
@@ -358,6 +375,10 @@ Component.register('mollie-refund-manager', {
          */
         btnRefund_Click() {
 
+            if (!this.isAclRefundAllowed) {
+                return;
+            }
+
             if (this.refundAmount <= 0.0) {
                 this._showNotificationWarning(this.$tc('mollie-payments.refund-manager.notifications.error.low-amount'));
                 return;
@@ -403,6 +424,11 @@ Component.register('mollie-refund-manager', {
          * but only do a full refund and stock reset.
          */
         btnRefundFull_Click() {
+
+            if (!this.isAclRefundAllowed) {
+                return;
+            }
+            
             this.isRefunding = false;
             this.MolliePaymentsRefundService.refundAll(
                 {
@@ -493,6 +519,10 @@ Component.register('mollie-refund-manager', {
          * @param item
          */
         btnCancelRefund_Click(item) {
+
+            if (!this.isAclCancelAllowed()) {
+                return;
+            }
 
             this.MolliePaymentsRefundService.cancel(
                 {

@@ -66,9 +66,9 @@
         }
       },
       "rounding": {
-        "info1" : "Shopware can use currency settings to calculate how it rounds an order’s grand total. This includes the number of decimals in your product pricing and the nearest rounding interval, such as 0.50 or 1.00.",
-        "info2" : "These settings can lead to a different grand total than the total sum of line items. When Mollie cross-checks these amounts and finds that they don’t match, it causes a checkout error.",
-        "info3" : "You can use this feature to avoid rounding issues in your checkout. When enabled, it adds a separate line item in your Mollie Dashboard for the difference in rounding, and your customers pay the grand total calculated by Shopware."
+        "info1": "Shopware can use currency settings to calculate how it rounds an order’s grand total. This includes the number of decimals in your product pricing and the nearest rounding interval, such as 0.50 or 1.00.",
+        "info2": "These settings can lead to a different grand total than the total sum of line items. When Mollie cross-checks these amounts and finds that they don’t match, it causes a checkout error.",
+        "info3": "You can use this feature to avoid rounding issues in your checkout. When enabled, it adds a separate line item in your Mollie Dashboard for the difference in rounding, and your customers pay the grand total calculated by Shopware."
       },
       "support": {
         "modalTitle": "Request support from Mollie",
@@ -119,6 +119,10 @@
     "refund-manager": {
       "general": {
         "unitQuantity": "pc."
+      },
+      "acl": {
+        "warningCreate": "You don't have permissions to create refunds",
+        "warningCancel": "You don't have permissions to cancel refunds"
       },
       "cart": {
         "title": "Order ##orderNumber##",
@@ -345,7 +349,7 @@
       "totalRemaining": "Refundable amount",
       "totalVouchers": "Voucher amount",
       "totalShipments": "Shipped amount ({quantity} items)",
-      "subscriptionBadge" : "Subscription Order",
+      "subscriptionBadge": "Subscription Order",
       "refundManager": {
         "title": "Mollie Refund Manager",
         "btnOpenRefundManager": "Open Refund Manager",
@@ -356,6 +360,16 @@
   "sw-customer": {
     "extendedInfo": {
       "labelPreferredIdealIssuer": "Preferred iDeal issuer"
+    }
+  },
+  "sw-privileges": {
+    "permissions": {
+      "parents": {
+        "mollie": "Mollie"
+      },
+      "refund_manager": {
+        "label": "Refund Manager"
+      }
     }
   }
 }

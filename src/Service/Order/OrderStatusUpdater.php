@@ -48,8 +48,8 @@ class OrderStatusUpdater
      * @param OrderTransactionEntity $transaction
      * @param string $targetShopwareStatusKey
      * @param Context $context
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function updatePaymentStatus(OrderTransactionEntity $transaction, string $targetShopwareStatusKey, Context $context): void
     {
