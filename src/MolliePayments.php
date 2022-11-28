@@ -38,6 +38,7 @@ class MolliePayments extends Plugin
         $loader->loadServices();
     }
 
+
     /**
      * @return void
      */

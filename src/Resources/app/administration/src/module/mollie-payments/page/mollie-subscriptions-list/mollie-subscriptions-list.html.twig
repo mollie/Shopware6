@@ -85,7 +85,8 @@
                     {% block mollie_payments_subscription_list_content_actions %}
                         <template #actions="{ item }">
                             {% block mollie_payments_subscription_list_content_actions_cancel %}
-                                <sw-context-menu-item class="mollie-subscriptions-grid-btn-cancel"
+                                <sw-context-menu-item v-if="cancelAllowed"
+                                                      class="mollie-subscriptions-grid-btn-cancel"
                                                       @click="btnCancel_Click(item)">
                                     {{ $tc('mollie-payments.subscriptions.list.columns.action.cancel') }}
                                 </sw-context-menu-item>

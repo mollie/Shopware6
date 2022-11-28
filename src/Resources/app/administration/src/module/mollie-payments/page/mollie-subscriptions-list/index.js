@@ -77,6 +77,14 @@ Component.register('mollie-subscriptions-list', {
             return this.subscriptions.length;
         },
 
+        /**
+         *
+         * @returns {*}
+         */
+        cancelAllowed() {
+            return this.acl.can('mollie_subscription.deleter');
+        },
+
     },
 
     methods: {
@@ -117,6 +125,11 @@ Component.register('mollie-subscriptions-list', {
          * @param item
          */
         btnCancel_Click(item) {
+
+            if (!this.cancelAllowed()) {
+                return;
+            }
+
             this.MolliePaymentsSubscriptionService
                 .cancel({
                     id: item.id,

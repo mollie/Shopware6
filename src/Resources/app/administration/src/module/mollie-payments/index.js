@@ -24,14 +24,14 @@ systemConfig.getValues('MolliePayments').then(config => {
 
     const navigationRoutes = [];
 
-    if(config["MolliePayments.config.subscriptionsEnabled"]) {
+    if (config["MolliePayments.config.subscriptionsEnabled"]) {
         navigationRoutes.push({
             id: 'mollie-subscriptions',
             label: 'mollie-payments.subscriptions.navigation.title',
-            privilege: 'order.viewer',
             path: 'mollie.payments.subscriptions',
             parent: 'sw-order',
             position: 10,
+            privilege: 'mollie_subscription:read',
         });
     }
 
@@ -49,6 +49,9 @@ systemConfig.getValues('MolliePayments').then(config => {
             subscriptions: {
                 component: 'mollie-subscriptions-list',
                 path: 'subscriptions',
+                meta: {
+                    privilege: 'mollie_subscription:read',
+                },
             },
         },
 

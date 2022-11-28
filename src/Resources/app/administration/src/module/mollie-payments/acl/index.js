@@ -28,3 +28,34 @@ Shopware.Service('privileges').addPrivilegeMappingEntry({
         },
     },
 });
+
+// eslint-disable-next-line no-undef
+Shopware.Service('privileges').addPrivilegeMappingEntry({
+    category: 'permissions',
+    parent: 'mollie',
+    key: 'mollie_subscription',
+    roles: {
+        viewer: {
+            privileges: [
+                'mollie_subscription:read',
+            ],
+            dependencies: [],
+        },
+        editor: {
+            privileges: [
+                'mollie_subscription:update',
+            ],
+            dependencies: [
+                'mollie_subscription.viewer',
+            ],
+        },
+        deleter: {
+            privileges: [
+                'mollie_subscription:delete',
+            ],
+            dependencies: [
+                'mollie_subscription.viewer',
+            ],
+        },
+    },
+});
