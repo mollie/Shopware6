@@ -13,8 +13,8 @@ class CancelAction extends BaseAction
     /**
      * @param string $subscriptionId
      * @param Context $context
-     * @return void
      * @throws Exception
+     * @return void
      */
     public function cancelSubscription(string $subscriptionId, Context $context): void
     {
