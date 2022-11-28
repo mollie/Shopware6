@@ -367,7 +367,7 @@
       "parents": {
         "mollie": "Mollie"
       },
-      "refund_manager": {
+      "mollie_refund_manager": {
         "label": "Refund Manager"
       },
       "mollie_subscription": {

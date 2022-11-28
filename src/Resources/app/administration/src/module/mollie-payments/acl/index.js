@@ -2,28 +2,28 @@
 Shopware.Service('privileges').addPrivilegeMappingEntry({
     category: 'permissions',
     parent: 'mollie',
-    key: 'refund_manager',
+    key: 'mollie_refund_manager',
     roles: {
         viewer: {
             privileges: [
-                'refund_manager:read',
+                'mollie_refund_manager:read',
             ],
             dependencies: [],
         },
         editor: {
             privileges: [
-                'refund_manager:write',
+                'mollie_refund_manager:write',
             ],
             dependencies: [
-                'refund_manager.viewer',
+                'mollie_refund_manager.viewer',
             ],
         },
         deleter: {
             privileges: [
-                'refund_manager:delete',
+                'mollie_refund_manager:delete',
             ],
             dependencies: [
-                'refund_manager.editor',
+                'mollie_refund_manager.editor',
             ],
         },
     },

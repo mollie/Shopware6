@@ -120,7 +120,7 @@ Component.override('sw-order-line-items-grid', {
                 return;
             }
 
-            return this.acl.can('refund_manager:read');
+            return this.acl.can('mollie_refund_manager:read');
         },
 
         /**

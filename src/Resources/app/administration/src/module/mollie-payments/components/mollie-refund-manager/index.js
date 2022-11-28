@@ -111,7 +111,7 @@ Component.register('mollie-refund-manager', {
          * @returns {*}
          */
         isAclRefundAllowed() {
-            return this.acl.can('refund_manager:write');
+            return this.acl.can('mollie_refund_manager:write');
         },
 
         /**
@@ -119,7 +119,7 @@ Component.register('mollie-refund-manager', {
          * @returns {*}
          */
         isAclCancelAllowed() {
-            return this.acl.can('refund_manager:delete');
+            return this.acl.can('mollie_refund_manager:delete');
         },
 
     },
