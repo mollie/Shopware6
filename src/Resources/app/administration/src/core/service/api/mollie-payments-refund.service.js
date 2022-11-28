@@ -78,6 +78,9 @@ export default class MolliePaymentsRefundService extends ApiService {
             )
             .then((response) => {
                 return ApiService.handleResponse(response);
+            })
+            .catch((error) => {
+                return ApiService.handleResponse(error.response);
             });
     }
 
