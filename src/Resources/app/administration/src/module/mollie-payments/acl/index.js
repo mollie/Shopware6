@@ -12,7 +12,7 @@ Shopware.Service('privileges').addPrivilegeMappingEntry({
         },
         editor: {
             privileges: [
-                'mollie_refund_manager:write',
+                'mollie_refund_manager:update',
             ],
             dependencies: [
                 'mollie_refund_manager.viewer',
