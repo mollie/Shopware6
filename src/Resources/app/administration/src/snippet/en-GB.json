@@ -11,11 +11,14 @@
       "mollie_webhook_received_status_completed": " Mollie Webhook Received (Completed)",
       "mollie_webhook_received_status_refunded": " Mollie Webhook Received (Refunded)",
       "mollie_webhook_received_status_partially_refunded": " Mollie Webhook Received (Partially Refunded)",
-      "mollie_refund_started": " Mollie Refund started",
-      "mollie_subscription_started": " Mollie Subscription started",
-      "mollie_subscription_ended": " Mollie Subscription completed",
-      "mollie_subscription_cancelled": " Mollie Subscription cancelled",
-      "mollie_subscription_renewed": " Mollie Subscription renewed",
+      "mollie_refund_started": " Mollie refund started",
+      "mollie_subscription_started": " Mollie subscription started",
+      "mollie_subscription_ended": " Mollie subscription completed",
+      "mollie_subscription_cancelled": " Mollie subscription cancelled",
+      "mollie_subscription_paused": " Mollie subscription paused",
+      "mollie_subscription_resumed": " Mollie subscription resumed",
+      "mollie_subscription_skipped": " Mollie subscription skipped",
+      "mollie_subscription_renewed": " Mollie subscription renewed",
       "mollie_subscription_renewal_reminder": " Mollie reminder for subscription renewal"
     }
   },
@@ -287,7 +290,10 @@
         "active": "Active",
         "canceled": "Canceled",
         "suspended": "Suspended",
-        "completed": "Completed"
+        "completed": "Completed",
+        "paused": "Paused",
+        "resumed": "Resumed",
+        "skipped": "Skipped"
       },
       "navigation": {
         "title": "Mollie Subscriptions"
@@ -295,25 +301,60 @@
       "TYPE_DAYS": "Day(s)",
       "TYPE_WEEKS": "Week(s)",
       "TYPE_MONTHS": "Month(s)",
+      "confirm": {
+        "cancel": "Do you really want to cancel this subscription?",
+        "pause": "Do you really want to pause this subscription?",
+        "resume": "Do you really want to resume this subscription?",
+        "skip": "Do you really want to skip this subscription? The subscription will be continued after it was skipped once."
+      },
+      "alerts": {
+        "cancelSuccess": "The subscription has been canceled successfully",
+        "pauseSuccess": "The subscription has been paused successfully",
+        "resumeSuccess": "The subscription has been resumed successfully",
+        "skipSuccess": "The subscription has been skipped successfully. The next payment has been updated."
+      },
       "list": {
-        "title": "Subscriptions",
+        "title": "Mollie Subscriptions",
         "columns": {
           "customer": "Customer",
-          "subscription_id": "Mollie ID",
-          "customer_id": "Mollie Customer",
           "status": "Status",
           "canceledAt": "Canceled at",
           "description": "Description",
           "createdAt": "Created at",
           "amount": "Amount",
-          "quantity": "Quantity",
           "nextPaymentAt": "Next Payment",
-          "prePaymentReminder": "Reminded at",
-          "action": {
-            "cancel": "Cancel subscription",
-            "success": "The subscription has been canceled",
-            "error": "Error in cancel subscription. More information in the logs."
-          }
+          "prePaymentReminder": "Reminded at"
+        },
+        "action": {
+          "edit": "Edit subscription"
+        }
+      },
+      "detail": {
+        "title": "Mollie Subscription",
+        "buttonCancelSubscription": "Cancel subscription",
+        "labelAmount": "Amount",
+        "labelQuantity": "Quantity",
+        "labelMollieSubscription": "Mollie Subscription",
+        "labelMollieCustomer": "Mollie Customer",
+        "labelCreatedAt": "Created at",
+        "buttonShowShopwareOrder": "Show Shopware order",
+        "buttonShowShopwareCustomer": "Show Shopware customer",
+        "cardTitleStatus": "Status",
+        "labelStatus": "Status",
+        "labelNextPaymentAt": "Next payment at",
+        "labelLastRemindedAt": "Last reminded at",
+        "labelMandateId": "Mandate",
+        "labelCanceledAt": "Canceled at",
+        "buttonPauseSubscription": "Pause subscription",
+        "buttonResumeSubscription": "Resume subscription",
+        "buttonSkipSubscription": "Skip subscription",
+        "history": {
+          "cardTitle": "History",
+          "colDate": "Date",
+          "colComment": "Comment",
+          "colStatusFrom": "Status (from)",
+          "colStatusTo": "Status (to)",
+          "colMollieSubscription": "Mollie Subscription"
         }
       },
       "product": {

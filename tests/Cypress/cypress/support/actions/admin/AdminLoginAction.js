@@ -5,6 +5,8 @@ export default class AdminLoginAction {
      */
     login() {
 
+        cy.viewport(1920, 2600);
+
         cy.visit('/admin');
 
         cy.get('#sw-field--username').type('admin');

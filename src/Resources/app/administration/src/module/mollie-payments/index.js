@@ -11,6 +11,7 @@ import './components/mollie-refund-manager';
 import './components/mollie-external-link';
 import './components/mollie-internal-link';
 import './page/mollie-subscriptions-list';
+import './page/mollie-subscriptions-detail';
 
 // eslint-disable-next-line no-undef
 const {Module, ApiService, Plugin} = Shopware;
@@ -24,7 +25,7 @@ systemConfig.getValues('MolliePayments').then(config => {
 
     const navigationRoutes = [];
 
-    if (config["MolliePayments.config.subscriptionsEnabled"]) {
+    if(config['MolliePayments.config.subscriptionsEnabled']) {
         navigationRoutes.push({
             id: 'mollie-subscriptions',
             label: 'mollie-payments.subscriptions.navigation.title',
@@ -50,6 +51,22 @@ systemConfig.getValues('MolliePayments').then(config => {
                 component: 'mollie-subscriptions-list',
                 path: 'subscriptions',
                 meta: {
+                    privilege: 'mollie_subscription:read',
+                },
+            },
+
+            subscription_detail: {
+                component: 'mollie-subscriptions-detail',
+                path: 'subscription/detail/:id',
+                props: {
+                    default: ($route) => {
+                        return {
+                            subscriptionId: $route.params.id,
+                        };
+                    },
+                },
+                meta: {
+                    parentPath: 'mollie.payments.subscriptions',
                     privilege: 'mollie_subscription:read',
                 },
             },

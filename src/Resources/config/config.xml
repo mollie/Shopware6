@@ -503,7 +503,7 @@
         <input-field type="bool">
             <name>subscriptionsEnabled</name>
             <defaultValue>true</defaultValue>
-            <label>Enable Mollie Subscriptions</label>
+            <label>Enable Mollie subscriptions</label>
             <label lang="de-DE">Mollie Subscriptions aktivieren</label>
             <label lang="nl-NL">Mollie Subscriptions activeren</label>
             <helpText>Enables or disables the full subscription functionality. Please reload the administration after changing this setting.</helpText>
@@ -513,7 +513,7 @@
         <input-field type="bool">
             <name>subscriptionsShowIndicator</name>
             <defaultValue>true</defaultValue>
-            <label>Show Subscription Indicator</label>
+            <label>Show subscription indicator</label>
             <label lang="de-DE">Abonnementetikett auf Produktseite anzeigen</label>
             <label lang="nl-NL">Label Abonnementen weergeven op productpagina</label>
             <helpText>Shows a subscription indicator on the product detail page of a subscription product.</helpText>
@@ -524,16 +524,36 @@
             <name>subscriptionsAllowAddressEditing</name>
             <defaultValue>false</defaultValue>
             <label>Allow customers to edit billing and shipping addresses for running subscriptions</label>
-            <label lang="de-DE">Kunden erlauben Rechnungs- und Lieferadresse zu bearbeiten</label>
+            <label lang="de-DE">Kunden erlauben die Rechnungs- und Lieferadresse zu bearbeiten</label>
             <label lang="nl-NL">Klanten toelaten om factuur- en verzendadressen voor lopende abonnementen te bewerken</label>
             <helpText>If enabled, customers are allowed to edit their billing and shipping addresses in the shop. Please consider that no new shipping costs will be calculated for modified addresses. Countries are not allowed to be edited.</helpText>
             <helpText lang="de-DE">Wenn aktiv, dürfen Kunden ihre Rechnungs- und Lieferadressen im Shop bearbeiten. Bitte beachten Sie, dass für geänderte Adressen keine neuen Versandkosten berechnet werden. Länder dürfen nicht bearbeitet werden.</helpText>
             <helpText lang="nl-NL">Indien ingeschakeld, mogen klanten hun factuur- en verzendadres in de shop bewerken. Houd er rekening mee dat er geen nieuwe verzendkosten worden berekend voor gewijzigde adressen. Landen mogen niet worden bewerkt.</helpText>
         </input-field>
         <input-field type="bool">
+            <name>subscriptionsAllowPauseResume</name>
+            <defaultValue>false</defaultValue>
+            <label>Allow customers to pause and resume running subscriptions</label>
+            <label lang="de-DE">Kunden elrauben laufende Abonnements zu pausieren und fortzusetzen</label>
+            <label lang="nl-NL">Laat klanten lopende abonnementen onderbreken en hervatten</label>
+            <helpText>If enabled, customers are allowed to pause and also resume their subscriptions in their account.</helpText>
+            <helpText lang="de-DE">Wenn diese Option aktiviert ist, können Kunden ihre Abonnements in ihrem Konto pausieren und auch fortsetzen.</helpText>
+            <helpText lang="nl-NL">Indien ingeschakeld, mogen klanten hun abonnementen onderbreken en hervatten in hun account.</helpText>
+        </input-field>
+        <input-field type="bool">
+            <name>subscriptionsAllowSkip</name>
+            <defaultValue>false</defaultValue>
+            <label>Allow customers to skip an upcoming subscription renewal</label>
+            <label lang="de-DE">Kunden erlauben eine anstehende Abonnementverlängerung zu überspringen</label>
+            <label lang="nl-NL">Sta klanten toe een lopende abonnementsverlenging over te slaan</label>
+            <helpText>If enabled, customers are allowed to skip an upcoming renewal of a running subscription. This also takes the last notice period into account.</helpText>
+            <helpText lang="de-DE">Wenn diese Option aktiviert ist, können Kunden eine bevorstehende Verlängerung eines laufenden Abonnements überspringen. Dabei wird auch die letzte Kündigungsfrist berücksichtigt.</helpText>
+            <helpText lang="nl-NL">Indien ingeschakeld, mogen klanten een aanstaande verlenging van een lopend abonnement overslaan. Hierbij wordt ook rekening gehouden met de laatste opzegtermijn.</helpText>
+        </input-field>
+        <input-field type="bool">
             <name>subscriptionSkipRenewalsOnFailedPayments</name>
             <defaultValue>false</defaultValue>
-            <label>Skip Subscription renewal if payment fails</label>
+            <label>Skip subscription renewal if payment fails</label>
             <label lang="de-DE">Abonnementverlängerung überspringen, wenn die Zahlung fehlschlägt</label>
             <label lang="nl-NL">Abonnementverlenging overslaan als de betaling mislukt</label>
             <helpText>If skipped, the plugin will not create new orders on subscription renewals, if the payment was not successful. If not skipped, then a new order is created and the customer can pay again within Shopware.</helpText>
@@ -556,9 +576,9 @@
             <label>Latest notice period before renewal (days)</label>
             <label lang="de-DE">Letzter Kündigungstermin vor Verlängerung (Tagen)</label>
             <label lang="nl-NL">Laatste opzegtermijn voor verlenging (dagen)</label>
-            <helpText>Set a notice period for customers before renewing the subscription. If a subscription renews on Friday and you use "2", then it can be cancelled with latest Wednesday. Use "0" to always allow cancellations.</helpText>
-            <helpText lang="de-DE">Legen Sie eine Kündigungsfrist für Verlänägerungen von Abonnements fest. Wenn sich ein Abonnement am Freitag verlängert und Sie "2" verwenden, kann es bis spätestens Mittwoch gekündigt werden. Verwenden Sie "0", um Stornierungen immer zuzulassen.</helpText>
-            <helpText lang="nl-NL">Stel een opzegtermijn in voor klanten voordat ze het abonnement verlengen. Als een abonnement op vrijdag wordt verlengd en je gebruikt "2", dan kan het uiterlijk woensdag worden opgezegd. Gebruik "0" om annuleringen altijd toe te staan</helpText>
+            <helpText>Set a notice period for customers before renewing the subscription. If a subscription renews on Friday and you use "2", then it can be cancelled or paused with latest Wednesday. Use "0" to always allow cancellations.</helpText>
+            <helpText lang="de-DE">Legen Sie eine Kündigungsfrist für Verlänägerungen von Abonnements fest. Wenn sich ein Abonnement am Freitag verlängert und Sie "2" verwenden, kann es bis spätestens Mittwoch gekündigt oder pausiert werden. Verwenden Sie "0", um Stornierungen immer zuzulassen.</helpText>
+            <helpText lang="nl-NL">Stel een opzegtermijn in voor klanten voordat ze het abonnement verlengen. Als een abonnement op vrijdag wordt verlengd en je gebruikt "2", dan kan het uiterlijk woensdag worden opgezegd of onderbroken. Gebruik "0" om annuleringen altijd toe te staan</helpText>
         </input-field>
     </card>
 

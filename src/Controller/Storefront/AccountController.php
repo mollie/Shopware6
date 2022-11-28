@@ -5,12 +5,12 @@ namespace Kiener\MolliePayments\Controller\Storefront;
 use Kiener\MolliePayments\Components\Subscription\Page\Account\SubscriptionPageLoader;
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Routing\Annotation\LoginRequired;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -121,10 +121,10 @@ class AccountController extends StorefrontController
 
             return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
         } catch (\Throwable $exception) {
-            $this->logger->error('Error when updating billing address of subscription ' . $subscriptionId . ': ' . $exception->getMessage());
-
-            $this->addFlash(self::DANGER, $this->trans('molliePayments.subscriptions.account.errorUpdateAddress'));
-            return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
+            return $this->routeToErrorPage(
+                'molliePayments.subscriptions.account.errorUpdateAddress',
+                'Error when updating billing address of subscription ' . $subscriptionId . ': ' . $exception->getMessage()
+            );
         }
     }
 
@@ -183,10 +183,10 @@ class AccountController extends StorefrontController
 
             return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
         } catch (\Throwable $exception) {
-            $this->logger->error('Error when updating shipping address of subscription ' . $subscriptionId . ': ' . $exception->getMessage());
-
-            $this->addFlash(self::DANGER, $this->trans('molliePayments.subscriptions.account.errorUpdateAddress'));
-            return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
+            return $this->routeToErrorPage(
+                'molliePayments.subscriptions.account.errorUpdateAddress',
+                'Error when updating shipping address of subscription ' . $subscriptionId . ': ' . $exception->getMessage()
+            );
         }
     }
 
@@ -205,10 +205,10 @@ class AccountController extends StorefrontController
 
             return $this->redirect($checkoutUrl);
         } catch (\Throwable $exception) {
-            $this->logger->error('Error when updating payment method of subscription ' . $swSubscriptionId . ': ' . $exception->getMessage());
-
-            $this->addFlash(self::DANGER, $this->trans('molliePayments.subscriptions.account.errorUpdatePayment'));
-            return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
+            return $this->routeToErrorPage(
+                'molliePayments.subscriptions.account.errorUpdatePayment',
+                'Error when updating payment method of subscription ' . $swSubscriptionId . ': ' . $exception->getMessage()
+            );
         }
     }
 
@@ -229,10 +229,73 @@ class AccountController extends StorefrontController
 
             return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
         } catch (\Throwable $exception) {
-            $this->logger->error('Error when updating payment method of subscription ' . $swSubscriptionId . ': ' . $exception->getMessage());
+            return $this->routeToErrorPage(
+                'molliePayments.subscriptions.account.errorUpdatePayment',
+                'Error when updating payment method of subscription ' . $swSubscriptionId . ': ' . $exception->getMessage()
+            );
+        }
+    }
 
-            $this->addFlash(self::DANGER, $this->trans('molliePayments.subscriptions.account.errorUpdatePayment'));
+    /**
+     * @LoginRequired()
+     * @Route("/account/mollie/subscriptions/{swSubscriptionId}/pause", name="frontend.account.mollie.subscriptions.pause", methods={"POST"})
+     * @param string $swSubscriptionId
+     */
+    public function pauseSubscription(string $swSubscriptionId, SalesChannelContext $context): Response
+    {
+        try {
+            $this->subscriptionManager->pauseSubscription($swSubscriptionId, $context->getContext());
+
+            $this->addFlash(self::SUCCESS, $this->trans('molliePayments.subscriptions.account.successPause'));
+
             return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
+        } catch (\Throwable $exception) {
+            return $this->routeToErrorPage(
+                'molliePayments.subscriptions.account.errorPause',
+                'Error when pausing subscription ' . $swSubscriptionId . ': ' . $exception->getMessage()
+            );
+        }
+    }
+
+    /**
+     * @LoginRequired()
+     * @Route("/account/mollie/subscriptions/{swSubscriptionId}/skip", name="frontend.account.mollie.subscriptions.skip", methods={"POST"})
+     * @param string $swSubscriptionId
+     */
+    public function skipSubscription(string $swSubscriptionId, SalesChannelContext $context): Response
+    {
+        try {
+            $this->subscriptionManager->skipSubscription($swSubscriptionId, 1, $context->getContext());
+
+            $this->addFlash(self::SUCCESS, $this->trans('molliePayments.subscriptions.account.successSkip'));
+
+            return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
+        } catch (\Throwable $exception) {
+            return $this->routeToErrorPage(
+                'molliePayments.subscriptions.account.errorSkip',
+                'Error when skipping subscription ' . $swSubscriptionId . ': ' . $exception->getMessage()
+            );
+        }
+    }
+
+    /**
+     * @LoginRequired()
+     * @Route("/account/mollie/subscriptions/{swSubscriptionId}/resume", name="frontend.account.mollie.subscriptions.resume", methods={"POST"})
+     * @param string $swSubscriptionId
+     */
+    public function resumeSubscription(string $swSubscriptionId, SalesChannelContext $context): Response
+    {
+        try {
+            $this->subscriptionManager->resumeSubscription($swSubscriptionId, $context->getContext());
+
+            $this->addFlash(self::SUCCESS, $this->trans('molliePayments.subscriptions.account.successResume'));
+
+            return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
+        } catch (\Throwable $exception) {
+            return $this->routeToErrorPage(
+                'molliePayments.subscriptions.account.errorResume',
+                'Error when resuming subscription ' . $swSubscriptionId . ': ' . $exception->getMessage()
+            );
         }
     }
 
@@ -250,10 +313,24 @@ class AccountController extends StorefrontController
 
             return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
         } catch (\Throwable $exception) {
-            $this->logger->error('Error when canceling subscription ' . $subscriptionId . ': ' . $exception->getMessage());
-
-            $this->addFlash(self::DANGER, $this->trans('molliePayments.subscriptions.account.errorCancelSubscription'));
-            return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
+            return $this->routeToErrorPage(
+                'molliePayments.subscriptions.account.errorCancelSubscription',
+                'Error when canceling subscription ' . $subscriptionId . ': ' . $exception->getMessage()
+            );
         }
+    }
+
+    /**
+     * @param string $errorSnippetKey
+     * @param string $logMessage
+     * @return RedirectResponse
+     */
+    private function routeToErrorPage(string $errorSnippetKey, string $logMessage): RedirectResponse
+    {
+        $this->logger->error($logMessage);
+
+        $this->addFlash(self::DANGER, $this->trans($errorSnippetKey));
+
+        return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
     }
 }

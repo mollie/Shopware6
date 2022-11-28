@@ -21,7 +21,9 @@
                 <sw-label class="mollie-order-user-card-subscription-badge"
                           variant="info" size="medium" appearance="pill" :ghost="true" :caps="true"
                           :dismissable="false">
-                    {{ $tc('sw-order.detailExtended.subscriptionBadge') }}
+                    <router-link :to="{ name: 'mollie.payments.subscription_detail', params: { id: subscriptionId } }">
+                        {{ $tc('sw-order.detailExtended.subscriptionBadge') }}
+                    </router-link>
                 </sw-label>
             </div>
         </dd>

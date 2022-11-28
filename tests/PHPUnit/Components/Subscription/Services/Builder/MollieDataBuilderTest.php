@@ -36,17 +36,8 @@ class MollieDataBuilderTest extends TestCase
         $subscription->setCurrency('USD');
         $subscription->setAmount(10.5);
         $subscription->setDescription('Subscription Product A');
-        $subscription->setMetadata(
-            new SubscriptionMetadata(
-                '2022-01-01',
-                2,
-                'days',
-                '5',
-                ''
-            )
-        );
 
-        $payload = $builder->buildRequestPayload($subscription, 'mdt_123');
+        $payload = $builder->buildRequestPayload($subscription, '2022-01-01', '2', 'days', 5, 'mdt_123');
 
         $expected = [
             'amount' => [

@@ -25,5 +25,13 @@ export default class AdminSubscriptionsAction {
         }
     }
 
+    /**
+     *
+     * @param rowIndex
+     */
+    openSubscription(rowIndex) {
+        cy.get('.sw-data-grid__row--' + rowIndex + ' > .sw-data-grid__cell--createdAt > .sw-data-grid__cell-content').click();
+        cy.wait(2000);
+    }
 
 }

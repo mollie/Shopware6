@@ -121,6 +121,7 @@ class WebhookController extends StorefrontController
                 throw new \Exception('Please provide a Mollie Payment ID with the payment that has been done for this subscription');
             }
 
+
             $subscription = $this->subscriptions->findSubscription($swSubscriptionId, $context->getContext());
 
             # first search if we already have an existing order

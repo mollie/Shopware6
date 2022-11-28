@@ -2,17 +2,15 @@
 
 namespace Kiener\MolliePayments\Facade;
 
+use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Exception\MissingMollieOrderIdException;
-use Kiener\MolliePayments\Factory\MollieApiFactory;
+use Kiener\MolliePayments\Service\Mollie\MolliePaymentDetails;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Service\Order\OrderStatusUpdater;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
-use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
-use Kiener\MolliePayments\Service\UpdateOrderTransactionCustomFields;
-use Kiener\MolliePayments\Struct\CreditCardStruct;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
@@ -46,6 +44,10 @@ class MolliePaymentFinalize
      */
     private $orderService;
 
+    /**
+     * @var SubscriptionManager
+     */
+    private $subscriptionManager;
 
     /**
      * @param OrderStatusConverter $orderStatusConverter
@@ -53,15 +55,18 @@ class MolliePaymentFinalize
      * @param SettingsService $settingsService
      * @param Order $mollieOrderService
      * @param OrderService $orderService
+     * @param SubscriptionManager $subscriptionManager
      */
-    public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, Order $mollieOrderService, OrderService $orderService)
+    public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, Order $mollieOrderService, OrderService $orderService, SubscriptionManager $subscriptionManager)
     {
         $this->orderStatusConverter = $orderStatusConverter;
         $this->orderStatusUpdater = $orderStatusUpdater;
         $this->settingsService = $settingsService;
         $this->mollieOrderService = $mollieOrderService;
         $this->orderService = $orderService;
+        $this->subscriptionManager = $subscriptionManager;
     }
+
 
     /**
      * @param AsyncPaymentTransactionStruct $transactionStruct
@@ -149,5 +154,21 @@ class MolliePaymentFinalize
             $transactionStruct->getOrderTransaction()->getId(),
             $salesChannelContext->getContext()
         );
+
+        # --------------------------------------------------------------------------------------------------------------------
+        # attention this is indeed a "hack".
+        # we don't have real webhooks in our cypress pipeline tests.
+        # this means the real subscription-handshake cannot be done.
+        # but we still need a mollie subscription. so there is a hidden cypress ENV mode.
+        # if enabled, we immediately create a subscription in this RETURN url instead of the webhook
+        $orderAttributes = new OrderAttributes($order);
+
+        if ($this->settingsService->getMollieCypressMode() && $orderAttributes->isTypeSubscription()) {
+            if ($mollieOrder->payments() !== null && count($mollieOrder->payments()) > 0) {
+                $paymentDetails = new MolliePaymentDetails();
+                $mandateId = $paymentDetails->getMandateId($mollieOrder->payments()[0]);
+                $this->subscriptionManager->confirmSubscription($order, $mandateId, $salesChannelContext->getContext());
+            }
+        }
     }
 }

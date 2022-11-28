@@ -15,6 +15,9 @@
       "mollie_subscription_started": " Mollie Abonnement gestartet",
       "mollie_subscription_ended": " Mollie Abonnement abgeschlossen",
       "mollie_subscription_cancelled": " Mollie Abonnement abgebrochen",
+      "mollie_subscription_paused": " Mollie Abonnement pausiert",
+      "mollie_subscription_resumed": " Mollie Abonnement fortgesetzt",
+      "mollie_subscription_skipped": " Mollie Abonnement ausgesetzt",
       "mollie_subscription_renewed": " Mollie Abonnement erneuert",
       "mollie_subscription_renewal_reminder": " Mollie Erinnerung zur Abonnement Erneuerung"
     }
@@ -287,7 +290,10 @@
         "active": "Aktiv",
         "canceled": "Abgebrochen",
         "suspended": "Ausgesetzt",
-        "completed": "Abgeschlossen"
+        "completed": "Abgeschlossen",
+        "paused": "Pausiert",
+        "resumed": "Fortgesetzt",
+        "skipped": "Ausgesetzt"
       },
       "navigation": {
         "title": "Mollie Abonnements"
@@ -295,25 +301,60 @@
       "TYPE_DAYS": "Tage",
       "TYPE_WEEKS": "Woche(n)",
       "TYPE_MONTHS": "Monat(e)",
+      "confirm": {
+        "cancel": "Möchtest du das Abonnement wirklich kündigen?",
+        "pause": "Möchtest du das Abonnement wirklich pausieren?",
+        "resume": "Möchtest du das Abonnement wirklich fortsetzen?",
+        "skip": "Möchtest du das Abonnement wirklich aussetzen? Das Abo wird nach einmaligem Aussetzen automatisch weitergeführt."
+      },
+      "alerts": {
+        "cancelSuccess": "Das Abonnement wurde erfolgreich gekündigt",
+        "pauseSuccess": "Das Abonnement wurde erfolgreich pausiert",
+        "resumeSuccess": "Das Abonnement wurde erfolgreich fortgesetzt",
+        "skipSuccess": "Das Abonnement wurde erfolgreich ausgesetzt. Das Datum der nächsten Zahlung wurde aktualisiert."
+      },
       "list": {
-        "title": "Abonnements",
+        "title": "Mollie Abonnements",
         "columns": {
           "customer": "Kunde",
-          "subscription_id": "Mollie ID",
-          "customer_id": "Mollie Kunde",
           "status": "Status",
           "description": "Beschreibung",
           "amount": "Betrag",
-          "quantity": "Anzahl",
           "nextPaymentAt": "Nächste Zahlung",
           "prePaymentReminder": "Erinnert am",
           "canceledAt": "Gekündigt",
-          "createdAt": "Erstellt",
-          "action": {
-            "cancel": "Abo kündigen",
-            "success": "Das Abonnement wurde gekündigt.",
-            "error": "Fehler bei der Kündigung des Abonnements. Weitere Informationen in den Protokollen."
-          }
+          "createdAt": "Erstellt"
+        },
+        "action": {
+          "edit": "Abonnement bearbeiten"
+        }
+      },
+      "detail": {
+        "title": "Mollie Abonnements",
+        "buttonCancelSubscription": "Abonnement kündigen",
+        "labelAmount": "Betrag",
+        "labelQuantity": "Stück",
+        "labelMollieSubscription": "Mollie Abo",
+        "labelMollieCustomer": "Mollie Kunde",
+        "labelMandateId": "Mandat",
+        "labelCreatedAt": "Erstellt am",
+        "buttonShowShopwareOrder": "Shopware Bestellung anzeigen",
+        "buttonShowShopwareCustomer": "Shopware Kunde anzeigen",
+        "cardTitleStatus": "Status",
+        "labelStatus": "Status",
+        "labelNextPaymentAt": "Nächste Zahlung am",
+        "labelLastRemindedAt": "Zuletzt erinnert am",
+        "labelCanceledAt": "Gekündigt am",
+        "buttonPauseSubscription": "Abonnement pausieren",
+        "buttonResumeSubscription": "Abonnement fortsetzen",
+        "buttonSkipSubscription": "Abonnement aussetzen",
+        "history": {
+          "cardTitle": "Statushistorie",
+          "colDate": "Datum",
+          "colComment": "Kommentar",
+          "colStatusFrom": "Status (von)",
+          "colStatusTo": "Status (zu)",
+          "colMollieSubscription": "Mollie Abo"
         }
       },
       "product": {

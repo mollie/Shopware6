@@ -1,24 +1,22 @@
 <?php
 
-namespace Kiener\MolliePayments\Components\Subscription\Services\Builder;
+namespace Kiener\MolliePayments\Components\Subscription\Services\Interval;
 
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\IntervalType;
-
-class SubscriptionStartDateBuilder
+class IntervalCalculator
 {
 
     /**
-     * @param \DateTimeInterface $orderDateTime
+     * @param \DateTimeInterface $baseDateTime
      * @param int $interval
      * @param string $intervalUnit
      * @return string
      */
-    public function buildStartDate(\DateTimeInterface $orderDateTime, int $interval, string $intervalUnit): string
+    public function getNextIntervalDate(\DateTimeInterface $baseDateTime, int $interval, string $intervalUnit): string
     {
         # cloning does not really work
         # even though Shopware sends DateTimeImmutable, we need to ensure
         # that we don't touch the original one by its reference
-        $startDateTS = $orderDateTime->getTimestamp();
+        $startDateTS = $baseDateTime->getTimestamp();
         $startDate = new \DateTimeImmutable();
         $startDate = $startDate->setTimestamp($startDateTS);
 

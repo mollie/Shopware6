@@ -6,6 +6,7 @@ use Exception;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
+use Kiener\MolliePayments\Components\Subscription\Services\Interval\IntervalCalculator;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
@@ -20,16 +21,16 @@ class SubscriptionBuilder
 {
 
     /**
-     * @var SubscriptionStartDateBuilder
+     * @var IntervalCalculator
      */
-    private $startDateBuilder;
+    private $intervalCalculator;
 
 
     /**
      */
     public function __construct()
     {
-        $this->startDateBuilder = new SubscriptionStartDateBuilder();
+        $this->intervalCalculator = new IntervalCalculator();
     }
 
 
@@ -100,9 +101,19 @@ class SubscriptionBuilder
         $subscriptionEntity->setOrderId($order->getId());
         $subscriptionEntity->setSalesChannelId($order->getSalesChannelId());
 
+
+        # calculate our first start date.
+        # this is our current date (now) + 1x the planned interval.
+        # we already charge now, so we start the recurrency in 1 interval.
+        $firstStartDate = $this->intervalCalculator->getNextIntervalDate(
+            $order->getOrderDateTime(),
+            $interval,
+            $intervalUnit
+        );
+
         $subscriptionEntity->setMetadata(
             new SubscriptionMetadata(
-                $this->startDateBuilder->buildStartDate($order->getOrderDateTime(), $interval, $intervalUnit),
+                $firstStartDate,
                 $interval,
                 $intervalUnit,
                 $times,

@@ -36,6 +36,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
         </service>
 
         <service id="Kiener\MolliePayments\Facade\Controller\PaymentReturnFacade">
@@ -44,9 +45,9 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\TransactionService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
-            <argument type="service" id="mollie_payments.logger"/>
             <argument type="service" id="Kiener\MolliePayments\Facade\MollieOrderPaymentFlow"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Router\RoutingDetector"/>
+            <argument type="service" id="mollie_payments.logger"/>
         </service>
 
         <service id="Kiener\MolliePayments\Facade\MollieOrderPaymentFlow">

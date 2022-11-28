@@ -1,9 +1,10 @@
 import template from './mollie-subscriptions-list.html.twig';
 import './mollie-subscriptions-list.scss';
 import MollieSubscriptionGrid from './grids/MollieSubscriptionGrid';
+import SubscriptionService from '../../../../core/service/subscription/subscription.service';
 
 // eslint-disable-next-line no-undef
-const {Component, Mixin} = Shopware;
+const {Component, Mixin, Application} = Shopware;
 
 // eslint-disable-next-line no-undef
 const {Criteria} = Shopware.Data;
@@ -30,7 +31,6 @@ Component.register('mollie-subscriptions-list', {
             isLoading: true,
             // -------------------------------------
             systemConfig: null,
-            customerRepository: null,
             // -------------------------------------
             subscriptions: null,
             // -------------------------------------
@@ -49,8 +49,21 @@ Component.register('mollie-subscriptions-list', {
 
     computed: {
 
+        /**
+         *
+         * @returns {mollie_subscription}
+         */
         repoSubscriptions() {
             return this.repositoryFactory.create('mollie_subscription');
+        },
+
+        /**
+         *
+         * @returns {SubscriptionService}
+         */
+        subscriptionService() {
+            // eslint-disable-next-line no-undef
+            return new SubscriptionService(Application.getApplicationRoot());
         },
 
         /**
@@ -75,14 +88,6 @@ Component.register('mollie-subscriptions-list', {
          */
         totalSubscriptions() {
             return this.subscriptions.length;
-        },
-
-        /**
-         *
-         * @returns {*}
-         */
-        cancelAllowed() {
-            return this.acl.can('mollie_subscription.deleter');
         },
 
     },
@@ -118,50 +123,6 @@ Component.register('mollie-subscriptions-list', {
         },
 
         // ---------------------------------------------------------------------------------------------------------
-        // <editor-fold desc="EVENTS">
-        // ---------------------------------------------------------------------------------------------------------
-
-        /**
-         * @param item
-         */
-        btnCancel_Click(item) {
-
-            if (!this.cancelAllowed()) {
-                return;
-            }
-
-            this.MolliePaymentsSubscriptionService
-                .cancel({
-                    id: item.id,
-                })
-                .then((response) => {
-                    if (response.success) {
-                        this.createNotificationSuccess({
-                            message: this.$tc('mollie-payments.subscriptions.list.columns.action.success'),
-                        });
-                        this.showRefundModal = true;
-
-                        // reload our list
-                        this.getList();
-
-                    } else {
-                        this.createNotificationError({
-                            message: this.$tc('mollie-payments.subscriptions.list.columns.action.error'),
-                        });
-                    }
-                })
-                .catch((response) => {
-                    this.createNotificationError({
-                        message: response.message,
-                    });
-                });
-        },
-
-        // ---------------------------------------------------------------------------------------------------------
-        // </editor-fold>
-        // ---------------------------------------------------------------------------------------------------------
-
-        // ---------------------------------------------------------------------------------------------------------
         // <editor-fold desc="GRID">
         // ---------------------------------------------------------------------------------------------------------
 
@@ -171,16 +132,7 @@ Component.register('mollie-subscriptions-list', {
          * @returns {*}
          */
         statusTranslation(status) {
-
-            if (status === '' || status === null) {
-                status = 'pending';
-            }
-
-            if (['pending', 'active', 'canceled', 'suspended', 'completed'].includes(status)) {
-                return this.$tc('mollie-payments.subscriptions.status.' + status);
-            }
-
-            return status;
+            return this.subscriptionService.getStatusTranslation(status);
         },
 
         /**
@@ -189,16 +141,7 @@ Component.register('mollie-subscriptions-list', {
          * @returns {string}
          */
         statusColor(status) {
-
-            if (status === '' || status === null || status === 'pending') {
-                return 'warning';
-            }
-
-            if (status === 'canceled' || status === 'suspended' || status === 'completed') {
-                return 'neutral';
-            }
-
-            return 'success';
+            return this.subscriptionService.getStatusColor(status);
         },
 
         // ---------------------------------------------------------------------------------------------------------

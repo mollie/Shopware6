@@ -16,6 +16,10 @@
             <tag name="shopware.entity.definition" entity="mollie_subscription_address"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryDefinition">
+            <tag name="shopware.entity.definition" entity="mollie_subscription_history"/>
+        </service>
+
         <service id="Kiener\MolliePayments\Components\Subscription\DAL\Customer\CustomerExtension">
             <tag name="shopware.entity.extension"/>
         </service>
@@ -35,6 +39,7 @@
         <service id="Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Enricher\LiveDataEnricher">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
             <argument type="service" id="mollie_payments.logger"/>
             <tag name="kernel.event_subscriber"/>
         </service>
@@ -42,6 +47,7 @@
         <service id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository">
             <argument type="service" id="mollie_subscription.repository"/>
             <argument type="service" id="mollie_subscription_address.repository"/>
+            <argument type="service" id="mollie_subscription_history.repository"/>
         </service>
 
         <!-- ============================================================================================== -->
@@ -79,21 +85,180 @@
         <!-- ============================================================================================== -->
 
         <service id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager">
-            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
-            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Actions\CreateAction"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Actions\ConfirmAction"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Actions\UpdateAddressAction"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Actions\UpdatePaymentAction"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Actions\RenewAction"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Actions\PauseAction"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Actions\ResumeAction"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Actions\SkipAction"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Actions\CancelAction"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Actions\RemindAction"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
+        </service>
+
+        <!-- ============================================================================================== -->
+        <!-- ACTIONS -->
+
+        <service id="Kiener\MolliePayments\Components\Subscription\Actions\CreateAction">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
             <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing\SubscriptionRenewing"/>
-            <argument type="service" id="sales_channel.repository"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Router\RoutingBuilder"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionCancellation\CancellationValidator"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler"/>
             <argument type="service" id="mollie_payments.logger"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\Actions\ConfirmAction">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+            <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionCancellation\CancellationValidator"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler"/>
+            <argument type="service" id="mollie_payments.logger"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\Actions\UpdateAddressAction">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+            <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionCancellation\CancellationValidator"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler"/>
+            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\Actions\UpdatePaymentAction">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+            <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionCancellation\CancellationValidator"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler"/>
+            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Router\RoutingBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\Actions\RenewAction">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+            <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionCancellation\CancellationValidator"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler"/>
+            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing\SubscriptionRenewing"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\Actions\PauseAction">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+            <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionCancellation\CancellationValidator"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler"/>
+            <argument type="service" id="mollie_payments.logger"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\Actions\ResumeAction">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+            <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionCancellation\CancellationValidator"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler"/>
+            <argument type="service" id="mollie_payments.logger"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\Actions\SkipAction">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+            <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionCancellation\CancellationValidator"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler"/>
+            <argument type="service" id="mollie_payments.logger"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\Actions\CancelAction">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+            <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionCancellation\CancellationValidator"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler"/>
+            <argument type="service" id="mollie_payments.logger"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\Actions\RemindAction">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+            <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionCancellation\CancellationValidator"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler"/>
+            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="sales_channel.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionReminder\ReminderValidator"/>
+        </service>
+
+        <!-- ============================================================================================== -->
+
+        <service id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionCancellation\CancellationValidator">
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionReminder\ReminderValidator">
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler">
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
         </service>
 
         <service id="Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder">

@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Components\Subscription\DAL\Subscription;
 
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressCollection;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryCollection;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\MollieLiveData;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\MollieStatus;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
@@ -35,6 +36,11 @@ class SubscriptionEntity extends Entity
      * @var string
      */
     protected $mollieCustomerId;
+
+    /**
+     * @var string
+     */
+    protected $status;
 
     /**
      * @var string
@@ -87,6 +93,11 @@ class SubscriptionEntity extends Entity
     protected $metadata;
 
     /**
+     * @var string
+     */
+    protected $mandateId;
+
+    /**
      * @var null|\DateTimeInterface
      */
     protected $lastRemindedAt;
@@ -131,6 +142,11 @@ class SubscriptionEntity extends Entity
      * @var null|SubscriptionAddressEntity
      */
     protected $shippingAddress;
+
+    /**
+     * @var SubscriptionHistoryCollection
+     */
+    protected $historyEntries;
 
     # --------------------------------------------------------------------------------
 
@@ -199,6 +215,22 @@ class SubscriptionEntity extends Entity
     public function setMollieCustomerId(string $mollieCustomerId): void
     {
         $this->mollieCustomerId = $mollieCustomerId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStatus(): string
+    {
+        return (string)$this->status;
+    }
+
+    /**
+     * @param string $status
+     */
+    public function setStatus(string $status): void
+    {
+        $this->status = $status;
     }
 
     /**
@@ -295,6 +327,22 @@ class SubscriptionEntity extends Entity
     public function setOrderId(string $orderId): void
     {
         $this->orderId = $orderId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMandateId(): string
+    {
+        return (string)$this->mandateId;
+    }
+
+    /**
+     * @param string $mandateId
+     */
+    public function setMandateId(string $mandateId): void
+    {
+        $this->mandateId = $mandateId;
     }
 
     /**
@@ -438,16 +486,94 @@ class SubscriptionEntity extends Entity
      */
     public function isActive(): bool
     {
-        if ($this->getMollieStatus() === '') {
-            # we might not have a live connection to Mollie
+        if ($this->getStatus() === '') {
+            # we might not have data somehow
             # we treat this as "active" as long as we don't have a cancelled date
             return ($this->canceledAt === null);
         }
 
-        return ($this->getMollieStatus() === MollieStatus::ACTIVE);
+        return ($this->getStatus() === SubscriptionStatus::ACTIVE || $this->getStatus() === SubscriptionStatus::RESUMED);
     }
 
+    /**
+     * @return bool
+     */
+    public function isPaused(): bool
+    {
+        return ($this->getStatus() === SubscriptionStatus::PAUSED);
+    }
 
+    /**
+     * @return bool
+     */
+    public function isSkipped(): bool
+    {
+        return ($this->getStatus() === SubscriptionStatus::SKIPPED);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isResumeAllowed(): bool
+    {
+        if ($this->getStatus() === SubscriptionStatus::PAUSED) {
+            return true;
+        }
+
+        if ($this->getStatus() === SubscriptionStatus::CANCELED) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isUpdatePaymentAllowed(): bool
+    {
+        return $this->isActive();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCancellationAllowed(): bool
+    {
+        return ($this->getStatus() !== SubscriptionStatus::CANCELED);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSkipAllowed(): bool
+    {
+        if ($this->getStatus() === SubscriptionStatus::ACTIVE) {
+            return true;
+        }
+
+        if ($this->getStatus() === SubscriptionStatus::RESUMED) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPauseAllowed(): bool
+    {
+        if ($this->getStatus() === SubscriptionStatus::ACTIVE) {
+            return true;
+        }
+
+        if ($this->getStatus() === SubscriptionStatus::RESUMED) {
+            return true;
+        }
+
+        return false;
+    }
 
     # -----------------------------------------------------------------------------------------------------
     # manually loaded data
@@ -516,5 +642,25 @@ class SubscriptionEntity extends Entity
     public function setAddresses(SubscriptionAddressCollection $addresses): void
     {
         $this->addresses = $addresses;
+    }
+
+    /**
+     * @return SubscriptionHistoryCollection
+     */
+    public function getHistoryEntries(): SubscriptionHistoryCollection
+    {
+        if ($this->historyEntries === null) {
+            return new SubscriptionHistoryCollection();
+        }
+
+        return $this->historyEntries;
+    }
+
+    /**
+     * @param SubscriptionHistoryCollection $historyEntries
+     */
+    public function setHistoryEntries(SubscriptionHistoryCollection $historyEntries): void
+    {
+        $this->historyEntries = $historyEntries;
     }
 }

@@ -446,6 +446,11 @@ class OrderAttributes
             return true;
         }
 
+        # also a shopware subscription id reference, means we have one
+        if (!empty($this->swSubscriptionId)) {
+            return true;
+        }
+
         # otherwise, verify if we have subscription items
         if ($this->order->getLineItems() instanceof OrderLineItemCollection) {
             foreach ($this->order->getLineItems() as $lineItem) {

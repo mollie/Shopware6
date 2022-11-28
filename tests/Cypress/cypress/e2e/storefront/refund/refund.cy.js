@@ -110,7 +110,7 @@ context("Order Refunds", () => {
             repoRefundManager.getFirstRefundDescriptionLabel().contains(REFUND_DESCRIPTION);
             // because of (weird) number formats which might not be the same
             // all the time (even if they should) we just search within multiple formats
-            elementHelper.assertContainsText(
+            elementHelper.assertContainsTexts(
                 repoRefundManager.getFirstRefundAmountLabel(),
                 ['2.00', '2,00']
             )
@@ -150,7 +150,7 @@ context("Order Refunds", () => {
             repoRefundManager.getFirstRefundCompositionLabel().contains('1 x');
 
             // verify our custom amount has been used
-            elementHelper.assertContainsText(
+            elementHelper.assertContainsTexts(
                 repoRefundManager.getFirstRefundAmountLabel(),
                 ['2.00', '2,00']
             )

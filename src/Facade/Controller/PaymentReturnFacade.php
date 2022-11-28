@@ -65,18 +65,17 @@ class PaymentReturnFacade
      */
     private $logger;
 
-
     /**
      * @param RouterInterface $router
      * @param BusinessEventDispatcher $eventDispatcher
      * @param SettingsService $settingsService
      * @param TransactionService $transactionService
      * @param MollieServiceOrder $orders
-     * @param LoggerInterface $logger
      * @param MollieOrderPaymentFlow $molliePaymentFlow
      * @param RoutingDetector $routingDetector
+     * @param LoggerInterface $logger
      */
-    public function __construct(RouterInterface $router, BusinessEventDispatcher $eventDispatcher, SettingsService $settingsService, TransactionService $transactionService, MollieServiceOrder $orders, LoggerInterface $logger, MollieOrderPaymentFlow $molliePaymentFlow, RoutingDetector $routingDetector)
+    public function __construct(RouterInterface $router, BusinessEventDispatcher $eventDispatcher, SettingsService $settingsService, TransactionService $transactionService, MollieServiceOrder $orders, MollieOrderPaymentFlow $molliePaymentFlow, RoutingDetector $routingDetector, LoggerInterface $logger)
     {
         $this->router = $router;
         $this->eventDispatcher = $eventDispatcher;
