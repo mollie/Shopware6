@@ -231,12 +231,4 @@ class BaseAction
     {
         return $this->pluginSettings->getEnvMollieDevMode();
     }
-
-    /**
-     * @return bool
-     */
-    protected function isMollieCypressMode(): bool
-    {
-        return $this->pluginSettings->getMollieCypressMode();
-    }
 }
