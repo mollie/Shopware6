@@ -65,7 +65,7 @@ stan: ## Starts the PHPStan Analyser
 	@php vendor/bin/phpstan analyse -c ./.phpstan.neon
 
 phpunit: ## Starts all PHPUnit Tests
-	@XDEBUG_MODE=coverage php vendor/bin/phpunit --configuration=phpunit.xml --coverage-html ../../../public/.reports/mollie/coverage
+	@XDEBUG_MODE=coverage php vendor/bin/phpunit --configuration=phpunit.xml --coverage-html ./.reports/phpunit/coverage
 
 infection: ## Starts all Infection/Mutation tests
 	@XDEBUG_MODE=coverage php vendor/bin/infection --configuration=./.infection.json --log-verbosity=all --debug
@@ -100,8 +100,6 @@ snippetcheck: ## Tests and verifies all plugin snippets
 
 pr: ## Prepares everything for a Pull Request
 	@PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config=./.php_cs.php
-	@make configcheck -B
-	@make snippetcheck -B
 	@make phpcheck -B
 	@make phpmin -B
 	@make stan -B
@@ -111,6 +109,8 @@ pr: ## Prepares everything for a Pull Request
 	@make stryker -B
 	@make eslint -B
 	@make stylelint -B
+	@make configcheck -B
+	@make snippetcheck -B
 
 release: ## Builds a PROD version and creates a ZIP file in plugins/.build
 	make clean -B

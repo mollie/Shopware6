@@ -12,10 +12,13 @@
       "mollie_webhook_received_status_refunded": " Mollie Webhook Ontvangen (Terugbetaald)",
       "mollie_webhook_received_status_partially_refunded": " Mollie Webhook Ontvangen (Gedeeltelijk terugbetaald)",
       "mollie_refund_started": " Mollie terugbetaling gestart",
-      "mollie_subscription_started": " Mollie Abonnement gestart",
-      "mollie_subscription_ended": " Mollie Subscription voltooid",
-      "mollie_subscription_cancelled": " Mollie Subscription opgezegd",
-      "mollie_subscription_renewed": " Mollie Subscription verlengd",
+      "mollie_subscription_started": " Mollie abonnement gestart",
+      "mollie_subscription_ended": " Mollie abonnement voltooid",
+      "mollie_subscription_cancelled": " Mollie abonnement opgezegd",
+      "mollie_subscription_paused": " Mollie abonnement gepauzeerd",
+      "mollie_subscription_resumed": " Mollie abonnement hervat",
+      "mollie_subscription_skipped": " Mollie subscription overgeslagen",
+      "mollie_subscription_renewed": " Mollie abonnement verlengd",
       "mollie_subscription_renewal_reminder": " Mollie herinnering voor abonnementsverlenging"
     }
   },
@@ -287,7 +290,10 @@
         "active": "Actief",
         "canceled": "Geannuleerd",
         "suspended": "Gepauzeerd",
-        "completed": "Voltooid"
+        "completed": "Voltooid",
+        "paused": "Onderbroken",
+        "resumed": "Hervat",
+        "skipped": "Overgeslagen"
       },
       "navigation": {
         "title": "Mollie Abonnementen"
@@ -295,25 +301,60 @@
       "TYPE_DAYS": "Dag(en)",
       "TYPE_WEEKS": "Weken",
       "TYPE_MONTHS": "Maanden",
+      "confirm": {
+        "cancel": "Wil je dit abonnement echt opzeggen?",
+        "pause": "Wil je dit abonnement echt pauzeren?",
+        "resume": "Wil je dit abonnement echt voortzetten?",
+        "skip": "Wilt je echt één bestelling overslaan? Het abonnement wordt voortgezet na eenmaal overslaan."
+      },
+      "alerts": {
+        "cancelSuccess": "Het abonnement is succesvol geannuleerd.",
+        "pauseSuccess": "Het abonnement is succesvol gepauzeerd.",
+        "resumeSuccess": "Het abonnement is succesvol hervat.",
+        "skipSuccess": "Het abonnement wordt één keer succesvol overgeslagen. De volgende betaling is bijgewerkt."
+      },
       "list": {
-        "title": "Abonnementen",
+        "title": "Mollie Abonnementen",
         "columns": {
           "customer": "Klant",
-          "subscription_id": "Mollie ID",
-          "customer_id": "Mollie Klant",
-          "status": "Toestand",
-          "canceledAt": "Geannuleerd om",
+          "status": "Status",
+          "canceledAt": "Geannuleerd op",
           "description": "Beschrijving",
-          "createdAt": "Gemaakt bij",
-          "amount": "Betrag",
-          "quantity": "Hoeveelheid",
+          "createdAt": "Gecreëerd op",
+          "amount": "Bedrag",
           "nextPaymentAt": "Volgende betaling",
-          "prePaymentReminder": "Herinnerd aan",
-          "action": {
-            "cancel": "Annuleer abonnement",
-            "success": "Het abonnement is opgezegd.",
-            "error": "Fout bij opzeggen abonnement. Meer informatie in de logboeken."
-          }
+          "prePaymentReminder": "Herinnerd op"
+        },
+        "action": {
+          "edit": "Abonnement bewerken"
+        }
+      },
+      "detail": {
+        "title": "Mollie Abonnement",
+        "buttonCancelSubscription": "Abonnement opzeggen",
+        "labelAmount": "Bedrag",
+        "labelQuantity": "Hoeveelheid",
+        "labelMollieSubscription": "Mollie Abonnement",
+        "labelMollieCustomer": "Mollie klant",
+        "labelCreatedAt": "Gecreëerd op",
+        "buttonShowShopwareOrder": "Toon Shopware bestelling",
+        "buttonShowShopwareCustomer": "Show Shopware klant",
+        "cardTitleStatus": "Status",
+        "labelStatus": "Status",
+        "labelNextPaymentAt": "Volgende betaling op",
+        "labelLastRemindedAt": "Laatst herinnerd op",
+        "labelMandateId": "Mandaat",
+        "labelCanceledAt": "Geannuleerd op",
+        "buttonPauseSubscription": "Abonnement pauzeren",
+        "buttonResumeSubscription": "Abonnement hervatten",
+        "buttonSkipSubscription": "Bestelling overslaan",
+        "history": {
+          "cardTitle": "Historie",
+          "colDate": "Datum",
+          "colComment": "commentaar",
+          "colStatusFrom": "Status (van)",
+          "colStatusTo": "Status (tot)",
+          "colMollieSubscription": "Mollie Abonnement"
         }
       },
       "product": {

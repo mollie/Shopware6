@@ -86,6 +86,8 @@ runs:
         # now change the domain of our shop, mollie doesn't work with localhost
         sudo echo "127.0.0.1 ${{ inputs._SHOP_DOMAIN }}" | sudo tee -a /etc/hosts
         docker exec shop bash -c "mysql -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='https://${{ inputs._SHOP_DOMAIN }}' WHERE url NOT LIKE 'default.%';\""
+        # we have to enable cypress mode in our shop, this helps us to create subscriptions without webhooks
+        docker exec shop bash -c "echo "MOLLIE_CYPRESS_MODE=1" >> /var/www/html.env"
 
     - name: Update Shopware Config
       shell: bash

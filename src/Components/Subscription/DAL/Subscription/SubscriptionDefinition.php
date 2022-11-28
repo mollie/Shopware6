@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Components\Subscription\DAL\Subscription;
 
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressDefinition;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryDefinition;
 use Shopware\Core\Checkout\Customer\CustomerDefinition;
 use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Content\Product\ProductDefinition;
@@ -70,11 +71,13 @@ class SubscriptionDefinition extends EntityDefinition
             (new StringField('mollie_id', 'mollieId')),
             (new StringField('mollie_customer_id', 'mollieCustomerId')),
 
+            new StringField('status', 'status'),
             new StringField('description', 'description'),
             new FloatField('amount', 'amount'),
             new IntField('quantity', 'quantity'),
             new StringField('currency', 'currency'),
             (new JsonField('metadata', 'metadata')),
+            (new StringField('mandate_id', 'mandateId')),
 
             (new DateTimeField('next_payment_at', 'nextPaymentAt'))->addFlags(new ApiAware()),
             (new DateTimeField('last_reminded_at', 'lastRemindedAt'))->addFlags(new ApiAware()),
@@ -99,6 +102,8 @@ class SubscriptionDefinition extends EntityDefinition
             new ManyToOneAssociationField('customer', 'customer_id', CustomerDefinition::class, 'id', false),
 
             new OneToManyAssociationField('addresses', SubscriptionAddressDefinition::class, 'subscription_id'),
+            new OneToManyAssociationField('historyEntries', SubscriptionHistoryDefinition::class, 'subscription_id'),
+
             new OneToOneAssociationField('billingAddress', 'billing_address_id', 'id', SubscriptionAddressDefinition::class, true),
             new OneToOneAssociationField('shippingAddress', 'shipping_address_id', 'id', SubscriptionAddressDefinition::class, true),
 

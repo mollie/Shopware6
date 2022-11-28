@@ -29,4 +29,15 @@ export default class TopMenuAction {
 
     }
 
+    /**
+     *
+     */
+    clickAccountWidgetSubscriptions() {
+        cy.get('#accountWidget').click();
+        cy.wait(500);
+
+        cy.get('.header-account-menu > .card > [href="/account/mollie/subscriptions"]').click();
+    }
+
+
 }

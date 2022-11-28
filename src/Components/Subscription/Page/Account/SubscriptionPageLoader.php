@@ -120,6 +120,8 @@ class SubscriptionPageLoader
         $page->setCountries($this->getCountries($salesChannelContext));
 
         $page->setAllowAddressEditing($settings->isSubscriptionsAllowAddressEditing());
+        $page->setAllowPauseResume($settings->isSubscriptionsAllowPauseResume());
+        $page->setAllowSkip($settings->isSubscriptionsAllowSkip());
 
         # ---------------------------------------------------------------------------------------------
 

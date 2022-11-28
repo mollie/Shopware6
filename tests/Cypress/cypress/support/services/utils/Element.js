@@ -2,10 +2,20 @@ export default class Element {
 
     /**
      *
+     * @param element
+     * @param text
+     * @returns {*}
+     */
+    assertContainsText(element, text) {
+        return this.assertContainsTexts(element, [text]);
+    }
+
+    /**
+     *
      * @param {Cypress.Chainable<JQuery<HTMLElement>>} element
      * @param haystack
      */
-    assertContainsText(element, haystack) {
+    assertContainsTexts(element, haystack) {
         element.invoke('text').then(elementText => {
 
             let found = false;
@@ -23,5 +33,6 @@ export default class Element {
 
         });
     }
+
 
 }

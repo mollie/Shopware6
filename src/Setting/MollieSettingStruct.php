@@ -167,6 +167,16 @@ class MollieSettingStruct extends Struct
     protected $subscriptionsAllowAddressEditing;
 
     /**
+     * @var bool
+     */
+    protected $subscriptionsAllowPauseResume;
+
+    /**
+     * @var bool
+     */
+    protected $subscriptionsAllowSkip;
+
+    /**
      * @var int
      */
     protected $subscriptionsReminderDays;
@@ -690,6 +700,38 @@ class MollieSettingStruct extends Struct
     public function setSubscriptionsAllowAddressEditing(bool $subscriptionsAllowAddressEditing): void
     {
         $this->subscriptionsAllowAddressEditing = $subscriptionsAllowAddressEditing;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSubscriptionsAllowPauseResume(): bool
+    {
+        return (bool)$this->subscriptionsAllowPauseResume;
+    }
+
+    /**
+     * @param bool $subscriptionsAllowPauseResume
+     */
+    public function setSubscriptionsAllowPauseResume(bool $subscriptionsAllowPauseResume): void
+    {
+        $this->subscriptionsAllowPauseResume = $subscriptionsAllowPauseResume;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSubscriptionsAllowSkip(): bool
+    {
+        return (bool)$this->subscriptionsAllowSkip;
+    }
+
+    /**
+     * @param bool $subscriptionsAllowSkip
+     */
+    public function setSubscriptionsAllowSkip(bool $subscriptionsAllowSkip): void
+    {
+        $this->subscriptionsAllowSkip = $subscriptionsAllowSkip;
     }
 
     /**

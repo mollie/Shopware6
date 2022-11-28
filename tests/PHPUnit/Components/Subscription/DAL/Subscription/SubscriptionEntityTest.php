@@ -6,12 +6,223 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\Interv
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\MollieStatus;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEvents;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionStatus;
 use PHPUnit\Framework\TestCase;
 
 
 class SubscriptionEntityTest extends TestCase
 {
+
+    /**
+     * This test verifies that our default value
+     * of the Mollie status is a correct empty string, if
+     * it has not been set yet.
+     *
+     * @return void
+     */
+    public function testStatusDefaultEmpty(): void
+    {
+        $subscription = new SubscriptionEntity();
+
+        static::assertSame('', $subscription->getStatus());
+    }
+
+    /**
+     * This test verifies that our custom Status
+     * can be set and returned correctly.
+     *
+     * @return void
+     */
+    public function testStatus(): void
+    {
+        $subscription = new SubscriptionEntity();
+        $subscription->setStatus('active');
+
+        static::assertSame('active', $subscription->getStatus());
+    }
+
+    /**
+     * This test verifies that our isConfirmed property is only returning TRUE
+     * if we have a MollieID set in the entity.
+     *
+     * @return void
+     */
+    public function testIsConfirmed(): void
+    {
+        $subscription = new SubscriptionEntity();
+
+        $subscription->setMollieId('');
+        static::assertSame(false, $subscription->isConfirmed());
+
+        $subscription->setMollieId('sub_123');
+        static::assertSame(true, $subscription->isConfirmed());
+    }
+
+    /**
+     * This test verifies that our isActive property is only returning TRUE
+     * if we have a status "active" set in the entity.
+     *
+     * @return void
+     */
+    public function testIsActive(): void
+    {
+        $subscription = new SubscriptionEntity();
+
+        $subscription->setStatus(SubscriptionStatus::ACTIVE);
+        $subscription->setCanceledAt(null);
+        static::assertSame(true, $subscription->isActive(), 'active if status active and no canceled date');
+
+        $subscription->setStatus(SubscriptionStatus::RESUMED);
+        $subscription->setCanceledAt(null);
+        static::assertSame(true, $subscription->isActive(), 'active if status resumed and no canceled date');
+
+        $subscription->setStatus('');
+        $subscription->setCanceledAt(new \DateTime());
+        static::assertSame(false, $subscription->isActive(), 'not active if no status but canceled date');
+
+        $subscription->setStatus(MollieStatus::CANCELED);
+        $subscription->setCanceledAt(null);
+        static::assertSame(false, $subscription->isActive(), 'canceled if status canceled but no canceled date');
+    }
+
+    /**
+     * This test verifies that our isPaused works correctly.
+     *
+     * @return void
+     */
+    public function testIsPaused(): void
+    {
+        $subscription = new SubscriptionEntity();
+
+        $subscription->setStatus(SubscriptionStatus::ACTIVE);
+        static::assertSame(false, $subscription->isPaused());
+
+        $subscription->setStatus(SubscriptionStatus::PAUSED);
+        static::assertSame(true, $subscription->isPaused());
+    }
+
+    /**
+     * This test verifies that our isPaused works correctly.
+     *
+     * @return void
+     */
+    public function testIsSkipped(): void
+    {
+        $subscription = new SubscriptionEntity();
+
+        $subscription->setStatus(SubscriptionStatus::SKIPPED);
+        static::assertSame(true, $subscription->isSkipped());
+
+        $subscription->setStatus(SubscriptionStatus::PAUSED);
+        static::assertSame(false, $subscription->isSkipped());
+    }
+
+    /**
+     * This test verifies that our isUpdatePaymentAllowed works correctly.
+     *
+     * @return void
+     */
+    public function testIsUpdatePaymentAllowed(): void
+    {
+        $subscription = new SubscriptionEntity();
+
+        $subscription->setStatus(SubscriptionStatus::ACTIVE);
+        static::assertSame(true, $subscription->isUpdatePaymentAllowed());
+
+        $subscription->setStatus(SubscriptionStatus::RESUMED);
+        static::assertSame(true, $subscription->isUpdatePaymentAllowed());
+
+        $subscription->setStatus(SubscriptionStatus::CANCELED);
+        static::assertSame(false, $subscription->isUpdatePaymentAllowed());
+    }
+
+    /**
+     * This test verifies that our isCancellationAllowed works correctly.
+     *
+     * @return void
+     */
+    public function testIsCancellationAllowed(): void
+    {
+        $subscription = new SubscriptionEntity();
+
+        $subscription->setStatus(SubscriptionStatus::ACTIVE);
+        static::assertSame(true, $subscription->isCancellationAllowed());
+
+        $subscription->setStatus(SubscriptionStatus::SKIPPED);
+        static::assertSame(true, $subscription->isCancellationAllowed());
+
+        $subscription->setStatus(SubscriptionStatus::RESUMED);
+        static::assertSame(true, $subscription->isCancellationAllowed());
+
+        $subscription->setStatus(SubscriptionStatus::CANCELED);
+        static::assertSame(false, $subscription->isCancellationAllowed());
+    }
+
+    /**
+     * This test verifies that our isPauseAllowed works correctly.
+     *
+     * @return void
+     */
+    public function testIsPauseAllowed(): void
+    {
+        $subscription = new SubscriptionEntity();
+
+        $subscription->setStatus(SubscriptionStatus::ACTIVE);
+        static::assertSame(true, $subscription->isPauseAllowed());
+
+        $subscription->setStatus(SubscriptionStatus::RESUMED);
+        static::assertSame(true, $subscription->isPauseAllowed());
+
+        $subscription->setStatus(SubscriptionStatus::SKIPPED);
+        static::assertSame(false, $subscription->isPauseAllowed());
+
+        $subscription->setStatus(SubscriptionStatus::CANCELED);
+        static::assertSame(false, $subscription->isPauseAllowed());
+    }
+
+    /**
+     * This test verifies that our isResumeAllowed works correctly.
+     *
+     * @return void
+     */
+    public function testIsResumeAllowed(): void
+    {
+        $subscription = new SubscriptionEntity();
+
+        $subscription->setStatus(SubscriptionStatus::PAUSED);
+        static::assertSame(true, $subscription->isResumeAllowed());
+
+        $subscription->setStatus(SubscriptionStatus::CANCELED);
+        static::assertSame(true, $subscription->isResumeAllowed());
+
+        $subscription->setStatus(SubscriptionStatus::ACTIVE);
+        static::assertSame(false, $subscription->isResumeAllowed());
+
+        $subscription->setStatus(SubscriptionStatus::SKIPPED);
+        static::assertSame(false, $subscription->isResumeAllowed());
+    }
+
+    /**
+     * This test verifies that our isSkipAllowed works correctly.
+     *
+     * @return void
+     */
+    public function testIsSkipAllowed(): void
+    {
+        $subscription = new SubscriptionEntity();
+
+        $subscription->setStatus(SubscriptionStatus::ACTIVE);
+        static::assertSame(true, $subscription->isSkipAllowed());
+
+        $subscription->setStatus(SubscriptionStatus::RESUMED);
+        static::assertSame(true, $subscription->isSkipAllowed());
+
+        $subscription->setStatus(SubscriptionStatus::CANCELED);
+        static::assertSame(false, $subscription->isSkipAllowed());
+
+        $subscription->setStatus(SubscriptionStatus::SKIPPED);
+        static::assertSame(false, $subscription->isSkipAllowed());
+    }
 
     /**
      * This test verifies that our metadata is correctly
@@ -48,85 +259,5 @@ class SubscriptionEntityTest extends TestCase
         static::assertSame($expected, $returnedMeta->toArray());
     }
 
-    /**
-     * This test verifies that our default value
-     * of the Mollie status is a correct empty string, if
-     * it has not been set yet.
-     *
-     * @return void
-     */
-    public function testMollieStatusDefaultEmpty(): void
-    {
-        $subscription = new SubscriptionEntity();
-
-        static::assertSame('', $subscription->getMollieStatus());
-    }
-
-    /**
-     * This test verifies that our custom Mollie Status
-     * can be set and returned correctly.
-     *
-     * @return void
-     */
-    public function testMollieStatus(): void
-    {
-        $subscription = new SubscriptionEntity();
-        $subscription->setMollieStatus('active');
-
-        static::assertSame('active', $subscription->getMollieStatus());
-    }
-
-    /**
-     * This test verifies that our isConfirmed property is only returning TRUE
-     * if we have a MollieID set in the entity.
-     *
-     * @return void
-     */
-    public function testIsConfirmed(): void
-    {
-        $subscription = new SubscriptionEntity();
-
-        static::assertSame(false, $subscription->isConfirmed());
-
-        $subscription->setMollieId('sub_123');
-
-        static::assertSame(true, $subscription->isConfirmed());
-    }
-
-    /**
-     * This test verifies that our isActive property is only returning TRUE
-     * if we have a status "active" set in the entity.
-     *
-     * @return void
-     */
-    public function testIsActive(): void
-    {
-        $subscription = new SubscriptionEntity();
-
-        $subscription->setCanceledAt(null);
-
-        # if we don't have a LIVE value
-        # then we act, as if it would be active, as long as no cancelled date is set.
-        # this is, because if the Mollie API is somehow not reachable, then we
-        # still need to let customers change things
-        static::assertSame(true, $subscription->isActive());
-
-        # let's change the cancelled
-        # and keep an empty string for the status
-        $subscription->setCanceledAt(new \DateTime());
-        static::assertSame(false, $subscription->isActive());
-
-        # now just revert to the cancelled
-        # and only check the mollie status
-        $subscription->setCanceledAt(null);
-
-        # set wrong status
-        $subscription->setMollieStatus(MollieStatus::CANCELED);
-        static::assertSame(false, $subscription->isActive());
-
-        # now set correct status
-        $subscription->setMollieStatus(MollieStatus::ACTIVE);
-        static::assertSame(true, $subscription->isActive());
-    }
 
 }
