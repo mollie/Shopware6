@@ -66,9 +66,9 @@
         }
       },
       "rounding": {
-        "info1" : "Shopware kann anhand von Währungseinstellungen berechnen, wie die Gesamtsumme einer Bestellung gerundet wird. Dazu gehören die Anzahl der Dezimalstellen in den Produktpreisen und das nächste Rundungsintervall, z. B. 0,50 oder 1,00.",
-        "info2" : "Diese Einstellungen können zu einer anderen Gesamtsumme als der Gesamtsumme der Einzelposten führen. Wenn Mollie diese Beträge abgleicht und feststellt, dass sie nicht übereinstimmen, verursacht dies einen Fehler.",
-        "info3" : "Sie können diese Funktion verwenden, um Rundungsprobleme in Ihrem Checkout zu vermeiden. Wenn diese aktiviert ist, fügt sie eine separate Position im Mollie-Dashboard für die Rundungsdifferenz hinzu, und die Kunden zahlen die von Shopware berechnete Gesamtsumme."
+        "info1": "Shopware kann anhand von Währungseinstellungen berechnen, wie die Gesamtsumme einer Bestellung gerundet wird. Dazu gehören die Anzahl der Dezimalstellen in den Produktpreisen und das nächste Rundungsintervall, z. B. 0,50 oder 1,00.",
+        "info2": "Diese Einstellungen können zu einer anderen Gesamtsumme als der Gesamtsumme der Einzelposten führen. Wenn Mollie diese Beträge abgleicht und feststellt, dass sie nicht übereinstimmen, verursacht dies einen Fehler.",
+        "info3": "Sie können diese Funktion verwenden, um Rundungsprobleme in Ihrem Checkout zu vermeiden. Wenn diese aktiviert ist, fügt sie eine separate Position im Mollie-Dashboard für die Rundungsdifferenz hinzu, und die Kunden zahlen die von Shopware berechnete Gesamtsumme."
       },
       "support": {
         "modalTitle": "Unterstützung von Mollie anfordern",
@@ -119,6 +119,10 @@
     "refund-manager": {
       "general": {
         "unitQuantity": "Stk."
+      },
+      "acl": {
+        "warningCreate": "Sie besitzen keine Berechtigungen, um Rückerstattungen durchzuführen",
+        "warningCancel": "Sie besitzen keine Berechtigungen, um Rückerstattungen abzubrechen"
       },
       "cart": {
         "title": "Bestellung ##orderNumber##",
@@ -356,6 +360,16 @@
   "sw-customer": {
     "extendedInfo": {
       "labelPreferredIdealIssuer": "Bevorzugter iDeal Aussteller"
+    }
+  },
+  "sw-privileges": {
+    "permissions": {
+      "parents": {
+        "mollie": "Mollie"
+      },
+      "refund_manager": {
+        "label": "Refund Manager"
+      }
     }
   }
 }

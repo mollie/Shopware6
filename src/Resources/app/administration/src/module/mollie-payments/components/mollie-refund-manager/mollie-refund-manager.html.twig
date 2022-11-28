@@ -306,7 +306,8 @@
                     </sw-description-list>
                     {# --------------------------------------------------------------------------------------------- #}
                     <sw-container gap="2px">
-                        <sw-number-field numberType="float"
+                        <sw-number-field v-if="isAclRefundAllowed"
+                                         numberType="float"
                                          size="medium"
                                          v-model="refundAmount"
                                          :min="0"
@@ -315,7 +316,7 @@
                                 {{ order.currency.symbol }}
                             </template>
                         </sw-number-field>
-                        <sw-button v-if="isButtonFixDiffAvailable()"
+                        <sw-button v-if="isAclRefundAllowed && isButtonFixDiffAvailable()"
                                    variant="ghost-danger" :block="true"
                                    class="btn-fix-diff"
                                    @click="btnFixDiff_Click()">
@@ -323,19 +324,24 @@
                         </sw-button>
                     </sw-container>
                     {# --------------------------------------------------------------------------------------------- #}
-                    <sw-textarea-field type="textarea"
+                    <sw-textarea-field v-if="isAclRefundAllowed"
+                                       type="textarea"
                                        v-model="refundDescription"
                                        class="field-description"
                                        :placeholder="$tc('mollie-payments.refund-manager.summary.placeholderDescription')">
                     </sw-textarea-field>
                     {# --------------------------------------------------------------------------------------------- #}
-                    <sw-checkbox-field v-if="configVerifyRefund"
+                    <sw-checkbox-field v-if="isAclRefundAllowed && configVerifyRefund"
                                        v-model="checkVerifyRefund"
                                        :label="$tc('mollie-payments.refund-manager.summary.checkVerification')"
                                        :bordered="true">
                     </sw-checkbox-field>
                     {# --------------------------------------------------------,------------------------------------- #}
-                    <sw-button variant="contrast"
+                    <sw-alert v-if="!isAclRefundAllowed" variant="warning">
+                        {{ $tc('mollie-payments.refund-manager.acl.warningCreate') }}
+                    </sw-alert>
+                    <sw-button v-if="isAclRefundAllowed"
+                               variant="contrast"
                                :block="true"
                                :disabled="configVerifyRefund && !checkVerifyRefund"
                                :class="{ 'tutorial-active' : tutorialPartialAmountRefundVisible || tutorialPartialQuantityVisible || tutorialPartialPromotionsVisible || tutorialResetStock || tutorialRefundShipping }"
@@ -344,7 +350,8 @@
                         {{ $tc('mollie-payments.refund-manager.summary.btnRefund') }}
                     </sw-button>
                     <hr style="margin-top:20px;margin-bottom:20px;"/>
-                    <sw-button variant="danger" :block="true"
+                    <sw-button v-if="isAclRefundAllowed"
+                               variant="danger" :block="true"
                                :disabled="configVerifyRefund && !checkVerifyRefund"
                                @click="btnRefundFull_Click()"
                                :isLoading="isRefunding"
@@ -360,6 +367,10 @@
         <sw-card :title="$tc('mollie-payments.refund-manager.refunds.title')" class="mollie-refund-manager-refunds"
                  :hero="false" :large="true">
             <div class="instructions-bar">
+                <sw-alert v-if="!isAclCancelAllowed"
+                          variant="warning">
+                    {{ $tc('mollie-payments.refund-manager.acl.warningCancel') }}
+                </sw-alert>
                 <mollie-external-link href="https://docs.mollie.com/payments/refunds#refund-statuses">
                     {{ $tc('mollie-payments.refund-manager.refunds.linkMore') }}
                 </mollie-external-link>
@@ -403,7 +414,7 @@
                     </sw-label>
                 </template>
                 <template #actions="{ item }">
-                    <sw-context-menu-item :disabled="!isRefundCancelable(item)"
+                    <sw-context-menu-item :disabled="(!isAclCancelAllowed || !isRefundCancelable(item))"
                                           variant="danger"
                                           @click="btnCancelRefund_Click(item)">
                         {{ $tc('mollie-payments.refund-manager.refunds.grid.btnCancelRefund') }}

@@ -120,6 +120,10 @@
       "general": {
         "unitQuantity": "st."
       },
+      "acl": {
+        "warningCreate": "U heeft geen rechten om terugbetalingen te maken",
+        "warningCancel": "U heeft geen rechten om terugbetalingen te annuleren"
+      },
       "cart": {
         "title": "Bestelling ##orderNumber##",
         "btnSelectAll": "Alles selecteren",
@@ -356,6 +360,16 @@
   "sw-customer": {
     "extendedInfo": {
       "labelPreferredIdealIssuer": "Voorkeur iDeal verstrekker"
+    }
+  },
+  "sw-privileges": {
+    "permissions": {
+      "parents": {
+        "mollie": "Mollie"
+      },
+      "refund_manager": {
+        "label": "Refund Manager"
+      }
     }
   }
 }
