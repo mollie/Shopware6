@@ -429,7 +429,7 @@ Component.register('mollie-refund-manager', {
             if (!this.isAclRefundAllowed) {
                 return;
             }
-            
+
             this.isRefunding = false;
             this.MolliePaymentsRefundService.refundAll(
                 {
@@ -522,7 +522,7 @@ Component.register('mollie-refund-manager', {
          */
         btnCancelRefund_Click(item) {
 
-            if (!this.isAclCancelAllowed()) {
+            if (!this.isAclCancelAllowed) {
                 return;
             }
 
