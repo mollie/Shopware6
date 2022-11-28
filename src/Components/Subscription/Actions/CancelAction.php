@@ -13,8 +13,8 @@ class CancelAction extends BaseAction
     /**
      * @param string $subscriptionId
      * @param Context $context
-     * @throws Exception
      * @return void
+     * @throws Exception
      */
     public function cancelSubscription(string $subscriptionId, Context $context): void
     {
@@ -42,6 +42,12 @@ class CancelAction extends BaseAction
         $newStatus = SubscriptionStatus::CANCELED;
 
         $this->getRepository()->cancelSubscription($subscriptionId, $newStatus, $context);
+
+
+        # -------------------------------------------------------------------------------------
+
+        # fetch latest data again, just to be safe
+        $subscription = $this->getRepository()->findById($subscriptionId, $context);
 
         $this->getStatusHistory()->markCanceled($subscription, $oldStatus, $newStatus, $context);
 

@@ -52,6 +52,12 @@ class PauseAction extends BaseAction
         $this->getRepository()->cancelSubscription($subscriptionId, $newStatus, $context);
 
 
+        # -------------------------------------------------------------------------------------
+
+        # fetch latest data again, just to be safe
+        $subscription = $this->getRepository()->findById($subscriptionId, $context);
+
+
         $this->getStatusHistory()->markPaused($subscription, $oldStatus, $newStatus, $context);
 
         # FLOW BUILDER / BUSINESS EVENTS

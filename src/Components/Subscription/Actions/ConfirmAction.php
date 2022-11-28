@@ -106,6 +106,9 @@ class ConfirmAction extends BaseAction
         );
 
 
+        # -------------------------------------------------------------------------------------
+
+        # fetch latest data again, just to be safe
         $finalSubscription = $this->getRepository()->findById($pendingSubscription->getId(), $context);
 
 

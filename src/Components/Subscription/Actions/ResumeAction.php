@@ -71,6 +71,10 @@ class ResumeAction extends BaseAction
 
         # -------------------------------------------------------------------------------------
 
+        # fetch latest data again, just to be safe
+        $subscription = $this->getRepository()->findById($subscriptionId, $context);
+
+
         # also add a history entry for this subscription
         $this->getStatusHistory()->markResumed($subscription, $oldStatus, $newStatus, $context);
 
