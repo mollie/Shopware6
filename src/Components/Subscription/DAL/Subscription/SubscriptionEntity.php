@@ -514,6 +514,24 @@ class SubscriptionEntity extends Entity
     /**
      * @return bool
      */
+    public function isRenewingAllowed(): bool
+    {
+        $status = $this->getStatus();
+
+        if ($status === SubscriptionStatus::ACTIVE) {
+            return true;
+        }
+
+        if ($status === SubscriptionStatus::COMPLETED) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
     public function isResumeAllowed(): bool
     {
         if ($this->getStatus() === SubscriptionStatus::PAUSED) {
@@ -540,7 +558,7 @@ class SubscriptionEntity extends Entity
      */
     public function isCancellationAllowed(): bool
     {
-        return ($this->getStatus() !== SubscriptionStatus::CANCELED);
+        return ($this->getStatus() !== SubscriptionStatus::CANCELED && $this->status !== SubscriptionStatus::PENDING);
     }
 
     /**
