@@ -157,6 +157,8 @@ export default class ShopConfigurationAction {
             // ------------------------------------------------------------------
             "MolliePayments.config.subscriptionsEnabled": true,
             "MolliePayments.config.subscriptionsShowIndicator": subscriptionIndicator,
+            "MolliePayments.config.subscriptionsAllowPauseResume": true,
+            "MolliePayments.config.subscriptionsAllowSkip": true,
         };
 
         this.apiClient.post('/_action/system-config/batch', data);
