@@ -115,32 +115,6 @@
                 {% endblock %}
                 {% block sw_order_detail_card_status %}
                     <sw-card :title="$tc('mollie-payments.subscriptions.detail.cardTitleStatus')" :hero="false" :isLoading="false" :large="false">
-                        <template #header-right>
-                            {% block sw_order_detail_card_status_action_pause %}
-                                <sw-button v-if="isAclEditAllowed && isPauseAllowed"
-                                           class="mollie-subscriptions-detail-link-button"
-                                           variant="ghost-danger"
-                                           @click="btnPause_Click()">
-                                    {{ $tc('mollie-payments.subscriptions.detail.buttonPauseSubscription') }}
-                                </sw-button>
-                            {% endblock %}
-                            {% block sw_order_detail_card_status_action_resume %}
-                                <sw-button v-if="isAclEditAllowed && isResumeAllowed"
-                                           class="mollie-subscriptions-detail-link-button"
-                                           variant="ghost"
-                                           @click="btnResume_Click()">
-                                    {{ $tc('mollie-payments.subscriptions.detail.buttonResumeSubscription') }}
-                                </sw-button>
-                            {% endblock %}
-                            {% block sw_order_detail_card_status_action_skip %}
-                                <sw-button v-if="isAclEditAllowed && isSkipAllowed"
-                                           class="mollie-subscriptions-detail-link-button"
-                                           variant="ghost-danger"
-                                           @click="btnSkip_Click()">
-                                    {{ $tc('mollie-payments.subscriptions.detail.buttonSkipSubscription') }}
-                                </sw-button>
-                            {% endblock %}
-                        </template>
                         <sw-container columns="1fr 1fr" gap="0px 30px">
                             {% block sw_order_detail_card_status_field_status %}
                                 <sw-text-field v-model="translatedStatus"
@@ -182,6 +156,32 @@
                                         :label="$tc('mollie-payments.subscriptions.detail.labelLastRemindedAt')"
                                         disabled="disabled">
                                 </sw-text-field>
+                            {% endblock %}
+                        </sw-container>
+                        <sw-container columns="1fr 1fr" gap="0px 30px" class="mollie-subscriptions-detail-status-action-row">
+                            {% block sw_order_detail_card_status_action_pause %}
+                                <sw-button v-if="isAclEditAllowed && isPauseAllowed"
+                                           class="mollie-subscriptions-detail-link-button cy-btn-pause"
+                                           variant="ghost-danger"
+                                           @click="btnPause_Click()">
+                                    {{ $tc('mollie-payments.subscriptions.detail.buttonPauseSubscription') }}
+                                </sw-button>
+                            {% endblock %}
+                            {% block sw_order_detail_card_status_action_resume %}
+                                <sw-button v-if="isAclEditAllowed && isResumeAllowed"
+                                           class="mollie-subscriptions-detail-link-button cy-btn-resume"
+                                           variant="ghost"
+                                           @click="btnResume_Click()">
+                                    {{ $tc('mollie-payments.subscriptions.detail.buttonResumeSubscription') }}
+                                </sw-button>
+                            {% endblock %}
+                            {% block sw_order_detail_card_status_action_skip %}
+                                <sw-button v-if="isAclEditAllowed && isSkipAllowed"
+                                           class="mollie-subscriptions-detail-link-button cy-btn-skip"
+                                           variant="ghost-danger"
+                                           @click="btnSkip_Click()">
+                                    {{ $tc('mollie-payments.subscriptions.detail.buttonSkipSubscription') }}
+                                </sw-button>
                             {% endblock %}
                         </sw-container>
                     </sw-card>

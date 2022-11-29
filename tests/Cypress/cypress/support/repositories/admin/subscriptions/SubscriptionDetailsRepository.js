@@ -33,15 +33,15 @@ export default class SubscriptionDetailsRepository {
     }
 
     getPauseButton() {
-        return cy.get('.sw-card__titles-right-slot > :nth-child(1)');
+        return cy.get('.cy-btn-pause');
     }
 
     getResumeButton() {
-        return cy.get('.sw-card__titles-right-slot > .sw-button');
+        return cy.get('.cy-btn-resume');
     }
 
     getSkipButton() {
-        return cy.get('.sw-card__titles-right-slot > :nth-child(2)');
+        return cy.get('.cy-btn-skip');
     }
 
     getCancelButton() {
