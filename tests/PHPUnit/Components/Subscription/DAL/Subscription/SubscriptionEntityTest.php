@@ -156,6 +156,9 @@ class SubscriptionEntityTest extends TestCase
 
         $subscription->setStatus(SubscriptionStatus::CANCELED);
         static::assertSame(false, $subscription->isCancellationAllowed());
+
+        $subscription->setStatus(SubscriptionStatus::PENDING);
+        static::assertSame(false, $subscription->isCancellationAllowed());
     }
 
     /**
