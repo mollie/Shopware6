@@ -156,6 +156,8 @@ describe('Subscription', () => {
 
                     // ------------------------------------------------------------------------------------------------------
 
+                    repoAdminSubscriptonDetails.getMollieCustomerIdField().should('be.visible');
+
                     vueJs.textField(repoAdminSubscriptonDetails.getMollieCustomerIdField()).containsValue('cst_');
                     vueJs.textField(repoAdminSubscriptonDetails.getCreatedAtField()).notEmptyValue();
 
@@ -219,12 +221,14 @@ describe('Subscription', () => {
 
                     prepareSubscriptionAndOpenDetails();
 
+                    repoAdminSubscriptonDetails.getStatusField().should('be.visible');
                     vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Active');
 
                     repoAdminSubscriptonDetails.getPauseButton().click();
                     repoAdminSubscriptonDetails.getConfirmButton().click();
                     cy.wait(2000);
 
+                    repoAdminSubscriptonDetails.getStatusField().should('be.visible');
                     vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Paused');
 
                     cy.contains(repoAdminSubscriptonDetails.getHistoryStatusFromSelector(0), 'active', {matchCase: false});
@@ -242,6 +246,7 @@ describe('Subscription', () => {
                     repoAdminSubscriptonDetails.getConfirmButton().click();
                     cy.wait(2000);
 
+                    repoAdminSubscriptonDetails.getStatusField().should('be.visible');
                     vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Paused');
 
                     repoAdminSubscriptonDetails.getResumeButton().click();
@@ -263,6 +268,7 @@ describe('Subscription', () => {
                     repoAdminSubscriptonDetails.getConfirmButton().click();
                     cy.wait(2000);
 
+                    repoAdminSubscriptonDetails.getStatusField().should('be.visible');
                     vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Skipped');
 
                     cy.contains(repoAdminSubscriptonDetails.getHistoryStatusFromSelector(0), 'active', {matchCase: false});
@@ -274,12 +280,14 @@ describe('Subscription', () => {
 
                     prepareSubscriptionAndOpenDetails();
 
+                    repoAdminSubscriptonDetails.getStatusField().should('be.visible');
                     vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Active');
 
                     repoAdminSubscriptonDetails.getCancelButton().click();
                     repoAdminSubscriptonDetails.getConfirmButton().click();
                     cy.wait(2000);
 
+                    repoAdminSubscriptonDetails.getStatusField().should('be.visible');
                     vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Canceled');
 
                     cy.contains(repoAdminSubscriptonDetails.getHistoryStatusFromSelector(0), 'active', {matchCase: false});
