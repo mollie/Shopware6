@@ -17,8 +17,8 @@ class ConfirmAction extends BaseAction
      * @param OrderEntity $order
      * @param string $mandateId
      * @param Context $context
-     * @throws CustomerCouldNotBeFoundException
      * @return void
+     * @throws CustomerCouldNotBeFoundException
      */
     public function confirmSubscription(OrderEntity $order, string $mandateId, Context $context): void
     {
@@ -27,6 +27,22 @@ class ConfirmAction extends BaseAction
         }
 
         # -------------------------------------------------------------------------------------
+        # VERIFY IF SUBSCRIPTION ORDER!!!!!
+
+        # load all pending subscriptions of the order.
+        # we will now make sure to create Mollie subscriptions and prepare everything for recurring payments.
+        # Attention -> if this is a casual order (no subscription) it will just find NOTHING!
+        # so return in that case
+        $pendingSubscriptions = $this->getRepository()->findPendingSubscriptions($order->getId(), $context);
+
+        # if we have nothing to confirm, then just return
+        if (count($pendingSubscriptions) <= 0) {
+            return;
+        }
+
+        # -------------------------------------------------------------------------------------
+        # WE AT LEAST HAVE A SUBSCRIPTION ORDER
+
 
         # if we have something to confirm (and create) but we don't
         # have a valid mandate ID, then throw an exception
@@ -48,17 +64,6 @@ class ConfirmAction extends BaseAction
             $order->getSalesChannelId(),
             $context
         );
-
-
-        # load all pending subscriptions of the order.
-        # we will now make sure to create Mollie subscriptions and prepare everything for recurring payments.
-        $pendingSubscriptions = $this->getRepository()->findPendingSubscriptions($order->getId(), $context);
-
-        # if we have nothing to confirm
-        # then just return
-        if (count($pendingSubscriptions) <= 0) {
-            return;
-        }
 
         # -------------------------------------------------------------------------------------
 
