@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Controller\Api\Subscription;
 
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Traits\Api\ApiTrait;
-use PHPUnit\Framework\MockObject\Api;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
@@ -56,6 +55,18 @@ class SubscriptionController extends AbstractController
     }
 
     /**
+     * @Route("/api/v{version}/_action/mollie/subscriptions/cancel", defaults={"auth_enabled"=true}, name="api.action.mollie.subscription.cancel_legacy", methods={"POST"})
+     *
+     * @param RequestDataBag $data
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function cancelLegacy(RequestDataBag $data, Context $context): JsonResponse
+    {
+        return $this->cancel($data, $context);
+    }
+
+    /**
      * @Route("/api/_action/mollie/subscriptions/pause", defaults={"auth_enabled"=true}, name="api.action.mollie.subscription.pause", methods={"POST"})
      *
      * @param RequestDataBag $data
@@ -74,6 +85,18 @@ class SubscriptionController extends AbstractController
         } catch (\Throwable $ex) {
             return $this->buildErrorResponse($ex->getMessage());
         }
+    }
+
+    /**
+     * @Route("/api/v{version}/_action/mollie/subscriptions/pause", defaults={"auth_enabled"=true}, name="api.action.mollie.subscription.pause_legacy", methods={"POST"})
+     *
+     * @param RequestDataBag $data
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function pauseLegacy(RequestDataBag $data, Context $context): JsonResponse
+    {
+        return $this->pause($data, $context);
     }
 
     /**
@@ -98,6 +121,18 @@ class SubscriptionController extends AbstractController
     }
 
     /**
+     * @Route("/api/v{version}/_action/mollie/subscriptions/resume", defaults={"auth_enabled"=true}, name="api.action.mollie.subscription.resume_legacy", methods={"POST"})
+     *
+     * @param RequestDataBag $data
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function resumeLegacy(RequestDataBag $data, Context $context): JsonResponse
+    {
+        return $this->resume($data, $context);
+    }
+
+    /**
      * @Route("/api/_action/mollie/subscriptions/skip", defaults={"auth_enabled"=true}, name="api.action.mollie.subscription.skip", methods={"POST"})
      *
      * @param RequestDataBag $data
@@ -117,5 +152,17 @@ class SubscriptionController extends AbstractController
         } catch (\Throwable $ex) {
             return $this->buildErrorResponse($ex->getMessage());
         }
+    }
+
+    /**
+     * @Route("/api/v{version}/_action/mollie/subscriptions/skip", defaults={"auth_enabled"=true}, name="api.action.mollie.subscription.skip_legacy", methods={"POST"})
+     *
+     * @param RequestDataBag $data
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function skipLegacy(RequestDataBag $data, Context $context): JsonResponse
+    {
+        return $this->skip($data, $context);
     }
 }
