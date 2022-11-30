@@ -120,6 +120,7 @@ class RefundsServiceTest extends TestCase
         $result = $this->refundService->refundPartial(
             $orderEntityMock,
             'test refund',
+            'test refund internal',
             24.99,
             [],
             Context::createDefaultContext()

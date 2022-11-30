@@ -55,6 +55,7 @@ Component.register('mollie-refund-manager', {
             pendingRefunds: 0,
             checkVerifyRefund: false,
             refundDescription: '',
+            refundInternalDescription:'',
             // -------------------------------
             // tutorials
             tutorialFullRefundVisible: false,
@@ -220,6 +221,7 @@ Component.register('mollie-refund-manager', {
             // verification checkbox and clean our text
             this.checkVerifyRefund = false;
             this.refundDescription = '';
+            this.refundInternalDescription = '';
         },
 
         /**
@@ -405,6 +407,7 @@ Component.register('mollie-refund-manager', {
                     orderId: this.order.id,
                     amount: this.refundAmount,
                     description: this.refundDescription,
+                    internalDescription: this.refundInternalDescription,
                     items: itemData,
                 })
                 .then((response) => {
@@ -435,6 +438,7 @@ Component.register('mollie-refund-manager', {
                 {
                     orderId: this.order.id,
                     description: this.refundDescription,
+                    internalDescription: this.refundInternalDescription,
                 })
                 .then((response) => {
                     if (response.success) {

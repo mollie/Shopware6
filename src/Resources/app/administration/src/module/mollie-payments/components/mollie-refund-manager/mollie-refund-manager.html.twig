@@ -331,6 +331,13 @@
                                        :placeholder="$tc('mollie-payments.refund-manager.summary.placeholderDescription')">
                     </sw-textarea-field>
                     {# --------------------------------------------------------------------------------------------- #}
+                    <sw-textarea-field v-if="isAclRefundAllowed"
+                                       type="textarea"
+                                       v-model="refundInternalDescription"
+                                       class="field-description"
+                                       :placeholder="$tc('mollie-payments.refund-manager.summary.placeholderInternalDescription')">
+                    </sw-textarea-field>
+                    {# --------------------------------------------------------------------------------------------- #}
                     <sw-checkbox-field v-if="isAclRefundAllowed && configVerifyRefund"
                                        v-model="checkVerifyRefund"
                                        :label="$tc('mollie-payments.refund-manager.summary.checkVerification')"

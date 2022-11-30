@@ -176,6 +176,7 @@
         "captionRemaining": "Refundable amount",
         "btnFixDiff": "Fix Difference",
         "placeholderDescription": "add an optional description for your refund",
+        "placeholderInternalDescription": "add an optional internal description for your refund",
         "checkVerification": "I have verified the total refund amount and the configured quantities to refund and re-stock.",
         "btnRefund": "Refund",
         "btnFullRefund": "Full Refund"
@@ -188,6 +189,7 @@
             "amount": "Amount",
             "status": "Status",
             "description": "Description",
+            "internalDescription": "Internal description",
             "composition": "Composition",
             "date": "Date"
           },

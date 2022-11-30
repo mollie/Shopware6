@@ -65,11 +65,12 @@ class FakeRefundService implements RefundServiceInterface
     /**
      * @param OrderEntity $order
      * @param string $description
+     * @param string $internalDescription
      * @param array $refundItems
      * @param Context $context
      * @return Refund
      */
-    public function refundFull(OrderEntity $order, string $description, array $refundItems, Context $context): Refund
+    public function refundFull(OrderEntity $order, string $description,string $internalDescription, array $refundItems, Context $context): Refund
     {
         $this->fullyRefunded = true;
         $this->refundedOrder = $order;
@@ -80,12 +81,13 @@ class FakeRefundService implements RefundServiceInterface
     /**
      * @param OrderEntity $order
      * @param string $description
+     * @param string $internalDescription
      * @param float $amount
      * @param array $lineItems
      * @param Context $context
      * @return Refund
      */
-    public function refundPartial(OrderEntity $order, string $description, float $amount, array $lineItems, Context $context): Refund
+    public function refundPartial(OrderEntity $order, string $description,string $internalDescription, float $amount, array $lineItems, Context $context): Refund
     {
         $this->fullyRefunded = false;
         $this->refundedOrder = $order;

@@ -176,6 +176,7 @@
         "captionRemaining": "Rückerstattbar",
         "btnFixDiff": "Differenz ausfüllen",
         "placeholderDescription": "Füge dieser Erstattung eine optionale Notiz hinzu.",
+        "placeholderInternalDescription": "Füge dieser Erstattung eine optionale interne Notiz hinzu.",
         "checkVerification": "Ich habe den Betrag der Rückerstattung geprüft und die Anzahl der Positionen für Erstattung und Lagerbestand konfiguriert.",
         "btnRefund": "Rückerstatten",
         "btnFullRefund": "Vollständig rückerstatten"
@@ -188,6 +189,7 @@
             "amount": "Betrag",
             "status": "Status",
             "description": "Beschreibung",
+            "internalDescription": "Interne beschreibung",
             "composition": "Zusammensetzung",
             "date": "Datum"
           },

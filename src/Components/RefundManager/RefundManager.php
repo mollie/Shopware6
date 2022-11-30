@@ -165,6 +165,7 @@ class RefundManager implements RefundManagerInterface
                 $refund = $this->refundService->refundPartial(
                     $order,
                     $request->getDescription(),
+                    $request->getInternalDescription(),
                     $order->getAmountTotal(),
                     $serviceItems,
                     $context
@@ -173,6 +174,7 @@ class RefundManager implements RefundManagerInterface
                 $refund = $this->refundService->refundFull(
                     $order,
                     $request->getDescription(),
+                    $request->getInternalDescription(),
                     $serviceItems,
                     $context
                 );
@@ -181,6 +183,7 @@ class RefundManager implements RefundManagerInterface
             $refund = $this->refundService->refundFull(
                 $order,
                 $request->getDescription(),
+                $request->getInternalDescription(),
                 $serviceItems,
                 $context
             );
@@ -188,6 +191,7 @@ class RefundManager implements RefundManagerInterface
             $refund = $this->refundService->refundPartial(
                 $order,
                 $request->getDescription(),
+                $request->getInternalDescription(),
                 (float)$request->getAmount(),
                 [],
                 $context
@@ -196,6 +200,7 @@ class RefundManager implements RefundManagerInterface
             $refund = $this->refundService->refundPartial(
                 $order,
                 $request->getDescription(),
+                $request->getInternalDescription(),
                 (float)$request->getAmount(),
                 $serviceItems,
                 $context
