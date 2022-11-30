@@ -387,7 +387,9 @@ describe('Subscription', () => {
 
                 it('C176306: Subscriptions are available in Account', () => {
 
-                    dummyUserScenario.execute();
+                    prepareSubscriptionAndOpenDetails();
+
+                    cy.visit('/');
                     topMenu.clickAccountWidgetSubscriptions();
 
                     // side menu needs subscription
