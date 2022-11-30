@@ -205,9 +205,16 @@ Component.register('mollie-subscriptions-detail', {
             }
 
             // eslint-disable-next-line no-undef
-            const fromDate = Shopware.Utils.format.dateWithUserTimezone(new Date(date));
+            const shopwareObj = Shopware;
 
-            return fromDate.toLocaleDateString() + ' ' + fromDate.toLocaleTimeString();
+            // starting with Shopware 6.4.10.0 we have a new dateWithUserTimezone function
+            // before this, we just use the old one
+            if (shopwareObj.Utils.format.dateWithUserTimezone) {
+                const formattedDate = shopwareObj.Utils.format.dateWithUserTimezone(new Date(date));
+                return formattedDate.toLocaleDateString() + ' ' + formattedDate.toLocaleTimeString();
+            }
+
+            return shopwareObj.Utils.format.date(new Date(date));
         },
 
         // ---------------------------------------------------------------------------------------------------------

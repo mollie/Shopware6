@@ -67,7 +67,17 @@
 
             <sw-card-view v-if="!isLoading">
                 {% block sw_order_detail_card_basic %}
-                    <sw-card :title="subscription.description" :subtitle="customerFullName" :hero="false" :isLoading="false" :large="false">
+                    <sw-card :title="$tc('mollie-payments.subscriptions.detail.cardTitleSubscription')" :hero="false" :isLoading="false" :large="false">
+
+                        <sw-container columns="1fr" gap="0px 30px">
+                            {% block sw_order_detail_card_basic_field_description %}
+                                <sw-text-field v-model="subscription.description"
+                                               :label="$tc('mollie-payments.subscriptions.detail.labelDescription')"
+                                               disabled="disabled">
+                                </sw-text-field>
+                            {% endblock %}
+                        </sw-container>
+
                         <sw-container columns="1fr 1fr" gap="0px 30px">
                             {% block sw_order_detail_card_basic_field_amount %}
                                 <sw-text-field v-model="subscription.amount"
@@ -86,12 +96,20 @@
                             {% endblock %}
                         </sw-container>
                         <sw-container columns="1fr 1fr" gap="0px 30px">
+                            {% block sw_order_detail_card_basic_field_customer_name %}
+                                <sw-text-field v-model="customerFullName"
+                                               :label="$tc('mollie-payments.subscriptions.detail.labelShopwareCustomer')"
+                                               disabled="disabled">
+                                </sw-text-field>
+                            {% endblock %}
                             {% block sw_order_detail_card_basic_field_mollie_customer_id %}
                                 <sw-text-field v-model="subscription.mollieCustomerId"
                                                :label="$tc('mollie-payments.subscriptions.detail.labelMollieCustomer')"
                                                disabled="disabled">
                                 </sw-text-field>
                             {% endblock %}
+                        </sw-container>
+                        <sw-container columns="1fr 1fr" gap="0px 30px">
                             {% block sw_order_detail_card_basic_field_created_at %}
                                 <sw-text-field v-model="formattedCreateAt"
                                                :label="$tc('mollie-payments.subscriptions.detail.labelCreatedAt')"
