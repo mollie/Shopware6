@@ -91,7 +91,7 @@ class RoutingBuilder
             $redirectUrl = $this->router->generate('frontend.mollie.payment', $params, $this->router::ABSOLUTE_URL);
         }
 
-        return $redirectUrl;
+        return (string)$redirectUrl;
     }
 
     /**
@@ -118,7 +118,7 @@ class RoutingBuilder
             $webhookUrl = $this->router->generate('frontend.mollie.webhook', $params, $this->router::ABSOLUTE_URL);
         }
 
-        $webhookUrl = $this->applyCustomDomain($webhookUrl);
+        $webhookUrl = $this->applyCustomDomain((string)$webhookUrl);
 
         return $webhookUrl;
     }
@@ -142,7 +142,7 @@ class RoutingBuilder
             $webhookUrl = $this->router->generate('frontend.mollie.webhook.subscription.renew', $params, $this->router::ABSOLUTE_URL);
         }
 
-        $webhookUrl = $this->applyCustomDomain($webhookUrl);
+        $webhookUrl = $this->applyCustomDomain((string)$webhookUrl);
 
         return $webhookUrl;
     }

@@ -130,6 +130,18 @@
             <helpText lang="de-DE">Blendet automatisch Zahlungsart im Checkout basierend auf den Limits von Mollie aus. Wenn Sie beispielsweise nur Kreditkartenzahlungen bis zu 500 Euro akzeptieren können, wird an der Kasse für einen Warenkorb von 600 Euro keine Kreditkarte als Zahlungsarte angezeigt.</helpText>
             <helpText lang="nl-NL">Verbergt automatisch betaalmethoden in de checkout op basis van Mollie's limieten. Als je bijvoorbeeld alleen creditcardbetalingen tot 500 euro kan accepteren, wordt bij een winkelwagen van 600 euro geen creditcard weergegeven als betaalmethode bij het afrekenen.</helpText>
         </input-field>
+        <input-field type="text">
+            <name>formatOrderNumber</name>
+            <label>Custom format for Mollie order numbers (Dashboard, PayPal, ...)</label>
+            <label lang="de-DE">Format für Mollie Bestellnummern (Dashboard, PayPal, ...)</label>
+            <label lang="nl-NL">Aangepast formaat voor Mollie bestelnummers (Dashboard, PayPal, ...)</label>
+            <helpText>If set, this format will be used before the order number in the Mollie dashboard. This will also be passed on to PayPal as invoice number.</helpText>
+            <helpText lang="de-DE">Wenn gesetzt, wird dieses Format vor der Bestellnummer im Mollie-Dashboard verwendet. Dieser Wert wird auch an PayPal als Rechnungsnummber übergeben</helpText>
+            <helpText lang="nl-NL">Indien ingesteld, wordt dit formaat vóór het bestelnummer in het Mollie-dashboard gebruikt. Dit wordt ook als factuurnummer doorgegeven aan PayPal.</helpText>
+        </input-field>
+        <component name="mollie-pluginconfig-section-payments-format">
+            <name>molliePluginConfigSectionPaymentsFormat</name>
+        </component>
         <component name="mollie-pluginconfig-section-payments">
             <name>molliePluginConfigSectionPayments</name>
         </component>
