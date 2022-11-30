@@ -504,8 +504,8 @@
             <name>subscriptionsEnabled</name>
             <defaultValue>true</defaultValue>
             <label>Enable Mollie subscriptions</label>
-            <label lang="de-DE">Mollie Subscriptions aktivieren</label>
-            <label lang="nl-NL">Mollie Subscriptions activeren</label>
+            <label lang="de-DE">Mollie Abonnements aktivieren</label>
+            <label lang="nl-NL">Mollie abonnementen activeren</label>
             <helpText>Enables or disables the full subscription functionality. Please reload the administration after changing this setting.</helpText>
             <helpText lang="de-DE">Aktiviert oder deaktiviert die vollständige Abonnementfunktion. Bitte laden Sie die Administration neu, nachdem Sie diese Einstellung geändert haben.</helpText>
             <helpText lang="nl-NL">Schakelt de volledige abonnementsfunctionaliteit in of uit. Herlaad de administratie na het wijzigen van deze instelling.</helpText>

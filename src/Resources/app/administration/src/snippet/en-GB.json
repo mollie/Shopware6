@@ -330,14 +330,14 @@
         }
       },
       "detail": {
-        "title": "Mollie Subscription",
+        "title": "Mollie subscription",
         "buttonCancelSubscription": "Cancel subscription",
         "labelDescription": "Description",
         "labelAmount": "Amount",
         "labelQuantity": "Quantity",
         "labelMollieSubscription": "Mollie Subscription",
-        "labelMollieCustomer": "Mollie Customer",
-        "labelShopwareCustomer": "Shopware Customer",
+        "labelMollieCustomer": "Mollie customer",
+        "labelShopwareCustomer": "Shopware customer",
         "labelCreatedAt": "Created at",
         "buttonShowShopwareOrder": "Show Shopware order",
         "buttonShowShopwareCustomer": "Show Shopware customer",
@@ -357,7 +357,7 @@
           "colComment": "Comment",
           "colStatusFrom": "Status (from)",
           "colStatusTo": "Status (to)",
-          "colMollieSubscription": "Mollie Subscription"
+          "colMollieSubscription": "Mollie subscription"
         }
       },
       "product": {
