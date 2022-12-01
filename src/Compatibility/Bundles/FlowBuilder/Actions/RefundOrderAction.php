@@ -109,6 +109,7 @@ class RefundOrderAction extends FlowAction
             $request = new RefundRequest(
                 (string)$order->getOrderNumber(),
                 'Refund through Shopware Flow Builder',
+                '',
                 null
             );
 

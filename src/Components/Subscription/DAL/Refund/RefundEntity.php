@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Components\Subscription\DAL\Refund;
 
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
+
 ;
 
 class RefundEntity extends Entity
@@ -16,22 +17,22 @@ class RefundEntity extends Entity
     protected $id;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     protected $orderId;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     protected $mollieRefundId;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     protected $publicDescription;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     protected $internalDescription;
 
@@ -53,7 +54,7 @@ class RefundEntity extends Entity
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getOrderId(): ?string
     {
@@ -61,7 +62,7 @@ class RefundEntity extends Entity
     }
 
     /**
-     * @param string|null $orderId
+     * @param null|string $orderId
      * @return void
      */
     public function setOrderId(?string $orderId): void
@@ -70,7 +71,7 @@ class RefundEntity extends Entity
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getMollieRefundId(): ?string
     {
@@ -78,7 +79,7 @@ class RefundEntity extends Entity
     }
 
     /**
-     * @param string|null $mollieRefundId
+     * @param null|string $mollieRefundId
      * @return void
      */
     public function setMollieRefundId(?string $mollieRefundId): void
@@ -87,7 +88,7 @@ class RefundEntity extends Entity
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getPublicDescription(): ?string
     {
@@ -95,7 +96,7 @@ class RefundEntity extends Entity
     }
 
     /**
-     * @param string|null $publicDescription
+     * @param null|string $publicDescription
      * @return void
      */
     public function setPublicDescription(?string $publicDescription): void
@@ -104,7 +105,7 @@ class RefundEntity extends Entity
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getInternalDescription(): ?string
     {
@@ -112,7 +113,7 @@ class RefundEntity extends Entity
     }
 
     /**
-     * @param string|null $internalDescription
+     * @param null|string $internalDescription
      * @return void
      */
     public function setInternalDescription(?string $internalDescription): void

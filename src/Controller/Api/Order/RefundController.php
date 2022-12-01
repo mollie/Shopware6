@@ -334,7 +334,7 @@ class RefundController extends AbstractController
      * @param Context $context
      * @return JsonResponse
      */
-    private function refundAction(string $orderId, string $orderNumber, string $description,string $internalDescription, ?float $amount, array $items, Context $context): JsonResponse
+    private function refundAction(string $orderId, string $orderNumber, string $description, string $internalDescription, ?float $amount, array $items, Context $context): JsonResponse
     {
         try {
             if (!empty($orderId)) {

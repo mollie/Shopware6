@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Hydrator;
 
 use Kiener\MolliePayments\Components\Subscription\DAL\Order\OrderExtension;
 use Kiener\MolliePayments\Components\Subscription\DAL\Refund\RefundCollection;
-use Kiener\MolliePayments\Components\Subscription\DAL\Refund\RefundDefinition;
 use Kiener\MolliePayments\Components\Subscription\DAL\Refund\RefundEntity;
 use Mollie\Api\Resources\Refund;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -46,12 +45,12 @@ class RefundHydrator
         $shopwareRefunds = $order->getExtension(OrderExtension::REFUND_PROPERTY_NAME);
 
         // Lookup the correct refund for the internal description
-        if ($shopwareRefunds){
-            $shopwareRefunds= $shopwareRefunds->filterByProperty('mollieRefundId',$refund->id);
+        if ($shopwareRefunds != null) {
+            $shopwareRefunds = $shopwareRefunds->filterByProperty('mollieRefundId', $refund->id);
 
             /** @var RefundEntity $shopwareRefund */
             $shopwareRefund = $shopwareRefunds->first();
-            if ($shopwareRefund){
+            if ($shopwareRefund != null) {
                 $internalDescription = $shopwareRefund->getInternalDescription();
             }
         }

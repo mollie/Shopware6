@@ -17,8 +17,8 @@ class Migration1669796049CreateRefund extends MigrationStep
 
     /**
      * @param Connection $connection
-     * @return void
      * @throws \Doctrine\DBAL\Exception
+     * @return void
      */
     public function update(Connection $connection): void
     {

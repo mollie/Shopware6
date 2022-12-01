@@ -91,7 +91,8 @@ class RefundsServiceTest extends TestCase
             $mollieOrderApiMock,
             $this->orderService,
             new RefundHydrator(),
-            new FakeMollieGateway()
+            new FakeMollieGateway(),
+            $this->createMock(EntityRepositoryInterface::class),
         );
     }
 

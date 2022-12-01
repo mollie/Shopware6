@@ -15,7 +15,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 
 class RefundDefinition extends EntityDefinition
 {
-
     public const ENTITY_NAME = 'mollie_refund';
 
     /**
@@ -26,16 +25,25 @@ class RefundDefinition extends EntityDefinition
         return self::ENTITY_NAME;
     }
 
+    /**
+     * @return string
+     */
     public function getEntityClass(): string
     {
         return RefundEntity::class;
     }
 
+    /**
+     * @return string
+     */
     public function getCollectionClass(): string
     {
         return RefundCollection::class;
     }
 
+    /**
+     * @return FieldCollection
+     */
     protected function defineFields(): FieldCollection
     {
         return new FieldCollection([

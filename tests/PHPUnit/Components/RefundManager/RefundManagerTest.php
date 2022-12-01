@@ -100,7 +100,7 @@ class RefundManagerTest extends TestCase
         $fakeContext = $this->createDummyMock(Context::class, $this);
 
 
-        $refundRequest = new RefundRequest('', '', null);
+        $refundRequest = new RefundRequest('', '', '',null);
 
         $refund = $this->manager->refund($order, $refundRequest, $fakeContext);
 
@@ -147,7 +147,7 @@ class RefundManagerTest extends TestCase
 
         # build a request object
         # so that we refund line-1 and make sure the stock is reset
-        $refundRequest = new RefundRequest('', '', null);
+        $refundRequest = new RefundRequest('', '', '',null);
         $refundRequest->addItem(new RefundRequestItem('line-1', 19.99, 1, 1));
 
         $refund = $this->manager->refund($order, $refundRequest, $fakeContext);

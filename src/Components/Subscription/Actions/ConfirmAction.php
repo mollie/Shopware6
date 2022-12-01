@@ -17,8 +17,8 @@ class ConfirmAction extends BaseAction
      * @param OrderEntity $order
      * @param string $mandateId
      * @param Context $context
-     * @return void
      * @throws CustomerCouldNotBeFoundException
+     * @return void
      */
     public function confirmSubscription(OrderEntity $order, string $mandateId, Context $context): void
     {
