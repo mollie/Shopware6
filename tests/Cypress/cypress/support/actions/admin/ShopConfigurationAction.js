@@ -140,7 +140,7 @@ export default class ShopConfigurationAction {
     _configureMolliePlugin(channelId, mollieFailureMode, creditCardComponents, applePayDirect, subscriptionIndicator) {
         const data = {};
 
-        data[channelId] = {
+        const config = {
             "MolliePayments.config.testMode": true,
             "MolliePayments.config.debugMode": true,
             // ------------------------------------------------------------------
@@ -160,6 +160,9 @@ export default class ShopConfigurationAction {
             "MolliePayments.config.subscriptionsAllowPauseResume": true,
             "MolliePayments.config.subscriptionsAllowSkip": true,
         };
+
+        data[null] = config;        // also add for "All Sales Channels" otherwise things in admin wouldnt work
+        data[channelId] = config;
 
         this.apiClient.post('/_action/system-config/batch', data);
     }

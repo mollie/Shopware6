@@ -168,7 +168,10 @@ describe('Subscription', () => {
                     vueJs.textField(repoAdminSubscriptonDetails.getNextPaymentAtField()).notEmptyValue();
                     vueJs.textField(repoAdminSubscriptonDetails.getLastRemindedAtField()).emptyValue();
 
-                    elementUtils.assertContainsText(repoAdminSubscriptonDetails.getHistoryCardTitle(), '(2)');
+                    // just do a contains, because card-titles are just different
+                    // across shopware versions, and in the end, we just need to make sure we see this exact string
+                    cy.contains("History (2)");
+
                     // oldest history entry
                     cy.contains(repoAdminSubscriptonDetails.getHistoryStatusToSelector(1), 'pending', {matchCase: false});
                     cy.contains(repoAdminSubscriptonDetails.getHistoryCommentSelector(1), 'created');
@@ -384,7 +387,9 @@ describe('Subscription', () => {
 
                 it('C176306: Subscriptions are available in Account', () => {
 
-                    dummyUserScenario.execute();
+                    prepareSubscriptionAndOpenDetails();
+
+                    cy.visit('/');
                     topMenu.clickAccountWidgetSubscriptions();
 
                     // side menu needs subscription

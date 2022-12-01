@@ -39,6 +39,16 @@
             <helpText lang="de-DE">Aktiviert den Testmodus mit der Mollie Sandbox Zahlungsseite. In der Storefront wird (Test Modus) neben den Zahlungsarten angezeigt.</helpText>
             <helpText lang="nl-NL">Staat de test modus toe met de Mollie Sandbox betalingspagina. De Storefront zal ook "(Test Mode)" tonen naast de naam van de betaalmethode.</helpText>
         </input-field>
+        <input-field type="bool">
+            <name>debugMode</name>
+            <label>Debug Mode</label>
+            <label lang="de-DE">Debug Modus</label>
+            <label lang="nl-NL">Debug Modus</label>
+            <defaultValue>false</defaultValue>
+            <helpText>Mollie has a custom log file in the Shopware log directory. This feature enables the extended logs with more information that could help to solve problems.</helpText>
+            <helpText lang="de-DE">Mollie hat eine eigene LOG Datei im Shopware Log Verzeichnis. Dieser Modus kümmert sich um erweiterte Informationen in diesen Log Dateien, die zusätzlich bei der Analyse von Fehlern beitragen können.</helpText>
+            <helpText lang="nl-NL">Mollie heeft een op maat logbestand in de Shopware logboek-map. Deze functie maakt uitgebreide logs mogelijk met meer informatie die helpen bij het oplossen van problemen.</helpText>
+        </input-field>
         <component name="mollie-pluginconfig-section-api">
             <name>molliePluginConfigSectionApi</name>
         </component>
@@ -47,6 +57,16 @@
         <title>Payments</title>
         <title lang="de-DE">Zahlungen</title>
         <title lang="nl-NL">Betalingen</title>
+        <input-field type="bool">
+            <name>shopwareFailedPayment</name>
+            <label>Use Shopware standard behaviour for failed payments</label>
+            <label lang="de-DE">Shopware Standardverhalten für fehlerhafte Zahlungen verwenden</label>
+            <label lang="nl-NL">Gebruik de standaard Shopware instelling voor mislukte betalingen</label>
+            <defaultValue>true</defaultValue>
+            <helpText>Use the default Shopware behaviour on failed payments. If disabled, Mollie will automatically provide a way to retry the payment by redirecting the user to the Mollie payments page.</helpText>
+            <helpText lang="de-DE">Aktiviert das Standardverhalten von Shopware für fehlerhafte Zahlungen. Wenn nicht aktiv, kümmert sich das Mollie Plugin um einen erneuten Versuch der Zahlung und leitet den Käufer auf die externe Mollie Zahlungsauswahl.</helpText>
+            <helpText lang="nl-NL">Gebruik de standaard Shopware instelling voor mislukte betalingen. Indien uitgeschakeld, zal Mollie automatisch een manier aanbieden om de betaling opnieuw te proberen door de user om te leiden naar de Mollie betalingspagina.</helpText>
+        </input-field>
         <input-field type="bool">
             <name>enableCreditCardComponents</name>
             <label>Enable Credit Card Components</label>
@@ -67,15 +87,28 @@
             <helpText lang="de-DE">Zeigt Apple Pay Buttons direkt auf der Produktseite oder Kategorie Seite an. Dieses Feature setzt voraus, dass die Zahlungsart 'Apple Pay' dem Verkaufskanal zugewiesen ist.</helpText>
             <helpText lang="nl-NL">Toon Apple Pay-buttons en betaalopties direct op een productdetailpagina of product listing pagina. Deze functie vereist dat de betaalmethode Apple Pay is toegewezen aan jouw verkoopkanaal.</helpText>
         </input-field>
-        <input-field type="bool">
-            <name>shopwareFailedPayment</name>
-            <label>Use Shopware standard behaviour for failed payments</label>
-            <label lang="de-DE">Shopware Standardverhalten für fehlerhafte Zahlungen verwenden</label>
-            <label lang="nl-NL">Gebruik de standaard Shopware instelling voor mislukte betalingen</label>
-            <defaultValue>true</defaultValue>
-            <helpText>Use the default Shopware behaviour on failed payments. If disabled, Mollie will automatically provide a way to retry the payment by redirecting the user to the Mollie payments page.</helpText>
-            <helpText lang="de-DE">Aktiviert das Standardverhalten von Shopware für fehlerhafte Zahlungen. Wenn nicht aktiv, kümmert sich das Mollie Plugin um einen erneuten Versuch der Zahlung und leitet den Käufer auf die externe Mollie Zahlungsauswahl.</helpText>
-            <helpText lang="nl-NL">Gebruik de standaard Shopware instelling voor mislukte betalingen. Indien uitgeschakeld, zal Mollie automatisch een manier aanbieden om de betaling opnieuw te proberen door de user om te leiden naar de Mollie betalingspagina.</helpText>
+        <input-field type="multi-select">
+            <name>applePayDirectRestrictions</name>
+            <label>Apple Pay Display Restrictions</label>
+            <label lang="de-DE">Apple Pay Anzeige Einschränkungen</label>
+            <label lang="nl-NL">Apple Pay weergavebeperkingen</label>
+            <helpText>Restrict Apple Pay Direct from being displayed on these pages.</helpText>
+            <helpText lang="de-DE">Verhindere die Anzeige von Apple Pay Direct auf den hier gewählten Seiten</helpText>
+            <helpText lang="nl-NL">Voorkom dat Apple Pay Direct wordt weergegeven op deze pagina's.</helpText>
+            <options>
+                <option>
+                    <id>plp</id>
+                    <name>Listing pages</name>
+                    <name lang="de-DE">Listing pages</name>
+                    <name lang="nl-NL">Listing pagina's</name>
+                </option>
+                <option>
+                    <id>pdp</id>
+                    <name>Detail pages</name>
+                    <name lang="de-DE">Detail pages</name>
+                    <name lang="nl-NL">Detail pagina's</name>
+                </option>
+            </options>
         </input-field>
         <input-field type="bool">
             <name>createCustomersAtMollie</name>
@@ -100,6 +133,39 @@
         <component name="mollie-pluginconfig-section-payments">
             <name>molliePluginConfigSectionPayments</name>
         </component>
+    </card>
+    <card>
+        <title>Order Management</title>
+        <title lang="de-DE">Auftragsverwaltung</title>
+        <title lang="nl-NL">Order beheer</title>
+        <input-field type="int">
+            <name>paymentMethodBankTransferDueDateDays</name>
+            <label>Bank Transfer Due Date (Days)</label>
+            <label lang="de-DE">Banküberweisung Fälligkeitsdauer (in Tagen seit Bestelleingang)</label>
+            <label lang="nl-NL">Bankoverschrijving vervaldatum (in dagen vanaf ontvangen bestelling)</label>
+            <helpText>Assign a custom "due date" for the Bank Transfer payment method. This is the time the customer can pay until the payment expires.</helpText>
+            <helpText lang="de-DE">Konfiguration eines eigenen Verfallsdatums für die Zahlungsart 'Bank Transfer'. Dies ist der Zeitraum einer möglichen Zahlung bis die Zahlungsmöglichkeit verfällt.</helpText>
+            <helpText lang="nl-NL">Wijs een aangepaste "vervaldatum" toe voor de betaalmethode Bankoverschrijving. Dit is de periode dat de klant kan betalen totdat de betaling vervalt.</helpText>
+        </input-field>
+        <input-field type="int">
+            <name>orderLifetimeDays</name>
+            <label>Order Lifetime Days</label>
+            <label lang="de-DE">Bestellungs Lebensdauer bei Mollie (in Tagen seit Bestelleingang)</label>
+            <label lang="nl-NL">Levensduur bestelling bij Mollie (in dagen vanaf ontvangen bestelling)</label>
+            <helpText>Configure the lifetime of an order until it expires when not paid. This applies to all payment methods.</helpText>
+            <helpText lang="de-DE">Konfiguration der Lebensdauer bis eine Bestellung verfällt, sofern sie nicht bezahlt wurde. Diese Konfiguration wirkt sich auf alle Zahlungsarten aus.</helpText>
+            <helpText lang="nl-NL">Configureer de levensduur van een bestelling totdat deze vervalt als er niet betaald is. Dit geldt voor alle betaalmethoden.</helpText>
+        </input-field>
+        <input-field type="bool">
+            <name>automaticShipping</name>
+            <defaultValue>true</defaultValue>
+            <label>Automatic Shipping</label>
+            <label lang="de-DE">Automatischer Versand</label>
+            <label lang="nl-NL">Automatische Verzending</label>
+            <helpText>If enabled, the plugin will automatically trigger a shipment at Mollie when the delivery status transitions to 'shipped'.</helpText>
+            <helpText lang="de-DE">Sofern aktiv, schickt das Plugin automatisch eine Versand Mitteilung an Mollie, sobald der Lieferstatus auf 'verschickt' übergeleitet wird.</helpText>
+            <helpText lang="nl-NL">Indien ingeschakeld, zal de plugin automatisch een verzending activeren bij Mollie wanneer de leveringstatus overgaat naar ‘verzonden’.</helpText>
+        </input-field>
     </card>
     <card>
         <title>Refund Manager</title>
@@ -144,72 +210,6 @@
             <helpText>Shows or hides the instructions area. You can simply turn this off in case it's disturbing once you're familiar with the Refund Manager.</helpText>
             <helpText lang="de-DE">Diese Funktion kann benutzt werden, um die Anleitungen auszublenden, sofern man einmal mit dem Refund Manager vetraut ist.</helpText>
             <helpText lang="nl-NL">Toont of verbergt de handleiding. Als het storend is, kan je het direkt deactiveren als je eenmaal vertrouwd bent met de Refund Manager.</helpText>
-        </input-field>
-    </card>
-    <card>
-        <title>Additional Settings</title>
-        <title lang="de-DE">Zusätzliche Einstellungen</title>
-        <title lang="nl-NL">Aanvullende instellingen</title>
-        <input-field type="bool">
-            <name>debugMode</name>
-            <label>Debug Mode</label>
-            <label lang="de-DE">Debug Modus</label>
-            <label lang="nl-NL">Debug Modus</label>
-            <defaultValue>false</defaultValue>
-            <helpText>Mollie has a custom log file in the Shopware log directory. This feature enables the extended logs with more information that could help to solve problems.</helpText>
-            <helpText lang="de-DE">Mollie hat eine eigene LOG Datei im Shopware Log Verzeichnis. Dieser Modus kümmert sich um erweiterte Informationen in diesen Log Dateien, die zusätzlich bei der Analyse von Fehlern beitragen können.</helpText>
-            <helpText lang="nl-NL">Mollie heeft een op maat logbestand in de Shopware logboek-map. Deze functie maakt uitgebreide logs mogelijk met meer informatie die helpen bij het oplossen van problemen.</helpText>
-        </input-field>
-        <input-field type="bool">
-            <name>automaticShipping</name>
-            <defaultValue>true</defaultValue>
-            <label>Automatic Shipping</label>
-            <label lang="de-DE">Automatischer Versand</label>
-            <label lang="nl-NL">Automatische Verzending</label>
-            <helpText>If enabled, the plugin will automatically trigger a shipment at Mollie when the delivery status transitions to 'shipped'.</helpText>
-            <helpText lang="de-DE">Sofern aktiv, schickt das Plugin automatisch eine Versand Mitteilung an Mollie, sobald der Lieferstatus auf 'verschickt' übergeleitet wird.</helpText>
-            <helpText lang="nl-NL">Indien ingeschakeld, zal de plugin automatisch een verzending activeren bij Mollie wanneer de leveringstatus overgaat naar ‘verzonden’.</helpText>
-        </input-field>
-        <input-field type="int">
-            <name>paymentMethodBankTransferDueDateDays</name>
-            <label>Bank Transfer Due Date (Days)</label>
-            <label lang="de-DE">Banküberweisung Fälligkeitsdauer (in Tagen seit Bestelleingang)</label>
-            <label lang="nl-NL">Bankoverschrijving vervaldatum (in dagen vanaf ontvangen bestelling)</label>
-            <helpText>Assign a custom "due date" for the Bank Transfer payment method. This is the time the customer can pay until the payment expires.</helpText>
-            <helpText lang="de-DE">Konfiguration eines eigenen Verfallsdatums für die Zahlungsart 'Bank Transfer'. Dies ist der Zeitraum einer möglichen Zahlung bis die Zahlungsmöglichkeit verfällt.</helpText>
-            <helpText lang="nl-NL">Wijs een aangepaste "vervaldatum" toe voor de betaalmethode Bankoverschrijving. Dit is de periode dat de klant kan betalen totdat de betaling vervalt.</helpText>
-        </input-field>
-        <input-field type="int">
-            <name>orderLifetimeDays</name>
-            <label>Order Lifetime Days</label>
-            <label lang="de-DE">Bestellungs Lebensdauer bei Mollie (in Tagen seit Bestelleingang)</label>
-            <label lang="nl-NL">Levensduur bestelling bij Mollie (in dagen vanaf ontvangen bestelling)</label>
-            <helpText>Configure the lifetime of an order until it expires when not paid. This applies to all payment methods.</helpText>
-            <helpText lang="de-DE">Konfiguration der Lebensdauer bis eine Bestellung verfällt, sofern sie nicht bezahlt wurde. Diese Konfiguration wirkt sich auf alle Zahlungsarten aus.</helpText>
-            <helpText lang="nl-NL">Configureer de levensduur van een bestelling totdat deze vervalt als er niet betaald is. Dit geldt voor alle betaalmethoden.</helpText>
-        </input-field>
-        <input-field type="multi-select">
-            <name>applePayDirectRestrictions</name>
-            <label>Apple Pay Display Restrictions</label>
-            <label lang="de-DE">Apple Pay Anzeige Einschränkungen</label>
-            <label lang="nl-NL">Apple Pay weergavebeperkingen</label>
-            <helpText>Restrict Apple Pay Direct from being displayed on these pages.</helpText>
-            <helpText lang="de-DE">Verhindere die Anzeige von Apple Pay Direct auf den hier gewählten Seiten</helpText>
-            <helpText lang="nl-NL">Voorkom dat Apple Pay Direct wordt weergegeven op deze pagina's.</helpText>
-            <options>
-                <option>
-                    <id>plp</id>
-                    <name>Listing pages</name>
-                    <name lang="de-DE">Listing pages</name>
-                    <name lang="nl-NL">Listing pagina's</name>
-                </option>
-                <option>
-                    <id>pdp</id>
-                    <name>Detail pages</name>
-                    <name lang="de-DE">Detail pages</name>
-                    <name lang="nl-NL">Detail pagina's</name>
-                </option>
-            </options>
         </input-field>
     </card>
     <card>
@@ -504,8 +504,8 @@
             <name>subscriptionsEnabled</name>
             <defaultValue>true</defaultValue>
             <label>Enable Mollie subscriptions</label>
-            <label lang="de-DE">Mollie Subscriptions aktivieren</label>
-            <label lang="nl-NL">Mollie Subscriptions activeren</label>
+            <label lang="de-DE">Mollie Abonnements aktivieren</label>
+            <label lang="nl-NL">Mollie abonnementen activeren</label>
             <helpText>Enables or disables the full subscription functionality. Please reload the administration after changing this setting.</helpText>
             <helpText lang="de-DE">Aktiviert oder deaktiviert die vollständige Abonnementfunktion. Bitte laden Sie die Administration neu, nachdem Sie diese Einstellung geändert haben.</helpText>
             <helpText lang="nl-NL">Schakelt de volledige abonnementsfunctionaliteit in of uit. Herlaad de administratie na het wijzigen van deze instelling.</helpText>

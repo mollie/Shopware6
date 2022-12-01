@@ -24,7 +24,7 @@
             {% block sw_order_detail_confirm_modal_cancel %}
                 <sw-confirm-modal
                         v-if="showConfirmCancel"
-                        type="delete"
+                        type="yesno"
                         :text="$tc('mollie-payments.subscriptions.confirm.cancel')"
                         @confirm="btnConfirmCancel_Click()"
                         @close="btnCloseAnyModal_Click()"
@@ -35,7 +35,7 @@
             {% block sw_order_detail_confirm_modal_pause %}
                 <sw-confirm-modal
                         v-if="showConfirmPause"
-                        type="delete"
+                        type="yesno"
                         :text="$tc('mollie-payments.subscriptions.confirm.pause')"
                         @confirm="btnConfirmPause_Click()"
                         @close="btnCloseAnyModal_Click()"
@@ -57,7 +57,7 @@
             {% block sw_order_detail_confirm_modal_skip %}
                 <sw-confirm-modal
                         v-if="showConfirmSkip"
-                        type="delete"
+                        type="yesno"
                         :text="$tc('mollie-payments.subscriptions.confirm.skip')"
                         @confirm="btnConfirmSkip_Click()"
                         @close="btnCloseAnyModal_Click()"
@@ -67,7 +67,17 @@
 
             <sw-card-view v-if="!isLoading">
                 {% block sw_order_detail_card_basic %}
-                    <sw-card :title="subscription.description" :subtitle="customerFullName" :hero="false" :isLoading="false" :large="false">
+                    <sw-card :title="$tc('mollie-payments.subscriptions.detail.cardTitleSubscription')" :hero="false" :isLoading="false" :large="false">
+
+                        <sw-container columns="1fr" gap="0px 30px">
+                            {% block sw_order_detail_card_basic_field_description %}
+                                <sw-text-field v-model="subscription.description"
+                                               :label="$tc('mollie-payments.subscriptions.detail.labelDescription')"
+                                               disabled="disabled">
+                                </sw-text-field>
+                            {% endblock %}
+                        </sw-container>
+
                         <sw-container columns="1fr 1fr" gap="0px 30px">
                             {% block sw_order_detail_card_basic_field_amount %}
                                 <sw-text-field v-model="subscription.amount"
@@ -86,12 +96,20 @@
                             {% endblock %}
                         </sw-container>
                         <sw-container columns="1fr 1fr" gap="0px 30px">
+                            {% block sw_order_detail_card_basic_field_customer_name %}
+                                <sw-text-field v-model="customerFullName"
+                                               :label="$tc('mollie-payments.subscriptions.detail.labelShopwareCustomer')"
+                                               disabled="disabled">
+                                </sw-text-field>
+                            {% endblock %}
                             {% block sw_order_detail_card_basic_field_mollie_customer_id %}
                                 <sw-text-field v-model="subscription.mollieCustomerId"
                                                :label="$tc('mollie-payments.subscriptions.detail.labelMollieCustomer')"
                                                disabled="disabled">
                                 </sw-text-field>
                             {% endblock %}
+                        </sw-container>
+                        <sw-container columns="1fr 1fr" gap="0px 30px">
                             {% block sw_order_detail_card_basic_field_created_at %}
                                 <sw-text-field v-model="formattedCreateAt"
                                                :label="$tc('mollie-payments.subscriptions.detail.labelCreatedAt')"
@@ -162,6 +180,7 @@
                             {% block sw_order_detail_card_status_action_pause %}
                                 <sw-button v-if="isAclEditAllowed && isPauseAllowed"
                                            class="mollie-subscriptions-detail-link-button cy-btn-pause"
+                                           :disabled="!allowPauseResume"
                                            variant="ghost-danger"
                                            @click="btnPause_Click()">
                                     {{ $tc('mollie-payments.subscriptions.detail.buttonPauseSubscription') }}
@@ -170,6 +189,7 @@
                             {% block sw_order_detail_card_status_action_resume %}
                                 <sw-button v-if="isAclEditAllowed && isResumeAllowed"
                                            class="mollie-subscriptions-detail-link-button cy-btn-resume"
+                                           :disabled="!allowPauseResume"
                                            variant="ghost"
                                            @click="btnResume_Click()">
                                     {{ $tc('mollie-payments.subscriptions.detail.buttonResumeSubscription') }}
@@ -178,6 +198,7 @@
                             {% block sw_order_detail_card_status_action_skip %}
                                 <sw-button v-if="isAclEditAllowed && isSkipAllowed"
                                            class="mollie-subscriptions-detail-link-button cy-btn-skip"
+                                           :disabled="!allowSkip"
                                            variant="ghost-danger"
                                            @click="btnSkip_Click()">
                                     {{ $tc('mollie-payments.subscriptions.detail.buttonSkipSubscription') }}

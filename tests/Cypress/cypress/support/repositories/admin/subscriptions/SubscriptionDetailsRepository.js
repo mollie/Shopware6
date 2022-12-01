@@ -48,10 +48,6 @@ export default class SubscriptionDetailsRepository {
         return cy.get('.smart-bar__actions > .sw-button');
     }
 
-    getHistoryCardTitle() {
-        return cy.get(':nth-child(3) > .sw-card > .sw-card__header > .sw-card__titles > .sw-card__title');
-    }
-
     getHistoryCommentSelector(rowIndex) {
         return '.sw-grid__row--' + rowIndex + ' > :nth-child(5) > .sw-grid__cell-content';
     }

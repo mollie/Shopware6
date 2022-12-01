@@ -68,6 +68,11 @@ describe('Cancellation permissions', () => {
         expect(allowed).toStrictEqual(false);
     });
 
+    test('pending status does not allow cancellation yet', () => {
+        const allowed = service.isCancellationAllowed('pending');
+        expect(allowed).toStrictEqual(false);
+    });
+
 })
 
 describe('Skipping permissions', () => {

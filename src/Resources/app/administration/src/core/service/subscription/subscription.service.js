@@ -63,7 +63,7 @@ export default class SubscriptionService {
      * @returns {boolean}
      */
     isCancellationAllowed(status) {
-        return (status !== 'canceled');
+        return (status !== 'canceled' && status !== 'pending');
     }
 
     /**
