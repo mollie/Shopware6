@@ -81,13 +81,22 @@ context("Plugin Config", () => {
             cy.get('.sw-button-process').should('not.be.disabled');
         })
 
-        it.only('C234008: Custom format for order number shows interactive preview @core', () => {
+
+        it('C234008: Custom format for order number shows interactive preview @core', () => {
 
             adminLogin.login();
             pluginAction.openPluginConfiguration();
 
             const inputPrefix = '.sw-system-config--field-mollie-payments-config-format-order-number > .sw-field';
             const divPreview = '.sw-system-config--field-mollie-payments-config-mollie-plugin-config-section-payments-format';
+            
+            // this feature doesn't work in lower shopware numbers
+            // just test that it's not visible and that our textfield can be edited
+            if (shopware.isVersionLowerEqual('6.3.5.2')) {
+                cy.get(inputPrefix).click().clear();
+                cy.get(divPreview).should('not.be.visible');
+                return;
+            }
 
             cy.get(inputPrefix).click().clear();
             cy.get(divPreview).should('not.be.visible');
