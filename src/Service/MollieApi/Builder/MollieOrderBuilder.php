@@ -129,7 +129,7 @@ class MollieOrderBuilder
 
         # build custom format
         # TODO this is just inline code, but it's unit tested, but maybe we should move it to a separate class too, and switch to unit tests + integration tests
-        if (!empty($settings->getFormatOrderNumber())) {
+        if (!empty(trim($settings->getFormatOrderNumber()))) {
             $orderNumberFormatted = $settings->getFormatOrderNumber();
             $orderNumberFormatted = str_replace('{ordernumber}', (string)$order->getOrderNumber(), (string)$orderNumberFormatted);
         } else {

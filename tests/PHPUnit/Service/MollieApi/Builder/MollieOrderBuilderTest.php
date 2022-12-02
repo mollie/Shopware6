@@ -20,6 +20,8 @@ class MollieOrderBuilderTest extends AbstractMollieOrderBuilder
         return
             [
                 'no_custom_format' => ['10000', ''],
+                'white_space_is_no_custom_format' => ['10000', ' '],
+                'more_whitespaces_are_also_no_custom_format' => ['10000', '   '],
                 'just_ordernumber' => ['10000', '{ordernumber}'],
                 'custom_prefix' => ['R10000', 'R{ordernumber}'],
                 'custom_suffix' => ['10000-stage', '{ordernumber}-stage'],
