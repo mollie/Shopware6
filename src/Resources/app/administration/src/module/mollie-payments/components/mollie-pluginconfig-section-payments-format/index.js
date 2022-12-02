@@ -41,10 +41,19 @@ Component.register('mollie-pluginconfig-section-payments-format', {
         /**
          *
          * @param ordernumber
-         * @returns {*}
+         * @returns {string|*}
          */
         getFormat(ordernumber) {
             const configRoot = this.$parent.$parent.$parent.$parent.$parent;
+
+            if (configRoot === null) {
+                return '';
+            }
+
+            // does not exist in shopware 6.3.5.2
+            if (configRoot.actualConfigData === undefined || configRoot.actualConfigData === null) {
+                return '';
+            }
 
             var text = configRoot.actualConfigData.null['MolliePayments.config.formatOrderNumber'];
 

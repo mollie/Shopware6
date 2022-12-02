@@ -30,6 +30,11 @@ export default class StringUtils {
      * @returns {*}
      */
     replace(search, replaceWith, text) {
+
+        if (text === undefined || text === null) {
+            return '';
+        }
+
         return text.split(search).join(replaceWith);
     }
 
