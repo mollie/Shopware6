@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Components\Subscription\Page\Account;
 
+use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\SettingsService;
@@ -22,6 +23,7 @@ use Shopware\Core\System\Salutation\SalutationEntity;
 use Shopware\Storefront\Framework\Page\StorefrontSearchResult;
 use Shopware\Storefront\Page\GenericPageLoaderInterface;
 use Shopware\Storefront\Page\MetaInformation;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class SubscriptionPageLoader
@@ -57,6 +59,11 @@ class SubscriptionPageLoader
      */
     private $settingsService;
 
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
+
 
     /**
      * @param GenericPageLoaderInterface $genericLoader
@@ -65,8 +72,9 @@ class SubscriptionPageLoader
      * @param AbstractCountryRoute $countryRoute
      * @param AbstractSalutationRoute $salutationRoute
      * @param SettingsService $settingsService
+     * @param ContainerInterface $container
      */
-    public function __construct(GenericPageLoaderInterface $genericLoader, EntityRepositoryInterface $repoSubscriptions, CustomerService $customerService, AbstractCountryRoute $countryRoute, AbstractSalutationRoute $salutationRoute, SettingsService $settingsService)
+    public function __construct(GenericPageLoaderInterface $genericLoader, EntityRepositoryInterface $repoSubscriptions, CustomerService $customerService, AbstractCountryRoute $countryRoute, AbstractSalutationRoute $salutationRoute, SettingsService $settingsService, ContainerInterface $container)
     {
         $this->genericLoader = $genericLoader;
         $this->repoSubscriptions = $repoSubscriptions;
@@ -74,6 +82,7 @@ class SubscriptionPageLoader
         $this->countryRoute = $countryRoute;
         $this->salutationRoute = $salutationRoute;
         $this->settingsService = $settingsService;
+        $this->container = $container;
     }
 
 
@@ -191,7 +200,18 @@ class SubscriptionPageLoader
             ->addFilter(new EqualsFilter('country.active', true))
             ->addAssociation('states');
 
-        $countries = $this->countryRoute->load(new Request(), $criteria, $salesChannelContext)->getCountries();
+
+        /** @var string $version */
+        $version = $this->container->getParameter('kernel.shopware_version');
+
+        $versionCompare = new VersionCompare($version);
+
+        if ($versionCompare->gt('6.3.5.2')) {
+            $countries = $this->countryRoute->load(new Request(), $criteria, $salesChannelContext)->getCountries();
+        } else {
+            # @phpstan-ignore-next-line
+            $countries = $this->countryRoute->load($criteria, $salesChannelContext)->getCountries();
+        }
 
         $countries->sortCountryAndStates();
 

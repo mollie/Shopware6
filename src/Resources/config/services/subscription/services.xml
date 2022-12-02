@@ -79,6 +79,7 @@
             <argument type="service" id="Shopware\Core\System\Country\SalesChannel\CountryRoute"/>
             <argument type="service" id="Shopware\Core\System\Salutation\SalesChannel\SalutationRoute"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="service_container"/>
         </service>
 
 
