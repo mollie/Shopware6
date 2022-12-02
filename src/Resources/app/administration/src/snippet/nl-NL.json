@@ -58,6 +58,10 @@
         }
       },
       "payments": {
+        "format": {
+          "placeholder": "Plaatshouder",
+          "preview": "Preview"
+        },
         "updatePaymentMethods": {
           "title": "Mollie Payments",
           "button": "Betaalmethoden updaten",

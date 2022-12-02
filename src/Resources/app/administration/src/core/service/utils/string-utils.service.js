@@ -22,4 +22,15 @@ export default class StringUtils {
         return false;
     }
 
+    /**
+     *
+     * @param search
+     * @param replaceWith
+     * @param text
+     * @returns {*}
+     */
+    replace(search, replaceWith, text) {
+        return text.split(search).join(replaceWith);
+    }
+
 }

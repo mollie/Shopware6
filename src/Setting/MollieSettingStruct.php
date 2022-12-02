@@ -67,6 +67,12 @@ class MollieSettingStruct extends Struct
     protected $createCustomersAtMollie = true;
 
     /**
+     * @var string
+     */
+    protected $formatOrderNumber = '';
+
+
+    /**
      * @var bool
      */
     protected $enableCreditCardComponents = false;
@@ -370,6 +376,22 @@ class MollieSettingStruct extends Struct
     {
         $this->useMolliePaymentMethodLimits = $useMolliePaymentMethodLimits;
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormatOrderNumber(): string
+    {
+        return (string)$this->formatOrderNumber;
+    }
+
+    /**
+     * @param string $formatOrderNumber
+     */
+    public function setFormatOrderNumber(string $formatOrderNumber): void
+    {
+        $this->formatOrderNumber = $formatOrderNumber;
     }
 
     /**

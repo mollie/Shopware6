@@ -127,9 +127,18 @@ class MollieOrderBuilder
             $orderData['amount'] = $this->priceBuilder->build($order->getAmountTotal(), $currency->getIsoCode());
         }
 
+        # build custom format
+        # TODO this is just inline code, but it's unit tested, but maybe we should move it to a separate class too, and switch to unit tests + integration tests
+        if (!empty($settings->getFormatOrderNumber())) {
+            $orderNumberFormatted = $settings->getFormatOrderNumber();
+            $orderNumberFormatted = str_replace('{ordernumber}', (string)$order->getOrderNumber(), (string)$orderNumberFormatted);
+        } else {
+            $orderNumberFormatted = $order->getOrderNumber();
+        }
+
         $orderData['locale'] = $localeCode;
         $orderData['method'] = $paymentMethod;
-        $orderData['orderNumber'] = $order->getOrderNumber();
+        $orderData['orderNumber'] = $orderNumberFormatted;
         $orderData['payment'] = $paymentData;
 
         $orderData['redirectUrl'] = $this->urlBuilder->buildReturnUrl($transactionId);

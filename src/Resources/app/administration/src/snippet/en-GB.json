@@ -58,6 +58,10 @@
         }
       },
       "payments": {
+        "format": {
+          "placeholder": "Placeholder",
+          "preview": "Preview"
+        },
         "updatePaymentMethods": {
           "title": "Mollie Payments",
           "button": "Update payment methods",

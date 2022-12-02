@@ -58,6 +58,10 @@
         }
       },
       "payments": {
+        "format": {
+          "placeholder": "Platzhalter",
+          "preview": "Vorschau"
+        },
         "updatePaymentMethods": {
           "title": "Mollie Payments",
           "button": "Zahlungsarten aktualisieren",
