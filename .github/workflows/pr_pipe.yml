@@ -349,9 +349,22 @@ jobs:
   # ------------------------------------------------------------------------------------------------------------------------
 
   e2e:
-    name: E2E Core Tests
+    name: E2E Core | Shopware ${{ matrix.shopware }}
     needs: build
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # latest Shopware
+          - shopware: '6.4.17.2'
+            php: '8.1'
+          # in between, 6.4.7.0 was a "breaker"
+          - shopware: '6.4.7.0'
+            php: '7.4'
+          # minimum supported Shopware version
+          - shopware: '6.3.5.2'
+            php: '7.4'
     steps:
 
       - name: Clone Code
@@ -367,8 +380,8 @@ jobs:
         uses: ./.github/actions/run-e2e
         with:
           # -------------------------------------------
-          SHOPWARE: 6.4.17.2
-          PHP: 8.1
+          SHOPWARE: ${{ matrix.shopware }}
+          PHP: ${{ matrix.php }}
           # -------------------------------------------
           MOLLIE_APIKEY_TEST: ""
           # -------------------------------------------
