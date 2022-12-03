@@ -173,7 +173,7 @@ runs:
       if: ${{ inputs.RUN_CYPRESS == 'true' && always() }}
       uses: actions/upload-artifact@v2
       with:
-        name: cypress_results_v${{ inputs.SHOPWARE }}{{ CYPRESS_RESULTS_SUFFIX }}
+        name: cypress_results_v${{ inputs.SHOPWARE }}{{ inputs.CYPRESS_RESULTS_SUFFIX }}
         retention-days: 1
         path: |
           tests/Cypress/cypress/results
