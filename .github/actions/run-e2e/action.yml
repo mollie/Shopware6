@@ -34,6 +34,10 @@ inputs:
     description: "If enabled, tests that are marked es deprecated will be removed"
     default: 'false'
     required: false
+  CYPRESS_RESULTS_SUFFIX:
+    description: "Additional suffix for the zip file with all Cypress results."
+    default: ''
+    required: false
   # ------------------------------------------------------------------------------------
   # TESTRAIL SETTINGS
   TESTRAIL:
@@ -169,7 +173,7 @@ runs:
       if: ${{ inputs.RUN_CYPRESS == 'true' && always() }}
       uses: actions/upload-artifact@v2
       with:
-        name: cypress_results_sw_v${{ inputs.SHOPWARE }}
+        name: cypress_results_v${{ inputs.SHOPWARE }}{{ CYPRESS_RESULTS_SUFFIX }}
         retention-days: 1
         path: |
           tests/Cypress/cypress/results

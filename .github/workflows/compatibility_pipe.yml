@@ -67,6 +67,7 @@ jobs:
           # -------------------------------------------
           MOLLIE_APIKEY_TEST: ${{ secrets.MOLLIE_APIKEY_TEST }}
           # -------------------------------------------
+          CYPRESS_RESULTS_SUFFIX: _plugin_v${{ matrix.plugin }}
           TESTRAIL: false
           # we have to remove old tests from the history, because e.g.
           # SEPA Direct Debit is not working anymore when being executed now...
