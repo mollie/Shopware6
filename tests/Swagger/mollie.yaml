@@ -247,15 +247,15 @@ paths:
         "200":
           description: "successful operation"
 
-  /mollie/webhook/subscription/{subscriptionId}/renew:
+  /mollie/webhook/subscription/{subscriptionId}:
       post:
         tags:
           - "Webhooks"
-        summary: "Sends a subscription renewal webhook to Shopware"
+        summary: "Start a subscription renewal or update an existing subscription order and payment status."
         parameters:
           - in: "path"
             name: "subscriptionId"
-            description: "ID of the Shopware Subscription that should be renewed"
+            description: "ID of the Shopware Subscription"
             required: true
         requestBody:
           content:
@@ -270,6 +270,28 @@ paths:
           "200":
             description: "successful operation"
 
+  /mollie/webhook/subscription/{subscriptionId}/renew:
+    post:
+      tags:
+        - "Webhooks (Legacy)"
+      summary: "Start a subscription renewal or update an existing subscription order and payment status. This was a misleading name and is now a legacy URL but still required for old payments."
+      parameters:
+        - in: "path"
+          name: "subscriptionId"
+          description: "ID of the Shopware Subscription"
+          required: true
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: "The matching transaction ID of Mollie that was captured. tr_xyz, ..."
+      responses:
+        "200":
+          description: "successful operation"
 
 components:
   securitySchemes:

@@ -88,7 +88,7 @@ class WebhookController extends StorefrontController
     }
 
     /**
-     * @Route("/mollie/webhook/subscription/{swSubscriptionId}/renew", defaults={"csrf_protected"=false}, name="frontend.mollie.webhook.subscription.renew", options={"seo"="false"}, methods={"GET", "POST"})
+     * @Route("/mollie/webhook/subscription/{swSubscriptionId}", defaults={"csrf_protected"=false}, name="frontend.mollie.webhook.subscription", options={"seo"="false"}, methods={"GET", "POST"})
      *
      * @param string $swSubscriptionId
      * @param Request $request
@@ -97,6 +97,20 @@ class WebhookController extends StorefrontController
      * @return JsonResponse
      */
     public function webhookSubscriptionRenew(string $swSubscriptionId, Request $request, RequestDataBag $requestData, SalesChannelContext $context): JsonResponse
+    {
+        return $this->webhookSubscriptionLegacyRenew($swSubscriptionId, $request, $requestData, $context);
+    }
+
+    /**
+     * @Route("/mollie/webhook/subscription/{swSubscriptionId}/renew", defaults={"csrf_protected"=false}, name="frontend.mollie.webhook.subscription.renew", options={"seo"="false"}, methods={"GET", "POST"})
+     *
+     * @param string $swSubscriptionId
+     * @param Request $request
+     * @param RequestDataBag $requestData
+     * @param SalesChannelContext $context
+     * @return JsonResponse
+     */
+    public function webhookSubscriptionLegacyRenew(string $swSubscriptionId, Request $request, RequestDataBag $requestData, SalesChannelContext $context): JsonResponse
     {
         # just to improve testing and manual calls, make it is lower case (requirement for entity repositories)
         $swSubscriptionId = strtolower($swSubscriptionId);

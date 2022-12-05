@@ -107,7 +107,7 @@ class WebhookController extends AbstractController
 
 
     /**
-     * @Route("/api/mollie/webhook/subscription/{swSubscriptionId}/renew", defaults={"auth_required"=false, "auth_enabled"=false}, name="api.mollie.webhook_subscription_renew", methods={"GET", "POST"})
+     * @Route("/api/mollie/webhook/subscription/{swSubscriptionId}", defaults={"auth_required"=false, "auth_enabled"=false}, name="api.mollie.webhook_subscription", methods={"GET", "POST"})
      *
      * @param string $swSubscriptionId
      * @param Request $request
@@ -115,7 +115,7 @@ class WebhookController extends AbstractController
      * @param Context $context
      * @return JsonResponse
      */
-    public function webhookSubscriptionRenew(string $swSubscriptionId, Request $request, RequestDataBag $requestData, Context $context): JsonResponse
+    public function webhookSubscriptionAction(string $swSubscriptionId, Request $request, RequestDataBag $requestData, Context $context): JsonResponse
     {
         # just to improve testing and manual calls, make it is lower case (requirement for entity repositories)
         $swSubscriptionId = strtolower($swSubscriptionId);
@@ -195,6 +195,34 @@ class WebhookController extends AbstractController
     }
 
     /**
+     * @Route("/api/v{version}/mollie/webhook/subscription/{swSubscriptionId}", defaults={"auth_required"=false, "auth_enabled"=false}, name="api.mollie.webhook_subscription-legacy", methods={"GET", "POST"})
+     *
+     * @param string $swSubscriptionId
+     * @param Request $request
+     * @param RequestDataBag $requestData
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function webhookSubscriptionLegacyAction(string $swSubscriptionId, Request $request, RequestDataBag $requestData, Context $context): JsonResponse
+    {
+        return $this->webhookSubscriptionAction($swSubscriptionId, $request, $requestData, $context);
+    }
+
+    /**
+     * @Route("/api/mollie/webhook/subscription/{swSubscriptionId}/renew", defaults={"auth_required"=false, "auth_enabled"=false}, name="api.mollie.webhook_subscription_renew", methods={"GET", "POST"})
+     *
+     * @param string $swSubscriptionId
+     * @param Request $request
+     * @param RequestDataBag $requestData
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function webhookSubscriptionRenewAction(string $swSubscriptionId, Request $request, RequestDataBag $requestData, Context $context): JsonResponse
+    {
+        return $this->webhookSubscriptionAction($swSubscriptionId, $request, $requestData, $context);
+    }
+
+    /**
      * @Route("/api/v{version}/mollie/webhook/subscription/{swSubscriptionId}/renew", defaults={"auth_required"=false, "auth_enabled"=false}, name="api.mollie.webhook_subscription_renew-legacy", methods={"GET", "POST"})
      *
      * @param string $swSubscriptionId
@@ -205,6 +233,51 @@ class WebhookController extends AbstractController
      */
     public function webhookSubscriptionRenewLegacyAction(string $swSubscriptionId, Request $request, RequestDataBag $requestData, Context $context): JsonResponse
     {
-        return $this->webhookSubscriptionRenew($swSubscriptionId, $request, $requestData, $context);
+        return $this->webhookSubscriptionAction($swSubscriptionId, $request, $requestData, $context);
+    }
+
+
+    /**
+     * @Route("/api/mollie/webhook/subscription/{swSubscriptionId}/mandate/update", defaults={"auth_required"=false, "auth_enabled"=false}, name="api.mollie.webhook_subscription_paymentmethod", methods={"GET", "POST"})
+     *
+     * @param string $swSubscriptionId
+     * @param Request $request
+     * @param RequestDataBag $requestData
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function webhookSubscriptionMandateUpdatedAction(string $swSubscriptionId, Request $request, RequestDataBag $requestData, Context $context): JsonResponse
+    {
+        # just to improve testing and manual calls, make it is lower case (requirement for entity repositories)
+        $swSubscriptionId = strtolower($swSubscriptionId);
+
+        try {
+            $this->subscriptions->updatePaymentMethodConfirm($swSubscriptionId, $context);
+
+            return new JsonResponse(['success' => true,], 200);
+        } catch (\Throwable $ex) {
+            $this->logger->error(
+                'Error in Mollie Webhook for Subscription payment method update ' . $swSubscriptionId,
+                [
+                    'error' => $ex->getMessage(),
+                ]
+            );
+
+            return new JsonResponse(['success' => false, 'error' => $ex->getMessage()], 422);
+        }
+    }
+
+    /**
+     * @Route("/api/v{version}/mollie/webhook/subscription/{swSubscriptionId}/mandate/update", defaults={"auth_required"=false, "auth_enabled"=false}, name="api.mollie.webhook_subscription_paymentmethod-legacy", methods={"GET", "POST"})
+     *
+     * @param string $swSubscriptionId
+     * @param Request $request
+     * @param RequestDataBag $requestData
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function webhookSubscriptionMandateUpdatedLegacyAction(string $swSubscriptionId, Request $request, RequestDataBag $requestData, Context $context): JsonResponse
+    {
+        return $this->webhookSubscriptionMandateUpdatedAction($swSubscriptionId, $request, $requestData, $context);
     }
 }
