@@ -176,7 +176,9 @@
         "captionRemaining": "Terugbetaalbaar bedrag",
         "btnFixDiff": "Herstel verschil",
         "placeholderDescription": "Een optionele beschrijving aan terugbetaling toevoegen",
+        "lblDescription": "Optionele beschrijving",
         "placeholderInternalDescription": "Een optionele interne beschrijving aan terugbetaling toevoegen",
+        "lblInternalDescription": "Optionele interne beschrijving",
         "checkVerification": "Ik heb het totale restitutiebedrag en de geconfigureerde hoeveelheden voor restitutie en herbevoorrading geverifieerd.",
         "btnRefund": "Terugbetaling",
         "btnFullRefund": "Volledige terugbetaling"
