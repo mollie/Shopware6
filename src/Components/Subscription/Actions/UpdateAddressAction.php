@@ -131,12 +131,6 @@ class UpdateAddressAction extends BaseAction
 
         $this->getRepository()->assignBillingAddress($subscriptionId, $address, $context);
 
-
-        $oldStatus = $subscription->getStatus();
-        $newStatus = SubscriptionStatus::CANCELED;
-
-        $this->getRepository()->cancelSubscription($subscriptionId, $newStatus, $context);
-
         # also add a history entry for this subscription
         $this->getStatusHistory()->markBillingUpdated($subscription, $context);
     }
