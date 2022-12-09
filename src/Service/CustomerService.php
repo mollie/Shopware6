@@ -338,9 +338,15 @@ class CustomerService
         if (isset($customFields[self::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID])) {
             $struct->setLegacyCustomerId($customFields[self::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID]);
         }
-
+        $molliePaymentsCustomFields = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS] ?? [];
+        if (! is_array($molliePaymentsCustomFields)) {
+            $this->logger->warning('Customer customFields for MolliePayments are invalid. Array is expected', [
+                'currentCustomFields' => $molliePaymentsCustomFields
+            ]);
+            $molliePaymentsCustomFields = [$molliePaymentsCustomFields];
+        }
         // Then assign all custom fields under the mollie_payments key
-        $struct->assign($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS] ?? []);
+        $struct->assign($molliePaymentsCustomFields);
 
         return $struct;
     }

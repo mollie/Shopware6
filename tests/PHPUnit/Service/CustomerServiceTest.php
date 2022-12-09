@@ -209,6 +209,20 @@ class CustomerServiceTest extends TestCase
                     'customer_id' => 'cst_987',
                 ]
             ],
+            'Broken mollie_payments custom Fields by external plugins' => [
+                'bar', 'cst_321', 'pfl_321', true,
+                ['mollie_payments' => 'foo' ], // existing customfields
+                [   // expected customfields
+                    'mollie_payments' => [
+                        'customer_ids' => [
+                            'pfl_321' => [
+                                'live' => '',
+                                'test' => 'cst_321'
+                            ]
+                        ]
+                    ]
+                ]
+            ]
         ];
     }
 }
