@@ -287,7 +287,9 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
             }
         }
 
-        form.submit();
+        if (!window.csrf.enabled && window.csrf.mode !== 'ajax') {
+            form.submit();
+        }
     }
 
 }
