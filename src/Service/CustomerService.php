@@ -25,7 +25,7 @@ use Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class CustomerService
+class CustomerService implements CustomerServiceInterface
 {
     public const CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID = 'customer_id';
     public const CUSTOM_FIELDS_KEY_CREDIT_CARD_TOKEN = 'credit_card_token';
@@ -184,7 +184,7 @@ class CustomerService
      *
      * @return EntityWrittenContainerEvent
      */
-    public function setCardToken(CustomerEntity $customer, string $cardToken, Context $context)
+    public function setCardToken(CustomerEntity $customer, string $cardToken, Context $context): EntityWrittenContainerEvent
     {
         // Get existing custom fields
         $customFields = $customer->getCustomFields();
@@ -233,7 +233,7 @@ class CustomerService
      *
      * @return EntityWrittenContainerEvent
      */
-    public function setIDealIssuer(CustomerEntity $customer, string $issuerId, Context $context)
+    public function setIDealIssuer(CustomerEntity $customer, string $issuerId, Context $context): EntityWrittenContainerEvent
     {
         // Get existing custom fields
         $customFields = $customer->getCustomFields();
@@ -390,7 +390,7 @@ class CustomerService
      * @param SalesChannelContext $context
      * @return null|CustomerEntity
      */
-    public function createApplePayDirectCustomer(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, string $paymentMethodId, SalesChannelContext $context)
+    public function createApplePayDirectCustomer(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, string $paymentMethodId, SalesChannelContext $context): ?CustomerEntity
     {
         $customerId = Uuid::randomHex();
         $addressId = Uuid::randomHex();
