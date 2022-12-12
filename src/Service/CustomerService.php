@@ -343,7 +343,7 @@ class CustomerService implements CustomerServiceInterface
             $this->logger->warning('Customer customFields for MolliePayments are invalid. Array is expected', [
                 'currentCustomFields' => $molliePaymentsCustomFields
             ]);
-            $molliePaymentsCustomFields = [$molliePaymentsCustomFields];
+            $molliePaymentsCustomFields = [];
         }
         // Then assign all custom fields under the mollie_payments key
         $struct->assign($molliePaymentsCustomFields);
