@@ -127,7 +127,6 @@ describe('Apple Pay Direct - Storefront Routes', () => {
 
             const request = new Promise((resolve) => {
                 storefrontClient.post('/mollie/apple-pay/start-payment').then(response => {
-                    console.log(response);
                     resolve({'data': response});
                 });
             })

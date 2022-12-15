@@ -84,11 +84,12 @@ class UpdatePaymentAction extends BaseAction
 
     /**
      * @param string $subscriptionId
+     * @param string $redirectUrl
      * @param Context $context
      * @throws CustomerCouldNotBeFoundException
      * @return string
      */
-    public function updatePaymentMethodStart(string $subscriptionId, Context $context): string
+    public function updatePaymentMethodStart(string $subscriptionId, string $redirectUrl, Context $context): string
     {
         $subscription = $this->getRepository()->findById($subscriptionId, $context);
 
@@ -116,14 +117,33 @@ class UpdatePaymentAction extends BaseAction
         # this will be used to process the payment and get/create a new mandate inside the Mollie API systems.
         $gateway = $this->getMollieGateway($subscription);
 
-        $payment = $gateway->createPayment([
+        # for headless, we might provide a separate return URL
+        # for the storefront, we build our correct one
+        if (empty($redirectUrl)) {
+            $redirectUrl = $this->routingBuilder->buildSubscriptionPaymentUpdatedReturnUrl($subscriptionId);
+        }
+
+        $webhookUrl = $this->routingBuilder->buildSubscriptionPaymentUpdatedWebhook($subscriptionId);
+
+
+        $payload = [
             'sequenceType' => 'first',
             'customerId' => $customerId,
             'method' => SubscriptionRemover::ALLOWED_METHODS,
             'amount' => $this->priceBuilder->build(0, 'EUR'),
             'description' => 'Update Subscription Payment: ' . $subscription->getDescription(),
-            'redirectUrl' => $this->routingBuilder->buildSubscriptionPaymentUpdated($subscriptionId),
-        ]);
+            'redirectUrl' => $redirectUrl,
+        ];
+
+        # storefront does not have a webhook
+        # it's done immediately on sync
+        if (!empty($webhookUrl)) {
+            $payload['webhookUrl'] = $webhookUrl;
+        }
+
+
+        $payment = $gateway->createPayment($payload);
+
 
         # now update our metadata and set the temporary transaction ID.
         # we need this in the redirectURL to verify if this
@@ -171,7 +191,7 @@ class UpdatePaymentAction extends BaseAction
         # based on the mandateId in this payment
         $status = $this->statusConverter->getMolliePaymentStatus($payment);
         if (!MolliePaymentStatus::isApprovedStatus($status)) {
-            throw new Exception('Payment failed when updating subscription payment method');
+            throw new Exception('Payment failed when updating subscription mandate. Payment ' . $payment->id . ' for new mandate was not successful!');
         }
 
         # now update our Mollie subscription

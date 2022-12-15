@@ -62,22 +62,27 @@ class SubscriptionDefinition extends EntityDefinition
     {
         return new FieldCollection([
 
-            (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
+            (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey(), new ApiAware()),
 
             # --------------------------------------------------------------------------------------------------------------------------
 
             (new FkField('customer_id', 'customerId', CustomerDefinition::class))->addFlags(new ApiAware()),
 
+            (new StringField('status', 'status'))->addFlags(new ApiAware()),
+            (new StringField('description', 'description'))->addFlags(new ApiAware()),
+            (new FloatField('amount', 'amount'))->addFlags(new ApiAware()),
+            (new IntField('quantity', 'quantity'))->addFlags(new ApiAware()),
+            (new StringField('currency', 'currency'))->addFlags(new ApiAware()),
+            (new JsonField('metadata', 'metadata')),
+
+            # --------------------------------------------------------------------------------------------------------------------------
+
+            # do not show in API!!!!!!
             (new StringField('mollie_id', 'mollieId')),
             (new StringField('mollie_customer_id', 'mollieCustomerId')),
-
-            new StringField('status', 'status'),
-            new StringField('description', 'description'),
-            new FloatField('amount', 'amount'),
-            new IntField('quantity', 'quantity'),
-            new StringField('currency', 'currency'),
-            (new JsonField('metadata', 'metadata')),
             (new StringField('mandate_id', 'mandateId')),
+
+            # --------------------------------------------------------------------------------------------------------------------------
 
             (new DateTimeField('next_payment_at', 'nextPaymentAt'))->addFlags(new ApiAware()),
             (new DateTimeField('last_reminded_at', 'lastRemindedAt'))->addFlags(new ApiAware()),

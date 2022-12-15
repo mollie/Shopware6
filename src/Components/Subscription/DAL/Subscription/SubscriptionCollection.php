@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Components\Subscription\DAL\Subscription;
 
+use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 
 /**
@@ -22,5 +23,27 @@ class SubscriptionCollection extends EntityCollection
     protected function getExpectedClass(): string
     {
         return SubscriptionEntity::class;
+    }
+
+    /**
+     * @return array<SubscriptionEntity>
+     */
+    public function getFlatList(): array
+    {
+        return $this->buildFlat($this);
+    }
+
+    /**
+     * @param SubscriptionCollection $lineItems
+     * @return array<SubscriptionEntity>
+     */
+    private function buildFlat(SubscriptionCollection $lineItems): array
+    {
+        $flat = [];
+        foreach ($lineItems as $lineItem) {
+            $flat[] = $lineItem;
+        }
+
+        return $flat;
     }
 }

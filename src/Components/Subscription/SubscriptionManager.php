@@ -248,13 +248,14 @@ class SubscriptionManager implements SubscriptionManagerInterface
 
     /**
      * @param string $subscriptionId
+     * @param string $redirectUrl
      * @param Context $context
      * @throws CustomerCouldNotBeFoundException
      * @return string
      */
-    public function updatePaymentMethodStart(string $subscriptionId, Context $context): string
+    public function updatePaymentMethodStart(string $subscriptionId, string $redirectUrl, Context $context): string
     {
-        return $this->actionUpdatePayment->updatePaymentMethodStart($subscriptionId, $context);
+        return $this->actionUpdatePayment->updatePaymentMethodStart($subscriptionId, $redirectUrl, $context);
     }
 
     /**
