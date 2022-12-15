@@ -111,7 +111,7 @@ Component.register('mollie-refund-manager', {
          * @returns {*}
          */
         isAclRefundAllowed() {
-            return this.acl.can('mollie_refund_manager:update');
+            return this.acl.can('mollie_refund_manager:create');
         },
 
         /**
