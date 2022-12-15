@@ -21,7 +21,7 @@ export default class PDPRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getApplePayDirectButton() {
-        return cy.get('.mollie-apple-pay-direct > .btn');
+        return cy.get('.mollie-apple-pay-direct-pdp > div > .js-apple-pay');
     }
 
 }

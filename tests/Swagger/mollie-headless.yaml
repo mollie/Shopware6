@@ -191,7 +191,7 @@ paths:
     post:
       tags:
         - "Apple Pay Direct"
-      summary: "Adds a new product to the Apple Pay Direct cart"
+      summary: "(optional) Adds a new product to the Apple Pay Direct cart. Skip this step if you want to proceed with the current Shopware cart of the user"
       security:
         - AccessKey: [ ]
         - AccessToken: [ ]
@@ -323,7 +323,7 @@ paths:
     post:
       tags:
         - "Apple Pay Direct"
-      summary: "Restores the original Shopware cart. Use this on Apple Pay cancellation events"
+      summary: "(Optional) Restores the original Shopware cart. Use this on Apple Pay cancellation events. You only need this, if you have used the add-product route before."
       security:
         - AccessKey: [ ]
         - AccessToken: [ ]

@@ -17,4 +17,12 @@ export default class ListingRepository {
         return cy.get(':nth-child(' + n + ') > .card > .card-body > .product-image-wrapper');
     }
 
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getApplePayDirectButton() {
+        return cy.get('.mollie-apple-pay-direct-listing > div > .js-apple-pay');
+    }
+
 }

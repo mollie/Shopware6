@@ -98,15 +98,27 @@
             <options>
                 <option>
                     <id>plp</id>
-                    <name>Listing pages</name>
-                    <name lang="de-DE">Listing pages</name>
-                    <name lang="nl-NL">Listing pagina's</name>
+                    <name>Category pages</name>
+                    <name lang="de-DE">Kategorieseiten</name>
+                    <name lang="nl-NL">Categorie pagina's</name>
                 </option>
                 <option>
                     <id>pdp</id>
-                    <name>Detail pages</name>
-                    <name lang="de-DE">Detail pages</name>
-                    <name lang="nl-NL">Detail pagina's</name>
+                    <name>Product pages</name>
+                    <name lang="de-DE">Produktseiten</name>
+                    <name lang="nl-NL">Product pagina's</name>
+                </option>
+                <option>
+                    <id>offcanvas</id>
+                    <name>Offcanvas cart</name>
+                    <name lang="de-DE">Offcanvas Warenkorb</name>
+                    <name lang="nl-NL">Offcanvas winkelmand</name>
+                </option>
+                <option>
+                    <id>cart</id>
+                    <name>Cart page</name>
+                    <name lang="de-DE">Warenkorbseite</name>
+                    <name lang="nl-NL">Winkelmand</name>
                 </option>
             </options>
         </input-field>
