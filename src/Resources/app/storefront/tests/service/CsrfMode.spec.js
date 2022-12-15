@@ -7,6 +7,13 @@ test('csrf mode is undefined', () => {
     expect(csrfMode.isActive()).toBe(false);
 
 });
+test('csrf properties are not set',() =>{
+    const fakeConfig = {
+        csrf: {},
+    };
+    const csrfMode = new CsrfMode(fakeConfig.csrf);
+    expect(csrfMode.isActive()).toBe(false);
+});
 
 test('csrf mode is disabled', () => {
     const fakeConfig = {
