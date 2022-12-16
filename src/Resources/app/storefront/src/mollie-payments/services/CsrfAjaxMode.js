@@ -1,4 +1,4 @@
-export default class CsrfMode
+export default class CsrfAjaxMode
 {
     constructor(csrf) {
         this.csrf = csrf;

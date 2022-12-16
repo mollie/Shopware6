@@ -2,7 +2,7 @@ import Plugin from 'src/plugin-system/plugin.class';
 import DomAccess from 'src/helper/dom-access.helper';
 import HttpClient from '../services/HttpClient';
 import DeviceDetection from 'src/helper/device-detection.helper';
-import CsrfMode from "../services/CsrfMode";
+import CsrfAjaxMode from "../services/CsrfAjaxMode";
 
 export default class MollieCreditCardComponentsSw64 extends Plugin {
     static options = {
@@ -286,7 +286,7 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
                 form.insertAdjacentElement('beforeend', createInput('tos', checkTOS.checked));
             }
         }
-        const csrfMode = new CsrfMode(window.csrf);
+        const csrfMode = new CsrfAjaxMode(window.csrf);
         if(!csrfMode.isActive())
         {
             form.submit();
