@@ -150,7 +150,8 @@
           },
           "btnResetLine": "Rij resetten",
           "checkDeductPromotion": "Promotie aftrekken"
-        }
+        },
+        "roundDiffItemAdded" : "Automatisch afrondingsitem toegevoegd"
       },
       "instructions": {
         "linkResetTutorials": "Handleidingen resetten",
@@ -182,7 +183,8 @@
         "placeholderDescription": "Een optionele beschrijving aan terugbetaling toevoegen",
         "checkVerification": "Ik heb het totale restitutiebedrag en de geconfigureerde hoeveelheden voor restitutie en herbevoorrading geverifieerd.",
         "btnRefund": "Terugbetaling",
-        "btnFullRefund": "Volledige terugbetaling"
+        "btnFullRefund": "Volledige terugbetaling",
+        "roundDiffItemAdded" : "Afrondingsitem"
       },
       "refunds": {
         "title": "Terugbetalingen in het Mollie Dashboard",

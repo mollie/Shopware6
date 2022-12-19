@@ -154,6 +154,20 @@ class RefundDataBuilder
         }
 
 
+        $roundingDiffTotal = 0;
+
+        // now search all line items in Mollie that are not recognized in Shopware yet
+        if ($mollieOrder instanceof \Mollie\Api\Resources\Order) {
+            /** @var OrderLine $mollieLine */
+            foreach ($mollieOrder->lines as $mollieLine) {
+                $metadata = $mollieLine->metadata;
+
+                if (property_exists($metadata, 'type') && (string)$metadata->type === 'rounding') {
+                    $roundingDiffTotal = $mollieLine->totalAmount->value;
+                }
+            }
+        }
+
         # now merge all line items
         # we first need products, then promotions and as last type we add the deliveries
         $refundItems = array_merge($refundItems, $refundPromotionItems, $refundDeliveryItems);
@@ -184,7 +198,8 @@ class RefundDataBuilder
             $voucherAmount,
             $pendingRefundAmount,
             $refundedTotal,
-            $remaining
+            $remaining,
+            $roundingDiffTotal
         );
     }
 

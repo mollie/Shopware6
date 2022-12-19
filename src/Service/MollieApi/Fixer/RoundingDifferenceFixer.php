@@ -59,6 +59,9 @@ class RoundingDifferenceFixer
                 ''
             );
 
+            # we need this for further (technical) identification later on (e.g. in refund manager)
+            $mollieLineItem->addMetaData('type', 'rounding');
+
             $lineItems->add($mollieLineItem);
         }
 
