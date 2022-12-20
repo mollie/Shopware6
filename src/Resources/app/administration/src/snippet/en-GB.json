@@ -150,7 +150,8 @@
           },
           "btnResetLine": "Reset Line",
           "checkDeductPromotion": "Deduct promotion"
-        }
+        },
+        "roundDiffItemAdded" : "Automatic rounding item was added"
       },
       "instructions": {
         "linkResetTutorials": "Reset Tutorials",
@@ -182,7 +183,8 @@
         "placeholderDescription": "add an optional description for your refund",
         "checkVerification": "I have verified the total refund amount and the configured quantities to refund and re-stock.",
         "btnRefund": "Refund",
-        "btnFullRefund": "Full Refund"
+        "btnFullRefund": "Full Refund",
+        "roundDiffItemAdded" : "Rounding item"
       },
       "refunds": {
         "title": "Refunds in the Mollie Dashboard",

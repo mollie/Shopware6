@@ -22,7 +22,7 @@ class RefundDataTest extends TestCase
      */
     public function testTotalValues()
     {
-        $data = new RefundData([], [], 5, 2, 6, 9);
+        $data = new RefundData([], [], 5, 2, 6, 9, 1.45);
 
         $expected = [
             'totals' => [
@@ -30,6 +30,7 @@ class RefundDataTest extends TestCase
                 'voucherAmount' => 5.0,
                 'pendingRefunds' => 2.0,
                 'refunded' => 6.0,
+                'roundingDiff' => 1.45
             ],
             'cart' => [],
             'refunds' => [],
@@ -59,7 +60,7 @@ class RefundDataTest extends TestCase
 
         $items[] = new ProductItem($lineItem, [], 2);
 
-        $data = new RefundData($items, [], 0, 0, 0, 0);
+        $data = new RefundData($items, [], 0, 0, 0, 0, 0);
 
         $expected = [
             [
@@ -98,7 +99,7 @@ class RefundDataTest extends TestCase
 
         $refunds[] = new Refund(new MollieApiClient());
 
-        $data = new RefundData([], $refunds, 0, 0, 0, 0);
+        $data = new RefundData([], $refunds, 0, 0, 0, 0, 0);
 
         $this->assertCount(1, $data->toArray()['refunds']);
     }

@@ -150,7 +150,8 @@
           },
           "btnResetLine": "Zeile zurücksetzen",
           "checkDeductPromotion": "Rabatt abziehen"
-        }
+        },
+        "roundDiffItemAdded" : "Automatische Position für Rundungen wurde hinzugefügt"
       },
       "instructions": {
         "linkResetTutorials": "Tutorials zurücksetzen",
@@ -182,7 +183,8 @@
         "placeholderDescription": "Füge dieser Erstattung eine optionale Notiz hinzu.",
         "checkVerification": "Ich habe den Betrag der Rückerstattung geprüft und die Anzahl der Positionen für Erstattung und Lagerbestand konfiguriert.",
         "btnRefund": "Rückerstatten",
-        "btnFullRefund": "Vollständig rückerstatten"
+        "btnFullRefund": "Vollständig rückerstatten",
+        "roundDiffItemAdded" : "Position für Rundungen"
       },
       "refunds": {
         "title": "Rückerstattungen im Mollie Dashboard",

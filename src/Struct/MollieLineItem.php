@@ -46,6 +46,12 @@ class MollieLineItem extends Struct
      */
     private $productUrl;
 
+    /**
+     * @var array<mixed>
+     */
+    private $metaData;
+
+
     public function __construct(
         string              $type,
         string              $name,
@@ -64,6 +70,8 @@ class MollieLineItem extends Struct
         $this->sku = $sku;
         $this->imageUrl = $imageUrl;
         $this->productUrl = $productUrl;
+
+        $this->metaData = [];
     }
 
     /**
@@ -197,5 +205,23 @@ class MollieLineItem extends Struct
     public function hasRoundingRest(): bool
     {
         return $this->price->getRoundingRest() !== 0.0;
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     * @return void
+     */
+    public function addMetaData(string $key, string $value)
+    {
+        $this->metaData[$key] = $value;
+    }
+
+    /**
+     * @return array|mixed[]
+     */
+    public function getMetaData(): array
+    {
+        return $this->metaData;
     }
 }

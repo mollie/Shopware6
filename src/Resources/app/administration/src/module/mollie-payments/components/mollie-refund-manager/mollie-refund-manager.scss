@@ -38,6 +38,10 @@
         color: #1abc9c;
     }
 
+    .color-rounding-item {
+        color: #ca5208ff;
+    }
+
     .sw-card--large {
         margin-left: 20px;
         margin-right: 20px;
@@ -95,6 +99,11 @@
             label {
                 font-size: 12px;
             }
+        }
+
+        .rounding-item-info-container {
+            margin-top: 20px;
+            margin-left: 20px;
         }
     }
 

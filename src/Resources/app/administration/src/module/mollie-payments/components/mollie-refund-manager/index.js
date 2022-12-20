@@ -55,6 +55,7 @@ Component.register('mollie-refund-manager', {
             pendingRefunds: 0,
             checkVerifyRefund: false,
             refundDescription: '',
+            roundingDiff: 0,
             // -------------------------------
             // tutorials
             tutorialFullRefundVisible: false,
@@ -580,6 +581,7 @@ Component.register('mollie-refund-manager', {
                     this.refundedAmount = response.totals.refunded;
                     this.voucherAmount = response.totals.voucherAmount;
                     this.pendingRefunds = response.totals.pendingRefunds;
+                    this.roundingDiff = response.totals.roundingDiff;
 
                     // build our local items
                     // we have to build it by assigning it to a new local object,

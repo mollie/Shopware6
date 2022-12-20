@@ -121,6 +121,10 @@
                     </sw-number-field>
                 </template>
             </sw-data-grid>
+            <div v-if="roundingDiff > 0" class="rounding-item-info-container color-rounding-item">
+                <sw-icon name="regular-exclamation-circle" :small="true" style="margin-right: 10px"></sw-icon>
+                {{ $tc('mollie-payments.refund-manager.cart.roundDiffItemAdded') }} ({{ roundingDiff | currency(order.currency.shortName) }})
+            </div>
         </sw-card>
         {# --------------------------------------------------------------------------------------------- #}
         {# --------------------------------------------------------------------------------------------- #}
@@ -257,6 +261,19 @@
                                     <dd class="summary-item-value"></dd>
                                     <dd class="summary-item-value">
                                         {{ order.positionPrice | currency(order.currency.translated.shortName) }}
+                                    </dd>
+                                </template>
+                            {% endblock %}
+                            {% block sw_order_line_items_grid_refund_summary_rounding_diff %}
+                                <template v-if="roundingDiff > 0">
+                                    <dt class="color-rounding-item">
+                                        <sw-icon name="regular-exclamation-circle" :small="true"></sw-icon>
+                                        &nbsp;&nbsp;
+                                        {{ $tc('mollie-payments.refund-manager.summary.roundDiffItemAdded') }}
+                                    </dt>
+                                    <dd class="summary-item-value"></dd>
+                                    <dd class="summary-item-value">
+                                        ({{ roundingDiff | currency(order.currency.shortName) }})
                                     </dd>
                                 </template>
                             {% endblock %}
