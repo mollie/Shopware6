@@ -38,7 +38,7 @@ describe('Apple Pay Direct - Storefront Routes', () => {
 
     describe('Routes', () => {
 
-        it('/mollie/apple-pay/available @core', () => {
+        it('C266699: /mollie/apple-pay/available @core', () => {
 
             const request = new Promise((resolve) => {
                 storefrontClient.get('/mollie/apple-pay/available').then(response => {
@@ -51,7 +51,7 @@ describe('Apple Pay Direct - Storefront Routes', () => {
             });
         })
 
-        it('/mollie/apple-pay/applepay-id @core', () => {
+        it('C266700: /mollie/apple-pay/applepay-id @core', () => {
 
             const request = new Promise((resolve) => {
                 storefrontClient.get('/mollie/apple-pay/applepay-id').then(response => {
@@ -64,7 +64,7 @@ describe('Apple Pay Direct - Storefront Routes', () => {
             });
         })
 
-        it('/mollie/apple-pay/add-product without product ID @core', () => {
+        it('C266701: /mollie/apple-pay/add-product without product ID @core', () => {
 
             const request = new Promise((resolve) => {
                 storefrontClient.post('/mollie/apple-pay/add-product', {}).then(response => {
@@ -78,7 +78,7 @@ describe('Apple Pay Direct - Storefront Routes', () => {
             });
         })
 
-        it('/mollie/apple-pay/validate without data @core', () => {
+        it('C266702: /mollie/apple-pay/validate without data @core', () => {
 
             const request = new Promise((resolve) => {
                 storefrontClient.post('/mollie/apple-pay/validate').then(response => {
@@ -91,7 +91,7 @@ describe('Apple Pay Direct - Storefront Routes', () => {
             });
         })
 
-        it('/mollie/apple-pay/shipping-methods @core', () => {
+        it('C266703: /mollie/apple-pay/shipping-methods @core', () => {
 
             const request = new Promise((resolve) => {
                 storefrontClient.post('/mollie/apple-pay/shipping-methods', {'countryCode': 'DE'}).then(response => {
@@ -105,7 +105,7 @@ describe('Apple Pay Direct - Storefront Routes', () => {
             });
         })
 
-        it('/mollie/apple-pay/shipping-methods without country code @core', () => {
+        it('C266704: /mollie/apple-pay/shipping-methods without country code @core', () => {
 
             const request = new Promise((resolve) => {
                 storefrontClient.post('/mollie/apple-pay/shipping-methods', {}).then(response => {
@@ -119,7 +119,7 @@ describe('Apple Pay Direct - Storefront Routes', () => {
             });
         })
 
-        it('/mollie/apple-pay/set-shipping without identifier @core', () => {
+        it('C266705: /mollie/apple-pay/set-shipping without identifier @core', () => {
 
             const request = new Promise((resolve) => {
                 storefrontClient.post('/mollie/apple-pay/set-shipping').then(response => {
@@ -133,7 +133,7 @@ describe('Apple Pay Direct - Storefront Routes', () => {
             });
         })
 
-        it('/mollie/apple-pay/start-payment redirects to cart with invalid data @core', () => {
+        it('C266706: /mollie/apple-pay/start-payment redirects to cart with invalid data @core', () => {
 
             const request = new Promise((resolve) => {
                 storefrontClient.post('/mollie/apple-pay/start-payment').then(response => {
@@ -146,7 +146,7 @@ describe('Apple Pay Direct - Storefront Routes', () => {
             });
         })
 
-        it('/mollie/apple-pay/finish-payment redirects to cart with invalid data @core', () => {
+        it('C266707: /mollie/apple-pay/finish-payment redirects to cart with invalid data @core', () => {
 
             const request = new Promise((resolve) => {
                 storefrontClient.get('/mollie/apple-pay/finish-payment').then(response => {
@@ -159,7 +159,7 @@ describe('Apple Pay Direct - Storefront Routes', () => {
             });
         })
 
-        it('/mollie/apple-pay/restore-cart @core', () => {
+        it('C266708: /mollie/apple-pay/restore-cart @core', () => {
 
             const request = new Promise((resolve) => {
                 storefrontClient.post('/mollie/apple-pay/restore-cart').then(response => {
@@ -189,7 +189,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
         describe('PDP', () => {
 
-            it('C4100: Apple Pay Direct not existing if available but not configured (PDP) @core', () => {
+            it('C4100: Apple Pay Direct hidden if not configured but possible in browser (PDP) @core', () => {
 
                 applePayFactory.registerApplePay(true);
 
@@ -203,7 +203,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
         describe('Listing', () => {
 
-            it('Apple Pay Direct not existing if available but not configured (Listing) @core', () => {
+            it('C266709: Apple Pay Direct hidden if not configured but possible in browser (Listing) @core', () => {
 
                 applePayFactory.registerApplePay(true);
 
@@ -216,9 +216,9 @@ describe('Apple Pay Direct - UI Tests', () => {
 
         describe('Offcanvas', () => {
 
-            it('Apple Pay Direct not existing if available but not configured (Offcanvas) @core', () => {
+            it('C266710: Apple Pay Direct hidden if not configured but possible in browser (Offcanvas) @core', () => {
 
-                applePayFactory.registerApplePay(false);
+                applePayFactory.registerApplePay(true);
 
                 cy.visit('/');
                 topMenu.clickOnSecondCategory();
@@ -231,9 +231,9 @@ describe('Apple Pay Direct - UI Tests', () => {
 
         describe('Cart', () => {
 
-            it('Apple Pay Direct not existing if available but not configured (Cart) @core', () => {
+            it('C266711: Apple Pay Direct hidden if not configured but possible in browser (Cart) @core', () => {
 
-                applePayFactory.registerApplePay(false);
+                applePayFactory.registerApplePay(true);
 
                 cy.visit('/');
                 topMenu.clickOnSecondCategory();
@@ -261,7 +261,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
         describe('PDP', () => {
 
-            it('C4099: Apple Pay Direct visible if available and configured (PDP) @core', () => {
+            it('C4099: Apple Pay Direct visible if configured and possible in browser (PDP) @core', () => {
 
                 applePayFactory.registerApplePay(true);
 
@@ -272,7 +272,7 @@ describe('Apple Pay Direct - UI Tests', () => {
                 repoPDP.getApplePayDirectButton().should('not.have.class', 'd-none');
             })
 
-            it('C4085: Apple Pay Direct hidden if not available but configured (PDP) @core', () => {
+            it('C4085: Apple Pay Direct hidden if configured but not possible in browser (PDP) @core', () => {
 
                 applePayFactory.registerApplePay(false);
 
@@ -287,7 +287,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
         describe('Listing', () => {
 
-            it('Apple Pay Direct visible if available and configured (Listing) @core', () => {
+            it('C266712: Apple Pay Direct visible if configured and possible in browser (Listing) @core', () => {
 
                 applePayFactory.registerApplePay(true);
 
@@ -297,7 +297,7 @@ describe('Apple Pay Direct - UI Tests', () => {
                 repoListing.getApplePayDirectButton().should('not.have.class', 'd-none');
             })
 
-            it('Apple Pay Direct hidden if not available but configured (Listing) @core', () => {
+            it('C266713: Apple Pay Direct hidden if configured but not possible in browser (Listing) @core', () => {
 
                 applePayFactory.registerApplePay(false);
 
@@ -311,7 +311,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
         describe('Offcanvas', () => {
 
-            it('Apple Pay Direct visible if available and configured (Offcanvas) @core', () => {
+            it('C266714: Apple Pay Direct visible if configured and possible in browser (Offcanvas) @core', () => {
 
                 applePayFactory.registerApplePay(true);
 
@@ -323,7 +323,7 @@ describe('Apple Pay Direct - UI Tests', () => {
                 repoOffcanvas.getApplePayDirectButton().should('not.have.class', 'd-none');
             })
 
-            it('Apple Pay Direct hidden if not available but configured (Offcanvas) @core', () => {
+            it('C266715: Apple Pay Direct hidden if configured but not possible in browser (Offcanvas) @core', () => {
 
                 applePayFactory.registerApplePay(false);
 
@@ -339,7 +339,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
         describe('Cart', () => {
 
-            it('Apple Pay Direct visible if available and configured (Cart) @core', () => {
+            it('C266716: Apple Pay Direct visible if configured and possible in browser (Cart) @core', () => {
 
                 applePayFactory.registerApplePay(true);
 
@@ -353,7 +353,7 @@ describe('Apple Pay Direct - UI Tests', () => {
                 repoCart.getApplePayDirectButton().should('not.have.class', 'd-none');
             })
 
-            it('Apple Pay Direct hidden if not available but configured (Cart) @core', () => {
+            it('C266717: Apple Pay Direct hidden if configured but not possible in browser (Cart) @core', () => {
 
                 applePayFactory.registerApplePay(false);
 
