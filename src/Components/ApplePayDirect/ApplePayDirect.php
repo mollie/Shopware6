@@ -175,15 +175,19 @@ class ApplePayDirect
         $enabled = false;
 
         if (is_array($salesChannelPaymentIDs) && $settings->isEnableApplePayDirect()) {
-            $applePayMethodID = $this->repoPaymentMethods->getActiveApplePayID($context->getContext());
+            try {
+                $applePayMethodID = $this->repoPaymentMethods->getActiveApplePayID($context->getContext());
 
-            foreach ($salesChannelPaymentIDs as $tempID) {
-                # verify if our Apple Pay payment method is indeed in use
-                # for the current sales channel
-                if ($tempID === $applePayMethodID) {
-                    $enabled = true;
-                    break;
+                foreach ($salesChannelPaymentIDs as $tempID) {
+                    # verify if our Apple Pay payment method is indeed in use
+                    # for the current sales channel
+                    if ($tempID === $applePayMethodID) {
+                        $enabled = true;
+                        break;
+                    }
                 }
+            } catch (\Exception $ex) {
+                # it can happen that apple pay is just not active in the system
             }
         }
 

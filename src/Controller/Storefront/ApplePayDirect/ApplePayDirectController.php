@@ -119,7 +119,10 @@ class ApplePayDirectController extends StorefrontController
                 'id' => $id,
             ]);
         } catch (\Throwable $ex) {
-            $this->logger->error('Apple Pay Direct ID: ' . $ex->getMessage());
+
+            # ! WE DO NOT LOG IN HERE!
+            # otherwise we would always get logs if its just not enabled
+            # so this is either a valid response or invalid one...that's it
 
             return new JsonResponse([
                 'id' => 'not-found',
