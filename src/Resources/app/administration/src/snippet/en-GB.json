@@ -308,10 +308,14 @@
       "TYPE_WEEKS": "Week(s)",
       "TYPE_MONTHS": "Month(s)",
       "confirm": {
-        "cancel": "Do you really want to cancel this subscription?",
-        "pause": "Do you really want to pause this subscription?",
-        "resume": "Do you really want to resume this subscription?",
-        "skip": "Do you really want to skip this subscription? The subscription will be continued after it was skipped once."
+        "cancelTitle" : "End subscription?",
+        "cancel": "Cancel your customer's subscription.",
+        "pauseTitle" : "Pause subscription?",
+        "pause": "Put the subscription on hold until you resume it again.",
+        "resumeTitle" : "Resume subscription?",
+        "resume": "Continue the subscription again.",
+        "skipTitle" : "Skip next instalment?",
+        "skip": "Skip the next instalment in the subscription. It continues automatically afterwards."
       },
       "alerts": {
         "cancelSuccess": "The subscription has been canceled successfully",

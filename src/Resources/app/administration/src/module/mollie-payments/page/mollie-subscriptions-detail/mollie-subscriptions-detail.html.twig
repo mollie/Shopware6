@@ -24,7 +24,7 @@
             {% block sw_order_detail_confirm_modal_cancel %}
                 <sw-confirm-modal
                         v-if="showConfirmCancel"
-                        type="yesno"
+                        :title="$tc('mollie-payments.subscriptions.confirm.cancelTitle')"
                         :text="$tc('mollie-payments.subscriptions.confirm.cancel')"
                         @confirm="btnConfirmCancel_Click()"
                         @close="btnCloseAnyModal_Click()"
@@ -35,7 +35,7 @@
             {% block sw_order_detail_confirm_modal_pause %}
                 <sw-confirm-modal
                         v-if="showConfirmPause"
-                        type="yesno"
+                        :title="$tc('mollie-payments.subscriptions.confirm.pauseTitle')"
                         :text="$tc('mollie-payments.subscriptions.confirm.pause')"
                         @confirm="btnConfirmPause_Click()"
                         @close="btnCloseAnyModal_Click()"
@@ -46,7 +46,7 @@
             {% block sw_order_detail_confirm_modal_resume %}
                 <sw-confirm-modal
                         v-if="showConfirmResume"
-                        type="yesno"
+                        :title="$tc('mollie-payments.subscriptions.confirm.resumeTitle')"
                         :text="$tc('mollie-payments.subscriptions.confirm.resume')"
                         @confirm="btnConfirmResume_Click()"
                         @close="btnCloseAnyModal_Click()"
@@ -57,7 +57,7 @@
             {% block sw_order_detail_confirm_modal_skip %}
                 <sw-confirm-modal
                         v-if="showConfirmSkip"
-                        type="yesno"
+                        :title="$tc('mollie-payments.subscriptions.confirm.skipTitle')"
                         :text="$tc('mollie-payments.subscriptions.confirm.skip')"
                         @confirm="btnConfirmSkip_Click()"
                         @close="btnCloseAnyModal_Click()"

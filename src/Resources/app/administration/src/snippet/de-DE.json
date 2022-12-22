@@ -308,10 +308,14 @@
       "TYPE_WEEKS": "Woche(n)",
       "TYPE_MONTHS": "Monat(e)",
       "confirm": {
-        "cancel": "Möchtest du das Abonnement wirklich kündigen?",
-        "pause": "Möchtest du das Abonnement wirklich pausieren?",
-        "resume": "Möchtest du das Abonnement wirklich fortsetzen?",
-        "skip": "Möchtest du das Abonnement wirklich aussetzen? Das Abo wird nach einmaligem Aussetzen automatisch weitergeführt."
+        "cancelTitle" : "Abonnement beenden?",
+        "cancel": "Kündigen Sie das Abonnement Ihres Kunden.",
+        "pauseTitle" : "Abonnement pausieren?",
+        "pause": "Pausieren Sie das Abonnement, bis Sie es wieder fortsetzen.",
+        "resumeTitle" : "Abonnement fortsetzen?",
+        "resume": "Das Abonnement erneut fortsetzen.",
+        "skipTitle" : "Nächste Rate überspringen?",
+        "skip": "Überspringen Sie die nächste Rate im Abonnement. Es wird danach automatisch fortgesetzt."
       },
       "alerts": {
         "cancelSuccess": "Das Abonnement wurde erfolgreich gekündigt",

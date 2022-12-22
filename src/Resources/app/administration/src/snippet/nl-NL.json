@@ -314,10 +314,14 @@
         "skip": "Wilt je echt één bestelling overslaan? Het abonnement wordt voortgezet na eenmaal overslaan."
       },
       "alerts": {
-        "cancelSuccess": "Het abonnement is succesvol geannuleerd.",
-        "pauseSuccess": "Het abonnement is succesvol gepauzeerd.",
-        "resumeSuccess": "Het abonnement is succesvol hervat.",
-        "skipSuccess": "Het abonnement wordt één keer succesvol overgeslagen. De volgende betaling is bijgewerkt."
+        "cancelTitle" : "Abonnement beëindigen?",
+        "cancel": "Annuleer het abonnement van uw klant.",
+        "pauseTitle" : "Abonnement pauzeren?",
+        "pause": "Zet het abonnement in de wacht totdat je het weer hervat.",
+        "resumeTitle" : "Abonnement hervatten?",
+        "resume": "Zet het abonnement weer voort.",
+        "skipTitle" : "Volgende betaling overslaan?",
+        "skip": "Sla het volgende betaling van het abonnement over. Daarna gaat het automatisch verder."
       },
       "list": {
         "title": "Mollie Abonnementen",
