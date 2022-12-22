@@ -203,6 +203,7 @@ class RefundService implements RefundServiceInterface
             foreach ($payment->refunds()->getArrayCopy() as $refund) {
                 /**
                  * TODO: for now we skip the canceled refunds since it is not implemented yet
+                 * use RefundStatus canceled when available
                  */
                 if ($refund->status === 'canceled') {
                     continue;
