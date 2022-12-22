@@ -163,7 +163,7 @@ context("Order Refunds", () => {
             cy.contains(REFUND_DESCRIPTION).should('not.exist')
         })
 
-        it('Canceled refunds should not be visible', () => {
+        it('C273581: Canceled refunds should not be visible', () => {
 
             createOrderAndOpenAdmin();
 
