@@ -199,8 +199,14 @@ class RefundService implements RefundServiceInterface
             $refundsArray = [];
 
             $payment = $this->getPayment($order);
-
+            /** @var Refund $refund */
             foreach ($payment->refunds()->getArrayCopy() as $refund) {
+                /**
+                 * TODO: for now we skip the canceled refunds since it is not implemented yet
+                 */
+                if ($refund->status === 'canceled') {
+                    continue;
+                }
                 $refundsArray[] = $this->refundHydrator->hydrate($refund);
             }
 
