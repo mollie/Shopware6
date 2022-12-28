@@ -154,6 +154,21 @@
                             </sw-button>
                         </div>
                     </sw-container>
+                    <sw-container v-if="roundingDiff" columns="1fr 20fr" class="instructions-block">
+                        <sw-icon name="default-money-cash" :small="false"
+                                 class="instructions-block-icon color-refund"></sw-icon>
+                        <div>
+                            <strong> {{ $tc('mollie-payments.refund-manager.instructions.titleRoundingDiff') }}</strong>
+                            <br/>
+                            {{ $tc('mollie-payments.refund-manager.instructions.textRoundingDiff') }}
+                            <br/>
+                            <br/>
+                            <sw-button variant="ghost" size="small" @click="btnToggleTutorialFull_Click()">
+                                {{ $tc('mollie-payments.refund-manager.instructions.btnToggleTutorial') }}
+                            </sw-button>
+                        </div>
+                    </sw-container>
+
                     <sw-container columns="1fr 20fr" class="instructions-block">
                         <sw-icon name="default-building-shop" :small="false"
                                  class="instructions-block-icon color-stock"></sw-icon>

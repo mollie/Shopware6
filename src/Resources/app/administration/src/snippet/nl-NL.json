@@ -167,7 +167,9 @@
         "titlePartialItems": "Gedeeltelijke terugbetaling (met artikelen)",
         "textPartialItems": "Als u hoeveelheden en artikelen als terugbetaald wilt markeren in Mollie, gebruik dan bovenstaand formulier. Stel uw hoeveelheden in en geef een aangepast bedrag op voor elk item dat zal worden terugbetaald. De totale som zal dan zichtbaar zijn in het tekstveld met het finale terugbetalingsbedrag. Vergeet niet dat het nog steeds mogelijk is om dit eindbedrag aan te passen voordat u de terugbetaling start.",
         "titlePartialPromotions": "Gedeeltelijke terugbetaling (met promotions)",
-        "textPartialPromotions": "Als je een promotion in je winkelwagen hebt, dan is de promotion een eigen line item. Als je alle afgeprijsde artikelen wilt terugbetalen, dan kann je de totale waarde van alle artikelen terugbetalen en ook de promotie zelf. Als u echter slechts een paar afgeprijsde artikelen wilt terugbetalen, kunt je de aangepaste korting automatisch aftrekken voor elk afzonderlijk artikel. Je kunt natuurlijk altijd de waarden veranderen mochten ze niet juist zijn."
+        "textPartialPromotions": "Als je een promotion in je winkelwagen hebt, dan is de promotion een eigen line item. Als je alle afgeprijsde artikelen wilt terugbetalen, dan kann je de totale waarde van alle artikelen terugbetalen en ook de promotie zelf. Als u echter slechts een paar afgeprijsde artikelen wilt terugbetalen, kunt je de aangepaste korting automatisch aftrekken voor elk afzonderlijk artikel. Je kunt natuurlijk altijd de waarden veranderen mochten ze niet juist zijn.",
+        "titleRoundingDiff": "Afrondingsverschil",
+        "textRoundingDiff": "Een volledige terugbetaling is inclusief afrondingsverschillen"
       },
       "summary": {
         "dataLoading": "Gegevens worden geladen...",

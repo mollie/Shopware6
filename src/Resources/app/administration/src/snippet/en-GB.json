@@ -167,7 +167,9 @@
         "titlePartialItems": "Partial Refund (with items)",
         "textPartialItems": "If you want to mark quantities and items as refunded in Mollie, use the form above. Set your quantities and provide a custom amount for every item that will be refunded. The total sum will then be visible in the final refund amount text field. Remember, it's still possible to adjust this final amount before starting your refund.",
         "titlePartialPromotions": "Partial Refund (with promotions)",
-        "textPartialPromotions": "If you have a promotion in your cart, then your promotion is a separate line item. If you want to refund all discounted items, go ahead and refund their total values and the full promotion line item itself. However, if you only want to refund a few items that were discounted, you can deduct the applied discount automatically for every single line item. You can of course always change values if they are not correct."
+        "textPartialPromotions": "If you have a promotion in your cart, then your promotion is a separate line item. If you want to refund all discounted items, go ahead and refund their total values and the full promotion line item itself. However, if you only want to refund a few items that were discounted, you can deduct the applied discount automatically for every single line item. You can of course always change values if they are not correct.",
+        "titleRoundingDiff": "Rounding difference",
+        "textRoundingDiff": "A full refund will include rounding differences"
       },
       "summary": {
         "dataLoading": "Data is loading...",
