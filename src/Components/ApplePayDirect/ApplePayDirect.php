@@ -421,10 +421,15 @@ class ApplePayDirect
         # and never the one from the customer (if already existing)
         if ($order->getAddresses() instanceof OrderAddressCollection) {
             foreach ($order->getAddresses() as $address) {
+                # attention, Apple Pay does not have a company name
+                # therefore we always need to make sure to remove the company field in our order
                 $this->repoOrderAdresses->updateAddress(
                     $address->getId(),
                     $firstname,
                     $lastname,
+                    '',
+                    '',
+                    '',
                     $street,
                     $zipcode,
                     $city,
