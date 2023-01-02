@@ -40,7 +40,7 @@ final class OrderLineMetaDataStruct
         if (property_exists($metaData, 'type') === false) {
             return $default;
         }
-        return $metaData->type;
+        return (string)$metaData->type;
     }
 
     public function isRoundingItem(): bool
