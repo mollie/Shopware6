@@ -91,10 +91,6 @@ class UpdateAddressAction extends BaseAction
     {
         $subscription = $this->getRepository()->findById($subscriptionId, $context);
 
-        if ($subscription->getStatus() !== SubscriptionStatus::ACTIVE && $subscription->getStatus() !== SubscriptionStatus::RESUMED) {
-            throw new Exception('Subscription is not active and cannot be edited');
-        }
-
         $settings = $this->getPluginSettings($subscription->getSalesChannelId());
 
         if (!$settings->isSubscriptionsEnabled()) {
@@ -156,10 +152,6 @@ class UpdateAddressAction extends BaseAction
     public function updateShippingAddress(string $subscriptionId, string $salutationId, string $title, string $firstname, string $lastname, string $company, string $department, string $additional1, string $additional2, string $phoneNumber, string $street, string $zipcode, string $city, string $countryStateId, Context $context): void
     {
         $subscription = $this->getRepository()->findById($subscriptionId, $context);
-
-        if ($subscription->getStatus() !== SubscriptionStatus::ACTIVE && $subscription->getStatus() !== SubscriptionStatus::RESUMED) {
-            throw new Exception('Subscription is not active and cannot be edited');
-        }
 
         $settings = $this->getPluginSettings($subscription->getSalesChannelId());
 
