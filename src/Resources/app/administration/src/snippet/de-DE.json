@@ -167,7 +167,9 @@
         "titlePartialItems": "Teilweise Rückerstattung (mit Positionen)",
         "textPartialItems": "Wenn Sie Mengen und Artikel in Mollie als erstattet markieren möchten, verwenden Sie das obige Formular. Legen Sie Ihre Mengen fest und geben Sie einen benutzerdefinierten Betrag für jeden Artikel an, der erstattet wird. Die Gesamtsumme wird dann im Textfeld des finalen Erstattungsbetrages angezeigt. Denken Sie daran, dass es immer noch möglich ist, diesen endgültigen Betrag anzupassen, bevor Sie mit der Rückerstattung beginnen.",
         "titlePartialPromotions": "Teilweise Rückerstattung (mit Rabatten)",
-        "textPartialPromotions": "Wenn Sie eine oder mehrere Rabatte in Ihrem Warenkorb haben, dann sind diese in Shopware als eigene Position in der Bestellung angelegt. Wenn Sie nun alle rabattierten Artikel erstatten möchten, erstatten Sie einfach alle Positionen der Artikel sowie die gesamte Rabattposition selbst. Wenn Sie jedoch nur einen Teil der rabattierten Artikel erstatten möchten, können Sie den angewendeten Rabatt automatisch für jeden einzelnen Artikel abziehen lassen. Sie können Werte natürlich jederzeit ändern, wenn sie nicht korrekt sind."
+        "textPartialPromotions": "Wenn Sie eine oder mehrere Rabatte in Ihrem Warenkorb haben, dann sind diese in Shopware als eigene Position in der Bestellung angelegt. Wenn Sie nun alle rabattierten Artikel erstatten möchten, erstatten Sie einfach alle Positionen der Artikel sowie die gesamte Rabattposition selbst. Wenn Sie jedoch nur einen Teil der rabattierten Artikel erstatten möchten, können Sie den angewendeten Rabatt automatisch für jeden einzelnen Artikel abziehen lassen. Sie können Werte natürlich jederzeit ändern, wenn sie nicht korrekt sind.",
+        "titleRoundingDiff": "Rundungsdifferenz",
+        "textRoundingDiff": "Bei einer vollständigen Rückerstattung werden Rundungsdifferenzen mit erstattet"
       },
       "summary": {
         "dataLoading": "Daten werden geladen...",
