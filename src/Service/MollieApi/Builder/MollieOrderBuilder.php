@@ -115,7 +115,6 @@ class MollieOrderBuilder
         $locale = $this->extractor->extractLocale($order, $salesChannelContext);
         $localeCode = ($locale instanceof LocaleEntity) ? $locale->getCode() : self::MOLLIE_DEFAULT_LOCALE_CODE;
         $lineItems = $order->getLineItems();
-        $webhookUrl = $this->urlBuilder->buildWebhookURL($transactionId);
         $isVerticalTaxCalculation = $this->isVerticalTaxCalculation($salesChannelContext);
 
         $orderData = [];
@@ -141,7 +140,11 @@ class MollieOrderBuilder
         $orderData['orderNumber'] = $orderNumberFormatted;
         $orderData['payment'] = $paymentData;
 
-        $orderData['redirectUrl'] = $this->urlBuilder->buildReturnUrl($transactionId);
+
+        $redirectUrl = $this->urlBuilder->buildReturnUrl($transactionId);
+        $webhookUrl = $this->urlBuilder->buildWebhookURL($transactionId);
+
+        $orderData['redirectUrl'] = $redirectUrl;
         $orderData['webhookUrl'] = $webhookUrl;
         $orderData['payment']['webhookUrl'] = $webhookUrl;
 

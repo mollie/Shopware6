@@ -155,7 +155,7 @@ class RenewAction extends BaseAction
         if ($swSubscription->getStatus() === SubscriptionStatus::SKIPPED) {
             $this->getRepository()->updateStatus($swSubscriptionId, SubscriptionStatus::RESUMED, $context);
         }
-        
+
 
         $newOrder = $this->renewingService->renewSubscription($swSubscription, $payment, $context);
 

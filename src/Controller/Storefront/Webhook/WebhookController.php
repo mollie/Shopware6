@@ -96,9 +96,9 @@ class WebhookController extends StorefrontController
      * @param SalesChannelContext $context
      * @return JsonResponse
      */
-    public function webhookSubscriptionRenew(string $swSubscriptionId, Request $request, RequestDataBag $requestData, SalesChannelContext $context): JsonResponse
+    public function onWebhookSubscriptionReceived(string $swSubscriptionId, Request $request, RequestDataBag $requestData, SalesChannelContext $context): JsonResponse
     {
-        return $this->webhookSubscriptionLegacyRenew($swSubscriptionId, $request, $requestData, $context);
+        return $this->onWebhookSubscriptionLegacyReceived($swSubscriptionId, $request, $requestData, $context);
     }
 
     /**
@@ -110,7 +110,7 @@ class WebhookController extends StorefrontController
      * @param SalesChannelContext $context
      * @return JsonResponse
      */
-    public function webhookSubscriptionLegacyRenew(string $swSubscriptionId, Request $request, RequestDataBag $requestData, SalesChannelContext $context): JsonResponse
+    public function onWebhookSubscriptionLegacyReceived(string $swSubscriptionId, Request $request, RequestDataBag $requestData, SalesChannelContext $context): JsonResponse
     {
         # just to improve testing and manual calls, make it is lower case (requirement for entity repositories)
         $swSubscriptionId = strtolower($swSubscriptionId);
