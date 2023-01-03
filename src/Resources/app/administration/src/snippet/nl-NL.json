@@ -321,7 +321,7 @@
         "cancelSuccess": "Het abonnement is succesvol opgezegd",
         "pauseSuccess": "Het abonnement is succesvol onderbroken",
         "resumeSuccess": "Het abonnement is succesvol voortgezet",
-        "skipSuccess": "Het abonnement is succesvol opgeschort. De volgende betalingsdatum is bijgewerkt.",
+        "skipSuccess": "Het abonnement is succesvol opgeschort. De volgende betalingsdatum is bijgewerkt."
       },
       "list": {
         "title": "Mollie Abonnementen",
