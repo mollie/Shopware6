@@ -144,7 +144,7 @@
                                                       data-form-csrf-handler="true"
                                                       class="order-table-header-context-menu-content-form">
                                                     {% block page_account_subscriptions_item_context_menu_resume_form_csrf %}
-                                                        {{ sw_csrf('frontend.account.mollie.subscriptions.payment.resume') }}
+                                                        {{ sw_csrf('frontend.account.mollie.subscriptions.resume') }}
                                                     {% endblock %}
                                                     {% block page_account_subscriptions_item_context_menu_resume_form_button %}
                                                         <button class="order-table-header-context-menu-content-link" type="submit">
@@ -165,7 +165,7 @@
                                                   data-form-csrf-handler="true"
                                                   class="order-table-header-context-menu-content-form">
                                                 {% block page_account_subscriptions_item_context_menu_skip_form_csrf %}
-                                                    {{ sw_csrf('frontend.account.mollie.subscriptions.payment.skip') }}
+                                                    {{ sw_csrf('frontend.account.mollie.subscriptions.skip') }}
                                                 {% endblock %}
                                                 {% block page_account_subscriptions_item_context_menu_skip_form_button %}
                                                     <button class="order-table-header-context-menu-content-link" type="submit">
