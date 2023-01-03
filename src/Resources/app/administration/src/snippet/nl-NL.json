@@ -310,12 +310,6 @@
       "TYPE_WEEKS": "Weken",
       "TYPE_MONTHS": "Maanden",
       "confirm": {
-        "cancel": "Wil je dit abonnement echt opzeggen?",
-        "pause": "Wil je dit abonnement echt pauzeren?",
-        "resume": "Wil je dit abonnement echt voortzetten?",
-        "skip": "Wilt je echt één bestelling overslaan? Het abonnement wordt voortgezet na eenmaal overslaan."
-      },
-      "alerts": {
         "cancelTitle" : "Abonnement beëindigen?",
         "cancel": "Annuleer het abonnement van uw klant.",
         "pauseTitle" : "Abonnement pauzeren?",
@@ -324,6 +318,12 @@
         "resume": "Zet het abonnement weer voort.",
         "skipTitle" : "Volgende betaling overslaan?",
         "skip": "Sla het volgende betaling van het abonnement over. Daarna gaat het automatisch verder."
+      },
+      "alerts": {
+        "cancelSuccess": "Het abonnement is succesvol opgezegd",
+        "pauseSuccess": "Het abonnement is succesvol onderbroken",
+        "resumeSuccess": "Het abonnement is succesvol voortgezet",
+        "skipSuccess": "Het abonnement is succesvol opgeschort. De volgende betalingsdatum is bijgewerkt."
       },
       "list": {
         "title": "Mollie Abonnementen",

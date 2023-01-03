@@ -489,7 +489,11 @@ Component.register('mollie-refund-manager', {
             const result = [];
 
             item.metadata.composition.forEach(function (entry) {
-                result.push(entry.swReference + ' (' + entry.quantity + ' x ' + entry.amount + ' ' + me.order.currency.symbol + ')');
+                let label = entry.label;
+                if(entry.swReference.length > 0){
+                    label = entry.swReference;
+                }
+                result.push(label + ' (' + entry.quantity + ' x ' + entry.amount + ' ' + me.order.currency.symbol + ')');
             });
 
             return result;

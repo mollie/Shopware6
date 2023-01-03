@@ -7,7 +7,7 @@ use Mollie\Api\Resources\Refund;
 
 class RefundData
 {
-
+    public const ROUNDING_ITEM_LABEL = 'ROUNDING_DIFF';
     /**
      * @var AbstractItem[]
      */
@@ -132,6 +132,18 @@ class RefundData
             $hydratedOrderItems[] = $item->toArray();
         }
 
+        /** @var array<mixed> $refundsArray */
+        $refundsArray = $this->refunds;
+        foreach ($refundsArray as $refundIndex => $refund) {
+            if (isset($refund['metadata']['composition']) && is_array($refund['metadata']['composition'])) {
+                foreach ($refund['metadata']['composition'] as $compositionIndex => $composition) {
+                    if ((bool)$composition['swReference'] === false) {
+                        $refundsArray[$refundIndex]['metadata']['composition'][$compositionIndex]['label'] = self::ROUNDING_ITEM_LABEL;
+                    }
+                }
+            }
+        }
+
         return [
             'totals' => [
                 'remaining' => round($this->amountRemaining, 2),
@@ -141,7 +153,7 @@ class RefundData
                 'roundingDiff' => round($this->roundingItemTotal, 2),
             ],
             'cart' => $hydratedOrderItems,
-            'refunds' => $this->refunds,
+            'refunds' => $refundsArray,
         ];
     }
 }

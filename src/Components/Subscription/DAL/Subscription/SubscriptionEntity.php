@@ -526,6 +526,14 @@ class SubscriptionEntity extends Entity
             return true;
         }
 
+        if ($status === SubscriptionStatus::RESUMED) {
+            return true;
+        }
+
+        if ($status === SubscriptionStatus::SKIPPED) {
+            return true;
+        }
+
         return false;
     }
 

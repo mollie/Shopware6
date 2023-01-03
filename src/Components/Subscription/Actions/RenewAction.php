@@ -152,7 +152,9 @@ class RenewAction extends BaseAction
         # we also need to make sure, that a skipped subscription is "resumed" again.
         # we use skip to show that it's not happening that nothing happens in this interval, but
         # once it's renewed, we make sure its resumed again
-        $this->getRepository()->updateStatus($swSubscriptionId, SubscriptionStatus::RESUMED, $context);
+        if ($swSubscription->getStatus() === SubscriptionStatus::SKIPPED) {
+            $this->getRepository()->updateStatus($swSubscriptionId, SubscriptionStatus::RESUMED, $context);
+        }
 
 
         $newOrder = $this->renewingService->renewSubscription($swSubscription, $payment, $context);

@@ -97,7 +97,7 @@ class RefundDataTest extends TestCase
     {
         $refunds = [];
 
-        $refunds[] = new Refund(new MollieApiClient());
+        $refunds[] = [];
 
         $data = new RefundData([], $refunds, 0, 0, 0, 0, 0);
 
