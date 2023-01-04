@@ -181,6 +181,8 @@ class RefundManager implements RefundManagerInterface
                 );
             }
         } elseif ($request->isFullRefundWithItems($order)) {
+            $this->appendRoundingItemFromMollieOrder($request, $mollieOrder);
+            $serviceItems = $this->convertToRefundItems($request, $order, $mollieOrder);
             $refund = $this->refundService->refundFull(
                 $order,
                 $request->getDescription(),
