@@ -151,7 +151,7 @@
           "btnResetLine": "Zeile zurücksetzen",
           "checkDeductPromotion": "Rabatt abziehen"
         },
-        "roundDiffItemAdded" : "Automatische Position für Rundungen wurde hinzugefügt"
+        "roundDiffItemAdded": "Automatische Position für Rundungen wurde hinzugefügt"
       },
       "instructions": {
         "linkResetTutorials": "Tutorials zurücksetzen",
@@ -186,7 +186,7 @@
         "checkVerification": "Ich habe den Betrag der Rückerstattung geprüft und die Anzahl der Positionen für Erstattung und Lagerbestand konfiguriert.",
         "btnRefund": "Rückerstatten",
         "btnFullRefund": "Vollständig rückerstatten",
-        "roundDiffItemAdded" : "Position für Rundungen"
+        "roundDiffItemAdded": "Position für Rundungen"
       },
       "refunds": {
         "title": "Rückerstattungen im Mollie Dashboard",
@@ -310,13 +310,13 @@
       "TYPE_WEEKS": "Woche(n)",
       "TYPE_MONTHS": "Monat(e)",
       "confirm": {
-        "cancelTitle" : "Abonnement beenden?",
+        "cancelTitle": "Abonnement beenden?",
         "cancel": "Kündigen Sie das Abonnement Ihres Kunden.",
-        "pauseTitle" : "Abonnement pausieren?",
+        "pauseTitle": "Abonnement pausieren?",
         "pause": "Pausieren Sie das Abonnement, bis Sie es wieder fortsetzen.",
-        "resumeTitle" : "Abonnement fortsetzen?",
+        "resumeTitle": "Abonnement fortsetzen?",
         "resume": "Das Abonnement erneut fortsetzen.",
-        "skipTitle" : "Nächste Rate überspringen?",
+        "skipTitle": "Nächste Rate überspringen?",
         "skip": "Überspringen Sie die nächste Rate im Abonnement. Es wird danach automatisch fortgesetzt."
       },
       "alerts": {

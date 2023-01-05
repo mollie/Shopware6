@@ -151,7 +151,7 @@
           "btnResetLine": "Reset Line",
           "checkDeductPromotion": "Deduct promotion"
         },
-        "roundDiffItemAdded" : "Automatic rounding item was added"
+        "roundDiffItemAdded": "Automatic rounding item was added"
       },
       "instructions": {
         "linkResetTutorials": "Reset Tutorials",
@@ -186,7 +186,7 @@
         "checkVerification": "I have verified the total refund amount and the configured quantities to refund and re-stock.",
         "btnRefund": "Refund",
         "btnFullRefund": "Full Refund",
-        "roundDiffItemAdded" : "Rounding item"
+        "roundDiffItemAdded": "Rounding item"
       },
       "refunds": {
         "title": "Refunds in the Mollie Dashboard",
@@ -271,8 +271,8 @@
           "modal": {
             "title": "Ship Order",
             "description": "This action will automatically ship an order through Mollie. The flow sequence will receive the order number, and pass this on to the Mollie API. Successful shipments and failed shipments will be visible in the Mollie log files.",
-            "warningConfig": "Please make sure to turn off any additional automation for this type of action to avoid any interferences.\nThe following activated features of this plugin might interfere with this action:",
-            "noWarnings": "No warnings"
+            "noWarnings": "No warnings",
+            "warningConfig": "Please make sure to turn off any additional automation for this type of action to avoid any interferences.\nThe following activated features of this plugin might interfere with this action:"
           }
         },
         "refundOrder": {
@@ -310,13 +310,13 @@
       "TYPE_WEEKS": "Week(s)",
       "TYPE_MONTHS": "Month(s)",
       "confirm": {
-        "cancelTitle" : "End subscription?",
+        "cancelTitle": "End subscription?",
         "cancel": "Cancel your customer's subscription.",
-        "pauseTitle" : "Pause subscription?",
+        "pauseTitle": "Pause subscription?",
         "pause": "Put the subscription on hold until you resume it again.",
-        "resumeTitle" : "Resume subscription?",
+        "resumeTitle": "Resume subscription?",
         "resume": "Continue the subscription again.",
-        "skipTitle" : "Skip next instalment?",
+        "skipTitle": "Skip next instalment?",
         "skip": "Skip the next instalment in the subscription. It continues automatically afterwards."
       },
       "alerts": {
@@ -330,12 +330,12 @@
         "columns": {
           "customer": "Customer",
           "status": "Status",
-          "canceledAt": "Canceled at",
           "description": "Description",
-          "createdAt": "Created at",
           "amount": "Amount",
           "nextPaymentAt": "Next Payment",
-          "prePaymentReminder": "Reminded at"
+          "prePaymentReminder": "Reminded at",
+          "canceledAt": "Canceled at",
+          "createdAt": "Created at"
         },
         "action": {
           "edit": "Edit subscription"
@@ -349,6 +349,7 @@
         "labelQuantity": "Quantity",
         "labelMollieSubscription": "Mollie Subscription",
         "labelMollieCustomer": "Mollie customer",
+        "labelMandateId": "Mandate",
         "labelShopwareCustomer": "Shopware customer",
         "labelCreatedAt": "Created at",
         "buttonShowShopwareOrder": "Show Shopware order",
@@ -358,7 +359,6 @@
         "labelStatus": "Status",
         "labelNextPaymentAt": "Next payment at",
         "labelLastRemindedAt": "Last reminded at",
-        "labelMandateId": "Mandate",
         "labelCanceledAt": "Canceled at",
         "buttonPauseSubscription": "Pause subscription",
         "buttonResumeSubscription": "Resume subscription",

@@ -151,7 +151,7 @@
           "btnResetLine": "Rij resetten",
           "checkDeductPromotion": "Promotie aftrekken"
         },
-        "roundDiffItemAdded" : "Automatisch afrondingsitem toegevoegd"
+        "roundDiffItemAdded": "Automatisch afrondingsitem toegevoegd"
       },
       "instructions": {
         "linkResetTutorials": "Handleidingen resetten",
@@ -186,7 +186,7 @@
         "checkVerification": "Ik heb het totale restitutiebedrag en de geconfigureerde hoeveelheden voor restitutie en herbevoorrading geverifieerd.",
         "btnRefund": "Terugbetaling",
         "btnFullRefund": "Volledige terugbetaling",
-        "roundDiffItemAdded" : "Afrondingsitem"
+        "roundDiffItemAdded": "Afrondingsitem"
       },
       "refunds": {
         "title": "Terugbetalingen in het Mollie Dashboard",
@@ -271,8 +271,8 @@
           "modal": {
             "title": "Bestelling verzenden",
             "description": "Deze actie zal automatisch een bestelling verzenden via Mollie. De flow sequence ontvangt het ordernummer, en geeft dit door aan de Mollie API. Succesvolle verzendingen en mislukte verzendingen zullen zichtbaar zijn in de Mollie logbestanden.",
-            "warningConfig": "Schakel alle extra automatiseringen uit die eventueel in conflict komen met deze Flow Builder actie. De volgende geactiveerde features in deze plugin kunnen elkaar kruisen met deze actie:",
-            "noWarnings": "Geen waarschuwingen"
+            "noWarnings": "Geen waarschuwingen",
+            "warningConfig": "Schakel alle extra automatiseringen uit die eventueel in conflict komen met deze Flow Builder actie. De volgende geactiveerde features in deze plugin kunnen elkaar kruisen met deze actie:"
           }
         },
         "refundOrder": {
@@ -310,13 +310,13 @@
       "TYPE_WEEKS": "Weken",
       "TYPE_MONTHS": "Maanden",
       "confirm": {
-        "cancelTitle" : "Abonnement beëindigen?",
+        "cancelTitle": "Abonnement beëindigen?",
         "cancel": "Annuleer het abonnement van uw klant.",
-        "pauseTitle" : "Abonnement pauzeren?",
+        "pauseTitle": "Abonnement pauzeren?",
         "pause": "Zet het abonnement in de wacht totdat je het weer hervat.",
-        "resumeTitle" : "Abonnement hervatten?",
+        "resumeTitle": "Abonnement hervatten?",
         "resume": "Zet het abonnement weer voort.",
-        "skipTitle" : "Volgende betaling overslaan?",
+        "skipTitle": "Volgende betaling overslaan?",
         "skip": "Sla het volgende betaling van het abonnement over. Daarna gaat het automatisch verder."
       },
       "alerts": {
@@ -330,12 +330,12 @@
         "columns": {
           "customer": "Klant",
           "status": "Status",
-          "canceledAt": "Geannuleerd op",
           "description": "Beschrijving",
-          "createdAt": "Gecreëerd op",
           "amount": "Bedrag",
           "nextPaymentAt": "Volgende betaling",
-          "prePaymentReminder": "Herinnerd op"
+          "prePaymentReminder": "Herinnerd op",
+          "canceledAt": "Geannuleerd op",
+          "createdAt": "Gecreëerd op"
         },
         "action": {
           "edit": "Abonnement bewerken"
@@ -349,6 +349,7 @@
         "labelQuantity": "Hoeveelheid",
         "labelMollieSubscription": "Mollie Abonnement",
         "labelMollieCustomer": "Mollie klant",
+        "labelMandateId": "Mandaat",
         "labelShopwareCustomer": "Shopware klant",
         "labelCreatedAt": "Gecreëerd op",
         "buttonShowShopwareOrder": "Toon Shopware bestelling",
@@ -358,7 +359,6 @@
         "labelStatus": "Status",
         "labelNextPaymentAt": "Volgende betaling op",
         "labelLastRemindedAt": "Laatst herinnerd op",
-        "labelMandateId": "Mandaat",
         "labelCanceledAt": "Geannuleerd op",
         "buttonPauseSubscription": "Abonnement pauzeren",
         "buttonResumeSubscription": "Abonnement hervatten",
