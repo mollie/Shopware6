@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "49cecd10b315561d9de23302a15d4f7d",
+    "content-hash": "d312ee4f7389284e9c85573ef98f1a46",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -318,6 +318,56 @@
                 "source": "https://github.com/aws/aws-sdk-php/tree/3.246.1"
             },
             "time": "2022-11-19T22:48:18+00:00"
+        },
+        {
+            "name": "boxblinkracer/phpunuhi",
+            "version": "0.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/boxblinkracer/phpunuhi.git",
+                "reference": "d94ee0584ee5c014a03615dc8b9345d45a759006"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/boxblinkracer/phpunuhi/zipball/d94ee0584ee5c014a03615dc8b9345d45a759006",
+                "reference": "d94ee0584ee5c014a03615dc8b9345d45a759006",
+                "shasum": ""
+            },
+            "require": {
+                "ext-dom": "*",
+                "ext-simplexml": "*",
+                "php": ">=7.2",
+                "symfony/console": "*"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.18",
+                "phpstan/phpstan": "*",
+                "phpunit/phpunit": "^8.5"
+            },
+            "bin": [
+                "bin/phpunuhi"
+            ],
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christian Dangl"
+                }
+            ],
+            "description": "Easy tool to work with translation files for validation, imports and exports.",
+            "support": {
+                "issues": "https://github.com/boxblinkracer/phpunuhi/issues",
+                "source": "https://github.com/boxblinkracer/phpunuhi/tree/0.6.0"
+            },
+            "time": "2023-01-05T08:10:35+00:00"
         },
         {
             "name": "brick/math",
@@ -14557,5 +14607,5 @@
         "ext-curl": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.3.0"
 }
