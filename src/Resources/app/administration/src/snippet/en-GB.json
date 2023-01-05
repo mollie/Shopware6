@@ -271,8 +271,8 @@
           "modal": {
             "title": "Ship Order",
             "description": "This action will automatically ship an order through Mollie. The flow sequence will receive the order number, and pass this on to the Mollie API. Successful shipments and failed shipments will be visible in the Mollie log files.",
-            "noWarnings": "No warnings",
-            "warningConfig": "Please make sure to turn off any additional automation for this type of action to avoid any interferences.\nThe following activated features of this plugin might interfere with this action:"
+            "warningConfig": "Please make sure to turn off any additional automation for this type of action to avoid any interferences.\nThe following activated features of this plugin might interfere with this action:",
+            "noWarnings": "No warnings"
           }
         },
         "refundOrder": {

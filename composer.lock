@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "56c07a49009442b50d2cf26dbf29c3c8",
+    "content-hash": "6c435bdc5519f5125e717e5d24dbd6ca",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -321,16 +321,16 @@
         },
         {
             "name": "boxblinkracer/phpunuhi",
-            "version": "dev-main",
+            "version": "0.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/boxblinkracer/phpunuhi.git",
-                "reference": "ec2a9bfd8bf89a7bc37b78ff1f27b58e9369f18d"
+                "reference": "8888eef714a1cf549cff01ca867098395736f862"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/boxblinkracer/phpunuhi/zipball/ec2a9bfd8bf89a7bc37b78ff1f27b58e9369f18d",
-                "reference": "ec2a9bfd8bf89a7bc37b78ff1f27b58e9369f18d",
+                "url": "https://api.github.com/repos/boxblinkracer/phpunuhi/zipball/8888eef714a1cf549cff01ca867098395736f862",
+                "reference": "8888eef714a1cf549cff01ca867098395736f862",
                 "shasum": ""
             },
             "require": {
@@ -344,7 +344,6 @@
                 "phpstan/phpstan": "*",
                 "phpunit/phpunit": "^8.5"
             },
-            "default-branch": true,
             "bin": [
                 "bin/phpunuhi"
             ],
@@ -366,9 +365,9 @@
             "description": "Easy tool to work with translation files for validation, imports and exports.",
             "support": {
                 "issues": "https://github.com/boxblinkracer/phpunuhi/issues",
-                "source": "https://github.com/boxblinkracer/phpunuhi/tree/main"
+                "source": "https://github.com/boxblinkracer/phpunuhi/tree/0.6.1"
             },
-            "time": "2023-01-05T08:14:00+00:00"
+            "time": "2023-01-05T11:20:44+00:00"
         },
         {
             "name": "brick/math",
@@ -14620,9 +14619,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "boxblinkracer/phpunuhi": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

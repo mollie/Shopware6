@@ -271,8 +271,8 @@
           "modal": {
             "title": "Bestelling verzenden",
             "description": "Deze actie zal automatisch een bestelling verzenden via Mollie. De flow sequence ontvangt het ordernummer, en geeft dit door aan de Mollie API. Succesvolle verzendingen en mislukte verzendingen zullen zichtbaar zijn in de Mollie logbestanden.",
-            "noWarnings": "Geen waarschuwingen",
-            "warningConfig": "Schakel alle extra automatiseringen uit die eventueel in conflict komen met deze Flow Builder actie. De volgende geactiveerde features in deze plugin kunnen elkaar kruisen met deze actie:"
+            "warningConfig": "Schakel alle extra automatiseringen uit die eventueel in conflict komen met deze Flow Builder actie. De volgende geactiveerde features in deze plugin kunnen elkaar kruisen met deze actie:",
+            "noWarnings": "Geen waarschuwingen"
           }
         },
         "refundOrder": {
