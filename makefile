@@ -93,8 +93,16 @@ stylelint: ## Starts the Stylelinter
 configcheck: ## Tests and verifies the plugin configuration file
 	cd ./tests/Custom && php verify-plugin-config.php
 
+# ------------------------------------------------------------------------------------------------------------
+
 snippetcheck: ## Tests and verifies all plugin snippets
 	php vendor/bin/phpunuhi validate --configuration=./.phpunuhi.xml
+
+snippetexport: ## Exports all snippets
+	php vendor/bin/phpunuhi export --configuration=./.phpunuhi.xml --dir=./.phpunuhi
+
+snippetimport: ## Imports the provided snippet set [set=xyz file=xz.csv]
+	php vendor/bin/phpunuhi import --configuration=./.phpunuhi.xml --set=$(set) --file=$(file) --intent=1
 
 # ------------------------------------------------------------------------------------------------------------
 
