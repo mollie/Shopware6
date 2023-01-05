@@ -430,5 +430,25 @@
         "label": "Abonnements"
       }
     }
+  },
+  "sw-flow": {
+    "triggers": {
+      "mollie": "Mollie",
+      "refund": "Rückerstattung",
+      "subscription": "Abonnement",
+      "webhookReceived": "Webhooks",
+      "status": "Status",
+      "started": "Gestartet",
+      "ended": "Beendet",
+      "paused": "Pausiert",
+      "renewalReminder": "Verlängerungserinnerung",
+      "renewed": "Erneuert",
+      "resumed": "Verlängert",
+      "skipped": "Ausgesetzt",
+      "all": "Alle",
+      "canceled": "Abgebrochen",
+      "expired": "Abgelaufen",
+      "partiallyRefunded": "Rückerstattet (teilweise)"
+    }
   }
 }

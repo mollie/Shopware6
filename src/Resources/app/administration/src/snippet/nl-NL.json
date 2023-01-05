@@ -430,5 +430,25 @@
         "label": "Abonnementen"
       }
     }
+  },
+  "sw-flow": {
+    "triggers": {
+      "mollie": "Mollie",
+      "refund": "Terugbetaling",
+      "subscription": "Abonnement",
+      "webhookReceived": "Webhook",
+      "status": "Toestand",
+      "started": "Begonnen",
+      "ended": "Geëindigd",
+      "paused": "Onderbroken",
+      "renewalReminder": "Verlengingsherinnering",
+      "renewed": "Vernieuwd",
+      "resumed": "Hervat",
+      "skipped": "Overgeslagen",
+      "all": "Alle",
+      "canceled": "Geannuleerd",
+      "expired": "Verlopen",
+      "partiallyRefunded": "Terugbetaald (gedeeltelijk)"
+    }
   }
 }

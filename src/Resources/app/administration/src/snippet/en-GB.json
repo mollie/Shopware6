@@ -430,5 +430,25 @@
         "label": "Subscriptions"
       }
     }
+  },
+  "sw-flow": {
+    "triggers": {
+      "mollie": "Mollie",
+      "refund": "Refund",
+      "subscription": "Subscription",
+      "webhookReceived": "Webhooks",
+      "status": "Status",
+      "started": "Started",
+      "ended": "Ended",
+      "paused": "Paused",
+      "renewalReminder": "Renewal Reminder",
+      "renewed": "Renewed",
+      "resumed": "Resumed",
+      "skipped": "Skipped",
+      "all": "All",
+      "canceled": "Canceled",
+      "expired": "Expired",
+      "partiallyRefunded": "Refunded (partially)"
+    }
   }
 }
