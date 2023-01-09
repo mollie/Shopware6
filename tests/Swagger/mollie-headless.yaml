@@ -125,6 +125,19 @@ paths:
       security:
         - AccessKey: [ ]
         - AccessToken: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orderId:
+                  default: "#"
+                finishUrl:
+                  default: ""
+                errorUrl:
+                  default: ""
+
       responses:
         "200":
           description: "successful operation"
