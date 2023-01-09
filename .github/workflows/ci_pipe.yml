@@ -29,22 +29,6 @@ jobs:
       - name: Test configuration
         run: make configcheck -B
 
-  snippets:
-    name: Test Plugin Snippets
-    runs-on: ubuntu-latest
-    needs: config
-    steps:
-      - name: Clone Code
-        uses: actions/checkout@v3
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 7.4
-
-      - name: Test snippets
-        run: make snippetcheck -B
-
   # ------------------------------------------------------------------------------------------------------------------------
 
   install:
@@ -70,6 +54,33 @@ jobs:
 
       - name: Install Dependencies
         run: make dev -B
+
+  # ------------------------------------------------------------------------------------------------------------------------
+
+  snippets:
+    name: Test Snippets
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - name: Clone Code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+
+      - name: Mount Dev Dependency Cache
+        uses: actions/cache@v3
+        with:
+          key: cache-dev-dependencies-${{ github.run_id }}
+          path: |
+            src/Resources/app/storefront/node_modules
+            src/Resources/app/administration/node_modules
+            vendor
+
+      - name: Test snippets
+        run: make snippetcheck -B
 
   # ------------------------------------------------------------------------------------------------------------------------
 
