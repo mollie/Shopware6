@@ -6,6 +6,7 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRep
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
+use Kiener\MolliePayments\Controller\StoreApi\Subscription\Response\SubscriptionCancelResponse;
 use Kiener\MolliePayments\Controller\StoreApi\Subscription\Response\SubscriptionPauseResponse;
 use Kiener\MolliePayments\Controller\StoreApi\Subscription\Response\SubscriptionPaymentUpdateResponse;
 use Kiener\MolliePayments\Controller\StoreApi\Subscription\Response\SubscriptionResumeResponse;
@@ -16,6 +17,7 @@ use Kiener\MolliePayments\Controller\StoreApi\Subscription\Response\Subscription
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -208,8 +210,8 @@ class SubscriptionController
      * @param string $subscriptionId
      * @param RequestDataBag $data
      * @param SalesChannelContext $context
-     * @throws CustomerCouldNotBeFoundException
      * @throws \Throwable
+     * @throws CustomerCouldNotBeFoundException
      * @return StoreApiResponse
      */
     public function updatePayment(string $subscriptionId, RequestDataBag $data, SalesChannelContext $context): StoreApiResponse
@@ -306,6 +308,28 @@ class SubscriptionController
             return new SubscriptionSkipResponse();
         } catch (\Throwable $ex) {
             $this->logger->error("Error when skipping subscription " . $subscriptionId . ": " . $ex->getMessage());
+            throw $ex;
+        }
+    }
+
+    /**
+     * @Route("/store-api/mollie/subscription/{subscriptionId}/cancel", name="store-api.mollie.subscription.cancel", methods={"POST"})
+     *
+     * @param string $subscriptionId
+     * @param SalesChannelContext $context
+     * @throws \Throwable
+     * @return StoreApiResponse
+     */
+    public function cancel(string $subscriptionId, SalesChannelContext $context): StoreApiResponse
+    {
+        try {
+            $this->validateRoute($context);
+
+            $this->subscriptionManager->cancelSubscription($subscriptionId, $context->getContext());
+
+            return new SubscriptionCancelResponse();
+        } catch (\Throwable $ex) {
+            $this->logger->error("Error when canceling subscription " . $subscriptionId . ": " . $ex->getMessage());
             throw $ex;
         }
     }

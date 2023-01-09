@@ -548,6 +548,23 @@ paths:
         "200":
           description: "successful operation"
 
+  /store-api/mollie/subscription/{subscriptionId}/cancel:
+    post:
+      tags:
+        - "Subscriptions"
+      summary: "Cancels a running subscription"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      parameters:
+        - in: "path"
+          name: "subscriptionId"
+          description: "ID of the Shopware subscription that will be updated"
+          required: true
+      responses:
+        "200":
+          description: "successful operation"
+
   /api/mollie/webhook/{transactionId}:
     post:
       tags:
