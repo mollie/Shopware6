@@ -35,6 +35,9 @@
         <service id="Kiener\MolliePayments\Components\Subscription\DAL\Salutation\SalutationExtension">
             <tag name="shopware.entity.extension"/>
         </service>
+        <service id="Kiener\MolliePayments\Components\RefundManager\DAL\RefundItem\RefundItemDefinition">
+            <tag name="shopware.entity.definition"/>
+        </service>
 
         <service id="Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Enricher\LiveDataEnricher">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
