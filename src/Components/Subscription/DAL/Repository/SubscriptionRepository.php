@@ -7,11 +7,14 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\Sub
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
+use Kiener\MolliePayments\Components\Subscription\Exception\SubscriptionNotFoundException;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\NotFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
 
 class SubscriptionRepository
@@ -59,6 +62,7 @@ class SubscriptionRepository
     /**
      * @param string $id
      * @param Context $context
+     * @throws SubscriptionNotFoundException
      * @return SubscriptionEntity
      */
     public function findById(string $id, Context $context): SubscriptionEntity
@@ -67,29 +71,56 @@ class SubscriptionRepository
         $criteria->addAssociation('customer');
         $criteria->addAssociation('historyEntries');
 
-        return $this->repoSubscriptions->search($criteria, $context)->first();
+        $result = $this->repoSubscriptions->search($criteria, $context);
+
+        if ($result->count() <= 0) {
+            throw new SubscriptionNotFoundException($id);
+        }
+
+        return $result->first();
     }
 
     /**
      * @param Context $context
-     * @return EntitySearchResult<SubscriptionEntity>
+     * @return EntitySearchResult
      */
     public function findAll(Context $context): EntitySearchResult
     {
         $criteria = new Criteria();
 
-        /** @var EntitySearchResult<SubscriptionEntity> $result */
-        $result = $this->repoSubscriptions->search($criteria, $context);
-
-        return $result;
+        return $this->repoSubscriptions->search($criteria, $context);
     }
 
+    /**
+     * @param string $swCustomerId
+     * @param bool $includedPending
+     * @param Context $context
+     * @return EntitySearchResult
+     */
+    public function findByCustomer(string $swCustomerId, bool $includedPending, Context $context): EntitySearchResult
+    {
+        $criteria = new Criteria([]);
+        $criteria->addAssociation('customer');
+        $criteria->addAssociation('historyEntries');
+        $criteria->addFilter(new EqualsFilter('customerId', $swCustomerId));
+
+        if (!$includedPending) {
+            $criteria->addFilter(
+                new NotFilter(
+                    NotFilter::CONNECTION_AND,
+                    [new EqualsFilter('mollieId', null),]
+                )
+            );
+        }
+
+        return $this->repoSubscriptions->search($criteria, $context);
+    }
 
     /**
      * @param string $salesChannelId
      * @param Context $context
      * @throws \Exception
-     * @return EntitySearchResult<SubscriptionEntity>
+     * @return EntitySearchResult
      */
     public function findByReminderRangeReached(string $salesChannelId, Context $context): EntitySearchResult
     {
@@ -105,16 +136,13 @@ class SubscriptionRepository
         # payment has to be in the future
         $criteria->addFilter(new RangeFilter('nextPaymentAt', ['gte' => $today->format('Y-m-d H:i:s')]));
 
-        /** @var EntitySearchResult<SubscriptionEntity> $result */
-        $result = $this->repoSubscriptions->search($criteria, $context);
-
-        return $result;
+        return $this->repoSubscriptions->search($criteria, $context);
     }
 
     /**
      * @param string $orderId
      * @param Context $context
-     * @return EntitySearchResult<SubscriptionEntity>
+     * @return EntitySearchResult
      */
     public function findPendingSubscriptions(string $orderId, Context $context): EntitySearchResult
     {
@@ -124,10 +152,7 @@ class SubscriptionRepository
         $criteria->addFilter(new EqualsFilter('orderId', $orderId));
         $criteria->addFilter(new EqualsFilter('mollieId', null));
 
-        /** @var EntitySearchResult<SubscriptionEntity> $result */
-        $result = $this->repoSubscriptions->search($criteria, $context);
-
-        return $result;
+        return $this->repoSubscriptions->search($criteria, $context);
     }
 
     #endregion

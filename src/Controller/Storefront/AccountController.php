@@ -201,7 +201,7 @@ class AccountController extends StorefrontController
     public function updatePaymentStart(string $swSubscriptionId, SalesChannelContext $salesChannelContext): Response
     {
         try {
-            $checkoutUrl = $this->subscriptionManager->updatePaymentMethodStart($swSubscriptionId, $salesChannelContext->getContext());
+            $checkoutUrl = $this->subscriptionManager->updatePaymentMethodStart($swSubscriptionId, '', $salesChannelContext->getContext());
 
             return $this->redirect($checkoutUrl);
         } catch (\Throwable $exception) {

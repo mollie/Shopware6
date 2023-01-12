@@ -156,6 +156,9 @@ class RoundingDifferenceFixerTest extends TestCase
         $this->assertEquals('', $diffItem->getImageUrl());
         $this->assertEquals('', $diffItem->getProductUrl());
         $this->assertEquals('', $diffItem->getLineItemId());
+
+        # we need a custom type to verify this type of item later in the refund manager
+        $this->assertEquals(['type' => 'rounding'], $diffItem->getMetaData());
     }
 
     /**

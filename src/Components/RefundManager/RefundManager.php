@@ -11,6 +11,7 @@ use Kiener\MolliePayments\Components\RefundManager\Integrators\StockManagerInter
 use Kiener\MolliePayments\Components\RefundManager\RefundData\RefundData;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
+use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItemRoundingDiff;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieRefundException;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Service\OrderService;
@@ -19,6 +20,7 @@ use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
 use Kiener\MolliePayments\Service\Refund\RefundService;
 use Kiener\MolliePayments\Service\Refund\RefundServiceInterface;
 use Kiener\MolliePayments\Service\Stock\StockManager;
+use Kiener\MolliePayments\Struct\MollieApi\OrderLineMetaDataStruct;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Mollie\Api\Resources\OrderLine;
@@ -155,6 +157,7 @@ class RefundManager implements RefundManagerInterface
             # we have to extract all items, so that they will be added to the metadata
             $requestItems = $this->buildRequestItemsFromOrder($order);
             $request->setItems($requestItems);
+            $this->appendRoundingItemFromMollieOrder($request, $mollieOrder);
 
             # convert again
             $serviceItems = $this->convertToRefundItems($request, $order, $mollieOrder);
@@ -180,6 +183,8 @@ class RefundManager implements RefundManagerInterface
                 );
             }
         } elseif ($request->isFullRefundWithItems($order)) {
+            $this->appendRoundingItemFromMollieOrder($request, $mollieOrder);
+            $serviceItems = $this->convertToRefundItems($request, $order, $mollieOrder);
             $refund = $this->refundService->refundFull(
                 $order,
                 $request->getDescription(),
@@ -208,7 +213,7 @@ class RefundManager implements RefundManagerInterface
         }
 
 
-        if (!$refund instanceof Refund) {
+        if (! $refund instanceof Refund) {
             # a problem happened, lets finish with an exception
             throw new CouldNotCreateMollieRefundException('', (string)$order->getOrderNumber());
         }
@@ -322,6 +327,30 @@ class RefundManager implements RefundManagerInterface
         return $items;
     }
 
+    private function appendRoundingItemFromMollieOrder(RefundRequest $request, ?\Mollie\Api\Resources\Order $mollieOrder): void
+    {
+        if ($mollieOrder === null) {
+            return;
+        }
+        $lines = $mollieOrder->lines();
+
+        /** @var OrderLine $line */
+        foreach ($lines as $line) {
+            $lineMetadataStruct = new OrderLineMetaDataStruct($line);
+            if ($lineMetadataStruct->isRoundingItem() === false) {
+                continue;
+            }
+
+            $refundRequestItem = new RefundRequestItemRoundingDiff(
+                $lineMetadataStruct->getId(),
+                $lineMetadataStruct->getAmount(),
+                $lineMetadataStruct->getQuantity(),
+                0
+            );
+            $request->addItem($refundRequestItem);
+        }
+    }
+
     /**
      * @param RefundRequest $request
      * @param OrderEntity $order
@@ -370,6 +399,9 @@ class RefundManager implements RefundManagerInterface
                             }
                         }
                     }
+                }
+                if ($requestItem instanceof RefundRequestItemRoundingDiff) {
+                    $mollieLineID = $requestItem->getLineId();
                 }
             }
 

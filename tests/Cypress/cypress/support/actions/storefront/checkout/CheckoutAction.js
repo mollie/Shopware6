@@ -43,6 +43,13 @@ export default class CheckoutAction {
     /**
      *
      */
+    goToCartInOffCanvas() {
+        repoOffCanvas.getCartButton().click();
+    }
+
+    /**
+     *
+     */
     goToCheckoutInOffCanvas() {
         repoOffCanvas.getCheckoutButton().click();
     }

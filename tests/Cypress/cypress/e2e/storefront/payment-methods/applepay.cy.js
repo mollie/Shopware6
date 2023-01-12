@@ -38,7 +38,7 @@ context("Apple Pay", () => {
 
     describe('Checkout', () => {
 
-        it('C4082: Apple Pay visible if available in browser (Checkout) @core', () => {
+        it('C4082: Apple Pay visible if possible in browser (Checkout) @core', () => {
 
             applePayFactory.registerApplePay(true);
 
@@ -54,7 +54,7 @@ context("Apple Pay", () => {
             cy.contains('Apple Pay').should('exist');
         })
 
-        it('C4080: Apple Pay hidden if not available in browser (Checkout) @core', () => {
+        it('C4080: Apple Pay hidden if not possible in browser (Checkout) @core', () => {
 
             applePayFactory.registerApplePay(false);
 
@@ -73,7 +73,7 @@ context("Apple Pay", () => {
 
     describe('Account', () => {
 
-        it('C4081: Apple Pay hidden in account if available in browser (Account) @core', () => {
+        it('C4081: Apple Pay hidden in account even if possible in browser @core', () => {
 
             applePayFactory.registerApplePay(true);
 
@@ -84,7 +84,7 @@ context("Apple Pay", () => {
             cy.contains('Apple Pay').should('not.exist');
         })
 
-        it('C4083: Apple Pay hidden if not available in browser (Account) @core', () => {
+        it('C4083: Apple Pay hidden if not possible in browser (Account) @core', () => {
 
             applePayFactory.registerApplePay(false);
 

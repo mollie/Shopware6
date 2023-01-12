@@ -4,6 +4,7 @@ import './extension/sw-order';
 import './components/mollie-pluginconfig-section-info';
 import './components/mollie-pluginconfig-section-api';
 import './components/mollie-pluginconfig-section-payments';
+import './components/mollie-pluginconfig-section-payments-format';
 import './components/mollie-pluginconfig-section-rounding';
 import './components/mollie-pluginconfig-support-modal';
 import './components/mollie-tracking-info';

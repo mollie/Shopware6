@@ -198,17 +198,17 @@ class SubscriptionEntityTest extends TestCase
         $subscription->setStatus(SubscriptionStatus::COMPLETED);
         static::assertSame(true, $subscription->isRenewingAllowed());
 
+        $subscription->setStatus(SubscriptionStatus::SKIPPED);
+        static::assertSame(true, $subscription->isRenewingAllowed());
+
+        $subscription->setStatus(SubscriptionStatus::RESUMED);
+        static::assertSame(true, $subscription->isRenewingAllowed());
+
 
         $subscription->setStatus(SubscriptionStatus::PAUSED);
         static::assertSame(false, $subscription->isRenewingAllowed());
 
         $subscription->setStatus(SubscriptionStatus::CANCELED);
-        static::assertSame(false, $subscription->isRenewingAllowed());
-
-        $subscription->setStatus(SubscriptionStatus::SKIPPED);
-        static::assertSame(false, $subscription->isRenewingAllowed());
-
-        $subscription->setStatus(SubscriptionStatus::RESUMED);
         static::assertSame(false, $subscription->isRenewingAllowed());
 
         $subscription->setStatus(SubscriptionStatus::PENDING);

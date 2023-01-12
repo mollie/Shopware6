@@ -18,7 +18,7 @@ describe('Apple Pay Direct - Store API Routes', () => {
          * without Mollie API keys, this might not return a valid ID.
          * Instead we just verify that the route is available and that the response is existing.
          */
-        it('Route is available @core', () => {
+        it('C266669: Route available /store-api/mollie/applepay/id @core', () => {
 
             const request = new Promise((resolve) => {
                 storeApiClient.get('/mollie/applepay/id').then(response => {
@@ -37,7 +37,7 @@ describe('Apple Pay Direct - Store API Routes', () => {
 
     context(storeApiPrefix + "/mollie/applepay/enabled", () => {
 
-        it('Route is available @core', () => {
+        it('C266670: Route available /store-api/mollie/applepay/enabled @core', () => {
 
             const request = new Promise((resolve) => {
                 storeApiClient.get('/mollie/applepay/enabled').then(response => {
@@ -55,7 +55,7 @@ describe('Apple Pay Direct - Store API Routes', () => {
 
     context(storeApiPrefix + "/mollie/applepay/add-product", () => {
 
-        it('add product with invalid quantity @core', () => {
+        it('C266671: Apple Pay Direct add product with invalid quantity (Store API) @core', () => {
 
             const request = new Promise((resolve) => {
                 storeApiClient.post('/mollie/applepay/add-product', {"productId": "unknown", quantity: 0}).then(response => {
@@ -71,7 +71,7 @@ describe('Apple Pay Direct - Store API Routes', () => {
 
         })
 
-        it('add product with invalid ID @core', () => {
+        it('C266672: Apple Pay Direct add product with invalid ID (Store API) @core', () => {
 
             const request = new Promise((resolve) => {
                 storeApiClient.post('/mollie/applepay/add-product', {"productId": "unknown", quantity: 1}).then(response => {
@@ -90,7 +90,7 @@ describe('Apple Pay Direct - Store API Routes', () => {
 
     context(storeApiPrefix + "/mollie/applepay/cart", () => {
 
-        it('get cart structure @core', () => {
+        it('C266673: Apple Pay Direct get cart structure (Store API) @core', () => {
 
             const request = new Promise((resolve) => {
                 storeApiClient.get('/mollie/applepay/cart').then(response => {
@@ -109,7 +109,7 @@ describe('Apple Pay Direct - Store API Routes', () => {
 
     context(storeApiPrefix + "/mollie/applepay/validate", () => {
 
-        it('no url provided @core', () => {
+        it('C266674: Apple pay Direct validate merchant domain (Store API) @core', () => {
 
             const request = new Promise((resolve) => {
                 storeApiClient.post('/mollie/applepay/validate').then(response => {
@@ -127,7 +127,7 @@ describe('Apple Pay Direct - Store API Routes', () => {
 
     context(storeApiPrefix + "/mollie/applepay/shipping-methods", () => {
 
-        it('no country code provided @core', () => {
+        it('C266675: Apple pay Direct Shipping Methods without country code (Store API) @core', () => {
 
             const request = new Promise((resolve) => {
                 storeApiClient.post('/mollie/applepay/shipping-methods').then(response => {
@@ -141,7 +141,7 @@ describe('Apple Pay Direct - Store API Routes', () => {
             });
         })
 
-        it('with valid country code @core', () => {
+        it('C266676: Apple pay Direct Shipping Methods with country code (Store API) @core', () => {
 
             const request = new Promise((resolve) => {
                 storeApiClient.post('/mollie/applepay/shipping-methods', {'countryCode': 'DE'}).then(response => {
@@ -160,7 +160,7 @@ describe('Apple Pay Direct - Store API Routes', () => {
 
     context(storeApiPrefix + "/mollie/applepay/shipping-method", () => {
 
-        it('no shipping identifier provided @core', () => {
+        it('C266677: Apple pay Direct set shipping without identifier (Store API) @core', () => {
 
             const request = new Promise((resolve) => {
                 storeApiClient.post('/mollie/applepay/shipping-method').then(response => {
@@ -174,7 +174,7 @@ describe('Apple Pay Direct - Store API Routes', () => {
             });
         })
 
-        it('with invalid identifier @core', () => {
+        it('C266678: Apple pay Direct set shipping with invalid identifier (Store API) @core', () => {
 
             const request = new Promise((resolve) => {
                 storeApiClient.post('/mollie/applepay/shipping-method', {'identifier': 'abc'}).then(response => {
@@ -193,7 +193,7 @@ describe('Apple Pay Direct - Store API Routes', () => {
 
     context(storeApiPrefix + "/mollie/applepay/pay", () => {
 
-        it('with invalid payment token @core', () => {
+        it('C266680: Apple pay Direct pay with invalid payment token (Store API) @core', () => {
 
             const request = new Promise((resolve) => {
                 storeApiClient.post('/mollie/applepay/pay').then(response => {
@@ -211,7 +211,7 @@ describe('Apple Pay Direct - Store API Routes', () => {
 
     context(storeApiPrefix + "/mollie/applepay/restore-cart", () => {
 
-        it('with invalid identifier @core', () => {
+        it('C266681: Apple Pay Direct restore cart (Store API) @core', () => {
 
             const request = new Promise((resolve) => {
                 storeApiClient.post('/mollie/applepay/restore-cart').then(response => {

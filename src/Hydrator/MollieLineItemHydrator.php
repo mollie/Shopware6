@@ -34,6 +34,12 @@ class MollieLineItemHydrator
         foreach ($lineItems as $lineItem) {
             $price = $lineItem->getPrice();
 
+            # get custom meta data from our prepared mollie item
+            $metadata = $lineItem->getMetaData();
+
+            # always add our line item id
+            $metadata['orderLineItemId'] = $lineItem->getLineItemId();
+
             $lines[] = [
                 'type' => $lineItem->getType(),
                 'name' => $lineItem->getName(),
@@ -45,9 +51,7 @@ class MollieLineItemHydrator
                 'sku' => $lineItem->getSku(),
                 'imageUrl' => $lineItem->getImageUrl(),
                 'productUrl' => $lineItem->getProductUrl(),
-                'metadata' => [
-                    'orderLineItemId' => $lineItem->getLineItemId(),
-                ],
+                'metadata' => $metadata,
             ];
         }
 

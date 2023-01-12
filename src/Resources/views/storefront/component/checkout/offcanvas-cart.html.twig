@@ -1,0 +1,16 @@
+{% sw_extends '@Storefront/storefront/component/checkout/offcanvas-cart.html.twig' %}
+
+
+{% block component_offcanvas_cart_actions_checkout %}
+    {{ parent() }}
+    {% if page.cart.lineItems|length > 0 %}
+        {% if mollie_applepaydirect_enabled and ('offcanvas' not in mollie_applepaydirect_restrictions) %}
+            {% block component_offcanvas_cart_actions_checkout_apple_direct_component %}
+                <div class="mt-2 js-apple-pay-container mollie-apple-pay-direct-offcanvas">
+                    {% include '@MolliePayments/mollie/component/apple-pay-direct-button.twig' %}
+                </div>
+            {% endblock %}
+        {% endif %}
+    {% endif %}
+{% endblock %}
+

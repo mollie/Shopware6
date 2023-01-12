@@ -163,6 +163,45 @@ context("Order Refunds", () => {
             cy.contains(REFUND_DESCRIPTION).should('not.exist')
         })
 
+        it('C273581: Canceled refunds should not be visible', () => {
+
+            createOrderAndOpenAdmin();
+
+            const REFUND_DESCRIPTION = 'full refund executed twice with Cypress';
+            const CANCELED_REFUND_STATUS_LABEL = 'mollie-payments.refunds.status.canceled';
+            // -------------------------------------------------------------------------------
+
+            // open the refund manager
+            // and start a partial refund of 2 EUR
+            adminOrders.openRefundManager();
+
+            // check if our button is disabled if
+            // the checkbox for the verification is not enabled
+            repoRefundManager.getFullRefundButton().should('be.disabled');
+
+            // now start the full refund
+            refundManager.fullRefund(REFUND_DESCRIPTION);
+
+            // verify that our refund now exists
+            repoRefundManager.getFirstRefundStatusLabel().contains('Pending');
+            repoRefundManager.getFirstRefundDescriptionLabel().contains(REFUND_DESCRIPTION);
+
+            // -------------------------------------------------------------------------------
+
+            // now cancel our pending refund
+            // and make sure that its gone afterwards
+            refundManager.cancelPendingRefund();
+
+            // now start the partial refund
+            refundManager.partialAmountRefund(2, REFUND_DESCRIPTION);
+
+            cy.contains(CANCELED_REFUND_STATUS_LABEL).should('not.exist');
+
+            // second cancel should clear the history
+            refundManager.cancelPendingRefund();
+            cy.contains(REFUND_DESCRIPTION).should('not.exist')
+        })
+
     })
 })
 

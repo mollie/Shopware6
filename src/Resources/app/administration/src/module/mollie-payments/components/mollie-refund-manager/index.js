@@ -56,6 +56,7 @@ Component.register('mollie-refund-manager', {
             checkVerifyRefund: false,
             refundDescription: '',
             refundInternalDescription:'',
+            roundingDiff: 0,
             // -------------------------------
             // tutorials
             tutorialFullRefundVisible: false,
@@ -112,7 +113,7 @@ Component.register('mollie-refund-manager', {
          * @returns {*}
          */
         isAclRefundAllowed() {
-            return this.acl.can('mollie_refund_manager:update');
+            return this.acl.can('mollie_refund_manager:create');
         },
 
         /**
@@ -492,7 +493,11 @@ Component.register('mollie-refund-manager', {
             const result = [];
 
             item.metadata.composition.forEach(function (entry) {
-                result.push(entry.swReference + ' (' + entry.quantity + ' x ' + entry.amount + ' ' + me.order.currency.symbol + ')');
+                let label = entry.label;
+                if(entry.swReference.length > 0){
+                    label = entry.swReference;
+                }
+                result.push(label + ' (' + entry.quantity + ' x ' + entry.amount + ' ' + me.order.currency.symbol + ')');
             });
 
             return result;
@@ -584,6 +589,7 @@ Component.register('mollie-refund-manager', {
                     this.refundedAmount = response.totals.refunded;
                     this.voucherAmount = response.totals.voucherAmount;
                     this.pendingRefunds = response.totals.pendingRefunds;
+                    this.roundingDiff = response.totals.roundingDiff;
 
                     // build our local items
                     // we have to build it by assigning it to a new local object,

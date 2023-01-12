@@ -178,5 +178,4 @@ abstract class AbstractMollieOrderBuilder extends TestCase
         );
     }
 
-    abstract function testOrderBuild(): void;
 }

@@ -10,12 +10,15 @@ use Kiener\MolliePayments\Components\RefundManager\RefundManager;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
 use Kiener\MolliePayments\Service\MollieApi\Order;
+use Mollie\Api\MollieApiClient;
+use Mollie\Api\Resources\Order as MollieOrder;
 use MolliePayments\Tests\Fakes\FakeOrderService;
 use MolliePayments\Tests\Fakes\FakeRefundService;
 use MolliePayments\Tests\Fakes\FlowBuilder\FakeFlowBuilderDispatcher;
 use MolliePayments\Tests\Fakes\FlowBuilder\FakeFlowBuilderFactory;
 use MolliePayments\Tests\Fakes\StockUpdater\FakeStockManager;
 use MolliePayments\Tests\Traits\MockTrait;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
@@ -62,8 +65,10 @@ class RefundManagerTest extends TestCase
         $fakeRefundService = new FakeRefundService('r-xyz-123', 9999);
         $this->fakeStockUpdater = new FakeStockManager();
 
-        /** @var Order $fakeOrder */
+        /** @var Order|MockObject $fakeOrder */
         $fakeOrder = $this->createDummyMock(Order::class, $this);
+        $fakeOrder->method('getMollieOrder')->willReturn(new MollieOrder($this->createMock(MollieApiClient::class)) );
+
 
         $this->fakeFlowBuilderDispatcher = new FakeFlowBuilderDispatcher();
         $flowBuilderEventFactory = new FlowBuilderEventFactory('6.4.8.0'); # use any higher version so that we get real events

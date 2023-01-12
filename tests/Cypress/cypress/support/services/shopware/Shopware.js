@@ -22,6 +22,14 @@ export default class Shopware {
     }
 
     /**
+     *
+     * @returns {string}
+     */
+    getStorefrontDomain() {
+        return Cypress.config().baseUrl;
+    }
+
+    /**
      * This function makes sure to prepare our Shopware session
      * before leaving our domain for now.
      * When we get back, our session should still be the same

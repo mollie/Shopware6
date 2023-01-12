@@ -410,6 +410,22 @@ class RefundsServiceTest extends TestCase
                     ]
                 ],
                 null
+            ],
+            'Mollie skip canceled' => [
+                1,
+                true,
+                PaymentStatus::STATUS_PAID,
+                [
+                    [
+                        'status' => RefundStatus::STATUS_REFUNDED,
+                        'amount' => 24.99
+                    ],
+                    [
+                        'status' => 'canceled',
+                        'amount' => 24.99
+                    ]
+                ],
+                null
             ]
         ];
     }

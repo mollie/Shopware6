@@ -88,6 +88,20 @@ class WebhookController extends StorefrontController
     }
 
     /**
+     * @Route("/mollie/webhook/subscription/{swSubscriptionId}", defaults={"csrf_protected"=false}, name="frontend.mollie.webhook.subscription", options={"seo"="false"}, methods={"GET", "POST"})
+     *
+     * @param string $swSubscriptionId
+     * @param Request $request
+     * @param RequestDataBag $requestData
+     * @param SalesChannelContext $context
+     * @return JsonResponse
+     */
+    public function onWebhookSubscriptionReceived(string $swSubscriptionId, Request $request, RequestDataBag $requestData, SalesChannelContext $context): JsonResponse
+    {
+        return $this->onWebhookSubscriptionLegacyReceived($swSubscriptionId, $request, $requestData, $context);
+    }
+
+    /**
      * @Route("/mollie/webhook/subscription/{swSubscriptionId}/renew", defaults={"csrf_protected"=false}, name="frontend.mollie.webhook.subscription.renew", options={"seo"="false"}, methods={"GET", "POST"})
      *
      * @param string $swSubscriptionId
@@ -96,7 +110,7 @@ class WebhookController extends StorefrontController
      * @param SalesChannelContext $context
      * @return JsonResponse
      */
-    public function webhookSubscriptionRenew(string $swSubscriptionId, Request $request, RequestDataBag $requestData, SalesChannelContext $context): JsonResponse
+    public function onWebhookSubscriptionLegacyReceived(string $swSubscriptionId, Request $request, RequestDataBag $requestData, SalesChannelContext $context): JsonResponse
     {
         # just to improve testing and manual calls, make it is lower case (requirement for entity repositories)
         $swSubscriptionId = strtolower($swSubscriptionId);

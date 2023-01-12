@@ -6,7 +6,7 @@
         <select class="custom-select" type="text" id="paymentMethodId" name="paymentMethodId">
             {% for payment in page.paymentMethods %}
                 <option value="{{ payment.id }}"
-                    {% if payment.id == context.paymentMethod.id %} selected="selected"{% endif %}>
+                        {% if payment.id == context.paymentMethod.id %} selected="selected"{% endif %}>
                     {{ payment.translated.name }}
 
                     {% if "MolliePayments" in payment.handlerIdentifier and page.isMollieTestMode == true %}
@@ -17,3 +17,16 @@
         </select>
     </div>
 {% endblock %}
+
+
+{% block page_checkout_aside_actions %}
+    {{ parent() }}
+    {% if mollie_applepaydirect_enabled and ('cart' not in mollie_applepaydirect_restrictions) %}
+        {% block page_checkout_aside_actions_apple_direct_component %}
+            <div class="mt-2 js-apple-pay-container mollie-apple-pay-direct-cart">
+                {% include '@MolliePayments/mollie/component/apple-pay-direct-button.twig' %}
+            </div>
+        {% endblock %}
+    {% endif %}
+{% endblock %}
+

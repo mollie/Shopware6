@@ -115,7 +115,6 @@ class MollieOrderBuilder
         $locale = $this->extractor->extractLocale($order, $salesChannelContext);
         $localeCode = ($locale instanceof LocaleEntity) ? $locale->getCode() : self::MOLLIE_DEFAULT_LOCALE_CODE;
         $lineItems = $order->getLineItems();
-        $webhookUrl = $this->urlBuilder->buildWebhookURL($transactionId);
         $isVerticalTaxCalculation = $this->isVerticalTaxCalculation($salesChannelContext);
 
         $orderData = [];
@@ -127,12 +126,25 @@ class MollieOrderBuilder
             $orderData['amount'] = $this->priceBuilder->build($order->getAmountTotal(), $currency->getIsoCode());
         }
 
+        # build custom format
+        # TODO this is just inline code, but it's unit tested, but maybe we should move it to a separate class too, and switch to unit tests + integration tests
+        if (!empty(trim($settings->getFormatOrderNumber()))) {
+            $orderNumberFormatted = $settings->getFormatOrderNumber();
+            $orderNumberFormatted = str_replace('{ordernumber}', (string)$order->getOrderNumber(), (string)$orderNumberFormatted);
+        } else {
+            $orderNumberFormatted = $order->getOrderNumber();
+        }
+
         $orderData['locale'] = $localeCode;
         $orderData['method'] = $paymentMethod;
-        $orderData['orderNumber'] = $order->getOrderNumber();
+        $orderData['orderNumber'] = $orderNumberFormatted;
         $orderData['payment'] = $paymentData;
 
-        $orderData['redirectUrl'] = $this->urlBuilder->buildReturnUrl($transactionId);
+
+        $redirectUrl = $this->urlBuilder->buildReturnUrl($transactionId);
+        $webhookUrl = $this->urlBuilder->buildWebhookURL($transactionId);
+
+        $orderData['redirectUrl'] = $redirectUrl;
         $orderData['webhookUrl'] = $webhookUrl;
         $orderData['payment']['webhookUrl'] = $webhookUrl;
 
