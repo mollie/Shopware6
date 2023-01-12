@@ -2,7 +2,9 @@
 
 namespace Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem;
 
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
+use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 
 class PromotionItem extends AbstractItem
 {
@@ -10,7 +12,12 @@ class PromotionItem extends AbstractItem
     /**
      * @var OrderLineItemEntity
      */
-    private $lineItem;
+    private $orderLineItem;
+
+    /**
+     * @var OrderDeliveryEntity
+     */
+    private $orderDeliveryItem;
 
     /**
      * @var int
@@ -19,13 +26,40 @@ class PromotionItem extends AbstractItem
 
 
     /**
-     * @param OrderLineItemEntity $lineItem
+     * @param OrderDeliveryEntity|OrderLineItemEntity $lineItem
      * @param int $alreadyRefundedQuantity
      */
-    public function __construct(OrderLineItemEntity $lineItem, int $alreadyRefundedQuantity)
+    private function __construct($lineItem, int $alreadyRefundedQuantity)
     {
-        $this->lineItem = $lineItem;
+        if ($lineItem instanceof OrderDeliveryEntity) {
+            $this->orderDeliveryItem = $lineItem;
+        }
+
+        if ($lineItem instanceof OrderLineItemEntity) {
+            $this->orderLineItem = $lineItem;
+        }
+
         $this->alreadyRefundedQty = $alreadyRefundedQuantity;
+    }
+
+    /**
+     * @param OrderLineItemEntity $lineItem
+     * @param int $alreadyRefundedQuantity
+     * @return PromotionItem
+     */
+    public static function fromOrderLineItem(OrderLineItemEntity $lineItem, int $alreadyRefundedQuantity)
+    {
+        return new PromotionItem($lineItem, $alreadyRefundedQuantity);
+    }
+
+    /**
+     * @param OrderDeliveryEntity $lineItem
+     * @param int $alreadyRefundedQuantity
+     * @return PromotionItem
+     */
+    public static function fromOrderDeliveryItem(OrderDeliveryEntity $lineItem, int $alreadyRefundedQuantity)
+    {
+        return new PromotionItem($lineItem, $alreadyRefundedQuantity);
     }
 
     /**
@@ -33,19 +67,46 @@ class PromotionItem extends AbstractItem
      */
     public function toArray(): array
     {
-        return $this->buildArray(
-            $this->lineItem->getId(),
-            $this->lineItem->getLabel(),
-            $this->getProductNumber(),
-            true,
-            false,
-            $this->lineItem->getUnitPrice(),
-            $this->lineItem->getQuantity(),
-            $this->lineItem->getTotalPrice(),
-            0,
-            0,
-            $this->alreadyRefundedQty
-        );
+        if ($this->orderLineItem !== null) {
+            return $this->buildArray(
+                $this->orderLineItem->getId(),
+                $this->orderLineItem->getLabel(),
+                $this->getProductNumber(),
+                true,
+                false,
+                $this->orderLineItem->getUnitPrice(),
+                $this->orderLineItem->getQuantity(),
+                $this->orderLineItem->getTotalPrice(),
+                0,
+                0,
+                $this->alreadyRefundedQty
+            );
+        } else {
+            $label = '';
+
+            $method = $this->orderDeliveryItem->getShippingMethod();
+            if ($method instanceof ShippingMethodEntity) {
+                $label = (string)$method->getName();
+            }
+
+            if (empty($label)) {
+                $label = 'SHIPPING';
+            }
+
+            return $this->buildArray(
+                $this->orderDeliveryItem->getId(),
+                $label,
+                'SHIPPING',
+                true,
+                false,
+                $this->orderDeliveryItem->getShippingCosts()->getTotalPrice(),
+                $this->orderDeliveryItem->getShippingCosts()->getQuantity(),
+                $this->orderDeliveryItem->getShippingCosts()->getTotalPrice(),
+                0,
+                0,
+                $this->alreadyRefundedQty
+            );
+        }
     }
 
     /**
@@ -53,12 +114,17 @@ class PromotionItem extends AbstractItem
      */
     public function getProductNumber(): string
     {
-        if ($this->lineItem->getPayload() === null) {
+        # delivery items have no product number
+        if ($this->orderDeliveryItem !== null) {
+            return '';
+        }
+
+        if ($this->orderLineItem->getPayload() === null) {
             return '';
         }
 
         # for promotions we use the voucher code as number to display
         # this one is in the reference ID
-        return (string)$this->lineItem->getReferencedId();
+        return (string)$this->orderLineItem->getReferencedId();
     }
 }

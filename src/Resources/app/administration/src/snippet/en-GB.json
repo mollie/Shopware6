@@ -11,11 +11,14 @@
       "mollie_webhook_received_status_completed": " Mollie Webhook Received (Completed)",
       "mollie_webhook_received_status_refunded": " Mollie Webhook Received (Refunded)",
       "mollie_webhook_received_status_partially_refunded": " Mollie Webhook Received (Partially Refunded)",
-      "mollie_refund_started": " Mollie Refund started",
-      "mollie_subscription_started": " Mollie Subscription started",
-      "mollie_subscription_ended": " Mollie Subscription completed",
-      "mollie_subscription_cancelled": " Mollie Subscription cancelled",
-      "mollie_subscription_renewed": " Mollie Subscription renewed",
+      "mollie_refund_started": " Mollie refund started",
+      "mollie_subscription_started": " Mollie subscription started",
+      "mollie_subscription_ended": " Mollie subscription completed",
+      "mollie_subscription_cancelled": " Mollie subscription cancelled",
+      "mollie_subscription_paused": " Mollie subscription paused",
+      "mollie_subscription_resumed": " Mollie subscription resumed",
+      "mollie_subscription_skipped": " Mollie subscription skipped",
+      "mollie_subscription_renewed": " Mollie subscription renewed",
       "mollie_subscription_renewal_reminder": " Mollie reminder for subscription renewal"
     }
   },
@@ -55,6 +58,10 @@
         }
       },
       "payments": {
+        "format": {
+          "placeholder": "Placeholder",
+          "preview": "Preview"
+        },
         "updatePaymentMethods": {
           "title": "Mollie Payments",
           "button": "Update payment methods",
@@ -64,6 +71,11 @@
         "mollieLimits": {
           "link": "Open Mollie Payment Limits"
         }
+      },
+      "rounding": {
+        "info1": "Shopware can use currency settings to calculate how it rounds an order’s grand total. This includes the number of decimals in your product pricing and the nearest rounding interval, such as 0.50 or 1.00.",
+        "info2": "These settings can lead to a different grand total than the total sum of line items. When Mollie cross-checks these amounts and finds that they don’t match, it causes a checkout error.",
+        "info3": "You can use this feature to avoid rounding issues in your checkout. When enabled, it adds a separate line item in your Mollie Dashboard for the difference in rounding, and your customers pay the grand total calculated by Shopware."
       },
       "support": {
         "modalTitle": "Request support from Mollie",
@@ -115,6 +127,10 @@
       "general": {
         "unitQuantity": "pc."
       },
+      "acl": {
+        "warningCreate": "You don't have permissions to create refunds",
+        "warningCancel": "You don't have permissions to cancel refunds"
+      },
       "cart": {
         "title": "Order ##orderNumber##",
         "btnSelectAll": "Select All",
@@ -134,7 +150,8 @@
           },
           "btnResetLine": "Reset Line",
           "checkDeductPromotion": "Deduct promotion"
-        }
+        },
+        "roundDiffItemAdded": "Automatic rounding item was added"
       },
       "instructions": {
         "linkResetTutorials": "Reset Tutorials",
@@ -150,7 +167,9 @@
         "titlePartialItems": "Partial Refund (with items)",
         "textPartialItems": "If you want to mark quantities and items as refunded in Mollie, use the form above. Set your quantities and provide a custom amount for every item that will be refunded. The total sum will then be visible in the final refund amount text field. Remember, it's still possible to adjust this final amount before starting your refund.",
         "titlePartialPromotions": "Partial Refund (with promotions)",
-        "textPartialPromotions": "If you have a promotion in your cart, then your promotion is a separate line item. If you want to refund all discounted items, go ahead and refund their total values and the full promotion line item itself. However, if you only want to refund a few items that were discounted, you can deduct the applied discount automatically for every single line item. You can of course always change values if they are not correct."
+        "textPartialPromotions": "If you have a promotion in your cart, then your promotion is a separate line item. If you want to refund all discounted items, go ahead and refund their total values and the full promotion line item itself. However, if you only want to refund a few items that were discounted, you can deduct the applied discount automatically for every single line item. You can of course always change values if they are not correct.",
+        "titleRoundingDiff": "Rounding difference",
+        "textRoundingDiff": "A full refund will include rounding differences"
       },
       "summary": {
         "dataLoading": "Data is loading...",
@@ -166,7 +185,8 @@
         "placeholderDescription": "add an optional description for your refund",
         "checkVerification": "I have verified the total refund amount and the configured quantities to refund and re-stock.",
         "btnRefund": "Refund",
-        "btnFullRefund": "Full Refund"
+        "btnFullRefund": "Full Refund",
+        "roundDiffItemAdded": "Rounding item"
       },
       "refunds": {
         "title": "Refunds in the Mollie Dashboard",
@@ -278,7 +298,10 @@
         "active": "Active",
         "canceled": "Canceled",
         "suspended": "Suspended",
-        "completed": "Completed"
+        "completed": "Completed",
+        "paused": "Paused",
+        "resumed": "Resumed",
+        "skipped": "Skipped"
       },
       "navigation": {
         "title": "Mollie Subscriptions"
@@ -286,25 +309,67 @@
       "TYPE_DAYS": "Day(s)",
       "TYPE_WEEKS": "Week(s)",
       "TYPE_MONTHS": "Month(s)",
+      "confirm": {
+        "cancelTitle": "End subscription?",
+        "cancel": "Cancel your customer's subscription.",
+        "pauseTitle": "Pause subscription?",
+        "pause": "Put the subscription on hold until you resume it again.",
+        "resumeTitle": "Resume subscription?",
+        "resume": "Continue the subscription again.",
+        "skipTitle": "Skip next instalment?",
+        "skip": "Skip the next instalment in the subscription. It continues automatically afterwards."
+      },
+      "alerts": {
+        "cancelSuccess": "The subscription has been canceled successfully",
+        "pauseSuccess": "The subscription has been paused successfully",
+        "resumeSuccess": "The subscription has been resumed successfully",
+        "skipSuccess": "The subscription has been skipped successfully. The next payment has been updated."
+      },
       "list": {
-        "title": "Subscriptions",
+        "title": "Mollie Subscriptions",
         "columns": {
           "customer": "Customer",
-          "subscription_id": "Mollie ID",
-          "customer_id": "Mollie Customer",
           "status": "Status",
-          "canceledAt": "Canceled at",
           "description": "Description",
-          "createdAt": "Created at",
           "amount": "Amount",
-          "quantity": "Quantity",
           "nextPaymentAt": "Next Payment",
           "prePaymentReminder": "Reminded at",
-          "action": {
-            "cancel": "Cancel subscription",
-            "success": "The subscription has been canceled",
-            "error": "Error in cancel subscription. More information in the logs."
-          }
+          "canceledAt": "Canceled at",
+          "createdAt": "Created at"
+        },
+        "action": {
+          "edit": "Edit subscription"
+        }
+      },
+      "detail": {
+        "title": "Mollie subscription",
+        "buttonCancelSubscription": "Cancel subscription",
+        "labelDescription": "Description",
+        "labelAmount": "Amount",
+        "labelQuantity": "Quantity",
+        "labelMollieSubscription": "Mollie Subscription",
+        "labelMollieCustomer": "Mollie customer",
+        "labelMandateId": "Mandate",
+        "labelShopwareCustomer": "Shopware customer",
+        "labelCreatedAt": "Created at",
+        "buttonShowShopwareOrder": "Show Shopware order",
+        "buttonShowShopwareCustomer": "Show Shopware customer",
+        "cardTitleSubscription": "Subscription",
+        "cardTitleStatus": "Status",
+        "labelStatus": "Status",
+        "labelNextPaymentAt": "Next payment at",
+        "labelLastRemindedAt": "Last reminded at",
+        "labelCanceledAt": "Canceled at",
+        "buttonPauseSubscription": "Pause subscription",
+        "buttonResumeSubscription": "Resume subscription",
+        "buttonSkipSubscription": "Skip subscription",
+        "history": {
+          "cardTitle": "History",
+          "colDate": "Date",
+          "colComment": "Comment",
+          "colStatusFrom": "Status (from)",
+          "colStatusTo": "Status (to)",
+          "colMollieSubscription": "Mollie subscription"
         }
       },
       "product": {
@@ -340,7 +405,7 @@
       "totalRemaining": "Refundable amount",
       "totalVouchers": "Voucher amount",
       "totalShipments": "Shipped amount ({quantity} items)",
-      "subscriptionBadge" : "Subscription Order",
+      "subscriptionBadge": "Subscription Order",
       "refundManager": {
         "title": "Mollie Refund Manager",
         "btnOpenRefundManager": "Open Refund Manager",
@@ -351,6 +416,39 @@
   "sw-customer": {
     "extendedInfo": {
       "labelPreferredIdealIssuer": "Preferred iDeal issuer"
+    }
+  },
+  "sw-privileges": {
+    "permissions": {
+      "parents": {
+        "mollie": "Mollie"
+      },
+      "mollie_refund_manager": {
+        "label": "Refund Manager"
+      },
+      "mollie_subscription": {
+        "label": "Subscriptions"
+      }
+    }
+  },
+  "sw-flow": {
+    "triggers": {
+      "mollie": "Mollie",
+      "refund": "Refund",
+      "subscription": "Subscription",
+      "webhookReceived": "Webhooks",
+      "status": "Status",
+      "started": "Started",
+      "ended": "Ended",
+      "paused": "Paused",
+      "renewalReminder": "Renewal Reminder",
+      "renewed": "Renewed",
+      "resumed": "Resumed",
+      "skipped": "Skipped",
+      "all": "All",
+      "canceled": "Canceled",
+      "expired": "Expired",
+      "partiallyRefunded": "Refunded (partially)"
     }
   }
 }

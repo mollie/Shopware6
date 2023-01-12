@@ -20,7 +20,7 @@ class MollieOrderAddressBuilder
         }
 
         $data = [
-            'title' => ($address->getSalutation() !== null) ? $address->getSalutation()->getDisplayName() : null,
+            'title' => ($address->getSalutation() !== null) ? trim((string)$address->getSalutation()->getDisplayName()) : null,
             'givenName' => $address->getFirstName(),
             'familyName' => $address->getLastName(),
             'email' => $email,

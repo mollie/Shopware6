@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Components\ApplePayDirect\Services;
 
+use Kiener\MolliePayments\Service\HttpClient\HttpClientInterface;
 use League\Flysystem\FilesystemInterface;
 
 class ApplePayDomainVerificationService
@@ -25,13 +26,20 @@ class ApplePayDomainVerificationService
      */
     private $filesystem;
 
+    /**
+     * @var HttpClientInterface
+     */
+    private $httpClient;
+
 
     /**
      * @param FilesystemInterface $filesystem
+     * @param HttpClientInterface $httpClient
      */
-    public function __construct(FilesystemInterface $filesystem)
+    public function __construct(FilesystemInterface $filesystem, HttpClientInterface $httpClient)
     {
         $this->filesystem = $filesystem;
+        $this->httpClient = $httpClient;
     }
 
     /**
@@ -40,8 +48,12 @@ class ApplePayDomainVerificationService
      */
     public function downloadDomainAssociationFile(): void
     {
-        $content = file_get_contents(self::URL_FILE);
+        $response = $this->httpClient->sendRequest('GET', self::URL_FILE);
 
-        $this->filesystem->put(self::LOCAL_FILE, (string)$content);
+        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+            return;
+        }
+
+        $this->filesystem->put(self::LOCAL_FILE, $response->getBody());
     }
 }

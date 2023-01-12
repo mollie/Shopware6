@@ -1,0 +1,50 @@
+name: 'Build Plugin'
+description: "Builds the Plugin"
+
+inputs:
+  shopware:
+    description: "The Shopware version that is used to build the plugin"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Start Docker
+      shell: bash
+      run: |
+        docker run --rm --name shop -d dockware/dev:${{ inputs.shopware }}
+        sleep 20
+        docker logs shop
+
+    - name: Update Shopware Config
+      shell: bash
+      run: |
+        docker exec shop bash -c 'sed -i "s/APP_ENV=dev/APP_ENV=prod/g" /var/www/html/.env' || true;
+
+    - name: Upload into Docker
+      shell: bash
+      run: |
+        docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
+        docker exec shop bash -c 'sudo chown www-data:www-data /var/www/html/custom/plugins -R'
+
+    # --------------------------------------------------------------------------------------------------------------------------------------
+
+    - name: Build Plugin
+      shell: bash
+      run: |
+        docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make release'
+
+    # --------------------------------------------------------------------------------------------------------------------------------------
+
+    - name: Download ZIP File
+      shell: bash
+      run: |
+        docker cp shop:/var/www/html/custom/plugins/.build/MolliePayments.zip ~/.build/MolliePayments.zip
+
+    - name: Store ZIP file in Github
+      uses: actions/upload-artifact@v2
+      with:
+        name: MolliePayments-Shopware-${{ inputs.shopware }}
+        retention-days: 4
+        path: ~/.build

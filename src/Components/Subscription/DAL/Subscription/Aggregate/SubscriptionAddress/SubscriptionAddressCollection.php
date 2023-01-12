@@ -6,6 +6,7 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionE
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 
 /**
+ * @extends EntityCollection<SubscriptionAddressEntity>
  * @method void add(SubscriptionEntity $entity)
  * @method void set(string $key, SubscriptionEntity $entity)
  * @method SubscriptionAddressEntity[]     getIterator()

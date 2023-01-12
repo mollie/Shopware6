@@ -57,4 +57,11 @@ export default class RefundManagerAction {
         cy.wait(4000);
     }
 
+    /**
+     *
+     */
+    selectAllItems() {
+        repoRefundManager.getSelectAllItemsButton().click(forceOption);
+    }
+
 }

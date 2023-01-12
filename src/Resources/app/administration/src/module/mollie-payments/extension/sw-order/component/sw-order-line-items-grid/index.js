@@ -17,6 +17,7 @@ Component.override('sw-order-line-items-grid', {
     inject: [
         'MolliePaymentsConfigService',
         'MolliePaymentsShippingService',
+        'acl',
     ],
 
 
@@ -114,7 +115,12 @@ Component.override('sw-order-line-items-grid', {
          * @returns {boolean}
          */
         isRefundManagerPossible() {
-            return this.configShowRefundManager;
+
+            if (!this.configShowRefundManager) {
+                return;
+            }
+
+            return this.acl.can('mollie_refund_manager:read');
         },
 
         /**

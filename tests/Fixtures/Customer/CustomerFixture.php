@@ -43,6 +43,17 @@ class CustomerFixture extends Fixture
     }
 
     /**
+     * @return string[]
+     */
+    public function groups(): array
+    {
+        return [
+            'mollie',
+            'mollie-demodata',
+        ];
+    }
+
+    /**
      * @param FixtureBag $bag
      * @return void
      */

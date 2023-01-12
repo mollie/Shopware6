@@ -26,7 +26,7 @@ abstract class AbstractSalesChannelGenerator implements GeneratorInterface
 
     /**
      * @param Context $context
-     * @return array<string, string>
+     * @return array<mixed>
      */
     protected function getSalesChannelIds(Context $context): array
     {

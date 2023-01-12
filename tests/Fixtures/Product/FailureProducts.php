@@ -39,6 +39,17 @@ class FailureProducts extends Fixture
     /**
      * @return string[]
      */
+    public function groups(): array
+    {
+        return [
+            'mollie',
+            'mollie-demodata',
+        ];
+    }
+
+    /**
+     * @return string[]
+     */
     public function dependsOn(): array
     {
         return [

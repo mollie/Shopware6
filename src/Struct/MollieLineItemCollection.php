@@ -6,6 +6,7 @@ use Mollie\Api\Types\OrderLineType;
 use Shopware\Core\Framework\Struct\StructCollection;
 
 /**
+ * @extends StructCollection<MollieLineItem>
  * @method void                add(MollieLineItem $entity)
  * @method void                set(string $key, MollieLineItem $entity)
  * @method MollieLineItem[]    getIterator()
@@ -46,5 +47,19 @@ class MollieLineItemCollection extends StructCollection
         }
 
         return $roundingSum;
+    }
+
+    /**
+     * @return float
+     */
+    public function getCartTotalAmount(): float
+    {
+        $sum = 0;
+
+        foreach ($this->getElements() as $item) {
+            $sum += $item->getPrice()->getTotalAmount();
+        }
+
+        return $sum;
     }
 }

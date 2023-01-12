@@ -1,4 +1,13 @@
-export default class OrdersListRepository {
+export default class OrderDetailsRepository {
+
+
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getDeliveryStatusTop() {
+        return cy.get(':nth-child(2) > .sw-order-state-select > .sw-field > .sw-block-field__block > #sw-field--selectedActionName');
+    }
 
     /**
      *
@@ -6,6 +15,14 @@ export default class OrdersListRepository {
      */
     getMollieActionsButton() {
         return cy.get('[style="grid-template-columns: 1fr auto; gap: 16px; place-items: stretch;"] > [align="right"] > .sw-button-group > .sw-context-button > .sw-button');
+    }
+
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getMollieActionButtonShipThroughMollie() {
+        return cy.get('.sw-order-line-items-grid__actions-ship-button');
     }
 
     /**
@@ -46,6 +63,54 @@ export default class OrdersListRepository {
      */
     getPaymentReferenceValue() {
         return cy.get('.mollie-order-user-card-payment-reference-value');
+    }
+
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getLineItemActionsButton(nthItem) {
+        return cy.get('.sw-data-grid__row--' + (nthItem - 1) + ' > .sw-data-grid__cell--actions > .sw-data-grid__cell-content > .sw-context-button > .sw-context-button__button');
+    }
+
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getLineItemActionsButtonShipThroughMollie() {
+        return cy.contains('Ship through Mollie');
+    }
+
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getEditButton() {
+        return cy.get('.smart-bar__actions > :nth-child(1) > .sw-button');
+    }
+
+    /**
+     *
+     * @param trackingCode
+     */
+    getTrackingCode(trackingCode) {
+        return cy.get(':nth-child(6) > .sw-field > .sw-block-field__block > .sw-select__selection > .sw-select-selection-list > li > .sw-select-selection-list__input');
+    }
+
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getSaveButton() {
+        return cy.get('.sw-button-process');
+    }
+
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getOrderSummarySection() {
+        return cy.get('.sw-order-detail__summary-data');
     }
 
 }

@@ -69,6 +69,14 @@ export default class RefundManagerRepository {
      *
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
+    getFirstRefundCompositionLabel() {
+        return cy.get('.sw-data-grid__cell--composition > .sw-data-grid__cell-content');
+    }
+
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
     getFirstRefundContextButton() {
         return cy.get('.mollie-refund-manager-refunds button[class=sw-context-button__button');
     }
@@ -79,6 +87,14 @@ export default class RefundManagerRepository {
      */
     getFirstRefundCancelButton() {
         return cy.contains('Cancel this refund');
+    }
+
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getSelectAllItemsButton() {
+        return cy.get('.order-container-top-left > .sw-button-group > :nth-child(1)');
     }
 
 }

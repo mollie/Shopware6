@@ -53,6 +53,13 @@
             <argument type="service" id="Kiener\MolliePayments\Service\Transition\OrderTransitionService"/>
         </service>
 
+
+        <service id="kiener.mollie_payments.http.client.factory" class="Kiener\MolliePayments\Service\HttpClient\PluginHttpClientFactory"/>
+
+        <service id="kiener.mollie_payments.http.client" class="Kiener\MolliePayments\Service\HttpClient\HttpClientInterface">
+            <factory service="kiener.mollie_payments.http.client.factory" method="buildClient"/>
+        </service>
+
         <!-- Services -->
 
         <service id="Kiener\MolliePayments\Service\CustomerService" class="Kiener\MolliePayments\Service\CustomerService">
@@ -87,6 +94,7 @@
             <argument type="service" id="media.repository"/>
             <argument type="service" id="payment_method.repository"/>
             <argument type="service" id="Shopware\Core\Framework\Plugin\Util\PluginIdProvider"/>
+            <argument type="service" id="kiener.mollie_payments.http.client"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\ProductService" class="Kiener\MolliePayments\Service\ProductService">
@@ -113,7 +121,6 @@
         <service id="Kiener\MolliePayments\Service\Cart\CartBackupService" class="Kiener\MolliePayments\Service\Cart\CartBackupService">
             <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
         </service>
-
 
 
         <service id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter" public="false">

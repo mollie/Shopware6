@@ -79,6 +79,10 @@ class OrderAttributes
      */
     private $creditCardFeeRegion;
 
+    /**
+     * @var string
+     */
+    private $timezone;
 
     /**
      * @var OrderEntity
@@ -106,6 +110,7 @@ class OrderAttributes
         $this->creditCardCountryCode = $this->getCustomFieldValue($order, 'creditCardCountryCode');
         $this->creditCardSecurity = $this->getCustomFieldValue($order, 'creditCardSecurity');
         $this->creditCardFeeRegion = $this->getCustomFieldValue($order, 'creditCardFeeRegion');
+        $this->timezone = $this->getCustomFieldValue($order, 'timezone');
     }
 
     /**
@@ -311,6 +316,22 @@ class OrderAttributes
     }
 
     /**
+     * @return string
+     */
+    public function getTimezone(): string
+    {
+        return $this->timezone;
+    }
+
+    /**
+     * @param string $timezone
+     */
+    public function setTimezone(string $timezone): void
+    {
+        $this->timezone = $timezone;
+    }
+
+    /**
      * @param null|stdClass $details
      * @return void
      */
@@ -405,6 +426,10 @@ class OrderAttributes
             $mollieData['creditCardFeeRegion'] = $this->creditCardFeeRegion;
         }
 
+        if ((string)$this->timezone !== '') {
+            $mollieData['timezone'] = $this->timezone;
+        }
+
         return [
             'mollie_payments' => $mollieData,
         ];
@@ -418,6 +443,11 @@ class OrderAttributes
         # if we already have a mollie subscription ID
         # then we KNOW it's a subscription
         if (!empty($this->mollieSubscriptionId)) {
+            return true;
+        }
+
+        # also a shopware subscription id reference, means we have one
+        if (!empty($this->swSubscriptionId)) {
             return true;
         }
 

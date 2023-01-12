@@ -110,7 +110,7 @@ context("Order Refunds", () => {
             repoRefundManager.getFirstRefundDescriptionLabel().contains(REFUND_DESCRIPTION);
             // because of (weird) number formats which might not be the same
             // all the time (even if they should) we just search within multiple formats
-            elementHelper.assertContainsText(
+            elementHelper.assertContainsTexts(
                 repoRefundManager.getFirstRefundAmountLabel(),
                 ['2.00', '2,00']
             )
@@ -119,6 +119,85 @@ context("Order Refunds", () => {
 
             // now cancel our pending refund
             // and make sure that its gone afterwards
+            refundManager.cancelPendingRefund();
+            cy.contains(REFUND_DESCRIPTION).should('not.exist')
+        })
+
+        it('C139487: Overwrite total amount in full item refund', () => {
+
+            createOrderAndOpenAdmin();
+
+            const REFUND_DESCRIPTION = 'item refund with custom amount with Cypress';
+
+            // -------------------------------------------------------------------------------
+
+            // open the refund manager
+            // and start a partial refund of 2 EUR
+            adminOrders.openRefundManager();
+
+            // click on SELECT ALL
+            refundManager.selectAllItems();
+
+            // now start the partial refund with a custom amount
+            refundManager.partialAmountRefund(2, REFUND_DESCRIPTION);
+
+            // -------------------------------------------------------------------------------
+
+            repoRefundManager.getFirstRefundStatusLabel().contains('Pending');
+            repoRefundManager.getFirstRefundDescriptionLabel().contains(REFUND_DESCRIPTION);
+
+            // verify that we have a valid composition (meaning item information)
+            repoRefundManager.getFirstRefundCompositionLabel().contains('1 x');
+
+            // verify our custom amount has been used
+            elementHelper.assertContainsTexts(
+                repoRefundManager.getFirstRefundAmountLabel(),
+                ['2.00', '2,00']
+            )
+
+            // -------------------------------------------------------------------------------
+
+            // now cancel our pending refund
+            // and make sure that its gone afterwards
+            refundManager.cancelPendingRefund();
+            cy.contains(REFUND_DESCRIPTION).should('not.exist')
+        })
+
+        it('C273581: Canceled refunds should not be visible', () => {
+
+            createOrderAndOpenAdmin();
+
+            const REFUND_DESCRIPTION = 'full refund executed twice with Cypress';
+            const CANCELED_REFUND_STATUS_LABEL = 'mollie-payments.refunds.status.canceled';
+            // -------------------------------------------------------------------------------
+
+            // open the refund manager
+            // and start a partial refund of 2 EUR
+            adminOrders.openRefundManager();
+
+            // check if our button is disabled if
+            // the checkbox for the verification is not enabled
+            repoRefundManager.getFullRefundButton().should('be.disabled');
+
+            // now start the full refund
+            refundManager.fullRefund(REFUND_DESCRIPTION);
+
+            // verify that our refund now exists
+            repoRefundManager.getFirstRefundStatusLabel().contains('Pending');
+            repoRefundManager.getFirstRefundDescriptionLabel().contains(REFUND_DESCRIPTION);
+
+            // -------------------------------------------------------------------------------
+
+            // now cancel our pending refund
+            // and make sure that its gone afterwards
+            refundManager.cancelPendingRefund();
+
+            // now start the partial refund
+            refundManager.partialAmountRefund(2, REFUND_DESCRIPTION);
+
+            cy.contains(CANCELED_REFUND_STATUS_LABEL).should('not.exist');
+
+            // second cancel should clear the history
             refundManager.cancelPendingRefund();
             cy.contains(REFUND_DESCRIPTION).should('not.exist')
         })

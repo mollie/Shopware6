@@ -15,5 +15,8 @@ module.exports = {
     ],
     "testMatch": [
         "<rootDir>/tests/**/*.spec.js"
-    ]
+    ],
+    "collectCoverage": true,
+    "collectCoverageFrom": ["<rootDir>/src/**"],
+    "coverageDirectory": "<rootDir>/.reports/jest/"
 };

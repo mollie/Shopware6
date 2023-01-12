@@ -8,7 +8,9 @@ use Kiener\MolliePayments\Exception\MollieOrderExpiredException;
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\PaymentHandler;
+use Kiener\MolliePayments\Service\MollieApi\Payment as MolliePayment;
 use Kiener\MolliePayments\Service\MollieApi\Payment as PaymentApiService;
+use Kiener\MolliePayments\Service\MollieApi\RequestAnonymizer\MollieRequestAnonymizer;
 use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Order as MollieOrder;
@@ -42,17 +44,30 @@ class Order
     private $routingBuilder;
 
     /**
+     * @var MollieRequestAnonymizer
+     */
+    private $requestAnonymizer;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
 
 
-    public function __construct(MollieApiFactory $clientFactory, PaymentApiService $paymentApiService, RoutingBuilder $routingBuilder, LoggerInterface $logger)
+    /**
+     * @param MollieApiFactory $clientFactory
+     * @param MolliePayment $paymentApiService
+     * @param RoutingBuilder $routingBuilder
+     * @param MollieRequestAnonymizer $requestAnonymizer
+     * @param LoggerInterface $logger
+     */
+    public function __construct(MollieApiFactory $clientFactory, PaymentApiService $paymentApiService, RoutingBuilder $routingBuilder, MollieRequestAnonymizer $requestAnonymizer, LoggerInterface $logger)
     {
         $this->clientFactory = $clientFactory;
         $this->logger = $logger;
         $this->paymentApiService = $paymentApiService;
         $this->routingBuilder = $routingBuilder;
+        $this->requestAnonymizer = $requestAnonymizer;
     }
 
     /**
@@ -77,6 +92,31 @@ class Order
             );
 
             throw new CouldNotFetchMollieOrderException($mollieOrderId, $e);
+        }
+    }
+
+    /**
+     * @param string $paymentId
+     * @param string $salesChannelId
+     * @param array<mixed> $parameters
+     * @return Payment
+     */
+    public function getMolliePayment(string $paymentId, string $salesChannelId, array $parameters = []): Payment
+    {
+        try {
+            $apiClient = $this->clientFactory->getClient($salesChannelId);
+
+            return $apiClient->payments->get($paymentId, $parameters);
+        } catch (ApiException $e) {
+            $this->logger->error(
+                sprintf(
+                    'API error occurred when fetching mollie payment %s with message %s',
+                    $paymentId,
+                    $e->getMessage()
+                )
+            );
+
+            throw new CouldNotFetchMollieOrderException($paymentId, $e);
         }
     }
 
@@ -114,6 +154,15 @@ class Order
          * Create an order at Mollie based on the prepared array of order data.
          */
         try {
+            $anonymizedData = $this->requestAnonymizer->anonymize($orderData);
+
+            $this->logger->debug(
+                'Mollie Order Request',
+                [
+                    'body' => $anonymizedData
+                ]
+            );
+
             return $apiClient->orders->create($orderData);
         } catch (ApiException $e) {
             $this->logger->critical(
@@ -359,32 +408,49 @@ class Order
 
     /**
      * @param string $mollieOrderId
+     * @param string $molliePaymentId
      * @param null|string $salesChannelId
      * @return Payment
      */
-    public function getCompletedPayment(string $mollieOrderId, ?string $salesChannelId): Payment
+    public function getCompletedPayment(string $mollieOrderId, string $molliePaymentId, ?string $salesChannelId): Payment
     {
-        $mollieOrder = $this->getMollieOrder($mollieOrderId, (string)$salesChannelId, ['embed' => 'payments']);
+        $allowed = [
+            PaymentStatus::STATUS_PAID,
+            PaymentStatus::STATUS_AUTHORIZED // Klarna
+        ];
 
-        $payments = $mollieOrder->payments();
 
-        if ($payments instanceof PaymentCollection) {
-            if ($payments->count() === 0) {
-                throw new PaymentNotFoundException($mollieOrderId);
-            }
+        if (!empty($mollieOrderId)) {
 
-            $allowed = [
-                PaymentStatus::STATUS_PAID,
-                PaymentStatus::STATUS_AUTHORIZED // Klarna
-            ];
+            # ORDER_ID, ord_123
+            $mollieOrder = $this->getMollieOrder($mollieOrderId, (string)$salesChannelId, ['embed' => 'payments']);
 
-            foreach ($payments->getArrayCopy() as $payment) {
-                if (in_array($payment->status, $allowed)) {
-                    return $payment;
+            $payments = $mollieOrder->payments();
+
+            if ($payments instanceof PaymentCollection) {
+                if ($payments->count() === 0) {
+                    throw new PaymentNotFoundException($mollieOrderId);
+                }
+
+                foreach ($payments->getArrayCopy() as $payment) {
+                    if (in_array($payment->status, $allowed)) {
+                        return $payment;
+                    }
                 }
             }
-        }
 
-        throw new PaymentNotFoundException($mollieOrderId);
+            throw new PaymentNotFoundException($mollieOrderId);
+        } else {
+
+            # TRANSACTION_ID,.... tr_abc
+
+            $payment = $this->getMolliePayment($molliePaymentId, (string)$salesChannelId);
+
+            if (in_array($payment->status, $allowed)) {
+                return $payment;
+            }
+
+            throw new PaymentNotFoundException($molliePaymentId);
+        }
     }
 }

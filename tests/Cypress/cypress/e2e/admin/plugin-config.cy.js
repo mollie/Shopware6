@@ -26,14 +26,39 @@ context("Plugin Config", () => {
 
     context(devices.getDescription(device), () => {
 
+        it('C147522: Onboarding Section is visible @core', () => {
+
+            adminLogin.login();
+            pluginAction.openPluginConfiguration();
+
+            cy.contains('Onboarding is easy with Mollie!');
+        })
+
+        it('C147523: Update Payment Method triggers action @core', () => {
+
+            adminLogin.login();
+            pluginAction.openPluginConfiguration();
+
+            cy.get('.sw-system-config--field-mollie-payments-config-mollie-plugin-config-section-payments > .sw-container > .sw-button').click();
+
+            cy.contains('The payment methods are successfully updated.');
+        })
+
+        it('C148986: Rounding Settings Information is visible @core', () => {
+
+            adminLogin.login();
+            pluginAction.openPluginConfiguration();
+
+            cy.contains('Shopware can use currency settings to calculate');
+        })
+
         it('C4001: Smart Contact Form is responding properly @core', () => {
 
             adminLogin.login();
-
             pluginAction.openPluginConfiguration();
 
-            cy.get('.col-right > button.sw-button', { timeout: 10000 }).click();
-            
+            cy.get('.col-right > button.sw-button', {timeout: 10000}).click();
+
             // we have to see our modal popup
             cy.contains('Request support from Mollie');
 
@@ -56,5 +81,39 @@ context("Plugin Config", () => {
             cy.get('.sw-button-process').should('not.be.disabled');
         })
 
+
+        it('C234008: Custom format for order number shows interactive preview @core', () => {
+
+            adminLogin.login();
+            pluginAction.openPluginConfiguration();
+
+            const inputPrefix = '.sw-system-config--field-mollie-payments-config-format-order-number > .sw-field';
+            const divPreview = '.sw-system-config--field-mollie-payments-config-mollie-plugin-config-section-payments-format';
+            
+            // this feature doesn't work in lower shopware numbers
+            // just test that it's not visible and that our textfield can be edited
+            if (shopware.isVersionLowerEqual('6.3.5.2')) {
+                cy.get(inputPrefix).click().clear();
+                cy.get(divPreview).should('not.be.visible');
+                return;
+            }
+
+            cy.get(inputPrefix).click().clear();
+            cy.get(divPreview).should('not.be.visible');
+
+            cy.get(inputPrefix).click().type('cypress');
+            cy.get(divPreview).should('be.visible');
+            cy.contains(divPreview, '"cypress"');
+
+            cy.get(inputPrefix).click().clear();
+            cy.get(inputPrefix).click().type('cypress_{ordernumber}', {parseSpecialCharSequences: false});
+            cy.get(divPreview).should('be.visible');
+            cy.contains(divPreview, '"cypress_1000"');
+
+            cy.get(inputPrefix).click().clear();
+            cy.get(inputPrefix).click().type('cypress_{ordernumber}-stage', {parseSpecialCharSequences: false});
+            cy.get(divPreview).should('be.visible');
+            cy.contains(divPreview, '"cypress_1000-stage"');
+        })
     })
 })

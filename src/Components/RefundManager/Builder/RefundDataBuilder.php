@@ -8,18 +8,18 @@ use Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem\Promotio
 use Kiener\MolliePayments\Components\RefundManager\RefundData\RefundData;
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Service\MollieApi\Order;
-use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\OrderServiceInterface;
 use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
 use Kiener\MolliePayments\Service\Refund\Item\RefundItemType;
 use Kiener\MolliePayments\Service\Refund\Mollie\RefundMetadata;
 use Kiener\MolliePayments\Service\Refund\RefundService;
 use Kiener\MolliePayments\Service\Refund\RefundServiceInterface;
+use Kiener\MolliePayments\Struct\MollieApi\OrderLineMetaDataStruct;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Refund;
-use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 
@@ -106,10 +106,13 @@ class RefundDataBuilder
                     $alreadyRefundedQty = $this->getRefundedQuantity($mollieOrderLineId, $mollieOrder, $refunds);
                 }
 
-                # this is just a way to move the
-                # promotions to the last positions of our array
-                if ($this->isPromotion($item)) {
-                    $refundPromotionItems[] = new PromotionItem($item, $alreadyRefundedQty);
+                # this is just a way to move the promotions to the last positions of our array.
+                # also, shipping-free promotions have their discount item in the deliveries,...so here would just
+                # be a 0,00 value line item, that we want to skip.
+                if ($lineItemAttribute->isPromotion()) {
+                    if ($item->getTotalPrice() !== 0.0) {
+                        $refundPromotionItems[] = PromotionItem::fromOrderLineItem($item, $alreadyRefundedQty);
+                    }
                 } else {
                     $refundItems[] = new ProductItem($item, $promotionCompositions, $alreadyRefundedQty);
                 }
@@ -121,6 +124,7 @@ class RefundDataBuilder
         # these are unfortunately no line items.
         # they are saved in a separate delivery collection
         if ($order->getDeliveries() !== null) {
+            /** @var OrderDeliveryEntity $delivery */
             foreach ($order->getDeliveries() as $delivery) {
                 $alreadyRefundedQty = 0;
 
@@ -142,10 +146,28 @@ class RefundDataBuilder
                     $alreadyRefundedQty = $this->getRefundedQuantity($mollieLineID, $mollieOrder, $refunds);
                 }
 
-                $refundDeliveryItems[] = new DeliveryItem($delivery, $alreadyRefundedQty);
+                if ($delivery->getShippingCosts()->getTotalPrice() < 0) {
+                    $refundPromotionItems[] = PromotionItem::fromOrderDeliveryItem($delivery, $alreadyRefundedQty);
+                } else {
+                    $refundDeliveryItems[] = new DeliveryItem($delivery, $alreadyRefundedQty);
+                }
             }
         }
 
+
+        $roundingDiffTotal = 0;
+
+        // now search all line items in Mollie that are not recognized in Shopware yet
+        if ($mollieOrder instanceof \Mollie\Api\Resources\Order) {
+            $lines = $mollieOrder->lines();
+            /** @var OrderLine $mollieLine */
+            foreach ($lines as $mollieLine) {
+                $metaDataStruct = new OrderLineMetaDataStruct($mollieLine);
+                if ($metaDataStruct->isRoundingItem()) {
+                    $roundingDiffTotal = $metaDataStruct->getAmount();
+                }
+            }
+        }
 
         # now merge all line items
         # we first need products, then promotions and as last type we add the deliveries
@@ -177,22 +199,11 @@ class RefundDataBuilder
             $voucherAmount,
             $pendingRefundAmount,
             $refundedTotal,
-            $remaining
+            $remaining,
+            $roundingDiffTotal
         );
     }
 
-    /**
-     * @param OrderLineItemEntity $itemEntity
-     * @return bool
-     */
-    private function isPromotion(OrderLineItemEntity $itemEntity): bool
-    {
-        if ($itemEntity->getPayload() === null) {
-            return false;
-        }
-
-        return isset($itemEntity->getPayload()['composition']);
-    }
 
     /**
      * @param array<mixed> $refunds

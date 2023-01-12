@@ -18,6 +18,7 @@ Component.register('mollie-refund-manager', {
     inject: [
         'MolliePaymentsConfigService',
         'MolliePaymentsRefundService',
+        'acl',
     ],
 
     props: {
@@ -54,6 +55,7 @@ Component.register('mollie-refund-manager', {
             pendingRefunds: 0,
             checkVerifyRefund: false,
             refundDescription: '',
+            roundingDiff: 0,
             // -------------------------------
             // tutorials
             tutorialFullRefundVisible: false,
@@ -103,6 +105,22 @@ Component.register('mollie-refund-manager', {
         gridMollieRefundsColumns() {
             const grid = new MollieRefundsGrid();
             return grid.buildColumns();
+        },
+
+        /**
+         *
+         * @returns {*}
+         */
+        isAclRefundAllowed() {
+            return this.acl.can('mollie_refund_manager:create');
+        },
+
+        /**
+         *
+         * @returns {*}
+         */
+        isAclCancelAllowed() {
+            return this.acl.can('mollie_refund_manager:delete');
         },
 
     },
@@ -358,6 +376,10 @@ Component.register('mollie-refund-manager', {
          */
         btnRefund_Click() {
 
+            if (!this.isAclRefundAllowed) {
+                return;
+            }
+
             if (this.refundAmount <= 0.0) {
                 this._showNotificationWarning(this.$tc('mollie-payments.refund-manager.notifications.error.low-amount'));
                 return;
@@ -387,10 +409,11 @@ Component.register('mollie-refund-manager', {
                     items: itemData,
                 })
                 .then((response) => {
-                    this._handleRefundSuccess(response)
-                })
-                .catch((response) => {
-                    this._showNotificationError(response.message);
+                    if (response.success) {
+                        this._handleRefundSuccess(response)
+                    } else {
+                        this._showNotificationError(response.errors[0]);
+                    }
                 })
                 .finally(() => {
                     this.isRefunding = false;
@@ -403,6 +426,11 @@ Component.register('mollie-refund-manager', {
          * but only do a full refund and stock reset.
          */
         btnRefundFull_Click() {
+
+            if (!this.isAclRefundAllowed) {
+                return;
+            }
+
             this.isRefunding = false;
             this.MolliePaymentsRefundService.refundAll(
                 {
@@ -410,10 +438,11 @@ Component.register('mollie-refund-manager', {
                     description: this.refundDescription,
                 })
                 .then((response) => {
-                    this._handleRefundSuccess(response)
-                })
-                .catch((response) => {
-                    this._showNotificationError(response.message);
+                    if (response.success) {
+                        this._handleRefundSuccess(response)
+                    } else {
+                        this._showNotificationError(response.errors[0]);
+                    }
                 })
                 .finally(() => {
                     this.isRefunding = false;
@@ -460,7 +489,11 @@ Component.register('mollie-refund-manager', {
             const result = [];
 
             item.metadata.composition.forEach(function (entry) {
-                result.push(entry.swReference + ' (' + entry.quantity + ' x ' + entry.amount + ' ' + me.order.currency.symbol + ')');
+                let label = entry.label;
+                if(entry.swReference.length > 0){
+                    label = entry.swReference;
+                }
+                result.push(label + ' (' + entry.quantity + ' x ' + entry.amount + ' ' + me.order.currency.symbol + ')');
             });
 
             return result;
@@ -494,21 +527,23 @@ Component.register('mollie-refund-manager', {
          */
         btnCancelRefund_Click(item) {
 
+            if (!this.isAclCancelAllowed) {
+                return;
+            }
+
             this.MolliePaymentsRefundService.cancel(
                 {
                     orderId: this.order.id,
                     refundId: item.id,
                 })
                 .then((response) => {
-                    if (!response.success) {
-                        this._showNotificationError(this.$tc('mollie-payments.refund-manager.notifications.error.refund-canceled'));
-                        return;
+                    if (response.success) {
+                        this._showNotificationSuccess(this.$tc('mollie-payments.refund-manager.notifications.success.refund-canceled'));
+                        this.$emit('refund-cancelled');
+                        this._fetchFormData();
+                    } else {
+                        this._showNotificationError(response.errors[0]);
                     }
-
-                    this._showNotificationSuccess(this.$tc('mollie-payments.refund-manager.notifications.success.refund-canceled'));
-
-                    this.$emit('refund-cancelled');
-                    this._fetchFormData();
                 })
                 .catch((response) => {
                     this._showNotificationError(response.error);
@@ -541,6 +576,7 @@ Component.register('mollie-refund-manager', {
                     orderId: this.order.id,
                 })
                 .then((response) => {
+
                     // we got the response from our plugin API endpoint.
                     // now simply assign the values to our props
                     // so that vue will show it
@@ -549,6 +585,7 @@ Component.register('mollie-refund-manager', {
                     this.refundedAmount = response.totals.refunded;
                     this.voucherAmount = response.totals.voucherAmount;
                     this.pendingRefunds = response.totals.pendingRefunds;
+                    this.roundingDiff = response.totals.roundingDiff;
 
                     // build our local items
                     // we have to build it by assigning it to a new local object,
@@ -574,13 +611,6 @@ Component.register('mollie-refund-manager', {
 
                     // yep, we're done loading ;)
                     this.isRefundDataLoading = false;
-                })
-                .catch((response) => {
-                    this.isRefundDataLoading = false;
-                    // now show an error
-                    this.createNotificationError({
-                        message: response.message,
-                    });
                 });
         },
 

@@ -23,6 +23,33 @@ export default class MolliePaymentsSubscriptionService extends ApiService {
         return this.__post('/cancel', data);
     }
 
+    /**
+     *
+     * @param data
+     * @returns {*}
+     */
+    pause(data = {id: null, customerId: null, salesChannelId: null}) {
+        return this.__post('/pause', data);
+    }
+
+    /**
+     *
+     * @param data
+     * @returns {*}
+     */
+    resume(data = {id: null, customerId: null, salesChannelId: null}) {
+        return this.__post('/resume', data);
+    }
+
+    /**
+     *
+     * @param data
+     * @returns {*}
+     */
+    skip(data = {id: null, customerId: null, salesChannelId: null}) {
+        return this.__post('/skip', data);
+    }
+
 
     /**
      *
@@ -40,6 +67,9 @@ export default class MolliePaymentsSubscriptionService extends ApiService {
             )
             .then((response) => {
                 return ApiService.handleResponse(response);
+            })
+            .catch((error) => {
+                return ApiService.handleResponse(error.response);
             });
     }
 
@@ -62,6 +92,9 @@ export default class MolliePaymentsSubscriptionService extends ApiService {
             )
             .then((response) => {
                 return ApiService.handleResponse(response);
+            })
+            .catch((error) => {
+                return ApiService.handleResponse(error.response);
             });
     }
 

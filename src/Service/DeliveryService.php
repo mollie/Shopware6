@@ -7,6 +7,7 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 
 class DeliveryService
@@ -54,8 +55,13 @@ class DeliveryService
 
         $deliveryCriteria->addAssociation('order');
 
-        return $this->getRepository()
-            ->search($deliveryCriteria, $context ?? Context::createDefaultContext())->get($deliveryId);
+        /** @var EntitySearchResult<OrderDeliveryEntity> $result */
+        $result = $this->getRepository()->search($deliveryCriteria, $context ?? Context::createDefaultContext());
+
+        /** @var null|OrderDeliveryEntity $delivery */
+        $delivery = $result->get($deliveryId);
+
+        return $delivery;
     }
 
     /**

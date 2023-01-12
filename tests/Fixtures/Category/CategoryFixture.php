@@ -36,6 +36,19 @@ class CategoryFixture extends Fixture
         $this->categoryRepository = $categoryRepository;
     }
 
+
+    /**
+     * @return string[]
+     */
+    public function groups(): array
+    {
+        return [
+            'mollie',
+            'mollie-demodata',
+        ];
+    }
+
+
     /**
      * @param FixtureBag $bag
      * @return void
@@ -48,6 +61,7 @@ class CategoryFixture extends Fixture
         $this->createCategory('0d8eefdd6d12456335280e2ff42431b9', "Voucher", $afterCatId);
         $this->createCategory('0d9eefdd6d12456335280e2ff42431b2', "Subscriptions", $afterCatId);
         $this->createCategory('0d9eefdd6d12456335280e2ff42431b9', "Failures", $afterCatId);
+        $this->createCategory('2a2eefdd6d12456335280e2ff42431b9', "Rounding", $afterCatId);
     }
 
     /**

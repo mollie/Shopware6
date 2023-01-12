@@ -20,6 +20,28 @@ externalDocs:
 
 paths:
 
+  /store-api/account/login:
+    post:
+      tags:
+        - "Account"
+      summary: "Login with a customer"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  default: ""
+                password:
+                  default: ""
+      responses:
+        "200":
+          description: "successful operation"
+
   /store-api/checkout/cart:
     get:
       tags:
@@ -103,6 +125,19 @@ paths:
       security:
         - AccessKey: [ ]
         - AccessToken: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orderId:
+                  default: "#"
+                finishUrl:
+                  default: ""
+                errorUrl:
+                  default: ""
+
       responses:
         "200":
           description: "successful operation"
@@ -191,7 +226,7 @@ paths:
     post:
       tags:
         - "Apple Pay Direct"
-      summary: "Adds a new product to the Apple Pay Direct cart"
+      summary: "(optional) Adds a new product to the Apple Pay Direct cart. Skip this step if you want to proceed with the current Shopware cart of the user"
       security:
         - AccessKey: [ ]
         - AccessToken: [ ]
@@ -323,7 +358,7 @@ paths:
     post:
       tags:
         - "Apple Pay Direct"
-      summary: "Restores the original Shopware cart. Use this on Apple Pay cancellation events"
+      summary: "(Optional) Restores the original Shopware cart. Use this on Apple Pay cancellation events. You only need this, if you have used the add-product route before."
       security:
         - AccessKey: [ ]
         - AccessToken: [ ]
@@ -332,6 +367,203 @@ paths:
           description: "successful operation"
 
 
+  /store-api/mollie/subscription:
+    get:
+      tags:
+        - "Subscriptions"
+      summary: "Gets all confirmed subscriptions of the current account."
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/mollie/subscription/{subscriptionId}/billing/update:
+    post:
+      tags:
+        - "Subscriptions"
+      summary: "Updates the billing address of a subscription"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      parameters:
+        - in: "path"
+          name: "subscriptionId"
+          description: "ID of the Shopware subscription that will be updated"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                salutationId:
+                  default: ""
+                title:
+                  default: ""
+                firstName:
+                  default: ""
+                lastName:
+                  default: ""
+                company:
+                  default: ""
+                department:
+                  default: ""
+                additionalField1:
+                  default: ""
+                additionalField2:
+                  default: ""
+                phoneNumber:
+                  default: ""
+                street:
+                  default: ""
+                zipcode:
+                  default: ""
+                city:
+                  default: ""
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/mollie/subscription/{subscriptionId}/shipping/update:
+    post:
+      tags:
+        - "Subscriptions"
+      summary: "Updates the shipping address of a subscription"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      parameters:
+        - in: "path"
+          name: "subscriptionId"
+          description: "ID of the Shopware subscription that will be updated"
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                salutationId:
+                  default: ""
+                title:
+                  default: ""
+                firstName:
+                  default: ""
+                lastName:
+                  default: ""
+                company:
+                  default: ""
+                department:
+                  default: ""
+                additionalField1:
+                  default: ""
+                additionalField2:
+                  default: ""
+                phoneNumber:
+                  default: ""
+                street:
+                  default: ""
+                zipcode:
+                  default: ""
+                city:
+                  default: ""
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/mollie/subscription/{subscriptionId}/payment/update:
+    post:
+      tags:
+        - "Subscriptions"
+      summary: "Starts the update process of the payment method for a subscription"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      parameters:
+        - in: "path"
+          name: "subscriptionId"
+          description: "ID of the Shopware subscription that will be updated"
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                redirectUrl:
+                  default: "https://localhost/return-xyz"
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/mollie/subscription/{subscriptionId}/pause:
+    post:
+      tags:
+        - "Subscriptions"
+      summary: "Pauses a running subscription"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      parameters:
+        - in: "path"
+          name: "subscriptionId"
+          description: "ID of the Shopware subscription that will be updated"
+          required: true
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/mollie/subscription/{subscriptionId}/resume:
+    post:
+      tags:
+        - "Subscriptions"
+      summary: "Resumes a paused subscription"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      parameters:
+        - in: "path"
+          name: "subscriptionId"
+          description: "ID of the Shopware subscription that will be updated"
+          required: true
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/mollie/subscription/{subscriptionId}/skip:
+    post:
+      tags:
+        - "Subscriptions"
+      summary: "Skips a running subscription"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      parameters:
+        - in: "path"
+          name: "subscriptionId"
+          description: "ID of the Shopware subscription that will be updated"
+          required: true
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/mollie/subscription/{subscriptionId}/cancel:
+    post:
+      tags:
+        - "Subscriptions"
+      summary: "Cancels a running subscription"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      parameters:
+        - in: "path"
+          name: "subscriptionId"
+          description: "ID of the Shopware subscription that will be updated"
+          required: true
+      responses:
+        "200":
+          description: "successful operation"
 
   /api/mollie/webhook/{transactionId}:
     post:
@@ -347,15 +579,61 @@ paths:
         "200":
           description: "successful operation"
 
-  /api/mollie/webhook/subscription/{subscriptionId}/renew:
+  /api/mollie/webhook/subscription/{subscriptionId}:
     post:
       tags:
         - "Webhooks"
-      summary: "Sends a subscription renewal webhook to Shopware"
+      summary: "Start a subscription renewal or update an existing subscription order and payment status."
       parameters:
         - in: "path"
           name: "subscriptionId"
-          description: "ID of the Shopware Subscription that should be renewed"
+          description: "ID of the Shopware Subscription"
+          required: true
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: "The matching transaction ID of Mollie that was captured. tr_xyz, ..."
+      responses:
+        "200":
+          description: "successful operation"
+
+  /api/mollie/webhook/subscription/{subscriptionId}/mandate/update:
+    post:
+      tags:
+        - "Webhooks"
+      summary: "Updates the mandate for the subscription after an initial update-payment-method action from the customer."
+      parameters:
+        - in: "path"
+          name: "subscriptionId"
+          description: "ID of the Shopware Subscription"
+          required: true
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: "The matching transaction ID of Mollie that was used with the 0,00 amount payment. tr_xyz, ..."
+      responses:
+        "200":
+          description: "successful operation"
+
+  /api/mollie/webhook/subscription/{subscriptionId}/renew:
+    post:
+      tags:
+        - "Webhooks (Legacy)"
+      summary: "Start a subscription renewal or update an existing subscription order and payment status. This was a misleading name and is now a legacy URL but still required for old payments."
+      parameters:
+        - in: "path"
+          name: "subscriptionId"
+          description: "ID of the Shopware Subscription"
           required: true
       requestBody:
         content:

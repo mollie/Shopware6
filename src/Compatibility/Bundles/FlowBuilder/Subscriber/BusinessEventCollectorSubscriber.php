@@ -5,8 +5,11 @@ namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Subscriber;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund\RefundStartedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionCancelledEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionEndedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionPausedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionRemindedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionRenewedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionResumedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionSkippedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionStartedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookReceivedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedAuthorizedEvent;
@@ -78,6 +81,9 @@ class BusinessEventCollectorSubscriber implements EventSubscriberInterface
             # --------------------------------------------
             SubscriptionStartedEvent::class,
             SubscriptionEndedEvent::class,
+            SubscriptionPausedEvent::class,
+            SubscriptionResumedEvent::class,
+            SubscriptionSkippedEvent::class,
             SubscriptionCancelledEvent::class,
             SubscriptionRemindedEvent::class,
             SubscriptionRenewedEvent::class,

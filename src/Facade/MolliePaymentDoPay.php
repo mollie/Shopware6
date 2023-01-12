@@ -26,6 +26,8 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Twig\Environment;
+use Twig\Extension\CoreExtension;
 
 class MolliePaymentDoPay
 {
@@ -74,6 +76,11 @@ class MolliePaymentDoPay
     private $subscriptionManager;
 
     /**
+     * @var Environment
+     */
+    private $twig;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -89,9 +96,10 @@ class MolliePaymentDoPay
      * @param UpdateOrderCustomFields $updateOrderCustomFields
      * @param UpdateOrderLineItems $updateOrderLineItems
      * @param SubscriptionManagerInterface $subscriptionManager
+     * @param Environment $twig
      * @param LoggerInterface $logger
      */
-    public function __construct(OrderDataExtractor $extractor, MollieOrderBuilder $orderBuilder, OrderService $orderService, Order $orderApiService, CustomerService $customerService, SettingsService $settingsService, UpdateOrderCustomFields $updateOrderCustomFields, UpdateOrderLineItems $updateOrderLineItems, SubscriptionManagerInterface $subscriptionManager, LoggerInterface $logger)
+    public function __construct(OrderDataExtractor $extractor, MollieOrderBuilder $orderBuilder, OrderService $orderService, Order $orderApiService, CustomerService $customerService, SettingsService $settingsService, UpdateOrderCustomFields $updateOrderCustomFields, UpdateOrderLineItems $updateOrderLineItems, SubscriptionManagerInterface $subscriptionManager, Environment $twig, LoggerInterface $logger)
     {
         $this->extractor = $extractor;
         $this->orderBuilder = $orderBuilder;
@@ -102,6 +110,7 @@ class MolliePaymentDoPay
         $this->updaterOrderCustomFields = $updateOrderCustomFields;
         $this->updaterLineItemCustomFields = $updateOrderLineItems;
         $this->subscriptionManager = $subscriptionManager;
+        $this->twig = $twig;
         $this->logger = $logger;
     }
 
@@ -141,6 +150,13 @@ class MolliePaymentDoPay
         $orderCustomFields = new OrderAttributes($order);
         $orderCustomFields->setTransactionReturnUrl($transactionStruct->getReturnUrl());
 
+        # Store current timezone in the order so we can fix the timezone during webhook calls.
+        if ($this->twig->hasExtension(CoreExtension::class)) {
+            /** @var CoreExtension $coreExtension */
+            $coreExtension = $this->twig->getExtension(CoreExtension::class);
+            $orderCustomFields->setTimezone($coreExtension->getTimezone()->getName());
+        }
+
         # extract the main Mollie Order ID "ord_xyz" that
         # we are working on in this case. this is empty for first orders
         # but filled if we do another payment attempt for an existing order.
@@ -166,7 +182,7 @@ class MolliePaymentDoPay
                 # Warn about cancelled/expired order, but otherwise do nothing and let it create a new order.
                 $this->logger->warning($e->getMessage(), [
                     'orderNumber' => $order->getOrderNumber(),
-                    'mollieOrderId' => $mollieOrderId
+                    'mollieOrderId' => $mollieOrderId,
                 ]);
             }
         }
@@ -194,8 +210,7 @@ class MolliePaymentDoPay
         # this will prepare the subscriptions in our database.
         # the confirmation of these, however, will be done in a webhook
         $subscriptionId = $this->subscriptionManager->createSubscription($order, $salesChannelContext);
-
-
+        
         # now update our custom struct values
         # and immediately set our Mollie Order ID and more
         $orderCustomFields->setMollieOrderId($mollieOrder->id);

@@ -7,7 +7,7 @@ use Mollie\Api\Resources\Refund;
 
 class RefundData
 {
-
+    public const ROUNDING_ITEM_LABEL = 'ROUNDING_DIFF';
     /**
      * @var AbstractItem[]
      */
@@ -38,6 +38,10 @@ class RefundData
      */
     private $amountRemaining;
 
+    /**
+     * @var float
+     */
+    private $roundingItemTotal;
 
     /**
      * @param AbstractItem[] $cartItems
@@ -46,8 +50,9 @@ class RefundData
      * @param float $amountPendingRefunds
      * @param float $amountCompletedRefunds
      * @param float $amountRemaining
+     * @param float $roundingItemTotal
      */
-    public function __construct(array $cartItems, array $refunds, float $amountVouchers, float $amountPendingRefunds, float $amountCompletedRefunds, float $amountRemaining)
+    public function __construct(array $cartItems, array $refunds, float $amountVouchers, float $amountPendingRefunds, float $amountCompletedRefunds, float $amountRemaining, float $roundingItemTotal)
     {
         $this->orderItems = $cartItems;
         $this->refunds = $refunds;
@@ -55,6 +60,7 @@ class RefundData
         $this->amountPendingRefunds = $amountPendingRefunds;
         $this->amountCompletedRefunds = $amountCompletedRefunds;
         $this->amountRemaining = $amountRemaining;
+        $this->roundingItemTotal = $roundingItemTotal;
     }
 
     /**
@@ -105,6 +111,14 @@ class RefundData
         return $this->amountRemaining;
     }
 
+    /**
+     * @return float
+     */
+    public function getRoundingItemTotal(): float
+    {
+        return $this->roundingItemTotal;
+    }
+
 
     /**
      * @return array<mixed>
@@ -118,15 +132,28 @@ class RefundData
             $hydratedOrderItems[] = $item->toArray();
         }
 
+        /** @var array<mixed> $refundsArray */
+        $refundsArray = $this->refunds;
+        foreach ($refundsArray as $refundIndex => $refund) {
+            if (isset($refund['metadata']['composition']) && is_array($refund['metadata']['composition'])) {
+                foreach ($refund['metadata']['composition'] as $compositionIndex => $composition) {
+                    if ((bool)$composition['swReference'] === false) {
+                        $refundsArray[$refundIndex]['metadata']['composition'][$compositionIndex]['label'] = self::ROUNDING_ITEM_LABEL;
+                    }
+                }
+            }
+        }
+
         return [
             'totals' => [
                 'remaining' => round($this->amountRemaining, 2),
                 'voucherAmount' => round($this->amountVouchers, 2),
                 'pendingRefunds' => round($this->amountPendingRefunds, 2),
                 'refunded' => round($this->amountCompletedRefunds, 2),
+                'roundingDiff' => round($this->roundingItemTotal, 2),
             ],
             'cart' => $hydratedOrderItems,
-            'refunds' => $this->refunds,
+            'refunds' => $refundsArray,
         ];
     }
 }

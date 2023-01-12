@@ -34,20 +34,24 @@ class MollieLineItemHydrator
         foreach ($lineItems as $lineItem) {
             $price = $lineItem->getPrice();
 
+            # get custom meta data from our prepared mollie item
+            $metadata = $lineItem->getMetaData();
+
+            # always add our line item id
+            $metadata['orderLineItemId'] = $lineItem->getLineItemId();
+
             $lines[] = [
                 'type' => $lineItem->getType(),
                 'name' => $lineItem->getName(),
                 'quantity' => $lineItem->getQuantity(),
                 'unitPrice' => $this->priceBuilder->build($price->getUnitPrice(), $currencyCode),
                 'totalAmount' => $this->priceBuilder->build($price->getTotalAmount(), $currencyCode),
-                'vatRate' => number_format($price->getVatRate(), MollieOrderPriceBuilder::MOLLIE_PRICE_PRECISION, '.', ''),
+                'vatRate' => $this->priceBuilder->formatValue($price->getVatRate()),
                 'vatAmount' => $this->priceBuilder->build($price->getVatAmount(), $currencyCode),
                 'sku' => $lineItem->getSku(),
                 'imageUrl' => $lineItem->getImageUrl(),
                 'productUrl' => $lineItem->getProductUrl(),
-                'metadata' => [
-                    'orderLineItemId' => $lineItem->getLineItemId(),
-                ],
+                'metadata' => $metadata,
             ];
         }
 

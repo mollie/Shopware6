@@ -11,6 +11,23 @@ class SubscriptionMetadataTest extends TestCase
 
 
     /**
+     * This test verifies that our properties can be
+     * accessed correctly.
+     *
+     * @return void
+     */
+    public function testProperties(): void
+    {
+        $meta = new SubscriptionMetadata('2022-05-01', 1, IntervalType::MONTHS, 5, 'tr_123');
+
+        static::assertSame('2022-05-01', $meta->getStartDate());
+        static::assertSame(1, $meta->getInterval());
+        static::assertSame(IntervalType::MONTHS, $meta->getIntervalUnit());
+        static::assertSame(5, $meta->getTimes());
+        static::assertSame('tr_123', $meta->getTmpTransaction());
+    }
+
+    /**
      * This test verifies that the array structure
      * for the JSON in the database is correctly built
      *
@@ -56,6 +73,20 @@ class SubscriptionMetadataTest extends TestCase
 
         static::assertArrayHasKey('times', $meta->toArray());
         static::assertSame(null, $meta->toArray()['times']);
+    }
+
+    /**
+     * This test verifies that our property can be used correclty.
+     *
+     * @return void
+     */
+    public function testTmpTransactionId(): void
+    {
+        $meta = new SubscriptionMetadata('2022-05-01', 1, IntervalType::MONTHS, null, 'tr_123');
+
+        $meta->setTmpTransaction('tr_xyz');
+
+        static::assertSame('tr_xyz', $meta->getTmpTransaction());
     }
 
 }

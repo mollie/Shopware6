@@ -10,8 +10,7 @@ export default class AdminAPIClient {
         this.basePath = '';
 
         this.client = axios.create({
-            baseURL: `${Cypress.config('baseUrl')}/api`,
-            timeout: 10000,
+            baseURL: `${Cypress.config('baseUrl')}/api`
         });
     }
 
@@ -140,16 +139,20 @@ export default class AdminAPIClient {
                     },
                     url,
                     method,
+                    timeout: 20000,
                     params,
                     data
                 };
 
-                return this.client.request(requestConfig).then((response) => {
-                    if (Array.isArray(response.data.data) && response.data.data.length === 1) {
-                        return response.data.data[0];
-                    }
-                    return response.data.data;
-                });
+                return this.client.request(requestConfig)
+                    .then((response) => {
+                        if (Array.isArray(response.data.data) && response.data.data.length === 1) {
+                            return response.data.data[0];
+                        }
+                        return response.data.data;
+                    }).catch((error) => {
+                        console.log(error);
+                    });
             })
             .catch(({response}) => {
                 console.log(response);
@@ -164,10 +167,13 @@ export default class AdminAPIClient {
      * @returns {*}
      */
     loginByUserName(username = 'admin', password = 'shopware') {
+
+        const me = this;
+
         return new Promise((resolve, reject) => {
             this._getCachedToken().then((token) => {
                 if (token !== undefined && token !== null) {
-                    console.log("reuse Access Token: " + token);
+                    console.log("Use existing Access Token");
                     resolve(token);
                     return;
                 }
@@ -184,7 +190,11 @@ export default class AdminAPIClient {
                     .post('/oauth/token', params)
                     .then((response) => {
                         const token = response.data.access_token;
+                        var tokenTime = me._getTimestamp();
+
                         window.localStorage.setItem('cachedAccessToken', token);
+                        window.localStorage.setItem('cachedAccessTokenTime', tokenTime);
+
                         resolve(token);
                     })
                     .catch((err) => {
@@ -201,9 +211,45 @@ export default class AdminAPIClient {
      */
     _getCachedToken() {
         return new Promise((resolve, reject) => {
-            const value = window.localStorage.getItem('cachedAccessToken');
-            resolve(value);
+            var existingToken = window.localStorage.getItem('cachedAccessToken');
+            const existingTokenTime = window.localStorage.getItem('cachedAccessTokenTime');
+
+            // test if the token is already expired
+            const currentTimestamp = this._getTimestamp();
+
+            const diffMinutes = this._getTimeDiffMinutes(existingTokenTime, currentTimestamp);
+
+            // the shopware token usually expires in 10 minutes
+            if (diffMinutes >= 9) {
+                existingToken = null;
+            }
+
+            resolve(existingToken);
         });
+    }
+
+    /**
+     *
+     * @returns {string}
+     * @private
+     */
+    _getTimestamp() {
+        var now = new Date();
+
+        return now.getFullYear() + '/' + (now.getMonth() + 1) + '/' + now.getDate() + " " + now.getHours() + ":" + now.getMinutes();
+    }
+
+    /**
+     *
+     * @param dateString1
+     * @param dateString2
+     * @returns {number}
+     * @private
+     */
+    _getTimeDiffMinutes(dateString1, dateString2) {
+        const diff = Math.abs(new Date(dateString2) - new Date(dateString1));
+
+        return Math.floor((diff / 1000) / 60);
     }
 
 }

@@ -62,7 +62,7 @@ Component.override('sw-order-user-card', {
 
             return null;
         },
-        mollieThirdPartyPaymentId(){
+        mollieThirdPartyPaymentId() {
             if (
                 !!this.currentOrder
                 && !!this.currentOrder.customFields
@@ -82,6 +82,15 @@ Component.override('sw-order-user-card', {
         isSubscription() {
             const orderAttributes = new OrderAttributes(this.currentOrder);
             return (orderAttributes.getSwSubscriptionId() !== '');
+        },
+
+        /**
+         *
+         * @returns {string|*}
+         */
+        subscriptionId() {
+            const orderAttributes = new OrderAttributes(this.currentOrder);
+            return orderAttributes.getSwSubscriptionId();
         },
 
         /**

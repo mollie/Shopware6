@@ -3,8 +3,10 @@
 namespace Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Enricher;
 
 use DateInterval;
+use Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEvents;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionStatus;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Service\SettingsService;
 use Psr\Log\LoggerInterface;
@@ -25,20 +27,26 @@ class LiveDataEnricher implements EventSubscriberInterface
     private $gwMollie;
 
     /**
+     * @var SubscriptionRepository
+     */
+    private $repoSubscriptions;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
 
-
     /**
      * @param SettingsService $pluginSettings
      * @param MollieGatewayInterface $gwMollie
+     * @param SubscriptionRepository $repoSubscriptions
      * @param LoggerInterface $logger
      */
-    public function __construct(SettingsService $pluginSettings, MollieGatewayInterface $gwMollie, LoggerInterface $logger)
+    public function __construct(SettingsService $pluginSettings, MollieGatewayInterface $gwMollie, SubscriptionRepository $repoSubscriptions, LoggerInterface $logger)
     {
         $this->pluginSettings = $pluginSettings;
         $this->gwMollie = $gwMollie;
+        $this->repoSubscriptions = $repoSubscriptions;
         $this->logger = $logger;
     }
 
@@ -86,12 +94,25 @@ class LiveDataEnricher implements EventSubscriberInterface
 
 
                 # ----------------------------------------------------------------------------------------------------
-                # now also get the live status from mollie and their API
+                # now get the mollie status if we don't have one in our subscription
+                # this is for backward compatibility, because our local status is new
+                if ($subscription->getStatus() === '') {
+                    $this->gwMollie->switchClient($subscription->getSalesChannelId());
+                    $mollieSubscription = $this->gwMollie->getSubscription($subscription->getMollieId(), $subscription->getMollieCustomerId());
 
-                $this->gwMollie->switchClient($subscription->getSalesChannelId());
-                $mollieSubscription = $this->gwMollie->getSubscription($subscription->getMollieId(), $subscription->getMollieCustomerId());
+                    # convert into our internal one
+                    # and update in our database
+                    $internalStatus = SubscriptionStatus::fromMollieStatus($mollieSubscription->status);
+                    $subscription->setStatus($internalStatus);
 
-                $subscription->setMollieStatus($mollieSubscription->status);
+                    $this->repoSubscriptions->updateStatus($subscription->getId(), $mollieSubscription->status, $event->getContext());
+                }
+
+                # ----------------------------------------------------------------------------------------------------
+                # TODO remove one day
+                # mollieStatus is deprecated
+
+                $subscription->setMollieStatus('Deprecated. Use status');
             } catch (\Throwable $ex) {
                 $this->logger->error(
                     'Error when enriching Subscription with additional data',

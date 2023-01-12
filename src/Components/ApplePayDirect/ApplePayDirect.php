@@ -175,15 +175,19 @@ class ApplePayDirect
         $enabled = false;
 
         if (is_array($salesChannelPaymentIDs) && $settings->isEnableApplePayDirect()) {
-            $applePayMethodID = $this->repoPaymentMethods->getActiveApplePayID($context->getContext());
+            try {
+                $applePayMethodID = $this->repoPaymentMethods->getActiveApplePayID($context->getContext());
 
-            foreach ($salesChannelPaymentIDs as $tempID) {
-                # verify if our Apple Pay payment method is indeed in use
-                # for the current sales channel
-                if ($tempID === $applePayMethodID) {
-                    $enabled = true;
-                    break;
+                foreach ($salesChannelPaymentIDs as $tempID) {
+                    # verify if our Apple Pay payment method is indeed in use
+                    # for the current sales channel
+                    if ($tempID === $applePayMethodID) {
+                        $enabled = true;
+                        break;
+                    }
                 }
+            } catch (\Exception $ex) {
+                # it can happen that apple pay is just not active in the system
             }
         }
 
@@ -417,10 +421,15 @@ class ApplePayDirect
         # and never the one from the customer (if already existing)
         if ($order->getAddresses() instanceof OrderAddressCollection) {
             foreach ($order->getAddresses() as $address) {
+                # attention, Apple Pay does not have a company name
+                # therefore we always need to make sure to remove the company field in our order
                 $this->repoOrderAdresses->updateAddress(
                     $address->getId(),
                     $firstname,
                     $lastname,
+                    '',
+                    '',
+                    '',
                     $street,
                     $zipcode,
                     $city,
@@ -462,6 +471,7 @@ class ApplePayDirect
         $this->orderService->updateMollieDataCustomFields(
             $order,
             $paymentData->getMollieID(),
+            '',
             $transaction->getId(),
             $context->getContext()
         );

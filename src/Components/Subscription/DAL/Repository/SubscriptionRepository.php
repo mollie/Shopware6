@@ -4,13 +4,17 @@ namespace Kiener\MolliePayments\Components\Subscription\DAL\Repository;
 
 use DateTime;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
+use Kiener\MolliePayments\Components\Subscription\Exception\SubscriptionNotFoundException;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\NotFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
 
 class SubscriptionRepository
@@ -26,16 +30,24 @@ class SubscriptionRepository
      */
     private $repoAddresses;
 
+    /**
+     * @var EntityRepositoryInterface
+     */
+    private $repoHistory;
+
 
     /**
      * @param EntityRepositoryInterface $repoSubscriptions
      * @param EntityRepositoryInterface $repoAddresses
+     * @param EntityRepositoryInterface $repoHistory
      */
-    public function __construct(EntityRepositoryInterface $repoSubscriptions, EntityRepositoryInterface $repoAddresses)
+    public function __construct(EntityRepositoryInterface $repoSubscriptions, EntityRepositoryInterface $repoAddresses, EntityRepositoryInterface $repoHistory)
     {
         $this->repoSubscriptions = $repoSubscriptions;
         $this->repoAddresses = $repoAddresses;
+        $this->repoHistory = $repoHistory;
     }
+
 
     #region READ
 
@@ -50,19 +62,27 @@ class SubscriptionRepository
     /**
      * @param string $id
      * @param Context $context
+     * @throws SubscriptionNotFoundException
      * @return SubscriptionEntity
      */
     public function findById(string $id, Context $context): SubscriptionEntity
     {
         $criteria = new Criteria([$id]);
         $criteria->addAssociation('customer');
+        $criteria->addAssociation('historyEntries');
 
-        return $this->repoSubscriptions->search($criteria, $context)->first();
+        $result = $this->repoSubscriptions->search($criteria, $context);
+
+        if ($result->count() <= 0) {
+            throw new SubscriptionNotFoundException($id);
+        }
+
+        return $result->first();
     }
 
     /**
      * @param Context $context
-     * @return EntitySearchResult<SubscriptionEntity>
+     * @return EntitySearchResult
      */
     public function findAll(Context $context): EntitySearchResult
     {
@@ -72,20 +92,38 @@ class SubscriptionRepository
     }
 
     /**
-     * @param int $daysOffset
+     * @param string $swCustomerId
+     * @param bool $includedPending
+     * @param Context $context
+     * @return EntitySearchResult
+     */
+    public function findByCustomer(string $swCustomerId, bool $includedPending, Context $context): EntitySearchResult
+    {
+        $criteria = new Criteria([]);
+        $criteria->addAssociation('customer');
+        $criteria->addAssociation('historyEntries');
+        $criteria->addFilter(new EqualsFilter('customerId', $swCustomerId));
+
+        if (!$includedPending) {
+            $criteria->addFilter(
+                new NotFilter(
+                    NotFilter::CONNECTION_AND,
+                    [new EqualsFilter('mollieId', null),]
+                )
+            );
+        }
+
+        return $this->repoSubscriptions->search($criteria, $context);
+    }
+
+    /**
      * @param string $salesChannelId
      * @param Context $context
      * @throws \Exception
-     * @return EntitySearchResult<SubscriptionEntity>
+     * @return EntitySearchResult
      */
-    public function findByReminderRangeReached(int $daysOffset, string $salesChannelId, Context $context): EntitySearchResult
+    public function findByReminderRangeReached(string $salesChannelId, Context $context): EntitySearchResult
     {
-        # let's use our current date and remove the
-        # provided number of offset days.
-        # the final result is the days in advance
-        $interval = new \DateInterval('P' . $daysOffset . 'D');
-        $prepaymentDate = (new \DateTimeImmutable)->sub($interval);
-
         $today = (new \DateTimeImmutable);
 
         $criteria = new Criteria();
@@ -104,7 +142,7 @@ class SubscriptionRepository
     /**
      * @param string $orderId
      * @param Context $context
-     * @return EntitySearchResult<SubscriptionEntity>
+     * @return EntitySearchResult
      */
     public function findPendingSubscriptions(string $orderId, Context $context): EntitySearchResult
     {
@@ -119,13 +157,14 @@ class SubscriptionRepository
 
     #endregion
 
-    #region INSERT/UPDATE
 
     /**
      * @param SubscriptionEntity $subscription
+     * @param string $status
      * @param Context $context
+     * @return void
      */
-    public function insertSubscription(SubscriptionEntity $subscription, Context $context): void
+    public function insertSubscription(SubscriptionEntity $subscription, string $status, Context $context): void
     {
         $this->repoSubscriptions->create(
             [
@@ -142,6 +181,7 @@ class SubscriptionRepository
                     'billingAddressId' => null,
                     'shippingAddressId' => null,
                     # ----------------------------------------------------------
+                    'status' => $status,
                     'description' => $subscription->getDescription(),
                     'amount' => $subscription->getAmount(),
                     'quantity' => $subscription->getQuantity(),
@@ -171,19 +211,44 @@ class SubscriptionRepository
     /**
      * @param string $id
      * @param string $mollieSubscriptionId
+     * @param string $status
      * @param string $mollieCustomerId
+     * @param string $mandateId
      * @param string $nextPaymentDate
      * @param Context $context
+     * @return void
      */
-    public function confirmSubscription(string $id, string $mollieSubscriptionId, string $mollieCustomerId, string $nextPaymentDate, Context $context): void
+    public function confirmNewSubscription(string $id, string $mollieSubscriptionId, string $status, string $mollieCustomerId, string $mandateId, string $nextPaymentDate, Context $context): void
     {
         $this->repoSubscriptions->update(
             [
                 [
                     'id' => $id,
+                    'status' => $status,
                     'mollieId' => $mollieSubscriptionId,
                     'mollieCustomerId' => $mollieCustomerId,
+                    'mandateId' => $mandateId,
                     'nextPaymentAt' => $nextPaymentDate,
+                    'canceledAt' => null,
+                ]
+            ],
+            $context
+        );
+    }
+
+    /**
+     * @param string $id
+     * @param string $status
+     * @param Context $context
+     * @return void
+     */
+    public function updateStatus(string $id, string $status, Context $context): void
+    {
+        $this->repoSubscriptions->update(
+            [
+                [
+                    'id' => $id,
+                    'status' => $status,
                 ]
             ],
             $context
@@ -203,6 +268,25 @@ class SubscriptionRepository
                 [
                     'id' => $id,
                     'metadata' => $metadata->toArray(),
+                ]
+            ],
+            $context
+        );
+    }
+
+    /**
+     * @param string $id
+     * @param string $mandateId
+     * @param Context $context
+     * @return void
+     */
+    public function updateMandate(string $id, string $mandateId, Context $context): void
+    {
+        $this->repoSubscriptions->update(
+            [
+                [
+                    'id' => $id,
+                    'mandateId' => $mandateId,
                 ]
             ],
             $context
@@ -247,14 +331,39 @@ class SubscriptionRepository
 
     /**
      * @param string $id
+     * @param string $status
      * @param Context $context
+     * @return void
      */
-    public function cancelSubscription(string $id, Context $context): void
+    public function cancelSubscription(string $id, string $status, Context $context): void
     {
         $this->repoSubscriptions->update(
             [
                 [
                     'id' => $id,
+                    'status' => $status,
+                    'nextPaymentAt' => null,
+                    'canceledAt' => new DateTime(),
+                ]
+            ],
+            $context
+        );
+    }
+
+    /**
+     * @param string $id
+     * @param string $status
+     * @param Context $context
+     * @return void
+     */
+    public function skipSubscription(string $id, string $status, Context $context): void
+    {
+        $this->repoSubscriptions->update(
+            [
+                [
+                    'id' => $id,
+                    'status' => $status,
+                    'nextPaymentAt' => null,
                     'canceledAt' => new DateTime(),
                 ]
             ],
@@ -333,6 +442,30 @@ class SubscriptionRepository
                     'additionalAddressLine1' => $address->getAdditionalAddressLine1(),
                     'additionalAddressLine2' => $address->getAdditionalAddressLine2(),
                 ],
+            ],
+            $context
+        );
+    }
+
+    /**
+     * @param string $subscriptionId
+     * @param SubscriptionHistoryEntity $historyEntity
+     * @param Context $context
+     * @return void
+     */
+    public function addHistoryEntry(string $subscriptionId, SubscriptionHistoryEntity $historyEntity, Context $context): void
+    {
+        $this->repoHistory->upsert(
+            [
+                [
+                    'id' => $historyEntity->getId(),
+                    'subscriptionId' => $subscriptionId,
+                    'statusFrom' => $historyEntity->getStatusFrom(),
+                    'statusTo' => $historyEntity->getStatusTo(),
+                    'comment' => $historyEntity->getComment(),
+                    'mollieId' => $historyEntity->getMollieId(),
+                    'createdAt' => $historyEntity->getCreatedAt(),
+                ]
             ],
             $context
         );

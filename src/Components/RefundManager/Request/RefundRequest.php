@@ -124,6 +124,11 @@ class RefundRequest
             return false;
         }
 
+        # now also check if we might have full item values but a different total amount
+        if ($this->amount !== null && $this->amount > 0 && $this->amount !== $order->getAmountTotal()) {
+            return false;
+        }
+
         return true;
     }
 
@@ -157,10 +162,16 @@ class RefundRequest
             return false;
         }
 
-
         $itemsDifferToCartAmount = $this->isDifferentAmount($order);
 
         if (!$itemsDifferToCartAmount) {
+
+            # now also check if we might have full item values
+            # but a different total amount
+            if ($this->amount > 0 && $this->amount !== $order->getAmountTotal()) {
+                return true;
+            }
+
             return false;
         }
 

@@ -5,18 +5,18 @@ namespace MolliePayments\Tests\Service\MollieApi\Builder;
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Facade\MolliePaymentFinalize;
 use Kiener\MolliePayments\Handler\PaymentHandler;
-use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Hydrator\MollieLineItemHydrator;
+use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieLineItemBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderAddressBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieShippingLineItemBuilder;
+use Kiener\MolliePayments\Service\MollieApi\Fixer\RoundingDifferenceFixer;
 use Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher;
 use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\PriceCalculator;
-use Kiener\MolliePayments\Service\MollieApi\VerticalTaxLineItemFixer;
 use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 use Kiener\MolliePayments\Service\Router\RoutingDetector;
 use Kiener\MolliePayments\Service\SettingsService;
@@ -165,18 +165,17 @@ abstract class AbstractMollieOrderBuilder extends TestCase
                 new IsOrderLineItemValid(),
                 new PriceCalculator(),
                 new LineItemDataExtractor(),
-                new FakeCompatibilityGateway()
+                new FakeCompatibilityGateway(),
+                new RoundingDifferenceFixer(),
+                new MollieLineItemHydrator(new MollieOrderPriceBuilder()),
+                new MollieShippingLineItemBuilder(new PriceCalculator())
             ),
             new MollieOrderAddressBuilder(),
             new MollieOrderCustomerEnricher($this->createMock(CustomerService::class)),
-            $this->loggerService,
-            new MollieShippingLineItemBuilder(new PriceCalculator(), new MollieOrderPriceBuilder()),
-            new VerticalTaxLineItemFixer($this->loggerService),
-            new MollieLineItemHydrator(new MollieOrderPriceBuilder()),
+            $routingBuilder,
             new FakeEventDispatcher(),
-            $routingBuilder
+            $this->loggerService
         );
     }
 
-    abstract function testOrderBuild(): void;
 }

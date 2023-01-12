@@ -211,9 +211,8 @@ describe('Credit Card Components', () => {
             }
 
             shopware.prepareDomainChange();
-            checkout.placeOrderOnEdit();
 
-            mollieSandbox.initSandboxCookie();
+            checkout.placeOrderOnEdit();
 
             // verify that our component card is really
             // been used by comparing the last 4 digits

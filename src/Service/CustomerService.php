@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Service;
 use Exception;
 use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGatewayInterface;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
+use Kiener\MolliePayments\Exception\CouldNotFetchMollieCustomerException;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
 use Kiener\MolliePayments\Struct\CustomerStruct;
@@ -25,7 +26,7 @@ use Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class CustomerService
+class CustomerService implements CustomerServiceInterface
 {
     public const CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID = 'customer_id';
     public const CUSTOM_FIELDS_KEY_CREDIT_CARD_TOKEN = 'credit_card_token';
@@ -144,7 +145,7 @@ class CustomerService
      *
      * @return EntityWrittenContainerEvent
      */
-    public function setCardToken(CustomerEntity $customer, string $cardToken, Context $context)
+    public function setCardToken(CustomerEntity $customer, string $cardToken, Context $context): EntityWrittenContainerEvent
     {
         // Get existing custom fields
         $customFields = $customer->getCustomFields();
@@ -193,7 +194,7 @@ class CustomerService
      *
      * @return EntityWrittenContainerEvent
      */
-    public function setIDealIssuer(CustomerEntity $customer, string $issuerId, Context $context)
+    public function setIDealIssuer(CustomerEntity $customer, string $issuerId, Context $context): EntityWrittenContainerEvent
     {
         // Get existing custom fields
         $customFields = $customer->getCustomFields();
@@ -298,9 +299,15 @@ class CustomerService
         if (isset($customFields[self::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID])) {
             $struct->setLegacyCustomerId($customFields[self::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID]);
         }
-
+        $molliePaymentsCustomFields = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS] ?? [];
+        if (! is_array($molliePaymentsCustomFields)) {
+            $this->logger->warning('Customer customFields for MolliePayments are invalid. Array is expected', [
+                'currentCustomFields' => $molliePaymentsCustomFields
+            ]);
+            $molliePaymentsCustomFields = [];
+        }
         // Then assign all custom fields under the mollie_payments key
-        $struct->assign($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS] ?? []);
+        $struct->assign($molliePaymentsCustomFields);
 
         return $struct;
     }
@@ -344,7 +351,7 @@ class CustomerService
      * @param SalesChannelContext $context
      * @return null|CustomerEntity
      */
-    public function createApplePayDirectCustomer(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, string $paymentMethodId, SalesChannelContext $context)
+    public function createApplePayDirectCustomer(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, string $paymentMethodId, SalesChannelContext $context): ?CustomerEntity
     {
         $customerId = Uuid::randomHex();
         $addressId = Uuid::randomHex();
@@ -481,8 +488,15 @@ class CustomerService
             return;
         }
 
-        if (!empty($struct->getCustomerId((string)$settings->getProfileId(), $settings->isTestMode()))) {
+        $mollieCustomerId = $struct->getCustomerId((string)$settings->getProfileId(), $settings->isTestMode());
+        try {
+            $this->customerApiService->getMollieCustomerById($mollieCustomerId, $salesChannelId);
             return;
+        } catch (CouldNotFetchMollieCustomerException $e) {
+            $this->logger->warning('No customer found for the current mollie id and sales channel combination, creating a new one.', [
+                'salesChannel' => $salesChannelId,
+                'mollieCustomerId' => $mollieCustomerId,
+            ]);
         }
 
         $customer = $this->getCustomer($customerId, $context);

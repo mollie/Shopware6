@@ -12,8 +12,8 @@ export default class NavigationRepository {
      *
      * @returns {*}
      */
-    getClothingMenuItem() {
-        return cy.get('#mainNavigation > div.container > nav > a:nth-child(3)');
+    getSecondMenuItem() {
+        return cy.get('#mainNavigation > div.container > nav > a:nth-child(2)');
     }
 
 }

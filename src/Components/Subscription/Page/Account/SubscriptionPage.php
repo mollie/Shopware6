@@ -40,6 +40,16 @@ class SubscriptionPage extends Page
      */
     protected $allowAddressEditing;
 
+    /**
+     * @var bool
+     */
+    protected $allowPauseResume;
+
+    /**
+     * @var bool
+     */
+    protected $allowSkip;
+
 
     /**
      * @return StorefrontSearchResult<SubscriptionEntity>
@@ -139,5 +149,37 @@ class SubscriptionPage extends Page
     public function setAllowAddressEditing(bool $allowAddressEditing): void
     {
         $this->allowAddressEditing = $allowAddressEditing;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowPauseResume(): bool
+    {
+        return $this->allowPauseResume;
+    }
+
+    /**
+     * @param bool $allowPauseResume
+     */
+    public function setAllowPauseResume(bool $allowPauseResume): void
+    {
+        $this->allowPauseResume = $allowPauseResume;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowSkip(): bool
+    {
+        return $this->allowSkip;
+    }
+
+    /**
+     * @param bool $allowSkip
+     */
+    public function setAllowSkip(bool $allowSkip): void
+    {
+        $this->allowSkip = $allowSkip;
     }
 }

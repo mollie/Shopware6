@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Components\Subscription\DAL\Subscription;
 
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressDefinition;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryDefinition;
 use Shopware\Core\Checkout\Customer\CustomerDefinition;
 use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Content\Product\ProductDefinition;
@@ -61,20 +62,27 @@ class SubscriptionDefinition extends EntityDefinition
     {
         return new FieldCollection([
 
-            (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
+            (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey(), new ApiAware()),
 
             # --------------------------------------------------------------------------------------------------------------------------
 
             (new FkField('customer_id', 'customerId', CustomerDefinition::class))->addFlags(new ApiAware()),
 
+            (new StringField('status', 'status'))->addFlags(new ApiAware()),
+            (new StringField('description', 'description'))->addFlags(new ApiAware()),
+            (new FloatField('amount', 'amount'))->addFlags(new ApiAware()),
+            (new IntField('quantity', 'quantity'))->addFlags(new ApiAware()),
+            (new StringField('currency', 'currency'))->addFlags(new ApiAware()),
+            (new JsonField('metadata', 'metadata')),
+
+            # --------------------------------------------------------------------------------------------------------------------------
+
+            # do not show in API!!!!!!
             (new StringField('mollie_id', 'mollieId')),
             (new StringField('mollie_customer_id', 'mollieCustomerId')),
+            (new StringField('mandate_id', 'mandateId')),
 
-            new StringField('description', 'description'),
-            new FloatField('amount', 'amount'),
-            new IntField('quantity', 'quantity'),
-            new StringField('currency', 'currency'),
-            (new JsonField('metadata', 'metadata')),
+            # --------------------------------------------------------------------------------------------------------------------------
 
             (new DateTimeField('next_payment_at', 'nextPaymentAt'))->addFlags(new ApiAware()),
             (new DateTimeField('last_reminded_at', 'lastRemindedAt'))->addFlags(new ApiAware()),
@@ -99,6 +107,8 @@ class SubscriptionDefinition extends EntityDefinition
             new ManyToOneAssociationField('customer', 'customer_id', CustomerDefinition::class, 'id', false),
 
             new OneToManyAssociationField('addresses', SubscriptionAddressDefinition::class, 'subscription_id'),
+            new OneToManyAssociationField('historyEntries', SubscriptionHistoryDefinition::class, 'subscription_id'),
+
             new OneToOneAssociationField('billingAddress', 'billing_address_id', 'id', SubscriptionAddressDefinition::class, true),
             new OneToOneAssociationField('shippingAddress', 'shipping_address_id', 'id', SubscriptionAddressDefinition::class, true),
 

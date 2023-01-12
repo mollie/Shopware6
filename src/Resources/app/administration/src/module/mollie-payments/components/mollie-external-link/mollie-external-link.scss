@@ -1,0 +1,25 @@
+@import "~scss/variables";
+
+.mollie-external-link {
+    color: $color-shopware-brand-500;
+    font-size: $font-size-small;
+    text-decoration: underline;
+    cursor: pointer;
+
+    &:hover,
+    &:focus {
+        color: $color-shopware-brand-600;
+    }
+
+    &__icon {
+        margin-left: 4px;
+    }
+
+    &--small {
+        font-size: $font-size-extra-small;
+
+        .mollie-external-link__icon {
+            margin-left: 2px;
+        }
+    }
+}

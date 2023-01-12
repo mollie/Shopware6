@@ -6,6 +6,7 @@ use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
 use Kiener\MolliePayments\Service\SettingsService;
+use Kiener\MolliePayments\Struct\CustomerStruct;
 use MolliePayments\Tests\Fakes\FakeEntityRepository;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
@@ -61,26 +62,28 @@ class CustomerServiceTest extends TestCase
     }
 
     /**
+     * This test makes sure that, if we have invalid mollie_payments custom fields, that the struct will be empty
      * @return void
+     * @throws \Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException
      */
-    public function testCustomerLogin()
-    {
-        $this->compatibilityGateway->method('getSalesChannelID')->willReturn('foo');
-
+    public function testCustomerCustomFieldsAreInvalid():void{
         $customer = $this->createConfiguredMock(CustomerEntity::class, [
-            'getId'    => 'bar',
-            'getEmail' => 'foo@bar.baz',
+            'getCustomFields' => ['mollie_payments'=>'foo']
         ]);
 
-        $context = $this->createConfiguredMock(SalesChannelContext::class, [
-            'getToken' => 'baz',
+        $search = $this->createConfiguredMock(EntitySearchResult::class, [
+            'first' => $customer
         ]);
+        
+        $this->customerRepository->entitySearchResults = [$search];
 
-        $this->salesChannelContextPersister->method('replace')->willReturn('token');
+        $customerStruct = $this->customerService->getCustomerStruct('fakeId',   $this->createMock(Context::class));
 
-        $this->compatibilityGateway->expects($this->once())->method('persistSalesChannelContext')->with('token', 'foo', 'bar');
+        $actual = json_encode($customerStruct);
+        $expected = '{"extensions":[]}';
 
-        $this->customerService->customerLogin($customer, $context);
+        $this->assertEquals($actual,$expected);
+
     }
 
     /**
@@ -243,6 +246,20 @@ class CustomerServiceTest extends TestCase
                     'customer_id' => 'cst_987',
                 ]
             ],
+            'Broken mollie_payments custom Fields by external plugins' => [
+                'bar', 'cst_321', 'pfl_321', true,
+                ['mollie_payments' => 'foo' ], // existing customfields
+                [   // expected customfields
+                    'mollie_payments' => [
+                        'customer_ids' => [
+                            'pfl_321' => [
+                                'live' => '',
+                                'test' => 'cst_321'
+                            ]
+                        ]
+                    ]
+                ]
+            ]
         ];
     }
 }

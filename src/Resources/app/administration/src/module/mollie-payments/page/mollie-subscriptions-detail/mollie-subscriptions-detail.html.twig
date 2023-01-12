@@ -1,0 +1,287 @@
+{% block sw_order_detail %}
+    <sw-page class="mollie-subscriptions-detail">
+
+        <template #smart-bar-header>
+            <h2>{{ $tc('mollie-payments.subscriptions.detail.title') }}</h2>
+        </template>
+
+        {% block sw_order_detail_actions %}
+            <template #smart-bar-actions>
+                {% block sw_order_detail_actions_cancel %}
+                    <sw-button v-if="!isLoading && isAclCancelAllowed && isCancellationAllowed"
+                               variant="danger"
+                               :disabled="false" :square="false" :block="false" :isLoading="false"
+                               class="mollie-subscriptions-detail-link-button"
+                               @click="btnCancel_Click()">
+                        {{ $tc('mollie-payments.subscriptions.detail.buttonCancelSubscription') }}
+                    </sw-button>
+                {% endblock %}
+            </template>
+        {% endblock %}
+
+        <template #content>
+
+            {% block sw_order_detail_confirm_modal_cancel %}
+                <sw-confirm-modal
+                        v-if="showConfirmCancel"
+                        :title="$tc('mollie-payments.subscriptions.confirm.cancelTitle')"
+                        :text="$tc('mollie-payments.subscriptions.confirm.cancel')"
+                        @confirm="btnConfirmCancel_Click()"
+                        @close="btnCloseAnyModal_Click()"
+                        @cancel="btnCloseAnyModal_Click()">
+                </sw-confirm-modal>
+            {% endblock %}
+
+            {% block sw_order_detail_confirm_modal_pause %}
+                <sw-confirm-modal
+                        v-if="showConfirmPause"
+                        :title="$tc('mollie-payments.subscriptions.confirm.pauseTitle')"
+                        :text="$tc('mollie-payments.subscriptions.confirm.pause')"
+                        @confirm="btnConfirmPause_Click()"
+                        @close="btnCloseAnyModal_Click()"
+                        @cancel="btnCloseAnyModal_Click()">
+                </sw-confirm-modal>
+            {% endblock %}
+
+            {% block sw_order_detail_confirm_modal_resume %}
+                <sw-confirm-modal
+                        v-if="showConfirmResume"
+                        :title="$tc('mollie-payments.subscriptions.confirm.resumeTitle')"
+                        :text="$tc('mollie-payments.subscriptions.confirm.resume')"
+                        @confirm="btnConfirmResume_Click()"
+                        @close="btnCloseAnyModal_Click()"
+                        @cancel="btnCloseAnyModal_Click()">
+                </sw-confirm-modal>
+            {% endblock %}
+
+            {% block sw_order_detail_confirm_modal_skip %}
+                <sw-confirm-modal
+                        v-if="showConfirmSkip"
+                        :title="$tc('mollie-payments.subscriptions.confirm.skipTitle')"
+                        :text="$tc('mollie-payments.subscriptions.confirm.skip')"
+                        @confirm="btnConfirmSkip_Click()"
+                        @close="btnCloseAnyModal_Click()"
+                        @cancel="btnCloseAnyModal_Click()">
+                </sw-confirm-modal>
+            {% endblock %}
+
+            <sw-card-view v-if="!isLoading">
+                {% block sw_order_detail_card_basic %}
+                    <sw-card :title="$tc('mollie-payments.subscriptions.detail.cardTitleSubscription')" :hero="false" :isLoading="false" :large="false">
+
+                        <sw-container columns="1fr" gap="0px 30px">
+                            {% block sw_order_detail_card_basic_field_description %}
+                                <sw-text-field v-model="subscription.description"
+                                               :label="$tc('mollie-payments.subscriptions.detail.labelDescription')"
+                                               disabled="disabled">
+                                </sw-text-field>
+                            {% endblock %}
+                        </sw-container>
+
+                        <sw-container columns="1fr 1fr" gap="0px 30px">
+                            {% block sw_order_detail_card_basic_field_amount %}
+                                <sw-text-field v-model="subscription.amount"
+                                               :label="$tc('mollie-payments.subscriptions.detail.labelAmount')"
+                                               disabled="disabled">
+                                    <template slot="suffix">
+                                        {{ subscription.currency }}
+                                    </template>
+                                </sw-text-field>
+                            {% endblock %}
+                            {% block sw_order_detail_card_basic_field_quantity %}
+                                <sw-text-field v-model="subscription.quantity"
+                                               :label="$tc('mollie-payments.subscriptions.detail.labelQuantity')"
+                                               disabled="disabled">
+                                </sw-text-field>
+                            {% endblock %}
+                        </sw-container>
+                        <sw-container columns="1fr 1fr" gap="0px 30px">
+                            {% block sw_order_detail_card_basic_field_customer_name %}
+                                <sw-text-field v-model="customerFullName"
+                                               :label="$tc('mollie-payments.subscriptions.detail.labelShopwareCustomer')"
+                                               disabled="disabled">
+                                </sw-text-field>
+                            {% endblock %}
+                            {% block sw_order_detail_card_basic_field_mollie_customer_id %}
+                                <sw-text-field v-model="subscription.mollieCustomerId"
+                                               :label="$tc('mollie-payments.subscriptions.detail.labelMollieCustomer')"
+                                               disabled="disabled">
+                                </sw-text-field>
+                            {% endblock %}
+                        </sw-container>
+                        <sw-container columns="1fr 1fr" gap="0px 30px">
+                            {% block sw_order_detail_card_basic_field_created_at %}
+                                <sw-text-field v-model="formattedCreateAt"
+                                               :label="$tc('mollie-payments.subscriptions.detail.labelCreatedAt')"
+                                               disabled="disabled">
+                                </sw-text-field>
+                            {% endblock %}
+                        </sw-container>
+                        <sw-container columns="1fr 1fr" gap="0px 30px">
+                            {% block sw_order_detail_card_basic_link_shopware_customer %}
+                                <mollie-internal-link inline :routerLink="{ name: 'sw.customer.detail', params: { id: subscription.customerId }, query: { edit: false } }">
+                                    {{ $tc('mollie-payments.subscriptions.detail.buttonShowShopwareCustomer') }}
+                                </mollie-internal-link>
+                            {% endblock %}
+                            {% block sw_order_detail_card_basic_link_shopware_order %}
+                                <mollie-internal-link inline :routerLink="{ name: 'sw.order.detail', params: { id: subscription.orderId }, query: { edit: false } }">
+                                    {{ $tc('mollie-payments.subscriptions.detail.buttonShowShopwareOrder') }}
+                                </mollie-internal-link>
+                            {% endblock %}
+                        </sw-container>
+                    </sw-card>
+                {% endblock %}
+                {% block sw_order_detail_card_status %}
+                    <sw-card :title="$tc('mollie-payments.subscriptions.detail.cardTitleStatus')" :hero="false" :isLoading="false" :large="false">
+                        <sw-container columns="1fr 1fr" gap="0px 30px">
+                            {% block sw_order_detail_card_status_field_status %}
+                                <sw-text-field v-model="translatedStatus"
+                                               :label="$tc('mollie-payments.subscriptions.detail.labelStatus')"
+                                               disabled="disabled">
+                                </sw-text-field>
+                            {% endblock %}
+                            {% block sw_order_detail_card_status_field_canceled_at %}
+                                <sw-text-field v-model="formattedCanceledAt"
+                                               :label="$tc('mollie-payments.subscriptions.detail.labelCanceledAt')"
+                                               disabled="disabled">
+                                </sw-text-field>
+                            {% endblock %}
+                        </sw-container>
+                        <sw-container columns="1fr 1fr" gap="0px 30px">
+                            {% block sw_order_detail_card_status_field_mollie_id %}
+                                <sw-text-field v-model="subscription.mollieId"
+                                               :label="$tc('mollie-payments.subscriptions.detail.labelMollieSubscription')"
+                                               disabled="disabled">
+                                </sw-text-field>
+                            {% endblock %}
+                            {% block sw_order_detail_card_status_field_mandate_id %}
+                                <sw-text-field v-model="subscription.mandateId"
+                                               :label="$tc('mollie-payments.subscriptions.detail.labelMandateId')"
+                                               disabled="disabled">
+                                </sw-text-field>
+                            {% endblock %}
+                        </sw-container>
+                        <sw-container columns="1fr 1fr" gap="0px 30px">
+                            {% block sw_order_detail_card_status_field_next_payment_at %}
+                                <sw-text-field v-model="formattedNextPaymentAt"
+                                               :label="$tc('mollie-payments.subscriptions.detail.labelNextPaymentAt')"
+                                               disabled="disabled">
+                                </sw-text-field>
+                            {% endblock %}
+                            {% block sw_order_detail_card_status_field_reminded_at %}
+                                <sw-text-field
+                                        v-model="formattedLastRemindedAt"
+                                        :label="$tc('mollie-payments.subscriptions.detail.labelLastRemindedAt')"
+                                        disabled="disabled">
+                                </sw-text-field>
+                            {% endblock %}
+                        </sw-container>
+                        <sw-container columns="1fr 1fr" gap="0px 30px" class="mollie-subscriptions-detail-status-action-row">
+                            {% block sw_order_detail_card_status_action_pause %}
+                                <sw-button v-if="isAclEditAllowed && isPauseAllowed"
+                                           class="mollie-subscriptions-detail-link-button cy-btn-pause"
+                                           :disabled="!allowPauseResume"
+                                           variant="ghost-danger"
+                                           @click="btnPause_Click()">
+                                    {{ $tc('mollie-payments.subscriptions.detail.buttonPauseSubscription') }}
+                                </sw-button>
+                            {% endblock %}
+                            {% block sw_order_detail_card_status_action_resume %}
+                                <sw-button v-if="isAclEditAllowed && isResumeAllowed"
+                                           class="mollie-subscriptions-detail-link-button cy-btn-resume"
+                                           :disabled="!allowPauseResume"
+                                           variant="ghost"
+                                           @click="btnResume_Click()">
+                                    {{ $tc('mollie-payments.subscriptions.detail.buttonResumeSubscription') }}
+                                </sw-button>
+                            {% endblock %}
+                            {% block sw_order_detail_card_status_action_skip %}
+                                <sw-button v-if="isAclEditAllowed && isSkipAllowed"
+                                           class="mollie-subscriptions-detail-link-button cy-btn-skip"
+                                           :disabled="!allowSkip"
+                                           variant="ghost-danger"
+                                           @click="btnSkip_Click()">
+                                    {{ $tc('mollie-payments.subscriptions.detail.buttonSkipSubscription') }}
+                                </sw-button>
+                            {% endblock %}
+                        </sw-container>
+                    </sw-card>
+                {% endblock %}
+                {% block sw_order_detail_card_history %}
+                    <sw-card :title="cardTitleHistory" :hero="false" :isLoading="false" :large="false">
+                        {% block sw_order_detail_card_history_grid %}
+                            <sw-grid :items="history"
+                                     :selectable="false"
+                                     :table="true"
+                                     :allowInlineEdit="false">
+                                <template #columns="{ item }">
+                                    <sw-grid-column flex="minmax(100px, 1fr)" :label="$tc('mollie-payments.subscriptions.detail.history.colDate')">
+                                        {{ item.createdAt | date({hour: '2-digit',minute: '2-digit',day: '2-digit',month: '2-digit',year: 'numeric'}) }}
+                                    </sw-grid-column>
+
+                                    {% block sw_order_detail_card_history_grid_columns %}
+
+                                        {% block sw_order_detail_card_history_grid_column_status_from %}
+                                            <sw-grid-column flex="minmax(50px, 1fr)" :label="$tc('mollie-payments.subscriptions.detail.history.colStatusFrom')">
+                                                {% block sw_order_detail_card_history_grid_column_status_from_inner %}
+                                                    <sw-label v-if="item.statusFrom"
+                                                              :variant="statusColor(item.statusFrom)"
+                                                              size="medium"
+                                                              appearance="pill"
+                                                              :ghost="false"
+                                                              :caps="true"
+                                                              :dismissable="false">
+                                                        {% block sw_order_detail_card_history_grid_column_status_from_inner_value %}
+                                                            {{ item.statusFromTranslated }}
+                                                        {% endblock %}
+                                                    </sw-label>
+                                                {% endblock %}
+                                            </sw-grid-column>
+                                        {% endblock %}
+
+                                        {% block sw_order_detail_card_history_grid_column_status_to %}
+                                            <sw-grid-column flex="minmax(50px, 1fr)" :label="$tc('mollie-payments.subscriptions.detail.history.colStatusTo')">
+                                                {% block sw_order_detail_card_history_grid_column_status_to_inner %}
+                                                    <sw-label v-if="item.statusTo"
+                                                              :variant="statusColor(item.statusTo)"
+                                                              size="medium"
+                                                              appearance="pill"
+                                                              :ghost="false"
+                                                              :caps="true"
+                                                              :dismissable="false">
+                                                        {% block sw_order_detail_card_history_grid_column_status_to_inner_value %}
+                                                            {{ item.statusToTranslated }}
+                                                        {% endblock %}
+                                                    </sw-label>
+                                                {% endblock %}
+                                            </sw-grid-column>
+                                        {% endblock %}
+
+                                        {% block sw_order_detail_card_history_grid_column_comment %}
+                                            <sw-grid-column flex="minmax(100px, 1fr)" :label="$tc('mollie-payments.subscriptions.detail.history.colComment')">
+                                                {% block sw_order_detail_card_history_grid_column_comment_inner %}
+                                                    {{ item.comment }}
+                                                {% endblock %}
+                                            </sw-grid-column>
+                                        {% endblock %}
+
+                                        {% block sw_order_detail_card_history_grid_column_mollie_id %}
+                                            <sw-grid-column flex="minmax(100px, 1fr)" :label="$tc('mollie-payments.subscriptions.detail.history.colMollieSubscription')">
+                                                {% block sw_order_detail_card_history_grid_column_mollie_id_inner %}
+                                                    {{ item.mollieId }}
+                                                {% endblock %}
+                                            </sw-grid-column>
+                                        {% endblock %}
+
+                                    {% endblock %}
+
+                                </template>
+                            </sw-grid>
+                        {% endblock %}
+                    </sw-card>
+                {% endblock %}
+            </sw-card-view>
+
+        </template>
+    </sw-page>
+{% endblock %}

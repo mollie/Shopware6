@@ -14,8 +14,8 @@ export default class TopMenuAction {
     /**
      *
      */
-    clickOnClothing() {
-        repo.getClothingMenuItem().click();
+    clickOnSecondCategory() {
+        repo.getSecondMenuItem().click();
     }
 
     /**
@@ -28,5 +28,16 @@ export default class TopMenuAction {
         cy.get('.header-account-menu > .card > .list-group > [href="/account/order"]').click();
 
     }
+
+    /**
+     *
+     */
+    clickAccountWidgetSubscriptions() {
+        cy.get('#accountWidget').click();
+        cy.wait(500);
+
+        cy.get('.header-account-menu > .card > [href="/account/mollie/subscriptions"]').click();
+    }
+
 
 }

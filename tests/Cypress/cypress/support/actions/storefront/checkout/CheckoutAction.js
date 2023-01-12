@@ -36,6 +36,20 @@ export default class CheckoutAction {
     /**
      *
      */
+    closeOffcanvasCart() {
+        cy.get('.cart-offcanvas.is-open > .offcanvas-close').click({force: true});
+    }
+
+    /**
+     *
+     */
+    goToCartInOffCanvas() {
+        repoOffCanvas.getCartButton().click();
+    }
+
+    /**
+     *
+     */
     goToCheckoutInOffCanvas() {
         repoOffCanvas.getCheckoutButton().click();
     }

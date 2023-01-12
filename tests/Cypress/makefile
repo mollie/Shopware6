@@ -16,6 +16,11 @@ clean: ## Clean all dependencies
 # ---------------------------------------------------------------------------------------------
 
 open-ui: ## Opens Cypress UI
+	@echo ""
+	@echo "*********************************************************************************************************"
+	@echo "ATTENTION, please enable MOLLIE_CYPRESS_MODE=1 in your .env to allow subscriptions without webhooks, if you cant provide webhooks!"
+	@echo "*********************************************************************************************************"
+	@echo ""
 ifndef url
 	$(warning Please provide the URL argument to Start Cypress!)
 	@exit 1
@@ -32,6 +37,11 @@ endif
 # ---------------------------------------------------------------------------------------------
 
 run: ## Runs all E2E tests for Shopware
+	@echo ""
+	@echo "*********************************************************************************************************"
+	@echo "ATTENTION, please enable MOLLIE_CYPRESS_MODE=1 in your .env to allow subscriptions without webhooks, if you cant provide webhooks!"
+	@echo "*********************************************************************************************************"
+	@echo ""
 ifndef url
 	$(warning Please provide the URL argument to Start Cypress!)
 	@exit 1
@@ -44,4 +54,3 @@ ifndef storeApiKey
 	storeApiKey=''
 endif
 	CYPRESS_BASE_URL=$(url) CYPRESS_SHOPWARE=$(shopware) CYPRESS_STORE_APIKEY=$(storeApiKey) ./node_modules/.bin/cypress run --headless --env filters="$(filters)"
-

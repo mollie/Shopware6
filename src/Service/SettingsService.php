@@ -142,4 +142,13 @@ class SettingsService implements PluginSettingsServiceInterface
         $devMode = trim((string)getenv('MOLLIE_DEV_MODE'));
         return ($devMode === '1');
     }
+
+    /**
+     * @return bool
+     */
+    public function getMollieCypressMode(): bool
+    {
+        $devMode = trim((string)getenv('MOLLIE_CYPRESS_MODE'));
+        return ($devMode === '1');
+    }
 }

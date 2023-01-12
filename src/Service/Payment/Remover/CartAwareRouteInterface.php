@@ -9,6 +9,7 @@ interface CartAwareRouteInterface
         'frontend.checkout.confirm.page',
         'frontend.checkout.finish.page',
         'frontend.cart.offcanvas',
+        'store-api.payment.method',
     ];
 
     public function isCartRoute(string $route = ""): bool;

@@ -2,11 +2,11 @@
 
 namespace PHPUnit\Components\Subscription\Services\Builder;
 
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\IntervalType;
-use Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionStartDateBuilder;
+use Kiener\MolliePayments\Components\Subscription\Services\Interval\IntervalCalculator;
 use PHPUnit\Framework\TestCase;
 
-class SubscriptionStartDateBuilderTest extends TestCase
+
+class IntervalCalculatorTest extends TestCase
 {
 
     /**
@@ -20,11 +20,11 @@ class SubscriptionStartDateBuilderTest extends TestCase
      */
     public function testIntervalWithDays(string $unit)
     {
-        $builder = new SubscriptionStartDateBuilder();
+        $builder = new IntervalCalculator();
 
         $orderDate = new \DateTimeImmutable('2022-07-08');
 
-        $startDate = $builder->buildStartDate($orderDate, 2, $unit);
+        $startDate = $builder->getNextIntervalDate($orderDate, 2, $unit);
 
         $this->assertEquals('2022-07-08', $orderDate->format('Y-m-d'), 'original date was modified');
         $this->assertEquals('2022-07-10', $startDate, 'calculated date is wrong');
@@ -41,11 +41,11 @@ class SubscriptionStartDateBuilderTest extends TestCase
      */
     public function testIntervalWithWeeks(string $unit)
     {
-        $builder = new SubscriptionStartDateBuilder();
+        $builder = new IntervalCalculator();
 
         $orderDate = new \DateTimeImmutable('2022-08-25');
 
-        $startDate = $builder->buildStartDate($orderDate, 2, $unit);
+        $startDate = $builder->getNextIntervalDate($orderDate, 2, $unit);
 
         $this->assertEquals('2022-08-25', $orderDate->format('Y-m-d'), 'original date was modified');
         $this->assertEquals('2022-09-08', $startDate, 'calculated date is wrong');
@@ -62,11 +62,11 @@ class SubscriptionStartDateBuilderTest extends TestCase
      */
     public function testIntervalWithMonths(string $unit)
     {
-        $builder = new SubscriptionStartDateBuilder();
+        $builder = new IntervalCalculator();
 
         $orderDate = new \DateTimeImmutable('2022-07-08');
 
-        $startDate = $builder->buildStartDate($orderDate, 2, $unit);
+        $startDate = $builder->getNextIntervalDate($orderDate, 2, $unit);
 
         $this->assertEquals('2022-07-08', $orderDate->format('Y-m-d'), 'original date was modified');
         $this->assertEquals('2022-09-08', $startDate, 'calculated date is wrong');

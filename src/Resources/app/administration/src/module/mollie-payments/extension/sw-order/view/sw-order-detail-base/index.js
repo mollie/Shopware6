@@ -63,7 +63,7 @@ Component.override('sw-order-detail-base', {
                 this.MolliePaymentsShippingService
                     .total({orderId: this.order.id})
                     .then((response) => {
-                        this.shippedAmount = response.amount;
+                        this.shippedAmount = Math.round(response.amount * 100) / 100;
                         this.shippedQuantity = response.quantity;
                     });
 
