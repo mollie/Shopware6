@@ -227,8 +227,9 @@ class MolliePaymentDoPay
         $this->updaterLineItemCustomFields->updateOrderLineItems($mollieOrder, $salesChannelContext);
 
 
-        # getCheckoutUrl can technically return null, even though that should never happen.
-        # But we need to give a Shopware a URL to redirect to, so use the Shopware Return URL as fallback.
+        # getCheckoutUrl can return null with Apple Pay Direct and similar payments,
+        # as it's not necessary to be directed to Mollie in that case.
+        # Return the store's return url, so we go to the correct page.
         $checkoutURL = $mollieOrder->getCheckoutUrl() ?? $transactionStruct->getReturnUrl();
 
         return new MolliePaymentPrepareData((string)$checkoutURL, (string)$mollieOrder->id);
