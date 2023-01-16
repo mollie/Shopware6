@@ -2,7 +2,7 @@ import Plugin from 'src/plugin-system/plugin.class';
 import DomAccess from 'src/helper/dom-access.helper';
 import HttpClient from '../services/HttpClient';
 import DeviceDetection from 'src/helper/device-detection.helper';
-import CsrfAjaxMode from "../services/CsrfAjaxMode";
+import CsrfAjaxMode from '../services/CsrfAjaxMode';
 
 export default class MollieCreditCardComponentsSw64 extends Plugin {
     static options = {
