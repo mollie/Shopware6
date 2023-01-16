@@ -1,6 +1,7 @@
 import './acl';
 import './extension/sw-customer';
 import './extension/sw-order';
+import './components/mollie-pluginconfig-element-orderstate-select';
 import './components/mollie-pluginconfig-section-info';
 import './components/mollie-pluginconfig-section-api';
 import './components/mollie-pluginconfig-section-payments';

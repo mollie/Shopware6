@@ -507,7 +507,7 @@
                 </option>
             </options>
         </input-field>
-        <component name="sw-entity-single-select">
+        <component name="mollie-pluginconfig-element-orderstate-select">
             <name>orderStateFinalState</name>
             <entity>state_machine_state</entity>
             <label>Final order state</label>
