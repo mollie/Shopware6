@@ -31,7 +31,14 @@
         "cardNumberLabel": "Kreditkartennummer",
         "cardExpiryDateLabel": "MM/JJ",
         "cardVerificationCodeLabel": "CVV",
-        "creditCardTagLine": "Zahlung gesichert und zur Verfügung gestellt von"
+        "creditCardTagLine": "Zahlung gesichert und zur Verfügung gestellt von",
+        "saveCardDetailLabel": "Kartendaten für zukünftige Zahlungen speichern"
+      },
+      "mandate": {
+        "cardTitleLabel": "%name% - Kreditkarte mit der Endung •••• %number%",
+        "newCard": "Neue Karte",
+        "remove": "Entfernen",
+        "deleteSuccessMessage": "Ihre Karte wurde erfolgreich gelöscht"
       },
       "ideal": {
         "selectBank": "Bank auswählen"

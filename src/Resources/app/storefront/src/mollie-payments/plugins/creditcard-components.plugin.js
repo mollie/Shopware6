@@ -1,16 +1,17 @@
-import Plugin from 'src/plugin-system/plugin.class';
-import HttpClient from '../services/HttpClient';
+import deepmerge from 'deepmerge';
+import MollieCreditCardMandate from '../core/creditcard-mandate.plugin';
 
-export default class MollieCreditCardComponents extends Plugin {
-    static options = {
+export default class MollieCreditCardComponents extends MollieCreditCardMandate {
+    static options =  deepmerge(MollieCreditCardMandate.options, {
         customerId: null,
         locale: null,
         profileId: null,
         shopUrl: null,
         testMode: true,
-    };
+    });
 
     init() {
+        super.init();
         const me = this;
         let componentsObject = null;
 
@@ -20,13 +21,6 @@ export default class MollieCreditCardComponents extends Plugin {
         // Remove the existing Mollie controller element
         if (mollieController) {
             mollieController.remove();
-        }
-
-        this.client = new HttpClient();
-
-        // Fix the trailing slash in the shop URL
-        if (this.options.shopUrl != null && this.options.shopUrl.substr(-1) === '/') {
-            this.options.shopUrl = this.options.shopUrl.substr(0, this.options.shopUrl.length - 1);
         }
 
         // Get the elements from the DOM
@@ -222,6 +216,25 @@ export default class MollieCreditCardComponents extends Plugin {
             !!creditCardRadioInput
             && creditCardRadioInput.checked === true
         ) {
+            const mandateId = this.getMandateCheckedValue();
+            // If the mandateId is valid, that means there is a mandate already selected,
+            // so we have to call the API to save it
+            // and then we continue by submitting our original payment form.
+            if (this.isValidSelectedMandate(mandateId)) {
+                this.client.get(
+                    me.options.shopUrl + '/mollie/components/store-mandate-id/' + me.options.customerId + '/' + mandateId,
+                    () => {
+                        paymentForm.submit();
+                    },
+                    () => {
+                        paymentForm.submit();
+                    },
+                    'application/json; charset=utf-8'
+                );
+
+                return;
+            }
+
             // Reset possible form errors
             const verificationErrors = document.getElementById(`${this.getInputFields().verificationCode.errors}`);
             verificationErrors.textContent = '';
@@ -236,11 +249,21 @@ export default class MollieCreditCardComponents extends Plugin {
             }
 
             if (!error) {
+                // Build query params
+                const queryParams = new URLSearchParams({
+                    'shouldSaveCardDetail': this.shouldSaveCardDetail(),
+                });
+
+                let queryString = queryParams.toString();
+                if (queryString){
+                    queryString = `?${queryString}`;
+                }
+
                 // now we finish by first calling our URL to store
                 // the credit card token for the user and the current checkout
                 // and then we continue by submitting our original payment form.
                 this.client.get(
-                    me.options.shopUrl + '/mollie/components/store-card-token/' + me.options.customerId + '/' + token,
+                    me.options.shopUrl + '/mollie/components/store-card-token/' + me.options.customerId + '/' + token + queryString,
                     () => {
                         const tokenInput = document.getElementById('cardToken');
                         tokenInput.setAttribute('value', token);

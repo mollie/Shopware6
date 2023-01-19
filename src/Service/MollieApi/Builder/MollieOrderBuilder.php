@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Service\MollieApi\Builder;
 
 use Kiener\MolliePayments\Event\MollieOrderBuildEvent;
+use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher;
 use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
@@ -176,6 +177,11 @@ class MollieOrderBuilder
 
         # add payment specific data
         if ($handler instanceof PaymentHandler) {
+            # set CreditCardPayment singleClickPayment true if Single click payment feature is enabled
+            if ($handler instanceof CreditCardPayment && $settings->isEnableSingleClickPayments()) {
+                $handler->setEnableSingleClickPayment(true);
+            }
+
             $orderData = $handler->processPaymentMethodSpecificParameters(
                 $orderData,
                 $order,
@@ -189,7 +195,7 @@ class MollieOrderBuilder
         // enrich data with create customer at mollie
         $orderAttributes = new OrderAttributes($order);
 
-        if ($orderAttributes->isTypeSubscription() || $settings->createCustomersAtMollie()) {
+        if ($orderAttributes->isTypeSubscription() || $settings->createCustomersAtMollie() || $settings->isEnableSingleClickPayments()) {
             $orderData = $this->customerEnricher->enrich($orderData, $customer, $settings, $salesChannelContext);
         }
 

@@ -31,7 +31,21 @@
         "cardNumberLabel": "Card number",
         "cardExpiryDateLabel": "Expiry date",
         "cardVerificationCodeLabel": "CVC/CVV",
-        "creditCardTagLine": "Payment secured and powered by"
+        "creditCardTagLine": "Payment secured and powered by",
+        "saveCardDetailLabel": "Save card details for future payments"
+      },
+      "mandate": {
+        "cardTitleLabel": "%name% - Credit card ending in •••• %number%",
+        "newCard": "New card",
+        "remove": "Remove",
+        "deleteSuccessMessage": "Your card was successfully deleted"
+      },
+      "mandateRemoveModal": {
+        "title": "Delete Confirmation",
+        "cardSubscription": "This card is being used for a subscription",
+        "deleteConfirmation": "Are you sure you want to delete?",
+        "cancelButton": "Cancel",
+        "deleteButton": "Delete"
       },
       "ideal": {
         "selectBank": "Select bank"

@@ -77,6 +77,17 @@ class MollieSettingStruct extends Struct
      */
     protected $enableCreditCardComponents = false;
 
+
+    /**
+     * @var bool
+     */
+    protected $enableCreditCardCompactView = false;
+
+    /**
+     * @var bool
+     */
+    protected $enableSingleClickPayments = false;
+
     /**
      * @var bool
      */
@@ -410,6 +421,41 @@ class MollieSettingStruct extends Struct
     public function setEnableCreditCardComponents(bool $enableCreditCardComponents): self
     {
         $this->enableCreditCardComponents = $enableCreditCardComponents;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnableSingleClickPayments(): bool
+    {
+        return $this->enableSingleClickPayments;
+    }
+
+    /**
+     * @param bool $enableSingleClickPayments
+     */
+    public function setEnableSingleClickPayments(bool $enableSingleClickPayments): void
+    {
+        $this->enableSingleClickPayments = $enableSingleClickPayments;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getEnableCreditCardCompactView(): bool
+    {
+        return $this->enableCreditCardCompactView;
+    }
+
+    /**
+     * @param bool $enableCreditCardCompactView
+     *
+     * @return self
+     */
+    public function setEnableCreditCardCompactView(bool $enableCreditCardCompactView): self
+    {
+        $this->enableCreditCardCompactView = $enableCreditCardCompactView;
         return $this;
     }
 

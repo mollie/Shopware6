@@ -31,7 +31,14 @@
         "cardNumberLabel": "Creditcardnummer",
         "cardExpiryDateLabel": "MM/JJ",
         "cardVerificationCodeLabel": "CVV",
-        "creditCardTagLine": "Betaling verzekerd en verzorgd door"
+        "creditCardTagLine": "Betaling verzekerd en verzorgd door",
+        "saveCardDetailLabel": "Bewaar kaartgegevens voor toekomstige betalingen"
+      },
+      "mandate": {
+        "cardTitleLabel": "%name% - Creditcard eindigend op •••• %number%",
+        "newCard": "Nieuwe kaart",
+        "remove": "Verwijderen",
+        "deleteSuccessMessage": "Uw kaart is succesvol verwijderd"
       },
       "ideal": {
         "selectBank": "Selecteer bank"

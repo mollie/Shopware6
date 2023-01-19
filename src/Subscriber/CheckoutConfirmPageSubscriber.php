@@ -4,8 +4,11 @@ namespace Kiener\MolliePayments\Subscriber;
 
 use Exception;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
+use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
 use Kiener\MolliePayments\Service\CustomerService;
+use Kiener\MolliePayments\Service\CustomerServiceInterface;
 use Kiener\MolliePayments\Service\CustomFieldService;
+use Kiener\MolliePayments\Service\MandateServiceInterface;
 use Kiener\MolliePayments\Service\Payment\Provider\ActivePaymentMethodsProvider;
 use Kiener\MolliePayments\Service\PaymentMethodService;
 use Kiener\MolliePayments\Service\SettingsService;
@@ -14,6 +17,7 @@ use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Method;
 use Mollie\Api\Types\PaymentMethod;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -57,6 +61,10 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
      */
     private $localeRepositoryInterface;
 
+    /**
+     * @var MandateServiceInterface
+     */
+    private $mandateService;
 
     /**
      * @return array<mixed>>
@@ -76,13 +84,20 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
      * @param SettingsService $settingsService
      * @param EntityRepositoryInterface $languageRepositoryInterface
      * @param EntityRepositoryInterface $localeRepositoryInterface
+     * @param MandateServiceInterface $mandateService
      */
-    public function __construct(MollieApiFactory $apiFactory, SettingsService $settingsService, EntityRepositoryInterface $languageRepositoryInterface, EntityRepositoryInterface $localeRepositoryInterface)
-    {
+    public function __construct(
+        MollieApiFactory $apiFactory,
+        SettingsService $settingsService,
+        EntityRepositoryInterface $languageRepositoryInterface,
+        EntityRepositoryInterface $localeRepositoryInterface,
+        MandateServiceInterface $mandateService
+    ) {
         $this->apiFactory = $apiFactory;
         $this->settingsService = $settingsService;
         $this->languageRepositoryInterface = $languageRepositoryInterface;
         $this->localeRepositoryInterface = $localeRepositoryInterface;
+        $this->mandateService = $mandateService;
     }
 
 
@@ -107,6 +122,7 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
         $this->addMollieTestModeVariableToPage($args);
         $this->addMollieComponentsVariableToPage($args);
         $this->addMollieIdealIssuersVariableToPage($args);
+        $this->addMollieSingleClickPaymentDataToPage($args);
     }
 
     /**
@@ -243,6 +259,7 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     {
         $args->getPage()->assign([
             'enable_credit_card_components' => $this->settings->getEnableCreditCardComponents(),
+            'enable_credit_card_compact_view' => $this->settings->getEnableCreditCardCompactView(),
         ]);
     }
 
@@ -311,6 +328,43 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
                 'ideal_issuers' => $ideal->issuers,
                 'preferred_issuer' => $preferredIssuer,
             ]);
+        }
+    }
+
+    /**
+     * Adds the components variable to the storefront.
+     *
+     * @param AccountEditOrderPageLoadedEvent|CheckoutConfirmPageLoadedEvent $args
+     */
+    private function addMollieSingleClickPaymentDataToPage($args): void
+    {
+        $args->getPage()->assign([
+            'enable_single_click_payments' => $this->settings->isEnableSingleClickPayments(),
+        ]);
+
+        if (!$this->settings->isEnableSingleClickPayments()) {
+            return;
+        }
+
+        try {
+            $salesChannelContext = $args->getSalesChannelContext();
+            $loggedInCustomer = $salesChannelContext->getCustomer();
+            if (!$loggedInCustomer instanceof CustomerEntity) {
+                return;
+            }
+
+            // only load the list of mandates if the payment method is CreditCardPayment
+            if ($salesChannelContext->getPaymentMethod()->getHandlerIdentifier() !== CreditCardPayment::class) {
+                return;
+            }
+
+            $mandates = $this->mandateService->getCreditCardMandatesByCustomerId($loggedInCustomer->getId(), $salesChannelContext);
+
+            $args->getPage()->setExtensions([
+                'MollieCreditCardMandateCollection' => $mandates
+            ]);
+        } catch (Exception $e) {
+            //
         }
     }
 }
