@@ -15,6 +15,8 @@ import './components/mollie-internal-link';
 import './page/mollie-subscriptions-list';
 import './page/mollie-subscriptions-detail';
 
+import defaultSearchConfiguration from './default-search-configuration';
+
 // eslint-disable-next-line no-undef
 const {Module, ApiService, Plugin} = Shopware;
 
@@ -47,6 +49,7 @@ systemConfig.getValues('MolliePayments').then(config => {
         targetVersion: '1.0.0',
         color: '#333',
         icon: 'default-action-settings',
+        entity: 'mollie_subscription',
 
         routes: {
             subscriptions: {
@@ -75,6 +78,8 @@ systemConfig.getValues('MolliePayments').then(config => {
         },
 
         navigation: navigationRoutes,
+
+        defaultSearchConfiguration
     });
 
     // Now tell Shopware it's okay to load the administration
