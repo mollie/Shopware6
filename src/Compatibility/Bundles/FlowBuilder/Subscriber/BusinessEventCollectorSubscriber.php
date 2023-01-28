@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Subscriber;
 
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Checkout\OrderSuccessEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund\RefundStartedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionCancelledEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionEndedEvent;
@@ -64,6 +65,8 @@ class BusinessEventCollectorSubscriber implements EventSubscriberInterface
         $collection = $event->getCollection();
 
         $events = [
+            OrderSuccessEvent::class,
+            # --------------------------------------------
             WebhookReceivedEvent::class,
             # --------------------------------------------
             WebhookReceivedPaidEvent::class,
