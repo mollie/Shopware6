@@ -112,6 +112,7 @@ Component.register('mollie-subscriptions-list', {
             this.naturalSorting = this.sortBy === 'createdAt';
 
             const criteria = new Criteria();
+            criteria.setTerm(this.term);
             criteria.addSorting(Criteria.sort(this.sortBy, this.sortDirection, this.naturalSorting));
             criteria.addAssociation('customer');
 

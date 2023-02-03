@@ -81,8 +81,7 @@ Application.addServiceProviderDecorator('ruleConditionDataProviderService', (rul
 Application.addServiceProviderDecorator('searchTypeService', searchTypeService => {
     searchTypeService.upsertType('mollie_subscription', {
         entityName: 'mollie_subscription',
-        entityService: 'mollieSubscriptionService',
-        placeholderSnippet: 'test',
+        placeholderSnippet: 'mollie-payments.searchPlaceholder',
         listingRoute: 'mollie.payments.subscriptions'
     });
 

@@ -1,5 +1,8 @@
 {
   "global": {
+    "entities": {
+      "mollie_subscription": "Mollie Subscription | Mollie Subscriptions"
+    },
     "businessEvents": {
       "mollie_webhook_received_All": " Mollie Webhook Received (All)",
       "mollie_webhook_received_status_authorized": " Mollie Webhook Received (Authorized)",
@@ -24,7 +27,8 @@
   },
   "mollie-payments": {
     "pluginTitle": "Mollie",
-    "pluginDescription": "Mollie Modul",
+    "pluginDescription": "Mollie Module",
+    "searchPlaceholder": "Search subscriptions...",
     "general": {
       "mainMenuItemGeneral": "Mollie Payments",
       "descriptionTextModule": "Mollie Payments",
@@ -428,6 +432,15 @@
       },
       "mollie_subscription": {
         "label": "Subscriptions"
+      }
+    }
+  },
+  "sw-profile": {
+    "tabSearchPreferences": {
+      "modules": {
+        "mollie_subscription": {
+          "description": "Description"
+        }
       }
     }
   },
