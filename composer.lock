@@ -321,16 +321,16 @@
         },
         {
             "name": "boxblinkracer/phpunuhi",
-            "version": "1.0.1",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/boxblinkracer/phpunuhi.git",
-                "reference": "cd95510fce15f24839fe15d07036d5c3ab92a9b1"
+                "reference": "e7fec312d7de94bb8baa1a4caa0c569f214000b1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/boxblinkracer/phpunuhi/zipball/cd95510fce15f24839fe15d07036d5c3ab92a9b1",
-                "reference": "cd95510fce15f24839fe15d07036d5c3ab92a9b1",
+                "url": "https://api.github.com/repos/boxblinkracer/phpunuhi/zipball/e7fec312d7de94bb8baa1a4caa0c569f214000b1",
+                "reference": "e7fec312d7de94bb8baa1a4caa0c569f214000b1",
                 "shasum": ""
             },
             "require": {
@@ -376,9 +376,9 @@
             ],
             "support": {
                 "issues": "https://github.com/boxblinkracer/phpunuhi/issues",
-                "source": "https://github.com/boxblinkracer/phpunuhi/tree/1.0.1"
+                "source": "https://github.com/boxblinkracer/phpunuhi/tree/1.1.0"
             },
-            "time": "2023-01-09T22:35:29+00:00"
+            "time": "2023-01-14T08:51:29+00:00"
         },
         {
             "name": "brick/math",
@@ -15092,5 +15092,5 @@
         "ext-curl": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.3.0"
 }
