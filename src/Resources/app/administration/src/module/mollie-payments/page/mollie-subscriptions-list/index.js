@@ -38,6 +38,7 @@ Component.register('mollie-subscriptions-list', {
             sortDirection: 'DESC',
             naturalSorting: true,
             showHelp: false,
+            searchConfigEntity: 'mollie_subscription',
         }
     },
 
@@ -106,13 +107,13 @@ Component.register('mollie-subscriptions-list', {
         /**
          *
          */
-        getList() {
+        async getList() {
 
             this.isLoading = true;
             this.naturalSorting = this.sortBy === 'createdAt';
 
-            const criteria = new Criteria();
-            criteria.setTerm(this.term);
+            const criteria = await this.addQueryScores(this.term, new Criteria());
+
             criteria.addSorting(Criteria.sort(this.sortBy, this.sortDirection, this.naturalSorting));
             criteria.addAssociation('customer');
 
