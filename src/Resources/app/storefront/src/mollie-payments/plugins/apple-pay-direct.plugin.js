@@ -22,8 +22,11 @@ export default class MollieApplePayDirect extends Plugin {
         // register our off-canvas listener
         // we need to re-init all apple pay button
         // once the offcanvas is loaded (lazy) into the DOM
-        const pluginOffCanvas = window.PluginManager.getPluginInstanceFromElement(document.querySelector('[data-offcanvas-cart]'), 'OffCanvasCart');
-        pluginOffCanvas.$emitter.subscribe('offCanvasOpened', me.onOffCanvasOpened.bind(me));
+        const elementOffcanvas = document.querySelector('[data-offcanvas-cart]');
+        if (elementOffcanvas instanceof HTMLElement) {
+            const pluginOffCanvas = window.PluginManager.getPluginInstanceFromElement(elementOffcanvas, 'OffCanvasCart');
+            pluginOffCanvas.$emitter.subscribe('offCanvasOpened', me.onOffCanvasOpened.bind(me));
+        }
 
         // now update our current page
         this.initCurrentPage();
