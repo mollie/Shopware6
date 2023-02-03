@@ -1,21 +1,21 @@
-import Plugin from 'src/plugin-system/plugin.class';
+import deepmerge from 'deepmerge';
+import MollieCreditCardMandate from '../core/creditcard-mandate.plugin';
 import DomAccess from 'src/helper/dom-access.helper';
-import HttpClient from '../services/HttpClient';
 import DeviceDetection from 'src/helper/device-detection.helper';
 import CsrfAjaxMode from '../services/CsrfAjaxMode';
 
-export default class MollieCreditCardComponentsSw64 extends Plugin {
-    static options = {
+export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMandate {
+    static options = deepmerge(MollieCreditCardMandate.options, {
         paymentId: null,
         customerId: null,
         locale: null,
         profileId: null,
         shopUrl: null,
         testMode: true,
-    };
+    });
 
     init() {
-
+        super.init();
         try {
             this._paymentForm = DomAccess.querySelector(document, this.getSelectors().paymentForm);
             this._confirmForm = DomAccess.querySelector(document, this.getSelectors().confirmForm);
@@ -24,12 +24,10 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
             return;
         }
 
-        this.client = new HttpClient();
-
         this._cleanUpExistingElement();
-        this._fixShopUrl();
         this._initializeComponentInstance();
         this._registerEvents();
+        this.registerMandateEvents();
     }
 
     _cleanUpExistingElement() {
@@ -39,13 +37,6 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
         // Remove the existing Mollie controller element
         if (mollieController) {
             mollieController.remove();
-        }
-    }
-
-    _fixShopUrl() {
-        // Fix the trailing slash in the shop URL
-        if (this.options.shopUrl != null && this.options.shopUrl.substr(-1) === '/') {
-            this.options.shopUrl = this.options.shopUrl.substr(0, this.options.shopUrl.length - 1);
         }
     }
 
@@ -225,6 +216,25 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
         // inject our own flow
         event.preventDefault();
 
+        const mandateId = this.getMandateCheckedValue();
+        // If the mandateId is valid, that means there is a mandate already selected,
+        // so we have to call the API to save it
+        // and then we continue by submitting our original payment form.
+        if (this.isValidSelectedMandate(mandateId)) {
+            this.client.get(
+                me.options.shopUrl + '/mollie/components/store-mandate-id/' + me.options.customerId + '/' + mandateId,
+                () => {
+                    me.continueShopwareCheckout(paymentForm);
+                },
+                () => {
+                    me.continueShopwareCheckout(paymentForm);
+                },
+                'application/json; charset=utf-8'
+            );
+
+            return;
+        }
+
 
         // Reset possible form errors
         const verificationErrors = document.getElementById(`${this.getInputFields().verificationCode.errors}`);
@@ -240,11 +250,21 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
             return;
         }
 
+        // Build query params
+        const queryParams = new URLSearchParams({
+            'shouldSaveCardDetail': this.shouldSaveCardDetail(),
+        });
+
+        let queryString = queryParams.toString();
+        if (queryString){
+            queryString = `?${queryString}`;
+        }
+
         // now we finish by first calling our URL to store
         // the credit card token for the user and the current checkout
         // and then we continue by submitting our original payment form.
         this.client.get(
-            me.options.shopUrl + '/mollie/components/store-card-token/' + me.options.customerId + '/' + token,
+            me.options.shopUrl + '/mollie/components/store-card-token/' + me.options.customerId + '/' + token + queryString,
             function () {
                 me.continueShopwareCheckout(paymentForm);
             },

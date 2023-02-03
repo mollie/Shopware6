@@ -118,6 +118,7 @@
 
         <service id="Kiener\MolliePayments\Controller\Storefront\CreditCard\CreditCardController" public="true">
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MandateService"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
@@ -167,6 +168,7 @@
 
         <service id="Kiener\MolliePayments\Controller\StoreApi\CreditCard\CreditCardController" public="true">
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MandateService"/>
         </service>
 
         <service id="Kiener\MolliePayments\Controller\StoreApi\iDEAL\iDealController" public="true">

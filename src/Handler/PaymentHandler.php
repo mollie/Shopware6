@@ -25,6 +25,9 @@ use Throwable;
 
 class PaymentHandler implements AsynchronousPaymentHandlerInterface
 {
+    public const PAYMENT_SEQUENCE_TYPE_FIRST = 'first';
+    public const PAYMENT_SEQUENCE_TYPE_RECURRING = 'recurring';
+
     protected const FIELD_ORDER_NUMBER = 'orderNumber';
     protected const FIELD_BILLING_ADDRESS = 'billingAddress';
     protected const FIELD_BILLING_EMAIL = 'billingEmail';

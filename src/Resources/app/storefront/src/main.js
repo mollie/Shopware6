@@ -6,6 +6,7 @@ import MollieCreditCardComponentsSw64 from './mollie-payments/plugins/creditcard
 import MollieIDealIssuer from './mollie-payments/plugins/ideal-issuer.plugin';
 import MollieApplePayDirect from './mollie-payments/plugins/apple-pay-direct.plugin';
 import MollieApplePayPaymentMethod from './mollie-payments/plugins/apple-pay-payment-method.plugin';
+import MollieCreditCardMandateManage from './mollie-payments/plugins/creditcard-mandate-manage.plugin';
 
 
 // Register them via the existing PluginManager
@@ -31,3 +32,8 @@ pluginManager.register('MollieApplePayPaymentMethod', MollieApplePayPaymentMetho
 // -----------------------------------------------------------------------------
 pluginManager.register('MollieCreditCardComponents', MollieCreditCardComponents, '[data-mollie-template-creditcard-components]');
 pluginManager.register('MollieCreditCardComponentsSw64', MollieCreditCardComponentsSw64, '[data-mollie-template-creditcard-components-sw64]');
+
+
+// manage credit card mandate
+// -----------------------------------------------------------------------------
+pluginManager.register('MollieCreditCardMandateManage', MollieCreditCardMandateManage, '[data-mollie-credit-card-mandate-manage]');
