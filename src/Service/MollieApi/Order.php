@@ -340,7 +340,7 @@ class Order
 
         $settings = $this->settingsService->getSettings($order->getSalesChannelId());
         # set CreditCardPayment singleClickPayment true if Single click payment feature is enabled
-        if ($paymentHandler instanceof CreditCardPayment && $settings->isEnableSingleClickPayments()) {
+        if ($paymentHandler instanceof CreditCardPayment && $settings->isOneClickPaymentsEnabled()) {
             $paymentHandler->setEnableSingleClickPayment(true);
         }
 

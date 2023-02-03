@@ -178,7 +178,7 @@ class MollieOrderBuilder
         # add payment specific data
         if ($handler instanceof PaymentHandler) {
             # set CreditCardPayment singleClickPayment true if Single click payment feature is enabled
-            if ($handler instanceof CreditCardPayment && $settings->isEnableSingleClickPayments()) {
+            if ($handler instanceof CreditCardPayment && $settings->isOneClickPaymentsEnabled()) {
                 $handler->setEnableSingleClickPayment(true);
             }
 
@@ -195,7 +195,7 @@ class MollieOrderBuilder
         // enrich data with create customer at mollie
         $orderAttributes = new OrderAttributes($order);
 
-        if ($orderAttributes->isTypeSubscription() || $settings->createCustomersAtMollie() || $settings->isEnableSingleClickPayments()) {
+        if ($orderAttributes->isTypeSubscription() || $settings->createCustomersAtMollie() || $settings->isOneClickPaymentsEnabled()) {
             $orderData = $this->customerEnricher->enrich($orderData, $customer, $settings, $salesChannelContext);
         }
 

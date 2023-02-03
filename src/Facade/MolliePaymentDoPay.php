@@ -253,7 +253,7 @@ class MolliePaymentDoPay
             # create customers for every subscription
             # or if we don't have a guest and our feature is enabled
             if ($isSubscription
-                || (!$customer->getGuest() && ($settings->createCustomersAtMollie() || $settings->isEnableSingleClickPayments()))
+                || (!$customer->getGuest() && ($settings->createCustomersAtMollie() || $settings->isOneClickPaymentsEnabled()))
             ) {
                 $this->customerService->createMollieCustomer(
                     $customer->getId(),

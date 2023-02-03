@@ -65,6 +65,8 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
             event.preventDefault();
             me.submitForm(event, componentsObject, paymentForm);
         });
+
+        this.registerMandateEvents();
     }
 
     getSelectors() {

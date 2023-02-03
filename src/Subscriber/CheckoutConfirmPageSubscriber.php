@@ -259,7 +259,7 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     {
         $args->getPage()->assign([
             'enable_credit_card_components' => $this->settings->getEnableCreditCardComponents(),
-            'enable_credit_card_compact_view' => $this->settings->getEnableCreditCardCompactView(),
+            'enable_one_click_payments_compact_view' => $this->settings->isOneClickPaymentsCompactView(),
         ]);
     }
 
@@ -339,10 +339,10 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     private function addMollieSingleClickPaymentDataToPage($args): void
     {
         $args->getPage()->assign([
-            'enable_single_click_payments' => $this->settings->isEnableSingleClickPayments(),
+            'enable_one_click_payments' => $this->settings->isOneClickPaymentsEnabled(),
         ]);
 
-        if (!$this->settings->isEnableSingleClickPayments()) {
+        if (!$this->settings->isOneClickPaymentsEnabled()) {
             return;
         }
 

@@ -16,7 +16,6 @@ export default class MollieCreditCardMandate extends Plugin {
     init() {
         this.client = new HttpClient();
         this._fixShopUrl()
-        this.registerMandateEvents();
     }
 
     /**

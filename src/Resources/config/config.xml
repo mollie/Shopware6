@@ -78,7 +78,7 @@
             <helpText lang="nl-NL">Toon credit card invoervelden direct in jouw Shopware shop. Indien uitgeschakeld, zal Mollie de formulieren tonen op de Mollie betaalpagina.</helpText>
         </input-field>
         <input-field type="bool">
-            <name>enableSingleClickPayments</name>
+            <name>oneClickPaymentsEnabled</name>
             <label>Enable Single Click Payments</label>
             <label lang="de-DE">Single-Click-Zahlungen aktivieren</label>
             <label lang="nl-NL">Betalingen met één klik mogelijk maken</label>
@@ -88,10 +88,10 @@
             <helpText lang="nl-NL">Sla de creditcard van de klant op voor terugkerende betalingen.</helpText>
         </input-field>
         <input-field type="bool">
-            <name>enableCreditCardCompactView</name>
-            <label>Compact view</label>
-            <label lang="de-DE">Kompakte Ansicht</label>
-            <label lang="nl-NL">Compacte weergave</label>
+            <name>oneClickPaymentsCompactView</name>
+            <label>One-Click Payments compact view</label>
+            <label lang="de-DE">One-Click-Zahlungen Kompaktansicht</label>
+            <label lang="nl-NL">Compacte weergave van One-Click Payments</label>
             <defaultValue>false</defaultValue>
             <helpText>Will show a compact view of the credit card within the checkout.</helpText>
             <helpText lang="de-DE">Zeigt eine kompakte Ansicht der Kreditkarte im Kassenbereich.</helpText>

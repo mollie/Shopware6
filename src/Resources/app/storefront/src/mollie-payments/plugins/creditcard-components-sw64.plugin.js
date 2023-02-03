@@ -27,6 +27,7 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
         this._cleanUpExistingElement();
         this._initializeComponentInstance();
         this._registerEvents();
+        this.registerMandateEvents();
     }
 
     _cleanUpExistingElement() {
@@ -223,10 +224,10 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
             this.client.get(
                 me.options.shopUrl + '/mollie/components/store-mandate-id/' + me.options.customerId + '/' + mandateId,
                 () => {
-                    paymentForm.submit();
+                    me.continueShopwareCheckout(paymentForm);
                 },
                 () => {
-                    paymentForm.submit();
+                    me.continueShopwareCheckout(paymentForm);
                 },
                 'application/json; charset=utf-8'
             );

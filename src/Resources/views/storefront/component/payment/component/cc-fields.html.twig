@@ -1,13 +1,13 @@
 {% set NEW_CARD_MANDATE_OPTION = 'newCard' %}
-{% set enableSingleClickPayments = page.enable_single_click_payments %}
+{% set enableOneClickPayments = page.enable_one_click_payments %}
 {% set mandates = page.extensions.MollieCreditCardMandateCollection %}
 
 {% block mollie_credit_card_mandate_list %}
     {% block mollie_credit_card_mandate_list_include %}
-        {% if enableSingleClickPayments and showIfActive and mandates|length > 0 and activeRoute is not same as 'frontend.account.payment.page' %}
+        {% if enableOneClickPayments and showIfActive and mandates|length > 0 and activeRoute is not same as 'frontend.account.payment.page' %}
             {% sw_include '@MolliePayments/mollie/component/credit-card-mandate.html.twig' with {
                 'mandates': mandates,
-                'compactView': page.enable_credit_card_compact_view,
+                'compactView': page.enable_one_click_payments_compact_view,
                 'modifiable': false
             } %}
         {% endif %}
@@ -17,7 +17,7 @@
 {% block mollie_credit_card_mandate_form %}
     <div class="mollie-credit-card-mandate">
         {% block mollie_credit_card_mandate_form_radio %}
-            {% if enableSingleClickPayments and page.enable_credit_card_components == true and showIfActive and mandates|length > 0 %}
+            {% if enableOneClickPayments and page.enable_credit_card_components == true and showIfActive and mandates|length > 0 %}
                 <div class="mollie-credit-card-mandate-radio {{ formRadioWrapperClass ?? 'custom-control custom-radio' }}">
                     {% block mollie_credit_card_mandate_form_radio_input %}
                         <input type="radio"
@@ -96,7 +96,7 @@
                         </div>
                     </div>
                     {% block mollie_credit_card_mandate_form_component_radio_should_save_card %}
-                        {% if enableSingleClickPayments %}
+                        {% if enableOneClickPayments %}
                             <div class="block-group">
                                 <div class="{{ formCheckboxWrapperClass ?? 'custom-control custom-checkbox' }} mollie-credit-card-custom-checkbox">
                                     {% block mollie_creditcard_form_check_store_card_checkbox_input %}

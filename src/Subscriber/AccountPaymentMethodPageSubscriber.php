@@ -72,10 +72,10 @@ class AccountPaymentMethodPageSubscriber implements EventSubscriberInterface
     private function addMollieSingleClickPaymentDataToPage(AccountPaymentMethodPageLoadedEvent $args): void
     {
         $args->getPage()->assign([
-            'enable_single_click_payments' => $this->settings->isEnableSingleClickPayments(),
+            'enable_one_click_payments' => $this->settings->isOneClickPaymentsEnabled(),
         ]);
 
-        if (!$this->settings->isEnableSingleClickPayments()) {
+        if (!$this->settings->isOneClickPaymentsEnabled()) {
             return;
         }
 

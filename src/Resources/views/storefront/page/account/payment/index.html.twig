@@ -14,7 +14,7 @@
 
 {% block page_account_payment_main %}
     {% block mollie_page_account_credit_card_mandate %}
-        {% if page.enable_single_click_payments %}
+        {% if page.enable_one_click_payments %}
             {% set mandates = page.extensions.MollieCreditCardMandateCollection %}
 
             {% block mollie_page_account_credit_card_mandate_condition %}
