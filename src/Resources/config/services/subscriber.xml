@@ -14,7 +14,7 @@
         </service>
 
         <service id="Kiener\MolliePayments\Subscriber\CancelMollieOrderSubscriber">
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="mollie_payments.logger"/>
             <argument>%kernel.shopware_version%</argument>
