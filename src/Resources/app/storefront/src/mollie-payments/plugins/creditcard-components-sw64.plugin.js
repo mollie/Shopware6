@@ -24,20 +24,9 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
             return;
         }
 
-        this.client = new HttpClient();
-
-        this._fixShopUrl();
         this._initializeComponentInstance();
         this._registerEvents();
         this.registerMandateEvents();
-    }
-
-
-    _fixShopUrl() {
-        // Fix the trailing slash in the shop URL
-        if (this.options.shopUrl != null && this.options.shopUrl.substr(-1) === '/') {
-            this.options.shopUrl = this.options.shopUrl.substr(0, this.options.shopUrl.length - 1);
-        }
     }
 
     _initializeComponentInstance() {
