@@ -18,7 +18,7 @@ use Shopware\Core\Framework\Event\SalesChannelAware;
 use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class OrderSuccessEvent extends Event implements CustomerAware, OrderAware, MailAware, SalesChannelAware, BusinessEventInterface
+class OrderFailedEvent extends Event implements CustomerAware, OrderAware, MailAware, SalesChannelAware, BusinessEventInterface
 {
     use JsonSerializableTrait;
 
@@ -67,7 +67,7 @@ class OrderSuccessEvent extends Event implements CustomerAware, OrderAware, Mail
      */
     public function getName(): string
     {
-        return 'mollie.checkout.order_success';
+        return 'mollie.checkout.order_failed';
     }
 
     /**

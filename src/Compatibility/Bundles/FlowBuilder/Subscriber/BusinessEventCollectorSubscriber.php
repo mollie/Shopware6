@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Subscriber;
 
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Checkout\OrderFailedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Checkout\OrderSuccessEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund\RefundStartedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionCancelledEvent;
@@ -23,7 +24,6 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatus
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedPartialRefundedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedPendingEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedRefundedEvent;
-use Kiener\MolliePayments\Components\Subscription\BusinessEvent\RenewalReminderEvent;
 use Shopware\Core\Framework\Event\BusinessEventCollector;
 use Shopware\Core\Framework\Event\BusinessEventCollectorEvent;
 use Shopware\Core\Framework\Event\BusinessEventDefinition;
@@ -66,6 +66,7 @@ class BusinessEventCollectorSubscriber implements EventSubscriberInterface
 
         $events = [
             OrderSuccessEvent::class,
+            OrderFailedEvent::class,
             # --------------------------------------------
             WebhookReceivedEvent::class,
             # --------------------------------------------

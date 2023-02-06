@@ -28,6 +28,8 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class MolliePaymentFinalize
 {
+    private const FLOWBUILDER_FAILED = 'failed';
+    private const FLOWBUILDER_SUCCESS = 'success';
 
     /**
      * @var OrderStatusConverter
@@ -152,11 +154,8 @@ class MolliePaymentFinalize
 
 
         # now either set the payment status for successful payments
-        # or make sure to throw an exception for Shopware in case
-        # of failed payments.
-        if (!MolliePaymentStatus::isFailedStatus($molliePaymentMethodKey, $paymentStatus)) {
-            $this->orderStatusUpdater->updatePaymentStatus($transactionStruct->getOrderTransaction(), $paymentStatus, $salesChannelContext->getContext());
-        } else {
+        # or make sure to throw an exception for Shopware in case of failed payments.
+        if (MolliePaymentStatus::isFailedStatus($molliePaymentMethodKey, $paymentStatus)) {
             $orderTransactionID = $transactionStruct->getOrderTransaction()->getUniqueIdentifier();
 
             # let's also create a different handling, if the customer either cancelled
@@ -164,13 +163,21 @@ class MolliePaymentFinalize
             if ($paymentStatus === MolliePaymentStatus::MOLLIE_PAYMENT_CANCELED) {
                 $message = sprintf('Payment for order %s (%s) was cancelled by the customer.', $order->getOrderNumber(), $mollieOrder->id);
 
+
                 throw new CustomerCanceledAsyncPaymentException($orderTransactionID, $message);
             } else {
                 $message = sprintf('Payment for order %s (%s) failed. The Mollie payment status was not successful for this payment attempt.', $order->getOrderNumber(), $mollieOrder->id);
 
+                # fire flow builder event
+                $this->fireFlowBuilderEvent(self::FLOWBUILDER_FAILED, $order, $salesChannelContext->getContext());
+
                 throw new AsyncPaymentFinalizeException($orderTransactionID, $message);
             }
         }
+
+        # --------------------------------------------------------------------------------------------------------------------
+
+        $this->orderStatusUpdater->updatePaymentStatus($transactionStruct->getOrderTransaction(), $paymentStatus, $salesChannelContext->getContext());
 
         # now update the custom fields of the order
         # we want to have as much information as possible in the shopware order
@@ -202,17 +209,18 @@ class MolliePaymentFinalize
         # --------------------------------------------------------------------------------------------------------------------
         # FLOW BUILDER
 
-        $this->fireFlowBuilderEvents($order, $salesChannelContext->getContext());
+        $this->fireFlowBuilderEvent(self::FLOWBUILDER_SUCCESS, $order, $salesChannelContext->getContext());
     }
 
 
     /**
+     * @param string $status
      * @param OrderEntity $order
      * @param Context $context
      * @throws \Exception
      * @return void
      */
-    private function fireFlowBuilderEvents(OrderEntity $order, Context $context): void
+    private function fireFlowBuilderEvent(string $status, OrderEntity $order, Context $context): void
     {
         $orderCustomer = $order->getOrderCustomer();
 
@@ -231,8 +239,15 @@ class MolliePaymentFinalize
         # we also have to reload the order because data is missing
         $finalOrder = $this->orderService->getOrder($order->getId(), $context);
 
-        $eventOrderSuccess = $this->flowBuilderEventFactory->buildOrderSuccessEvent($customers->first(), $finalOrder, $context);
+        switch ($status) {
+            case self::FLOWBUILDER_FAILED:
+                $event = $this->flowBuilderEventFactory->buildOrderFailedEvent($customers->first(), $finalOrder, $context);
+                break;
 
-        $this->flowBuilderFactory->createDispatcher()->dispatch($eventOrderSuccess);
+            default:
+                $event = $this->flowBuilderEventFactory->buildOrderSuccessEvent($customers->first(), $finalOrder, $context);
+        }
+
+        $this->flowBuilderFactory->createDispatcher()->dispatch($event);
     }
 }

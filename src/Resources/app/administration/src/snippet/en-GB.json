@@ -2,6 +2,7 @@
   "global": {
     "businessEvents": {
       "mollie_checkout_order_success": " Order successful",
+      "mollie_checkout_order_failed": " Order failed",
       "mollie_webhook_received_All": " Mollie Webhook Received (All)",
       "mollie_webhook_received_status_authorized": " Mollie Webhook Received (Authorized)",
       "mollie_webhook_received_status_failed": " Mollie Webhook Received (Failed)",
@@ -450,7 +451,8 @@
       "canceled": "Canceled",
       "expired": "Expired",
       "partiallyRefunded": "Refunded (partially)",
-      "orderSuccess" : "Order successful"
+      "orderSuccess" : "Order successful",
+      "orderFailed" : "Order failed"
     }
   }
 }
