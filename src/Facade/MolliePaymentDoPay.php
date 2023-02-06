@@ -210,7 +210,7 @@ class MolliePaymentDoPay
         # this will prepare the subscriptions in our database.
         # the confirmation of these, however, will be done in a webhook
         $subscriptionId = $this->subscriptionManager->createSubscription($order, $salesChannelContext);
-        
+
         # now update our custom struct values
         # and immediately set our Mollie Order ID and more
         $orderCustomFields->setMollieOrderId($mollieOrder->id);
@@ -252,7 +252,9 @@ class MolliePaymentDoPay
 
             # create customers for every subscription
             # or if we don't have a guest and our feature is enabled
-            if ($isSubscription || (!$customer->getGuest() && $settings->createCustomersAtMollie())) {
+            if ($isSubscription
+                || (!$customer->getGuest() && ($settings->createCustomersAtMollie() || $settings->isOneClickPaymentsEnabled()))
+            ) {
                 $this->customerService->createMollieCustomer(
                     $customer->getId(),
                     $salesChannelContext->getSalesChannel()->getId(),

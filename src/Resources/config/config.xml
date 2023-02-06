@@ -78,6 +78,26 @@
             <helpText lang="nl-NL">Toon credit card invoervelden direct in jouw Shopware shop. Indien uitgeschakeld, zal Mollie de formulieren tonen op de Mollie betaalpagina.</helpText>
         </input-field>
         <input-field type="bool">
+            <name>oneClickPaymentsEnabled</name>
+            <label>Enable Single Click Payments</label>
+            <label lang="de-DE">Single-Click-Zahlungen aktivieren</label>
+            <label lang="nl-NL">Betalingen met één klik mogelijk maken</label>
+            <defaultValue>true</defaultValue>
+            <helpText>Save customer's credit card for recurring payments.</helpText>
+            <helpText lang="de-DE">Speichern Sie die Kreditkarte des Kunden für wiederkehrende Zahlungen.</helpText>
+            <helpText lang="nl-NL">Sla de creditcard van de klant op voor terugkerende betalingen.</helpText>
+        </input-field>
+        <input-field type="bool">
+            <name>oneClickPaymentsCompactView</name>
+            <label>One-Click Payments compact view</label>
+            <label lang="de-DE">One-Click-Zahlungen Kompaktansicht</label>
+            <label lang="nl-NL">Compacte weergave van One-Click Payments</label>
+            <defaultValue>false</defaultValue>
+            <helpText>Will show a compact view of the credit card within the checkout.</helpText>
+            <helpText lang="de-DE">Zeigt eine kompakte Ansicht der Kreditkarte im Kassenbereich.</helpText>
+            <helpText lang="nl-NL">Toont een compacte weergave van de creditcard bij het afrekenen.</helpText>
+        </input-field>
+        <input-field type="bool">
             <name>enableApplePayDirect</name>
             <label>Enable Apple Pay Direct</label>
             <label lang="de-DE">Apple Pay Direct aktivieren</label>
