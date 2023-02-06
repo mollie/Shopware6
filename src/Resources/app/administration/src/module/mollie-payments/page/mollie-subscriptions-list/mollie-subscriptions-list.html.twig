@@ -114,5 +114,15 @@
                 </sw-entity-listing>
             {% endblock %}
         </template>
+
+        <template #sidebar>
+            <sw-sidebar>
+                <sw-sidebar-item
+                    icon="regular-undo"
+                    :title="$tc('sw-product.list.titleSidebarItemRefresh')"
+                    @click="onRefresh"
+                />
+            </sw-sidebar>
+        </template>
     </sw-page>
 {% endblock %}
