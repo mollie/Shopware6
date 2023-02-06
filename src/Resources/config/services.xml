@@ -168,7 +168,7 @@
         </service>
 
         <service id="Kiener\MolliePayments\Subscriber\OrderStateSubscriber" class="Kiener\MolliePayments\Subscriber\OrderStateSubscriber">
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\PaymentMethodService"/>
             <tag name="kernel.event_subscriber"/>

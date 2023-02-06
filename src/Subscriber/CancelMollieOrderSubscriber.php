@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Subscriber;
 
+use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\OrderService;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
@@ -22,10 +23,7 @@ class CancelMollieOrderSubscriber implements EventSubscriberInterface
      * @var string
      */
     private $shopwareVersion;
-    /**
-     * @var MollieApiClient
-     */
-    private $apiClient;
+
     /**
      * @var OrderService
      */
@@ -35,20 +33,24 @@ class CancelMollieOrderSubscriber implements EventSubscriberInterface
      * @var LoggerInterface
      */
     private $logger;
+    /**
+     * @var MollieApiFactory
+     */
+    private $apiFactory;
 
 
     /**
-     * @param MollieApiClient $apiClient
+     * @param MollieApiFactory $apiFactory
      * @param OrderService $orderService
      * @param LoggerInterface $loggerService
      * @param string $shopwareVersion
      */
-    public function __construct(MollieApiClient $apiClient, OrderService $orderService, LoggerInterface $loggerService, string $shopwareVersion)
+    public function __construct(MollieApiFactory $apiFactory, OrderService $orderService, LoggerInterface $loggerService, string $shopwareVersion)
     {
-        $this->apiClient = $apiClient;
         $this->orderService = $orderService;
         $this->shopwareVersion = $shopwareVersion;
         $this->logger = $loggerService;
+        $this->apiFactory = $apiFactory;
     }
 
     public static function getSubscribedEvents()
@@ -87,10 +89,12 @@ class CancelMollieOrderSubscriber implements EventSubscriberInterface
         }
 
         try {
-            $mollieOrder = $this->apiClient->orders->get($mollieOrderId);
+            $apiClient = $this->apiFactory->getClient($order->getSalesChannelId());
+
+            $mollieOrder = $apiClient->orders->get($mollieOrderId);
 
             if (in_array($mollieOrder->status, [self::MOLLIE_CANCEL_ORDER_STATES])) {
-                $this->apiClient->orders->cancel($mollieOrderId);
+                $apiClient->orders->cancel($mollieOrderId);
             }
         } catch (ApiException $e) {
             $this->logger->warning(
