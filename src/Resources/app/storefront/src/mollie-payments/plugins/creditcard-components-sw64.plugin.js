@@ -24,25 +24,22 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
             return;
         }
 
-        this._cleanUpExistingElement();
+        this.client = new HttpClient();
+
+        this._fixShopUrl();
         this._initializeComponentInstance();
         this._registerEvents();
         this.registerMandateEvents();
     }
 
-    _cleanUpExistingElement() {
-        // Get an existing Mollie controller element
-        const mollieController = document.querySelector(this.getSelectors().mollieController);
 
-        // Remove the existing Mollie controller element
-        if (mollieController) {
-            mollieController.remove();
-        }
+    _fixShopUrl() {
+        // Fix the trailing slash in the shop URL
+        if (this.options.shopUrl != null && this.options.shopUrl.substr(-1) === '/') {
+            this.options.shopUrl = this.options.shopUrl.substr(0, this.options.shopUrl.length - 1);
     }
 
     _initializeComponentInstance() {
-        this._componentsObject = null;
-
         // Get the elements from the DOM
         const cardHolder = document.querySelector(this.getSelectors().cardHolder);
         const componentsContainer = document.querySelector(this.getSelectors().componentsContainer);
@@ -51,12 +48,15 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
         if (
             !!componentsContainer
             && !!cardHolder
+            && !window.mollieComponentsObject
         ) {
             // eslint-disable-next-line no-undef
-            this._componentsObject = Mollie(this.options.profileId, {
+            window.mollieComponentsObject = Mollie(this.options.profileId, {
                 locale: this.options.locale,
                 testmode: this.options.testMode,
             });
+
+            window.mollieComponents = {};
         }
 
         // Create components inputs
@@ -144,12 +144,9 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
             this.getInputFields().verificationCode,
         ];
 
-        if (this._componentsObject !== null) {
-
+        if (window.mollieComponentsObject) {
             inputs.forEach((element, index, arr) => {
-
-                const component = this._componentsObject.createComponent(element.name, me.getDefaultProperties());
-                component.mount(element.id);
+                const component = this._mountMollieComponent(element.id, element.name);
                 arr[index][element.name] = component;
 
                 // Handle errors
@@ -175,6 +172,21 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
                 });
             });
         }
+    }
+
+    _mountMollieComponent(componentId, componentName) {
+        if (!window.mollieComponents[componentName]) {
+            window.mollieComponents[componentName] = window.mollieComponentsObject.createComponent(
+                componentName,
+                this.getDefaultProperties()
+            );
+        } else {
+            window.mollieComponents[componentName].unmount();
+        }
+
+        window.mollieComponents[componentName].mount(componentId);
+
+        return window.mollieComponents[componentName];
     }
 
     setFocus(componentName, isFocused) {
@@ -241,7 +253,7 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
         verificationErrors.textContent = '';
 
         // Get a payment token
-        const {token, error} = await this._componentsObject.createToken();
+        const {token, error} = await window.mollieComponentsObject.createToken();
 
         if (error) {
             verificationErrors.textContent = error.message;
