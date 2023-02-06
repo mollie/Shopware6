@@ -2,6 +2,8 @@
 
 namespace Kiener\MolliePayments\Facade;
 
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Exception\MissingMollieOrderIdException;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentDetails;
@@ -13,10 +15,15 @@ use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
+use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\Exception\AsyncPaymentFinalizeException;
 use Shopware\Core\Checkout\Payment\Exception\CustomerCanceledAsyncPaymentException;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
+use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class MolliePaymentFinalize
@@ -50,14 +57,32 @@ class MolliePaymentFinalize
     private $subscriptionManager;
 
     /**
+     * @var EntityRepository
+     */
+    private $repoCustomer;
+
+    /**
+     * @var FlowBuilderFactory
+     */
+    private $flowBuilderFactory;
+
+    /**
+     * @var FlowBuilderEventFactory
+     */
+    private $flowBuilderEventFactory;
+
+
+    /**
      * @param OrderStatusConverter $orderStatusConverter
      * @param OrderStatusUpdater $orderStatusUpdater
      * @param SettingsService $settingsService
      * @param Order $mollieOrderService
      * @param OrderService $orderService
      * @param SubscriptionManager $subscriptionManager
+     * @param FlowBuilderFactory $flowBuilderFactory
+     * @param FlowBuilderEventFactory $flowBuilderEventFactory
      */
-    public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, Order $mollieOrderService, OrderService $orderService, SubscriptionManager $subscriptionManager)
+    public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, Order $mollieOrderService, OrderService $orderService, SubscriptionManager $subscriptionManager, EntityRepository $repoCustomer, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory)
     {
         $this->orderStatusConverter = $orderStatusConverter;
         $this->orderStatusUpdater = $orderStatusUpdater;
@@ -65,6 +90,9 @@ class MolliePaymentFinalize
         $this->mollieOrderService = $mollieOrderService;
         $this->orderService = $orderService;
         $this->subscriptionManager = $subscriptionManager;
+        $this->repoCustomer = $repoCustomer;
+        $this->flowBuilderFactory = $flowBuilderFactory;
+        $this->flowBuilderEventFactory = $flowBuilderEventFactory;
     }
 
 
@@ -170,5 +198,41 @@ class MolliePaymentFinalize
                 $this->subscriptionManager->confirmSubscription($order, $mandateId, $salesChannelContext->getContext());
             }
         }
+
+        # --------------------------------------------------------------------------------------------------------------------
+        # FLOW BUILDER
+
+        $this->fireFlowBuilderEvents($order, $salesChannelContext->getContext());
+    }
+
+
+    /**
+     * @param OrderEntity $order
+     * @param Context $context
+     * @throws \Exception
+     * @return void
+     */
+    private function fireFlowBuilderEvents(OrderEntity $order, Context $context): void
+    {
+        $orderCustomer = $order->getOrderCustomer();
+
+        if (!$orderCustomer instanceof OrderCustomerEntity) {
+            return;
+        }
+
+        $criteria = new Criteria([(string)$orderCustomer->getCustomerId()]);
+
+        $customers = $this->repoCustomer->search($criteria, $context);
+
+        if ($customers->count() <= 0) {
+            return;
+        }
+
+        # we also have to reload the order because data is missing
+        $finalOrder = $this->orderService->getOrder($order->getId(), $context);
+
+        $eventOrderSuccess = $this->flowBuilderEventFactory->buildOrderSuccessEvent($customers->first(), $finalOrder, $context);
+
+        $this->flowBuilderFactory->createDispatcher()->dispatch($eventOrderSuccess);
     }
 }

@@ -88,6 +88,8 @@ class OrderService implements OrderServiceInterface
         $criteria = new Criteria([$orderId]);
         $criteria->addAssociation('currency');
         $criteria->addAssociation('addresses');
+        $criteria->addAssociation('addresses.country');     # required for FlowBuilder -> send confirm email option
+        $criteria->addAssociation('shippingMethod');        # required for FlowBuilder -> send confirm email option
         $criteria->addAssociation('shippingAddress');   # important for subscription creation
         $criteria->addAssociation('billingAddress');    # important for subscription creation
         $criteria->addAssociation('billingAddress.country');
