@@ -37,6 +37,7 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
         // Fix the trailing slash in the shop URL
         if (this.options.shopUrl != null && this.options.shopUrl.substr(-1) === '/') {
             this.options.shopUrl = this.options.shopUrl.substr(0, this.options.shopUrl.length - 1);
+        }
     }
 
     _initializeComponentInstance() {
@@ -268,7 +269,7 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
         });
 
         let queryString = queryParams.toString();
-        if (queryString){
+        if (queryString) {
             queryString = `?${queryString}`;
         }
 
@@ -319,8 +320,7 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
             }
         }
         const csrfMode = new CsrfAjaxMode(window.csrf);
-        if(!csrfMode.isActive())
-        {
+        if (!csrfMode.isActive()) {
             form.submit();
         }
     }
