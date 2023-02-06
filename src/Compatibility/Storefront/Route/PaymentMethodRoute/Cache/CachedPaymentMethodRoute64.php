@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\Cache;
 
 use Kiener\MolliePayments\Service\Cart\Voucher\VoucherCartCollector;
+use Kiener\MolliePayments\Service\ContextState\ContextStateHandler;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Shopware\Core\Checkout\Cart\Cart;
@@ -12,6 +13,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CachedPaymentMethodRoute64 implements EventSubscriberInterface
 {
+
+    /**
+     * @var ContextStateHandler
+     */
+    private $contextState;
 
     /**
      * @var CartService
@@ -32,6 +38,8 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
     {
         $this->pluginSettings = $pluginSettings;
         $this->cartService = $cartService;
+
+        $this->contextState = new ContextStateHandler('payment_method_generate_cache_key');
     }
 
 
@@ -54,6 +62,12 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
      */
     public function onGenerateCacheKey(PaymentMethodRouteCacheKeyEvent $event): void
     {
+        # sometimes it can happen that an infinite-loop occurs due to the
+        # loading of the cartService data below. So we only do this once in here!
+        if ($this->contextState->hasSnapshot($event->getContext())) {
+            return;
+        }
+
         $cart = $this->cartService->getCart($event->getContext()->getToken(), $event->getContext());
 
         $parts = $event->getParts();
@@ -63,6 +77,8 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
         $parts = $this->addSubscriptionKey($cart, $parts);
 
         $event->setParts($parts);
+
+        $this->contextState->saveSnapshot(true, $event->getContext());
     }
 
     /**
