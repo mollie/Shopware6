@@ -323,7 +323,7 @@ jobs:
       - name: Build Plugin
         uses: ./.github/actions/build-plugin
         with:
-          shopware: 6.4.18.0
+          shopware: 6.4.19.0
 
   # ------------------------------------------------------------------------------------------------------------------------
 
@@ -368,7 +368,7 @@ jobs:
       matrix:
         include:
           # latest Shopware
-          - shopware: '6.4.18.0'
+          - shopware: '6.4.19.0'
             php: '8.2'
           # in between, 6.4.7.0 was a "breaker"
           - shopware: '6.4.7.0'
