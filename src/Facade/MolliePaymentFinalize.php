@@ -28,8 +28,9 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class MolliePaymentFinalize
 {
-    private const FLOWBUILDER_FAILED = 'failed';
     private const FLOWBUILDER_SUCCESS = 'success';
+    private const FLOWBUILDER_FAILED = 'failed';
+    private const FLOWBUILDER_CANCELED = 'canceled';
 
     /**
      * @var OrderStatusConverter
@@ -163,6 +164,8 @@ class MolliePaymentFinalize
             if ($paymentStatus === MolliePaymentStatus::MOLLIE_PAYMENT_CANCELED) {
                 $message = sprintf('Payment for order %s (%s) was cancelled by the customer.', $order->getOrderNumber(), $mollieOrder->id);
 
+                # fire flow builder event
+                $this->fireFlowBuilderEvent(self::FLOWBUILDER_CANCELED, $order, $salesChannelContext->getContext());
 
                 throw new CustomerCanceledAsyncPaymentException($orderTransactionID, $message);
             } else {
@@ -242,6 +245,10 @@ class MolliePaymentFinalize
         switch ($status) {
             case self::FLOWBUILDER_FAILED:
                 $event = $this->flowBuilderEventFactory->buildOrderFailedEvent($customers->first(), $finalOrder, $context);
+                break;
+
+            case self::FLOWBUILDER_CANCELED:
+                $event = $this->flowBuilderEventFactory->buildOrderCanceledEvent($customers->first(), $finalOrder, $context);
                 break;
 
             default:

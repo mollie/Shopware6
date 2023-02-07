@@ -3,6 +3,7 @@
     "businessEvents": {
       "mollie_checkout_order_success": " Bestelling succesvol",
       "mollie_checkout_order_failed": " Bestelling mislukt",
+      "mollie_checkout_order_canceled": " Bestelling geannuleerd",
       "mollie_webhook_received_All": " Mollie Webhook Ontvangen (Alle)",
       "mollie_webhook_received_status_authorized": " Mollie Webhook Ontvangen (Geautoriseerd)",
       "mollie_webhook_received_status_failed": " Mollie Webhook Ontvangen (Mislukt)",
@@ -452,7 +453,8 @@
       "expired": "Verlopen",
       "partiallyRefunded": "Terugbetaald (gedeeltelijk)",
       "orderSuccess" : "Bestelling succesvol",
-      "orderFailed" : "Bestelling mislukt"
+      "orderFailed" : "Bestelling mislukt",
+      "orderCanceled" : "Bestelling geannuleerd"
     }
   }
 }

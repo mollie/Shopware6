@@ -3,6 +3,7 @@
     "businessEvents": {
       "mollie_checkout_order_success": " Bestellung erfolgreich",
       "mollie_checkout_order_failed": " Bestellung fehlgeschlagen",
+      "mollie_checkout_order_canceled": " Bestellung abgebrochen",
       "mollie_webhook_received_All": " Mollie Webhook empfangen (Alle)",
       "mollie_webhook_received_status_authorized": " Mollie Webhook empfangen (Authorisiert)",
       "mollie_webhook_received_status_failed": " Mollie Webhook empfangen (Fehler)",
@@ -452,7 +453,8 @@
       "expired": "Abgelaufen",
       "partiallyRefunded": "Rückerstattet (teilweise)",
       "orderSuccess" : "Bestellung erfolgreich",
-      "orderFailed" : "Bestellung fehlgeschlagen"
+      "orderFailed" : "Bestellung fehlgeschlagen",
+      "orderCanceled" : "Bestellung abgebrochen"
     }
   }
 }
