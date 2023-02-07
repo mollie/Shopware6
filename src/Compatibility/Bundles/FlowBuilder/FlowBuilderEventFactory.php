@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder;
 
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Checkout\OrderCanceledEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Checkout\OrderFailedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Checkout\OrderSuccessEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\DummyEvent;
@@ -368,5 +369,20 @@ class FlowBuilderEventFactory
         }
 
         return new OrderFailedEvent($order, $customer, $context);
+    }
+
+    /**
+     * @param CustomerEntity $customer
+     * @param OrderEntity $order
+     * @param Context $context
+     * @return DummyEvent|OrderCanceledEvent
+     */
+    public function buildOrderCanceledEvent(CustomerEntity $customer, OrderEntity $order, Context $context)
+    {
+        if ($this->versionCompare->lt(FlowBuilderFactory::FLOW_BUILDER_MIN_VERSION)) {
+            return new DummyEvent();
+        }
+
+        return new OrderCanceledEvent($order, $customer, $context);
     }
 }
