@@ -59,13 +59,13 @@ phpmin: ## Starts the PHP compatibility checks
 	@php vendor/bin/phpcs -p --standard=PHPCompatibility --extensions=php --runtime-set testVersion 7.2 ./src
 
 csfix: ## Starts the PHP CS Fixer
-	@php vendor/bin/php-cs-fixer fix --config=./.php_cs.php --dry-run
+	@PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config=./.php_cs.php --dry-run
 
 stan: ## Starts the PHPStan Analyser
 	@php vendor/bin/phpstan analyse -c ./.phpstan.neon
 
 phpunit: ## Starts all PHPUnit Tests
-	@XDEBUG_MODE=coverage php vendor/bin/phpunit --configuration=phpunit.xml --coverage-html ../../../public/.reports/mollie/coverage
+	@XDEBUG_MODE=coverage php vendor/bin/phpunit --configuration=phpunit.xml --coverage-html ./.reports/phpunit/coverage
 
 infection: ## Starts all Infection/Mutation tests
 	@XDEBUG_MODE=coverage php vendor/bin/infection --configuration=./.infection.json --log-verbosity=all --debug
@@ -90,10 +90,24 @@ stylelint: ## Starts the Stylelinter
 	cd ./src/Resources/app/administration && ./node_modules/.bin/stylelint --allow-empty-input ./src/**/*.scss
 	cd ./src/Resources/app/storefront && ./node_modules/.bin/stylelint --allow-empty-input ./src/**/*.scss
 
+configcheck: ## Tests and verifies the plugin configuration file
+	cd ./tests/Custom && php verify-plugin-config.php
+
+# ------------------------------------------------------------------------------------------------------------
+
+snippetcheck: ## Tests and verifies all plugin snippets
+	php vendor/bin/phpunuhi validate --configuration=./.phpunuhi.xml
+
+snippetexport: ## Exports all snippets
+	php vendor/bin/phpunuhi export --configuration=./.phpunuhi.xml --dir=./.phpunuhi
+
+snippetimport: ## Imports the provided snippet set [set=xyz file=xz.csv]
+	php vendor/bin/phpunuhi import --configuration=./.phpunuhi.xml --set=$(set) --file=$(file) --intent=1
+
 # ------------------------------------------------------------------------------------------------------------
 
 pr: ## Prepares everything for a Pull Request
-	@php vendor/bin/php-cs-fixer fix --config=./.php_cs.php
+	@PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config=./.php_cs.php
 	@make phpcheck -B
 	@make phpmin -B
 	@make stan -B
@@ -103,6 +117,8 @@ pr: ## Prepares everything for a Pull Request
 	@make stryker -B
 	@make eslint -B
 	@make stylelint -B
+	@make configcheck -B
+	@make snippetcheck -B
 
 release: ## Builds a PROD version and creates a ZIP file in plugins/.build
 	make clean -B
@@ -110,5 +126,5 @@ release: ## Builds a PROD version and creates a ZIP file in plugins/.build
 	make build -B
 	php switch-composer.php prod
 	cd .. && rm -rf ./.build/MolliePayments* && mkdir -p ./.build
-	cd .. && zip -qq -r -0 ./.build/MolliePayments.zip MolliePayments/ -x '*.editorconfig' '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*' '*/makefile' '*.DS_Store' '*/switch-composer.php' '*/phpunit.xml' '*/.infection.json' '*/phpunit.autoload.php' '*/.phpstan*' '*/.php_cs.php' '*/phpinsights.php'
+	cd .. && zip -qq -r -0 ./.build/MolliePayments.zip MolliePayments/ -x '*.editorconfig' '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*' '*/makefile' '*.DS_Store' '*/switch-composer.php' '*/phpunit.xml' '*/.phpunuhi.xml' '*/.infection.json' '*/phpunit.autoload.php' '*/.phpstan*' '*/.php_cs.php' '*/phpinsights.php'
 	php switch-composer.php dev

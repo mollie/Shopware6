@@ -81,5 +81,39 @@ context("Plugin Config", () => {
             cy.get('.sw-button-process').should('not.be.disabled');
         })
 
+
+        it('C234008: Custom format for order number shows interactive preview @core', () => {
+
+            adminLogin.login();
+            pluginAction.openPluginConfiguration();
+
+            const inputPrefix = '.sw-system-config--field-mollie-payments-config-format-order-number > .sw-field';
+            const divPreview = '.sw-system-config--field-mollie-payments-config-mollie-plugin-config-section-payments-format';
+            
+            // this feature doesn't work in lower shopware numbers
+            // just test that it's not visible and that our textfield can be edited
+            if (shopware.isVersionLowerEqual('6.3.5.2')) {
+                cy.get(inputPrefix).click().clear();
+                cy.get(divPreview).should('not.be.visible');
+                return;
+            }
+
+            cy.get(inputPrefix).click().clear();
+            cy.get(divPreview).should('not.be.visible');
+
+            cy.get(inputPrefix).click().type('cypress');
+            cy.get(divPreview).should('be.visible');
+            cy.contains(divPreview, '"cypress"');
+
+            cy.get(inputPrefix).click().clear();
+            cy.get(inputPrefix).click().type('cypress_{ordernumber}', {parseSpecialCharSequences: false});
+            cy.get(divPreview).should('be.visible');
+            cy.contains(divPreview, '"cypress_1000"');
+
+            cy.get(inputPrefix).click().clear();
+            cy.get(inputPrefix).click().type('cypress_{ordernumber}-stage', {parseSpecialCharSequences: false});
+            cy.get(divPreview).should('be.visible');
+            cy.contains(divPreview, '"cypress_1000-stage"');
+        })
     })
 })

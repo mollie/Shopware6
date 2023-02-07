@@ -30,6 +30,15 @@ class VersionCompare
     }
 
     /**
+     * @param string $versionB
+     * @return bool
+     */
+    public function gt(string $versionB): bool
+    {
+        return version_compare($this->swVersion, $versionB, '>');
+    }
+
+    /**
      * @param string $version
      * @return bool
      */

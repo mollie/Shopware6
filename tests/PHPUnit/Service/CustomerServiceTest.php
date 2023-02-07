@@ -4,7 +4,9 @@ namespace Kiener\MolliePayments\Tests\Service;
 
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
+use Kiener\MolliePayments\Service\MollieApi\Mandate;
 use Kiener\MolliePayments\Service\SettingsService;
+use Kiener\MolliePayments\Struct\CustomerStruct;
 use MolliePayments\Tests\Fakes\FakeEntityRepository;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
@@ -44,8 +46,34 @@ class CustomerServiceTest extends TestCase
             $this->createMock(EntityRepositoryInterface::class),
             $this->settingsService,
             'does.not.matter.here',
-            $this->createMock(NumberRangeValueGeneratorInterface::class)
+            $this->createMock(NumberRangeValueGeneratorInterface::class),
+            $this->createMock(Mandate::class)
         );
+
+    }
+
+    /**
+     * This test makes sure that, if we have invalid mollie_payments custom fields, that the struct will be empty
+     * @return void
+     * @throws \Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException
+     */
+    public function testCustomerCustomFieldsAreInvalid():void{
+        $customer = $this->createConfiguredMock(CustomerEntity::class, [
+            'getCustomFields' => ['mollie_payments'=>'foo']
+        ]);
+
+        $search = $this->createConfiguredMock(EntitySearchResult::class, [
+            'first' => $customer
+        ]);
+
+        $this->customerRepository->entitySearchResults = [$search];
+
+        $customerStruct = $this->customerService->getCustomerStruct('fakeId',   $this->createMock(Context::class));
+
+        $actual = json_encode($customerStruct);
+        $expected = '{"extensions":[]}';
+
+        $this->assertEquals($actual,$expected);
 
     }
 
@@ -209,6 +237,20 @@ class CustomerServiceTest extends TestCase
                     'customer_id' => 'cst_987',
                 ]
             ],
+            'Broken mollie_payments custom Fields by external plugins' => [
+                'bar', 'cst_321', 'pfl_321', true,
+                ['mollie_payments' => 'foo' ], // existing customfields
+                [   // expected customfields
+                    'mollie_payments' => [
+                        'customer_ids' => [
+                            'pfl_321' => [
+                                'live' => '',
+                                'test' => 'cst_321'
+                            ]
+                        ]
+                    ]
+                ]
+            ]
         ];
     }
 }

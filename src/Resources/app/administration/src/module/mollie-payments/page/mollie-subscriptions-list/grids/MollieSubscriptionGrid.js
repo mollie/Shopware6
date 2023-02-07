@@ -35,13 +35,7 @@ export default class MollieSubscriptionGrid {
                 property: 'mollieStatus',
                 label: app.$tc('mollie-payments.subscriptions.list.columns.status'),
                 allowResize: true,
-                sortable: false, // this data doesnt really existin in the database, so sorting would throw an error
-            },
-            {
-                property: 'quantity',
-                label: app.$tc('mollie-payments.subscriptions.list.columns.quantity'),
-                allowResize: true,
-                align: 'center',
+                sortable: false, // this data doesnt really existing in the database, so sorting would throw an error
             },
             {
                 property: 'amount',
@@ -64,24 +58,6 @@ export default class MollieSubscriptionGrid {
                 dataIndex: 'canceledAt',
                 label: app.$tc('mollie-payments.subscriptions.list.columns.canceledAt'),
                 visible: true,
-            },
-            {
-                property: 'mollieId',
-                dataIndex: 'mollieId',
-                label: app.$tc('mollie-payments.subscriptions.list.columns.subscription_id'),
-                allowResize: true,
-            },
-            {
-                property: 'mollieCustomerId',
-                dataIndex: 'mollieCustomerId',
-                label: app.$tc('mollie-payments.subscriptions.list.columns.customer_id'),
-                allowResize: true,
-            },
-            {
-                property: 'id',
-                dataIndex: 'id',
-                label: 'Id',
-                allowResize: true,
             },
         ];
     }

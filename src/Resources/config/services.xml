@@ -53,6 +53,13 @@
             <argument type="service" id="Kiener\MolliePayments\Service\Transition\OrderTransitionService"/>
         </service>
 
+
+        <service id="kiener.mollie_payments.http.client.factory" class="Kiener\MolliePayments\Service\HttpClient\PluginHttpClientFactory"/>
+
+        <service id="kiener.mollie_payments.http.client" class="Kiener\MolliePayments\Service\HttpClient\HttpClientInterface">
+            <factory service="kiener.mollie_payments.http.client.factory" method="buildClient"/>
+        </service>
+
         <!-- Services -->
 
         <service id="Kiener\MolliePayments\Service\CustomerService" class="Kiener\MolliePayments\Service\CustomerService">
@@ -66,6 +73,13 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument>%kernel.shopware_version%</argument>
             <argument type="service" id="Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Service\MandateService" class="Kiener\MolliePayments\Service\MandateService">
+            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Mandate"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\CustomFieldService" class="Kiener\MolliePayments\Service\CustomFieldService">
@@ -87,6 +101,7 @@
             <argument type="service" id="media.repository"/>
             <argument type="service" id="payment_method.repository"/>
             <argument type="service" id="Shopware\Core\Framework\Plugin\Util\PluginIdProvider"/>
+            <argument type="service" id="kiener.mollie_payments.http.client"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\ProductService" class="Kiener\MolliePayments\Service\ProductService">
@@ -113,7 +128,6 @@
         <service id="Kiener\MolliePayments\Service\Cart\CartBackupService" class="Kiener\MolliePayments\Service\Cart\CartBackupService">
             <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
         </service>
-
 
 
         <service id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter" public="false">
@@ -149,11 +163,12 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="language.repository"/>
             <argument type="service" id="locale.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MandateService"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
         <service id="Kiener\MolliePayments\Subscriber\OrderStateSubscriber" class="Kiener\MolliePayments\Subscriber\OrderStateSubscriber">
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\PaymentMethodService"/>
             <tag name="kernel.event_subscriber"/>
@@ -161,6 +176,13 @@
 
         <service id="Kiener\MolliePayments\Subscriber\TestModeNotificationSubscriber">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Subscriber\AccountPaymentMethodPageSubscriber" class="Kiener\MolliePayments\Subscriber\AccountPaymentMethodPageSubscriber">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MandateService"/>
+
             <tag name="kernel.event_subscriber"/>
         </service>
 

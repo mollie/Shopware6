@@ -2,6 +2,8 @@
 
 namespace Kiener\MolliePayments\Handler;
 
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Exception\PaymentUrlException;
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Facade\MolliePaymentFinalize;
@@ -25,6 +27,9 @@ use Throwable;
 
 class PaymentHandler implements AsynchronousPaymentHandlerInterface
 {
+    public const PAYMENT_SEQUENCE_TYPE_FIRST = 'first';
+    public const PAYMENT_SEQUENCE_TYPE_RECURRING = 'recurring';
+
     protected const FIELD_ORDER_NUMBER = 'orderNumber';
     protected const FIELD_BILLING_ADDRESS = 'billingAddress';
     protected const FIELD_BILLING_EMAIL = 'billingEmail';

@@ -19,6 +19,36 @@ export default class MollieApplePayDirect extends Plugin {
 
         me.client = new HttpClient();
 
+        // register our off-canvas listener
+        // we need to re-init all apple pay button
+        // once the offcanvas is loaded (lazy) into the DOM
+        const elementOffcanvas = document.querySelector('[data-offcanvas-cart]');
+        if (elementOffcanvas instanceof HTMLElement) {
+            const pluginOffCanvas = window.PluginManager.getPluginInstanceFromElement(elementOffcanvas, 'OffCanvasCart');
+            pluginOffCanvas.$emitter.subscribe('offCanvasOpened', me.onOffCanvasOpened.bind(me));
+        }
+
+        // now update our current page
+        this.initCurrentPage();
+    }
+
+    /**
+     *
+     */
+    onOffCanvasOpened() {
+        // as soon as the offcanvas is loaded
+        // we refresh our current page, because
+        // there might be a new apple pay button
+        this.initCurrentPage();
+    }
+
+    /**
+     *
+     */
+    initCurrentPage() {
+
+        const me = this;
+
         // we might have wrapping containers
         // that also need to be hidden -> they might have different margins or other things
         const applePayContainers = document.querySelectorAll('.js-apple-pay-container');
@@ -50,7 +80,6 @@ export default class MollieApplePayDirect extends Plugin {
 
         // verify if apple pay is even allowed
         // in our current sales channel
-
         me.client.get(
             shopUrl + '/mollie/apple-pay/available',
             data => {
@@ -88,20 +117,27 @@ export default class MollieApplePayDirect extends Plugin {
         const productId = form.querySelector('input[name="id"]').value;
         const countryCode = form.querySelector('input[name="countryCode"]').value;
         const currency = form.querySelector('input[name="currency"]').value;
+        const mode = form.querySelector('input[name="mode"]').value;
 
-        // our fallback is quantity 1
-        var quantity = 1;
+        // this helps us to figure out if we are in
+        // "product" mode to purchase a single product, or in "cart" mode
+        // to just purchase the current cart with Apple Pay Direct.
+        const isProductMode = (mode === 'productMode');
 
-        // if we have our sQuantity dropdown, use
-        // that quantity when adding the product
-        var quantitySelects = document.getElementsByClassName('product-detail-quantity-select')
-        if (quantitySelects.length > 0) {
-            quantity = quantitySelects[0].value;
+        if (isProductMode) {
+            // our fallback is quantity 1
+            var quantity = 1;
+
+            // if we have our sQuantity dropdown, use that quantity when adding the product
+            var quantitySelects = document.getElementsByClassName('product-detail-quantity-select')
+            if (quantitySelects.length > 0) {
+                quantity = quantitySelects[0].value;
+            }
+
+            me.addProductToCart(productId, quantity, shopUrl);
         }
 
-        me.addProductToCart(productId, quantity, shopUrl);
-
-        var session = me.createApplePaySession(countryCode, currency, shopUrl);
+        var session = me.createApplePaySession(isProductMode, countryCode, currency, shopUrl);
         session.begin();
     }
 
@@ -123,12 +159,13 @@ export default class MollieApplePayDirect extends Plugin {
 
     /**
      *
+     * @param isProductMode
      * @param country
      * @param currency
      * @param shopSlug
      * @returns {ApplePaySession}
      */
-    createApplePaySession(country, currency, shopSlug) {
+    createApplePaySession(isProductMode, country, currency, shopSlug) {
 
         const me = this;
 
@@ -265,7 +302,11 @@ export default class MollieApplePayDirect extends Plugin {
 
         session.oncancel = function () {
 
-            me.client.post(shopSlug + '/mollie/apple-pay/restore-cart');
+            // if we are in product mode
+            // we should restore our original cart
+            if (isProductMode) {
+                me.client.post(shopSlug + '/mollie/apple-pay/restore-cart');
+            }
         };
 
         return session;

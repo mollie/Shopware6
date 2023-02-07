@@ -14,7 +14,7 @@
         </service>
 
         <service id="Kiener\MolliePayments\Subscriber\CancelMollieOrderSubscriber">
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="mollie_payments.logger"/>
             <argument>%kernel.shopware_version%</argument>
@@ -33,8 +33,14 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Subscriber\ApplePaySubscriber">
+            <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="Kiener\MolliePayments\Subscriber\ApplePayDirectSubscriber">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 

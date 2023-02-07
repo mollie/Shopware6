@@ -25,10 +25,12 @@ use Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class CustomerService
+class CustomerService implements CustomerServiceInterface
 {
     public const CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID = 'customer_id';
     public const CUSTOM_FIELDS_KEY_CREDIT_CARD_TOKEN = 'credit_card_token';
+    public const CUSTOM_FIELDS_KEY_MANDATE_ID = 'mandate_id';
+    public const CUSTOM_FIELDS_KEY_SHOULD_SAVE_CARD_DETAIL = 'shouldSaveCardDetail';
     public const CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER = 'preferred_ideal_issuer';
 
     /** @var EntityRepositoryInterface */
@@ -180,11 +182,11 @@ class CustomerService
      *
      * @param CustomerEntity $customer
      * @param string $cardToken
-     * @param Context $context
+     * @param SalesChannelContext $context
      *
      * @return EntityWrittenContainerEvent
      */
-    public function setCardToken(CustomerEntity $customer, string $cardToken, Context $context)
+    public function setCardToken(CustomerEntity $customer, string $cardToken, SalesChannelContext $context, bool $shouldSaveCardDetail = false): EntityWrittenContainerEvent
     {
         // Get existing custom fields
         $customFields = $customer->getCustomFields();
@@ -196,8 +198,39 @@ class CustomerService
 
         // Store the card token in the custom fields
         $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_CREDIT_CARD_TOKEN] = $cardToken;
+        // Store shouldSaveCardDetail in the custom fields
+        $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_SHOULD_SAVE_CARD_DETAIL] = $shouldSaveCardDetail;
 
         $this->logger->debug("Setting Credit Card Token", [
+            'customerId' => $customer->getId(),
+            'customFields' => $customFields,
+        ]);
+
+        // Store the custom fields on the customer
+        return $this->customerRepository->update([[
+            'id' => $customer->getId(),
+            'customFields' => $customFields
+        ]], $context->getContext());
+    }
+
+    /**
+     * Stores the credit mandate id in the custom fields of the customer.
+     *
+     * @param CustomerEntity $customer
+     * @param string $mandateId
+     * @param Context $context
+     *
+     * @return EntityWrittenContainerEvent
+     */
+    public function setMandateId(CustomerEntity $customer, string $mandateId, Context $context): EntityWrittenContainerEvent
+    {
+        // Get existing custom fields
+        $customFields = $customer->getCustomFields() ?? [];
+
+        // Store the mandate id in the custom fields
+        $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_MANDATE_ID] = $mandateId;
+
+        $this->logger->debug("Setting Credit Card Mandate Id", [
             'customerId' => $customer->getId(),
             'customFields' => $customFields,
         ]);
@@ -233,7 +266,7 @@ class CustomerService
      *
      * @return EntityWrittenContainerEvent
      */
-    public function setIDealIssuer(CustomerEntity $customer, string $issuerId, Context $context)
+    public function setIDealIssuer(CustomerEntity $customer, string $issuerId, Context $context): EntityWrittenContainerEvent
     {
         // Get existing custom fields
         $customFields = $customer->getCustomFields();
@@ -338,9 +371,15 @@ class CustomerService
         if (isset($customFields[self::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID])) {
             $struct->setLegacyCustomerId($customFields[self::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID]);
         }
-
+        $molliePaymentsCustomFields = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS] ?? [];
+        if (! is_array($molliePaymentsCustomFields)) {
+            $this->logger->warning('Customer customFields for MolliePayments are invalid. Array is expected', [
+                'currentCustomFields' => $molliePaymentsCustomFields
+            ]);
+            $molliePaymentsCustomFields = [];
+        }
         // Then assign all custom fields under the mollie_payments key
-        $struct->assign($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS] ?? []);
+        $struct->assign($molliePaymentsCustomFields);
 
         return $struct;
     }
@@ -384,7 +423,7 @@ class CustomerService
      * @param SalesChannelContext $context
      * @return null|CustomerEntity
      */
-    public function createApplePayDirectCustomer(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, string $paymentMethodId, SalesChannelContext $context)
+    public function createApplePayDirectCustomer(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, string $paymentMethodId, SalesChannelContext $context): ?CustomerEntity
     {
         $customerId = Uuid::randomHex();
         $addressId = Uuid::randomHex();

@@ -2,12 +2,18 @@
 
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder;
 
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Checkout\OrderCanceledEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Checkout\OrderFailedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Checkout\OrderSuccessEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\DummyEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund\RefundStartedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionCancelledEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionEndedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionPausedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionRemindedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionRenewedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionResumedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionSkippedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionStartedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookReceivedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedAuthorizedEvent;
@@ -279,6 +285,51 @@ class FlowBuilderEventFactory
      * @param CustomerEntity $customer
      * @param SubscriptionEntity $subscription
      * @param Context $context
+     * @return DummyEvent|SubscriptionPausedEvent
+     */
+    public function buildSubscriptionPausedEvent(CustomerEntity $customer, SubscriptionEntity $subscription, Context $context)
+    {
+        if ($this->versionCompare->lt(FlowBuilderFactory::FLOW_BUILDER_MIN_VERSION)) {
+            return new DummyEvent();
+        }
+
+        return new SubscriptionPausedEvent($subscription, $customer, $context);
+    }
+
+    /**
+     * @param CustomerEntity $customer
+     * @param SubscriptionEntity $subscription
+     * @param Context $context
+     * @return DummyEvent|SubscriptionResumedEvent
+     */
+    public function buildSubscriptionResumedEvent(CustomerEntity $customer, SubscriptionEntity $subscription, Context $context)
+    {
+        if ($this->versionCompare->lt(FlowBuilderFactory::FLOW_BUILDER_MIN_VERSION)) {
+            return new DummyEvent();
+        }
+
+        return new SubscriptionResumedEvent($subscription, $customer, $context);
+    }
+
+    /**
+     * @param CustomerEntity $customer
+     * @param SubscriptionEntity $subscription
+     * @param Context $context
+     * @return DummyEvent|SubscriptionSkippedEvent
+     */
+    public function buildSubscriptionSkippedEvent(CustomerEntity $customer, SubscriptionEntity $subscription, Context $context)
+    {
+        if ($this->versionCompare->lt(FlowBuilderFactory::FLOW_BUILDER_MIN_VERSION)) {
+            return new DummyEvent();
+        }
+
+        return new SubscriptionSkippedEvent($subscription, $customer, $context);
+    }
+
+    /**
+     * @param CustomerEntity $customer
+     * @param SubscriptionEntity $subscription
+     * @param Context $context
      * @return DummyEvent|SubscriptionRenewedEvent
      */
     public function buildSubscriptionRenewedEvent(CustomerEntity $customer, SubscriptionEntity $subscription, Context $context)
@@ -288,5 +339,50 @@ class FlowBuilderEventFactory
         }
 
         return new SubscriptionRenewedEvent($subscription, $customer, $context);
+    }
+
+    /**
+     * @param CustomerEntity $customer
+     * @param OrderEntity $order
+     * @param Context $context
+     * @return DummyEvent|OrderSuccessEvent
+     */
+    public function buildOrderSuccessEvent(CustomerEntity $customer, OrderEntity $order, Context $context)
+    {
+        if ($this->versionCompare->lt(FlowBuilderFactory::FLOW_BUILDER_MIN_VERSION)) {
+            return new DummyEvent();
+        }
+
+        return new OrderSuccessEvent($order, $customer, $context);
+    }
+
+    /**
+     * @param CustomerEntity $customer
+     * @param OrderEntity $order
+     * @param Context $context
+     * @return DummyEvent|OrderFailedEvent
+     */
+    public function buildOrderFailedEvent(CustomerEntity $customer, OrderEntity $order, Context $context)
+    {
+        if ($this->versionCompare->lt(FlowBuilderFactory::FLOW_BUILDER_MIN_VERSION)) {
+            return new DummyEvent();
+        }
+
+        return new OrderFailedEvent($order, $customer, $context);
+    }
+
+    /**
+     * @param CustomerEntity $customer
+     * @param OrderEntity $order
+     * @param Context $context
+     * @return DummyEvent|OrderCanceledEvent
+     */
+    public function buildOrderCanceledEvent(CustomerEntity $customer, OrderEntity $order, Context $context)
+    {
+        if ($this->versionCompare->lt(FlowBuilderFactory::FLOW_BUILDER_MIN_VERSION)) {
+            return new DummyEvent();
+        }
+
+        return new OrderCanceledEvent($order, $customer, $context);
     }
 }

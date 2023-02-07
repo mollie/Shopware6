@@ -67,9 +67,26 @@ class MollieSettingStruct extends Struct
     protected $createCustomersAtMollie = true;
 
     /**
+     * @var string
+     */
+    protected $formatOrderNumber = '';
+
+
+    /**
      * @var bool
      */
     protected $enableCreditCardComponents = false;
+
+
+    /**
+     * @var bool
+     */
+    protected $oneClickPaymentsCompactView = false;
+
+    /**
+     * @var bool
+     */
+    protected $oneClickPaymentsEnabled = false;
 
     /**
      * @var bool
@@ -165,6 +182,16 @@ class MollieSettingStruct extends Struct
      * @var bool
      */
     protected $subscriptionsAllowAddressEditing;
+
+    /**
+     * @var bool
+     */
+    protected $subscriptionsAllowPauseResume;
+
+    /**
+     * @var bool
+     */
+    protected $subscriptionsAllowSkip;
 
     /**
      * @var int
@@ -363,6 +390,22 @@ class MollieSettingStruct extends Struct
     }
 
     /**
+     * @return string
+     */
+    public function getFormatOrderNumber(): string
+    {
+        return (string)$this->formatOrderNumber;
+    }
+
+    /**
+     * @param string $formatOrderNumber
+     */
+    public function setFormatOrderNumber(string $formatOrderNumber): void
+    {
+        $this->formatOrderNumber = $formatOrderNumber;
+    }
+
+    /**
      * @return bool
      */
     public function getEnableCreditCardComponents()
@@ -378,6 +421,41 @@ class MollieSettingStruct extends Struct
     public function setEnableCreditCardComponents(bool $enableCreditCardComponents): self
     {
         $this->enableCreditCardComponents = $enableCreditCardComponents;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOneClickPaymentsEnabled(): bool
+    {
+        return $this->oneClickPaymentsEnabled;
+    }
+
+    /**
+     * @param bool $oneClickPaymentsEnabled
+     */
+    public function setOneClickPaymentsEnabled(bool $oneClickPaymentsEnabled): void
+    {
+        $this->oneClickPaymentsEnabled = $oneClickPaymentsEnabled;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOneClickPaymentsCompactView(): bool
+    {
+        return $this->oneClickPaymentsCompactView;
+    }
+
+    /**
+     * @param bool $oneClickPaymentsCompactView
+     *
+     * @return self
+     */
+    public function setOneClickPaymentsCompactView(bool $oneClickPaymentsCompactView): self
+    {
+        $this->oneClickPaymentsCompactView = $oneClickPaymentsCompactView;
         return $this;
     }
 
@@ -690,6 +768,38 @@ class MollieSettingStruct extends Struct
     public function setSubscriptionsAllowAddressEditing(bool $subscriptionsAllowAddressEditing): void
     {
         $this->subscriptionsAllowAddressEditing = $subscriptionsAllowAddressEditing;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSubscriptionsAllowPauseResume(): bool
+    {
+        return (bool)$this->subscriptionsAllowPauseResume;
+    }
+
+    /**
+     * @param bool $subscriptionsAllowPauseResume
+     */
+    public function setSubscriptionsAllowPauseResume(bool $subscriptionsAllowPauseResume): void
+    {
+        $this->subscriptionsAllowPauseResume = $subscriptionsAllowPauseResume;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSubscriptionsAllowSkip(): bool
+    {
+        return (bool)$this->subscriptionsAllowSkip;
+    }
+
+    /**
+     * @param bool $subscriptionsAllowSkip
+     */
+    public function setSubscriptionsAllowSkip(bool $subscriptionsAllowSkip): void
+    {
+        $this->subscriptionsAllowSkip = $subscriptionsAllowSkip;
     }
 
     /**

@@ -47,8 +47,9 @@ class MollieHttpClient implements MollieHttpAdapterInterface
      */
     public function send($httpMethod, $url, $headers, $httpBody)
     {
-        /** @var resource $curl */
         $curl = curl_init($url);
+
+        assert($curl !== false);
 
         $headers["Content-Type"] = "application/json";
 

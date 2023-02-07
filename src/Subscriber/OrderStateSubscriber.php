@@ -3,13 +3,12 @@
 
 namespace Kiener\MolliePayments\Subscriber;
 
+use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\PaymentMethodService;
-use Mollie\Api\MollieApiClient;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
-use Shopware\Core\Checkout\Order\Event\OrderStateMachineStateChangeEvent;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\OrderStates;
 use Shopware\Core\Framework\Api\Context\AdminApiSource;
@@ -25,9 +24,8 @@ class OrderStateSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /** @var MollieApiClient $apiClient */
-    private $apiClient;
-
+    /** @var MollieApiFactory */
+    private $apiFactory;
     /** @var OrderService */
     private $orderService;
 
@@ -35,13 +33,13 @@ class OrderStateSubscriber implements EventSubscriberInterface
     private $paymentMethodService;
 
     public function __construct(
-        MollieApiClient      $apiClient,
+        MollieApiFactory     $apiFactory,
         OrderService         $orderService,
         PaymentMethodService $paymentMethodService
     ) {
-        $this->apiClient = $apiClient;
         $this->orderService = $orderService;
         $this->paymentMethodService = $paymentMethodService;
+        $this->apiFactory = $apiFactory;
     }
 
 
@@ -51,7 +49,7 @@ class OrderStateSubscriber implements EventSubscriberInterface
      */
     public function onKlarnaOrderCancelledAsAdmin(StateMachineStateChangeEvent $event): void
     {
-        if (!($event->getContext()->getSource() instanceof AdminApiSource)) {
+        if (! ($event->getContext()->getSource() instanceof AdminApiSource)) {
             return;
         }
 
@@ -69,18 +67,18 @@ class OrderStateSubscriber implements EventSubscriberInterface
 
         $order = $this->orderService->getOrder($event->getTransition()->getEntityId(), $event->getContext());
 
-        if (!$order instanceof OrderEntity) {
+        if (! $order instanceof OrderEntity) {
             return;
         }
 
-        if (!$order->getTransactions() instanceof OrderTransactionCollection) {
+        if (! $order->getTransactions() instanceof OrderTransactionCollection) {
             return;
         }
 
         // use filterByState(OrderTransactionStates::STATE_OPEN)?
         $lastTransaction = $order->getTransactions()->last();
 
-        if (!$lastTransaction instanceof OrderTransactionEntity) {
+        if (! $lastTransaction instanceof OrderTransactionEntity) {
             return;
         }
 
@@ -92,13 +90,13 @@ class OrderStateSubscriber implements EventSubscriberInterface
 
         $molliePaymentMethod = null;
 
-        if (!is_null($paymentMethod) && !is_null($paymentMethod->getCustomFields())
+        if (! is_null($paymentMethod) && ! is_null($paymentMethod->getCustomFields())
             && array_key_exists('mollie_payment_method_name', $paymentMethod->getCustomFields())) {
             $molliePaymentMethod = $paymentMethod->getCustomFields()['mollie_payment_method_name'];
         }
 
         if (is_null($molliePaymentMethod) ||
-            !in_array($molliePaymentMethod, ['klarnapaylater', 'klarnasliceit'])) {
+            ! in_array($molliePaymentMethod, ['klarnapaylater', 'klarnasliceit'])) {
             return;
         }
 
@@ -106,7 +104,7 @@ class OrderStateSubscriber implements EventSubscriberInterface
 
         $mollieOrderId = null;
 
-        if (!is_null($customFields) &&
+        if (! is_null($customFields) &&
             array_key_exists(CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS, $customFields) &&
             array_key_exists('order_id', $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS])) {
             $mollieOrderId = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS]['order_id'];
@@ -115,11 +113,12 @@ class OrderStateSubscriber implements EventSubscriberInterface
         if (is_null($mollieOrderId)) {
             return;
         }
+        $apiClient = $this->apiFactory->getClient($order->getSalesChannelId());
 
-        $mollieOrder = $this->apiClient->orders->get($mollieOrderId);
+        $mollieOrder = $apiClient->orders->get($mollieOrderId);
 
         if (in_array($mollieOrder->status, ['created', 'authorized', 'shipping'])) {
-            $this->apiClient->orders->cancel($mollieOrderId);
+            $apiClient->orders->cancel($mollieOrderId);
         }
     }
 }

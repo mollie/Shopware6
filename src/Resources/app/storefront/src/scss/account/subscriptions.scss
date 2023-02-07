@@ -14,6 +14,24 @@
   margin: 10px 0;
 }
 
+.order-item-status-badge.order-item-status-badge-paused {
+  background-color: #707070;
+  color: #fff;
+  margin: 10px 0;
+}
+
+.order-item-status-badge.order-item-status-badge-skipped {
+  background-color: #ffb100;
+  color: #fff;
+  margin: 10px 0;
+}
+
+.order-item-status-badge.order-item-status-badge-resumed {
+  background-color: #26b6cf;
+  color: #fff;
+  margin: 10px 0;
+}
+
 .order-table-header-description {
   padding: 0 !important;
   display: block;

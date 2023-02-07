@@ -1,6 +1,9 @@
 {
   "global": {
     "businessEvents": {
+      "mollie_checkout_order_success": " Bestelling succesvol",
+      "mollie_checkout_order_failed": " Bestelling mislukt",
+      "mollie_checkout_order_canceled": " Bestelling geannuleerd",
       "mollie_webhook_received_All": " Mollie Webhook Ontvangen (Alle)",
       "mollie_webhook_received_status_authorized": " Mollie Webhook Ontvangen (Geautoriseerd)",
       "mollie_webhook_received_status_failed": " Mollie Webhook Ontvangen (Mislukt)",
@@ -12,10 +15,13 @@
       "mollie_webhook_received_status_refunded": " Mollie Webhook Ontvangen (Terugbetaald)",
       "mollie_webhook_received_status_partially_refunded": " Mollie Webhook Ontvangen (Gedeeltelijk terugbetaald)",
       "mollie_refund_started": " Mollie terugbetaling gestart",
-      "mollie_subscription_started": " Mollie Abonnement gestart",
-      "mollie_subscription_ended": " Mollie Subscription voltooid",
-      "mollie_subscription_cancelled": " Mollie Subscription opgezegd",
-      "mollie_subscription_renewed": " Mollie Subscription verlengd",
+      "mollie_subscription_started": " Mollie abonnement gestart",
+      "mollie_subscription_ended": " Mollie abonnement voltooid",
+      "mollie_subscription_cancelled": " Mollie abonnement opgezegd",
+      "mollie_subscription_paused": " Mollie abonnement gepauzeerd",
+      "mollie_subscription_resumed": " Mollie abonnement hervat",
+      "mollie_subscription_skipped": " Mollie subscription overgeslagen",
+      "mollie_subscription_renewed": " Mollie abonnement verlengd",
       "mollie_subscription_renewal_reminder": " Mollie herinnering voor abonnementsverlenging"
     }
   },
@@ -55,6 +61,10 @@
         }
       },
       "payments": {
+        "format": {
+          "placeholder": "Plaatshouder",
+          "preview": "Preview"
+        },
         "updatePaymentMethods": {
           "title": "Mollie Payments",
           "button": "Betaalmethoden updaten",
@@ -120,6 +130,10 @@
       "general": {
         "unitQuantity": "st."
       },
+      "acl": {
+        "warningCreate": "U heeft geen rechten om terugbetalingen te maken",
+        "warningCancel": "U heeft geen rechten om terugbetalingen te annuleren"
+      },
       "cart": {
         "title": "Bestelling ##orderNumber##",
         "btnSelectAll": "Alles selecteren",
@@ -139,7 +153,8 @@
           },
           "btnResetLine": "Rij resetten",
           "checkDeductPromotion": "Promotie aftrekken"
-        }
+        },
+        "roundDiffItemAdded": "Automatisch afrondingsitem toegevoegd"
       },
       "instructions": {
         "linkResetTutorials": "Handleidingen resetten",
@@ -155,7 +170,9 @@
         "titlePartialItems": "Gedeeltelijke terugbetaling (met artikelen)",
         "textPartialItems": "Als u hoeveelheden en artikelen als terugbetaald wilt markeren in Mollie, gebruik dan bovenstaand formulier. Stel uw hoeveelheden in en geef een aangepast bedrag op voor elk item dat zal worden terugbetaald. De totale som zal dan zichtbaar zijn in het tekstveld met het finale terugbetalingsbedrag. Vergeet niet dat het nog steeds mogelijk is om dit eindbedrag aan te passen voordat u de terugbetaling start.",
         "titlePartialPromotions": "Gedeeltelijke terugbetaling (met promotions)",
-        "textPartialPromotions": "Als je een promotion in je winkelwagen hebt, dan is de promotion een eigen line item. Als je alle afgeprijsde artikelen wilt terugbetalen, dan kann je de totale waarde van alle artikelen terugbetalen en ook de promotie zelf. Als u echter slechts een paar afgeprijsde artikelen wilt terugbetalen, kunt je de aangepaste korting automatisch aftrekken voor elk afzonderlijk artikel. Je kunt natuurlijk altijd de waarden veranderen mochten ze niet juist zijn."
+        "textPartialPromotions": "Als je een promotion in je winkelwagen hebt, dan is de promotion een eigen line item. Als je alle afgeprijsde artikelen wilt terugbetalen, dan kann je de totale waarde van alle artikelen terugbetalen en ook de promotie zelf. Als u echter slechts een paar afgeprijsde artikelen wilt terugbetalen, kunt je de aangepaste korting automatisch aftrekken voor elk afzonderlijk artikel. Je kunt natuurlijk altijd de waarden veranderen mochten ze niet juist zijn.",
+        "titleRoundingDiff": "Afrondingsverschil",
+        "textRoundingDiff": "Een volledige terugbetaling is inclusief afrondingsverschillen"
       },
       "summary": {
         "dataLoading": "Gegevens worden geladen...",
@@ -171,7 +188,8 @@
         "placeholderDescription": "Een optionele beschrijving aan terugbetaling toevoegen",
         "checkVerification": "Ik heb het totale restitutiebedrag en de geconfigureerde hoeveelheden voor restitutie en herbevoorrading geverifieerd.",
         "btnRefund": "Terugbetaling",
-        "btnFullRefund": "Volledige terugbetaling"
+        "btnFullRefund": "Volledige terugbetaling",
+        "roundDiffItemAdded": "Afrondingsitem"
       },
       "refunds": {
         "title": "Terugbetalingen in het Mollie Dashboard",
@@ -283,7 +301,10 @@
         "active": "Actief",
         "canceled": "Geannuleerd",
         "suspended": "Gepauzeerd",
-        "completed": "Voltooid"
+        "completed": "Voltooid",
+        "paused": "Onderbroken",
+        "resumed": "Hervat",
+        "skipped": "Overgeslagen"
       },
       "navigation": {
         "title": "Mollie Abonnementen"
@@ -291,25 +312,67 @@
       "TYPE_DAYS": "Dag(en)",
       "TYPE_WEEKS": "Weken",
       "TYPE_MONTHS": "Maanden",
+      "confirm": {
+        "cancelTitle": "Abonnement beëindigen?",
+        "cancel": "Annuleer het abonnement van uw klant.",
+        "pauseTitle": "Abonnement pauzeren?",
+        "pause": "Zet het abonnement in de wacht totdat je het weer hervat.",
+        "resumeTitle": "Abonnement hervatten?",
+        "resume": "Zet het abonnement weer voort.",
+        "skipTitle": "Volgende betaling overslaan?",
+        "skip": "Sla het volgende betaling van het abonnement over. Daarna gaat het automatisch verder."
+      },
+      "alerts": {
+        "cancelSuccess": "Het abonnement is succesvol opgezegd",
+        "pauseSuccess": "Het abonnement is succesvol onderbroken",
+        "resumeSuccess": "Het abonnement is succesvol voortgezet",
+        "skipSuccess": "Het abonnement is succesvol opgeschort. De volgende betalingsdatum is bijgewerkt."
+      },
       "list": {
-        "title": "Abonnementen",
+        "title": "Mollie Abonnementen",
         "columns": {
           "customer": "Klant",
-          "subscription_id": "Mollie ID",
-          "customer_id": "Mollie Klant",
-          "status": "Toestand",
-          "canceledAt": "",
+          "status": "Status",
           "description": "Beschrijving",
-          "createdAt": "Gemaakt bij",
-          "amount": "Betrag",
-          "quantity": "Hoeveelheid",
+          "amount": "Bedrag",
           "nextPaymentAt": "Volgende betaling",
-          "prePaymentReminder": "Herinnerd aan",
-          "action": {
-            "cancel": "Annuleer abonnement",
-            "success": "Het abonnement is opgezegd.",
-            "error": "Fout bij opzeggen abonnement. Meer informatie in de logboeken."
-          }
+          "prePaymentReminder": "Herinnerd op",
+          "canceledAt": "Geannuleerd op",
+          "createdAt": "Gecreëerd op"
+        },
+        "action": {
+          "edit": "Abonnement bewerken"
+        }
+      },
+      "detail": {
+        "title": "Mollie Abonnement",
+        "buttonCancelSubscription": "Abonnement opzeggen",
+        "labelDescription": "Omschrijving",
+        "labelAmount": "Bedrag",
+        "labelQuantity": "Hoeveelheid",
+        "labelMollieSubscription": "Mollie Abonnement",
+        "labelMollieCustomer": "Mollie klant",
+        "labelMandateId": "Mandaat",
+        "labelShopwareCustomer": "Shopware klant",
+        "labelCreatedAt": "Gecreëerd op",
+        "buttonShowShopwareOrder": "Toon Shopware bestelling",
+        "buttonShowShopwareCustomer": "Show Shopware klant",
+        "cardTitleSubscription": "Abonnement",
+        "cardTitleStatus": "Status",
+        "labelStatus": "Status",
+        "labelNextPaymentAt": "Volgende betaling op",
+        "labelLastRemindedAt": "Laatst herinnerd op",
+        "labelCanceledAt": "Geannuleerd op",
+        "buttonPauseSubscription": "Abonnement pauzeren",
+        "buttonResumeSubscription": "Abonnement hervatten",
+        "buttonSkipSubscription": "Bestelling overslaan",
+        "history": {
+          "cardTitle": "Historie",
+          "colDate": "Datum",
+          "colComment": "commentaar",
+          "colStatusFrom": "Status (van)",
+          "colStatusTo": "Status (tot)",
+          "colMollieSubscription": "Mollie Abonnement"
         }
       },
       "product": {
@@ -356,6 +419,42 @@
   "sw-customer": {
     "extendedInfo": {
       "labelPreferredIdealIssuer": "Voorkeur iDeal verstrekker"
+    }
+  },
+  "sw-privileges": {
+    "permissions": {
+      "parents": {
+        "mollie": "Mollie"
+      },
+      "mollie_refund_manager": {
+        "label": "Refund Manager"
+      },
+      "mollie_subscription": {
+        "label": "Abonnementen"
+      }
+    }
+  },
+  "sw-flow": {
+    "triggers": {
+      "mollie": "Mollie",
+      "refund": "Terugbetaling",
+      "subscription": "Abonnement",
+      "webhookReceived": "Webhook",
+      "status": "Toestand",
+      "started": "Begonnen",
+      "ended": "Geëindigd",
+      "paused": "Onderbroken",
+      "renewalReminder": "Verlengingsherinnering",
+      "renewed": "Vernieuwd",
+      "resumed": "Hervat",
+      "skipped": "Overgeslagen",
+      "all": "Alle",
+      "canceled": "Geannuleerd",
+      "expired": "Verlopen",
+      "partiallyRefunded": "Terugbetaald (gedeeltelijk)",
+      "orderSuccess" : "Bestelling succesvol",
+      "orderFailed" : "Bestelling mislukt",
+      "orderCanceled" : "Bestelling geannuleerd"
     }
   }
 }

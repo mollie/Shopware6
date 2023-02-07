@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Service\MollieApi\Builder;
 
 use Kiener\MolliePayments\Event\MollieOrderBuildEvent;
+use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher;
 use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
@@ -115,7 +116,6 @@ class MollieOrderBuilder
         $locale = $this->extractor->extractLocale($order, $salesChannelContext);
         $localeCode = ($locale instanceof LocaleEntity) ? $locale->getCode() : self::MOLLIE_DEFAULT_LOCALE_CODE;
         $lineItems = $order->getLineItems();
-        $webhookUrl = $this->urlBuilder->buildWebhookURL($transactionId);
         $isVerticalTaxCalculation = $this->isVerticalTaxCalculation($salesChannelContext);
 
         $orderData = [];
@@ -127,12 +127,25 @@ class MollieOrderBuilder
             $orderData['amount'] = $this->priceBuilder->build($order->getAmountTotal(), $currency->getIsoCode());
         }
 
+        # build custom format
+        # TODO this is just inline code, but it's unit tested, but maybe we should move it to a separate class too, and switch to unit tests + integration tests
+        if (!empty(trim($settings->getFormatOrderNumber()))) {
+            $orderNumberFormatted = $settings->getFormatOrderNumber();
+            $orderNumberFormatted = str_replace('{ordernumber}', (string)$order->getOrderNumber(), (string)$orderNumberFormatted);
+        } else {
+            $orderNumberFormatted = $order->getOrderNumber();
+        }
+
         $orderData['locale'] = $localeCode;
         $orderData['method'] = $paymentMethod;
-        $orderData['orderNumber'] = $order->getOrderNumber();
+        $orderData['orderNumber'] = $orderNumberFormatted;
         $orderData['payment'] = $paymentData;
 
-        $orderData['redirectUrl'] = $this->urlBuilder->buildReturnUrl($transactionId);
+
+        $redirectUrl = $this->urlBuilder->buildReturnUrl($transactionId);
+        $webhookUrl = $this->urlBuilder->buildWebhookURL($transactionId);
+
+        $orderData['redirectUrl'] = $redirectUrl;
         $orderData['webhookUrl'] = $webhookUrl;
         $orderData['payment']['webhookUrl'] = $webhookUrl;
 
@@ -164,6 +177,11 @@ class MollieOrderBuilder
 
         # add payment specific data
         if ($handler instanceof PaymentHandler) {
+            # set CreditCardPayment singleClickPayment true if Single click payment feature is enabled
+            if ($handler instanceof CreditCardPayment && $settings->isOneClickPaymentsEnabled()) {
+                $handler->setEnableSingleClickPayment(true);
+            }
+
             $orderData = $handler->processPaymentMethodSpecificParameters(
                 $orderData,
                 $order,
@@ -177,7 +195,7 @@ class MollieOrderBuilder
         // enrich data with create customer at mollie
         $orderAttributes = new OrderAttributes($order);
 
-        if ($orderAttributes->isTypeSubscription() || $settings->createCustomersAtMollie()) {
+        if ($orderAttributes->isTypeSubscription() || $settings->createCustomersAtMollie() || $settings->isOneClickPaymentsEnabled()) {
             $orderData = $this->customerEnricher->enrich($orderData, $customer, $settings, $salesChannelContext);
         }
 

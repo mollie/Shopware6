@@ -12,10 +12,27 @@ export default class StoreAPIClient {
         this.authInformation = {};
         this.basePath = '';
 
+        this.clearContextToken();
+
         this.client = axios.create({
             baseURL: `${Cypress.config('baseUrl')}/store-api`,
             timeout: 10000,
         });
+    }
+
+    /**
+     *
+     * @param token
+     */
+    setContextToken(token) {
+        this.contextToken = token;
+    }
+
+    /**
+     *
+     */
+    clearContextToken() {
+        this.contextToken = '-'; // empty is not allowed
     }
 
     /**
@@ -164,6 +181,7 @@ export default class StoreAPIClient {
         return {
             Accept: 'application/vnd.api+json',
             'sw-access-key': this.salesChannelApiKey,
+            'sw-context-token': this.contextToken,
             'Content-Type': 'application/json'
         };
     }

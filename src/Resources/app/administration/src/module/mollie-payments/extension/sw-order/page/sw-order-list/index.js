@@ -31,6 +31,44 @@ Component.override('sw-order-list', {
          * @param order
          * @returns {boolean}
          */
+        isMollie(order) {
+            const attributes = new OrderAttributes(order);
+
+            if (attributes.getOrderId() !== '') {
+                return true;
+            }
+
+            if (attributes.getPaymentId() !== '') {
+                return true;
+            }
+
+            return false;
+        },
+
+        /**
+         *
+         * @param order
+         * @returns {string}
+         */
+        getMollieId(order) {
+            const attributes = new OrderAttributes(order);
+
+            if (attributes.getOrderId() !== '') {
+                return attributes.getOrderId();
+            }
+
+            if (attributes.getPaymentId() !== '') {
+                return attributes.getPaymentId();
+            }
+
+            return '';
+        },
+
+        /**
+         *
+         * @param order
+         * @returns {boolean}
+         */
         isMollieSubscription(order) {
             const attributes = new OrderAttributes(order);
             return (attributes.getSwSubscriptionId() !== '');

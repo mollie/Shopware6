@@ -7,7 +7,6 @@ use Kiener\MolliePayments\Handler\Method\BanContactPayment;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Kiener\MolliePayments\Handler\Method\BelfiusPayment;
 use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
-use Kiener\MolliePayments\Handler\Method\DirectDebitPayment;
 use Kiener\MolliePayments\Handler\Method\EpsPayment;
 use Kiener\MolliePayments\Handler\Method\GiftCardPayment;
 use Kiener\MolliePayments\Handler\Method\GiroPayPayment;
@@ -24,6 +23,7 @@ use Kiener\MolliePayments\Handler\Method\Przelewy24Payment;
 use Kiener\MolliePayments\Handler\Method\SofortPayment;
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Kiener\MolliePayments\MolliePayments;
+use Kiener\MolliePayments\Service\HttpClient\HttpClientInterface;
 use Mollie\Api\Resources\Order;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
@@ -52,24 +52,24 @@ class PaymentMethodService
     /** @var EntityRepositoryInterface */
     private $mediaRepository;
 
+    /** @var HttpClientInterface */
+    private $httpClient;
+
+
     /**
-     * PaymentMethodService constructor.
-     *
      * @param MediaService $mediaService
      * @param EntityRepositoryInterface $mediaRepository
      * @param EntityRepositoryInterface $paymentRepository
      * @param PluginIdProvider $pluginIdProvider
+     * @param HttpClientInterface $httpClient
      */
-    public function __construct(
-        MediaService              $mediaService,
-        EntityRepositoryInterface $mediaRepository,
-        EntityRepositoryInterface $paymentRepository,
-        PluginIdProvider          $pluginIdProvider
-    ) {
+    public function __construct(MediaService $mediaService, EntityRepositoryInterface $mediaRepository, EntityRepositoryInterface $paymentRepository, PluginIdProvider $pluginIdProvider, HttpClientInterface $httpClient)
+    {
         $this->mediaService = $mediaService;
         $this->mediaRepository = $mediaRepository;
         $this->paymentRepository = $paymentRepository;
         $this->pluginIdProvider = $pluginIdProvider;
+        $this->httpClient = $httpClient;
     }
 
     /**
@@ -398,7 +398,7 @@ class PaymentMethodService
      *
      * @return string
      */
-    private function getMediaId(array $paymentMethod, Context $context): string
+    private function getMediaId(array $paymentMethod, Context $context): ?string
     {
         /** @var string $fileName */
         $fileName = $paymentMethod['name'] . '-icon';
@@ -416,12 +416,16 @@ class PaymentMethodService
         // Add icon to the media library
         $iconMime = 'image/svg+xml';
         $iconExt = 'svg';
-        $iconBlob = (string)file_get_contents('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.svg');
+        $iconBlob = $this->downloadFile('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.svg');
 
-        if (empty(trim($iconBlob))) {
-            $iconBlob = (string)file_get_contents('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.png');
+        if ($iconBlob === '') {
+            $iconBlob = $this->downloadFile('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.png');
             $iconMime = 'image/png';
             $iconExt = 'png';
+        }
+
+        if ($iconBlob === '') {
+            return null;
         }
 
         return $this->mediaService->saveFile(
@@ -452,5 +456,20 @@ class PaymentMethodService
         }
 
         return $paymentMethod->getHandlerIdentifier() === ApplePayPayment::class && $mollieOrder->isPaid() === true;
+    }
+
+    /**
+     * @param string $url
+     * @return string
+     */
+    private function downloadFile(string $url): string
+    {
+        $response = $this->httpClient->sendRequest('GET', $url);
+
+        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+            return '';
+        }
+
+        return $response->getBody();
     }
 }

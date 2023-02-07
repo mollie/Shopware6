@@ -5,6 +5,23 @@ on: [ pull_request, workflow_dispatch ]
 
 jobs:
 
+  config:
+    name: Test Plugin Configuration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+
+      - name: Test configuration
+        run: make configcheck -B
+
+  # ------------------------------------------------------------------------------------------------------------------------
+
   install:
     name: Install Dependencies
     runs-on: ubuntu-latest
@@ -28,6 +45,33 @@ jobs:
 
       - name: Install Dependencies
         run: make dev -B
+
+  # ------------------------------------------------------------------------------------------------------------------------
+
+  snippets:
+    name: Test Plugin Snippets
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - name: Clone Code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+
+      - name: Mount Dev Dependency Cache
+        uses: actions/cache@v3
+        with:
+          key: cache-dev-dependencies-${{ github.run_id }}
+          path: |
+            src/Resources/app/storefront/node_modules
+            src/Resources/app/administration/node_modules
+            vendor
+
+      - name: Test snippets
+        run: make snippetcheck -B
 
   # ------------------------------------------------------------------------------------------------------------------------
 
@@ -279,7 +323,7 @@ jobs:
       - name: Build Plugin
         uses: ./.github/actions/build-plugin
         with:
-          shopware: 6.4.17.0
+          shopware: 6.4.18.0
 
   # ------------------------------------------------------------------------------------------------------------------------
 
@@ -316,9 +360,22 @@ jobs:
   # ------------------------------------------------------------------------------------------------------------------------
 
   e2e:
-    name: E2E Core Tests
+    name: E2E Core | Shopware ${{ matrix.shopware }}
     needs: build
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # latest Shopware
+          - shopware: '6.4.18.0'
+            php: '8.2'
+          # in between, 6.4.7.0 was a "breaker"
+          - shopware: '6.4.7.0'
+            php: '7.4'
+          # minimum supported Shopware version
+          - shopware: '6.3.5.2'
+            php: '7.4'
     steps:
 
       - name: Clone Code
@@ -334,8 +391,8 @@ jobs:
         uses: ./.github/actions/run-e2e
         with:
           # -------------------------------------------
-          SHOPWARE: 6.4.16.0
-          PHP: 8.1
+          SHOPWARE: ${{ matrix.shopware }}
+          PHP: ${{ matrix.php }}
           # -------------------------------------------
           MOLLIE_APIKEY_TEST: ""
           # -------------------------------------------

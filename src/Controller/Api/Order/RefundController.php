@@ -8,10 +8,10 @@ use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\Refund\RefundService;
+use Kiener\MolliePayments\Traits\Api\ApiTrait;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
-use Shopware\Core\Framework\ShopwareHttpException;
 use Shopware\Core\Framework\Validation\DataBag\QueryDataBag;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,6 +20,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class RefundController extends AbstractController
 {
+    use ApiTrait;
 
     /**
      * @var OrderService
@@ -118,12 +119,9 @@ class RefundController extends AbstractController
             $data = $this->refundManager->getData($order, $context);
 
             return $this->json($data->toArray());
-        } catch (ShopwareHttpException $e) {
-            $this->logger->error($e->getMessage());
-            return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
         } catch (\Throwable $e) {
             $this->logger->error($e->getMessage());
-            return $this->json(['message' => $e->getMessage()], 500);
+            return $this->buildErrorResponse($e->getMessage());
         }
     }
 
@@ -279,12 +277,9 @@ class RefundController extends AbstractController
             $refunds = $this->refundService->getRefunds($order);
 
             return $this->json($refunds);
-        } catch (ShopwareHttpException $e) {
-            $this->logger->error($e->getMessage());
-            return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
         } catch (\Throwable $e) {
             $this->logger->error($e->getMessage());
-            return $this->json(['message' => $e->getMessage()], 500);
+            return $this->buildErrorResponse($e->getMessage());
         }
     }
 
@@ -308,9 +303,6 @@ class RefundController extends AbstractController
             ];
 
             return $this->json($json);
-        } catch (ShopwareHttpException $e) {
-            $this->logger->error($e->getMessage());
-            return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
         } catch (PaymentNotFoundException $e) {
 
             # This indicates there is no completed payment for this order, so there are no refunds yet.
@@ -324,7 +316,7 @@ class RefundController extends AbstractController
             return $this->json($totals);
         } catch (\Throwable $e) {
             $this->logger->error($e->getMessage());
-            return $this->json(['message' => $e->getMessage()], 500);
+            return $this->buildErrorResponse($e->getMessage());
         }
     }
 
@@ -379,13 +371,7 @@ class RefundController extends AbstractController
         } catch (\Throwable $e) {
             $this->logger->error($e->getMessage());
 
-            return $this->json(
-                [
-                    'success' => false,
-                    'message' => $e->getMessage()
-                ],
-                500
-            );
+            return $this->buildErrorResponse($e->getMessage());
         }
     }
 
@@ -399,16 +385,12 @@ class RefundController extends AbstractController
     {
         try {
             $success = $this->refundManager->cancelRefund($orderId, $refundId, $context);
-        } catch (ShopwareHttpException $e) {
-            $this->logger->error($e->getMessage());
-            return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
+            return $this->json([
+                'success' => $success
+            ]);
         } catch (\Throwable $e) {
             $this->logger->error($e->getMessage());
-            return $this->json(['message' => $e->getMessage()], 500);
+            return $this->buildErrorResponse($e->getMessage());
         }
-
-        return $this->json([
-            'success' => $success
-        ]);
     }
 }

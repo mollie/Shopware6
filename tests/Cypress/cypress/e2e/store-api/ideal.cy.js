@@ -12,7 +12,7 @@ const storeApiPrefix = '/store-api';
 
 context(storeApiPrefix +"/mollie/ideal/issuers", () => {
 
-    it('fetch issuers', () => {
+    it('C266683: iDEAL fetch issuers (Store API)', () => {
 
         const request = new Promise((resolve) => {
             client.get('/mollie/ideal/issuers').then(response => {
@@ -30,7 +30,7 @@ context(storeApiPrefix +"/mollie/ideal/issuers", () => {
 
 context(storeApiPrefix +"/mollie/ideal/store-issuer", () => {
 
-    it('invalid customer id @core', () => {
+    it('C266684: iDEAL store issuer with invalid customer id (Store API) @core', () => {
 
         const request = new Promise((resolve) => {
             client.post('/mollie/ideal/store-issuer/cust-123/ideal_ABNANL2A').then(response => {

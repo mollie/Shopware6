@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class MolliePayments extends Plugin
 {
-    const PLUGIN_VERSION = '3.3.0';
+    const PLUGIN_VERSION = '3.4.0';
 
 
     /**
@@ -37,6 +37,7 @@ class MolliePayments extends Plugin
         $loader = new DependencyLoader($container);
         $loader->loadServices();
     }
+
 
     /**
      * @return void

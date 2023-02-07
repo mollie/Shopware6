@@ -91,7 +91,7 @@ class RoutingBuilder
             $redirectUrl = $this->router->generate('frontend.mollie.payment', $params, $this->router::ABSOLUTE_URL);
         }
 
-        return $redirectUrl;
+        return (string)$redirectUrl;
     }
 
     /**
@@ -118,7 +118,7 @@ class RoutingBuilder
             $webhookUrl = $this->router->generate('frontend.mollie.webhook', $params, $this->router::ABSOLUTE_URL);
         }
 
-        $webhookUrl = $this->applyCustomDomain($webhookUrl);
+        $webhookUrl = $this->applyCustomDomain((string)$webhookUrl);
 
         return $webhookUrl;
     }
@@ -136,13 +136,13 @@ class RoutingBuilder
         ];
 
         if ($isStoreApiCall) {
-            $webhookUrl = $this->router->generate('api.mollie.webhook_subscription_renew', $params, $this->router::ABSOLUTE_URL);
+            $webhookUrl = $this->router->generate('api.mollie.webhook_subscription', $params, $this->router::ABSOLUTE_URL);
             $webhookUrl = $this->applyAdminDomain($webhookUrl);
         } else {
-            $webhookUrl = $this->router->generate('frontend.mollie.webhook.subscription.renew', $params, $this->router::ABSOLUTE_URL);
+            $webhookUrl = $this->router->generate('frontend.mollie.webhook.subscription', $params, $this->router::ABSOLUTE_URL);
         }
 
-        $webhookUrl = $this->applyCustomDomain($webhookUrl);
+        $webhookUrl = $this->applyCustomDomain((string)$webhookUrl);
 
         return $webhookUrl;
     }
@@ -151,13 +151,44 @@ class RoutingBuilder
      * @param string $subscriptionId
      * @return string
      */
-    public function buildSubscriptionPaymentUpdated(string $subscriptionId): string
+    public function buildSubscriptionPaymentUpdatedWebhook(string $subscriptionId): string
     {
+        $isStoreApiCall = $this->routingDetector->isStoreApiRoute();
+
+        if (!$isStoreApiCall) {
+            return '';
+        }
+
         $params = [
             self::ROUTE_PARAM_SUBSCRIPTION_UPDATE_PAYMENT_ID => $subscriptionId
         ];
 
-        return $this->router->generate('frontend.account.mollie.subscriptions.payment.update-success', $params, $this->router::ABSOLUTE_URL);
+        $webhookUrl = $this->router->generate('api.mollie.webhook_subscription_paymentmethod', $params, $this->router::ABSOLUTE_URL);
+        $webhookUrl = $this->applyAdminDomain($webhookUrl);
+
+        return $this->applyCustomDomain((string)$webhookUrl);
+    }
+
+    /**
+     * @param string $subscriptionId
+     * @return string
+     */
+    public function buildSubscriptionPaymentUpdatedReturnUrl(string $subscriptionId): string
+    {
+        $isStoreApiCall = $this->routingDetector->isStoreApiRoute();
+
+        $params = [
+            self::ROUTE_PARAM_SUBSCRIPTION_UPDATE_PAYMENT_ID => $subscriptionId
+        ];
+
+        if ($isStoreApiCall) {
+            $webhookUrl = $this->router->generate('api.mollie.webhook_subscription_paymentmethod', $params, $this->router::ABSOLUTE_URL);
+            $webhookUrl = $this->applyAdminDomain($webhookUrl);
+        } else {
+            $webhookUrl = $this->router->generate('frontend.account.mollie.subscriptions.payment.update-success', $params, $this->router::ABSOLUTE_URL);
+        }
+
+        return $this->applyCustomDomain((string)$webhookUrl);
     }
 
     /**

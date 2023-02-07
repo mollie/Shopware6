@@ -31,11 +31,18 @@
                         :showDelete="false"
                         :isLoading="isLoading">
 
+
+                    {% block mollie_payments_subscription_list_content_description %}
+                        <template #column-description="{ item }">
+                            <router-link :to="{ name: 'mollie.payments.subscription_detail', params: { id: item.id } }">
+                                {{ item.description }}
+                            </router-link>
+                        </template>
+                    {% endblock %}
+
                     {% block mollie_payments_subscription_list_content_customer %}
                         <template #column-customerId="{ item }">
-                            <router-link :to="{ name: 'sw.customer.detail', params: { id: item.customerId }, query: { edit: false } }">
-                                {{ item.customer.firstName }} {{ item.customer.lastName }}
-                            </router-link>
+                            {{ item.customer.firstName }} {{ item.customer.lastName }}
                         </template>
                     {% endblock %}
 
@@ -47,47 +54,50 @@
 
                     {% block mollie_payments_subscription_list_content_status %}
                         <template #column-mollieStatus="{ item }">
-                            <sw-label :variant="statusColor(item.mollieStatus)"
+                            <sw-label :variant="statusColor(item.status)"
                                       size="medium"
                                       appearance="pill"
                                       :ghost="false"
                                       :caps="true"
                                       :dismissable="false">
-                                {{ statusTranslation(item.mollieStatus) }}
+                                {{ statusTranslation(item.status) }}
                             </sw-label>
                         </template>
                     {% endblock %}
 
                     {% block mollie_payments_subscription_list_content_next_payment_date %}
                         <template #column-nextPaymentAt="{ item }">
-                            {{ item.nextPaymentAt | date('d/m/Y') }}
+                            {{ item.nextPaymentAt | date({hour: '2-digit',minute: '2-digit',day: '2-digit',month: '2-digit',year: 'numeric'}) }}
                         </template>
                     {% endblock %}
 
                     {% block mollie_payments_subscription_list_content_pre_payment_reminder %}
                         <template #column-lastRemindedAt="{ item }">
-                            {{ item.lastRemindedAt | date('d/m/Y') }}
+                            {{ item.lastRemindedAt | date({hour: '2-digit',minute: '2-digit',day: '2-digit',month: '2-digit',year: 'numeric'}) }}
                         </template>
                     {% endblock %}
 
                     {% block mollie_payments_subscription_list_content_created_at %}
                         <template #column-createdAt="{ item }">
-                            {{ item.createdAt | date('d/m/Y') }}
+                            <router-link :to="{ name: 'mollie.payments.subscription_detail', params: { id: item.id } }">
+                                {{ item.createdAt | date({hour: '2-digit',minute: '2-digit',day: '2-digit',month: '2-digit',year: 'numeric'}) }}
+                            </router-link>
                         </template>
                     {% endblock %}
 
                     {% block mollie_payments_subscription_list_content_canceled_at %}
                         <template #column-canceledAt="{ item }">
-                            {{ item.canceledAt | date('d/m/Y') }}
+                            {{ item.canceledAt | date({hour: '2-digit',minute: '2-digit',day: '2-digit',month: '2-digit',year: 'numeric'}) }}
                         </template>
                     {% endblock %}
 
                     {% block mollie_payments_subscription_list_content_actions %}
                         <template #actions="{ item }">
-                            {% block mollie_payments_subscription_list_content_actions_cancel %}
-                                <sw-context-menu-item class="mollie-subscriptions-grid-btn-cancel"
-                                                      @click="btnCancel_Click(item)">
-                                    {{ $tc('mollie-payments.subscriptions.list.columns.action.cancel') }}
+                            {% block mollie_payments_subscription_list_content_actions_edit %}
+                                <sw-context-menu-item class="mollie-subscriptions-grid-btn-edit">
+                                    <router-link :to="{ name: 'mollie.payments.subscription_detail', params: { id: item.id } }">
+                                        {{ $tc('mollie-payments.subscriptions.list.action.edit') }}
+                                    </router-link>
                                 </sw-context-menu-item>
                             {% endblock %}
                         </template>

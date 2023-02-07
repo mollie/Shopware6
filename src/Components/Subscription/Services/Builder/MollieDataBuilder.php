@@ -25,16 +25,17 @@ class MollieDataBuilder
 
     /**
      * @param SubscriptionEntity $subscription
+     * @param string $startDate
+     * @param string $interval
+     * @param string $intervalUnit
+     * @param int $times ,
      * @param string $mandateId
      * @return array<mixed>
      */
-    public function buildRequestPayload(SubscriptionEntity $subscription, string $mandateId): array
+    public function buildRequestPayload(SubscriptionEntity $subscription, string $startDate, string $interval, string $intervalUnit, int $times, string $mandateId): array
     {
-        $metadata = $subscription->getMetadata();
-
-        $startDate = $metadata->getStartDate();
-        $interval = $metadata->getInterval() . ' ' . $metadata->getIntervalUnit();
-        $times = ($metadata->getTimes() > 0) ? $metadata->getTimes() : null;
+        $intervalValue = $interval . ' ' . $intervalUnit;
+        $timesValue = ($times > 0) ? $times : null;
 
         return [
             'amount' => [
@@ -45,8 +46,8 @@ class MollieDataBuilder
             'metadata' => [],
             'webhookUrl' => $this->routingBuilder->buildSubscriptionWebhook($subscription->getId()),
             'startDate' => $startDate,
-            'interval' => $interval,
-            'times' => $times,
+            'interval' => $intervalValue,
+            'times' => $timesValue,
             'mandateId' => $mandateId,
         ];
     }

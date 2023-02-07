@@ -128,4 +128,23 @@ class ReminderValidatorTest extends TestCase
         $this->assertEquals(false, $shouldRemind);
     }
 
+    /**
+     * This test verifies that we do not get reminded
+     * if we don't even have an upcoming renewal.
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function testNoNextRenewalLeadsToNoReminder()
+    {
+        $shouldRemind = $this->validator->shouldRemind(
+            null,
+            new \DateTime('2022-01-27'),
+            1,
+            null
+        );
+
+        $this->assertEquals(false, $shouldRemind);
+    }
+
 }
