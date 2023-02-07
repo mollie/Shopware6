@@ -1,13 +1,13 @@
 <phpunuhi>
     <translations>
 
-        <set name="Administration">
+        <set name="administration" format="json" jsonIndent="2">
             <file locale="de-DE">./src/Resources/app/administration/src/snippet/de-DE.json</file>
             <file locale="en-GB">./src/Resources/app/administration/src/snippet/en-GB.json</file>
             <file locale="nl-NL">./src/Resources/app/administration/src/snippet/nl-NL.json</file>
         </set>
 
-        <set name="Storefront">
+        <set name="storefront" format="json" jsonIndent="2">
             <file locale="de-DE">./src/Resources/snippet/de_DE/mollie-payments.de-DE.json</file>
             <file locale="en-GB">./src/Resources/snippet/en_GB/mollie-payments.en-GB.json</file>
             <file locale="nl-NL">./src/Resources/snippet/nl_NL/mollie-payments.nl-NL.json</file>

@@ -116,10 +116,7 @@ describe('Credit Card Components', () => {
 
             cy.wait(1200);
 
-            // if we have a space as invalid card holder name
-            // then somehow this error appears.
-            // its not consistent, so we just assert for this text
-            cy.contains("Failed to submit card data");
+            cy.contains("The 'cardHolder' field should not contain only whitespace characters");
         })
 
         it('C4108: Invalid Card Number', () => {

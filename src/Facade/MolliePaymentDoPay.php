@@ -171,7 +171,6 @@ class MolliePaymentDoPay
                 return $this->handleNextPaymentAttempt(
                     $order,
                     $swOrderTransactionID,
-                    $orderCustomFields,
                     $mollieOrderId,
                     $paymentMethod,
                     $transactionStruct,
@@ -210,11 +209,10 @@ class MolliePaymentDoPay
         # this will prepare the subscriptions in our database.
         # the confirmation of these, however, will be done in a webhook
         $subscriptionId = $this->subscriptionManager->createSubscription($order, $salesChannelContext);
-        
+
         # now update our custom struct values
         # and immediately set our Mollie Order ID and more
         $orderCustomFields->setMollieOrderId($mollieOrder->id);
-        $orderCustomFields->setMolliePaymentUrl($mollieOrder->getCheckoutUrl());
 
         # if we have a subscription, make sure
         # to remember the ID in our order
@@ -228,9 +226,10 @@ class MolliePaymentDoPay
         $this->updaterLineItemCustomFields->updateOrderLineItems($mollieOrder, $salesChannelContext);
 
 
-        # this condition somehow looks weird to me (TODO)
-        $checkoutURL = $orderCustomFields->getMolliePaymentUrl() ?? $orderCustomFields->getTransactionReturnUrl() ?? $transactionStruct->getReturnUrl();
-
+        # getCheckoutUrl can return null with Apple Pay Direct and similar payments,
+        # as it's not necessary to be directed to Mollie in that case.
+        # Return the store's return url, so we go to the correct page.
+        $checkoutURL = $mollieOrder->getCheckoutUrl() ?? $transactionStruct->getReturnUrl();
 
         return new MolliePaymentPrepareData((string)$checkoutURL, (string)$mollieOrder->id);
     }
@@ -252,7 +251,9 @@ class MolliePaymentDoPay
 
             # create customers for every subscription
             # or if we don't have a guest and our feature is enabled
-            if ($isSubscription || (!$customer->getGuest() && $settings->createCustomersAtMollie())) {
+            if ($isSubscription
+                || (!$customer->getGuest() && ($settings->createCustomersAtMollie() || $settings->isOneClickPaymentsEnabled()))
+            ) {
                 $this->customerService->createMollieCustomer(
                     $customer->getId(),
                     $salesChannelContext->getSalesChannel()->getId(),
@@ -276,7 +277,6 @@ class MolliePaymentDoPay
     /**
      * @param OrderEntity $order
      * @param string $swOrderTransactionID
-     * @param OrderAttributes $orderCustomFields
      * @param string $mollieOrderId
      * @param string $paymentMethod
      * @param AsyncPaymentTransactionStruct $transactionStruct
@@ -285,7 +285,7 @@ class MolliePaymentDoPay
      * @throws ApiException|MollieOrderCancelledException|MollieOrderExpiredException
      * @return MolliePaymentPrepareData
      */
-    private function handleNextPaymentAttempt(OrderEntity $order, string $swOrderTransactionID, OrderAttributes $orderCustomFields, string $mollieOrderId, string $paymentMethod, AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext, PaymentHandler $paymentHandler): MolliePaymentPrepareData
+    private function handleNextPaymentAttempt(OrderEntity $order, string $swOrderTransactionID, string $mollieOrderId, string $paymentMethod, AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext, PaymentHandler $paymentHandler): MolliePaymentPrepareData
     {
         $this->logger->debug(
             'Start additional payment attempt for order: ' . $order->getOrderNumber(),
@@ -322,11 +322,6 @@ class MolliePaymentDoPay
         if (empty($payment->getCheckoutUrl())) {
             throw new PaymentUrlException($transactionStruct->getOrderTransaction()->getId(), "Couldn't get Mollie payment CheckoutURL for " . $payment->id);
         }
-
-        // save custom fields because shopware return url could have changed
-        // e.g. if changedPayment Parameter has to be added the shopware payment token changes
-        $orderCustomFields->setMolliePaymentUrl($payment->getCheckoutUrl());
-        $this->updaterOrderCustomFields->updateOrder($order->getId(), $orderCustomFields, $salesChannelContext->getContext());
 
         return new MolliePaymentPrepareData($payment->getCheckoutUrl(), $mollieOrderId);
     }

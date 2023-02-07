@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Service;
 
 use Kiener\MolliePayments\Struct\CustomerStruct;
+use Kiener\MolliePayments\Struct\Mandate\MandateCollection;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
@@ -15,7 +16,8 @@ interface CustomerServiceInterface
 {
     public function customerLogin(CustomerEntity $customer, SalesChannelContext $context): ?string;
     public function isCustomerLoggedIn(SalesChannelContext $context): bool;
-    public function setCardToken(CustomerEntity $customer, string $cardToken, Context $context): EntityWrittenContainerEvent;
+    public function setCardToken(CustomerEntity $customer, string $cardToken, SalesChannelContext $context, bool $shouldSaveCardDetail = false): EntityWrittenContainerEvent;
+    public function setMandateId(CustomerEntity $customer, string $cardToken, Context $context): EntityWrittenContainerEvent;
 
     /**
      * @param string $customerID

@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Tests\Service;
 use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
+use Kiener\MolliePayments\Service\MollieApi\Mandate;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\CustomerStruct;
 use MolliePayments\Tests\Fakes\FakeEntityRepository;
@@ -55,8 +56,10 @@ class CustomerServiceTest extends TestCase
             $this->salesChannelContextPersister,
             $this->createMock(EntityRepositoryInterface::class),
             $this->settingsService,
+            'does.not.matter.here',
             $this->createMock(NumberRangeValueGeneratorInterface::class),
-            $this->compatibilityGateway
+            $this->compatibilityGateway,
+            $this->createMock(Mandate::class)
         );
 
     }
@@ -74,7 +77,7 @@ class CustomerServiceTest extends TestCase
         $search = $this->createConfiguredMock(EntitySearchResult::class, [
             'first' => $customer
         ]);
-        
+
         $this->customerRepository->entitySearchResults = [$search];
 
         $customerStruct = $this->customerService->getCustomerStruct('fakeId',   $this->createMock(Context::class));
