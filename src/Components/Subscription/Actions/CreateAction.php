@@ -46,6 +46,7 @@ class CreateAction extends BaseAction
 
         if (!$attributes->isSubscriptionProduct()) {
             # Mixed carts are not allowed for subscriptions
+             $this->getLogger()->debug("Order {$order->getOrderNumber()} did not create a subscription.");
             return '';
         }
 
