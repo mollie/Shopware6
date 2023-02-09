@@ -124,6 +124,14 @@ Component.register('mollie-refund-manager', {
             return this.acl.can('mollie_refund_manager:delete');
         },
 
+        /**
+         * Return the title with a count
+         * @returns {*}
+         */
+        descriptionCharacterCountingTitle(){
+            return this.$tc('mollie-payments.refund-manager.summary.lblDescription',0,{characters:this.refundDescription.length})
+        },
+
     },
 
     methods: {

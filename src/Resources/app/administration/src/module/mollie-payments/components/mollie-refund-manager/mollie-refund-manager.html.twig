@@ -360,8 +360,9 @@
                                        type="textarea"
                                        v-model="refundDescription"
                                        class="field-description"
-                                       :label="$tc('mollie-payments.refund-manager.summary.lblDescription')"
-                                       :placeholder="$tc('mollie-payments.refund-manager.summary.placeholderDescription')">
+                                       :label="descriptionCharacterCountingTitle"
+                                       :placeholder="$tc('mollie-payments.refund-manager.summary.placeholderDescription')"
+                                       :helpText="$tc('mollie-payments.refund-manager.summary.descriptionHelp')">
                     </sw-textarea-field>
                     {# --------------------------------------------------------------------------------------------- #}
                     <sw-textarea-field v-if="isAclRefundAllowed"
@@ -369,7 +370,8 @@
                                        v-model="refundInternalDescription"
                                        class="field-description"
                                        :label="$tc('mollie-payments.refund-manager.summary.lblInternalDescription')"
-                                       :placeholder="$tc('mollie-payments.refund-manager.summary.placeholderInternalDescription')">
+                                       :placeholder="$tc('mollie-payments.refund-manager.summary.placeholderInternalDescription')"
+                                       :helpText="$tc('mollie-payments.refund-manager.summary.internalDescriptionHelp')">
                     </sw-textarea-field>
                     {# --------------------------------------------------------------------------------------------- #}
                     <sw-checkbox-field v-if="isAclRefundAllowed && configVerifyRefund"
