@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Components\Subscription\DAL\Order;
+namespace Kiener\MolliePayments\Components\RefundManager\DAL\Order;
 
 use Kiener\MolliePayments\Components\Subscription\DAL\Refund\RefundDefinition;
 use Shopware\Core\Checkout\Order\OrderDefinition;
