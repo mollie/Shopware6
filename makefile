@@ -96,7 +96,7 @@ configcheck: ## Tests and verifies the plugin configuration file
 # ------------------------------------------------------------------------------------------------------------
 
 snippetcheck: ## Tests and verifies all plugin snippets
-	php vendor/bin/phpunuhi validate --configuration=./.phpunuhi.xml
+	php vendor/bin/phpunuhi validate --configuration=./.phpunuhi.xml --report-format=junit --report-output=./.phpunuhi/junit.xml
 
 snippetexport: ## Exports all snippets
 	php vendor/bin/phpunuhi export --configuration=./.phpunuhi.xml --dir=./.phpunuhi

@@ -65,7 +65,6 @@
         "mollie/mollie-api-php": "2.40.1"
     },
     "require-dev": {
-        "boxblinkracer/phpunuhi": "^1.0",
         "phpunit/phpunit": "^9.5",
         "phpstan/phpstan": "1.8.2",
         "friendsofphp/php-cs-fixer": "^2.18",
@@ -74,7 +73,8 @@
         "infection/infection": "^0.25.4",
         "shopware/core": "*",
         "shopware/administration": "*",
-        "shopware/storefront": "*"
+        "shopware/storefront": "*",
+        "boxblinkracer/phpunuhi": "dev-main"
     },
     "scripts": {
         "post-install-cmd": [

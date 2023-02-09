@@ -1,16 +1,33 @@
-<phpunuhi>
+<phpunuhi
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/boxblinkracer/phpunuhi/main/config.xsd"
+>
     <translations>
 
-        <set name="administration" format="json" jsonIndent="2">
-            <file locale="de-DE">./src/Resources/app/administration/src/snippet/de-DE.json</file>
-            <file locale="en-GB">./src/Resources/app/administration/src/snippet/en-GB.json</file>
-            <file locale="nl-NL">./src/Resources/app/administration/src/snippet/nl-NL.json</file>
+        <set name="administration">
+            <format>
+                <json indent="2"/>
+            </format>
+            <locales>
+                <locale name="de-DE">./src/Resources/app/administration/src/snippet/de-DE.json</locale>
+                <locale name="en-GB">./src/Resources/app/administration/src/snippet/en-GB.json</locale>
+                <locale name="nl-NL">./src/Resources/app/administration/src/snippet/nl-NL.json</locale>
+            </locales>
         </set>
 
-        <set name="storefront" format="json" jsonIndent="2">
-            <file locale="de-DE">./src/Resources/snippet/de_DE/mollie-payments.de-DE.json</file>
-            <file locale="en-GB">./src/Resources/snippet/en_GB/mollie-payments.en-GB.json</file>
-            <file locale="nl-NL">./src/Resources/snippet/nl_NL/mollie-payments.nl-NL.json</file>
+        <set name="storefront">
+            <format>
+                <json indent="2"/>
+            </format>
+            <styles>
+                <style>camel</style>
+                <style>kebab</style>
+            </styles>
+            <locales>
+                <locale name="de-DE">./src/Resources/snippet/de_DE/mollie-payments.de-DE.json</locale>
+                <locale name="en-GB">./src/Resources/snippet/en_GB/mollie-payments.en-GB.json</locale>
+                <locale name="nl-NL">./src/Resources/snippet/nl_NL/mollie-payments.nl-NL.json</locale>
+            </locales>
         </set>
 
     </translations>
