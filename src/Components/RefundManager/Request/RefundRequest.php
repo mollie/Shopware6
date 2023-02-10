@@ -18,6 +18,11 @@ class RefundRequest
     private $description;
 
     /**
+     * @var string
+     */
+    private $internalDescription;
+
+    /**
      * @var ?float
      */
     private $amount;
@@ -28,15 +33,18 @@ class RefundRequest
     private $items;
 
 
+
     /**
      * @param string $orderNumber
      * @param string $description
+     * @param string $internalDescription
      * @param null|float $amount
      */
-    public function __construct(string $orderNumber, string $description, ?float $amount)
+    public function __construct(string $orderNumber, string $description, string $internalDescription, ?float $amount)
     {
         $this->orderNumber = $orderNumber;
         $this->description = $description;
+        $this->internalDescription = $internalDescription;
         $this->amount = $amount;
         $this->items = [];
     }
@@ -79,6 +87,14 @@ class RefundRequest
         }
 
         return $this->description;
+    }
+
+    /**
+     * @return string
+     */
+    public function getInternalDescription(): string
+    {
+        return $this->internalDescription;
     }
 
     /**

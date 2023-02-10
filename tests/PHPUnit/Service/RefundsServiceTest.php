@@ -97,7 +97,8 @@ class RefundsServiceTest extends TestCase
             $mollieOrderApiMock,
             $this->orderService,
             new RefundHydrator(),
-            new FakeMollieGateway()
+            new FakeMollieGateway(),
+            $this->createMock(EntityRepositoryInterface::class),
         );
     }
 
@@ -126,6 +127,7 @@ class RefundsServiceTest extends TestCase
         $result = $this->refundService->refundPartial(
             $orderEntityMock,
             'test refund',
+            'test refund internal',
             24.99,
             [],
             Context::createDefaultContext()

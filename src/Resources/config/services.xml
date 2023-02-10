@@ -24,6 +24,7 @@
         <import resource="services/scheduled_tasks.xml"/>
 
         <import resource="services/subscription/services.xml"/>
+        <import resource="services/refundmanager/services.xml"/>
     </imports>
 
     <services>

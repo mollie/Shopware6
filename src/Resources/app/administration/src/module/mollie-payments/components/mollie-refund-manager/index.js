@@ -55,6 +55,7 @@ Component.register('mollie-refund-manager', {
             pendingRefunds: 0,
             checkVerifyRefund: false,
             refundDescription: '',
+            refundInternalDescription:'',
             roundingDiff: 0,
             // -------------------------------
             // tutorials
@@ -121,6 +122,14 @@ Component.register('mollie-refund-manager', {
          */
         isAclCancelAllowed() {
             return this.acl.can('mollie_refund_manager:delete');
+        },
+
+        /**
+         * Return the title with a count
+         * @returns {*}
+         */
+        descriptionCharacterCountingTitle(){
+            return this.$tc('mollie-payments.refund-manager.summary.lblDescription',0,{characters:this.refundDescription.length})
         },
 
     },
@@ -221,6 +230,7 @@ Component.register('mollie-refund-manager', {
             // verification checkbox and clean our text
             this.checkVerifyRefund = false;
             this.refundDescription = '';
+            this.refundInternalDescription = '';
         },
 
         /**
@@ -406,6 +416,7 @@ Component.register('mollie-refund-manager', {
                     orderId: this.order.id,
                     amount: this.refundAmount,
                     description: this.refundDescription,
+                    internalDescription: this.refundInternalDescription,
                     items: itemData,
                 })
                 .then((response) => {
@@ -436,6 +447,7 @@ Component.register('mollie-refund-manager', {
                 {
                     orderId: this.order.id,
                     description: this.refundDescription,
+                    internalDescription: this.refundInternalDescription,
                 })
                 .then((response) => {
                     if (response.success) {

@@ -31,6 +31,10 @@ export default class MollieRefundsGrid {
                 label: app.$tc('mollie-payments.refund-manager.refunds.grid.columns.description'),
             },
             {
+                property: 'internalDescription',
+                label: app.$tc('mollie-payments.refund-manager.refunds.grid.columns.internalDescription'),
+            },
+            {
                 property: 'composition',
                 label: app.$tc('mollie-payments.refund-manager.refunds.grid.columns.composition'),
                 width: '100px',
