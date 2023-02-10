@@ -5,7 +5,6 @@ namespace Kiener\MolliePayments\Migration;
 use Doctrine\DBAL\Connection;
 use Shopware\Core\Framework\Migration\MigrationStep;
 
-
 class Migration1669796049CreateRefund extends MigrationStep
 {
 
@@ -20,8 +19,8 @@ class Migration1669796049CreateRefund extends MigrationStep
 
     /**
      * @param Connection $connection
-     * @return void
      * @throws \Doctrine\DBAL\Exception
+     * @return void
      */
     public function update(Connection $connection): void
     {

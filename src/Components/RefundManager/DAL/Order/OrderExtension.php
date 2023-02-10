@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\RefundManager\DAL\Order;
 
-use Kiener\MolliePayments\Components\Subscription\DAL\Refund\RefundDefinition;
+use Kiener\MolliePayments\Components\RefundManager\DAL\Refund\RefundDefinition;
 use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityExtension;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\CascadeDelete;

@@ -2,9 +2,9 @@
 
 namespace Kiener\MolliePayments\Hydrator;
 
-use Kiener\MolliePayments\Components\Subscription\DAL\Order\OrderExtension;
-use Kiener\MolliePayments\Components\Subscription\DAL\Refund\RefundCollection;
-use Kiener\MolliePayments\Components\Subscription\DAL\Refund\RefundEntity;
+use Kiener\MolliePayments\Components\RefundManager\DAL\Order\OrderExtension;
+use Kiener\MolliePayments\Components\RefundManager\DAL\Refund\RefundCollection;
+use Kiener\MolliePayments\Components\RefundManager\DAL\Refund\RefundEntity;
 use Mollie\Api\Resources\Refund;
 use Shopware\Core\Checkout\Order\OrderEntity;
 
