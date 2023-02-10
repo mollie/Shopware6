@@ -119,11 +119,17 @@ Component.register('mollie-subscriptions-list', {
          *
          */
         async getList() {
-
             this.isLoading = true;
             this.naturalSorting = this.sortBy === 'createdAt';
 
-            const criteria = await this.addQueryScores(this.term, new Criteria());
+            let criteria = new Criteria();
+
+            // Compatibility for 6.4.4, as admin search was improved in 6.4.5
+            if('addQueryScores' in this) {
+                criteria = await this.addQueryScores(this.term, criteria);
+            } else {
+                criteria.setTerm(this.term);
+            }
 
             criteria.addSorting(Criteria.sort(this.sortBy, this.sortDirection, this.naturalSorting));
             criteria.addAssociation('customer');
