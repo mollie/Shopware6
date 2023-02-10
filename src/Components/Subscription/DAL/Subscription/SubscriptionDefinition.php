@@ -99,10 +99,6 @@ class SubscriptionDefinition extends EntityDefinition
             new UpdatedAtField(),
 
             # --------------------------------------------------------------------------------------------------------------------------
-            # RUNTIME LOADED
-            (new StringField('mollieStatus', 'mollieStatus'))->addFlags(new Runtime(), new ApiAware()),
-
-            # --------------------------------------------------------------------------------------------------------------------------
 
             new ManyToOneAssociationField('customer', 'customer_id', CustomerDefinition::class, 'id', false),
 
