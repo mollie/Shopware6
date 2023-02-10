@@ -107,12 +107,6 @@ class LiveDataEnricher implements EventSubscriberInterface
 
                     $this->repoSubscriptions->updateStatus($subscription->getId(), $mollieSubscription->status, $event->getContext());
                 }
-
-                # ----------------------------------------------------------------------------------------------------
-                # TODO remove one day
-                # mollieStatus is deprecated
-
-                $subscription->setMollieStatus('Deprecated. Use status');
             } catch (\Throwable $ex) {
                 $this->logger->error(
                     'Error when enriching Subscription with additional data',
