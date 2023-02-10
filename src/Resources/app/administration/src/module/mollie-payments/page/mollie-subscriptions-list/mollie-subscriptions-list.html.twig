@@ -118,7 +118,7 @@
         <template #sidebar>
             <sw-sidebar>
                 <sw-sidebar-item
-                    icon="regular-undo"
+                    :icon="compatibilityIcons.refresh"
                     :title="$tc('sw-product.list.titleSidebarItemRefresh')"
                     @click="onRefresh"
                 />
