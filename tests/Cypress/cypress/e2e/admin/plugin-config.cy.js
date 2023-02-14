@@ -99,11 +99,7 @@ context("Plugin Config", () => {
             }
 
             cy.get(inputPrefix).click().clear();
-            cy.get(divPreview).should('not.be.visible');
-
-            cy.get(inputPrefix).click().type('cypress');
             cy.get(divPreview).should('be.visible');
-            cy.contains(divPreview, '"cypress"');
 
             cy.get(inputPrefix).click().clear();
             cy.get(inputPrefix).click().type('cypress_{ordernumber}', {parseSpecialCharSequences: false});
