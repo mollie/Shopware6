@@ -4,22 +4,19 @@ namespace Kiener\MolliePayments\Components\RefundManager;
 
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatcherAdapterInterface;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactoryInterface;
 use Kiener\MolliePayments\Components\RefundManager\Builder\RefundDataBuilder;
 use Kiener\MolliePayments\Components\RefundManager\Integrators\StockManagerInterface;
+use Kiener\MolliePayments\Components\RefundManager\RefundCollection\RefundCollection;
 use Kiener\MolliePayments\Components\RefundManager\RefundData\RefundData;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItemRoundingDiff;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieRefundException;
 use Kiener\MolliePayments\Service\MollieApi\Order;
-use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\OrderServiceInterface;
 use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
-use Kiener\MolliePayments\Service\Refund\RefundService;
 use Kiener\MolliePayments\Service\Refund\RefundServiceInterface;
-use Kiener\MolliePayments\Service\Stock\StockManager;
 use Kiener\MolliePayments\Struct\MollieApi\OrderLineMetaDataStruct;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
@@ -27,6 +24,7 @@ use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Refund;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -116,8 +114,8 @@ class RefundManager implements RefundManagerInterface
      * @param OrderEntity $order
      * @param RefundRequest $request
      * @param Context $context
-     * @throws \Mollie\Api\Exceptions\ApiException
      * @return Refund
+     * @throws \Mollie\Api\Exceptions\ApiException
      */
     public function refund(OrderEntity $order, RefundRequest $request, Context $context): Refund
     {
@@ -213,7 +211,7 @@ class RefundManager implements RefundManagerInterface
         }
 
 
-        if (! $refund instanceof Refund) {
+        if (!$refund instanceof Refund) {
             # a problem happened, lets finish with an exception
             throw new CouldNotCreateMollieRefundException('', (string)$order->getOrderNumber());
         }
@@ -300,21 +298,48 @@ class RefundManager implements RefundManagerInterface
      */
     private function buildRequestItemsFromOrder(OrderEntity $order)
     {
+
+        $refunds = $this->refundService->getRefunds($order);
+//        dump($refunds);
+        $refundCollection = new RefundCollection();
+        foreach ($refunds as $refund) {
+            if (!isset($refund['metadata'])) {
+                continue;
+            }
+
+            $metadata = $refund['metadata'];
+            if (!isset($metadata['composition'])) {
+                continue;
+            }
+
+            $composition = $metadata['composition'];
+            foreach ($composition as $lineItem) {
+                $refundCollection->addRefund($lineItem['mollieLineId'], $lineItem['quantity']);
+
+            }
+        }
+
         $items = [];
 
         if ($order->getLineItems() instanceof OrderLineItemCollection) {
+            /** @var OrderLineItemEntity $lineItem */
             foreach ($order->getLineItems() as $lineItem) {
+                $orderLineId = $lineItem->getCustomFields()['mollie_payments']['order_line_id'];
+                $alreadyRefundedQuantity = $refundCollection->getRefundQuantityForMollieId($orderLineId);
                 $items[] = new RefundRequestItem(
                     $lineItem->getId(),
                     $lineItem->getTotalPrice(),
-                    $lineItem->getQuantity(),
+                    $lineItem->getQuantity() - $alreadyRefundedQuantity,
                     0
                 );
             }
         }
 
         if ($order->getDeliveries() instanceof OrderDeliveryCollection) {
+            /** @var OrderDeliveryEntity $delivery */
             foreach ($order->getDeliveries() as $delivery) {
+//                dump($delivery);
+                $alreadyRefundedQuantity = $refundCollection->getRefundQuantityForMollieId($orderLineId);
                 $items[] = new RefundRequestItem(
                     $delivery->getId(),
                     $delivery->getShippingCosts()->getTotalPrice(),
@@ -323,7 +348,7 @@ class RefundManager implements RefundManagerInterface
                 );
             }
         }
-
+//        dd($items);
         return $items;
     }
 
