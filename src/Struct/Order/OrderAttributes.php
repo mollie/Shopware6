@@ -40,6 +40,11 @@ class OrderAttributes
     private $transactionReturnUrl;
 
     /**
+     * @var null|string
+     */
+    private $molliePaymentUrl;
+
+    /**
      * @var string
      */
     private $creditCardNumber;
@@ -97,6 +102,7 @@ class OrderAttributes
         $this->mollieSubscriptionId = $this->getCustomFieldValue($order, 'mollieSubscriptionId');
         $this->thirdPartyPaymentId = $this->getCustomFieldValue($order, 'third_party_payment_id');
         $this->transactionReturnUrl = $this->getCustomFieldValue($order, 'transactionReturnUrl');
+        $this->molliePaymentUrl = $this->getCustomFieldValue($order, 'molliePaymentUrl');
         $this->creditCardNumber = $this->getCustomFieldValue($order, 'creditCardNumber');
         $this->creditCardHolder = $this->getCustomFieldValue($order, 'creditCardHolder');
         $this->creditCardAudience = $this->getCustomFieldValue($order, 'creditCardAudience');
@@ -179,6 +185,22 @@ class OrderAttributes
     {
         $this->swSubscriptionId = $swSubscriptionId;
         $this->mollieSubscriptionId = $mollieSubscriptionId;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getMolliePaymentUrl(): ?string
+    {
+        return $this->molliePaymentUrl;
+    }
+
+    /**
+     * @param null|string $molliePaymentUrl
+     */
+    public function setMolliePaymentUrl(?string $molliePaymentUrl): void
+    {
+        $this->molliePaymentUrl = $molliePaymentUrl;
     }
 
     /**
@@ -368,8 +390,15 @@ class OrderAttributes
             $mollieData['third_party_payment_id'] = $this->thirdPartyPaymentId;
         }
 
+        # used by the Mollie Failure-Mode within this plugin
         if ((string)$this->transactionReturnUrl !== '') {
             $mollieData['transactionReturnUrl'] = $this->transactionReturnUrl;
+        }
+
+        # used for the API to read the checkout-URL
+        # within 3rd party systems
+        if ((string)$this->molliePaymentUrl !== '') {
+            $mollieData['molliePaymentUrl'] = $this->molliePaymentUrl;
         }
 
         if ((string)$this->creditCardNumber !== '') {
