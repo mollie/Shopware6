@@ -79,23 +79,23 @@
         </input-field>
         <input-field type="bool">
             <name>oneClickPaymentsEnabled</name>
-            <label>Enable Single Click Payments</label>
-            <label lang="de-DE">Single-Click-Zahlungen aktivieren</label>
-            <label lang="nl-NL">Betalingen met één klik mogelijk maken</label>
-            <defaultValue>true</defaultValue>
-            <helpText>Save customer's credit card for recurring payments.</helpText>
-            <helpText lang="de-DE">Speichern Sie die Kreditkarte des Kunden für wiederkehrende Zahlungen.</helpText>
-            <helpText lang="nl-NL">Sla de creditcard van de klant op voor terugkerende betalingen.</helpText>
+            <label>Enable One-Click Payments</label>
+            <label lang="de-DE">One-Click-Zahlungen aktivieren</label>
+            <label lang="nl-NL">One-Click betalingen activeren</label>
+            <defaultValue>false</defaultValue>
+            <helpText>Customers can choose to save their credit card data for repeating orders. Sensitive data will only be stored on the Mollie servers and not in Shopware.</helpText>
+            <helpText lang="de-DE">Kunden haben die Möglichkeit, ihre Kreditkartendaten für erneute Bestellungen zu speichern. Sensible Daten werden nur auf den Mollie-Servern und nicht in Shopware gespeichert.</helpText>
+            <helpText lang="nl-NL">Klanten kunnen ervoor kiezen hun creditcardgegevens op te slaan voor toekomstige bestellingen. Gevoelige gegevens worden alleen opgeslagen op de servers van Mollie en niet in Shopware.</helpText>
         </input-field>
         <input-field type="bool">
             <name>oneClickPaymentsCompactView</name>
-            <label>One-Click Payments compact view</label>
-            <label lang="de-DE">One-Click-Zahlungen Kompaktansicht</label>
+            <label>Enable One-Click Payments compact view</label>
+            <label lang="de-DE">One-Click-Zahlungen Kompaktansicht aktivieren</label>
             <label lang="nl-NL">Compacte weergave van One-Click Payments</label>
             <defaultValue>false</defaultValue>
-            <helpText>Will show a compact view of the credit card within the checkout.</helpText>
-            <helpText lang="de-DE">Zeigt eine kompakte Ansicht der Kreditkarte im Kassenbereich.</helpText>
-            <helpText lang="nl-NL">Toont een compacte weergave van de creditcard bij het afrekenen.</helpText>
+            <helpText>If enabled, the stored credit cards will not be displayed as visual cards on the checkout page.</helpText>
+            <helpText lang="de-DE">Wenn aktiviert, werden die gespeicherten Kreditkarten nicht als visuelle Karten auf der Checkout-Seite angezeigt.</helpText>
+            <helpText lang="nl-NL">Indien ingeschakeld, worden de opgeslagen creditcards niet weergegeven als visuele kaarten op de afrekenpagina.</helpText>
         </input-field>
         <input-field type="bool">
             <name>enableApplePayDirect</name>
