@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Subscriber;
 
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\IntervalType;
 use Kiener\MolliePayments\Service\SettingsService;
+use Kiener\MolliePayments\Storefront\Struct\SubscriptionCartExtensionStruct;
 use Kiener\MolliePayments\Storefront\Struct\SubscriptionDataExtensionStruct;
 use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Kiener\MolliePayments\Struct\Product\ProductAttributes;
@@ -118,12 +119,15 @@ class SubscriptionSubscriber implements EventSubscriberInterface
 
 
         if ($page instanceof CheckoutConfirmPage) {
+            $subscriptionFound = false;
             foreach ($page->getCart()->getLineItems()->getFlat() as $lineItem) {
                 $lineItemAttributes = new LineItemAttributes($lineItem);
 
                 $isSubscription = $lineItemAttributes->isSubscriptionProduct();
 
                 if ($isSubscription) {
+                    $subscriptionFound = true;
+
                     $interval = (int)$lineItemAttributes->getSubscriptionInterval();
                     $unit = (string)$lineItemAttributes->getSubscriptionIntervalUnit();
                     $repetition = (int)$lineItemAttributes->getSubscriptionRepetition();
@@ -139,6 +143,10 @@ class SubscriptionSubscriber implements EventSubscriberInterface
                     $lineItem->addExtension('mollieSubscription', $struct);
                 }
             }
+
+            # we need this for some checks on the cart
+            $cartStruct = new SubscriptionCartExtensionStruct($subscriptionFound);
+            $event->getPage()->addExtension('mollieSubscriptionCart', $cartStruct);
         }
     }
 

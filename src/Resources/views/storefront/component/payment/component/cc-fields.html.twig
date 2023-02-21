@@ -1,6 +1,7 @@
 {% set NEW_CARD_MANDATE_OPTION = 'newCard' %}
 {% set enableOneClickPayments = page.enable_one_click_payments %}
 {% set mandates = page.extensions.MollieCreditCardMandateCollection %}
+{% set mollieCart = page.extensions.mollieSubscriptionCart %}
 
 {% block mollie_credit_card_mandate_list %}
     {% block mollie_credit_card_mandate_list_include %}
@@ -106,12 +107,14 @@
                                                name="mollieShouldSaveCardDetail"
                                         />
                                     {% endblock %}
-                                    {% block mollie_creditcard_form_check_store_card_checkbox_label %}
-                                        <label class="{{ formCheckLabelClass ?? 'custom-control-label' }}"
-                                               for="mollieShouldSaveCardDetail">
-                                            {{ "molliePayments.components.creditCard.saveCardDetailLabel"|trans|striptags }}
-                                        </label>
-                                    {% endblock %}
+                                    {% if not mollieCart.hasSubscription %}
+                                        {# it doesnt make sense to show it for subscriptions, that is always saved anyway #}
+                                        {% block mollie_creditcard_form_check_store_card_checkbox_label %}
+                                            <label class="{{ formCheckLabelClass ?? 'custom-control-label' }}" for="mollieShouldSaveCardDetail">
+                                                {{ "molliePayments.components.creditCard.saveCardDetailLabel"|trans|striptags }}
+                                            </label>
+                                        {% endblock %}
+                                    {% endif %}
                                 </div>
                             </div>
                         {% endif %}
