@@ -9,6 +9,19 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 interface MandateServiceInterface
 {
+
+    /**
+     * @param string $customerId
+     * @param string $mandateId
+     * @param SalesChannelContext $context
+     * @return void
+     */
     public function revokeMandateByCustomerId(string $customerId, string $mandateId, SalesChannelContext $context): void;
+
+    /**
+     * @param string $customerId
+     * @param SalesChannelContext $context
+     * @return MandateCollection
+     */
     public function getCreditCardMandatesByCustomerId(string $customerId, SalesChannelContext $context): MandateCollection;
 }

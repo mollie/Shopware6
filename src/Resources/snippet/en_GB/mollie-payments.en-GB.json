@@ -26,8 +26,10 @@
                 "selectBank": "Select bank"
             },
             "mandate": {
-                "cardTitleLabel": "%name% - Credit card ending in •••• %number%",
+                "sectionTitle": "Saved cards",
+                "cardTitleLabel": "%name% •••• %number%",
                 "deleteSuccessMessage": "Your card was successfully deleted",
+                "deleteErrorMessage": "There was a problem when removing your card",
                 "newCard": "New card",
                 "remove": "Remove"
             },

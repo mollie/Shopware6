@@ -26,8 +26,10 @@
                 "selectBank": "Selecteer bank"
             },
             "mandate": {
-                "cardTitleLabel": "%name% - Creditcard eindigend op •••• %number%",
+                "sectionTitle": "Opgeslagen kaarten",
+                "cardTitleLabel": "%name% •••• %number%",
                 "deleteSuccessMessage": "Uw kaart is succesvol verwijderd",
+                "deleteErrorMessage": "Er is een probleem opgetreden bij het verwijderen van uw kaart",
                 "newCard": "Nieuwe kaart",
                 "remove": "Verwijderen"
             },

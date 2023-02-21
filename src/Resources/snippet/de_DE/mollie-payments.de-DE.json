@@ -26,8 +26,10 @@
                 "selectBank": "Bank auswählen"
             },
             "mandate": {
-                "cardTitleLabel": "%name% - Kreditkarte mit der Endung •••• %number%",
+                "sectionTitle": "Gespeicherte Karten",
+                "cardTitleLabel": "%name% •••• %number%",
                 "deleteSuccessMessage": "Ihre Karte wurde erfolgreich gelöscht",
+                "deleteErrorMessage": "Beim Entfernen Ihrer Karte ist ein Problem aufgetreten",
                 "newCard": "Neue Karte",
                 "remove": "Entfernen"
             },

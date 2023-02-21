@@ -96,7 +96,7 @@
                         </div>
                     </div>
                     {% block mollie_credit_card_mandate_form_component_radio_should_save_card %}
-                        {% if enableOneClickPayments %}
+                        {% if enableOneClickPayments and not context.customer.guest %}
                             <div class="block-group">
                                 <div class="{{ formCheckboxWrapperClass ?? 'custom-control custom-checkbox' }} mollie-credit-card-custom-checkbox">
                                     {% block mollie_creditcard_form_check_store_card_checkbox_input %}
@@ -106,11 +106,9 @@
                                                name="mollieShouldSaveCardDetail"
                                         />
                                     {% endblock %}
-
                                     {% block mollie_creditcard_form_check_store_card_checkbox_label %}
                                         <label class="{{ formCheckLabelClass ?? 'custom-control-label' }}"
-                                               for="mollieShouldSaveCardDetail"
-                                        >
+                                               for="mollieShouldSaveCardDetail">
                                             {{ "molliePayments.components.creditCard.saveCardDetailLabel"|trans|striptags }}
                                         </label>
                                     {% endblock %}

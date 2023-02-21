@@ -1,3 +1,8 @@
+.mollie-credit-card-mandate-manage {
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
 .mollie-credit-card-mandate-list {
     .mollie-credit-card-mandate {
         &:last-child {
@@ -21,6 +26,9 @@
 }
 
 .mollie-credit-card-mandate {
+    margin-left:25px;
+    margin-bottom: 25px;
+
     .mollie-credit-card-mandate-radio {
         margin-top: 13px;
     }
@@ -63,8 +71,8 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        width: 280px;
-        height: 115px;
+        width: 210px;
+        height: 95px;
         border-radius: 8px;
         background-color: $sw-color-brand-primary;
         margin-top: 12px;
