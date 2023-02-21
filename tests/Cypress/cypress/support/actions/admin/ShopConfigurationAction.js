@@ -35,7 +35,7 @@ export default class ShopConfigurationAction {
         this.setupPlugin(mollieFailureMode, creditCardComponents, applePayDirect, false);
 
         // let's just wait a bit
-        cy.wait(12000);
+        cy.wait(20000);
 
         this._clearCache();
 
@@ -147,6 +147,7 @@ export default class ShopConfigurationAction {
             "MolliePayments.config.shopwareFailedPayment": !mollieFailureMode,
             "MolliePayments.config.enableCreditCardComponents": creditCardComponents,
             "MolliePayments.config.enableApplePayDirect": applePayDirect,
+            "MolliePayments.config.oneClickPaymentsEnabled": false,
             "MolliePayments.config.paymentMethodBankTransferDueDateDays": 2,
             "MolliePayments.config.orderLifetimeDays": 4,
             // ------------------------------------------------------------------
@@ -175,7 +176,7 @@ export default class ShopConfigurationAction {
         this.apiClient.get('/payment-method').then(payments => {
 
             if (payments === undefined || payments === null) {
-                throw new Error('Attention, No payments found trough Shopware API');
+                throw new Error('Attention, No payments through trough Shopware API');
             }
 
             payments.forEach(element => {
