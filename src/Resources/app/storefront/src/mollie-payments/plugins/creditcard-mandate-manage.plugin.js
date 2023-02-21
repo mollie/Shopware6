@@ -14,25 +14,32 @@ export default class MollieCreditCardMandateManage extends Plugin {
         mollieMandateDataId: 'data-mollie-credit-card-mandate-id',
         mollieMandateRemoveButtonClass: '.mollie-credit-card-mandate-remove',
         mollieMandateRemoveModalButtonClass: '.mollie-credit-card-mandate-remove-modal-button',
-        mollieMandateDeleteAlertId: '#mollieCreditCardMandateDeleteSuccess',
+        mollieMandateDeleteAlertSuccessId: '#mollieCreditCardMandateDeleteSuccess',
+        mollieMandateDeleteAlertErrorId: '#mollieCreditCardMandateDeleteError',
     };
 
     init() {
         const {
             shopUrl,
             customerId,
-            mollieMandateDeleteAlertId,
+            mollieMandateDeleteAlertSuccessId,
+            mollieMandateDeleteAlertErrorId,
         } = this.options;
         if (!shopUrl) {
-            throw new Error(`The "shopUrl" option for the plugin "${ this._pluginName }" is not defined.`);
+            throw new Error(`The "shopUrl" option for the plugin "${this._pluginName}" is not defined.`);
         }
 
         if (!customerId) {
-            throw new Error(`The "customerId" option for the plugin "${ this._pluginName }" is not defined.`);
+            throw new Error(`The "customerId" option for the plugin "${this._pluginName}" is not defined.`);
         }
 
-        this.mollieMandateDeleteAlertEl = DomAccess.querySelector(document, mollieMandateDeleteAlertId, false);
+        this.mollieMandateDeleteAlertEl = DomAccess.querySelector(document, mollieMandateDeleteAlertSuccessId, false);
         if (!this.mollieMandateDeleteAlertEl) {
+            return;
+        }
+
+        this.mollieMandateDeleteAlertErrorEl = DomAccess.querySelector(document, mollieMandateDeleteAlertErrorId, false);
+        if (!this.mollieMandateDeleteAlertErrorEl) {
             return;
         }
 
@@ -97,28 +104,32 @@ export default class MollieCreditCardMandateManage extends Plugin {
         }
 
         PageLoadingIndicatorUtil.create();
-        this.deleteMandate(currentMandateId).then(({ success }) => {
-            PageLoadingIndicatorUtil.remove();
-            if (!success) {
-                return;
-            }
+        this.deleteMandate(currentMandateId).then(({success}) => {
 
-            this.mollieMandateDeleteAlertEl.classList.remove('d-none')
-            currentContainerEl.remove();
+            PageLoadingIndicatorUtil.remove();
+
+            if (success) {
+                this.mollieMandateDeleteAlertErrorEl.classList.add('d-none')
+                this.mollieMandateDeleteAlertEl.classList.remove('d-none')
+                currentContainerEl.remove();
+            } else {
+                this.mollieMandateDeleteAlertEl.classList.add('d-none')
+                this.mollieMandateDeleteAlertErrorEl.classList.remove('d-none')
+            }
         });
     }
 
     deleteMandate(mandateId) {
-        const { shopUrl, customerId } = this.options
+        const {shopUrl, customerId} = this.options
 
         return new Promise((resolve) => {
             this.client.get(
                 shopUrl + '/mollie/components/revoke-mandate/' + customerId + '/' + mandateId,
                 (res) => {
-                    resolve({ success: res && res.success })
+                    resolve({success: res && res.success})
                 },
                 () => {
-                    resolve({ success: false })
+                    resolve({success: false})
                 },
                 'application/json; charset=utf-8'
             );

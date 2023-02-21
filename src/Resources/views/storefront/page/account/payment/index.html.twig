@@ -15,10 +15,12 @@
 {% block page_account_payment_main %}
     {% block mollie_page_account_credit_card_mandate %}
         {% if page.enable_one_click_payments %}
+
             {% set mandates = page.extensions.MollieCreditCardMandateCollection %}
 
             {% block mollie_page_account_credit_card_mandate_condition %}
                 {% if mandates|length > 0 %}
+
                     {% set mandateOptions = {
                         "shopUrl": seoUrl('frontend.home.page'),
                         "customerId": context.customer.id,
@@ -31,20 +33,28 @@
                                 content: "molliePayments.components.mandate.deleteSuccessMessage"|trans|striptags,
                             } %}
                         </div>
+                        <div class="d-none" id="mollieCreditCardMandateDeleteError">
+                            {% sw_include '@Storefront/storefront/utilities/alert.html.twig' with {
+                                type: 'danger',
+                                content: "molliePayments.components.mandate.deleteErrorMessage"|trans|striptags,
+                            } %}
+                        </div>
                     {% endblock %}
 
                     {% block mollie_page_account_credit_card_mandate_manage %}
-                        <div class="mollie-credit-card-mandate-list"
-                             data-mollie-credit-card-mandate-manage="true"
-                             data-mollie-credit-card-mandate-manage-options='{{ mandateOptions|json_encode }}'
-                        >
-                            {% block mollie_page_account_credit_card_mandate_manage_include %}
-                                {% sw_include '@MolliePayments/mollie/component/credit-card-mandate.html.twig' with {
-                                    'mandates': mandates,
-                                    'compactView': true,
-                                    'modifiable': true
-                                } %}
-                            {% endblock %}
+                        <div class="mollie-credit-card-mandate-manage">
+                            <h2 class="card-title">{{ "molliePayments.components.mandate.sectionTitle"|trans|striptags }}</h2>
+                            <div class="mollie-credit-card-mandate-list"
+                                 data-mollie-credit-card-mandate-manage="true"
+                                 data-mollie-credit-card-mandate-manage-options='{{ mandateOptions|json_encode }}'>
+                                {% block mollie_page_account_credit_card_mandate_manage_include %}
+                                    {% sw_include '@MolliePayments/mollie/component/credit-card-mandate.html.twig' with {
+                                        'mandates': mandates,
+                                        'compactView': true,
+                                        'modifiable': true
+                                    } %}
+                                {% endblock %}
+                            </div>
                         </div>
                     {% endblock %}
 
@@ -61,6 +71,7 @@
                             'subscription' : true,
                         } %}
                     {% endblock %}
+
                 {% endif %}
             {% endblock %}
         {% endif %}

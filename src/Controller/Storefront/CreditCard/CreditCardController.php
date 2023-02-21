@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Controller\Storefront\CreditCard;
 use Exception;
 use Kiener\MolliePayments\Service\CustomerServiceInterface;
 use Kiener\MolliePayments\Service\MandateServiceInterface;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -29,14 +30,22 @@ class CreditCardController extends StorefrontController
      */
     private $mandateService;
 
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
 
     /**
      * @param CustomerServiceInterface $customerService
+     * @param MandateServiceInterface $mandateService
+     * @param LoggerInterface $logger
      */
-    public function __construct(CustomerServiceInterface $customerService, MandateServiceInterface $mandateService)
+    public function __construct(CustomerServiceInterface $customerService, MandateServiceInterface $mandateService, LoggerInterface $logger)
     {
         $this->customerService = $customerService;
         $this->mandateService = $mandateService;
+        $this->logger = $logger;
     }
 
     /**
@@ -118,24 +127,37 @@ class CreditCardController extends StorefrontController
      */
     public function revokeMandate(string $customerId, string $mandateId, SalesChannelContext $context): JsonResponse
     {
-        $result = null;
         $success = false;
+        $result = null;
+
         $customer = $this->customerService->getCustomer($customerId, $context->getContext());
+
         if ($customer instanceof CustomerEntity) {
             try {
                 $this->mandateService->revokeMandateByCustomerId($customerId, $mandateId, $context);
 
+                $this->logger->info('One-Click Payments customer ' . $customerId . ' removed stored mandate ' . $mandateId);
+
                 $success = true;
             } catch (Exception $exception) {
-                $result = $exception->getMessage();
+                $this->logger->error(
+                    'One-Click Payments  error when removing mandate from customer',
+                    [
+                        'error' => $exception
+                    ]
+                );
+
+                $result = 'Error when removing mandate';
             }
         }
 
-        return new JsonResponse([
-            'success' => $success,
-            'customerId' => $customerId,
-            'mandateId' => $mandateId,
-            'result' => $result
-        ]);
+        return new JsonResponse(
+            [
+                'success' => $success,
+                'customerId' => $customerId,
+                'mandateId' => $mandateId,
+                'result' => $result
+            ]
+        );
     }
 }
