@@ -93,7 +93,7 @@ class CancelMollieOrderSubscriber implements EventSubscriberInterface
 
             $mollieOrder = $apiClient->orders->get($mollieOrderId);
 
-            if (in_array($mollieOrder->status, [self::MOLLIE_CANCEL_ORDER_STATES])) {
+            if (in_array($mollieOrder->status, self::MOLLIE_CANCEL_ORDER_STATES)) {
                 $apiClient->orders->cancel($mollieOrderId);
             }
         } catch (ApiException $e) {
