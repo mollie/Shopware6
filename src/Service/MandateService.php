@@ -60,7 +60,7 @@ class MandateService implements MandateServiceInterface
         $subscriptions = $this->subscriptionManager->findSubscriptionByMandateId($customerId, $mandateId, $context->getContext());
 
         foreach ($subscriptions->getElements() as $subscription) {
-            if ($subscription->isActive()) {
+            if ($subscription->isActive() || $subscription->isSkipped()) {
                 throw new Exception('Active subscription found for this mandate');
             }
         }
@@ -133,7 +133,7 @@ class MandateService implements MandateServiceInterface
             $beingUsedForSubscription = false;
 
             foreach ($subscriptions->getElements() as $subscription) {
-                if ($subscription->isActive()) {
+                if ($subscription->isActive() || $subscription->isSkipped()) {
                     $beingUsedForSubscription = true;
                     break;
                 }
