@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionC
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieCustomerException;
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieCustomerMandatesException;
+use Kiener\MolliePayments\Exception\CouldNotRevokeMollieCustomerMandateException;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Service\MollieApi\Mandate as MandateApiService;
 use Kiener\MolliePayments\Struct\Mandate\CreditCardDetailStruct;
@@ -21,9 +22,6 @@ class MandateService implements MandateServiceInterface
 {
     public const MANDATE_METHOD_CREDIT_CARD = 'creditcard';
 
-    /** @var LoggerInterface */
-    private $logger;
-
     /** @var CustomerServiceInterface */
     private $customerService;
 
@@ -33,80 +31,45 @@ class MandateService implements MandateServiceInterface
     /** @var SubscriptionManager */
     private $subscriptionManager;
 
+
     /**
-     * Creates a new instance of the mandate service.
      *
-     * @param LoggerInterface $logger
      * @param CustomerServiceInterface $customerService
      * @param MandateApiService $mandateApiService
      * @param SubscriptionManager $subscriptionManager
      */
-    public function __construct(
-        LoggerInterface $logger,
-        CustomerServiceInterface $customerService,
-        MandateApiService $mandateApiService,
-        SubscriptionManager $subscriptionManager
-    ) {
-        $this->logger = $logger;
+    public function __construct(CustomerServiceInterface $customerService, MandateApiService $mandateApiService, SubscriptionManager $subscriptionManager)
+    {
         $this->customerService = $customerService;
         $this->mandateApiService = $mandateApiService;
         $this->subscriptionManager = $subscriptionManager;
     }
 
+
     /**
-     * Revoking a mandate by mandateId. Before revoking a mandate, all connected subscriptions will be canceled.
-     *
      * @param string $customerId
      * @param string $mandateId
      * @param SalesChannelContext $context
-     * @throws CustomerCouldNotBeFoundException
-     * @throws CouldNotFetchMollieCustomerMandatesException
+     * @throws CouldNotRevokeMollieCustomerMandateException
      * @return void
      */
     public function revokeMandateByCustomerId(string $customerId, string $mandateId, SalesChannelContext $context): void
     {
-        try {
-            $mollieCustomerId = $this->customerService->getMollieCustomerId($customerId, $context->getSalesChannelId(), $context->getContext());
+        $mollieCustomerId = $this->customerService->getMollieCustomerId($customerId, $context->getSalesChannelId(), $context->getContext());
 
-            $subscriptions = $this->subscriptionManager->findSubscriptionByMandateId($customerId, $mandateId, $context->getContext());
-            # cancel all connected subscriptions before revoking the mandate
-            if ($subscriptions->count() > 0) {
-                # skip revoking the mandate if any subscription is not cancelable
-                foreach ($subscriptions->getElements() as $subscription) {
-                    $isCancellable = $this->subscriptionManager->isCancelable($subscription, $context->getContext());
-                    if ($isCancellable) {
-                        continue;
-                    }
+        $subscriptions = $this->subscriptionManager->findSubscriptionByMandateId($customerId, $mandateId, $context->getContext());
 
-                    throw new Exception(sprintf(
-                        'Subscription ID %s is not possible to cancel. Mandate ID %s can\'t be removed.',
-                        $subscription->getId(),
-                        $mandateId
-                    ));
-                }
-
-                # cancel all connected subscription if they are cancelable
-                foreach ($subscriptions->getElements() as $subscription) {
-                    $this->subscriptionManager->cancelSubscription($subscription->getId(), $context->getContext());
-                }
+        foreach ($subscriptions->getElements() as $subscription) {
+            if ($subscription->isActive()) {
+                throw new Exception('Active subscription found for this mandate');
             }
-
-            $this->logger->debug('Revoking a mandate of the Mollie customer', [
-                'customerId' => $customerId,
-                'mollieCustomerId' => $mollieCustomerId,
-                'mandateId' => $mandateId,
-            ]);
-
-            $this->mandateApiService->revokeMandateByMollieCustomerId($mollieCustomerId, $mandateId, $context->getSalesChannelId());
-        } catch (Exception $exception) {
-            $this->logger->error('Error while revoking a mandate', [
-                'error' => $exception->getMessage(),
-                'customerId' => $customerId,
-                'mandateId' => $mandateId,
-            ]);
-
-            throw $exception;
         }
+
+        $this->mandateApiService->revokeMandateByMollieCustomerId(
+            $mollieCustomerId,
+            $mandateId,
+            $context->getSalesChannelId()
+        );
     }
 
     /**
@@ -167,9 +130,16 @@ class MandateService implements MandateServiceInterface
 
             # check if this mandate has connected subscriptions
             $subscriptions = $this->subscriptionManager->findSubscriptionByMandateId($customerId, $mandate->id, $context);
-            if ($subscriptions->count() > 0) {
-                $mandateStruct->setBeingUsedForSubscription(true);
+            $beingUsedForSubscription = false;
+
+            foreach ($subscriptions->getElements() as $subscription) {
+                if ($subscription->isActive()) {
+                    $beingUsedForSubscription = true;
+                    break;
+                }
             }
+            $mandateStruct->setBeingUsedForSubscription($beingUsedForSubscription);
+
 
             $mandateCollection->add($mandateStruct);
         }

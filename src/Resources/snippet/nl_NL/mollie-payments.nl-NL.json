@@ -31,11 +31,12 @@
                 "deleteSuccessMessage": "Uw kaart is succesvol verwijderd",
                 "deleteErrorMessage": "Er is een probleem opgetreden bij het verwijderen van uw kaart",
                 "newCard": "Nieuwe kaart",
-                "remove": "Verwijderen"
+                "remove": "Verwijderen",
+                "subscriptionBadge" : "Abonnement"
             },
             "mandateRemoveModal": {
                 "cancelButton": "Annuleren",
-                "cardSubscription": "Deze kaart wordt gebruikt voor een abonnement",
+                "cardSubscription": "Deze kaart wordt gebruikt voor een abonnement. Annuleer eerst uw abonnement voordat u deze kaart verwijdert.",
                 "deleteButton": "Verwijderen",
                 "deleteConfirmation": "Weet je zeker dat je dat wilt verwijderen?",
                 "title": "Bevestiging verwijderen"

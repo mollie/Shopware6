@@ -31,11 +31,12 @@
                 "deleteSuccessMessage": "Ihre Karte wurde erfolgreich gelöscht",
                 "deleteErrorMessage": "Beim Entfernen Ihrer Karte ist ein Problem aufgetreten",
                 "newCard": "Neue Karte",
-                "remove": "Entfernen"
+                "remove": "Entfernen",
+                "subscriptionBadge" : "Abonnement"
             },
             "mandateRemoveModal": {
                 "cancelButton": "Stornieren",
-                "cardSubscription": "Diese Karte wird für ein Abonnement verwendet",
+                "cardSubscription": "Diese Karte wird für ein Abonnement verwendet. Bitte beenden Sie zuerst das Abonnement bevor Sie diese Karte löschen.",
                 "deleteButton": "Löschen",
                 "deleteConfirmation": "Sind Sie sicher, dass Sie die Zahlart löschen möchten?",
                 "title": "Bestätigung zum Löschen"

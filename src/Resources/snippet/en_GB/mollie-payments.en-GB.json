@@ -31,11 +31,12 @@
                 "deleteSuccessMessage": "Your card was successfully deleted",
                 "deleteErrorMessage": "There was a problem when removing your card",
                 "newCard": "New card",
-                "remove": "Remove"
+                "remove": "Remove",
+                "subscriptionBadge" : "Subscription"
             },
             "mandateRemoveModal": {
                 "cancelButton": "Cancel",
-                "cardSubscription": "This card is being used for a subscription",
+                "cardSubscription": "This card is being used for a subscription. Please cancel the subscription first before removing this card.",
                 "deleteButton": "Delete",
                 "deleteConfirmation": "Are you sure you want to delete?",
                 "title": "Delete Confirmation"

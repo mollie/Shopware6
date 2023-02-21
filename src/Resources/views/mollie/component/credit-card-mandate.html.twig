@@ -1,10 +1,8 @@
 {% block mollie_credit_card_mandates %}
     {% for mandate in mandates %}
         {% block mollie_credit_card_mandate %}
-            <div
-                class="mollie-credit-card-mandate"
-                data-mollie-credit-card-mandate-id="{{ mandate.id }}"
-            >
+            <div class="mollie-credit-card-mandate" data-mollie-credit-card-mandate-id="{{ mandate.id }}">
+
                 {% block mollie_credit_card_mandate_block %}
                     <div class="{{ modifiable ? '' : (formRadioWrapperClass ?? 'custom-control custom-radio') }} mollie-credit-card-mandate-radio">
                         {% block mollie_credit_card_mandate_block_input %}
@@ -30,6 +28,12 @@
                                          })|striptags }}
                                     </span>
                                 {% endblock %}
+
+                                {% if modifiable and mandate.beingUsedForSubscription %}
+                                    <span class="badge badge-lg order-item-status-badge order-item-status-badge-canceled" style="margin:0px;margin-left:20px;">
+                                     {{ "molliePayments.components.mandate.subscriptionBadge"|trans|striptags }}
+                                    </span>
+                                {% endif %}
 
                                 {% block mollie_credit_card_mandate_block_view %}
                                     {% if compactView %}
@@ -70,14 +74,14 @@
                             {% if modifiable %}
                                 {% block mollie_credit_card_mandate_block_actions %}
                                     <span class="mollie-credit-card-mandate-actions-item">
-                                        {% block mollie_credit_card_mandate_block_actions_remove %}
-                                            <span class="mollie-credit-card-mandate-actions-item-text mollie-credit-card-mandate-remove"
-                                                {{ dataBsToggleAttr }}="modal"
+                                    {% block mollie_credit_card_mandate_block_actions_remove %}
+                                        <span class="mollie-credit-card-mandate-actions-item-text mollie-credit-card-mandate-remove"
+                                        {{ dataBsToggleAttr }}="modal"
                                                 {{ dataBsTargetAttr }}="#{{ mandate.beingUsedForSubscription ? 'mollieCreditCardSubscriptionMandateRemoveModal' : 'mollieCreditCardMandateRemoveModal' }}"
                                             >
                                                 {{ "molliePayments.components.mandate.remove"|trans|striptags }}
                                             </span>
-                                        {% endblock %}
+                                    {% endblock %}
                                     </span>
                                 {% endblock %}
                             {% endif %}
