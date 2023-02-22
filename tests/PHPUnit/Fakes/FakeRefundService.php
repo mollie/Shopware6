@@ -111,7 +111,8 @@ class FakeRefundService implements RefundServiceInterface
      */
     public function getRefunds(OrderEntity $order): array
     {
-        // TODO: Implement getRefunds() method.
+        // FIXME: Only implements that nothing has been refunded yet, this might have to be changed.
+        return [];
     }
 
     /**
