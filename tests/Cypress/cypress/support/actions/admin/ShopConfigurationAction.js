@@ -28,7 +28,7 @@ export default class ShopConfigurationAction {
 
         cy.wait(500);
 
-        this._prepareShippingMethods();
+        this.prepareShippingMethods();
 
         cy.wait(500);
 
@@ -211,7 +211,7 @@ export default class ShopConfigurationAction {
      * Also add some shipping costs for better tests.
      * @private
      */
-    _prepareShippingMethods() {
+    prepareShippingMethods() {
         this.apiClient.get('/rule').then(rules => {
 
             if (rules === undefined || rules === null) {
@@ -253,10 +253,10 @@ export default class ShopConfigurationAction {
                                     ],
                                     "translations": {
                                         "de-DE": {
-                                            "tracking_url": "https://www.carrier.com/de/tracking/%s"
+                                            "trackingUrl": "https://www.carrier.com/de/tracking/%s"
                                         },
                                         "en-GB": {
-                                            "tracking_url": "https://www.carrier.com/en/tracking/%s"
+                                            "trackingUrl": "https://www.carrier.com/en/tracking/%s"
                                         }
                                     }
                                 };
