@@ -114,8 +114,8 @@ class RefundManager implements RefundManagerInterface
      * @param OrderEntity $order
      * @param RefundRequest $request
      * @param Context $context
-     * @return Refund
      * @throws \Mollie\Api\Exceptions\ApiException
+     * @return Refund
      */
     public function refund(OrderEntity $order, RefundRequest $request, Context $context): Refund
     {
@@ -301,7 +301,7 @@ class RefundManager implements RefundManagerInterface
         $refunds = $this->refundService->getRefunds($order);
 
         $refundCalculationHelper = new RefundCalculationHelper();
-        /** @var array $refund */
+        /** @var array<mixed> $refund */
         foreach ($refunds as $refund) {
             if (!isset($refund['metadata'])) {
                 continue;
@@ -315,7 +315,6 @@ class RefundManager implements RefundManagerInterface
             $composition = $metadata['composition'];
 
             foreach ($composition as $compositionItem) {
-
                 $refundCalculationHelper->addRefundItem(
                     new RefundItem(
                         $compositionItem['swLineId'],
@@ -323,7 +322,8 @@ class RefundManager implements RefundManagerInterface
                         $compositionItem['swReference'],
                         $compositionItem['quantity'],
                         $compositionItem['amount']
-                    ));
+                    )
+                );
             }
         }
 
@@ -332,7 +332,6 @@ class RefundManager implements RefundManagerInterface
         if ($order->getLineItems() instanceof OrderLineItemCollection) {
             /** @var OrderLineItemEntity $lineItem */
             foreach ($order->getLineItems() as $lineItem) {
-
                 $orderLineId = $this->getOrderLineId($lineItem);
 
                 $alreadyRefundedQuantity = $refundCalculationHelper->getRefundQuantityForMollieId($orderLineId);
@@ -350,7 +349,6 @@ class RefundManager implements RefundManagerInterface
         if ($order->getDeliveries() instanceof OrderDeliveryCollection) {
             /** @var OrderDeliveryEntity $delivery */
             foreach ($order->getDeliveries() as $delivery) {
-
                 $orderLineId = $this->getOrderLineId($delivery);
 
                 $alreadyRefundedQuantity = $refundCalculationHelper->getRefundQuantityForMollieId($orderLineId);

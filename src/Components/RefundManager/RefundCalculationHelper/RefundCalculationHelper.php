@@ -32,7 +32,7 @@ class RefundCalculationHelper
     {
         $refundQuantity = 0;
         foreach ($this->refundItems as $refundItem) {
-            if ($refundItem->getMollieLineID()===$orderLineId){
+            if ($refundItem->getMollieLineID()===$orderLineId) {
                 $refundQuantity += $refundItem->getQuantity();
             }
         }
@@ -47,7 +47,7 @@ class RefundCalculationHelper
     {
         $refundAmount = 0;
         foreach ($this->refundItems as $refundItem) {
-            if ($refundItem->getMollieLineID()===$orderLineId){
+            if ($refundItem->getMollieLineID()===$orderLineId) {
                 $refundAmount += $refundItem->getAmount();
             }
         }
