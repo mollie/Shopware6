@@ -95,6 +95,7 @@
 
         <service id="Kiener\MolliePayments\Service\Order\UpdateOrderLineItems">
             <argument type="service" id="order_line_item.repository"/>
+            <argument type="service" id="order_delivery.repository"/>
         </service>
 
 
