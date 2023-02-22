@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Service;
 
+use Kiener\MolliePayments\Components\RefundManager\DAL\Order\OrderExtension;
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderLineIdException;
 use Kiener\MolliePayments\Exception\OrderNumberNotFoundException;
@@ -80,8 +81,8 @@ class OrderService implements OrderServiceInterface
      *
      * @param string $orderId
      * @param Context $context
-     * @throws OrderNotFoundException
      * @return OrderEntity
+     * @throws OrderNotFoundException
      */
     public function getOrder(string $orderId, Context $context): OrderEntity
     {
@@ -107,7 +108,7 @@ class OrderService implements OrderServiceInterface
         $criteria->addAssociation('transactions.paymentMethod');
         $criteria->addAssociation('transactions.paymentMethod.appPaymentMethod.app');
         $criteria->addAssociation('transactions.stateMachineState');
-        $criteria->addAssociation('refunds'); # for refund manager
+        $criteria->addAssociation(OrderExtension::REFUND_PROPERTY_NAME); # for refund manager
 
 
         $order = $this->orderRepository->search($criteria, $context)->first();
@@ -147,8 +148,8 @@ class OrderService implements OrderServiceInterface
 
     /**
      * @param OrderEntity $order
-     * @throws CouldNotExtractMollieOrderIdException
      * @return string
+     * @throws CouldNotExtractMollieOrderIdException
      */
     public function getMollieOrderId(OrderEntity $order): string
     {

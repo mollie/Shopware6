@@ -58,6 +58,7 @@ context("Order Refunds", () => {
             createOrderAndOpenAdmin();
 
             const REFUND_DESCRIPTION = 'full refund with Cypress';
+            const REFUND_INTERNAL_DESCRIPTION = 'refund done';
 
             // -------------------------------------------------------------------------------
 
@@ -70,11 +71,13 @@ context("Order Refunds", () => {
             repoRefundManager.getFullRefundButton().should('be.disabled');
 
             // now start the partial refund
-            refundManager.fullRefund(REFUND_DESCRIPTION);
+            refundManager.fullRefund(REFUND_DESCRIPTION, REFUND_INTERNAL_DESCRIPTION);
 
             // verify that our refund now exists
             repoRefundManager.getFirstRefundStatusLabel().contains('Pending');
-            repoRefundManager.getFirstRefundDescriptionLabel().contains(REFUND_DESCRIPTION);
+
+            repoRefundManager.getFirstRefundPublicDescriptionLabel().contains(REFUND_DESCRIPTION);
+            repoRefundManager.getFirstRefundInternalDescriptionLabel().contains(REFUND_INTERNAL_DESCRIPTION);
 
             // -------------------------------------------------------------------------------
 
@@ -107,7 +110,7 @@ context("Order Refunds", () => {
 
             // verify that our refund now exists
             repoRefundManager.getFirstRefundStatusLabel().contains('Pending');
-            repoRefundManager.getFirstRefundDescriptionLabel().contains(REFUND_DESCRIPTION);
+            repoRefundManager.getFirstRefundPublicDescriptionLabel().contains(REFUND_DESCRIPTION);
             // because of (weird) number formats which might not be the same
             // all the time (even if they should) we just search within multiple formats
             elementHelper.assertContainsTexts(
@@ -144,7 +147,7 @@ context("Order Refunds", () => {
             // -------------------------------------------------------------------------------
 
             repoRefundManager.getFirstRefundStatusLabel().contains('Pending');
-            repoRefundManager.getFirstRefundDescriptionLabel().contains(REFUND_DESCRIPTION);
+            repoRefundManager.getFirstRefundPublicDescriptionLabel().contains(REFUND_DESCRIPTION);
 
             // verify that we have a valid composition (meaning item information)
             repoRefundManager.getFirstRefundCompositionLabel().contains('1 x');
@@ -180,11 +183,11 @@ context("Order Refunds", () => {
             repoRefundManager.getFullRefundButton().should('be.disabled');
 
             // now start the full refund
-            refundManager.fullRefund(REFUND_DESCRIPTION);
+            refundManager.fullRefund(REFUND_DESCRIPTION, '');
 
             // verify that our refund now exists
             repoRefundManager.getFirstRefundStatusLabel().contains('Pending');
-            repoRefundManager.getFirstRefundDescriptionLabel().contains(REFUND_DESCRIPTION);
+            repoRefundManager.getFirstRefundPublicDescriptionLabel().contains(REFUND_DESCRIPTION);
 
             // -------------------------------------------------------------------------------
 
