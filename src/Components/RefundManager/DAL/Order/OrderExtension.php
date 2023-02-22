@@ -12,7 +12,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 
 class OrderExtension extends EntityExtension
 {
-    const REFUND_PROPERTY_NAME = 'refunds';
+    const REFUND_PROPERTY_NAME = 'mollie_refunds';
 
     /**
      * @return string

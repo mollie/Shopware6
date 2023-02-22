@@ -45,12 +45,12 @@ class RefundHydrator
         $shopwareRefunds = $order->getExtension(OrderExtension::REFUND_PROPERTY_NAME);
 
         // Lookup the correct refund for the internal description
-        if ($shopwareRefunds != null) {
+        if ($shopwareRefunds !== null) {
             $shopwareRefunds = $shopwareRefunds->filterByProperty('mollieRefundId', $refund->id);
 
             /** @var RefundEntity $shopwareRefund */
             $shopwareRefund = $shopwareRefunds->first();
-            if ($shopwareRefund != null) {
+            if ($shopwareRefund !== null) {
                 $internalDescription = $shopwareRefund->getInternalDescription();
             }
         }
