@@ -301,12 +301,13 @@ class RefundManager implements RefundManagerInterface
         $refunds = $this->refundService->getRefunds($order);
 
         $refundCalculationHelper = new RefundCalculationHelper();
+
         foreach ($refunds as $refund) {
-            if (!isset($refund['metadata'])) {
+            if (!isset($refund->metadata)) {
                 continue;
             }
 
-            $metadata = $refund['metadata'];
+            $metadata = $refund->metadata;
             if (!isset($metadata['composition'])) {
                 continue;
             }
@@ -322,7 +323,7 @@ class RefundManager implements RefundManagerInterface
         if ($order->getLineItems() instanceof OrderLineItemCollection) {
             /** @var OrderLineItemEntity $lineItem */
             foreach ($order->getLineItems() as $lineItem) {
-                $orderLineId = $lineItem->getCustomFields()['mollie_payments']['order_line_id'];
+                $orderLineId = $this->getOrderLineId($lineItem);
                 $alreadyRefundedQuantity = $refundCalculationHelper->getRefundQuantityForMollieId($orderLineId);
                 $items[] = new RefundRequestItem(
                     $lineItem->getId(),
@@ -336,7 +337,7 @@ class RefundManager implements RefundManagerInterface
         if ($order->getDeliveries() instanceof OrderDeliveryCollection) {
             /** @var OrderDeliveryEntity $delivery */
             foreach ($order->getDeliveries() as $delivery) {
-                $orderLineId = $delivery->getCustomFields()['mollie_payments']['order_line_id'];
+                $orderLineId = $this->getOrderLineId($delivery);
                 $alreadyRefundedQuantity = $refundCalculationHelper->getRefundQuantityForMollieId($orderLineId);
                 $items[] = new RefundRequestItem(
                     $delivery->getId(),
@@ -448,5 +449,30 @@ class RefundManager implements RefundManagerInterface
         }
 
         return $serviceItems;
+    }
+
+    /**
+     * @param OrderDeliveryEntity|OrderLineItemEntity $lineItem
+     * @return string
+     */
+    public function getOrderLineId($lineItem): string
+    {
+        $customFields = $lineItem->getCustomFields();
+
+        if (!isset($customFields)) {
+            return "";
+        }
+
+        if (!isset($customFields['mollie_payments'])) {
+            return "";
+        }
+
+        $molliePayments = $customFields['mollie_payments'];
+
+        if (!isset($molliePayments['order_line_id'])) {
+            return "";
+        }
+
+        return $molliePayments['order_line_id'];
     }
 }

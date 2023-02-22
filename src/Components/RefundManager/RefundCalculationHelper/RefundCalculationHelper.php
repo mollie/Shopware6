@@ -5,7 +5,7 @@ namespace Kiener\MolliePayments\Components\RefundManager\RefundCalculationHelper
 
 class RefundCalculationHelper
 {
-    /** @var array */
+    /** @var array<string,int> */
     protected $refundArray;
 
     public function __construct()
@@ -28,18 +28,10 @@ class RefundCalculationHelper
     }
 
     /**
-     * @return array
-     */
-    public function getRefundArray(): array
-    {
-        return $this->refundArray;
-    }
-
-    /**
-     * @param $orderLineId
+     * @param string $orderLineId
      * @return int
      */
-    public function getRefundQuantityForMollieId($orderLineId): int
+    public function getRefundQuantityForMollieId(string $orderLineId): int
     {
         if (isset($this->refundArray[$orderLineId])) {
             return $this->refundArray[$orderLineId];
