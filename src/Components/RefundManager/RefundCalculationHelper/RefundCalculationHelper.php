@@ -3,28 +3,25 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\RefundManager\RefundCalculationHelper;
 
+use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
+
 class RefundCalculationHelper
 {
-    /** @var array<string,int> */
-    protected $refundArray;
+    /** @var RefundItem[] */
+    protected $refundItems;
 
     public function __construct()
     {
-        $this->refundArray = [];
+        $this->refundItems = [];
     }
 
     /**
-     * @param string $mollieLineId
-     * @param int $quantity
+     * @param RefundItem $refundItem
      * @return void
      */
-    public function addRefund(string $mollieLineId, int $quantity)
+    public function addRefundItem(RefundItem $refundItem)
     {
-        if (isset($this->refundArray[$mollieLineId])) {
-            $this->refundArray[$mollieLineId] = $this->refundArray[$mollieLineId] + $quantity;
-        } else {
-            $this->refundArray[$mollieLineId] = $quantity;
-        }
+        $this->refundItems[] = $refundItem;
     }
 
     /**
@@ -33,9 +30,27 @@ class RefundCalculationHelper
      */
     public function getRefundQuantityForMollieId(string $orderLineId): int
     {
-        if (isset($this->refundArray[$orderLineId])) {
-            return $this->refundArray[$orderLineId];
+        $refundQuantity = 0;
+        foreach ($this->refundItems as $refundItem) {
+            if ($refundItem->getMollieLineID()===$orderLineId){
+                $refundQuantity += $refundItem->getQuantity();
+            }
         }
-        return 0;
+        return $refundQuantity;
+    }
+
+    /**
+     * @param string $orderLineId
+     * @return float
+     */
+    public function getRefundAmountForMollieId(string $orderLineId): float
+    {
+        $refundAmount = 0;
+        foreach ($this->refundItems as $refundItem) {
+            if ($refundItem->getMollieLineID()===$orderLineId){
+                $refundAmount += $refundItem->getAmount();
+            }
+        }
+        return $refundAmount;
     }
 }

@@ -114,8 +114,8 @@ class RefundManager implements RefundManagerInterface
      * @param OrderEntity $order
      * @param RefundRequest $request
      * @param Context $context
-     * @throws \Mollie\Api\Exceptions\ApiException
      * @return Refund
+     * @throws \Mollie\Api\Exceptions\ApiException
      */
     public function refund(OrderEntity $order, RefundRequest $request, Context $context): Refund
     {
@@ -301,20 +301,29 @@ class RefundManager implements RefundManagerInterface
         $refunds = $this->refundService->getRefunds($order);
 
         $refundCalculationHelper = new RefundCalculationHelper();
-
+        /** @var array $refund */
         foreach ($refunds as $refund) {
-            if (!isset($refund->metadata)) {
+            if (!isset($refund['metadata'])) {
                 continue;
             }
 
-            $metadata = $refund->metadata;
+            $metadata = $refund['metadata'];
             if (!isset($metadata['composition'])) {
                 continue;
             }
 
             $composition = $metadata['composition'];
-            foreach ($composition as $lineItem) {
-                $refundCalculationHelper->addRefund($lineItem['mollieLineId'], $lineItem['quantity']);
+
+            foreach ($composition as $compositionItem) {
+
+                $refundCalculationHelper->addRefundItem(
+                    new RefundItem(
+                        $compositionItem['swLineId'],
+                        $compositionItem['mollieLineId'],
+                        $compositionItem['swReference'],
+                        $compositionItem['quantity'],
+                        $compositionItem['amount']
+                    ));
             }
         }
 
@@ -323,11 +332,15 @@ class RefundManager implements RefundManagerInterface
         if ($order->getLineItems() instanceof OrderLineItemCollection) {
             /** @var OrderLineItemEntity $lineItem */
             foreach ($order->getLineItems() as $lineItem) {
+
                 $orderLineId = $this->getOrderLineId($lineItem);
+
                 $alreadyRefundedQuantity = $refundCalculationHelper->getRefundQuantityForMollieId($orderLineId);
+                $alreadyRefundedAmount = $refundCalculationHelper->getRefundAmountForMollieId($orderLineId);
+
                 $items[] = new RefundRequestItem(
                     $lineItem->getId(),
-                    $lineItem->getTotalPrice(),
+                    $lineItem->getTotalPrice() - $alreadyRefundedAmount,
                     $lineItem->getQuantity() - $alreadyRefundedQuantity,
                     0
                 );
@@ -337,11 +350,15 @@ class RefundManager implements RefundManagerInterface
         if ($order->getDeliveries() instanceof OrderDeliveryCollection) {
             /** @var OrderDeliveryEntity $delivery */
             foreach ($order->getDeliveries() as $delivery) {
+
                 $orderLineId = $this->getOrderLineId($delivery);
+
                 $alreadyRefundedQuantity = $refundCalculationHelper->getRefundQuantityForMollieId($orderLineId);
+                $alreadyRefundedAmount = $refundCalculationHelper->getRefundAmountForMollieId($orderLineId);
+
                 $items[] = new RefundRequestItem(
                     $delivery->getId(),
-                    $delivery->getShippingCosts()->getTotalPrice(),
+                    $delivery->getShippingCosts()->getTotalPrice() - $alreadyRefundedAmount,
                     $delivery->getShippingCosts()->getQuantity() - $alreadyRefundedQuantity,
                     0
                 );
