@@ -81,8 +81,8 @@ class OrderService implements OrderServiceInterface
      *
      * @param string $orderId
      * @param Context $context
-     * @return OrderEntity
      * @throws OrderNotFoundException
+     * @return OrderEntity
      */
     public function getOrder(string $orderId, Context $context): OrderEntity
     {
@@ -148,8 +148,8 @@ class OrderService implements OrderServiceInterface
 
     /**
      * @param OrderEntity $order
-     * @return string
      * @throws CouldNotExtractMollieOrderIdException
+     * @return string
      */
     public function getMollieOrderId(OrderEntity $order): string
     {
