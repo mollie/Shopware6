@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Components\RefundManager\RefundCollection;
+namespace Kiener\MolliePayments\Components\RefundManager\RefundCalculationHelper;
 
-class RefundCollection
+class RefundCalculationHelper
 {
     /** @var array */
-    protected array $refundArray;
+    protected $refundArray;
 
     public function __construct()
     {
@@ -46,6 +46,4 @@ class RefundCollection
         }
         return 0;
     }
-
-
 }
