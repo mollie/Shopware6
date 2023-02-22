@@ -300,7 +300,7 @@ class RefundManager implements RefundManagerInterface
     {
 
         $refunds = $this->refundService->getRefunds($order);
-//        dump($refunds);
+
         $refundCollection = new RefundCollection();
         foreach ($refunds as $refund) {
             if (!isset($refund['metadata'])) {
@@ -315,7 +315,6 @@ class RefundManager implements RefundManagerInterface
             $composition = $metadata['composition'];
             foreach ($composition as $lineItem) {
                 $refundCollection->addRefund($lineItem['mollieLineId'], $lineItem['quantity']);
-
             }
         }
 
@@ -338,17 +337,17 @@ class RefundManager implements RefundManagerInterface
         if ($order->getDeliveries() instanceof OrderDeliveryCollection) {
             /** @var OrderDeliveryEntity $delivery */
             foreach ($order->getDeliveries() as $delivery) {
-//                dump($delivery);
+                $orderLineId = $delivery->getCustomFields()['mollie_payments']['order_line_id'];
                 $alreadyRefundedQuantity = $refundCollection->getRefundQuantityForMollieId($orderLineId);
                 $items[] = new RefundRequestItem(
                     $delivery->getId(),
                     $delivery->getShippingCosts()->getTotalPrice(),
-                    $delivery->getShippingCosts()->getQuantity(),
+                    $delivery->getShippingCosts()->getQuantity() - $alreadyRefundedQuantity,
                     0
                 );
             }
         }
-//        dd($items);
+
         return $items;
     }
 
