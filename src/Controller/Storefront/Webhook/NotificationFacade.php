@@ -6,6 +6,7 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatche
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
+use Kiener\MolliePayments\Event\MollieOrderBuildEvent;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
@@ -134,9 +135,9 @@ class NotificationFacade
      * @param string $swTransactionId
      * @param Context $context
      * @param string $actionId
-     * @throws \Exception
-     * @throws CustomerCouldNotBeFoundException
      * @return void
+     * @throws CustomerCouldNotBeFoundException
+     * @throws \Exception
      */
     public function onNotify(string $swTransactionId, Context $context, string $actionId): void
     {
@@ -220,14 +221,14 @@ class NotificationFacade
                 throw new \Exception('Order has no metadata: ' . $swOrder->getOrderNumber());
             }
 
-            $metaShortId = $metadata[MollieOrderBuildSubscriber::METADATA_SHORT_TRANSACTION_ID_KEY];
+            $metaShortId = $metadata[MollieOrderBuildEvent::METADATA_SHORT_TRANSACTION_ID_KEY];
             $transShortId = substr($swTransactionId, 0, 8);
 
             if ($metaShortId == $transShortId) {
                 $mollieOrderId = $mollieOrder->id;
             }
         }
-        
+
 
         if (!empty($mollieOrderId)) {
 

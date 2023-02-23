@@ -7,7 +7,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class MollieOrderBuildEvent
 {
-
+    public const METADATA_SHORT_TRANSACTION_ID_KEY = 'tid';
     /**
      * @var array<mixed>
      */
@@ -47,7 +47,8 @@ class MollieOrderBuildEvent
         $this->transactionId = $transactionId;
         $this->salesChannelContext = $salesChannelContext;
 
-        $this->metadata = [];
+        $shortId = substr($transactionId, 0, 8);
+        $this->metadata = [self::METADATA_SHORT_TRANSACTION_ID_KEY =>$shortId];
     }
 
     /**
