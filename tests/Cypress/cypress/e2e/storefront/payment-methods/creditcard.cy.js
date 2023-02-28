@@ -103,7 +103,7 @@ describe('Credit Card Components', () => {
         })
 
         // somehow mollie has a different behaviour at the moment? lets skip this for now
-        it.skip('C4107: Invalid Card Holder (Invalid Value)', () => {
+        it('C4107: Invalid Card Holder (Invalid Value)', () => {
 
             setUp();
 
@@ -117,7 +117,7 @@ describe('Credit Card Components', () => {
 
             cy.wait(1200);
 
-            cy.contains("The 'cardHolder' field should not contain only whitespace characters");
+            cy.contains("Card holder cannot be empty");
         })
 
         it('C4108: Invalid Card Number', () => {
