@@ -2,18 +2,13 @@
 
 namespace Kiener\MolliePayments\Struct\OrderLineItemEntity;
 
+use Kiener\MolliePayments\Struct\OrderXEntityAttributes;
 use Kiener\MolliePayments\Struct\Voucher\VoucherType;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
+use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 
-class OrderLineItemEntityAttributes
+class OrderLineItemEntityAttributes extends OrderXEntityAttributes
 {
-
-    /**
-     * @var OrderLineItemEntity
-     */
-    private $item;
-
-
     /**
      * @var string
      */
@@ -23,11 +18,6 @@ class OrderLineItemEntityAttributes
      * @var bool
      */
     private $subscriptionProduct;
-
-    /**
-     * @var string
-     */
-    private $mollieOrderLineID;
 
     /**
      * @var int
@@ -44,21 +34,26 @@ class OrderLineItemEntityAttributes
      */
     private $subscriptionRepetitionCount;
 
+    /**
+     * @var OrderLineItemEntity
+     */
+    private $item;
+
 
     /**
-     * @param OrderLineItemEntity $lineItem
+     * @param OrderLineItemEntity $entity
      */
-    public function __construct(OrderLineItemEntity $lineItem)
+    public function __construct(OrderLineItemEntity $entity)
     {
-        $this->item = $lineItem;
+        parent::__construct($entity);
+        $this->item = $entity;
+        $this->voucherType = $this->getCustomFieldValue($entity, 'voucher_type');
 
-        $this->voucherType = $this->getCustomFieldValue($lineItem, 'voucher_type');
-        $this->mollieOrderLineID = $this->getCustomFieldValue($lineItem, 'order_line_id');
+        $this->subscriptionProduct = (bool)$this->getCustomFieldValue($entity, 'subscription_enabled');
+        $this->subscriptionInterval = (int)$this->getCustomFieldValue($entity, 'subscription_interval');
+        $this->subscriptionIntervalUnit = (string)$this->getCustomFieldValue($entity, 'subscription_interval_unit');
+        $this->subscriptionRepetitionCount = (int)$this->getCustomFieldValue($entity, 'subscription_repetition');
 
-        $this->subscriptionProduct = (bool)$this->getCustomFieldValue($lineItem, 'subscription_enabled');
-        $this->subscriptionInterval = (int)$this->getCustomFieldValue($lineItem, 'subscription_interval');
-        $this->subscriptionIntervalUnit = (string)$this->getCustomFieldValue($lineItem, 'subscription_interval_unit');
-        $this->subscriptionRepetitionCount = (int)$this->getCustomFieldValue($lineItem, 'subscription_repetition');
     }
 
     /**
@@ -78,14 +73,6 @@ class OrderLineItemEntityAttributes
         }
 
         return $this->voucherType;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMollieOrderLineID(): string
-    {
-        return $this->mollieOrderLineID;
     }
 
     /**
@@ -142,25 +129,18 @@ class OrderLineItemEntityAttributes
         return false;
     }
 
-    /**
-     * Somehow there are 2 custom fields? in payload and custom fields?
-     * ....mhm...lets test always both
-     * @param OrderLineItemEntity $lineItem
-     * @param string $keyName
-     * @return string
-     */
-    private function getCustomFieldValue(OrderLineItemEntity $lineItem, string $keyName): string
+    protected function getCustomFieldValue(Entity $entity, string $keyName): string
     {
         $foundValue = '';
 
         # ---------------------------------------------------------------------------
-        # search in payload
+        # first search in payload
 
-        if ($lineItem->getPayload() !== null) {
+        if ($entity instanceof OrderLineItemEntity && $entity->getPayload() !== null) {
             # check if we have customFields in our payload
-            if (array_key_exists('customFields', $lineItem->getPayload())) {
+            if (array_key_exists('customFields', $entity->getPayload())) {
                 # load the custom fields
-                $customFields = $lineItem->getPayload()['customFields'];
+                $customFields = $entity->getPayload()['customFields'];
 
                 if (is_array($customFields)) {
                     # ---------------------------------------------------------------------------
@@ -180,28 +160,8 @@ class OrderLineItemEntityAttributes
             }
         }
 
-        # ---------------------------------------------------------------------------
-        # search in custom fields
-
-        if ($foundValue === '') {
-            # check if we have customFields
-            $customFields = $lineItem->getCustomFields();
-
-            if ($customFields !== null) {
-                # ---------------------------------------------------------------------------
-                # search in new structure
-                $fullKey = 'mollie_payments_product_' . $keyName;
-                $foundValue = (array_key_exists($fullKey, $customFields)) ? (string)$customFields[$fullKey] : '';
-
-                # old structure
-                # check if we have a mollie entry
-                if ($foundValue === '' && array_key_exists('mollie_payments', $customFields)) {
-                    # load the mollie entry
-                    $mollieData = $customFields['mollie_payments'];
-                    # assign our value if we have it
-                    $foundValue = (array_key_exists($keyName, $mollieData)) ? (string)$mollieData[$keyName] : '';
-                }
-            }
+        if ($foundValue == '') {
+            $foundValue = parent::getCustomFieldValue($entity, $keyName);
         }
 
         return $foundValue;

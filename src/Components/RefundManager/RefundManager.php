@@ -7,7 +7,6 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFact
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactoryInterface;
 use Kiener\MolliePayments\Components\RefundManager\Builder\RefundDataBuilder;
 use Kiener\MolliePayments\Components\RefundManager\Integrators\StockManagerInterface;
-use Kiener\MolliePayments\Components\RefundManager\RefundCalculationHelper\RefundCalculationHelper;
 use Kiener\MolliePayments\Components\RefundManager\RefundData\RefundData;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
@@ -19,6 +18,7 @@ use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
 use Kiener\MolliePayments\Service\Refund\RefundServiceInterface;
 use Kiener\MolliePayments\Struct\MollieApi\OrderLineMetaDataStruct;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
+use Kiener\MolliePayments\Struct\OrderDeliveryEntity\OrderDeliveryEntityAttributes;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Refund;
@@ -114,8 +114,8 @@ class RefundManager implements RefundManagerInterface
      * @param OrderEntity $order
      * @param RefundRequest $request
      * @param Context $context
-     * @throws \Mollie\Api\Exceptions\ApiException
      * @return Refund
+     * @throws \Mollie\Api\Exceptions\ApiException
      */
     public function refund(OrderEntity $order, RefundRequest $request, Context $context): Refund
     {
@@ -153,7 +153,7 @@ class RefundManager implements RefundManagerInterface
             # we have a full refund, but only with amount
             # and no items. to make sure that we have clean data
             # we have to extract all items, so that they will be added to the metadata
-            $requestItems = $this->buildRequestItemsFromOrder($order);
+            $requestItems = $this->buildRequestItemsFromOrder($order, $context);
             $request->setItems($requestItems);
             $this->appendRoundingItemFromMollieOrder($request, $mollieOrder);
 
@@ -296,47 +296,20 @@ class RefundManager implements RefundManagerInterface
      * @param OrderEntity $order
      * @return array<mixed>
      */
-    private function buildRequestItemsFromOrder(OrderEntity $order)
+    private function buildRequestItemsFromOrder(OrderEntity $order, Context $context)
     {
-        $refunds = $this->refundService->getRefunds($order);
-
-        $refundCalculationHelper = new RefundCalculationHelper();
-        /** @var array<mixed> $refund */
-        foreach ($refunds as $refund) {
-            if (!isset($refund['metadata'])) {
-                continue;
-            }
-
-            $metadata = $refund['metadata'];
-            if (!isset($metadata['composition'])) {
-                continue;
-            }
-
-            $composition = $metadata['composition'];
-
-            foreach ($composition as $compositionItem) {
-                $refundCalculationHelper->addRefundItem(
-                    new RefundItem(
-                        $compositionItem['swLineId'],
-                        $compositionItem['mollieLineId'],
-                        $compositionItem['swReference'],
-                        $compositionItem['quantity'],
-                        $compositionItem['amount']
-                    )
-                );
-            }
-        }
-
         $items = [];
+
+        $refundData = $this->builderData->buildRefundData($order, $context);
 
         if ($order->getLineItems() instanceof OrderLineItemCollection) {
             /** @var OrderLineItemEntity $lineItem */
             foreach ($order->getLineItems() as $lineItem) {
-                $orderItemAttributes = new OrderLineItemEntityAttributes($lineItem);
-                $orderLineId = $orderItemAttributes->getMollieOrderLineID();
-                $alreadyRefundedQuantity = $refundCalculationHelper->getRefundQuantityForMollieId($orderLineId);
-                $alreadyRefundedAmount = $refundCalculationHelper->getRefundAmountForMollieId($orderLineId);
+                $orderLineItemAttributes = new OrderLineItemEntityAttributes($lineItem);
 
+                $alreadyRefundedQuantity = $refundData->getRefundedQuantity($orderLineItemAttributes->getMollieOrderLineID());
+                $alreadyRefundedAmount = $refundData->getRefundedAmount($orderLineItemAttributes->getMollieOrderLineID());
+                dump($alreadyRefundedQuantity,$alreadyRefundedAmount);
                 $items[] = new RefundRequestItem(
                     $lineItem->getId(),
                     $lineItem->getTotalPrice() - $alreadyRefundedAmount,
@@ -349,11 +322,11 @@ class RefundManager implements RefundManagerInterface
         if ($order->getDeliveries() instanceof OrderDeliveryCollection) {
             /** @var OrderDeliveryEntity $delivery */
             foreach ($order->getDeliveries() as $delivery) {
-                $orderItemAttributes = new OrderLineItemEntityAttributes($lineItem);
-                $orderLineId = $orderItemAttributes->getMollieOrderLineID();
-                $alreadyRefundedQuantity = $refundCalculationHelper->getRefundQuantityForMollieId($orderLineId);
-                $alreadyRefundedAmount = $refundCalculationHelper->getRefundAmountForMollieId($orderLineId);
+                $orderLineItemAttributes = new OrderDeliveryEntityAttributes($delivery);
 
+                $alreadyRefundedQuantity = $refundData->getRefundedQuantity($orderLineItemAttributes->getMollieOrderLineID());
+                $alreadyRefundedAmount = $refundData->getRefundedAmount($orderLineItemAttributes->getMollieOrderLineID());
+                dump($alreadyRefundedQuantity,$alreadyRefundedAmount);
                 $items[] = new RefundRequestItem(
                     $delivery->getId(),
                     $delivery->getShippingCosts()->getTotalPrice() - $alreadyRefundedAmount,
@@ -465,4 +438,32 @@ class RefundManager implements RefundManagerInterface
 
         return $serviceItems;
     }
+
+
+    /**
+     * Get the orderLineId from both OrderDeliveryEntity and OrderLineItemEntity
+     * @param OrderDeliveryEntity|OrderLineItemEntity $lineItem
+     * @return string
+     */
+    public function getOrderLineId($lineItem): string
+    {
+        $customFields = $lineItem->getCustomFields();
+
+        if (!isset($customFields)) {
+            return "";
+        }
+
+        if (!isset($customFields['mollie_payments'])) {
+            return "";
+        }
+
+        $molliePayments = $customFields['mollie_payments'];
+
+        if (!isset($molliePayments['order_line_id'])) {
+            return "";
+        }
+
+        return $molliePayments['order_line_id'];
+    }
+
 }

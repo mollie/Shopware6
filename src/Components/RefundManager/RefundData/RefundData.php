@@ -3,6 +3,11 @@
 namespace Kiener\MolliePayments\Components\RefundManager\RefundData;
 
 use Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem\AbstractItem;
+use Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem\DeliveryItem;
+use Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem\ProductItem;
+use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
+use Kiener\MolliePayments\Struct\OrderDeliveryEntity\OrderDeliveryEntityAttributes;
+use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Mollie\Api\Resources\Refund;
 
 class RefundData
@@ -42,6 +47,7 @@ class RefundData
      * @var float
      */
     private $roundingItemTotal;
+
 
     /**
      * @param AbstractItem[] $cartItems
@@ -155,5 +161,63 @@ class RefundData
             'cart' => $hydratedOrderItems,
             'refunds' => $refundsArray,
         ];
+    }
+
+    /**
+     * @param string $mollieId
+     * @return int
+     */
+    public function getRefundedQuantity(string $mollieId): int
+    {
+        foreach ($this->orderItems as $orderItem) {
+            if ($orderItem instanceof ProductItem) {
+                $orderItemAttributes = new OrderLineItemEntityAttributes($orderItem->getLineItem());
+            }
+
+            if ($orderItem instanceof DeliveryItem) {
+                $orderItemAttributes = new OrderDeliveryEntityAttributes($orderItem->getDelivery());
+            }
+
+            if (empty($orderItemAttributes)) {
+                continue;
+            }
+
+            if ($mollieId === $orderItemAttributes->getMollieOrderLineID()) {
+                $refundArray = $orderItem->toArray();
+                return $refundArray['refunded'];
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * @param string $mollieId
+     * @return float
+     */
+    public function getRefundedAmount(string $mollieId):float
+    {
+        $totalAmount = 0;
+
+        ## The amount is being calculated via the refunds because it might have been a custom amount.
+        foreach ($this->refunds as $refund) {
+            if (!isset($refund['metadata'])) {
+                continue;
+            }
+
+            $metadata = $refund['metadata'];
+            if (!isset($metadata['composition'])) {
+                continue;
+            }
+
+            $composition = $metadata['composition'];
+
+            foreach ($composition as $compositionItem) {
+                if ($compositionItem['mollieLineId']===$mollieId){
+                    $totalAmount+=$compositionItem['amount'];
+                }
+
+            }
+        }
+        return $totalAmount;
     }
 }
