@@ -23,6 +23,7 @@ use Shopware\Core\Checkout\Payment\Exception\CustomerCanceledAsyncPaymentExcepti
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
@@ -60,7 +61,7 @@ class MolliePaymentFinalize
     private $subscriptionManager;
 
     /**
-     * @var EntityRepository
+     * @var EntityRepositoryInterface
      */
     private $repoCustomer;
 
@@ -82,10 +83,11 @@ class MolliePaymentFinalize
      * @param Order $mollieOrderService
      * @param OrderService $orderService
      * @param SubscriptionManager $subscriptionManager
+     * @param EntityRepositoryInterface $repoCustomer
      * @param FlowBuilderFactory $flowBuilderFactory
      * @param FlowBuilderEventFactory $flowBuilderEventFactory
      */
-    public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, Order $mollieOrderService, OrderService $orderService, SubscriptionManager $subscriptionManager, EntityRepository $repoCustomer, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory)
+    public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, Order $mollieOrderService, OrderService $orderService, SubscriptionManager $subscriptionManager, EntityRepositoryInterface $repoCustomer, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory)
     {
         $this->orderStatusConverter = $orderStatusConverter;
         $this->orderStatusUpdater = $orderStatusUpdater;
