@@ -210,6 +210,16 @@
             <helpText lang="de-DE">Sofern aktiv, schickt das Plugin automatisch eine Versand Mitteilung an Mollie, sobald der Lieferstatus auf 'verschickt' übergeleitet wird.</helpText>
             <helpText lang="nl-NL">Indien ingeschakeld, zal de plugin automatisch een verzending activeren bij Mollie wanneer de leveringstatus overgaat naar ‘verzonden’.</helpText>
         </input-field>
+        <input-field type="bool">
+            <name>automaticCancellation</name>
+            <defaultValue>true</defaultValue>
+            <label>Automatic Cancellation</label>
+            <label lang="de-DE">Automatische Stornierung</label>
+            <label lang="nl-NL">Automatische annulering</label>
+            <helpText>If enabled, the plugin will automatically cancel Mollie orders when being cancelled in Shopware. Only orders that are created, authorized or partially shipped will be cancelled. If partially shipped, only items that where not shipped will be cancelled.</helpText>
+            <helpText lang="de-DE">Wenn aktiviert, storniert das Plugin Mollie-Bestellungen automatisch, wenn sie in Shopware storniert werden. Nur Bestellungen, die erstellt, autorisiert oder teilweise versandt wurden, werden storniert. Bei teilweisem Versand werden nur Artikel storniert, die nicht versendet wurden.</helpText>
+            <helpText lang="nl-NL">Indien ingeschakeld, zal de plug-in automatisch Mollie-bestellingen annuleren wanneer ze worden geannuleerd in Shopware. Alleen bestellingen die zijn aangemaakt, geautoriseerd of gedeeltelijk zijn verzonden, worden geannuleerd. Indien gedeeltelijk verzonden, worden alleen artikelen geannuleerd die niet zijn verzonden.</helpText>
+        </input-field>
     </card>
     <card>
         <title>Refund Manager</title>
