@@ -28,6 +28,10 @@ export default class ShopConfigurationAction {
 
         cy.wait(500);
 
+        this._configureShop();
+
+        cy.wait(500);
+
         this.prepareShippingMethods();
 
         cy.wait(500);
@@ -268,6 +272,22 @@ export default class ShopConfigurationAction {
                 }
             });
         });
+    }
+
+    /**
+     *
+     * @private
+     */
+    _configureShop() {
+        const data = {};
+
+        const config = {
+            "core.loginRegistration.showAccountTypeSelection": true,
+        };
+
+        data[null] = config;
+
+        this.apiClient.post('/_action/system-config/batch', data);
     }
 
     /**

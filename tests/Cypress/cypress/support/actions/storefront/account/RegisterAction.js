@@ -13,10 +13,13 @@ export default class RegisterAction {
 
         cy.visit('/account');
 
+        repo.getAccountType().select('Commercial');
         repo.getSalutation().select('Mr.');
 
         repo.getFirstname().clear().type('Mollie');
         repo.getLastname().clear().type('Mollie');
+
+        repo.getCompany().clear().type('Mollie');
 
         repo.getEmail().clear().type(email);
         repo.getPassword().clear().type(password);

@@ -42,6 +42,7 @@ const device = devices.getFirstDevice();
 const payments = [
     {caseId: 'C4101', key: 'credit-card', name: 'Credit card'},
     {caseId: 'C4111', key: 'paypal', name: 'PayPal'},
+    {caseId: 'C466903', key: 'billie', name: 'Billie'},
     {caseId: 'C4114', key: 'klarnapaynow', name: 'Pay now'},
     {caseId: 'C4115', key: 'klarnapaylater', name: 'Pay later'},
     {caseId: 'C4117', key: 'klarnasliceit', name: 'Slice it'},
@@ -116,6 +117,10 @@ context("Checkout Tests", () => {
                     mollieSandbox.initSandboxCookie();
 
                     if (payment.key === 'klarnapaylater' || payment.key === 'klarnapaynow' || payment.key === 'klarnasliceit') {
+
+                        molliePayment.selectAuthorized();
+
+                    } else if (payment.key === 'billie') {
 
                         molliePayment.selectAuthorized();
 
