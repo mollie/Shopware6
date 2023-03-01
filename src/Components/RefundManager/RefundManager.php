@@ -332,8 +332,8 @@ class RefundManager implements RefundManagerInterface
         if ($order->getLineItems() instanceof OrderLineItemCollection) {
             /** @var OrderLineItemEntity $lineItem */
             foreach ($order->getLineItems() as $lineItem) {
-                $orderLineId = $this->getOrderLineId($lineItem);
-
+                $orderItemAttributes = new OrderLineItemEntityAttributes($lineItem);
+                $orderLineId = $orderItemAttributes->getMollieOrderLineID();
                 $alreadyRefundedQuantity = $refundCalculationHelper->getRefundQuantityForMollieId($orderLineId);
                 $alreadyRefundedAmount = $refundCalculationHelper->getRefundAmountForMollieId($orderLineId);
 
@@ -349,8 +349,8 @@ class RefundManager implements RefundManagerInterface
         if ($order->getDeliveries() instanceof OrderDeliveryCollection) {
             /** @var OrderDeliveryEntity $delivery */
             foreach ($order->getDeliveries() as $delivery) {
-                $orderLineId = $this->getOrderLineId($delivery);
-
+                $orderItemAttributes = new OrderLineItemEntityAttributes($lineItem);
+                $orderLineId = $orderItemAttributes->getMollieOrderLineID();
                 $alreadyRefundedQuantity = $refundCalculationHelper->getRefundQuantityForMollieId($orderLineId);
                 $alreadyRefundedAmount = $refundCalculationHelper->getRefundAmountForMollieId($orderLineId);
 
@@ -464,30 +464,5 @@ class RefundManager implements RefundManagerInterface
         }
 
         return $serviceItems;
-    }
-
-    /**
-     * @param OrderDeliveryEntity|OrderLineItemEntity $lineItem
-     * @return string
-     */
-    public function getOrderLineId($lineItem): string
-    {
-        $customFields = $lineItem->getCustomFields();
-
-        if (!isset($customFields)) {
-            return "";
-        }
-
-        if (!isset($customFields['mollie_payments'])) {
-            return "";
-        }
-
-        $molliePayments = $customFields['mollie_payments'];
-
-        if (!isset($molliePayments['order_line_id'])) {
-            return "";
-        }
-
-        return $molliePayments['order_line_id'];
     }
 }
