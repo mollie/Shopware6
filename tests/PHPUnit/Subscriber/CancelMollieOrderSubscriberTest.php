@@ -22,6 +22,6 @@ class CancelMollieOrderSubscriberTest extends TestCase
             OrderStatus::STATUS_SHIPPING
         ];
 
-        self::assertSame($expected, CancelMollieOrderSubscriber::MOLLIE_CANCEL_ORDER_STATES);
+        self::assertSame($expected, CancelMollieOrderSubscriber::ALLOWED_CANCELLABLE_MOLLIE_STATES);
     }
 }

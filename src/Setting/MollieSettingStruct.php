@@ -111,6 +111,11 @@ class MollieSettingStruct extends Struct
     /**
      * @var bool
      */
+    protected $automaticCancellation;
+
+    /**
+     * @var bool
+     */
     protected $refundManagerEnabled;
 
     /**
@@ -616,6 +621,22 @@ class MollieSettingStruct extends Struct
     public function setAutomaticShipping(bool $automaticShipping): void
     {
         $this->automaticShipping = $automaticShipping;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAutomaticCancellation(): bool
+    {
+        return $this->automaticCancellation;
+    }
+
+    /**
+     * @param bool $automaticCancellation
+     */
+    public function setAutomaticCancellation(bool $automaticCancellation): void
+    {
+        $this->automaticCancellation = $automaticCancellation;
     }
 
     /**
