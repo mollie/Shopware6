@@ -16,19 +16,28 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class MailServiceTest extends TestCase
 {
-    /**
-     * @var MailService
-     */
-    protected $mailService;
+
+    private const RECIPIENT_DE = 'Mollie Support DE <meinsupport@mollie.com>';
+    private const RECIPIENT_INTL = 'Mollie Support <info@mollie.com>';
+
 
     /**
-     * @var Email
+     * @var MailFactory
      */
-    protected $email;
+    private $mailFactory;
 
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject|DataValidator|(DataValidator&\PHPUnit\Framework\MockObject\MockObject)
+     */
+    private $dataValidator;
+
+
+    /**
+     * @return void
+     */
     public function setUp(): void
     {
-        $dataValidator = $this->createMock(DataValidator::class);
+        $this->dataValidator = $this->createMock(DataValidator::class);
 
         $validator = $this->createConfiguredMock(ValidatorInterface::class, [
             'validate' => (new ConstraintViolationList())
@@ -37,125 +46,101 @@ class MailServiceTest extends TestCase
         $fileSystem = $this->createConfiguredMock(FilesystemInterface::class, [
             'getMimetype' => 'application/fake'
         ]);
+
         $fileSystem->method('read')->willReturnCallback(function ($url) {
             return sprintf('Fake body for url %s', $url);
         });
 
-        $mailFactory = new MailFactory($validator, $fileSystem);
+        $this->mailFactory = new MailFactory($validator, $fileSystem);
+    }
 
-        $mailSender = $this->createMock(MailSender::class);
-        $mailSender->method('send')->willReturnCallback(function (Email $email) {
-            $this->assertEquals($this->email->getSubject(), $email->getSubject());
-            $this->assertEquals($this->email->getTo(), $email->getTo());
-            $this->assertEquals($this->email->getFrom(), $email->getFrom());
-            $this->assertEquals($this->email->getReturnPath(), $email->getReturnPath());
-            $this->assertEquals($this->email->getReplyTo(), $email->getReplyTo());
-            $this->assertEquals($this->email->getHtmlBody(), $email->getHtmlBody());
-            $this->assertEquals($this->email->getTextBody(), $email->getTextBody());
 
-            foreach($this->email->getAttachments() as $index => $expectedAttachment) {
-                $actualAttachment = $email->getAttachments()[$index] ?? null;
+    /**
+     * This test verifies that we send the correct mail data
+     * to the mail server.
+     *
+     * @dataProvider getMailData
+     *
+     * @param $expectedData
+     * @param $mailData
+     * @param $attachments
+     * @return void
+     */
+    public function testMailSenderGetsCorrectData($expectedData, $mailData, $attachments)
+    {
+        $expectedMail = $this->buildExpectedMailObject(
+            $mailData,
+            $attachments,
+            $expectedData
+        );
 
-                $this->assertInstanceOf(DataPart::class, $actualAttachment);
-                $this->assertEquals($expectedAttachment->getBody(), $actualAttachment->getBody());
+        $mailSenderMock = $this->createMock(MailSender::class);
+
+        $mailSenderMock->method('send')->willReturnCallback(function (Email $actualMail) use ($expectedMail) {
+
+            $this->assertEquals($expectedMail->getSubject(), $actualMail->getSubject(), 'subject is wrong');
+            $this->assertEquals($expectedMail->getTo(), $actualMail->getTo(), 'to-email is wrong');
+            $this->assertEquals($expectedMail->getFrom(), $actualMail->getFrom(), 'from-email is wrong');
+            $this->assertEquals($expectedMail->getReturnPath(), $actualMail->getReturnPath(), 'return path is wrong');
+            $this->assertEquals($expectedMail->getReplyTo(), $actualMail->getReplyTo(), 'reply-to is wrong');
+            $this->assertEquals($expectedMail->getHtmlBody(), $actualMail->getHtmlBody(), 'html body is wrong');
+            $this->assertEquals($expectedMail->getTextBody(), $actualMail->getTextBody(), 'text body is wrong');
+
+            $index = 0;
+
+            foreach ($expectedMail->getAttachments() as $expectedAttachment) {
+                $actualAttachment = $actualMail->getAttachments()[$index] ?? null;
+
+                $this->assertInstanceOf(DataPart::class, $actualAttachment, 'No attachment found in actual mail');
+                $this->assertEquals($expectedAttachment->getBody(), $actualAttachment->getBody(), 'attachment body is wrong');
+
+                $index++;
             }
         });
 
-        $this->mailService = new MailService(
-            $dataValidator,
-            $mailFactory,
-            $mailSender,
-            new NullLogger()
+
+        $mailService = new MailService(
+            $this->dataValidator,
+            $this->mailFactory,
+            $mailSenderMock
         );
+
+        $mailService->send($mailData, $attachments);
     }
+
 
     /**
-     * @param $data
-     * @param $attachments
-     * @return void
-     * @dataProvider mailData
+     * @return array
      */
-    public function testSendingMail($data, $attachments = [])
-    {
-        $this->prepareExpectedEmail($data, $attachments);
-        $this->mailService->send($data, $attachments);
-    }
-
-    /**
-     * Mimic the mailfactory
-     * @param $data
-     * @param $attachments
-     * @return void
-     */
-    private function prepareExpectedEmail($data, $attachments)
-    {
-        $this->email = new Email();
-
-        if (isset($data['subject'])) {
-            $this->email->subject($data['subject']);
-        }
-
-        if (isset($data['recipientLocale']) && $data['recipientLocale'] === 'de-DE') {
-            $this->email->to('Mollie Support DE <meinsupport@mollie.com>');
-        } else {
-            $this->email->to('Mollie Support <info@mollie.com>');
-        }
-
-        if (isset($data['noReplyHost'])) {
-            $this->email->from(sprintf('no-reply@%s <no-reply@%s>', $data['noReplyHost'], $data['noReplyHost']));
-        }
-
-        if (isset($data['replyToName']) && isset($data['replyToEmail'])) {
-            $this->email->returnPath(sprintf('%s <%s>', $data['replyToName'], $data['replyToEmail']));
-            $this->email->replyTo(sprintf('%s <%s>', $data['replyToName'], $data['replyToEmail']));
-        }
-
-        if (isset($data['contentHtml'])) {
-            $html = sprintf('<div style="font-family:arial; font-size:12px;">%s</div>', $data['contentHtml']);
-            $text = strip_tags(str_replace(['</p>', '<br>', '<br/>'], "\r\n", $data['contentHtml']));
-
-            $this->email->html($html);
-            $this->email->text($text);
-        }
-
-        foreach ($attachments as $attachment) {
-            if (is_string($attachment) && file_exists($attachment)) {
-                $this->email->embed(
-                    sprintf('Fake body for url %s', $attachment),
-                    basename($attachment),
-                    'application/fake'
-                );
-            } else if (is_array($attachment)
-                && array_key_exists('content', $attachment)
-                && array_key_exists('fileName', $attachment)
-                && array_key_exists('mimeType', $attachment)) {
-                $this->email->embed($attachment['content'], $attachment['fileName'], $attachment['mimeType']);
-            }
-        }
-    }
-
-    public function mailData()
+    public function getMailData(): array
     {
         return [
-            'Mail German support, no attachments' => [
+            '1. German support, no attachments' => [
                 [
-                    'subject' => 'subject',
-                    'noReplyHost' => 'localhost',
-                    'recipientLocale' => 'de-DE',
-                    'contentHtml' => 'Hello world',
-                    'replyToName' => 'Max Mustermann',
-                    'replyToEmail' => 'maxmustermann@localhost'
-                ]
-            ],
-            'Mail German support, binary attachment' => [
-                [
-                    'subject' => 'subject',
-                    'noReplyHost' => 'localhost',
-                    'recipientLocale' => 'de-DE',
-                    'contentHtml' => 'Hello world',
-                    'replyToName' => 'Max Mustermann',
-                    'replyToEmail' => 'maxmustermann@localhost'
+                    'expectedTo' => self::RECIPIENT_DE,
                 ],
+                $this->buildMailArrayData(
+                    'Help needed',
+                    'localhost',
+                    'de-DE',
+                    'Hello world',
+                    'Max Mustermann',
+                    'maxmustermann@localhost'
+                ),
+                [],
+            ],
+            '2. German support, binary attachment' => [
+                [
+                    'expectedTo' => self::RECIPIENT_DE,
+                ],
+                $this->buildMailArrayData(
+                    'Help needed',
+                    'localhost',
+                    'de-DE',
+                    'Hello world',
+                    'Max Mustermann',
+                    'maxmustermann@localhost'
+                ),
                 [
                     [
                         'content' => 'foo',
@@ -164,38 +149,111 @@ class MailServiceTest extends TestCase
                     ]
                 ]
             ],
-            'Mail German support, url attachment' => [
+            '3. German support, url attachment' => [
                 [
-                    'subject' => 'subject',
-                    'noReplyHost' => 'localhost',
-                    'recipientLocale' => 'de-DE',
-                    'contentHtml' => 'Hello world',
-                    'replyToName' => 'Max Mustermann',
-                    'replyToEmail' => 'maxmustermann@localhost'
+                    'expectedTo' => self::RECIPIENT_DE,
                 ],
+                $this->buildMailArrayData(
+                    'Help needed',
+                    'localhost',
+                    'de-DE',
+                    'Hello world',
+                    'Max Mustermann',
+                    'maxmustermann@localhost'
+                ),
                 [
-                    __FILE__ // Test with a real file because we check if the file exists before adding it as attachment
+                    __FILE__,
                 ]
             ],
-            'Mail International support, no attachments' => [
+            '4. International support, no attachments' => [
                 [
-                    'subject' => 'subject',
-                    'noReplyHost' => 'localhost',
-                    'recipientLocale' => null,
-                    'contentHtml' => 'Hello world',
-                    'replyToName' => 'Max Mustermann',
-                    'replyToEmail' => 'maxmustermann@localhost'
-                ]
+                    'expectedTo' => self::RECIPIENT_INTL,
+                ],
+                $this->buildMailArrayData(
+                    'Help needed',
+                    'localhost',
+                    'en-GB',
+                    'Hello world',
+                    'Max Mustermann',
+                    'maxmustermann@localhost'
+                )
+                ,
+                [],
             ],
-            'Mail International support without passing locale, no attachments' => [
+            '5. International support without passing locale, no attachments' => [
                 [
-                    'subject' => 'subject',
-                    'noReplyHost' => 'localhost',
-                    'contentHtml' => 'Hello world',
-                    'replyToName' => 'Max Mustermann',
-                    'replyToEmail' => 'maxmustermann@localhost'
-                ]
+                    'expectedTo' => self::RECIPIENT_INTL
+                ],
+                $this->buildMailArrayData(
+                    'Help needed',
+                    'localhost',
+                    '',
+                    'Hello world',
+                    'Max Mustermann',
+                    'maxmustermann@localhost'
+                ),
+                [],
             ],
         ];
     }
+
+    /**
+     * @param string $subject
+     * @param string $host
+     * @param string $locale
+     * @param string $html
+     * @param string $replyName
+     * @param string $replyMail
+     * @return string[]
+     */
+    private function buildMailArrayData(string $subject, string $host, string $locale, string $html, string $replyName, string $replyMail)
+    {
+        return [
+            'subject' => $subject,
+            'noReplyHost' => $host,
+            'recipientLocale' => $locale,
+            'contentHtml' => $html,
+            'replyToName' => $replyName,
+            'replyToEmail' => $replyMail,
+        ];
+    }
+
+    /**
+     * @param array $data
+     * @param array $attachments
+     * @param array $expectedData
+     * @return Email
+     */
+    private function buildExpectedMailObject(array $data, array $attachments, array $expectedData)
+    {
+        $email = new Email();
+
+        $email->subject($data['subject']);
+        $email->to($expectedData['expectedTo']);
+
+        $email->from(sprintf('no-reply@%s <no-reply@%s>', $data['noReplyHost'], $data['noReplyHost']));
+        $email->returnPath(sprintf('%s <%s>', $data['replyToName'], $data['replyToEmail']));
+        $email->replyTo(sprintf('%s <%s>', $data['replyToName'], $data['replyToEmail']));
+
+
+        $html = sprintf('<div style="font-family:arial; font-size:12px;">%s</div>', $data['contentHtml']);
+        $text = strip_tags(str_replace(['</p>', '<br>', '<br/>'], "\r\n", $html));
+
+        $email->html($html);
+        $email->text($text);
+
+        foreach ($attachments as $attachment) {
+
+            if (is_string($attachment)) {
+                # embed our file if we have a filename
+                $email->embedFromPath($attachment, basename($attachment), 'application/fake');
+                continue;
+            }
+
+            $email->embed($attachment['content'], $attachment['fileName'], $attachment['mimeType']);
+        }
+
+        return $email;
+    }
+
 }
