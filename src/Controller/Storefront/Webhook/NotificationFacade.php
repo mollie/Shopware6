@@ -288,8 +288,10 @@ class NotificationFacade
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('id', $transactionId));
         $criteria->addAssociation('order');
+        $criteria->addAssociation('order.salesChannel');
         $criteria->addAssociation('order.lineItems');
         $criteria->addAssociation('order.currency');
+        $criteria->addAssociation('order.transactions');
         $criteria->addAssociation('paymentMethod');
 
         return $this->repoOrderTransactions->search($criteria, $context)->first();
