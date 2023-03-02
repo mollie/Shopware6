@@ -42,6 +42,13 @@
             <tag name="shopware.payment.method.async"/>
         </service>
 
+        <!-- Billie PaymentHandler -->
+        <service id="Kiener\MolliePayments\Handler\Method\BilliePayment" class="Kiener\MolliePayments\Handler\Method\BilliePayment">
+            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="service_container"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+
         <!-- Credit Card PaymentHandler -->
         <service id="Kiener\MolliePayments\Handler\Method\CreditCardPayment" class="Kiener\MolliePayments\Handler\Method\CreditCardPayment">
             <argument type="service" id="mollie_payments.logger"/>

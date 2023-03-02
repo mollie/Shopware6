@@ -6,6 +6,7 @@ use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Handler\Method\BanContactPayment;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Kiener\MolliePayments\Handler\Method\BelfiusPayment;
+use Kiener\MolliePayments\Handler\Method\BilliePayment;
 use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
 use Kiener\MolliePayments\Handler\Method\EpsPayment;
 use Kiener\MolliePayments\Handler\Method\GiftCardPayment;
@@ -369,6 +370,7 @@ class PaymentMethodService
             ApplePayPayment::class,
             BanContactPayment::class,
             BankTransferPayment::class,
+            BilliePayment::class,
             BelfiusPayment::class,
             CreditCardPayment::class,
             EpsPayment::class,

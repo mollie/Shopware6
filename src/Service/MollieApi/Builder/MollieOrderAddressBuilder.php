@@ -35,6 +35,11 @@ class MollieOrderAddressBuilder
             $data['streetAdditional'] = $streetAdditional;
         }
 
+        $company = trim((string)$address->getCompany());
+        if (!empty($company)) {
+            $data['organizationName'] = $company;
+        }
+
         return $data;
     }
 }
