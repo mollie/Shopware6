@@ -114,8 +114,8 @@ class RefundManager implements RefundManagerInterface
      * @param OrderEntity $order
      * @param RefundRequest $request
      * @param Context $context
-     * @return Refund
      * @throws \Mollie\Api\Exceptions\ApiException
+     * @return Refund
      */
     public function refund(OrderEntity $order, RefundRequest $request, Context $context): Refund
     {
@@ -309,7 +309,7 @@ class RefundManager implements RefundManagerInterface
 
                 $alreadyRefundedQuantity = $refundData->getRefundedQuantity($orderLineItemAttributes->getMollieOrderLineID());
                 $alreadyRefundedAmount = $refundData->getRefundedAmount($orderLineItemAttributes->getMollieOrderLineID());
-                dump($alreadyRefundedQuantity,$alreadyRefundedAmount);
+
                 $items[] = new RefundRequestItem(
                     $lineItem->getId(),
                     $lineItem->getTotalPrice() - $alreadyRefundedAmount,
@@ -326,7 +326,7 @@ class RefundManager implements RefundManagerInterface
 
                 $alreadyRefundedQuantity = $refundData->getRefundedQuantity($orderLineItemAttributes->getMollieOrderLineID());
                 $alreadyRefundedAmount = $refundData->getRefundedAmount($orderLineItemAttributes->getMollieOrderLineID());
-                dump($alreadyRefundedQuantity,$alreadyRefundedAmount);
+
                 $items[] = new RefundRequestItem(
                     $delivery->getId(),
                     $delivery->getShippingCosts()->getTotalPrice() - $alreadyRefundedAmount,
@@ -465,5 +465,4 @@ class RefundManager implements RefundManagerInterface
 
         return $molliePayments['order_line_id'];
     }
-
 }

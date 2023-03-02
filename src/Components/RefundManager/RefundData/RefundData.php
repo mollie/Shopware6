@@ -199,6 +199,7 @@ class RefundData
         $totalAmount = 0;
 
         ## The amount is being calculated via the refunds because it might have been a custom amount.
+        /** @var array<mixed> $refund */
         foreach ($this->refunds as $refund) {
             if (!isset($refund['metadata'])) {
                 continue;
@@ -212,10 +213,9 @@ class RefundData
             $composition = $metadata['composition'];
 
             foreach ($composition as $compositionItem) {
-                if ($compositionItem['mollieLineId']===$mollieId){
+                if ($compositionItem['mollieLineId']===$mollieId) {
                     $totalAmount+=$compositionItem['amount'];
                 }
-
             }
         }
         return $totalAmount;

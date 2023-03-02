@@ -53,7 +53,6 @@ class OrderLineItemEntityAttributes extends OrderXEntityAttributes
         $this->subscriptionInterval = (int)$this->getCustomFieldValue($entity, 'subscription_interval');
         $this->subscriptionIntervalUnit = (string)$this->getCustomFieldValue($entity, 'subscription_interval_unit');
         $this->subscriptionRepetitionCount = (int)$this->getCustomFieldValue($entity, 'subscription_repetition');
-
     }
 
     /**
@@ -160,7 +159,7 @@ class OrderLineItemEntityAttributes extends OrderXEntityAttributes
             }
         }
 
-        if ($foundValue == '') {
+        if ($foundValue === '') {
             $foundValue = parent::getCustomFieldValue($entity, $keyName);
         }
 

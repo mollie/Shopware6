@@ -9,11 +9,8 @@ use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 
 class OrderDeliveryEntityAttributes extends OrderXEntityAttributes
 {
-    private OrderDeliveryEntity $deliveryEntity;
-
     public function __construct(OrderDeliveryEntity $entity)
     {
         parent::__construct($entity);
-        $this->deliveryEntity = $entity;
     }
 }
