@@ -10,6 +10,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\PrimaryKey;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\Required;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\IdField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\LongTextField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\ReferenceVersionField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 
@@ -52,6 +53,7 @@ class RefundDefinition extends EntityDefinition
             # --------------------------------------------------------------------------------------------------------------------------
 
             (new FkField('order_id', 'orderId', OrderDefinition::class)),
+            new ReferenceVersionField(OrderDefinition::class, 'order_version_id'),
 
             (new StringField('mollie_refund_id', 'mollieRefundId')),
 
