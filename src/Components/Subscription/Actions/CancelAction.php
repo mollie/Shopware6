@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Components\Subscription\Actions;
 
 use Exception;
 use Kiener\MolliePayments\Components\Subscription\Actions\Base\BaseAction;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionStatus;
 use Shopware\Core\Framework\Context;
 
@@ -54,5 +55,27 @@ class CancelAction extends BaseAction
         # FLOW BUILDER / BUSINESS EVENTS
         $event = $this->getFlowBuilderEventFactory()->buildSubscriptionCancelledEvent($subscription->getCustomer(), $subscription, $context);
         $this->getFlowBuilderDispatcher()->dispatch($event);
+    }
+
+    /**
+     * Check the subscription is cancelable or not
+     *
+     * @param SubscriptionEntity $subscription
+     * @param Context $context
+     * @throws Exception
+     * @return bool
+     */
+    public function isCancelable(SubscriptionEntity $subscription, Context $context): bool
+    {
+        if (!$subscription->isCancellationAllowed()) {
+            return false;
+        }
+
+        $allowCancellation = $this->isCancellationPeriodValid($subscription, $context);
+        if (!$allowCancellation) {
+            return false;
+        }
+
+        return true;
     }
 }

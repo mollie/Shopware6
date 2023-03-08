@@ -10,7 +10,8 @@ export default class AdminAPIClient {
         this.basePath = '';
 
         this.client = axios.create({
-            baseURL: `${Cypress.config('baseUrl')}/api`
+            baseURL: `${Cypress.config('baseUrl')}/api`,
+            timeout: 10000,
         });
     }
 

@@ -2,10 +2,19 @@
 
 namespace Kiener\MolliePayments\Controller\Storefront\ApplePayDirect;
 
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatcherAdapterInterface;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect;
 use Kiener\MolliePayments\Service\Cart\CartBackupService;
+use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Traits\Storefront\RedirectTrait;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
+use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
@@ -30,6 +39,8 @@ class ApplePayDirectController extends StorefrontController
      */
     private const SNIPPET_ERROR = 'molliePayments.payments.applePayDirect.paymentError';
 
+    private const FLOWBUILDER_SUCCESS = 'success';
+    private const FLOWBUILDER_FAILED = 'failed';
 
     /**
      * @var ApplePayDirect
@@ -52,6 +63,26 @@ class ApplePayDirectController extends StorefrontController
     private $flashBag;
 
     /**
+     * @var FlowBuilderDispatcherAdapterInterface
+     */
+    private $flowBuilderDispatcher;
+
+    /**
+     * @var FlowBuilderEventFactory
+     */
+    private $flowBuilderEventFactory;
+
+    /**
+     * @var EntityRepositoryInterface
+     */
+    private $repoCustomers;
+
+    /**
+     * @var OrderService
+     */
+    private $orderService;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -63,14 +94,24 @@ class ApplePayDirectController extends StorefrontController
      * @param LoggerInterface $logger
      * @param CartBackupService $cartBackup
      * @param FlashBag $sessionFlashBag
+     * @param FlowBuilderFactory $flowBuilderFactory
+     * @param FlowBuilderEventFactory $flowBuilderEventFactory
+     * @param EntityRepositoryInterface $repoCustomers
+     * @param OrderService $orderService
+     * @throws \Exception
      */
-    public function __construct(ApplePayDirect $applePay, RouterInterface $router, LoggerInterface $logger, CartBackupService $cartBackup, FlashBag $sessionFlashBag)
+    public function __construct(ApplePayDirect $applePay, RouterInterface $router, LoggerInterface $logger, CartBackupService $cartBackup, FlashBag $sessionFlashBag, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, EntityRepositoryInterface $repoCustomers, OrderService $orderService)
     {
         $this->applePay = $applePay;
         $this->router = $router;
         $this->logger = $logger;
         $this->flashBag = $sessionFlashBag;
         $this->cartBackupService = $cartBackup;
+        $this->repoCustomers = $repoCustomers;
+        $this->orderService = $orderService;
+
+        $this->flowBuilderEventFactory = $flowBuilderEventFactory;
+        $this->flowBuilderDispatcher = $flowBuilderFactory->createDispatcher();
     }
 
 
@@ -352,6 +393,7 @@ class ApplePayDirectController extends StorefrontController
      *
      * @param SalesChannelContext $context
      * @param Request $request
+     * @throws \Exception
      * @return RedirectResponse
      */
     public function finishPayment(SalesChannelContext $context, Request $request): RedirectResponse
@@ -403,6 +445,9 @@ class ApplePayDirectController extends StorefrontController
                 $context
             );
 
+            # fire our custom storefront event
+            $this->fireFlowBuilderStorefrontEvent(self::FLOWBUILDER_SUCCESS, $order, $context->getContext());
+
             return new RedirectResponse($returnUrl);
         } catch (Throwable $ex) {
             $this->logger->error('Apple Pay Direct error when finishing Mollie payment: ' . $ex->getMessage());
@@ -413,6 +458,9 @@ class ApplePayDirectController extends StorefrontController
 
             # also add an error for our target page
             $this->flashBag->add('danger', $this->trans(self::SNIPPET_ERROR));
+
+            # fire our custom storefront event
+            $this->fireFlowBuilderStorefrontEvent(self::FLOWBUILDER_FAILED, $order, $context->getContext());
 
             return new RedirectResponse($returnUrl);
         }
@@ -435,5 +483,43 @@ class ApplePayDirectController extends StorefrontController
 
             return new JsonResponse(['success' => false,], 500);
         }
+    }
+
+    /**
+     * @param string $status
+     * @param OrderEntity $order
+     * @param Context $context
+     * @throws \Exception
+     * @return void
+     */
+    private function fireFlowBuilderStorefrontEvent(string $status, OrderEntity $order, Context $context): void
+    {
+        $orderCustomer = $order->getOrderCustomer();
+
+        if (!$orderCustomer instanceof OrderCustomerEntity) {
+            return;
+        }
+
+        $criteria = new Criteria([(string)$orderCustomer->getCustomerId()]);
+
+        $customers = $this->repoCustomers->search($criteria, $context);
+
+        if ($customers->count() <= 0) {
+            return;
+        }
+
+        # we also have to reload the order because data is missing
+        $finalOrder = $this->orderService->getOrder($order->getId(), $context);
+
+        switch ($status) {
+            case self::FLOWBUILDER_FAILED:
+                $event = $this->flowBuilderEventFactory->buildOrderFailedEvent($customers->first(), $finalOrder, $context);
+                break;
+
+            default:
+                $event = $this->flowBuilderEventFactory->buildOrderSuccessEvent($customers->first(), $finalOrder, $context);
+        }
+
+        $this->flowBuilderDispatcher->dispatch($event);
     }
 }

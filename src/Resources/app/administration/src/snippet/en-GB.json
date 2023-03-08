@@ -4,6 +4,9 @@
       "mollie_subscription": "Mollie Subscription | Mollie Subscriptions"
     },
     "businessEvents": {
+      "mollie_checkout_order_success": " Order successful",
+      "mollie_checkout_order_failed": " Order failed",
+      "mollie_checkout_order_canceled": " Order canceled",
       "mollie_webhook_received_All": " Mollie Webhook Received (All)",
       "mollie_webhook_received_status_authorized": " Mollie Webhook Received (Authorized)",
       "mollie_webhook_received_status_failed": " Mollie Webhook Received (Failed)",
@@ -186,7 +189,12 @@
         "captionRefunded": "Refunded amount",
         "captionRemaining": "Refundable amount",
         "btnFixDiff": "Fix Difference",
-        "placeholderDescription": "add an optional description for your refund",
+        "placeholderDescription": "Enter bank/card statement description for consumer. Max 140 characters",
+        "lblDescription": "Description (optional) ({characters}/140 characters)",
+        "descriptionHelp": "This will be shown on the consumer's bank or card statement when possible. The message will be truncated after 140 characters.",
+        "placeholderInternalDescription": "Enter your internal description",
+        "lblInternalDescription": "Internal description (optional)",
+        "internalDescriptionHelp": "This will be shown as a local description in the administration interface.",
         "checkVerification": "I have verified the total refund amount and the configured quantities to refund and re-stock.",
         "btnRefund": "Refund",
         "btnFullRefund": "Full Refund",
@@ -200,6 +208,7 @@
             "amount": "Amount",
             "status": "Status",
             "description": "Description",
+            "internalDescription": "Internal description",
             "composition": "Composition",
             "date": "Date"
           },
@@ -461,7 +470,10 @@
       "all": "All",
       "canceled": "Canceled",
       "expired": "Expired",
-      "partiallyRefunded": "Refunded (partially)"
+      "partiallyRefunded": "Refunded (partially)",
+      "orderSuccess" : "Order successful",
+      "orderFailed" : "Order failed",
+      "orderCanceled" : "Order canceled"
     }
   }
 }

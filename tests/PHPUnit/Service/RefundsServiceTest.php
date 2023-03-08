@@ -14,6 +14,7 @@ use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\Refund\RefundService;
 use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 use Kiener\MolliePayments\Service\Router\RoutingDetector;
+use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Service\UpdateOrderTransactionCustomFields;
 use Mollie\Api\Endpoints\OrderEndpoint;
@@ -48,6 +49,8 @@ class RefundsServiceTest extends TestCase
 
     private $refundService;
 
+    private $settingService;
+
     public function setUp(): void
     {
         $logger = new NullLogger();
@@ -74,24 +77,28 @@ class RefundsServiceTest extends TestCase
 
         $routingBuilder = $this->buildRoutingBuilder($this, '');
 
+        $this->settingService = $this->createMock(SettingsService::class);
+
         $mollieOrderApiMock = new MollieOrderApi(
             $apiFactoryMock,
             $paymentApiService,
             $routingBuilder,
             new MollieRequestAnonymizer('*'),
-            new NullLogger()
+            new NullLogger(),
+            $this->settingService
         );
 
 
-        $mollieOrderApiMock = new MollieOrderApi($apiFactoryMock, $paymentApiService, $routingBuilder, new MollieRequestAnonymizer('*'), $loggerServiceMock);
-        $mollieOrderApiMock = new MollieOrderApi($apiFactoryMock, $paymentApiService, $routingBuilder, new MollieRequestAnonymizer('*'), $loggerServiceMock);
+        $mollieOrderApiMock = new MollieOrderApi($apiFactoryMock, $paymentApiService, $routingBuilder, new MollieRequestAnonymizer('*'), $loggerServiceMock, $this->settingService);
+        $mollieOrderApiMock = new MollieOrderApi($apiFactoryMock, $paymentApiService, $routingBuilder, new MollieRequestAnonymizer('*'), $loggerServiceMock, $this->settingService);
 
 
         $this->refundService = new RefundService(
             $mollieOrderApiMock,
             $this->orderService,
             new RefundHydrator(),
-            new FakeMollieGateway()
+            new FakeMollieGateway(),
+            $this->createMock(EntityRepositoryInterface::class),
         );
     }
 
@@ -120,6 +127,7 @@ class RefundsServiceTest extends TestCase
         $result = $this->refundService->refundPartial(
             $orderEntityMock,
             'test refund',
+            'test refund internal',
             24.99,
             [],
             Context::createDefaultContext()

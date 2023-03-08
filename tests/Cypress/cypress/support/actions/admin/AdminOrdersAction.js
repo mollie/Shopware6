@@ -105,6 +105,7 @@ export default class AdminOrdersAction {
      */
     setTrackingCode(trackingCode) {
         repoOrdersDetails.getEditButton().click();
+        cy.wait(1000);
         repoOrdersDetails.getTrackingCode(trackingCode).type(trackingCode, forceOption);
         repoOrdersDetails.getSaveButton().click();
         // here are automatic reloads and things as it seems

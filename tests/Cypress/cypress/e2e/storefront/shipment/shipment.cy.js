@@ -41,6 +41,7 @@ const device = devices.getFirstDevice();
 context("Order Shipping", () => {
 
     before(() => {
+        configAction.prepareShippingMethods();
         configAction.updateProducts('', false, '', '');
     })
 
@@ -87,7 +88,7 @@ context("Order Shipping", () => {
 
             repoShippingFull.getTrackingCarrier().should('not.have.value', '');
             repoShippingFull.getTrackingCode().should('have.value', TRACKING_CODE);
-            repoShippingFull.getTrackingUrl().should('have.value', '');
+            repoShippingFull.getTrackingUrl().should('not.have.value', '');
 
             shippingAction.shipOrder();
 

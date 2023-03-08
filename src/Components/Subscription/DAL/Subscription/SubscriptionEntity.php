@@ -116,11 +116,6 @@ class SubscriptionEntity extends Entity
     # manually loaded data
 
     /**
-     * @var string
-     */
-    protected $mollieStatus;
-
-    /**
      * @var null|\DateTimeInterface
      */
     protected $cancelUntil;
@@ -603,21 +598,6 @@ class SubscriptionEntity extends Entity
 
     # -----------------------------------------------------------------------------------------------------
     # manually loaded data
-    /**
-     * @param string $mollieStatus
-     */
-    public function setMollieStatus(string $mollieStatus): void
-    {
-        $this->mollieStatus = $mollieStatus;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMollieStatus(): string
-    {
-        return (string)$this->mollieStatus;
-    }
 
     /**
      * @param null|\DateTimeInterface $cancelUntil

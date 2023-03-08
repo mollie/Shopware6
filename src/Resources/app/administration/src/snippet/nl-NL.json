@@ -1,6 +1,9 @@
 {
   "global": {
     "businessEvents": {
+      "mollie_checkout_order_success": " Bestelling succesvol",
+      "mollie_checkout_order_failed": " Bestelling mislukt",
+      "mollie_checkout_order_canceled": " Bestelling geannuleerd",
       "mollie_webhook_received_All": " Mollie Webhook Ontvangen (Alle)",
       "mollie_webhook_received_status_authorized": " Mollie Webhook Ontvangen (Geautoriseerd)",
       "mollie_webhook_received_status_failed": " Mollie Webhook Ontvangen (Mislukt)",
@@ -182,7 +185,12 @@
         "captionRefunded": "Terugbetaald bedrag",
         "captionRemaining": "Terugbetaalbaar bedrag",
         "btnFixDiff": "Herstel verschil",
-        "placeholderDescription": "Een optionele beschrijving aan terugbetaling toevoegen",
+        "placeholderDescription": "Voer uw bank/card statement beschrijving in. Max. 140 tekens",
+        "lblDescription": "Beschrijving (optioneel) ({characters}/140 tekens)",
+        "descriptionHelp": "Dit wordt indien mogelijk getoond op het bank- of kaartafschrift van de consument. Het bericht wordt afgekapt na 140 tekens.",
+        "placeholderInternalDescription": "Voer uw interne beschrijving in.",
+        "lblInternalDescription": "Interne beschrijving (optioneel)",
+        "internalDescriptionHelp": "Dit wordt getoond als een lokale beschrijving in de administratie-interface.",
         "checkVerification": "Ik heb het totale restitutiebedrag en de geconfigureerde hoeveelheden voor restitutie en herbevoorrading geverifieerd.",
         "btnRefund": "Terugbetaling",
         "btnFullRefund": "Volledige terugbetaling",
@@ -196,6 +204,7 @@
             "amount": "Bedrag",
             "status": "Status",
             "description": "Beschrijving",
+            "internalDescription": "Interne beschrijving",
             "composition": "Samenstelling",
             "date": "Datum"
           },
@@ -448,7 +457,10 @@
       "all": "Alle",
       "canceled": "Geannuleerd",
       "expired": "Verlopen",
-      "partiallyRefunded": "Terugbetaald (gedeeltelijk)"
+      "partiallyRefunded": "Terugbetaald (gedeeltelijk)",
+      "orderSuccess" : "Bestelling succesvol",
+      "orderFailed" : "Bestelling mislukt",
+      "orderCanceled" : "Bestelling geannuleerd"
     }
   }
 }

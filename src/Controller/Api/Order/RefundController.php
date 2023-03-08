@@ -75,6 +75,7 @@ class RefundController extends AbstractController
     {
         $orderNumber = (string)$query->get('number');
         $description = $query->get('description', '');
+        $internalDescription = $query->get('internalDescription', '');
         $amount = $query->get('amount', null); # we need NULL as full refund option
         # we don't allow items here
         # because this is a non-technical call, and
@@ -90,6 +91,7 @@ class RefundController extends AbstractController
             '',
             $orderNumber,
             $description,
+            $internalDescription,
             $amount,
             $items,
             $context
@@ -163,6 +165,7 @@ class RefundController extends AbstractController
     {
         $orderId = $data->getAlnum('orderId', '');
         $description = $data->get('description', '');
+        $internalDescription = $data->get('internalDescription', '');
         $amount = $data->get('amount', null);
         $items = [];
 
@@ -176,6 +179,7 @@ class RefundController extends AbstractController
             $orderId,
             '',
             $description,
+            $internalDescription,
             $amount,
             $items,
             $context
@@ -324,12 +328,13 @@ class RefundController extends AbstractController
      * @param string $orderId
      * @param string $orderNumber
      * @param string $description
+     * @param string $internalDescription
      * @param null|float $amount
      * @param array<mixed> $items
      * @param Context $context
      * @return JsonResponse
      */
-    private function refundAction(string $orderId, string $orderNumber, string $description, ?float $amount, array $items, Context $context): JsonResponse
+    private function refundAction(string $orderId, string $orderNumber, string $description, string $internalDescription, ?float $amount, array $items, Context $context): JsonResponse
     {
         try {
             if (!empty($orderId)) {
@@ -346,6 +351,7 @@ class RefundController extends AbstractController
             $refundRequest = new RefundRequest(
                 (string)$order->getOrderNumber(),
                 $description,
+                $internalDescription,
                 $amount
             );
 

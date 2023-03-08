@@ -14,22 +14,24 @@ interface RefundServiceInterface
     /**
      * @param OrderEntity $order
      * @param string $description
+     * @param string $internalDescription
      * @param RefundItem[] $refundItems
      * @param Context $context
      * @return Refund
      */
-    public function refundFull(OrderEntity $order, string $description, array $refundItems, Context $context): Refund;
+    public function refundFull(OrderEntity $order, string $description, string $internalDescription, array $refundItems, Context $context): Refund;
 
     /**
      * @param OrderEntity $order
      * @param string $description
+     * @param string $internalDescription
      * @param float $amount
      * @param RefundItem[] $lineItems
      * @param Context $context
      * @throws ApiException
      * @return Refund
      */
-    public function refundPartial(OrderEntity $order, string $description, float $amount, array $lineItems, Context $context): Refund;
+    public function refundPartial(OrderEntity $order, string $description, string $internalDescription, float $amount, array $lineItems, Context $context): Refund;
 
     /**
      * @param OrderEntity $order

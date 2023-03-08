@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Service;
 
+use Kiener\MolliePayments\Components\RefundManager\DAL\Order\OrderExtension;
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderLineIdException;
 use Kiener\MolliePayments\Exception\OrderNumberNotFoundException;
@@ -88,6 +89,8 @@ class OrderService implements OrderServiceInterface
         $criteria = new Criteria([$orderId]);
         $criteria->addAssociation('currency');
         $criteria->addAssociation('addresses');
+        $criteria->addAssociation('addresses.country');     # required for FlowBuilder -> send confirm email option
+        $criteria->addAssociation('shippingMethod');        # required for FlowBuilder -> send confirm email option
         $criteria->addAssociation('shippingAddress');   # important for subscription creation
         $criteria->addAssociation('billingAddress');    # important for subscription creation
         $criteria->addAssociation('billingAddress.country');
@@ -105,6 +108,7 @@ class OrderService implements OrderServiceInterface
         $criteria->addAssociation('transactions.paymentMethod');
         $criteria->addAssociation('transactions.paymentMethod.appPaymentMethod.app');
         $criteria->addAssociation('transactions.stateMachineState');
+        $criteria->addAssociation(OrderExtension::REFUND_PROPERTY_NAME); # for refund manager
 
 
         $order = $this->orderRepository->search($criteria, $context)->first();

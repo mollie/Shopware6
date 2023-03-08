@@ -1,21 +1,21 @@
-import Plugin from 'src/plugin-system/plugin.class';
+import deepmerge from 'deepmerge';
+import MollieCreditCardMandate from '../core/creditcard-mandate.plugin';
 import DomAccess from 'src/helper/dom-access.helper';
-import HttpClient from '../services/HttpClient';
 import DeviceDetection from 'src/helper/device-detection.helper';
 import CsrfAjaxMode from '../services/CsrfAjaxMode';
 
-export default class MollieCreditCardComponentsSw64 extends Plugin {
-    static options = {
+export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMandate {
+    static options = deepmerge(MollieCreditCardMandate.options, {
         paymentId: null,
         customerId: null,
         locale: null,
         profileId: null,
         shopUrl: null,
         testMode: true,
-    };
+    });
 
     init() {
-
+        super.init();
         try {
             this._paymentForm = DomAccess.querySelector(document, this.getSelectors().paymentForm);
             this._confirmForm = DomAccess.querySelector(document, this.getSelectors().confirmForm);
@@ -24,34 +24,12 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
             return;
         }
 
-        this.client = new HttpClient();
-
-        this._cleanUpExistingElement();
-        this._fixShopUrl();
         this._initializeComponentInstance();
         this._registerEvents();
-    }
-
-    _cleanUpExistingElement() {
-        // Get an existing Mollie controller element
-        const mollieController = document.querySelector(this.getSelectors().mollieController);
-
-        // Remove the existing Mollie controller element
-        if (mollieController) {
-            mollieController.remove();
-        }
-    }
-
-    _fixShopUrl() {
-        // Fix the trailing slash in the shop URL
-        if (this.options.shopUrl != null && this.options.shopUrl.substr(-1) === '/') {
-            this.options.shopUrl = this.options.shopUrl.substr(0, this.options.shopUrl.length - 1);
-        }
+        this.registerMandateEvents();
     }
 
     _initializeComponentInstance() {
-        this._componentsObject = null;
-
         // Get the elements from the DOM
         const cardHolder = document.querySelector(this.getSelectors().cardHolder);
         const componentsContainer = document.querySelector(this.getSelectors().componentsContainer);
@@ -60,12 +38,15 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
         if (
             !!componentsContainer
             && !!cardHolder
+            && !window.mollieComponentsObject
         ) {
             // eslint-disable-next-line no-undef
-            this._componentsObject = Mollie(this.options.profileId, {
+            window.mollieComponentsObject = Mollie(this.options.profileId, {
                 locale: this.options.locale,
                 testmode: this.options.testMode,
             });
+
+            window.mollieComponents = {};
         }
 
         // Create components inputs
@@ -153,12 +134,9 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
             this.getInputFields().verificationCode,
         ];
 
-        if (this._componentsObject !== null) {
-
+        if (window.mollieComponentsObject) {
             inputs.forEach((element, index, arr) => {
-
-                const component = this._componentsObject.createComponent(element.name, me.getDefaultProperties());
-                component.mount(element.id);
+                const component = this._mountMollieComponent(element.id, element.name);
                 arr[index][element.name] = component;
 
                 // Handle errors
@@ -184,6 +162,21 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
                 });
             });
         }
+    }
+
+    _mountMollieComponent(componentId, componentName) {
+        if (!window.mollieComponents[componentName]) {
+            window.mollieComponents[componentName] = window.mollieComponentsObject.createComponent(
+                componentName,
+                this.getDefaultProperties()
+            );
+        } else {
+            window.mollieComponents[componentName].unmount();
+        }
+
+        window.mollieComponents[componentName].mount(componentId);
+
+        return window.mollieComponents[componentName];
     }
 
     setFocus(componentName, isFocused) {
@@ -225,13 +218,32 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
         // inject our own flow
         event.preventDefault();
 
+        const mandateId = this.getMandateCheckedValue();
+        // If the mandateId is valid, that means there is a mandate already selected,
+        // so we have to call the API to save it
+        // and then we continue by submitting our original payment form.
+        if (this.isValidSelectedMandate(mandateId)) {
+            this.client.get(
+                me.options.shopUrl + '/mollie/components/store-mandate-id/' + me.options.customerId + '/' + mandateId,
+                () => {
+                    me.continueShopwareCheckout(paymentForm);
+                },
+                () => {
+                    me.continueShopwareCheckout(paymentForm);
+                },
+                'application/json; charset=utf-8'
+            );
+
+            return;
+        }
+
 
         // Reset possible form errors
         const verificationErrors = document.getElementById(`${this.getInputFields().verificationCode.errors}`);
         verificationErrors.textContent = '';
 
         // Get a payment token
-        const {token, error} = await this._componentsObject.createToken();
+        const {token, error} = await window.mollieComponentsObject.createToken();
 
         if (error) {
             verificationErrors.textContent = error.message;
@@ -240,11 +252,21 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
             return;
         }
 
+        // Build query params
+        const queryParams = new URLSearchParams({
+            'shouldSaveCardDetail': this.shouldSaveCardDetail(),
+        });
+
+        let queryString = queryParams.toString();
+        if (queryString) {
+            queryString = `?${queryString}`;
+        }
+
         // now we finish by first calling our URL to store
         // the credit card token for the user and the current checkout
         // and then we continue by submitting our original payment form.
         this.client.get(
-            me.options.shopUrl + '/mollie/components/store-card-token/' + me.options.customerId + '/' + token,
+            me.options.shopUrl + '/mollie/components/store-card-token/' + me.options.customerId + '/' + token + queryString,
             function () {
                 me.continueShopwareCheckout(paymentForm);
             },
@@ -287,8 +309,7 @@ export default class MollieCreditCardComponentsSw64 extends Plugin {
             }
         }
         const csrfMode = new CsrfAjaxMode(window.csrf);
-        if(!csrfMode.isActive())
-        {
+        if (!csrfMode.isActive()) {
             form.submit();
         }
     }

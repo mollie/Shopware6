@@ -29,6 +29,14 @@ export default class RefundManagerRepository {
      *
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
+    getInternalDescription() {
+        return cy.get('#sw-field--refundInternalDescription');
+    }
+
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
     getRefundButton() {
         return cy.get('.sw-button--contrast');
     }
@@ -61,8 +69,16 @@ export default class RefundManagerRepository {
      *
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
-    getFirstRefundDescriptionLabel() {
+    getFirstRefundPublicDescriptionLabel() {
         return cy.get('.sw-data-grid__cell--description > .sw-data-grid__cell-content');
+    }
+
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getFirstRefundInternalDescriptionLabel() {
+        return cy.get('.sw-data-grid__cell--internalDescription > .sw-data-grid__cell-content')
     }
 
     /**

@@ -45,7 +45,9 @@ class CreateAction extends BaseAction
         $attributes = new OrderLineItemEntityAttributes($item);
 
         if (!$attributes->isSubscriptionProduct()) {
-            # Mixed carts are not allowed for subscriptions
+            $this->getLogger()->warning("Order {$order->getOrderNumber()} did not create a subscription. Line item does not seem to be a subscription product (anymore)!");
+            # return an empty string that will be saved as "reference".
+            # so our order will not be a subscription
             return '';
         }
 

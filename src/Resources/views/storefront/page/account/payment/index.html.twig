@@ -1,7 +1,6 @@
 {% sw_extends '@Storefront/storefront/page/account/payment/index.html.twig' %}
 
 {% block page_account_payment %}
-
     {% if mollie_applepay_enabled %}
         <div id="mollie_hide_applepay" data-mollie-template-applepay-account data-mollie-apple-pay-payment-method-options="{{ {
             shopUrl: seoUrl('frontend.home.page'),
@@ -9,6 +8,74 @@
         }
         |json_encode }}"></div>
     {% endif %}
+
+    {{ parent() }}
+{% endblock %}
+
+{% block page_account_payment_main %}
+    {% block mollie_page_account_credit_card_mandate %}
+        {% if page.enable_one_click_payments %}
+
+            {% set mandates = page.extensions.MollieCreditCardMandateCollection %}
+
+            {% block mollie_page_account_credit_card_mandate_condition %}
+                {% if mandates|length > 0 %}
+
+                    {% set mandateOptions = {
+                        "shopUrl": seoUrl('frontend.home.page'),
+                        "customerId": context.customer.id,
+                    } %}
+
+                    {% block mollie_page_account_credit_card_mandate_message %}
+                        <div class="d-none" id="mollieCreditCardMandateDeleteSuccess">
+                            {% sw_include '@Storefront/storefront/utilities/alert.html.twig' with {
+                                type: 'success',
+                                content: "molliePayments.components.mandate.deleteSuccessMessage"|trans|striptags,
+                            } %}
+                        </div>
+                        <div class="d-none" id="mollieCreditCardMandateDeleteError">
+                            {% sw_include '@Storefront/storefront/utilities/alert.html.twig' with {
+                                type: 'danger',
+                                content: "molliePayments.components.mandate.deleteErrorMessage"|trans|striptags,
+                            } %}
+                        </div>
+                    {% endblock %}
+
+                    {% block mollie_page_account_credit_card_mandate_manage %}
+                        <div class="mollie-credit-card-mandate-manage">
+                            <h2 class="card-title">{{ "molliePayments.components.mandate.sectionTitle"|trans|striptags }}</h2>
+                            <div class="mollie-credit-card-mandate-list"
+                                 data-mollie-credit-card-mandate-manage="true"
+                                 data-mollie-credit-card-mandate-manage-options='{{ mandateOptions|json_encode }}'>
+                                {% block mollie_page_account_credit_card_mandate_manage_include %}
+                                    {% sw_include '@MolliePayments/mollie/component/credit-card-mandate.html.twig' with {
+                                        'mandates': mandates,
+                                        'compactView': true,
+                                        'modifiable': true
+                                    } %}
+                                {% endblock %}
+                            </div>
+                        </div>
+                    {% endblock %}
+
+                    {% block mollie_page_account_credit_card_remove_mandate_modal %}
+                        {% sw_include '@MolliePayments/mollie/component/credit-card-mandate-remove-modal.html.twig' with {
+                            'modalId' : 'mollieCreditCardMandateRemoveModal',
+                            'subscription' : false,
+                        } %}
+                    {% endblock %}
+
+                    {% block mollie_page_account_credit_card_remove_subscription_mandate_modal %}
+                        {% sw_include '@MolliePayments/mollie/component/credit-card-mandate-remove-modal.html.twig' with {
+                            'modalId' : 'mollieCreditCardSubscriptionMandateRemoveModal',
+                            'subscription' : true,
+                        } %}
+                    {% endblock %}
+
+                {% endif %}
+            {% endblock %}
+        {% endif %}
+    {% endblock %}
 
     {{ parent() }}
 {% endblock %}

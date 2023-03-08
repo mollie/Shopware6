@@ -82,7 +82,7 @@ class CustomerFixture extends Fixture
             'firstName' => 'Mollie NL',
             'lastName' => 'Test',
             'email' => 'test@mollie.nl',
-            'password' => 'mollie'
+            'password' => 'molliemollie'
         ]];
 
         $this->customerRepository->upsert($dataNL, Context::createDefaultContext());

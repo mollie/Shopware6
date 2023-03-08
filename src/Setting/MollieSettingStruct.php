@@ -77,6 +77,17 @@ class MollieSettingStruct extends Struct
      */
     protected $enableCreditCardComponents = false;
 
+
+    /**
+     * @var bool
+     */
+    protected $oneClickPaymentsCompactView = false;
+
+    /**
+     * @var bool
+     */
+    protected $oneClickPaymentsEnabled = false;
+
     /**
      * @var bool
      */
@@ -96,6 +107,11 @@ class MollieSettingStruct extends Struct
      * @var bool
      */
     protected $automaticShipping;
+
+    /**
+     * @var bool
+     */
+    protected $automaticCancellation;
 
     /**
      * @var bool
@@ -414,6 +430,41 @@ class MollieSettingStruct extends Struct
     }
 
     /**
+     * @return bool
+     */
+    public function isOneClickPaymentsEnabled(): bool
+    {
+        return $this->oneClickPaymentsEnabled;
+    }
+
+    /**
+     * @param bool $oneClickPaymentsEnabled
+     */
+    public function setOneClickPaymentsEnabled(bool $oneClickPaymentsEnabled): void
+    {
+        $this->oneClickPaymentsEnabled = $oneClickPaymentsEnabled;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOneClickPaymentsCompactView(): bool
+    {
+        return $this->oneClickPaymentsCompactView;
+    }
+
+    /**
+     * @param bool $oneClickPaymentsCompactView
+     *
+     * @return self
+     */
+    public function setOneClickPaymentsCompactView(bool $oneClickPaymentsCompactView): self
+    {
+        $this->oneClickPaymentsCompactView = $oneClickPaymentsCompactView;
+        return $this;
+    }
+
+    /**
      * @return int
      */
     public function getPaymentMethodBankTransferDueDateDays(): ?int
@@ -570,6 +621,22 @@ class MollieSettingStruct extends Struct
     public function setAutomaticShipping(bool $automaticShipping): void
     {
         $this->automaticShipping = $automaticShipping;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAutomaticCancellation(): bool
+    {
+        return $this->automaticCancellation;
+    }
+
+    /**
+     * @param bool $automaticCancellation
+     */
+    public function setAutomaticCancellation(bool $automaticCancellation): void
+    {
+        $this->automaticCancellation = $automaticCancellation;
     }
 
     /**

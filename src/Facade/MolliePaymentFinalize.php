@@ -2,6 +2,8 @@
 
 namespace Kiener\MolliePayments\Facade;
 
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Exception\MissingMollieOrderIdException;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentDetails;
@@ -13,14 +15,23 @@ use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
+use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\Exception\AsyncPaymentFinalizeException;
 use Shopware\Core\Checkout\Payment\Exception\CustomerCanceledAsyncPaymentException;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
+use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class MolliePaymentFinalize
 {
+    private const FLOWBUILDER_SUCCESS = 'success';
+    private const FLOWBUILDER_FAILED = 'failed';
+    private const FLOWBUILDER_CANCELED = 'canceled';
 
     /**
      * @var OrderStatusConverter
@@ -50,14 +61,33 @@ class MolliePaymentFinalize
     private $subscriptionManager;
 
     /**
+     * @var EntityRepositoryInterface
+     */
+    private $repoCustomer;
+
+    /**
+     * @var FlowBuilderFactory
+     */
+    private $flowBuilderFactory;
+
+    /**
+     * @var FlowBuilderEventFactory
+     */
+    private $flowBuilderEventFactory;
+
+
+    /**
      * @param OrderStatusConverter $orderStatusConverter
      * @param OrderStatusUpdater $orderStatusUpdater
      * @param SettingsService $settingsService
      * @param Order $mollieOrderService
      * @param OrderService $orderService
      * @param SubscriptionManager $subscriptionManager
+     * @param EntityRepositoryInterface $repoCustomer
+     * @param FlowBuilderFactory $flowBuilderFactory
+     * @param FlowBuilderEventFactory $flowBuilderEventFactory
      */
-    public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, Order $mollieOrderService, OrderService $orderService, SubscriptionManager $subscriptionManager)
+    public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, Order $mollieOrderService, OrderService $orderService, SubscriptionManager $subscriptionManager, EntityRepositoryInterface $repoCustomer, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory)
     {
         $this->orderStatusConverter = $orderStatusConverter;
         $this->orderStatusUpdater = $orderStatusUpdater;
@@ -65,6 +95,9 @@ class MolliePaymentFinalize
         $this->mollieOrderService = $mollieOrderService;
         $this->orderService = $orderService;
         $this->subscriptionManager = $subscriptionManager;
+        $this->repoCustomer = $repoCustomer;
+        $this->flowBuilderFactory = $flowBuilderFactory;
+        $this->flowBuilderEventFactory = $flowBuilderEventFactory;
     }
 
 
@@ -124,11 +157,8 @@ class MolliePaymentFinalize
 
 
         # now either set the payment status for successful payments
-        # or make sure to throw an exception for Shopware in case
-        # of failed payments.
-        if (!MolliePaymentStatus::isFailedStatus($molliePaymentMethodKey, $paymentStatus)) {
-            $this->orderStatusUpdater->updatePaymentStatus($transactionStruct->getOrderTransaction(), $paymentStatus, $salesChannelContext->getContext());
-        } else {
+        # or make sure to throw an exception for Shopware in case of failed payments.
+        if (MolliePaymentStatus::isFailedStatus($molliePaymentMethodKey, $paymentStatus)) {
             $orderTransactionID = $transactionStruct->getOrderTransaction()->getUniqueIdentifier();
 
             # let's also create a different handling, if the customer either cancelled
@@ -136,13 +166,23 @@ class MolliePaymentFinalize
             if ($paymentStatus === MolliePaymentStatus::MOLLIE_PAYMENT_CANCELED) {
                 $message = sprintf('Payment for order %s (%s) was cancelled by the customer.', $order->getOrderNumber(), $mollieOrder->id);
 
+                # fire flow builder event
+                $this->fireFlowBuilderEvent(self::FLOWBUILDER_CANCELED, $order, $salesChannelContext->getContext());
+
                 throw new CustomerCanceledAsyncPaymentException($orderTransactionID, $message);
             } else {
                 $message = sprintf('Payment for order %s (%s) failed. The Mollie payment status was not successful for this payment attempt.', $order->getOrderNumber(), $mollieOrder->id);
 
+                # fire flow builder event
+                $this->fireFlowBuilderEvent(self::FLOWBUILDER_FAILED, $order, $salesChannelContext->getContext());
+
                 throw new AsyncPaymentFinalizeException($orderTransactionID, $message);
             }
         }
+
+        # --------------------------------------------------------------------------------------------------------------------
+
+        $this->orderStatusUpdater->updatePaymentStatus($transactionStruct->getOrderTransaction(), $paymentStatus, $salesChannelContext->getContext());
 
         # now update the custom fields of the order
         # we want to have as much information as possible in the shopware order
@@ -170,5 +210,53 @@ class MolliePaymentFinalize
                 $this->subscriptionManager->confirmSubscription($order, $mandateId, $salesChannelContext->getContext());
             }
         }
+
+        # --------------------------------------------------------------------------------------------------------------------
+        # FLOW BUILDER
+
+        $this->fireFlowBuilderEvent(self::FLOWBUILDER_SUCCESS, $order, $salesChannelContext->getContext());
+    }
+
+
+    /**
+     * @param string $status
+     * @param OrderEntity $order
+     * @param Context $context
+     * @throws \Exception
+     * @return void
+     */
+    private function fireFlowBuilderEvent(string $status, OrderEntity $order, Context $context): void
+    {
+        $orderCustomer = $order->getOrderCustomer();
+
+        if (!$orderCustomer instanceof OrderCustomerEntity) {
+            return;
+        }
+
+        $criteria = new Criteria([(string)$orderCustomer->getCustomerId()]);
+
+        $customers = $this->repoCustomer->search($criteria, $context);
+
+        if ($customers->count() <= 0) {
+            return;
+        }
+
+        # we also have to reload the order because data is missing
+        $finalOrder = $this->orderService->getOrder($order->getId(), $context);
+
+        switch ($status) {
+            case self::FLOWBUILDER_FAILED:
+                $event = $this->flowBuilderEventFactory->buildOrderFailedEvent($customers->first(), $finalOrder, $context);
+                break;
+
+            case self::FLOWBUILDER_CANCELED:
+                $event = $this->flowBuilderEventFactory->buildOrderCanceledEvent($customers->first(), $finalOrder, $context);
+                break;
+
+            default:
+                $event = $this->flowBuilderEventFactory->buildOrderSuccessEvent($customers->first(), $finalOrder, $context);
+        }
+
+        $this->flowBuilderFactory->createDispatcher()->dispatch($event);
     }
 }

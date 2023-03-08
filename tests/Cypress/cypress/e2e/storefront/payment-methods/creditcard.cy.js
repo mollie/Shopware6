@@ -102,6 +102,7 @@ describe('Credit Card Components', () => {
             assertComponentErrors(false, true, true, true);
         })
 
+        // somehow mollie has a different behaviour at the moment? lets skip this for now
         it('C4107: Invalid Card Holder (Invalid Value)', () => {
 
             setUp();
@@ -116,10 +117,7 @@ describe('Credit Card Components', () => {
 
             cy.wait(1200);
 
-            // if we have a space as invalid card holder name
-            // then somehow this error appears.
-            // its not consistent, so we just assert for this text
-            cy.contains("Failed to submit card data");
+            cy.contains("Card holder cannot be empty");
         })
 
         it('C4108: Invalid Card Number', () => {

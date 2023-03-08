@@ -17,10 +17,17 @@ export default class RefundManagerAction {
 
     /**
      *
-     * @param description
+     * @param publicDesc
+     * @param privateDesc
      */
-    fullRefund(description) {
-        repoRefundManager.getDescription().clear(forceOption).type(description, forceOption);
+    fullRefund(publicDesc, privateDesc) {
+        repoRefundManager.getDescription().clear(forceOption).type(publicDesc, forceOption);
+
+        if (privateDesc !== null && privateDesc.trim() !== '') {
+            // empty strings do not work
+            repoRefundManager.getInternalDescription().clear(forceOption).type(privateDesc, forceOption);
+        }
+
         repoRefundManager.getVerifyCheckbox().click(forceOption);
         repoRefundManager.getFullRefundButton().click(forceOption);
 

@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace MolliePayments\Tests\Fakes;
 
+use Exception;
 use Kiener\MolliePayments\Service\CustomerServiceInterface;
 use Kiener\MolliePayments\Struct\CustomerStruct;
+use Kiener\MolliePayments\Struct\Mandate\MandateCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
@@ -15,10 +17,14 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 final class FakeCustomerService implements CustomerServiceInterface
 {
     private EntityWrittenContainerEvent $setCardTokenResponse;
+    private EntityWrittenContainerEvent $setMandateIdResponse;
     private ?CustomerEntity $customerEntity = null;
+    private bool $throwException;
 
-    public function __construct(){
+    public function __construct(bool $throwException = false) {
         $this->setCardTokenResponse = new EntityWrittenContainerEvent(new Context(new SystemSource()), new NestedEventCollection(),[]);
+        $this->setMandateIdResponse = new EntityWrittenContainerEvent(new Context(new SystemSource()), new NestedEventCollection(),[]);
+        $this->throwException = $throwException;
     }
 
     public function customerLogin(CustomerEntity $customer, SalesChannelContext $context): ?string
@@ -31,9 +37,14 @@ final class FakeCustomerService implements CustomerServiceInterface
         return false;
     }
 
-    public function setCardToken(CustomerEntity $customer, string $cardToken, Context $context): EntityWrittenContainerEvent
+    public function setCardToken(CustomerEntity $customer, string $cardToken, SalesChannelContext $context, bool $shouldSaveCardDetail = false): EntityWrittenContainerEvent
     {
        return $this->setCardTokenResponse;
+    }
+
+    public function setMandateId(CustomerEntity $customer, string $cardToken, Context $context): EntityWrittenContainerEvent
+    {
+        return $this->setMandateIdResponse;
     }
 
     public function saveCustomerCustomFields(string $customerID, array $customFields, Context $context): EntityWrittenContainerEvent
@@ -98,11 +109,17 @@ final class FakeCustomerService implements CustomerServiceInterface
         return $customerService;
     }
 
+    public function withSaveMandateIdErrors(array $errors): self
+    {
+        $customerService = clone $this;
+        $customerService->setMandateIdResponse = new EntityWrittenContainerEvent(new Context(new SystemSource()), new NestedEventCollection(), $errors);
+        return $customerService;
+    }
+
     public function withFakeCustomer(): self
     {
         $customerService = clone $this;
         $customerService->customerEntity = new CustomerEntity();
         return $customerService;
     }
-
 }

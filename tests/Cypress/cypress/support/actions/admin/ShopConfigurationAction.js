@@ -28,14 +28,18 @@ export default class ShopConfigurationAction {
 
         cy.wait(500);
 
-        this._prepareShippingMethods();
+        this._configureShop();
+
+        cy.wait(500);
+
+        this.prepareShippingMethods();
 
         cy.wait(500);
 
         this.setupPlugin(mollieFailureMode, creditCardComponents, applePayDirect, false);
 
         // let's just wait a bit
-        cy.wait(12000);
+        cy.wait(20000);
 
         this._clearCache();
 
@@ -147,6 +151,7 @@ export default class ShopConfigurationAction {
             "MolliePayments.config.shopwareFailedPayment": !mollieFailureMode,
             "MolliePayments.config.enableCreditCardComponents": creditCardComponents,
             "MolliePayments.config.enableApplePayDirect": applePayDirect,
+            "MolliePayments.config.oneClickPaymentsEnabled": false,
             "MolliePayments.config.paymentMethodBankTransferDueDateDays": 2,
             "MolliePayments.config.orderLifetimeDays": 4,
             // ------------------------------------------------------------------
@@ -175,7 +180,7 @@ export default class ShopConfigurationAction {
         this.apiClient.get('/payment-method').then(payments => {
 
             if (payments === undefined || payments === null) {
-                throw new Error('Attention, No payments found trough Shopware API');
+                throw new Error('Attention, No payments through trough Shopware API');
             }
 
             payments.forEach(element => {
@@ -210,7 +215,7 @@ export default class ShopConfigurationAction {
      * Also add some shipping costs for better tests.
      * @private
      */
-    _prepareShippingMethods() {
+    prepareShippingMethods() {
         this.apiClient.get('/rule').then(rules => {
 
             if (rules === undefined || rules === null) {
@@ -252,10 +257,10 @@ export default class ShopConfigurationAction {
                                     ],
                                     "translations": {
                                         "de-DE": {
-                                            "tracking_url": "https://www.carrier.com/de/tracking/%s"
+                                            "trackingUrl": "https://www.carrier.com/de/tracking/%s"
                                         },
                                         "en-GB": {
-                                            "tracking_url": "https://www.carrier.com/en/tracking/%s"
+                                            "trackingUrl": "https://www.carrier.com/en/tracking/%s"
                                         }
                                     }
                                 };
@@ -267,6 +272,22 @@ export default class ShopConfigurationAction {
                 }
             });
         });
+    }
+
+    /**
+     *
+     * @private
+     */
+    _configureShop() {
+        const data = {};
+
+        const config = {
+            "core.loginRegistration.showAccountTypeSelection": true,
+        };
+
+        data[null] = config;
+
+        this.apiClient.post('/_action/system-config/batch', data);
     }
 
     /**

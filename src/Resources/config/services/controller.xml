@@ -118,6 +118,8 @@
 
         <service id="Kiener\MolliePayments\Controller\Storefront\CreditCard\CreditCardController" public="true">
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MandateService"/>
+            <argument type="service" id="mollie_payments.logger"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
@@ -136,6 +138,10 @@
             <argument type="service" id="mollie_payments.logger"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Cart\CartBackupService"/>
             <argument type="service" id="session.flash_bag"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
+            <argument type="service" id="customer.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
@@ -167,6 +173,7 @@
 
         <service id="Kiener\MolliePayments\Controller\StoreApi\CreditCard\CreditCardController" public="true">
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MandateService"/>
         </service>
 
         <service id="Kiener\MolliePayments\Controller\StoreApi\iDEAL\iDealController" public="true">

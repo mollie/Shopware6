@@ -24,6 +24,7 @@
         <import resource="services/scheduled_tasks.xml"/>
 
         <import resource="services/subscription/services.xml"/>
+        <import resource="services/refundmanager/services.xml"/>
     </imports>
 
     <services>
@@ -73,6 +74,12 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument>%kernel.shopware_version%</argument>
             <argument type="service" id="Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Service\MandateService" class="Kiener\MolliePayments\Service\MandateService">
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Mandate"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\CustomFieldService" class="Kiener\MolliePayments\Service\CustomFieldService">
@@ -156,11 +163,12 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="language.repository"/>
             <argument type="service" id="locale.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MandateService"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
         <service id="Kiener\MolliePayments\Subscriber\OrderStateSubscriber" class="Kiener\MolliePayments\Subscriber\OrderStateSubscriber">
-            <argument type="service" id="Mollie\Api\MollieApiClient"/>
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\PaymentMethodService"/>
             <tag name="kernel.event_subscriber"/>
@@ -168,6 +176,13 @@
 
         <service id="Kiener\MolliePayments\Subscriber\TestModeNotificationSubscriber">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Subscriber\AccountPaymentMethodPageSubscriber" class="Kiener\MolliePayments\Subscriber\AccountPaymentMethodPageSubscriber">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MandateService"/>
+
             <tag name="kernel.event_subscriber"/>
         </service>
 

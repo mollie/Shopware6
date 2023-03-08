@@ -1,5 +1,14 @@
 export default class RegisterRepository {
 
+
+    /**
+     *
+     * @returns {*}
+     */
+    getAccountType() {
+        return cy.get('#accountType');
+    }
+
     /**
      *
      * @returns {*}
@@ -22,6 +31,14 @@ export default class RegisterRepository {
      */
     getLastname() {
         return cy.get('#personalLastName');
+    }
+
+    /**
+     *
+     * @returns {*}
+     */
+    getCompany() {
+        return cy.get('#billingAddresscompany');
     }
 
     /**

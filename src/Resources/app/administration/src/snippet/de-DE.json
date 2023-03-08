@@ -1,6 +1,9 @@
 {
   "global": {
     "businessEvents": {
+      "mollie_checkout_order_success": " Bestellung erfolgreich",
+      "mollie_checkout_order_failed": " Bestellung fehlgeschlagen",
+      "mollie_checkout_order_canceled": " Bestellung abgebrochen",
       "mollie_webhook_received_All": " Mollie Webhook empfangen (Alle)",
       "mollie_webhook_received_status_authorized": " Mollie Webhook empfangen (Authorisiert)",
       "mollie_webhook_received_status_failed": " Mollie Webhook empfangen (Fehler)",
@@ -182,7 +185,12 @@
         "captionRefunded": "Rückerstattete Menge",
         "captionRemaining": "Rückerstattbar",
         "btnFixDiff": "Differenz ausfüllen",
-        "placeholderDescription": "Füge dieser Erstattung eine optionale Notiz hinzu.",
+        "placeholderDescription": "Geben Sie eine Beschreibung für den Kontoauszug bzw. Kartenabrechnung an. Max. 140 Zeichen",
+        "lblDescription": "Beschreibung (optional) ({characters}/140 Zeichen)",
+        "descriptionHelp": "Dies wird, wenn möglich, auf der Bank- oder Kartenabrechnung des Verbrauchers angezeigt. Die Nachricht wird nach 140 Zeichen abgeschnitten.",
+        "placeholderInternalDescription": "Geben Sie Ihre interne Beschreibung ein",
+        "lblInternalDescription": "Interne Beschreibung (optional)",
+        "internalDescriptionHelp": "Dies wird als lokale Beschreibung in der Verwaltungsschnittstelle angezeigt.",
         "checkVerification": "Ich habe den Betrag der Rückerstattung geprüft und die Anzahl der Positionen für Erstattung und Lagerbestand konfiguriert.",
         "btnRefund": "Rückerstatten",
         "btnFullRefund": "Vollständig rückerstatten",
@@ -196,6 +204,7 @@
             "amount": "Betrag",
             "status": "Status",
             "description": "Beschreibung",
+            "internalDescription": "Interne beschreibung",
             "composition": "Zusammensetzung",
             "date": "Datum"
           },
@@ -448,7 +457,10 @@
       "all": "Alle",
       "canceled": "Abgebrochen",
       "expired": "Abgelaufen",
-      "partiallyRefunded": "Rückerstattet (teilweise)"
+      "partiallyRefunded": "Rückerstattet (teilweise)",
+      "orderSuccess" : "Bestellung erfolgreich",
+      "orderFailed" : "Bestellung fehlgeschlagen",
+      "orderCanceled" : "Bestellung abgebrochen"
     }
   }
 }

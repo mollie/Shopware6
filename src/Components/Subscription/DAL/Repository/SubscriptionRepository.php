@@ -6,6 +6,7 @@ use DateTime;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Components\Subscription\Exception\SubscriptionNotFoundException;
 use Shopware\Core\Framework\Context;
@@ -78,6 +79,24 @@ class SubscriptionRepository
         }
 
         return $result->first();
+    }
+
+    /**
+     * @param string $customerId
+     * @param string $mandateId
+     * @param Context $context
+     * @return SubscriptionCollection
+     */
+    public function findByMandateId(string $customerId, string $mandateId, Context $context): SubscriptionCollection
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('customerId', $customerId));
+        $criteria->addFilter(new EqualsFilter('mandateId', $mandateId));
+
+        /** @var SubscriptionCollection $result */
+        $result = $this->repoSubscriptions->search($criteria, $context)->getEntities();
+
+        return $result;
     }
 
     /**
