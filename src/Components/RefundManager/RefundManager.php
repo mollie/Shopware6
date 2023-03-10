@@ -31,6 +31,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 
 class RefundManager implements RefundManagerInterface
 {
@@ -71,6 +72,11 @@ class RefundManager implements RefundManagerInterface
     private $flowBuilderEventFactory;
 
     /**
+     * @var EntityRepositoryInterface
+     */
+    protected $refundRepository;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -84,16 +90,17 @@ class RefundManager implements RefundManagerInterface
      * @param FlowBuilderFactoryInterface $flowBuilderFactory
      * @param FlowBuilderEventFactory $flowBuilderEventFactory
      * @param StockManagerInterface $stockUpdater
+     * @param EntityRepositoryInterface $refundRepository
      * @param LoggerInterface $logger
-     * @throws \Exception
      */
-    public function __construct(RefundDataBuilder $refundDataBuilder, OrderServiceInterface $orderService, RefundServiceInterface $refundService, Order $mollieOrder, FlowBuilderFactoryInterface $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, StockManagerInterface $stockUpdater, LoggerInterface $logger)
+    public function __construct(RefundDataBuilder $refundDataBuilder, OrderServiceInterface $orderService, RefundServiceInterface $refundService, Order $mollieOrder, FlowBuilderFactoryInterface $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, StockManagerInterface $stockUpdater, EntityRepositoryInterface $refundRepository, LoggerInterface $logger)
     {
         $this->builderData = $refundDataBuilder;
         $this->orderService = $orderService;
         $this->mollie = $mollieOrder;
         $this->refundService = $refundService;
         $this->stockManager = $stockUpdater;
+        $this->refundRepository = $refundRepository;
         $this->logger = $logger;
 
         $this->flowBuilderEventFactory = $flowBuilderEventFactory;
@@ -213,12 +220,28 @@ class RefundManager implements RefundManagerInterface
         }
 
 
-        if (! $refund instanceof Refund) {
+        if (!$refund instanceof Refund) {
             # a problem happened, lets finish with an exception
             throw new CouldNotCreateMollieRefundException('', (string)$order->getOrderNumber());
         }
 
         $refundAmount = (float)$refund->amount->value;
+
+
+        # SAVE LOCAL REFUND
+        # ---------------------------------------------------------------------------------------------
+        $this->refundRepository->create(
+            [
+                [
+                    'orderId' => $order->getId(),
+                    'orderVersionId' => $order->getVersionId(),
+                    'mollieRefundId' => $refund->id,
+                    'publicDescription' => $request->getDescription(),
+                    'internalDescription' => $request->getInternalDescription(),
+                ]
+            ],
+            $context
+        );
 
 
         # DISPATCH FLOW BUILDER
