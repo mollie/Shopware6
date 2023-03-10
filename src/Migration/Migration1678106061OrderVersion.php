@@ -19,12 +19,12 @@ class Migration1678106061OrderVersion extends MigrationStep
 ALTER TABLE `mollie_refund`
 ADD COLUMN `order_version_id` BINARY(16) NULL DEFAULT NULL AFTER `order_id`
 SQL;
-        $connection->executeStatement($sql);
+        $connection->exec($sql);
 
         $sql = "UPDATE `mollie_refund`
 SET `order_version_id` ='" . Defaults::LIVE_VERSION . "'";
 
-        $connection->executeStatement($sql);
+        $connection->exec($sql);
 
         $sql = <<<SQL
 ALTER TABLE `mollie_refund`
@@ -32,7 +32,7 @@ CHANGE `order_version_id` `order_version_id` BINARY(16) NOT NULL,
 ADD KEY `fk.mollie_refund.order_id` (`order_id`,`order_version_id`),
 ADD CONSTRAINT `fk.mollie_refund.order_id` FOREIGN KEY (`order_id`,`order_version_id`) REFERENCES `order` (`id`,`version_id`) ON DELETE CASCADE ON UPDATE CASCADE
 SQL;
-        $connection->executeStatement($sql);
+        $connection->exec($sql);
     }
 
     public function updateDestructive(Connection $connection): void
