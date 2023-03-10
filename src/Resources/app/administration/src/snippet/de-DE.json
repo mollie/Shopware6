@@ -1,5 +1,8 @@
 {
   "global": {
+    "entities": {
+      "mollie_subscription": "Mollie Abonnement | Mollie Abonnements"
+    },
     "businessEvents": {
       "mollie_checkout_order_success": " Bestellung erfolgreich",
       "mollie_checkout_order_failed": " Bestellung fehlgeschlagen",
@@ -28,6 +31,7 @@
   "mollie-payments": {
     "pluginTitle": "Mollie",
     "pluginDescription": "Mollie Module",
+    "searchPlaceholder": "In Abonnements suchen...",
     "general": {
       "mainMenuItemGeneral": "Mollie Payments Zahlungen",
       "descriptionTextModule": "Mollie Payments Zahlungen",
@@ -268,6 +272,15 @@
         },
         "confirmButton": "Versenden",
         "cancelButton": "Nicht versenden"
+      }
+    },
+    "sw-profile": {
+      "tabSearchPreferences": {
+        "modules": {
+          "mollie_subscription": {
+            "description": "Beschreibung"
+          }
+        }
       }
     },
     "sw-flow": {
