@@ -77,6 +77,7 @@ abstract class AbstractMailService
     /**
      * @param array<mixed> $attachments
      * @return array<mixed>
+     * @deprecated 
      */
     protected function filterFileAttachments(array $attachments = []): array
     {
