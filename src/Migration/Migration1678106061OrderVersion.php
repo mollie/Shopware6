@@ -21,12 +21,10 @@ ADD COLUMN `order_version_id` BINARY(16) NULL DEFAULT NULL AFTER `order_id`
 SQL;
         $connection->executeStatement($sql);
 
-        $sql = <<<SQL
-UPDATE `mollie_refund`
-SET `order_version_id` = :orderVersionId
-SQL;
+        $sql = "UPDATE `mollie_refund`
+SET `order_version_id` ='" . Defaults::LIVE_VERSION . "'";
 
-        $connection->executeStatement($sql, ['orderVersionId' => Defaults::LIVE_VERSION]);
+        $connection->executeStatement($sql);
 
         $sql = <<<SQL
 ALTER TABLE `mollie_refund`
