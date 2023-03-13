@@ -99,4 +99,12 @@ class ProductItem extends AbstractItem
 
         return (string)$this->lineItem->getPayload()['productNumber'];
     }
+
+    /**
+     * @return OrderLineItemEntity
+     */
+    public function getLineItem(): OrderLineItemEntity
+    {
+        return $this->lineItem;
+    }
 }

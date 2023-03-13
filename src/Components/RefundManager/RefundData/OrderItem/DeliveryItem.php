@@ -53,4 +53,12 @@ class DeliveryItem extends AbstractItem
             $this->alreadyRefundedQty
         );
     }
+
+    /**
+     * @return OrderDeliveryEntity
+     */
+    public function getDelivery(): OrderDeliveryEntity
+    {
+        return $this->delivery;
+    }
 }

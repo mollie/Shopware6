@@ -17,13 +17,19 @@ class UpdateOrderLineItems
      */
     private $orderLineRepository;
 
+    /**
+     * @var EntityRepositoryInterface
+     */
+    private $orderDeliveryRepository;
+
 
     /**
      * @param EntityRepositoryInterface $orderLineRepository
      */
-    public function __construct(EntityRepositoryInterface $orderLineRepository)
+    public function __construct(EntityRepositoryInterface $orderLineRepository, EntityRepositoryInterface $orderDeliveryRepository)
     {
         $this->orderLineRepository = $orderLineRepository;
+        $this->orderDeliveryRepository = $orderDeliveryRepository;
     }
 
     /**
@@ -34,10 +40,7 @@ class UpdateOrderLineItems
     {
         /** @var OrderLine $orderLine */
         foreach ($mollieOrder->lines() as $orderLine) {
-            if ($orderLine->type === OrderLineType::TYPE_SHIPPING_FEE) {
-                continue;
-            }
-
+            ##Contrary to the name, this can also be an order_delivery id since these are also kind of line items
             $shopwareLineItemId = (string)$orderLine->metadata->orderLineItemId;
 
             if (empty($shopwareLineItemId)) {
@@ -53,7 +56,11 @@ class UpdateOrderLineItems
                 ]
             ];
 
-            $this->orderLineRepository->update([$data], $salesChannelContext->getContext());
+            if ($orderLine->type === OrderLineType::TYPE_SHIPPING_FEE) {
+                $this->orderDeliveryRepository->update([$data], $salesChannelContext->getContext());
+            } else {
+                $this->orderLineRepository->update([$data], $salesChannelContext->getContext());
+            }
         }
     }
 }
