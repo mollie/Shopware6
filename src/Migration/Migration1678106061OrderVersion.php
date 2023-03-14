@@ -22,7 +22,7 @@ SQL;
         $connection->exec($sql);
 
         $sql = "UPDATE `mollie_refund`
-SET `order_version_id` ='" . Defaults::LIVE_VERSION . "'";
+SET `order_version_id` =X'" . Defaults::LIVE_VERSION . "'";
 
         $connection->exec($sql);
 
