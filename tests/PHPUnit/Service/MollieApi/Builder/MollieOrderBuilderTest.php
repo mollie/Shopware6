@@ -4,6 +4,7 @@ namespace MolliePayments\Tests\Service\MollieApi\Builder;
 
 use Kiener\MolliePayments\Handler\Method\PayPalPayment;
 use MolliePayments\Tests\Fakes\FakeContainer;
+use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Uuid\Uuid;
 
@@ -26,6 +27,7 @@ class MollieOrderBuilderTest extends AbstractMollieOrderBuilder
                 'custom_prefix' => ['R10000', 'R{ordernumber}'],
                 'custom_suffix' => ['10000-stage', '{ordernumber}-stage'],
                 'full_format' => ['R10000-stage', 'R{ordernumber}-stage'],
+                'with_customer_number' => ['R10000-5000', 'R{ordernumber}-{customernumber}'],
             ];
     }
 
@@ -51,6 +53,10 @@ class MollieOrderBuilderTest extends AbstractMollieOrderBuilder
         $order->setSalesChannelId(Uuid::randomHex());
         $order->setTaxStatus('ok');
         $order->setOrderNumber('10000');
+
+        $customer = new OrderCustomerEntity();
+        $customer->setCustomerNumber('5000');
+        $order->setOrderCustomer($customer);
 
         $data = $this->builder->build(
             $order,

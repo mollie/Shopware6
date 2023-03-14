@@ -14,6 +14,7 @@ use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
+use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\Locale\LocaleEntity;
@@ -132,6 +133,11 @@ class MollieOrderBuilder
         if (!empty(trim($settings->getFormatOrderNumber()))) {
             $orderNumberFormatted = $settings->getFormatOrderNumber();
             $orderNumberFormatted = str_replace('{ordernumber}', (string)$order->getOrderNumber(), (string)$orderNumberFormatted);
+
+            $orderCustomer = $order->getOrderCustomer();
+            if ($orderCustomer instanceof OrderCustomerEntity) {
+                $orderNumberFormatted = str_replace('{customernumber}', (string)$orderCustomer->getCustomerNumber(), (string)$orderNumberFormatted);
+            }
         } else {
             $orderNumberFormatted = $order->getOrderNumber();
         }
