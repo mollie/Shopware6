@@ -17,6 +17,10 @@
             <factory service="Kiener\MolliePayments\Service\Logger\MollieLoggerFactory" method="createLogger"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Service\Logger\MollieEventLogger" class="Kiener\MolliePayments\Service\Logger\MollieEventLogger">
+            <argument type="service" id="log_entry.repository"/>
+        </service>
+
         <service id="Kiener\MolliePayments\Service\OrderDeliveryService">
             <argument type="service" id="order_delivery.repository"/>
         </service>
@@ -26,6 +30,7 @@
         <service id="Kiener\MolliePayments\Service\MollieApi\RequestAnonymizer\MollieRequestAnonymizer">
             <argument>*</argument>
         </service>
+
 
         <service id="Kiener\MolliePayments\Service\TokenAnonymizer"/>
 
