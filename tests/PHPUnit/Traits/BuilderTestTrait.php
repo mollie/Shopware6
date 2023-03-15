@@ -24,7 +24,12 @@ trait BuilderTestTrait
 
         $routingDetector = new RoutingDetector(new RequestStack(new Request()));
 
-        return new RoutingBuilder($fakeRouter, $routingDetector, new FakePluginSettings(''));
+        return new RoutingBuilder(
+            $fakeRouter,
+            $routingDetector,
+            new FakePluginSettings(''),
+            ''
+        );
     }
 
 }

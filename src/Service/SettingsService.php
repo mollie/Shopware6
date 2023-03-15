@@ -29,15 +29,37 @@ class SettingsService implements PluginSettingsServiceInterface
      */
     private $repoSalesChannels;
 
+    /**
+     * @var string
+     */
+    private $envShopDomain;
+
+    /**
+     * @var string
+     */
+    private $envDevMode;
+
+    /**
+     * @var string
+     */
+    private $envCypressMode;
+
 
     /**
      * @param SystemConfigService $systemConfigService
      * @param EntityRepositoryInterface $repoSalesChannels
+     * @param ?string $envShopDomain
+     * @param ?string $envDevMode
+     * @param ?string $envCypressMode
      */
-    public function __construct(SystemConfigService $systemConfigService, EntityRepositoryInterface $repoSalesChannels)
+    public function __construct(SystemConfigService $systemConfigService, EntityRepositoryInterface $repoSalesChannels, ?string $envShopDomain, ?string $envDevMode, ?string $envCypressMode)
     {
         $this->systemConfigService = $systemConfigService;
         $this->repoSalesChannels = $repoSalesChannels;
+
+        $this->envShopDomain = (string)$envShopDomain;
+        $this->envDevMode = (string)$envDevMode;
+        $this->envCypressMode = (string)$envCypressMode;
     }
 
     /**
@@ -128,7 +150,7 @@ class SettingsService implements PluginSettingsServiceInterface
      */
     public function getEnvMollieShopDomain(): string
     {
-        return trim((string)getenv('MOLLIE_SHOP_DOMAIN'));
+        return trim($this->envShopDomain);
     }
 
     /**
@@ -139,7 +161,7 @@ class SettingsService implements PluginSettingsServiceInterface
      */
     public function getEnvMollieDevMode(): bool
     {
-        $devMode = trim((string)getenv('MOLLIE_DEV_MODE'));
+        $devMode = trim($this->envDevMode);
         return ($devMode === '1');
     }
 
@@ -148,7 +170,7 @@ class SettingsService implements PluginSettingsServiceInterface
      */
     public function getMollieCypressMode(): bool
     {
-        $devMode = trim((string)getenv('MOLLIE_CYPRESS_MODE'));
+        $devMode = trim($this->envCypressMode);
         return ($devMode === '1');
     }
 }
