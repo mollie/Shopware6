@@ -155,7 +155,12 @@ abstract class AbstractMollieOrderBuilder extends TestCase
 
 
         $routingDetector = new RoutingDetector(new RequestStack(new Request()));
-        $routingBuilder = new RoutingBuilder($this->router, $routingDetector, new FakePluginSettings(''));
+        $routingBuilder = new RoutingBuilder(
+            $this->router,
+            $routingDetector,
+            new FakePluginSettings(''),
+            ''
+        );
 
         $this->builder = new MollieOrderBuilder(
             $this->settingsService,
