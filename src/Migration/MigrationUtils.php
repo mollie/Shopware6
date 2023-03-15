@@ -112,8 +112,8 @@ class MigrationUtils
     /**
      * @param string $table
      * @param string $indexName
-     * @return bool
      * @throws Exception
+     * @return bool
      */
     private function isIndexExisting(string $table, string $indexName)
     {
