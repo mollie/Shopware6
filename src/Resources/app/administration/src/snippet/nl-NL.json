@@ -275,15 +275,6 @@
       }
     },
 
-    "sw-profile": {
-      "tabSearchPreferences": {
-        "modules": {
-          "mollie_subscription": {
-            "description": "Beschrijving"
-          }
-        }
-      }
-    },
     "sw-flow": {
       "actions": {
         "shipOrder": {
@@ -451,6 +442,15 @@
       },
       "mollie_subscription": {
         "label": "Abonnementen"
+      }
+    }
+  },
+  "sw-profile": {
+    "tabSearchPreferences": {
+      "modules": {
+        "mollie_subscription": {
+          "description": "Beschrijving"
+        }
       }
     }
   },

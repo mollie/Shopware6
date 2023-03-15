@@ -274,15 +274,6 @@
         "cancelButton": "Nicht versenden"
       }
     },
-    "sw-profile": {
-      "tabSearchPreferences": {
-        "modules": {
-          "mollie_subscription": {
-            "description": "Beschreibung"
-          }
-        }
-      }
-    },
     "sw-flow": {
       "actions": {
         "shipOrder": {
@@ -450,6 +441,15 @@
       },
       "mollie_subscription": {
         "label": "Abonnements"
+      }
+    }
+  },
+  "sw-profile": {
+    "tabSearchPreferences": {
+      "modules": {
+        "mollie_subscription": {
+          "description": "Beschreibung"
+        }
       }
     }
   },
