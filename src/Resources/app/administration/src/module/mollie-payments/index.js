@@ -78,7 +78,7 @@ systemConfig.getValues('MolliePayments').then(config => {
 
         navigation,
 
-        defaultSearchConfiguration
+        defaultSearchConfiguration,
     });
 
     // Now tell Shopware it's okay to load the administration

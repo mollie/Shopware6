@@ -3,7 +3,7 @@ const defaultSearchConfiguration = {
     description: {
         _searchable: true,
         _score: 500,
-    }
+    },
 };
 
 export default defaultSearchConfiguration;
