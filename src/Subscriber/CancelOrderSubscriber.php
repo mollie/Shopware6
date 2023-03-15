@@ -14,7 +14,7 @@ use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMa
 use Shopware\Core\System\StateMachine\Event\StateMachineStateChangeEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CancelMollieOrderSubscriber implements EventSubscriberInterface
+class CancelOrderSubscriber implements EventSubscriberInterface
 {
 
     /**
@@ -22,8 +22,7 @@ class CancelMollieOrderSubscriber implements EventSubscriberInterface
      * our cancellation (if enabled in the config).
      */
     public const AUTOMATIC_TRIGGER_ACTIONS = [
-        StateMachineTransitionActions::ACTION_CANCEL,
-        StateMachineTransitionActions::ACTION_FAIL
+        StateMachineTransitionActions::ACTION_CANCEL
     ];
 
     /**
