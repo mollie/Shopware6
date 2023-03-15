@@ -26,16 +26,21 @@ class MigrationUtils
      * @param string $table
      * @param string $column
      * @param string $type
+     * @param string $default
      * @param string $after
      * @throws Exception
      */
-    public function createColumn(string $table, string $column, string $type, string $after): void
+    public function createColumn(string $table, string $column, string $type, string $default, string $after): void
     {
         $colQuery = $this->connection->executeQuery("SHOW COLUMNS FROM " . $table . " LIKE '" . $column . "'")->fetch();
 
         # only create if not yet existing
         if ($colQuery === false) {
-            $sql = "ALTER TABLE " . $table . " ADD " . $column . " " . $type;
+            $sql = "ALTER TABLE " . $table . " ADD " . $column . " " . $type . ' NULL ';
+
+            if (!empty($default)) {
+                $sql .= ' DEFAULT ' . $default;
+            }
 
             if (!empty($after)) {
                 $sql .= ' AFTER `' . $after . '`';
@@ -107,8 +112,8 @@ class MigrationUtils
     /**
      * @param string $table
      * @param string $indexName
-     * @throws Exception
      * @return bool
+     * @throws Exception
      */
     private function isIndexExisting(string $table, string $indexName)
     {

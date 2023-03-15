@@ -31,17 +31,17 @@ class Migration1678106061OrderVersion extends MigrationStep
             'mollie_refund',
             'order_version_id',
             'BINARY(16)',
+            'NULL',
             'order_id'
         );
 
         # update existing entries and set the order_version_id to the
         # latest default version ID from the Shopware constant (that's totally fine now)
-        $connection->exec("UPDATE `mollie_refund` SET `order_version_id` =X'" . Defaults::LIVE_VERSION . "'");
+        $connection->exec("UPDATE `mollie_refund` SET `order_version_id` =X'" . Defaults::LIVE_VERSION . "' WHERE order_version_id IS NULL");
 
         # change to NOT-NULL now that we have updated everything
         $sql = "ALTER TABLE `mollie_refund` CHANGE `order_version_id` `order_version_id` BINARY(16) NOT NULL";
         $connection->exec($sql);
-
 
         # add a key that consists of order_id and version_id
         $utils->addKey(
