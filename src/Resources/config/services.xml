@@ -191,7 +191,7 @@
             <argument type="service" id="router"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Router\RoutingDetector"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument key="$envAppUrl">%env(default::APP_ENV)%</argument>
+            <argument key="$envAppUrl">%env(default::APP_URL)%</argument>
         </service>
 
     </services>
