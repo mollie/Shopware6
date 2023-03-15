@@ -5,7 +5,7 @@
 
 {% block mollie_credit_card_mandate_list %}
     {% block mollie_credit_card_mandate_list_include %}
-        {% if enableOneClickPayments and showIfActive and mandates|length > 0 and activeRoute is not same as 'frontend.account.payment.page' %}
+        {% if enableOneClickPayments and showIfActive and mandates|length > 0 and activeRoute is not same as ('frontend.account.payment.page') %}
             {% sw_include '@MolliePayments/mollie/component/credit-card-mandate.html.twig' with {
                 'mandates': mandates,
                 'compactView': page.enable_one_click_payments_compact_view,

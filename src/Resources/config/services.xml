@@ -83,7 +83,7 @@
         </service>
 
         <service id="Kiener\MolliePayments\Service\CustomFieldService" class="Kiener\MolliePayments\Service\CustomFieldService">
-            <argument type="service" id="custom_field_set.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\CustomFieldSet\CustomFieldSetRepository"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\DeliveryService" class="Kiener\MolliePayments\Service\DeliveryService">
@@ -164,13 +164,6 @@
             <argument type="service" id="language.repository"/>
             <argument type="service" id="locale.repository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MandateService"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Subscriber\OrderStateSubscriber" class="Kiener\MolliePayments\Subscriber\OrderStateSubscriber">
-            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\PaymentMethodService"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 

@@ -21,7 +21,6 @@ use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\Refund;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\System\Currency\CurrencyEntity;
 
 class RefundService implements RefundServiceInterface
@@ -47,26 +46,19 @@ class RefundService implements RefundServiceInterface
      */
     private $gwMollie;
 
-    /**
-     * @var EntityRepositoryInterface
-     */
-    protected $refundRepository;
-
 
     /**
      * @param Order $mollie
      * @param OrderService $orders
      * @param RefundHydrator $refundHydrator
      * @param MollieGatewayInterface $gwMollie
-     * @param EntityRepositoryInterface $refundRepository
      */
-    public function __construct(Order $mollie, OrderService $orders, RefundHydrator $refundHydrator, MollieGatewayInterface $gwMollie, EntityRepositoryInterface $refundRepository)
+    public function __construct(Order $mollie, OrderService $orders, RefundHydrator $refundHydrator, MollieGatewayInterface $gwMollie)
     {
         $this->mollie = $mollie;
         $this->orders = $orders;
         $this->refundHydrator = $refundHydrator;
         $this->gwMollie = $gwMollie;
-        $this->refundRepository = $refundRepository;
     }
 
 
@@ -119,8 +111,6 @@ class RefundService implements RefundServiceInterface
             throw new CouldNotCreateMollieRefundException($mollieOrderId, (string)$order->getOrderNumber());
         }
 
-        $this->saveRefundDescriptions($order, $refund, $description, $internalDescription, $context);
-
         return $refund;
     }
 
@@ -153,18 +143,16 @@ class RefundService implements RefundServiceInterface
             throw new CouldNotCreateMollieRefundException('', (string)$order->getOrderNumber());
         }
 
-        $this->saveRefundDescriptions($order, $refund, $description, $internalDescription, $context);
-
         return $refund;
     }
 
     /**
      * @param OrderEntity $order
      * @param string $refundId
-     * @throws PaymentNotFoundException
      * @throws CouldNotCancelMollieRefundException
      * @throws CouldNotExtractMollieOrderIdException
      * @throws CouldNotFetchMollieOrderException
+     * @throws PaymentNotFoundException
      * @return bool
      */
     public function cancel(OrderEntity $order, string $refundId): bool
@@ -199,10 +187,10 @@ class RefundService implements RefundServiceInterface
 
     /**
      * @param OrderEntity $order
-     * @throws PaymentNotFoundException
      * @throws CouldNotExtractMollieOrderIdException
      * @throws CouldNotFetchMollieOrderException
      * @throws CouldNotFetchMollieRefundsException
+     * @throws PaymentNotFoundException
      * @return array<mixed>
      */
     public function getRefunds(OrderEntity $order): array
@@ -233,9 +221,9 @@ class RefundService implements RefundServiceInterface
 
     /**
      * @param OrderEntity $order
-     * @throws CouldNotExtractMollieOrderIdException
      * @throws CouldNotFetchMollieOrderException
      * @throws PaymentNotFoundException
+     * @throws CouldNotExtractMollieOrderIdException
      * @return float
      */
     public function getRemainingAmount(OrderEntity $order): float
@@ -273,9 +261,9 @@ class RefundService implements RefundServiceInterface
 
     /**
      * @param OrderEntity $order
-     * @throws CouldNotExtractMollieOrderIdException
      * @throws CouldNotFetchMollieOrderException
      * @throws PaymentNotFoundException
+     * @throws CouldNotExtractMollieOrderIdException
      * @return float
      */
     public function getRefundedAmount(OrderEntity $order): float
@@ -306,25 +294,5 @@ class RefundService implements RefundServiceInterface
             '',
             $order->getSalesChannelId()
         );
-    }
-
-    /**
-     * @param OrderEntity $order
-     * @param Refund $refund
-     * @param string $description
-     * @param string $internalDescription
-     * @param Context $context
-     * @return void
-     */
-    private function saveRefundDescriptions(OrderEntity $order, Refund $refund, string $description, string $internalDescription, Context $context)
-    {
-        $this->refundRepository->create([
-            [
-                'orderId' => $order->getId(),
-                'mollieRefundId' => $refund->id,
-                'publicDescription' => $description,
-                'internalDescription' => $internalDescription,
-            ]
-        ], $context);
     }
 }

@@ -24,7 +24,7 @@ Component.register('mollie-pluginconfig-section-payments-format', {
          * @returns {string}
          */
         sample1() {
-            return this.getFormat('1000');
+            return this.getFormat('1000', '5000');
         },
 
         /**
@@ -32,7 +32,7 @@ Component.register('mollie-pluginconfig-section-payments-format', {
          * @returns {string}
          */
         sample2() {
-            return this.getFormat('5023');
+            return this.getFormat('5023', '2525');
         },
 
     },
@@ -42,14 +42,18 @@ Component.register('mollie-pluginconfig-section-payments-format', {
         /**
          *
          * @param ordernumber
-         * @returns {string|*}
+         * @param customerNumber
+         * @returns {*}
          */
-        getFormat(ordernumber) {
+        getFormat(ordernumber, customerNumber) {
 
             const template = this.getConfigData('MolliePayments.config.formatOrderNumber');
 
             const stringUtils = new StringUtils();
-            const text = stringUtils.replace('{ordernumber}', ordernumber, template);
+
+            let text = stringUtils.replace('{ordernumber}', ordernumber, template);
+
+            text = stringUtils.replace('{customernumber}', customerNumber, text);
 
             return text;
         },

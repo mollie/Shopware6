@@ -6,6 +6,12 @@
 
     <services>
 
+        <service id="Kiener\MolliePayments\Repository\CustomFieldSet\CustomFieldSetRepository"
+                 class="Kiener\MolliePayments\Repository\CustomFieldSet\CustomFieldSetRepository">
+            <argument type="service" id="custom_field_set.repository"/>
+        </service>
+
+
         <service id="Kiener\MolliePayments\Repository\Order\OrderAddressRepository" class="Kiener\MolliePayments\Repository\Order\OrderAddressRepository">
             <argument type="service" id="order_address.repository"/>
         </service>

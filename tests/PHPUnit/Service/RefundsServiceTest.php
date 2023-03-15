@@ -90,15 +90,12 @@ class RefundsServiceTest extends TestCase
 
 
         $mollieOrderApiMock = new MollieOrderApi($apiFactoryMock, $paymentApiService, $routingBuilder, new MollieRequestAnonymizer('*'), $loggerServiceMock, $this->settingService);
-        $mollieOrderApiMock = new MollieOrderApi($apiFactoryMock, $paymentApiService, $routingBuilder, new MollieRequestAnonymizer('*'), $loggerServiceMock, $this->settingService);
-
 
         $this->refundService = new RefundService(
             $mollieOrderApiMock,
             $this->orderService,
             new RefundHydrator(),
-            new FakeMollieGateway(),
-            $this->createMock(EntityRepositoryInterface::class),
+            new FakeMollieGateway()
         );
     }
 

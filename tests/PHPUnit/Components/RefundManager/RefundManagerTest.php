@@ -25,6 +25,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 
 class RefundManagerTest extends TestCase
 {
@@ -82,6 +83,7 @@ class RefundManagerTest extends TestCase
             new FakeFlowBuilderFactory($this->fakeFlowBuilderDispatcher),
             $flowBuilderEventFactory,
             $this->fakeStockUpdater,
+            $this->createMock(EntityRepositoryInterface::class),
             new NullLogger()
         );
     }

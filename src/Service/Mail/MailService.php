@@ -52,7 +52,7 @@ class MailService extends AbstractMailService
             $this->getNoReplyAddress($data),
             $this->getRecipients($data['recipientLocale'] ?? null),
             $this->buildContents($data),
-            $this->filterFileAttachments($attachments),
+            [],
             [], // Additional data, but doesn't work properly.
             $this->filterBinaryAttachments($attachments)
         );

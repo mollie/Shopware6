@@ -3,14 +3,12 @@
 namespace Kiener\MolliePayments\Service;
 
 use Exception;
-use Psr\Log\LoggerInterface;
+use Kiener\MolliePayments\Repository\CustomFieldSet\CustomFieldSetRepositoryInterface;
 use Shopware\Core\Checkout\Customer\CustomerDefinition;
 use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\CustomField\CustomFieldTypes;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class CustomFieldService
 {
@@ -18,17 +16,17 @@ class CustomFieldService
 
 
     /**
-     * @var EntityRepositoryInterface
+     * @var CustomFieldSetRepositoryInterface
      */
-    private $customFieldSetRepository;
+    private $repoCustomFieldSets;
 
 
     /**
-     * @param EntityRepositoryInterface $customFieldSetRepository
+     * @param CustomFieldSetRepositoryInterface $customFieldSetRepository
      */
-    public function __construct(EntityRepositoryInterface $customFieldSetRepository)
+    public function __construct(CustomFieldSetRepositoryInterface $customFieldSetRepository)
     {
-        $this->customFieldSetRepository = $customFieldSetRepository;
+        $this->repoCustomFieldSets = $customFieldSetRepository;
     }
 
     /**
@@ -41,7 +39,7 @@ class CustomFieldService
             $mollieCustomerFieldId = Uuid::randomHex();
             $iDealIssuerFieldId = Uuid::randomHex();
 
-            $this->customFieldSetRepository->upsert([[
+            $this->repoCustomFieldSets->upsert([[
                 'id' => Uuid::randomHex(),
                 'name' => 'mollie_payments',
                 'config' => [
