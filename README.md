@@ -7,7 +7,7 @@
 
 
 ## Introduction
-Mollie offers various payment methods which can be easily integrated into your Shopware-powered webshop by using our official plugin. Mollie accepts all major payment methods such as Visa, Mastercard, American Express, PayPal, iDEAL, SOFORT Banking, SEPA Bank Transfer, SEPA Direct Debit, Apple Pay, KBC/CBC Payment Button, Bancontact, Belfius Pay Button, paysafecard, CartaSi, Cartes Bancaires, Gift cards, Monizze Vouchers and Sodexo Vouchers.
+Mollie offers various payment methods which can be easily integrated into your Shopware-powered webshop by using our official plugin. Mollie accepts all major payment methods such as Visa, Mastercard, American Express, PayPal, iDEAL, SOFORT Banking, SEPA Bank Transfer, SEPA Direct Debit, Apple Pay, KBC/CBC Payment Button, Bancontact, Belfius Pay Button, paysafecard, CartaSi, Cartes Bancaires, Gift cards, Billie, Monizze Vouchers and Sodexo Vouchers.
 
 1.  Installation is easy.
 2.  Go to  [Mollie](https://www.mollie.com/signup/)  to create your Mollie account

@@ -121,6 +121,10 @@ pr: ## Prepares everything for a Pull Request
 	@make snippetcheck -B
 
 release: ## Builds a PROD version and creates a ZIP file in plugins/.build
+	php switch-composer.php dev
+	composer update shopware/core
+	composer update shopware/storefront
+	composer update shopware/administration
 	make clean -B
 	make install -B
 	make build -B
