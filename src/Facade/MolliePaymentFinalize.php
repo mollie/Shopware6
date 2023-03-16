@@ -6,6 +6,7 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFact
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Exception\MissingMollieOrderIdException;
+use Kiener\MolliePayments\Repository\Customer\CustomerRepositoryInterface;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentDetails;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
@@ -61,7 +62,7 @@ class MolliePaymentFinalize
     private $subscriptionManager;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var CustomerRepositoryInterface
      */
     private $repoCustomer;
 
@@ -83,11 +84,11 @@ class MolliePaymentFinalize
      * @param Order $mollieOrderService
      * @param OrderService $orderService
      * @param SubscriptionManager $subscriptionManager
-     * @param EntityRepositoryInterface $repoCustomer
+     * @param CustomerRepositoryInterface $repoCustomer
      * @param FlowBuilderFactory $flowBuilderFactory
      * @param FlowBuilderEventFactory $flowBuilderEventFactory
      */
-    public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, Order $mollieOrderService, OrderService $orderService, SubscriptionManager $subscriptionManager, EntityRepositoryInterface $repoCustomer, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory)
+    public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, Order $mollieOrderService, OrderService $orderService, SubscriptionManager $subscriptionManager, CustomerRepositoryInterface $repoCustomer, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory)
     {
         $this->orderStatusConverter = $orderStatusConverter;
         $this->orderStatusUpdater = $orderStatusUpdater;

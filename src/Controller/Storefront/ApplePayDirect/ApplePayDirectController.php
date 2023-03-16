@@ -6,6 +6,7 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatche
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect;
+use Kiener\MolliePayments\Repository\Customer\CustomerRepositoryInterface;
 use Kiener\MolliePayments\Service\Cart\CartBackupService;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Traits\Storefront\RedirectTrait;
@@ -73,7 +74,7 @@ class ApplePayDirectController extends StorefrontController
     private $flowBuilderEventFactory;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var CustomerRepositoryInterface
      */
     private $repoCustomers;
 
@@ -96,11 +97,11 @@ class ApplePayDirectController extends StorefrontController
      * @param FlashBag $sessionFlashBag
      * @param FlowBuilderFactory $flowBuilderFactory
      * @param FlowBuilderEventFactory $flowBuilderEventFactory
-     * @param EntityRepositoryInterface $repoCustomers
+     * @param CustomerRepositoryInterface $repoCustomers
      * @param OrderService $orderService
      * @throws \Exception
      */
-    public function __construct(ApplePayDirect $applePay, RouterInterface $router, LoggerInterface $logger, CartBackupService $cartBackup, FlashBag $sessionFlashBag, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, EntityRepositoryInterface $repoCustomers, OrderService $orderService)
+    public function __construct(ApplePayDirect $applePay, RouterInterface $router, LoggerInterface $logger, CartBackupService $cartBackup, FlashBag $sessionFlashBag, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, CustomerRepositoryInterface $repoCustomers, OrderService $orderService)
     {
         $this->applePay = $applePay;
         $this->router = $router;

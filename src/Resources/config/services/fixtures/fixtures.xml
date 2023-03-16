@@ -20,7 +20,7 @@
 
         <service id="MolliePayments\Fixtures\Customer\CustomerFixture">
             <argument type="service" id="Basecom\FixturePlugin\FixtureHelper"/>
-            <argument type="service" id="customer.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\Customer\CustomerRepository"/>
             <tag name="basecom.fixture"/>
         </service>
 
