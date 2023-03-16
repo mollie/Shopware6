@@ -13,7 +13,7 @@
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Stock\StockManager"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\RefundManager\Repository\Refund\RefundRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\Refund\RefundRepository"/>
             <argument type="service" id="mollie_payments.logger"/>
         </service>
 

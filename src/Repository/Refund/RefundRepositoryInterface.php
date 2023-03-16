@@ -1,6 +1,6 @@
 <?php
 
-namespace Kiener\MolliePayments\Components\RefundManager\Repository\Refund;
+namespace Kiener\MolliePayments\Repository\Refund;
 
 use Shopware\Core\Framework\Context;
 
@@ -18,5 +18,4 @@ interface RefundRepositoryInterface
      * @return void
      */
     public function create(array $data, Context $context): void;
-
 }

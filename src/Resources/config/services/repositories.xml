@@ -28,8 +28,8 @@
             <argument type="service" id="payment_method.repository"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Components\RefundManager\Repository\Refund\RefundRepository"
-        class="Kiener\MolliePayments\Components\RefundManager\Repository\Refund\RefundRepository">
+        <service id="Kiener\MolliePayments\Repository\Refund\RefundRepository"
+                 class="Kiener\MolliePayments\Repository\Refund\RefundRepository">
             <argument type="service" id="mollie_refund.repository"/>
         </service>
 

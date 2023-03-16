@@ -1,6 +1,6 @@
 <?php
 
-namespace Kiener\MolliePayments\Components\RefundManager\Repository\Refund;
+namespace Kiener\MolliePayments\Repository\Refund;
 
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -10,13 +10,13 @@ class RefundRepository implements RefundRepositoryInterface
 {
 
     /**
-     * @var EntityRepositoryInterface|EntityRepository
+     * @var EntityRepository|EntityRepositoryInterface
      */
     private $coreRepository;
 
 
     /**
-     * @param EntityRepositoryInterface|EntityRepository $refundRepository
+     * @param EntityRepository|EntityRepositoryInterface $refundRepository
      */
     public function __construct($refundRepository)
     {
@@ -34,7 +34,7 @@ class RefundRepository implements RefundRepositoryInterface
     }
 
     /**
-     * @param array $data
+     * @param array<mixed> $data
      * @param Context $context
      * @return void
      */

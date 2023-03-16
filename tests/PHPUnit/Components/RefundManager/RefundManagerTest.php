@@ -7,9 +7,9 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund\Refund
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Components\RefundManager\Builder\RefundDataBuilder;
 use Kiener\MolliePayments\Components\RefundManager\RefundManager;
-use Kiener\MolliePayments\Components\RefundManager\Repository\Refund\RefundRepositoryInterface;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
+use Kiener\MolliePayments\Repository\Refund\RefundRepositoryInterface;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order as MollieOrder;

@@ -9,18 +9,19 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactoryIn
 use Kiener\MolliePayments\Components\RefundManager\Builder\RefundDataBuilder;
 use Kiener\MolliePayments\Components\RefundManager\Integrators\StockManagerInterface;
 use Kiener\MolliePayments\Components\RefundManager\RefundData\RefundData;
-use Kiener\MolliePayments\Components\RefundManager\Repository\Refund\RefundRepositoryInterface;
+
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItemRoundingDiff;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieRefundException;
+use Kiener\MolliePayments\Repository\Refund\RefundRepositoryInterface;
 use Kiener\MolliePayments\Service\MollieApi\Order;
-use Kiener\MolliePayments\Service\OrderService;
+
 use Kiener\MolliePayments\Service\OrderServiceInterface;
 use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
-use Kiener\MolliePayments\Service\Refund\RefundService;
+
 use Kiener\MolliePayments\Service\Refund\RefundServiceInterface;
-use Kiener\MolliePayments\Service\Stock\StockManager;
+
 use Kiener\MolliePayments\Struct\MollieApi\OrderLineMetaDataStruct;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
@@ -32,7 +33,6 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 
 class RefundManager implements RefundManagerInterface
 {
