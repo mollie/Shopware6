@@ -27,6 +27,7 @@
         <import resource="services/refundmanager/services.xml"/>
     </imports>
 
+
     <services>
 
         <!-- Configuration -->
@@ -111,6 +112,9 @@
         <service id="Kiener\MolliePayments\Service\SettingsService" class="Kiener\MolliePayments\Service\SettingsService">
             <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
             <argument type="service" id="sales_channel.repository"/>
+            <argument key="$envShopDomain">%env(default::MOLLIE_SHOP_DOMAIN)%</argument>
+            <argument key="$envDevMode">%env(default::MOLLIE_DEV_MODE)%</argument>
+            <argument key="$envCypressMode">%env(default::MOLLIE_CYPRESS_MODE)%</argument>
         </service>
 
         <service id="Kiener\MolliePayments\Service\ShippingMethodService" class="Kiener\MolliePayments\Service\ShippingMethodService">
@@ -167,13 +171,6 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Subscriber\OrderStateSubscriber" class="Kiener\MolliePayments\Subscriber\OrderStateSubscriber">
-            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\PaymentMethodService"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
         <service id="Kiener\MolliePayments\Subscriber\TestModeNotificationSubscriber">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <tag name="kernel.event_subscriber"/>
@@ -194,6 +191,7 @@
             <argument type="service" id="router"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Router\RoutingDetector"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument key="$envAppUrl">%env(default::APP_URL)%</argument>
         </service>
 
     </services>

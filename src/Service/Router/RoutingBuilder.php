@@ -9,11 +9,6 @@ class RoutingBuilder
 {
 
     /**
-     *
-     */
-    private const ADMIN_DOMAIN_ENV_KEY = 'APP_URL';
-
-    /**
      * This has to match the parameter from the Return Route annotations.
      * Otherwise, an exception is being thrown.
      */
@@ -39,6 +34,11 @@ class RoutingBuilder
 
 
     /**
+     * @var string
+     */
+    private $envAppUrl;
+
+    /**
      * @var RouterInterface
      */
     private $router;
@@ -58,12 +58,14 @@ class RoutingBuilder
      * @param RouterInterface $router
      * @param RoutingDetector $routingDetector
      * @param PluginSettingsServiceInterface $pluginSettings
+     * @param ?string $envAppUrl
      */
-    public function __construct(RouterInterface $router, RoutingDetector $routingDetector, PluginSettingsServiceInterface $pluginSettings)
+    public function __construct(RouterInterface $router, RoutingDetector $routingDetector, PluginSettingsServiceInterface $pluginSettings, ?string $envAppUrl)
     {
         $this->router = $router;
         $this->routingDetector = $routingDetector;
         $this->pluginSettings = $pluginSettings;
+        $this->envAppUrl = (string)$envAppUrl;
     }
 
 
@@ -197,7 +199,7 @@ class RoutingBuilder
      */
     private function applyAdminDomain(string $url): string
     {
-        $adminDomain = trim((string)getenv(self::ADMIN_DOMAIN_ENV_KEY));
+        $adminDomain = trim($this->envAppUrl);
         $adminDomain = str_replace('http://', '', $adminDomain);
         $adminDomain = str_replace('https://', '', $adminDomain);
 

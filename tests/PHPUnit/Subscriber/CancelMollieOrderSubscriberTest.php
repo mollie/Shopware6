@@ -2,7 +2,7 @@
 
 namespace MolliePayments\Tests\Subscriber;
 
-use Kiener\MolliePayments\Subscriber\CancelMollieOrderSubscriber;
+use Kiener\MolliePayments\Subscriber\CancelOrderSubscriber;
 use Mollie\Api\Types\OrderStatus;
 use PHPUnit\Framework\TestCase;
 
@@ -11,7 +11,7 @@ class CancelMollieOrderSubscriberTest extends TestCase
 
     public function testListeningOnCorrectEvent(): void
     {
-        self::assertArrayHasKey('state_machine.order.state_changed', CancelMollieOrderSubscriber::getSubscribedEvents());
+        self::assertArrayHasKey('state_machine.order.state_changed', CancelOrderSubscriber::getSubscribedEvents());
     }
 
     public function testCancelMollieOrderStatesConstant(): void
@@ -22,6 +22,6 @@ class CancelMollieOrderSubscriberTest extends TestCase
             OrderStatus::STATUS_SHIPPING
         ];
 
-        self::assertSame($expected, CancelMollieOrderSubscriber::ALLOWED_CANCELLABLE_MOLLIE_STATES);
+        self::assertSame($expected, CancelOrderSubscriber::ALLOWED_CANCELLABLE_MOLLIE_STATES);
     }
 }
