@@ -45,7 +45,7 @@ class CreateAction extends BaseAction
         $attributes = new OrderLineItemEntityAttributes($item);
 
         if (!$attributes->isSubscriptionProduct()) {
-            $this->getLogger()->warning("Order {$order->getOrderNumber()} did not create a subscription. Line item does not seem to be a subscription product (anymore)!");
+            # this is no subscription product (regular checkout), so return an empty string.
             # return an empty string that will be saved as "reference".
             # so our order will not be a subscription
             return '';
