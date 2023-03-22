@@ -65,7 +65,7 @@
         <!-- Services -->
 
         <service id="Kiener\MolliePayments\Service\CustomerService" class="Kiener\MolliePayments\Service\CustomerService">
-            <argument type="service" id="country.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\Country\CountryRepository"/>
             <argument type="service" id="customer.repository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Customer"/>
             <argument type="service" id="event_dispatcher"/>
