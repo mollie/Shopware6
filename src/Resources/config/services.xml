@@ -99,7 +99,7 @@
 
         <service id="Kiener\MolliePayments\Service\PaymentMethodService" class="Kiener\MolliePayments\Service\PaymentMethodService" public="true">
             <argument type="service" id="Shopware\Core\Content\Media\MediaService"/>
-            <argument type="service" id="media.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\Media\MediaRepository"/>
             <argument type="service" id="payment_method.repository"/>
             <argument type="service" id="Shopware\Core\Framework\Plugin\Util\PluginIdProvider"/>
             <argument type="service" id="kiener.mollie_payments.http.client"/>

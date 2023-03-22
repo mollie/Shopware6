@@ -24,6 +24,7 @@ use Kiener\MolliePayments\Handler\Method\Przelewy24Payment;
 use Kiener\MolliePayments\Handler\Method\SofortPayment;
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Kiener\MolliePayments\MolliePayments;
+use Kiener\MolliePayments\Repository\Media\MediaRepository;
 use Kiener\MolliePayments\Service\HttpClient\HttpClientInterface;
 use Mollie\Api\Resources\Order;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
@@ -50,7 +51,7 @@ class PaymentMethodService
     /** @var PluginIdProvider */
     private $pluginIdProvider;
 
-    /** @var EntityRepositoryInterface */
+    /** @var MediaRepository */
     private $mediaRepository;
 
     /** @var HttpClientInterface */
@@ -59,12 +60,12 @@ class PaymentMethodService
 
     /**
      * @param MediaService $mediaService
-     * @param EntityRepositoryInterface $mediaRepository
+     * @param MediaRepository $mediaRepository
      * @param EntityRepositoryInterface $paymentRepository
      * @param PluginIdProvider $pluginIdProvider
      * @param HttpClientInterface $httpClient
      */
-    public function __construct(MediaService $mediaService, EntityRepositoryInterface $mediaRepository, EntityRepositoryInterface $paymentRepository, PluginIdProvider $pluginIdProvider, HttpClientInterface $httpClient)
+    public function __construct(MediaService $mediaService, MediaRepository $mediaRepository, EntityRepositoryInterface $paymentRepository, PluginIdProvider $pluginIdProvider, HttpClientInterface $httpClient)
     {
         $this->mediaService = $mediaService;
         $this->mediaRepository = $mediaRepository;
