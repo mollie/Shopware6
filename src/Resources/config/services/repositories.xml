@@ -28,5 +28,9 @@
             <argument type="service" id="payment_method.repository"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Repository\Salutation\SalutationRepository">
+            <argument type="service" id="salutation.repository"/>
+        </service>
+
     </services>
 </container>

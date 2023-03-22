@@ -6,6 +6,7 @@ use Exception;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieCustomerException;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
+use Kiener\MolliePayments\Repository\Salutation\SalutationRepository;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
 use Kiener\MolliePayments\Struct\CustomerStruct;
 use Psr\Log\LoggerInterface;
@@ -51,7 +52,7 @@ class CustomerService implements CustomerServiceInterface
     /** @var SalesChannelContextPersister */
     private $salesChannelContextPersister;
 
-    /** @var EntityRepositoryInterface */
+    /** @var SalutationRepository */
     private $salutationRepository;
 
     /** @var SettingsService */
@@ -72,7 +73,7 @@ class CustomerService implements CustomerServiceInterface
      * @param EventDispatcherInterface $eventDispatcher
      * @param LoggerInterface $logger
      * @param SalesChannelContextPersister $salesChannelContextPersister
-     * @param EntityRepositoryInterface $salutationRepository
+     * @param SalutationRepository $salutationRepository
      * @param SettingsService $settingsService
      * @param string $shopwareVersion
      * @param NumberRangeValueGeneratorInterface $valueGenerator
@@ -84,11 +85,12 @@ class CustomerService implements CustomerServiceInterface
         EventDispatcherInterface           $eventDispatcher,
         LoggerInterface                    $logger,
         SalesChannelContextPersister       $salesChannelContextPersister,
-        EntityRepositoryInterface          $salutationRepository,
+        SalutationRepository               $salutationRepository,
         SettingsService                    $settingsService,
         string                             $shopwareVersion,
         NumberRangeValueGeneratorInterface $valueGenerator
-    ) {
+    )
+    {
         $this->countryRepository = $countryRepository;
         $this->customerRepository = $customerRepository;
         $this->customerApiService = $customerApiService;
@@ -290,8 +292,8 @@ class CustomerService implements CustomerServiceInterface
      * @param string $customerId
      * @param string $salesChannelId
      * @param Context $context
-     * @throws CustomerCouldNotBeFoundException
      * @return string
+     * @throws CustomerCouldNotBeFoundException
      */
     public function getMollieCustomerId(string $customerId, string $salesChannelId, Context $context): string
     {
@@ -352,8 +354,8 @@ class CustomerService implements CustomerServiceInterface
     /**
      * @param string $customerId
      * @param Context $context
-     * @throws CustomerCouldNotBeFoundException
      * @return CustomerStruct
+     * @throws CustomerCouldNotBeFoundException
      */
     public function getCustomerStruct(string $customerId, Context $context): CustomerStruct
     {
@@ -372,7 +374,7 @@ class CustomerService implements CustomerServiceInterface
             $struct->setLegacyCustomerId($customFields[self::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID]);
         }
         $molliePaymentsCustomFields = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS] ?? [];
-        if (! is_array($molliePaymentsCustomFields)) {
+        if (!is_array($molliePaymentsCustomFields)) {
             $this->logger->warning('Customer customFields for MolliePayments are invalid. Array is expected', [
                 'currentCustomFields' => $molliePaymentsCustomFields
             ]);
