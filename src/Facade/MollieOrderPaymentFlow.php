@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Facade;
 
+use Kiener\MolliePayments\Repository\OrderTransactions\OrderTransactionRepository;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
 use Kiener\MolliePayments\Service\Order\OrderStatusUpdater;
@@ -35,7 +36,7 @@ class MollieOrderPaymentFlow
     /** @var EntityRepositoryInterface */
     private $paymentMethodRepository;
 
-    /** @var EntityRepositoryInterface */
+    /** @var OrderTransactionRepository */
     private $orderTransactionRepository;
 
     public function __construct(
@@ -44,7 +45,7 @@ class MollieOrderPaymentFlow
         SettingsService $settingsService,
         PaymentMethodService $paymentMethodService,
         EntityRepositoryInterface $paymentMethodRepository,
-        EntityRepositoryInterface $orderTransactionRepository
+        OrderTransactionRepository $orderTransactionRepository
     ) {
         $this->orderStatusConverter = $orderStatusConverter;
         $this->orderStatusUpdater = $orderStatusUpdater;

@@ -59,7 +59,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\PaymentMethodService"/>
             <argument type="service" id="payment_method.repository"/>
-            <argument type="service" id="order_transaction.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\OrderTransactions\OrderTransactionRepository"/>
         </service>
 
         <service id="Kiener\MolliePayments\Facade\MollieSupportFacade">
