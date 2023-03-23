@@ -28,5 +28,8 @@
             <argument type="service" id="payment_method.repository"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Repository\MollieSubscription\MollieSubscriptionRepository">
+            <argument type="service" id="mollie_subscription.repository"/>
+        </service>
     </services>
 </container>

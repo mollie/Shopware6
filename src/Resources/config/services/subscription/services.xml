@@ -45,7 +45,7 @@
         </service>
 
         <service id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository">
-            <argument type="service" id="mollie_subscription.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\MollieSubscription\MollieSubscriptionRepository"/>
             <argument type="service" id="mollie_subscription_address.repository"/>
             <argument type="service" id="mollie_subscription_history.repository"/>
         </service>
@@ -74,7 +74,7 @@
 
         <service id="Kiener\MolliePayments\Components\Subscription\Page\Account\SubscriptionPageLoader">
             <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
-            <argument type="service" id="mollie_subscription.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\MollieSubscription\MollieSubscriptionRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
             <argument type="service" id="Shopware\Core\System\Country\SalesChannel\CountryRoute"/>
             <argument type="service" id="Shopware\Core\System\Salutation\SalesChannel\SalutationRoute"/>

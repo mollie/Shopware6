@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Components\Subscription\Page\Account;
 
 use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
+use Kiener\MolliePayments\Repository\MollieSubscription\MollieSubscriptionRepository;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Shopware\Core\Checkout\Cart\Exception\CustomerNotLoggedInException;
@@ -35,7 +36,7 @@ class SubscriptionPageLoader
     private $genericLoader;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var MollieSubscriptionRepository
      */
     private $repoSubscriptions;
 
@@ -67,14 +68,14 @@ class SubscriptionPageLoader
 
     /**
      * @param GenericPageLoaderInterface $genericLoader
-     * @param EntityRepositoryInterface $repoSubscriptions
+     * @param MollieSubscriptionRepository $repoSubscriptions
      * @param CustomerService $customerService
      * @param AbstractCountryRoute $countryRoute
      * @param AbstractSalutationRoute $salutationRoute
      * @param SettingsService $settingsService
      * @param ContainerInterface $container
      */
-    public function __construct(GenericPageLoaderInterface $genericLoader, EntityRepositoryInterface $repoSubscriptions, CustomerService $customerService, AbstractCountryRoute $countryRoute, AbstractSalutationRoute $salutationRoute, SettingsService $settingsService, ContainerInterface $container)
+    public function __construct(GenericPageLoaderInterface $genericLoader, MollieSubscriptionRepository $repoSubscriptions, CustomerService $customerService, AbstractCountryRoute $countryRoute, AbstractSalutationRoute $salutationRoute, SettingsService $settingsService, ContainerInterface $container)
     {
         $this->genericLoader = $genericLoader;
         $this->repoSubscriptions = $repoSubscriptions;
