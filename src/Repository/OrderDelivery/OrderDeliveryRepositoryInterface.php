@@ -8,7 +8,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEve
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 
-interface OrderDeliveryInterface
+interface OrderDeliveryRepositoryInterface
 {
     public function upsert(array $data, Context $context): void;
     public function create(array $data, Context $context): void;

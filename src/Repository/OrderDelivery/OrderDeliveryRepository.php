@@ -11,7 +11,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 
-class OrderDeliveryRepository implements OrderDeliveryInterface
+class OrderDeliveryRepository implements OrderDeliveryRepositoryInterface
 {
     /**
      * @var EntityRepository|EntityRepositoryInterface
