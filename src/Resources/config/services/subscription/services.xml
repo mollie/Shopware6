@@ -66,7 +66,7 @@
             <argument type="service" id="Doctrine\DBAL\Connection"/>
             <argument type="service" id="mail_template_type.repository"/>
             <argument type="service" id="mail_template.repository"/>
-            <argument type="service" id="sales_channel.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepository"/>
         </service>
 
         <!-- ============================================================================================== -->
@@ -246,7 +246,7 @@
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler"/>
             <argument type="service" id="mollie_payments.logger"/>
-            <argument type="service" id="sales_channel.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionReminder\ReminderValidator"/>
         </service>
 

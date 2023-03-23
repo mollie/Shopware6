@@ -2,10 +2,10 @@
 
 namespace Kiener\MolliePayments\Service\Mail\AttachmentGenerator;
 
+use Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepository;
 use Kiener\MolliePayments\Service\MollieApi\ApiKeyValidator;
 use Kiener\MolliePayments\Service\SettingsService;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Shopware\Core\System\SystemConfig\Service\ConfigurationService;
 
@@ -27,11 +27,12 @@ class ReadablePluginConfigurationGenerator extends AbstractPluginConfigurationGe
     ];
 
     public function __construct(
-        ConfigurationService      $configurationService,
-        EntityRepositoryInterface $salesChannelRepository,
-        SettingsService           $settingsService,
-        ApiKeyValidator           $apiKeyValidator
-    ) {
+        ConfigurationService   $configurationService,
+        SalesChannelRepository $salesChannelRepository,
+        SettingsService        $settingsService,
+        ApiKeyValidator        $apiKeyValidator
+    )
+    {
         $this->apiKeyValidator = $apiKeyValidator;
 
         parent::__construct($configurationService, $salesChannelRepository, $settingsService);
@@ -39,8 +40,8 @@ class ReadablePluginConfigurationGenerator extends AbstractPluginConfigurationGe
 
     /**
      * @param Context $context
-     * @throws \Mollie\Api\Exceptions\ApiException
      * @return array<mixed>
+     * @throws \Mollie\Api\Exceptions\ApiException
      */
     public function generate(Context $context): array
     {
