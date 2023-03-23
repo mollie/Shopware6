@@ -88,7 +88,7 @@
         </service>
 
         <service id="Kiener\MolliePayments\Service\DeliveryService" class="Kiener\MolliePayments\Service\DeliveryService">
-            <argument type="service" id="order_delivery.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\OrderDelivery\OrderDeliveryRepository"/>
         </service>
 
 

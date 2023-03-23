@@ -2,19 +2,19 @@
 
 namespace Kiener\MolliePayments\Service;
 
+use Kiener\MolliePayments\Repository\OrderDelivery\OrderDeliveryRepository;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 
 class OrderDeliveryService
 {
     /**
-     * @var EntityRepositoryInterface
+     * @var OrderDeliveryRepository
      */
     private $orderDeliveryRepository;
 
-    public function __construct(EntityRepositoryInterface $orderDeliveryRepository)
+    public function __construct(OrderDeliveryRepository $orderDeliveryRepository)
     {
         $this->orderDeliveryRepository = $orderDeliveryRepository;
     }

@@ -22,7 +22,7 @@
         </service>
 
         <service id="Kiener\MolliePayments\Service\OrderDeliveryService">
-            <argument type="service" id="order_delivery.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\OrderDelivery\OrderDeliveryRepository"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\MolliePaymentExtractor"/>
