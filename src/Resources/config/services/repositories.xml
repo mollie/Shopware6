@@ -28,7 +28,7 @@
             <argument type="service" id="payment_method.repository"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Repository\OrderTransactions\OrderTransactionRepository">
+        <service id="Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepository">
             <argument type="service" id="order_transaction.repository"/>
         </service>
     </services>

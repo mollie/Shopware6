@@ -9,7 +9,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 
-interface OrderTransactionInterface
+interface OrderTransactionRepositoryInterface
 {
     public function upsert(array $data, Context $context): void;
     public function create(array $data, Context $context): void;
