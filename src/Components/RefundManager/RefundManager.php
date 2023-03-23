@@ -13,6 +13,7 @@ use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItemRoundingDiff;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieRefundException;
+use Kiener\MolliePayments\Repository\MollieRefund\MollieRefundRepository;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\OrderServiceInterface;
@@ -72,7 +73,7 @@ class RefundManager implements RefundManagerInterface
     private $flowBuilderEventFactory;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var MollieRefundRepository
      */
     protected $refundRepository;
 
@@ -90,10 +91,10 @@ class RefundManager implements RefundManagerInterface
      * @param FlowBuilderFactoryInterface $flowBuilderFactory
      * @param FlowBuilderEventFactory $flowBuilderEventFactory
      * @param StockManagerInterface $stockUpdater
-     * @param EntityRepositoryInterface $refundRepository
+     * @param MollieRefundRepository $refundRepository
      * @param LoggerInterface $logger
      */
-    public function __construct(RefundDataBuilder $refundDataBuilder, OrderServiceInterface $orderService, RefundServiceInterface $refundService, Order $mollieOrder, FlowBuilderFactoryInterface $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, StockManagerInterface $stockUpdater, EntityRepositoryInterface $refundRepository, LoggerInterface $logger)
+    public function __construct(RefundDataBuilder $refundDataBuilder, OrderServiceInterface $orderService, RefundServiceInterface $refundService, Order $mollieOrder, FlowBuilderFactoryInterface $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, StockManagerInterface $stockUpdater, MollieRefundRepository $refundRepository, LoggerInterface $logger)
     {
         $this->builderData = $refundDataBuilder;
         $this->orderService = $orderService;
