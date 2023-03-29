@@ -89,8 +89,7 @@ class CustomerService implements CustomerServiceInterface
         SettingsService                    $settingsService,
         string                             $shopwareVersion,
         NumberRangeValueGeneratorInterface $valueGenerator
-    )
-    {
+    ) {
         $this->countryRepository = $countryRepository;
         $this->customerRepository = $customerRepository;
         $this->customerApiService = $customerApiService;
@@ -292,8 +291,8 @@ class CustomerService implements CustomerServiceInterface
      * @param string $customerId
      * @param string $salesChannelId
      * @param Context $context
-     * @return string
      * @throws CustomerCouldNotBeFoundException
+     * @return string
      */
     public function getMollieCustomerId(string $customerId, string $salesChannelId, Context $context): string
     {
@@ -354,8 +353,8 @@ class CustomerService implements CustomerServiceInterface
     /**
      * @param string $customerId
      * @param Context $context
-     * @return CustomerStruct
      * @throws CustomerCouldNotBeFoundException
+     * @return CustomerStruct
      */
     public function getCustomerStruct(string $customerId, Context $context): CustomerStruct
     {

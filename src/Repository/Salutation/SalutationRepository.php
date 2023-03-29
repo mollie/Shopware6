@@ -63,6 +63,6 @@ class SalutationRepository implements SalutationRepositoryInterface
      */
     public function searchIds(Criteria $criteria, Context $context): IdSearchResult
     {
-        return $this->salutationRepository->searchIds($criteria,$context);
+        return $this->salutationRepository->searchIds($criteria, $context);
     }
 }
