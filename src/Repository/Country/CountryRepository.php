@@ -63,6 +63,6 @@ class CountryRepository implements CountryRepositoryInterface
      */
     public function searchIds(Criteria $criteria, Context $context): IdSearchResult
     {
-        return $this->countryRepository->searchIds($criteria,$context);
+        return $this->countryRepository->searchIds($criteria, $context);
     }
 }
