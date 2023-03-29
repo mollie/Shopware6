@@ -2,7 +2,7 @@
 
 namespace Kiener\MolliePayments\Service;
 
-use Kiener\MolliePayments\Repository\OrderDelivery\OrderDeliveryRepository;
+use Kiener\MolliePayments\Repository\OrderDelivery\OrderDeliveryRepositoryInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
@@ -14,16 +14,16 @@ class DeliveryService
     private const PARAM_MOLLIE_PAYMENTS = 'mollie_payments';
     private const PARAM_IS_SHIPPED = 'is_shipped';
 
-    /** @var OrderDeliveryRepository $orderDeliveryRepository */
+    /** @var OrderDeliveryRepositoryInterface */
     private $orderDeliveryRepository;
 
     /**
      * Creates a new instance of the transaction service.
      *
-     * @param OrderDeliveryRepository $orderDeliveryRepository
+     * @param OrderDeliveryRepositoryInterface $orderDeliveryRepository
      */
     public function __construct(
-        OrderDeliveryRepository $orderDeliveryRepository
+        OrderDeliveryRepositoryInterface $orderDeliveryRepository
     ) {
         $this->orderDeliveryRepository = $orderDeliveryRepository;
     }

@@ -29,21 +29,21 @@ class OrderDeliveryRepository implements OrderDeliveryRepositoryInterface
     /**
      * @param array<mixed> $data
      * @param Context $context
-     * @return void
+     * @return EntityWrittenContainerEvent
      */
-    public function upsert(array $data, Context $context): void
+    public function upsert(array $data, Context $context): EntityWrittenContainerEvent
     {
-        $this->orderDeliveryRepository->upsert($data, $context);
+        return $this->orderDeliveryRepository->upsert($data, $context);
     }
 
     /**
      * @param array<mixed> $data
      * @param Context $context
-     * @return void
+     * @return EntityWrittenContainerEvent
      */
-    public function create(array $data, Context $context): void
+    public function create(array $data, Context $context): EntityWrittenContainerEvent
     {
-        $this->orderDeliveryRepository->create($data, $context);
+        return $this->orderDeliveryRepository->create($data, $context);
     }
 
 
@@ -64,16 +64,16 @@ class OrderDeliveryRepository implements OrderDeliveryRepositoryInterface
      */
     public function searchIds(Criteria $criteria, Context $context): IdSearchResult
     {
-        return $this->orderDeliveryRepository->searchIds($criteria,$context);
+        return $this->orderDeliveryRepository->searchIds($criteria, $context);
     }
 
     /**
-     * @param array $data
+     * @param array<mixed> $data
      * @param Context $context
      * @return EntityWrittenContainerEvent
      */
     public function update(array $data, Context $context): EntityWrittenContainerEvent
     {
-        return $this->orderDeliveryRepository->update($data,$context);
+        return $this->orderDeliveryRepository->update($data, $context);
     }
 }
