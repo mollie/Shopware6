@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieCustomerException;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Repository\Salutation\SalutationRepository;
+use Kiener\MolliePayments\Repository\Salutation\SalutationRepositoryInterface;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
 use Kiener\MolliePayments\Struct\CustomerStruct;
 use Psr\Log\LoggerInterface;
@@ -52,7 +53,7 @@ class CustomerService implements CustomerServiceInterface
     /** @var SalesChannelContextPersister */
     private $salesChannelContextPersister;
 
-    /** @var SalutationRepository */
+    /** @var SalutationRepositoryInterface */
     private $salutationRepository;
 
     /** @var SettingsService */
@@ -73,7 +74,7 @@ class CustomerService implements CustomerServiceInterface
      * @param EventDispatcherInterface $eventDispatcher
      * @param LoggerInterface $logger
      * @param SalesChannelContextPersister $salesChannelContextPersister
-     * @param SalutationRepository $salutationRepository
+     * @param SalutationRepositoryInterface $salutationRepository
      * @param SettingsService $settingsService
      * @param string $shopwareVersion
      * @param NumberRangeValueGeneratorInterface $valueGenerator
@@ -85,7 +86,7 @@ class CustomerService implements CustomerServiceInterface
         EventDispatcherInterface           $eventDispatcher,
         LoggerInterface                    $logger,
         SalesChannelContextPersister       $salesChannelContextPersister,
-        SalutationRepository               $salutationRepository,
+        SalutationRepositoryInterface      $salutationRepository,
         SettingsService                    $settingsService,
         string                             $shopwareVersion,
         NumberRangeValueGeneratorInterface $valueGenerator
