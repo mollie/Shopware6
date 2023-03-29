@@ -6,6 +6,7 @@ use Exception;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieCustomerException;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
+use Kiener\MolliePayments\Repository\Customer\CustomerRepositoryInterface;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
 use Kiener\MolliePayments\Struct\CustomerStruct;
 use Psr\Log\LoggerInterface;
@@ -36,7 +37,7 @@ class CustomerService implements CustomerServiceInterface
     /** @var EntityRepositoryInterface */
     private $countryRepository;
 
-    /** @var EntityRepositoryInterface */
+    /** @var CustomerRepositoryInterface */
     private $customerRepository;
 
     /** @var Customer */
@@ -67,7 +68,7 @@ class CustomerService implements CustomerServiceInterface
      * Creates a new instance of the customer service.
      *
      * @param EntityRepositoryInterface $countryRepository
-     * @param EntityRepositoryInterface $customerRepository
+     * @param CustomerRepositoryInterface $customerRepository
      * @param Customer $customerApiService
      * @param EventDispatcherInterface $eventDispatcher
      * @param LoggerInterface $logger
@@ -79,7 +80,7 @@ class CustomerService implements CustomerServiceInterface
      */
     public function __construct(
         EntityRepositoryInterface          $countryRepository,
-        EntityRepositoryInterface          $customerRepository,
+        CustomerRepositoryInterface        $customerRepository,
         Customer                           $customerApiService,
         EventDispatcherInterface           $eventDispatcher,
         LoggerInterface                    $logger,
@@ -372,7 +373,7 @@ class CustomerService implements CustomerServiceInterface
             $struct->setLegacyCustomerId($customFields[self::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID]);
         }
         $molliePaymentsCustomFields = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS] ?? [];
-        if (! is_array($molliePaymentsCustomFields)) {
+        if (!is_array($molliePaymentsCustomFields)) {
             $this->logger->warning('Customer customFields for MolliePayments are invalid. Array is expected', [
                 'currentCustomFields' => $molliePaymentsCustomFields
             ]);

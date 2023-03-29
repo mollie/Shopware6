@@ -6,6 +6,7 @@ namespace Kiener\MolliePayments\Repository\Customer;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 
@@ -27,21 +28,21 @@ class CustomerRepository implements CustomerRepositoryInterface
     /**
      * @param array<mixed> $data
      * @param Context $context
-     * @return void
+     * @return EntityWrittenContainerEvent
      */
-    public function upsert(array $data, Context $context): void
+    public function upsert(array $data, Context $context): EntityWrittenContainerEvent
     {
-        $this->customerRepository->upsert($data, $context);
+        return $this->customerRepository->upsert($data, $context);
     }
 
     /**
      * @param array<mixed> $data
      * @param Context $context
-     * @return void
+     * @return EntityWrittenContainerEvent
      */
-    public function create(array $data, Context $context): void
+    public function create(array $data, Context $context): EntityWrittenContainerEvent
     {
-        $this->customerRepository->create($data, $context);
+        return $this->customerRepository->create($data, $context);
     }
 
 
@@ -53,5 +54,15 @@ class CustomerRepository implements CustomerRepositoryInterface
     public function search(Criteria $criteria, Context $context): EntitySearchResult
     {
         return $this->customerRepository->search($criteria, $context);
+    }
+
+    /**
+     * @param array<mixed> $data
+     * @param Context $context
+     * @return EntityWrittenContainerEvent
+     */
+    public function update(array $data, Context $context): EntityWrittenContainerEvent
+    {
+        return $this->customerRepository->update($data, $context);
     }
 }
