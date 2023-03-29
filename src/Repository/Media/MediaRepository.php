@@ -6,6 +6,7 @@ namespace Kiener\MolliePayments\Repository\Media;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
@@ -28,21 +29,21 @@ class MediaRepository implements MediaRepositoryInterface
     /**
      * @param array<mixed> $data
      * @param Context $context
-     * @return void
+     * @return EntityWrittenContainerEvent
      */
-    public function upsert(array $data, Context $context): void
+    public function upsert(array $data, Context $context): EntityWrittenContainerEvent
     {
-        $this->mediaRepository->upsert($data, $context);
+        return $this->mediaRepository->upsert($data, $context);
     }
 
     /**
      * @param array<mixed> $data
      * @param Context $context
-     * @return void
+     * @return EntityWrittenContainerEvent
      */
-    public function create(array $data, Context $context): void
+    public function create(array $data, Context $context): EntityWrittenContainerEvent
     {
-        $this->mediaRepository->create($data, $context);
+        return $this->mediaRepository->create($data, $context);
     }
 
 
@@ -63,6 +64,6 @@ class MediaRepository implements MediaRepositoryInterface
      */
     public function searchIds(Criteria $criteria, Context $context): IdSearchResult
     {
-        return $this->mediaRepository->searchIds($criteria,$context);
+        return $this->mediaRepository->searchIds($criteria, $context);
     }
 }
