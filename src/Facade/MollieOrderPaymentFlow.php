@@ -2,7 +2,7 @@
 
 namespace Kiener\MolliePayments\Facade;
 
-use Kiener\MolliePayments\Repository\OrderTransactions\OrderTransactionRepository;
+use Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepositoryInterface;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
 use Kiener\MolliePayments\Service\Order\OrderStatusUpdater;
@@ -36,16 +36,16 @@ class MollieOrderPaymentFlow
     /** @var EntityRepositoryInterface */
     private $paymentMethodRepository;
 
-    /** @var OrderTransactionRepository */
+    /** @var OrderTransactionRepositoryInterface */
     private $orderTransactionRepository;
 
     public function __construct(
-        OrderStatusConverter $orderStatusConverter,
-        OrderStatusUpdater $orderStatusUpdater,
-        SettingsService $settingsService,
-        PaymentMethodService $paymentMethodService,
-        EntityRepositoryInterface $paymentMethodRepository,
-        OrderTransactionRepository $orderTransactionRepository
+        OrderStatusConverter                $orderStatusConverter,
+        OrderStatusUpdater                  $orderStatusUpdater,
+        SettingsService                     $settingsService,
+        PaymentMethodService                $paymentMethodService,
+        EntityRepositoryInterface           $paymentMethodRepository,
+        OrderTransactionRepositoryInterface $orderTransactionRepository
     ) {
         $this->orderStatusConverter = $orderStatusConverter;
         $this->orderStatusUpdater = $orderStatusUpdater;
@@ -65,7 +65,7 @@ class MollieOrderPaymentFlow
      * @throws \Mollie\Api\Exceptions\ApiException
      * @return bool
      */
-    public function process(OrderTransactionEntity $transaction, OrderEntity $order, Order $mollieOrder, string $salesChannelId, Context  $context): bool
+    public function process(OrderTransactionEntity $transaction, OrderEntity $order, Order $mollieOrder, string $salesChannelId, Context $context): bool
     {
         $paymentStatus = $this->orderStatusConverter->getMollieOrderStatus($mollieOrder);
         $settings = $this->settingsService->getSettings($salesChannelId);

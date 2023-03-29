@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Repository\OrderTransactions;
+namespace Kiener\MolliePayments\Repository\OrderTransaction;
 
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -29,21 +29,21 @@ class OrderTransactionRepository implements OrderTransactionRepositoryInterface
     /**
      * @param array<mixed> $data
      * @param Context $context
-     * @return void
+     * @return EntityWrittenContainerEvent
      */
-    public function upsert(array $data, Context $context): void
+    public function upsert(array $data, Context $context): EntityWrittenContainerEvent
     {
-        $this->orderTransactionRepository->upsert($data, $context);
+        return $this->orderTransactionRepository->upsert($data, $context);
     }
 
     /**
      * @param array<mixed> $data
      * @param Context $context
-     * @return void
+     * @return EntityWrittenContainerEvent
      */
-    public function create(array $data, Context $context): void
+    public function create(array $data, Context $context): EntityWrittenContainerEvent
     {
-        $this->orderTransactionRepository->create($data, $context);
+        return $this->orderTransactionRepository->create($data, $context);
     }
 
 
@@ -64,16 +64,16 @@ class OrderTransactionRepository implements OrderTransactionRepositoryInterface
      */
     public function searchIds(Criteria $criteria, Context $context): IdSearchResult
     {
-        return $this->orderTransactionRepository->searchIds($criteria,$context);
+        return $this->orderTransactionRepository->searchIds($criteria, $context);
     }
 
     /**
-     * @param array $data
+     * @param array<mixed> $data
      * @param Context $context
      * @return EntityWrittenContainerEvent
      */
     public function update(array $data, Context $context): EntityWrittenContainerEvent
     {
-        return $this->orderTransactionRepository->update($data,$context);
+        return $this->orderTransactionRepository->update($data, $context);
     }
 }

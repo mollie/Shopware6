@@ -2,27 +2,27 @@
 
 namespace Kiener\MolliePayments\Service;
 
-use Kiener\MolliePayments\Repository\OrderTransactions\OrderTransactionRepository;
+use Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepositoryInterface;
+
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 
 class TransactionService
 {
-    /** @var EntityRepositoryInterface $orderTransactionRepository */
+    /** @var OrderTransactionRepositoryInterface */
     private $orderTransactionRepository;
 
     /**
      * Creates a new instance of the transaction service.
      *
-     * @param OrderTransactionRepository $orderTransactionRepository
+     * @param OrderTransactionRepositoryInterface $orderTransactionRepository
      */
     public function __construct(
-        OrderTransactionRepository $orderTransactionRepository
+        OrderTransactionRepositoryInterface $orderTransactionRepository
     ) {
         $this->orderTransactionRepository = $orderTransactionRepository;
     }
