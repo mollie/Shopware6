@@ -2,25 +2,22 @@
 
 namespace Kiener\MolliePayments\Service\Mail\AttachmentGenerator;
 
-use Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepository;
-use Kiener\MolliePayments\Service\SalesChannel\SalesChannelDataExtractor;
+use Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepositoryInterface;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\SalesChannelCollection;
-use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 abstract class AbstractSalesChannelGenerator implements GeneratorInterface
 {
     /**
-     * @var SalesChannelRepository
+     * @var SalesChannelRepositoryInterface
      */
     protected $salesChannelRepository;
 
     /**
-     * @param SalesChannelRepository $salesChannelRepository
+     * @param SalesChannelRepositoryInterface $salesChannelRepository
      */
-    public function __construct(SalesChannelRepository $salesChannelRepository)
+    public function __construct(SalesChannelRepositoryInterface $salesChannelRepository)
     {
         $this->salesChannelRepository = $salesChannelRepository;
     }

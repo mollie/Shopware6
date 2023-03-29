@@ -16,7 +16,7 @@ use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionCancellat
 use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler;
 use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionReminder\ReminderValidator;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
-use Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepository;
+use Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepositoryInterface;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Psr\Log\LoggerInterface;
@@ -30,7 +30,7 @@ class RemindAction extends BaseAction
 {
 
     /**
-     * @var SalesChannelRepository
+     * @var SalesChannelRepositoryInterface
      */
     private $repoSalesChannel;
 
@@ -52,11 +52,11 @@ class RemindAction extends BaseAction
      * @param FlowBuilderEventFactory $flowBuilderEventFactory
      * @param SubscriptionHistoryHandler $subscriptionHistory
      * @param LoggerInterface $logger
-     * @param SalesChannelRepository $repoSalesChannel
+     * @param SalesChannelRepositoryInterface $repoSalesChannel
      * @param ReminderValidator $reminderValidator
      * @throws Exception
      */
-    public function __construct(SettingsService $pluginSettings, SubscriptionRepository $repoSubscriptions, SubscriptionBuilder $subscriptionBuilder, MollieDataBuilder $mollieRequestBuilder, CustomerService $customers, MollieGatewayInterface $gwMollie, CancellationValidator $cancellationValidator, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionHistoryHandler $subscriptionHistory, LoggerInterface $logger, SalesChannelRepository $repoSalesChannel, ReminderValidator $reminderValidator)
+    public function __construct(SettingsService $pluginSettings, SubscriptionRepository $repoSubscriptions, SubscriptionBuilder $subscriptionBuilder, MollieDataBuilder $mollieRequestBuilder, CustomerService $customers, MollieGatewayInterface $gwMollie, CancellationValidator $cancellationValidator, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionHistoryHandler $subscriptionHistory, LoggerInterface $logger, SalesChannelRepositoryInterface $repoSalesChannel, ReminderValidator $reminderValidator)
     {
         parent::__construct(
             $pluginSettings,

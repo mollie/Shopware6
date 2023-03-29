@@ -29,21 +29,21 @@ class SalesChannelRepository implements SalesChannelRepositoryInterface
     /**
      * @param array<mixed> $data
      * @param Context $context
-     * @return void
+     * @return EntityWrittenContainerEvent
      */
-    public function upsert(array $data, Context $context): void
+    public function upsert(array $data, Context $context): EntityWrittenContainerEvent
     {
-        $this->salesChannelRepository->upsert($data, $context);
+        return $this->salesChannelRepository->upsert($data, $context);
     }
 
     /**
      * @param array<mixed> $data
      * @param Context $context
-     * @return void
+     * @return EntityWrittenContainerEvent
      */
-    public function create(array $data, Context $context): void
+    public function create(array $data, Context $context): EntityWrittenContainerEvent
     {
-        $this->salesChannelRepository->create($data, $context);
+        return $this->salesChannelRepository->create($data, $context);
     }
 
 
@@ -64,16 +64,16 @@ class SalesChannelRepository implements SalesChannelRepositoryInterface
      */
     public function searchIds(Criteria $criteria, Context $context): IdSearchResult
     {
-        return $this->salesChannelRepository->searchIds($criteria,$context);
+        return $this->salesChannelRepository->searchIds($criteria, $context);
     }
 
     /**
-     * @param array $data
+     * @param array<mixed> $data
      * @param Context $context
      * @return EntityWrittenContainerEvent
      */
     public function update(array $data, Context $context): EntityWrittenContainerEvent
     {
-        return $this->salesChannelRepository->update($data,$context);
+        return $this->salesChannelRepository->update($data, $context);
     }
 }
