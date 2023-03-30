@@ -89,7 +89,8 @@ class CustomerService implements CustomerServiceInterface
         SettingsService                    $settingsService,
         string                             $shopwareVersion,
         NumberRangeValueGeneratorInterface $valueGenerator
-    ) {
+    )
+    {
         $this->countryRepository = $countryRepository;
         $this->customerRepository = $customerRepository;
         $this->customerApiService = $customerApiService;
@@ -184,7 +185,7 @@ class CustomerService implements CustomerServiceInterface
      * @param CustomerEntity $customer
      * @param string $cardToken
      * @param SalesChannelContext $context
-     *
+     * @param bool $shouldSaveCardDetail
      * @return EntityWrittenContainerEvent
      */
     public function setCardToken(CustomerEntity $customer, string $cardToken, SalesChannelContext $context, bool $shouldSaveCardDetail = false): EntityWrittenContainerEvent
@@ -291,8 +292,8 @@ class CustomerService implements CustomerServiceInterface
      * @param string $customerId
      * @param string $salesChannelId
      * @param Context $context
-     * @throws CustomerCouldNotBeFoundException
      * @return string
+     * @throws CustomerCouldNotBeFoundException
      */
     public function getMollieCustomerId(string $customerId, string $salesChannelId, Context $context): string
     {
@@ -353,8 +354,8 @@ class CustomerService implements CustomerServiceInterface
     /**
      * @param string $customerId
      * @param Context $context
-     * @throws CustomerCouldNotBeFoundException
      * @return CustomerStruct
+     * @throws CustomerCouldNotBeFoundException
      */
     public function getCustomerStruct(string $customerId, Context $context): CustomerStruct
     {
