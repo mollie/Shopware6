@@ -29,21 +29,21 @@ class MollieRefundRepository implements MollieRefundRepositoryInterface
     /**
      * @param array<mixed> $data
      * @param Context $context
-     * @return void
+     * @return EntityWrittenContainerEvent
      */
-    public function upsert(array $data, Context $context): void
+    public function upsert(array $data, Context $context): EntityWrittenContainerEvent
     {
-        $this->mollieRefundRepository->upsert($data, $context);
+        return $this->mollieRefundRepository->upsert($data, $context);
     }
 
     /**
      * @param array<mixed> $data
      * @param Context $context
-     * @return void
+     * @return EntityWrittenContainerEvent
      */
-    public function create(array $data, Context $context): void
+    public function create(array $data, Context $context): EntityWrittenContainerEvent
     {
-        $this->mollieRefundRepository->create($data, $context);
+        return $this->mollieRefundRepository->create($data, $context);
     }
 
 
@@ -64,16 +64,16 @@ class MollieRefundRepository implements MollieRefundRepositoryInterface
      */
     public function searchIds(Criteria $criteria, Context $context): IdSearchResult
     {
-        return $this->mollieRefundRepository->searchIds($criteria,$context);
+        return $this->mollieRefundRepository->searchIds($criteria, $context);
     }
 
     /**
-     * @param array $data
+     * @param array<mixed> $data
      * @param Context $context
      * @return EntityWrittenContainerEvent
      */
     public function update(array $data, Context $context): EntityWrittenContainerEvent
     {
-        return $this->mollieRefundRepository->update($data,$context);
+        return $this->mollieRefundRepository->update($data, $context);
     }
 }
