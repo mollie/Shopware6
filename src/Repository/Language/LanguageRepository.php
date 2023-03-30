@@ -29,21 +29,21 @@ class LanguageRepository implements LanguageRepositoryInterface
     /**
      * @param array<mixed> $data
      * @param Context $context
-     * @return void
+     * @return EntityWrittenContainerEvent
      */
-    public function upsert(array $data, Context $context): void
+    public function upsert(array $data, Context $context): EntityWrittenContainerEvent
     {
-        $this->languageRepository->upsert($data, $context);
+        return $this->languageRepository->upsert($data, $context);
     }
 
     /**
      * @param array<mixed> $data
      * @param Context $context
-     * @return void
+     * @return EntityWrittenContainerEvent
      */
-    public function create(array $data, Context $context): void
+    public function create(array $data, Context $context): EntityWrittenContainerEvent
     {
-        $this->languageRepository->create($data, $context);
+        return $this->languageRepository->create($data, $context);
     }
 
 
@@ -64,16 +64,16 @@ class LanguageRepository implements LanguageRepositoryInterface
      */
     public function searchIds(Criteria $criteria, Context $context): IdSearchResult
     {
-        return $this->languageRepository->searchIds($criteria,$context);
+        return $this->languageRepository->searchIds($criteria, $context);
     }
 
     /**
-     * @param array $data
+     * @param array<mixed> $data
      * @param Context $context
      * @return EntityWrittenContainerEvent
      */
     public function update(array $data, Context $context): EntityWrittenContainerEvent
     {
-        return $this->languageRepository->update($data,$context);
+        return $this->languageRepository->update($data, $context);
     }
 }
