@@ -29,21 +29,21 @@ class MollieSubscriptionRepository implements MollieSubscriptionRepositoryInterf
     /**
      * @param array<mixed> $data
      * @param Context $context
-     * @return void
+     * @return EntityWrittenContainerEvent
      */
-    public function upsert(array $data, Context $context): void
+    public function upsert(array $data, Context $context): EntityWrittenContainerEvent
     {
-        $this->mollieSubscriptionRepository->upsert($data, $context);
+        return $this->mollieSubscriptionRepository->upsert($data, $context);
     }
 
     /**
      * @param array<mixed> $data
      * @param Context $context
-     * @return void
+     * @return EntityWrittenContainerEvent
      */
-    public function create(array $data, Context $context): void
+    public function create(array $data, Context $context): EntityWrittenContainerEvent
     {
-        $this->mollieSubscriptionRepository->create($data, $context);
+        return $this->mollieSubscriptionRepository->create($data, $context);
     }
 
 
@@ -64,16 +64,16 @@ class MollieSubscriptionRepository implements MollieSubscriptionRepositoryInterf
      */
     public function searchIds(Criteria $criteria, Context $context): IdSearchResult
     {
-        return $this->mollieSubscriptionRepository->searchIds($criteria,$context);
+        return $this->mollieSubscriptionRepository->searchIds($criteria, $context);
     }
 
     /**
-     * @param array $data
+     * @param array<mixed> $data
      * @param Context $context
      * @return EntityWrittenContainerEvent
      */
     public function update(array $data, Context $context): EntityWrittenContainerEvent
     {
-        return $this->mollieSubscriptionRepository->update($data,$context);
+        return $this->mollieSubscriptionRepository->update($data, $context);
     }
 }

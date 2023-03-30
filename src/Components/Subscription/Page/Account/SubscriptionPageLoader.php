@@ -4,12 +4,11 @@ namespace Kiener\MolliePayments\Components\Subscription\Page\Account;
 
 use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
-use Kiener\MolliePayments\Repository\MollieSubscription\MollieSubscriptionRepository;
+use Kiener\MolliePayments\Repository\MollieSubscription\MollieSubscriptionRepositoryInterface;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Shopware\Core\Checkout\Cart\Exception\CustomerNotLoggedInException;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
@@ -36,7 +35,7 @@ class SubscriptionPageLoader
     private $genericLoader;
 
     /**
-     * @var MollieSubscriptionRepository
+     * @var MollieSubscriptionRepositoryInterface
      */
     private $repoSubscriptions;
 
@@ -68,14 +67,14 @@ class SubscriptionPageLoader
 
     /**
      * @param GenericPageLoaderInterface $genericLoader
-     * @param MollieSubscriptionRepository $repoSubscriptions
+     * @param MollieSubscriptionRepositoryInterface $repoSubscriptions
      * @param CustomerService $customerService
      * @param AbstractCountryRoute $countryRoute
      * @param AbstractSalutationRoute $salutationRoute
      * @param SettingsService $settingsService
      * @param ContainerInterface $container
      */
-    public function __construct(GenericPageLoaderInterface $genericLoader, MollieSubscriptionRepository $repoSubscriptions, CustomerService $customerService, AbstractCountryRoute $countryRoute, AbstractSalutationRoute $salutationRoute, SettingsService $settingsService, ContainerInterface $container)
+    public function __construct(GenericPageLoaderInterface $genericLoader, MollieSubscriptionRepositoryInterface $repoSubscriptions, CustomerService $customerService, AbstractCountryRoute $countryRoute, AbstractSalutationRoute $salutationRoute, SettingsService $settingsService, ContainerInterface $container)
     {
         $this->genericLoader = $genericLoader;
         $this->repoSubscriptions = $repoSubscriptions;

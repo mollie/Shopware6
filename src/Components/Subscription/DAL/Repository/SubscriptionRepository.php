@@ -9,13 +9,12 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\Subscr
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Components\Subscription\Exception\SubscriptionNotFoundException;
-use Kiener\MolliePayments\Repository\MollieSubscription\MollieSubscriptionRepository;
+use Kiener\MolliePayments\Repository\MollieSubscription\MollieSubscriptionRepositoryInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\NotFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
 
@@ -23,7 +22,7 @@ class SubscriptionRepository
 {
 
     /**
-     * @var MollieSubscriptionRepository
+     * @var MollieSubscriptionRepositoryInterface
      */
     private $repoSubscriptions;
 
@@ -39,11 +38,11 @@ class SubscriptionRepository
 
 
     /**
-     * @param MollieSubscriptionRepository $repoSubscriptions
+     * @param MollieSubscriptionRepositoryInterface $repoSubscriptions
      * @param EntityRepositoryInterface $repoAddresses
      * @param EntityRepositoryInterface $repoHistory
      */
-    public function __construct(MollieSubscriptionRepository $repoSubscriptions, EntityRepositoryInterface $repoAddresses, EntityRepositoryInterface $repoHistory)
+    public function __construct(MollieSubscriptionRepositoryInterface $repoSubscriptions, EntityRepositoryInterface $repoAddresses, EntityRepositoryInterface $repoHistory)
     {
         $this->repoSubscriptions = $repoSubscriptions;
         $this->repoAddresses = $repoAddresses;
