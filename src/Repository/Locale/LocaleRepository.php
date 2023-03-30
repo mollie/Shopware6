@@ -29,21 +29,21 @@ class LocaleRepository implements LocaleRepositoryInterface
     /**
      * @param array<mixed> $data
      * @param Context $context
-     * @return void
+     * @return EntityWrittenContainerEvent
      */
-    public function upsert(array $data, Context $context): void
+    public function upsert(array $data, Context $context): EntityWrittenContainerEvent
     {
-        $this->localeRepository->upsert($data, $context);
+        return $this->localeRepository->upsert($data, $context);
     }
 
     /**
      * @param array<mixed> $data
      * @param Context $context
-     * @return void
+     * @return EntityWrittenContainerEvent
      */
-    public function create(array $data, Context $context): void
+    public function create(array $data, Context $context): EntityWrittenContainerEvent
     {
-        $this->localeRepository->create($data, $context);
+        return $this->localeRepository->create($data, $context);
     }
 
 
@@ -64,16 +64,16 @@ class LocaleRepository implements LocaleRepositoryInterface
      */
     public function searchIds(Criteria $criteria, Context $context): IdSearchResult
     {
-        return $this->localeRepository->searchIds($criteria,$context);
+        return $this->localeRepository->searchIds($criteria, $context);
     }
 
     /**
-     * @param array $data
+     * @param array<mixed> $data
      * @param Context $context
      * @return EntityWrittenContainerEvent
      */
     public function update(array $data, Context $context): EntityWrittenContainerEvent
     {
-        return $this->localeRepository->update($data,$context);
+        return $this->localeRepository->update($data, $context);
     }
 }
