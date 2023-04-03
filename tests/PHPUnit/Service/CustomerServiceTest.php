@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Tests\Service;
 
+use Kiener\MolliePayments\Repository\Country\CountryRepository;
 use Kiener\MolliePayments\Repository\Customer\CustomerRepositoryInterface;
 use Kiener\MolliePayments\Repository\Salutation\SalutationRepository;
 use Kiener\MolliePayments\Service\CustomerService;
@@ -40,7 +41,7 @@ class CustomerServiceTest extends TestCase
         $this->settingsService = $this->createMock(SettingsService::class);
 
         $this->customerService = new CustomerService(
-            $this->createMock(EntityRepositoryInterface::class),
+            $this->createMock(CountryRepository::class),
             $this->customerRepository,
             $this->createMock(Customer::class),
             $this->createMock(EventDispatcherInterface::class),

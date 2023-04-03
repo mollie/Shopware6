@@ -6,6 +6,7 @@ use Exception;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieCustomerException;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
+use Kiener\MolliePayments\Repository\Country\CountryRepository;
 use Kiener\MolliePayments\Repository\Customer\CustomerRepositoryInterface;
 use Kiener\MolliePayments\Repository\Salutation\SalutationRepository;
 use Kiener\MolliePayments\Repository\Salutation\SalutationRepositoryInterface;
@@ -36,7 +37,7 @@ class CustomerService implements CustomerServiceInterface
     public const CUSTOM_FIELDS_KEY_SHOULD_SAVE_CARD_DETAIL = 'shouldSaveCardDetail';
     public const CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER = 'preferred_ideal_issuer';
 
-    /** @var EntityRepositoryInterface */
+    /** @var CountryRepository */
     private $countryRepository;
 
     /** @var CustomerRepositoryInterface */
@@ -67,21 +68,9 @@ class CustomerService implements CustomerServiceInterface
     private $valueGenerator;
 
     /**
-     * Creates a new instance of the customer service.
-     *
-     * @param EntityRepositoryInterface $countryRepository
-     * @param CustomerRepositoryInterface $customerRepository
-     * @param Customer $customerApiService
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param LoggerInterface $logger
-     * @param SalesChannelContextPersister $salesChannelContextPersister
-     * @param SalutationRepositoryInterface $salutationRepository
-     * @param SettingsService $settingsService
-     * @param string $shopwareVersion
-     * @param NumberRangeValueGeneratorInterface $valueGenerator
      */
     public function __construct(
-        EntityRepositoryInterface          $countryRepository,
+        CountryRepository          $countryRepository,
         CustomerRepositoryInterface        $customerRepository,
         Customer                           $customerApiService,
         EventDispatcherInterface           $eventDispatcher,
