@@ -88,14 +88,12 @@
         </service>
 
         <service id="Kiener\MolliePayments\Service\DeliveryService" class="Kiener\MolliePayments\Service\DeliveryService">
-            <argument type="service" id="order_delivery.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\OrderDelivery\OrderDeliveryRepository"/>
         </service>
-
 
         <service id="Kiener\MolliePayments\Service\Installer\CustomFieldsInstaller" public="true">
             <argument type="service" id="custom_field_set.repository"/>
         </service>
-
 
         <service id="Kiener\MolliePayments\Service\PaymentMethodService" class="Kiener\MolliePayments\Service\PaymentMethodService" public="true">
             <argument type="service" id="Shopware\Core\Content\Media\MediaService"/>
@@ -126,13 +124,12 @@
         </service>
 
         <service id="Kiener\MolliePayments\Service\TransactionService" class="Kiener\MolliePayments\Service\TransactionService">
-            <argument type="service" id="order_transaction.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepository"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\Cart\CartBackupService" class="Kiener\MolliePayments\Service\Cart\CartBackupService">
             <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
         </service>
-
 
         <service id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter" public="false">
         </service>
@@ -142,7 +139,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater"/>
             <argument type="service" id="payment_method.repository"/>
-            <argument type="service" id="order_transaction.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
@@ -165,8 +162,8 @@
         <service id="Kiener\MolliePayments\Subscriber\CheckoutConfirmPageSubscriber" class="Kiener\MolliePayments\Subscriber\CheckoutConfirmPageSubscriber">
             <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="language.repository"/>
-            <argument type="service" id="locale.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\Language\LanguageRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\Locale\LocaleRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MandateService"/>
             <tag name="kernel.event_subscriber"/>
         </service>
