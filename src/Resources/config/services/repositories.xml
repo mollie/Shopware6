@@ -32,7 +32,7 @@
         </service>
 
         <service id="Kiener\MolliePayments\Repository\MailTemplateType\MailTemplateTypeRepository">
-            <argument type="service" id="mail_template_type.repository"/>
+        <service id="Kiener\MolliePayments\Repository\MailTemplate\MailTemplateRepository">
         </service>
 
     </services>
