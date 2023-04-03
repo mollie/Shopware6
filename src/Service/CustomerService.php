@@ -7,6 +7,9 @@ use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieCustomerException;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Repository\Country\CountryRepository;
+use Kiener\MolliePayments\Repository\Customer\CustomerRepositoryInterface;
+use Kiener\MolliePayments\Repository\Salutation\SalutationRepository;
+use Kiener\MolliePayments\Repository\Salutation\SalutationRepositoryInterface;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
 use Kiener\MolliePayments\Struct\CustomerStruct;
 use Psr\Log\LoggerInterface;
@@ -37,7 +40,7 @@ class CustomerService implements CustomerServiceInterface
     /** @var CountryRepository */
     private $countryRepository;
 
-    /** @var EntityRepositoryInterface */
+    /** @var CustomerRepositoryInterface */
     private $customerRepository;
 
     /** @var Customer */
@@ -52,7 +55,7 @@ class CustomerService implements CustomerServiceInterface
     /** @var SalesChannelContextPersister */
     private $salesChannelContextPersister;
 
-    /** @var EntityRepositoryInterface */
+    /** @var SalutationRepositoryInterface */
     private $salutationRepository;
 
     /** @var SettingsService */
@@ -65,31 +68,20 @@ class CustomerService implements CustomerServiceInterface
     private $valueGenerator;
 
     /**
-     * Creates a new instance of the customer service.
-     *
-     * @param CountryRepository $countryRepository
-     * @param EntityRepositoryInterface $customerRepository
-     * @param Customer $customerApiService
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param LoggerInterface $logger
-     * @param SalesChannelContextPersister $salesChannelContextPersister
-     * @param EntityRepositoryInterface $salutationRepository
-     * @param SettingsService $settingsService
-     * @param string $shopwareVersion
-     * @param NumberRangeValueGeneratorInterface $valueGenerator
      */
     public function __construct(
-        CountryRepository                  $countryRepository,
-        EntityRepositoryInterface          $customerRepository,
+        CountryRepository          $countryRepository,
+        CustomerRepositoryInterface        $customerRepository,
         Customer                           $customerApiService,
         EventDispatcherInterface           $eventDispatcher,
         LoggerInterface                    $logger,
         SalesChannelContextPersister       $salesChannelContextPersister,
-        EntityRepositoryInterface          $salutationRepository,
+        SalutationRepositoryInterface      $salutationRepository,
         SettingsService                    $settingsService,
         string                             $shopwareVersion,
         NumberRangeValueGeneratorInterface $valueGenerator
-    ) {
+    )
+    {
         $this->countryRepository = $countryRepository;
         $this->customerRepository = $customerRepository;
         $this->customerApiService = $customerApiService;
@@ -184,7 +176,7 @@ class CustomerService implements CustomerServiceInterface
      * @param CustomerEntity $customer
      * @param string $cardToken
      * @param SalesChannelContext $context
-     *
+     * @param bool $shouldSaveCardDetail
      * @return EntityWrittenContainerEvent
      */
     public function setCardToken(CustomerEntity $customer, string $cardToken, SalesChannelContext $context, bool $shouldSaveCardDetail = false): EntityWrittenContainerEvent
@@ -291,8 +283,8 @@ class CustomerService implements CustomerServiceInterface
      * @param string $customerId
      * @param string $salesChannelId
      * @param Context $context
-     * @throws CustomerCouldNotBeFoundException
      * @return string
+     * @throws CustomerCouldNotBeFoundException
      */
     public function getMollieCustomerId(string $customerId, string $salesChannelId, Context $context): string
     {
@@ -353,8 +345,8 @@ class CustomerService implements CustomerServiceInterface
     /**
      * @param string $customerId
      * @param Context $context
-     * @throws CustomerCouldNotBeFoundException
      * @return CustomerStruct
+     * @throws CustomerCouldNotBeFoundException
      */
     public function getCustomerStruct(string $customerId, Context $context): CustomerStruct
     {

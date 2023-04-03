@@ -9,6 +9,7 @@ use Kiener\MolliePayments\Components\RefundManager\Builder\RefundDataBuilder;
 use Kiener\MolliePayments\Components\RefundManager\RefundManager;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
+use Kiener\MolliePayments\Repository\MollieRefund\MollieRefundRepositoryInterface;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order as MollieOrder;
@@ -68,7 +69,7 @@ class RefundManagerTest extends TestCase
 
         /** @var Order|MockObject $fakeOrder */
         $fakeOrder = $this->createDummyMock(Order::class, $this);
-        $fakeOrder->method('getMollieOrder')->willReturn(new MollieOrder($this->createMock(MollieApiClient::class)) );
+        $fakeOrder->method('getMollieOrder')->willReturn(new MollieOrder($this->createMock(MollieApiClient::class)));
 
 
         $this->fakeFlowBuilderDispatcher = new FakeFlowBuilderDispatcher();
@@ -83,7 +84,7 @@ class RefundManagerTest extends TestCase
             new FakeFlowBuilderFactory($this->fakeFlowBuilderDispatcher),
             $flowBuilderEventFactory,
             $this->fakeStockUpdater,
-            $this->createMock(EntityRepositoryInterface::class),
+            $this->createMock(MollieRefundRepositoryInterface::class),
             new NullLogger()
         );
     }
@@ -107,7 +108,7 @@ class RefundManagerTest extends TestCase
         $fakeContext = $this->createDummyMock(Context::class, $this);
 
 
-        $refundRequest = new RefundRequest('', '', '',null);
+        $refundRequest = new RefundRequest('', '', '', null);
 
         $refund = $this->manager->refund($order, $refundRequest, $fakeContext);
 
@@ -154,7 +155,7 @@ class RefundManagerTest extends TestCase
 
         # build a request object
         # so that we refund line-1 and make sure the stock is reset
-        $refundRequest = new RefundRequest('', '', '',null);
+        $refundRequest = new RefundRequest('', '', '', null);
         $refundRequest->addItem(new RefundRequestItem('line-1', 19.99, 1, 1));
 
         $refund = $this->manager->refund($order, $refundRequest, $fakeContext);

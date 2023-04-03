@@ -7,7 +7,7 @@
     <services>
 
         <service id="MolliePayments\Fixtures\SalesChannel\SalesChannelFixture">
-            <argument type="service" id="sales_channel.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepository"/>
             <argument type="service" id="payment_method.repository"/>
             <tag name="basecom.fixture"/>
         </service>
@@ -20,7 +20,7 @@
 
         <service id="MolliePayments\Fixtures\Customer\CustomerFixture">
             <argument type="service" id="Basecom\FixturePlugin\FixtureHelper"/>
-            <argument type="service" id="customer.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\Customer\CustomerRepository"/>
             <tag name="basecom.fixture"/>
         </service>
 
