@@ -165,8 +165,11 @@
         <service id="Kiener\MolliePayments\Subscriber\CheckoutConfirmPageSubscriber" class="Kiener\MolliePayments\Subscriber\CheckoutConfirmPageSubscriber">
             <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="language.repository"/>
+
+            <argument type="service" id="Kiener\MolliePayments\Repository\Language\LanguageRepository"/>
+        
             <argument type="service" id="Kiener\MolliePayments\Repository\Locale\LocaleRepository"/>
+
             <argument type="service" id="Kiener\MolliePayments\Service\MandateService"/>
             <tag name="kernel.event_subscriber"/>
         </service>

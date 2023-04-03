@@ -32,6 +32,11 @@
         </service>
 
 
+        <service id="Kiener\MolliePayments\Repository\Language\LanguageRepository">
+            <argument type="service" id="language.repository"/>
+             </service>
+
+
         <service id="Kiener\MolliePayments\Repository\Locale\LocaleRepository">
             <argument type="service" id="locale.repository"/>
         </service>
@@ -55,6 +60,7 @@
       
       <service id="Kiener\MolliePayments\Repository\MailTemplate\MailTemplateRepository">
        <argument type="service" id="mail_template.repository"/>
+
         </service>
 
     </services>

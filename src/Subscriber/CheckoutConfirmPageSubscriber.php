@@ -5,6 +5,8 @@ namespace Kiener\MolliePayments\Subscriber;
 use Exception;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
+use Kiener\MolliePayments\Repository\Language\LanguageRepository;
+use Kiener\MolliePayments\Repository\Language\LanguageRepositoryInterface;
 use Kiener\MolliePayments\Repository\Locale\LocaleRepository;
 use Kiener\MolliePayments\Repository\Locale\LocaleRepositoryInterface;
 use Kiener\MolliePayments\Service\CustomerService;
@@ -54,7 +56,7 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     private $settings;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var LanguageRepositoryInterface
      */
     private $languageRepositoryInterface;
 
@@ -82,16 +84,11 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param MollieApiFactory $apiFactory
-     * @param SettingsService $settingsService
-     * @param EntityRepositoryInterface $languageRepositoryInterface
-     * @param LocaleRepositoryInterface $localeRepositoryInterface
-     * @param MandateServiceInterface $mandateService
      */
     public function __construct(
         MollieApiFactory          $apiFactory,
         SettingsService           $settingsService,
-        EntityRepositoryInterface $languageRepositoryInterface,
+        LanguageRepositoryInterface $languageRepositoryInterface,
         LocaleRepositoryInterface $localeRepositoryInterface,
         MandateServiceInterface   $mandateService
     ) {
