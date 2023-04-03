@@ -2,39 +2,29 @@
 
 namespace Kiener\MolliePayments\Service;
 
+use Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepositoryInterface;
+
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
-use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 
 class TransactionService
 {
-    /** @var EntityRepositoryInterface $orderTransactionRepository */
+    /** @var OrderTransactionRepositoryInterface */
     private $orderTransactionRepository;
 
     /**
      * Creates a new instance of the transaction service.
      *
-     * @param EntityRepositoryInterface $orderTransactionRepository
+     * @param OrderTransactionRepositoryInterface $orderTransactionRepository
      */
     public function __construct(
-        EntityRepositoryInterface $orderTransactionRepository
+        OrderTransactionRepositoryInterface $orderTransactionRepository
     ) {
         $this->orderTransactionRepository = $orderTransactionRepository;
-    }
-
-    /**
-     * Returns the order transaction repository.
-     *
-     * @return EntityRepositoryInterface
-     */
-    public function getRepository(): EntityRepositoryInterface
-    {
-        return $this->orderTransactionRepository;
     }
 
     /**
@@ -55,7 +45,7 @@ class TransactionService
         $transactionCriteria->addAssociation('order.currency');
 
         /** @var OrderTransactionCollection $transactions */
-        $transactions = $this->getRepository()->search(
+        $transactions = $this->orderTransactionRepository->search(
             $transactionCriteria,
             $context ?? Context::createDefaultContext()
         );
@@ -78,7 +68,7 @@ class TransactionService
         OrderTransactionEntity $transaction,
         Context                $context = null
     ): EntityWrittenContainerEvent {
-        return $this->getRepository()->update(
+        return $this->orderTransactionRepository->update(
             [$transaction->getVars()],
             $context ?? Context::createDefaultContext()
         );
