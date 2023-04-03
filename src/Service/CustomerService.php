@@ -6,6 +6,7 @@ use Exception;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieCustomerException;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
+use Kiener\MolliePayments\Repository\Customer\CustomerRepositoryInterface;
 use Kiener\MolliePayments\Repository\Salutation\SalutationRepository;
 use Kiener\MolliePayments\Repository\Salutation\SalutationRepositoryInterface;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
@@ -38,7 +39,7 @@ class CustomerService implements CustomerServiceInterface
     /** @var EntityRepositoryInterface */
     private $countryRepository;
 
-    /** @var EntityRepositoryInterface */
+    /** @var CustomerRepositoryInterface */
     private $customerRepository;
 
     /** @var Customer */
@@ -69,7 +70,7 @@ class CustomerService implements CustomerServiceInterface
      * Creates a new instance of the customer service.
      *
      * @param EntityRepositoryInterface $countryRepository
-     * @param EntityRepositoryInterface $customerRepository
+     * @param CustomerRepositoryInterface $customerRepository
      * @param Customer $customerApiService
      * @param EventDispatcherInterface $eventDispatcher
      * @param LoggerInterface $logger
@@ -81,7 +82,7 @@ class CustomerService implements CustomerServiceInterface
      */
     public function __construct(
         EntityRepositoryInterface          $countryRepository,
-        EntityRepositoryInterface          $customerRepository,
+        CustomerRepositoryInterface        $customerRepository,
         Customer                           $customerApiService,
         EventDispatcherInterface           $eventDispatcher,
         LoggerInterface                    $logger,
@@ -90,7 +91,8 @@ class CustomerService implements CustomerServiceInterface
         SettingsService                    $settingsService,
         string                             $shopwareVersion,
         NumberRangeValueGeneratorInterface $valueGenerator
-    ) {
+    )
+    {
         $this->countryRepository = $countryRepository;
         $this->customerRepository = $customerRepository;
         $this->customerApiService = $customerApiService;
@@ -185,7 +187,7 @@ class CustomerService implements CustomerServiceInterface
      * @param CustomerEntity $customer
      * @param string $cardToken
      * @param SalesChannelContext $context
-     *
+     * @param bool $shouldSaveCardDetail
      * @return EntityWrittenContainerEvent
      */
     public function setCardToken(CustomerEntity $customer, string $cardToken, SalesChannelContext $context, bool $shouldSaveCardDetail = false): EntityWrittenContainerEvent
@@ -292,8 +294,8 @@ class CustomerService implements CustomerServiceInterface
      * @param string $customerId
      * @param string $salesChannelId
      * @param Context $context
-     * @throws CustomerCouldNotBeFoundException
      * @return string
+     * @throws CustomerCouldNotBeFoundException
      */
     public function getMollieCustomerId(string $customerId, string $salesChannelId, Context $context): string
     {
@@ -354,8 +356,8 @@ class CustomerService implements CustomerServiceInterface
     /**
      * @param string $customerId
      * @param Context $context
-     * @throws CustomerCouldNotBeFoundException
      * @return CustomerStruct
+     * @throws CustomerCouldNotBeFoundException
      */
     public function getCustomerStruct(string $customerId, Context $context): CustomerStruct
     {

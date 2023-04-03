@@ -7,6 +7,7 @@ namespace MolliePayments\Fixtures\Customer;
 use Basecom\FixturePlugin\Fixture;
 use Basecom\FixturePlugin\FixtureBag;
 use Basecom\FixturePlugin\FixtureHelper;
+use Kiener\MolliePayments\Repository\Customer\CustomerRepositoryInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 
@@ -27,16 +28,16 @@ class CustomerFixture extends Fixture
     private $helper;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var CustomerRepositoryInterface
      */
     private $customerRepository;
 
 
     /**
      * @param FixtureHelper $helper
-     * @param EntityRepositoryInterface $customerRepository
+     * @param CustomerRepositoryInterface $customerRepository
      */
-    public function __construct(FixtureHelper $helper, EntityRepositoryInterface $customerRepository)
+    public function __construct(FixtureHelper $helper, CustomerRepositoryInterface $customerRepository)
     {
         $this->helper = $helper;
         $this->customerRepository = $customerRepository;

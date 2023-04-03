@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Tests\Service;
 
+use Kiener\MolliePayments\Repository\Customer\CustomerRepositoryInterface;
 use Kiener\MolliePayments\Repository\Salutation\SalutationRepository;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
@@ -9,6 +10,7 @@ use Kiener\MolliePayments\Service\MollieApi\Mandate;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\CustomerStruct;
 use MolliePayments\Tests\Fakes\FakeEntityRepository;
+use MolliePayments\Tests\Fakes\Repositories\FakeCustomerRepository;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Customer\CustomerDefinition;
@@ -23,7 +25,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CustomerServiceTest extends TestCase
 {
-    /** @var EntityRepositoryInterface */
+    /** @var CustomerRepositoryInterface */
     private $customerRepository;
 
     /** @var CustomerService */
@@ -34,7 +36,7 @@ class CustomerServiceTest extends TestCase
 
     public function setUp(): void
     {
-        $this->customerRepository = new FakeEntityRepository(new CustomerDefinition());
+        $this->customerRepository = new FakeCustomerRepository(new CustomerDefinition());
         $this->settingsService = $this->createMock(SettingsService::class);
 
         $this->customerService = new CustomerService(
@@ -58,9 +60,10 @@ class CustomerServiceTest extends TestCase
      * @return void
      * @throws \Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException
      */
-    public function testCustomerCustomFieldsAreInvalid():void{
+    public function testCustomerCustomFieldsAreInvalid(): void
+    {
         $customer = $this->createConfiguredMock(CustomerEntity::class, [
-            'getCustomFields' => ['mollie_payments'=>'foo']
+            'getCustomFields' => ['mollie_payments' => 'foo']
         ]);
 
         $search = $this->createConfiguredMock(EntitySearchResult::class, [
@@ -69,12 +72,12 @@ class CustomerServiceTest extends TestCase
 
         $this->customerRepository->entitySearchResults = [$search];
 
-        $customerStruct = $this->customerService->getCustomerStruct('fakeId',   $this->createMock(Context::class));
+        $customerStruct = $this->customerService->getCustomerStruct('fakeId', $this->createMock(Context::class));
 
         $actual = json_encode($customerStruct);
         $expected = '{"extensions":[]}';
 
-        $this->assertEquals($actual,$expected);
+        $this->assertEquals($actual, $expected);
 
     }
 
@@ -240,7 +243,7 @@ class CustomerServiceTest extends TestCase
             ],
             'Broken mollie_payments custom Fields by external plugins' => [
                 'bar', 'cst_321', 'pfl_321', true,
-                ['mollie_payments' => 'foo' ], // existing customfields
+                ['mollie_payments' => 'foo'], // existing customfields
                 [   // expected customfields
                     'mollie_payments' => [
                         'customer_ids' => [
