@@ -31,9 +31,15 @@
             <argument type="service" id="payment_method.repository"/>
         </service>
 
+
+        <service id="Kiener\MolliePayments\Repository\MollieSubscriptionAddress\MollieSubscriptionAddressRepository">
+            <argument type="service" id="mollie_subscription_address.repository"/>
+ </service>
+ 
         <service id="Kiener\MolliePayments\Repository\MollieSubscriptionHistory\MollieSubscriptionHistoryRepository">
             <argument type="service" id="mollie_subscription_history.repository"/>
         </service>
+        
         <service id="Kiener\MolliePayments\Repository\MailTemplateType\MailTemplateTypeRepository">
          <argument type="service" id="mail_template_type.repository"/>
        </service>
