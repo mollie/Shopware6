@@ -109,7 +109,7 @@
 
         <service id="Kiener\MolliePayments\Service\SettingsService" class="Kiener\MolliePayments\Service\SettingsService">
             <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
-            <argument type="service" id="sales_channel.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepository"/>
             <argument key="$envShopDomain">%env(default::MOLLIE_SHOP_DOMAIN)%</argument>
             <argument key="$envDevMode">%env(default::MOLLIE_DEV_MODE)%</argument>
             <argument key="$envCypressMode">%env(default::MOLLIE_CYPRESS_MODE)%</argument>

@@ -31,6 +31,10 @@
             <argument type="service" id="payment_method.repository"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepository">
+            <argument type="service" id="sales_channel.repository"/>
+        </service>
+
         <service id="Kiener\MolliePayments\Repository\OrderDelivery\OrderDeliveryRepository">
             <argument type="service" id="order_delivery.repository"/>
         </service>
