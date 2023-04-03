@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Components\RefundManager;
 
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatcherAdapterInterface;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactoryInterface;
 use Kiener\MolliePayments\Components\RefundManager\Builder\RefundDataBuilder;
 use Kiener\MolliePayments\Components\RefundManager\Integrators\StockManagerInterface;
@@ -13,13 +12,11 @@ use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItemRoundingDiff;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieRefundException;
+use Kiener\MolliePayments\Repository\MollieRefund\MollieRefundRepositoryInterface;
 use Kiener\MolliePayments\Service\MollieApi\Order;
-use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\OrderServiceInterface;
 use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
-use Kiener\MolliePayments\Service\Refund\RefundService;
 use Kiener\MolliePayments\Service\Refund\RefundServiceInterface;
-use Kiener\MolliePayments\Service\Stock\StockManager;
 use Kiener\MolliePayments\Struct\MollieApi\OrderLineMetaDataStruct;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
@@ -31,7 +28,6 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 
 class RefundManager implements RefundManagerInterface
 {
@@ -72,7 +68,7 @@ class RefundManager implements RefundManagerInterface
     private $flowBuilderEventFactory;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var MollieRefundRepositoryInterface
      */
     protected $refundRepository;
 
@@ -90,10 +86,10 @@ class RefundManager implements RefundManagerInterface
      * @param FlowBuilderFactoryInterface $flowBuilderFactory
      * @param FlowBuilderEventFactory $flowBuilderEventFactory
      * @param StockManagerInterface $stockUpdater
-     * @param EntityRepositoryInterface $refundRepository
+     * @param MollieRefundRepositoryInterface $refundRepository
      * @param LoggerInterface $logger
      */
-    public function __construct(RefundDataBuilder $refundDataBuilder, OrderServiceInterface $orderService, RefundServiceInterface $refundService, Order $mollieOrder, FlowBuilderFactoryInterface $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, StockManagerInterface $stockUpdater, EntityRepositoryInterface $refundRepository, LoggerInterface $logger)
+    public function __construct(RefundDataBuilder $refundDataBuilder, OrderServiceInterface $orderService, RefundServiceInterface $refundService, Order $mollieOrder, FlowBuilderFactoryInterface $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, StockManagerInterface $stockUpdater, MollieRefundRepositoryInterface $refundRepository, LoggerInterface $logger)
     {
         $this->builderData = $refundDataBuilder;
         $this->orderService = $orderService;
