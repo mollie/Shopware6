@@ -9,6 +9,7 @@ use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
+use Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepositoryInterface;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentDetails;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
@@ -56,7 +57,7 @@ class NotificationFacade
     private $repoPaymentMethods;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var OrderTransactionRepositoryInterface
      */
     private $repoOrderTransactions;
 
@@ -101,7 +102,7 @@ class NotificationFacade
      * @param OrderStatusConverter $statusConverter
      * @param OrderStatusUpdater $statusUpdater
      * @param EntityRepositoryInterface $repoPaymentMethods
-     * @param EntityRepositoryInterface $repoOrderTransactions
+     * @param OrderTransactionRepositoryInterface $repoOrderTransactions
      * @param FlowBuilderFactory $flowBuilderFactory
      * @param FlowBuilderEventFactory $flowBuilderEventFactory
      * @param SettingsService $serviceService
@@ -110,7 +111,7 @@ class NotificationFacade
      * @param LoggerInterface $logger
      * @throws \Exception
      */
-    public function __construct(MollieGatewayInterface $gatewayMollie, OrderStatusConverter $statusConverter, OrderStatusUpdater $statusUpdater, EntityRepositoryInterface $repoPaymentMethods, EntityRepositoryInterface $repoOrderTransactions, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SettingsService $serviceService, SubscriptionManager $subscription, OrderService $orderService, LoggerInterface $logger)
+    public function __construct(MollieGatewayInterface $gatewayMollie, OrderStatusConverter $statusConverter, OrderStatusUpdater $statusUpdater, EntityRepositoryInterface $repoPaymentMethods, OrderTransactionRepositoryInterface $repoOrderTransactions, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SettingsService $serviceService, SubscriptionManager $subscription, OrderService $orderService, LoggerInterface $logger)
     {
         $this->gatewayMollie = $gatewayMollie;
         $this->statusConverter = $statusConverter;
