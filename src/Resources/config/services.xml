@@ -124,7 +124,7 @@
         </service>
 
         <service id="Kiener\MolliePayments\Service\TransactionService" class="Kiener\MolliePayments\Service\TransactionService">
-            <argument type="service" id="order_transaction.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepository"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\Cart\CartBackupService" class="Kiener\MolliePayments\Service\Cart\CartBackupService">
@@ -139,7 +139,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater"/>
             <argument type="service" id="payment_method.repository"/>
-            <argument type="service" id="order_transaction.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
