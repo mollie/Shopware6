@@ -6,6 +6,8 @@ use Exception;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieCustomerException;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
+use Kiener\MolliePayments\Repository\Salutation\SalutationRepository;
+use Kiener\MolliePayments\Repository\Salutation\SalutationRepositoryInterface;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
 use Kiener\MolliePayments\Struct\CustomerStruct;
 use Psr\Log\LoggerInterface;
@@ -51,7 +53,7 @@ class CustomerService implements CustomerServiceInterface
     /** @var SalesChannelContextPersister */
     private $salesChannelContextPersister;
 
-    /** @var EntityRepositoryInterface */
+    /** @var SalutationRepositoryInterface */
     private $salutationRepository;
 
     /** @var SettingsService */
@@ -72,7 +74,7 @@ class CustomerService implements CustomerServiceInterface
      * @param EventDispatcherInterface $eventDispatcher
      * @param LoggerInterface $logger
      * @param SalesChannelContextPersister $salesChannelContextPersister
-     * @param EntityRepositoryInterface $salutationRepository
+     * @param SalutationRepositoryInterface $salutationRepository
      * @param SettingsService $settingsService
      * @param string $shopwareVersion
      * @param NumberRangeValueGeneratorInterface $valueGenerator
@@ -84,7 +86,7 @@ class CustomerService implements CustomerServiceInterface
         EventDispatcherInterface           $eventDispatcher,
         LoggerInterface                    $logger,
         SalesChannelContextPersister       $salesChannelContextPersister,
-        EntityRepositoryInterface          $salutationRepository,
+        SalutationRepositoryInterface      $salutationRepository,
         SettingsService                    $settingsService,
         string                             $shopwareVersion,
         NumberRangeValueGeneratorInterface $valueGenerator
@@ -372,7 +374,7 @@ class CustomerService implements CustomerServiceInterface
             $struct->setLegacyCustomerId($customFields[self::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID]);
         }
         $molliePaymentsCustomFields = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS] ?? [];
-        if (! is_array($molliePaymentsCustomFields)) {
+        if (!is_array($molliePaymentsCustomFields)) {
             $this->logger->warning('Customer customFields for MolliePayments are invalid. Array is expected', [
                 'currentCustomFields' => $molliePaymentsCustomFields
             ]);
