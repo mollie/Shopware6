@@ -355,12 +355,10 @@
         </service>
 
         <service id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing\SubscriptionRenewing">
-            <argument type="service"
-                      id="Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface"/>
-            <argument type="service" id="order_address.repository"/>
+            <argument type="service" id="Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\Order\OrderAddressRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
-            <argument type="service"
-                      id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing\OrderCloneService"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing\OrderCloneService"/>
         </service>
     </services>
 </container>
