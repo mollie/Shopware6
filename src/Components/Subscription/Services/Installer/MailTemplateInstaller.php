@@ -5,6 +5,9 @@ namespace Kiener\MolliePayments\Components\Subscription\Services\Installer;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
+use Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepositoryInterface;
+use Kiener\MolliePayments\Repository\MailTemplate\MailTemplateRepositoryInterface;
+use Kiener\MolliePayments\Repository\MailTemplateType\MailTemplateTypeRepositoryInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
@@ -23,17 +26,17 @@ class MailTemplateInstaller
     private $connection;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var MailTemplateTypeRepositoryInterface
      */
     private $repoMailTypes;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var MailTemplateRepositoryInterface
      */
     private $repoMailTemplates;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var SalesChannelRepositoryInterface
      */
     private $repoSalesChannels;
 
@@ -41,9 +44,9 @@ class MailTemplateInstaller
      * @param Connection $connection
      * @param EntityRepositoryInterface $repoMailTypes
      * @param EntityRepositoryInterface $repoMailTemplates
-     * @param EntityRepositoryInterface $repoSalesChannels
+     * @param SalesChannelRepositoryInterface $repoSalesChannels
      */
-    public function __construct(Connection $connection, EntityRepositoryInterface $repoMailTypes, EntityRepositoryInterface $repoMailTemplates, EntityRepositoryInterface $repoSalesChannels)
+    public function __construct(Connection $connection, MailTemplateTypeRepositoryInterface $repoMailTypes, MailTemplateRepositoryInterface $repoMailTemplates, SalesChannelRepositoryInterface $repoSalesChannels)
     {
         $this->connection = $connection;
         $this->repoMailTypes = $repoMailTypes;

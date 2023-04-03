@@ -5,6 +5,7 @@ namespace MolliePayments\Fixtures\SalesChannel;
 
 use Basecom\FixturePlugin\Fixture;
 use Basecom\FixturePlugin\FixtureBag;
+use Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepositoryInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -15,7 +16,7 @@ class SalesChannelFixture extends Fixture
 {
 
     /**
-     * @var EntityRepositoryInterface
+     * @var SalesChannelRepositoryInterface
      */
     private $repoSalesChannels;
 
@@ -26,10 +27,10 @@ class SalesChannelFixture extends Fixture
 
 
     /**
-     * @param EntityRepositoryInterface $repoSalesChannels
+     * @param SalesChannelRepositoryInterface $repoSalesChannels
      * @param EntityRepositoryInterface $repoPaymentMethods
      */
-    public function __construct(EntityRepositoryInterface $repoSalesChannels, EntityRepositoryInterface $repoPaymentMethods)
+    public function __construct(SalesChannelRepositoryInterface $repoSalesChannels, EntityRepositoryInterface $repoPaymentMethods)
     {
         $this->repoSalesChannels = $repoSalesChannels;
         $this->repoPaymentMethods = $repoPaymentMethods;

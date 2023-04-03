@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Service\Mail\AttachmentGenerator;
 
 use Kiener\MolliePayments\Exception\SalesChannelPaymentMethodsException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
+use Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepositoryInterface;
 use Kiener\MolliePayments\Service\SalesChannel\SalesChannelDataExtractor;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
@@ -34,10 +35,10 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
     protected $salesChannelDataExtractor;
 
     public function __construct(
-        EntityRepositoryInterface $salesChannelRepository,
-        MollieApiFactory          $apiFactory,
-        EntityRepositoryInterface $paymentMethodRepository,
-        SalesChannelDataExtractor $salesChannelDataExtractor
+        SalesChannelRepositoryInterface $salesChannelRepository,
+        MollieApiFactory                $apiFactory,
+        EntityRepositoryInterface       $paymentMethodRepository,
+        SalesChannelDataExtractor       $salesChannelDataExtractor
     ) {
         parent::__construct($salesChannelRepository);
 
