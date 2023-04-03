@@ -31,8 +31,8 @@
             <argument type="service" id="payment_method.repository"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Repository\MailTemplateType\MailTemplateTypeRepository">
         <service id="Kiener\MolliePayments\Repository\MailTemplate\MailTemplateRepository">
-            <argument type="service" id="mail_template.repository"/>
         </service>
 
     </services>
