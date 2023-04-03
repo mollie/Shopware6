@@ -34,5 +34,34 @@
         <service id="Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepository">
             <argument type="service" id="order_transaction.repository"/>
         </service>
+
+        <service id="Kiener\MolliePayments\Repository\Language\LanguageRepository">
+            <argument type="service" id="language.repository"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Repository\Locale\LocaleRepository">
+            <argument type="service" id="locale.repository"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Repository\MollieRefund\MollieRefundRepository">
+            <argument type="service" id="mollie_refund.repository"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Repository\MollieSubscriptionAddress\MollieSubscriptionAddressRepository">
+            <argument type="service" id="mollie_subscription_address.repository"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Repository\MollieSubscriptionHistory\MollieSubscriptionHistoryRepository">
+            <argument type="service" id="mollie_subscription_history.repository"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Repository\MailTemplateType\MailTemplateTypeRepository">
+            <argument type="service" id="mail_template_type.repository"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Repository\MailTemplate\MailTemplateRepository">
+            <argument type="service" id="mail_template.repository"/>
+        </service>
+
     </services>
 </container>
