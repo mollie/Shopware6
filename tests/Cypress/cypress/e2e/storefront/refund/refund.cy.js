@@ -182,6 +182,9 @@ context("Order Refunds", () => {
             // the checkbox for the verification is not enabled
             repoRefundManager.getFullRefundButton().should('be.disabled');
 
+            // check if refund quantity input field is visible
+            repoRefundManager.getFirstRefundedQuantityInputField().should('be.visible');
+
             // now start the full refund
             refundManager.fullRefund(REFUND_DESCRIPTION, '');
 
@@ -194,6 +197,9 @@ context("Order Refunds", () => {
             // now cancel our pending refund
             // and make sure that its gone afterwards
             refundManager.cancelPendingRefund();
+
+            // after cancel, the refund input field should be visible again
+            repoRefundManager.getFirstRefundedQuantityInputField().should('be.visible');
 
             // now start the partial refund
             refundManager.partialAmountRefund(2, REFUND_DESCRIPTION);

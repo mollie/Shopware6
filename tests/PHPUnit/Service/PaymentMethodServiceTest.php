@@ -24,11 +24,14 @@ use Kiener\MolliePayments\Handler\Method\PaySafeCardPayment;
 use Kiener\MolliePayments\Handler\Method\Przelewy24Payment;
 use Kiener\MolliePayments\Handler\Method\SofortPayment;
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
+use Kiener\MolliePayments\Repository\Media\MediaRepository;
+use Kiener\MolliePayments\Repository\Media\MediaRepositoryInterface;
 use Kiener\MolliePayments\Service\HttpClient\Adapter\Curl\CurlClient;
 use Kiener\MolliePayments\Service\PaymentMethodService;
 use Mollie\Api\HttpAdapter\CurlMollieHttpAdapter;
 use MolliePayments\Tests\Fakes\FakeEntityRepository;
 use MolliePayments\Tests\Fakes\FakeHttpClient;
+use MolliePayments\Tests\Fakes\Repositories\FakeMediaRepository;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\CashPayment;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\DebitPayment;
@@ -52,7 +55,7 @@ class PaymentMethodServiceTest extends TestCase
     private $context;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var MediaRepositoryInterface
      */
     private $mediaRepository;
 
@@ -71,7 +74,7 @@ class PaymentMethodServiceTest extends TestCase
         parent::setUp();
 
         $this->context = $this->createMock(Context::class);;
-        $this->mediaRepository = new FakeEntityRepository(new MediaDefinition());
+        $this->mediaRepository = new FakeMediaRepository(new MediaDefinition());
         $this->paymentMethodRepository = new FakeEntityRepository(new PaymentMethodDefinition());
 
         $this->paymentMethodService = new PaymentMethodService(
