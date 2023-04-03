@@ -68,19 +68,18 @@ class CustomerService implements CustomerServiceInterface
     private $valueGenerator;
 
     /**
+     * @param CountryRepository $countryRepository
+     * @param CustomerRepositoryInterface $customerRepository
+     * @param Customer $customerApiService
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param LoggerInterface $logger
+     * @param SalesChannelContextPersister $salesChannelContextPersister
+     * @param SalutationRepositoryInterface $salutationRepository
+     * @param SettingsService $settingsService
+     * @param string $shopwareVersion
+     * @param NumberRangeValueGeneratorInterface $valueGenerator
      */
-    public function __construct(
-        CountryRepository          $countryRepository,
-        CustomerRepositoryInterface        $customerRepository,
-        Customer                           $customerApiService,
-        EventDispatcherInterface           $eventDispatcher,
-        LoggerInterface                    $logger,
-        SalesChannelContextPersister       $salesChannelContextPersister,
-        SalutationRepositoryInterface      $salutationRepository,
-        SettingsService                    $settingsService,
-        string                             $shopwareVersion,
-        NumberRangeValueGeneratorInterface $valueGenerator
-    )
+    public function __construct(CountryRepository $countryRepository, CustomerRepositoryInterface $customerRepository, Customer $customerApiService, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger, SalesChannelContextPersister $salesChannelContextPersister, SalutationRepositoryInterface $salutationRepository, SettingsService $settingsService, string $shopwareVersion, NumberRangeValueGeneratorInterface $valueGenerator)
     {
         $this->countryRepository = $countryRepository;
         $this->customerRepository = $customerRepository;

@@ -33,16 +33,16 @@
 
         <service id="Kiener\MolliePayments\Repository\Country\CountryRepository">
             <argument type="service" id="country.repository"/>
-        </service> 
-        
+        </service>
+
         <service id="Kiener\MolliePayments\Repository\Customer\CustomerRepository">
             <argument type="service" id="customer.repository"/>
-        </service> 
-        
+        </service>
+
         <service id="Kiener\MolliePayments\Repository\Salutation\SalutationRepository">
             <argument type="service" id="salutation.repository"/>
-        </service> 
- 
+        </service>
+
         <service id="Kiener\MolliePayments\Repository\Media\MediaRepository">
             <argument type="service" id="media.repository"/>
         </service>
