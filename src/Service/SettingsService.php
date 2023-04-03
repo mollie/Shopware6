@@ -2,9 +2,9 @@
 
 namespace Kiener\MolliePayments\Service;
 
+use Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepositoryInterface;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 
@@ -25,7 +25,7 @@ class SettingsService implements PluginSettingsServiceInterface
 
     /**
      *
-     * @var EntityRepositoryInterface
+     * @var SalesChannelRepositoryInterface
      */
     private $repoSalesChannels;
 
@@ -47,12 +47,12 @@ class SettingsService implements PluginSettingsServiceInterface
 
     /**
      * @param SystemConfigService $systemConfigService
-     * @param EntityRepositoryInterface $repoSalesChannels
+     * @param SalesChannelRepositoryInterface $repoSalesChannels
      * @param ?string $envShopDomain
      * @param ?string $envDevMode
      * @param ?string $envCypressMode
      */
-    public function __construct(SystemConfigService $systemConfigService, EntityRepositoryInterface $repoSalesChannels, ?string $envShopDomain, ?string $envDevMode, ?string $envCypressMode)
+    public function __construct(SystemConfigService $systemConfigService, SalesChannelRepositoryInterface $repoSalesChannels, ?string $envShopDomain, ?string $envDevMode, ?string $envCypressMode)
     {
         $this->systemConfigService = $systemConfigService;
         $this->repoSalesChannels = $repoSalesChannels;
