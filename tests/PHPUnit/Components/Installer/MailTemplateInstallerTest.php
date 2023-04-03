@@ -6,6 +6,7 @@ namespace MolliePayments\Tests\Components\Installer;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ForwardCompatibility\Result;
 use Kiener\MolliePayments\Components\Subscription\Services\Installer\MailTemplateInstaller;
+use Kiener\MolliePayments\Repository\MailTemplate\MailTemplateRepositoryInterface;
 use PHPUnit\Framework\Constraint\IsType;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Defaults;
@@ -35,7 +36,7 @@ class MailTemplateInstallerTest extends TestCase
     protected $repoMailTypes;
 
     /**
-     * @var EntityRepository|EntityRepositoryInterface
+     * @var MailTemplateRepositoryInterface
      */
     protected $repoMailTemplates;
 
@@ -48,7 +49,7 @@ class MailTemplateInstallerTest extends TestCase
     {
         $this->connection = $this->createMock(Connection::class);
         $this->repoMailTypes = $this->createMock(EntityRepository::class);
-        $this->repoMailTemplates = $this->createMock(EntityRepository::class);
+        $this->repoMailTemplates = $this->createMock(MailTemplateRepositoryInterface::class);
         $this->repoSalesChannels = $this->createMock(EntityRepository::class);
 
         $salesChannelSearchResult = $this->createConfiguredMock(EntitySearchResult::class, [
@@ -297,7 +298,7 @@ class MailTemplateInstallerTest extends TestCase
     }
 
     # ----Connection----------------------------------------
-    private function setupConnection($enLangId, $deLangId )
+    private function setupConnection($enLangId, $deLangId)
     {
         $enResult = $this->createConfiguredMock(Result::class, [
             'fetchColumn' => $enLangId,
@@ -332,7 +333,7 @@ class MailTemplateInstallerTest extends TestCase
     private function setupMailTypeRepoWithExistingData($id)
     {
         $result = $this->createConfiguredMock(IdSearchResult::class, [
-            'getIds'  => [$id],
+            'getIds' => [$id],
             'firstId' => $id,
         ]);
 
@@ -354,7 +355,7 @@ class MailTemplateInstallerTest extends TestCase
     private function setupMailTemplateRepoWithExistingData($id)
     {
         $result = $this->createConfiguredMock(IdSearchResult::class, [
-            'getIds'  => [$id],
+            'getIds' => [$id],
             'firstId' => $id,
         ]);
 
