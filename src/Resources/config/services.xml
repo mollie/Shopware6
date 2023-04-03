@@ -91,11 +91,9 @@
             <argument type="service" id="order_delivery.repository"/>
         </service>
 
-
         <service id="Kiener\MolliePayments\Service\Installer\CustomFieldsInstaller" public="true">
             <argument type="service" id="custom_field_set.repository"/>
         </service>
-
 
         <service id="Kiener\MolliePayments\Service\PaymentMethodService" class="Kiener\MolliePayments\Service\PaymentMethodService" public="true">
             <argument type="service" id="Shopware\Core\Content\Media\MediaService"/>
@@ -133,7 +131,6 @@
             <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
         </service>
 
-
         <service id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter" public="false">
         </service>
 
@@ -165,11 +162,8 @@
         <service id="Kiener\MolliePayments\Subscriber\CheckoutConfirmPageSubscriber" class="Kiener\MolliePayments\Subscriber\CheckoutConfirmPageSubscriber">
             <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-
             <argument type="service" id="Kiener\MolliePayments\Repository\Language\LanguageRepository"/>
-        
             <argument type="service" id="Kiener\MolliePayments\Repository\Locale\LocaleRepository"/>
-
             <argument type="service" id="Kiener\MolliePayments\Service\MandateService"/>
             <tag name="kernel.event_subscriber"/>
         </service>
