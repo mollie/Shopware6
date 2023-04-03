@@ -9,12 +9,12 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\Subscr
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Components\Subscription\Exception\SubscriptionNotFoundException;
+use Kiener\MolliePayments\Repository\MollieSubscriptionHistory\MollieSubscriptionHistoryRepositoryInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\NotFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
 
@@ -32,7 +32,7 @@ class SubscriptionRepository
     private $repoAddresses;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var MollieSubscriptionHistoryRepositoryInterface
      */
     private $repoHistory;
 
@@ -40,9 +40,9 @@ class SubscriptionRepository
     /**
      * @param EntityRepositoryInterface $repoSubscriptions
      * @param EntityRepositoryInterface $repoAddresses
-     * @param EntityRepositoryInterface $repoHistory
+     * @param MollieSubscriptionHistoryRepositoryInterface $repoHistory
      */
-    public function __construct(EntityRepositoryInterface $repoSubscriptions, EntityRepositoryInterface $repoAddresses, EntityRepositoryInterface $repoHistory)
+    public function __construct(EntityRepositoryInterface $repoSubscriptions, EntityRepositoryInterface $repoAddresses, MollieSubscriptionHistoryRepositoryInterface $repoHistory)
     {
         $this->repoSubscriptions = $repoSubscriptions;
         $this->repoAddresses = $repoAddresses;
