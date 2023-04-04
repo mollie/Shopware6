@@ -33,6 +33,7 @@ use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Content\Media\MediaCollection;
 use Shopware\Core\Content\Media\MediaService;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
@@ -46,7 +47,7 @@ class PaymentMethodService
     /** @var MediaService */
     private $mediaService;
 
-    /** @var EntityRepositoryInterface */
+    /** @var EntityRepository */
     private $paymentRepository;
 
     /** @var PluginIdProvider */
@@ -62,11 +63,11 @@ class PaymentMethodService
     /**
      * @param MediaService $mediaService
      * @param MediaRepositoryInterface $mediaRepository
-     * @param EntityRepositoryInterface $paymentRepository
+     * @param EntityRepository $paymentRepository
      * @param PluginIdProvider $pluginIdProvider
      * @param HttpClientInterface $httpClient
      */
-    public function __construct(MediaService $mediaService, MediaRepositoryInterface $mediaRepository, EntityRepositoryInterface $paymentRepository, PluginIdProvider $pluginIdProvider, HttpClientInterface $httpClient)
+    public function __construct(MediaService $mediaService, MediaRepositoryInterface $mediaRepository, EntityRepository $paymentRepository, PluginIdProvider $pluginIdProvider, HttpClientInterface $httpClient)
     {
         $this->mediaService = $mediaService;
         $this->mediaRepository = $mediaRepository;

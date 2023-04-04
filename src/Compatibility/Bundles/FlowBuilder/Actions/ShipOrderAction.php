@@ -9,11 +9,12 @@ use Kiener\MolliePayments\Service\OrderServiceInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Flow\Dispatching\Action\FlowAction;
 use Shopware\Core\Content\Flow\Dispatching\StorableFlow;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Event\FlowEvent;
 use Shopware\Core\Framework\Event\OrderAware;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ShipOrderAction extends FlowAction  implements EventSubscriberInterface
+class ShipOrderAction extends FlowAction implements EventSubscriberInterface
 {
 
     /**
@@ -72,14 +73,14 @@ class ShipOrderAction extends FlowAction  implements EventSubscriberInterface
 
     /**
      * @param StorableFlow $flow
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function handleFlow(StorableFlow $flow): void
     {
         $orderId = $flow->getStore('order_id');
 
-        $this->shipOrder($orderId);
+        $this->shipOrder($orderId, $flow->getContext());
     }
 
     /**
@@ -102,21 +103,21 @@ class ShipOrderAction extends FlowAction  implements EventSubscriberInterface
 
         $orderId = $baseEvent->getOrderId();
 
-        $this->shipOrder($orderId);
+        $this->shipOrder($orderId, $baseEvent->getContext());
     }
 
     /**
      * @param string $orderId
-     * @return void
+     * @param Context $context
      * @throws \Exception
+     * @return void
      */
-    private function shipOrder(string $orderId): void
+    private function shipOrder(string $orderId, Context $context): void
     {
         $orderNumber = '';
 
         try {
-
-            $order = $this->orderService->getOrder($orderId, $baseEvent->getContext());
+            $order = $this->orderService->getOrder($orderId, $context);
 
             $orderNumber = $order->getOrderNumber();
 
@@ -127,7 +128,7 @@ class ShipOrderAction extends FlowAction  implements EventSubscriberInterface
                 '',
                 '',
                 '',
-                $baseEvent->getContext()
+                $context
             );
         } catch (\Exception $ex) {
             $this->logger->error(

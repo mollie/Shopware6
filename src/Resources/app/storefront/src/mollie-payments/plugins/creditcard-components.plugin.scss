@@ -66,12 +66,12 @@
   }
 
   .custom-control-label::before {
-    @include border-radius($custom-checkbox-indicator-border-radius);
+    @include border-radius(5px);
   }
 
   .custom-control-input:checked ~ .custom-control-label {
     &::after {
-      background-image: $custom-checkbox-indicator-icon-checked;
+     // background-image: $custom-checkbox-indicator-icon-checked;
     }
   }
 }

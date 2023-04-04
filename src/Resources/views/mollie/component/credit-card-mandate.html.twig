@@ -4,12 +4,12 @@
             <div class="mollie-credit-card-mandate" data-mollie-credit-card-mandate-id="{{ mandate.id }}">
 
                 {% block mollie_credit_card_mandate_block %}
-                    <div class="{{ modifiable ? '' : (formRadioWrapperClass ?? 'custom-control custom-radio') }} mollie-credit-card-mandate-radio">
+                    <div class="{{ modifiable ? '' : (formRadioWrapperClass ?? 'custom-control custom-radio form-check') }} mollie-credit-card-mandate-radio">
                         {% block mollie_credit_card_mandate_block_input %}
                             {% if not modifiable %}
                                 <input type="radio"
                                        name="mollieCreditCardMandate"
-                                       class="{{ formCheckInputClass ?? 'custom-control-input' }}"
+                                       class="{{ formCheckInputClass ?? 'custom-control-input form-check-input' }}"
                                        id="mandate{{ mandate.id }}"
                                        value="{{ mandate.id }}"
                                         {{ loop.first ? 'checked' : '' }}
@@ -18,7 +18,7 @@
                         {% endblock %}
 
                         {% block mollie_credit_card_mandate_block_label %}
-                            <label class="{{ modifiable ? '' : (formCheckLabelClass ?? 'custom-control-label') }} mollie-credit-card-mandate-label"
+                            <label class="{{ modifiable ? '' : (formCheckLabelClass ?? 'custom-control-label form-check-label') }} mollie-credit-card-mandate-label"
                                    for="mandate{{ mandate.id }}">
                                 {% block mollie_credit_card_mandate_block_title %}
                                     <span class="mollie-credit-card-mandate-title">

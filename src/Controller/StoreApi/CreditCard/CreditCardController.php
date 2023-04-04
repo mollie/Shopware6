@@ -17,9 +17,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @RouteScope(scopes={"store-api"})
- */
 class CreditCardController
 {
 
@@ -44,7 +41,7 @@ class CreditCardController
 
 
     /**
-     * @Route("/store-api/mollie/creditcard/store-token/{customerId}/{cardToken}", name="store-api.mollie.creditcard.store-token", methods={"POST"})
+     * @Route("/store-api/mollie/creditcard/store-token/{customerId}/{cardToken}", name="store-api.mollie.creditcard.store-token", methods={"POST"}, defaults={"_routeScope"="api"})
      *
      * @param string $customerId
      * @param string $cardToken
@@ -71,7 +68,7 @@ class CreditCardController
     }
 
     /**
-     * @Route("/store-api/mollie/creditcard/store-mandate-id/{customerId}/{mandateId}", name="store-api.mollie.creditcard.store-mandate-id", methods={"POST"})
+     * @Route("/store-api/mollie/creditcard/store-mandate-id/{customerId}/{mandateId}", name="store-api.mollie.creditcard.store-mandate-id", methods={"POST"}, defaults={"_routeScope"="api"})
      *
      * @param string $customerId
      * @param string $mandateId
@@ -96,7 +93,7 @@ class CreditCardController
     }
 
     /**
-     * @Route("/store-api/mollie/mandate/revoke/{customerId}/{mandateId}", name="store-api.mollie.mandate.revoke", methods={"POST"})
+     * @Route("/store-api/mollie/mandate/revoke/{customerId}/{mandateId}", name="store-api.mollie.mandate.revoke", methods={"POST"}, defaults={"_routeScope"="api"})
      *
      * @param string $customerId
      * @param string $mandateId
@@ -112,7 +109,7 @@ class CreditCardController
     }
 
     /**
-     * @Route("/store-api/mollie/mandates/{customerId}", name="store-api.mollie.mandates", methods={"GET"})
+     * @Route("/store-api/mollie/mandates/{customerId}", name="store-api.mollie.mandates", methods={"GET"}, defaults={"_routeScope"="api"})
      *
      * @param string $customerId
      * @param SalesChannelContext $context

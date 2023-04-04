@@ -38,8 +38,7 @@ class SupportController extends AbstractController
     }
 
     /**
-     * @RouteScope(scopes={"api"})
-     * @Route("/api/_action/mollie/support/request", defaults={"auth_enabled"=true}, name="api.action.mollie.support.request", methods={"POST"})
+     * @Route("/api/_action/mollie/support/request", defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.action.mollie.support.request", methods={"POST"})
      *
      * @param Request $request
      * @param Context $context
@@ -67,8 +66,7 @@ class SupportController extends AbstractController
     }
 
     /**
-     * @RouteScope(scopes={"api"})
-     * @Route("/api/v{version}/_action/mollie/support/request", defaults={"auth_enabled"=true}, name="api.action.mollie.support.request.legacy", methods={"POST"})
+     * @Route("/api/v{version}/_action/mollie/support/request", defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.action.mollie.support.request.legacy", methods={"POST"})
      *
      * @param Request $request
      * @param Context $context

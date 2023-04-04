@@ -8,6 +8,7 @@ use Kiener\MolliePayments\Service\OrderServiceInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Flow\Dispatching\Action\FlowAction;
 use Shopware\Core\Content\Flow\Dispatching\StorableFlow;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Event\FlowEvent;
 use Shopware\Core\Framework\Event\OrderAware;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -71,14 +72,14 @@ class RefundOrderAction extends FlowAction implements EventSubscriberInterface
 
     /**
      * @param StorableFlow $flow
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function handleFlow(StorableFlow $flow): void
     {
         $orderId = $flow->getStore('order_id');
 
-        $this->refundOrder($orderId);
+        $this->refundOrder($orderId, $flow->getContext());
     }
 
     /**
@@ -101,21 +102,21 @@ class RefundOrderAction extends FlowAction implements EventSubscriberInterface
 
         $orderId = $baseEvent->getOrderId();
 
-        $this->refundOrder($orderId);
+        $this->refundOrder($orderId, $baseEvent->getContext());
     }
 
     /**
      * @param string $orderId
-     * @return void
+     * @param Context $context
      * @throws \Exception
+     * @return void
      */
-    private function refundOrder(string $orderId): void
+    private function refundOrder(string $orderId, Context $context): void
     {
         $orderNumber = '';
 
         try {
-
-            $order = $this->orderService->getOrder($orderId, $baseEvent->getContext());
+            $order = $this->orderService->getOrder($orderId, $context);
 
             $orderNumber = $order->getOrderNumber();
 
@@ -128,7 +129,7 @@ class RefundOrderAction extends FlowAction implements EventSubscriberInterface
                 null
             );
 
-            $this->refundManager->refund($order, $request, $baseEvent->getContext());
+            $this->refundManager->refund($order, $request, $context);
         } catch (\Exception $ex) {
             $this->logger->error(
                 'Error when refunding order with Flow Builder Action',

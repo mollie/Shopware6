@@ -64,8 +64,7 @@ class RefundController extends AbstractController
     # OPERATIONAL APIs
 
     /**
-     * @RouteScope(scopes={"api"})
-     * @Route("/api/mollie/refund/order", defaults={"auth_enabled"=true}, name="api.mollie.refund.order", methods={"GET"})
+     * @Route("/api/mollie/refund/order", defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.mollie.refund.order", methods={"GET"})
      *
      * @param QueryDataBag $query
      * @param Context $context
@@ -104,8 +103,7 @@ class RefundController extends AbstractController
     # TECHNICAL ADMIN APIs
 
     /**
-     * @RouteScope(scopes={"api"})
-     * @Route("/api/_action/mollie/refund-manager/data", defaults={"auth_enabled"=true}, name="api.action.mollie.refund-manager.data", methods={"POST"})
+     * @Route("/api/_action/mollie/refund-manager/data", defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.action.mollie.refund-manager.data", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -128,8 +126,7 @@ class RefundController extends AbstractController
     }
 
     /**
-     * @RouteScope(scopes={"api"})
-     * @Route("/api/_action/mollie/refund/list", defaults={"auth_enabled"=true}, name="api.action.mollie.refund.list", methods={"POST"})
+     * @Route("/api/_action/mollie/refund/list", defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.action.mollie.refund.list", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -141,8 +138,7 @@ class RefundController extends AbstractController
     }
 
     /**
-     * @RouteScope(scopes={"api"})
-     * @Route("/api/_action/mollie/refund/total", defaults={"auth_enabled"=true}, name="api.action.mollie.refund.total", methods={"POST"})
+     * @Route("/api/_action/mollie/refund/total", defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.action.mollie.refund.total", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -154,8 +150,7 @@ class RefundController extends AbstractController
     }
 
     /**
-     * @RouteScope(scopes={"api"})
-     * @Route("/api/_action/mollie/refund", defaults={"auth_enabled"=true}, name="api.action.mollie.refund", methods={"POST"})
+     * @Route("/api/_action/mollie/refund", defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.action.mollie.refund", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -187,8 +182,7 @@ class RefundController extends AbstractController
     }
 
     /**
-     * @RouteScope(scopes={"api"})
-     * @Route("/api/_action/mollie/refund/cancel", defaults={"auth_enabled"=true}, name="api.action.mollie.refund.cancel", methods={"POST"})
+     * @Route("/api/_action/mollie/refund/cancel", defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.action.mollie.refund.cancel", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -200,8 +194,7 @@ class RefundController extends AbstractController
     }
 
     /**
-     * @RouteScope(scopes={"api"})
-     * @Route("/api/v{version}/_action/mollie/refund-manager/data", defaults={"auth_enabled"=true}, name="api.action.mollie.refund-manager.data.legacy", methods={"POST"})
+     * @Route("/api/v{version}/_action/mollie/refund-manager/data", defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.action.mollie.refund-manager.data.legacy", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -213,8 +206,7 @@ class RefundController extends AbstractController
     }
 
     /**
-     * @RouteScope(scopes={"api"})
-     * @Route("/api/v{version}/_action/mollie/refund/list", defaults={"auth_enabled"=true}, name="api.action.mollie.refund.list.legacy", methods={"POST"})
+     * @Route("/api/v{version}/_action/mollie/refund/list", defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.action.mollie.refund.list.legacy", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -226,8 +218,7 @@ class RefundController extends AbstractController
     }
 
     /**
-     * @RouteScope(scopes={"api"})
-     * @Route("/api/v{version}/_action/mollie/refund/total", defaults={"auth_enabled"=true}, name="api.action.mollie.refund.total.legacy", methods={"POST"})
+     * @Route("/api/v{version}/_action/mollie/refund/total", defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.action.mollie.refund.total.legacy", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -239,8 +230,7 @@ class RefundController extends AbstractController
     }
 
     /**
-     * @RouteScope(scopes={"api"})
-     * @Route("/api/v{version}/_action/mollie/refund", defaults={"auth_enabled"=true}, name="api.action.mollie.refund.legacy", methods={"POST"})
+     * @Route("/api/v{version}/_action/mollie/refund", defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.action.mollie.refund.legacy", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -252,8 +242,7 @@ class RefundController extends AbstractController
     }
 
     /**
-     * @RouteScope(scopes={"api"})
-     * @Route("/api/v{version}/_action/mollie/refund/cancel", defaults={"auth_enabled"=true}, name="api.action.mollie.refund.cancel.legacy", methods={"POST"})
+     * @Route("/api/v{version}/_action/mollie/refund/cancel", defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.action.mollie.refund.cancel.legacy", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context

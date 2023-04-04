@@ -3,8 +3,11 @@ import MollieCreditCardMandate from '../core/creditcard-mandate.plugin';
 import DomAccess from 'src/helper/dom-access.helper';
 import DeviceDetection from 'src/helper/device-detection.helper';
 import CsrfAjaxMode from '../services/CsrfAjaxMode';
+import ConfirmPageRepository from "../services/ConfirmPageRepository";
 
 export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMandate {
+
+
     static options = deepmerge(MollieCreditCardMandate.options, {
         paymentId: null,
         customerId: null,
@@ -14,13 +17,24 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
         testMode: true,
     });
 
+
+    /**
+     *
+     */
     init() {
+
         super.init();
+
         try {
             this._paymentForm = DomAccess.querySelector(document, this.getSelectors().paymentForm);
             this._confirmForm = DomAccess.querySelector(document, this.getSelectors().confirmForm);
-            this._confirmFormButton = DomAccess.querySelector(this._confirmForm, this.getSelectors().confirmFormButton);
+
+            const repoConfirmPage = new ConfirmPageRepository(document);
+
+            this._confirmFormButton = repoConfirmPage.getSubmitButton();
+
         } catch (e) {
+            console.error('Mollie Credit Card components: Required HTML elements not found on this page!');
             return;
         }
 
@@ -29,22 +43,26 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
         this.registerMandateEvents();
     }
 
+    /**
+     *
+     * @private
+     */
     _initializeComponentInstance() {
         // Get the elements from the DOM
         const cardHolder = document.querySelector(this.getSelectors().cardHolder);
         const componentsContainer = document.querySelector(this.getSelectors().componentsContainer);
 
         // Initialize Mollie Components instance
-        if (
-            !!componentsContainer
-            && !!cardHolder
-            && !window.mollieComponentsObject
-        ) {
+        if (!!componentsContainer && !!cardHolder && !window.mollieComponentsObject) {
+
             // eslint-disable-next-line no-undef
-            window.mollieComponentsObject = Mollie(this.options.profileId, {
-                locale: this.options.locale,
-                testmode: this.options.testMode,
-            });
+            window.mollieComponentsObject = Mollie(
+                this.options.profileId,
+                {
+                    locale: this.options.locale,
+                    testmode: this.options.testMode,
+                }
+            );
 
             window.mollieComponents = {};
         }

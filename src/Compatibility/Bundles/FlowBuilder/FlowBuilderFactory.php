@@ -4,7 +4,9 @@ namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder;
 
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Dispatchers\DummyFlowBuilderDispatcher;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Dispatchers\ShopwareFlowBuilderDispatcher;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Dispatchers\ShopwareFlowBuilderDispatcher65;
 use Kiener\MolliePayments\Compatibility\VersionCompare;
+use Shopware\Core\Content\Flow\Dispatching\FlowDispatcher;
 
 class FlowBuilderFactory implements FlowBuilderFactoryInterface
 {
@@ -24,15 +26,22 @@ class FlowBuilderFactory implements FlowBuilderFactoryInterface
      */
     private $businessEventDispatcher;
 
+    /**
+     * @var FlowDispatcher
+     */
+    private $flowDispatcher;
+
 
     /**
      * @param string $shopwareVersion
      * @param \Shopware\Core\Framework\Event\BusinessEventDispatcher $businessEventDispatcher
+     * @param FlowDispatcher $flowDispatcher
      */
-    public function __construct(string $shopwareVersion, $businessEventDispatcher)
+    public function __construct(string $shopwareVersion, $businessEventDispatcher, $flowDispatcher)
     {
         $this->versionCompare = new VersionCompare($shopwareVersion);
         $this->businessEventDispatcher = $businessEventDispatcher;
+        $this->flowDispatcher = $flowDispatcher;
     }
 
 
@@ -42,6 +51,10 @@ class FlowBuilderFactory implements FlowBuilderFactoryInterface
      */
     public function createDispatcher(): FlowBuilderDispatcherAdapterInterface
     {
+        if ($this->versionCompare->lt('6.5.0.0')) {
+            return new ShopwareFlowBuilderDispatcher65($this->flowDispatcher);
+        }
+
         if ($this->versionCompare->lt(self::FLOW_BUILDER_MIN_VERSION)) {
             return new DummyFlowBuilderDispatcher();
         }

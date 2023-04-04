@@ -35,8 +35,7 @@ class PaymentMethodController extends AbstractController
     }
 
     /**
-     * @RouteScope(scopes={"api"})
-     * @Route("/api/_action/mollie/payment-method/update-methods", defaults={"auth_enabled"=true}, name="api.mollie.payment-method.update-methods", methods={"GET"})
+     * @Route("/api/_action/mollie/payment-method/update-methods", defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.mollie.payment-method.update-methods", methods={"GET"})
      *
      * @param Context $context
      * @return JsonResponse
@@ -47,8 +46,7 @@ class PaymentMethodController extends AbstractController
     }
 
     /**
-     * @RouteScope(scopes={"api"})
-     * @Route("/api/v{version}/_action/mollie/payment-method/update-methods", defaults={"auth_enabled"=true}, name="api.mollie.payment-method.update-methods.legacy", methods={"GET"})
+     * @Route("/api/v{version}/_action/mollie/payment-method/update-methods", defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.mollie.payment-method.update-methods.legacy", methods={"GET"})
      *
      * @param Context $context
      * @return JsonResponse

@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @RouteScope(scopes={"storefront"})
+ * @Route(defaults={"_routeScope"={"storefront","_loginRequired"=true}})
  */
 class AccountController extends StorefrontController
 {
@@ -51,7 +51,6 @@ class AccountController extends StorefrontController
 
 
     /**
-     * @LoginRequired()
      * @Route("/account/mollie/subscriptions", name="frontend.account.mollie.subscriptions.page", options={"seo"="false"}, methods={"GET", "POST"}, defaults={"XmlHttpRequest"=true})
      */
     public function subscriptionsList(Request $request, SalesChannelContext $salesChannelContext): Response
@@ -67,7 +66,6 @@ class AccountController extends StorefrontController
     }
 
     /**
-     * @LoginRequired()
      * @Route("/account/mollie/subscriptions/{subscriptionId}/billing/update", name="frontend.account.mollie.subscriptions.billing.update", methods={"POST"})
      *
      * @param string $subscriptionId
@@ -129,7 +127,6 @@ class AccountController extends StorefrontController
     }
 
     /**
-     * @LoginRequired()
      * @Route("/account/mollie/subscriptions/{subscriptionId}/shipping/update", name="frontend.account.mollie.subscriptions.shipping.update", methods={"POST"})
      *
      * @param string $subscriptionId
@@ -191,7 +188,6 @@ class AccountController extends StorefrontController
     }
 
     /**
-     * @LoginRequired()
      * @Route("/account/mollie/subscriptions/{swSubscriptionId}/payment/update", name="frontend.account.mollie.subscriptions.payment.update", methods={"POST"})
      *
      * @param string $swSubscriptionId
@@ -213,7 +209,6 @@ class AccountController extends StorefrontController
     }
 
     /**
-     * @LoginRequired()
      * @Route("/account/mollie/subscriptions/{swSubscriptionId}/payment/update/finish", name="frontend.account.mollie.subscriptions.payment.update-success", methods={"GET", "POST"})
      *
      * @param string $swSubscriptionId
@@ -237,7 +232,6 @@ class AccountController extends StorefrontController
     }
 
     /**
-     * @LoginRequired()
      * @Route("/account/mollie/subscriptions/{swSubscriptionId}/pause", name="frontend.account.mollie.subscriptions.pause", methods={"POST"})
      * @param string $swSubscriptionId
      */
@@ -258,7 +252,6 @@ class AccountController extends StorefrontController
     }
 
     /**
-     * @LoginRequired()
      * @Route("/account/mollie/subscriptions/{swSubscriptionId}/skip", name="frontend.account.mollie.subscriptions.skip", methods={"POST"})
      * @param string $swSubscriptionId
      */
@@ -279,7 +272,6 @@ class AccountController extends StorefrontController
     }
 
     /**
-     * @LoginRequired()
      * @Route("/account/mollie/subscriptions/{swSubscriptionId}/resume", name="frontend.account.mollie.subscriptions.resume", methods={"POST"})
      * @param string $swSubscriptionId
      */
@@ -300,7 +292,6 @@ class AccountController extends StorefrontController
     }
 
     /**
-     * @LoginRequired()
      * @Route("/account/mollie/subscriptions/{subscriptionId}/cancel", name="frontend.account.mollie.subscriptions.cancel", methods={"POST"})
      * @param mixed $subscriptionId
      */

@@ -16,9 +16,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @RouteScope(scopes={"api"})
- */
 class WebhookController extends AbstractController
 {
 
@@ -59,7 +56,7 @@ class WebhookController extends AbstractController
 
 
     /**
-     * @Route("/api/mollie/webhook/{swTransactionId}", defaults={"auth_required"=false, "auth_enabled"=false}, name="api.mollie.webhook", methods={"GET", "POST"})
+     * @Route("/api/mollie/webhook/{swTransactionId}", defaults={"auth_required"=false, "auth_enabled"=false, "_routeScope"="api"}, name="api.mollie.webhook", methods={"GET", "POST"})
      *
      * @param string $swTransactionId
      * @param Request $request
@@ -93,7 +90,7 @@ class WebhookController extends AbstractController
     }
 
     /**
-     * @Route("/api/v{version}/mollie/webhook/{swTransactionId}", defaults={"auth_required"=false, "auth_enabled"=false}, name="api.mollie.webhook-legacy", methods={"GET", "POST"})
+     * @Route("/api/v{version}/mollie/webhook/{swTransactionId}", defaults={"auth_required"=false, "auth_enabled"=false, "_routeScope"="api"}, name="api.mollie.webhook-legacy", methods={"GET", "POST"})
      *
      * @param string $swTransactionId
      * @param Request $request
@@ -107,7 +104,7 @@ class WebhookController extends AbstractController
 
 
     /**
-     * @Route("/api/mollie/webhook/subscription/{swSubscriptionId}", defaults={"auth_required"=false, "auth_enabled"=false}, name="api.mollie.webhook_subscription", methods={"GET", "POST"})
+     * @Route("/api/mollie/webhook/subscription/{swSubscriptionId}", defaults={"auth_required"=false, "auth_enabled"=false, "_routeScope"="api"}, name="api.mollie.webhook_subscription", methods={"GET", "POST"})
      *
      * @param string $swSubscriptionId
      * @param Request $request
@@ -195,7 +192,7 @@ class WebhookController extends AbstractController
     }
 
     /**
-     * @Route("/api/v{version}/mollie/webhook/subscription/{swSubscriptionId}", defaults={"auth_required"=false, "auth_enabled"=false}, name="api.mollie.webhook_subscription-legacy", methods={"GET", "POST"})
+     * @Route("/api/v{version}/mollie/webhook/subscription/{swSubscriptionId}", defaults={"auth_required"=false, "auth_enabled"=false, "_routeScope"="api"}, name="api.mollie.webhook_subscription-legacy", methods={"GET", "POST"})
      *
      * @param string $swSubscriptionId
      * @param Request $request
@@ -209,7 +206,7 @@ class WebhookController extends AbstractController
     }
 
     /**
-     * @Route("/api/mollie/webhook/subscription/{swSubscriptionId}/renew", defaults={"auth_required"=false, "auth_enabled"=false}, name="api.mollie.webhook_subscription_renew", methods={"GET", "POST"})
+     * @Route("/api/mollie/webhook/subscription/{swSubscriptionId}/renew", defaults={"auth_required"=false, "auth_enabled"=false, "_routeScope"="api"}, name="api.mollie.webhook_subscription_renew", methods={"GET", "POST"})
      *
      * @param string $swSubscriptionId
      * @param Request $request
@@ -223,7 +220,7 @@ class WebhookController extends AbstractController
     }
 
     /**
-     * @Route("/api/v{version}/mollie/webhook/subscription/{swSubscriptionId}/renew", defaults={"auth_required"=false, "auth_enabled"=false}, name="api.mollie.webhook_subscription_renew-legacy", methods={"GET", "POST"})
+     * @Route("/api/v{version}/mollie/webhook/subscription/{swSubscriptionId}/renew", defaults={"auth_required"=false, "auth_enabled"=false, "_routeScope"="api"}, name="api.mollie.webhook_subscription_renew-legacy", methods={"GET", "POST"})
      *
      * @param string $swSubscriptionId
      * @param Request $request
@@ -238,7 +235,7 @@ class WebhookController extends AbstractController
 
 
     /**
-     * @Route("/api/mollie/webhook/subscription/{swSubscriptionId}/mandate/update", defaults={"auth_required"=false, "auth_enabled"=false}, name="api.mollie.webhook_subscription_paymentmethod", methods={"GET", "POST"})
+     * @Route("/api/mollie/webhook/subscription/{swSubscriptionId}/mandate/update", defaults={"auth_required"=false, "auth_enabled"=false, "_routeScope"="api"}, name="api.mollie.webhook_subscription_paymentmethod", methods={"GET", "POST"})
      *
      * @param string $swSubscriptionId
      * @param Request $request
@@ -268,7 +265,7 @@ class WebhookController extends AbstractController
     }
 
     /**
-     * @Route("/api/v{version}/mollie/webhook/subscription/{swSubscriptionId}/mandate/update", defaults={"auth_required"=false, "auth_enabled"=false}, name="api.mollie.webhook_subscription_paymentmethod-legacy", methods={"GET", "POST"})
+     * @Route("/api/v{version}/mollie/webhook/subscription/{swSubscriptionId}/mandate/update", defaults={"auth_required"=false, "auth_enabled"=false, "_routeScope"="api"}, name="api.mollie.webhook_subscription_paymentmethod-legacy", methods={"GET", "POST"})
      *
      * @param string $swSubscriptionId
      * @param Request $request

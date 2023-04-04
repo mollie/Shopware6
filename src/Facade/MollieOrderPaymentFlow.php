@@ -12,6 +12,7 @@ use Mollie\Api\Resources\Order;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
@@ -33,20 +34,23 @@ class MollieOrderPaymentFlow
     /** @var PaymentMethodService */
     private $paymentMethodService;
 
-    /** @var EntityRepositoryInterface */
+    /** @var EntityRepository */
     private $paymentMethodRepository;
 
     /** @var OrderTransactionRepositoryInterface */
     private $orderTransactionRepository;
 
-    public function __construct(
-        OrderStatusConverter                $orderStatusConverter,
-        OrderStatusUpdater                  $orderStatusUpdater,
-        SettingsService                     $settingsService,
-        PaymentMethodService                $paymentMethodService,
-        EntityRepositoryInterface           $paymentMethodRepository,
-        OrderTransactionRepositoryInterface $orderTransactionRepository
-    ) {
+
+    /**
+     * @param OrderStatusConverter $orderStatusConverter
+     * @param OrderStatusUpdater $orderStatusUpdater
+     * @param SettingsService $settingsService
+     * @param PaymentMethodService $paymentMethodService
+     * @param EntityRepository $paymentMethodRepository
+     * @param OrderTransactionRepositoryInterface $orderTransactionRepository
+     */
+    public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, PaymentMethodService $paymentMethodService, EntityRepository $paymentMethodRepository, OrderTransactionRepositoryInterface $orderTransactionRepository)
+    {
         $this->orderStatusConverter = $orderStatusConverter;
         $this->orderStatusUpdater = $orderStatusUpdater;
         $this->settingsService = $settingsService;

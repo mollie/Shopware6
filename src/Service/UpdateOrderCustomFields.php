@@ -4,16 +4,21 @@ namespace Kiener\MolliePayments\Service;
 
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 
 class UpdateOrderCustomFields
 {
     /**
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $orderRepository;
 
-    public function __construct(EntityRepositoryInterface $orderRepository)
+
+    /**
+     * @param EntityRepository $orderRepository
+     */
+    public function __construct($orderRepository)
     {
         $this->orderRepository = $orderRepository;
     }
