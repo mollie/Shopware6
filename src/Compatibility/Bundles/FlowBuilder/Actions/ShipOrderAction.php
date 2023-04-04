@@ -8,10 +8,12 @@ use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\OrderServiceInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Flow\Dispatching\Action\FlowAction;
+use Shopware\Core\Content\Flow\Dispatching\StorableFlow;
 use Shopware\Core\Framework\Event\FlowEvent;
 use Shopware\Core\Framework\Event\OrderAware;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ShipOrderAction extends FlowAction
+class ShipOrderAction extends FlowAction  implements EventSubscriberInterface
 {
 
     /**
@@ -69,6 +71,18 @@ class ShipOrderAction extends FlowAction
     }
 
     /**
+     * @param StorableFlow $flow
+     * @return void
+     * @throws \Exception
+     */
+    public function handleFlow(StorableFlow $flow): void
+    {
+        $orderId = $flow->getStore('order_id');
+
+        $this->shipOrder($orderId);
+    }
+
+    /**
      * @param FlowEvent $event
      * @throws \Exception
      */
@@ -86,20 +100,21 @@ class ShipOrderAction extends FlowAction
             return;
         }
 
-        $this->shipOrder($baseEvent, $config);
+        $orderId = $baseEvent->getOrderId();
+
+        $this->shipOrder($orderId);
     }
 
     /**
-     * @param OrderAware $baseEvent
-     * @param array<mixed> $config
+     * @param string $orderId
+     * @return void
      * @throws \Exception
      */
-    private function shipOrder(OrderAware $baseEvent, array $config): void
+    private function shipOrder(string $orderId): void
     {
         $orderNumber = '';
 
         try {
-            $orderId = $baseEvent->getOrderId();
 
             $order = $this->orderService->getOrder($orderId, $baseEvent->getContext());
 
