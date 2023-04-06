@@ -9,6 +9,7 @@ use Basecom\FixturePlugin\FixtureBag;
 use Basecom\FixturePlugin\FixtureHelper;
 use Shopware\Core\Content\Category\CategoryEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 
 
@@ -21,16 +22,16 @@ class CategoryFixture extends Fixture
     private $helper;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $categoryRepository;
 
 
     /**
      * @param FixtureHelper $helper
-     * @param EntityRepositoryInterface $categoryRepository
+     * @param EntityRepository $categoryRepository
      */
-    public function __construct(FixtureHelper $helper, EntityRepositoryInterface $categoryRepository)
+    public function __construct(FixtureHelper $helper, EntityRepository $categoryRepository)
     {
         $this->helper = $helper;
         $this->categoryRepository = $categoryRepository;
@@ -55,8 +56,13 @@ class CategoryFixture extends Fixture
      */
     public function load(FixtureBag $bag): void
     {
-        $catElectronics = $this->helper->Category()->getByName('Free time & electronics');
-        $afterCatId = ($catElectronics instanceof CategoryEntity) ? $catElectronics->getId() : null;
+        $appendCategory = $this->helper->Category()->getByName('Free time & electronics');
+
+        if (!$appendCategory instanceof CategoryEntity) {
+            $appendCategory = $this->helper->Category()->getFirst();
+        }
+
+        $afterCatId = ($appendCategory instanceof CategoryEntity) ? $appendCategory->getId() : null;
 
         $this->createCategory('0d8eefdd6d12456335280e2ff42431b9', "Voucher", $afterCatId);
         $this->createCategory('0d9eefdd6d12456335280e2ff42431b2', "Subscriptions", $afterCatId);
@@ -71,6 +77,8 @@ class CategoryFixture extends Fixture
      */
     private function createCategory(string $id, string $name, ?string $afterCategoryId): void
     {
+        $parentRoot = $this->helper->Category()->getRootCategory();
+
         $this->categoryRepository->upsert([
             [
                 'id' => $id,
@@ -89,7 +97,7 @@ class CategoryFixture extends Fixture
                 'visible' => true,
                 'type' => 'page',
                 'cmsPageId' => $this->helper->Cms()->getDefaultCategoryLayout()->getId(),
-                'parentId' => $this->helper->Category()->getByName('Catalogue #1')->getId(),
+                'parentId' => $parentRoot->getId(),
                 'afterCategoryId' => $afterCategoryId,
             ],
         ], Context::createDefaultContext());

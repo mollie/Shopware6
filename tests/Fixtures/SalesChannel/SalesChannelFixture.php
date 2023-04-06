@@ -7,6 +7,7 @@ use Basecom\FixturePlugin\Fixture;
 use Basecom\FixturePlugin\FixtureBag;
 use Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepositoryInterface;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
@@ -21,16 +22,16 @@ class SalesChannelFixture extends Fixture
     private $repoSalesChannels;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $repoPaymentMethods;
 
 
     /**
      * @param SalesChannelRepositoryInterface $repoSalesChannels
-     * @param EntityRepositoryInterface $repoPaymentMethods
+     * @param EntityRepository $repoPaymentMethods
      */
-    public function __construct(SalesChannelRepositoryInterface $repoSalesChannels, EntityRepositoryInterface $repoPaymentMethods)
+    public function __construct(SalesChannelRepositoryInterface $repoSalesChannels, EntityRepository $repoPaymentMethods)
     {
         $this->repoSalesChannels = $repoSalesChannels;
         $this->repoPaymentMethods = $repoPaymentMethods;
@@ -58,7 +59,7 @@ class SalesChannelFixture extends Fixture
 
         # first delete all existing configurations
         # of the specific sales channels
-        $salesChannelIds = $this->repoSalesChannels->searchIds(new Criteria([]), $ctx)->getIds();
+        $salesChannelIds = $this->repoSalesChannels->searchIds(new Criteria(), $ctx)->getIds();
 
         $this->activatePaymentMethods($ctx);
         $this->assignPaymentMethods($salesChannelIds, $ctx);
@@ -100,7 +101,7 @@ class SalesChannelFixture extends Fixture
         $paymentUpdates = [];
         $molliePaymentMethodIdsPrepared = [];
 
-        $molliePaymentMethodIds = $this->repoPaymentMethods->searchIds(new Criteria([]), $ctx)->getIds();
+        $molliePaymentMethodIds = $this->repoPaymentMethods->searchIds(new Criteria(), $ctx)->getIds();
 
 
         foreach ($molliePaymentMethodIds as $id) {

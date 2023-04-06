@@ -6,6 +6,7 @@ namespace Kiener\MolliePayments\Service\Installer;
 
 use Kiener\MolliePayments\Struct\Voucher\VoucherType;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\System\CustomField\CustomFieldTypes;
 
@@ -24,15 +25,15 @@ class CustomFieldsInstaller
 
 
     /**
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $repoCustomFields;
 
 
     /**
-     * @param EntityRepositoryInterface $repoCustomFields
+     * @param EntityRepository $repoCustomFields
      */
-    public function __construct(EntityRepositoryInterface $repoCustomFields)
+    public function __construct(EntityRepository$repoCustomFields)
     {
         $this->repoCustomFields = $repoCustomFields;
     }

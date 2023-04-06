@@ -3,6 +3,10 @@
 namespace Kiener\MolliePayments\Controller\Storefront\Payment;
 
 use Exception;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatcherAdapterInterface;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactoryInterface;
 use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGatewayInterface;
 use Kiener\MolliePayments\Event\PaymentPageFailEvent;
 use Kiener\MolliePayments\Exception\CouldNotFetchTransactionException;
@@ -31,7 +35,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
- * @RouteScope(scopes={"storefront"})
+ * @Route(defaults={"_routeScope"={"storefront"}})
  */
 class MollieFailureController extends StorefrontController
 {
@@ -52,7 +56,7 @@ class MollieFailureController extends StorefrontController
     private $apiFactory;
 
     /**
-     * @var BusinessEventDispatcher
+     * @var FlowBuilderDispatcherAdapterInterface
      */
     private $eventDispatcher;
 
@@ -81,22 +85,24 @@ class MollieFailureController extends StorefrontController
      * @param RouterInterface $router
      * @param CompatibilityGatewayInterface $compatibilityGateway
      * @param MollieApiFactory $apiFactory
-     * @param BusinessEventDispatcher $eventDispatcher
      * @param OrderStateService $orderStateService
      * @param TransactionService $transactionService
      * @param LoggerInterface $logger
      * @param TransactionTransitionServiceInterface $transactionTransitionService
+     * @param FlowBuilderFactoryInterface $flowBuilderFactory
+     * @throws Exception
      */
-    public function __construct(RouterInterface $router, CompatibilityGatewayInterface $compatibilityGateway, MollieApiFactory $apiFactory, BusinessEventDispatcher $eventDispatcher, OrderStateService $orderStateService, TransactionService $transactionService, LoggerInterface $logger, TransactionTransitionServiceInterface $transactionTransitionService)
+    public function __construct(RouterInterface $router, CompatibilityGatewayInterface $compatibilityGateway, MollieApiFactory $apiFactory, OrderStateService $orderStateService, TransactionService $transactionService, LoggerInterface $logger, TransactionTransitionServiceInterface $transactionTransitionService, FlowBuilderFactoryInterface $flowBuilderFactory)
     {
         $this->router = $router;
         $this->compatibilityGateway = $compatibilityGateway;
         $this->apiFactory = $apiFactory;
-        $this->eventDispatcher = $eventDispatcher;
         $this->orderStateService = $orderStateService;
         $this->transactionService = $transactionService;
         $this->logger = $logger;
         $this->transactionTransitionService = $transactionTransitionService;
+
+        $this->eventDispatcher = $flowBuilderFactory->createDispatcher();
     }
 
     /**
@@ -269,7 +275,7 @@ class MollieFailureController extends StorefrontController
             $redirectUrl
         );
 
-        $this->eventDispatcher->dispatch($paymentPageFailEvent, $paymentPageFailEvent::EVENT_NAME);
+        $this->eventDispatcher->dispatch($paymentPageFailEvent);
 
         return $this->renderStorefront('@Storefront/storefront/page/checkout/payment/failed.html.twig', [
             'redirectUrl' => $this->router->generate('frontend.mollie.payment.retry', [

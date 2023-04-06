@@ -39,9 +39,8 @@ class ShippingController extends AbstractController
     }
 
     /**
-     * @RouteScope(scopes={"api"})
      * @Route("/api/mollie/ship/order",
-     *         defaults={"auth_enabled"=true}, name="api.mollie.ship.order", methods={"GET"})
+     *         defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.mollie.ship.order", methods={"GET"})
      *
      * @param QueryDataBag $query
      * @param Context $context
@@ -81,9 +80,8 @@ class ShippingController extends AbstractController
     }
 
     /**
-     * @RouteScope(scopes={"api"})
      * @Route("/api/mollie/ship/item",
-     *         defaults={"auth_enabled"=true}, name="api.mollie.ship.item", methods={"GET"})
+     *         defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.mollie.ship.item", methods={"GET"})
      *
      * @param QueryDataBag $query
      * @param Context $context
@@ -186,9 +184,8 @@ class ShippingController extends AbstractController
     // Admin routes
 
     /**
-     * @RouteScope(scopes={"api"})
      * @Route("/api/_action/mollie/ship",
-     *         defaults={"auth_enabled"=true}, name="api.action.mollie.ship.order", methods={"POST"})
+     *         defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.action.mollie.ship.order", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -206,9 +203,8 @@ class ShippingController extends AbstractController
     }
 
     /**
-     * @RouteScope(scopes={"api"})
      * @Route("/api/v{version}/_action/mollie/ship",
-     *         defaults={"auth_enabled"=true}, name="api.action.mollie.ship.order.legacy", methods={"POST"})
+     *         defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.action.mollie.ship.order.legacy", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -267,9 +263,8 @@ class ShippingController extends AbstractController
     }
 
     /**
-     * @RouteScope(scopes={"api"})
      * @Route("/api/_action/mollie/ship/item",
-     *         defaults={"auth_enabled"=true}, name="api.action.mollie.ship.item", methods={"POST"})
+     *         defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.action.mollie.ship.item", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -289,9 +284,8 @@ class ShippingController extends AbstractController
     }
 
     /**
-     * @RouteScope(scopes={"api"})
      * @Route("/api/v{version}/_action/mollie/ship/item",
-     *         defaults={"auth_enabled"=true}, name="api.action.mollie.ship.item.legacy", methods={"POST"})
+     *         defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.action.mollie.ship.item.legacy", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -364,9 +358,8 @@ class ShippingController extends AbstractController
     }
 
     /**
-     * @RouteScope(scopes={"api"})
      * @Route("/api/_action/mollie/ship/status",
-     *         defaults={"auth_enabled"=true}, name="api.action.mollie.ship.status", methods={"POST"})
+     *         defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.action.mollie.ship.status", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -378,9 +371,8 @@ class ShippingController extends AbstractController
     }
 
     /**
-     * @RouteScope(scopes={"api"})
      * @Route("/api/v{version}/_action/mollie/ship/status",
-     *         defaults={"auth_enabled"=true}, name="api.action.mollie.ship.status.legacy", methods={"POST"})
+     *         defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.action.mollie.ship.status.legacy", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -412,9 +404,8 @@ class ShippingController extends AbstractController
     }
 
     /**
-     * @RouteScope(scopes={"api"})
      * @Route("/api/_action/mollie/ship/total",
-     *         defaults={"auth_enabled"=true}, name="api.action.mollie.ship.total", methods={"POST"})
+     *         defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.action.mollie.ship.total", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -426,9 +417,8 @@ class ShippingController extends AbstractController
     }
 
     /**
-     * @RouteScope(scopes={"api"})
      * @Route("/api/v{version}/_action/mollie/ship/total",
-     *         defaults={"auth_enabled"=true}, name="api.action.mollie.ship.total.legacy", methods={"POST"})
+     *         defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.action.mollie.ship.total.legacy", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context

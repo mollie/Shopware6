@@ -13,6 +13,7 @@ use Shopware\Core\Checkout\Cart\CartDataCollectorInterface;
 use Shopware\Core\Checkout\Cart\LineItem\CartDataCollection;
 use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -37,7 +38,7 @@ class VoucherCartCollector implements CartDataCollectorInterface
      * @param VoucherService $voucherService
      * @param EntityRepositoryInterface $paymentMethodRepository
      */
-    public function __construct(VoucherService $voucherService, EntityRepositoryInterface $paymentMethodRepository)
+    public function __construct(VoucherService $voucherService, EntityRepository $paymentMethodRepository)
     {
         $this->voucherService = $voucherService;
         $this->repoPaymentMethods = $paymentMethodRepository;

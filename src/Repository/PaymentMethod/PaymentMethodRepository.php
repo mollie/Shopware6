@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Repository\PaymentMethod;
 
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -20,7 +21,7 @@ class PaymentMethodRepository
     /**
      * @param EntityRepositoryInterface $repoPaymentMethods
      */
-    public function __construct(EntityRepositoryInterface $repoPaymentMethods)
+    public function __construct(EntityRepository $repoPaymentMethods)
     {
         $this->repoPaymentMethods = $repoPaymentMethods;
     }

@@ -14,6 +14,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -22,7 +23,7 @@ class OrderCloneService
 {
 
     /**
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $repoOrders;
 
@@ -38,11 +39,11 @@ class OrderCloneService
 
 
     /**
-     * @param EntityRepositoryInterface $repoOrders
+     * @param EntityRepository $repoOrders
      * @param OrderConverter $orderConverter
      * @param Processor $processor
      */
-    public function __construct(EntityRepositoryInterface $repoOrders, OrderConverter $orderConverter, Processor $processor)
+    public function __construct(EntityRepository $repoOrders, OrderConverter $orderConverter, Processor $processor)
     {
         $this->repoOrders = $repoOrders;
         $this->orderConverter = $orderConverter;

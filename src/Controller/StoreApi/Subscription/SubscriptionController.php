@@ -26,7 +26,6 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @RouteScope(scopes={"store-api"})
  * @Route(defaults={"_routeScope"={"store-api"}})
  */
 class SubscriptionController

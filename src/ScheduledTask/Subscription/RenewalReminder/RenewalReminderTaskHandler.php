@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\ScheduledTask\Subscription\RenewalReminder;
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
 
@@ -27,7 +28,7 @@ class RenewalReminderTaskHandler extends ScheduledTaskHandler
      * @param SubscriptionManager $subscriptionManager
      * @param LoggerInterface $logger
      */
-    public function __construct(EntityRepositoryInterface $scheduledTaskRepository, SubscriptionManager $subscriptionManager, LoggerInterface $logger)
+    public function __construct(EntityRepository $scheduledTaskRepository, SubscriptionManager $subscriptionManager, LoggerInterface $logger)
     {
         parent::__construct($scheduledTaskRepository);
 

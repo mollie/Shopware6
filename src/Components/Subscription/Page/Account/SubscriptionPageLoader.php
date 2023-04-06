@@ -8,6 +8,7 @@ use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Shopware\Core\Checkout\Cart\Exception\CustomerNotLoggedInException;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -35,7 +36,7 @@ class SubscriptionPageLoader
     private $genericLoader;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $repoSubscriptions;
 
@@ -67,14 +68,14 @@ class SubscriptionPageLoader
 
     /**
      * @param GenericPageLoaderInterface $genericLoader
-     * @param EntityRepositoryInterface $repoSubscriptions
+     * @param EntityRepository $repoSubscriptions
      * @param CustomerService $customerService
      * @param AbstractCountryRoute $countryRoute
      * @param AbstractSalutationRoute $salutationRoute
      * @param SettingsService $settingsService
      * @param ContainerInterface $container
      */
-    public function __construct(GenericPageLoaderInterface $genericLoader, EntityRepositoryInterface $repoSubscriptions, CustomerService $customerService, AbstractCountryRoute $countryRoute, AbstractSalutationRoute $salutationRoute, SettingsService $settingsService, ContainerInterface $container)
+    public function __construct(GenericPageLoaderInterface $genericLoader, EntityRepository $repoSubscriptions, CustomerService $customerService, AbstractCountryRoute $countryRoute, AbstractSalutationRoute $salutationRoute, SettingsService $settingsService, ContainerInterface $container)
     {
         $this->genericLoader = $genericLoader;
         $this->repoSubscriptions = $repoSubscriptions;
@@ -89,12 +90,13 @@ class SubscriptionPageLoader
     /**
      * @param Request $request
      * @param SalesChannelContext $salesChannelContext
+     * @throws \Exception
      * @return SubscriptionPage
      */
     public function load(Request $request, SalesChannelContext $salesChannelContext): SubscriptionPage
     {
         if (!$salesChannelContext->getCustomer() && $request->get('deepLinkCode', false) === false) {
-            throw new CustomerNotLoggedInException();
+            throw new \Exception('Customer not logged in');
         }
 
         $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannelId());

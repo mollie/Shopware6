@@ -5,9 +5,9 @@ namespace Kiener\MolliePayments\Components\Subscription\Services\Installer;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
-use Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepositoryInterface;
 use Kiener\MolliePayments\Repository\MailTemplate\MailTemplateRepositoryInterface;
 use Kiener\MolliePayments\Repository\MailTemplateType\MailTemplateTypeRepositoryInterface;
+use Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepositoryInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
@@ -42,8 +42,8 @@ class MailTemplateInstaller
 
     /**
      * @param Connection $connection
-     * @param EntityRepositoryInterface $repoMailTypes
-     * @param EntityRepositoryInterface $repoMailTemplates
+     * @param MailTemplateTypeRepositoryInterface $repoMailTypes
+     * @param MailTemplateRepositoryInterface $repoMailTemplates
      * @param SalesChannelRepositoryInterface $repoSalesChannels
      */
     public function __construct(Connection $connection, MailTemplateTypeRepositoryInterface $repoMailTypes, MailTemplateRepositoryInterface $repoMailTemplates, SalesChannelRepositoryInterface $repoSalesChannels)
@@ -315,11 +315,12 @@ class MailTemplateInstaller
                 WHERE `locale`.`code` = :code
                 ";
 
-        $languageId = $connection->executeQuery($sql, ['code' => $locale])->fetchColumn();
+        $languageId = $connection->executeQuery($sql, ['code' => $locale])->fetchOne();
+
         if (!$languageId) {
             return null;
         }
 
-        return $languageId;
+        return (string)$languageId;
     }
 }

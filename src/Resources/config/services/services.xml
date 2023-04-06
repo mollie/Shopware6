@@ -8,7 +8,7 @@
 
         <service id="Kiener\MolliePayments\Service\Logger\MollieLoggerFactory" class="Kiener\MolliePayments\Service\Logger\MollieLoggerFactory">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="session"/>
+            <argument type="service" id="session" on-invalid="null"/>
             <argument>%kernel.logs_dir%/mollie_%kernel.environment%.log</argument>
             <argument>14</argument>
         </service>

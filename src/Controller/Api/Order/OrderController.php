@@ -19,18 +19,16 @@ class OrderController extends AbstractController
     /** @var Order */
     private $mollieOrderService;
 
-    public function __construct(
-        OrderService $orderService,
-        Order        $mollieOrderService
-    ) {
+
+    public function __construct(OrderService $orderService, Order $mollieOrderService)
+    {
         $this->orderService = $orderService;
         $this->mollieOrderService = $mollieOrderService;
     }
 
     /**
-     * @RouteScope(scopes={"api"})
      * @Route("/api/_action/mollie/order/payment-url",
-     *         defaults={"auth_enabled"=true}, name="api.action.mollie.order.payment-url", methods={"POST"})
+     *         defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.action.mollie.order.payment-url", methods={"POST"})
      *
      * @param Request $request
      *
@@ -44,9 +42,8 @@ class OrderController extends AbstractController
     }
 
     /**
-     * @RouteScope(scopes={"api"})
      * @Route("/api/v{version}/_action/mollie/order/payment-url",
-     *         defaults={"auth_enabled"=true}, name="api.action.mollie.order.payment-url.legacy", methods={"POST"})
+     *         defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.action.mollie.order.payment-url.legacy", methods={"POST"})
      *
      * @param Request $request
      *

@@ -13,9 +13,6 @@ use Shopware\Core\System\SalesChannel\StoreApiResponse;
 use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @RouteScope(scopes={"store-api"})
- */
 class iDealController
 {
 
@@ -42,7 +39,7 @@ class iDealController
 
 
     /**
-     * @Route("/store-api/mollie/ideal/issuers", name="store-api.mollie.ideal.issuers", methods={"GET"})
+     * @Route("/store-api/mollie/ideal/issuers", name="store-api.mollie.ideal.issuers", methods={"GET"}, defaults={"_routeScope"="api"})
      *
      * @param SalesChannelContext $context
      * @return StoreApiResponse
@@ -71,7 +68,7 @@ class iDealController
     }
 
     /**
-     * @Route("/store-api/mollie/ideal/store-issuer/{customerId}/{issuerId}", name="store-api.mollie.ideal.store-issuer", methods={"POST"})
+     * @Route("/store-api/mollie/ideal/store-issuer/{customerId}/{issuerId}", name="store-api.mollie.ideal.store-issuer", methods={"POST"}, defaults={"_routeScope"="api"})
      *
      * @param string $customerId
      * @param string $issuerId
