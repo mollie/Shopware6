@@ -51,7 +51,7 @@ class FlowBuilderFactory implements FlowBuilderFactoryInterface
      */
     public function createDispatcher(): FlowBuilderDispatcherAdapterInterface
     {
-        if ($this->versionCompare->lt('6.5.0.0')) {
+        if ($this->versionCompare->gte('6.5.0.0')) {
             return new ShopwareFlowBuilderDispatcher65($this->flowDispatcher);
         }
 
