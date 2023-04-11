@@ -2,28 +2,31 @@
 
 namespace Kiener\MolliePayments\Service\Logger;
 
+use Kiener\MolliePayments\Service\Logger\Processors\AnonymousWebProcessor;
+use Kiener\MolliePayments\Service\Logger\Processors\SessionProcessor;
+use Kiener\MolliePayments\Service\Logger\Services\URLAnonymizer;
 use Kiener\MolliePayments\Service\SettingsService;
-use Monolog\Formatter\LogstashFormatter;
 use Monolog\Handler\RotatingFileHandler;
-use Monolog\Level;
 use Monolog\Logger;
-use Monolog\Processor\PsrLogMessageProcessor;
+use Monolog\Processor\IntrospectionProcessor;
+use Monolog\Processor\WebProcessor;
 use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 class MollieLoggerFactory
 {
+
+
+    /**
+     * this is the channel name that will be
+     * displayed in the backend. It must not contain spaces
+     */
+    const CHANNEL = 'Mollie';
+
 
     /**
      * @var SettingsService
      */
     private $settingsService;
-
-    /**
-     * @var ?Session
-     */
-    private $session;
 
     /**
      * @var string
@@ -38,61 +41,37 @@ class MollieLoggerFactory
 
     /**
      * @param SettingsService $settingsService
-     * @param ?Session $session
      * @param string $filename
      * @param string $retentionDays
      */
-    public function __construct(SettingsService $settingsService, ?Session $session, string $filename, string $retentionDays)
+    public function __construct(SettingsService $settingsService, string $filename, string $retentionDays)
     {
         $this->settingsService = $settingsService;
-        $this->session = $session;
         $this->filename = $filename;
         $this->retentionDays = $retentionDays;
     }
 
     /**
-     * @return MollieLogger
+     * @return LoggerInterface
      */
     public function createLogger(): LoggerInterface
     {
         $config = $this->settingsService->getSettings();
 
-        $sessionID = ($this->session !== null) ? $this->session->getId() : '-';
+        # 100 = DEBUG, 200 = INFO
+        $minLevel = ($config->isDebugMode()) ? 100 : 200;
 
-        $minLevel = Level::Info;
+        $fileHandler = new RotatingFileHandler($this->filename, $this->retentionDays, $minLevel);
 
-        if ($config->isDebugMode()) {
-            $minLevel = Level::Debug;
-        }
-
-        return $this->buildLogger(
-            'Mollie',
-            [],
-            $minLevel
-        );
-    }
-
-    /**
-     * @param string $channel
-     * @param array $processors
-     * @param null|Level $logLevel
-     * @return LoggerInterface
-     */
-    private function buildLogger(string $channel, array $processors, ?Level $logLevel = null): LoggerInterface
-    {
-        if ($logLevel === null) {
-            $logLevel = Level::Debug;
-        }
-
-        $logStashFormatter = new LogstashFormatter($channel, 'Shopware');
-
-        $fileHandler = new RotatingFileHandler($this->filename, $this->retentionDays, $logLevel);
-        $fileHandler->setFormatter($logStashFormatter);
+        $processors = [];
+        $processors[] = new AnonymousWebProcessor(new WebProcessor(), new URLAnonymizer());
+        $processors[] = new IntrospectionProcessor();
 
         foreach ($processors as $processor) {
             $fileHandler->pushProcessor($processor);
         }
 
-        return new Logger($channel, [$fileHandler]);
+        return new Logger(self::CHANNEL, [$fileHandler]);
     }
+
 }
