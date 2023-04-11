@@ -61,12 +61,31 @@ class WebhookController extends StorefrontController
      *
      * @param SalesChannelContext $context
      * @param string $swTransactionId
+     * @param Request $request
      * @return JsonResponse
      */
-    public function onWebhookReceived(SalesChannelContext $context, string $swTransactionId): JsonResponse
+    public function onWebhookReceived(SalesChannelContext $context, string $swTransactionId, Request $request): JsonResponse
     {
+        $actionId='';
+        $requestContent = $request->getContent(false);
+        if (is_string($requestContent)) {
+            $explodedString = explode('=', $requestContent);
+            if (isset($explodedString[1])) {
+                $actionId = $explodedString[1];
+            }
+        }
+
+        if (empty($actionId)) {
+            $this->logger->error(
+                'Error in Mollie Webhook for Transaction no valid transaction id found' . $swTransactionId,
+                [
+                    'transactionId' => $swTransactionId
+                ]
+            );
+        }
+
         try {
-            $this->notificationFacade->onNotify($swTransactionId, $context->getContext());
+            $this->notificationFacade->onNotify($swTransactionId, $context->getContext(), $actionId);
 
             return new JsonResponse(['success' => true]);
         } catch (\Throwable $ex) {
@@ -157,7 +176,7 @@ class WebhookController extends StorefrontController
             # now simply redirect to the official webhook
             # that handles the full order, validates the payment and
             # starts to trigger things.
-            return $this->onWebhookReceived($context, $latestTransaction->getId());
+            return $this->onWebhookReceived($context, $latestTransaction->getId(), $request);
         } catch (SubscriptionSkippedException $ex) {
             # if we skip a new subscription, then we need to respond with
             # 200 OK so that Mollie will not try it again.

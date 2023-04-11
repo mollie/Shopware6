@@ -6,6 +6,7 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatche
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
+use Kiener\MolliePayments\Event\MollieOrderBuildEvent;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
@@ -18,6 +19,7 @@ use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
+use Kiener\MolliePayments\Subscriber\MollieOrderBuildSubscriber;
 use Mollie\Api\Resources\Order;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
@@ -134,10 +136,12 @@ class NotificationFacade
     /**
      * @param string $swTransactionId
      * @param Context $context
-     * @throws CustomerCouldNotBeFoundException
+     * @param string $actionId
      * @return void
+     * @throws CustomerCouldNotBeFoundException
+     * @throws \Exception
      */
-    public function onNotify(string $swTransactionId, Context $context): void
+    public function onNotify(string $swTransactionId, Context $context, string $actionId): void
     {
         # -----------------------------------------------------------------------------------------------------
         # LOAD TRANSACTION
@@ -198,7 +202,37 @@ class NotificationFacade
         $molliePayment = null;
         $mollieOrder = null;
 
-        if (!empty($orderAttributes->getMollieOrderId())) {
+        if (empty($mollieOrderId)) {
+            if (str_starts_with($actionId, 'ord')) {
+                $mollieOrder = $this->gatewayMollie->getOrder($actionId);
+                $molliePayment = $this->statusConverter->getLatestPayment($mollieOrder);
+            } elseif (str_starts_with($actionId, 'tr')) {
+                $molliePayment = $this->gatewayMollie->getPayment($actionId);
+                if ($molliePayment->orderId != null) {
+                    $mollieOrder = $this->gatewayMollie->getOrder($molliePayment->orderId);
+                }
+            }
+
+            if ($mollieOrder == null) {
+                throw new \Exception('No valid order has been found: ' . $swOrder->getOrderNumber());
+            }
+
+            $metadata = json_decode($mollieOrder->metadata, true);
+
+            if ($metadata == null) {
+                throw new \Exception('Order has no metadata: ' . $swOrder->getOrderNumber());
+            }
+
+            $metaShortId = $metadata[MollieOrderBuildEvent::METADATA_SHORT_TRANSACTION_ID_KEY];
+            $transShortId = substr($swTransactionId, 0, 8);
+
+            if ($metaShortId == $transShortId) {
+                $mollieOrderId = $mollieOrder->id;
+            }
+        }
+
+
+        if (!empty($mollieOrderId)) {
 
             # fetch the order of our mollie ID
             # from our sales channel mollie profile
