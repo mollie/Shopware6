@@ -38,12 +38,14 @@ class AnonymousWebProcessor
      * works for both monolog versions (old and new) for Shopware 6.4 and 6.5.
      *
      * @phpstan-param  Record $record
+     * @param mixed $record
      * @return array<mixed>
      */
     public function __invoke($record)
     {
         $record = $this->webProcessor->__invoke($record);
 
+        /** @phpstan-ignore-next-line */
         if (isset($record['extra'])) {
             if (array_key_exists('ip', $record['extra'])) {
                 # replace it with our anonymous IP

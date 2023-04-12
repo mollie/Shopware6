@@ -6,10 +6,10 @@ namespace MolliePayments\Tests\Components\RefundManager;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund\RefundStartedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Components\RefundManager\Builder\RefundDataBuilder;
+use Kiener\MolliePayments\Components\RefundManager\DAL\Repository\RefundRepositoryInterface;
 use Kiener\MolliePayments\Components\RefundManager\RefundManager;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
-use Kiener\MolliePayments\Repository\MollieRefund\MollieRefundRepositoryInterface;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order as MollieOrder;
@@ -26,7 +26,6 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 
 class RefundManagerTest extends TestCase
 {
@@ -84,7 +83,7 @@ class RefundManagerTest extends TestCase
             new FakeFlowBuilderFactory($this->fakeFlowBuilderDispatcher),
             $flowBuilderEventFactory,
             $this->fakeStockUpdater,
-            $this->createMock(MollieRefundRepositoryInterface::class),
+            $this->createMock(RefundRepositoryInterface::class),
             new NullLogger()
         );
     }

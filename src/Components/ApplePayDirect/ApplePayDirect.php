@@ -10,6 +10,7 @@ use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Repository\Order\OrderAddressRepository;
+use Kiener\MolliePayments\Repository\Order\OrderAddressRepositoryInterface;
 use Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepository;
 use Kiener\MolliePayments\Service\Cart\CartBackupService;
 use Kiener\MolliePayments\Service\CartService;
@@ -102,7 +103,7 @@ class ApplePayDirect
     private $orderService;
 
     /**
-     * @var OrderAddressRepository
+     * @var OrderAddressRepositoryInterface
      */
     private $repoOrderAdresses;
 
@@ -121,9 +122,9 @@ class ApplePayDirect
      * @param MollieApiFactory $mollieApiFactory
      * @param ShopService $shopService
      * @param OrderService $orderService
-     * @param OrderAddressRepository $repoOrderAdresses
+     * @param OrderAddressRepositoryInterface $repoOrderAdresses
      */
-    public function __construct(ApplePayDomainVerificationService $domainFileDownloader, ApplePayPayment $paymentHandler, MolliePaymentDoPay $molliePayments, CartServiceInterface $cartService, ApplePayFormatter $formatter, ApplePayShippingBuilder $shippingBuilder, SettingsService $pluginSettings, CustomerService $customerService, PaymentMethodRepository $repoPaymentMethods, CartBackupService $cartBackupService, MollieApiFactory $mollieApiFactory, ShopService $shopService, OrderService $orderService, OrderAddressRepository $repoOrderAdresses)
+    public function __construct(ApplePayDomainVerificationService $domainFileDownloader, ApplePayPayment $paymentHandler, MolliePaymentDoPay $molliePayments, CartServiceInterface $cartService, ApplePayFormatter $formatter, ApplePayShippingBuilder $shippingBuilder, SettingsService $pluginSettings, CustomerService $customerService, PaymentMethodRepository $repoPaymentMethods, CartBackupService $cartBackupService, MollieApiFactory $mollieApiFactory, ShopService $shopService, OrderService $orderService, OrderAddressRepositoryInterface $repoOrderAdresses)
     {
         $this->domainFileDownloader = $domainFileDownloader;
         $this->paymentHandler = $paymentHandler;

@@ -9,7 +9,6 @@ use Kiener\MolliePayments\Repository\CustomFieldSet\CustomFieldSetRepository;
 use Kiener\MolliePayments\Service\CustomFieldService;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\Migration\MigrationCollection;
 use Shopware\Core\Framework\Plugin;
 use Shopware\Core\Framework\Plugin\Context\ActivateContext;
@@ -57,16 +56,13 @@ class MolliePayments extends Plugin
     {
         parent::install($context);
 
-        /** @var EntityRepository $customFieldRepository */
-        $customFieldRepository = $this->container->get('custom_field_set.repository');
+        # that's the only part we use the Shopware repository directly,
+        # and not our custom one, because our repositories are not yet registered in this function
+        /** @var EntityRepository $shopwareRepoCustomFields */
+        $shopwareRepoCustomFields = $this->container->get('custom_field_set.repository');
+        $mollieRepoCustomFields = new CustomFieldSetRepository($shopwareRepoCustomFields);
 
-        // Add custom fields
-        $customFieldService = new CustomFieldService(
-            new CustomFieldSetRepository(
-                $customFieldRepository
-            )
-        );
-
+        $customFieldService = new CustomFieldService($mollieRepoCustomFields);
         $customFieldService->addCustomFields($context->getContext());
 
         $this->runDbMigrations($context->getMigrationCollection());

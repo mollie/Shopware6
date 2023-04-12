@@ -16,12 +16,14 @@ interface CustomerRepositoryInterface
      * @return EntityWrittenContainerEvent
      */
     public function upsert(array $data, Context $context): EntityWrittenContainerEvent;
+
     /**
      * @param array<mixed> $data
      * @param Context $context
      * @return EntityWrittenContainerEvent
      */
     public function create(array $data, Context $context): EntityWrittenContainerEvent;
+
     /**
      * @param Criteria $criteria
      * @param Context $context

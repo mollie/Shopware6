@@ -10,6 +10,7 @@ use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Service\UpdateOrderTransactionCustomFields;
 use MolliePayments\Tests\Fakes\FakeEntityRepository;
+use MolliePayments\Tests\Fakes\Repository\FakeOrderRepository;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
@@ -31,7 +32,7 @@ class OrderServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->orderRepository = new FakeEntityRepository(new OrderDefinition());
+        $this->orderRepository = new FakeOrderRepository();
 
         $this->orderService = new OrderService(
             $this->orderRepository,

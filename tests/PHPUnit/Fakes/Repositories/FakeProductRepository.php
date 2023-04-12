@@ -4,6 +4,9 @@ namespace MolliePayments\Tests\Fakes\Repositories;
 
 use Kiener\MolliePayments\Repository\Product\ProductRepositoryInterface;
 use Shopware\Core\Content\Product\ProductEntity;
+use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 
@@ -56,6 +59,16 @@ class FakeProductRepository implements ProductRepositoryInterface
         }
 
         return [$this->searchResultNumber];
+    }
+
+    /**
+     * @param Criteria $criteria
+     * @param Context $context
+     * @return EntitySearchResult
+     */
+    public function search(Criteria $criteria, Context $context): EntitySearchResult
+    {
+        // TODO: Implement search() method.
     }
 
 }

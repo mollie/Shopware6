@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieCustomerException;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Repository\Country\CountryRepository;
+use Kiener\MolliePayments\Repository\Country\CountryRepositoryInterface;
 use Kiener\MolliePayments\Repository\Customer\CustomerRepositoryInterface;
 use Kiener\MolliePayments\Repository\Salutation\SalutationRepository;
 use Kiener\MolliePayments\Repository\Salutation\SalutationRepositoryInterface;
@@ -19,7 +20,6 @@ use Shopware\Core\Checkout\Customer\Event\CustomerBeforeLoginEvent;
 use Shopware\Core\Checkout\Customer\Event\CustomerLoginEvent;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -37,10 +37,14 @@ class CustomerService implements CustomerServiceInterface
     public const CUSTOM_FIELDS_KEY_SHOULD_SAVE_CARD_DETAIL = 'shouldSaveCardDetail';
     public const CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER = 'preferred_ideal_issuer';
 
-    /** @var CountryRepository */
+    /**
+     * @var CountryRepositoryInterface
+     */
     private $countryRepository;
 
-    /** @var CustomerRepositoryInterface */
+    /**
+     * @var CustomerRepositoryInterface
+     */
     private $customerRepository;
 
     /** @var Customer */
@@ -68,7 +72,7 @@ class CustomerService implements CustomerServiceInterface
     private $valueGenerator;
 
     /**
-     * @param CountryRepository $countryRepository
+     * @param CountryRepositoryInterface $countryRepository
      * @param CustomerRepositoryInterface $customerRepository
      * @param Customer $customerApiService
      * @param EventDispatcherInterface $eventDispatcher
@@ -79,7 +83,7 @@ class CustomerService implements CustomerServiceInterface
      * @param string $shopwareVersion
      * @param NumberRangeValueGeneratorInterface $valueGenerator
      */
-    public function __construct(CountryRepository $countryRepository, CustomerRepositoryInterface $customerRepository, Customer $customerApiService, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger, SalesChannelContextPersister $salesChannelContextPersister, SalutationRepositoryInterface $salutationRepository, SettingsService $settingsService, string $shopwareVersion, NumberRangeValueGeneratorInterface $valueGenerator)
+    public function __construct(CountryRepositoryInterface $countryRepository, CustomerRepositoryInterface $customerRepository, Customer $customerApiService, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger, SalesChannelContextPersister $salesChannelContextPersister, SalutationRepositoryInterface $salutationRepository, SettingsService $settingsService, string $shopwareVersion, NumberRangeValueGeneratorInterface $valueGenerator)
     {
         $this->countryRepository = $countryRepository;
         $this->customerRepository = $customerRepository;

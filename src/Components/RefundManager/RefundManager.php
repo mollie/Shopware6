@@ -6,13 +6,13 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatche
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactoryInterface;
 use Kiener\MolliePayments\Components\RefundManager\Builder\RefundDataBuilder;
+use Kiener\MolliePayments\Components\RefundManager\DAL\Repository\RefundRepositoryInterface;
 use Kiener\MolliePayments\Components\RefundManager\Integrators\StockManagerInterface;
 use Kiener\MolliePayments\Components\RefundManager\RefundData\RefundData;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItemRoundingDiff;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieRefundException;
-use Kiener\MolliePayments\Repository\MollieRefund\MollieRefundRepositoryInterface;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Service\OrderServiceInterface;
 use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
@@ -68,7 +68,7 @@ class RefundManager implements RefundManagerInterface
     private $flowBuilderEventFactory;
 
     /**
-     * @var MollieRefundRepositoryInterface
+     * @var RefundRepositoryInterface
      */
     protected $refundRepository;
 
@@ -86,10 +86,10 @@ class RefundManager implements RefundManagerInterface
      * @param FlowBuilderFactoryInterface $flowBuilderFactory
      * @param FlowBuilderEventFactory $flowBuilderEventFactory
      * @param StockManagerInterface $stockUpdater
-     * @param MollieRefundRepositoryInterface $refundRepository
+     * @param RefundRepositoryInterface $refundRepository
      * @param LoggerInterface $logger
      */
-    public function __construct(RefundDataBuilder $refundDataBuilder, OrderServiceInterface $orderService, RefundServiceInterface $refundService, Order $mollieOrder, FlowBuilderFactoryInterface $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, StockManagerInterface $stockUpdater, MollieRefundRepositoryInterface $refundRepository, LoggerInterface $logger)
+    public function __construct(RefundDataBuilder $refundDataBuilder, OrderServiceInterface $orderService, RefundServiceInterface $refundService, Order $mollieOrder, FlowBuilderFactoryInterface $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, StockManagerInterface $stockUpdater, RefundRepositoryInterface $refundRepository, LoggerInterface $logger)
     {
         $this->builderData = $refundDataBuilder;
         $this->orderService = $orderService;

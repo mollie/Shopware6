@@ -14,7 +14,9 @@ class DeliveryService
     private const PARAM_MOLLIE_PAYMENTS = 'mollie_payments';
     private const PARAM_IS_SHIPPED = 'is_shipped';
 
-    /** @var OrderDeliveryRepositoryInterface */
+    /**
+     * @var OrderDeliveryRepositoryInterface
+     */
     private $orderDeliveryRepository;
 
     /**
@@ -22,9 +24,8 @@ class DeliveryService
      *
      * @param OrderDeliveryRepositoryInterface $orderDeliveryRepository
      */
-    public function __construct(
-        OrderDeliveryRepositoryInterface $orderDeliveryRepository
-    ) {
+    public function __construct(OrderDeliveryRepositoryInterface $orderDeliveryRepository)
+    {
         $this->orderDeliveryRepository = $orderDeliveryRepository;
     }
 

@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Facade;
 
 use Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepositoryInterface;
+use Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepositoryInterface;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
 use Kiener\MolliePayments\Service\Order\OrderStatusUpdater;
@@ -13,7 +14,6 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEnti
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -34,7 +34,7 @@ class MollieOrderPaymentFlow
     /** @var PaymentMethodService */
     private $paymentMethodService;
 
-    /** @var EntityRepository */
+    /** @var PaymentMethodRepositoryInterface */
     private $paymentMethodRepository;
 
     /** @var OrderTransactionRepositoryInterface */
@@ -46,10 +46,10 @@ class MollieOrderPaymentFlow
      * @param OrderStatusUpdater $orderStatusUpdater
      * @param SettingsService $settingsService
      * @param PaymentMethodService $paymentMethodService
-     * @param EntityRepository $paymentMethodRepository
+     * @param PaymentMethodRepositoryInterface $paymentMethodRepository
      * @param OrderTransactionRepositoryInterface $orderTransactionRepository
      */
-    public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, PaymentMethodService $paymentMethodService, EntityRepository $paymentMethodRepository, OrderTransactionRepositoryInterface $orderTransactionRepository)
+    public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, PaymentMethodService $paymentMethodService, PaymentMethodRepositoryInterface $paymentMethodRepository, OrderTransactionRepositoryInterface $orderTransactionRepository)
     {
         $this->orderStatusConverter = $orderStatusConverter;
         $this->orderStatusUpdater = $orderStatusUpdater;

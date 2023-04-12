@@ -10,6 +10,7 @@ use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepositoryInterface;
+use Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepositoryInterface;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentDetails;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
@@ -26,7 +27,6 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
@@ -53,7 +53,7 @@ class NotificationFacade
     private $statusUpdater;
 
     /**
-     * @var EntityRepository
+     * @var PaymentMethodRepositoryInterface
      */
     private $repoPaymentMethods;
 
@@ -102,7 +102,7 @@ class NotificationFacade
      * @param MollieGatewayInterface $gatewayMollie
      * @param OrderStatusConverter $statusConverter
      * @param OrderStatusUpdater $statusUpdater
-     * @param EntityRepository $repoPaymentMethods
+     * @param PaymentMethodRepositoryInterface $repoPaymentMethods
      * @param OrderTransactionRepositoryInterface $repoOrderTransactions
      * @param FlowBuilderFactory $flowBuilderFactory
      * @param FlowBuilderEventFactory $flowBuilderEventFactory
@@ -112,7 +112,7 @@ class NotificationFacade
      * @param LoggerInterface $logger
      * @throws \Exception
      */
-    public function __construct(MollieGatewayInterface $gatewayMollie, OrderStatusConverter $statusConverter, OrderStatusUpdater $statusUpdater, EntityRepository $repoPaymentMethods, OrderTransactionRepositoryInterface $repoOrderTransactions, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SettingsService $serviceService, SubscriptionManager $subscription, OrderService $orderService, LoggerInterface $logger)
+    public function __construct(MollieGatewayInterface $gatewayMollie, OrderStatusConverter $statusConverter, OrderStatusUpdater $statusUpdater, PaymentMethodRepositoryInterface $repoPaymentMethods, OrderTransactionRepositoryInterface $repoOrderTransactions, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SettingsService $serviceService, SubscriptionManager $subscription, OrderService $orderService, LoggerInterface $logger)
     {
         $this->gatewayMollie = $gatewayMollie;
         $this->statusConverter = $statusConverter;

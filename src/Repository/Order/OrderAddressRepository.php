@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Repository\Order;
 
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 
 class OrderAddressRepository implements OrderAddressRepositoryInterface
@@ -19,7 +18,7 @@ class OrderAddressRepository implements OrderAddressRepositoryInterface
     /**
      * @param EntityRepository $repoOrderAdresses
      */
-    public function __construct(EntityRepository $repoOrderAdresses)
+    public function __construct($repoOrderAdresses)
     {
         $this->repoOrderAdresses = $repoOrderAdresses;
     }

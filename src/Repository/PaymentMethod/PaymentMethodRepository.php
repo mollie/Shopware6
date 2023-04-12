@@ -5,25 +5,57 @@ namespace Kiener\MolliePayments\Repository\PaymentMethod;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 
-class PaymentMethodRepository
+class PaymentMethodRepository implements PaymentMethodRepositoryInterface
 {
 
     /**
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $repoPaymentMethods;
 
 
     /**
-     * @param EntityRepositoryInterface $repoPaymentMethods
+     * @param EntityRepository $repoPaymentMethods
      */
-    public function __construct(EntityRepository $repoPaymentMethods)
+    public function __construct($repoPaymentMethods)
     {
         $this->repoPaymentMethods = $repoPaymentMethods;
+    }
+
+    /**
+     * @param Criteria $criteria
+     * @param Context $context
+     * @return IdSearchResult
+     */
+    public function searchIds(Criteria $criteria, Context $context): IdSearchResult
+    {
+        return $this->repoPaymentMethods->searchIds($criteria, $context);
+    }
+
+    /**
+     * @param array<mixed> $data
+     * @param Context $context
+     * @return EntityWrittenContainerEvent
+     */
+    public function upsert(array $data, Context $context): EntityWrittenContainerEvent
+    {
+        return $this->repoPaymentMethods->upsert($data, $context);
+    }
+
+    /**
+     * @param Criteria $criteria
+     * @param Context $context
+     * @return EntitySearchResult
+     */
+    public function search(Criteria $criteria, Context $context): EntitySearchResult
+    {
+        return $this->repoPaymentMethods->search($criteria, $context);
     }
 
     /**

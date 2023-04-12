@@ -9,11 +9,8 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\Subscr
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Components\Subscription\Exception\SubscriptionNotFoundException;
-use Kiener\MolliePayments\Repository\MollieSubscriptionAddress\MollieSubscriptionAddressRepositoryInterface;
-use Kiener\MolliePayments\Repository\MollieSubscriptionHistory\MollieSubscriptionHistoryRepositoryInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -29,22 +26,22 @@ class SubscriptionRepository
     private $repoSubscriptions;
 
     /**
-     * @var MollieSubscriptionAddressRepositoryInterface
+     * @var EntityRepository
      */
     private $repoAddresses;
 
     /**
-     * @var MollieSubscriptionHistoryRepositoryInterface
+     * @var EntityRepository
      */
     private $repoHistory;
 
 
     /**
      * @param EntityRepository $repoSubscriptions
-     * @param MollieSubscriptionAddressRepositoryInterface $repoAddresses
+     * @param EntityRepository $repoAddresses
      * @param EntityRepository $repoHistory
      */
-    public function __construct(EntityRepository $repoSubscriptions, MollieSubscriptionAddressRepositoryInterface $repoAddresses, MollieSubscriptionHistoryRepositoryInterface $repoHistory)
+    public function __construct($repoSubscriptions, $repoAddresses, $repoHistory)
     {
         $this->repoSubscriptions = $repoSubscriptions;
         $this->repoAddresses = $repoAddresses;
@@ -53,14 +50,6 @@ class SubscriptionRepository
 
 
     #region READ
-
-    /**
-     * @return EntityRepository
-     */
-    public function getRepository(): EntityRepository
-    {
-        return $this->repoSubscriptions;
-    }
 
     /**
      * @param string $id
@@ -173,6 +162,16 @@ class SubscriptionRepository
         $criteria->addFilter(new EqualsFilter('orderId', $orderId));
         $criteria->addFilter(new EqualsFilter('mollieId', null));
 
+        return $this->repoSubscriptions->search($criteria, $context);
+    }
+
+    /**
+     * @param Criteria $criteria
+     * @param Context $context
+     * @return EntitySearchResult
+     */
+    public function search(Criteria $criteria, Context $context): EntitySearchResult
+    {
         return $this->repoSubscriptions->search($criteria, $context);
     }
 

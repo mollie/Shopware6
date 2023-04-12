@@ -211,7 +211,7 @@ class PaymentReturnFacade
             $redirectUrl
         );
 
-        $this->eventDispatcher->dispatch($paymentPageRedirectEvent, $paymentPageRedirectEvent::EVENT_NAME);
+        $this->eventDispatcher->dispatch($paymentPageRedirectEvent);
 
         return new RedirectResponse($redirectUrl);
     }

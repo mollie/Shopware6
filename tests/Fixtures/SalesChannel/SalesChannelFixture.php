@@ -17,7 +17,7 @@ class SalesChannelFixture extends Fixture
 {
 
     /**
-     * @var SalesChannelRepositoryInterface
+     * @var EntityRepository
      */
     private $repoSalesChannels;
 
@@ -28,10 +28,10 @@ class SalesChannelFixture extends Fixture
 
 
     /**
-     * @param SalesChannelRepositoryInterface $repoSalesChannels
+     * @param EntityRepository $repoSalesChannels
      * @param EntityRepository $repoPaymentMethods
      */
-    public function __construct(SalesChannelRepositoryInterface $repoSalesChannels, EntityRepository $repoPaymentMethods)
+    public function __construct(EntityRepository $repoSalesChannels, EntityRepository $repoPaymentMethods)
     {
         $this->repoSalesChannels = $repoSalesChannels;
         $this->repoPaymentMethods = $repoPaymentMethods;

@@ -61,17 +61,17 @@ class MollieLoggerFactory
         # 100 = DEBUG, 200 = INFO
         $minLevel = ($config->isDebugMode()) ? 100 : 200;
 
-        $fileHandler = new RotatingFileHandler($this->filename, $this->retentionDays, $minLevel);
+        $fileHandler = new RotatingFileHandler($this->filename, (int)$this->retentionDays, $minLevel);
 
         $processors = [];
         $processors[] = new AnonymousWebProcessor(new WebProcessor(), new URLAnonymizer());
         $processors[] = new IntrospectionProcessor();
 
+        /** @var callable $processor */
         foreach ($processors as $processor) {
             $fileHandler->pushProcessor($processor);
         }
 
         return new Logger(self::CHANNEL, [$fileHandler]);
     }
-
 }

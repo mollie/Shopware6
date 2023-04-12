@@ -2,18 +2,9 @@
 
 namespace Kiener\MolliePayments\Service;
 
-use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
-use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderLineIdException;
-use Kiener\MolliePayments\Exception\OrderNumberNotFoundException;
-use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Checkout\Order\SalesChannel\OrderService as ShopwareOrderService;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Validation\DataBag\DataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 

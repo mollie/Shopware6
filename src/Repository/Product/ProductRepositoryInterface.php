@@ -3,6 +3,9 @@
 namespace Kiener\MolliePayments\Repository\Product;
 
 use Shopware\Core\Content\Product\ProductEntity;
+use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 interface ProductRepositoryInterface
@@ -21,4 +24,11 @@ interface ProductRepositoryInterface
      * @return array<ProductEntity>
      */
     public function findByNumber(string $productNumber, SalesChannelContext $context): array;
+
+    /**
+     * @param Criteria $criteria
+     * @param Context $context
+     * @return EntitySearchResult
+     */
+    public function search(Criteria $criteria, Context $context): EntitySearchResult;
 }

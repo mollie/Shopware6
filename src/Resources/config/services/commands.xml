@@ -13,12 +13,11 @@
         </service>
 
         <service id="Kiener\MolliePayments\Command\DAL\DALCleanupCommand">
-            <argument type="service" id="product.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\Product\ProductRepository"/>
             <argument type="service" id="Doctrine\DBAL\Connection"/>
             <argument type="service" id="mollie_payments.logger"/>
             <tag name="console.command"/>
         </service>
-
 
         <service id="Kiener\MolliePayments\Command\ApplePay\ApplePayDownloadCommand">
             <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect"/>

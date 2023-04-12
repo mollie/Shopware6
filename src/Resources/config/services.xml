@@ -92,19 +92,19 @@
         </service>
 
         <service id="Kiener\MolliePayments\Service\Installer\CustomFieldsInstaller" public="true">
-            <argument type="service" id="custom_field_set.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\CustomFieldSet\CustomFieldSetRepository"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\PaymentMethodService" class="Kiener\MolliePayments\Service\PaymentMethodService" public="true">
             <argument type="service" id="Shopware\Core\Content\Media\MediaService"/>
             <argument type="service" id="Kiener\MolliePayments\Repository\Media\MediaRepository"/>
-            <argument type="service" id="payment_method.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepository"/>
             <argument type="service" id="Shopware\Core\Framework\Plugin\Util\PluginIdProvider"/>
             <argument type="service" id="kiener.mollie_payments.http.client"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\ProductService" class="Kiener\MolliePayments\Service\ProductService">
-            <argument type="service" id="product.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\Product\ProductRepository"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\SettingsService" class="Kiener\MolliePayments\Service\SettingsService">
@@ -138,7 +138,7 @@
             <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater"/>
-            <argument type="service" id="payment_method.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>

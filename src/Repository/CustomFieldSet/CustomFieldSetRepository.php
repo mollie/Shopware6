@@ -13,11 +13,10 @@ class CustomFieldSetRepository implements CustomFieldSetRepositoryInterface
      */
     private $coreRepository;
 
-
     /**
      * @param EntityRepository $customFieldSetRepository
      */
-    public function __construct(EntityRepository $customFieldSetRepository)
+    public function __construct($customFieldSetRepository)
     {
         $this->coreRepository = $customFieldSetRepository;
     }

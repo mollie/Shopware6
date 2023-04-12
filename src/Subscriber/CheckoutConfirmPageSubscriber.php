@@ -5,16 +5,11 @@ namespace Kiener\MolliePayments\Subscriber;
 use Exception;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
-use Kiener\MolliePayments\Repository\Language\LanguageRepository;
 use Kiener\MolliePayments\Repository\Language\LanguageRepositoryInterface;
-use Kiener\MolliePayments\Repository\Locale\LocaleRepository;
 use Kiener\MolliePayments\Repository\Locale\LocaleRepositoryInterface;
 use Kiener\MolliePayments\Service\CustomerService;
-use Kiener\MolliePayments\Service\CustomerServiceInterface;
 use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\MandateServiceInterface;
-use Kiener\MolliePayments\Service\Payment\Provider\ActivePaymentMethodsProvider;
-use Kiener\MolliePayments\Service\PaymentMethodService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Exceptions\ApiException;
@@ -22,15 +17,11 @@ use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Method;
 use Mollie\Api\Types\PaymentMethod;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Storefront\Page\Account\Order\AccountEditOrderPageLoadedEvent;
 use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
-use Shopware\Storefront\Page\PageLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Throwable;
 
 class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
 {
@@ -58,12 +49,12 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     /**
      * @var LanguageRepositoryInterface
      */
-    private $languageRepositoryInterface;
+    private $repoLanguages;
 
     /**
      * @var LocaleRepositoryInterface
      */
-    private $localeRepositoryInterface;
+    private $repoLocales;
 
     /**
      * @var MandateServiceInterface
@@ -84,18 +75,18 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * @param MollieApiFactory $apiFactory
+     * @param SettingsService $settingsService
+     * @param LanguageRepositoryInterface $languageRepositoryInterface
+     * @param LocaleRepositoryInterface $localeRepositoryInterface
+     * @param MandateServiceInterface $mandateService
      */
-    public function __construct(
-        MollieApiFactory          $apiFactory,
-        SettingsService           $settingsService,
-        LanguageRepositoryInterface $languageRepositoryInterface,
-        LocaleRepositoryInterface $localeRepositoryInterface,
-        MandateServiceInterface   $mandateService
-    ) {
+    public function __construct(MollieApiFactory $apiFactory, SettingsService $settingsService, LanguageRepositoryInterface $languageRepositoryInterface, LocaleRepositoryInterface $localeRepositoryInterface, MandateServiceInterface $mandateService)
+    {
         $this->apiFactory = $apiFactory;
         $this->settingsService = $settingsService;
-        $this->languageRepositoryInterface = $languageRepositoryInterface;
-        $this->localeRepositoryInterface = $localeRepositoryInterface;
+        $this->repoLanguages = $languageRepositoryInterface;
+        $this->repoLocales = $localeRepositoryInterface;
         $this->mandateService = $mandateService;
     }
 
@@ -173,12 +164,14 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
                 $languageCriteria = new Criteria();
                 $languageCriteria->addFilter(new EqualsFilter('id', $languageId));
 
-                $languages = $this->languageRepositoryInterface->search($languageCriteria, $args->getContext());
+                $languages = $this->repoLanguages->search($languageCriteria, $args->getContext());
+
                 $localeId = $languages->first()->getLocaleId();
+
                 $localeCriteria = new Criteria();
                 $localeCriteria->addFilter(new EqualsFilter('id', $localeId));
 
-                $locales = $this->localeRepositoryInterface->search($localeCriteria, $args->getContext());
+                $locales = $this->repoLocales->search($localeCriteria, $args->getContext());
                 $locale = $locales->first()->getCode();
             }
         }

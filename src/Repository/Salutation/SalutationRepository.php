@@ -5,7 +5,6 @@ namespace Kiener\MolliePayments\Repository\Salutation;
 
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
@@ -13,12 +12,12 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 class SalutationRepository implements SalutationRepositoryInterface
 {
     /**
-     * @var EntityRepository|EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $salutationRepository;
 
     /**
-     * @param EntityRepository|EntityRepositoryInterface $salutationRepository
+     * @param EntityRepository $salutationRepository
      */
     public function __construct($salutationRepository)
     {

@@ -14,6 +14,10 @@ class OrderDeliveryService
      */
     private $orderDeliveryRepository;
 
+
+    /**
+     * @param OrderDeliveryRepositoryInterface $orderDeliveryRepository
+     */
     public function __construct(OrderDeliveryRepositoryInterface $orderDeliveryRepository)
     {
         $this->orderDeliveryRepository = $orderDeliveryRepository;

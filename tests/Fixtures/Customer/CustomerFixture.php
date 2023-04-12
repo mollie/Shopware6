@@ -28,16 +28,16 @@ class CustomerFixture extends Fixture
     private $helper;
 
     /**
-     * @var CustomerRepositoryInterface
+     * @var EntityRepository
      */
     private $customerRepository;
 
 
     /**
      * @param FixtureHelper $helper
-     * @param CustomerRepositoryInterface $customerRepository
+     * @param EntityRepository $customerRepository
      */
-    public function __construct(FixtureHelper $helper, CustomerRepositoryInterface $customerRepository)
+    public function __construct(FixtureHelper $helper, $customerRepository)
     {
         $this->helper = $helper;
         $this->customerRepository = $customerRepository;

@@ -5,7 +5,6 @@ namespace Kiener\MolliePayments\Repository\Customer;
 
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
@@ -13,12 +12,13 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 class CustomerRepository implements CustomerRepositoryInterface
 {
     /**
-     * @var EntityRepository|EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $customerRepository;
 
+
     /**
-     * @param EntityRepository|EntityRepositoryInterface $customerRepository
+     * @param EntityRepository $customerRepository
      */
     public function __construct($customerRepository)
     {
@@ -44,7 +44,6 @@ class CustomerRepository implements CustomerRepositoryInterface
     {
         return $this->customerRepository->create($data, $context);
     }
-
 
     /**
      * @param Criteria $criteria

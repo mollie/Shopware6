@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Service\Order;
 
 use Kiener\MolliePayments\Repository\Order\OrderRepository;
+use Kiener\MolliePayments\Repository\Order\OrderRepositoryInterface;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
@@ -22,7 +23,7 @@ class OrderStatusUpdater
     private $orderHandler;
 
     /**
-     * @var OrderRepository
+     * @var OrderRepositoryInterface
      */
     private $repoOrders;
 
@@ -39,11 +40,11 @@ class OrderStatusUpdater
 
     /**
      * @param OrderStateService $orderHandler
-     * @param OrderRepository $repoOrders
+     * @param OrderRepositoryInterface $repoOrders
      * @param TransactionTransitionServiceInterface $transactionTransitionService
      * @param LoggerInterface $logger
      */
-    public function __construct(OrderStateService $orderHandler, OrderRepository $repoOrders, TransactionTransitionServiceInterface $transactionTransitionService, LoggerInterface $logger)
+    public function __construct(OrderStateService $orderHandler, OrderRepositoryInterface $repoOrders, TransactionTransitionServiceInterface $transactionTransitionService, LoggerInterface $logger)
     {
         $this->orderHandler = $orderHandler;
         $this->repoOrders = $repoOrders;

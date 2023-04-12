@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Service\Mail\AttachmentGenerator;
 
 use Kiener\MolliePayments\Exception\SalesChannelPaymentMethodsException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
+use Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepositoryInterface;
 use Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepositoryInterface;
 use Kiener\MolliePayments\Service\SalesChannel\SalesChannelDataExtractor;
 use Mollie\Api\Exceptions\ApiException;
@@ -12,7 +13,6 @@ use Mollie\Api\Resources\Method;
 use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
@@ -25,7 +25,7 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
     protected $apiFactory;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var PaymentMethodRepositoryInterface
      */
     protected $paymentMethodRepository;
 
@@ -34,12 +34,14 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
      */
     protected $salesChannelDataExtractor;
 
-    public function __construct(
-        SalesChannelRepositoryInterface $salesChannelRepository,
-        MollieApiFactory                $apiFactory,
-        EntityRepositoryInterface       $paymentMethodRepository,
-        SalesChannelDataExtractor       $salesChannelDataExtractor
-    ) {
+    /**
+     * @param SalesChannelRepositoryInterface $salesChannelRepository
+     * @param MollieApiFactory $apiFactory
+     * @param PaymentMethodRepositoryInterface $paymentMethodRepository
+     * @param SalesChannelDataExtractor $salesChannelDataExtractor
+     */
+    public function __construct(SalesChannelRepositoryInterface $salesChannelRepository, MollieApiFactory $apiFactory, PaymentMethodRepositoryInterface $paymentMethodRepository, SalesChannelDataExtractor $salesChannelDataExtractor)
+    {
         parent::__construct($salesChannelRepository);
 
         $this->apiFactory = $apiFactory;

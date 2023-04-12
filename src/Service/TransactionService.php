@@ -13,17 +13,19 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 
 class TransactionService
 {
-    /** @var OrderTransactionRepositoryInterface */
+    /**
+     * @var OrderTransactionRepositoryInterface
+     */
     private $orderTransactionRepository;
+
 
     /**
      * Creates a new instance of the transaction service.
      *
      * @param OrderTransactionRepositoryInterface $orderTransactionRepository
      */
-    public function __construct(
-        OrderTransactionRepositoryInterface $orderTransactionRepository
-    ) {
+    public function __construct(OrderTransactionRepositoryInterface $orderTransactionRepository)
+    {
         $this->orderTransactionRepository = $orderTransactionRepository;
     }
 
@@ -64,10 +66,8 @@ class TransactionService
      * @param null|Context $context
      * @return EntityWrittenContainerEvent
      */
-    public function updateTransaction(
-        OrderTransactionEntity $transaction,
-        Context                $context = null
-    ): EntityWrittenContainerEvent {
+    public function updateTransaction(OrderTransactionEntity $transaction, Context $context = null): EntityWrittenContainerEvent
+    {
         return $this->orderTransactionRepository->update(
             [$transaction->getVars()],
             $context ?? Context::createDefaultContext()

@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderLineIdException;
 use Kiener\MolliePayments\Exception\OrderNumberNotFoundException;
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
+use Kiener\MolliePayments\Repository\Order\OrderRepositoryInterface;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderTransaction\OrderTransactionAttributes;
@@ -18,8 +19,6 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\SalesChannel\OrderService as ShopwareOrderService;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Validation\DataBag\DataBag;
@@ -28,7 +27,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 class OrderService implements OrderServiceInterface
 {
     /**
-     * @var EntityRepository
+     * @var OrderRepositoryInterface
      */
     protected $orderRepository;
 
@@ -59,14 +58,14 @@ class OrderService implements OrderServiceInterface
 
 
     /**
-     * @param EntityRepository $orderRepository
+     * @param OrderRepositoryInterface $orderRepository
      * @param ShopwareOrderService $swOrderService
      * @param Order $mollieOrderService
      * @param UpdateOrderCustomFields $customFieldsUpdater
      * @param UpdateOrderTransactionCustomFields $orderTransactionCustomFields
      * @param LoggerInterface $logger
      */
-    public function __construct(EntityRepository $orderRepository, ShopwareOrderService $swOrderService, Order $mollieOrderService, UpdateOrderCustomFields $customFieldsUpdater, UpdateOrderTransactionCustomFields $orderTransactionCustomFields, LoggerInterface $logger)
+    public function __construct(OrderRepositoryInterface $orderRepository, ShopwareOrderService $swOrderService, Order $mollieOrderService, UpdateOrderCustomFields $customFieldsUpdater, UpdateOrderTransactionCustomFields $orderTransactionCustomFields, LoggerInterface $logger)
     {
         $this->orderRepository = $orderRepository;
         $this->swOrderService = $swOrderService;

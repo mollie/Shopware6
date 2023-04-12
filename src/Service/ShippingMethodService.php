@@ -2,22 +2,20 @@
 
 namespace Kiener\MolliePayments\Service;
 
-use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
-use Shopware\Core\Checkout\Shipping\Aggregate\ShippingMethodPrice\ShippingMethodPriceEntity;
 use Shopware\Core\Checkout\Shipping\ShippingMethodCollection;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Shopware\Core\Framework\DataAbstractionLayer\Pricing\PriceCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class ShippingMethodService
 {
-    /** @var EntityRepository */
+
+    /**
+     * @var EntityRepository
+     */
     private $shippingMethodRepository;
 
     /**
@@ -25,7 +23,7 @@ class ShippingMethodService
      *
      * @param EntityRepository $shippingMethodRepository
      */
-    public function __construct(EntityRepository $shippingMethodRepository)
+    public function __construct($shippingMethodRepository)
     {
         $this->shippingMethodRepository = $shippingMethodRepository;
     }
