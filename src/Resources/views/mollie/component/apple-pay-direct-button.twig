@@ -7,10 +7,17 @@
             {# this is for Shopware >= 6.4 #}
             {% set productId = product.id %}
         {% endif %}
-        <div id="mollie-apd-csrf" class="d-none">
-            <input type="hidden" name="_mollie_csrf_token" value="{{ sw_csrf('frontend.mollie.apple-pay.authorize', {"mode": "token"}) }}">
-            <input type="hidden" name="_mollie_csrf_token" value="{{ sw_csrf('frontend.mollie.apple-pay.shipping-methods', {"mode": "token"}) }}">
-        </div>
+
+
+        {% if mollie_csrf_available %}
+            {#
+            CSRF functions are not available anymore since Shopware 6.5.
+            To avoid function-not-found exception we have to conditionally fetch the required
+            code from a separate file.
+            #}
+            {% sw_include '@MolliePayments/mollie/component/apple-pay-direct-button-csrf.twig' %}
+        {% endif %}
+
         <input type="hidden" name="id" value="{{ productId }}"/>
         <input type="hidden" name="currency" value="{{ context.currency.translated.shortName }}"/>
         <input type="hidden" name="countryCode" value="{{ context.shippingLocation.country.iso }}"/>

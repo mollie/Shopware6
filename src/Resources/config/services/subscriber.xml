@@ -33,6 +33,11 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Subscriber\CsrfSubscriber">
+            <argument>%kernel.shopware_version%</argument>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="Kiener\MolliePayments\Subscriber\ApplePaySubscriber">
             <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect"/>
             <tag name="kernel.event_subscriber"/>
