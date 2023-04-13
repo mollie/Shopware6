@@ -5,8 +5,7 @@ namespace Kiener\MolliePayments\Controller\Storefront;
 use Kiener\MolliePayments\Components\Subscription\Page\Account\SubscriptionPageLoader;
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Framework\Routing\Annotation\LoginRequired;
-use Shopware\Core\Framework\Routing\Annotation\RouteScope;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
@@ -16,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route(defaults={"_routeScope"={"storefront"}, "_loginRequired"=true})
+ * @Route(defaults={"_routeScope"={"storefront"}})
  */
 class AccountController extends StorefrontController
 {
@@ -55,6 +54,10 @@ class AccountController extends StorefrontController
      */
     public function subscriptionsList(Request $request, SalesChannelContext $salesChannelContext): Response
     {
+        if (!$this->isLoggedIn($salesChannelContext)) {
+            return $this->redirectToLoginPage();
+        }
+
         $page = $this->pageLoader->load($request, $salesChannelContext);
 
         return $this->renderStorefront(
@@ -75,6 +78,10 @@ class AccountController extends StorefrontController
      */
     public function updateBilling(string $subscriptionId, RequestDataBag $data, SalesChannelContext $salesChannelContext): Response
     {
+        if (!$this->isLoggedIn($salesChannelContext)) {
+            return $this->redirectToLoginPage();
+        }
+
         try {
             $address = $data->get('address', null);
 
@@ -136,6 +143,10 @@ class AccountController extends StorefrontController
      */
     public function updateShipping(string $subscriptionId, RequestDataBag $data, SalesChannelContext $salesChannelContext): Response
     {
+        if (!$this->isLoggedIn($salesChannelContext)) {
+            return $this->redirectToLoginPage();
+        }
+
         try {
             $address = $data->get('address', null);
 
@@ -196,6 +207,10 @@ class AccountController extends StorefrontController
      */
     public function updatePaymentStart(string $swSubscriptionId, SalesChannelContext $salesChannelContext): Response
     {
+        if (!$this->isLoggedIn($salesChannelContext)) {
+            return $this->redirectToLoginPage();
+        }
+
         try {
             $checkoutUrl = $this->subscriptionManager->updatePaymentMethodStart($swSubscriptionId, '', $salesChannelContext->getContext());
 
@@ -217,6 +232,10 @@ class AccountController extends StorefrontController
      */
     public function updatePaymentFinish(string $swSubscriptionId, SalesChannelContext $salesChannelContext): Response
     {
+        if (!$this->isLoggedIn($salesChannelContext)) {
+            return $this->redirectToLoginPage();
+        }
+
         try {
             $this->subscriptionManager->updatePaymentMethodConfirm($swSubscriptionId, $salesChannelContext->getContext());
 
@@ -237,6 +256,10 @@ class AccountController extends StorefrontController
      */
     public function pauseSubscription(string $swSubscriptionId, SalesChannelContext $context): Response
     {
+        if (!$this->isLoggedIn($context)) {
+            return $this->redirectToLoginPage();
+        }
+
         try {
             $this->subscriptionManager->pauseSubscription($swSubscriptionId, $context->getContext());
 
@@ -257,6 +280,10 @@ class AccountController extends StorefrontController
      */
     public function skipSubscription(string $swSubscriptionId, SalesChannelContext $context): Response
     {
+        if (!$this->isLoggedIn($context)) {
+            return $this->redirectToLoginPage();
+        }
+
         try {
             $this->subscriptionManager->skipSubscription($swSubscriptionId, 1, $context->getContext());
 
@@ -277,6 +304,10 @@ class AccountController extends StorefrontController
      */
     public function resumeSubscription(string $swSubscriptionId, SalesChannelContext $context): Response
     {
+        if (!$this->isLoggedIn($context)) {
+            return $this->redirectToLoginPage();
+        }
+
         try {
             $this->subscriptionManager->resumeSubscription($swSubscriptionId, $context->getContext());
 
@@ -297,6 +328,10 @@ class AccountController extends StorefrontController
      */
     public function cancelSubscription($subscriptionId, SalesChannelContext $context): Response
     {
+        if (!$this->isLoggedIn($context)) {
+            return $this->redirectToLoginPage();
+        }
+
         try {
             $this->subscriptionManager->cancelSubscription($subscriptionId, $context->getContext());
 
@@ -323,5 +358,22 @@ class AccountController extends StorefrontController
         $this->addFlash(self::DANGER, $this->trans($errorSnippetKey));
 
         return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
+    }
+
+    /**
+     * @return RedirectResponse
+     */
+    private function redirectToLoginPage(): RedirectResponse
+    {
+        return new RedirectResponse($this->generateUrl('frontend.account.login'), 302);
+    }
+
+    /**
+     * @param SalesChannelContext $context
+     * @return bool
+     */
+    private function isLoggedIn(SalesChannelContext $context): bool
+    {
+        return ($context->getCustomer() instanceof CustomerEntity);
     }
 }

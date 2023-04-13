@@ -36,8 +36,8 @@ class CsrfSubscriber implements EventSubscriberInterface
 
     /**
      * @param StorefrontRenderEvent $event
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function onStorefrontRender(StorefrontRenderEvent $event): void
     {
