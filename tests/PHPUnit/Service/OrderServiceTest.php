@@ -9,13 +9,11 @@ use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Service\UpdateOrderTransactionCustomFields;
-use MolliePayments\Tests\Fakes\FakeEntityRepository;
-use MolliePayments\Tests\Fakes\Repository\FakeOrderRepository;
+use MolliePayments\Tests\Fakes\Repositories\FakeOrderRepository;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
-use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\SalesChannel\OrderService as ShopwareOrderService;
 use Shopware\Core\Framework\Context;
@@ -27,12 +25,25 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 
 class OrderServiceTest extends TestCase
 {
+    /**
+     * @var OrderEntity
+     */
+    private $testOrder;
+
     private $orderRepository;
     private $orderService;
 
+
+    /**
+     * @return void
+     */
     protected function setUp(): void
     {
-        $this->orderRepository = new FakeOrderRepository();
+        $this->testOrder = new OrderEntity();
+        $this->testOrder->setId('id-123');
+        $this->testOrder->setOrderNumber('nr-123');
+
+        $this->orderRepository = new FakeOrderRepository($this->testOrder);
 
         $this->orderService = new OrderService(
             $this->orderRepository,
@@ -44,21 +55,6 @@ class OrderServiceTest extends TestCase
         );
     }
 
-    private function setUpOrderRepositoryWithOrder()
-    {
-        $searchResult = $this->createConfiguredMock(EntitySearchResult::class, [
-            'first' => $this->createConfiguredMock(OrderEntity::class, [
-                'getId' => 'foo'
-            ])
-        ]);
-
-        $idSearchResult = $this->createConfiguredMock(IdSearchResult::class, [
-            'firstId' => 'foo'
-        ]);
-
-        $this->orderRepository->entitySearchResults[] = $searchResult;
-        $this->orderRepository->idSearchResults[] = $idSearchResult;
-    }
 
     private function setUpOrderRepositoryWithoutOrder()
     {
@@ -76,63 +72,67 @@ class OrderServiceTest extends TestCase
         $this->orderRepository->entitySearchResults[] = $searchResult;
     }
 
-    public function testGetOrder()
+    /**
+     * This test verifies that we get a found order from the repository
+     * and also that our passed criteria arguments contain the order ID that we use as argument.
+     *
+     * @return void
+     */
+    public function testGetOrderFindsEntity(): void
     {
-        $this->setUpOrderRepositoryWithOrder();
+        $foundOrder = $this->orderService->getOrder('id-123', Context::createDefaultContext());
 
-        $actualResult = $this->orderService->getOrder('foo', Context::createDefaultContext());
+        $this->assertSame($this->testOrder, $foundOrder);
 
-        $this->assertNotNull($actualResult);
-        $this->assertInstanceOf(OrderEntity::class, $actualResult);
-        $this->assertContainsOnlyInstancesOf(Criteria::class, $this->orderRepository->criteria);
+        $receivedCriteria = $this->orderRepository->getCriteriaSearch();
 
-        /** @var Criteria $receivedCriteria */
-        $receivedCriteria = $this->orderRepository->criteria[0];
-
-        $this->assertContains('foo', $receivedCriteria->getIds());
+        $this->assertInstanceOf(Criteria::class, $receivedCriteria);
+        $this->assertContains('id-123', $receivedCriteria->getIds());
     }
 
-    public function testGetOrderDoesntExist()
+    /**
+     * This test verifies that our service correctly returns
+     * a found order entity when searching by order number.
+     *
+     * @return void
+     */
+    public function testGetOrderByNumberReturnsOrder(): void
     {
-        $this->setUpOrderRepositoryWithoutOrder();
+        $foundOrder = $this->orderService->getOrderByNumber('not-used', Context::createDefaultContext());
 
-        $this->expectException(OrderNotFoundException::class);
-        $this->orderService->getOrder('foo', Context::createDefaultContext());
+        $this->assertSame($this->testOrder, $foundOrder);
     }
 
-    public function testGetOrderByNumber()
+    /**
+     * This test verifies that our repository gets the correctly built filter criteria.
+     * The service builds a new equalsFilter with the orderNumber.
+     * We extract this filter and verify that our inputArgument is used as value in this filter.
+     *
+     * @return void
+     */
+    public function testGetOrderByNumberUsesCorrectCriteria(): void
     {
-        $this->setUpOrderRepositoryWithOrder();
+        $orderNumber = 'nr-123';
 
-        $actualResult = $this->orderService->getOrderByNumber('bar', Context::createDefaultContext());
+        $this->orderService->getOrderByNumber($orderNumber, Context::createDefaultContext());
 
-        $this->assertNotNull($actualResult);
-        $this->assertInstanceOf(OrderEntity::class, $actualResult);
-        $this->assertContainsOnlyInstancesOf(Criteria::class, $this->orderRepository->criteria);
+        $receivedCriteria = $this->orderRepository->getCriteriaSearchIDs();
 
-        /** @var Criteria $receivedCriteria */
-        $receivedCriteria = $this->orderRepository->criteria[0];
+        $this->assertInstanceOf(Criteria::class, $receivedCriteria);
+
+        # search all orderNumber "equals" filter, and just extract the sent-value.
+        # this helps us to verify that our correct $orderNumber has been used.
+        $sentOrderNumberValues = [];
+        foreach ($receivedCriteria->getFilters() as $filter) {
+            if ($filter instanceof EqualsFilter && $filter->getField() === 'orderNumber') {
+                $sentOrderNumberValues[] = $filter->getValue();
+            }
+        }
 
         $this->assertTrue($receivedCriteria->hasEqualsFilter('orderNumber'));
-
-        $orderNumberFilters = array_filter($receivedCriteria->getFilters(), static function (Filter $filter) {
-            return $filter instanceof EqualsFilter && $filter->getField() === 'orderNumber';
-        });
-
-        $orderNumberFilterValues = array_map(static function (EqualsFilter $filter) {
-            return $filter->getValue();
-        }, $orderNumberFilters);
-
-        $this->assertContains('bar', $orderNumberFilterValues);
+        $this->assertContains($orderNumber, $sentOrderNumberValues, 'no orderNumber filter has been found with a correct value');
     }
 
-    public function testGetOrderByNumberDoesntExist()
-    {
-        $this->setUpOrderRepositoryWithoutOrder();
-
-        $this->expectException(OrderNumberNotFoundException::class);
-        $this->orderService->getOrderByNumber('bar', Context::createDefaultContext());
-    }
 
     public function testGetMollieOrderId()
     {

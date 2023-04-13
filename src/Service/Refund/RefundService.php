@@ -149,10 +149,10 @@ class RefundService implements RefundServiceInterface
     /**
      * @param OrderEntity $order
      * @param string $refundId
-     * @throws CouldNotCancelMollieRefundException
      * @throws CouldNotExtractMollieOrderIdException
      * @throws CouldNotFetchMollieOrderException
      * @throws PaymentNotFoundException
+     * @throws CouldNotCancelMollieRefundException
      * @return bool
      */
     public function cancel(OrderEntity $order, string $refundId): bool
@@ -187,10 +187,10 @@ class RefundService implements RefundServiceInterface
 
     /**
      * @param OrderEntity $order
-     * @throws CouldNotExtractMollieOrderIdException
      * @throws CouldNotFetchMollieOrderException
      * @throws CouldNotFetchMollieRefundsException
      * @throws PaymentNotFoundException
+     * @throws CouldNotExtractMollieOrderIdException
      * @return array<mixed>
      */
     public function getRefunds(OrderEntity $order): array
@@ -201,6 +201,7 @@ class RefundService implements RefundServiceInterface
             $refundsArray = [];
 
             $payment = $this->getPayment($order);
+
             /** @var Refund $refund */
             foreach ($payment->refunds()->getArrayCopy() as $refund) {
                 /**
@@ -221,9 +222,9 @@ class RefundService implements RefundServiceInterface
 
     /**
      * @param OrderEntity $order
-     * @throws CouldNotFetchMollieOrderException
      * @throws PaymentNotFoundException
      * @throws CouldNotExtractMollieOrderIdException
+     * @throws CouldNotFetchMollieOrderException
      * @return float
      */
     public function getRemainingAmount(OrderEntity $order): float
@@ -261,9 +262,9 @@ class RefundService implements RefundServiceInterface
 
     /**
      * @param OrderEntity $order
-     * @throws CouldNotFetchMollieOrderException
      * @throws PaymentNotFoundException
      * @throws CouldNotExtractMollieOrderIdException
+     * @throws CouldNotFetchMollieOrderException
      * @return float
      */
     public function getRefundedAmount(OrderEntity $order): float

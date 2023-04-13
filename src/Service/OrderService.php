@@ -131,6 +131,7 @@ class OrderService implements OrderServiceInterface
     {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('orderNumber', $orderNumber));
+
         $orderId = $this->orderRepository->searchIds($criteria, $context)->firstId();
 
         if (is_string($orderId)) {
