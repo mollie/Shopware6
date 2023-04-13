@@ -3,7 +3,7 @@ import MollieCreditCardMandate from '../core/creditcard-mandate.plugin';
 import DomAccess from 'src/helper/dom-access.helper';
 import DeviceDetection from 'src/helper/device-detection.helper';
 import CsrfAjaxMode from '../services/CsrfAjaxMode';
-import ConfirmPageRepository from "../services/ConfirmPageRepository";
+import ConfirmPageRepository from '../services/ConfirmPageRepository';
 
 export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMandate {
 
