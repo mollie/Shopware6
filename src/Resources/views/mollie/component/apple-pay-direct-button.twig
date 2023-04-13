@@ -15,7 +15,7 @@
             To avoid function-not-found exception we have to conditionally fetch the required
             code from a separate file.
             #}
-            {% sw_include '@MolliePayments/mollie/component/apple-pay-direct-button-csrf.twig' %}
+            {% sw_include '@MolliePayments/storefront/csrf/components/apple-pay-direct-button-csrf.twig' %}
         {% endif %}
 
         <input type="hidden" name="id" value="{{ productId }}"/>

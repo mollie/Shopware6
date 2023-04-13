@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route(defaults={"_routeScope"={"storefront","_loginRequired"=true}})
+ * @Route(defaults={"_routeScope"={"storefront"}, "_loginRequired"=true})
  */
 class AccountController extends StorefrontController
 {
