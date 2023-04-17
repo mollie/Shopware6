@@ -11,7 +11,6 @@ use Shopware\Core\Framework\Event\CustomerAware;
 use Shopware\Core\Framework\Event\EventData\EntityType;
 use Shopware\Core\Framework\Event\EventData\EventDataCollection;
 use Shopware\Core\Framework\Event\EventData\MailRecipientStruct;
-use Shopware\Core\Framework\Event\MailActionInterface;
 use Shopware\Core\Framework\Event\MailAware;
 use Shopware\Core\Framework\Event\SalesChannelAware;
 use Shopware\Core\Framework\Struct\JsonSerializableTrait;
@@ -19,7 +18,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelDefinition;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class SubscriptionRemindedEvent extends Event implements CustomerAware, MailActionInterface, SalesChannelAware, MailAware
+class SubscriptionRemindedEvent extends Event implements CustomerAware, SalesChannelAware, MailAware
 {
     use JsonSerializableTrait;
 
