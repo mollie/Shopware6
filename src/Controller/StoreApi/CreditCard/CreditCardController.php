@@ -17,6 +17,9 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * @Route(defaults={"_routeScope"={"store-api"}})
+ */
 class CreditCardController
 {
 
@@ -30,8 +33,10 @@ class CreditCardController
      */
     private $mandateService;
 
+
     /**
      * @param CustomerService $customerService
+     * @param MandateServiceInterface $mandateService
      */
     public function __construct(CustomerService $customerService, MandateServiceInterface $mandateService)
     {
@@ -41,7 +46,7 @@ class CreditCardController
 
 
     /**
-     * @Route("/store-api/mollie/creditcard/store-token/{customerId}/{cardToken}", name="store-api.mollie.creditcard.store-token", methods={"POST"}, defaults={"_routeScope"="api"})
+     * @Route("/store-api/mollie/creditcard/store-token/{customerId}/{cardToken}", name="store-api.mollie.creditcard.store-token", methods={"POST"})
      *
      * @param string $customerId
      * @param string $cardToken
@@ -68,7 +73,7 @@ class CreditCardController
     }
 
     /**
-     * @Route("/store-api/mollie/creditcard/store-mandate-id/{customerId}/{mandateId}", name="store-api.mollie.creditcard.store-mandate-id", methods={"POST"}, defaults={"_routeScope"="api"})
+     * @Route("/store-api/mollie/creditcard/store-mandate-id/{customerId}/{mandateId}", name="store-api.mollie.creditcard.store-mandate-id", methods={"POST"})
      *
      * @param string $customerId
      * @param string $mandateId
@@ -93,7 +98,7 @@ class CreditCardController
     }
 
     /**
-     * @Route("/store-api/mollie/mandate/revoke/{customerId}/{mandateId}", name="store-api.mollie.mandate.revoke", methods={"POST"}, defaults={"_routeScope"="api"})
+     * @Route("/store-api/mollie/mandate/revoke/{customerId}/{mandateId}", name="store-api.mollie.mandate.revoke", methods={"POST"})
      *
      * @param string $customerId
      * @param string $mandateId
@@ -109,7 +114,7 @@ class CreditCardController
     }
 
     /**
-     * @Route("/store-api/mollie/mandates/{customerId}", name="store-api.mollie.mandates", methods={"GET"}, defaults={"_routeScope"="api"})
+     * @Route("/store-api/mollie/mandates/{customerId}", name="store-api.mollie.mandates", methods={"GET"})
      *
      * @param string $customerId
      * @param SalesChannelContext $context

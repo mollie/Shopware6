@@ -1,3 +1,8 @@
+import Shopware from "Services/shopware/Shopware";
+
+const shopware = new Shopware();
+
+
 export default class OrdersListRepository {
 
 
@@ -14,7 +19,7 @@ export default class OrdersListRepository {
      * @returns {string}
      */
     getLatestOrderStatusLabelSelector() {
-        return '.sw-data-grid__row--0 > .sw-data-grid__cell--stateMachineState-name > .sw-data-grid__cell-content > .sw-label';
+        return '.sw-data-grid__row--0 > .sw-data-grid__cell--stateMachineState-name > .sw-data-grid__cell-content';
     }
 
     /**
@@ -22,7 +27,7 @@ export default class OrdersListRepository {
      * @returns {string}
      */
     getLatestPaymentStatusLabelSelector() {
-        return ".sw-data-grid__row--0 > .sw-data-grid__cell--transactions-last\\(\\)-stateMachineState-name > .sw-data-grid__cell-content > .sw-label";
+        return ".sw-data-grid__row--0 > .sw-data-grid__cell--transactions-last\\(\\)-stateMachineState-name > .sw-data-grid__cell-content";
     }
 
 }

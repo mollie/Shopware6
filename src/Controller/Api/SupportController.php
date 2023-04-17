@@ -13,6 +13,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * @Route(defaults={"_routeScope"={"api"}, "auth_enabled"=true})
+ */
 class SupportController extends AbstractController
 {
 
@@ -38,7 +41,7 @@ class SupportController extends AbstractController
     }
 
     /**
-     * @Route("/api/_action/mollie/support/request", defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.action.mollie.support.request", methods={"POST"})
+     * @Route("/api/_action/mollie/support/request", name="api.action.mollie.support.request", methods={"POST"})
      *
      * @param Request $request
      * @param Context $context
@@ -66,7 +69,7 @@ class SupportController extends AbstractController
     }
 
     /**
-     * @Route("/api/v{version}/_action/mollie/support/request", defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.action.mollie.support.request.legacy", methods={"POST"})
+     * @Route("/api/v{version}/_action/mollie/support/request", name="api.action.mollie.support.request.legacy", methods={"POST"})
      *
      * @param Request $request
      * @param Context $context

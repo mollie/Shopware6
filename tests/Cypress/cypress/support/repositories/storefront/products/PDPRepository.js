@@ -1,3 +1,7 @@
+import Shopware from "Services/shopware/Shopware";
+
+const shopware = new Shopware();
+
 export default class PDPRepository {
 
     /**
@@ -5,15 +9,27 @@ export default class PDPRepository {
      * @returns {*}
      */
     getAddToCartButton() {
-        return cy.get('.buy-widget-container > .col-8 > .btn');
+        if (shopware.isVersionGreaterEqual('6.5')) {
+            return cy.get('.d-grid > .btn');
+        } else {
+            return cy.get('.buy-widget-container > .col-8 > .btn');
+        }
     }
 
     /**
      *
      * @returns {*}
      */
-    getQuantity() {
+    getQuantityDropdown() {
         return cy.get('.col-4 > .custom-select');
+    }
+
+    /**
+     *
+     * @returns {*}
+     */
+    getQuantityBtnUp() {
+        return cy.get('.btn-plus');
     }
 
     /**

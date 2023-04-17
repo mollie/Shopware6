@@ -11,6 +11,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * @Route(defaults={"_routeScope"={"api"}, "auth_required"=true, "auth_enabled"=true})
+ */
 class OrderController extends AbstractController
 {
     /** @var OrderService */
@@ -27,8 +30,7 @@ class OrderController extends AbstractController
     }
 
     /**
-     * @Route("/api/_action/mollie/order/payment-url",
-     *         defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.action.mollie.order.payment-url", methods={"POST"})
+     * @Route("/api/_action/mollie/order/payment-url", name="api.action.mollie.order.payment-url", methods={"POST"})
      *
      * @param Request $request
      *
@@ -42,8 +44,7 @@ class OrderController extends AbstractController
     }
 
     /**
-     * @Route("/api/v{version}/_action/mollie/order/payment-url",
-     *         defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.action.mollie.order.payment-url.legacy", methods={"POST"})
+     * @Route("/api/v{version}/_action/mollie/order/payment-url", name="api.action.mollie.order.payment-url.legacy", methods={"POST"})
      *
      * @param Request $request
      *

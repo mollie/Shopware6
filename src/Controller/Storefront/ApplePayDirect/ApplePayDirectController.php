@@ -146,6 +146,7 @@ class ApplePayDirectController extends StorefrontController
      * ATTENTION:
      * this is not about Apple Pay Direct - but the namespace of the URL is a good one (/apple-pay)
      * and I don't want to create all kinds of new controllers
+     *
      * @Route("/mollie/apple-pay/applepay-id", defaults={"csrf_protected"=true}, name="frontend.mollie.apple-pay.id", options={"seo"="false"}, methods={"GET"})
      *
      * @param SalesChannelContext $context
