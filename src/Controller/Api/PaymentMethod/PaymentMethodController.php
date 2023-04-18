@@ -12,6 +12,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Throwable;
 
+/**
+ * @Route(defaults={"_routeScope"={"api"}, "auth_required"=true, "auth_enabled"=true})
+ */
 class PaymentMethodController extends AbstractController
 {
     /**
@@ -35,7 +38,7 @@ class PaymentMethodController extends AbstractController
     }
 
     /**
-     * @Route("/api/_action/mollie/payment-method/update-methods", defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.mollie.payment-method.update-methods", methods={"GET"})
+     * @Route("/api/_action/mollie/payment-method/update-methods", name="api.mollie.payment-method.update-methods", methods={"GET"})
      *
      * @param Context $context
      * @return JsonResponse
@@ -46,7 +49,7 @@ class PaymentMethodController extends AbstractController
     }
 
     /**
-     * @Route("/api/v{version}/_action/mollie/payment-method/update-methods", defaults={"auth_enabled"=true, "_routeScope"="api"}, name="api.mollie.payment-method.update-methods.legacy", methods={"GET"})
+     * @Route("/api/v{version}/_action/mollie/payment-method/update-methods", name="api.mollie.payment-method.update-methods.legacy", methods={"GET"})
      *
      * @param Context $context
      * @return JsonResponse

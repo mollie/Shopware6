@@ -238,6 +238,10 @@ export default class ShopConfigurationAction {
 
                             this.apiClient.get('/shipping-method/' + element.id + '/prices').then(price => {
 
+                                if (price === undefined) {
+                                    return;
+                                }
+                                
                                 const shippingData = {
                                     "id": element.id,
                                     "active": true,

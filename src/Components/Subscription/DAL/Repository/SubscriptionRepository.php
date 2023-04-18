@@ -109,7 +109,7 @@ class SubscriptionRepository
      */
     public function findByCustomer(string $swCustomerId, bool $includedPending, Context $context): EntitySearchResult
     {
-        $criteria = new Criteria([]);
+        $criteria = new Criteria();
         $criteria->addAssociation('customer');
         $criteria->addAssociation('historyEntries');
         $criteria->addFilter(new EqualsFilter('customerId', $swCustomerId));
