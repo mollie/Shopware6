@@ -2,18 +2,15 @@
 
 namespace Kiener\MolliePayments\Resources\snippet\nl_NL;
 
-use Shopware\Core\System\Snippet\Files\SnippetFileInterface;
+use Shopware\Core\System\Snippet\Files\AbstractSnippetFile;
 
-class SnippetFile_nl_NL implements SnippetFileInterface
+class SnippetFile_nl_NL_65 extends AbstractSnippetFile
 {
     public function getName(): string
     {
         return 'mollie-payments.nl-NL';
     }
 
-    /**
-     * Required for deprecation warnings in Shopware 6.4.17.0
-     */
     public function getTechnicalName(): string
     {
         return $this->getName();

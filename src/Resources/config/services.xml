@@ -15,7 +15,6 @@
         <import resource="services/repositories.xml"/>
         <import resource="services/payment.xml"/>
         <import resource="services/services.xml"/>
-        <import resource="services/snippets.xml"/>
         <import resource="services/subscriber.xml"/>
         <import resource="services/validators.xml"/>
         <import resource="services/builder.xml"/>

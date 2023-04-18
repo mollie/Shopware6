@@ -1,19 +1,19 @@
-<?php declare(strict_types=1);
+<?php
 
-namespace Kiener\MolliePayments\Resources\snippet\nl_NL;
+declare(strict_types=1);
 
-use Shopware\Core\System\Snippet\Files\SnippetFileInterface;
+namespace Kiener\MolliePayments\Resources\snippet\de_DE;
 
-class SnippetFile_nl_NL implements SnippetFileInterface
+use Shopware\Core\System\Snippet\Files\AbstractSnippetFile;
+
+class SnippetFile_de_DE_65 extends AbstractSnippetFile
 {
+
     public function getName(): string
     {
-        return 'mollie-payments.nl-NL';
+        return 'mollie-payments.de-DE';
     }
 
-    /**
-     * Required for deprecation warnings in Shopware 6.4.17.0
-     */
     public function getTechnicalName(): string
     {
         return $this->getName();
@@ -21,12 +21,12 @@ class SnippetFile_nl_NL implements SnippetFileInterface
 
     public function getPath(): string
     {
-        return __DIR__ . '/mollie-payments.nl-NL.json';
+        return __DIR__ . '/mollie-payments.de-DE.json';
     }
 
     public function getIso(): string
     {
-        return 'nl-NL';
+        return 'de-DE';
     }
 
     public function getAuthor(): string
@@ -38,4 +38,5 @@ class SnippetFile_nl_NL implements SnippetFileInterface
     {
         return false;
     }
+
 }
