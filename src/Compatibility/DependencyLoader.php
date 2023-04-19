@@ -65,6 +65,11 @@ class DependencyLoader
             $loader->load('compatibility/services_6.3.5.0.xml');
         }
 
+        if ($versionCompare->gte('6.5')) {
+            $loader->load('compatibility/snippets_65.xml');
+        } else {
+            $loader->load('compatibility/snippets.xml');
+        }
 
         $composerDevReqsInstalled = file_exists(__DIR__ . '/../../vendor/bin/phpunit');
 
