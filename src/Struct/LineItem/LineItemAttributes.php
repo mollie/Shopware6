@@ -68,6 +68,21 @@ class LineItemAttributes
     }
 
     /**
+     * @return string[]
+     */
+    public static function getKeyList(): array
+    {
+        return [
+            'mollie_payments_product_voucher_type',
+            'mollie_payments_product_subscription_enabled',
+            'mollie_payments_product_subscription_interval',
+            'mollie_payments_product_subscription_interval_unit',
+            'mollie_payments_product_subscription_repetition',
+            'mollie_payments_product_subscription_repetition_type',
+        ];
+    }
+
+    /**
      * @return string
      */
     public function getProductNumber(): string
