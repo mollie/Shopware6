@@ -70,7 +70,11 @@ context("Order Shipping", () => {
             assertShippingStatus('Shipped', 2);
 
             repoOrderDetails.getMollieActionsButton().click({force: true});
-            repoOrderDetails.getMollieActionButtonShipThroughMollie().should('have.class', 'is--disabled');
+            let disabledClassName = 'is--disabled'
+            if(shopware.isVersionGreaterEqual('6.5')){
+                disabledClassName = 'sw-button--disabled';
+            }
+            repoOrderDetails.getMollieActionButtonShipThroughMollie().should('have.class', disabledClassName);
         })
 
         it('C152048: Full Shipping in Administration with Tracking', () => {
@@ -95,7 +99,13 @@ context("Order Shipping", () => {
             assertShippingStatus('Shipped', 2);
 
             repoOrderDetails.getMollieActionsButton().click({force: true});
-            repoOrderDetails.getMollieActionButtonShipThroughMollie().should('have.class', 'is--disabled');
+
+            let disabledClassName = 'is--disabled'
+            if(shopware.isVersionGreaterEqual('6.5')){
+                disabledClassName = 'sw-button--disabled';
+            }
+
+            repoOrderDetails.getMollieActionButtonShipThroughMollie().should('have.class', disabledClassName);
         })
 
         it('C4040: Partial Shipping in Administration', () => {
@@ -140,7 +150,12 @@ context("Order Shipping", () => {
             assertShippingStatus('Shipped', 4);
 
             repoOrderDetails.getMollieActionsButton().click({force: true});
-            repoOrderDetails.getMollieActionButtonShipThroughMollie().should('have.class', 'is--disabled');
+            let disabledClassName = 'is--disabled'
+            if(shopware.isVersionGreaterEqual('6.5')){
+                disabledClassName = 'sw-button--disabled';
+            }
+
+            repoOrderDetails.getMollieActionButtonShipThroughMollie().should('have.class', disabledClassName);
         })
 
         it('C4044: Partial Shipping with Tracking', () => {

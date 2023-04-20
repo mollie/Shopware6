@@ -1,6 +1,7 @@
 import template from './mollie-ship-order.html.twig';
 
-const {Component, Mixin} = Shopware;
+// eslint-disable-next-line no-undef
+const {Component} = Shopware;
 
 Component.register('mollie-ship-order', {
     template,
@@ -17,7 +18,7 @@ Component.register('mollie-ship-order', {
             code: '',
             url: '',
         },
-        showTrackingInfo:false
+        showTrackingInfo:false,
     },
 
 

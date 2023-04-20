@@ -85,7 +85,7 @@ export default class OrderDetailsRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getLineItemActionsButtonShipThroughMollie() {
-        return cy.contains('Ship through Mollie');
+        return cy.get('.sw-context-button__menu-popover').contains('Ship through Mollie');
     }
 
     /**
@@ -125,5 +125,9 @@ export default class OrderDetailsRepository {
 
     getOrderDetailsTab() {
         return cy.get('.sw-order-detail__tabs .sw-order-detail__tabs-tab-details')
+    }
+
+    getOrderDetailsGeneralTab() {
+        return cy.get('.sw-order-detail__tabs .sw-order-detail__tabs-tab-general')
     }
 }

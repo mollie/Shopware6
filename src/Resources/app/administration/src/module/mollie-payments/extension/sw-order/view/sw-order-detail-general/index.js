@@ -9,7 +9,7 @@ Component.override('sw-order-detail-general', {
     mixins: [
         Mixin.getByName('notification'),
     ],
-    props:{
+    props: {
         showRefundModal: false,
         showShipOrderModal: false,
     },
@@ -47,33 +47,35 @@ Component.override('sw-order-detail-general', {
 
     methods: {
         getMollieData() {
-            if (this.isMollieOrder) {
-
-                this.MolliePaymentsRefundService.getRefundManagerData(
-                    {
-                        orderId: this.order.id,
-                    })
-                    .then((response) => {
-                        this.remainingAmount = response.totals.remaining;
-                        this.refundedAmount = response.totals.refunded;
-                        this.voucherAmount = response.totals.voucherAmount;
-                        this.refundAmountPending = response.totals.pendingRefunds;
-                        this.refunds = response.refunds;
-                    })
-                    .catch((response) => {
-                        this.createNotificationError({
-                            message: response.message,
-                        });
-                    });
-
-                this.MolliePaymentsShippingService
-                    .total({orderId: this.order.id})
-                    .then((response) => {
-                        this.shippedAmount = Math.round(response.amount * 100) / 100;
-                        this.shippedQuantity = response.quantity;
-                    });
-
+            if (!this.isMollieOrder) {
+                return
             }
+
+            this.MolliePaymentsRefundService.getRefundManagerData(
+                {
+                    orderId: this.order.id,
+                })
+                .then((response) => {
+                    this.remainingAmount = response.totals.remaining;
+                    this.refundedAmount = response.totals.refunded;
+                    this.voucherAmount = response.totals.voucherAmount;
+                    this.refundAmountPending = response.totals.pendingRefunds;
+                    this.refunds = response.refunds;
+                })
+                .catch((response) => {
+                    this.createNotificationError({
+                        message: response.message,
+                    });
+                });
+
+            this.MolliePaymentsShippingService
+                .total({orderId: this.order.id})
+                .then((response) => {
+                    this.shippedAmount = Math.round(response.amount * 100) / 100;
+                    this.shippedQuantity = response.quantity;
+                });
+
+
         },
         onOpenRefundManager() {
             this.showRefundModal = true;
@@ -85,8 +87,8 @@ Component.override('sw-order-detail-general', {
         onToggleShipOrderModal(shipOrderModal) {
             this.showShipOrderModal = shipOrderModal;
         },
-        onOpenShipOrderModal(){
-            this.showShipOrderModal=true;
+        onOpenShipOrderModal() {
+            this.showShipOrderModal = true;
         },
         onRefundManagerPossible(refundManagerPossible) {
             this.isRefundManagerPossible = refundManagerPossible;

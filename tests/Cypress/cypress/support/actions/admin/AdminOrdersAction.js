@@ -106,11 +106,17 @@ export default class AdminOrdersAction {
     setTrackingCode(trackingCode) {
         repoOrdersDetails.getEditButton().click();
         cy.wait(1000);
+        // Tracking Code is added on OrderDetails Tab, therefore we need to open a new tab first
+        // and navigating back after tracking code is set. since 6.5
         if (shopware.isVersionGreaterEqual('6.5')) {
             repoOrdersDetails.getOrderDetailsTab().click();
         }
         repoOrdersDetails.getTrackingCode(trackingCode).type(trackingCode, forceOption);
         repoOrdersDetails.getSaveButton().click();
+        if (shopware.isVersionGreaterEqual('6.5')) {
+            cy.wait(1000);
+            repoOrdersDetails.getOrderDetailsGeneralTab().click();
+        }
         // here are automatic reloads and things as it seems
         // I really want to test the real UX, so we just wait like a human
         cy.wait(4000);
