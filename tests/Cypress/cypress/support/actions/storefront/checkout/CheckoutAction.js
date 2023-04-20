@@ -11,7 +11,9 @@ const repoConfirm = new ConfirmRepository();
 const topMenu = new TopMenuAction();
 const listing = new ListingAction();
 const pdp = new PDPAction();
+import Shopware from "Services/shopware/Shopware";
 
+const shopware = new Shopware();
 
 export default class CheckoutAction {
 
@@ -37,7 +39,11 @@ export default class CheckoutAction {
      *
      */
     closeOffcanvasCart() {
-        cy.get('.cart-offcanvas.is-open > .offcanvas-close').click({force: true});
+        let selector = '.cart-offcanvas.is-open > .offcanvas-close';
+        if (shopware.isVersionGreaterEqual('6.5')) {
+            selector = '.cart-offcanvas.show .offcanvas-close';
+        }
+        cy.get(selector).click({force: true});
     }
 
     /**

@@ -3,7 +3,7 @@
         {# --------------------------------------------------------------------------------------------- #}
         {# --------------------------------------------------------------------------------------------- #}
         {# --------------------------------------------------------------------------------------------- #}
-        <sw-card :title="titleCardOrder" class="mollie-refund-manager-order-container" :hero="false" :large="true">
+        <sw-card :title="titleCardOrder"  position-identifier="mollie-refund-manager-order-container"  class="mollie-refund-manager-order-container" :hero="false" :large="true">
             <sw-container columns="5fr 1fr" class="order-container-top">
                 <div class="order-container-top-left">
                     <sw-button-group>
@@ -129,7 +129,7 @@
         {# --------------------------------------------------------------------------------------------- #}
         {# --------------------------------------------------------------------------------------------- #}
         {# --------------------------------------------------------------------------------------------- #}
-        <sw-card :hero="false" class="mollie-refund-manager-instructions-container" :large="true">
+        <sw-card :hero="false" class="mollie-refund-manager-instructions-container" position-identifier="mollie-refund-manager-instructions-container"  :large="true">
             <sw-container v-if="configShowInstructions" columns="1fr" gap="0px">
                 <div class="instructions-container-top">
                     <sw-button variant="context" size="small" icon="default-basic-x-block"
@@ -139,7 +139,7 @@
                 </div>
             </sw-container>
             <sw-container columns="4fr 4fr 3fr" gap="0px">
-                <sw-card-section v-if="configShowInstructions" class="instructions-container-content" divider="right">
+                <sw-card-section v-if="configShowInstructions" position-identfier="instructions-container-content" class="instructions-container-content" divider="right">
                     <sw-container columns="1fr 20fr" class="instructions-block">
                         <sw-icon name="default-money-cash" :small="false"
                                  class="instructions-block-icon color-refund"></sw-icon>
@@ -407,7 +407,7 @@
         {# --------------------------------------------------------------------------------------------- #}
         {# --------------------------------------------------------------------------------------------- #}
         {# --------------------------------------------------------------------------------------------- #}
-        <sw-card :title="$tc('mollie-payments.refund-manager.refunds.title')" class="mollie-refund-manager-refunds"
+        <sw-card :title="$tc('mollie-payments.refund-manager.refunds.title')" position-identifier="mollie-refund-manager-refunds" class="mollie-refund-manager-refunds"
                  :hero="false" :large="true">
             <div class="instructions-bar">
                 <sw-alert v-if="!isAclCancelAllowed"
