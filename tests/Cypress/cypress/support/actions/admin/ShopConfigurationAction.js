@@ -21,29 +21,15 @@ export default class ShopConfigurationAction {
      */
     setupShop(mollieFailureMode, creditCardComponents, applePayDirect) {
 
-        // this is flaky...maybe we just give a bit time?
-        cy.wait(3000);
-
         this._activatePaymentMethods();
-
-        cy.wait(500);
 
         this._configureShop();
 
-        cy.wait(500);
-
         this.prepareShippingMethods();
-
-        cy.wait(500);
 
         this.setupPlugin(mollieFailureMode, creditCardComponents, applePayDirect, false);
 
-        // let's just wait a bit
-        cy.wait(20000);
-
         this._clearCache();
-
-        cy.wait(1000);
     }
 
 
@@ -55,8 +41,6 @@ export default class ShopConfigurationAction {
      * @param subscriptionIndicator
      */
     setupPlugin(mollieFailureMode, creditCardComponents, applePayDirect, subscriptionIndicator) {
-
-        cy.wait(2000);
 
         // assign all payment methods to
         // all available sales channels
@@ -82,7 +66,7 @@ export default class ShopConfigurationAction {
      */
     updateProducts(voucherValue, subscriptionEnabled, subscriptionInterval, subscriptionIntervalUnit) {
 
-        cy.wait(2000);
+        cy.log('Configuring Shopware Products');
 
         if (voucherValue === 'eco') {
             voucherValue = '1';
@@ -98,7 +82,6 @@ export default class ShopConfigurationAction {
             subscriptionInterval = null;
         }
 
-
         let customFields = null;
 
         if (voucherValue !== '') {
@@ -110,24 +93,41 @@ export default class ShopConfigurationAction {
             }
         }
 
+        cy.intercept({url: '/api/_action/sync'}).as("updateProducts");
 
         this.apiClient.get('/product').then(products => {
 
             if (products === undefined || products === null) {
-                throw new Error('Attention, No products found trough Shopware API');
+                console.error('Attention, No products found trough Shopware API');
+                // send an empty request so that our cy.wait has something, otherwise the full timeout is consumed
+                this.apiClient.bulkUpdate('product', []);
+                return;
             }
 
-            products.forEach(product => {
-                const data = {
+            const maxChunkSize = 80;
+            let data = [];
+
+            for (const product of products) {
+                const row = {
                     "id": product.id,
                     "customFields": customFields,
                 };
-                this.apiClient.patch('/product/' + product.id, data);
-            });
+                data.push(row);
+
+                if (data.length >= maxChunkSize) {
+                    this.apiClient.bulkUpdate('product', data);
+                    data = [];
+                }
+            }
+
+            if (data.length >= 0) {
+                this.apiClient.bulkUpdate('product', data);
+            }
         });
 
-        // let's just wait a bit
-        cy.wait(3000);
+        cy.wait("@updateProducts", {requestTimeout: 100000});
+
+        cy.log('Products done');
 
         this._clearCache();
     }
@@ -177,13 +177,22 @@ export default class ShopConfigurationAction {
      * @private
      */
     _activatePaymentMethods() {
+
+        const entity = 'payment_method';
+        const interceptAlias = 'updatePaymentMethods';
+
+        this._cypressInterceptBulkUpdate(entity, interceptAlias);
+
         this.apiClient.get('/payment-method').then(payments => {
 
             if (payments === undefined || payments === null) {
-                throw new Error('Attention, No payments through trough Shopware API');
+                console.log('Attention, No payments through trough Shopware API');
+                return;
             }
 
-            payments.forEach(element => {
+            const data = [];
+
+            for (const element of payments) {
 
                 let shouldBeActive = false;
 
@@ -199,14 +208,20 @@ export default class ShopConfigurationAction {
                     shouldBeActive = true;
                 }
 
-                const data = {
+                const row = {
                     "id": element.id,
                     "active": shouldBeActive,
                 };
 
-                this.apiClient.patch('/payment-method/' + element.id, data);
-            });
+                data.push(row);
+            }
+
+            if (data.length >= 0) {
+                this.apiClient.bulkUpdate(entity, data);
+            }
         });
+
+        cy.wait('@' + interceptAlias, {requestTimeout: 50000});
     }
 
     /**
@@ -216,6 +231,7 @@ export default class ShopConfigurationAction {
      * @private
      */
     prepareShippingMethods() {
+
         this.apiClient.get('/rule').then(rules => {
 
             if (rules === undefined || rules === null) {
@@ -231,6 +247,7 @@ export default class ShopConfigurationAction {
                     this.apiClient.get('/shipping-method').then(shippingMethods => {
 
                         if (shippingMethods === undefined || shippingMethods === null) {
+                            return;
                             throw new Error('Attention, No shippingMethods trough Shopware API');
                         }
 
@@ -241,7 +258,7 @@ export default class ShopConfigurationAction {
                                 if (price === undefined) {
                                     return;
                                 }
-                                
+
                                 const shippingData = {
                                     "id": element.id,
                                     "active": true,
@@ -303,6 +320,7 @@ export default class ShopConfigurationAction {
         this.apiClient.get('/payment-method').then(payments => {
 
             if (payments === undefined || payments === null) {
+                return;
                 throw new Error('Attention, No payments trough Shopware API');
             }
 
@@ -331,6 +349,23 @@ export default class ShopConfigurationAction {
         return this.apiClient.delete('/_action/cache').catch((err) => {
             console.log('Cache could not be cleared')
         });
+    }
+
+    /**
+     *
+     * @param entityName
+     * @param alias
+     * @private
+     */
+    _cypressInterceptBulkUpdate(entityName, alias) {
+        cy.intercept(
+            {
+                url: '/api/_action/sync',
+                headers: {
+                    'x-cypress-entity': entityName,
+                },
+            }
+        ).as(alias);
     }
 
 }

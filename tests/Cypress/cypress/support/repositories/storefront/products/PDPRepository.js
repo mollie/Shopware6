@@ -10,7 +10,7 @@ export default class PDPRepository {
      */
     getAddToCartButton() {
         if (shopware.isVersionGreaterEqual('6.5')) {
-            return cy.get('.d-grid > .btn');
+            return cy.get('.btn-buy');
         } else {
             return cy.get('.buy-widget-container > .col-8 > .btn');
         }

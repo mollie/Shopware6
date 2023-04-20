@@ -144,6 +144,8 @@ context("Checkout Tests", () => {
 
                     } else if (payment.key === 'credit-card') {
 
+                        cy.wait(2000);
+                        
                         mollieCreditCard.enterValidCard();
                         mollieCreditCard.submitForm();
                         molliePayment.selectPaid();
