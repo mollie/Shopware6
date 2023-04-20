@@ -18,9 +18,9 @@ export default class AdminOrdersAction {
      */
     openOrders() {
         cy.wait(200);
-        repoMainMenu.getOrders().click();
+        repoMainMenu.getOrders().click({force:true});
         cy.wait(1000);
-        repoMainMenu.getOrdersOverview().click();
+        repoMainMenu.getOrdersOverview().click({force:true});
         cy.wait(1000);
     }
 
@@ -106,6 +106,9 @@ export default class AdminOrdersAction {
     setTrackingCode(trackingCode) {
         repoOrdersDetails.getEditButton().click();
         cy.wait(1000);
+        if (shopware.isVersionGreaterEqual('6.5')) {
+            repoOrdersDetails.getOrderDetailsTab().click();
+        }
         repoOrdersDetails.getTrackingCode(trackingCode).type(trackingCode, forceOption);
         repoOrdersDetails.getSaveButton().click();
         // here are automatic reloads and things as it seems

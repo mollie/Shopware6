@@ -19,25 +19,33 @@ Component.override('sw-order-line-items-grid', {
         'MolliePaymentsShippingService',
         'acl',
     ],
-
+    props: {
+        shopwareVersion: {
+            type: Number,
+            default: 6.4,
+        },
+        showShipOrderModal: false,
+        showRefundModal: false,
+        showTrackingInfo: false,
+    },
 
     /**
      *
-     * @returns {{isLoading: boolean, shippingStatus: null, showRefundModal: boolean, isShipOrderLoading: boolean, showShipItemModal: null, showShipOrderModal: boolean, showTrackingInfo: boolean, tracking: {carrier: string, code: string, url: string}, isShipItemLoading: boolean, shipQuantity: number}}
+     * @returns {{isLoading: boolean, shippingStatus: null: boolean, isShipOrderLoading: boolean, showShipItemModal: null, showShipOrderModal: boolean, showTrackingInfo: boolean, tracking: {carrier: string, code: string, url: string}, isShipItemLoading: boolean, shipQuantity: number}}
      */
     data() {
         return {
             isLoading: false,
             // ---------------------------------
             configShowRefundManager: true,
-            showRefundModal: false,
+
             // ---------------------------------
             isShipOrderLoading: false,
             isShipItemLoading: false,
             shipQuantity: 0,
-            showShipOrderModal: false,
+
             showShipItemModal: null,
-            showTrackingInfo: false,
+
             shippingStatus: null,
             tracking: {
                 carrier: '',
@@ -63,19 +71,6 @@ Component.override('sw-order-line-items-grid', {
             );
 
             return columnDefinitions;
-        },
-
-        getShipOrderColumns() {
-            return [
-                {
-                    property: 'label',
-                    label: this.$tc('mollie-payments.modals.shipping.order.itemHeader'),
-                },
-                {
-                    property: 'quantity',
-                    label: this.$tc('mollie-payments.modals.shipping.order.quantityHeader'),
-                },
-            ];
         },
 
         shippableLineItems() {
@@ -145,21 +140,40 @@ Component.override('sw-order-line-items-grid', {
     created() {
         this.createdComponent();
     },
+    watch: {
+        showShipOrderModal(showShipOrderModal) {
 
+            if (showShipOrderModal) {
+                this.updateTrackingPrefilling();
+
+            } else {
+                this.isShipOrderLoading = false;
+                this.resetTracking();
+            }
+        },
+    },
     methods: {
 
-        createdComponent() {
+        async createdComponent() {
             // Do not attempt to load the shipping status if this isn't a Mollie order,
             // or it will trigger an exception in the API.
+            let refundManagerPossible = false;
+
+
             if (this.isMollieOrder) {
-                this.getShippingStatus();
+                await this.getShippingStatus();
 
                 const me = this;
 
                 this.MolliePaymentsConfigService.getRefundManagerConfig(this.order.salesChannelId).then((response) => {
                     me.configShowRefundManager = response.enabled;
                 });
+                refundManagerPossible = this.isRefundManagerPossible;
+
+
             }
+            this.$emit('refund-manager-possible', refundManagerPossible)
+            this.$emit('shipping-possible', this.isShippingPossible)
         },
 
 
@@ -168,10 +182,12 @@ Component.override('sw-order-line-items-grid', {
 
         onOpenRefundManager() {
             this.showRefundModal = true;
+            this.$emit('toggle-refund-manager-modal', this.showRefundModal);
         },
 
         onCloseRefundManager() {
             this.showRefundModal = false;
+            this.$emit('toggle-refund-manager-modal', this.showRefundModal);
         },
 
         //==== Shipping =============================================================================================//
@@ -188,14 +204,13 @@ Component.override('sw-order-line-items-grid', {
 
         onOpenShipOrderModal() {
             this.showShipOrderModal = true;
-
-            this.updateTrackingPrefilling();
+            this.$emit('toggle-ship-order-modal', this.showShipOrderModal);
         },
 
         onCloseShipOrderModal() {
-            this.isShipOrderLoading = false;
             this.showShipOrderModal = false;
-            this.resetTracking();
+            this.$emit('toggle-ship-order-modal', this.showShipOrderModal);
+            this.$emit('shipping-possible', this.isShippingPossible);
         },
 
         onConfirmShipOrder() {

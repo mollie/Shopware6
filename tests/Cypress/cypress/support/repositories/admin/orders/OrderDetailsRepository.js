@@ -1,3 +1,7 @@
+import Shopware from "Services/shopware/Shopware";
+
+const shopware = new Shopware();
+
 export default class OrderDetailsRepository {
 
 
@@ -6,6 +10,9 @@ export default class OrderDetailsRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getDeliveryStatusTop() {
+        if(shopware.isVersionGreaterEqual('6.5')){
+            return cy.get('.sw-order-general-info__order-state-delivery .sw-block-field__block .sw-single-select__selection-text');
+        }
         return cy.get(':nth-child(2) > .sw-order-state-select > .sw-field > .sw-block-field__block > #sw-field--selectedActionName');
     }
 
@@ -94,6 +101,9 @@ export default class OrderDetailsRepository {
      * @param trackingCode
      */
     getTrackingCode(trackingCode) {
+        if (shopware.isVersionGreaterEqual('6.5')) {
+            return  cy.get('.sw-order-user-card__tracking-code-select input.sw-select-selection-list__input');
+        }
         return cy.get(':nth-child(6) > .sw-field > .sw-block-field__block > .sw-select__selection > .sw-select-selection-list > li > .sw-select-selection-list__input');
     }
 
@@ -113,4 +123,7 @@ export default class OrderDetailsRepository {
         return cy.get('.sw-order-detail__summary-data');
     }
 
+    getOrderDetailsTab() {
+        return cy.get('.sw-order-detail__tabs .sw-order-detail__tabs-tab-details')
+    }
 }
