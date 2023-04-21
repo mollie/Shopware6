@@ -36,6 +36,11 @@ const scenarioDummyBasket = new DummyBasketScenario(1);
 
 describe('SEPA Bank Transfer', () => {
 
+    before(() => {
+        configAction.setupShop(false, false, false);
+        configAction.updateProducts('', false, 0, '');
+    });
+
     testDevices.forEach(device => {
 
         context(devices.getDescription(device), () => {
@@ -43,8 +48,6 @@ describe('SEPA Bank Transfer', () => {
             beforeEach(() => {
                 devices.setDevice(device);
                 session.resetBrowserSession();
-                configAction.setupShop(false, false, false);
-                configAction.updateProducts('', false, 0, '');
             });
 
             it('C4129: Payment status "open" leads to successful order', () => {
