@@ -70,10 +70,12 @@ context("Order Shipping", () => {
             assertShippingStatus('Shipped', 2);
 
             repoOrderDetails.getMollieActionsButton().click({force: true});
+
             let disabledClassName = 'is--disabled'
-            if(shopware.isVersionGreaterEqual('6.5')){
+            if (shopware.isVersionGreaterEqual('6.5')) {
                 disabledClassName = 'sw-button--disabled';
             }
+
             repoOrderDetails.getMollieActionButtonShipThroughMollie().should('have.class', disabledClassName);
         })
 
@@ -101,7 +103,7 @@ context("Order Shipping", () => {
             repoOrderDetails.getMollieActionsButton().click({force: true});
 
             let disabledClassName = 'is--disabled'
-            if(shopware.isVersionGreaterEqual('6.5')){
+            if (shopware.isVersionGreaterEqual('6.5')) {
                 disabledClassName = 'sw-button--disabled';
             }
 
@@ -150,8 +152,9 @@ context("Order Shipping", () => {
             assertShippingStatus('Shipped', 4);
 
             repoOrderDetails.getMollieActionsButton().click({force: true});
+
             let disabledClassName = 'is--disabled'
-            if(shopware.isVersionGreaterEqual('6.5')){
+            if (shopware.isVersionGreaterEqual('6.5')) {
                 disabledClassName = 'sw-button--disabled';
             }
 
@@ -195,7 +198,8 @@ context("Order Shipping", () => {
 
         it('C152049: Shipment offers selection from multiple tracking codes', () => {
 
-            const TRACKING_CODE1 = 'code-1';            const TRACKING_CODE2 = 'code-2';
+            const TRACKING_CODE1 = 'code-1';
+            const TRACKING_CODE2 = 'code-2';
 
             createOrderAndOpenAdmin(2, 1);
 
@@ -255,8 +259,9 @@ function assertShippingStatus(statusLabel, shippedItemsCount) {
     cy.wait(2000);
 
     repoOrderDetails.getDeliveryStatusTop().should('contain.text', statusLabel, {timeout: 6000});
-    if(shopware.isVersionLowerEqual('6.5')){
-        /** since 6.5 you dont see the shipped items in summary **/
+
+    if (shopware.isVersionLower('6.5')) {
+        /** since 6.5 you don't see the shipped items in summary **/
         repoOrderDetails.getOrderSummarySection().should('contain.text', 'Shipped amount (' + shippedItemsCount + ' items)', {timeout: 6000});
     }
 }
