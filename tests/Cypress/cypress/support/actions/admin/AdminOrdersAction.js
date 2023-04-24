@@ -112,6 +112,8 @@ export default class AdminOrdersAction {
             repoOrdersDetails.getOrderDetailsTab().click();
         }
         repoOrdersDetails.getTrackingCode(trackingCode).type(trackingCode, forceOption);
+        repoOrdersDetails.getTrackingCodeAddButton().click();
+        cy.wait(1000);
         repoOrdersDetails.getSaveButton().click();
         if (shopware.isVersionGreaterEqual('6.5')) {
             cy.wait(1000);

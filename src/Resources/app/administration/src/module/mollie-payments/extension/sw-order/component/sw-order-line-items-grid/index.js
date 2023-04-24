@@ -140,13 +140,6 @@ Component.override('sw-order-line-items-grid', {
     created() {
         this.createdComponent();
     },
-    async updated(){
-        if (!this.isMollieOrder) {
-            return
-        }
-        await this.getShippingStatus();
-        this.$emit('shipping-possible', this.isShippingPossible)
-    },
     watch: {
         showShipOrderModal(showShipOrderModal) {
 
@@ -239,8 +232,10 @@ Component.override('sw-order-line-items-grid', {
                 .then(() => {
                     this.onCloseShipOrderModal();
                 })
-                .then(() => {
+                .then(async() => {
                     this.$emit('ship-item-success');
+                    await this.getShippingStatus();
+                    this.$emit('shipping-possible', this.isShippingPossible)
                 })
                 .catch((response) => {
                     this.createNotificationError({
@@ -323,7 +318,6 @@ Component.override('sw-order-line-items-grid', {
             if (itemShippingStatus === null || itemShippingStatus === undefined) {
                 return '~';
             }
-
             return itemShippingStatus.quantityShippable;
         },
 
