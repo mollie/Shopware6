@@ -107,6 +107,10 @@ export default class OrderDetailsRepository {
         return cy.get(':nth-child(6) > .sw-field > .sw-block-field__block > .sw-select__selection > .sw-select-selection-list > li > .sw-select-selection-list__input');
     }
 
+    getTrackingCodeAddButton() {
+        return cy.get('.sw-popover__wrapper .sw-multi-tag-select-valid')
+    }
+
     /**
      *
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
