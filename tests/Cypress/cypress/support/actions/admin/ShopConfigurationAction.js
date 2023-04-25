@@ -104,25 +104,36 @@ export default class ShopConfigurationAction {
                 return;
             }
 
-            const maxChunkSize = 80;
-            let data = [];
+            // lets wait a few seconds
+            // otherwise the call is already sent before we
+            // even reach our cy.wait for update products.
+            const waitStartMS = 3000;
+            setTimeout(() => {
 
-            for (const product of products) {
-                const row = {
-                    "id": product.id,
-                    "customFields": customFields,
-                };
-                data.push(row);
+                console.log('start');
 
-                if (data.length >= maxChunkSize) {
-                    this.apiClient.bulkUpdate('product', data);
-                    data = [];
+                const maxChunkSize = 80;
+                let data = [];
+
+                for (const product of products) {
+                    const row = {
+                        "id": product.id,
+                        "customFields": customFields,
+                    };
+                    data.push(row);
+
+                    if (data.length >= maxChunkSize) {
+                        this.apiClient.bulkUpdate('product', data);
+                        data = [];
+                    }
                 }
-            }
 
-            if (data.length >= 0) {
-                this.apiClient.bulkUpdate('product', data);
-            }
+                if (data.length >= 0) {
+                    this.apiClient.bulkUpdate('product', data);
+                }
+            }, waitStartMS);
+
+
         });
 
         cy.wait("@updateProducts", {requestTimeout: 100000});
