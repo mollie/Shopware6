@@ -35,7 +35,6 @@ class RefundHydrator
 
         $metaData = '';
 
-        /** @phpstan-ignore-next-line */
         if (property_exists($refund, 'metadata')) {
             $metaData = (string)$refund->metadata;
         }
