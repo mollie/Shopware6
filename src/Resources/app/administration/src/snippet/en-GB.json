@@ -403,6 +403,7 @@
   },
   "sw-order": {
     "detailExtended": {
+      "titleCreditCardData" : "Credit Card data",
       "buttonMolliePaymentLink": "Copy to Clipboard",
       "columnRefunded": "Refunded",
       "columnShipped": "Shipped",

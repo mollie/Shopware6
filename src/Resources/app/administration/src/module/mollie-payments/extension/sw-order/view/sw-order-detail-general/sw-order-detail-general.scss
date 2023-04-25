@@ -1,0 +1,31 @@
+.sw-order-detail-base__mollie-info {
+    .mollie-property-column-left {
+        float: left;
+    }
+
+    .mollie-property-column-right {
+        float: right;
+    }
+
+    .mollie-property-section {
+        margin-bottom: 20px;
+    }
+
+    .mollie-property-title {
+        font-weight: 600;
+        color: #52667a;
+        font-size: 14px;
+    }
+
+    .mollie-property-creditcard-section {
+        margin-top: 6px;
+    }
+
+    .mollie-property-content {
+        font-size: 14px;
+    }
+
+    .mollie-property-paymentlink-button {
+        margin-top: 10px;
+    }
+}

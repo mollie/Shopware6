@@ -84,7 +84,7 @@ export default class PaymentAction {
     fillCreditCardComponents(name, number, expiryDate, cvc) {
 
         // always make sure that the iFrame is loaded
-        cy.wait(1000);
+        cy.wait(1500);
 
         // that iframe seems to need a bit. had some missing characters recently
         // so we click in a textfield, wait and then type

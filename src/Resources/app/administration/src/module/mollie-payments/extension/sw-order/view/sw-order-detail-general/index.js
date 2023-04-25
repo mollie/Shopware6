@@ -1,4 +1,6 @@
 import template from './sw-order-detail-general.html.twig';
+import './sw-order-detail-general.scss';
+import OrderAttributes from "../../../../../../core/models/OrderAttributes";
 
 // eslint-disable-next-line no-undef
 const {Component, Mixin} = Shopware;
@@ -25,17 +27,105 @@ Component.override('sw-order-detail-general', {
 
             isRefundManagerPossible: false,
             isShippingPossible: false,
+            molliePaymentUrl: '',
+            molliePaymentUrlCopied: false,
         }
     },
 
     inject: [
         'MolliePaymentsRefundService',
         'MolliePaymentsShippingService',
+        'MolliePaymentsOrderService',
     ],
 
     computed: {
         isMollieOrder() {
             return (this.order.customFields !== null && 'mollie_payments' in this.order.customFields);
+        },
+
+        /**
+         *
+         * @returns {string|*}
+         */
+        creditCardLabel() {
+            return this._creditCardData().getLabel()
+        },
+
+        /**
+         *
+         * @returns {string|*}
+         */
+        creditCardNumber() {
+            return '**** **** **** ' + this._creditCardData().getNumber()
+        },
+
+        /**
+         *
+         * @returns {string|*}
+         */
+        creditCardHolder() {
+            return this._creditCardData().getHolder()
+        },
+
+        /**
+         *
+         * @returns {null|string|*}
+         */
+        mollieOrderId() {
+
+            const orderAttributes = new OrderAttributes(this.order);
+
+            if (orderAttributes.getOrderId() !== '') {
+                return orderAttributes.getOrderId();
+            }
+
+            if (orderAttributes.getPaymentId() !== '') {
+                return orderAttributes.getPaymentId();
+            }
+
+            return null;
+        },
+        mollieThirdPartyPaymentId() {
+            if (
+                !!this.order
+                && !!this.order.customFields
+                && !!this.order.customFields.mollie_payments
+                && !!this.order.customFields.mollie_payments.third_party_payment_id
+            ) {
+                return this.order.customFields.mollie_payments.third_party_payment_id;
+            }
+
+            return null;
+        },
+
+        /**
+         *
+         * @returns {null|*}
+         */
+        isSubscription() {
+            const orderAttributes = new OrderAttributes(this.order);
+            return (orderAttributes.getSwSubscriptionId() !== '');
+        },
+
+        /**
+         *
+         * @returns {string|*}
+         */
+        subscriptionId() {
+            const orderAttributes = new OrderAttributes(this.order);
+            return orderAttributes.getSwSubscriptionId();
+        },
+
+        /**
+         *
+         * @returns {boolean}
+         */
+        hasPaymentLink() {
+            return this.molliePaymentUrl !== '';
+        },
+
+        hasCreditCardData() {
+            return this._creditCardData().hasCreditCardData();
         },
     },
 
@@ -45,7 +135,41 @@ Component.override('sw-order-detail-general', {
         },
     },
 
+    created() {
+        this.createdComponent();
+    },
+
     methods: {
+
+        createdComponent() {
+            this.molliePaymentUrl = '';
+
+            if (this.mollieOrderId) {
+                this.MolliePaymentsOrderService.getPaymentUrl({orderId: this.order.id}).then(response => {
+                    this.molliePaymentUrl = (response.url !== null) ? response.url : '';
+                });
+            }
+        },
+
+        /**+
+         * @returns {CreditcardAttributes|*|null}
+         * @private
+         */
+        _creditCardData() {
+            const orderAttributes = new OrderAttributes(this.order);
+            return orderAttributes.getCreditCardAttributes();
+        },
+
+        copyPaymentUrlToClipboard() {
+            // eslint-disable-next-line no-undef
+            Shopware.Utils.dom.copyToClipboard(this.molliePaymentUrl);
+            this.molliePaymentUrlCopied = true;
+        },
+
+        onMolliePaymentUrlProcessFinished(value) {
+            this.molliePaymentUrlCopied = value;
+        },
+
         getMollieData() {
             if (!this.isMollieOrder) {
                 return
@@ -74,9 +198,8 @@ Component.override('sw-order-detail-general', {
                     this.shippedAmount = Math.round(response.amount * 100) / 100;
                     this.shippedQuantity = response.quantity;
                 });
-
-
         },
+
         onOpenRefundManager() {
             this.showRefundModal = true;
         },
@@ -84,15 +207,19 @@ Component.override('sw-order-detail-general', {
         onToggleRefundManagerModal(showRefundManagerModal) {
             this.showRefundModal = showRefundManagerModal;
         },
+
         onToggleShipOrderModal(shipOrderModal) {
             this.showShipOrderModal = shipOrderModal;
         },
+
         onOpenShipOrderModal() {
             this.showShipOrderModal = true;
         },
+
         onRefundManagerPossible(refundManagerPossible) {
             this.isRefundManagerPossible = refundManagerPossible;
         },
+
         onShippingPossible(shippingPossible) {
 
             this.isShippingPossible = shippingPossible;

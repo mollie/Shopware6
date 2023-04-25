@@ -1,40 +1,113 @@
-
 {% block sw_order_detail_general_info_card %}
     {% parent %}
-    <sw-card
-            class="sw-order-detail-base__mollie-info"
-            position-identifier="sw-order-detail-mollie-info"
-            :title="$tc('mollie-payments.pluginTitle')"
-    >
-        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
-        {% block sw_order_detail_general_mollie_info %}
-            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
-            {% block sw_order_detail_general_mollie_info_action_buttons %}
-                <sw-button-group>
-                    {% block sw_order_detail_general_mollie_info_action_buttons_order_shipping %}
-                        <sw-button
-                                class="sw-order-line-items-grid__actions-ship-button"
-                                :disabled="!isShippingPossible"
-                                variant="primary" size="small"
-                                @click="onOpenShipOrderModal"
-                        >{{ $tc('mollie-payments.general.shipThroughMollie') }}</sw-button>
-                    {% endblock %}
-                {% block sw_order_detail_general_mollie_info_action_buttons_refund_manager %}
-                    <sw-button
-                            class="sw-order-line-items-grid__actions-refund-btn"
-                            variant="primary" size="small"
-                            :disabled="!isRefundManagerPossible"
-                            @click="onOpenRefundManager"
-                    > {{ $tc('sw-order.detailExtended.refundManager.btnOpenRefundManager') }}</sw-button>
-                    {% endblock %}
-                </sw-button-group>
-            {% endblock %}
-        {% endblock %}
-    </sw-card>
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_order_detail_general_mollie_info %}
+        <sw-card v-if="isMollieOrder"
+                 class="sw-order-detail-base__mollie-info"
+                 position-identifier="sw-order-detail-mollie-info"
+                 :title="$tc('mollie-payments.pluginTitle')">
+
+            <div class="mollie-property-column-left">
+
+                {% block sw_order_detail_general_mollie_info_property_creditcard %}
+                    <div v-if="hasCreditCardData" class="mollie-property-section">
+                        <dt class="mollie-property-title">
+                            {{ $tc('sw-order.detailExtended.titleCreditCardData') }}
+                        </dt>
+                        <dd class="mollie-property-creditcard-section">
+                            <mollie-credit-card-logo :creditCardCompany="creditCardLabel">
+                                {{ creditCardLabel }}
+                            </mollie-credit-card-logo>
+                        </dd>
+                        <dd class="mollie-property-content">
+                            {{ creditCardNumber }}
+                        </dd>
+                        <dd class="mollie-property-content">
+                            {{ creditCardHolder }}
+                        </dd>
+                    </div>
+                {% endblock %}
+
+                {% block sw_order_detail_general_mollie_info_property_orderid %}
+                    <div class="mollie-property-section">
+                        <dt class="mollie-property-title">
+                            {{ $tc('sw-order.detailExtended.labelMollieOrderId') }}
+                        </dt>
+                        <dd class="mollie-property-content">
+                            {{ mollieOrderId }}
+                            <div v-if="isSubscription" style="margin-bottom:20px;">
+                                <sw-label class="mollie-order-user-card-subscription-badge"
+                                          variant="info" size="medium" appearance="pill" :ghost="true" :caps="true"
+                                          :dismissable="false">
+                                    <router-link :to="{ name: 'mollie.payments.subscription_detail', params: { id: subscriptionId } }">
+                                        {{ $tc('sw-order.detailExtended.subscriptionBadge') }}
+                                    </router-link>
+                                </sw-label>
+                            </div>
+                        </dd>
+                    </div>
+                {% endblock %}
+
+                {% block sw_order_detail_general_mollie_info_property_paymentref %}
+                    <div v-if="mollieThirdPartyPaymentId" class="mollie-property-section">
+                        <template>
+                            <dt class="mollie-property-title mollie-order-user-card-payment-reference-title">
+                                {{ $tc('sw-order.detailExtended.labelMollieThirdPartyPaymentId') }}
+                            </dt>
+                            <dd class="mollie-property-content">
+                                {{ mollieThirdPartyPaymentId }}
+                            </dd>
+                        </template>
+                    </div>
+                {% endblock %}
+
+                {% block sw_order_detail_general_mollie_info_property_paymentlink %}
+                    <div v-if="hasPaymentLink" class="mollie-property-section">
+                        <dt class="mollie-property-title">
+                            {{ $tc('sw-order.detailExtended.labelMolliePaymentLink') }}
+                        </dt>
+                        <dd>
+                            <sw-button-process size="x-small"
+                                               class="mollie-property-paymentlink-button"
+                                               :disabled="!molliePaymentUrl"
+                                               :processSuccess="molliePaymentUrlCopied"
+                                               @click="copyPaymentUrlToClipboard"
+                                               @process-finish="onMolliePaymentUrlProcessFinished">
+                                {{ $tc('sw-order.detailExtended.buttonMolliePaymentLink') }}
+                            </sw-button-process>
+                        </dd>
+                    </div>
+                {% endblock %}
+            </div>
+
+            <div class="mollie-property-column-right">
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_order_detail_general_mollie_info_action_buttons %}
+                    <sw-button-group split-button>
+                        {% block sw_order_detail_general_mollie_info_action_buttons_order_shipping %}
+                            <sw-button class="sw-order-line-items-grid__actions-ship-button"
+                                       :disabled="!isShippingPossible"
+                                       variant="ghost" size="small"
+                                       @click="onOpenShipOrderModal">
+                                {{ $tc('mollie-payments.general.shipThroughMollie') }}</sw-button>
+                        {% endblock %}
+                        {% block sw_order_detail_general_mollie_info_action_buttons_refund_manager %}
+                            <sw-button class="sw-order-line-items-grid__actions-refund-btn"
+                                       variant="ghost" size="small"
+                                       :disabled="!isRefundManagerPossible"
+                                       @click="onOpenRefundManager">
+                                {{ $tc('sw-order.detailExtended.refundManager.btnOpenRefundManager') }}</sw-button>
+                        {% endblock %}
+                    </sw-button-group>
+                {% endblock %}
+            </div>
+        </sw-card>
+    {% endblock %}
+
 {% endblock %}
 
 {% block sw_order_detail_general_line_items_grid %}
-
     <sw-order-line-items-grid :order="order"
                               :context="versionContext"
                               ref="sw-order-line-item-grid"
@@ -59,9 +132,6 @@
                               @toggle-refund-manager-modal="onToggleRefundManagerModal"
                               @toggle-ship-order-modal="onToggleShipOrderModal"
     >
-
-
-
     </sw-order-line-items-grid>
 {% endblock %}
 

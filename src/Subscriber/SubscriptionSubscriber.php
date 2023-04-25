@@ -3,7 +3,6 @@
 namespace Kiener\MolliePayments\Subscriber;
 
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\IntervalType;
-use Kiener\MolliePayments\Service\CartService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Storefront\Struct\SubscriptionCartExtensionStruct;
 use Kiener\MolliePayments\Storefront\Struct\SubscriptionDataExtensionStruct;
@@ -32,10 +31,10 @@ class SubscriptionSubscriber implements EventSubscriberInterface
      */
     private $translator;
 
+
     /**
      * @param SettingsService $settingsService
      * @param TranslatorInterface $translator
-     * @param CartService $cartService
      */
     public function __construct(SettingsService $settingsService, TranslatorInterface $translator)
     {

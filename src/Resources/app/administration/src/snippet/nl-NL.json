@@ -403,6 +403,7 @@
   },
   "sw-order": {
     "detailExtended": {
+      "titleCreditCardData" : "Credit Card data",
       "buttonMolliePaymentLink": "Kopieer naar Klembord",
       "columnRefunded": "Terugbetaald",
       "columnShipped": "Verzonden",
