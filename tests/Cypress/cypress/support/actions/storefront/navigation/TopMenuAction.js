@@ -26,7 +26,6 @@ export default class TopMenuAction {
         cy.wait(500);
 
         cy.get('.header-account-menu > .card > .list-group > [href="/account/order"]').click();
-
     }
 
     /**
@@ -36,7 +35,7 @@ export default class TopMenuAction {
         cy.get('#accountWidget').click();
         cy.wait(500);
 
-        cy.get('.header-account-menu > .card > [href="/account/mollie/subscriptions"]').click();
+        cy.get('[href="/account/mollie/subscriptions"]').click();
     }
 
 
