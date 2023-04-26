@@ -58,6 +58,9 @@ context("Order Shipping", () => {
 
             adminOrders.openShipThroughMollie();
 
+            // make sure our modal is visible
+            cy.contains('.sw-modal__header', 'Ship through Mollie');
+
             // verify we have 2x 1 item
             // we use contain because linebreaks \n exist.
             // but we don't add 11 items...so that should be fine
