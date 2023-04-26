@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace MolliePayments\Tests\Controller\Storefront\CreditCard;
 
-use Kiener\MolliePayments\Controller\Storefront\CreditCard\CreditCardController;
+use Kiener\MolliePayments\Controller\Storefront\CreditCard\CreditCardControllerBase;
 use MolliePayments\Tests\Fakes\FakeCustomerService;
 use MolliePayments\Tests\Fakes\FakeMandateService;
 use PHPUnit\Framework\TestCase;
@@ -19,7 +19,7 @@ final class CreditCardControllerTest extends TestCase
         $customerService = new FakeCustomerService();
         $salesChannelContext = $this->createMock(SalesChannelContext::class);
         $mandateService = new FakeMandateService();
-        $controller = new CreditCardController($customerService, $mandateService, new NullLogger());
+        $controller = new CreditCardControllerBase($customerService, $mandateService, new NullLogger());
 
         $actualResponse = $controller->storeCardToken($salesChannelContext,'test','test', new Request());
         $expected = new JsonResponse([
@@ -40,7 +40,7 @@ final class CreditCardControllerTest extends TestCase
 
         $salesChannelContext = $this->createMock(SalesChannelContext::class);
         $mandateService = new FakeMandateService();
-        $controller = new CreditCardController($customerService, $mandateService, new NullLogger());
+        $controller = new CreditCardControllerBase($customerService, $mandateService, new NullLogger());
 
         $actualResponse = $controller->storeCardToken($salesChannelContext,'test','test', new Request());
         $expected = new JsonResponse([
@@ -58,7 +58,7 @@ final class CreditCardControllerTest extends TestCase
 
         $salesChannelContext = $this->createMock(SalesChannelContext::class);
         $mandateService = new FakeMandateService();
-        $controller = new CreditCardController($customerService, $mandateService, new NullLogger());
+        $controller = new CreditCardControllerBase($customerService, $mandateService, new NullLogger());
 
         $actualResponse = $controller->storeCardToken($salesChannelContext,'test','test', new Request());
         $expected = new JsonResponse([
@@ -75,7 +75,7 @@ final class CreditCardControllerTest extends TestCase
         $customerService = new FakeCustomerService();
         $salesChannelContext = $this->createMock(SalesChannelContext::class);
         $mandateService = new FakeMandateService();
-        $controller = new CreditCardController($customerService, $mandateService, new NullLogger());
+        $controller = new CreditCardControllerBase($customerService, $mandateService, new NullLogger());
 
         $actualResponse = $controller->storeMandateId('test','test', $salesChannelContext);
         $expected = new JsonResponse([
@@ -95,7 +95,7 @@ final class CreditCardControllerTest extends TestCase
 
         $salesChannelContext = $this->createMock(SalesChannelContext::class);
         $mandateService = new FakeMandateService();
-        $controller = new CreditCardController($customerService, $mandateService, new NullLogger());
+        $controller = new CreditCardControllerBase($customerService, $mandateService, new NullLogger());
 
         $actualResponse = $controller->storeMandateId('test','test', $salesChannelContext);
         $expected = new JsonResponse([
@@ -113,7 +113,7 @@ final class CreditCardControllerTest extends TestCase
 
         $salesChannelContext = $this->createMock(SalesChannelContext::class);
         $mandateService = new FakeMandateService();
-        $controller = new CreditCardController($customerService, $mandateService, new NullLogger());
+        $controller = new CreditCardControllerBase($customerService, $mandateService, new NullLogger());
 
         $actualResponse = $controller->storeMandateId('test','test', $salesChannelContext);
         $expected = new JsonResponse([
@@ -130,7 +130,7 @@ final class CreditCardControllerTest extends TestCase
         $customerService = new FakeCustomerService();
         $salesChannelContext = $this->createMock(SalesChannelContext::class);
         $mandateService = new FakeMandateService();
-        $controller = new CreditCardController($customerService, $mandateService, new NullLogger());
+        $controller = new CreditCardControllerBase($customerService, $mandateService, new NullLogger());
 
         $actualResponse = $controller->revokeMandate('test','test', $salesChannelContext);
         $expected = new JsonResponse([
@@ -153,7 +153,7 @@ final class CreditCardControllerTest extends TestCase
 
         $salesChannelContext = $this->createMock(SalesChannelContext::class);
         $mandateService = new FakeMandateService(true);
-        $controller = new CreditCardController($customerService, $mandateService, new NullLogger());
+        $controller = new CreditCardControllerBase($customerService, $mandateService, new NullLogger());
 
         $actualResponse = $controller->revokeMandate('test','test', $salesChannelContext);
         $expected = new JsonResponse([
@@ -172,7 +172,7 @@ final class CreditCardControllerTest extends TestCase
 
         $salesChannelContext = $this->createMock(SalesChannelContext::class);
         $mandateService = new FakeMandateService();
-        $controller = new CreditCardController($customerService, $mandateService, new NullLogger());
+        $controller = new CreditCardControllerBase($customerService, $mandateService, new NullLogger());
 
         $actualResponse = $controller->revokeMandate('test','test', $salesChannelContext);
         $expected = new JsonResponse([

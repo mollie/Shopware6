@@ -18,8 +18,8 @@ export default class ShipThroughMollieAction {
      */
     shipOrder() {
 
-        cy.wait(1000);
-        
+        cy.wait(2000);
+
         repoShippingFull.getShippingButton().click(forceOption);
 
         // here are automatic reloads and things as it seems

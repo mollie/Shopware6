@@ -6,7 +6,6 @@
 
     <imports>
         <import resource="services/api.xml"/>
-        <import resource="services/controller.xml"/>
         <import resource="services/components.xml"/>
         <import resource="services/commands.xml"/>
         <import resource="services/facades.xml"/>
@@ -18,10 +17,8 @@
         <import resource="services/subscriber.xml"/>
         <import resource="services/validators.xml"/>
         <import resource="services/builder.xml"/>
-        <import resource="services/controller.xml"/>
         <import resource="services/handlers.xml"/>
         <import resource="services/scheduled_tasks.xml"/>
-
         <import resource="services/subscription/services.xml"/>
         <import resource="services/refundmanager/services.xml"/>
     </imports>
@@ -147,15 +144,6 @@
             <argument type="service" id="mollie_payments.logger"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Controller\Storefront\Webhook\WebhookController" public="true">
-            <argument type="service" id="Kiener\MolliePayments\Controller\Storefront\Webhook\NotificationFacade"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
-            <argument type="service" id="Kiener\MolliePayments\Repository\Order\OrderRepository"/>
-            <argument type="service" id="mollie_payments.logger"/>
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-        </service>
 
         <!-- Subscribers -->
         <service id="Kiener\MolliePayments\Subscriber\CheckoutConfirmPageSubscriber" class="Kiener\MolliePayments\Subscriber\CheckoutConfirmPageSubscriber">

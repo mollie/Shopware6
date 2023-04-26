@@ -16,7 +16,11 @@ use Shopware\Core\Framework\Plugin\Context\DeactivateContext;
 use Shopware\Core\Framework\Plugin\Context\InstallContext;
 use Shopware\Core\Framework\Plugin\Context\UninstallContext;
 use Shopware\Core\Framework\Plugin\Context\UpdateContext;
+use Shopware\Core\Kernel;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
 class MolliePayments extends Plugin
 {
@@ -46,6 +50,34 @@ class MolliePayments extends Plugin
     public function boot(): void
     {
         parent::boot();
+    }
+
+    /**
+     * @param RoutingConfigurator $routes
+     * @param string $environment
+     * @return void
+     */
+    public function configureRoutes(RoutingConfigurator $routes, string $environment): void
+    {
+        if (!$this->isActive()) {
+            return;
+        }
+
+        /** @var Container $container */
+        $container = $this->container;
+
+        $loader = new DependencyLoader($container);
+
+        $routeDir = $loader->getRoutesPath($this->getPath());
+
+        $fileSystem = new Filesystem();
+
+        if ($fileSystem->exists($routeDir)) {
+            $routes->import($routeDir . '/{routes}/*' . Kernel::CONFIG_EXTS, 'glob');
+            $routes->import($routeDir . '/{routes}/' . $environment . '/**/*' . Kernel::CONFIG_EXTS, 'glob');
+            $routes->import($routeDir . '/{routes}' . Kernel::CONFIG_EXTS, 'glob');
+            $routes->import($routeDir . '/{routes}_' . $environment . Kernel::CONFIG_EXTS, 'glob');
+        }
     }
 
     /**
