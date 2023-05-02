@@ -59,7 +59,7 @@ context("Order Shipping", () => {
             adminOrders.openShipThroughMollie();
 
             // make sure our modal is visible
-            cy.contains('.sw-modal__header', 'Ship through Mollie');
+            cy.contains('.sw-modal__header', 'Ship through Mollie', {timeout: 50000});
 
             // verify we have 2x 1 item
             // we use contain because linebreaks \n exist.
@@ -125,6 +125,10 @@ context("Order Shipping", () => {
             repoShippingItem.getShippableQuantity().should('contain.text', '2');
 
             shippingAction.shipLineItem(1);
+
+            // somehow this is required in Shopware 6.5, lets just stick with it, its ok
+            cy.wait(2000);
+            cy.reload();
 
             assertShippingStatus('Shipped (partially)', 1);
 

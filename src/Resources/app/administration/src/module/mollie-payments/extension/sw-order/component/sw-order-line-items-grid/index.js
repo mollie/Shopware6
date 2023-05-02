@@ -24,9 +24,6 @@ Component.override('sw-order-line-items-grid', {
             type: Number,
             default: 6.4,
         },
-        showShipOrderModal: false,
-        showRefundModal: false,
-        showTrackingInfo: false,
     },
 
     /**
@@ -38,20 +35,20 @@ Component.override('sw-order-line-items-grid', {
             isLoading: false,
             // ---------------------------------
             configShowRefundManager: true,
-
+            showRefundModal: false,
             // ---------------------------------
             isShipOrderLoading: false,
             isShipItemLoading: false,
             shipQuantity: 0,
-
             showShipItemModal: null,
-
             shippingStatus: null,
             tracking: {
                 carrier: '',
                 code: '',
                 url: '',
             },
+            showShipOrderModal: false,
+            showTrackingInfo: false,
         };
     },
 
@@ -204,12 +201,10 @@ Component.override('sw-order-line-items-grid', {
 
         onOpenShipOrderModal() {
             this.showShipOrderModal = true;
-            this.$emit('toggle-ship-order-modal', this.showShipOrderModal);
         },
 
         onCloseShipOrderModal() {
             this.showShipOrderModal = false;
-            this.$emit('toggle-ship-order-modal', this.showShipOrderModal);
         },
 
         onConfirmShipOrder() {
@@ -232,7 +227,7 @@ Component.override('sw-order-line-items-grid', {
                 .then(() => {
                     this.onCloseShipOrderModal();
                 })
-                .then(async() => {
+                .then(async () => {
                     this.$emit('ship-item-success');
                     await this.getShippingStatus();
                     this.$emit('shipping-possible', this.isShippingPossible)

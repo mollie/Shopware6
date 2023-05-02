@@ -11,10 +11,7 @@ Component.override('sw-order-detail-general', {
     mixins: [
         Mixin.getByName('notification'),
     ],
-    props: {
-        showRefundModal: false,
-        showShipOrderModal: false,
-    },
+
     data() {
         return {
             remainingAmount: 0.0,
@@ -201,19 +198,11 @@ Component.override('sw-order-detail-general', {
         },
 
         onOpenRefundManager() {
-            this.showRefundModal = true;
-        },
-
-        onToggleRefundManagerModal(showRefundManagerModal) {
-            this.showRefundModal = showRefundManagerModal;
-        },
-
-        onToggleShipOrderModal(shipOrderModal) {
-            this.showShipOrderModal = shipOrderModal;
+            this.$refs.swOrderLineItemsGrid.onOpenRefundManager();
         },
 
         onOpenShipOrderModal() {
-            this.showShipOrderModal = true;
+            this.$refs.swOrderLineItemsGrid.onOpenShipOrderModal();
         },
 
         onRefundManagerPossible(refundManagerPossible) {

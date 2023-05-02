@@ -110,14 +110,12 @@
 {% block sw_order_detail_general_line_items_grid %}
     <sw-order-line-items-grid :order="order"
                               :context="versionContext"
-                              ref="sw-order-line-item-grid"
+                              ref="swOrderLineItemsGrid"
                               :remainingAmount="remainingAmount"
                               :refundedAmount="refundedAmount"
                               :voucherAmount="voucherAmount"
                               :refunds="refunds"
                               :shopwareVersion="6.5"
-                              :showRefundModal="showRefundModal"
-                              :showShipOrderModal="showShipOrderModal"
                               @refund-success="onSaveEdits"
                               @refund-cancelled="onSaveEdits"
                               @ship-order-success="onSaveEdits"
@@ -129,8 +127,6 @@
                               @item-cancel="recalculateAndReload"
                               @refund-manager-possible="onRefundManagerPossible"
                               @shipping-possible="onShippingPossible"
-                              @toggle-refund-manager-modal="onToggleRefundManagerModal"
-                              @toggle-ship-order-modal="onToggleShipOrderModal"
     >
     </sw-order-line-items-grid>
 {% endblock %}
