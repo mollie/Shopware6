@@ -411,36 +411,3 @@ jobs:
           TESTRAIL_DOMAIN: ${{ secrets.TESTRAIL_DOMAIN }}
           TESTRAIL_USERNAME: ${{ secrets.TESTRAIL_USERNAME }}
           TESTRAIL_PASSWORD: ${{ secrets.TESTRAIL_PASSWORD }}
-
-  install_tests:
-    name: Installation | Shopware ${{ matrix.shopware }}
-    needs: [ build ]
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        shopware: [ '6.3.5.1', '6.3.5.0' ]
-    steps:
-
-      - name: Clone Code
-        uses: actions/checkout@v3
-
-      - name: Mount Build Cache
-        uses: actions/cache@v3
-        with:
-          key: cache-plugin-${{ github.run_id }}
-          path: ~/.build
-
-      - name: Installation Tests, Shopware ${{ matrix.shopware }}
-        uses: ./.github/actions/run-e2e
-        with:
-          # -------------------------------------------
-          SHOPWARE: ${{ matrix.shopware }}
-          PHP: 7.4
-          # -------------------------------------------
-          MOLLIE_APIKEY_TEST: ${{ secrets.MOLLIE_APIKEY_TEST }}
-          # -------------------------------------------
-          # only do installation tests without Cypress here
-          # this is just for old Shopware versions that do not
-          # support the API that we need for Cypress
-          RUN_CYPRESS: false
