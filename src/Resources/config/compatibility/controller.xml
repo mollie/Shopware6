@@ -56,7 +56,7 @@
             </call>
         </service>
 
-        <service id="Kiener\MolliePayments\Controller\Api\SupportController" public="true">
+        <service id="Kiener\MolliePayments\Controller\Api\Support\Sw6\SupportController" public="true">
             <argument type="service" id="Kiener\MolliePayments\Facade\MollieSupportFacade"/>
             <argument type="service" id="mollie_payments.logger"/>
 
@@ -103,9 +103,6 @@
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
-            </call>
-            <call method="setTwig">
-                <argument type="service" id="twig"/>
             </call>
         </service>
 
