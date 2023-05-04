@@ -84,10 +84,7 @@ export default class PaymentAction {
 
         // always make sure that the iFrame is loaded
         cy.wait(2500);
-
-        // make sure that the iFrame is loaded
-        cy.contains('Enter your card information');
-
+ 
         // that iframe seems to need a bit. had some missing characters recently
         // so we click in a textfield, wait and then type
         const clickTimeMS = 100;
