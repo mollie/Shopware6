@@ -296,6 +296,8 @@ describe('Administration Tests', () => {
 
         mollieSandbox.initSandboxCookie();
 
+        cy.wait(1000);
+
         mollieCreditCardForm.enterValidCard();
         mollieCreditCardForm.submitForm();
 
