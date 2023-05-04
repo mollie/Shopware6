@@ -308,7 +308,7 @@ describe('Administration Tests', () => {
         // our Mollie Sandbox data needs to be visible on our page
         // that's the only thing we can verify for now, but speaking of the data
         // the assertion should be very accurate and unique on our page.
-        cy.contains('Credit Card Data');
+        cy.contains('Credit Card data');
         cy.contains('Mastercard');
         cy.contains('**** **** **** 0005');
         cy.contains('T. TEST');
