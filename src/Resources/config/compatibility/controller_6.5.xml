@@ -84,7 +84,7 @@
         <!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
         <!-- Storefront Controller -->
 
-        <service id="Kiener\MolliePayments\Controller\Storefront\Payment\Sw6\ReturnController" public="true">
+        <service id="Kiener\MolliePayments\Controller\Storefront\Payment\Sw65\ReturnController" public="true">
             <argument type="service" id="Kiener\MolliePayments\Facade\Controller\PaymentReturnFacade"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
