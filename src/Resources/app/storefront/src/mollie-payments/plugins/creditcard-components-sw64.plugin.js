@@ -1,6 +1,5 @@
 import deepmerge from 'deepmerge';
 import MollieCreditCardMandate from '../core/creditcard-mandate.plugin';
-import DomAccess from 'src/helper/dom-access.helper';
 import DeviceDetection from 'src/helper/device-detection.helper';
 import CsrfAjaxMode from '../services/CsrfAjaxMode';
 import ConfirmPageRepository from '../services/ConfirmPageRepository';
@@ -26,11 +25,11 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
         super.init();
 
         try {
-            this._paymentForm = DomAccess.querySelector(document, this.getSelectors().paymentForm);
-            this._confirmForm = DomAccess.querySelector(document, this.getSelectors().confirmForm);
 
             const repoConfirmPage = new ConfirmPageRepository(document);
 
+            this._paymentForm = repoConfirmPage.getPaymentForm();
+            this._confirmForm = repoConfirmPage.getConfirmForm();
             this._confirmFormButton = repoConfirmPage.getSubmitButton();
 
         } catch (e) {
@@ -78,7 +77,8 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
     _reactivateFormSubmit() {
         this._confirmFormButton.disabled = false;
 
-        const loader = DomAccess.querySelector(this._confirmFormButton, '.loader', false);
+        // TODO check this
+        const loader = document.querySelector(this._confirmFormButton).querySelector('.loader');
 
         if (loader) {
             loader.remove();

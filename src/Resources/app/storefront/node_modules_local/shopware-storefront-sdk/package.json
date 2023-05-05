@@ -1,0 +1,25 @@
+{
+  "name": "shopware-storefront-sdk",
+  "version": "0.0.2",
+  "description": "Provides Shopware Storefront Utilities as Typescript",
+  "main": "sdk.js",
+  "types": "sdk.d.ts",
+  "scripts": {
+    "publish-to-npm": "rm -rf dist; tsc --build && cp package.json dist && cat ./package.json | grep -v '\\\"private\\\":' > dist/package.json; cp README.md dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FriendsOfShopware/shopware-storefront-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/FriendsOfShopware/shopware-storefront-sdk/issues"
+  },
+  "author": "FriendsOfShopware",
+  "license": "MIT",
+  "dependencies": {
+    "deepmerge": "^4.2.2"
+  },
+  "devDependencies": {
+    "typescript": "^4.7.4"
+  }
+}

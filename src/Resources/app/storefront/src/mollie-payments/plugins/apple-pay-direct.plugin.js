@@ -1,5 +1,4 @@
-import Plugin from 'src/plugin-system/plugin.class';
-import DomAccess from 'src/helper/dom-access.helper';
+import Plugin from '@shopware-storefront-sdk/plugin-system/plugin.class';
 import HttpClient from '../services/HttpClient';
 
 export default class MollieApplePayDirect extends Plugin {
@@ -356,7 +355,7 @@ export default class MollieApplePayDirect extends Plugin {
     getShopUrl(button) {
         // get sales channel base URL
         // so that our shop slug is correctly
-        let shopSlug = DomAccess.getDataAttribute(button, 'data-shop-url');
+        let shopSlug = button.getAttribute('data-shop-url');
 
         // remove trailing slash if existing
         if (shopSlug.substr(-1) === '/') {

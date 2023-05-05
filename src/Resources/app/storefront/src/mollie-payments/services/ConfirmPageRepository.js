@@ -10,6 +10,22 @@ export default class ConfirmPageRepository {
 
     /**
      *
+     * @returns {*}
+     */
+    getPaymentForm() {
+        return this._document.querySelector('#changePaymentForm');
+    }
+
+    /**
+     *
+     * @returns {*}
+     */
+    getConfirmForm() {
+        return this._document.querySelector('#confirmOrderForm');
+    }
+
+    /**
+     *
      * @returns {Element}
      */
     getSubmitButton() {

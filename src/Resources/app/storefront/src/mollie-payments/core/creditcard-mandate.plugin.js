@@ -1,5 +1,4 @@
-import Plugin from 'src/plugin-system/plugin.class';
-import DomAccess from 'src/helper/dom-access.helper';
+import Plugin from '@shopware-storefront-sdk/plugin-system/plugin.class';
 import HttpClient from '../services/HttpClient';
 
 /**
@@ -33,8 +32,8 @@ export default class MollieCreditCardMandate extends Plugin {
             return;
         }
 
-        this.mollieCreditCarfFormEl = DomAccess.querySelector(document, mollieCreditCardFormClass, false);
-        this.mollieCreditCardMandateEls = DomAccess.querySelectorAll(document, mollieCreditCardMandateInput, false);
+        this.mollieCreditCarfFormEl = document.querySelector('.mollie-components-credit-card');
+        this.mollieCreditCardMandateEls = document.querySelector('input[name="mollieCreditCardMandate"]');
 
         if (!this.mollieCreditCarfFormEl || !this.mollieCreditCardMandateEls) {
             return
@@ -68,9 +67,9 @@ export default class MollieCreditCardMandate extends Plugin {
      * Get value of `mollieCreditCardMandate` checked radio input
      */
     getMandateCheckedValue() {
-        const { mollieCreditCardMandateInput } = this.options;
+        const {mollieCreditCardMandateInput} = this.options;
 
-        const mandateInput = DomAccess.querySelector(document, `${ mollieCreditCardMandateInput }:checked`, false);
+        const mandateInput = document.querySelector(`${mollieCreditCardMandateInput}:checked`);
         if (!mandateInput || !mandateInput.value) {
             return null;
         }
@@ -86,9 +85,9 @@ export default class MollieCreditCardMandate extends Plugin {
      * Get value of `mollieShouldSaveCardDetail` checkbox input
      */
     shouldSaveCardDetail() {
-        const { mollieShouldSaveCardDetailInput } = this.options;
+        const {mollieShouldSaveCardDetailInput} = this.options;
 
-        const shouldSaveCardDetail = DomAccess.querySelector(document, mollieShouldSaveCardDetailInput, false);
+        const shouldSaveCardDetail = document.querySelector('input[name="mollieShouldSaveCardDetail"]');
         if (!shouldSaveCardDetail) {
             return false;
         }
@@ -97,7 +96,7 @@ export default class MollieCreditCardMandate extends Plugin {
     }
 
     onMandateInputChange(mandateValue) {
-        const { newCardMandateOption } = this.options
+        const {newCardMandateOption} = this.options
         if (mandateValue === newCardMandateOption) {
             this.mollieCreditCarfFormEl.classList.remove('d-none');
             return;
