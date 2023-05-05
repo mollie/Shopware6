@@ -14,38 +14,26 @@ runs:
       shell: bash
       run: |
         curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt install shopware-cli
-    
-    - name: Start Docker
-      shell: bash
-      run: |
-        docker run --rm --name shop -d dockware/dev:${{ inputs.shopware }}
-        sleep 20
-        docker logs shop
-
-    - name: Update Shopware Config
-      shell: bash
-      run: |
-        docker exec shop bash -c 'sed -i "s/APP_ENV=dev/APP_ENV=prod/g" /var/www/html/.env' || true;
 
     - name: Upload into Docker
       shell: bash
       run: |
-        docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
-        docker exec shop bash -c 'sudo chown www-data:www-data /var/www/html/custom/plugins -R'
+        mkdir -p $(pwd)/../html/custom/plugins/MolliePayments
+        mv -v $(pwd)/* $(pwd)/../html/custom/plugins/MolliePayments
 
     # --------------------------------------------------------------------------------------------------------------------------------------
 
     - name: Build Plugin
       shell: bash
       run: |
-        docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make release'
+        cd $(pwd)/../html/custom/plugins/MolliePayments && make release
 
     # --------------------------------------------------------------------------------------------------------------------------------------
 
-    - name: Download ZIP File
+    - name: Copy ZIP File
       shell: bash
       run: |
-        docker cp shop:/var/www/html/custom/plugins/.build/MolliePayments.zip ~/.build/MolliePayments.zip
+        cp $(pwd)/../html/custom/plugins/.build/MolliePayments.zip ~/.build/MolliePayments.zip
 
     - name: Store ZIP file in Github
       uses: actions/upload-artifact@v2
