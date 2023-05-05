@@ -24,8 +24,6 @@ export default class MollieCreditCardMandate extends Plugin {
     registerMandateEvents() {
         const {
             newCardMandateOption,
-            mollieCreditCardFormClass,
-            mollieCreditCardMandateInput,
         } = this.options;
 
         if (!newCardMandateOption) {
@@ -85,8 +83,6 @@ export default class MollieCreditCardMandate extends Plugin {
      * Get value of `mollieShouldSaveCardDetail` checkbox input
      */
     shouldSaveCardDetail() {
-        const {mollieShouldSaveCardDetailInput} = this.options;
-
         const shouldSaveCardDetail = document.querySelector('input[name="mollieShouldSaveCardDetail"]');
         if (!shouldSaveCardDetail) {
             return false;

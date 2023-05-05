@@ -21,8 +21,6 @@ export default class MollieCreditCardMandateManage extends Plugin {
         const {
             shopUrl,
             customerId,
-            mollieMandateDeleteAlertSuccessId,
-            mollieMandateDeleteAlertErrorId,
         } = this.options;
         if (!shopUrl) {
             throw new Error(`The "shopUrl" option for the plugin "${this._pluginName}" is not defined.`);
@@ -47,10 +45,6 @@ export default class MollieCreditCardMandateManage extends Plugin {
     }
 
     registerEvents() {
-        const {
-            mollieMandateRemoveButtonClass,
-            mollieMandateRemoveModalButtonClass,
-        } = this.options;
 
         const removeButtons = document.querySelector('.mollie-credit-card-mandate-remove');
         if (!removeButtons || removeButtons.length === 0) {
