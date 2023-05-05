@@ -10,6 +10,11 @@ runs:
   using: "composite"
   steps:
 
+    - name: Install Shopware CLI
+      shell: bash
+      run: |
+        curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt install shopware-cli
+    
     - name: Start Docker
       shell: bash
       run: |
@@ -29,12 +34,6 @@ runs:
         docker exec shop bash -c 'sudo chown www-data:www-data /var/www/html/custom/plugins -R'
 
     # --------------------------------------------------------------------------------------------------------------------------------------
-
-    - name: Install Shopware CLI
-      shell: bash
-      run: |
-        https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt install shopware-cli
-        docker exec shop bash -c 'curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt install shopware-cli'
 
     - name: Build Plugin
       shell: bash
