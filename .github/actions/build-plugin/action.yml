@@ -30,6 +30,11 @@ runs:
 
     # --------------------------------------------------------------------------------------------------------------------------------------
 
+    - name: Install Shopware CLI
+      shell: bash
+      run: |
+        docker exec shop bash -c 'curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt install shopware-cli'
+
     - name: Build Plugin
       shell: bash
       run: |
@@ -40,7 +45,7 @@ runs:
     - name: Download ZIP File
       shell: bash
       run: |
-        docker cp shop:/var/www/html/custom/plugins/.build/MolliePayments.zip ~/.build/MolliePayments.zip
+        docker cp shop:/var/www/html/MolliePayments.zip ~/.build/MolliePayments.zip
 
     - name: Store ZIP file in Github
       uses: actions/upload-artifact@v2

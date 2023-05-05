@@ -41,7 +41,6 @@ fixtures: ## Installs all available testing fixtures of the Mollie plugin
 	cd /var/www/html && php bin/console fixture:load:group mollie
 
 build-cli: ## Installs the plugin, and builds the artifacts using the Shopware CLI build command
-	go install github.com/FriendsOfShopware/shopware-cli@latest
 	cd ../../.. && shopware-cli extension build custom/plugins/MolliePayments
 
 build: ## Installs the plugin, and builds the artifacts using the Shopware build commands (requires Shopware)
