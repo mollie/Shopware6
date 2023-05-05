@@ -26,6 +26,7 @@ runs:
     - name: Build Plugin
       shell: bash
       run: |
+        export NODE_OPTIONS=--openssl-legacy-provider
         cd $(pwd)/../html/custom/plugins/MolliePayments && make release
 
     # --------------------------------------------------------------------------------------------------------------------------------------
