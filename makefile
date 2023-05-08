@@ -35,13 +35,11 @@ clean: ## Cleans all dependencies
 	rm -rf .reports | true
 	rm -rf ./src/Resources/app/administration/node_modules/*
 	rm -rf ./src/Resources/app/storefront/node_modules/*
+	rm -rf ./src/Resources/app/storefront/dist/storefront/js
 
 fixtures: ## Installs all available testing fixtures of the Mollie plugin
 	cd /var/www/html && php bin/console cache:clear
 	cd /var/www/html && php bin/console fixture:load:group mollie
-
-build-cli: ## Installs the plugin, and builds the artifacts using the Shopware CLI build command
-	cd ../../.. && shopware-cli extension build custom/plugins/MolliePayments
 
 build: ## Installs the plugin, and builds the artifacts using the Shopware build commands (requires Shopware)
 	cd /var/www/html && php bin/console plugin:refresh
@@ -123,6 +121,8 @@ pr: ## Prepares everything for a Pull Request
 	@make configcheck -B
 	@make snippetcheck -B
 
+# -------------------------------------------------------------------------------------------------
+
 release: ## Builds a PROD version and creates a ZIP file in plugins/.build
 	php switch-composer.php dev
 	composer update shopware/core
@@ -131,7 +131,7 @@ release: ## Builds a PROD version and creates a ZIP file in plugins/.build
 	make clean -B
 	make install -B
 	php switch-composer.php prod
-	make build-cli -B
+	cd ../../.. && shopware-cli extension build custom/plugins/MolliePayments
 	cd .. && rm -rf ./.build/MolliePayments* && mkdir -p ./.build
 	cd .. && zip -qq -r -0 ./.build/MolliePayments.zip MolliePayments/ -x '*.editorconfig' '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*' '*/makefile' '*.DS_Store' '*/switch-composer.php' '*/phpunit.xml' '*/.phpunuhi.xml' '*/.infection.json' '*/phpunit.autoload.php' '*/.phpstan*' '*/.php_cs.php' '*/phpinsights.php'
 	php switch-composer.php dev
