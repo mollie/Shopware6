@@ -31,6 +31,7 @@ module.exports = defineConfig({
         },
     ], 
     e2e: {
+        defaultCommandTimeout: 10000,
         experimentalSessionAndOrigin: true,
         testIsolation: "strict",
         experimentalWebKitSupport: true,
