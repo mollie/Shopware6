@@ -16,3 +16,4 @@ src/Resources/public/administration/js/
 /src/Resources/app/administration/.stryker-tmp
 /.phpunuhi/
 /src/Resources/public/static
+/src/Resources/public/js

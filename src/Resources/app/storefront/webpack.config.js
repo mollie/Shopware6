@@ -5,7 +5,7 @@ module.exports = {
     entry: './src/custom.js',
     output: {
         path: path.resolve(__dirname, '..', '..', 'public', 'js'),
-        filename: 'mollie.js',
+        filename: 'mollie-payments.js',
     },
     resolve: {
         extensions: ['.js'],

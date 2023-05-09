@@ -39,8 +39,9 @@ class MolliePayments extends Plugin
 
         # load the dependencies that are compatible
         # with our current shopware version
-        $loader = new DependencyLoader($container);
+        $loader = new DependencyLoader($this->container);
         $loader->loadServices();
+        $loader->prepareStorefrontBuild();
     }
 
 
@@ -102,8 +103,8 @@ class MolliePayments extends Plugin
 
     /**
      * @param UpdateContext $context
-     * @throws \Doctrine\DBAL\Exception
      * @return void
+     * @throws \Doctrine\DBAL\Exception
      */
     public function update(UpdateContext $context): void
     {
@@ -139,8 +140,8 @@ class MolliePayments extends Plugin
 
     /**
      * @param ActivateContext $context
-     * @throws \Doctrine\DBAL\Exception
      * @return void
+     * @throws \Doctrine\DBAL\Exception
      */
     public function activate(ActivateContext $context): void
     {
@@ -167,6 +168,9 @@ class MolliePayments extends Plugin
      */
     private function preparePlugin(Context $context): void
     {
+        $loader = new DependencyLoader($this->container);
+        $loader->prepareStorefrontBuild();
+
         /** @var PluginInstaller $pluginInstaller */
         $pluginInstaller = $this->container->get(PluginInstaller::class);
 

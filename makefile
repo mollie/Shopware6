@@ -42,7 +42,7 @@ fixtures: ## Installs all available testing fixtures of the Mollie plugin
 	cd /var/www/html && php bin/console fixture:load:group mollie
 
 build: ## Installs the plugin, and builds the artifacts using the Shopware build commands (requires Shopware)
-	# cd ./src/Resources/app/storefront && make build
+	cd ./src/Resources/app/storefront && make build
 	cd /var/www/html && php bin/console plugin:refresh
 	cd /var/www/html && php bin/console plugin:install MolliePayments --activate | true
 	cd /var/www/html && php bin/console plugin:refresh
@@ -134,15 +134,15 @@ release: ## Builds a PROD version and creates a ZIP file in plugins/.build
 	make dev -B
 	# -------------------------------------------------------------------------------------------------
 	@echo "BUILD JAVASCRIPT FOR SHOPWARE <= 6.4"
-	php switch-composer.php prod && cd ../../.. && export NODE_OPTIONS=--openssl-legacy-provider && shopware-cli extension build custom/plugins/MolliePayments
-	cp ./src/Resources/app/storefront/dist/storefront/js/mollie-payments.js ./src/Resources/app/storefront/dist/mollie-payments-64.js
+	#php switch-composer.php prod && cd ../../.. && export NODE_OPTIONS=--openssl-legacy-provider && shopware-cli extension build custom/plugins/MolliePayments
+	#cp ./src/Resources/app/storefront/dist/storefront/js/mollie-payments.js ./src/Resources/app/storefront/dist/mollie-payments-64.js
 	# -------------------------------------------------------------------------------------------------
 	@echo "BUILD JAVASCRIPT FOR SHOPWARE >= 6.5"
 	make build -B
-	cp ./src/Resources/app/storefront/dist/storefront/js/mollie-payments.js ./src/Resources/app/storefront/dist/mollie-payments-65.js
+	#cp ./src/Resources/app/storefront/dist/storefront/js/mollie-payments.js ./src/Resources/app/storefront/dist/mollie-payments-65.js
 	# -------------------------------------------------------------------------------------------------
 	@echo "CLEAN CURRENT JAVASCRIPT DISTRIBUTION FILE"
-	rm -rf ./src/Resources/app/storefront/dist/storefront/js/mollie-payments.js
+	#rm -rf ./src/Resources/app/storefront/dist/storefront/js/mollie-payments.js
 	# -------------------------------------------------------------------------------------------------
 	php switch-composer.php prod
 	make clean -B
