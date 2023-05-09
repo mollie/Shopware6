@@ -135,6 +135,7 @@ release: ## Builds a PROD version and creates a ZIP file in plugins/.build
 	php switch-composer.php prod
 	make build -B
 	cp ./src/Resources/app/storefront/dist/storefront/js/mollie-payments.js ./src/Resources/app/storefront/dist/mollie-payments-65.js
+	export NODE_OPTIONS=--openssl-legacy-provider
 	cd ../../.. && shopware-cli extension build custom/plugins/MolliePayments
 	cp ./src/Resources/app/storefront/dist/storefront/js/mollie-payments.js ./src/Resources/app/storefront/dist/mollie-payments-64.js
 	rm -rf ./src/Resources/app/storefront/dist/storefront/js/mollie-payments.js
