@@ -131,15 +131,23 @@ release: ## Builds a PROD version and creates a ZIP file in plugins/.build
 	composer update shopware/storefront
 	composer update shopware/administration
 	make clean -B
-	make install -B
-	php switch-composer.php prod
+	make dev -B
+	# -------------------------------------------------------------------------------------------------
+	@echo "BUILD JAVASCRIPT FOR SHOPWARE <= 6.4"
+	php switch-composer.php prod && cd ../../.. && export NODE_OPTIONS=--openssl-legacy-provider && shopware-cli extension build custom/plugins/MolliePayments
+	cp ./src/Resources/app/storefront/dist/storefront/js/mollie-payments.js ./src/Resources/app/storefront/dist/mollie-payments-64.js
+	# -------------------------------------------------------------------------------------------------
+	@echo "BUILD JAVASCRIPT FOR SHOPWARE >= 6.5"
 	make build -B
 	cp ./src/Resources/app/storefront/dist/storefront/js/mollie-payments.js ./src/Resources/app/storefront/dist/mollie-payments-65.js
-	export NODE_OPTIONS=--openssl-legacy-provider
-	cd ../../.. && shopware-cli extension build custom/plugins/MolliePayments
-	cp ./src/Resources/app/storefront/dist/storefront/js/mollie-payments.js ./src/Resources/app/storefront/dist/mollie-payments-64.js
+	# -------------------------------------------------------------------------------------------------
+	@echo "CLEAN CURRENT JAVASCRIPT DISTRIBUTION FILE"
 	rm -rf ./src/Resources/app/storefront/dist/storefront/js/mollie-payments.js
+	# -------------------------------------------------------------------------------------------------
+	php switch-composer.php prod
+	make clean -B
+	make install -B
+	# -------------------------------------------------------------------------------------------------
 	cd .. && rm -rf ./.build/MolliePayments* && mkdir -p ./.build
-	rm -rf ./src/Resources/app/storefront/node_modules/*
 	cd .. && zip -qq -r -0 ./.build/MolliePayments.zip MolliePayments/ -x '*.editorconfig' '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules' '*/makefile' '*.DS_Store' '*/switch-composer.php' '*/phpunit.xml' '*/.phpunuhi.xml' '*/.infection.json' '*/phpunit.autoload.php' '*/.phpstan*' '*/.php_cs.php' '*/phpinsights.php'
 	php switch-composer.php dev
