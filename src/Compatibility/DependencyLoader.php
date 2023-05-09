@@ -95,12 +95,17 @@ class DependencyLoader
 
         $pluginRoot = __DIR__ . '/../..';
 
+        $distFileFolder = $pluginRoot . '/src/Resources/app/storefront/dist/storefront/js';
+        if (!file_exists($distFileFolder)) {
+            mkdir($distFileFolder, 0777, true);
+        }
+
         if ($versionCompare->gte('6.5')) {
             $file = $pluginRoot . '/src/Resources/app/storefront/dist/mollie-payments-65.js';
             if (file_exists($file)) {
                 copy(
                     $file,
-                    $pluginRoot . '/src/Resources/app/storefront/dist/storefront/js/mollie-payments.js',
+                    $distFileFolder . '/mollie-payments.js',
                 );
             }
 
@@ -109,10 +114,11 @@ class DependencyLoader
             if (file_exists($file)) {
                 copy(
                     $file,
-                    $pluginRoot . '/src/Resources/app/storefront/dist/storefront/js/mollie-payments.js',
+                    $distFileFolder . '/mollie-payments.js',
                 );
             }
         }
+
     }
 
     /**
