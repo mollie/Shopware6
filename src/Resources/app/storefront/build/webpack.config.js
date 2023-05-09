@@ -1,4 +1,5 @@
-const {join, resolve} = require('path');
+const {resolve, join} = require("path");
+
 module.exports = () => {
     return {
         resolve: {
@@ -9,4 +10,4 @@ module.exports = () => {
             },
         },
     };
-}
+};

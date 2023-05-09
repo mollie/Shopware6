@@ -92,6 +92,27 @@ class DependencyLoader
                 $loader->load('services/fixtures/fixtures.xml');
             }
         }
+
+        $pluginRoot = __DIR__ . '/../..';
+
+        if ($versionCompare->gte('6.5')) {
+            $file = $pluginRoot . '/src/Resources/app/storefront/dist/mollie-payments-65.js';
+            if (file_exists($file)) {
+                copy(
+                    $file,
+                    $pluginRoot . '/src/Resources/app/storefront/dist/storefront/js/mollie-payments.js',
+                );
+            }
+
+        } else {
+            $file = $pluginRoot . '/src/Resources/app/storefront/dist/mollie-payments-64.js';
+            if (file_exists($file)) {
+                copy(
+                    $file,
+                    $pluginRoot . '/src/Resources/app/storefront/dist/storefront/js/mollie-payments.js',
+                );
+            }
+        }
     }
 
     /**

@@ -9,9 +9,7 @@ import MollieApplePayPaymentMethod from './mollie-payments/plugins/apple-pay-pay
 import MollieCreditCardMandateManage from './mollie-payments/plugins/creditcard-mandate-manage.plugin';
 
 
-// Register them via the existing PluginManager
 const pluginManager = window.PluginManager;
-
 
 // global plugins
 // -----------------------------------------------------------------------------
@@ -37,3 +35,10 @@ pluginManager.register('MollieCreditCardComponentsSw64', MollieCreditCardCompone
 // manage credit card mandate
 // -----------------------------------------------------------------------------
 pluginManager.register('MollieCreditCardMandateManage', MollieCreditCardMandateManage, '[data-mollie-credit-card-mandate-manage]');
+
+
+// this is required so that our
+// plugins are existing
+pluginManager.initializePlugins();
+
+

@@ -10,31 +10,42 @@ runs:
   using: "composite"
   steps:
 
-    - name: Install Shopware CLI
+    - name: Start Docker
       shell: bash
       run: |
-        curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt install shopware-cli
+        docker run --rm --name shop -d dockware/dev:6.5.0.0
+        sleep 20
+        docker logs shop
+
+    - name: Update Shopware Config
+      shell: bash
+      run: |
+        docker exec shop bash -c 'sed -i "s/APP_ENV=dev/APP_ENV=prod/g" /var/www/html/.env' || true;
 
     - name: Upload into Docker
       shell: bash
       run: |
-        mkdir -p $(pwd)/../html/custom/plugins/MolliePayments
-        mv -v $(pwd)/* $(pwd)/../html/custom/plugins/MolliePayments
+        docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
+        docker exec shop bash -c 'sudo chown www-data:www-data /var/www/html/custom/plugins -R'
 
     # --------------------------------------------------------------------------------------------------------------------------------------
+
+    - name: Install Shopware CLI
+      shell: bash
+      run: |
+        docker exec shop bash -c 'sudo curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt install shopware-cli'
 
     - name: Build Plugin
       shell: bash
       run: |
-        export NODE_OPTIONS=--openssl-legacy-provider
-        cd $(pwd)/../html/custom/plugins/MolliePayments && make release
+        docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make release'
 
     # --------------------------------------------------------------------------------------------------------------------------------------
 
-    - name: Copy ZIP File
+    - name: Download ZIP File
       shell: bash
       run: |
-        cp $(pwd)/../html/custom/plugins/.build/MolliePayments.zip ~/.build/MolliePayments.zip
+        docker cp shop:/var/www/html/custom/plugins/.build/MolliePayments.zip ~/.build/MolliePayments.zip
 
     - name: Store ZIP file in Github
       uses: actions/upload-artifact@v2

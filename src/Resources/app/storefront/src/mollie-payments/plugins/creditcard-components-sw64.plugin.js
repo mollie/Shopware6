@@ -1,6 +1,6 @@
 import deepmerge from 'deepmerge';
 import MollieCreditCardMandate from '../core/creditcard-mandate.plugin';
-import DeviceDetection from 'src/helper/device-detection.helper';
+import DeviceDetection from '../services/DeviceDetection';
 import CsrfAjaxMode from '../services/CsrfAjaxMode';
 import ConfirmPageRepository from '../services/ConfirmPageRepository';
 

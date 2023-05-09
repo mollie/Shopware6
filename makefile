@@ -20,15 +20,15 @@ install: ## Installs all production dependencies
 	# ----------------------------------------------------------------
 	@composer validate
 	@composer install --no-dev
-	cd src/Resources/app/administration && npm install --production
-	cd src/Resources/app/storefront && npm install --production
+	cd src/Resources/app/administration && yarn install --production
+	cd src/Resources/app/storefront && yarn install --production
 
 dev: ## Installs all dev dependencies
 	php switch-composer.php dev
 	@composer validate
 	@composer install
-	cd src/Resources/app/administration && npm install
-	cd src/Resources/app/storefront && npm install
+	cd src/Resources/app/administration && yarn install
+	cd src/Resources/app/storefront && yarn install
 
 clean: ## Cleans all dependencies
 	rm -rf vendor/*
@@ -42,6 +42,7 @@ fixtures: ## Installs all available testing fixtures of the Mollie plugin
 	cd /var/www/html && php bin/console fixture:load:group mollie
 
 build: ## Installs the plugin, and builds the artifacts using the Shopware build commands (requires Shopware)
+	# cd ./src/Resources/app/storefront && make build
 	cd /var/www/html && php bin/console plugin:refresh
 	cd /var/www/html && php bin/console plugin:install MolliePayments --activate | true
 	cd /var/www/html && php bin/console plugin:refresh
@@ -50,6 +51,7 @@ build: ## Installs the plugin, and builds the artifacts using the Shopware build
 	cd /var/www/html && php bin/console theme:refresh
 	cd /var/www/html && php bin/console theme:compile
 	cd /var/www/html && php bin/console theme:refresh
+	cd /var/www/html && php bin/console assets:install
 
 # ------------------------------------------------------------------------------------------------------------
 
@@ -80,7 +82,7 @@ jest: ## Starts all Jest tests
 
 stryker: ## Starts the Stryker Jest Mutation Tests
 	cd ./src/Resources/app/administration && ./node_modules/.bin/stryker run .stryker.conf.json
-	@# Storefront has no tests at the momentcd ./src/Resources/app/storefront && ./node_modules/.bin/stryker run .stryker.conf.json
+	@# Storefront has no tests at the moment
 	@# cd ./src/Resources/app/storefront && ./node_modules/.bin/stryker run .stryker.conf.json
 
 eslint: ## Starts the ESLinter
@@ -131,7 +133,11 @@ release: ## Builds a PROD version and creates a ZIP file in plugins/.build
 	make clean -B
 	make install -B
 	php switch-composer.php prod
+	make build -B
+	cp ./src/Resources/app/storefront/dist/storefront/js/mollie-payments.js ./src/Resources/app/storefront/dist/mollie-payments-64.js
 	cd ../../.. && shopware-cli extension build custom/plugins/MolliePayments
+	cp ./src/Resources/app/storefront/dist/storefront/js/mollie-payments.js ./src/Resources/app/storefront/dist/mollie-payments-65.js
+	rm -rf ./src/Resources/app/storefront/dist/storefront/js/mollie-payments.js
 	cd .. && rm -rf ./.build/MolliePayments* && mkdir -p ./.build
 	rm -rf ./src/Resources/app/storefront/node_modules/*
 	cd .. && zip -qq -r -0 ./.build/MolliePayments.zip MolliePayments/ -x '*.editorconfig' '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules' '*/makefile' '*.DS_Store' '*/switch-composer.php' '*/phpunit.xml' '*/.phpunuhi.xml' '*/.infection.json' '*/phpunit.autoload.php' '*/.phpstan*' '*/.php_cs.php' '*/phpinsights.php'

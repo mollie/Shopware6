@@ -1,5 +1,4 @@
 import Plugin from '@shopware-storefront-sdk/plugin-system/plugin.class';
-import PageLoadingIndicatorUtil from 'src/utility/loading-indicator/page-loading-indicator.util';
 import HttpClient from '../services/HttpClient';
 
 /**
@@ -97,10 +96,7 @@ export default class MollieCreditCardMandateManage extends Plugin {
             return
         }
 
-        PageLoadingIndicatorUtil.create();
         this.deleteMandate(currentMandateId).then(({success}) => {
-
-            PageLoadingIndicatorUtil.remove();
 
             if (success) {
                 this.mollieMandateDeleteAlertErrorEl.classList.add('d-none')
