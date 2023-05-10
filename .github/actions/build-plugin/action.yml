@@ -49,6 +49,6 @@ runs:
     - name: Store ZIP file in Github
       uses: actions/upload-artifact@v2
       with:
-        name: MolliePayments-Shopware-${{ inputs.shopware }}
+        name: MolliePayments-Shopware
         retention-days: 4
         path: ~/.build
