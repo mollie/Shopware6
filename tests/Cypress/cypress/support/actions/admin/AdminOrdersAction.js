@@ -17,7 +17,7 @@ export default class AdminOrdersAction {
      *
      */
     openOrders() {
-        cy.wait(200);
+        cy.wait(1000);
         repoMainMenu.getOrders().click({force: true});
         cy.wait(1000);
         repoMainMenu.getOrdersOverview().click({force: true});

@@ -107,10 +107,8 @@ export default class ShopConfigurationAction {
             // lets wait a few seconds
             // otherwise the call is already sent before we
             // even reach our cy.wait for update products.
-            const waitStartMS = 3000;
+            const waitStartMS = 10 * 1000;
             setTimeout(() => {
-
-                console.log('start');
 
                 const maxChunkSize = 80;
                 let data = [];
@@ -132,7 +130,6 @@ export default class ShopConfigurationAction {
                     this.apiClient.bulkUpdate('product', data);
                 }
             }, waitStartMS);
-
 
         });
 
