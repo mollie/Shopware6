@@ -10,6 +10,5 @@ help:
 
 # ------------------------------------------------------------------------------------------------------------
 
-build: ## Builds using webpack and installs the assets
+build: ## Builds using webpack
 	npx webpack build --config webpack.config.js
-	cd /var/www/html && php bin/console assets:install

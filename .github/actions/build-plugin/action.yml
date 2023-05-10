@@ -30,14 +30,17 @@ runs:
 
     # --------------------------------------------------------------------------------------------------------------------------------------
 
-    - name: Install Shopware CLI
-      shell: bash
-      run: |
-        docker exec shop bash -c 'sudo curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt install shopware-cli'
+    #- name: Install Shopware CLI
+    #  shell: bash
+    #  run: |
+    #    docker exec shop bash -c 'sudo curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt install shopware-cli'
 
     - name: Build Plugin
       shell: bash
       run: |
+        docker exec shop bash -c 'cd /var/www/html && php bin/console plugin:refresh'
+        docker exec shop bash -c 'cd /var/www/html && php bin/console plugin:install MolliePayments --activate'
+        docker exec shop bash -c 'cd /var/www/html && php bin/console cache:clear'
         docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make release'
 
     # --------------------------------------------------------------------------------------------------------------------------------------

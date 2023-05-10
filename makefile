@@ -20,17 +20,17 @@ install: ## Installs all production dependencies
 	# ----------------------------------------------------------------
 	@composer validate
 	@composer install --no-dev
-	cd src/Resources/app/administration && yarn install --production
-	cd src/Resources/app/storefront && yarn install --production
+	cd src/Resources/app/administration && npm install --production
+	cd src/Resources/app/storefront && npm install --production
 
 dev: ## Installs all dev dependencies
 	php switch-composer.php dev
 	@composer validate
 	@composer install
-	cd src/Resources/app/administration && yarn install
-	cd src/Resources/app/storefront && yarn install
+	cd src/Resources/app/administration && npm install
+	cd src/Resources/app/storefront && npm install
 
-clean: ## Cleans all dependencies
+clean: ## Cleans all dependencies and files
 	rm -rf vendor/*
 	rm -rf .reports | true
 	rm -rf ./src/Resources/app/administration/node_modules/*
@@ -38,20 +38,18 @@ clean: ## Cleans all dependencies
 	rm -rf ./src/Resources/app/storefront/dist/storefront/js
 
 fixtures: ## Installs all available testing fixtures of the Mollie plugin
-	cd /var/www/html && php bin/console cache:clear
-	cd /var/www/html && php bin/console fixture:load:group mollie
+	cd ../../.. && php bin/console cache:clear
+	cd ../../.. && php bin/console fixture:load:group mollie
 
 build: ## Installs the plugin, and builds the artifacts using the Shopware build commands (requires Shopware)
 	cd ./src/Resources/app/storefront && make build
-	cd /var/www/html && php bin/console plugin:refresh
-	cd /var/www/html && php bin/console plugin:install MolliePayments --activate | true
-	cd /var/www/html && php bin/console plugin:refresh
-	cd /var/www/html && php bin/console theme:dump
-	cd /var/www/html && SHOPWARE_ADMIN_BUILD_ONLY_EXTENSIONS=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true DISABLE_ADMIN_COMPILATION_TYPECHECK=true ./bin/build-js.sh
-	cd /var/www/html && php bin/console theme:refresh
-	cd /var/www/html && php bin/console theme:compile
-	cd /var/www/html && php bin/console theme:refresh
-	cd /var/www/html && php bin/console assets:install
+	# -----------------------------------------------------
+	cd ../../.. && ./bin/build-storefront.sh
+	cd ../../.. && SHOPWARE_ADMIN_BUILD_ONLY_EXTENSIONS=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true DISABLE_ADMIN_COMPILATION_TYPECHECK=true ./bin/build-administration.sh
+	# -----------------------------------------------------
+	cd ../../.. && php bin/console theme:refresh
+	cd ../../.. && php bin/console theme:compile
+	cd ../../.. && php bin/console theme:refresh
 
 # ------------------------------------------------------------------------------------------------------------
 
@@ -126,28 +124,38 @@ pr: ## Prepares everything for a Pull Request
 # -------------------------------------------------------------------------------------------------
 
 release: ## Builds a PROD version and creates a ZIP file in plugins/.build
+	@echo "UPDATE SHOPWARE DEPENDENCIES"
 	php switch-composer.php dev
 	composer update shopware/core
 	composer update shopware/storefront
 	composer update shopware/administration
+	# -------------------------------------------------------------------------------------------------
+	@echo "INSTALL DEV DEPENDENCIES"
 	make clean -B
 	make dev -B
 	# -------------------------------------------------------------------------------------------------
-	@echo "BUILD JAVASCRIPT FOR SHOPWARE <= 6.4"
-	#php switch-composer.php prod && cd ../../.. && export NODE_OPTIONS=--openssl-legacy-provider && shopware-cli extension build custom/plugins/MolliePayments
-	#cp ./src/Resources/app/storefront/dist/storefront/js/mollie-payments.js ./src/Resources/app/storefront/dist/mollie-payments-64.js
+	#@echo "BUILD JAVASCRIPT FOR SHOPWARE <= 6.4"
+	# php switch-composer.php prod && cd ../../.. && export NODE_OPTIONS=--openssl-legacy-provider && shopware-cli extension build custom/plugins/MolliePayments
+	# cp ./src/Resources/app/storefront/dist/storefront/js/mollie-payments.js ./src/Resources/app/storefront/dist/mollie-payments-64.js
 	# -------------------------------------------------------------------------------------------------
-	@echo "BUILD JAVASCRIPT FOR SHOPWARE >= 6.5"
+	# @echo "BUILD JAVASCRIPT FOR SHOPWARE >= 6.5"
+	# make build -B
+	# cp ./src/Resources/app/storefront/dist/storefront/js/mollie-payments.js ./src/Resources/app/storefront/dist/mollie-payments-65.js
+	# -------------------------------------------------------------------------------------------------
+	#@echo "CLEAN CURRENT JAVASCRIPT DISTRIBUTION FILE"
+	# rm -rf ./src/Resources/app/storefront/dist/storefront/js/mollie-payments.js
+	# -------------------------------------------------------------------------------------------------
+	@echo "BUILD DISTRIBUTION FILES"
 	make build -B
-	#cp ./src/Resources/app/storefront/dist/storefront/js/mollie-payments.js ./src/Resources/app/storefront/dist/mollie-payments-65.js
 	# -------------------------------------------------------------------------------------------------
-	@echo "CLEAN CURRENT JAVASCRIPT DISTRIBUTION FILE"
-	#rm -rf ./src/Resources/app/storefront/dist/storefront/js/mollie-payments.js
-	# -------------------------------------------------------------------------------------------------
+	@echo "INSTALL PRODUCTION DEPENDENCIES"
 	php switch-composer.php prod
-	make clean -B
 	make install -B
+	rm -rf ./src/Resources/app/storefront/node_modules/*
 	# -------------------------------------------------------------------------------------------------
+	@echo "CREATE ZIP FILE"
 	cd .. && rm -rf ./.build/MolliePayments* && mkdir -p ./.build
 	cd .. && zip -qq -r -0 ./.build/MolliePayments.zip MolliePayments/ -x '*.editorconfig' '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules' '*/makefile' '*.DS_Store' '*/switch-composer.php' '*/phpunit.xml' '*/.phpunuhi.xml' '*/.infection.json' '*/phpunit.autoload.php' '*/.phpstan*' '*/.php_cs.php' '*/phpinsights.php'
+	# -------------------------------------------------------------------------------------------------
+	@echo "RESET COMPOSER.JSON"
 	php switch-composer.php dev
