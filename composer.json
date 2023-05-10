@@ -61,6 +61,7 @@
         "shopware/administration": "<6,>=7"
     },
     "require": {
+        "php": ">=7.4",
         "ext-curl": "*",
         "mollie/mollie-api-php": "2.40.1"
     },
