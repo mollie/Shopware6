@@ -21,7 +21,7 @@ export default class AdminOrdersAction {
         repoMainMenu.getOrders().click({force: true});
         cy.wait(1000);
         repoMainMenu.getOrdersOverview().click({force: true});
-        cy.wait(1000);
+        cy.wait(2000);
     }
 
     /**
@@ -80,7 +80,7 @@ export default class AdminOrdersAction {
     openShipThroughMollie() {
         repoOrdersDetails.getMollieActionsButton().click({force: true});
 
-        cy.wait(2000);
+        cy.wait(4000);
 
         repoOrdersDetails.getMollieActionButtonShipThroughMollie().click({force: true});
 
@@ -94,8 +94,10 @@ export default class AdminOrdersAction {
      * @param nthItem
      */
     openLineItemShipping(nthItem) {
+
         repoOrdersDetails.getLineItemActionsButton(nthItem).click({force: true})
-        cy.wait(2000);
+
+        cy.wait(4000);
         repoOrdersDetails.getLineItemActionsButtonShipThroughMollie().click({force: true});
         // here are automatic reloads and things as it seems
         // I really want to test the real UX, so we just wait like a human
