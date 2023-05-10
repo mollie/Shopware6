@@ -103,8 +103,8 @@ class MolliePayments extends Plugin
 
     /**
      * @param UpdateContext $context
-     * @return void
      * @throws \Doctrine\DBAL\Exception
+     * @return void
      */
     public function update(UpdateContext $context): void
     {
@@ -140,8 +140,8 @@ class MolliePayments extends Plugin
 
     /**
      * @param ActivateContext $context
-     * @return void
      * @throws \Doctrine\DBAL\Exception
+     * @return void
      */
     public function activate(ActivateContext $context): void
     {
@@ -161,16 +161,12 @@ class MolliePayments extends Plugin
         parent::deactivate($context);
     }
 
-
     /**
      * @param Context $context
      * @throws \Doctrine\DBAL\Exception
      */
     private function preparePlugin(Context $context): void
     {
-        $loader = new DependencyLoader($this->container);
-        $loader->prepareStorefrontBuild();
-
         /** @var PluginInstaller $pluginInstaller */
         $pluginInstaller = $this->container->get(PluginInstaller::class);
 

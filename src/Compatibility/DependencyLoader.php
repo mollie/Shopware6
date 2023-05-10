@@ -121,7 +121,10 @@ class DependencyLoader
         }
 
         if (file_exists($file) && !file_exists($target)) {
-            copy($file, $target);
+            # while we use our current webpack approach
+            # we must not use this.
+            # also it's not perfectly working somehow
+            # copy($file, $target);
         }
     }
 
