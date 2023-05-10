@@ -393,6 +393,7 @@ describe('Subscription', () => {
                     topMenu.clickAccountWidgetSubscriptions();
 
                     // side menu needs subscription
+                    cy.wait(2000);
                     cy.contains('.account-aside', 'Subscriptions');
                     // we should at least find 1 subscription
                     cy.get('.account-order-overview').find('.order-table').should('have.length.greaterThan', 0);
