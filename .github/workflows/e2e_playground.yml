@@ -35,8 +35,6 @@ jobs:
 
       - name: Build Plugin
         uses: ./.github/actions/build-plugin
-        with:
-          shopware: ${{ github.event.inputs.swVersion }}
 
   e2e:
     name: E2E Tests | Shopware ${{ github.event.inputs.swVersion }}, PHP ${{ github.event.inputs.phpVersion }}

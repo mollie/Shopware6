@@ -331,8 +331,6 @@ jobs:
 
       - name: Build Plugin
         uses: ./.github/actions/build-plugin
-        with:
-          shopware: 6.4.20.1
 
   e2e:
     name: E2E | Shopware ${{ matrix.shopware }}, PHP ${{ matrix.php }}
@@ -346,44 +344,6 @@ jobs:
             php: '8.2'
           - shopware: '6.4.20.2'
             php: '8.2'
-          - shopware: '6.4.19.0'
-            php: '8.2'
-          - shopware: '6.4.18.0'
-            php: '8.2'
-          - shopware: '6.4.17.2'
-            php: '8.1'
-          - shopware: '6.4.17.1'
-            php: '8.1'
-          - shopware: '6.4.16.1'
-            php: '8.1'
-          - shopware: '6.4.15.2'
-            php: '8.1'
-          - shopware: '6.4.15.1'
-            php: '8.1'
-          - shopware: '6.4.14.0'
-            php: '8.1'
-          - shopware: '6.4.12.0'
-            php: '8.0'
-          - shopware: '6.4.11.1'
-            php: '8.0'
-          - shopware: '6.4.10.0'
-            php: '8.0'
-          - shopware: '6.4.9.0'
-            php: '7.4'
-          - shopware: '6.4.8.2'
-            php: '7.4'
-          - shopware: '6.4.7.0'
-            php: '7.4'
-          - shopware: '6.4.6.1'
-            php: '7.4'
-          - shopware: '6.4.5.1'
-            php: '7.4'
-          - shopware: '6.4.4.1'
-            php: '7.4'
-          - shopware: '6.4.2.1'
-            php: '7.4'
-          - shopware: '6.4.1.2'
-            php: '7.4'
           - shopware: '6.4.0.0'
             php: '7.4'
     steps:

@@ -1,7 +1,10 @@
-name: PR Pipeline
+name: Nightly Pipeline
 
-on: [ pull_request, workflow_dispatch ]
-
+on:
+  workflow_dispatch:
+  schedule:
+    # 00:15 am
+    - cron: '15 0 * * *'
 
 jobs:
 
@@ -49,7 +52,7 @@ jobs:
   # ------------------------------------------------------------------------------------------------------------------------
 
   snippets:
-    name: Test Plugin Snippets
+    name: Test Snippets
     runs-on: ubuntu-latest
     needs: install
     steps:
@@ -224,7 +227,7 @@ jobs:
         run: make phpunit -B
 
   infection:
-    name: Mutation Tests
+    name: Infection Tests
     needs: phpunit
     runs-on: ubuntu-latest
     steps:
@@ -317,62 +320,63 @@ jobs:
       - name: Mount Build Cache
         uses: actions/cache@v3
         with:
-          key: cache-build-${{ github.run_id }}
+          key: cache-plugin-${{ github.run_id }}
           path: ~/.build
 
       - name: Build Plugin
         uses: ./.github/actions/build-plugin
 
-  # ------------------------------------------------------------------------------------------------------------------------
-
-  installation:
-    name: Installation | Shopware ${{ matrix.shopware }}
-    needs: build
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        shopware: [ '6.5.0.0', '6.4.20.2', '6.4.0.0' ]
-    steps:
-
-      - name: Clone Code
-        uses: actions/checkout@v3
-
-      - name: Mount Build Cache
-        uses: actions/cache@v3
-        with:
-          key: cache-build-${{ github.run_id }}
-          path: ~/.build
-
-      - name: Installation Tests, Shopware ${{ matrix.shopware }}
-        uses: ./.github/actions/run-e2e
-        with:
-          # -------------------------------------------
-          SHOPWARE: ${{ matrix.shopware }}
-          PHP: 7.4
-          # -------------------------------------------
-          MOLLIE_APIKEY_TEST: ""
-          # -------------------------------------------
-          RUN_CYPRESS: false
-
-  # ------------------------------------------------------------------------------------------------------------------------
-
   e2e:
-    name: E2E Core | Shopware ${{ matrix.shopware }}
+    name: E2E | Shopware ${{ matrix.shopware }}, PHP ${{ matrix.php }}
     needs: build
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         include:
-          # latest Shopware
-          - shopware: '6.4.20.1'
+          - shopware: '6.5.0.0'
             php: '8.2'
-          # in between, 6.4.7.0 was a "breaker"
+          - shopware: '6.4.20.2'
+            php: '8.2'
+          - shopware: '6.4.19.0'
+            php: '8.2'
+          - shopware: '6.4.18.0'
+            php: '8.2'
+          - shopware: '6.4.17.2'
+            php: '8.1'
+          - shopware: '6.4.17.1'
+            php: '8.1'
+          - shopware: '6.4.16.1'
+            php: '8.1'
+          - shopware: '6.4.15.2'
+            php: '8.1'
+          - shopware: '6.4.15.1'
+            php: '8.1'
+          - shopware: '6.4.14.0'
+            php: '8.1'
+          - shopware: '6.4.12.0'
+            php: '8.0'
+          - shopware: '6.4.11.1'
+            php: '8.0'
+          - shopware: '6.4.10.0'
+            php: '8.0'
+          - shopware: '6.4.9.0'
+            php: '7.4'
+          - shopware: '6.4.8.2'
+            php: '7.4'
           - shopware: '6.4.7.0'
             php: '7.4'
-          # minimum supported Shopware version
-          - shopware: '6.3.5.2'
+          - shopware: '6.4.6.1'
+            php: '7.4'
+          - shopware: '6.4.5.1'
+            php: '7.4'
+          - shopware: '6.4.4.1'
+            php: '7.4'
+          - shopware: '6.4.2.1'
+            php: '7.4'
+          - shopware: '6.4.1.2'
+            php: '7.4'
+          - shopware: '6.4.0.0'
             php: '7.4'
     steps:
 
@@ -382,19 +386,20 @@ jobs:
       - name: Mount Build Cache
         uses: actions/cache@v3
         with:
-          key: cache-build-${{ github.run_id }}
+          key: cache-plugin-${{ github.run_id }}
           path: ~/.build
 
-      - name: E2E Core Tests, Shopware ${{ matrix.shopware }}
+      - name: E2E Tests, Shopware ${{ matrix.shopware }}
         uses: ./.github/actions/run-e2e
         with:
           # -------------------------------------------
           SHOPWARE: ${{ matrix.shopware }}
           PHP: ${{ matrix.php }}
           # -------------------------------------------
-          MOLLIE_APIKEY_TEST: ""
+          MOLLIE_APIKEY_TEST: ${{ secrets.MOLLIE_APIKEY_TEST }}
           # -------------------------------------------
           RUN_CYPRESS: true
-          TESTRAIL: false
-          # only run @core tests, because we have no API key here
-          FILTERS: "@core"
+          TESTRAIL: true
+          TESTRAIL_DOMAIN: ${{ secrets.TESTRAIL_DOMAIN }}
+          TESTRAIL_USERNAME: ${{ secrets.TESTRAIL_USERNAME }}
+          TESTRAIL_PASSWORD: ${{ secrets.TESTRAIL_PASSWORD }}
