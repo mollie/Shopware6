@@ -41,6 +41,8 @@ const device = devices.getFirstDevice();
 context("Order Shipping", () => {
 
     before(() => {
+        configAction.setupShop(false, false, false);
+
         configAction.prepareShippingMethods();
         configAction.updateProducts('', false, '', '');
     })
@@ -165,6 +167,7 @@ context("Order Shipping", () => {
                 disabledClassName = 'sw-button--disabled';
             }
 
+            cy.wait(1000);
             repoOrderDetails.getMollieActionButtonShipThroughMollie().should('have.class', disabledClassName);
         })
 

@@ -16,7 +16,7 @@ export default class AdminPluginAction {
             cy.visit('/admin#/sw/plugin/settings/MolliePayments');
         }
 
-        cy.wait(2000);
+        cy.wait(4000);
     }
 
 }
