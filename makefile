@@ -20,15 +20,15 @@ prod: ## Installs all production dependencies
 	# ----------------------------------------------------------------
 	@composer validate
 	@composer install --no-dev
-	cd src/Resources/app/administration && yarn npm --production
-	cd src/Resources/app/storefront && yarn install --production
+	cd src/Resources/app/administration && npm install --omit=dev
+	cd src/Resources/app/storefront && npm install --production
 
 dev: ## Installs all dev dependencies
 	php switch-composer.php dev
 	@composer validate
 	@composer install
 	cd src/Resources/app/administration && npm install
-	cd src/Resources/app/storefront && yarn install
+	cd src/Resources/app/storefront && npm install
 
 install: ## [deprecated] Installs all production dependencies. Please use "make prod" now.
 	@make prod -B
@@ -147,6 +147,8 @@ release: ## Builds a PROD version and creates a ZIP file in plugins/.build
 	@echo "INSTALL PRODUCTION DEPENDENCIES"
 	php switch-composer.php prod
 	make prod -B
+	rm -rf ./src/Resources/app/administration/node_modules/*
+	rm -rf ./src/Resources/app/storefront/node_modules/*
 	# -------------------------------------------------------------------------------------------------
 	@echo "CREATE ZIP FILE"
 	cd .. && rm -rf ./.build/MolliePayments* && mkdir -p ./.build
