@@ -147,7 +147,6 @@ release: ## Builds a PROD version and creates a ZIP file in plugins/.build
 	@echo "INSTALL PRODUCTION DEPENDENCIES"
 	php switch-composer.php prod
 	make prod -B
-	rm -rf ./src/Resources/app/administration/node_modules/*
 	rm -rf ./src/Resources/app/storefront/node_modules/*
 	# -------------------------------------------------------------------------------------------------
 	@echo "CREATE ZIP FILE"
