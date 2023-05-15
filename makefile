@@ -20,14 +20,14 @@ prod: ## Installs all production dependencies
 	# ----------------------------------------------------------------
 	@composer validate
 	@composer install --no-dev
-	cd src/Resources/app/administration && yarn install --production
+	cd src/Resources/app/administration && yarn npm --production
 	cd src/Resources/app/storefront && yarn install --production
 
 dev: ## Installs all dev dependencies
 	php switch-composer.php dev
 	@composer validate
 	@composer install
-	cd src/Resources/app/administration && yarn install
+	cd src/Resources/app/administration && npm install
 	cd src/Resources/app/storefront && yarn install
 
 install: ## [deprecated] Installs all production dependencies. Please use "make prod" now.
