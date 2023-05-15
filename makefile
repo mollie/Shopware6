@@ -39,18 +39,19 @@ clean: ## Cleans all dependencies and files
 	rm -rf .reports | true
 	# ------------------------------------------------------
 	rm -rf ./src/Resources/app/administration/node_modules/*
-	rm -rf ./src/Resources/app/administration/node_modules/.yarn-integrity
-	# ------------------------------------------------------
 	rm -rf ./src/Resources/app/storefront/node_modules/*
-	rm -rf ./src/Resources/app/storefront/node_modules/.yarn-integrity
 	# ------------------------------------------------------
-	rm -rf ./src/Resources/app/storefront/dist/storefront/js
+	rm -rf ./src/Resources/app/storefront/dist/storefront
+	rm -rf ./src/Resources/public
 
 build: ## Installs the plugin, and builds the artifacts using the Shopware build commands (requires Shopware)
-	cd ./src/Resources/app/storefront && make build
+	# cd ../../.. && PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true ./bin/build-storefront.sh
+	# cd ../../.. && SHOPWARE_ADMIN_BUILD_ONLY_EXTENSIONS=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true DISABLE_ADMIN_COMPILATION_TYPECHECK=true ./bin/build-administration.sh
+	php switch-composer.php prod
+	cd ../../.. && export NODE_OPTIONS=--openssl-legacy-provider && shopware-cli extension build custom/plugins/MolliePayments
+	php switch-composer.php dev
 	# -----------------------------------------------------
-	cd ../../.. && PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true ./bin/build-storefront.sh
-	cd ../../.. && SHOPWARE_ADMIN_BUILD_ONLY_EXTENSIONS=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true DISABLE_ADMIN_COMPILATION_TYPECHECK=true ./bin/build-administration.sh
+	cd ./src/Resources/app/storefront && make build -B
 	# -----------------------------------------------------
 	cd ../../.. && php bin/console theme:refresh
 	cd ../../.. && php bin/console theme:compile
@@ -134,6 +135,8 @@ pr: ## Prepares everything for a Pull Request
 # -------------------------------------------------------------------------------------------------
 
 release: ## Builds a PROD version and creates a ZIP file in plugins/.build
+	cd .. && rm -rf ./.build/MolliePayments* && mkdir -p ./.build
+	# -------------------------------------------------------------------------------------------------
 	@echo "UPDATE SHOPWARE DEPENDENCIES"
 	php switch-composer.php dev
 	composer update shopware/core
@@ -151,8 +154,7 @@ release: ## Builds a PROD version and creates a ZIP file in plugins/.build
 	rm -rf ./src/Resources/app/storefront/node_modules/*
 	# -------------------------------------------------------------------------------------------------
 	@echo "CREATE ZIP FILE"
-	cd .. && rm -rf ./.build/MolliePayments* && mkdir -p ./.build
-	cd .. && zip -qq -r -0 ./.build/MolliePayments.zip MolliePayments/ -x '*.editorconfig' '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules' '*/makefile' '*.DS_Store' '*/switch-composer.php' '*/phpunit.xml' '*/.phpunuhi.xml' '*/.infection.json' '*/phpunit.autoload.php' '*/.phpstan*' '*/.php_cs.php' '*/phpinsights.php'
+	cd .. && zip -qq -r -0 ./.build/MolliePayments.zip MolliePayments/ -x '*.editorconfig' '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*' '*/makefile' '*.DS_Store' '*/switch-composer.php' '*/phpunit.xml' '*/.phpunuhi.xml' '*/.infection.json' '*/phpunit.autoload.php' '*/.phpstan*' '*/.php_cs.php' '*/phpinsights.php'
 	# -------------------------------------------------------------------------------------------------
 	@echo "RESET COMPOSER.JSON"
 	php switch-composer.php dev

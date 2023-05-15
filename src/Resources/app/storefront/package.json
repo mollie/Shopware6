@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "author": "Mollie B.V.",
-  "dependencies": {},
   "devDependencies": {
     "@babel/cli": "^7.5.5",
     "@babel/core": "^7.5.5",
