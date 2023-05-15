@@ -11,7 +11,7 @@ module.exports = {
         extensions: ['.js'],
         alias: {
             '@shopware-storefront-sdk': resolve(
-                join(__dirname, 'node_modules_local', 'shopware-storefront-sdk'),
+                join(__dirname, 'src_vendor', 'shopware-storefront-sdk'),
             ),
         },
     },
