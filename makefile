@@ -55,6 +55,7 @@ build: ## Installs the plugin, and builds the artifacts using the Shopware build
 	cd ../../.. && php bin/console theme:refresh
 	cd ../../.. && php bin/console theme:compile
 	cd ../../.. && php bin/console theme:refresh
+	cd ../../.. && php bin/console assets:install
 
 fixtures: ## Installs all available testing fixtures of the Mollie plugin
 	cd ../../.. && php bin/console cache:clear
