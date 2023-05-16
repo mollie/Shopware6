@@ -87,7 +87,6 @@
                     <sw-button-group split-button>
                         {% block sw_order_detail_general_mollie_info_action_buttons_order_shipping %}
                             <sw-button class="sw-order-line-items-grid__actions-ship-button"
-                                       :disabled="!isShippingPossible"
                                        variant="ghost" size="small"
                                        @click="onOpenShipOrderModal">
                                 {{ $tc('mollie-payments.general.shipThroughMollie') }}</sw-button>
