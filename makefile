@@ -7,6 +7,9 @@
 
 PLUGIN_VERSION=`php -r 'echo json_decode(file_get_contents("MolliePayments/composer.json"))->version;'`
 
+SW_CLI_VERSION=$(bash shopware-cli --version 2>/dev/null)
+
+
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
@@ -24,6 +27,11 @@ prod: ## Installs all production dependencies
 	cd src/Resources/app/storefront && npm install --production
 
 dev: ## Installs all dev dependencies
+ifndef SW_CLI_VERSION
+    curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt install shopware-cli
+else 
+	@echo "Shopware CLI already installed"
+endif
 	php switch-composer.php dev
 	@composer validate
 	@composer install
@@ -44,12 +52,16 @@ clean: ## Cleans all dependencies and files
 	rm -rf ./src/Resources/app/storefront/dist/storefront
 	rm -rf ./src/Resources/public
 
-build: ## Installs the plugin, and builds the artifacts using the Shopware build commands (requires Shopware)
-	# cd ../../.. && PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true ./bin/build-storefront.sh
-	# cd ../../.. && SHOPWARE_ADMIN_BUILD_ONLY_EXTENSIONS=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true DISABLE_ADMIN_COMPILATION_TYPECHECK=true ./bin/build-administration.sh
+build: ## Installs the plugin, and builds the artifacts using the Shopware build commands. use cli=1 for Shopware CLI
+ifdef cli
 	php switch-composer.php prod
 	cd ../../.. && export NODE_OPTIONS=--openssl-legacy-provider && shopware-cli extension build custom/plugins/MolliePayments
 	php switch-composer.php dev
+else 
+	php switch-composer.php dev
+	cd ../../.. && PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true ./bin/build-storefront.sh
+	cd ../../.. && SHOPWARE_ADMIN_BUILD_ONLY_EXTENSIONS=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true DISABLE_ADMIN_COMPILATION_TYPECHECK=true ./bin/build-administration.sh
+endif
 	# -----------------------------------------------------
 	cd ./src/Resources/app/storefront && make build -B
 	# -----------------------------------------------------
@@ -146,7 +158,7 @@ release: ## Builds a PROD version and creates a ZIP file in plugins/.build
 	@echo "INSTALL DEV DEPENDENCIES AND BUILD"
 	make clean -B
 	make dev -B
-	make build -B
+	make build cli=1 -B
 	# -------------------------------------------------------------------------------------------------
 	@echo "INSTALL PRODUCTION DEPENDENCIES"
 	php switch-composer.php prod
