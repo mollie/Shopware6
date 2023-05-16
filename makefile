@@ -8,6 +8,7 @@
 PLUGIN_VERSION=`php -r 'echo json_decode(file_get_contents("MolliePayments/composer.json"))->version;'`
 
 SW_CLI_VERSION=$(bash shopware-cli --version 2>/dev/null)
+NODE_VERSION:=$(shell node -v)
 
 
 help:
@@ -146,7 +147,11 @@ pr: ## Prepares everything for a Pull Request
 
 # -------------------------------------------------------------------------------------------------
 
-release: ## Builds a PROD version and creates a ZIP file in plugins/.build
+release: ## Builds a PROD version and creates a ZIP file in plugins/.build. use cli=1 for Shopware CLI
+ifneq (,$(findstring v12,$(NODE_VERSION)))
+	$(warning Attention, reqruires Node v14 or higher to build a release!)
+	@exit 1
+endif
 	cd .. && rm -rf ./.build/MolliePayments* && mkdir -p ./.build
 	# -------------------------------------------------------------------------------------------------
 	@echo "UPDATE SHOPWARE DEPENDENCIES"
@@ -170,3 +175,7 @@ release: ## Builds a PROD version and creates a ZIP file in plugins/.build
 	# -------------------------------------------------------------------------------------------------
 	@echo "RESET COMPOSER.JSON"
 	php switch-composer.php dev
+	# -------------------------------------------------------------------------------------------------
+	@echo ""
+	@echo "CONGRATULATIONS"
+	@echo "The new ZIP file is available at plugins/.build/MolliePayments.zip"
