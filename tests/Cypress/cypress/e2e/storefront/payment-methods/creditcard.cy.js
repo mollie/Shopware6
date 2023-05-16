@@ -32,6 +32,7 @@ const adminOrders = new AdminOrdersAction();
 
 const scenarioDummyBasket = new DummyBasketScenario(1);
 
+export const getMochaContext = () => cy.state('runnable').ctx;
 
 const testDevices = [devices.getFirstDevice()];
 
@@ -57,6 +58,12 @@ describe('Credit Card Components', () => {
     context(devices.getDescription(devices.getFirstDevice()), () => {
 
         it('C4102: Successful card payment', () => {
+
+            if (shopware.isVersionEqual('6.4.0.0')) {
+                // https://issues.shopware.com/issues/NEXT-15044
+                getMochaContext().skip('This test is not working on Shopware 6.4.0, because the selected payment method is not active and therefore no credit card compnoents are visible. https://issues.shopware.com/issues/NEXT-15044');
+                return;
+            }
 
             setUp();
 
@@ -87,6 +94,12 @@ describe('Credit Card Components', () => {
 
         it('C4105: Invalid Card Holder (Empty)', () => {
 
+            if (shopware.isVersionEqual('6.4.0.0')) {
+                // https://issues.shopware.com/issues/NEXT-15044
+                getMochaContext().skip('This test is not working on Shopware 6.4.0, because the selected payment method is not active and therefore no credit card compnoents are visible. https://issues.shopware.com/issues/NEXT-15044');
+                return;
+            }
+
             setUp();
 
             payment.fillCreditCardComponents('', validCardNumber, '1228', '1234');
@@ -105,6 +118,12 @@ describe('Credit Card Components', () => {
         // somehow mollie has a different behaviour at the moment? lets skip this for now
         it('C4107: Invalid Card Holder (Invalid Value)', () => {
 
+            if (shopware.isVersionEqual('6.4.0.0')) {
+                // https://issues.shopware.com/issues/NEXT-15044
+                getMochaContext().skip('This test is not working on Shopware 6.4.0, because the selected payment method is not active and therefore no credit card compnoents are visible. https://issues.shopware.com/issues/NEXT-15044');
+                return;
+            }
+
             setUp();
 
             payment.fillCreditCardComponents(' ', validCardNumber, '1228', '1234');
@@ -121,6 +140,11 @@ describe('Credit Card Components', () => {
         })
 
         it('C4108: Invalid Card Number', () => {
+
+            if (shopware.isVersionEqual('6.4.0.0')) {
+                getMochaContext().skip('This test is not working on Shopware 6.4.0, because the selected payment method is not active and therefore no credit card compnoents are visible. https://issues.shopware.com/issues/NEXT-15044');
+                return;
+            }
 
             setUp();
 
@@ -139,6 +163,11 @@ describe('Credit Card Components', () => {
 
         it('C4109: Invalid Expiry Date', () => {
 
+            if (shopware.isVersionEqual('6.4.0.0')) {
+                getMochaContext().skip('This test is not working on Shopware 6.4.0, because the selected payment method is not active and therefore no credit card compnoents are visible. https://issues.shopware.com/issues/NEXT-15044');
+                return;
+            }
+
             setUp();
 
             payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '12', '1234');
@@ -155,6 +184,11 @@ describe('Credit Card Components', () => {
         })
 
         it('C4110: Invalid CVC Code', () => {
+
+            if (shopware.isVersionEqual('6.4.0.0')) {
+                getMochaContext().skip('This test is not working on Shopware 6.4.0, because the selected payment method is not active and therefore no credit card compnoents are visible. https://issues.shopware.com/issues/NEXT-15044');
+                return;
+            }
 
             setUp();
 
@@ -338,6 +372,8 @@ function setUp() {
     // this is a bug, so we just switch to another payment
     // before switching back to credit card
     payment.switchPaymentMethod('PayPal');
+
+    cy.pause();
 
     if (shopware.isVersionGreaterEqual(6.4)) {
         payment.switchPaymentMethod('Credit card');
