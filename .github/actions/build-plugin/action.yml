@@ -25,11 +25,6 @@ runs:
 
     # --------------------------------------------------------------------------------------------------------------------------------------
 
-    - name: Install Shopware CLI
-      shell: bash
-      run: |
-        docker exec shop bash -c 'sudo curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt install shopware-cli'
-
     - name: Install Plugin
       shell: bash
       run: |

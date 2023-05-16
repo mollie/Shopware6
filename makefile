@@ -49,16 +49,10 @@ clean: ## Cleans all dependencies and files
 	rm -rf ./src/Resources/app/storefront/dist/storefront
 	rm -rf ./src/Resources/public
 
-build: ## Installs the plugin, and builds the artifacts using the Shopware build commands. use cli=1 for Shopware CLI
-ifdef cli
+build: ## Installs the plugin, and builds the artifacts using the Shopware build commands.
 	php switch-composer.php prod
 	cd ../../.. && export NODE_OPTIONS=--openssl-legacy-provider && shopware-cli extension build custom/plugins/MolliePayments
 	php switch-composer.php dev
-else 
-	php switch-composer.php dev
-	cd ../../.. && PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true ./bin/build-storefront.sh
-	cd ../../.. && SHOPWARE_ADMIN_BUILD_ONLY_EXTENSIONS=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true DISABLE_ADMIN_COMPILATION_TYPECHECK=true ./bin/build-administration.sh
-endif
 	# -----------------------------------------------------
 	# CUSTOM WEBPACK
 	cd ./src/Resources/app/storefront && make build -B
@@ -145,7 +139,7 @@ pr: ## Prepares everything for a Pull Request
 
 # -------------------------------------------------------------------------------------------------
 
-release: ## Builds a PROD version and creates a ZIP file in plugins/.build. use cli=1 for Shopware CLI
+release: ## Builds a PROD version and creates a ZIP file in plugins/.build.
 ifneq (,$(findstring v12,$(NODE_VERSION)))
 	$(warning Attention, reqruires Node v14 or higher to build a release!)
 	@exit 1
@@ -161,7 +155,7 @@ endif
 	@echo "INSTALL DEV DEPENDENCIES AND BUILD"
 	make clean -B
 	make dev -B
-	make build cli=1 -B
+	make build -B
 	# -------------------------------------------------------------------------------------------------
 	@echo "INSTALL PRODUCTION DEPENDENCIES"
 	php switch-composer.php prod
