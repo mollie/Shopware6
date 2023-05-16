@@ -7,7 +7,7 @@
 
 PLUGIN_VERSION=`php -r 'echo json_decode(file_get_contents("MolliePayments/composer.json"))->version;'`
 
-SW_CLI_VERSION=$(bash shopware-cli --version 2>/dev/null)
+SW_CLI_VERSION:=$(shell shopware-cli --version 1>/dev/null)
 NODE_VERSION:=$(shell node -v)
 
 
@@ -28,11 +28,7 @@ prod: ## Installs all production dependencies
 	cd src/Resources/app/storefront && npm install --production
 
 dev: ## Installs all dev dependencies
-ifndef SW_CLI_VERSION
-    curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt install shopware-cli
-else 
-	@echo "Shopware CLI already installed"
-endif
+	curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt install shopware-cli
 	php switch-composer.php dev
 	@composer validate
 	@composer install
@@ -64,12 +60,14 @@ else
 	cd ../../.. && SHOPWARE_ADMIN_BUILD_ONLY_EXTENSIONS=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true DISABLE_ADMIN_COMPILATION_TYPECHECK=true ./bin/build-administration.sh
 endif
 	# -----------------------------------------------------
+	# CUSTOM WEBPACK
 	cd ./src/Resources/app/storefront && make build -B
 	# -----------------------------------------------------
 	cd ../../.. && php bin/console theme:refresh
 	cd ../../.. && php bin/console theme:compile
 	cd ../../.. && php bin/console theme:refresh
 	cd ../../.. && php bin/console assets:install
+	cd ../../.. && php bin/console cache:clear
 
 fixtures: ## Installs all available testing fixtures of the Mollie plugin
 	cd ../../.. && php bin/console cache:clear
@@ -171,7 +169,7 @@ endif
 	rm -rf ./src/Resources/app/storefront/node_modules/*
 	# -------------------------------------------------------------------------------------------------
 	@echo "CREATE ZIP FILE"
-	cd .. && zip -qq -r -0 ./.build/MolliePayments.zip MolliePayments/ -x '*.editorconfig' '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*' '*/makefile' '*.DS_Store' '*/switch-composer.php' '*/phpunit.xml' '*/.phpunuhi.xml' '*/.infection.json' '*/phpunit.autoload.php' '*/.phpstan*' '*/.php_cs.php' '*/phpinsights.php'
+	cd .. && zip -qq -r -0 ./.build/MolliePayments.zip MolliePayments/ -x '*.editorconfig' '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*' '*/makefile' '*.DS_Store' '*/.shopware-extension.yml' '*/switch-composer.php' '*/phpunit.xml' '*/.phpunuhi.xml' '*/.infection.json' '*/phpunit.autoload.php' '*/.phpstan*' '*/.php_cs.php' '*/phpinsights.php'
 	# -------------------------------------------------------------------------------------------------
 	@echo "RESET COMPOSER.JSON"
 	php switch-composer.php dev
