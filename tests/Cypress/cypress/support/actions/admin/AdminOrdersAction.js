@@ -78,9 +78,11 @@ export default class AdminOrdersAction {
      *
      */
     openShipThroughMollie() {
-        repoOrdersDetails.getMollieActionsButton().click({force: true});
 
-        cy.wait(4000);
+        if (shopware.isVersionLower('6.5')) {
+            repoOrdersDetails.getMollieActionsButton().click({force: true});
+            cy.wait(4000);
+        }
 
         repoOrdersDetails.getMollieActionButtonShipThroughMollie().click({force: true});
 

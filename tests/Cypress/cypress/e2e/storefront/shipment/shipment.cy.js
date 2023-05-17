@@ -74,6 +74,10 @@ context("Order Shipping", () => {
             // verify delivery status and item shipped count
             assertShippingStatus('Shipped', 2);
 
+            if (shopware.isVersionLower('6.5')) {
+                repoOrderDetails.getMollieActionsButton().click({force: true});
+            }
+
             let disabledClassName = 'is--disabled'
             if (shopware.isVersionGreaterEqual('6.5')) {
                 disabledClassName = 'sw-button--disabled';
