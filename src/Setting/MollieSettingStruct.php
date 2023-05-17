@@ -233,6 +233,10 @@ class MollieSettingStruct extends Struct
      */
     protected $fixRoundingDiffSKU = '';
 
+    /**
+     * @var bool
+     */
+    protected $useShopwareJavascript = false;
 
     /**
      * @return string
@@ -902,4 +906,21 @@ class MollieSettingStruct extends Struct
     {
         $this->fixRoundingDiffSKU = $fixRoundingDiffSKU;
     }
+
+    /**
+     * @return bool
+     */
+    public function isUseShopwareJavascript(): bool
+    {
+        return $this->useShopwareJavascript;
+    }
+
+    /**
+     * @param bool $useShopwareJavascript
+     */
+    public function setUseShopwareJavascript(bool $useShopwareJavascript): void
+    {
+        $this->useShopwareJavascript = $useShopwareJavascript;
+    }
+
 }

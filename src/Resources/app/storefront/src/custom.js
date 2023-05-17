@@ -1,12 +1,10 @@
-import 'regenerator-runtime';
+import MollieRegistration from './register';
 
-import MollieCreditCardComponents from './mollie-payments/plugins/creditcard-components.plugin';
-import MollieCreditCardComponentsSw64 from './mollie-payments/plugins/creditcard-components-sw64.plugin';
-import MollieIDealIssuer from './mollie-payments/plugins/ideal-issuer.plugin';
-import MollieApplePayDirect from './mollie-payments/plugins/apple-pay-direct.plugin';
-import MollieApplePayPaymentMethod from './mollie-payments/plugins/apple-pay-payment-method.plugin';
-import MollieCreditCardMandateManage from './mollie-payments/plugins/creditcard-mandate-manage.plugin';
-
+// this file is used as a custom webpack-built JS resource that
+// works in all Shopware versions 6.4 and 6.5
+// it's consumed in a custom twig base file.
+// if this is not wanted, it can be turned off, then the main.js needs to be
+// manually built inside the Shopware that wants to use it.
 
 /**
  * ATTENTION:
@@ -22,38 +20,19 @@ import MollieCreditCardMandateManage from './mollie-payments/plugins/creditcard-
  */
 window.addEventListener('load', function () {
 
-    const pluginManager = window.PluginManager;
+    if (window.mollie_javascript_use_shopware !== undefined && window.mollie_javascript_use_shopware !== '1') {
+        
+        const molliePlugins = new MollieRegistration();
+        molliePlugins.register();
 
-    // global plugins
-    // -----------------------------------------------------------------------------
-    // hide apple pay direct buttons across the whole shop, if not available
-    pluginManager.register('MollieApplePayDirect', MollieApplePayDirect);
-    // this is just the iDEAL dropdown..not quite sure why its not bound to the DOM -> TODO?
-    pluginManager.register('MollieIDealIssuer', MollieIDealIssuer);
+        // fire our loaded events, so that plugin developers can still override our plugins
+        // -----------------------------------------------------------------------------
+        window.dispatchEvent(new Event('mollieLoaded'));
 
-
-    // hiding the standard Apple Pay method in the checkout and account area
-    // -----------------------------------------------------------------------------
-    pluginManager.register('MollieApplePayPaymentMethod', MollieApplePayPaymentMethod, '[data-mollie-template-applepay-account]');
-    pluginManager.register('MollieApplePayPaymentMethod', MollieApplePayPaymentMethod, '[data-mollie-template-applepay-checkout]');
-
-
-    // showing credit card components in the checkout
-    // we have 2 versions for < Shopware 6.4 and >= Shopware 6.4
-    // -----------------------------------------------------------------------------
-    pluginManager.register('MollieCreditCardComponents', MollieCreditCardComponents, '[data-mollie-template-creditcard-components]');
-    pluginManager.register('MollieCreditCardComponentsSw64', MollieCreditCardComponentsSw64, '[data-mollie-template-creditcard-components-sw64]');
-
-    // manage credit card mandate
-    // -----------------------------------------------------------------------------
-    pluginManager.register('MollieCreditCardMandateManage', MollieCreditCardMandateManage, '[data-mollie-credit-card-mandate-manage]');
-
-
-    // fire our loaded events, so that plugin developers can still override our plugins
-    // -----------------------------------------------------------------------------
-    window.dispatchEvent(new Event('mollieLoaded'));
-
-    // this is required so that our,plugins are existing
-    // -----------------------------------------------------------------------------
-    pluginManager.initializePlugins();
+        // this is required so that our,plugins are existing
+        // -----------------------------------------------------------------------------
+        window.PluginManager.initializePlugins();
+    }
 })
+
+

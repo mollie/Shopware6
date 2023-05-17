@@ -670,4 +670,20 @@
         </component>
     </card>
 
+    <card>
+        <title>Javascript</title>
+        <title lang="de-DE">Storefront Javascript</title>
+        <title lang="nl-NL">Storefront Javascript</title>
+        <input-field type="bool">
+            <name>useShopwareJavascript</name>
+            <label>Use Shopware default Javascript in Storefront (requires manual compilation)</label>
+            <label lang="de-DE">Verwenden Sie Shopware-Standard-Javascript in Storefront (erfordert manuelle Kompilierung)</label>
+            <label lang="nl-NL">Gebruik Shopware standaard Javascript in Storefront (vereist handmatig bouwen)</label>
+            <defaultValue>false</defaultValue>
+            <helpText>You can also bring back Mollie inside the "all.js" of the theme directly. This requires that you rebuild the Storefront on your own.</helpText>
+            <helpText>Sie können Mollie auch direkt in die "all.js" des Themes zurückbringen. Dies erfordert, dass Sie die Storefront selbst neu erstellen.</helpText>
+            <helpText lang="nl-NL">Je kunt Mollie ook rechtstreeks terugbrengen in de "all.js" van het thema. Dit vereist dat je de Storefront zelf herbouwt.</helpText>
+        </input-field>
+    </card>
+
 </config>
