@@ -81,9 +81,11 @@ export default class AdminOrdersAction {
 
         if (shopware.isVersionLower('6.5')) {
             repoOrdersDetails.getMollieActionsButton().click({force: true});
-            cy.wait(4000);
+            cy.wait(2000);
         }
 
+        // it will be lazy-loaded enabled
+        cy.wait(2000);
         repoOrdersDetails.getMollieActionButtonShipThroughMollie().click({force: true});
 
         // here are automatic reloads and things as it seems
@@ -114,13 +116,16 @@ export default class AdminOrdersAction {
      */
     setTrackingCode(trackingCode) {
 
-        repoOrdersDetails.getEditButton().click();
+        if (shopware.isVersionLower('6.5')) {
+            repoOrdersDetails.getEditButton().click();
+        }
 
         cy.wait(2000);
 
         // Tracking Code is added on OrderDetails Tab, therefore we need to open a new tab first
         // and navigating back after tracking code is set. since 6.5
         if (shopware.isVersionGreaterEqual('6.5')) {
+            cy.wait(1000);
             repoOrdersDetails.getOrderDetailsTab().click();
         }
 
