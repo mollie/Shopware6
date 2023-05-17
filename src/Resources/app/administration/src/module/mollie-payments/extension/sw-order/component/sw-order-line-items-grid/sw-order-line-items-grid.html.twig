@@ -5,7 +5,7 @@
                   columns="1fr auto"
                   gap="16px"
                   v-show="!editable"
-                v-if="shopwareVersion < 6.5"
+                  v-if="shopwareVersion < 6.5"
     >
 
         {% block sw_order_line_items_grid_line_item_filter %}
@@ -21,7 +21,8 @@
             <div align="right" v-if="isMollieOrder">
                 <sw-button-group>
                     {% block sw_order_line_items_grid_mollie_actions_button %}
-                        <sw-button class="sw-order-line-items-grid__actions-btn" variant="ghost" size="small" :block="true"
+                        <sw-button class="sw-order-line-items-grid__actions-btn" variant="ghost" size="small"
+                                   :block="true"
                                    :disabled="possibleActionsCount <= 0">
                             <sw-icon name="default-badge-info" decorative></sw-icon>
                             {{ $tc('mollie-payments.general.btnMollieActions') }}&nbsp;({{ possibleActionsCount }})
@@ -91,10 +92,10 @@
               :title="$tc('mollie-payments.modals.shipping.title')"
               variant="small">
         <mollie-ship-order
-        :tracking="tracking"
-        :shippableLineItems="shippableLineItems"
-        :showTrackingInfo="showTrackingInfo"
-        :order="order"
+                :tracking="tracking"
+                :shippableLineItems="shippableLineItems"
+                :showTrackingInfo="showTrackingInfo"
+                :order="order"
         >
         </mollie-ship-order>
         <template #modal-footer>

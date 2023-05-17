@@ -209,9 +209,13 @@ Component.override('sw-order-detail-general', {
             this.isRefundManagerPossible = refundManagerPossible;
         },
 
+        /**
+         *
+         * @param shippingPossible
+         */
         onShippingPossible(shippingPossible) {
-
             this.isShippingPossible = shippingPossible;
         },
+
     },
 });

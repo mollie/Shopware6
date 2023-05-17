@@ -40,7 +40,8 @@
                                 <sw-label class="mollie-order-user-card-subscription-badge"
                                           variant="info" size="medium" appearance="pill" :ghost="true" :caps="true"
                                           :dismissable="false">
-                                    <router-link :to="{ name: 'mollie.payments.subscription_detail', params: { id: subscriptionId } }">
+                                    <router-link
+                                            :to="{ name: 'mollie.payments.subscription_detail', params: { id: subscriptionId } }">
                                         {{ $tc('sw-order.detailExtended.subscriptionBadge') }}
                                     </router-link>
                                 </sw-label>
@@ -84,10 +85,12 @@
             <div class="mollie-property-column-right">
                 <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
                 {% block sw_order_detail_general_mollie_info_action_buttons %}
+                    {# Mollie Actions buttons for Shopware 6.5 #}
                     <sw-button-group split-button>
                         {% block sw_order_detail_general_mollie_info_action_buttons_order_shipping %}
                             <sw-button class="sw-order-line-items-grid__actions-ship-button"
                                        variant="ghost" size="small"
+                                       :disabled="!isShippingPossible"
                                        @click="onOpenShipOrderModal">
                                 {{ $tc('mollie-payments.general.shipThroughMollie') }}</sw-button>
                         {% endblock %}
@@ -136,9 +139,11 @@
     <dd v-if="refundedAmount > 0"><strong>{{ refundedAmount | currency(order.currency.shortName) }}</strong></dd>
 
     <dt v-if="refundAmountPending > 0"><strong>{{ $tc('sw-order.detailExtended.totalRefundsPending') }}</strong></dt>
-    <dd v-if="refundAmountPending > 0"><strong>{{ refundAmountPending | currency(order.currency.shortName) }}</strong></dd>
+    <dd v-if="refundAmountPending > 0"><strong>{{ refundAmountPending | currency(order.currency.shortName) }}</strong>
+    </dd>
 
-    <dt v-if="shippedQuantity > 0"><strong>{{ $tc('sw-order.detailExtended.totalShipments', 0, { quantity: shippedQuantity }) }}</strong></dt>
+    <dt v-if="shippedQuantity > 0">
+        <strong>{{ $tc('sw-order.detailExtended.totalShipments', 0, { quantity: shippedQuantity }) }}</strong></dt>
     <dd v-if="shippedQuantity > 0"><strong>{{ shippedAmount | currency(order.currency.shortName) }}</strong></dd>
 {% endblock %}
 

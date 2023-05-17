@@ -74,8 +74,6 @@ context("Order Shipping", () => {
             // verify delivery status and item shipped count
             assertShippingStatus('Shipped', 2);
 
-            repoOrderDetails.getMollieActionsButton().click({force: true});
-
             let disabledClassName = 'is--disabled'
             if (shopware.isVersionGreaterEqual('6.5')) {
                 disabledClassName = 'sw-button--disabled';
@@ -105,7 +103,9 @@ context("Order Shipping", () => {
 
             assertShippingStatus('Shipped', 2);
 
-            repoOrderDetails.getMollieActionsButton().click({force: true});
+            if (shopware.isVersionLower('6.5')) {
+                repoOrderDetails.getMollieActionsButton().click({force: true});
+            }
 
             let disabledClassName = 'is--disabled'
             if (shopware.isVersionGreaterEqual('6.5')) {
@@ -119,9 +119,7 @@ context("Order Shipping", () => {
 
             createOrderAndOpenAdmin(2, 2);
 
-
             adminOrders.openLineItemShipping(1);
-
 
             repoShippingItem.getShippedQuantity().should('contain.text', '0');
             repoShippingItem.getShippableQuantity().should('contain.text', '2');
@@ -160,7 +158,9 @@ context("Order Shipping", () => {
 
             assertShippingStatus('Shipped', 4);
 
-            repoOrderDetails.getMollieActionsButton().click({force: true});
+            if (shopware.isVersionLower('6.5')) {
+                repoOrderDetails.getMollieActionsButton().click({force: true});
+            }
 
             let disabledClassName = 'is--disabled'
             if (shopware.isVersionGreaterEqual('6.5')) {
@@ -249,10 +249,6 @@ function createOrderAndOpenAdmin(itemCount, itemQty) {
 
     mollieSandbox.initSandboxCookie();
     molliePayment.selectAuthorized();
-
-    // increase our viewport for admin
-    // otherwise we don't see a lot (page height)
-    cy.viewport(1920, 2000);
 
     adminLogin.login();
     adminOrders.openOrders();
