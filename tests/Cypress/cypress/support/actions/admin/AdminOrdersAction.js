@@ -85,7 +85,7 @@ export default class AdminOrdersAction {
         }
 
         // it will be lazy-loaded enabled
-        cy.wait(2000);
+        cy.wait(6000);
         repoOrdersDetails.getMollieActionButtonShipThroughMollie().click({force: true});
 
         // here are automatic reloads and things as it seems
