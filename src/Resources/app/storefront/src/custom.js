@@ -21,7 +21,7 @@ import MollieRegistration from './register';
 window.addEventListener('load', function () {
 
     if (window.mollie_javascript_use_shopware !== undefined && window.mollie_javascript_use_shopware !== '1') {
-        
+
         const molliePlugins = new MollieRegistration();
         molliePlugins.register();
 

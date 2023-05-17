@@ -35,14 +35,14 @@ class StorefrontBuildSubscriber implements EventSubscriberInterface
 
     /**
      * @param StorefrontRenderEvent $event
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function onStorefrontRender(StorefrontRenderEvent $event): void
     {
         $settings = $this->settingsService->getSettings($event->getSalesChannelContext()->getSalesChannel()->getId());
 
         $useJsValue = (int)$settings->isUseShopwareJavascript();
-        $event->setParameter('mollie_javascript_use_shopware',$useJsValue );
+        $event->setParameter('mollie_javascript_use_shopware', $useJsValue);
     }
 }

@@ -922,5 +922,4 @@ class MollieSettingStruct extends Struct
     {
         $this->useShopwareJavascript = $useShopwareJavascript;
     }
-
 }
