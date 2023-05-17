@@ -101,7 +101,7 @@ export default class AdminOrdersAction {
 
         repoOrdersDetails.getLineItemActionsButton(nthItem).click({force: true})
 
-        cy.wait(4000);
+        cy.wait(1000);
 
         repoOrdersDetails.getLineItemActionsButtonShipThroughMollie().click({force: true});
 
