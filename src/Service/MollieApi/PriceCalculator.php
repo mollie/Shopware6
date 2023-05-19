@@ -111,7 +111,14 @@ class PriceCalculator
             # now calculate our fake tax rate
             # from the final price and vat amount value
             $net = $roundedLineItemTotalPrice - $vatAmount;
-            $fakeTaxRate = $vatAmount / $net * 100;
+
+            if ($net !== 0) {
+                $fakeTaxRate = $vatAmount / $net * 100;
+            } else {
+                # this happened once, division by zero
+                # so just make 0 out of it (worked for client)
+                $fakeTaxRate = 0;
+            }
 
             $roundedVatRate = round($fakeTaxRate, 2);
 
