@@ -84,8 +84,7 @@ export default class AdminOrdersAction {
             cy.wait(2000);
         }
 
-        // it will be lazy-loaded enabled
-        cy.wait(6000);
+        repoOrdersDetails.getMollieActionButtonShipThroughMollie().should('not.have.class', 'sw-button--disabled');
         repoOrdersDetails.getMollieActionButtonShipThroughMollie().click({force: true});
 
         // here are automatic reloads and things as it seems
@@ -101,8 +100,7 @@ export default class AdminOrdersAction {
 
         repoOrdersDetails.getLineItemActionsButton(nthItem).click({force: true})
 
-        cy.wait(1000);
-
+        repoOrdersDetails.getLineItemActionsButtonShipThroughMollie().should('not.have.class', 'is--disabled');
         repoOrdersDetails.getLineItemActionsButtonShipThroughMollie().click({force: true});
 
         // here are automatic reloads and things as it seems
