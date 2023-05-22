@@ -61,7 +61,7 @@ describe('Credit Card Components', () => {
 
             if (shopware.isVersionEqual('6.4.0.0')) {
                 // https://issues.shopware.com/issues/NEXT-15044
-                getMochaContext().skip('This test is not working on Shopware 6.4.0, because the selected payment method is not active and therefore no credit card compnoents are visible. https://issues.shopware.com/issues/NEXT-15044');
+                getMochaContext().skip('This test is not working on Shopware 6.4.0, because the selected payment method is not active and therefore no credit card components are visible. https://issues.shopware.com/issues/NEXT-15044');
                 return;
             }
 
@@ -96,7 +96,7 @@ describe('Credit Card Components', () => {
 
             if (shopware.isVersionEqual('6.4.0.0')) {
                 // https://issues.shopware.com/issues/NEXT-15044
-                getMochaContext().skip('This test is not working on Shopware 6.4.0, because the selected payment method is not active and therefore no credit card compnoents are visible. https://issues.shopware.com/issues/NEXT-15044');
+                getMochaContext().skip('This test is not working on Shopware 6.4.0, because the selected payment method is not active and therefore no credit card components are visible. https://issues.shopware.com/issues/NEXT-15044');
                 return;
             }
 
@@ -120,7 +120,7 @@ describe('Credit Card Components', () => {
 
             if (shopware.isVersionEqual('6.4.0.0')) {
                 // https://issues.shopware.com/issues/NEXT-15044
-                getMochaContext().skip('This test is not working on Shopware 6.4.0, because the selected payment method is not active and therefore no credit card compnoents are visible. https://issues.shopware.com/issues/NEXT-15044');
+                getMochaContext().skip('This test is not working on Shopware 6.4.0, because the selected payment method is not active and therefore no credit card components are visible. https://issues.shopware.com/issues/NEXT-15044');
                 return;
             }
 
@@ -142,7 +142,7 @@ describe('Credit Card Components', () => {
         it('C4108: Invalid Card Number', () => {
 
             if (shopware.isVersionEqual('6.4.0.0')) {
-                getMochaContext().skip('This test is not working on Shopware 6.4.0, because the selected payment method is not active and therefore no credit card compnoents are visible. https://issues.shopware.com/issues/NEXT-15044');
+                getMochaContext().skip('This test is not working on Shopware 6.4.0, because the selected payment method is not active and therefore no credit card components are visible. https://issues.shopware.com/issues/NEXT-15044');
                 return;
             }
 
@@ -164,7 +164,7 @@ describe('Credit Card Components', () => {
         it('C4109: Invalid Expiry Date', () => {
 
             if (shopware.isVersionEqual('6.4.0.0')) {
-                getMochaContext().skip('This test is not working on Shopware 6.4.0, because the selected payment method is not active and therefore no credit card compnoents are visible. https://issues.shopware.com/issues/NEXT-15044');
+                getMochaContext().skip('This test is not working on Shopware 6.4.0, because the selected payment method is not active and therefore no credit card components are visible. https://issues.shopware.com/issues/NEXT-15044');
                 return;
             }
 
@@ -186,7 +186,7 @@ describe('Credit Card Components', () => {
         it('C4110: Invalid CVC Code', () => {
 
             if (shopware.isVersionEqual('6.4.0.0')) {
-                getMochaContext().skip('This test is not working on Shopware 6.4.0, because the selected payment method is not active and therefore no credit card compnoents are visible. https://issues.shopware.com/issues/NEXT-15044');
+                getMochaContext().skip('This test is not working on Shopware 6.4.0, because the selected payment method is not active and therefore no credit card components are visible. https://issues.shopware.com/issues/NEXT-15044');
                 return;
             }
 
@@ -227,7 +227,7 @@ describe('Credit Card Components', () => {
             if (shopware.isVersionGreaterEqual(6.4)) {
 
                 payment.showAllPaymentMethods();
-                payment.selectPaymentMethod('Credit card');
+                payment.selectPaymentMethod('Card');
                 payment.showAllPaymentMethods();
 
                 payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '1228', '1234');
@@ -235,7 +235,7 @@ describe('Credit Card Components', () => {
             } else {
 
                 payment.openPaymentsModal();
-                payment.selectPaymentMethod('Credit card');
+                payment.selectPaymentMethod('Card');
 
                 payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '1228', '1234');
 
@@ -376,13 +376,13 @@ function setUp() {
     cy.pause();
 
     if (shopware.isVersionGreaterEqual(6.4)) {
-        payment.switchPaymentMethod('Credit card');
+        payment.switchPaymentMethod('Card');
     } else {
         payment.openPaymentsModal();
         // only select the card, and do not switch completely
         // we still need our modal, to add our components data
         // before closing it.
-        payment.selectPaymentMethod('Credit card');
+        payment.selectPaymentMethod('Card');
     }
 }
 

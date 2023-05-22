@@ -19,7 +19,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 class CreditCardPayment extends PaymentHandler
 {
     public const PAYMENT_METHOD_NAME = PaymentMethod::CREDITCARD;
-    public const PAYMENT_METHOD_DESCRIPTION = 'Credit card';
+    public const PAYMENT_METHOD_DESCRIPTION = 'Card';
     protected const FIELD_CREDIT_CARD_TOKEN = 'cardToken';
 
     /** @var string */
