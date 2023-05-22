@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Service;
 
 use Exception;
+use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieCustomerException;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
@@ -19,6 +20,7 @@ use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Customer\Event\CustomerBeforeLoginEvent;
 use Shopware\Core\Checkout\Customer\Event\CustomerLoginEvent;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
+use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -504,7 +506,16 @@ class CustomerService implements CustomerServiceInterface
     {
         try {
             $criteria = new Criteria();
-            $criteria->addFilter(new EqualsFilter('salutationKey', 'not_specified'));
+
+            $versionCompare = new VersionCompare($this->shopwareVersion);
+
+            if ($versionCompare->gte('6.5.0.0')) {
+                $criteria->addFilter(new EqualsFilter('salutationKey', 'not_specified'));
+            } else {
+                # in Shopware 6.4.x, it seems that not_specified is not allowed in the AddressValidator->isValidSalutationId.
+                # So we unfortunately have to use "mr" as a fallback.
+                $criteria->addFilter(new EqualsFilter('salutationKey', 'mr'));
+            }
 
             // Get salutations
             /** @var string[] $salutations */
