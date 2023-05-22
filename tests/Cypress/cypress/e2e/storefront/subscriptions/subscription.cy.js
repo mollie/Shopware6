@@ -123,7 +123,7 @@ describe('Subscription', () => {
                         paymentAction.closePaymentsModal();
                     }
 
-                    paymentAction.switchPaymentMethod('Credit card');
+                    paymentAction.switchPaymentMethod('Card');
 
                     shopware.prepareDomainChange();
                     checkout.placeOrderOnConfirm();
@@ -366,7 +366,7 @@ describe('Subscription', () => {
                         paymentAction.openPaymentsModal();
                     }
 
-                    paymentAction.switchPaymentMethod('Credit card');
+                    paymentAction.switchPaymentMethod('Card');
 
                     shopware.prepareDomainChange();
                     checkout.placeOrderOnConfirm();
@@ -410,7 +410,7 @@ function assertAvailablePaymentMethods() {
     cy.contains('paysafecard').should('not.exist');
 
     cy.contains('iDEAL').should('exist');
-    cy.contains('Credit card').should('exist');
+    cy.contains('Card').should('exist');
     cy.contains('SOFORT').should('exist');
     cy.contains('eps').should('exist');
     cy.contains('Bancontact').should('exist');
@@ -426,7 +426,7 @@ function prepareSubscriptionAndOpenDetails() {
     const dummyScenario = new DummyBasketScenario(1)
     dummyScenario.execute();
 
-    paymentAction.switchPaymentMethod('Credit card');
+    paymentAction.switchPaymentMethod('Card');
     shopware.prepareDomainChange();
     checkout.placeOrderOnConfirm();
 

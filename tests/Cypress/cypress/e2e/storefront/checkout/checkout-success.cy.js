@@ -40,7 +40,7 @@ const device = devices.getFirstDevice();
 
 
 const payments = [
-    {caseId: 'C4101', key: 'credit-card', name: 'Credit card'},
+    {caseId: 'C4101', key: 'credit-card', name: 'Card'},
     {caseId: 'C4111', key: 'paypal', name: 'PayPal'},
     {caseId: 'C466903', key: 'billie', name: 'Billie'},
     {caseId: 'C4114', key: 'klarnapaynow', name: 'Pay now'},
