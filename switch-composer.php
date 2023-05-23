@@ -6,7 +6,7 @@ $env = (count($argv) >= 2) ? (string)$argv[1] : '';
 $composerContent = file_get_contents(__DIR__ . '/composer.json');
 $composerContent = json_decode($composerContent, true);
 
-const SW_VERSIONS_RELEASE = '>=6.3.5';
+const SW_VERSIONS_RELEASE = '>=6.4.0';
 const SW_VERSIONS_DEV = '*';
 
 

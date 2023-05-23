@@ -13,15 +13,5 @@ jobs:
       - name: Clone Code
         uses: actions/checkout@v3
 
-      - name: Create Cache Directories
-        run: |
-          mkdir -p ~/.build
-
-      - name: Mount Build Cache
-        uses: actions/cache@v3
-        with:
-          key: cache-plugin-${{ github.run_id }}
-          path: ~/.build
-
       - name: Build Plugin
         uses: ./.github/actions/build-plugin

@@ -158,13 +158,15 @@ endif
 	make build -B
 	# -------------------------------------------------------------------------------------------------
 	@echo "INSTALL PRODUCTION DEPENDENCIES"
-	php switch-composer.php prod
 	make prod -B
 	rm -rf ./src/Resources/app/storefront/node_modules/*
 	# DELETE distribution file. that ones not compatible between 6.5 and 6.4
 	# if one wants to use it, they need to run build-storefront.sh manually and activate that feature
 	# in our plugin configuration! (use shopware standard js)
 	rm -rf ./src/Resources/app/storefront/dist/storefront
+	# switch to PROD dependencies before zipping plugin
+	# this is very important for the Shopware Store.
+	php switch-composer.php prod
 	# -------------------------------------------------------------------------------------------------
 	@echo "CREATE ZIP FILE"
 	cd .. && zip -qq -r -0 ./.build/MolliePayments.zip MolliePayments/ -x '*.editorconfig' '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*' '*/makefile' '*.DS_Store' '*/.shopware-extension.yml' '*/switch-composer.php' '*/phpunit.xml' '*/.phpunuhi.xml' '*/.infection.json' '*/phpunit.autoload.php' '*/.phpstan*' '*/.php_cs.php' '*/phpinsights.php'
