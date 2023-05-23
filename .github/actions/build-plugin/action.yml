@@ -45,9 +45,19 @@ runs:
       run: |
         docker cp shop:/var/www/html/custom/plugins/.build/MolliePayments.zip ~/.build/MolliePayments.zip
 
+    - name: Extract ZIP file for artifact
+      shell: bash
+      run: |
+        unzip ~/.build/MolliePayments.zip -d ~/.build/MolliePayments
+
     - name: Store ZIP file in Github
       uses: actions/upload-artifact@v2
       with:
         name: MolliePayments-Shopware
         retention-days: 4
-        path: ~/.build
+        path: ~/.build/MolliePayments
+
+    - name: Delete TMP files
+      shell: bash
+      run: |
+        rm -rf ~/.build/MolliePayments
