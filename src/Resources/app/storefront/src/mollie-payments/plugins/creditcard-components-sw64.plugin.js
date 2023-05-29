@@ -78,7 +78,7 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
         this._confirmFormButton.disabled = false;
 
         // TODO check this
-        const loader = document.querySelector(this._confirmFormButton).querySelector('.loader');
+        const loader = this._confirmFormButton.querySelector('.loader');
 
         if (loader) {
             loader.remove();
