@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Service;
 
+use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 
 class ConfigService
@@ -19,15 +20,29 @@ class ConfigService
     /** @var null|string */
     private $salesChannelId;
 
+    /**
+     * @var MollieGatewayInterface
+     */
+    private $gatewayMollie;
+
+    /**
+     * @var SettingsService
+     */
+    private $settingsService;
+
 
     /**
      * @param SystemConfigService $systemConfigService
-     * @param null|string $salesChannelId
+     * @param MollieGatewayInterface $mollieGateway
+     * @param SettingsService $settingsService
+     * @param string|null $salesChannelId
      */
-    public function __construct(SystemConfigService $systemConfigService, ?string $salesChannelId = null)
+    public function __construct(SystemConfigService $systemConfigService, MollieGatewayInterface $mollieGateway, SettingsService $settingsService, ?string $salesChannelId = null)
     {
         $this->systemConfigService = $systemConfigService;
         $this->salesChannelId = $salesChannelId;
+        $this->settingsService = $settingsService;
+        $this->gatewayMollie = $mollieGateway;
     }
 
     /**
@@ -95,4 +110,20 @@ class ConfigService
     {
         $this->salesChannelId = $salesChannelId;
     }
+
+    /**
+     * @param string $salesChannelId
+     * @return void
+     */
+    public function fetchProfileId(string $salesChannelId): void
+    {
+        $this->gatewayMollie->switchClient($salesChannelId);
+
+        $profileId = $this->gatewayMollie->getProfileId();
+
+        $isTestMode = $this->settingsService->getSettings($salesChannelId)->isTestMode();
+
+        $this->settingsService->setProfileId($profileId, $salesChannelId, $isTestMode);
+    }
+
 }

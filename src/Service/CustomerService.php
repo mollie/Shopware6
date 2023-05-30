@@ -65,11 +65,18 @@ class CustomerService implements CustomerServiceInterface
     /** @var SettingsService */
     private $settingsService;
 
+    /**
+     * @var ConfigService
+     */
+    private $configService;
+
+
     /** @var string */
     private $shopwareVersion;
 
     /** @var NumberRangeValueGeneratorInterface */
     private $valueGenerator;
+
 
     /**
      * @param CountryRepositoryInterface $countryRepository
@@ -82,8 +89,9 @@ class CustomerService implements CustomerServiceInterface
      * @param SettingsService $settingsService
      * @param string $shopwareVersion
      * @param NumberRangeValueGeneratorInterface $valueGenerator
+     * @param ConfigService $configService
      */
-    public function __construct(CountryRepositoryInterface $countryRepository, CustomerRepositoryInterface $customerRepository, Customer $customerApiService, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger, SalesChannelContextPersister $salesChannelContextPersister, SalutationRepositoryInterface $salutationRepository, SettingsService $settingsService, string $shopwareVersion, NumberRangeValueGeneratorInterface $valueGenerator)
+    public function __construct(CountryRepositoryInterface $countryRepository, CustomerRepositoryInterface $customerRepository, Customer $customerApiService, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger, SalesChannelContextPersister $salesChannelContextPersister, SalutationRepositoryInterface $salutationRepository, SettingsService $settingsService, string $shopwareVersion, NumberRangeValueGeneratorInterface $valueGenerator, ConfigService $configService)
     {
         $this->countryRepository = $countryRepository;
         $this->customerRepository = $customerRepository;
@@ -95,6 +103,7 @@ class CustomerService implements CustomerServiceInterface
         $this->settingsService = $settingsService;
         $this->shopwareVersion = $shopwareVersion;
         $this->valueGenerator = $valueGenerator;
+        $this->configService = $configService;
     }
 
     /**
@@ -286,8 +295,8 @@ class CustomerService implements CustomerServiceInterface
      * @param string $customerId
      * @param string $salesChannelId
      * @param Context $context
-     * @throws CustomerCouldNotBeFoundException
      * @return string
+     * @throws CustomerCouldNotBeFoundException
      */
     public function getMollieCustomerId(string $customerId, string $salesChannelId, Context $context): string
     {
@@ -348,8 +357,8 @@ class CustomerService implements CustomerServiceInterface
     /**
      * @param string $customerId
      * @param Context $context
-     * @throws CustomerCouldNotBeFoundException
      * @return CustomerStruct
+     * @throws CustomerCouldNotBeFoundException
      */
     public function getCustomerStruct(string $customerId, Context $context): CustomerStruct
     {
@@ -529,12 +538,12 @@ class CustomerService implements CustomerServiceInterface
         $struct = $this->getCustomerStruct($customerId, $context);
 
         if (empty($settings->getProfileId())) {
-            $this->logger->warning('No profile ID available, cannot create customer.', [
+            $this->logger->warning('No profile ID available, fetch new Profile Id', [
                 'saleschannel' => $salesChannelId,
                 'customerId' => $customerId,
             ]);
 
-            return;
+            $this->configService->fetchProfileId($salesChannelId);
         }
 
         if ($this->customerApiService->isLegacyCustomerValid($struct->getLegacyCustomerId(), $salesChannelId)) {
