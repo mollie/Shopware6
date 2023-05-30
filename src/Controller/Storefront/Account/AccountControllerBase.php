@@ -6,6 +6,7 @@ use Kiener\MolliePayments\Components\Subscription\Page\Account\SubscriptionPageL
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Content\Media\Pathname\UrlGeneratorInterface;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
@@ -13,6 +14,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGenerator;
 
 class AccountControllerBase extends StorefrontController
 {
@@ -209,7 +211,16 @@ class AccountControllerBase extends StorefrontController
         }
 
         try {
-            $checkoutUrl = $this->subscriptionManager->updatePaymentMethodStart($swSubscriptionId, '', $salesChannelContext->getContext());
+
+            $redirectUrl = $this->generateUrl(
+                'frontend.account.mollie.subscriptions.payment.update-success',
+                [
+                    'swSubscriptionId' => $swSubscriptionId
+                ],
+                UrlGenerator::ABSOLUTE_URL
+            );
+
+            $checkoutUrl = $this->subscriptionManager->updatePaymentMethodStart($swSubscriptionId, $redirectUrl, $salesChannelContext->getContext());
 
             return $this->redirect($checkoutUrl);
         } catch (\Throwable $exception) {
