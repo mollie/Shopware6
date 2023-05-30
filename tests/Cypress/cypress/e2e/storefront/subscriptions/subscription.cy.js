@@ -24,6 +24,7 @@ import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatu
 import CreditCardScreenAction from "cypress-mollie/src/actions/screens/CreditCardScreen";
 import DummyBasketScenario from "Scenarios/DummyBasketScenario";
 import SubscriptionDetailsRepository from "Repositories/admin/subscriptions/SubscriptionDetailsRepository";
+import SubscriptionRepository from "Repositories/storefront/account/SubscriptionRepository";
 
 
 const devices = new Devices();
@@ -37,6 +38,7 @@ const repoProductDetailsAdmin = new ProductDetailRepository();
 const repoOrdersDetails = new OrderDetailsRepository();
 const repoAdminSubscriptions = new SubscriptionsListRepository();
 const repoAdminSubscriptonDetails = new SubscriptionDetailsRepository();
+const repoSubscriptionStorefront = new SubscriptionRepository();
 
 const configAction = new ShopConfigurationAction();
 const adminProducts = new AdminProductsAction();
@@ -202,7 +204,7 @@ describe('Subscription', () => {
 
                 it('C183210: Subscription page in Administration has links to customer and order', () => {
 
-                    prepareSubscriptionAndOpenDetails();
+                    prepareSubscriptionAndOpenAdminDetails();
 
                     // --------------------------------------------------------------------------------------------------
 
@@ -222,7 +224,7 @@ describe('Subscription', () => {
 
                 it('C183206: Pause subscription in Administration', () => {
 
-                    prepareSubscriptionAndOpenDetails();
+                    prepareSubscriptionAndOpenAdminDetails();
 
                     repoAdminSubscriptonDetails.getStatusField().should('be.visible');
                     vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Active');
@@ -241,7 +243,7 @@ describe('Subscription', () => {
 
                 it('C183208: Resume subscription in Administration', () => {
 
-                    prepareSubscriptionAndOpenDetails();
+                    prepareSubscriptionAndOpenAdminDetails();
 
                     vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Active');
 
@@ -263,7 +265,7 @@ describe('Subscription', () => {
 
                 it('C183207: Skip subscription in Administration', () => {
 
-                    prepareSubscriptionAndOpenDetails();
+                    prepareSubscriptionAndOpenAdminDetails();
 
                     vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Active');
 
@@ -281,7 +283,7 @@ describe('Subscription', () => {
 
                 it('C183209: Cancel subscription in Administration', () => {
 
-                    prepareSubscriptionAndOpenDetails();
+                    prepareSubscriptionAndOpenAdminDetails();
 
                     repoAdminSubscriptonDetails.getStatusField().should('be.visible');
                     vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Active');
@@ -387,7 +389,7 @@ describe('Subscription', () => {
 
                 it('C176306: Subscriptions are available in Account', () => {
 
-                    prepareSubscriptionAndOpenDetails();
+                    prepareSubscriptionAndOpenAdminDetails();
 
                     cy.visit('/');
                     topMenu.clickAccountWidgetSubscriptions();
@@ -397,6 +399,12 @@ describe('Subscription', () => {
                     cy.contains('.account-aside', 'Subscriptions');
                     // we should at least find 1 subscription
                     cy.get('.account-order-overview').find('.order-table').should('have.length.greaterThan', 0);
+
+                    repoSubscriptionStorefront.getSubscriptionContextMenuButton(0).click();
+                    cy.contains('Repeat subscription');
+
+                    repoSubscriptionStorefront.getSubscriptionViewButton(0).click();
+                    cy.contains('edit billing address');
                 })
 
             })
@@ -419,7 +427,7 @@ function assertAvailablePaymentMethods() {
     cy.contains('PayPal').should('exist');
 }
 
-function prepareSubscriptionAndOpenDetails() {
+function prepareSubscriptionAndOpenAdminDetails() {
     configAction.setupPlugin(true, false, false, true);
     configAction.updateProducts('', true, 3, 'weeks');
 
