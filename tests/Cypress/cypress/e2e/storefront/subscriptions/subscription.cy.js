@@ -387,7 +387,7 @@ describe('Subscription', () => {
                     assertAvailablePaymentMethods();
                 })
 
-                it('C176306: Subscriptions are available in Account', () => {
+                it.only('C176306: Subscriptions are available in Account', () => {
 
                     prepareSubscriptionAndOpenAdminDetails();
 
@@ -400,11 +400,11 @@ describe('Subscription', () => {
                     // we should at least find 1 subscription
                     cy.get('.account-order-overview').find('.order-table').should('have.length.greaterThan', 0);
 
-                    repoSubscriptionStorefront.getSubscriptionContextMenuButton(0).click();
-                    cy.contains('Repeat subscription');
-
                     repoSubscriptionStorefront.getSubscriptionViewButton(0).click();
                     cy.contains('edit billing address');
+
+                    repoSubscriptionStorefront.getSubscriptionContextMenuButton(0).click();
+                    cy.contains('Repeat subscription');
                 })
 
             })
