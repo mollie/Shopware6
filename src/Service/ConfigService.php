@@ -35,7 +35,7 @@ class ConfigService
      * @param SystemConfigService $systemConfigService
      * @param MollieGatewayInterface $mollieGateway
      * @param SettingsService $settingsService
-     * @param string|null $salesChannelId
+     * @param null|string $salesChannelId
      */
     public function __construct(SystemConfigService $systemConfigService, MollieGatewayInterface $mollieGateway, SettingsService $settingsService, ?string $salesChannelId = null)
     {
@@ -125,5 +125,4 @@ class ConfigService
 
         $this->settingsService->setProfileId($profileId, $salesChannelId, $isTestMode);
     }
-
 }

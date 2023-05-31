@@ -211,7 +211,6 @@ class AccountControllerBase extends StorefrontController
         }
 
         try {
-
             $redirectUrl = $this->generateUrl(
                 'frontend.account.mollie.subscriptions.payment.update-success',
                 [

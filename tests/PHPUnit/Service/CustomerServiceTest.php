@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Tests\Service;
 use Kiener\MolliePayments\Repository\Country\CountryRepository;
 use Kiener\MolliePayments\Repository\Customer\CustomerRepositoryInterface;
 use Kiener\MolliePayments\Repository\Salutation\SalutationRepository;
+use Kiener\MolliePayments\Service\ConfigService;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
 use Kiener\MolliePayments\Service\MollieApi\Mandate;
@@ -51,7 +52,7 @@ class CustomerServiceTest extends TestCase
             $this->settingsService,
             'does.not.matter.here',
             $this->createMock(NumberRangeValueGeneratorInterface::class),
-            $this->createMock(Mandate::class)
+            $this->createMock(ConfigService::class)
         );
 
     }
