@@ -133,6 +133,13 @@ export default class MollieApplePayDirect extends Plugin {
                 quantity = quantitySelects[0].value;
             }
 
+            // also try our Shopware 6.5 selector
+            const sw65Selector = 'lineItems[' + productId + '][quantity]';
+            quantitySelects = document.getElementsByName(sw65Selector)
+            if (quantitySelects.length > 0) {
+                quantity = quantitySelects[0].value;
+            }
+
             me.addProductToCart(productId, quantity, shopUrl);
         }
 
