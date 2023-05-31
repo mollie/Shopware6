@@ -71,7 +71,9 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
     }
 
     _registerEvents() {
-        this._confirmForm.addEventListener('submit', this.submitForm.bind(this));
+        if (this._confirmForm !== null) {
+            this._confirmForm.addEventListener('submit', this.submitForm.bind(this));
+        }
     }
 
     _reactivateFormSubmit() {

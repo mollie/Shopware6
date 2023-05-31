@@ -76,8 +76,10 @@
                                     <span class="mollie-credit-card-mandate-actions-item">
                                     {% block mollie_credit_card_mandate_block_actions_remove %}
                                         <span class="mollie-credit-card-mandate-actions-item-text mollie-credit-card-mandate-remove"
-                                        {{ dataBsToggleAttr }}="modal"
-                                                {{ dataBsTargetAttr }}="#{{ mandate.beingUsedForSubscription ? 'mollieCreditCardSubscriptionMandateRemoveModal' : 'mollieCreditCardMandateRemoveModal' }}"
+                                              data-toggle="modal"
+                                              data-bs-toggle="modal"
+                                              data-target="#{{ mandate.beingUsedForSubscription ? 'mollieCreditCardSubscriptionMandateRemoveModal' : 'mollieCreditCardMandateRemoveModal' }}"
+                                              data-bs-target="#{{ mandate.beingUsedForSubscription ? 'mollieCreditCardSubscriptionMandateRemoveModal' : 'mollieCreditCardMandateRemoveModal' }}"
                                             >
                                                 {{ "molliePayments.components.mandate.remove"|trans|striptags }}
                                             </span>

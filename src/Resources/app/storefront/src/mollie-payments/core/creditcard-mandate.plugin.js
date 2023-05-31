@@ -31,7 +31,7 @@ export default class MollieCreditCardMandate extends Plugin {
         }
 
         this.mollieCreditCarfFormEl = document.querySelector('.mollie-components-credit-card');
-        this.mollieCreditCardMandateEls = document.querySelector('input[name="mollieCreditCardMandate"]');
+        this.mollieCreditCardMandateEls = document.querySelectorAll('input[name="mollieCreditCardMandate"]');
 
         if (!this.mollieCreditCarfFormEl || !this.mollieCreditCardMandateEls) {
             return
@@ -98,6 +98,9 @@ export default class MollieCreditCardMandate extends Plugin {
             return;
         }
 
-        this.mollieCreditCarfFormEl.classList.add('d-none');
+        // i dont know...makes no sense but works
+        if (mandateValue !== null) {
+            this.mollieCreditCarfFormEl.classList.add('d-none');
+        }
     }
 }

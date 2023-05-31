@@ -45,12 +45,12 @@ export default class MollieCreditCardMandateManage extends Plugin {
 
     registerEvents() {
 
-        const removeButtons = document.querySelector('.mollie-credit-card-mandate-remove');
+        const removeButtons = document.querySelectorAll('.mollie-credit-card-mandate-remove');
         if (!removeButtons || removeButtons.length === 0) {
             return;
         }
 
-        const modalRemoveButtons = document.querySelector('.mollie-credit-card-mandate-remove-modal-button');
+        const modalRemoveButtons = document.querySelectorAll('.mollie-credit-card-mandate-remove-modal-button');
         if (!modalRemoveButtons || modalRemoveButtons.length === 0) {
             return;
         }
