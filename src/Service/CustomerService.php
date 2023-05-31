@@ -543,14 +543,18 @@ class CustomerService implements CustomerServiceInterface
                 'customerId' => $customerId,
             ]);
 
+            // auto-fix missing profile IDs
             $this->configService->fetchProfileId($salesChannelId);
+
+            // refresh settings with new fetched profile id
+            $settings = $this->settingsService->getSettings($salesChannelId);
         }
 
         if ($this->customerApiService->isLegacyCustomerValid($struct->getLegacyCustomerId(), $salesChannelId)) {
             $this->setMollieCustomerId(
                 $customerId,
                 (string)$struct->getLegacyCustomerId(),
-                $settings->getProfileId(),
+                (string)$settings->getProfileId(),
                 $settings->isTestMode(),
                 $context
             );
@@ -587,7 +591,7 @@ class CustomerService implements CustomerServiceInterface
         $this->setMollieCustomerId(
             $customerId,
             $mollieCustomer->id,
-            $settings->getProfileId(),
+            (string)$settings->getProfileId(),
             $settings->isTestMode(),
             $context
         );
