@@ -35,16 +35,17 @@ class CustomFieldService
     public function addCustomFields(Context $context): void
     {
         try {
+            $fieldSetId = Uuid::randomHex();
             $mollieOrderFieldId = Uuid::randomHex();
             $mollieCustomerFieldId = Uuid::randomHex();
             $iDealIssuerFieldId = Uuid::randomHex();
 
             $this->repoCustomFieldSets->upsert([[
-                'id' => Uuid::randomHex(),
+                'id' => $fieldSetId,
                 'name' => 'mollie_payments',
                 'config' => [
                     'label' => [
-                        'en-GB' => 'Mollie'
+                        'en-GB' => 'Mollie',
                     ]
                 ],
                 'customFields' => [
@@ -58,6 +59,7 @@ class CustomFieldService
                             'customFieldPosition' => 1,
                             'label' => [
                                 'en-GB' => 'Mollie customer ID',
+                                'de-DE' => 'Mollie Kunden ID',
                                 'nl-NL' => 'Mollie customer ID'
                             ]
                         ]
@@ -72,6 +74,7 @@ class CustomFieldService
                             'customFieldPosition' => 1,
                             'label' => [
                                 'en-GB' => 'Mollie transaction ID',
+                                'de-DE' => 'Mollie Transaktions ID',
                                 'nl-NL' => 'Mollie transactienummer'
                             ]
                         ]
@@ -86,6 +89,7 @@ class CustomFieldService
                             'customFieldPosition' => 1,
                             'label' => [
                                 'en-GB' => 'Preferred iDeal issuer',
+                                'de-DE' => 'iDeal Bankpräferenz',
                                 'nl-NL' => 'iDeal bankvoorkeur'
                             ]
                         ]
@@ -93,16 +97,12 @@ class CustomFieldService
                 ],
                 'relations' => [
                     [
-                        'id' => $mollieCustomerFieldId,
+                        'id' => Uuid::randomHex(),
                         'entityName' => CustomerDefinition::ENTITY_NAME
                     ],
                     [
-                        'id' => $mollieOrderFieldId,
+                        'id' => Uuid::randomHex(),
                         'entityName' => OrderDefinition::ENTITY_NAME
-                    ],
-                    [
-                        'id' => $iDealIssuerFieldId,
-                        'entityName' => CustomerDefinition::ENTITY_NAME
                     ]
                 ]
             ]], $context);
