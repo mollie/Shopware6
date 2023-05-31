@@ -387,7 +387,7 @@ describe('Subscription', () => {
                     assertAvailablePaymentMethods();
                 })
 
-                it.only('C176306: Subscriptions are available in Account', () => {
+                it('C176306: Subscriptions are available in Account', () => {
 
                     prepareSubscriptionAndOpenAdminDetails();
 
