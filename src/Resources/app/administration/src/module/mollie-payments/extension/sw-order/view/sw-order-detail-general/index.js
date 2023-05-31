@@ -14,6 +14,7 @@ Component.override('sw-order-detail-general', {
 
     data() {
         return {
+            configShowRefundManager: false,
             remainingAmount: 0.0,
             refundedAmount: 0.0,
             voucherAmount: 0.0,
@@ -33,6 +34,7 @@ Component.override('sw-order-detail-general', {
         'MolliePaymentsRefundService',
         'MolliePaymentsShippingService',
         'MolliePaymentsOrderService',
+        'MolliePaymentsConfigService',
     ],
 
     computed: {
@@ -145,6 +147,10 @@ Component.override('sw-order-detail-general', {
                 this.MolliePaymentsOrderService.getPaymentUrl({orderId: this.order.id}).then(response => {
                     this.molliePaymentUrl = (response.url !== null) ? response.url : '';
                 });
+
+                this.MolliePaymentsConfigService.getRefundManagerConfig(this.order.salesChannelId).then((response) => {
+                    this.configShowRefundManager = response.enabled;
+                });
             }
         },
 
@@ -206,6 +212,12 @@ Component.override('sw-order-detail-general', {
         },
 
         onRefundManagerPossible(refundManagerPossible) {
+
+            if (!this.configShowRefundManager) {
+                this.isRefundManagerPossible = false;
+                return;
+            }
+
             this.isRefundManagerPossible = refundManagerPossible;
         },
 
