@@ -7,7 +7,7 @@ $composerContent = file_get_contents(__DIR__ . '/composer.json');
 $composerContent = json_decode($composerContent, true);
 
 const SW_VERSIONS_RELEASE = '>=6.4.0';
-const SW_VERSIONS_DEV = '>=6.5.0';
+const SW_VERSIONS_DEV = '*';
 
 
 if ($env === 'prod') {
