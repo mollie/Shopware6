@@ -367,7 +367,7 @@ Component.register('mollie-refund-manager', {
             const diff = Math.abs(this.refundAmount - this.remainingAmount);
 
             // show if 5 cents or less diff
-            return diff > 0 && diff <= 0.05;
+            return diff > 0 && diff <= 0.07;
         },
 
         /**
