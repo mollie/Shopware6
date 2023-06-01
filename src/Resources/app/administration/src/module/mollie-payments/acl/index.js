@@ -7,12 +7,14 @@ Shopware.Service('privileges').addPrivilegeMappingEntry({
         viewer: {
             privileges: [
                 'mollie_refund_manager:read',
+                'mollie_refund:read',
             ],
             dependencies: [],
         },
         creator: {
             privileges: [
                 'mollie_refund_manager:create',
+                'mollie_refund:create',
             ],
             dependencies: [
                 'mollie_refund_manager.viewer',
@@ -21,6 +23,7 @@ Shopware.Service('privileges').addPrivilegeMappingEntry({
         deleter: {
             privileges: [
                 'mollie_refund_manager:delete',
+                'mollie_refund:delete',
             ],
             dependencies: [
                 'mollie_refund_manager.creator',
