@@ -2,7 +2,6 @@
 
 namespace MolliePayments\Fixtures\Product\Traits;
 
-
 use Basecom\FixturePlugin\FixtureHelper;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -10,7 +9,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 
 trait ProductFixtureTrait
 {
-
     /**
      * @param string $id
      * @param string $name
@@ -48,46 +46,46 @@ trait ProductFixtureTrait
         # delete our temp file again
         unlink($imagePath);
 
-        $repoProducts->upsert([
+        $repoProducts->upsert(
             [
-                'id' => $id,
-                'name' => $name,
-                'taxId' => $helper->SalesChannel()->getTax19()->getId(),
-                'productNumber' => $number,
-                'description' => $description,
-                'visibilities' => [
-                    [
-                        'id' => $visibilityID,
-                        'salesChannelId' => $helper->SalesChannel()->getStorefrontSalesChannel()->getId(),
-                        'visibility' => 30,
-                    ]
-                ],
-                'categories' => [
-                    [
-                        'id' => $helper->Category()->getByName($categoryName)->getId(),
-                    ]
-                ],
-                'stock' => 10,
-                'price' => [
-                    [
-                        'currencyId' => $helper->SalesChannel()->getCurrencyEuro()->getId(),
-                        'gross' => $price,
-                        'net' => $price,
-                        'linked' => true,
-                    ]
-                ],
-                'media' => [
-                    [
-                        'id' => $coverId,
-                        'mediaId' => $mediaId,
-                    ]
-                ],
-                'coverId' => $coverId,
-                'customFields' => $customFields,
-            ]
-        ],
+                [
+                    'id' => $id,
+                    'name' => $name,
+                    'taxId' => $helper->SalesChannel()->getTax19()->getId(),
+                    'productNumber' => $number,
+                    'description' => $description,
+                    'visibilities' => [
+                        [
+                            'id' => $visibilityID,
+                            'salesChannelId' => $helper->SalesChannel()->getStorefrontSalesChannel()->getId(),
+                            'visibility' => 30,
+                        ]
+                    ],
+                    'categories' => [
+                        [
+                            'id' => $helper->Category()->getByName($categoryName)->getId(),
+                        ]
+                    ],
+                    'stock' => 10,
+                    'price' => [
+                        [
+                            'currencyId' => $helper->SalesChannel()->getCurrencyEuro()->getId(),
+                            'gross' => $price,
+                            'net' => $price,
+                            'linked' => true,
+                        ]
+                    ],
+                    'media' => [
+                        [
+                            'id' => $coverId,
+                            'mediaId' => $mediaId,
+                        ]
+                    ],
+                    'coverId' => $coverId,
+                    'customFields' => $customFields,
+                ]
+            ],
             Context::createDefaultContext()
         );
     }
-
 }

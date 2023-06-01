@@ -11,7 +11,6 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 
 class MollieShippingLineItemBuilder
 {
-
     /**
      * @var PriceCalculator
      */

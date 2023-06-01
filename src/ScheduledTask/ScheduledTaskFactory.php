@@ -9,7 +9,6 @@ use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTask;
 
 class ScheduledTaskFactory
 {
-
     /**
      * @var PluginSettingsServiceInterface
      */

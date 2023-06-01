@@ -29,7 +29,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class SubscriptionPageLoader
 {
-
     /**
      * @var GenericPageLoaderInterface
      */

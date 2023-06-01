@@ -8,7 +8,6 @@ use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
 class CreditCardMandatesResponse extends StoreApiResponse
 {
-
     /**
      * @var ArrayStruct<mixed, mixed>
      */

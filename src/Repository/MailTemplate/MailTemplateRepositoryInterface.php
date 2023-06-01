@@ -9,7 +9,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 
 interface MailTemplateRepositoryInterface
 {
-
     /**
      * @param Criteria $criteria
      * @param Context $context

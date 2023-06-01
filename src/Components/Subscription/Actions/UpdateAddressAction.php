@@ -26,8 +26,6 @@ use Shopware\Core\Framework\Uuid\Uuid;
 
 class UpdateAddressAction extends BaseAction
 {
-
-
     /**
      * @var OrderService
      */

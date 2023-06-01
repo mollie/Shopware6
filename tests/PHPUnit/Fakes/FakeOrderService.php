@@ -11,7 +11,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class FakeOrderService implements OrderServiceInterface
 {
-
     /**
      * @var OrderEntity
      */
@@ -74,5 +73,4 @@ class FakeOrderService implements OrderServiceInterface
     {
         return '';
     }
-
 }

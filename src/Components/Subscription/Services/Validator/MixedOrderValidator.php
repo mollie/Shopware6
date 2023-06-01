@@ -10,7 +10,6 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 
 class MixedOrderValidator
 {
-
     /**
      * @param OrderEntity $order
      * @return bool

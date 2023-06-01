@@ -6,10 +6,8 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Enricher\Live
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEvents;
 use PHPUnit\Framework\TestCase;
 
-
 class LiveDataEnricherTest extends TestCase
 {
-
     /**
      * This test verifies that our correct list of
      * events is used to subscribe.
@@ -24,6 +22,4 @@ class LiveDataEnricherTest extends TestCase
 
         static::assertSame($expected, array_keys(LiveDataEnricher::getSubscribedEvents()));
     }
-
-
 }

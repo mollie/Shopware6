@@ -11,7 +11,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 
 interface OrderTransactionRepositoryInterface
 {
-
     /**
      * @param Criteria $criteria
      * @param Context $context

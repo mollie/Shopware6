@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Service\MollieApi\RequestAnonymizer;
 
 class MollieRequestAnonymizer
 {
-
     /**
      * @var string
      */

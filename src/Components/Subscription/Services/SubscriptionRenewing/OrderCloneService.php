@@ -20,7 +20,6 @@ use Shopware\Core\Framework\Uuid\Uuid;
 
 class OrderCloneService
 {
-
     /**
      * @var OrderRepositoryInterface
      */

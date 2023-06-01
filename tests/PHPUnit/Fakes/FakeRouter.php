@@ -2,13 +2,12 @@
 
 namespace MolliePayments\Tests\Fakes;
 
-
+use http\Env\Request;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouterInterface;
 
 class FakeRouter implements RouterInterface
 {
-
     /**
      * @var string
      */
@@ -31,7 +30,7 @@ class FakeRouter implements RouterInterface
      * @param int $referenceType
      * @return string
      */
-    public function generate($name, $parameters = [], $referenceType = self::ABSOLUTE_PATH)
+    public function generate($name, $parameters = [], $referenceType = self::ABSOLUTE_PATH): string
     {
         return $this->url;
     }
@@ -46,7 +45,7 @@ class FakeRouter implements RouterInterface
     /**
      * @return RequestContext|void
      */
-    public function getContext()
+    public function getContext(): RequestContext
     {
     }
 
@@ -61,8 +60,7 @@ class FakeRouter implements RouterInterface
      * @param string $pathinfo
      * @return array|void
      */
-    public function match($pathinfo)
+    public function match($pathinfo): array
     {
     }
-
 }

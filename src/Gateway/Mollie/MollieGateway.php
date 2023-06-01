@@ -15,7 +15,6 @@ use Mollie\Api\Types\PaymentMethod;
 
 class MollieGateway implements MollieGatewayInterface
 {
-
     /**
      * @var MollieApiClient
      */

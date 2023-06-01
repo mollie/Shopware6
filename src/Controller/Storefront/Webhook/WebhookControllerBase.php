@@ -18,7 +18,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class WebhookControllerBase extends StorefrontController
 {
-
     /**
      * @var NotificationFacade
      */

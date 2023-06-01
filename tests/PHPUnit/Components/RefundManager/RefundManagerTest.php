@@ -29,7 +29,6 @@ use Shopware\Core\Framework\Context;
 
 class RefundManagerTest extends TestCase
 {
-
     use MockTrait;
 
 
@@ -50,8 +49,8 @@ class RefundManagerTest extends TestCase
 
 
     /**
-     * @return void
      * @throws \Exception
+     * @return void
      */
     protected function setUp(): void
     {
@@ -66,7 +65,7 @@ class RefundManagerTest extends TestCase
         $fakeRefundService = new FakeRefundService('r-xyz-123', 9999);
         $this->fakeStockUpdater = new FakeStockManager();
 
-        /** @var Order|MockObject $fakeOrder */
+        /** @var MockObject|Order $fakeOrder */
         $fakeOrder = $this->createDummyMock(Order::class, $this);
         $fakeOrder->method('getMollieOrder')->willReturn(new MollieOrder($this->createMock(MollieApiClient::class)));
 
@@ -92,8 +91,8 @@ class RefundManagerTest extends TestCase
      * This test verifies that our correct flow builder
      * event is fired with all required data.
      *
-     * @return void
      * @throws \Mollie\Api\Exceptions\ApiException
+     * @return void
      */
     public function testFlowBuilderDispatching()
     {
@@ -130,8 +129,8 @@ class RefundManagerTest extends TestCase
      * order line item entities for that ID and extract the product ID.
      * This will be passed on with the quantity for the stock reset.
      *
-     * @return void
      * @throws \Mollie\Api\Exceptions\ApiException
+     * @return void
      */
     public function testStockReset()
     {
@@ -168,5 +167,4 @@ class RefundManagerTest extends TestCase
         $this->assertEquals(1, $this->fakeStockUpdater->getQuantity());
         $this->assertEquals('r-xyz-123', $this->fakeStockUpdater->getMollieRefundID());
     }
-
 }

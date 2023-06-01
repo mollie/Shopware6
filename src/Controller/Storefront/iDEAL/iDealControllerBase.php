@@ -18,7 +18,6 @@ use Symfony\Component\Routing\Router;
 
 class iDealControllerBase extends StorefrontController
 {
-
     /**
      * @var CustomerService
      */

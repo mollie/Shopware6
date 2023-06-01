@@ -13,7 +13,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 
 class OrderRepository implements OrderRepositoryInterface
 {
-
     /**
      * @var EntityRepository
      */

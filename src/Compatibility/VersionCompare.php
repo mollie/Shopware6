@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Compatibility;
 
 class VersionCompare
 {
-
     /**
      * @var string
      */

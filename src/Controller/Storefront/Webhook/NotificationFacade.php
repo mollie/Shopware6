@@ -36,7 +36,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 
 class NotificationFacade
 {
-
     /**
      * @var MollieGatewayInterface
      */
@@ -199,14 +198,12 @@ class NotificationFacade
         $mollieOrder = null;
 
         if (!empty($orderAttributes->getMollieOrderId())) {
-
             # fetch the order of our mollie ID
             # from our sales channel mollie profile
             $mollieOrder = $this->gatewayMollie->getOrder($mollieOrderId);
             $molliePayment = $this->statusConverter->getLatestPayment($mollieOrder);
             $status = $this->statusConverter->getMollieOrderStatus($mollieOrder);
         } elseif ($orderAttributes->isTypeSubscription()) {
-
             # subscriptions are automatically charged using a payment ID
             # so we do not have an order, but a payment instead
             $molliePayment = $this->gatewayMollie->getPayment($molliePaymentId);
@@ -244,7 +241,6 @@ class NotificationFacade
         # if our payment expired, then we can also expire our local subscription in the database.
 
         switch ($status) {
-
             case MolliePaymentStatus::MOLLIE_PAYMENT_PAID:
             case MolliePaymentStatus::MOLLIE_PAYMENT_PENDING:
             case MolliePaymentStatus::MOLLIE_PAYMENT_AUTHORIZED:
@@ -374,7 +370,6 @@ class NotificationFacade
         $paymentEvent = null;
 
         switch ($status) {
-
             case MolliePaymentStatus::MOLLIE_PAYMENT_FAILED:
                 $paymentEvent = $this->flowBuilderEventFactory->buildWebhookReceivedFailedEvent($swOrder, $context);
                 break;

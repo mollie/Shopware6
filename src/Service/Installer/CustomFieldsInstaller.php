@@ -11,7 +11,6 @@ use Shopware\Core\System\CustomField\CustomFieldTypes;
 
 class CustomFieldsInstaller
 {
-
     # --------------------------------------------------------------------------------
     private const ID_CUSTOM_FIELDSET = 'f2acb41af0be41638540b31917007fa3';
     private const ID_RELATION_PRDUCTS = 'e01518b929b64fe5bd3ab0f16857dc32';

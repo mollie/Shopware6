@@ -9,7 +9,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ApplePayDirectSubscriber implements EventSubscriberInterface
 {
-
     /**
      * @var SettingsService
      */

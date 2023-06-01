@@ -17,7 +17,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class VoucherService
 {
-
     /**
      * @var ProductRepositoryInterface
      */

@@ -10,7 +10,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 
 interface OrderRepositoryInterface
 {
-
     /**
      * @param array<mixed> $data
      * @param Context $context

@@ -7,7 +7,6 @@ use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
 class SubscriptionPaymentUpdateResponse extends StoreApiResponse
 {
-
     /**
      * @var ArrayStruct<mixed, mixed>
      */

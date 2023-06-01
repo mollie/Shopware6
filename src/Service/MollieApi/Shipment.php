@@ -157,7 +157,6 @@ class Shipment
         $totalQuantity = 0;
 
         foreach ($mollieOrder->lines() as $mollieOrderLine) {
-
             /** @var OrderLine $mollieOrderLine */
             if ($mollieOrderLine->type === OrderLineType::TYPE_SHIPPING_FEE) {
                 continue;

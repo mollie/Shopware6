@@ -7,7 +7,6 @@ use DateTimeInterface;
 
 class ReminderValidator
 {
-
     /**
      * @param null|DateTimeInterface $nextRenewal
      * @param DateTimeInterface $today

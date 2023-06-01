@@ -10,7 +10,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 
 interface RefundRepositoryInterface
 {
-
     /**
      * @param array<mixed> $data
      * @param Context $context

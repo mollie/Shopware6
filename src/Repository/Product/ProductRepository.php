@@ -12,7 +12,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class ProductRepository implements ProductRepositoryInterface
 {
-
     /**
      * @var EntityRepository
      */

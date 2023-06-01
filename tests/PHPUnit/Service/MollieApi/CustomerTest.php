@@ -95,15 +95,14 @@ class CustomerTest extends TestCase
     }
 
     /**
-     * @param string|null $mollieCustomerId
+     * @param null|string $mollieCustomerId
      * @param bool $expectedValue
      * @dataProvider isLegacyCustomerValidTestData
      */
     public function testIsLegacyCustomerValid(
         ?string $mollieCustomerId,
         bool $expectedValue
-    )
-    {
+    ) {
         $actualValue = $this->customerApiService->isLegacyCustomerValid($mollieCustomerId, '');
 
         $this->assertIsBool($actualValue);

@@ -2,7 +2,6 @@
 
 namespace MolliePayments\Fixtures\Product;
 
-
 use Basecom\FixturePlugin\Fixture;
 use Basecom\FixturePlugin\FixtureBag;
 use Basecom\FixturePlugin\FixtureHelper;
@@ -10,7 +9,6 @@ use MolliePayments\Fixtures\Category\CategoryFixture;
 use MolliePayments\Fixtures\Product\Traits\ProductFixtureTrait;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-
 
 class FailureProducts extends Fixture
 {
@@ -82,5 +80,4 @@ class FailureProducts extends Fixture
         $this->createProduct('0d3eeedd6d10436385580e2ff42431b9', 'Authentication Failed', 'MOL_ERROR_10', $category, $description, 1010, $image, [], $this->repoProducts, $this->helper);
         $this->createProduct('0d3eeedd6d11436385580e2ff42431b9', 'Card Declined', 'MOL_ERROR_11', $category, $description, 1011, $image, [], $this->repoProducts, $this->helper);
     }
-
 }

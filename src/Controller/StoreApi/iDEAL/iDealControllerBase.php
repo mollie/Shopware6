@@ -15,7 +15,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class iDealControllerBase
 {
-
     /**
      * @var CustomerService
      */

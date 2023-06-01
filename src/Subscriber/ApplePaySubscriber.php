@@ -8,7 +8,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ApplePaySubscriber implements EventSubscriberInterface
 {
-
     /**
      * @var ApplePayDirect
      */

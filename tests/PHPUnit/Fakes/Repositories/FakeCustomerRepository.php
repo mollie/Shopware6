@@ -8,5 +8,4 @@ use MolliePayments\Tests\Fakes\FakeEntityRepository;
 
 class FakeCustomerRepository extends FakeEntityRepository implements CustomerRepositoryInterface
 {
-
 }

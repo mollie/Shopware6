@@ -27,7 +27,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class SubscriptionControllerBase
 {
-
     /**
      * @var SubscriptionManager
      */

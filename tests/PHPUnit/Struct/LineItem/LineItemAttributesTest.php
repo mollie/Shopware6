@@ -9,7 +9,6 @@ use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 
 class LineItemAttributesTest extends TestCase
 {
-
     /**
      * This test is very important.
      * It's used for the CartBeforeSerializationEvent event.
@@ -143,5 +142,4 @@ class LineItemAttributesTest extends TestCase
 
         $this->assertEquals($expected, $attributes->toArray());
     }
-
 }

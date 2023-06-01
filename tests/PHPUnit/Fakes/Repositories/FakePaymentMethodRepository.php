@@ -14,7 +14,6 @@ use Shopware\Core\Framework\Event\NestedEventCollection;
 
 class FakePaymentMethodRepository implements PaymentMethodRepositoryInterface
 {
-
     /**
      * @var PaymentMethodEntity
      */
@@ -85,5 +84,4 @@ class FakePaymentMethodRepository implements PaymentMethodRepositoryInterface
     {
         return 'phpunit-id';
     }
-
 }

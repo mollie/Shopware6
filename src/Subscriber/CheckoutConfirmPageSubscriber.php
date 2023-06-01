@@ -25,7 +25,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
 {
-
     /**
      * @var MollieApiFactory
      */

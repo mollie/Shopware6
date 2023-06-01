@@ -6,10 +6,8 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionS
 use Mollie\Api\Types\SubscriptionStatus as MollieSubscriptionStatus;
 use PHPUnit\Framework\TestCase;
 
-
 class SubscriptionStatusTest extends TestCase
 {
-
     /**
      * @return array[]
      */
@@ -85,5 +83,4 @@ class SubscriptionStatusTest extends TestCase
 
         static::assertSame(SubscriptionStatus::PENDING, $convertedStatus);
     }
-
 }

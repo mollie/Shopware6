@@ -7,7 +7,6 @@ use Shopware\Core\Framework\Migration\MigrationStep;
 
 class Migration1669796049CreateRefund extends MigrationStep
 {
-
     /**
      * @return int
      */

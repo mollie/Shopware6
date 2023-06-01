@@ -291,7 +291,6 @@ class MolliePaymentDoPay
                 );
             }
         } catch (CouldNotCreateMollieCustomerException|CustomerCouldNotBeFoundException $e) {
-
             # TODO do we really need to catch this? shouldnt it fail fast?
 
             $this->logger->error(

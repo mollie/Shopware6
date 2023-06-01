@@ -18,7 +18,6 @@ use Symfony\Component\Routing\Generator\UrlGenerator;
 
 class AccountControllerBase extends StorefrontController
 {
-
     /**
      * @var SubscriptionPageLoader
      */

@@ -54,13 +54,12 @@ class CustomerServiceTest extends TestCase
             $this->createMock(NumberRangeValueGeneratorInterface::class),
             $this->createMock(ConfigService::class)
         );
-
     }
 
     /**
      * This test makes sure that, if we have invalid mollie_payments custom fields, that the struct will be empty
-     * @return void
      * @throws \Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException
+     * @return void
      */
     public function testCustomerCustomFieldsAreInvalid(): void
     {
@@ -80,7 +79,6 @@ class CustomerServiceTest extends TestCase
         $expected = '{"extensions":[]}';
 
         $this->assertEquals($actual, $expected);
-
     }
 
     /**
@@ -97,8 +95,7 @@ class CustomerServiceTest extends TestCase
         bool   $testMode,
         array  $existingCustomFields,
         array  $expectedCustomFields
-    )
-    {
+    ) {
         $customer = $this->createConfiguredMock(CustomerEntity::class, [
             'getCustomFields' => $existingCustomFields
         ]);

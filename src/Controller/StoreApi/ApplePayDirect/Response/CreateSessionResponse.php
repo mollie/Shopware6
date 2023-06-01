@@ -7,7 +7,6 @@ use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
 class CreateSessionResponse extends StoreApiResponse
 {
-
     /**
      * @var StringStruct
      */

@@ -36,7 +36,6 @@ use Symfony\Component\Routing\RouterInterface;
 
 class MollieFailureControllerBase extends StorefrontController
 {
-
     /**
      * @var RouterInterface
      */

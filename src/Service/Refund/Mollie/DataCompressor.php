@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Service\Refund\Mollie;
 
 class DataCompressor
 {
-
     /**
      * this will be the string length where
      * compression will be active. all strings

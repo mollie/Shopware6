@@ -6,7 +6,6 @@ use Shopware\Core\Framework\Context;
 
 interface CustomFieldSetRepositoryInterface
 {
-
     /**
      * @param array<mixed> $data
      * @param Context $context

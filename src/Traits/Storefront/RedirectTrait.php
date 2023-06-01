@@ -6,7 +6,6 @@ use Symfony\Component\Routing\RouterInterface;
 
 trait RedirectTrait
 {
-
     /**
      * @param string $orderId
      * @param RouterInterface $router

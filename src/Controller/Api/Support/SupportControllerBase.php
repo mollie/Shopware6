@@ -14,7 +14,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class SupportControllerBase extends AbstractController
 {
-
     /**
      * @var MollieSupportFacade
      */

@@ -21,14 +21,14 @@ final class CreditCardControllerTest extends TestCase
         $mandateService = new FakeMandateService();
         $controller = new CreditCardControllerBase($customerService, $mandateService, new NullLogger());
 
-        $actualResponse = $controller->storeCardToken($salesChannelContext,'test','test', new Request());
+        $actualResponse = $controller->storeCardToken($salesChannelContext, 'test', 'test', new Request());
         $expected = new JsonResponse([
             'success' => false,
             'customerId' => 'test',
             'result' => null
         ]);
 
-        $this->assertEquals($expected,$actualResponse);
+        $this->assertEquals($expected, $actualResponse);
     }
 
     public function testResponseNotSuccessWithErrors():void
@@ -42,17 +42,18 @@ final class CreditCardControllerTest extends TestCase
         $mandateService = new FakeMandateService();
         $controller = new CreditCardControllerBase($customerService, $mandateService, new NullLogger());
 
-        $actualResponse = $controller->storeCardToken($salesChannelContext,'test','test', new Request());
+        $actualResponse = $controller->storeCardToken($salesChannelContext, 'test', 'test', new Request());
         $expected = new JsonResponse([
             'success' => false,
             'customerId' => 'test',
             'result' => ['test error']
         ]);
 
-        $this->assertEquals($expected,$actualResponse);
+        $this->assertEquals($expected, $actualResponse);
     }
 
-    public function testResponseSuccess():void{
+    public function testResponseSuccess():void
+    {
         $customerService = new FakeCustomerService();
         $customerService = $customerService->withFakeCustomer();
 
@@ -60,14 +61,14 @@ final class CreditCardControllerTest extends TestCase
         $mandateService = new FakeMandateService();
         $controller = new CreditCardControllerBase($customerService, $mandateService, new NullLogger());
 
-        $actualResponse = $controller->storeCardToken($salesChannelContext,'test','test', new Request());
+        $actualResponse = $controller->storeCardToken($salesChannelContext, 'test', 'test', new Request());
         $expected = new JsonResponse([
             'success' => true,
             'customerId' => 'test',
             'result' => []
         ]);
 
-        $this->assertEquals($expected,$actualResponse);
+        $this->assertEquals($expected, $actualResponse);
     }
 
     public function testResponseNotSuccessWithoutCustomerStoreMandateId():void
@@ -77,7 +78,7 @@ final class CreditCardControllerTest extends TestCase
         $mandateService = new FakeMandateService();
         $controller = new CreditCardControllerBase($customerService, $mandateService, new NullLogger());
 
-        $actualResponse = $controller->storeMandateId('test','test', $salesChannelContext);
+        $actualResponse = $controller->storeMandateId('test', 'test', $salesChannelContext);
         $expected = new JsonResponse([
             'success' => false,
             'customerId' => 'test',
@@ -97,7 +98,7 @@ final class CreditCardControllerTest extends TestCase
         $mandateService = new FakeMandateService();
         $controller = new CreditCardControllerBase($customerService, $mandateService, new NullLogger());
 
-        $actualResponse = $controller->storeMandateId('test','test', $salesChannelContext);
+        $actualResponse = $controller->storeMandateId('test', 'test', $salesChannelContext);
         $expected = new JsonResponse([
             'success' => false,
             'customerId' => 'test',
@@ -107,7 +108,8 @@ final class CreditCardControllerTest extends TestCase
         $this->assertEquals($expected, $actualResponse);
     }
 
-    public function testResponseSuccessStoreMandateId():void{
+    public function testResponseSuccessStoreMandateId():void
+    {
         $customerService = new FakeCustomerService();
         $customerService = $customerService->withFakeCustomer();
 
@@ -115,7 +117,7 @@ final class CreditCardControllerTest extends TestCase
         $mandateService = new FakeMandateService();
         $controller = new CreditCardControllerBase($customerService, $mandateService, new NullLogger());
 
-        $actualResponse = $controller->storeMandateId('test','test', $salesChannelContext);
+        $actualResponse = $controller->storeMandateId('test', 'test', $salesChannelContext);
         $expected = new JsonResponse([
             'success' => true,
             'customerId' => 'test',
@@ -132,7 +134,7 @@ final class CreditCardControllerTest extends TestCase
         $mandateService = new FakeMandateService();
         $controller = new CreditCardControllerBase($customerService, $mandateService, new NullLogger());
 
-        $actualResponse = $controller->revokeMandate('test','test', $salesChannelContext);
+        $actualResponse = $controller->revokeMandate('test', 'test', $salesChannelContext);
         $expected = new JsonResponse([
             'success' => false,
             'customerId' => 'test',
@@ -155,7 +157,7 @@ final class CreditCardControllerTest extends TestCase
         $mandateService = new FakeMandateService(true);
         $controller = new CreditCardControllerBase($customerService, $mandateService, new NullLogger());
 
-        $actualResponse = $controller->revokeMandate('test','test', $salesChannelContext);
+        $actualResponse = $controller->revokeMandate('test', 'test', $salesChannelContext);
         $expected = new JsonResponse([
             'success' => false,
             'customerId' => 'test',
@@ -166,7 +168,8 @@ final class CreditCardControllerTest extends TestCase
         $this->assertEquals($expected, $actualResponse);
     }
 
-    public function testResponseSuccessRevokeMandate():void{
+    public function testResponseSuccessRevokeMandate():void
+    {
         $customerService = new FakeCustomerService();
         $customerService = $customerService->withFakeCustomer();
 
@@ -174,7 +177,7 @@ final class CreditCardControllerTest extends TestCase
         $mandateService = new FakeMandateService();
         $controller = new CreditCardControllerBase($customerService, $mandateService, new NullLogger());
 
-        $actualResponse = $controller->revokeMandate('test','test', $salesChannelContext);
+        $actualResponse = $controller->revokeMandate('test', 'test', $salesChannelContext);
         $expected = new JsonResponse([
             'success' => true,
             'customerId' => 'test',

@@ -7,7 +7,6 @@ use Shopware\Core\System\CustomEntity\Xml\Entity;
 
 interface ScheduledTaskRepositoryInterface
 {
-
     /**
      * @return EntityRepository
      */

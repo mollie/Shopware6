@@ -435,7 +435,6 @@ class Order
 
 
         if (!empty($mollieOrderId)) {
-
             # ORDER_ID, ord_123
             $mollieOrder = $this->getMollieOrder($mollieOrderId, (string)$salesChannelId, ['embed' => 'payments']);
 
@@ -455,7 +454,6 @@ class Order
 
             throw new PaymentNotFoundException($mollieOrderId);
         } else {
-
             # TRANSACTION_ID,.... tr_abc
 
             $payment = $this->getMolliePayment($molliePaymentId, (string)$salesChannelId);

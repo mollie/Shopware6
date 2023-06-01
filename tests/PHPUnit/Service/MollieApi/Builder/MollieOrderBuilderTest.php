@@ -8,11 +8,8 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Uuid\Uuid;
 
-
 class MollieOrderBuilderTest extends AbstractMollieOrderBuilder
 {
-
-
     /**
      * @return \string[][]
      */
@@ -39,8 +36,8 @@ class MollieOrderBuilderTest extends AbstractMollieOrderBuilder
      * @dataProvider getFormatValues
      * @param string $expected
      * @param string $format
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function testOrderNumberFormat(string $expected, string $format): void
     {
@@ -69,5 +66,4 @@ class MollieOrderBuilderTest extends AbstractMollieOrderBuilder
 
         self::assertSame($expected, $data['orderNumber']);
     }
-
 }

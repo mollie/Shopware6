@@ -6,7 +6,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 
 class ScheduledTaskRepository implements ScheduledTaskRepositoryInterface
 {
-
     /**
      * @var EntityRepository
      */

@@ -2,8 +2,8 @@
 
 namespace MolliePayments\Tests\Struct;
 
-use PHPUnit\Framework\TestCase;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
+use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Order\OrderEntity;
 
 class MollieOrderCustomFieldsStructTest extends TestCase

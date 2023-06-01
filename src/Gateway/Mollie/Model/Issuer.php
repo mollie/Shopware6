@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Gateway\Mollie\Model;
 
 class Issuer
 {
-
     /**
      * @var string
      */

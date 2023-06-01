@@ -9,7 +9,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
-
 class FakeProductRepository implements ProductRepositoryInterface
 {
     /**
@@ -24,8 +23,8 @@ class FakeProductRepository implements ProductRepositoryInterface
 
 
     /**
-     * @param ProductEntity|null $resultID
-     * @param ProductEntity|null $resultNumber
+     * @param null|ProductEntity $resultID
+     * @param null|ProductEntity $resultNumber
      */
     public function __construct(?ProductEntity $resultID, ?ProductEntity $resultNumber)
     {
@@ -70,5 +69,4 @@ class FakeProductRepository implements ProductRepositoryInterface
     {
         // TODO: Implement search() method.
     }
-
 }

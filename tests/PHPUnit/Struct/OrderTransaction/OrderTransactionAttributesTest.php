@@ -5,10 +5,8 @@ namespace MolliePayments\Tests\Struct\OrderTransaction;
 use Kiener\MolliePayments\Struct\OrderTransaction\OrderTransactionAttributes;
 use PHPUnit\Framework\TestCase;
 
-
 class OrderTransactionAttributesTest extends TestCase
 {
-
     /**
      * This test verifies that nothing breaks if nothing is
      * passed while creating the struct.
@@ -65,5 +63,4 @@ class OrderTransactionAttributesTest extends TestCase
 
         $this->assertEquals([], $struct->toArray());
     }
-
 }

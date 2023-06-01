@@ -7,7 +7,6 @@ use Shopware\Core\Checkout\Cart\Cart;
 
 class MixedCartValidator
 {
-
     /**
      * @param Cart $cart
      * @return bool

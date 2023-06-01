@@ -47,7 +47,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class FlowBuilderEventFactory
 {
-
     /**
      * @var VersionCompare
      */

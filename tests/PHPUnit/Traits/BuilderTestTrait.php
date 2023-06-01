@@ -12,7 +12,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 trait BuilderTestTrait
 {
-
     /**
      * @param TestCase $testCase
      * @param string $generatedURL
@@ -31,5 +30,4 @@ trait BuilderTestTrait
             ''
         );
     }
-
 }

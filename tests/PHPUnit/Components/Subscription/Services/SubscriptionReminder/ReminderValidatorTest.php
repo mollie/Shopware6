@@ -8,7 +8,6 @@ use PHPUnit\Framework\TestCase;
 
 class ReminderValidatorTest extends TestCase
 {
-
     /**
      * @var ReminderValidator
      */
@@ -132,8 +131,8 @@ class ReminderValidatorTest extends TestCase
      * This test verifies that we do not get reminded
      * if we don't even have an upcoming renewal.
      *
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function testNoNextRenewalLeadsToNoReminder()
     {
@@ -146,5 +145,4 @@ class ReminderValidatorTest extends TestCase
 
         $this->assertEquals(false, $shouldRemind);
     }
-
 }

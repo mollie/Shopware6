@@ -9,11 +9,8 @@ use Mollie\Api\Resources\Refund;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 
-
 class RefundDataTest extends TestCase
 {
-
-
     /**
      * This test verifies that the array format
      * of our total values are correct.
@@ -103,5 +100,4 @@ class RefundDataTest extends TestCase
 
         $this->assertCount(1, $data->toArray()['refunds']);
     }
-
 }

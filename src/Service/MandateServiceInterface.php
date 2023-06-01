@@ -9,7 +9,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 interface MandateServiceInterface
 {
-
     /**
      * @param string $customerId
      * @param string $mandateId

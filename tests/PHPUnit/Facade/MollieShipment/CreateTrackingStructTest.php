@@ -21,7 +21,6 @@ use Shopware\Core\Framework\Context;
 
 class CreateTrackingStructTest extends TestCase
 {
-
     private $shipmentFacade;
 
     /**

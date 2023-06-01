@@ -23,7 +23,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ConfigControllerBase extends AbstractController
 {
-
     /**
      * @var SettingsService
      */

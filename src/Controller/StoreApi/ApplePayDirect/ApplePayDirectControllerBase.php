@@ -22,7 +22,6 @@ use Throwable;
 
 class ApplePayDirectControllerBase
 {
-
     /**
      * @var ApplePayDirect
      */
@@ -234,7 +233,6 @@ class ApplePayDirectControllerBase
         # customers are ready, data is ready, but the handling has a problem.
 
         try {
-
             # create our new Shopware Order
             $order = $this->applePay->createOrder($newContext);
 

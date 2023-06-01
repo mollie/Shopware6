@@ -28,7 +28,6 @@ use Symfony\Component\Routing\RouterInterface;
 
 class PaymentReturnFacade
 {
-
     /**
      * @var RouterInterface
      */

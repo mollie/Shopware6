@@ -7,7 +7,6 @@ use Shopware\Core\Content\Product\ProductEntity;
 
 class LineItemAttributes
 {
-
     /**
      * @var string
      */
@@ -217,10 +216,8 @@ class LineItemAttributes
         $foundValue = '';
 
         if ($lineItem->getPayload() !== null) {
-
             # check if we have customFields in our payload
             if (array_key_exists('customFields', $lineItem->getPayload())) {
-
                 # load the custom fields
                 $customFields = $lineItem->getPayload()['customFields'];
 

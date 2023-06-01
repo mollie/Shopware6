@@ -7,10 +7,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-
 class RoutingDetectorTest extends TestCase
 {
-
     /**
      * This test verifies that our router is correctly
      * used and its generated URL is being returned correctly.
@@ -56,5 +54,4 @@ class RoutingDetectorTest extends TestCase
 
         $this->assertEquals(true, $isRoute);
     }
-
 }

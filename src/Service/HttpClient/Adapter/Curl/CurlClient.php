@@ -7,7 +7,6 @@ use Kiener\MolliePayments\Service\HttpClient\Response\HttpResponse;
 
 class CurlClient implements HttpClientInterface
 {
-
     /**
      * @var int
      */

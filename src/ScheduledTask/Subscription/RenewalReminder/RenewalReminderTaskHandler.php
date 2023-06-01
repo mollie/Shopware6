@@ -10,7 +10,6 @@ use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
 
 class RenewalReminderTaskHandler extends ScheduledTaskHandler
 {
-
     /**
      * @var SubscriptionManager
      */

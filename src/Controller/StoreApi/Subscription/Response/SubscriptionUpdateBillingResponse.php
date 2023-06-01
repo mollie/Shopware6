@@ -8,7 +8,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SubscriptionUpdateBillingResponse extends StoreApiResponse
 {
-
     /**
      * @var ArrayStruct<mixed, mixed>
      */

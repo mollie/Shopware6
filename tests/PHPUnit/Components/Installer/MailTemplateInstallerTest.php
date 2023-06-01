@@ -6,9 +6,9 @@ namespace MolliePayments\Tests\Components\Installer;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ForwardCompatibility\Result;
 use Kiener\MolliePayments\Components\Subscription\Services\Installer\MailTemplateInstaller;
-use Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepository;
-use Kiener\MolliePayments\Repository\MailTemplateType\MailTemplateTypeRepositoryInterface;
 use Kiener\MolliePayments\Repository\MailTemplate\MailTemplateRepositoryInterface;
+use Kiener\MolliePayments\Repository\MailTemplateType\MailTemplateTypeRepositoryInterface;
+use Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepository;
 use PHPUnit\Framework\Constraint\IsType;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Defaults;
@@ -73,8 +73,8 @@ class MailTemplateInstallerTest extends TestCase
     /**
      * Tests that nothing new is inserted into the database if we have existing MailType and MailTemplate
      *
-     * @return void
      * @throws \Doctrine\DBAL\Exception
+     * @return void
      */
     public function testWithExistingData()
     {
@@ -96,8 +96,8 @@ class MailTemplateInstallerTest extends TestCase
     /**
      * Tests creating MailType when the system default language is not English or German
      *
-     * @return void
      * @throws \Doctrine\DBAL\Exception
+     * @return void
      */
     public function testCreateMailTypeWhereDefaultLangIsNotEnglishOrGerman()
     {
@@ -133,8 +133,8 @@ class MailTemplateInstallerTest extends TestCase
     /**
      * Tests creating MailType when the system default language is English
      *
-     * @return void
      * @throws \Doctrine\DBAL\Exception
+     * @return void
      */
     public function testCreateMailTypeWhereDefaultLangIsEnglish()
     {
@@ -166,8 +166,8 @@ class MailTemplateInstallerTest extends TestCase
     /**
      * Tests creating MailType when the system default language is German
      *
-     * @return void
      * @throws \Doctrine\DBAL\Exception
+     * @return void
      */
     public function testCreateMailTypeWhereDefaultLangIsGerman()
     {
@@ -201,8 +201,8 @@ class MailTemplateInstallerTest extends TestCase
     /**
      * Tests creating MailTemplate when the system default language is not English or German
      *
-     * @return void
      * @throws \Doctrine\DBAL\Exception
+     * @return void
      */
     public function testCreateMailTemplateWhereDefaultLangIsNotEnglishOrGerman()
     {
@@ -238,8 +238,8 @@ class MailTemplateInstallerTest extends TestCase
     /**
      * Tests creating MailTemplate when the system default language is English
      *
-     * @return void
      * @throws \Doctrine\DBAL\Exception
+     * @return void
      */
     public function testCreateMailTemplateWhereDefaultLangIsEnglish()
     {
@@ -271,8 +271,8 @@ class MailTemplateInstallerTest extends TestCase
     /**
      * Tests creating MailTemplate when the system default language is German
      *
-     * @return void
      * @throws \Doctrine\DBAL\Exception
+     * @return void
      */
     public function testCreateMailTemplateWhereDefaultLangIsGerman()
     {
@@ -366,5 +366,4 @@ class MailTemplateInstallerTest extends TestCase
         $this->repoMailTemplates->method('searchIds')->willReturn($result);
         $this->repoMailTemplates->expects($this->once())->method('searchIds');
     }
-
 }

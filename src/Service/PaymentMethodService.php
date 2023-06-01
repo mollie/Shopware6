@@ -158,7 +158,6 @@ class PaymentMethodService
 
                 $upsertData[] = $paymentMethodData;
             } else {
-
                 # let's create a full parameter list of everything
                 # that our new payment method needs to have
                 $paymentMethodData = [

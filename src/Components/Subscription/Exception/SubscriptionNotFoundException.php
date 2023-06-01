@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Components\Subscription\Exception;
 
 class SubscriptionNotFoundException extends \Exception
 {
-
     /**
      * @param string $subscriptionId
      * @param null|\Throwable $previous

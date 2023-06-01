@@ -16,7 +16,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class MailServiceTest extends TestCase
 {
-
     private const RECIPIENT_DE = 'Mollie Support DE <meinsupport@mollie.com>';
     private const RECIPIENT_INTL = 'Mollie Support <info@mollie.com>';
 
@@ -77,7 +76,6 @@ class MailServiceTest extends TestCase
         $mailSenderMock = $this->createMock(MailSender::class);
 
         $mailSenderMock->method('send')->willReturnCallback(function (Email $actualMail) use ($expectedMail) {
-
             $this->assertEquals($expectedMail->getSubject(), $actualMail->getSubject(), 'subject is wrong');
             $this->assertEquals($expectedMail->getTo(), $actualMail->getTo(), 'to-email is wrong');
             $this->assertEquals($expectedMail->getFrom(), $actualMail->getFrom(), 'from-email is wrong');
@@ -227,7 +225,6 @@ class MailServiceTest extends TestCase
         $email->text($text);
 
         foreach ($attachments as $attachment) {
-
             if (is_string($attachment)) {
                 # embed our file if we have a filename
                 // TODO Daniel: This has changed in 6.4.20ish, file attachments work differently. Probably disallow adding filepath attachments and redo removed test.
@@ -240,5 +237,4 @@ class MailServiceTest extends TestCase
 
         return $email;
     }
-
 }

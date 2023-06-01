@@ -12,7 +12,6 @@ use Shopware\Core\Framework\Context;
 
 class ConfirmAction extends BaseAction
 {
-
     /**
      * @param OrderEntity $order
      * @param string $mandateId

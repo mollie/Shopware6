@@ -6,7 +6,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 interface CompatibilityGatewayInterface
 {
-
     /**
      * @param SalesChannelContext $context
      * @return string

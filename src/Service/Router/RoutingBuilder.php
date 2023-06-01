@@ -7,7 +7,6 @@ use Symfony\Component\Routing\RouterInterface;
 
 class RoutingBuilder
 {
-
     /**
      * This has to match the parameter from the Return Route annotations.
      * Otherwise, an exception is being thrown.

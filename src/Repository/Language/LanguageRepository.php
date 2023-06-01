@@ -10,7 +10,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 
 class LanguageRepository implements LanguageRepositoryInterface
 {
-
     /**
      * @var EntityRepository
      */

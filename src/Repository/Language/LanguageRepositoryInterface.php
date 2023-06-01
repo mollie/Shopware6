@@ -9,7 +9,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 
 interface LanguageRepositoryInterface
 {
-
     /**
      * @param Criteria $criteria
      * @param Context $context

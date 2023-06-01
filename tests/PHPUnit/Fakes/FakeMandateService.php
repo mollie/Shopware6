@@ -20,7 +20,8 @@ final class FakeMandateService implements MandateServiceInterface
 {
     private bool $throwException;
 
-    public function __construct(bool $throwException = false) {
+    public function __construct(bool $throwException = false)
+    {
         $this->throwException = $throwException;
     }
 

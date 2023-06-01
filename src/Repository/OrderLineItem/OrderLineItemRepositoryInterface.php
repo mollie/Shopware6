@@ -7,7 +7,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEve
 
 interface OrderLineItemRepositoryInterface
 {
-
     /**
      * @param array<mixed> $data
      * @param Context $context

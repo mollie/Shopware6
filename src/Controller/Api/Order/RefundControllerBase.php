@@ -297,7 +297,6 @@ class RefundControllerBase extends AbstractController
 
             return $this->json($json);
         } catch (PaymentNotFoundException $e) {
-
             # This indicates there is no completed payment for this order, so there are no refunds yet.
             $totals = [
                 'remaining' => 0,

@@ -7,7 +7,6 @@ use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 
 class MollieDataBuilder
 {
-
     /**
      * @var RoutingBuilder
      */

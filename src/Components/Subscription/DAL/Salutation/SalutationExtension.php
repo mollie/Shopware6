@@ -11,7 +11,6 @@ use Shopware\Core\System\Salutation\SalutationDefinition;
 
 class SalutationExtension extends EntityExtension
 {
-
     /**
      * @return string
      */

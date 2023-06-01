@@ -20,7 +20,6 @@ $snippets = [
 ];
 
 foreach ($snippets['admin'] as $scopeName => $files) {
-
     # all files of our scope belong together
     # meaning, they need to be "identical"
     $scopeSnippetCount = null;
@@ -62,11 +61,8 @@ foreach ($snippets['admin'] as $scopeName => $files) {
     $previousFile = '';
     $previousKeys = null;
     foreach ($foundSnippets as $file => $snippetKeys) {
-
         if ($previousKeys !== null) {
-
             if (!arrayEqual($previousKeys, $snippetKeys)) {
-
                 echo "Found difference in snippets in these files: " . PHP_EOL;
                 echo "  - A: " . $previousFile . PHP_EOL;
                 echo "  - B: " . $file . PHP_EOL;
@@ -103,7 +99,7 @@ exit(0);
  */
 function array_flat($array, $prefix = '')
 {
-    $result = array();
+    $result = [];
 
     foreach ($array as $key => $value) {
         $new_key = $prefix . (empty($prefix) ? '' : '.') . $key;

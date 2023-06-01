@@ -47,7 +47,7 @@ abstract class AbstractMollieOrderBuilder extends TestCase
     use PaymentBuilderTrait;
 
     /**
-     * @var SettingsService|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject|SettingsService
      */
     protected $settingsService;
     /**
@@ -103,7 +103,7 @@ abstract class AbstractMollieOrderBuilder extends TestCase
      */
     protected $molliePaymentFinalize;
     /**
-     * @var TransactionTransitionServiceInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject|TransactionTransitionServiceInterface
      */
     protected $transitionService;
     /**
@@ -182,5 +182,4 @@ abstract class AbstractMollieOrderBuilder extends TestCase
             $this->loggerService
         );
     }
-
 }

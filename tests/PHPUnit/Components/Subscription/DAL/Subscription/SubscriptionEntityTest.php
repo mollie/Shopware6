@@ -9,10 +9,8 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionE
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionStatus;
 use PHPUnit\Framework\TestCase;
 
-
 class SubscriptionEntityTest extends TestCase
 {
-
     /**
      * This test verifies that our default value
      * of the Mollie status is a correct empty string, if
@@ -294,6 +292,4 @@ class SubscriptionEntityTest extends TestCase
 
         static::assertSame($expected, $returnedMeta->toArray());
     }
-
-
 }

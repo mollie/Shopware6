@@ -13,10 +13,8 @@ class FakeContainer implements ContainerInterface
         // TODO: Implement get() method.
     }
 
-    public function has(string $id)
+    public function has(string $id): bool
     {
         // TODO: Implement has() method.
     }
-
-
 }

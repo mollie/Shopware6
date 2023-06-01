@@ -77,11 +77,8 @@ class OrderService implements OrderServiceInterface
 
 
     /**
-     * Return an order entity, enriched with associations.
-     *
      * @param string $orderId
      * @param Context $context
-     * @throws OrderNotFoundException
      * @return OrderEntity
      */
     public function getOrder(string $orderId, Context $context): OrderEntity
@@ -226,7 +223,6 @@ class OrderService implements OrderServiceInterface
         $creditCardDetails = null;
 
         try {
-
             // Add the transaction ID to the order's custom fields
             // We might need this later on for reconciliation
             $molliePayment = $this->mollieOrderService->getCompletedPayment($mollieOrderID, $molliePaymentId, $order->getSalesChannelId());

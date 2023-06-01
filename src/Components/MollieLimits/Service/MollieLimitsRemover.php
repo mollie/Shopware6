@@ -81,7 +81,7 @@ class MollieLimitsRemover extends PaymentMethodRemover
         if ($this->isOrderRoute()) {
             try {
                 $order = $this->getOrder($context->getContext());
-            } catch (BadRequestException|MissingRequestException|OrderNotFoundException $e) {
+            } catch (Exception $e) {
                 $this->logger->error($e->getMessage(), [
                     'exception' => $e,
                 ]);

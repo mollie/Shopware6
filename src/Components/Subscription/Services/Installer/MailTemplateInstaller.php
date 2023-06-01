@@ -18,7 +18,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class MailTemplateInstaller
 {
-
     /**
      * @var Connection
      */

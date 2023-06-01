@@ -17,7 +17,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class WebhookReceivedEvent extends Event implements OrderAware, MailAware, SalesChannelAware
 {
-
     /**
      * @var OrderEntity
      */

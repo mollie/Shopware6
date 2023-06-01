@@ -14,10 +14,8 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 
-
 class RefundRequestTest extends TestCase
 {
-
     /**
      * This test verifies that our property is correctly set.
      *
@@ -25,7 +23,7 @@ class RefundRequestTest extends TestCase
      */
     public function testOrderNumber()
     {
-        $request = new RefundRequest('ord-123', '', '',0);
+        $request = new RefundRequest('ord-123', '', '', 0);
 
         $this->assertEquals('ord-123', $request->getOrderNumber());
     }
@@ -37,7 +35,7 @@ class RefundRequestTest extends TestCase
      */
     public function testDescription()
     {
-        $request = new RefundRequest('', 'custom refund','', 0);
+        $request = new RefundRequest('', 'custom refund', '', 0);
 
         $this->assertEquals('custom refund', $request->getDescription());
     }
@@ -50,7 +48,7 @@ class RefundRequestTest extends TestCase
      */
     public function testDescriptionFallback()
     {
-        $request = new RefundRequest('ORD-123', '','', 0);
+        $request = new RefundRequest('ORD-123', '', '', 0);
 
         $this->assertEquals('Refunded through Shopware. Order number: ORD-123', $request->getDescription());
     }
@@ -62,7 +60,7 @@ class RefundRequestTest extends TestCase
      */
     public function testInternalDescription()
     {
-        $request = new RefundRequest('', '','custom refund', 0);
+        $request = new RefundRequest('', '', 'custom refund', 0);
 
         $this->assertEquals('custom refund', $request->getInternalDescription());
     }
@@ -74,7 +72,7 @@ class RefundRequestTest extends TestCase
      */
     public function testAmount()
     {
-        $request = new RefundRequest('', '','', 4.99);
+        $request = new RefundRequest('', '', '', 4.99);
 
         $this->assertEquals(4.99, $request->getAmount());
     }
@@ -89,7 +87,7 @@ class RefundRequestTest extends TestCase
      */
     public function testIsFullRefundWithItems_EmptyItems()
     {
-        $request = new RefundRequest('', '','', 4.99);
+        $request = new RefundRequest('', '', '', 4.99);
 
         $this->assertEquals(false, $request->isFullRefundWithItems(new OrderEntity()));
     }
@@ -103,7 +101,7 @@ class RefundRequestTest extends TestCase
     {
         $order = $this->getOrder();
 
-        $request = new RefundRequest('', '','', 0);
+        $request = new RefundRequest('', '', '', 0);
         $request->addItem(new RefundRequestItem('line-1', 4.99, 1, 0));
 
         $this->assertEquals(false, $request->isFullRefundWithItems($order));
@@ -119,7 +117,7 @@ class RefundRequestTest extends TestCase
     {
         $order = $this->getOrder();
 
-        $request = new RefundRequest('', '','', 0);
+        $request = new RefundRequest('', '', '', 0);
         $request->addItem(new RefundRequestItem('line-1', 19.99, 1, 0));
 
         $this->assertEquals(true, $request->isFullRefundWithItems($order));
@@ -152,7 +150,7 @@ class RefundRequestTest extends TestCase
 
         $order->setDeliveries(new OrderDeliveryCollection([$delivery]));
 
-        $request = new RefundRequest('', '','', 0);
+        $request = new RefundRequest('', '', '', 0);
         $request->addItem(new RefundRequestItem('delivery-1', 2, 1, 0));
 
         $this->assertEquals(false, $request->isFullRefundWithItems($order));
@@ -165,7 +163,7 @@ class RefundRequestTest extends TestCase
      */
     public function testIsFullRefundAmountOnly_NoAmountNoItems()
     {
-        $request = new RefundRequest('', '','', null);
+        $request = new RefundRequest('', '', '', null);
 
         $this->assertEquals(true, $request->isFullRefundAmountOnly());
     }
@@ -177,7 +175,7 @@ class RefundRequestTest extends TestCase
      */
     public function testIsFullRefundAmountOnly_NoAmountWithItems()
     {
-        $request = new RefundRequest('', '','', null);
+        $request = new RefundRequest('', '', '', null);
         $request->addItem(new RefundRequestItem('line-1', 19.99, 1, 0));
 
         $this->assertEquals(false, $request->isFullRefundAmountOnly());
@@ -190,7 +188,7 @@ class RefundRequestTest extends TestCase
      */
     public function testIsFullRefundAmountOnly_AmountNoItems()
     {
-        $request = new RefundRequest('', '','', 4);
+        $request = new RefundRequest('', '', '', 4);
 
         $this->assertEquals(false, $request->isFullRefundAmountOnly());
     }
@@ -202,7 +200,7 @@ class RefundRequestTest extends TestCase
      */
     public function testIsFullRefundAmountOnly_AmountWithItems()
     {
-        $request = new RefundRequest('', '','', 4);
+        $request = new RefundRequest('', '', '', 4);
         $request->addItem(new RefundRequestItem('line-1', 19.99, 1, 0));
 
         $this->assertEquals(false, $request->isFullRefundAmountOnly());
@@ -215,7 +213,7 @@ class RefundRequestTest extends TestCase
      */
     public function testIsPartialRefundAmountOnly_NoAmountNoItems()
     {
-        $request = new RefundRequest('', '','', null);
+        $request = new RefundRequest('', '', '', null);
 
         $this->assertEquals(false, $request->isPartialAmountOnly());
     }
@@ -227,7 +225,7 @@ class RefundRequestTest extends TestCase
      */
     public function testIsPartialRefundAmountOnly_AmountWithItems()
     {
-        $request = new RefundRequest('', '','', 4);
+        $request = new RefundRequest('', '', '', 4);
         $request->addItem(new RefundRequestItem('line-1', 19.99, 1, 0));
 
         $this->assertEquals(false, $request->isPartialAmountOnly());
@@ -240,7 +238,7 @@ class RefundRequestTest extends TestCase
      */
     public function testIsPartialRefundAmountOnly_AmountNoItems()
     {
-        $request = new RefundRequest('', '','', 5);
+        $request = new RefundRequest('', '', '', 5);
 
         $this->assertEquals(true, $request->isPartialAmountOnly());
     }
@@ -252,7 +250,7 @@ class RefundRequestTest extends TestCase
      */
     public function testIsPartialRefundWithItems_EmptyItems()
     {
-        $request = new RefundRequest('', '','', 4.99);
+        $request = new RefundRequest('', '', '', 4.99);
 
         $this->assertEquals(false, $request->isPartialAmountWithItems(new OrderEntity()));
     }
@@ -266,7 +264,7 @@ class RefundRequestTest extends TestCase
     {
         $order = $this->getOrder();
 
-        $request = new RefundRequest('', '','', 0);
+        $request = new RefundRequest('', '', '', 0);
         $request->addItem(new RefundRequestItem('line-1', 4.99, 1, 0));
 
         $this->assertEquals(true, $request->isPartialAmountWithItems($order));
@@ -281,7 +279,7 @@ class RefundRequestTest extends TestCase
     {
         $order = $this->getOrder();
 
-        $request = new RefundRequest('', '','', 0);
+        $request = new RefundRequest('', '', '', 0);
         $request->addItem(new RefundRequestItem('line-1', 19.99, 1, 0));
 
         $this->assertEquals(false, $request->isPartialAmountWithItems($order));
@@ -301,5 +299,4 @@ class RefundRequestTest extends TestCase
 
         return $order;
     }
-
 }

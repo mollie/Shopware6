@@ -10,7 +10,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 
 interface CountryRepositoryInterface
 {
-
     /**
      * @param Criteria $criteria
      * @param Context $context

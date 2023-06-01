@@ -15,7 +15,7 @@ final class MollieSettingsStructTest extends TestCase
      *
      * @dataProvider orderLifeTimeDaysData
      * @param $lifeTimeDays
-     * @param int|null $realLifeTimeDays
+     * @param null|int $realLifeTimeDays
      */
     public function testGetOrderLifetimeDays($lifeTimeDays, ?int $realLifeTimeDays)
     {
@@ -26,7 +26,6 @@ final class MollieSettingsStructTest extends TestCase
         ]);
         $actualValue = $settingsStruct->getOrderLifetimeDays();
         $this->assertSame($realLifeTimeDays, $actualValue);
-
     }
 
     /**
@@ -34,8 +33,8 @@ final class MollieSettingsStructTest extends TestCase
      *
      * @dataProvider orderLifeTimeDaysData
      * @param $lifeTimeDays
-     * @param int|null $realLifeTimeDays
-     * @param string|null $expectedDateString
+     * @param null|int $realLifeTimeDays
+     * @param null|string $expectedDateString
      * @throws \Exception
      */
     public function testGetOrderLifetimeDate($lifeTimeDays, ?int $realLifeTimeDays, ?string $expectedDateString)
@@ -54,8 +53,8 @@ final class MollieSettingsStructTest extends TestCase
      *
      * @dataProvider orderBankTransferDueDays
      * @param $lifeTimeDays
-     * @param int|null $realLifeTimeDays
-     * @param string|null $expectedDateString
+     * @param null|int $realLifeTimeDays
+     * @param null|string $expectedDateString
      */
     public function testBankTransferDueDays($lifeTimeDays, ?int $realLifeTimeDays, ?string $expectedDateString)
     {
@@ -73,8 +72,8 @@ final class MollieSettingsStructTest extends TestCase
      *
      * @dataProvider orderBankTransferDueDays
      * @param $lifeTimeDays
-     * @param int|null $realLifeTimeDays
-     * @param string|null $expectedDateString
+     * @param null|int $realLifeTimeDays
+     * @param null|string $expectedDateString
      * @throws \Exception
      */
     public function testBankTransferDueDate($lifeTimeDays, ?int $realLifeTimeDays, ?string $expectedDateString)

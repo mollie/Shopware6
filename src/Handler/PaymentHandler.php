@@ -134,7 +134,6 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         }
 
         try {
-
             # before we send the customer to the Mollie payment page
             # we will process the order transaction, which means we set it to be IN PROGRESS.
             # this is just how it works at the moment, I did only add the comment for it here :)
@@ -183,7 +182,6 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             # that cancel the Shopware order in a coordinated way by Shopware
             throw $ex;
         } catch (Throwable $ex) {
-
             # this processes all unhandled exceptions.
             # we need to log whatever happens in here, and then also
             # throw an exception that breaks the order in a coordinated way.

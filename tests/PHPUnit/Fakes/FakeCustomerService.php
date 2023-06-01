@@ -21,9 +21,10 @@ final class FakeCustomerService implements CustomerServiceInterface
     private ?CustomerEntity $customerEntity = null;
     private bool $throwException;
 
-    public function __construct(bool $throwException = false) {
-        $this->setCardTokenResponse = new EntityWrittenContainerEvent(new Context(new SystemSource()), new NestedEventCollection(),[]);
-        $this->setMandateIdResponse = new EntityWrittenContainerEvent(new Context(new SystemSource()), new NestedEventCollection(),[]);
+    public function __construct(bool $throwException = false)
+    {
+        $this->setCardTokenResponse = new EntityWrittenContainerEvent(new Context(new SystemSource()), new NestedEventCollection(), []);
+        $this->setMandateIdResponse = new EntityWrittenContainerEvent(new Context(new SystemSource()), new NestedEventCollection(), []);
         $this->throwException = $throwException;
     }
 
@@ -39,7 +40,7 @@ final class FakeCustomerService implements CustomerServiceInterface
 
     public function setCardToken(CustomerEntity $customer, string $cardToken, SalesChannelContext $context, bool $shouldSaveCardDetail = false): EntityWrittenContainerEvent
     {
-       return $this->setCardTokenResponse;
+        return $this->setCardTokenResponse;
     }
 
     public function setMandateId(CustomerEntity $customer, string $cardToken, Context $context): EntityWrittenContainerEvent

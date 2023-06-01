@@ -11,7 +11,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class KlarnaPayNowPayment extends PaymentHandler
 {
-
     /**
      *
      */

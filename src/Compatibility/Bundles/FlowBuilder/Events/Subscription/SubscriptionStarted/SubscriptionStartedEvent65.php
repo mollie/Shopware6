@@ -6,7 +6,6 @@ use Shopware\Core\Content\Flow\Dispatching\Aware\ScalarValuesAware;
 
 class SubscriptionStartedEvent65 extends SubscriptionStartedEvent implements ScalarValuesAware
 {
-
     /**
      * @return array<mixed>
      */

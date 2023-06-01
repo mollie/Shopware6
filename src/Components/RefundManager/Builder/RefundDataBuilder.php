@@ -25,7 +25,6 @@ use Shopware\Core\Framework\Context;
 
 class RefundDataBuilder
 {
-
     /**
      * @var OrderServiceInterface
      */
@@ -130,7 +129,6 @@ class RefundDataBuilder
 
                 # remember, subscriptions have no order
                 if (!$orderAttributes->isTypeSubscription() && $mollieOrder instanceof \Mollie\Api\Resources\Order) {
-
                     # search the mollie line id for the order
                     # because we don't have this in our order items.
                     $mollieLineID = '';

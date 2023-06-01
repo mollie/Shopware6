@@ -7,10 +7,8 @@ use Kiener\MolliePayments\Struct\MollieLineItem;
 use Kiener\MolliePayments\Struct\MollieLineItemCollection;
 use PHPUnit\Framework\TestCase;
 
-
 class MollieLineItemCollectionTest extends TestCase
 {
-
     /**
      * This test verifies that our total amount of the cart
      * is always correctly calculated from the sum of items.
@@ -43,5 +41,4 @@ class MollieLineItemCollectionTest extends TestCase
 
         $this->assertEquals(4.73, $items->getCartTotalAmount());
     }
-
 }

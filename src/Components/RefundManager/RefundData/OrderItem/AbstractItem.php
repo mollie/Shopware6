@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem;
 
 abstract class AbstractItem
 {
-
     /**
      * @param string $id
      * @param string $label

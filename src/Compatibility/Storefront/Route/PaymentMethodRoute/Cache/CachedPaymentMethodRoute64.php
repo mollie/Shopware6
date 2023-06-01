@@ -12,7 +12,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CachedPaymentMethodRoute64 implements EventSubscriberInterface
 {
-
     /**
      * @var CartService
      */

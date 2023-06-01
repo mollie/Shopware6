@@ -19,7 +19,6 @@ use Shopware\Core\System\Currency\CurrencyEntity;
 
 class SubscriptionBuilder
 {
-
     /**
      * @var IntervalCalculator
      */

@@ -7,7 +7,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class FakeEventDispatcher implements EventDispatcherInterface
 {
-
     /**
      * @var object
      */
@@ -38,7 +37,7 @@ class FakeEventDispatcher implements EventDispatcherInterface
 
     /**
      * @param object $event
-     * @param string|null $eventName
+     * @param null|string $eventName
      * @return object
      */
     public function dispatch(object $event, string $eventName = null): object
@@ -69,19 +68,20 @@ class FakeEventDispatcher implements EventDispatcherInterface
         // TODO: Implement removeSubscriber() method.
     }
 
-    public function getListeners(string $eventName = null)
+    public function getListeners(string $eventName = null): array
     {
         // TODO: Implement getListeners() method.
     }
 
-    public function getListenerPriority(string $eventName, callable $listener)
+    public function getListenerPriority(string $eventName, callable $listener): ?int
     {
         // TODO: Implement getListenerPriority() method.
     }
 
-    public function hasListeners(string $eventName = null)
+    public function hasListeners(string $eventName = null): bool
     {
         // TODO: Implement hasListeners() method.
     }
+
 
 }

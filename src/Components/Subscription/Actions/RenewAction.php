@@ -27,7 +27,6 @@ use Shopware\Core\Framework\Context;
 
 class RenewAction extends BaseAction
 {
-
     /**
      * @var SubscriptionRenewing
      */

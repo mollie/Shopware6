@@ -10,7 +10,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 interface ProductRepositoryInterface
 {
-
     /**
      * @param string $productId
      * @param SalesChannelContext $context

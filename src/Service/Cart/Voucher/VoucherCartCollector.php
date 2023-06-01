@@ -73,7 +73,6 @@ class VoucherCartCollector implements CartDataCollectorInterface
 
         if ($salesChannelHasVoucherMethod) {
             foreach ($original->getLineItems() as $item) {
-
                 # get the final inherited voucher type of the product
                 # this might even be from the parent
                 $voucherType = $this->voucherService->getFinalVoucherType($item, $context);

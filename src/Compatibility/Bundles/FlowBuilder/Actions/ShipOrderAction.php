@@ -16,7 +16,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ShipOrderAction extends FlowAction implements EventSubscriberInterface
 {
-
     /**
      * @var LoggerInterface
      */

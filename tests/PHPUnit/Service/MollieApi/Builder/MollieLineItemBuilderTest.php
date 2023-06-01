@@ -2,7 +2,6 @@
 
 namespace MolliePayments\Tests\Service\MollieApi\Builder;
 
-
 use Kiener\MolliePayments\Hydrator\MollieLineItemHydrator;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieLineItemBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
@@ -19,7 +18,6 @@ use MolliePayments\Tests\Utils\Traits\PaymentBuilderTrait;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
-
 
 class MollieLineItemBuilderTest extends TestCase
 {
@@ -282,5 +280,4 @@ class MollieLineItemBuilderTest extends TestCase
 
         $this->assertEquals($expectedOrderSum, $lineItemSum);
     }
-
 }

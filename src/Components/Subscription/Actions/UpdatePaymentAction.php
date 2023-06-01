@@ -27,7 +27,6 @@ use Shopware\Core\Framework\Context;
 
 class UpdatePaymentAction extends BaseAction
 {
-
     /**
      * @var MollieOrderPriceBuilder
      */

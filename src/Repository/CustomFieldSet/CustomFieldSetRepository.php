@@ -7,7 +7,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 
 class CustomFieldSetRepository implements CustomFieldSetRepositoryInterface
 {
-
     /**
      * @var EntityRepository
      */

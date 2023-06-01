@@ -27,7 +27,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class RemindAction extends BaseAction
 {
-
     /**
      * @var SalesChannelRepositoryInterface
      */
@@ -103,7 +102,6 @@ class RemindAction extends BaseAction
 
             /** @var SubscriptionEntity $subscription */
             foreach ($availableSubscriptions->getElements() as $subscription) {
-
                 # if it's not active in Mollie, then don't do anything
                 if ($subscription->getStatus() !== SubscriptionStatus::ACTIVE && $subscription->getStatus() !== SubscriptionStatus::RESUMED) {
                     continue;

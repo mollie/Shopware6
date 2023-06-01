@@ -9,7 +9,6 @@ use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
 class GetIDResponse extends StoreApiResponse
 {
-
     /**
      * @var ArrayStruct<mixed, mixed>
      */

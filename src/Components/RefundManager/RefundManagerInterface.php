@@ -10,7 +10,6 @@ use Shopware\Core\Framework\Context;
 
 interface RefundManagerInterface
 {
-
     /**
      * @param OrderEntity $order
      * @param Context $context

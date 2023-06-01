@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Tests\Service\ApplePayDirect;
 
-
 use Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDomainVerificationService;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayFormatter;
@@ -40,7 +39,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class ApplePayDirectTest extends TestCase
 {
-
     use MockTrait;
 
     /**
@@ -191,5 +189,4 @@ class ApplePayDirectTest extends TestCase
 
         return $swCart;
     }
-
 }

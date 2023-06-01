@@ -7,7 +7,6 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 
 class OrderLineItemEntityAttributes
 {
-
     /**
      * @var OrderLineItemEntity
      */

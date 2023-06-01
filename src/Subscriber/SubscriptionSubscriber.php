@@ -20,7 +20,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SubscriptionSubscriber implements EventSubscriberInterface
 {
-
     /**
      * @var SettingsService
      */

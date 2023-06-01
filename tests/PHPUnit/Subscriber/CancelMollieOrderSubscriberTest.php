@@ -8,7 +8,6 @@ use PHPUnit\Framework\TestCase;
 
 class CancelMollieOrderSubscriberTest extends TestCase
 {
-
     public function testListeningOnCorrectEvent(): void
     {
         self::assertArrayHasKey('state_machine.order.state_changed', CancelOrderSubscriber::getSubscribedEvents());

@@ -3,7 +3,6 @@
 
 namespace MolliePayments\Fixtures\Category;
 
-
 use Basecom\FixturePlugin\Fixture;
 use Basecom\FixturePlugin\FixtureBag;
 use Basecom\FixturePlugin\FixtureHelper;
@@ -12,10 +11,8 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 
-
 class CategoryFixture extends Fixture
 {
-
     /**
      * @var FixtureHelper
      */
@@ -73,7 +70,7 @@ class CategoryFixture extends Fixture
     /**
      * @param string $id
      * @param string $name
-     * @param string|null $afterCategoryId
+     * @param null|string $afterCategoryId
      */
     private function createCategory(string $id, string $name, ?string $afterCategoryId): void
     {
@@ -102,5 +99,4 @@ class CategoryFixture extends Fixture
             ],
         ], Context::createDefaultContext());
     }
-
 }

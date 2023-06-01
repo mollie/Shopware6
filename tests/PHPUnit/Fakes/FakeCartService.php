@@ -2,15 +2,12 @@
 
 namespace MolliePayments\Tests\Fakes;
 
-
 use Kiener\MolliePayments\Service\CartServiceInterface;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
-
 class FakeCartService implements CartServiceInterface
 {
-
     /**
      * @var Cart
      */
@@ -76,5 +73,4 @@ class FakeCartService implements CartServiceInterface
     {
         // TODO: Implement updatePaymentMethod() method.
     }
-
 }

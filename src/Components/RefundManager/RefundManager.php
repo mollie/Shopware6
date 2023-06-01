@@ -31,7 +31,6 @@ use Shopware\Core\Framework\Context;
 
 class RefundManager implements RefundManagerInterface
 {
-
     /**
      * @var OrderServiceInterface
      */
@@ -154,7 +153,6 @@ class RefundManager implements RefundManagerInterface
         $refund = null;
 
         if ($request->isFullRefundAmountOnly()) {
-
             # we have a full refund, but only with amount
             # and no items. to make sure that we have clean data
             # we have to extract all items, so that they will be added to the metadata
@@ -251,7 +249,6 @@ class RefundManager implements RefundManagerInterface
         # if everything worked above, iterate through all our
         # refund items and increase their stock
         foreach ($request->getItems() as $item) {
-
             # skip if nothing should be added to the stock
             if ($item->getStockIncreaseQty() <= 0) {
                 continue;
@@ -398,7 +395,6 @@ class RefundManager implements RefundManagerInterface
                     $shopwareReferenceID = (string)$orderItem->getReferencedId();
                 }
             } else {
-
                 # yeah i know complexity...but for now lets keep it compact :)
                 if ($order->getDeliveries() instanceof OrderDeliveryCollection && $mollieOrder instanceof \Mollie\Api\Resources\Order) {
                     # if we do not have an item

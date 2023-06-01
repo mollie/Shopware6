@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Struct;
 
 class MolliePaymentPrepareData
 {
-
     /**
      * @var string
      */

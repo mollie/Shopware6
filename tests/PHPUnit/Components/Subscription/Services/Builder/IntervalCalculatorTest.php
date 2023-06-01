@@ -5,10 +5,8 @@ namespace PHPUnit\Components\Subscription\Services\Builder;
 use Kiener\MolliePayments\Components\Subscription\Services\Interval\IntervalCalculator;
 use PHPUnit\Framework\TestCase;
 
-
 class IntervalCalculatorTest extends TestCase
 {
-
     /**
      * This test verifies that the start date of our Mollie subscription is correctly calculated.
      * This is not the date of the order, but the first calculated date in the future according
@@ -71,5 +69,4 @@ class IntervalCalculatorTest extends TestCase
         $this->assertEquals('2022-07-08', $orderDate->format('Y-m-d'), 'original date was modified');
         $this->assertEquals('2022-09-08', $startDate, 'calculated date is wrong');
     }
-
 }

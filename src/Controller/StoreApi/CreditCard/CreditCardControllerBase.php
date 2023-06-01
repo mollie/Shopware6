@@ -19,7 +19,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class CreditCardControllerBase
 {
-
     /**
      * @var CustomerService
      */

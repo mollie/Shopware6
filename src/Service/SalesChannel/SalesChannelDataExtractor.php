@@ -8,7 +8,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class SalesChannelDataExtractor
 {
-
     /**
      * @param SalesChannelEntity $salesChannelEntity
      * @return PaymentMethodCollection

@@ -3,7 +3,6 @@
 
 namespace MolliePayments\Fixtures\Customer;
 
-
 use Basecom\FixturePlugin\Fixture;
 use Basecom\FixturePlugin\FixtureBag;
 use Basecom\FixturePlugin\FixtureHelper;
@@ -11,10 +10,8 @@ use Kiener\MolliePayments\Repository\Customer\CustomerRepositoryInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 
-
 class CustomerFixture extends Fixture
 {
-
     private const CUSTOMER_ID_NL = '0d8eefdd6d32456385580e2ff42431b9';
     private const ADDRESS_ID_NL = 'e27dc2b4e85f4a0f9a912a09f07701b0';
 
@@ -87,7 +84,5 @@ class CustomerFixture extends Fixture
         ]];
 
         $this->customerRepository->upsert($dataNL, Context::createDefaultContext());
-
     }
-
 }

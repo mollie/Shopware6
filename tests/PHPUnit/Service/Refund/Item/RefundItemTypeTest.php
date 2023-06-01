@@ -7,7 +7,6 @@ use PHPUnit\Framework\TestCase;
 
 class RefundItemTypeTest extends TestCase
 {
-
     /**
      * This test verifies that our constant is not changed.
      * It will be used in the meta data of the refund inside Mollie.
@@ -33,5 +32,4 @@ class RefundItemTypeTest extends TestCase
     {
         $this->assertEquals('partial', RefundItemType::PARTIAL);
     }
-
 }

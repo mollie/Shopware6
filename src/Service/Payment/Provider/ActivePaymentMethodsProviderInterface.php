@@ -8,7 +8,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 interface ActivePaymentMethodsProviderInterface
 {
-
     /**
      * @param float         $price
      * @param string        $currency

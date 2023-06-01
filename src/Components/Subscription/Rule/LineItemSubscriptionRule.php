@@ -11,7 +11,6 @@ use Symfony\Component\Validator\Constraints\Type;
 
 class LineItemSubscriptionRule extends Rule
 {
-
     /**
      * @var bool
      */

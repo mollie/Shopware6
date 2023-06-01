@@ -35,7 +35,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class ApplePayDirect
 {
-
     /**
      * @var ApplePayDomainVerificationService
      */

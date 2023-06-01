@@ -45,7 +45,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class BusinessEventCollectorSubscriber implements EventSubscriberInterface
 {
-
     /**
      * @var VersionCompare
      */

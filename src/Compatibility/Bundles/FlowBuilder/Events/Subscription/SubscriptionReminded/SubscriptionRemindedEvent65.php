@@ -6,7 +6,6 @@ use Shopware\Core\Content\Flow\Dispatching\Aware\ScalarValuesAware;
 
 class SubscriptionRemindedEvent65 extends SubscriptionRemindedEvent implements ScalarValuesAware
 {
-
     /**
      * @return array<mixed>
      */

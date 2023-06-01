@@ -8,8 +8,6 @@ use PHPUnit\Framework\TestCase;
 
 class SubscriptionMetadataTest extends TestCase
 {
-
-
     /**
      * This test verifies that our properties can be
      * accessed correctly.
@@ -88,5 +86,4 @@ class SubscriptionMetadataTest extends TestCase
 
         static::assertSame('tr_xyz', $meta->getTmpTransaction());
     }
-
 }

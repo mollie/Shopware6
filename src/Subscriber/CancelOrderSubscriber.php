@@ -16,7 +16,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CancelOrderSubscriber implements EventSubscriberInterface
 {
-
     /**
      * These Shopware actions will automatically trigger
      * our cancellation (if enabled in the config).
@@ -95,7 +94,6 @@ class CancelOrderSubscriber implements EventSubscriberInterface
         $transitionName = $event->getTransition()->getTransitionName();
 
         try {
-
             # if we don't have at least one of our
             # actions that automatically trigger this feature, continue
             if (!in_array($transitionName, self::AUTOMATIC_TRIGGER_ACTIONS, true)) {

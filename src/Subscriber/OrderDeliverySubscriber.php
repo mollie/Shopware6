@@ -12,7 +12,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class OrderDeliverySubscriber implements EventSubscriberInterface
 {
-
     /**
      * @var SettingsService
      */

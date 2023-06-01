@@ -9,7 +9,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class CartBackupService
 {
-
     /**
      *
      */
@@ -52,7 +51,7 @@ class CartBackupService
         $salesChannelName = (string)$context->getSalesChannel()->getName();
 
         # create new cart with our backup token
-        $newCart = $this->cartService->createNew(self::BACKUP_TOKEN, $salesChannelName);
+        $newCart = $this->cartService->createNew(self::BACKUP_TOKEN);
 
         # assign our items to the backup
         # this is the only thing we really need to backup at this stage.
@@ -75,7 +74,7 @@ class CartBackupService
 
         # create a new "old" original cart (to avoid foreign reference problems)
         # and set the items from our backup
-        $newCart = $this->cartService->createNew($context->getToken(), (string)$context->getSalesChannel()->getName());
+        $newCart = $this->cartService->createNew($context->getToken());
         $newCart->setLineItems($backupCart->getLineItems());
 
         # set and persist

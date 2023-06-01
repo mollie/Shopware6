@@ -14,7 +14,6 @@ use Shopware\Core\Kernel;
 
 class MollieApiFactory
 {
-
     /**
      * @var string
      */
@@ -135,7 +134,6 @@ class MollieApiFactory
     public function buildClient(string $apiKey): MollieApiClient
     {
         try {
-
             # in some rare peaks, the Mollie API might take a bit more time.
             # so we set it a higher connect timeout, and also a high enough response timeout
             $connectTimeout = 5;
@@ -149,7 +147,6 @@ class MollieApiFactory
 
             $this->apiClient->addVersionString('MollieShopware6/' . MolliePayments::PLUGIN_VERSION);
         } catch (Exception $e) {
-
             # the Invalid API if not starting with test_ or live_ (and more) is coming through an exception.
             # but we don't want this to happen in here...it's just annoying...so only log other errors
             if ($this->stringContains('Invalid API key', $e->getMessage()) === false) {

@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class MollieDataBuilderTest extends TestCase
 {
-
     use BuilderTestTrait;
 
 
@@ -55,5 +54,4 @@ class MollieDataBuilderTest extends TestCase
 
         $this->assertEquals($expected, $payload);
     }
-
 }

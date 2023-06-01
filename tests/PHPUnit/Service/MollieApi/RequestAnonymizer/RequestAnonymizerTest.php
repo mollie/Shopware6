@@ -2,13 +2,11 @@
 
 namespace MolliePayments\Tests\Service\MollieApi\RequestAnonymizer;
 
-
 use Kiener\MolliePayments\Service\MollieApi\RequestAnonymizer\MollieRequestAnonymizer;
 use PHPUnit\Framework\TestCase;
 
 class MollieRequestAnonymizerTest extends TestCase
 {
-
     /**
      * This test verifies that we get an empty string
      * if we have an invalid value that is just NULL.

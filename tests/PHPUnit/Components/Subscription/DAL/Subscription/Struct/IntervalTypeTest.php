@@ -5,10 +5,8 @@ namespace MolliePayments\Tests\Components\Subscription\DAL\Subscription\Struct;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\IntervalType;
 use PHPUnit\Framework\TestCase;
 
-
 class IntervalTypeTest extends TestCase
 {
-
     /**
      * This test verifies that the value of our constant is correct.
      *
@@ -38,5 +36,4 @@ class IntervalTypeTest extends TestCase
     {
         static::assertSame('months', IntervalType::MONTHS);
     }
-
 }

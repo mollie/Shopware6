@@ -8,5 +8,4 @@ use MolliePayments\Tests\Fakes\FakeEntityRepository;
 
 class FakeMediaRepository extends FakeEntityRepository implements MediaRepositoryInterface
 {
-
 }

@@ -15,7 +15,6 @@ use Shopware\Core\Framework\Uuid\Uuid;
 
 class LineItemDataExtractorTest extends TestCase
 {
-
     public function testWithMissingProduct(): void
     {
         $extractor = new LineItemDataExtractor();

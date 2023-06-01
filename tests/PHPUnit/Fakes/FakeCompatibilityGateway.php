@@ -6,10 +6,8 @@ use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGatewayInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
-
 class FakeCompatibilityGateway implements CompatibilityGatewayInterface
 {
-
     /**
      * @param SalesChannelContext $context
      * @return string

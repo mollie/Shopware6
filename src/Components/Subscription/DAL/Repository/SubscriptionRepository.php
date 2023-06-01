@@ -19,7 +19,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
 
 class SubscriptionRepository
 {
-
     /**
      * @var EntityRepository
      */

@@ -7,7 +7,6 @@ use League\Flysystem\Filesystem;
 
 class ApplePayDomainVerificationService
 {
-
     /**
      * This is the static download URL for all Mollie merchants.
      * This one must not change! But the content might change, you'll never know.

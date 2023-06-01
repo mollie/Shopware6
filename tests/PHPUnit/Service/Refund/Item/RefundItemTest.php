@@ -8,7 +8,6 @@ use PHPUnit\Framework\TestCase;
 
 class RefundItemTest extends TestCase
 {
-
     /**
      * This is the data that is sent through our service to Mollie.
      * It's not the refund amount, but only the composition of the refund.
@@ -29,5 +28,4 @@ class RefundItemTest extends TestCase
 
         $this->assertEquals(14.99, $item->getAmount());
     }
-
 }

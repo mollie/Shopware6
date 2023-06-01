@@ -2,7 +2,6 @@
 
 namespace MolliePayments\Fixtures\SalesChannel;
 
-
 use Basecom\FixturePlugin\Fixture;
 use Basecom\FixturePlugin\FixtureBag;
 use Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepositoryInterface;
@@ -12,10 +11,8 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 
-
 class SalesChannelFixture extends Fixture
 {
-
     /**
      * @var EntityRepository
      */
@@ -111,7 +108,6 @@ class SalesChannelFixture extends Fixture
         }
 
         foreach ($salesChannelIds as $id) {
-
             $paymentUpdates[] = [
                 'id' => $id,
                 'paymentMethods' => $molliePaymentMethodIdsPrepared,
@@ -120,5 +116,4 @@ class SalesChannelFixture extends Fixture
 
         $this->repoSalesChannels->update($paymentUpdates, $ctx);
     }
-
 }

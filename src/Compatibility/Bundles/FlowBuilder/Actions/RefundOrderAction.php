@@ -15,7 +15,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class RefundOrderAction extends FlowAction implements EventSubscriberInterface
 {
-
     /**
      * @var OrderServiceInterface
      */

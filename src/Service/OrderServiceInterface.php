@@ -10,7 +10,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 interface OrderServiceInterface
 {
-
     /**
      * @param DataBag $data
      * @param SalesChannelContext $context

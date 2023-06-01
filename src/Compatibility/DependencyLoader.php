@@ -10,7 +10,6 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
 class DependencyLoader
 {
-
     /**
      * @var Container
      */

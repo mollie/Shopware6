@@ -7,7 +7,6 @@ use Doctrine\DBAL\Exception;
 
 class MigrationUtils
 {
-
     /**
      * @var Connection
      */

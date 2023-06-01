@@ -10,7 +10,6 @@ use Shopware\Core\Framework\Context;
 
 class CancelAction extends BaseAction
 {
-
     /**
      * @param string $subscriptionId
      * @param Context $context

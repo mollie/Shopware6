@@ -9,8 +9,6 @@ use Shopware\Core\Framework\Uuid\Uuid;
 
 class SubscriptionCollectionTest extends TestCase
 {
-
-
     /**
      * This test verifies that our flat list does not
      * throw errors when being used with an empty subscription list.
@@ -50,5 +48,4 @@ class SubscriptionCollectionTest extends TestCase
         $this->assertEquals(0, array_keys($flatList)[0]);
         $this->assertEquals(1, array_keys($flatList)[1]);
     }
-
 }

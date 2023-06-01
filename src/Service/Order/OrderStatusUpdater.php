@@ -16,7 +16,6 @@ use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachine
 
 class OrderStatusUpdater
 {
-
     /**
      * @var OrderStateService
      */
@@ -199,7 +198,6 @@ class OrderStatusUpdater
         $addLog = false;
 
         switch ($statusTo) {
-
             case MolliePaymentStatus::MOLLIE_PAYMENT_OPEN:
             case MolliePaymentStatus::MOLLIE_PAYMENT_PENDING:
                 break;

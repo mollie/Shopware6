@@ -229,7 +229,7 @@ class SetShipmentTest extends TestCase
     /**
      * create a delivery entity and set the order in delivery if given
      *
-     * @param OrderEntity|null $order
+     * @param null|OrderEntity $order
      * @return OrderDeliveryEntity
      */
     private function createDelivery(?OrderEntity $order): OrderDeliveryEntity
@@ -247,7 +247,7 @@ class SetShipmentTest extends TestCase
     /**
      * create an order entity and set the transaction in order if given
      *
-     * @param OrderTransactionEntity|null $transaction
+     * @param null|OrderTransactionEntity $transaction
      * @return OrderEntity
      */
     private function createOrder(?OrderTransactionEntity $transaction): OrderEntity

@@ -158,7 +158,6 @@ class ApplePayDirectControllerBase extends StorefrontController
                 'id' => $id,
             ]);
         } catch (\Throwable $ex) {
-
             # ! WE DO NOT LOG IN HERE!
             # otherwise we would always get logs if its just not enabled
             # so this is either a valid response or invalid one...that's it
@@ -335,7 +334,6 @@ class ApplePayDirectControllerBase extends StorefrontController
     public function startPayment(SalesChannelContext $context, Request $request): Response
     {
         try {
-
             # we clear our cart backup now
             # we are in the user redirection process where a restoring wouldnt make sense
             # because from now on we would end on the cart page where we could even switch payment method.

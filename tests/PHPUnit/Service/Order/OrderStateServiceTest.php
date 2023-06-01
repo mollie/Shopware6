@@ -32,7 +32,7 @@ class OrderStateServiceTest extends TestCase
     /** @var OrderStateService */
     private $orderStateHelper;
 
-    /** @var SettingsService|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|SettingsService */
     private $settingsService;
 
     public function setUp(): void

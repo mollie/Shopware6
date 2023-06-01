@@ -146,30 +146,30 @@ class PriceCalculatorTest extends TestCase
     public function getVatAmountTestData(): array
     {
         return [
-//            'gross price configuration, gross price is 138,88 => (30% off discount from 462,92)' => [
-//                "9.09",
-//                CartPrice::TAX_STATE_GROSS,
-//                'EUR',
-//                $this->createOrderLineItemEntity(1, 138.88, 138.88, 9.08, 7.0)
-//            ],
-//            'taxfree configuration, net price is 129,79 => (30% off discount from 432,64)' => [
-//                "0.00",
-//                CartPrice::TAX_STATE_FREE,
-//                'EUR',
-//                $this->createOrderLineItemEntity(1, 129.79, 129.79, 0.0, 7.0, CartPrice::TAX_STATE_FREE)
-//            ],
-//            'net price configuration, net price is 129,79 => (30% off discount from 432,64)' => [
-//                "9.08",
-//                CartPrice::TAX_STATE_NET,
-//                'EUR',
-//                $this->createOrderLineItemEntity(1, 129.79, 129.79, 9.08, 7.0)
-//            ],
-//            'gross price configuration, 13.68 gross price other taxAmount' => [
-//                "1.89",
-//                CartPrice::TAX_STATE_GROSS,
-//                'EUR',
-//                $this->createOrderLineItemEntity(1, 1.1368, 13.68, 1.88, 16)
-//            ],
+            //            'gross price configuration, gross price is 138,88 => (30% off discount from 462,92)' => [
+            //                "9.09",
+            //                CartPrice::TAX_STATE_GROSS,
+            //                'EUR',
+            //                $this->createOrderLineItemEntity(1, 138.88, 138.88, 9.08, 7.0)
+            //            ],
+            //            'taxfree configuration, net price is 129,79 => (30% off discount from 432,64)' => [
+            //                "0.00",
+            //                CartPrice::TAX_STATE_FREE,
+            //                'EUR',
+            //                $this->createOrderLineItemEntity(1, 129.79, 129.79, 0.0, 7.0, CartPrice::TAX_STATE_FREE)
+            //            ],
+            //            'net price configuration, net price is 129,79 => (30% off discount from 432,64)' => [
+            //                "9.08",
+            //                CartPrice::TAX_STATE_NET,
+            //                'EUR',
+            //                $this->createOrderLineItemEntity(1, 129.79, 129.79, 9.08, 7.0)
+            //            ],
+            //            'gross price configuration, 13.68 gross price other taxAmount' => [
+            //                "1.89",
+            //                CartPrice::TAX_STATE_GROSS,
+            //                'EUR',
+            //                $this->createOrderLineItemEntity(1, 1.1368, 13.68, 1.88, 16)
+            //            ],
         ];
     }
 

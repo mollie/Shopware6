@@ -2,7 +2,6 @@
 
 namespace MolliePayments\Fixtures\Product;
 
-
 use Basecom\FixturePlugin\Fixture;
 use Basecom\FixturePlugin\FixtureBag;
 use Basecom\FixturePlugin\FixtureHelper;
@@ -10,10 +9,8 @@ use MolliePayments\Fixtures\Product\Traits\ProductFixtureTrait;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 
-
 class VoucherFixture extends Fixture
 {
-
     use ProductFixtureTrait;
 
     /**

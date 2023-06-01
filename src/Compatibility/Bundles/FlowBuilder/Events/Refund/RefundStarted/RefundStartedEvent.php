@@ -16,7 +16,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class RefundStartedEvent extends Event implements OrderAware, MailAware, SalesChannelAware
 {
-
     /**
      * @var OrderEntity
      */

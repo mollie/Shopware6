@@ -2,7 +2,6 @@
 
 namespace MolliePayments\Fixtures\Product;
 
-
 use Basecom\FixturePlugin\Fixture;
 use Basecom\FixturePlugin\FixtureBag;
 use Basecom\FixturePlugin\FixtureHelper;
@@ -10,10 +9,8 @@ use MolliePayments\Fixtures\Product\Traits\ProductFixtureTrait;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 
-
 class SubscriptionFixture extends Fixture
 {
-
     use ProductFixtureTrait;
 
     /**
@@ -73,5 +70,4 @@ class SubscriptionFixture extends Fixture
         $this->createProduct('1d1eeedd6d22436385580e2ff42431b9', 'Subscription (1x Daily)', 'MOL_SUB_1', $category, $description, 19, $image, $customFieldsDaily, $this->repoProducts, $this->helper);
         $this->createProduct('1d2eeedd6d22436385580e2ff42431b9', 'Subscription (1x Weekly)', 'MOL_SUB_2', $category, $description, 29, $image, $customFieldsWeekly, $this->repoProducts, $this->helper);
     }
-
 }

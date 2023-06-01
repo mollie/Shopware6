@@ -8,7 +8,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class StorefrontBuildSubscriber implements EventSubscriberInterface
 {
-
     /**
      * @var SettingsService
      */

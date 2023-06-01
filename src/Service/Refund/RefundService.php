@@ -25,7 +25,6 @@ use Shopware\Core\System\Currency\CurrencyEntity;
 
 class RefundService implements RefundServiceInterface
 {
-
     /**
      * @var Order
      */
@@ -283,7 +282,6 @@ class RefundService implements RefundServiceInterface
         $orderAttributes = new OrderAttributes($order);
 
         if ($orderAttributes->isTypeSubscription()) {
-
             # subscriptions do not have a mollie order
             $this->gwMollie->switchClient($order->getSalesChannelId());
 

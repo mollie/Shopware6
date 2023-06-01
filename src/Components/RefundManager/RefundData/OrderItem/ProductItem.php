@@ -6,7 +6,6 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 
 class ProductItem extends AbstractItem
 {
-
     /**
      * @var OrderLineItemEntity
      */
@@ -52,7 +51,6 @@ class ProductItem extends AbstractItem
 
         foreach ($promotionCompositions as $composition) {
             foreach ($composition as $compItem) {
-
                 # the ID is the reference ID
                 # if they match, then our current line item was in that promotion
                 if ($compItem['id'] === $this->lineItem->getReferencedId()) {

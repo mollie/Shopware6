@@ -9,7 +9,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ShopwareFlowBuilderDispatcher65 implements FlowBuilderDispatcherAdapterInterface
 {
-
     /**
      * @var FlowDispatcher
      */

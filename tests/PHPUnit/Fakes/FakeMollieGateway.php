@@ -8,10 +8,8 @@ use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\Subscription;
 
-
 class FakeMollieGateway implements MollieGatewayInterface
 {
-
     public function switchClient(string $salesChannelID): void
     {
         // TODO: Implement switchClient() method.
@@ -66,5 +64,4 @@ class FakeMollieGateway implements MollieGatewayInterface
     {
         return [];
     }
-
 }

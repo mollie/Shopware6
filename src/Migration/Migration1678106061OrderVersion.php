@@ -9,7 +9,6 @@ use Shopware\Core\Framework\Migration\MigrationStep;
 
 class Migration1678106061OrderVersion extends MigrationStep
 {
-
     /**
      * @return int
      */

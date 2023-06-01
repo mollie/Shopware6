@@ -28,7 +28,7 @@ class WebhookTimezoneSubscriberTest extends TestCase
     protected $subscriber;
 
     /**
-     * @var TransactionService&MockObject
+     * @var MockObject&TransactionService
      */
     protected $transactionService;
 

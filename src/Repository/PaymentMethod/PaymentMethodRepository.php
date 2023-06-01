@@ -13,7 +13,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 
 class PaymentMethodRepository implements PaymentMethodRepositoryInterface
 {
-
     /**
      * @var EntityRepository
      */

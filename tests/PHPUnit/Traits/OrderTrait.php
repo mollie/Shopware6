@@ -33,7 +33,8 @@ trait OrderTrait
         string  $city,
         ?string $salutationName,
         ?string $countryISO,
-        ?string $additional): CustomerAddressEntity
+        ?string $additional
+    ): CustomerAddressEntity
     {
         $customerAddress = new CustomerAddressEntity();
         $customerAddress->setId(Uuid::randomHex());
@@ -77,8 +78,7 @@ trait OrderTrait
         string $seoUrl = '',
         string $imageUrl = '',
         int    $position = 1
-    ): OrderLineItemEntity
-    {
+    ): OrderLineItemEntity {
         $productId = Uuid::randomHex();
         $totalPrice = $quantity * $unitPrice;
         $calculatedTax = new CalculatedTax($taxAmount, $taxRate, $totalPrice);

@@ -7,7 +7,6 @@ use PHPUnit\Framework\TestCase;
 
 class DataCompressorTest extends TestCase
 {
-
     /**
      * @var DataCompressor
      */
@@ -51,5 +50,4 @@ class DataCompressorTest extends TestCase
         $this->assertEquals(31, strlen($value));
         $this->assertEquals('2a88d9b59d474c7e869d8071649be43', $value);
     }
-
 }

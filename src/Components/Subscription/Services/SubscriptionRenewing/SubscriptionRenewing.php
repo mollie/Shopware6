@@ -17,7 +17,6 @@ use Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInt
 
 class SubscriptionRenewing
 {
-
     /**
      * @var NumberRangeValueGeneratorInterface
      */

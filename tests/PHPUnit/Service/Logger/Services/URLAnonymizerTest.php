@@ -7,7 +7,6 @@ use PHPUnit\Framework\TestCase;
 
 class URLAnonymizerTest extends TestCase
 {
-
     /**
      * The payment finalize URL has a token in the query.
      * We need to make sure to remove this from the logs
@@ -21,5 +20,4 @@ class URLAnonymizerTest extends TestCase
 
         $this->assertEquals('https://shop.phpunit.mollie/payment/finalize-transaction', $anonymizer->anonymize($url));
     }
-
 }

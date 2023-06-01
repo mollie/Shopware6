@@ -10,7 +10,6 @@ use PHPUnit\Framework\TestCase;
 
 class AnonymousWebProcessorTest extends TestCase
 {
-
     /**
      * @var AnonymousWebProcessor
      */

@@ -10,7 +10,6 @@ use Shopware\Core\Content\Flow\Dispatching\FlowDispatcher;
 
 class FlowBuilderFactory implements FlowBuilderFactoryInterface
 {
-
     /**
      *
      */
@@ -24,6 +23,7 @@ class FlowBuilderFactory implements FlowBuilderFactoryInterface
     /**
      * @var null|\Shopware\Core\Framework\Event\BusinessEventDispatcher
      */
+    /** @phpstan-ignore-next-line */
     private $businessEventDispatcher;
 
     /**
@@ -37,6 +37,7 @@ class FlowBuilderFactory implements FlowBuilderFactoryInterface
      * @param \Shopware\Core\Framework\Event\BusinessEventDispatcher $businessEventDispatcher
      * @param FlowDispatcher $flowDispatcher
      */
+    /** @phpstan-ignore-next-line */
     public function __construct(string $shopwareVersion, $businessEventDispatcher, $flowDispatcher)
     {
         $this->versionCompare = new VersionCompare($shopwareVersion);

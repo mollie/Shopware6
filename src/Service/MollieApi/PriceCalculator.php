@@ -11,7 +11,6 @@ use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 
 class PriceCalculator
 {
-
     /**
      *
      */
@@ -99,7 +98,6 @@ class PriceCalculator
         #       item #2: 20% tax rate, net price: 13.03, quantity 1
         #       promotion: 50 EUR amount off on full cart
         if ($taxCollection->count() > 1) {
-
             # start by summing up the individual
             # tax amounts from the tax rates
             $vatAmount = 0;

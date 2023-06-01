@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Service;
 
 interface CustomFieldsInterface
 {
-
     /**
      *
      */

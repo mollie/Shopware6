@@ -8,7 +8,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEve
 
 class OrderAddressRepository implements OrderAddressRepositoryInterface
 {
-
     /**
      * @var EntityRepository
      */

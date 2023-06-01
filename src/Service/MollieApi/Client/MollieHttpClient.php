@@ -9,7 +9,6 @@ use Mollie\Api\MollieApiClient;
 
 class MollieHttpClient implements MollieHttpAdapterInterface
 {
-
     /**
      * @var int in seconds
      */

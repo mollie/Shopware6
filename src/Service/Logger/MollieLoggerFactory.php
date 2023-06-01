@@ -14,8 +14,6 @@ use Psr\Log\LoggerInterface;
 
 class MollieLoggerFactory
 {
-
-
     /**
      * this is the channel name that will be
      * displayed in the backend. It must not contain spaces

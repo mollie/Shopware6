@@ -8,7 +8,6 @@ use Shopware\Core\System\SalesChannel\Context\SalesChannelContextServiceInterfac
 
 class CompatibilityFactory
 {
-
     /**
      * @var string
      */

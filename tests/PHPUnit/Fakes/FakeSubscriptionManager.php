@@ -9,7 +9,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class FakeSubscriptionManager implements SubscriptionManagerInterface
 {
-
     /**
      * @param OrderEntity $order
      * @param SalesChannelContext $context
@@ -29,5 +28,4 @@ class FakeSubscriptionManager implements SubscriptionManagerInterface
     public function confirmSubscription(OrderEntity $order, string $mandateId, Context $context): void
     {
     }
-
 }

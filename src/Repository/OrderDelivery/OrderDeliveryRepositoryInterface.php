@@ -10,7 +10,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 
 interface OrderDeliveryRepositoryInterface
 {
-
     /**
      * @param Criteria $criteria
      * @param Context $context

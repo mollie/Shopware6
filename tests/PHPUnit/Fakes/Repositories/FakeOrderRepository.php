@@ -12,10 +12,8 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 use Shopware\Core\Framework\Uuid\Uuid;
 
-
 class FakeOrderRepository implements OrderRepositoryInterface
 {
-
     /**
      * @var OrderEntity
      */
@@ -122,6 +120,4 @@ class FakeOrderRepository implements OrderRepositoryInterface
     {
         // TODO: Implement updateOrderLastUpdated() method.
     }
-
-
 }

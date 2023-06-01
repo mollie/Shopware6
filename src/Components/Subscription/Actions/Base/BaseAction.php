@@ -24,7 +24,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class BaseAction
 {
-
     /**
      * @var SettingsService
      */

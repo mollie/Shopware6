@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Tests\Service;
 
-
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Handler\Method\BanContactPayment;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
@@ -70,7 +69,8 @@ class PaymentMethodServiceTest extends TestCase
         $paymentMethod->setId('id-123');
         $paymentMethod->setHandlerIdentifier('handler-id-123');
 
-        $this->context = $this->createMock(Context::class);;
+        $this->context = $this->createMock(Context::class);
+        ;
         $this->mediaRepository = new FakeMediaRepository(new MediaDefinition());
         $this->paymentMethodRepository = new FakePaymentMethodRepository($paymentMethod);
 
@@ -117,5 +117,4 @@ class PaymentMethodServiceTest extends TestCase
 
         $this->assertEquals($expected, $handlers);
     }
-
 }
