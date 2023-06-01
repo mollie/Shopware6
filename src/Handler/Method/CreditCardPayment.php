@@ -2,18 +2,14 @@
 
 namespace Kiener\MolliePayments\Handler\Method;
 
-use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
-use Kiener\MolliePayments\Facade\MolliePaymentFinalize;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\CustomFieldService;
-use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Mollie\Api\Types\PaymentMethod;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Framework\Context;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class CreditCardPayment extends PaymentHandler
@@ -38,7 +34,8 @@ class CreditCardPayment extends PaymentHandler
         LoggerInterface    $logger,
         ContainerInterface $container,
         CustomerService    $customerService
-    ) {
+    )
+    {
         parent::__construct($logger, $container);
         $this->customerService = $customerService;
     }

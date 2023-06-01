@@ -43,6 +43,10 @@ class LineItemAttributes
      */
     private $subscriptionRepetitionType;
 
+    /**
+     * @var bool
+     */
+    private $isPromotionProduct;
 
     /**
      * @param LineItem $lineItem
@@ -57,6 +61,8 @@ class LineItemAttributes
         if (array_key_exists('productNumber', $payload)) {
             $this->productNumber = (string)$payload['productNumber'];
         }
+
+        $this->isPromotionProduct = array_key_exists('promotionId', $payload);
 
         $this->voucherType = $this->getCustomFieldValue($lineItem, 'voucher_type');
 
@@ -91,6 +97,14 @@ class LineItemAttributes
     }
 
     /**
+     * @return bool
+     */
+    public function isPromotionProduct(): bool
+    {
+        return $this->isPromotionProduct;
+    }
+
+    /**
      * @return string
      */
     public function getVoucherType(): string
@@ -121,7 +135,6 @@ class LineItemAttributes
     {
         $this->subscriptionProduct = $subscriptionProduct;
     }
-
 
     /**
      * @return int
