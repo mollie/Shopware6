@@ -34,8 +34,7 @@ class CreditCardPayment extends PaymentHandler
         LoggerInterface    $logger,
         ContainerInterface $container,
         CustomerService    $customerService
-    )
-    {
+    ) {
         parent::__construct($logger, $container);
         $this->customerService = $customerService;
     }

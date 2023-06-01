@@ -34,8 +34,8 @@ class CreateAction extends BaseAction
     /**
      * @param OrderEntity $order
      * @param SalesChannelContext $context
-     * @return string
      * @throws Exception
+     * @return string
      */
     public function createSubscription(OrderEntity $order, SalesChannelContext $context): string
     {
@@ -100,6 +100,4 @@ class CreateAction extends BaseAction
 
         return $subscription->getId();
     }
-
-
 }

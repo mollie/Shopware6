@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Components\Subscription\Services\Validator;
 use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Shopware\Core\Checkout\Cart\Cart;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 
 class MixedOrderValidator
@@ -20,7 +21,13 @@ class MixedOrderValidator
         $otherItemsCount = 0;
         $isMixedCart = false;
 
-        foreach ($order->getLineItems()->getElements() as $lineItem) {
+        $lineItems = $order->getLineItems();
+
+        if (!$lineItems instanceof OrderLineItemCollection) {
+            return false;
+        }
+
+        foreach ($lineItems->getElements() as $lineItem) {
             $attributes = new OrderLineItemEntityAttributes($lineItem);
 
             if ($attributes->isSubscriptionProduct()) {
@@ -47,5 +54,4 @@ class MixedOrderValidator
 
         return false;
     }
-
 }

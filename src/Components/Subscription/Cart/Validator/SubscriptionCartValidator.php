@@ -136,5 +136,4 @@ class SubscriptionCartValidator implements CartValidatorInterface
 
         return false;
     }
-
 }

@@ -45,5 +45,4 @@ class MixedCartValidator
 
         return false;
     }
-
 }
