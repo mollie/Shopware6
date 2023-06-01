@@ -372,9 +372,7 @@ function setUp() {
     // this is a bug, so we just switch to another payment
     // before switching back to credit card
     payment.switchPaymentMethod('PayPal');
-
-    cy.pause();
-
+    
     if (shopware.isVersionGreaterEqual(6.4)) {
         payment.switchPaymentMethod('Card');
     } else {
