@@ -99,6 +99,11 @@ class SubscriptionDefinition extends EntityDefinition
             new UpdatedAtField(),
 
             # --------------------------------------------------------------------------------------------------------------------------
+            # RUNTIME FIELDS
+
+            (new DateTimeField('cancelUntil', 'cancelUntil'))->addFlags(new Runtime()),
+
+            # --------------------------------------------------------------------------------------------------------------------------
 
             new ManyToOneAssociationField('customer', 'customer_id', CustomerDefinition::class, 'id', false),
 
