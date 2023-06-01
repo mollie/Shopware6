@@ -1,51 +1,50 @@
 <?php
 
-namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Checkout;
+namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionPaused;
 
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionDefinition;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Shopware\Core\Checkout\Customer\CustomerDefinition;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\Checkout\Order\OrderDefinition;
-use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Event\CustomerAware;
 use Shopware\Core\Framework\Event\EventData\EntityType;
 use Shopware\Core\Framework\Event\EventData\EventDataCollection;
 use Shopware\Core\Framework\Event\EventData\MailRecipientStruct;
 use Shopware\Core\Framework\Event\MailAware;
-use Shopware\Core\Framework\Event\OrderAware;
 use Shopware\Core\Framework\Event\SalesChannelAware;
 use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class OrderFailedEvent extends Event implements CustomerAware, OrderAware, MailAware, SalesChannelAware
+class SubscriptionPausedEvent extends Event implements CustomerAware, MailAware, SalesChannelAware
 {
     use JsonSerializableTrait;
 
 
     /**
-     * @var OrderEntity
+     * @var SubscriptionEntity
      */
-    private $order;
+    protected $subscription;
 
     /**
      * @var CustomerEntity
      */
-    private $customer;
+    protected $customer;
 
     /**
      * @var Context
      */
-    private $context;
+    protected $context;
 
 
     /**
-     * @param OrderEntity $order
+     * @param SubscriptionEntity $subscription
      * @param CustomerEntity $customer
      * @param Context $context
      */
-    public function __construct(OrderEntity $order, CustomerEntity $customer, Context $context)
+    public function __construct(SubscriptionEntity $subscription, CustomerEntity $customer, Context $context)
     {
-        $this->order = $order;
+        $this->subscription = $subscription;
         $this->customer = $customer;
         $this->context = $context;
     }
@@ -57,7 +56,7 @@ class OrderFailedEvent extends Event implements CustomerAware, OrderAware, MailA
     public static function getAvailableData(): EventDataCollection
     {
         return (new EventDataCollection())
-            ->add('order', new EntityType(OrderDefinition::class))
+            ->add('subscription', new EntityType(SubscriptionDefinition::class))
             ->add('customer', new EntityType(CustomerDefinition::class));
     }
 
@@ -66,7 +65,7 @@ class OrderFailedEvent extends Event implements CustomerAware, OrderAware, MailA
      */
     public function getName(): string
     {
-        return 'mollie.checkout.order_failed';
+        return 'mollie.subscription.paused';
     }
 
     /**
@@ -78,19 +77,11 @@ class OrderFailedEvent extends Event implements CustomerAware, OrderAware, MailA
     }
 
     /**
-     * @return OrderEntity
+     * @return SubscriptionEntity
      */
-    public function getOrder(): OrderEntity
+    public function getSubscription(): SubscriptionEntity
     {
-        return $this->order;
-    }
-
-    /**
-     * @return string
-     */
-    public function getOrderId(): string
-    {
-        return $this->order->getId();
+        return $this->subscription;
     }
 
     /**

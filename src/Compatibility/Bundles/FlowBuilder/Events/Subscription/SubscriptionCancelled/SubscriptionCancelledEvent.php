@@ -1,6 +1,6 @@
 <?php
 
-namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription;
+namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionCancelled;
 
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionDefinition;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
@@ -24,17 +24,17 @@ class SubscriptionCancelledEvent extends Event implements CustomerAware, MailAwa
     /**
      * @var SubscriptionEntity
      */
-    private $subscription;
+    protected $subscription;
 
     /**
      * @var CustomerEntity
      */
-    private $customer;
+    protected $customer;
 
     /**
      * @var Context
      */
-    private $context;
+    protected $context;
 
 
     /**

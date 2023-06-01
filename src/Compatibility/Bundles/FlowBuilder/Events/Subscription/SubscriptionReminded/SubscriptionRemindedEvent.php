@@ -1,6 +1,6 @@
 <?php
 
-namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription;
+namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionReminded;
 
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionDefinition;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
@@ -26,27 +26,27 @@ class SubscriptionRemindedEvent extends Event implements CustomerAware, SalesCha
     /**
      * @var SubscriptionEntity
      */
-    private $subscription;
+    protected $subscription;
 
     /**
      * @var CustomerEntity
      */
-    private $customer;
+    protected $customer;
 
     /**
      * @var SalesChannelEntity
      */
-    private $salesChannel;
+    protected $salesChannel;
 
     /**
      * @var Context
      */
-    private $context;
+    protected $context;
 
     /**
      * @var MailRecipientStruct
      */
-    private $mailRecipient;
+    protected $mailRecipient;
 
 
     /**
@@ -103,14 +103,6 @@ class SubscriptionRemindedEvent extends Event implements CustomerAware, SalesCha
     }
 
     /**
-     * @return SubscriptionEntity
-     */
-    public function getSubscription(): SubscriptionEntity
-    {
-        return $this->subscription;
-    }
-
-    /**
      * @return CustomerEntity
      */
     public function getCustomer(): CustomerEntity
@@ -127,6 +119,22 @@ class SubscriptionRemindedEvent extends Event implements CustomerAware, SalesCha
     }
 
     /**
+     * @return SubscriptionEntity
+     */
+    public function getSubscription(): SubscriptionEntity
+    {
+        return $this->subscription;
+    }
+
+    /**
+     * @return MailRecipientStruct
+     */
+    public function getMailStruct(): MailRecipientStruct
+    {
+        return $this->mailRecipient;
+    }
+
+    /**
      * @return EventDataCollection
      */
     public static function getAvailableData(): EventDataCollection
@@ -138,13 +146,5 @@ class SubscriptionRemindedEvent extends Event implements CustomerAware, SalesCha
         $data->add('salesChannel', new EntityType(SalesChannelDefinition::class));
 
         return $data;
-    }
-
-    /**
-     * @return MailRecipientStruct
-     */
-    public function getMailStruct(): MailRecipientStruct
-    {
-        return $this->mailRecipient;
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund;
+namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund\RefundStarted;
 
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\OrderDefinition;
@@ -20,17 +20,17 @@ class RefundStartedEvent extends Event implements OrderAware, MailAware, SalesCh
     /**
      * @var OrderEntity
      */
-    private $order;
+    protected $order;
 
     /**
      * @var float
      */
-    private $amount;
+    protected $amount;
 
     /**
      * @var Context
      */
-    private $context;
+    protected $context;
 
 
     /**

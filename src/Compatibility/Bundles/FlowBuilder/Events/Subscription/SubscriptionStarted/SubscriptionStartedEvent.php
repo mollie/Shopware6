@@ -1,6 +1,6 @@
 <?php
 
-namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription;
+namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionStarted;
 
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionDefinition;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
@@ -16,7 +16,7 @@ use Shopware\Core\Framework\Event\SalesChannelAware;
 use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class SubscriptionEndedEvent extends Event implements CustomerAware, MailAware, SalesChannelAware
+class SubscriptionStartedEvent extends Event implements CustomerAware, MailAware, SalesChannelAware
 {
     use JsonSerializableTrait;
 
@@ -24,17 +24,17 @@ class SubscriptionEndedEvent extends Event implements CustomerAware, MailAware, 
     /**
      * @var SubscriptionEntity
      */
-    private $subscription;
+    protected $subscription;
 
     /**
      * @var CustomerEntity
      */
-    private $customer;
+    protected $customer;
 
     /**
      * @var Context
      */
-    private $context;
+    protected $context;
 
 
     /**
@@ -65,7 +65,7 @@ class SubscriptionEndedEvent extends Event implements CustomerAware, MailAware, 
      */
     public function getName(): string
     {
-        return 'mollie.subscription.ended';
+        return 'mollie.subscription.started';
     }
 
     /**

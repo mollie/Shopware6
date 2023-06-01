@@ -3,7 +3,7 @@
 
 namespace MolliePayments\Tests\Components\RefundManager;
 
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund\RefundStartedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund\RefundStarted\RefundStartedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Components\RefundManager\Builder\RefundDataBuilder;
 use Kiener\MolliePayments\Components\RefundManager\DAL\Repository\RefundRepositoryInterface;
