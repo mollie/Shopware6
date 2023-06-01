@@ -82,10 +82,6 @@
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\CustomFieldService" class="Kiener\MolliePayments\Service\CustomFieldService">
-            <argument type="service" id="Kiener\MolliePayments\Repository\CustomFieldSet\CustomFieldSetRepository"/>
-        </service>
-
         <service id="Kiener\MolliePayments\Service\DeliveryService" class="Kiener\MolliePayments\Service\DeliveryService">
             <argument type="service" id="Kiener\MolliePayments\Repository\OrderDelivery\OrderDeliveryRepository"/>
         </service>

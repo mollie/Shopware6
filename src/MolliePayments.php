@@ -95,9 +95,6 @@ class MolliePayments extends Plugin
         $shopwareRepoCustomFields = $this->container->get('custom_field_set.repository');
         $mollieRepoCustomFields = new CustomFieldSetRepository($shopwareRepoCustomFields);
 
-        $customFieldService = new CustomFieldService($mollieRepoCustomFields);
-        $customFieldService->addCustomFields($context->getContext());
-
         $this->runDbMigrations($context->getMigrationCollection());
     }
 
