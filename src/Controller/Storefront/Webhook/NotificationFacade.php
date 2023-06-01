@@ -318,24 +318,6 @@ class NotificationFacade
         return $result;
     }
 
-    /**
-     * @param OrderEntity $order
-     * @return string
-     */
-    private function getMollieId(OrderEntity $order): string
-    {
-        $customFields = $order->getCustomFields();
-
-        if (!isset($customFields['mollie_payments'])) {
-            return "";
-        }
-
-        if (!isset($customFields['mollie_payments']['order_id'])) {
-            return "";
-        }
-
-        return (string)$customFields['mollie_payments']['order_id'];
-    }
 
     /**
      * @param OrderTransactionEntity $transaction
