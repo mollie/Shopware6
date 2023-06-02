@@ -77,7 +77,7 @@ class ShipOrderAction extends FlowAction implements EventSubscriberInterface
      */
     public function handleFlow(StorableFlow $flow): void
     {
-        $orderId = $flow->getStore('order_id');
+        $orderId = $flow->getStore('orderId');
 
         $this->shipOrder($orderId, $flow->getContext());
     }
