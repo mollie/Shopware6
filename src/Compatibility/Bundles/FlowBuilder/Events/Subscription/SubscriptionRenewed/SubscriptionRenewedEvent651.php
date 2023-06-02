@@ -1,10 +1,10 @@
 <?php
 
-namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionStarted;
+namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionRenewed;
 
 use Shopware\Core\Content\Flow\Dispatching\Aware\ScalarValuesAware;
 
-class SubscriptionStartedEvent65 extends SubscriptionStartedEvent implements ScalarValuesAware
+class SubscriptionRenewedEvent651 extends SubscriptionRenewedEvent implements ScalarValuesAware
 {
     /**
      * @return array<mixed>

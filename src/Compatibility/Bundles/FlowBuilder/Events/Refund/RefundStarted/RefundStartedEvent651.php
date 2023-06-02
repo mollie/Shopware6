@@ -4,7 +4,7 @@ namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund\
 
 use Shopware\Core\Content\Flow\Dispatching\Aware\ScalarValuesAware;
 
-class RefundStartedEvent65 extends RefundStartedEvent implements ScalarValuesAware
+class RefundStartedEvent651 extends RefundStartedEvent implements ScalarValuesAware
 {
     /**
      * @return array<mixed>

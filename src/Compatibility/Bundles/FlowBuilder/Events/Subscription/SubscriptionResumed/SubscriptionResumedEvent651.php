@@ -1,10 +1,10 @@
 <?php
 
-namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionReminded;
+namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionResumed;
 
 use Shopware\Core\Content\Flow\Dispatching\Aware\ScalarValuesAware;
 
-class SubscriptionRemindedEvent65 extends SubscriptionRemindedEvent implements ScalarValuesAware
+class SubscriptionResumedEvent651 extends SubscriptionResumedEvent implements ScalarValuesAware
 {
     /**
      * @return array<mixed>
@@ -14,7 +14,6 @@ class SubscriptionRemindedEvent65 extends SubscriptionRemindedEvent implements S
         return [
             'customer' => $this->customer,
             'subscription' => $this->subscription,
-            'salesChannel' => $this->salesChannel,
         ];
     }
 }

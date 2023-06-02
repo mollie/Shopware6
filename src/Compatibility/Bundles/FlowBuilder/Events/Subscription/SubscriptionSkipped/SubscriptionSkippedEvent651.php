@@ -4,7 +4,7 @@ namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscri
 
 use Shopware\Core\Content\Flow\Dispatching\Aware\ScalarValuesAware;
 
-class SubscriptionSkippedEvent65 extends SubscriptionSkippedEvent implements ScalarValuesAware
+class SubscriptionSkippedEvent651 extends SubscriptionSkippedEvent implements ScalarValuesAware
 {
     /**
      * @return array<mixed>

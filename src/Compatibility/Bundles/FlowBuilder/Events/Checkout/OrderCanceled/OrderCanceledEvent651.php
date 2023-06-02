@@ -1,10 +1,10 @@
 <?php
 
-namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Checkout\OrderFailed;
+namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Checkout\OrderCanceled;
 
 use Shopware\Core\Content\Flow\Dispatching\Aware\ScalarValuesAware;
 
-class OrderFailedEvent65 extends OrderFailedEvent implements ScalarValuesAware
+class OrderCanceledEvent651 extends OrderCanceledEvent implements ScalarValuesAware
 {
     /**
      * @return array<mixed>
