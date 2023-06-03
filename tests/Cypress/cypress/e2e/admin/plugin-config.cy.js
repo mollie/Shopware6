@@ -4,6 +4,7 @@ import Session from "Services/utils/Session"
 import AdminLoginAction from "Actions/admin/AdminLoginAction";
 import Shopware from "Services/shopware/Shopware";
 import AdminPluginAction from "Actions/admin/AdminPluginAction";
+import VueJs from "Services/utils/VueJs/VueJs";
 
 
 const devices = new Devices();
@@ -86,7 +87,7 @@ context("Plugin Config", () => {
             adminLogin.login();
             pluginAction.openPluginConfiguration();
 
-            const inputPrefix = '.sw-system-config--field-mollie-payments-config-format-order-number > .sw-field';
+            const inputPrefix = '#MolliePayments\\.config\\.formatOrderNumber';
             const divPreview = '.sw-system-config--field-mollie-payments-config-mollie-plugin-config-section-payments-format';
 
             cy.get(inputPrefix).click().clear();
