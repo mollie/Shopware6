@@ -156,7 +156,7 @@ class MollieOrderBuilder
         $orderData['payment']['webhookUrl'] = $webhookUrl;
 
 
-        if ($lineItems instanceof OrderLineItemCollection && $this->isSubscriptions($lineItems->getElements())) {
+        if ($settings->isSubscriptionsEnabled() && $lineItems instanceof OrderLineItemCollection && $this->isSubscriptions($lineItems->getElements())) {
             $orderData['payment']['sequenceType'] = 'first';
         }
 
