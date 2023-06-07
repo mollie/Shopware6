@@ -51,7 +51,7 @@ clean: ## Cleans all dependencies and files
 
 build: ## Installs the plugin, and builds the artifacts using the Shopware build commands.
 	php switch-composer.php prod
-	cd ../../.. && export NODE_OPTIONS=openssl-legacy-provider && shopware-cli extension build custom/plugins/MolliePayments
+	cd ../../.. && export NODE_OPTIONS=--openssl-legacy-provider && shopware-cli extension build custom/plugins/MolliePayments
 	php switch-composer.php dev
 	# -----------------------------------------------------
 	# CUSTOM WEBPACK
