@@ -80,6 +80,10 @@
         "info2": "Deze instellingen kunnen leiden tot een andere totale som dan de totale som van lineitems. Wanneer Mollie deze bedragen kruiselings controleert en vaststelt dat ze niet overeenkomen, ontstaat er een fout bij het afrekenen.",
         "info3": "Je kunt deze functie gebruiken om afrondingsproblemen bij het afrekenen te voorkomen. Indien ingeschakeld, voegt het een apart lineitem toe aan je Mollie Dashboard met het afrondingsverschil, en betalen je klanten de totale som zoals berekend door Shopware."
       },
+      "order": {
+        "bankTransferDueDateKlarnaLimitReached": "Het is niet mogelijk om Klarna Pay now, Klarna Slice it of Klarna Pay later als methode te gebruiken wanneer de vervaldatum meer dan 28 dagen in de toekomst ligt, tenzij een ander maximum is overeengekomen tussen de merchant en Klarna.",
+        "bankTransferDueDateLimitReached": "Het is niet mogelijk om de orderlevensduur langer dan 100 dagen in te stellen."
+      },
       "support": {
         "modalTitle": "Verzoek support van Mollie",
         "btnCancel": "Cancel",

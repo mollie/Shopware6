@@ -80,6 +80,10 @@
         "info2": "These settings can lead to a different grand total than the total sum of line items. When Mollie cross-checks these amounts and finds that they don’t match, it causes a checkout error.",
         "info3": "You can use this feature to avoid rounding issues in your checkout. When enabled, it adds a separate line item in your Mollie Dashboard for the difference in rounding, and your customers pay the grand total calculated by Shopware."
       },
+      "order": {
+        "bankTransferDueDateKlarnaLimitReached": "It is not possible to use Klarna Pay now, Klarna Slice it or Klarna Pay later as method when your expiry date is more than 28 days in the future, unless another maximum is agreed between the merchant and Klarna.",
+        "bankTransferDueDateLimitReached": "It is not possible to set the order life time higher than 100 days."
+      },
       "support": {
         "modalTitle": "Request support from Mollie",
         "btnCancel": "Cancel",

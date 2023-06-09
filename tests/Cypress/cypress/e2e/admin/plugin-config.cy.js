@@ -103,5 +103,27 @@ context("Plugin Config", () => {
             cy.get(divPreview).should('be.visible');
             cy.contains(divPreview, '"cypress_1000-stage"');
         })
+
+        it('Display order lifetime days warning', () => {
+
+            adminLogin.login();
+            pluginAction.openPluginConfiguration();
+
+            const inputField = cy.get('#MolliePayments\\.config\\.orderLifetimeDays');
+            const errorDiv = '.bankTransferDueDateLimitReached';
+            const klarnaWarningDiv = '.bankTransferDueDateKlarnaLimitReached';
+
+            inputField.clear().type('10');
+            cy.get(klarnaWarningDiv).should('not.exist');
+            cy.get(errorDiv).should('not.exist');
+
+            inputField.clear().type('30');
+            cy.get(klarnaWarningDiv).should('exist');
+            cy.get(errorDiv).should('not.exist');
+
+            inputField.clear().type('101');
+            cy.get(klarnaWarningDiv).should('not.exist');
+            cy.get(errorDiv).should('exist');
+        })
     })
 })

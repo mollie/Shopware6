@@ -191,6 +191,9 @@
             <helpText lang="de-DE">Konfiguration eines eigenen Verfallsdatums für die Zahlungsart 'Bank Transfer'. Dies ist der Zeitraum einer möglichen Zahlung bis die Zahlungsmöglichkeit verfällt.</helpText>
             <helpText lang="nl-NL">Wijs een aangepaste "vervaldatum" toe voor de betaalmethode Bankoverschrijving. Dit is de periode dat de klant kan betalen totdat de betaling vervalt.</helpText>
         </input-field>
+        <component name="mollie-pluginconfig-section-order-lifetime-warning">
+            <name>molliePluginConfigSectionOrderLifeTimeWarning</name>
+        </component>
         <input-field type="int">
             <name>orderLifetimeDays</name>
             <label>Order Lifetime Days</label>

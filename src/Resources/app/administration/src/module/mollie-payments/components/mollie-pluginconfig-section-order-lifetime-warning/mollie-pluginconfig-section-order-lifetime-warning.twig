@@ -1,0 +1,8 @@
+<sw-container gap="16px">
+    <sw-alert v-if="klarnaOrderLifeTimeReached" class="bankTransferDueDateKlarnaLimitReached" variant="warning" :showIcon="true" :closable="false">
+        {{ $tc('mollie-payments.config.order.bankTransferDueDateKlarnaLimitReached') }}
+    </sw-alert>
+    <sw-alert v-if="oderLifeTimeLimitReached" class="bankTransferDueDateLimitReached" variant="error" :showIcon="true" :closable="false">
+        {{ $tc('mollie-payments.config.order.bankTransferDueDateLimitReached') }}
+    </sw-alert>
+</sw-container>
