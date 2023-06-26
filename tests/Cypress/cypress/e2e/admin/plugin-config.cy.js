@@ -104,7 +104,7 @@ context("Plugin Config", () => {
             cy.contains(divPreview, '"cypress_1000-stage"');
         })
 
-        it('Display order lifetime days warning', () => {
+        it('C1097313: Display order lifetime days warning', () => {
 
             adminLogin.login();
             pluginAction.openPluginConfiguration();

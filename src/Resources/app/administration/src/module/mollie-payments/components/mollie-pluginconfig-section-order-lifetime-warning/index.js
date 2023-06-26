@@ -25,8 +25,7 @@ Component.register('mollie-pluginconfig-section-order-lifetime-warning', {
     },
     methods: {
         createdComponent() {
-            const maximumOrderLifeTimeKlarna = 28;
-            const maximumOrderLifeTime = 100;
+
             /**
              * The input element is displayed later, so we have to wait until it is inside the dom document
              */
@@ -38,19 +37,21 @@ Component.register('mollie-pluginconfig-section-order-lifetime-warning', {
                 }
                 clearInterval(interval);
 
-                const orderLifeTime = parseInt(orderLifeTimeElement.value);
-                this.oderLifeTimeLimitReached = orderLifeTime > maximumOrderLifeTime;
-                this.klarnaOrderLifeTimeReached = !this.oderLifeTimeLimitReached && orderLifeTime > maximumOrderLifeTimeKlarna;
+                this.toggleWarning(orderLifeTimeElement);
 
                 orderLifeTimeElement.addEventListener("keyup", (event) => {
-                    const orderLifeTime = parseInt(event.target.value);
-                    this.oderLifeTimeLimitReached = orderLifeTime > maximumOrderLifeTime;
-                    this.klarnaOrderLifeTimeReached = !this.oderLifeTimeLimitReached && orderLifeTime > maximumOrderLifeTimeKlarna;
+                    this.toggleWarning(event.target);
                 }, true);
 
             }, 500);
-
         },
 
+        toggleWarning(element){
+            const maximumOrderLifeTimeKlarna = 28;
+            const maximumOrderLifeTime = 100;
+            const orderLifeTime = parseInt(element.value);
+            this.oderLifeTimeLimitReached = orderLifeTime > maximumOrderLifeTime;
+            this.klarnaOrderLifeTimeReached = !this.oderLifeTimeLimitReached && orderLifeTime > maximumOrderLifeTimeKlarna;
+        },
     },
 });
