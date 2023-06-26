@@ -109,21 +109,38 @@ context("Plugin Config", () => {
             adminLogin.login();
             pluginAction.openPluginConfiguration();
 
-            const inputField = cy.get('#MolliePayments\\.config\\.orderLifetimeDays');
+
+            const inputField = '#MolliePayments\\.config\\.orderLifetimeDays';
             const errorDiv = '.bankTransferDueDateLimitReached';
             const klarnaWarningDiv = '.bankTransferDueDateKlarnaLimitReached';
 
-            inputField.clear().type('10');
-            cy.get(klarnaWarningDiv).should('not.exist');
-            cy.get(errorDiv).should('not.exist');
 
-            inputField.clear().type('30');
+            cy.get(inputField).clear().type('101');
+            cy.get(klarnaWarningDiv).should('not.exist');
+            cy.get(errorDiv).should('exist');
+
+            pluginAction.savePlugConfiguration();
+            cy.get(klarnaWarningDiv).should('not.exist');
+            cy.get(errorDiv).should('exist');
+
+            cy.get(inputField).clear().type('30');
             cy.get(klarnaWarningDiv).should('exist');
             cy.get(errorDiv).should('not.exist');
 
-            inputField.clear().type('101');
+            pluginAction.savePlugConfiguration();
+            cy.get(klarnaWarningDiv).should('exist');
+            cy.get(errorDiv).should('not.exist');
+
+
+            cy.get(inputField).clear().type('0');
             cy.get(klarnaWarningDiv).should('not.exist');
-            cy.get(errorDiv).should('exist');
+            cy.get(errorDiv).should('not.exist');
+
+            pluginAction.savePlugConfiguration();
+            cy.get(klarnaWarningDiv).should('not.exist');
+            cy.get(errorDiv).should('not.exist');
+
+
         })
     })
 })

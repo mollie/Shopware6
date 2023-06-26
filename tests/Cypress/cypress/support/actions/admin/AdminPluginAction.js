@@ -19,4 +19,9 @@ export default class AdminPluginAction {
         cy.wait(4000);
     }
 
+    savePlugConfiguration() {
+        cy.get('.sw-extension-config__save-action').click();
+        cy.wait(4000);
+    }
+
 }
