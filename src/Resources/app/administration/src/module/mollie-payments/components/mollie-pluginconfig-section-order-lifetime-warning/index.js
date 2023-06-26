@@ -1,4 +1,5 @@
 import template from './mollie-pluginconfig-section-order-lifetime-warning.twig';
+import OrderLifeTimeLimitsDetectorService from './services/OderLifeTimeLimitDetectorService';
 
 
 // eslint-disable-next-line no-undef
@@ -25,7 +26,7 @@ Component.register('mollie-pluginconfig-section-order-lifetime-warning', {
     },
     methods: {
         createdComponent() {
-
+            const limitDetector = new OrderLifeTimeLimitsDetectorService()
             /**
              * The input element is displayed later, so we have to wait until it is inside the dom document
              */
@@ -36,22 +37,20 @@ Component.register('mollie-pluginconfig-section-order-lifetime-warning', {
                     return;
                 }
                 clearInterval(interval);
+                const value =  parseInt(orderLifeTimeElement.value);
+                limitDetector.checkValue(value);
+                this.oderLifeTimeLimitReached = limitDetector.isOderLifeTimeLimitReached();
+                this.klarnaOrderLifeTimeReached = limitDetector.isKlarnaOrderLifeTimeReached();
 
-                this.toggleWarning(orderLifeTimeElement);
 
                 orderLifeTimeElement.addEventListener("keyup", (event) => {
-                    this.toggleWarning(event.target);
+                    const value =  parseInt(event.target.value);
+                    limitDetector.checkValue(value);
+                    this.oderLifeTimeLimitReached = limitDetector.isOderLifeTimeLimitReached();
+                    this.klarnaOrderLifeTimeReached = limitDetector.isKlarnaOrderLifeTimeReached();
                 }, true);
 
             }, 500);
-        },
-
-        toggleWarning(element){
-            const maximumOrderLifeTimeKlarna = 28;
-            const maximumOrderLifeTime = 100;
-            const orderLifeTime = parseInt(element.value);
-            this.oderLifeTimeLimitReached = orderLifeTime > maximumOrderLifeTime;
-            this.klarnaOrderLifeTimeReached = !this.oderLifeTimeLimitReached && orderLifeTime > maximumOrderLifeTimeKlarna;
         },
     },
 });
