@@ -38,16 +38,16 @@ Component.register('mollie-pluginconfig-section-order-lifetime-warning', {
                 }
                 clearInterval(interval);
                 const value =  parseInt(orderLifeTimeElement.value);
-                limitDetector.checkValue(value);
-                this.oderLifeTimeLimitReached = limitDetector.isOderLifeTimeLimitReached();
-                this.klarnaOrderLifeTimeReached = limitDetector.isKlarnaOrderLifeTimeReached();
+
+                this.oderLifeTimeLimitReached = limitDetector.isOderLifeTimeLimitReached(value);
+                this.klarnaOrderLifeTimeReached = limitDetector.isKlarnaOrderLifeTimeReached(value);
 
 
                 orderLifeTimeElement.addEventListener("keyup", (event) => {
                     const value =  parseInt(event.target.value);
-                    limitDetector.checkValue(value);
-                    this.oderLifeTimeLimitReached = limitDetector.isOderLifeTimeLimitReached();
-                    this.klarnaOrderLifeTimeReached = limitDetector.isKlarnaOrderLifeTimeReached();
+
+                    this.oderLifeTimeLimitReached = limitDetector.isOderLifeTimeLimitReached(value);
+                    this.klarnaOrderLifeTimeReached = limitDetector.isKlarnaOrderLifeTimeReached(value);
                 }, true);
 
             }, 500);

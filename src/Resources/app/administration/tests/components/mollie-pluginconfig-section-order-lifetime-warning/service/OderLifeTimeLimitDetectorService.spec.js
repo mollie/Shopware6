@@ -3,19 +3,19 @@ import OderLifeTimeLimitDetectorService from './../../../../../administration/sr
 const service = new OderLifeTimeLimitDetectorService();
 
 test('No warnings are shown', () => {
-    service.checkValue(0);
-    expect(service.isKlarnaOrderLifeTimeReached()).toBe(false);
-    expect(service.isOderLifeTimeLimitReached()).toBe(false);
+    const oderLifeTime = 0;
+    expect(service.isKlarnaOrderLifeTimeReached(oderLifeTime)).toBe(false);
+    expect(service.isOderLifeTimeLimitReached(oderLifeTime)).toBe(false);
 });
 
 test('Klarna Limit reached', () => {
-    service.checkValue(29);
-    expect(service.isKlarnaOrderLifeTimeReached()).toBe(true);
-    expect(service.isOderLifeTimeLimitReached()).toBe(false);
+    const oderLifeTime = 29;
+    expect(service.isKlarnaOrderLifeTimeReached(oderLifeTime)).toBe(true);
+    expect(service.isOderLifeTimeLimitReached(oderLifeTime)).toBe(false);
 });
 
 test('Order Limit reached', () => {
-    service.checkValue(101);
-    expect(service.isKlarnaOrderLifeTimeReached()).toBe(false);
-    expect(service.isOderLifeTimeLimitReached()).toBe(true);
+    const oderLifeTime = 101;
+    expect(service.isKlarnaOrderLifeTimeReached(oderLifeTime)).toBe(false);
+    expect(service.isOderLifeTimeLimitReached(oderLifeTime)).toBe(true);
 });
