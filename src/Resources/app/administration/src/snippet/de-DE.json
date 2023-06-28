@@ -80,6 +80,10 @@
         "info2": "Diese Einstellungen können zu einer anderen Gesamtsumme als der Gesamtsumme der Einzelposten führen. Wenn Mollie diese Beträge abgleicht und feststellt, dass sie nicht übereinstimmen, verursacht dies einen Fehler.",
         "info3": "Sie können diese Funktion verwenden, um Rundungsprobleme in Ihrem Checkout zu vermeiden. Wenn diese aktiviert ist, fügt sie eine separate Position im Mollie-Dashboard für die Rundungsdifferenz hinzu, und die Kunden zahlen die von Shopware berechnete Gesamtsumme."
       },
+      "order": {
+        "bankTransferDueDateKlarnaLimitReached": "Es ist nicht möglich, Klarna Pay now, Klarna Slice it oder Klarna Pay later als Zahlungsmethode zu verwenden, wenn Ihr Ablaufdatum mehr als 28 Tage in der Zukunft liegt, es sei denn, zwischen dem Händler und Klarna wurde eine andere Höchstgrenze vereinbart.",
+        "bankTransferDueDateLimitReached": "Es ist nicht möglich, die Bestelllaufzeit auf mehr als 100 Tage festzulegen."
+      },
       "support": {
         "modalTitle": "Unterstützung von Mollie anfordern",
         "btnCancel": "Abbrechen",
