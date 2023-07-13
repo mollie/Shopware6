@@ -78,6 +78,37 @@ context("Checkout Failure Tests", () => {
                 cy.contains('Thank you for your order');
             })
 
+            it('C1278577: Retry canceled payment with Mollie Failure Mode', () => {
+
+                scenarioDummyBasket.execute();
+                paymentAction.switchPaymentMethod('PayPal');
+
+                shopware.prepareDomainChange();
+                checkout.placeOrderOnConfirm();
+
+                mollieSandbox.initSandboxCookie();
+                molliePaymentStatus.selectCancelled();
+
+                // verify that we are back in our shop
+                // if the payment fails, the order is finished, but
+                // we still have the option to change the payment method
+                cy.url().should('include', '/mollie/payment/');
+
+                // click on the mollie plugin retry button
+                // which brings us to the mollie payment selection page
+                checkout.mollieFailureModeRetryPayment();
+
+                cy.url().should('include', '/checkout/select-method/');
+
+                // select giro pay and mark it as "paid"
+                mollieSandbox.initSandboxCookie();
+                molliePaymentList.selectGiropay();
+                molliePaymentStatus.selectPaid();
+
+                cy.url().should('include', '/checkout/finish');
+                cy.contains('Thank you for your order');
+            })
+
             it('C4010: Continue Shopping after failed payment in Mollie Failure Mode', () => {
 
                 scenarioDummyBasket.execute();
@@ -153,7 +184,7 @@ context("Checkout Failure Tests", () => {
                 cy.contains('Thank you for updating your order');
             })
 
-            it('C4012: Retry cancelled payment with Shopware Failure Mode', () => {
+            it('C4012: Retry canceled payment with Shopware Failure Mode', () => {
 
                 scenarioDummyBasket.execute();
                 paymentAction.switchPaymentMethod('PayPal');
@@ -170,13 +201,12 @@ context("Checkout Failure Tests", () => {
                 cy.url().should('include', '/account/order/edit/');
 
                 if (shopware.isVersionGreaterEqual('6.4.10.0')) {
-                    cy.contains('We have received your order, but the payment was aborted');
+                    cy.contains('We have received your order, but the payment was aborted. Please change your payment method or try again.');
                 } else {
-                    cy.contains('We received your order, but the payment was aborted');
+                    cy.contains('We have received your order, but the payment was aborted. Please change your payment method or try again.');
                 }
 
-
-                paymentAction.switchPaymentMethod('PayPal');
+                paymentAction.switchPaymentMethod('Giropay');
 
                 checkout.placeOrderOnEdit();
 
