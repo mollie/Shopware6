@@ -55,7 +55,11 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
     {
         $originalRuleIds = $event->getContext()->getRuleIds();
 
-        /** the cart service changes the rule ids based on cart. after failed payment we are not in cart anymore and the rules will resetted */
+        /**
+         * the cart service changes the rule ids based on cart.
+         * after failed payment we are not in cart anymore but instead on edit order
+         * in this case the cart is empty so the rules will be reset
+         */
         $cart = $this->cartService->getCart($event->getContext()->getToken(), $event->getContext());
 
         /** we have to collect the original rules before cart service is called and set them again */
