@@ -53,7 +53,11 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
      */
     public function onGenerateCacheKey(PaymentMethodRouteCacheKeyEvent $event): void
     {
+        $originalRuleIds = $event->getContext()->getRuleIds();
+
         $cart = $this->cartService->getCart($event->getContext()->getToken(), $event->getContext());
+
+        $event->getContext()->setRuleIds($originalRuleIds);
 
         $parts = $event->getParts();
 
