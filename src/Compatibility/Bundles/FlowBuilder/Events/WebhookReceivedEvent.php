@@ -6,6 +6,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\Event\BusinessEventInterface;
 use Shopware\Core\Framework\Event\EventData\EntityType;
 use Shopware\Core\Framework\Event\EventData\EventDataCollection;
 use Shopware\Core\Framework\Event\EventData\MailRecipientStruct;
@@ -15,22 +16,22 @@ use Shopware\Core\Framework\Event\OrderAware;
 use Shopware\Core\Framework\Event\SalesChannelAware;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class WebhookReceivedEvent extends Event implements OrderAware, MailAware, SalesChannelAware
+class WebhookReceivedEvent extends Event implements OrderAware, MailAware, SalesChannelAware, BusinessEventInterface
 {
     /**
      * @var OrderEntity
      */
-    private $order;
+    protected $order;
 
     /**
      * @var string
      */
-    private $status;
+    protected $status;
 
     /**
      * @var Context
      */
-    private $context;
+    protected $context;
 
 
     /**
