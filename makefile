@@ -57,15 +57,15 @@ build: ## Installs the plugin, and builds the artifacts using the Shopware build
 	# CUSTOM WEBPACK
 	cd ./src/Resources/app/storefront && make build -B
 	# -----------------------------------------------------
-	cd ../../.. && php bin/console theme:refresh
-	cd ../../.. && php bin/console theme:compile
-	cd ../../.. && php bin/console theme:refresh
-	cd ../../.. && php bin/console assets:install
-	cd ../../.. && php bin/console cache:clear
+	cd ../../.. && php bin/console --no-debug theme:refresh
+	cd ../../.. && php bin/console --no-debug theme:compile
+	cd ../../.. && php bin/console --no-debug theme:refresh
+	cd ../../.. && php bin/console --no-debug assets:install
+	cd ../../.. && php bin/console --no-debug cache:clear
 
 fixtures: ## Installs all available testing fixtures of the Mollie plugin
-	cd ../../.. && php bin/console cache:clear
-	cd ../../.. && php bin/console fixture:load:group mollie
+	cd ../../.. && php bin/console --no-debug cache:clear
+	cd ../../.. && php bin/console --no-debug fixture:load:group mollie
 
 # ------------------------------------------------------------------------------------------------------------
 
