@@ -14,6 +14,7 @@ use Kiener\MolliePayments\Service\MollieApi\Payment as PaymentApiService;
 use Kiener\MolliePayments\Service\MollieApi\RequestAnonymizer\MollieRequestAnonymizer;
 use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 use Kiener\MolliePayments\Service\SettingsService;
+use Kiener\MolliePayments\Struct\MollieApi\ShipmentTrackingInfoStruct;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Order as MollieOrder;
 use Mollie\Api\Resources\OrderLine;
@@ -25,7 +26,9 @@ use Mollie\Api\Types\PaymentStatus;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class Order
@@ -378,14 +381,17 @@ class Order
         return $mollieOrder->status === 'created' ? $mollieOrder->getCheckoutUrl() : null;
     }
 
-    public function setShipment(string $mollieOrderId, string $salesChannelId): bool
+    public function setShipment(string $mollieOrderId, ?ShipmentTrackingInfoStruct $trackingInfoStruct, string $salesChannelId): bool
     {
         $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId);
-
+        $shipment = [];
+        if($trackingInfoStruct instanceof ShipmentTrackingInfoStruct){
+            $shipment['tracking'] = $trackingInfoStruct->toArray();
+        }
         /** @var OrderLine $orderLine */
         foreach ($mollieOrder->lines() as $orderLine) {
             if ($orderLine->shippableQuantity > 0) {
-                $mollieOrder->shipAll();
+                $mollieOrder->shipAll($shipment);
 
                 return true;
             }

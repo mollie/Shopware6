@@ -20,6 +20,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -169,8 +170,8 @@ class MollieShipment implements MollieShipmentInterface
 
             return false;
         }
-
-        $addedMollieShipment = $this->mollieApiOrderService->setShipment($mollieOrderId, $order->getSalesChannelId());
+        $trackingInfoStruct = $this->createTrackingInfoStructFromDelivery($delivery);
+        $addedMollieShipment = $this->mollieApiOrderService->setShipment($mollieOrderId, $trackingInfoStruct, $order->getSalesChannelId());
 
         if ($addedMollieShipment) {
             $values = [CustomFieldsInterface::DELIVERY_SHIPPED => true];
@@ -463,6 +464,15 @@ class MollieShipment implements MollieShipmentInterface
             return false;
         });
     }
+    private function createTrackingInfoStructFromDelivery(OrderDeliveryEntity $orderDeliveryEntity):?ShipmentTrackingInfoStruct{
+        $trackingCodes = $orderDeliveryEntity->getTrackingCodes();
+        $shippingMethod = $orderDeliveryEntity->getShippingMethod();
+        if (count($trackingCodes) !== 1 && ! $shippingMethod instanceof ShippingMethodEntity) {
+            return null;
+        }
+
+        return $this->createTrackingInfoStruct($shippingMethod->getName(),$trackingCodes[0], $shippingMethod->getTrackingUrl());
+    }
 
     private function createTrackingInfoStruct(string $trackingCarrier, string $trackingCode, string $trackingUrl): ?ShipmentTrackingInfoStruct
     {
@@ -476,6 +486,11 @@ class MollieShipment implements MollieShipmentInterface
 
         if (empty($trackingCode)) {
             throw new \InvalidArgumentException('Missing Argument for Tracking Code!');
+        }
+
+        $trackingUrl = trim(sprintf($trackingUrl, $trackingCode));
+        if (filter_var($trackingUrl, FILTER_VALIDATE_URL) === false) {
+            $trackingUrl = '';
         }
 
         return new ShipmentTrackingInfoStruct($trackingCarrier, $trackingCode, $trackingUrl);

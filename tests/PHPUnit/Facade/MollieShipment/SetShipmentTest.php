@@ -211,6 +211,7 @@ class SetShipmentTest extends TestCase
         $order->setSalesChannel($salesChannel);
         $order->setSalesChannelId($salesChannelId);
         $delivery = $this->createDelivery($order);
+
         $deliveryId = $delivery->getId();
         $this->orderDeliveryService->method('getDelivery')->willReturn($delivery);
         $this->mollieApiOrderService->method('setShipment')
@@ -236,7 +237,7 @@ class SetShipmentTest extends TestCase
     {
         $delivery = new OrderDeliveryEntity();
         $delivery->setId(Uuid::randomHex());
-
+        $delivery->setTrackingCodes([]);
         if ($order instanceof OrderEntity) {
             $delivery->setOrder($order);
         }
