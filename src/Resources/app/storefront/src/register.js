@@ -1,5 +1,3 @@
-import 'regenerator-runtime';
-
 import MollieCreditCardComponents from './mollie-payments/plugins/creditcard-components.plugin';
 import MollieCreditCardComponentsSw64 from './mollie-payments/plugins/creditcard-components-sw64.plugin';
 import MollieIDealIssuer from './mollie-payments/plugins/ideal-issuer.plugin';
