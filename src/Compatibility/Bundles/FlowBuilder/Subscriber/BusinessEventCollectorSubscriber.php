@@ -27,6 +27,7 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionStarted\SubscriptionStartedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionStarted\SubscriptionStartedEvent651;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookReceivedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookReceivedEvent651;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedAuthorizedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedCancelledEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedChargebackEvent;
@@ -86,9 +87,7 @@ class BusinessEventCollectorSubscriber implements EventSubscriberInterface
         $collection = $event->getCollection();
 
         $events = [
-            # --------------------------------------------
-            WebhookReceivedEvent::class,
-            # --------------------------------------------
+
             WebhookReceivedPaidEvent::class,
             WebhookReceivedFailedEvent::class,
             WebhookReceivedExpiredEvent::class,
@@ -102,6 +101,9 @@ class BusinessEventCollectorSubscriber implements EventSubscriberInterface
         ];
 
         if ($this->versionCompare->gte('6.5.1.0')) {
+            # --------------------------------------------
+            $events[] = WebhookReceivedEvent651::class;
+            # --------------------------------------------
             $events[] = OrderSuccessEvent651::class;
             $events[] = OrderFailedEvent651::class;
             $events[] = OrderCanceledEvent651::class;
@@ -117,6 +119,9 @@ class BusinessEventCollectorSubscriber implements EventSubscriberInterface
             $events[] = SubscriptionCancelledEvent651::class;
             $events[] = SubscriptionRenewedEvent651::class;
         } else {
+            # --------------------------------------------
+            $events[] = WebhookReceivedEvent::class;
+            # --------------------------------------------
             $events[] = OrderSuccessEvent::class;
             $events[] = OrderFailedEvent::class;
             $events[] = OrderCanceledEvent::class;
