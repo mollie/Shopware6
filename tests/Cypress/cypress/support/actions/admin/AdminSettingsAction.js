@@ -16,7 +16,7 @@ export default class AdminSettingsAction {
         cy.wait(3000);
     }
 
-    editFirstBusinessEvent(){
+    openFirstBusinessEvent(){
         cy.get('.sw-data-grid__body .sw-data-grid__row.sw-data-grid__row--0 .sw-context-button__button').click({force:true});
         cy.get('.sw-context-menu-item.sw-entity-listing__context-menu-edit-action').click();
     }
