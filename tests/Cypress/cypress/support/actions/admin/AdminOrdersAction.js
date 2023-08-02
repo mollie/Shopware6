@@ -97,14 +97,12 @@ export default class AdminOrdersAction {
      * @param nthItem
      */
     openLineItemShipping(nthItem) {
+
+        cy.wait(2000);
         
         repoOrdersDetails.getLineItemActionsButton(nthItem).click({force: true})
 
-        cy.wait(1000);
-
         repoOrdersDetails.getLineItemActionsButtonShipThroughMollie().should('not.have.class', 'is--disabled');
-
-        cy.wait(1000);
 
         repoOrdersDetails.getLineItemActionsButtonShipThroughMollie().click({force: true});
 
