@@ -97,10 +97,15 @@ export default class AdminOrdersAction {
      * @param nthItem
      */
     openLineItemShipping(nthItem) {
-
+        
         repoOrdersDetails.getLineItemActionsButton(nthItem).click({force: true})
 
+        cy.wait(1000);
+
         repoOrdersDetails.getLineItemActionsButtonShipThroughMollie().should('not.have.class', 'is--disabled');
+
+        cy.wait(1000);
+
         repoOrdersDetails.getLineItemActionsButtonShipThroughMollie().click({force: true});
 
         // here are automatic reloads and things as it seems
