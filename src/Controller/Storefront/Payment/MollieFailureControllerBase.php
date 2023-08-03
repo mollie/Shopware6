@@ -4,8 +4,6 @@ namespace Kiener\MolliePayments\Controller\Storefront\Payment;
 
 use Exception;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatcherAdapterInterface;
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactoryInterface;
 use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGatewayInterface;
 use Kiener\MolliePayments\Event\PaymentPageFailEvent;
@@ -14,6 +12,9 @@ use Kiener\MolliePayments\Exception\MissingMollieOrderIdException;
 use Kiener\MolliePayments\Exception\MissingOrderInTransactionException;
 use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeFetchedException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
+use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
+use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
+use Kiener\MolliePayments\Service\MollieApi\Order as MollieServiceOrder;
 use Kiener\MolliePayments\Service\Order\OrderStateService;
 use Kiener\MolliePayments\Service\TransactionService;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
@@ -76,6 +77,15 @@ class MollieFailureControllerBase extends StorefrontController
      */
     private $transactionTransitionService;
 
+    /**
+     * @var MollieServiceOrder
+     */
+    private $mollieOrderService;
+
+    /**
+     * @var OrderStatusConverter
+     */
+    private $orderStatusConverter;
 
     /**
      * @param RouterInterface $router
@@ -86,9 +96,10 @@ class MollieFailureControllerBase extends StorefrontController
      * @param LoggerInterface $logger
      * @param TransactionTransitionServiceInterface $transactionTransitionService
      * @param FlowBuilderFactoryInterface $flowBuilderFactory
-     * @throws Exception
+     * @param MollieServiceOrder $mollieOrderService
+     * @param OrderStatusConverter $orderStatusConverter
      */
-    public function __construct(RouterInterface $router, CompatibilityGatewayInterface $compatibilityGateway, MollieApiFactory $apiFactory, OrderStateService $orderStateService, TransactionService $transactionService, LoggerInterface $logger, TransactionTransitionServiceInterface $transactionTransitionService, FlowBuilderFactoryInterface $flowBuilderFactory)
+    public function __construct(RouterInterface $router, CompatibilityGatewayInterface $compatibilityGateway, MollieApiFactory $apiFactory, OrderStateService $orderStateService, TransactionService $transactionService, LoggerInterface $logger, TransactionTransitionServiceInterface $transactionTransitionService, FlowBuilderFactoryInterface $flowBuilderFactory, MollieServiceOrder $mollieOrderService, OrderStatusConverter $orderStatusConverter)
     {
         $this->router = $router;
         $this->compatibilityGateway = $compatibilityGateway;
@@ -97,6 +108,8 @@ class MollieFailureControllerBase extends StorefrontController
         $this->transactionService = $transactionService;
         $this->logger = $logger;
         $this->transactionTransitionService = $transactionTransitionService;
+        $this->mollieOrderService = $mollieOrderService;
+        $this->orderStatusConverter = $orderStatusConverter;
 
         $this->eventDispatcher = $flowBuilderFactory->createDispatcher();
     }
@@ -184,42 +197,18 @@ class MollieFailureControllerBase extends StorefrontController
      */
     public function retry(SalesChannelContext $context, string $transactionId): RedirectResponse
     {
-        # keep compatible to older Shopware versions by avoiding
-        # the Parameter Bag
-        $redirectUrl = (string)$_GET['redirectUrl'];
+        $transaction = $this->transactionService->getTransactionById($transactionId, null, $context->getContext());
 
-        /** @var string $redirectUrl */
-        $redirectUrl = urldecode($redirectUrl);
-
-        if (!filter_var($redirectUrl, FILTER_VALIDATE_URL)) {
-            throw new Exception('The redirect URL is invalid.');
+        if ($transaction === null) {
+            throw new Exception('Transaction with ID ' . $transactionId . ' not found');
         }
 
-        /**
-         * Get the transaction from the order transaction repository. With the
-         * transaction we can fetch the order from the database.
-         *
-         * @var OrderTransactionEntity $transaction
-         */
-        $transaction = $this->transactionService->getTransactionById(
-            $transactionId,
-            null,
-            $context->getContext()
-        );
+        $order = $transaction->getOrder();
 
-        /**
-         * Get the order entity from the transaction. With the order entity, we can
-         * retrieve the Mollie ID from its custom fields and fetch the payment
-         * status from Mollie's Orders API.
-         */
-        if ($transaction !== null) {
-            $order = $transaction->getOrder();
+        if (!$order instanceof OrderEntity) {
+            throw new Exception('Order for transaction with ID ' . $transaction->getOrderId() . ' not found');
         }
 
-        // Throw an error if the order is not found
-        if (!isset($order)) {
-            throw new OrderNotFoundException($transaction->getOrderId());
-        }
 
         $orderAttributes = new OrderAttributes($order);
 
@@ -230,15 +219,35 @@ class MollieFailureControllerBase extends StorefrontController
             ]
         );
 
-        // Reopen the order
-        $this->orderStateService->setOrderState(
-            $order,
-            OrderStates::STATE_OPEN,
-            $context->getContext()
+
+        # REOPEN the order
+        $this->orderStateService->setOrderState($order, OrderStates::STATE_OPEN, $context->getContext());
+
+        # if we redirect to the payment screen, set the transaction to in progress
+        $this->transactionTransitionService->processTransaction($transaction, $context->getContext());
+
+        # now fetch the Mollie order
+        $mollieOrder = $this->mollieOrderService->getMollieOrder(
+            $orderAttributes->getMollieOrderId(),
+            $order->getSalesChannelId(),
+            [
+                'embed' => 'payments'
+            ]
         );
 
-        // If we redirect to the payment screen, set the transaction to in progress
-        $this->transactionTransitionService->processTransaction($transaction, $context->getContext());
+        $paymentStatus = $this->orderStatusConverter->getMollieOrderStatus($mollieOrder);
+
+        # if its a failed status, then we have to create a new payment
+        # otherwise no payment would exist, and we are not able to redirect to the payment screen
+        if (MolliePaymentStatus::isFailedStatus('', $paymentStatus)) {
+            $mollieOrder->createPayment([]);
+        }
+
+        $redirectUrl = (string)$orderAttributes->getMolliePaymentUrl();
+
+        if (!filter_var($redirectUrl, FILTER_VALIDATE_URL)) {
+            throw new Exception('The redirect URL is invalid.');
+        }
 
         return new RedirectResponse($redirectUrl);
     }
@@ -276,7 +285,6 @@ class MollieFailureControllerBase extends StorefrontController
         return $this->renderStorefront('@Storefront/storefront/page/checkout/payment/failed.html.twig', [
             'redirectUrl' => $this->router->generate('frontend.mollie.payment.retry', [
                 'transactionId' => $transactionId,
-                'redirectUrl' => urlencode($redirectUrl),
             ]),
             'displayUrl' => $redirectUrl,
         ]);

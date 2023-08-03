@@ -100,6 +100,8 @@
             <argument type="service" id="mollie_payments.logger"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
