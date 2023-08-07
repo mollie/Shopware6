@@ -200,11 +200,7 @@ context("Checkout Failure Tests", () => {
                 // but we still need to complete the payment and edit the order
                 cy.url().should('include', '/account/order/edit/');
 
-                if (shopware.isVersionGreaterEqual('6.4.10.0')) {
-                    cy.contains('We have received your order, but the payment was aborted. Please change your payment method or try again.');
-                } else {
-                    cy.contains('We have received your order, but the payment was aborted. Please change your payment method or try again.');
-                }
+                cy.contains('We have received your order, but the payment was aborted');
 
                 paymentAction.switchPaymentMethod('Giropay');
 
