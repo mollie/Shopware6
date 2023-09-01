@@ -66,11 +66,6 @@ class BankTransferOrderBuilderTest extends AbstractMollieOrderBuilder
             ->modify(sprintf('+%d day', $bankDueDays))
             ->format('Y-m-d');
 
-        $expectedOrderLifeTime = (new DateTime())
-            ->setTimezone(new DateTimeZone('UTC'))
-            ->modify(sprintf('+%d day', $expiresDays))
-            ->format('Y-m-d');
-
 
         $expected = [
             'amount' => (new MollieOrderPriceBuilder())->build($amountTotal, $currencyISO),
@@ -79,14 +74,13 @@ class BankTransferOrderBuilderTest extends AbstractMollieOrderBuilder
             'orderNumber' => $orderNumber,
             'payment' => [
                 'webhookUrl' => $redirectWebhookUrl,
-                'dueDate' => $bankDueDatetime,
             ],
             'redirectUrl' => $redirectWebhookUrl,
             'webhookUrl' => $redirectWebhookUrl,
             'lines' => $this->getExpectedLineItems($taxStatus, $lineItems, $currency),
             'billingAddress' => $this->getExpectedTestAddress($this->address, $this->email),
             'shippingAddress' => $this->getExpectedTestAddress($this->address, $this->email),
-            'expiresAt' => $expectedOrderLifeTime
+            'expiresAt' => $bankDueDatetime
         ];
 
         self::assertSame($expected, $actual);

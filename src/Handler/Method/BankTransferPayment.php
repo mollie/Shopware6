@@ -51,8 +51,7 @@ class BankTransferPayment extends PaymentHandler
 
         if ($dueDateDays > 0) {
             $dueDate = $settings->getPaymentMethodBankTransferDueDate();
-
-            $orderData['payment']['dueDate'] = $dueDate;
+            $orderData['expiresAt'] = $dueDate;
         }
 
         return $orderData;
