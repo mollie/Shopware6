@@ -218,68 +218,41 @@
     const loadingElements = Array.from(document.getElementsByClassName('loading'));
     const successElements = Array.from(document.getElementsByClassName('success'));
     const failedElements = Array.from(document.getElementsByClassName('failed'));
+
+    function handleResponse(response){
+        console.log(response.target.response);
+        const json = JSON.parse(response.target.response);
+
+        if (json.ready) {
+            clearInterval(interval);
+            if(statusChangeButton !== null){
+                statusChangeButton.style.display = 'none';
+            }
+            loadingElements.forEach(function(element){
+                element.style.display = 'none';
+            });
+            returnButton.style.display = 'block';
+            returnButton.href= json.redirectUrl;
+            if(json.status === 'open' || json.status === 'paid'){
+                successElements.forEach(function(element){
+                    element.style.display = 'block';
+                });
+            }else{
+                failedElements.forEach(function(element){
+                    element.style.display = 'block';
+                });
+            }
+
+        }
+    }
     function requestStatus() {
         const xhr = new XMLHttpRequest();
         xhr.open('GET', '/mollie/pos/{{ swOrderId }}/{{ molliePaymentId }}/status');
         xhr.setRequestHeader('Content-Type', 'application/json');
 
-        xhr.onload = function (response) {
-            console.log(response.target.response);
-            const json = JSON.parse(response.target.response);
+        xhr.onload = handleResponse;
 
-            if (json.ready) {
-                clearInterval(interval);
-                if(statusChangeButton !== null){
-                    statusChangeButton.style.display = 'none';
-                }
-                loadingElements.forEach(function(element){
-                    element.style.display = 'none';
-                });
-                returnButton.style.display = 'block';
-                returnButton.href= json.redirectUrl;
-                if(json.status === 'open' || json.status === 'paid'){
-                    successElements.forEach(function(element){
-                        element.style.display = 'block';
-                    });
-                }else{
-                    failedElements.forEach(function(element){
-                        element.style.display = 'block';
-                    });
-                }
-
-            }
-        };
-
-        xhr.onerror = function (response) {
-            console.log(response.target.response);
-            const json = JSON.parse(response.target.response);
-
-            if (json.ready) {
-                clearInterval(interval);
-                loadingElements.forEach(function(element){
-                    element.style.display = 'none';
-                });
-                if(statusChangeButton !== null){
-                    statusChangeButton.style.display = 'none';
-                }
-                returnButton.style.display = 'block';
-                returnButton.href= json.redirectUrl;
-
-
-                returnButton.style.display = 'block';
-                returnButton.href= json.redirectUrl;
-                if(json.status === 'open' || json.status === 'paid'){
-                    successElements.forEach(function(element){
-                        element.style.display = 'block';
-                    });
-                }else{
-                    failedElements.forEach(function(element){
-                        element.style.display = 'block';
-                    });
-                }
-
-            }
-        };
+        xhr.onerror = handleResponse;
 
         xhr.send();
     }
