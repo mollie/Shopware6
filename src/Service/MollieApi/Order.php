@@ -7,11 +7,13 @@ use Kiener\MolliePayments\Exception\MollieOrderCancelledException;
 use Kiener\MolliePayments\Exception\MollieOrderExpiredException;
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
+use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\MollieApi\Payment as MolliePayment;
 use Kiener\MolliePayments\Service\MollieApi\Payment as PaymentApiService;
 use Kiener\MolliePayments\Service\MollieApi\RequestAnonymizer\MollieRequestAnonymizer;
 use Kiener\MolliePayments\Service\Router\RoutingBuilder;
+use Kiener\MolliePayments\Service\SettingsService;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Order as MollieOrder;
 use Mollie\Api\Resources\OrderLine;
@@ -53,6 +55,10 @@ class Order
      */
     private $logger;
 
+    /**
+     * @var SettingsService
+     */
+    private $settingsService;
 
     /**
      * @param MollieApiFactory $clientFactory
@@ -60,14 +66,16 @@ class Order
      * @param RoutingBuilder $routingBuilder
      * @param MollieRequestAnonymizer $requestAnonymizer
      * @param LoggerInterface $logger
+     * @param SettingsService $settingsService
      */
-    public function __construct(MollieApiFactory $clientFactory, PaymentApiService $paymentApiService, RoutingBuilder $routingBuilder, MollieRequestAnonymizer $requestAnonymizer, LoggerInterface $logger)
+    public function __construct(MollieApiFactory $clientFactory, PaymentApiService $paymentApiService, RoutingBuilder $routingBuilder, MollieRequestAnonymizer $requestAnonymizer, LoggerInterface $logger, SettingsService $settingsService)
     {
         $this->clientFactory = $clientFactory;
         $this->logger = $logger;
         $this->paymentApiService = $paymentApiService;
         $this->routingBuilder = $routingBuilder;
         $this->requestAnonymizer = $requestAnonymizer;
+        $this->settingsService = $settingsService;
     }
 
     /**
@@ -330,6 +338,12 @@ class Order
             ],
         ];
 
+        $settings = $this->settingsService->getSettings($order->getSalesChannelId());
+        # set CreditCardPayment singleClickPayment true if Single click payment feature is enabled
+        if ($paymentHandler instanceof CreditCardPayment && $settings->isOneClickPaymentsEnabled()) {
+            $paymentHandler->setEnableSingleClickPayment(true);
+        }
+
         # now we have to add payment specific data
         # like we would do with initial orders too
         $tmpOrder = $paymentHandler->processPaymentMethodSpecificParameters($newPaymentData, $order, $salesChannelContext, $customer);
@@ -421,7 +435,6 @@ class Order
 
 
         if (!empty($mollieOrderId)) {
-
             # ORDER_ID, ord_123
             $mollieOrder = $this->getMollieOrder($mollieOrderId, (string)$salesChannelId, ['embed' => 'payments']);
 
@@ -441,7 +454,6 @@ class Order
 
             throw new PaymentNotFoundException($mollieOrderId);
         } else {
-
             # TRANSACTION_ID,.... tr_abc
 
             $payment = $this->getMolliePayment($molliePaymentId, (string)$salesChannelId);

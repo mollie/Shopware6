@@ -21,12 +21,12 @@ use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
 use Kiener\MolliePayments\Service\SettingsService;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Cart\Event\CheckoutOrderPlacedEvent;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 
 class RenewAction extends BaseAction
 {
-
     /**
      * @var SubscriptionRenewing
      */
@@ -152,7 +152,9 @@ class RenewAction extends BaseAction
         # we also need to make sure, that a skipped subscription is "resumed" again.
         # we use skip to show that it's not happening that nothing happens in this interval, but
         # once it's renewed, we make sure its resumed again
-        $this->getRepository()->updateStatus($swSubscriptionId, SubscriptionStatus::RESUMED, $context);
+        if ($swSubscription->getStatus() === SubscriptionStatus::SKIPPED) {
+            $this->getRepository()->updateStatus($swSubscriptionId, SubscriptionStatus::RESUMED, $context);
+        }
 
 
         $newOrder = $this->renewingService->renewSubscription($swSubscription, $payment, $context);
@@ -164,7 +166,12 @@ class RenewAction extends BaseAction
         # --------------------------------------------------------------------------------------------------
         # FLOW BUILDER / BUSINESS EVENTS
 
+        # send renewed command
         $event = $this->getFlowBuilderEventFactory()->buildSubscriptionRenewedEvent($swSubscription->getCustomer(), $swSubscription, $context);
+        $this->getFlowBuilderDispatcher()->dispatch($event);
+
+        # send original checkout-order-placed of shopware
+        $event = new CheckoutOrderPlacedEvent($context, $newOrder, $newOrder->getSalesChannelId());
         $this->getFlowBuilderDispatcher()->dispatch($event);
 
         # if this was our last renewal, then send out

@@ -6,7 +6,6 @@ use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
 
 class RefundMetadata
 {
-
     /**
      * @var DataCompressor
      */

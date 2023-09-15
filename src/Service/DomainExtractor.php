@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Service;
 
 class DomainExtractor
 {
-
     /**
      * @param string $url
      * @return string

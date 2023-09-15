@@ -2,6 +2,8 @@
 
 namespace Kiener\MolliePayments\Handler;
 
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Exception\PaymentUrlException;
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Facade\MolliePaymentFinalize;
@@ -25,6 +27,9 @@ use Throwable;
 
 class PaymentHandler implements AsynchronousPaymentHandlerInterface
 {
+    public const PAYMENT_SEQUENCE_TYPE_FIRST = 'first';
+    public const PAYMENT_SEQUENCE_TYPE_RECURRING = 'recurring';
+
     protected const FIELD_ORDER_NUMBER = 'orderNumber';
     protected const FIELD_BILLING_ADDRESS = 'billingAddress';
     protected const FIELD_BILLING_EMAIL = 'billingEmail';
@@ -129,7 +134,6 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         }
 
         try {
-
             # before we send the customer to the Mollie payment page
             # we will process the order transaction, which means we set it to be IN PROGRESS.
             # this is just how it works at the moment, I did only add the comment for it here :)
@@ -178,7 +182,6 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             # that cancel the Shopware order in a coordinated way by Shopware
             throw $ex;
         } catch (Throwable $ex) {
-
             # this processes all unhandled exceptions.
             # we need to log whatever happens in here, and then also
             # throw an exception that breaks the order in a coordinated way.

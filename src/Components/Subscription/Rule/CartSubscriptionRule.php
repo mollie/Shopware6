@@ -13,7 +13,6 @@ use Symfony\Component\Validator\Constraints\Type;
 
 class CartSubscriptionRule extends Rule
 {
-
     /**
      * @var bool
      */

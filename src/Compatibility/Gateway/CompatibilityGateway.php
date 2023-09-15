@@ -12,7 +12,6 @@ use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMa
 
 class CompatibilityGateway implements CompatibilityGatewayInterface
 {
-
     /**
      * @var string
      */

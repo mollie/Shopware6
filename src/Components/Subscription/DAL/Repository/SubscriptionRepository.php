@@ -6,42 +6,41 @@ use DateTime;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Components\Subscription\Exception\SubscriptionNotFoundException;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\NotFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
 
 class SubscriptionRepository
 {
-
     /**
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $repoSubscriptions;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $repoAddresses;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $repoHistory;
 
 
     /**
-     * @param EntityRepositoryInterface $repoSubscriptions
-     * @param EntityRepositoryInterface $repoAddresses
-     * @param EntityRepositoryInterface $repoHistory
+     * @param EntityRepository $repoSubscriptions
+     * @param EntityRepository $repoAddresses
+     * @param EntityRepository $repoHistory
      */
-    public function __construct(EntityRepositoryInterface $repoSubscriptions, EntityRepositoryInterface $repoAddresses, EntityRepositoryInterface $repoHistory)
+    public function __construct($repoSubscriptions, $repoAddresses, $repoHistory)
     {
         $this->repoSubscriptions = $repoSubscriptions;
         $this->repoAddresses = $repoAddresses;
@@ -50,14 +49,6 @@ class SubscriptionRepository
 
 
     #region READ
-
-    /**
-     * @return EntityRepositoryInterface
-     */
-    public function getRepository(): EntityRepositoryInterface
-    {
-        return $this->repoSubscriptions;
-    }
 
     /**
      * @param string $id
@@ -81,6 +72,24 @@ class SubscriptionRepository
     }
 
     /**
+     * @param string $customerId
+     * @param string $mandateId
+     * @param Context $context
+     * @return SubscriptionCollection
+     */
+    public function findByMandateId(string $customerId, string $mandateId, Context $context): SubscriptionCollection
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('customerId', $customerId));
+        $criteria->addFilter(new EqualsFilter('mandateId', $mandateId));
+
+        /** @var SubscriptionCollection $result */
+        $result = $this->repoSubscriptions->search($criteria, $context)->getEntities();
+
+        return $result;
+    }
+
+    /**
      * @param Context $context
      * @return EntitySearchResult
      */
@@ -99,7 +108,7 @@ class SubscriptionRepository
      */
     public function findByCustomer(string $swCustomerId, bool $includedPending, Context $context): EntitySearchResult
     {
-        $criteria = new Criteria([]);
+        $criteria = new Criteria();
         $criteria->addAssociation('customer');
         $criteria->addAssociation('historyEntries');
         $criteria->addFilter(new EqualsFilter('customerId', $swCustomerId));
@@ -152,6 +161,16 @@ class SubscriptionRepository
         $criteria->addFilter(new EqualsFilter('orderId', $orderId));
         $criteria->addFilter(new EqualsFilter('mollieId', null));
 
+        return $this->repoSubscriptions->search($criteria, $context);
+    }
+
+    /**
+     * @param Criteria $criteria
+     * @param Context $context
+     * @return EntitySearchResult
+     */
+    public function search(Criteria $criteria, Context $context): EntitySearchResult
+    {
         return $this->repoSubscriptions->search($criteria, $context);
     }
 

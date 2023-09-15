@@ -12,7 +12,6 @@ use Shopware\Core\Framework\Context;
 
 class FakeRefundManager implements RefundManagerInterface
 {
-
     /**
      * @var OrderEntity
      */
@@ -108,5 +107,4 @@ class FakeRefundManager implements RefundManagerInterface
 
         return $refund;
     }
-
 }

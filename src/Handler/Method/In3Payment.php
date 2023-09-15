@@ -6,7 +6,6 @@ use Kiener\MolliePayments\Handler\PaymentHandler;
 
 class In3Payment extends PaymentHandler
 {
-
     /**
      *
      */

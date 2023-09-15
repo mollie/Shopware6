@@ -14,6 +14,7 @@ use Kiener\MolliePayments\Components\Subscription\Actions\SkipAction;
 use Kiener\MolliePayments\Components\Subscription\Actions\UpdateAddressAction;
 use Kiener\MolliePayments\Components\Subscription\Actions\UpdatePaymentAction;
 use Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -22,7 +23,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class SubscriptionManager implements SubscriptionManagerInterface
 {
-
     /**
      * @var CreateAction
      */
@@ -120,6 +120,22 @@ class SubscriptionManager implements SubscriptionManagerInterface
             return $this->repoSubscriptions->findById($id, $context);
         } catch (\Throwable $ex) {
             throw new Exception('Subscription with ID ' . $id . ' not found in Shopware');
+        }
+    }
+
+    /**
+     * @param string $customerId
+     * @param string $mandateId
+     * @param Context $context
+     * @throws Exception
+     * @return SubscriptionCollection
+     */
+    public function findSubscriptionByMandateId(string $customerId, string $mandateId, Context $context): SubscriptionCollection
+    {
+        try {
+            return $this->repoSubscriptions->findByMandateId($customerId, $mandateId, $context);
+        } catch (\Throwable $ex) {
+            throw new Exception('Subscription with mandate ID ' . $mandateId . ' not found in Shopware');
         }
     }
 
@@ -325,5 +341,16 @@ class SubscriptionManager implements SubscriptionManagerInterface
     public function cancelSubscription(string $subscriptionId, Context $context): void
     {
         $this->actionCancel->cancelSubscription($subscriptionId, $context);
+    }
+
+    /**
+     * @param SubscriptionEntity $subscription
+     * @param Context $context
+     * @throws Exception
+     * @return bool
+     */
+    public function isCancelable(SubscriptionEntity $subscription, Context $context): bool
+    {
+        return $this->actionCancel->isCancelable($subscription, $context);
     }
 }

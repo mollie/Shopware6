@@ -9,7 +9,6 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 
 class DeliveryItem extends AbstractItem
 {
-
     /**
      * @var OrderDeliveryEntity
      */

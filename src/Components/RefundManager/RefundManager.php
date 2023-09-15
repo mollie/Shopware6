@@ -4,21 +4,20 @@ namespace Kiener\MolliePayments\Components\RefundManager;
 
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatcherAdapterInterface;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactoryInterface;
 use Kiener\MolliePayments\Components\RefundManager\Builder\RefundDataBuilder;
+use Kiener\MolliePayments\Components\RefundManager\DAL\Repository\RefundRepositoryInterface;
 use Kiener\MolliePayments\Components\RefundManager\Integrators\StockManagerInterface;
 use Kiener\MolliePayments\Components\RefundManager\RefundData\RefundData;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
+use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItemRoundingDiff;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieRefundException;
 use Kiener\MolliePayments\Service\MollieApi\Order;
-use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\OrderServiceInterface;
 use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
-use Kiener\MolliePayments\Service\Refund\RefundService;
 use Kiener\MolliePayments\Service\Refund\RefundServiceInterface;
-use Kiener\MolliePayments\Service\Stock\StockManager;
+use Kiener\MolliePayments\Struct\MollieApi\OrderLineMetaDataStruct;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Mollie\Api\Resources\OrderLine;
@@ -32,7 +31,6 @@ use Shopware\Core\Framework\Context;
 
 class RefundManager implements RefundManagerInterface
 {
-
     /**
      * @var OrderServiceInterface
      */
@@ -69,6 +67,11 @@ class RefundManager implements RefundManagerInterface
     private $flowBuilderEventFactory;
 
     /**
+     * @var RefundRepositoryInterface
+     */
+    protected $refundRepository;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -82,16 +85,17 @@ class RefundManager implements RefundManagerInterface
      * @param FlowBuilderFactoryInterface $flowBuilderFactory
      * @param FlowBuilderEventFactory $flowBuilderEventFactory
      * @param StockManagerInterface $stockUpdater
+     * @param RefundRepositoryInterface $refundRepository
      * @param LoggerInterface $logger
-     * @throws \Exception
      */
-    public function __construct(RefundDataBuilder $refundDataBuilder, OrderServiceInterface $orderService, RefundServiceInterface $refundService, Order $mollieOrder, FlowBuilderFactoryInterface $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, StockManagerInterface $stockUpdater, LoggerInterface $logger)
+    public function __construct(RefundDataBuilder $refundDataBuilder, OrderServiceInterface $orderService, RefundServiceInterface $refundService, Order $mollieOrder, FlowBuilderFactoryInterface $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, StockManagerInterface $stockUpdater, RefundRepositoryInterface $refundRepository, LoggerInterface $logger)
     {
         $this->builderData = $refundDataBuilder;
         $this->orderService = $orderService;
         $this->mollie = $mollieOrder;
         $this->refundService = $refundService;
         $this->stockManager = $stockUpdater;
+        $this->refundRepository = $refundRepository;
         $this->logger = $logger;
 
         $this->flowBuilderEventFactory = $flowBuilderEventFactory;
@@ -149,12 +153,12 @@ class RefundManager implements RefundManagerInterface
         $refund = null;
 
         if ($request->isFullRefundAmountOnly()) {
-
             # we have a full refund, but only with amount
             # and no items. to make sure that we have clean data
             # we have to extract all items, so that they will be added to the metadata
             $requestItems = $this->buildRequestItemsFromOrder($order);
             $request->setItems($requestItems);
+            $this->appendRoundingItemFromMollieOrder($request, $mollieOrder);
 
             # convert again
             $serviceItems = $this->convertToRefundItems($request, $order, $mollieOrder);
@@ -165,6 +169,7 @@ class RefundManager implements RefundManagerInterface
                 $refund = $this->refundService->refundPartial(
                     $order,
                     $request->getDescription(),
+                    $request->getInternalDescription(),
                     $order->getAmountTotal(),
                     $serviceItems,
                     $context
@@ -173,14 +178,18 @@ class RefundManager implements RefundManagerInterface
                 $refund = $this->refundService->refundFull(
                     $order,
                     $request->getDescription(),
+                    $request->getInternalDescription(),
                     $serviceItems,
                     $context
                 );
             }
         } elseif ($request->isFullRefundWithItems($order)) {
+            $this->appendRoundingItemFromMollieOrder($request, $mollieOrder);
+            $serviceItems = $this->convertToRefundItems($request, $order, $mollieOrder);
             $refund = $this->refundService->refundFull(
                 $order,
                 $request->getDescription(),
+                $request->getInternalDescription(),
                 $serviceItems,
                 $context
             );
@@ -188,6 +197,7 @@ class RefundManager implements RefundManagerInterface
             $refund = $this->refundService->refundPartial(
                 $order,
                 $request->getDescription(),
+                $request->getInternalDescription(),
                 (float)$request->getAmount(),
                 [],
                 $context
@@ -196,6 +206,7 @@ class RefundManager implements RefundManagerInterface
             $refund = $this->refundService->refundPartial(
                 $order,
                 $request->getDescription(),
+                $request->getInternalDescription(),
                 (float)$request->getAmount(),
                 $serviceItems,
                 $context
@@ -211,6 +222,22 @@ class RefundManager implements RefundManagerInterface
         $refundAmount = (float)$refund->amount->value;
 
 
+        # SAVE LOCAL REFUND
+        # ---------------------------------------------------------------------------------------------
+        $this->refundRepository->create(
+            [
+                [
+                    'orderId' => $order->getId(),
+                    'orderVersionId' => $order->getVersionId(),
+                    'mollieRefundId' => $refund->id,
+                    'publicDescription' => $request->getDescription(),
+                    'internalDescription' => $request->getInternalDescription(),
+                ]
+            ],
+            $context
+        );
+
+
         # DISPATCH FLOW BUILDER
         # ---------------------------------------------------------------------------------------------
         $event = $this->flowBuilderEventFactory->buildRefundStartedEvent($order, $refundAmount, $context);
@@ -222,7 +249,6 @@ class RefundManager implements RefundManagerInterface
         # if everything worked above, iterate through all our
         # refund items and increase their stock
         foreach ($request->getItems() as $item) {
-
             # skip if nothing should be added to the stock
             if ($item->getStockIncreaseQty() <= 0) {
                 continue;
@@ -317,6 +343,30 @@ class RefundManager implements RefundManagerInterface
         return $items;
     }
 
+    private function appendRoundingItemFromMollieOrder(RefundRequest $request, ?\Mollie\Api\Resources\Order $mollieOrder): void
+    {
+        if ($mollieOrder === null) {
+            return;
+        }
+        $lines = $mollieOrder->lines();
+
+        /** @var OrderLine $line */
+        foreach ($lines as $line) {
+            $lineMetadataStruct = new OrderLineMetaDataStruct($line);
+            if ($lineMetadataStruct->isRoundingItem() === false) {
+                continue;
+            }
+
+            $refundRequestItem = new RefundRequestItemRoundingDiff(
+                $lineMetadataStruct->getId(),
+                $lineMetadataStruct->getAmount(),
+                $lineMetadataStruct->getQuantity(),
+                0
+            );
+            $request->addItem($refundRequestItem);
+        }
+    }
+
     /**
      * @param RefundRequest $request
      * @param OrderEntity $order
@@ -345,7 +395,6 @@ class RefundManager implements RefundManagerInterface
                     $shopwareReferenceID = (string)$orderItem->getReferencedId();
                 }
             } else {
-
                 # yeah i know complexity...but for now lets keep it compact :)
                 if ($order->getDeliveries() instanceof OrderDeliveryCollection && $mollieOrder instanceof \Mollie\Api\Resources\Order) {
                     # if we do not have an item
@@ -365,6 +414,9 @@ class RefundManager implements RefundManagerInterface
                             }
                         }
                     }
+                }
+                if ($requestItem instanceof RefundRequestItemRoundingDiff) {
+                    $mollieLineID = $requestItem->getLineId();
                 }
             }
 

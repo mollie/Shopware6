@@ -53,7 +53,7 @@
                     {% endblock %}
 
                     {% block mollie_payments_subscription_list_content_status %}
-                        <template #column-mollieStatus="{ item }">
+                        <template #column-status="{ item }">
                             <sw-label :variant="statusColor(item.status)"
                                       size="medium"
                                       appearance="pill"

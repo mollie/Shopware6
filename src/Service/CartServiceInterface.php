@@ -7,7 +7,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 interface CartServiceInterface
 {
-
     /**
      * @param string $productId
      * @param int $quantity

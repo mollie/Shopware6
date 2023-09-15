@@ -2,26 +2,29 @@
 
 namespace Kiener\MolliePayments\Service\Logger;
 
+use Kiener\MolliePayments\Service\Logger\Processors\AnonymousWebProcessor;
+use Kiener\MolliePayments\Service\Logger\Processors\SessionProcessor;
+use Kiener\MolliePayments\Service\Logger\Services\URLAnonymizer;
 use Kiener\MolliePayments\Service\SettingsService;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
-use Monolog\Processor\PsrLogMessageProcessor;
+use Monolog\Processor\IntrospectionProcessor;
+use Monolog\Processor\WebProcessor;
 use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 class MollieLoggerFactory
 {
+    /**
+     * this is the channel name that will be
+     * displayed in the backend. It must not contain spaces
+     */
+    const CHANNEL = 'Mollie';
+
 
     /**
      * @var SettingsService
      */
     private $settingsService;
-
-    /**
-     * @var Session
-     */
-    private $session;
 
     /**
      * @var string
@@ -36,38 +39,37 @@ class MollieLoggerFactory
 
     /**
      * @param SettingsService $settingsService
-     * @param Session $session
      * @param string $filename
      * @param string $retentionDays
      */
-    public function __construct(SettingsService $settingsService, Session $session, string $filename, string $retentionDays)
+    public function __construct(SettingsService $settingsService, string $filename, string $retentionDays)
     {
         $this->settingsService = $settingsService;
-        $this->session = $session;
         $this->filename = $filename;
         $this->retentionDays = $retentionDays;
     }
 
     /**
-     * @return MollieLogger
+     * @return LoggerInterface
      */
     public function createLogger(): LoggerInterface
     {
         $config = $this->settingsService->getSettings();
 
-        $sessionID = $this->session->getId();
+        # 100 = DEBUG, 200 = INFO
+        $minLevel = ($config->isDebugMode()) ? 100 : 200;
 
-        $minLevel = LogLevel::INFO;
+        $fileHandler = new RotatingFileHandler($this->filename, (int)$this->retentionDays, $minLevel);
 
-        if ($config->isDebugMode()) {
-            $minLevel = LogLevel::DEBUG;
+        $processors = [];
+        $processors[] = new AnonymousWebProcessor(new WebProcessor(), new URLAnonymizer());
+        $processors[] = new IntrospectionProcessor();
+
+        /** @var callable $processor */
+        foreach ($processors as $processor) {
+            $fileHandler->pushProcessor($processor);
         }
 
-        return new MollieLogger(
-            $this->filename,
-            $this->retentionDays,
-            $minLevel,
-            $sessionID
-        );
+        return new Logger(self::CHANNEL, [$fileHandler]);
     }
 }

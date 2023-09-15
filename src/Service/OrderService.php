@@ -2,10 +2,12 @@
 
 namespace Kiener\MolliePayments\Service;
 
+use Kiener\MolliePayments\Components\RefundManager\DAL\Order\OrderExtension;
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderLineIdException;
 use Kiener\MolliePayments\Exception\OrderNumberNotFoundException;
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
+use Kiener\MolliePayments\Repository\Order\OrderRepositoryInterface;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderTransaction\OrderTransactionAttributes;
@@ -17,7 +19,6 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\SalesChannel\OrderService as ShopwareOrderService;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Validation\DataBag\DataBag;
@@ -26,7 +27,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 class OrderService implements OrderServiceInterface
 {
     /**
-     * @var EntityRepositoryInterface
+     * @var OrderRepositoryInterface
      */
     protected $orderRepository;
 
@@ -57,14 +58,14 @@ class OrderService implements OrderServiceInterface
 
 
     /**
-     * @param EntityRepositoryInterface $orderRepository
+     * @param OrderRepositoryInterface $orderRepository
      * @param ShopwareOrderService $swOrderService
      * @param Order $mollieOrderService
      * @param UpdateOrderCustomFields $customFieldsUpdater
      * @param UpdateOrderTransactionCustomFields $orderTransactionCustomFields
      * @param LoggerInterface $logger
      */
-    public function __construct(EntityRepositoryInterface $orderRepository, ShopwareOrderService $swOrderService, Order $mollieOrderService, UpdateOrderCustomFields $customFieldsUpdater, UpdateOrderTransactionCustomFields $orderTransactionCustomFields, LoggerInterface $logger)
+    public function __construct(OrderRepositoryInterface $orderRepository, ShopwareOrderService $swOrderService, Order $mollieOrderService, UpdateOrderCustomFields $customFieldsUpdater, UpdateOrderTransactionCustomFields $orderTransactionCustomFields, LoggerInterface $logger)
     {
         $this->orderRepository = $orderRepository;
         $this->swOrderService = $swOrderService;
@@ -76,11 +77,8 @@ class OrderService implements OrderServiceInterface
 
 
     /**
-     * Return an order entity, enriched with associations.
-     *
      * @param string $orderId
      * @param Context $context
-     * @throws OrderNotFoundException
      * @return OrderEntity
      */
     public function getOrder(string $orderId, Context $context): OrderEntity
@@ -88,7 +86,7 @@ class OrderService implements OrderServiceInterface
         $criteria = new Criteria([$orderId]);
         $criteria->addAssociation('currency');
         $criteria->addAssociation('addresses');
-        $criteria->addAssociation('shippingAddress');   # important for subscription creation
+        $criteria->addAssociation('addresses.country');     # required for FlowBuilder -> send confirm email option
         $criteria->addAssociation('billingAddress');    # important for subscription creation
         $criteria->addAssociation('billingAddress.country');
         $criteria->addAssociation('orderCustomer');
@@ -105,6 +103,7 @@ class OrderService implements OrderServiceInterface
         $criteria->addAssociation('transactions.paymentMethod');
         $criteria->addAssociation('transactions.paymentMethod.appPaymentMethod.app');
         $criteria->addAssociation('transactions.stateMachineState');
+        $criteria->addAssociation(OrderExtension::REFUND_PROPERTY_NAME); # for refund manager
 
 
         $order = $this->orderRepository->search($criteria, $context)->first();
@@ -129,6 +128,7 @@ class OrderService implements OrderServiceInterface
     {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('orderNumber', $orderNumber));
+
         $orderId = $this->orderRepository->searchIds($criteria, $context)->firstId();
 
         if (is_string($orderId)) {
@@ -223,7 +223,6 @@ class OrderService implements OrderServiceInterface
         $creditCardDetails = null;
 
         try {
-
             // Add the transaction ID to the order's custom fields
             // We might need this later on for reconciliation
             $molliePayment = $this->mollieOrderService->getCompletedPayment($mollieOrderID, $molliePaymentId, $order->getSalesChannelId());

@@ -10,7 +10,6 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
 class DependencyLoader
 {
-
     /**
      * @var Container
      */
@@ -57,12 +56,23 @@ class DependencyLoader
             $loader->load('compatibility/flowbuilder/6.4.6.0.xml');
         }
 
-
         # load other data
         if ($versionCompare->gte('6.4')) {
             $loader->load('compatibility/services_6.4.xml');
         } elseif ($versionCompare->gte('6.3.5.0')) {
             $loader->load('compatibility/services_6.3.5.0.xml');
+        }
+
+        if ($versionCompare->gte('6.5')) {
+            $loader->load('compatibility/snippets_6.5.xml');
+        } else {
+            $loader->load('compatibility/snippets.xml');
+        }
+
+        if ($versionCompare->gte('6.5')) {
+            $loader->load('compatibility/controller_6.5.xml');
+        } else {
+            $loader->load('compatibility/controller.xml');
         }
 
 
@@ -81,5 +91,57 @@ class DependencyLoader
                 $loader->load('services/fixtures/fixtures.xml');
             }
         }
+    }
+
+    /**
+     * @return void
+     */
+    public function prepareStorefrontBuild(): void
+    {
+        /** @var string $version */
+        $version = $this->container->getParameter('kernel.shopware_version');
+
+        $versionCompare = new VersionCompare($version);
+
+        $pluginRoot = __DIR__ . '/../..';
+
+        $distFileFolder = $pluginRoot . '/src/Resources/app/storefront/dist/storefront/js';
+
+        if (!file_exists($distFileFolder)) {
+            mkdir($distFileFolder, 0777, true);
+        }
+
+        if ($versionCompare->gte('6.5')) {
+            $file = $pluginRoot . '/src/Resources/app/storefront/dist/mollie-payments-65.js';
+            $target = $distFileFolder . '/mollie-payments.js';
+        } else {
+            $file = $pluginRoot . '/src/Resources/app/storefront/dist/mollie-payments-64.js';
+            $target = $distFileFolder . '/mollie-payments.js';
+        }
+
+        if (file_exists($file) && !file_exists($target)) {
+            # while we use our current webpack approach
+            # we must not use this.
+            # also it's not perfectly working somehow
+            # copy($file, $target);
+        }
+    }
+
+    /**
+     * @param string $pluginPath
+     * @return string
+     */
+    public function getRoutesPath(string $pluginPath): string
+    {
+        /** @var string $version */
+        $version = $this->container->getParameter('kernel.shopware_version');
+
+        $versionCompare = new VersionCompare($version);
+
+        if ($versionCompare->gte('6.5')) {
+            return $pluginPath . '/Resources/config/compatibility/routes/sw65';
+        }
+
+        return $pluginPath . '/Resources/config/compatibility/routes/sw6';
     }
 }

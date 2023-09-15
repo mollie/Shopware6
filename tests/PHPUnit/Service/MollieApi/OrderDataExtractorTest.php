@@ -23,7 +23,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class OrderDataExtractorTest extends TestCase
 {
-
     /** @var LoggerInterface */
     private $loggerService;
 
@@ -36,7 +35,7 @@ class OrderDataExtractorTest extends TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|SalesChannelContext */
     private $salesChannelContext;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|Context */
+    /** @var Context|\PHPUnit\Framework\MockObject\MockObject */
     private $context;
 
     public function setUp(): void

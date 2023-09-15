@@ -9,10 +9,8 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionE
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionStatus;
 use PHPUnit\Framework\TestCase;
 
-
 class SubscriptionEntityTest extends TestCase
 {
-
     /**
      * This test verifies that our default value
      * of the Mollie status is a correct empty string, if
@@ -198,17 +196,17 @@ class SubscriptionEntityTest extends TestCase
         $subscription->setStatus(SubscriptionStatus::COMPLETED);
         static::assertSame(true, $subscription->isRenewingAllowed());
 
+        $subscription->setStatus(SubscriptionStatus::SKIPPED);
+        static::assertSame(true, $subscription->isRenewingAllowed());
+
+        $subscription->setStatus(SubscriptionStatus::RESUMED);
+        static::assertSame(true, $subscription->isRenewingAllowed());
+
 
         $subscription->setStatus(SubscriptionStatus::PAUSED);
         static::assertSame(false, $subscription->isRenewingAllowed());
 
         $subscription->setStatus(SubscriptionStatus::CANCELED);
-        static::assertSame(false, $subscription->isRenewingAllowed());
-
-        $subscription->setStatus(SubscriptionStatus::SKIPPED);
-        static::assertSame(false, $subscription->isRenewingAllowed());
-
-        $subscription->setStatus(SubscriptionStatus::RESUMED);
         static::assertSame(false, $subscription->isRenewingAllowed());
 
         $subscription->setStatus(SubscriptionStatus::PENDING);
@@ -294,6 +292,4 @@ class SubscriptionEntityTest extends TestCase
 
         static::assertSame($expected, $returnedMeta->toArray());
     }
-
-
 }

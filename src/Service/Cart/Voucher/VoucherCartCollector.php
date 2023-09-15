@@ -3,17 +3,15 @@
 namespace Kiener\MolliePayments\Service\Cart\Voucher;
 
 use Kiener\MolliePayments\Controller\Api\PaymentMethodController;
-use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
+use Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepositoryInterface;
 use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Kiener\MolliePayments\Struct\Voucher\VoucherType;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\CartBehavior;
 use Shopware\Core\Checkout\Cart\CartDataCollectorInterface;
 use Shopware\Core\Checkout\Cart\LineItem\CartDataCollection;
-use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -23,7 +21,7 @@ class VoucherCartCollector implements CartDataCollectorInterface
     public const VOUCHER_PERMITTED = 'mollie-voucher-permitted';
 
     /**
-     * @var EntityRepositoryInterface
+     * @var PaymentMethodRepositoryInterface
      */
     private $repoPaymentMethods;
 
@@ -35,9 +33,9 @@ class VoucherCartCollector implements CartDataCollectorInterface
 
     /**
      * @param VoucherService $voucherService
-     * @param EntityRepositoryInterface $paymentMethodRepository
+     * @param PaymentMethodRepositoryInterface $paymentMethodRepository
      */
-    public function __construct(VoucherService $voucherService, EntityRepositoryInterface $paymentMethodRepository)
+    public function __construct(VoucherService $voucherService, PaymentMethodRepositoryInterface $paymentMethodRepository)
     {
         $this->voucherService = $voucherService;
         $this->repoPaymentMethods = $paymentMethodRepository;
@@ -75,7 +73,6 @@ class VoucherCartCollector implements CartDataCollectorInterface
 
         if ($salesChannelHasVoucherMethod) {
             foreach ($original->getLineItems() as $item) {
-
                 # get the final inherited voucher type of the product
                 # this might even be from the parent
                 $voucherType = $this->voucherService->getFinalVoucherType($item, $context);

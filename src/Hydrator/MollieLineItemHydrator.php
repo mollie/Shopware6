@@ -7,7 +7,6 @@ use Kiener\MolliePayments\Struct\MollieLineItemCollection;
 
 class MollieLineItemHydrator
 {
-
     /**
      * @var MollieOrderPriceBuilder
      */

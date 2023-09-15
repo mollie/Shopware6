@@ -5,9 +5,10 @@ namespace Kiener\MolliePayments;
 use Exception;
 use Kiener\MolliePayments\Compatibility\DependencyLoader;
 use Kiener\MolliePayments\Components\Installer\PluginInstaller;
+use Kiener\MolliePayments\Repository\CustomFieldSet\CustomFieldSetRepository;
 use Kiener\MolliePayments\Service\CustomFieldService;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Migration\MigrationCollection;
 use Shopware\Core\Framework\Plugin;
 use Shopware\Core\Framework\Plugin\Context\ActivateContext;
@@ -15,11 +16,15 @@ use Shopware\Core\Framework\Plugin\Context\DeactivateContext;
 use Shopware\Core\Framework\Plugin\Context\InstallContext;
 use Shopware\Core\Framework\Plugin\Context\UninstallContext;
 use Shopware\Core\Framework\Plugin\Context\UpdateContext;
+use Shopware\Core\Kernel;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
 class MolliePayments extends Plugin
 {
-    const PLUGIN_VERSION = '3.3.0';
+    const PLUGIN_VERSION = '4.1.0';
 
 
     /**
@@ -34,8 +39,9 @@ class MolliePayments extends Plugin
 
         # load the dependencies that are compatible
         # with our current shopware version
-        $loader = new DependencyLoader($container);
+        $loader = new DependencyLoader($this->container);
         $loader->loadServices();
+        $loader->prepareStorefrontBuild();
     }
 
 
@@ -48,6 +54,34 @@ class MolliePayments extends Plugin
     }
 
     /**
+     * @param RoutingConfigurator $routes
+     * @param string $environment
+     * @return void
+     */
+    public function configureRoutes(RoutingConfigurator $routes, string $environment): void
+    {
+        if (!$this->isActive()) {
+            return;
+        }
+
+        /** @var Container $container */
+        $container = $this->container;
+
+        $loader = new DependencyLoader($container);
+
+        $routeDir = $loader->getRoutesPath($this->getPath());
+
+        $fileSystem = new Filesystem();
+
+        if ($fileSystem->exists($routeDir)) {
+            $routes->import($routeDir . '/{routes}/*' . Kernel::CONFIG_EXTS, 'glob');
+            $routes->import($routeDir . '/{routes}/' . $environment . '/**/*' . Kernel::CONFIG_EXTS, 'glob');
+            $routes->import($routeDir . '/{routes}' . Kernel::CONFIG_EXTS, 'glob');
+            $routes->import($routeDir . '/{routes}_' . $environment . Kernel::CONFIG_EXTS, 'glob');
+        }
+    }
+
+    /**
      * @param InstallContext $context
      * @return void
      */
@@ -55,13 +89,11 @@ class MolliePayments extends Plugin
     {
         parent::install($context);
 
-        /** @var EntityRepositoryInterface $customFieldRepository */
-        $customFieldRepository = $this->container->get('custom_field_set.repository');
-
-        // Add custom fields
-        $customFieldService = new CustomFieldService($customFieldRepository);
-
-        $customFieldService->addCustomFields($context->getContext());
+        # that's the only part we use the Shopware repository directly,
+        # and not our custom one, because our repositories are not yet registered in this function
+        /** @var EntityRepository $shopwareRepoCustomFields */
+        $shopwareRepoCustomFields = $this->container->get('custom_field_set.repository');
+        $mollieRepoCustomFields = new CustomFieldSetRepository($shopwareRepoCustomFields);
 
         $this->runDbMigrations($context->getMigrationCollection());
     }
@@ -125,7 +157,6 @@ class MolliePayments extends Plugin
     {
         parent::deactivate($context);
     }
-
 
     /**
      * @param Context $context

@@ -1,0 +1,67 @@
+{% block mollie_credit_card_mandate_remove_modal %}
+    <div class="modal fade mollie-credit-card-mandate-remove-modal"
+         id="{{ modalId }}"
+         data-backdrop="static"
+         data-bs-backdrop="static"
+         tabindex="-1"
+         role="dialog"
+         aria-hidden="true">
+        {% block mollie_credit_card_mandate_remove_modal_dialog %}
+            <div class="modal-dialog" role="dialog">
+                {% block mollie_credit_card_mandate_remove_modal_content %}
+                    <div class="modal-content">
+                        {% block mollie_credit_card_mandate_remove_modal_header %}
+                            <div class="modal-header">
+                                {% block mollie_credit_card_mandate_remove_modal_header_title %}
+                                    <h5 class="modal-title">
+                                        {{ "molliePayments.components.mandateRemoveModal.title"|trans|striptags }}
+                                    </h5>
+                                {% endblock %}
+
+                                {% block mollie_credit_card_mandate_remove_modal_header_close_button %}
+                                    <button class="close" type="button" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close">
+                                    {% sw_icon 'x' %}
+                                    </button>
+                                {% endblock %}
+                            </div>
+                        {% endblock %}
+
+                        {% block mollie_credit_card_mandate_remove_modal_body %}
+                            <div class="modal-body">
+                                {% if subscription %}
+                                    {% block mollie_credit_card_mandate_remove_modal_body_card_subscription %}
+                                        <p>{{ "molliePayments.components.mandateRemoveModal.cardSubscription"|trans|striptags }}</p>
+                                    {% endblock %}
+                                {% endif %}
+
+                                {% if not subscription %}
+                                    {% block mollie_credit_card_mandate_remove_modal_body_confirmation %}
+                                        <p>{{ "molliePayments.components.mandateRemoveModal.deleteConfirmation"|trans|striptags }}</p>
+                                    {% endblock %}
+                                {% endif %}
+                            </div>
+                        {% endblock %}
+
+                        {% block mollie_credit_card_mandate_remove_modal_footer %}
+                            <div class="modal-footer">
+                                {% block mollie_credit_card_mandate_remove_modal_header_back_button %}
+                                    <button class="btn" type="button" data-dismiss="modal" data-bs-dismiss="modal">
+                                    {{ "molliePayments.components.mandateRemoveModal.cancelButton"|trans|striptags }}
+                                    </button>
+                                {% endblock %}
+
+                                {% if not subscription %}
+                                    {% block mollie_credit_card_mandate_remove_modal_footer_form_button %}
+                                        <button type="button" class="btn btn-primary mollie-credit-card-mandate-remove-modal-button" data-dismiss="modal" data-bs-dismiss="modal">
+                                        {{ "molliePayments.components.mandateRemoveModal.deleteButton"|trans|striptags }}
+                                        </button>
+                                    {% endblock %}
+                                {% endif %}
+                            </div>
+                        {% endblock %}
+                    </div>
+                {% endblock %}
+            </div>
+        {% endblock %}
+    </div>
+{% endblock %}

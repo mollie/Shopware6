@@ -125,6 +125,19 @@ paths:
       security:
         - AccessKey: [ ]
         - AccessToken: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orderId:
+                  default: "#"
+                finishUrl:
+                  default: ""
+                errorUrl:
+                  default: ""
+
       responses:
         "200":
           description: "successful operation"
@@ -523,6 +536,23 @@ paths:
       tags:
         - "Subscriptions"
       summary: "Skips a running subscription"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      parameters:
+        - in: "path"
+          name: "subscriptionId"
+          description: "ID of the Shopware subscription that will be updated"
+          required: true
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/mollie/subscription/{subscriptionId}/cancel:
+    post:
+      tags:
+        - "Subscriptions"
+      summary: "Cancels a running subscription"
       security:
         - AccessKey: [ ]
         - AccessToken: [ ]

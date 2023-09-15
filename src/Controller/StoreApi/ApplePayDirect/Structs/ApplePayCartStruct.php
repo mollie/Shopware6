@@ -6,7 +6,6 @@ use Shopware\Core\Framework\Struct\Struct;
 
 class ApplePayCartStruct extends Struct
 {
-
     /**
      * @var array<mixed>
      */

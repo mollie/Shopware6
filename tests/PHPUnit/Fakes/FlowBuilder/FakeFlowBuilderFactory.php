@@ -7,7 +7,6 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactoryIn
 
 class FakeFlowBuilderFactory implements FlowBuilderFactoryInterface
 {
-
     /**
      * @var FlowBuilderDispatcherAdapterInterface
      */
@@ -29,5 +28,4 @@ class FakeFlowBuilderFactory implements FlowBuilderFactoryInterface
     {
         return $this->dispatcher;
     }
-
 }

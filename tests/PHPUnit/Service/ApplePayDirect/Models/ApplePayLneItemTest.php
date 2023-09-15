@@ -2,14 +2,11 @@
 
 namespace Kiener\MolliePayments\Tests\Service\ApplePayDirect\Models;
 
-
 use Kiener\MolliePayments\Components\ApplePayDirect\Models\ApplePayLineItem;
 use PHPUnit\Framework\TestCase;
 
 class ApplePayLineItemTest extends TestCase
 {
-
-
     /**
      * This test verifies that the setter
      * and getter for this property work correctly.
@@ -53,5 +50,4 @@ class ApplePayLineItemTest extends TestCase
 
         $this->assertEquals(10, $item->getPrice());
     }
-
 }

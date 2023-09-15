@@ -8,8 +8,6 @@ use PHPUnit\Framework\TestCase;
 
 class MollieLineItemTest extends TestCase
 {
-
-
     /**
      * This test verifies that we get a correct empty
      * array of metadata if nothing has been added.

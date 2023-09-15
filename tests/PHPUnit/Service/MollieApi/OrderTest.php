@@ -74,7 +74,8 @@ class OrderTest extends TestCase
             $this->paymentApiService,
             $this->buildRoutingBuilder($this, ''),
             new MollieRequestAnonymizer('*'),
-            new NullLogger()
+            new NullLogger(),
+            $this->createMock(SettingsService::class)
         );
     }
 

@@ -6,7 +6,7 @@ export default class FullShippingRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getShippingButton() {
-        return cy.get('.sw-modal__footer > .sw-button--primary');
+        return cy.get('.sw-modal__footer > .sw-button--primary', {timeout: 10000});
     }
 
     /**
@@ -14,7 +14,7 @@ export default class FullShippingRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getFirstItemQuantity() {
-        return cy.get('.sw-data-grid__row--0 > .sw-data-grid__cell--quantity > .sw-data-grid__cell-content > .sw-data-grid__cell-value');
+        return cy.get('.sw-data-grid__row--0 > .sw-data-grid__cell--quantity > .sw-data-grid__cell-content');
     }
 
     /**
@@ -22,7 +22,7 @@ export default class FullShippingRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getSecondItemQuantity() {
-        return cy.get('.sw-data-grid__row--1 > .sw-data-grid__cell--quantity > .sw-data-grid__cell-content > .sw-data-grid__cell-value');
+        return cy.get('.sw-data-grid__row--1 > .sw-data-grid__cell--quantity > .sw-data-grid__cell-content');
     }
 
     /**

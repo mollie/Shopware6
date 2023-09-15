@@ -43,7 +43,7 @@ class ShipmentTest extends TestCase
 
     protected function setUpOrderLines()
     {
-        $this->mollieOrder->method('lines')->willReturnCallback(function() {
+        $this->mollieOrder->method('lines')->willReturnCallback(function () {
             $collection = new OrderLineCollection(4, \Safe\json_decode('{}'));
 
             // Total shipped: 5 items, amount € 175.00

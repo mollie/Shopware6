@@ -4,9 +4,11 @@ namespace Kiener\MolliePayments\Subscriber;
 
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\IntervalType;
 use Kiener\MolliePayments\Service\SettingsService;
+use Kiener\MolliePayments\Storefront\Struct\SubscriptionCartExtensionStruct;
 use Kiener\MolliePayments\Storefront\Struct\SubscriptionDataExtensionStruct;
 use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Kiener\MolliePayments\Struct\Product\ProductAttributes;
+use Shopware\Core\Checkout\Cart\Event\CartBeforeSerializationEvent;
 use Shopware\Storefront\Event\StorefrontRenderEvent;
 use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPage;
 use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
@@ -18,7 +20,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SubscriptionSubscriber implements EventSubscriberInterface
 {
-
     /**
      * @var SettingsService
      */
@@ -46,12 +47,32 @@ class SubscriptionSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
+            CartBeforeSerializationEvent::class => 'onBeforeSerializeCart',
+            # ------------------------------------------------------------------------
             StorefrontRenderEvent::class => 'onStorefrontRender',
             ProductPageLoadedEvent::class => 'addSubscriptionData',
             CheckoutConfirmPageLoadedEvent::class => 'addSubscriptionData',
         ];
     }
 
+    /**
+     * this is required to allow our custom fields
+     * if we don't add them in here, then they will be removed for cart lineItems
+     * https://github.com/shopware/platform/blob/trunk/UPGRADE-6.5.md
+     *
+     * @param CartBeforeSerializationEvent $event
+     * @return void
+     */
+    public function onBeforeSerializeCart(CartBeforeSerializationEvent $event): void
+    {
+        $allowed = $event->getCustomFieldAllowList();
+
+        foreach (LineItemAttributes::getKeyList() as $key) {
+            $allowed[] = $key;
+        }
+
+        $event->setCustomFieldAllowList($allowed);
+    }
 
     /**
      * @param StorefrontRenderEvent $event
@@ -118,12 +139,16 @@ class SubscriptionSubscriber implements EventSubscriberInterface
 
 
         if ($page instanceof CheckoutConfirmPage) {
+            $subscriptionFound = false;
+
             foreach ($page->getCart()->getLineItems()->getFlat() as $lineItem) {
                 $lineItemAttributes = new LineItemAttributes($lineItem);
 
                 $isSubscription = $lineItemAttributes->isSubscriptionProduct();
 
                 if ($isSubscription) {
+                    $subscriptionFound = true;
+
                     $interval = (int)$lineItemAttributes->getSubscriptionInterval();
                     $unit = (string)$lineItemAttributes->getSubscriptionIntervalUnit();
                     $repetition = (int)$lineItemAttributes->getSubscriptionRepetition();
@@ -139,6 +164,10 @@ class SubscriptionSubscriber implements EventSubscriberInterface
                     $lineItem->addExtension('mollieSubscription', $struct);
                 }
             }
+
+            # we need this for some checks on the cart
+            $cartStruct = new SubscriptionCartExtensionStruct($subscriptionFound);
+            $event->getPage()->addExtension('mollieSubscriptionCart', $cartStruct);
         }
     }
 

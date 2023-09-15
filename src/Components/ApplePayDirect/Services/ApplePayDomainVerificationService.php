@@ -3,11 +3,10 @@
 namespace Kiener\MolliePayments\Components\ApplePayDirect\Services;
 
 use Kiener\MolliePayments\Service\HttpClient\HttpClientInterface;
-use League\Flysystem\FilesystemInterface;
+use League\Flysystem\Filesystem;
 
 class ApplePayDomainVerificationService
 {
-
     /**
      * This is the static download URL for all Mollie merchants.
      * This one must not change! But the content might change, you'll never know.
@@ -22,7 +21,7 @@ class ApplePayDomainVerificationService
 
 
     /**
-     * @var FilesystemInterface
+     * @var Filesystem
      */
     private $filesystem;
 
@@ -33,10 +32,10 @@ class ApplePayDomainVerificationService
 
 
     /**
-     * @param FilesystemInterface $filesystem
+     * @param Filesystem $filesystem
      * @param HttpClientInterface $httpClient
      */
-    public function __construct(FilesystemInterface $filesystem, HttpClientInterface $httpClient)
+    public function __construct(Filesystem $filesystem, HttpClientInterface $httpClient)
     {
         $this->filesystem = $filesystem;
         $this->httpClient = $httpClient;
@@ -54,6 +53,10 @@ class ApplePayDomainVerificationService
             return;
         }
 
-        $this->filesystem->put(self::LOCAL_FILE, $response->getBody());
+        if ($this->filesystem->has(self::LOCAL_FILE)) {
+            $this->filesystem->delete(self::LOCAL_FILE);
+        }
+
+        $this->filesystem->write(self::LOCAL_FILE, $response->getBody());
     }
 }

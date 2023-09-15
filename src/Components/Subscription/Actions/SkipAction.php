@@ -10,7 +10,6 @@ use Shopware\Core\Framework\Context;
 
 class SkipAction extends BaseAction
 {
-
     /**
      * @param string $subscriptionId
      * @param int $skipCount

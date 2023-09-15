@@ -212,5 +212,4 @@ class CheckoutConfirmPageSubscriberTest extends TestCase
 
         self::assertArrayHasKey($expected, CheckoutConfirmPageSubscriber::getSubscribedEvents());
     }
-
 }

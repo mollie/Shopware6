@@ -5,10 +5,12 @@ namespace Kiener\MolliePayments\Components\Subscription\Services\Installer;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
+use Kiener\MolliePayments\Repository\MailTemplate\MailTemplateRepositoryInterface;
+use Kiener\MolliePayments\Repository\MailTemplateType\MailTemplateTypeRepositoryInterface;
+use Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepositoryInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -16,34 +18,33 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class MailTemplateInstaller
 {
-
     /**
      * @var Connection
      */
     private $connection;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var MailTemplateTypeRepositoryInterface
      */
     private $repoMailTypes;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var MailTemplateRepositoryInterface
      */
     private $repoMailTemplates;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var SalesChannelRepositoryInterface
      */
     private $repoSalesChannels;
 
     /**
      * @param Connection $connection
-     * @param EntityRepositoryInterface $repoMailTypes
-     * @param EntityRepositoryInterface $repoMailTemplates
-     * @param EntityRepositoryInterface $repoSalesChannels
+     * @param MailTemplateTypeRepositoryInterface $repoMailTypes
+     * @param MailTemplateRepositoryInterface $repoMailTemplates
+     * @param SalesChannelRepositoryInterface $repoSalesChannels
      */
-    public function __construct(Connection $connection, EntityRepositoryInterface $repoMailTypes, EntityRepositoryInterface $repoMailTemplates, EntityRepositoryInterface $repoSalesChannels)
+    public function __construct(Connection $connection, MailTemplateTypeRepositoryInterface $repoMailTypes, MailTemplateRepositoryInterface $repoMailTemplates, SalesChannelRepositoryInterface $repoSalesChannels)
     {
         $this->connection = $connection;
         $this->repoMailTypes = $repoMailTypes;
@@ -312,11 +313,12 @@ class MailTemplateInstaller
                 WHERE `locale`.`code` = :code
                 ";
 
-        $languageId = $connection->executeQuery($sql, ['code' => $locale])->fetchColumn();
+        $languageId = $connection->executeQuery($sql, ['code' => $locale])->fetchOne();
+
         if (!$languageId) {
             return null;
         }
 
-        return $languageId;
+        return (string)$languageId;
     }
 }

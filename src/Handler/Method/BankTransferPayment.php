@@ -2,16 +2,12 @@
 
 namespace Kiener\MolliePayments\Handler\Method;
 
-use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
-use Kiener\MolliePayments\Facade\MolliePaymentFinalize;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\SettingsService;
-use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Mollie\Api\Types\PaymentMethod;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Framework\Rule\Container\ContainerInterface;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class BankTransferPayment extends PaymentHandler
@@ -50,9 +46,11 @@ class BankTransferPayment extends PaymentHandler
     public function processPaymentMethodSpecificParameters(array $orderData, OrderEntity $orderEntity, SalesChannelContext $salesChannelContext, CustomerEntity $customer): array
     {
         $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
-        $dueDate = $settings->getPaymentMethodBankTransferDueDate();
 
-        if (!empty($dueDate)) {
+        $dueDateDays = (int)$settings->getPaymentMethodBankTransferDueDateDays();
+
+        if ($dueDateDays > 0) {
+            $dueDate = $settings->getPaymentMethodBankTransferDueDate();
             $orderData['expiresAt'] = $dueDate;
         }
 

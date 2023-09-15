@@ -8,7 +8,6 @@ use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 
 class PromotionItem extends AbstractItem
 {
-
     /**
      * @var OrderLineItemEntity
      */

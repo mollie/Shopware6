@@ -7,12 +7,14 @@ use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Service\OrderServiceInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Flow\Dispatching\Action\FlowAction;
+use Shopware\Core\Content\Flow\Dispatching\StorableFlow;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Event\FlowEvent;
 use Shopware\Core\Framework\Event\OrderAware;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class RefundOrderAction extends FlowAction
+class RefundOrderAction extends FlowAction implements EventSubscriberInterface
 {
-
     /**
      * @var OrderServiceInterface
      */
@@ -68,6 +70,18 @@ class RefundOrderAction extends FlowAction
     }
 
     /**
+     * @param StorableFlow $flow
+     * @throws \Exception
+     * @return void
+     */
+    public function handleFlow(StorableFlow $flow): void
+    {
+        $orderId = $flow->getStore('orderId');
+
+        $this->refundOrder($orderId, $flow->getContext());
+    }
+
+    /**
      * @param FlowEvent $event
      * @throws \Exception
      */
@@ -85,22 +99,23 @@ class RefundOrderAction extends FlowAction
             return;
         }
 
-        $this->refundOrder($baseEvent, $config);
+        $orderId = $baseEvent->getOrderId();
+
+        $this->refundOrder($orderId, $baseEvent->getContext());
     }
 
     /**
-     * @param OrderAware $baseEvent
-     * @param array<mixed> $config
+     * @param string $orderId
+     * @param Context $context
      * @throws \Exception
+     * @return void
      */
-    private function refundOrder(OrderAware $baseEvent, array $config): void
+    private function refundOrder(string $orderId, Context $context): void
     {
         $orderNumber = '';
 
         try {
-            $orderId = $baseEvent->getOrderId();
-
-            $order = $this->orderService->getOrder($orderId, $baseEvent->getContext());
+            $order = $this->orderService->getOrder($orderId, $context);
 
             $orderNumber = $order->getOrderNumber();
 
@@ -109,10 +124,11 @@ class RefundOrderAction extends FlowAction
             $request = new RefundRequest(
                 (string)$order->getOrderNumber(),
                 'Refund through Shopware Flow Builder',
+                '',
                 null
             );
 
-            $this->refundManager->refund($order, $request, $baseEvent->getContext());
+            $this->refundManager->refund($order, $request, $context);
         } catch (\Exception $ex) {
             $this->logger->error(
                 'Error when refunding order with Flow Builder Action',

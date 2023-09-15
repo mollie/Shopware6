@@ -2,16 +2,32 @@
 
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Subscriber;
 
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund\RefundStartedEvent;
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionCancelledEvent;
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionEndedEvent;
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionPausedEvent;
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionRemindedEvent;
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionRenewedEvent;
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionResumedEvent;
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionSkippedEvent;
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionStartedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Checkout\OrderCanceled\OrderCanceledEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Checkout\OrderCanceled\OrderCanceledEvent651;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Checkout\OrderFailed\OrderFailedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Checkout\OrderFailed\OrderFailedEvent651;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Checkout\OrderSuccess\OrderSuccessEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Checkout\OrderSuccess\OrderSuccessEvent651;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund\RefundStarted\RefundStartedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund\RefundStarted\RefundStartedEvent651;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionCancelled\SubscriptionCancelledEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionCancelled\SubscriptionCancelledEvent651;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionEnded\SubscriptionEndedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionEnded\SubscriptionEndedEvent651;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionPaused\SubscriptionPausedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionPaused\SubscriptionPausedEvent651;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionReminded\SubscriptionRemindedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionReminded\SubscriptionRemindedEvent651;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionRenewed\SubscriptionRenewedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionRenewed\SubscriptionRenewedEvent651;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionResumed\SubscriptionResumedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionResumed\SubscriptionResumedEvent651;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionSkipped\SubscriptionSkippedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionSkipped\SubscriptionSkippedEvent651;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionStarted\SubscriptionStartedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionStarted\SubscriptionStartedEvent651;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookReceivedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookReceivedEvent651;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedAuthorizedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedCancelledEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedChargebackEvent;
@@ -22,7 +38,7 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatus
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedPartialRefundedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedPendingEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedRefundedEvent;
-use Kiener\MolliePayments\Components\Subscription\BusinessEvent\RenewalReminderEvent;
+use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Shopware\Core\Framework\Event\BusinessEventCollector;
 use Shopware\Core\Framework\Event\BusinessEventCollectorEvent;
 use Shopware\Core\Framework\Event\BusinessEventDefinition;
@@ -30,6 +46,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class BusinessEventCollectorSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var VersionCompare
+     */
+    private $versionCompare;
 
     /**
      * @var BusinessEventCollector
@@ -38,10 +58,13 @@ class BusinessEventCollectorSubscriber implements EventSubscriberInterface
 
 
     /**
+     * @param string $shopwareVersion
      * @param BusinessEventCollector $businessEventCollector
      */
-    public function __construct(BusinessEventCollector $businessEventCollector)
+    public function __construct(string $shopwareVersion, BusinessEventCollector $businessEventCollector)
     {
+        $this->versionCompare = new VersionCompare($shopwareVersion);
+
         $this->businessEventCollector = $businessEventCollector;
     }
 
@@ -64,8 +87,7 @@ class BusinessEventCollectorSubscriber implements EventSubscriberInterface
         $collection = $event->getCollection();
 
         $events = [
-            WebhookReceivedEvent::class,
-            # --------------------------------------------
+
             WebhookReceivedPaidEvent::class,
             WebhookReceivedFailedEvent::class,
             WebhookReceivedExpiredEvent::class,
@@ -76,22 +98,49 @@ class BusinessEventCollectorSubscriber implements EventSubscriberInterface
             WebhookReceivedChargebackEvent::class,
             WebhookReceivedRefundedEvent::class,
             WebhookReceivedPartialRefundedEvent::class,
-            # --------------------------------------------
-            RefundStartedEvent::class,
-            # --------------------------------------------
-            SubscriptionStartedEvent::class,
-            SubscriptionEndedEvent::class,
-            SubscriptionPausedEvent::class,
-            SubscriptionResumedEvent::class,
-            SubscriptionSkippedEvent::class,
-            SubscriptionCancelledEvent::class,
-            SubscriptionRemindedEvent::class,
-            SubscriptionRenewedEvent::class,
         ];
 
-        foreach ($events as $event) {
+        if ($this->versionCompare->gte('6.5.1.0')) {
+            # --------------------------------------------
+            $events[] = WebhookReceivedEvent651::class;
+            # --------------------------------------------
+            $events[] = OrderSuccessEvent651::class;
+            $events[] = OrderFailedEvent651::class;
+            $events[] = OrderCanceledEvent651::class;
+            # --------------------------------------------
+            $events[] = RefundStartedEvent651::class;
+            # --------------------------------------------
+            $events[] = SubscriptionRemindedEvent651::class;
+            $events[] = SubscriptionStartedEvent651::class;
+            $events[] = SubscriptionPausedEvent651::class;
+            $events[] = SubscriptionEndedEvent651::class;
+            $events[] = SubscriptionResumedEvent651::class;
+            $events[] = SubscriptionSkippedEvent651::class;
+            $events[] = SubscriptionCancelledEvent651::class;
+            $events[] = SubscriptionRenewedEvent651::class;
+        } else {
+            # --------------------------------------------
+            $events[] = WebhookReceivedEvent::class;
+            # --------------------------------------------
+            $events[] = OrderSuccessEvent::class;
+            $events[] = OrderFailedEvent::class;
+            $events[] = OrderCanceledEvent::class;
+            # --------------------------------------------
+            $events[] = RefundStartedEvent::class;
+            # --------------------------------------------
+            $events[] = SubscriptionRemindedEvent::class;
+            $events[] = SubscriptionStartedEvent::class;
+            $events[] = SubscriptionPausedEvent::class;
+            $events[] = SubscriptionEndedEvent::class;
+            $events[] = SubscriptionResumedEvent::class;
+            $events[] = SubscriptionSkippedEvent::class;
+            $events[] = SubscriptionCancelledEvent::class;
+            $events[] = SubscriptionRenewedEvent::class;
+        }
+
+        foreach ($events as $tmpEvent) {
             /** @var BusinessEventDefinition $definition */
-            $definition = $this->businessEventCollector->define($event);
+            $definition = $this->businessEventCollector->define($tmpEvent);
             $collection->set($definition->getName(), $definition);
         }
     }

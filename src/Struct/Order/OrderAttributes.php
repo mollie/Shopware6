@@ -390,10 +390,13 @@ class OrderAttributes
             $mollieData['third_party_payment_id'] = $this->thirdPartyPaymentId;
         }
 
+        # used by the Mollie Failure-Mode within this plugin
         if ((string)$this->transactionReturnUrl !== '') {
             $mollieData['transactionReturnUrl'] = $this->transactionReturnUrl;
         }
 
+        # used for the API to read the checkout-URL
+        # within 3rd party systems
         if ((string)$this->molliePaymentUrl !== '') {
             $mollieData['molliePaymentUrl'] = $this->molliePaymentUrl;
         }

@@ -31,7 +31,7 @@ class SnippetFile_nl_NL implements SnippetFileInterface
 
     public function getAuthor(): string
     {
-        return 'Carsten Schmitz';
+        return 'Mollie B.V.';
     }
 
     public function isBase(): bool

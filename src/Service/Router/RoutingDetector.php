@@ -8,7 +8,6 @@ use Symfony\Component\Routing\RouterInterface;
 
 class RoutingDetector
 {
-
     /**
      * This is the ID of the webhook route of the storefront.
      */

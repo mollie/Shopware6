@@ -6,7 +6,6 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 
 class RefundRequest
 {
-
     /**
      * @var string
      */
@@ -16,6 +15,11 @@ class RefundRequest
      * @var string
      */
     private $description;
+
+    /**
+     * @var string
+     */
+    private $internalDescription;
 
     /**
      * @var ?float
@@ -28,15 +32,18 @@ class RefundRequest
     private $items;
 
 
+
     /**
      * @param string $orderNumber
      * @param string $description
+     * @param string $internalDescription
      * @param null|float $amount
      */
-    public function __construct(string $orderNumber, string $description, ?float $amount)
+    public function __construct(string $orderNumber, string $description, string $internalDescription, ?float $amount)
     {
         $this->orderNumber = $orderNumber;
         $this->description = $description;
+        $this->internalDescription = $internalDescription;
         $this->amount = $amount;
         $this->items = [];
     }
@@ -79,6 +86,14 @@ class RefundRequest
         }
 
         return $this->description;
+    }
+
+    /**
+     * @return string
+     */
+    public function getInternalDescription(): string
+    {
+        return $this->internalDescription;
     }
 
     /**
@@ -165,7 +180,6 @@ class RefundRequest
         $itemsDifferToCartAmount = $this->isDifferentAmount($order);
 
         if (!$itemsDifferToCartAmount) {
-
             # now also check if we might have full item values
             # but a different total amount
             if ($this->amount > 0 && $this->amount !== $order->getAmountTotal()) {

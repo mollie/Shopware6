@@ -41,6 +41,9 @@ const device = devices.getFirstDevice();
 context("Order Shipping", () => {
 
     before(() => {
+        configAction.setupShop(false, false, false);
+
+        configAction.prepareShippingMethods();
         configAction.updateProducts('', false, '', '');
     })
 
@@ -57,6 +60,9 @@ context("Order Shipping", () => {
 
             adminOrders.openShipThroughMollie();
 
+            // make sure our modal is visible
+            cy.contains('.sw-modal__header', 'Ship through Mollie', {timeout: 50000});
+
             // verify we have 2x 1 item
             // we use contain because linebreaks \n exist.
             // but we don't add 11 items...so that should be fine
@@ -68,8 +74,16 @@ context("Order Shipping", () => {
             // verify delivery status and item shipped count
             assertShippingStatus('Shipped', 2);
 
-            repoOrderDetails.getMollieActionsButton().click({force: true});
-            repoOrderDetails.getMollieActionButtonShipThroughMollie().should('have.class', 'is--disabled');
+            if (shopware.isVersionLower('6.5')) {
+                repoOrderDetails.getMollieActionsButton().click({force: true});
+            }
+
+            let disabledClassName = 'is--disabled'
+            if (shopware.isVersionGreaterEqual('6.5')) {
+                disabledClassName = 'sw-button--disabled';
+            }
+
+            repoOrderDetails.getMollieActionButtonShipThroughMollie().should('have.class', disabledClassName);
         })
 
         it('C152048: Full Shipping in Administration with Tracking', () => {
@@ -87,28 +101,38 @@ context("Order Shipping", () => {
 
             repoShippingFull.getTrackingCarrier().should('not.have.value', '');
             repoShippingFull.getTrackingCode().should('have.value', TRACKING_CODE);
-            repoShippingFull.getTrackingUrl().should('have.value', '');
+            repoShippingFull.getTrackingUrl().should('not.have.value', '');
 
             shippingAction.shipOrder();
 
             assertShippingStatus('Shipped', 2);
 
-            repoOrderDetails.getMollieActionsButton().click({force: true});
-            repoOrderDetails.getMollieActionButtonShipThroughMollie().should('have.class', 'is--disabled');
+            if (shopware.isVersionLower('6.5')) {
+                repoOrderDetails.getMollieActionsButton().click({force: true});
+            }
+
+            let disabledClassName = 'is--disabled'
+            if (shopware.isVersionGreaterEqual('6.5')) {
+                disabledClassName = 'sw-button--disabled';
+            }
+
+            repoOrderDetails.getMollieActionButtonShipThroughMollie().should('have.class', disabledClassName);
         })
 
         it('C4040: Partial Shipping in Administration', () => {
 
             createOrderAndOpenAdmin(2, 2);
 
-
             adminOrders.openLineItemShipping(1);
-
 
             repoShippingItem.getShippedQuantity().should('contain.text', '0');
             repoShippingItem.getShippableQuantity().should('contain.text', '2');
 
             shippingAction.shipLineItem(1);
+
+            // somehow this is required in Shopware 6.5, lets just stick with it, its ok
+            cy.wait(2000);
+            cy.reload();
 
             assertShippingStatus('Shipped (partially)', 1);
 
@@ -138,8 +162,17 @@ context("Order Shipping", () => {
 
             assertShippingStatus('Shipped', 4);
 
-            repoOrderDetails.getMollieActionsButton().click({force: true});
-            repoOrderDetails.getMollieActionButtonShipThroughMollie().should('have.class', 'is--disabled');
+            if (shopware.isVersionLower('6.5')) {
+                repoOrderDetails.getMollieActionsButton().click({force: true});
+            }
+
+            let disabledClassName = 'is--disabled'
+            if (shopware.isVersionGreaterEqual('6.5')) {
+                disabledClassName = 'sw-button--disabled';
+            }
+
+            cy.wait(1000);
+            repoOrderDetails.getMollieActionButtonShipThroughMollie().should('have.class', disabledClassName);
         })
 
         it('C4044: Partial Shipping with Tracking', () => {
@@ -221,10 +254,6 @@ function createOrderAndOpenAdmin(itemCount, itemQty) {
     mollieSandbox.initSandboxCookie();
     molliePayment.selectAuthorized();
 
-    // increase our viewport for admin
-    // otherwise we don't see a lot (page height)
-    cy.viewport(1920, 2000);
-
     adminLogin.login();
     adminOrders.openOrders();
     adminOrders.openLastOrder();
@@ -241,5 +270,8 @@ function assertShippingStatus(statusLabel, shippedItemsCount) {
 
     repoOrderDetails.getDeliveryStatusTop().should('contain.text', statusLabel, {timeout: 6000});
 
-    repoOrderDetails.getOrderSummarySection().should('contain.text', 'Shipped amount (' + shippedItemsCount + ' items)', {timeout: 6000});
+    if (shopware.isVersionLower('6.5')) {
+        /** since 6.5 you don't see the shipped items in summary **/
+        repoOrderDetails.getOrderSummarySection().should('contain.text', 'Shipped amount (' + shippedItemsCount + ' items)', {timeout: 6000});
+    }
 }

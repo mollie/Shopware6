@@ -9,7 +9,6 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 
 class OrderAttributesTest extends TestCase
 {
-
     /**
      * @return void
      */
@@ -55,5 +54,4 @@ class OrderAttributesTest extends TestCase
 
         $this->assertEquals(true, $attributes->isTypeSubscription());
     }
-
 }

@@ -15,7 +15,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class LiveDataEnricher implements EventSubscriberInterface
 {
-
     /**
      * @var SettingsService
      */
@@ -69,7 +68,6 @@ class LiveDataEnricher implements EventSubscriberInterface
         /** @var SubscriptionEntity $subscription */
         foreach ($event->getEntities() as $subscription) {
             try {
-
                 # ----------------------------------------------------------------------------------------------------
                 # set the cancellation until-date depending on our plugin configuration
 
@@ -107,12 +105,6 @@ class LiveDataEnricher implements EventSubscriberInterface
 
                     $this->repoSubscriptions->updateStatus($subscription->getId(), $mollieSubscription->status, $event->getContext());
                 }
-
-                # ----------------------------------------------------------------------------------------------------
-                # TODO remove one day
-                # mollieStatus is deprecated
-
-                $subscription->setMollieStatus('Deprecated. Use status');
             } catch (\Throwable $ex) {
                 $this->logger->error(
                     'Error when enriching Subscription with additional data',

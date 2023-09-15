@@ -16,10 +16,17 @@ use Shopware\Core\System\Currency\CurrencyEntity;
 
 class BankTransferOrderBuilderTest extends AbstractMollieOrderBuilder
 {
+
+    /**
+     * @return void
+     * @throws \Exception
+     */
     public function testOrderBuild(): void
     {
         $redirectWebhookUrl = 'https://foo';
+
         $this->router->method('generate')->willReturn($redirectWebhookUrl);
+
         $paymentMethod = PaymentMethod::BANKTRANSFER;
 
 
@@ -30,9 +37,11 @@ class BankTransferOrderBuilderTest extends AbstractMollieOrderBuilder
         );
 
 
-        $bankDueDays = $this->expiresAt + 5;
+        $bankDueDays = 2;
+        $expiresDays = 10;
+
         $this->settingStruct->assign([
-            'orderLifetimeDays' => $this->expiresAt,
+            'orderLifetimeDays' => $expiresDays,
             'paymentMethodBankTransferDueDateDays' => $bankDueDays
         ]);
 
@@ -52,22 +61,26 @@ class BankTransferOrderBuilderTest extends AbstractMollieOrderBuilder
 
         $actual = $this->builder->build($order, $transactionId, $paymentMethod, $this->salesChannelContext, $this->paymentHandler, []);
 
-        $expectedOrderLifeTime = (new DateTime())->setTimezone(new DateTimeZone('UTC'))
+        $bankDueDatetime = (new DateTime())
+            ->setTimezone(new DateTimeZone('UTC'))
             ->modify(sprintf('+%d day', $bankDueDays))
             ->format('Y-m-d');
+
 
         $expected = [
             'amount' => (new MollieOrderPriceBuilder())->build($amountTotal, $currencyISO),
             'locale' => $this->localeCode,
             'method' => $paymentMethod,
             'orderNumber' => $orderNumber,
-            'payment' => ['webhookUrl' => $redirectWebhookUrl],
+            'payment' => [
+                'webhookUrl' => $redirectWebhookUrl,
+            ],
             'redirectUrl' => $redirectWebhookUrl,
             'webhookUrl' => $redirectWebhookUrl,
             'lines' => $this->getExpectedLineItems($taxStatus, $lineItems, $currency),
             'billingAddress' => $this->getExpectedTestAddress($this->address, $this->email),
             'shippingAddress' => $this->getExpectedTestAddress($this->address, $this->email),
-            'expiresAt' => $expectedOrderLifeTime
+            'expiresAt' => $bankDueDatetime
         ];
 
         self::assertSame($expected, $actual);

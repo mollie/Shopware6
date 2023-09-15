@@ -31,7 +31,7 @@ class SnippetFile_en_GB implements SnippetFileInterface
 
     public function getAuthor(): string
     {
-        return 'Reinder van Bochove';
+        return 'Mollie B.V.';
     }
 
     public function isBase(): bool

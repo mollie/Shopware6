@@ -7,12 +7,16 @@
 
 PLUGIN_VERSION=`php -r 'echo json_decode(file_get_contents("MolliePayments/composer.json"))->version;'`
 
+SW_CLI_VERSION:=$(shell shopware-cli --version 1>/dev/null)
+NODE_VERSION:=$(shell node -v)
+
+
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 # ------------------------------------------------------------------------------------------------------------
 
-install: ## Installs all production dependencies
+prod: ## Installs all production dependencies
 	# do not switch to production composer PROD, otherwise it would
 	# also install shopware in here -> we just need it for the release composer.json file
 	# so just switch to our dev dependency variant
@@ -20,35 +24,48 @@ install: ## Installs all production dependencies
 	# ----------------------------------------------------------------
 	@composer validate
 	@composer install --no-dev
-	cd src/Resources/app/administration && npm install --production
+	cd src/Resources/app/administration && npm install --omit=dev
 	cd src/Resources/app/storefront && npm install --production
 
 dev: ## Installs all dev dependencies
+	curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt install shopware-cli
 	php switch-composer.php dev
 	@composer validate
 	@composer install
 	cd src/Resources/app/administration && npm install
 	cd src/Resources/app/storefront && npm install
 
-clean: ## Cleans all dependencies
+install: ## [deprecated] Installs all production dependencies. Please use "make prod" now.
+	@make prod -B
+
+clean: ## Cleans all dependencies and files
 	rm -rf vendor/*
+	# ------------------------------------------------------
 	rm -rf .reports | true
+	# ------------------------------------------------------
 	rm -rf ./src/Resources/app/administration/node_modules/*
 	rm -rf ./src/Resources/app/storefront/node_modules/*
+	# ------------------------------------------------------
+	rm -rf ./src/Resources/app/storefront/dist/storefront
+	rm -rf ./src/Resources/public
+
+build: ## Installs the plugin, and builds the artifacts using the Shopware build commands.
+	php switch-composer.php prod
+	cd ../../.. && export NODE_OPTIONS=--openssl-legacy-provider && shopware-cli extension build custom/plugins/MolliePayments
+	php switch-composer.php dev
+	# -----------------------------------------------------
+	# CUSTOM WEBPACK
+	cd ./src/Resources/app/storefront && make build -B
+	# -----------------------------------------------------
+	cd ../../.. && php bin/console --no-debug theme:refresh
+	cd ../../.. && php bin/console --no-debug theme:compile
+	cd ../../.. && php bin/console --no-debug theme:refresh
+	cd ../../.. && php bin/console --no-debug assets:install
+	cd ../../.. && php bin/console --no-debug cache:clear
 
 fixtures: ## Installs all available testing fixtures of the Mollie plugin
-	cd /var/www/html && php bin/console cache:clear
-	cd /var/www/html && php bin/console fixture:load:group mollie
-
-build: ## Installs the plugin, and builds the artifacts using the Shopware build commands (requires Shopware)
-	cd /var/www/html && php bin/console plugin:refresh
-	cd /var/www/html && php bin/console plugin:install MolliePayments --activate | true
-	cd /var/www/html && php bin/console plugin:refresh
-	cd /var/www/html && php bin/console theme:dump
-	cd /var/www/html && SHOPWARE_ADMIN_BUILD_ONLY_EXTENSIONS=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true DISABLE_ADMIN_COMPILATION_TYPECHECK=true ./bin/build-js.sh
-	cd /var/www/html && php bin/console theme:refresh
-	cd /var/www/html && php bin/console theme:compile
-	cd /var/www/html && php bin/console theme:refresh
+	cd ../../.. && php bin/console --no-debug cache:clear
+	cd ../../.. && php bin/console --no-debug fixture:load:group mollie
 
 # ------------------------------------------------------------------------------------------------------------
 
@@ -79,7 +96,7 @@ jest: ## Starts all Jest tests
 
 stryker: ## Starts the Stryker Jest Mutation Tests
 	cd ./src/Resources/app/administration && ./node_modules/.bin/stryker run .stryker.conf.json
-	@# Storefront has no tests at the momentcd ./src/Resources/app/storefront && ./node_modules/.bin/stryker run .stryker.conf.json
+	@# Storefront has no tests at the moment
 	@# cd ./src/Resources/app/storefront && ./node_modules/.bin/stryker run .stryker.conf.json
 
 eslint: ## Starts the ESLinter
@@ -93,8 +110,16 @@ stylelint: ## Starts the Stylelinter
 configcheck: ## Tests and verifies the plugin configuration file
 	cd ./tests/Custom && php verify-plugin-config.php
 
+# ------------------------------------------------------------------------------------------------------------
+
 snippetcheck: ## Tests and verifies all plugin snippets
-	cd ./tests/Custom && php verify-plugin-snippets.php
+	php vendor/bin/phpunuhi validate --configuration=./.phpunuhi.xml --report-format=junit --report-output=./.phpunuhi/junit.xml
+
+snippetexport: ## Exports all snippets
+	php vendor/bin/phpunuhi export --configuration=./.phpunuhi.xml --dir=./.phpunuhi
+
+snippetimport: ## Imports the provided snippet set [set=xyz file=xz.csv]
+	php vendor/bin/phpunuhi import --configuration=./.phpunuhi.xml --set=$(set) --file=$(file) --intent=1
 
 # ------------------------------------------------------------------------------------------------------------
 
@@ -112,11 +137,43 @@ pr: ## Prepares everything for a Pull Request
 	@make configcheck -B
 	@make snippetcheck -B
 
-release: ## Builds a PROD version and creates a ZIP file in plugins/.build
-	make clean -B
-	make install -B
-	make build -B
-	php switch-composer.php prod
+# -------------------------------------------------------------------------------------------------
+
+release: ## Builds a PROD version and creates a ZIP file in plugins/.build.
+ifneq (,$(findstring v12,$(NODE_VERSION)))
+	$(warning Attention, reqruires Node v14 or higher to build a release!)
+	@exit 1
+endif
 	cd .. && rm -rf ./.build/MolliePayments* && mkdir -p ./.build
-	cd .. && zip -qq -r -0 ./.build/MolliePayments.zip MolliePayments/ -x '*.editorconfig' '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*' '*/makefile' '*.DS_Store' '*/switch-composer.php' '*/phpunit.xml' '*/.infection.json' '*/phpunit.autoload.php' '*/.phpstan*' '*/.php_cs.php' '*/phpinsights.php'
+	# -------------------------------------------------------------------------------------------------
+	@echo "UPDATE SHOPWARE DEPENDENCIES"
 	php switch-composer.php dev
+	composer update shopware/core
+	composer update shopware/storefront
+	composer update shopware/administration
+	# -------------------------------------------------------------------------------------------------
+	@echo "INSTALL DEV DEPENDENCIES AND BUILD"
+	make clean -B
+	make dev -B
+	make build -B
+	# -------------------------------------------------------------------------------------------------
+	@echo "INSTALL PRODUCTION DEPENDENCIES"
+	make prod -B
+	rm -rf ./src/Resources/app/storefront/node_modules/*
+	# DELETE distribution file. that ones not compatible between 6.5 and 6.4
+	# if one wants to use it, they need to run build-storefront.sh manually and activate that feature
+	# in our plugin configuration! (use shopware standard js)
+	rm -rf ./src/Resources/app/storefront/dist/storefront
+	# switch to PROD dependencies before zipping plugin
+	# this is very important for the Shopware Store.
+	php switch-composer.php prod
+	# -------------------------------------------------------------------------------------------------
+	@echo "CREATE ZIP FILE"
+	cd .. && zip -qq -r -0 ./.build/MolliePayments.zip MolliePayments/ -x '*.editorconfig' '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*' '*/makefile' '*.DS_Store' '*/.shopware-extension.yml' '*/switch-composer.php' '*/phpunit.xml' '*/.phpunuhi.xml' '*/.infection.json' '*/phpunit.autoload.php' '*/.phpstan*' '*/.php_cs.php' '*/phpinsights.php'
+	# -------------------------------------------------------------------------------------------------
+	@echo "RESET COMPOSER.JSON"
+	php switch-composer.php dev
+	# -------------------------------------------------------------------------------------------------
+	@echo ""
+	@echo "CONGRATULATIONS"
+	@echo "The new ZIP file is available at plugins/.build/MolliePayments.zip"

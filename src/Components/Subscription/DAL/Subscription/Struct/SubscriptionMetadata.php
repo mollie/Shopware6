@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct;
 
 class SubscriptionMetadata
 {
-
     /**
      * @var string
      */

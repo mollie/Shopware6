@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Service\Refund\Item;
 
 class RefundItem
 {
-
     /**
      * @var string
      */

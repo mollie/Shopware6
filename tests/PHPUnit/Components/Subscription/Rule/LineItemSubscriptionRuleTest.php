@@ -9,10 +9,8 @@ use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\Rule\LineItemScope;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
-
 class LineItemSubscriptionRuleTest extends TestCase
 {
-
     /**
      * @var LineItemSubscriptionRule
      */
@@ -108,5 +106,4 @@ class LineItemSubscriptionRuleTest extends TestCase
 
         static::assertSame($expected, $match);
     }
-
 }

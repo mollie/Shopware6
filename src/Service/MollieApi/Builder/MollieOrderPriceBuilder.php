@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Service\MollieApi\Builder;
 
 class MollieOrderPriceBuilder
 {
-
     /**
      *
      */

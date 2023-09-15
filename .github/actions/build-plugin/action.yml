@@ -1,11 +1,6 @@
 name: 'Build Plugin'
 description: "Builds the Plugin"
 
-inputs:
-  shopware:
-    description: "The Shopware version that is used to build the plugin"
-    required: true
-
 runs:
   using: "composite"
   steps:
@@ -13,7 +8,7 @@ runs:
     - name: Start Docker
       shell: bash
       run: |
-        docker run --rm --name shop -d dockware/dev:${{ inputs.shopware }}
+        docker run --rm --name shop --env NODE_VERSION=18 --env PHP_VERSION=8.1 -d dockware/dev:6.5.4.1
         sleep 20
         docker logs shop
 
@@ -30,6 +25,14 @@ runs:
 
     # --------------------------------------------------------------------------------------------------------------------------------------
 
+    - name: Install Plugin
+      shell: bash
+      run: |
+        docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make prod'
+        docker exec shop bash -c 'cd /var/www/html && php bin/console plugin:refresh'
+        docker exec shop bash -c 'cd /var/www/html && php bin/console plugin:install MolliePayments --activate'
+        docker exec shop bash -c 'cd /var/www/html && php bin/console cache:clear'
+
     - name: Build Plugin
       shell: bash
       run: |
@@ -42,9 +45,19 @@ runs:
       run: |
         docker cp shop:/var/www/html/custom/plugins/.build/MolliePayments.zip ~/.build/MolliePayments.zip
 
+    - name: Extract ZIP file for artifact
+      shell: bash
+      run: |
+        unzip ~/.build/MolliePayments.zip -d ~/.build/MolliePayments
+
     - name: Store ZIP file in Github
       uses: actions/upload-artifact@v2
       with:
-        name: MolliePayments-Shopware-${{ inputs.shopware }}
+        name: MolliePayments-Shopware
         retention-days: 4
-        path: ~/.build
+        path: ~/.build/MolliePayments
+
+    - name: Delete TMP files
+      shell: bash
+      run: |
+        rm -rf ~/.build/MolliePayments

@@ -2,7 +2,6 @@
 
 namespace MolliePayments\Tests\Fakes;
 
-
 use Exception;
 use Kiener\MolliePayments\Service\Transition\OrderTransitionServiceInterface;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -18,7 +17,7 @@ class FakeOrderTransitionService implements OrderTransitionServiceInterface
 
     public $returns = [];
 
-    /** @var Exception|null */
+    /** @var null|Exception */
     public $exception = null;
 
     public function getAvailableTransitions(OrderEntity $order, Context $context): array

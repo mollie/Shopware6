@@ -2,7 +2,6 @@
 
 namespace MolliePayments\Tests\Service\Cart\Voucher;
 
-
 use Kiener\MolliePayments\Service\Cart\Voucher\VoucherService;
 use Kiener\MolliePayments\Struct\Voucher\VoucherType;
 use MolliePayments\Tests\Fakes\Repositories\FakeProductRepository;
@@ -17,7 +16,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class VoucherServiceTest extends TestCase
 {
-
     use MockTrait;
 
     /**
@@ -172,5 +170,4 @@ class VoucherServiceTest extends TestCase
 
         return $item;
     }
-
 }

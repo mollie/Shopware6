@@ -6,6 +6,7 @@ use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Handler\Method\BanContactPayment;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Kiener\MolliePayments\Handler\Method\BelfiusPayment;
+use Kiener\MolliePayments\Handler\Method\BilliePayment;
 use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
 use Kiener\MolliePayments\Handler\Method\EpsPayment;
 use Kiener\MolliePayments\Handler\Method\GiftCardPayment;
@@ -23,6 +24,9 @@ use Kiener\MolliePayments\Handler\Method\Przelewy24Payment;
 use Kiener\MolliePayments\Handler\Method\SofortPayment;
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Kiener\MolliePayments\MolliePayments;
+use Kiener\MolliePayments\Repository\Media\MediaRepository;
+use Kiener\MolliePayments\Repository\Media\MediaRepositoryInterface;
+use Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepositoryInterface;
 use Kiener\MolliePayments\Service\HttpClient\HttpClientInterface;
 use Mollie\Api\Resources\Order;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
@@ -30,7 +34,6 @@ use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Content\Media\MediaCollection;
 use Shopware\Core\Content\Media\MediaService;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -43,13 +46,17 @@ class PaymentMethodService
     /** @var MediaService */
     private $mediaService;
 
-    /** @var EntityRepositoryInterface */
+    /**
+     * @var PaymentMethodRepositoryInterface
+     */
     private $paymentRepository;
 
     /** @var PluginIdProvider */
     private $pluginIdProvider;
 
-    /** @var EntityRepositoryInterface */
+    /**
+     * @var MediaRepositoryInterface
+     */
     private $mediaRepository;
 
     /** @var HttpClientInterface */
@@ -58,12 +65,12 @@ class PaymentMethodService
 
     /**
      * @param MediaService $mediaService
-     * @param EntityRepositoryInterface $mediaRepository
-     * @param EntityRepositoryInterface $paymentRepository
+     * @param MediaRepositoryInterface $mediaRepository
+     * @param PaymentMethodRepositoryInterface $paymentRepository
      * @param PluginIdProvider $pluginIdProvider
      * @param HttpClientInterface $httpClient
      */
-    public function __construct(MediaService $mediaService, EntityRepositoryInterface $mediaRepository, EntityRepositoryInterface $paymentRepository, PluginIdProvider $pluginIdProvider, HttpClientInterface $httpClient)
+    public function __construct(MediaService $mediaService, MediaRepositoryInterface $mediaRepository, PaymentMethodRepositoryInterface $paymentRepository, PluginIdProvider $pluginIdProvider, HttpClientInterface $httpClient)
     {
         $this->mediaService = $mediaService;
         $this->mediaRepository = $mediaRepository;
@@ -72,15 +79,6 @@ class PaymentMethodService
         $this->httpClient = $httpClient;
     }
 
-    /**
-     * Returns the payment repository.
-     *
-     * @return EntityRepositoryInterface
-     */
-    public function getRepository(): EntityRepositoryInterface
-    {
-        return $this->paymentRepository;
-    }
 
     /**
      * @param Context $context
@@ -160,7 +158,6 @@ class PaymentMethodService
 
                 $upsertData[] = $paymentMethodData;
             } else {
-
                 # let's create a full parameter list of everything
                 # that our new payment method needs to have
                 $paymentMethodData = [
@@ -369,6 +366,7 @@ class PaymentMethodService
             ApplePayPayment::class,
             BanContactPayment::class,
             BankTransferPayment::class,
+            BilliePayment::class,
             BelfiusPayment::class,
             CreditCardPayment::class,
             EpsPayment::class,

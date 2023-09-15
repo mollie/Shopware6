@@ -10,7 +10,6 @@ use Shopware\Core\Framework\Context;
 
 class FakeMollieShipment implements MollieShipmentInterface
 {
-
     /**
      * @var false
      */
@@ -129,5 +128,4 @@ class FakeMollieShipment implements MollieShipmentInterface
     {
         return new Shipment(new MollieApiClient());
     }
-
 }

@@ -10,7 +10,6 @@ use Shopware\Core\Content\Product\ProductEntity;
 
 class ProductAttributes
 {
-
     /**
      * @var ?string
      */

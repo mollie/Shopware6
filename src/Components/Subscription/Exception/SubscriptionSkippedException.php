@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Components\Subscription\Exception;
 
 class SubscriptionSkippedException extends \Exception
 {
-
     /**
      * @param string $subscriptionId
      * @param string $transactionId

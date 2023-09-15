@@ -6,6 +6,7 @@ use Kiener\MolliePayments\Hydrator\RefundHydrator;
 use Mollie\Api\Resources\Refund;
 use Mollie\Api\Types\RefundStatus;
 use PHPUnit\Framework\TestCase;
+use Shopware\Core\Checkout\Order\OrderEntity;
 
 class RefundHydratorTest extends TestCase
 {
@@ -30,8 +31,11 @@ class RefundHydratorTest extends TestCase
      */
     public function testRefundHydrator(array $expected, Refund $refund)
     {
-        self::assertIsArray($this->refundHydrator->hydrate($refund));
-        self::assertEquals($expected, $this->refundHydrator->hydrate($refund));
+        $orderMock = $this->createMock(OrderEntity::class);
+        ;
+        self::assertIsArray($this->refundHydrator->hydrate($refund, $orderMock));
+
+        self::assertEquals($expected, $this->refundHydrator->hydrate($refund, $orderMock));
     }
 
     /**
@@ -76,8 +80,8 @@ class RefundHydratorTest extends TestCase
     }
 
     /**
-     * @param float|null $amount
-     * @param float|null $settlementAmount
+     * @param null|float $amount
+     * @param null|float $settlementAmount
      * @param string $status
      * @return array
      */
@@ -104,6 +108,7 @@ class RefundHydratorTest extends TestCase
             'amount' => $amount,
             'settlementAmount' => $settlementAmount,
             'description' => 'description',
+            'internalDescription' => null,
             'createdAt' => '2015-08-01T12:34:56+0100',
             'status' => $status,
             'isFailed' => $status == RefundStatus::STATUS_FAILED,

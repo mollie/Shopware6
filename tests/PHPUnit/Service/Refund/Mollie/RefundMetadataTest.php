@@ -22,7 +22,6 @@ use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachine
 
 class RefundMetadataTest extends TestCase
 {
-
     /**
      * This test verifies that its possible to assign the
      * correct type for the metadata.
@@ -106,5 +105,4 @@ class RefundMetadataTest extends TestCase
         $this->assertEquals(8, strlen($lineId));
         $this->assertEquals('2a88e43c', $lineId);
     }
-
 }

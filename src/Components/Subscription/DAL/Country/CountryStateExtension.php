@@ -12,7 +12,6 @@ use Shopware\Core\System\Country\Aggregate\CountryState\CountryStateDefinition;
 
 class CountryStateExtension extends EntityExtension
 {
-
     /**
      * @return string
      */

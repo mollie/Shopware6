@@ -8,7 +8,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 interface SubscriptionManagerInterface
 {
-
     /**
      * @param OrderEntity $order
      * @param SalesChannelContext $context

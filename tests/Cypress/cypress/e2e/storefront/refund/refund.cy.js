@@ -58,6 +58,7 @@ context("Order Refunds", () => {
             createOrderAndOpenAdmin();
 
             const REFUND_DESCRIPTION = 'full refund with Cypress';
+            const REFUND_INTERNAL_DESCRIPTION = 'refund done';
 
             // -------------------------------------------------------------------------------
 
@@ -70,11 +71,13 @@ context("Order Refunds", () => {
             repoRefundManager.getFullRefundButton().should('be.disabled');
 
             // now start the partial refund
-            refundManager.fullRefund(REFUND_DESCRIPTION);
+            refundManager.fullRefund(REFUND_DESCRIPTION, REFUND_INTERNAL_DESCRIPTION);
 
             // verify that our refund now exists
             repoRefundManager.getFirstRefundStatusLabel().contains('Pending');
-            repoRefundManager.getFirstRefundDescriptionLabel().contains(REFUND_DESCRIPTION);
+
+            repoRefundManager.getFirstRefundPublicDescriptionLabel().contains(REFUND_DESCRIPTION);
+            repoRefundManager.getFirstRefundInternalDescriptionLabel().contains(REFUND_INTERNAL_DESCRIPTION);
 
             // -------------------------------------------------------------------------------
 
@@ -107,7 +110,7 @@ context("Order Refunds", () => {
 
             // verify that our refund now exists
             repoRefundManager.getFirstRefundStatusLabel().contains('Pending');
-            repoRefundManager.getFirstRefundDescriptionLabel().contains(REFUND_DESCRIPTION);
+            repoRefundManager.getFirstRefundPublicDescriptionLabel().contains(REFUND_DESCRIPTION);
             // because of (weird) number formats which might not be the same
             // all the time (even if they should) we just search within multiple formats
             elementHelper.assertContainsTexts(
@@ -144,7 +147,7 @@ context("Order Refunds", () => {
             // -------------------------------------------------------------------------------
 
             repoRefundManager.getFirstRefundStatusLabel().contains('Pending');
-            repoRefundManager.getFirstRefundDescriptionLabel().contains(REFUND_DESCRIPTION);
+            repoRefundManager.getFirstRefundPublicDescriptionLabel().contains(REFUND_DESCRIPTION);
 
             // verify that we have a valid composition (meaning item information)
             repoRefundManager.getFirstRefundCompositionLabel().contains('1 x');
@@ -159,6 +162,52 @@ context("Order Refunds", () => {
 
             // now cancel our pending refund
             // and make sure that its gone afterwards
+            refundManager.cancelPendingRefund();
+            cy.contains(REFUND_DESCRIPTION).should('not.exist')
+        })
+
+        // TODO attention this is skipped because of a bug in Mollie. they dont' clear up deleted refunds. line items are still refunded.
+        it.skip('C273581: Canceled refunds should not be visible', () => {
+
+            createOrderAndOpenAdmin();
+
+            const REFUND_DESCRIPTION = 'full refund executed twice with Cypress';
+            const CANCELED_REFUND_STATUS_LABEL = 'mollie-payments.refunds.status.canceled';
+            // -------------------------------------------------------------------------------
+
+            // open the refund manager
+            // and start a partial refund of 2 EUR
+            adminOrders.openRefundManager();
+
+            // check if our button is disabled if
+            // the checkbox for the verification is not enabled
+            repoRefundManager.getFullRefundButton().should('be.disabled');
+
+            // check if refund quantity input field is visible
+            repoRefundManager.getFirstRefundedQuantityInputField().should('be.visible');
+
+            // now start the full refund
+            refundManager.fullRefund(REFUND_DESCRIPTION, '');
+
+            // verify that our refund now exists
+            repoRefundManager.getFirstRefundStatusLabel().contains('Pending');
+            repoRefundManager.getFirstRefundPublicDescriptionLabel().contains(REFUND_DESCRIPTION);
+
+            // -------------------------------------------------------------------------------
+
+            // now cancel our pending refund
+            // and make sure that its gone afterwards
+            refundManager.cancelPendingRefund();
+
+            // after cancel, the refund input field should be visible again
+            repoRefundManager.getFirstRefundedQuantityInputField().should('be.visible');
+
+            // now start the partial refund
+            refundManager.partialAmountRefund(2, REFUND_DESCRIPTION);
+
+            cy.contains(CANCELED_REFUND_STATUS_LABEL).should('not.exist');
+
+            // second cancel should clear the history
             refundManager.cancelPendingRefund();
             cy.contains(REFUND_DESCRIPTION).should('not.exist')
         })

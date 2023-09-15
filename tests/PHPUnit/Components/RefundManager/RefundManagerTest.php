@@ -3,19 +3,23 @@
 
 namespace MolliePayments\Tests\Components\RefundManager;
 
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund\RefundStartedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund\RefundStarted\RefundStartedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Components\RefundManager\Builder\RefundDataBuilder;
+use Kiener\MolliePayments\Components\RefundManager\DAL\Repository\RefundRepositoryInterface;
 use Kiener\MolliePayments\Components\RefundManager\RefundManager;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
 use Kiener\MolliePayments\Service\MollieApi\Order;
+use Mollie\Api\MollieApiClient;
+use Mollie\Api\Resources\Order as MollieOrder;
 use MolliePayments\Tests\Fakes\FakeOrderService;
 use MolliePayments\Tests\Fakes\FakeRefundService;
 use MolliePayments\Tests\Fakes\FlowBuilder\FakeFlowBuilderDispatcher;
 use MolliePayments\Tests\Fakes\FlowBuilder\FakeFlowBuilderFactory;
 use MolliePayments\Tests\Fakes\StockUpdater\FakeStockManager;
 use MolliePayments\Tests\Traits\MockTrait;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
@@ -25,7 +29,6 @@ use Shopware\Core\Framework\Context;
 
 class RefundManagerTest extends TestCase
 {
-
     use MockTrait;
 
 
@@ -46,8 +49,8 @@ class RefundManagerTest extends TestCase
 
 
     /**
-     * @return void
      * @throws \Exception
+     * @return void
      */
     protected function setUp(): void
     {
@@ -62,8 +65,10 @@ class RefundManagerTest extends TestCase
         $fakeRefundService = new FakeRefundService('r-xyz-123', 9999);
         $this->fakeStockUpdater = new FakeStockManager();
 
-        /** @var Order $fakeOrder */
+        /** @var MockObject|Order $fakeOrder */
         $fakeOrder = $this->createDummyMock(Order::class, $this);
+        $fakeOrder->method('getMollieOrder')->willReturn(new MollieOrder($this->createMock(MollieApiClient::class)));
+
 
         $this->fakeFlowBuilderDispatcher = new FakeFlowBuilderDispatcher();
         $flowBuilderEventFactory = new FlowBuilderEventFactory('6.4.8.0'); # use any higher version so that we get real events
@@ -77,6 +82,7 @@ class RefundManagerTest extends TestCase
             new FakeFlowBuilderFactory($this->fakeFlowBuilderDispatcher),
             $flowBuilderEventFactory,
             $this->fakeStockUpdater,
+            $this->createMock(RefundRepositoryInterface::class),
             new NullLogger()
         );
     }
@@ -85,8 +91,8 @@ class RefundManagerTest extends TestCase
      * This test verifies that our correct flow builder
      * event is fired with all required data.
      *
-     * @return void
      * @throws \Mollie\Api\Exceptions\ApiException
+     * @return void
      */
     public function testFlowBuilderDispatching()
     {
@@ -100,7 +106,7 @@ class RefundManagerTest extends TestCase
         $fakeContext = $this->createDummyMock(Context::class, $this);
 
 
-        $refundRequest = new RefundRequest('', '', null);
+        $refundRequest = new RefundRequest('', '', '', null);
 
         $refund = $this->manager->refund($order, $refundRequest, $fakeContext);
 
@@ -123,8 +129,8 @@ class RefundManagerTest extends TestCase
      * order line item entities for that ID and extract the product ID.
      * This will be passed on with the quantity for the stock reset.
      *
-     * @return void
      * @throws \Mollie\Api\Exceptions\ApiException
+     * @return void
      */
     public function testStockReset()
     {
@@ -147,7 +153,7 @@ class RefundManagerTest extends TestCase
 
         # build a request object
         # so that we refund line-1 and make sure the stock is reset
-        $refundRequest = new RefundRequest('', '', null);
+        $refundRequest = new RefundRequest('', '', '', null);
         $refundRequest->addItem(new RefundRequestItem('line-1', 19.99, 1, 1));
 
         $refund = $this->manager->refund($order, $refundRequest, $fakeContext);
@@ -161,5 +167,4 @@ class RefundManagerTest extends TestCase
         $this->assertEquals(1, $this->fakeStockUpdater->getQuantity());
         $this->assertEquals('r-xyz-123', $this->fakeStockUpdater->getMollieRefundID());
     }
-
 }

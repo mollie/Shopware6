@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Installer;
 
+use Kiener\MolliePayments\Repository\CustomFieldSet\CustomFieldSetRepositoryInterface;
 use Kiener\MolliePayments\Struct\Voucher\VoucherType;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\System\CustomField\CustomFieldTypes;
 
 class CustomFieldsInstaller
 {
-
     # --------------------------------------------------------------------------------
     private const ID_CUSTOM_FIELDSET = 'f2acb41af0be41638540b31917007fa3';
     private const ID_RELATION_PRDUCTS = 'e01518b929b64fe5bd3ab0f16857dc32';
@@ -24,15 +23,15 @@ class CustomFieldsInstaller
 
 
     /**
-     * @var EntityRepositoryInterface
+     * @var CustomFieldSetRepositoryInterface
      */
     private $repoCustomFields;
 
 
     /**
-     * @param EntityRepositoryInterface $repoCustomFields
+     * @param CustomFieldSetRepositoryInterface $repoCustomFields
      */
-    public function __construct(EntityRepositoryInterface $repoCustomFields)
+    public function __construct(CustomFieldSetRepositoryInterface $repoCustomFields)
     {
         $this->repoCustomFields = $repoCustomFields;
     }

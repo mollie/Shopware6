@@ -33,6 +33,7 @@
                                         type="button"
                                         id="accountOrderDropdown"
                                         data-toggle="dropdown"
+                                        data-bs-toggle="dropdown"
                                         aria-haspopup="true"
                                         aria-expanded="false">
                                     {% sw_icon 'more-horizontal' %}
@@ -56,9 +57,12 @@
                                               class="order-table-header-context-menu-content-form"
                                               data-add-to-cart="true">
 
-                                            {% block page_account_subscriptions_item_context_menu_reorder_form_csrf %}
-                                                {{ sw_csrf('frontend.checkout.line-item.add') }}
-                                            {% endblock %}
+                                            {% if mollie_csrf_available %}
+                                                {% block page_account_subscriptions_item_context_menu_reorder_form_csrf %}
+                                                    {% sw_include '@MolliePayments/storefront/csrf/account/subscriptions-index-context-menu-reorder.twig' %}
+                                                {% endblock %}
+                                            {% endif %}
+
 
                                             {% block page_account_subscriptions_item_context_menu_reorder_form_redirect %}
                                                 <input type="hidden" name="redirectTo" value="frontend.cart.offcanvas"/>
@@ -103,9 +107,13 @@
                                                   method="post"
                                                   data-form-csrf-handler="true"
                                                   class="order-table-header-context-menu-content-form">
-                                                {% block page_account_subscriptions_item_context_menu_update_payment_form_csrf %}
-                                                    {{ sw_csrf('frontend.account.mollie.subscriptions.payment.update') }}
-                                                {% endblock %}
+
+                                                {% if mollie_csrf_available %}
+                                                    {% block page_account_subscriptions_item_context_menu_update_payment_form_csrf %}
+                                                        {% sw_include '@MolliePayments/storefront/csrf/account/subscriptions-index-context-menu-update-payment.twig' %}
+                                                    {% endblock %}
+                                                {% endif %}
+
                                                 {% block page_account_subscriptions_item_context_menu_update_payment_form_button %}
                                                     <button class="order-table-header-context-menu-content-link" type="submit">
                                                         {{ "molliePayments.subscriptions.account.mollieSubscriptionUpdatePayment"|trans|sw_sanitize }}
@@ -124,9 +132,13 @@
                                                       method="post"
                                                       data-form-csrf-handler="true"
                                                       class="order-table-header-context-menu-content-form">
-                                                    {% block page_account_subscriptions_item_context_menu_pause_form_csrf %}
-                                                        {{ sw_csrf('frontend.account.mollie.subscriptions.pause') }}
-                                                    {% endblock %}
+
+                                                    {% if mollie_csrf_available %}
+                                                        {% block page_account_subscriptions_item_context_menu_pause_form_csrf %}
+                                                            {% sw_include '@MolliePayments/storefront/csrf/account/subscriptions-index-context-menu-pause.twig' %}
+                                                        {% endblock %}
+                                                    {% endif %}
+
                                                     {% block page_account_subscriptions_item_context_menu_pause_form_button %}
                                                         <button class="order-table-header-context-menu-content-link" type="submit">
                                                             {{ "molliePayments.subscriptions.account.mollieSubscriptionPause"|trans|sw_sanitize }}
@@ -143,9 +155,13 @@
                                                       method="post"
                                                       data-form-csrf-handler="true"
                                                       class="order-table-header-context-menu-content-form">
-                                                    {% block page_account_subscriptions_item_context_menu_resume_form_csrf %}
-                                                        {{ sw_csrf('frontend.account.mollie.subscriptions.payment.resume') }}
-                                                    {% endblock %}
+
+                                                    {% if mollie_csrf_available %}
+                                                        {% block page_account_subscriptions_item_context_menu_resume_form_csrf %}
+                                                            {% sw_include '@MolliePayments/storefront/csrf/account/subscriptions-index-context-menu-resume.twig' %}
+                                                        {% endblock %}
+                                                    {% endif %}
+
                                                     {% block page_account_subscriptions_item_context_menu_resume_form_button %}
                                                         <button class="order-table-header-context-menu-content-link" type="submit">
                                                             {{ "molliePayments.subscriptions.account.mollieSubscriptionResume"|trans|sw_sanitize }}
@@ -164,9 +180,13 @@
                                                   method="post"
                                                   data-form-csrf-handler="true"
                                                   class="order-table-header-context-menu-content-form">
-                                                {% block page_account_subscriptions_item_context_menu_skip_form_csrf %}
-                                                    {{ sw_csrf('frontend.account.mollie.subscriptions.payment.skip') }}
-                                                {% endblock %}
+
+                                                {% if mollie_csrf_available %}
+                                                    {% block page_account_subscriptions_item_context_menu_skip_form_csrf %}
+                                                        {% sw_include '@MolliePayments/storefront/csrf/account/subscriptions-index-context-menu-skip.twig' %}
+                                                    {% endblock %}
+                                                {% endif %}
+
                                                 {% block page_account_subscriptions_item_context_menu_skip_form_button %}
                                                     <button class="order-table-header-context-menu-content-link" type="submit">
                                                         {{ "molliePayments.subscriptions.account.mollieSubscriptionSkip"|trans|sw_sanitize }}
@@ -194,9 +214,11 @@
                                                   id="subscriptionsDetailForm-{{ subscriptions.Id }}"
                                                   method="post">
 
-                                                {% block page_account_subscriptions_item_context_menu_cancel_form_csrf %}
-                                                    {{ sw_csrf('frontend.account.mollie.subscriptions.cancel') }}
-                                                {% endblock %}
+                                                {% if mollie_csrf_available %}
+                                                    {% block page_account_subscriptions_item_context_menu_cancel_form_csrf %}
+                                                        {% sw_include '@MolliePayments/storefront/csrf/account/subscriptions-index-context-menu-cancel.twig' %}
+                                                    {% endblock %}
+                                                {% endif %}
 
                                                 {% block page_account_subscriptions_item_context_menu_cancel_form_line_items_input %}
                                                     {% block page_account_subscriptions_item_context_menu_cancel_form_line_item_input %}
@@ -249,6 +271,8 @@
                                     type="submit"
                                     data-toggle="collapse"
                                     data-target="#subscription{{ subscription.id }}"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#subscription{{ subscription.id }}"
                                     aria-expanded="false"
                                     aria-controls="collapseExample">
                                 {% block page_account_subscription_item_subscription_table_body_cell_toggle_subscription_details_button_text %}
@@ -301,7 +325,9 @@
                                                                                         <button type="button"
                                                                                                 class="btn btn-primary"
                                                                                                 data-toggle="modal"
-                                                                                                data-target="#editBillingAddress{{ subscription.id }}">
+                                                                                                data-target="#editBillingAddress{{ subscription.id }}"
+                                                                                                data-bs-toggle="modal"
+                                                                                                data-bs-target="#editBillingAddress{{ subscription.id }}">
                                                                                             {{ "molliePayments.subscriptions.account.btnEditBillingAddress" | trans | sw_sanitize }}
                                                                                         </button>
                                                                                     {% endif %}
@@ -338,6 +364,7 @@
                                                                                         <button type="button"
                                                                                                 class="close"
                                                                                                 data-dismiss="modal"
+                                                                                                data-bs-dismiss="modal"
                                                                                                 aria-label="Close">
                                                                                             <span aria-hidden="true">&times;</span>
                                                                                         </button>
@@ -363,9 +390,11 @@
                                                                                                                       }
                                                                                                                   ) }}">
 
-                                                                                                                {% block component_address_subscription_billing_address_form_csrf %}
-                                                                                                                    {{ sw_csrf('frontend.account.mollie.subscriptions.billing.update') }}
-                                                                                                                {% endblock %}
+                                                                                                                {% if mollie_csrf_available %}
+                                                                                                                    {% block component_address_subscription_billing_address_form_csrf %}
+                                                                                                                        {% sw_include '@MolliePayments/storefront/csrf/account/subscriptions-index-billing-update.twig' %}
+                                                                                                                    {% endblock %}
+                                                                                                                {% endif %}
 
                                                                                                                 {% block component_address_subscription_billing_address_form_hidden_inputs %}
                                                                                                                 {% endblock %}
@@ -452,7 +481,9 @@
                                                                                     <button type="button"
                                                                                             class="btn btn-primary"
                                                                                             data-toggle="modal"
-                                                                                            data-target="#editShippingAddress{{ subscription.id }}">
+                                                                                            data-target="#editShippingAddress{{ subscription.id }}"
+                                                                                            data-bs-toggle="modal"
+                                                                                            data-bs-target="#editShippingAddress{{ subscription.id }}">
                                                                                         {{ "molliePayments.subscriptions.account.btnEditShippingAddress" | trans | sw_sanitize }}
                                                                                     </button>
                                                                                 {% endif %}
@@ -487,6 +518,7 @@
                                                                                             <button type="button"
                                                                                                     class="close"
                                                                                                     data-dismiss="modal"
+                                                                                                    data-bs-dismiss="modal"
                                                                                                     aria-label="Close">
                                                                                                 <span aria-hidden="true">&times;</span>
                                                                                             </button>
@@ -512,9 +544,11 @@
                                                                                                                       }
                                                                                                                   ) }}">
 
-                                                                                                                {% block component_address_subscription_shipping_address_form_csrf %}
-                                                                                                                    {{ sw_csrf('frontend.account.mollie.subscriptions.shipping.update') }}
-                                                                                                                {% endblock %}
+                                                                                                                {% if mollie_csrf_available %}
+                                                                                                                    {% block component_address_subscription_shipping_address_form_csrf %}
+                                                                                                                        {% sw_include '@MolliePayments/storefront/csrf/account/subscriptions-index-shipping-update.twig' %}
+                                                                                                                    {% endblock %}
+                                                                                                                {% endif %}
 
                                                                                                                 {% block component_address_subscription_shipping_address_form_hidden_inputs %}
                                                                                                                 {% endblock %}

@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Tests\Compatibility\Bundles\FlowBuilder\Actions;
 
-
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Actions\RefundOrderAction;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Actions\ShipOrderAction;
 use Mollie\Api\Resources\Refund;
@@ -21,7 +20,6 @@ use Shopware\Core\Framework\Util\Random;
 
 class ShipOrderActionTest extends TestCase
 {
-
     use FlowBuilderTestTrait;
 
     /**
@@ -42,8 +40,8 @@ class ShipOrderActionTest extends TestCase
      * If everything works out correctly, our shipment service is called with a full-shipment
      * as well as the correct order number.
      *
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function testShippingAction()
     {
@@ -66,5 +64,4 @@ class ShipOrderActionTest extends TestCase
         $this->assertEquals(true, $fakeShipment->isFullyShipped());
         $this->assertEquals('ord-123', $fakeShipment->getShippedOrderNumber());
     }
-
 }

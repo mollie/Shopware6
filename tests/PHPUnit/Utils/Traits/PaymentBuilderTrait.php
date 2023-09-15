@@ -70,8 +70,8 @@ trait PaymentBuilderTrait
 
     /**
      * @param string $taxStatus
-     * @param OrderLineItemCollection|null $lineItems
-     * @param CurrencyEntity|null $currency
+     * @param null|OrderLineItemCollection $lineItems
+     * @param null|CurrencyEntity $currency
      * @return array<string,mixed>
      */
     public function getExpectedLineItems(string $taxStatus, ?OrderLineItemCollection $lineItems = null, CurrencyEntity $currency): array
@@ -189,5 +189,4 @@ trait PaymentBuilderTrait
 
         return $order;
     }
-
 }

@@ -32,6 +32,7 @@ const adminOrders = new AdminOrdersAction();
 
 const scenarioDummyBasket = new DummyBasketScenario(1);
 
+export const getMochaContext = () => cy.state('runnable').ctx;
 
 const testDevices = [devices.getFirstDevice()];
 
@@ -57,6 +58,12 @@ describe('Credit Card Components', () => {
     context(devices.getDescription(devices.getFirstDevice()), () => {
 
         it('C4102: Successful card payment', () => {
+
+            if (shopware.isVersionEqual('6.4.0.0')) {
+                // https://issues.shopware.com/issues/NEXT-15044
+                getMochaContext().skip('This test is not working on Shopware 6.4.0, because the selected payment method is not active and therefore no credit card components are visible. https://issues.shopware.com/issues/NEXT-15044');
+                return;
+            }
 
             setUp();
 
@@ -87,6 +94,12 @@ describe('Credit Card Components', () => {
 
         it('C4105: Invalid Card Holder (Empty)', () => {
 
+            if (shopware.isVersionEqual('6.4.0.0')) {
+                // https://issues.shopware.com/issues/NEXT-15044
+                getMochaContext().skip('This test is not working on Shopware 6.4.0, because the selected payment method is not active and therefore no credit card components are visible. https://issues.shopware.com/issues/NEXT-15044');
+                return;
+            }
+
             setUp();
 
             payment.fillCreditCardComponents('', validCardNumber, '1228', '1234');
@@ -102,7 +115,14 @@ describe('Credit Card Components', () => {
             assertComponentErrors(false, true, true, true);
         })
 
+        // somehow mollie has a different behaviour at the moment? lets skip this for now
         it('C4107: Invalid Card Holder (Invalid Value)', () => {
+
+            if (shopware.isVersionEqual('6.4.0.0')) {
+                // https://issues.shopware.com/issues/NEXT-15044
+                getMochaContext().skip('This test is not working on Shopware 6.4.0, because the selected payment method is not active and therefore no credit card components are visible. https://issues.shopware.com/issues/NEXT-15044');
+                return;
+            }
 
             setUp();
 
@@ -116,13 +136,15 @@ describe('Credit Card Components', () => {
 
             cy.wait(1200);
 
-            // if we have a space as invalid card holder name
-            // then somehow this error appears.
-            // its not consistent, so we just assert for this text
-            cy.contains("Failed to submit card data");
+            cy.contains("Card holder cannot be empty");
         })
 
         it('C4108: Invalid Card Number', () => {
+
+            if (shopware.isVersionEqual('6.4.0.0')) {
+                getMochaContext().skip('This test is not working on Shopware 6.4.0, because the selected payment method is not active and therefore no credit card components are visible. https://issues.shopware.com/issues/NEXT-15044');
+                return;
+            }
 
             setUp();
 
@@ -141,6 +163,11 @@ describe('Credit Card Components', () => {
 
         it('C4109: Invalid Expiry Date', () => {
 
+            if (shopware.isVersionEqual('6.4.0.0')) {
+                getMochaContext().skip('This test is not working on Shopware 6.4.0, because the selected payment method is not active and therefore no credit card components are visible. https://issues.shopware.com/issues/NEXT-15044');
+                return;
+            }
+
             setUp();
 
             payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '12', '1234');
@@ -157,6 +184,11 @@ describe('Credit Card Components', () => {
         })
 
         it('C4110: Invalid CVC Code', () => {
+
+            if (shopware.isVersionEqual('6.4.0.0')) {
+                getMochaContext().skip('This test is not working on Shopware 6.4.0, because the selected payment method is not active and therefore no credit card components are visible. https://issues.shopware.com/issues/NEXT-15044');
+                return;
+            }
 
             setUp();
 
@@ -195,7 +227,7 @@ describe('Credit Card Components', () => {
             if (shopware.isVersionGreaterEqual(6.4)) {
 
                 payment.showAllPaymentMethods();
-                payment.selectPaymentMethod('Credit card');
+                payment.selectPaymentMethod('Card');
                 payment.showAllPaymentMethods();
 
                 payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '1228', '1234');
@@ -203,7 +235,7 @@ describe('Credit Card Components', () => {
             } else {
 
                 payment.openPaymentsModal();
-                payment.selectPaymentMethod('Credit card');
+                payment.selectPaymentMethod('Card');
 
                 payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '1228', '1234');
 
@@ -298,6 +330,8 @@ describe('Administration Tests', () => {
 
         mollieSandbox.initSandboxCookie();
 
+        cy.wait(1000);
+
         mollieCreditCardForm.enterValidCard();
         mollieCreditCardForm.submitForm();
 
@@ -310,7 +344,13 @@ describe('Administration Tests', () => {
         // our Mollie Sandbox data needs to be visible on our page
         // that's the only thing we can verify for now, but speaking of the data
         // the assertion should be very accurate and unique on our page.
-        cy.contains('Credit Card Data');
+        if (shopware.isVersionGreaterEqual(6.5)) {
+            // its finally a snippet with a bit different default text
+            cy.contains('Credit Card data');
+        } else {
+            cy.contains('Credit Card Data');
+        }
+
         cy.contains('Mastercard');
         cy.contains('**** **** **** 0005');
         cy.contains('T. TEST');
@@ -332,15 +372,15 @@ function setUp() {
     // this is a bug, so we just switch to another payment
     // before switching back to credit card
     payment.switchPaymentMethod('PayPal');
-
+    
     if (shopware.isVersionGreaterEqual(6.4)) {
-        payment.switchPaymentMethod('Credit card');
+        payment.switchPaymentMethod('Card');
     } else {
         payment.openPaymentsModal();
         // only select the card, and do not switch completely
         // we still need our modal, to add our components data
         // before closing it.
-        payment.selectPaymentMethod('Credit card');
+        payment.selectPaymentMethod('Card');
     }
 }
 

@@ -15,6 +15,13 @@ export default class AdminPluginAction {
         } else {
             cy.visit('/admin#/sw/plugin/settings/MolliePayments');
         }
+
+        cy.wait(4000);
+    }
+
+    savePlugConfiguration() {
+        cy.get('.sw-extension-config__save-action').click();
+        cy.wait(4000);
     }
 
 }

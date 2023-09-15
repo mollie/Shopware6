@@ -12,7 +12,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 trait BuilderTestTrait
 {
-
     /**
      * @param TestCase $testCase
      * @param string $generatedURL
@@ -24,7 +23,11 @@ trait BuilderTestTrait
 
         $routingDetector = new RoutingDetector(new RequestStack(new Request()));
 
-        return new RoutingBuilder($fakeRouter, $routingDetector, new FakePluginSettings(''));
+        return new RoutingBuilder(
+            $fakeRouter,
+            $routingDetector,
+            new FakePluginSettings(''),
+            ''
+        );
     }
-
 }

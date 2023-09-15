@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Struct\OrderTransaction;
 
 class OrderTransactionAttributes
 {
-
     /**
      * @var null|string
      */

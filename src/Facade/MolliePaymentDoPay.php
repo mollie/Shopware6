@@ -10,6 +10,7 @@ use Kiener\MolliePayments\Exception\MollieOrderExpiredException;
 use Kiener\MolliePayments\Exception\PaymentUrlException;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\CustomerService;
+use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Order;
@@ -210,7 +211,7 @@ class MolliePaymentDoPay
         # this will prepare the subscriptions in our database.
         # the confirmation of these, however, will be done in a webhook
         $subscriptionId = $this->subscriptionManager->createSubscription($order, $salesChannelContext);
-        
+
         # now update our custom struct values
         # and immediately set our Mollie Order ID and more
         $orderCustomFields->setMollieOrderId($mollieOrder->id);
@@ -250,9 +251,39 @@ class MolliePaymentDoPay
 
             $customer = $this->extractor->extractCustomer($order, $salesChannelContext);
 
+            $oneClickShouldSaveCard = false;
+            $oneClickIsReused = false;
+
+            $customFields = $customer->getCustomFields();
+
+            if (isset($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS])) {
+                $mollieData = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS];
+
+                $oneClickShouldSaveCard = (isset($mollieData[CustomerService::CUSTOM_FIELDS_KEY_SHOULD_SAVE_CARD_DETAIL])) ? (bool)$mollieData[CustomerService::CUSTOM_FIELDS_KEY_SHOULD_SAVE_CARD_DETAIL] : false;
+                $oneClickIsReused = (isset($mollieData[CustomerService::CUSTOM_FIELDS_KEY_MANDATE_ID])) ? (bool)$mollieData[CustomerService::CUSTOM_FIELDS_KEY_MANDATE_ID] : false;
+            }
+
             # create customers for every subscription
             # or if we don't have a guest and our feature is enabled
-            if ($isSubscription || (!$customer->getGuest() && $settings->createCustomersAtMollie())) {
+            $createCustomer = false;
+
+            # subscription requires it
+            if ($isSubscription) {
+                $createCustomer = true;
+            }
+
+            # if real customer, and setting is enabled
+            if (!$customer->getGuest() && $settings->createCustomersAtMollie()) {
+                $createCustomer = true;
+            }
+
+            # if we have a customer that wants to save a mandate or reuse it, and its no guest and our setting is also enabled
+            # then create a customer on the mollie side
+            if (($oneClickShouldSaveCard || $oneClickIsReused) && !$customer->getGuest() && $settings->isOneClickPaymentsEnabled()) {
+                $createCustomer = true;
+            }
+
+            if ($createCustomer) {
                 $this->customerService->createMollieCustomer(
                     $customer->getId(),
                     $salesChannelContext->getSalesChannel()->getId(),
@@ -260,7 +291,6 @@ class MolliePaymentDoPay
                 );
             }
         } catch (CouldNotCreateMollieCustomerException|CustomerCouldNotBeFoundException $e) {
-
             # TODO do we really need to catch this? shouldnt it fail fast?
 
             $this->logger->error(

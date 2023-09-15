@@ -3,7 +3,8 @@
 namespace Kiener\MolliePayments\Repository\Product;
 
 use Shopware\Core\Content\Product\ProductEntity;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -11,17 +12,16 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class ProductRepository implements ProductRepositoryInterface
 {
-
     /**
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $repoProducts;
 
 
     /**
-     * @param EntityRepositoryInterface $repoProducts
+     * @param EntityRepository $repoProducts
      */
-    public function __construct(EntityRepositoryInterface $repoProducts)
+    public function __construct($repoProducts)
     {
         $this->repoProducts = $repoProducts;
     }
@@ -60,5 +60,15 @@ class ProductRepository implements ProductRepositoryInterface
         $elements = $products->getElements();
 
         return $elements;
+    }
+
+    /**
+     * @param Criteria $criteria
+     * @param Context $context
+     * @return EntitySearchResult
+     */
+    public function search(Criteria $criteria, Context $context): EntitySearchResult
+    {
+        return $this->repoProducts->search($criteria, $context);
     }
 }

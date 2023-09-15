@@ -15,7 +15,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class RegularPaymentRemover extends PaymentMethodRemover
 {
-
     /**
      * @param ContainerInterface $container
      * @param RequestStack $requestStack

@@ -2,13 +2,11 @@
 
 namespace Kiener\MolliePayments\Tests\Service\ApplePayDirect\Models;
 
-
 use Kiener\MolliePayments\Components\ApplePayDirect\Models\ApplePayCart;
 use PHPUnit\Framework\TestCase;
 
 class ApplePayCartTest extends TestCase
 {
-
     /**
      * This test verifies that the taxes
      * can be set correctly.
@@ -96,5 +94,4 @@ class ApplePayCartTest extends TestCase
 
         $this->assertEquals(33.49, $cart->getAmount());
     }
-
 }

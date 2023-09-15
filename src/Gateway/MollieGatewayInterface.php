@@ -9,7 +9,6 @@ use Mollie\Api\Resources\Subscription;
 
 interface MollieGatewayInterface
 {
-
     /**
      * @param string $salesChannelID
      */

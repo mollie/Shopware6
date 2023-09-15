@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRen
 
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
+use Kiener\MolliePayments\Repository\Order\OrderAddressRepositoryInterface;
 use Kiener\MolliePayments\Service\OrderService;
 use Mollie\Api\Resources\Payment;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
@@ -11,22 +12,18 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionColl
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\EntityNotFoundException;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface;
-use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class SubscriptionRenewing
 {
-
     /**
      * @var NumberRangeValueGeneratorInterface
      */
     private $numberRanges;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var OrderAddressRepositoryInterface
      */
     private $repoOrderAddress;
 
@@ -43,11 +40,11 @@ class SubscriptionRenewing
 
     /**
      * @param NumberRangeValueGeneratorInterface $numberRanges
-     * @param EntityRepositoryInterface $repoOrderAddress
+     * @param OrderAddressRepositoryInterface $repoOrderAddress
      * @param OrderService $orderService
      * @param OrderCloneService $orderCloneService
      */
-    public function __construct(NumberRangeValueGeneratorInterface $numberRanges, EntityRepositoryInterface $repoOrderAddress, OrderService $orderService, OrderCloneService $orderCloneService)
+    public function __construct(NumberRangeValueGeneratorInterface $numberRanges, OrderAddressRepositoryInterface $repoOrderAddress, OrderService $orderService, OrderCloneService $orderCloneService)
     {
         $this->numberRanges = $numberRanges;
         $this->repoOrderAddress = $repoOrderAddress;

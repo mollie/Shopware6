@@ -10,6 +10,7 @@ use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Repository\Order\OrderAddressRepository;
+use Kiener\MolliePayments\Repository\Order\OrderAddressRepositoryInterface;
 use Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepository;
 use Kiener\MolliePayments\Service\Cart\CartBackupService;
 use Kiener\MolliePayments\Service\CartService;
@@ -34,7 +35,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class ApplePayDirect
 {
-
     /**
      * @var ApplePayDomainVerificationService
      */
@@ -102,7 +102,7 @@ class ApplePayDirect
     private $orderService;
 
     /**
-     * @var OrderAddressRepository
+     * @var OrderAddressRepositoryInterface
      */
     private $repoOrderAdresses;
 
@@ -121,9 +121,9 @@ class ApplePayDirect
      * @param MollieApiFactory $mollieApiFactory
      * @param ShopService $shopService
      * @param OrderService $orderService
-     * @param OrderAddressRepository $repoOrderAdresses
+     * @param OrderAddressRepositoryInterface $repoOrderAdresses
      */
-    public function __construct(ApplePayDomainVerificationService $domainFileDownloader, ApplePayPayment $paymentHandler, MolliePaymentDoPay $molliePayments, CartServiceInterface $cartService, ApplePayFormatter $formatter, ApplePayShippingBuilder $shippingBuilder, SettingsService $pluginSettings, CustomerService $customerService, PaymentMethodRepository $repoPaymentMethods, CartBackupService $cartBackupService, MollieApiFactory $mollieApiFactory, ShopService $shopService, OrderService $orderService, OrderAddressRepository $repoOrderAdresses)
+    public function __construct(ApplePayDomainVerificationService $domainFileDownloader, ApplePayPayment $paymentHandler, MolliePaymentDoPay $molliePayments, CartServiceInterface $cartService, ApplePayFormatter $formatter, ApplePayShippingBuilder $shippingBuilder, SettingsService $pluginSettings, CustomerService $customerService, PaymentMethodRepository $repoPaymentMethods, CartBackupService $cartBackupService, MollieApiFactory $mollieApiFactory, ShopService $shopService, OrderService $orderService, OrderAddressRepositoryInterface $repoOrderAdresses)
     {
         $this->domainFileDownloader = $domainFileDownloader;
         $this->paymentHandler = $paymentHandler;
@@ -175,15 +175,19 @@ class ApplePayDirect
         $enabled = false;
 
         if (is_array($salesChannelPaymentIDs) && $settings->isEnableApplePayDirect()) {
-            $applePayMethodID = $this->repoPaymentMethods->getActiveApplePayID($context->getContext());
+            try {
+                $applePayMethodID = $this->repoPaymentMethods->getActiveApplePayID($context->getContext());
 
-            foreach ($salesChannelPaymentIDs as $tempID) {
-                # verify if our Apple Pay payment method is indeed in use
-                # for the current sales channel
-                if ($tempID === $applePayMethodID) {
-                    $enabled = true;
-                    break;
+                foreach ($salesChannelPaymentIDs as $tempID) {
+                    # verify if our Apple Pay payment method is indeed in use
+                    # for the current sales channel
+                    if ($tempID === $applePayMethodID) {
+                        $enabled = true;
+                        break;
+                    }
                 }
+            } catch (\Exception $ex) {
+                # it can happen that apple pay is just not active in the system
             }
         }
 
@@ -417,10 +421,15 @@ class ApplePayDirect
         # and never the one from the customer (if already existing)
         if ($order->getAddresses() instanceof OrderAddressCollection) {
             foreach ($order->getAddresses() as $address) {
+                # attention, Apple Pay does not have a company name
+                # therefore we always need to make sure to remove the company field in our order
                 $this->repoOrderAdresses->updateAddress(
                     $address->getId(),
                     $firstname,
                     $lastname,
+                    '',
+                    '',
+                    '',
                     $street,
                     $zipcode,
                     $city,

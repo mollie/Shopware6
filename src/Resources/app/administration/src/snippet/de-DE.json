@@ -1,6 +1,9 @@
 {
   "global": {
     "businessEvents": {
+      "mollie_checkout_order_success": " Bestellung erfolgreich",
+      "mollie_checkout_order_failed": " Bestellung fehlgeschlagen",
+      "mollie_checkout_order_canceled": " Bestellung abgebrochen",
       "mollie_webhook_received_All": " Mollie Webhook empfangen (Alle)",
       "mollie_webhook_received_status_authorized": " Mollie Webhook empfangen (Authorisiert)",
       "mollie_webhook_received_status_failed": " Mollie Webhook empfangen (Fehler)",
@@ -77,6 +80,10 @@
         "info2": "Diese Einstellungen können zu einer anderen Gesamtsumme als der Gesamtsumme der Einzelposten führen. Wenn Mollie diese Beträge abgleicht und feststellt, dass sie nicht übereinstimmen, verursacht dies einen Fehler.",
         "info3": "Sie können diese Funktion verwenden, um Rundungsprobleme in Ihrem Checkout zu vermeiden. Wenn diese aktiviert ist, fügt sie eine separate Position im Mollie-Dashboard für die Rundungsdifferenz hinzu, und die Kunden zahlen die von Shopware berechnete Gesamtsumme."
       },
+      "order": {
+        "bankTransferDueDateKlarnaLimitReached": "Es ist nicht möglich, Klarna Pay now, Klarna Slice it oder Klarna Pay later als Zahlungsmethode zu verwenden, wenn Ihr Ablaufdatum mehr als 28 Tage in der Zukunft liegt, es sei denn, zwischen dem Händler und Klarna wurde eine andere Höchstgrenze vereinbart.",
+        "bankTransferDueDateLimitReached": "Es ist nicht möglich, die Bestelllaufzeit auf mehr als 100 Tage festzulegen."
+      },
       "support": {
         "modalTitle": "Unterstützung von Mollie anfordern",
         "btnCancel": "Abbrechen",
@@ -151,7 +158,7 @@
           "btnResetLine": "Zeile zurücksetzen",
           "checkDeductPromotion": "Rabatt abziehen"
         },
-        "roundDiffItemAdded" : "Automatische Position für Rundungen wurde hinzugefügt"
+        "roundDiffItemAdded": "Automatische Position für Rundungen wurde hinzugefügt"
       },
       "instructions": {
         "linkResetTutorials": "Tutorials zurücksetzen",
@@ -167,7 +174,9 @@
         "titlePartialItems": "Teilweise Rückerstattung (mit Positionen)",
         "textPartialItems": "Wenn Sie Mengen und Artikel in Mollie als erstattet markieren möchten, verwenden Sie das obige Formular. Legen Sie Ihre Mengen fest und geben Sie einen benutzerdefinierten Betrag für jeden Artikel an, der erstattet wird. Die Gesamtsumme wird dann im Textfeld des finalen Erstattungsbetrages angezeigt. Denken Sie daran, dass es immer noch möglich ist, diesen endgültigen Betrag anzupassen, bevor Sie mit der Rückerstattung beginnen.",
         "titlePartialPromotions": "Teilweise Rückerstattung (mit Rabatten)",
-        "textPartialPromotions": "Wenn Sie eine oder mehrere Rabatte in Ihrem Warenkorb haben, dann sind diese in Shopware als eigene Position in der Bestellung angelegt. Wenn Sie nun alle rabattierten Artikel erstatten möchten, erstatten Sie einfach alle Positionen der Artikel sowie die gesamte Rabattposition selbst. Wenn Sie jedoch nur einen Teil der rabattierten Artikel erstatten möchten, können Sie den angewendeten Rabatt automatisch für jeden einzelnen Artikel abziehen lassen. Sie können Werte natürlich jederzeit ändern, wenn sie nicht korrekt sind."
+        "textPartialPromotions": "Wenn Sie eine oder mehrere Rabatte in Ihrem Warenkorb haben, dann sind diese in Shopware als eigene Position in der Bestellung angelegt. Wenn Sie nun alle rabattierten Artikel erstatten möchten, erstatten Sie einfach alle Positionen der Artikel sowie die gesamte Rabattposition selbst. Wenn Sie jedoch nur einen Teil der rabattierten Artikel erstatten möchten, können Sie den angewendeten Rabatt automatisch für jeden einzelnen Artikel abziehen lassen. Sie können Werte natürlich jederzeit ändern, wenn sie nicht korrekt sind.",
+        "titleRoundingDiff": "Rundungsdifferenz",
+        "textRoundingDiff": "Bei einer vollständigen Rückerstattung werden Rundungsdifferenzen mit erstattet"
       },
       "summary": {
         "dataLoading": "Daten werden geladen...",
@@ -180,11 +189,16 @@
         "captionRefunded": "Rückerstattete Menge",
         "captionRemaining": "Rückerstattbar",
         "btnFixDiff": "Differenz ausfüllen",
-        "placeholderDescription": "Füge dieser Erstattung eine optionale Notiz hinzu.",
+        "placeholderDescription": "Geben Sie eine Beschreibung für den Kontoauszug bzw. Kartenabrechnung an. Max. 140 Zeichen",
+        "lblDescription": "Beschreibung (optional) ({characters}/140 Zeichen)",
+        "descriptionHelp": "Dies wird, wenn möglich, auf der Bank- oder Kartenabrechnung des Verbrauchers angezeigt. Die Nachricht wird nach 140 Zeichen abgeschnitten.",
+        "placeholderInternalDescription": "Geben Sie Ihre interne Beschreibung ein",
+        "lblInternalDescription": "Interne Beschreibung (optional)",
+        "internalDescriptionHelp": "Dies wird als lokale Beschreibung in der Verwaltungsschnittstelle angezeigt.",
         "checkVerification": "Ich habe den Betrag der Rückerstattung geprüft und die Anzahl der Positionen für Erstattung und Lagerbestand konfiguriert.",
         "btnRefund": "Rückerstatten",
         "btnFullRefund": "Vollständig rückerstatten",
-        "roundDiffItemAdded" : "Position für Rundungen"
+        "roundDiffItemAdded": "Position für Rundungen"
       },
       "refunds": {
         "title": "Rückerstattungen im Mollie Dashboard",
@@ -194,6 +208,7 @@
             "amount": "Betrag",
             "status": "Status",
             "description": "Beschreibung",
+            "internalDescription": "Interne beschreibung",
             "composition": "Zusammensetzung",
             "date": "Datum"
           },
@@ -308,13 +323,13 @@
       "TYPE_WEEKS": "Woche(n)",
       "TYPE_MONTHS": "Monat(e)",
       "confirm": {
-        "cancelTitle" : "Abonnement beenden?",
+        "cancelTitle": "Abonnement beenden?",
         "cancel": "Kündigen Sie das Abonnement Ihres Kunden.",
-        "pauseTitle" : "Abonnement pausieren?",
+        "pauseTitle": "Abonnement pausieren?",
         "pause": "Pausieren Sie das Abonnement, bis Sie es wieder fortsetzen.",
-        "resumeTitle" : "Abonnement fortsetzen?",
+        "resumeTitle": "Abonnement fortsetzen?",
         "resume": "Das Abonnement erneut fortsetzen.",
-        "skipTitle" : "Nächste Rate überspringen?",
+        "skipTitle": "Nächste Rate überspringen?",
         "skip": "Überspringen Sie die nächste Rate im Abonnement. Es wird danach automatisch fortgesetzt."
       },
       "alerts": {
@@ -392,6 +407,7 @@
   },
   "sw-order": {
     "detailExtended": {
+      "titleCreditCardData" : "Kreditkartendaten",
       "buttonMolliePaymentLink": "In die Zwischenablage kopieren",
       "columnRefunded": "Rückerstattet",
       "columnShipped": "Versandt",
@@ -427,6 +443,29 @@
       "mollie_subscription": {
         "label": "Abonnements"
       }
+    }
+  },
+  "sw-flow": {
+    "triggers": {
+      "mollie": "Mollie",
+      "refund": "Rückerstattung",
+      "subscription": "Abonnement",
+      "webhookReceived": "Webhooks",
+      "status": "Status",
+      "started": "Gestartet",
+      "ended": "Beendet",
+      "paused": "Pausiert",
+      "renewalReminder": "Verlängerungserinnerung",
+      "renewed": "Erneuert",
+      "resumed": "Verlängert",
+      "skipped": "Ausgesetzt",
+      "all": "Alle",
+      "canceled": "Abgebrochen",
+      "expired": "Abgelaufen",
+      "partiallyRefunded": "Rückerstattet (teilweise)",
+      "orderSuccess" : "Bestellung erfolgreich",
+      "orderFailed" : "Bestellung fehlgeschlagen",
+      "orderCanceled" : "Bestellung abgebrochen"
     }
   }
 }

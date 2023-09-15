@@ -272,5 +272,41 @@ context("Store API Subscription Routes", () => {
 
     });
 
+    describe('POST /cancel', function () {
+
+        const url = '/mollie/subscription/' + fakeSubscriptionID + '/cancel';
+
+        it('C330671: /cancel with unauthorized customer @core', () => {
+            const request = new Promise((resolve) => {
+                client.post(url).then(response => {
+                    resolve({'data': response.data});
+                });
+            })
+            cy.wrap(request).its('data').then(response => {
+                cy.wrap(response).its('status').should('eq', 401)
+            });
+        })
+
+        it('C330672: /cancel with authorized customer @core', () => {
+
+            loginAction.registerAndLogin('loginDone');
+
+            cy.wait('@loginDone').then(() => {
+
+                const request = new Promise((resolve) => {
+                    client.post(url, {}).then(response => {
+                        resolve({'data': response.data});
+                    });
+                })
+
+                cy.wrap(request).its('data').then(response => {
+                    cy.wrap(response).its('status').should('eq', 500)
+                    expect(response.data.errors[0].detail).to.contain('Subscription ' + fakeSubscriptionID + ' not found in Shopware');
+                });
+            });
+        })
+
+    });
+
 })
 

@@ -9,6 +9,8 @@ use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
+use Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepositoryInterface;
+use Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepositoryInterface;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentDetails;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
@@ -24,7 +26,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEnti
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
@@ -34,7 +36,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 
 class NotificationFacade
 {
-
     /**
      * @var MollieGatewayInterface
      */
@@ -51,12 +52,12 @@ class NotificationFacade
     private $statusUpdater;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var PaymentMethodRepositoryInterface
      */
     private $repoPaymentMethods;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var OrderTransactionRepositoryInterface
      */
     private $repoOrderTransactions;
 
@@ -100,8 +101,8 @@ class NotificationFacade
      * @param MollieGatewayInterface $gatewayMollie
      * @param OrderStatusConverter $statusConverter
      * @param OrderStatusUpdater $statusUpdater
-     * @param EntityRepositoryInterface $repoPaymentMethods
-     * @param EntityRepositoryInterface $repoOrderTransactions
+     * @param PaymentMethodRepositoryInterface $repoPaymentMethods
+     * @param OrderTransactionRepositoryInterface $repoOrderTransactions
      * @param FlowBuilderFactory $flowBuilderFactory
      * @param FlowBuilderEventFactory $flowBuilderEventFactory
      * @param SettingsService $serviceService
@@ -110,7 +111,7 @@ class NotificationFacade
      * @param LoggerInterface $logger
      * @throws \Exception
      */
-    public function __construct(MollieGatewayInterface $gatewayMollie, OrderStatusConverter $statusConverter, OrderStatusUpdater $statusUpdater, EntityRepositoryInterface $repoPaymentMethods, EntityRepositoryInterface $repoOrderTransactions, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SettingsService $serviceService, SubscriptionManager $subscription, OrderService $orderService, LoggerInterface $logger)
+    public function __construct(MollieGatewayInterface $gatewayMollie, OrderStatusConverter $statusConverter, OrderStatusUpdater $statusUpdater, PaymentMethodRepositoryInterface $repoPaymentMethods, OrderTransactionRepositoryInterface $repoOrderTransactions, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SettingsService $serviceService, SubscriptionManager $subscription, OrderService $orderService, LoggerInterface $logger)
     {
         $this->gatewayMollie = $gatewayMollie;
         $this->statusConverter = $statusConverter;
@@ -197,14 +198,12 @@ class NotificationFacade
         $mollieOrder = null;
 
         if (!empty($orderAttributes->getMollieOrderId())) {
-
             # fetch the order of our mollie ID
             # from our sales channel mollie profile
             $mollieOrder = $this->gatewayMollie->getOrder($mollieOrderId);
             $molliePayment = $this->statusConverter->getLatestPayment($mollieOrder);
             $status = $this->statusConverter->getMollieOrderStatus($mollieOrder);
         } elseif ($orderAttributes->isTypeSubscription()) {
-
             # subscriptions are automatically charged using a payment ID
             # so we do not have an order, but a payment instead
             $molliePayment = $this->gatewayMollie->getPayment($molliePaymentId);
@@ -242,7 +241,6 @@ class NotificationFacade
         # if our payment expired, then we can also expire our local subscription in the database.
 
         switch ($status) {
-
             case MolliePaymentStatus::MOLLIE_PAYMENT_PAID:
             case MolliePaymentStatus::MOLLIE_PAYMENT_PENDING:
             case MolliePaymentStatus::MOLLIE_PAYMENT_AUTHORIZED:
@@ -288,8 +286,10 @@ class NotificationFacade
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('id', $transactionId));
         $criteria->addAssociation('order');
+        $criteria->addAssociation('order.salesChannel');
         $criteria->addAssociation('order.lineItems');
         $criteria->addAssociation('order.currency');
+        $criteria->addAssociation('order.transactions');
         $criteria->addAssociation('paymentMethod');
 
         return $this->repoOrderTransactions->search($criteria, $context)->first();
@@ -314,24 +314,6 @@ class NotificationFacade
         return $result;
     }
 
-    /**
-     * @param OrderEntity $order
-     * @return string
-     */
-    private function getMollieId(OrderEntity $order): string
-    {
-        $customFields = $order->getCustomFields();
-
-        if (!isset($customFields['mollie_payments'])) {
-            return "";
-        }
-
-        if (!isset($customFields['mollie_payments']['order_id'])) {
-            return "";
-        }
-
-        return (string)$customFields['mollie_payments']['order_id'];
-    }
 
     /**
      * @param OrderTransactionEntity $transaction
@@ -388,7 +370,6 @@ class NotificationFacade
         $paymentEvent = null;
 
         switch ($status) {
-
             case MolliePaymentStatus::MOLLIE_PAYMENT_FAILED:
                 $paymentEvent = $this->flowBuilderEventFactory->buildWebhookReceivedFailedEvent($swOrder, $context);
                 break;

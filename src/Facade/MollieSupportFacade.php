@@ -8,7 +8,6 @@ use Shopware\Core\Framework\Context;
 
 class MollieSupportFacade
 {
-
     /**
      * @var AttachmentCollector
      */

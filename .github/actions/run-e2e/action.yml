@@ -89,7 +89,7 @@ runs:
         sleep 15
         # now change the domain of our shop, mollie doesn't work with localhost
         sudo echo "127.0.0.1 ${{ inputs._SHOP_DOMAIN }}" | sudo tee -a /etc/hosts
-        docker exec shop bash -c "mysql -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='https://${{ inputs._SHOP_DOMAIN }}' WHERE url NOT LIKE 'default.%';\""
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='https://${{ inputs._SHOP_DOMAIN }}' WHERE url NOT LIKE 'default.%';\""
 
     - name: Update Shopware Config
       shell: bash
@@ -106,6 +106,11 @@ runs:
         docker cp ${{ inputs._ZIP_FILE }} shop:/var/www/html/custom/plugins/MolliePayments.zip
         docker exec shop bash -c 'cd /var/www/html/custom/plugins && unzip -qq -o MolliePayments.zip'
 
+    - name: Configure Shopware
+      shell: bash
+      run: |
+        docker exec shop bash -c 'php bin/console system:config:set core.loginRegistration.showAccountTypeSelection true'
+
     - name: Install Plugin
       shell: bash
       run: |
@@ -120,7 +125,15 @@ runs:
         docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.testMode true'
         docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.liveApiKey ${{ inputs.MOLLIE_APIKEY_TEST }}'
         docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.testApiKey ${{ inputs.MOLLIE_APIKEY_TEST }}'
+        docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.formatOrderNumber github_{ordernumber}'
         docker exec shop bash -c 'php bin/console cache:clear'
+
+    # --------------------------------------------------------------------------------------------------------------------------------------
+
+    - name: DAL Validate
+      shell: bash
+      run: |
+        docker exec shop bash -c 'php bin/console dal:validate'
 
     # --------------------------------------------------------------------------------------------------------------------------------------
 

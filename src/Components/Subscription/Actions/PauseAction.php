@@ -9,7 +9,6 @@ use Shopware\Core\Framework\Context;
 
 class PauseAction extends BaseAction
 {
-
     /**
      * @param string $subscriptionId
      * @param Context $context

@@ -1,0 +1,114 @@
+.mollie-credit-card-mandate-manage {
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+.mollie-credit-card-mandate-list {
+    .mollie-credit-card-mandate {
+        &:last-child {
+            margin-bottom: 15px;
+        }
+    }
+}
+
+.mollie-credit-card-mandate-remove-modal {
+    .modal-body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        p {
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+    }
+}
+
+.mollie-credit-card-mandate {
+    margin-bottom: 25px;
+
+    .mollie-credit-card-mandate-radio {
+        margin-top: 13px;
+    }
+
+    .mollie-credit-card-mandate-label {
+        margin-bottom: 0;
+    }
+
+    .mollie-credit-card-mandate-actions-item {
+        margin-top: 4px;
+        display: flex;
+        column-gap: 8px;
+        align-items: center;
+        cursor: pointer;
+
+        svg {
+            top: 0;
+        }
+
+        .mollie-credit-card-mandate-actions-item-text {
+            color: $sw-color-brand-primary;
+        }
+
+        &:hover {
+            .mollie-credit-card-mandate-actions-item-text {
+                color: $link-hover-color;
+            }
+        }
+    }
+
+    .mollie-credit-card-mandate-title {
+        font-weight: 700;
+        font-size: 14px;
+        line-height: 16px;
+    }
+
+    .mollie-credit-card-mandate-full-view {
+        position: relative;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 210px;
+        height: 95px;
+        border-radius: 8px;
+        background-color: $sw-color-brand-primary;
+        margin-top: 12px;
+
+        .mollie-credit-card-mandate-full-view-card-type {
+            color: $white;
+            margin: 0;
+            font-size: 20px;
+            line-height: 20px;
+        }
+
+        .mollie-credit-card-mandate-full-view-card-info {
+            display: flex;
+            flex-direction: column;
+
+            .mollie-credit-card-mandate-full-view-card-number {
+                color: $white;
+                font-weight: 400;
+                font-size: 12px;
+                line-height: 18px;
+                margin-bottom: 4px;
+            }
+
+            .mollie-credit-card-mandate-full-view-card-holder-name {
+                color: $white;
+                font-weight: 600;
+                font-size: 12px;
+                line-height: 18px;
+            }
+        }
+    }
+
+    .mollie-credit-card-mandate-compact-view-card-holder-name {
+        color: $gray-300;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 21px;
+        display: block;
+    }
+}

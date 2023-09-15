@@ -1,0 +1,11 @@
+{% sw_extends '@Storefront/storefront/base.html.twig' %}
+
+{% block base_main %}
+    <script>
+        window.mollie_javascript_use_shopware = '{{ mollie_javascript_use_shopware }}'
+    </script>
+    {% if mollie_javascript_use_shopware != '1' %}
+        <script src="{{ asset('bundles/molliepayments/mollie-payments.js', 'asset') }}"></script>
+    {% endif %}
+    {{ parent() }}
+{% endblock %}

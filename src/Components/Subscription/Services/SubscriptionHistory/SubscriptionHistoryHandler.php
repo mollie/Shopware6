@@ -11,7 +11,6 @@ use Shopware\Core\Framework\Uuid\Uuid;
 
 class SubscriptionHistoryHandler
 {
-
     /**
      * @var SubscriptionRepository
      */

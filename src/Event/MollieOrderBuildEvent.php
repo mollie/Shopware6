@@ -7,7 +7,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class MollieOrderBuildEvent
 {
-
     /**
      * @var array<mixed>
      */

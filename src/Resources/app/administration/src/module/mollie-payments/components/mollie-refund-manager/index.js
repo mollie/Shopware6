@@ -55,6 +55,7 @@ Component.register('mollie-refund-manager', {
             pendingRefunds: 0,
             checkVerifyRefund: false,
             refundDescription: '',
+            refundInternalDescription:'',
             roundingDiff: 0,
             // -------------------------------
             // tutorials
@@ -121,6 +122,14 @@ Component.register('mollie-refund-manager', {
          */
         isAclCancelAllowed() {
             return this.acl.can('mollie_refund_manager:delete');
+        },
+
+        /**
+         * Return the title with a count
+         * @returns {*}
+         */
+        descriptionCharacterCountingTitle(){
+            return this.$tc('mollie-payments.refund-manager.summary.lblDescription',0,{characters:this.refundDescription.length})
         },
 
     },
@@ -221,6 +230,7 @@ Component.register('mollie-refund-manager', {
             // verification checkbox and clean our text
             this.checkVerifyRefund = false;
             this.refundDescription = '';
+            this.refundInternalDescription = '';
         },
 
         /**
@@ -357,7 +367,7 @@ Component.register('mollie-refund-manager', {
             const diff = Math.abs(this.refundAmount - this.remainingAmount);
 
             // show if 5 cents or less diff
-            return diff > 0 && diff <= 0.05;
+            return diff > 0 && diff <= 0.07;
         },
 
         /**
@@ -406,6 +416,7 @@ Component.register('mollie-refund-manager', {
                     orderId: this.order.id,
                     amount: this.refundAmount,
                     description: this.refundDescription,
+                    internalDescription: this.refundInternalDescription,
                     items: itemData,
                 })
                 .then((response) => {
@@ -436,6 +447,7 @@ Component.register('mollie-refund-manager', {
                 {
                     orderId: this.order.id,
                     description: this.refundDescription,
+                    internalDescription: this.refundInternalDescription,
                 })
                 .then((response) => {
                     if (response.success) {
@@ -489,7 +501,11 @@ Component.register('mollie-refund-manager', {
             const result = [];
 
             item.metadata.composition.forEach(function (entry) {
-                result.push(entry.swReference + ' (' + entry.quantity + ' x ' + entry.amount + ' ' + me.order.currency.symbol + ')');
+                let label = entry.label;
+                if(entry.swReference.length > 0){
+                    label = entry.swReference;
+                }
+                result.push(label + ' (' + entry.quantity + ' x ' + entry.amount + ' ' + me.order.currency.symbol + ')');
             });
 
             return result;

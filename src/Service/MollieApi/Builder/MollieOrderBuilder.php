@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Service\MollieApi\Builder;
 
 use Kiener\MolliePayments\Event\MollieOrderBuildEvent;
+use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher;
 use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
@@ -13,6 +14,7 @@ use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
+use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\Locale\LocaleEntity;
@@ -115,7 +117,6 @@ class MollieOrderBuilder
         $locale = $this->extractor->extractLocale($order, $salesChannelContext);
         $localeCode = ($locale instanceof LocaleEntity) ? $locale->getCode() : self::MOLLIE_DEFAULT_LOCALE_CODE;
         $lineItems = $order->getLineItems();
-        $webhookUrl = $this->urlBuilder->buildWebhookURL($transactionId);
         $isVerticalTaxCalculation = $this->isVerticalTaxCalculation($salesChannelContext);
 
         $orderData = [];
@@ -132,6 +133,11 @@ class MollieOrderBuilder
         if (!empty(trim($settings->getFormatOrderNumber()))) {
             $orderNumberFormatted = $settings->getFormatOrderNumber();
             $orderNumberFormatted = str_replace('{ordernumber}', (string)$order->getOrderNumber(), (string)$orderNumberFormatted);
+
+            $orderCustomer = $order->getOrderCustomer();
+            if ($orderCustomer instanceof OrderCustomerEntity) {
+                $orderNumberFormatted = str_replace('{customernumber}', (string)$orderCustomer->getCustomerNumber(), (string)$orderNumberFormatted);
+            }
         } else {
             $orderNumberFormatted = $order->getOrderNumber();
         }
@@ -141,12 +147,16 @@ class MollieOrderBuilder
         $orderData['orderNumber'] = $orderNumberFormatted;
         $orderData['payment'] = $paymentData;
 
-        $orderData['redirectUrl'] = $this->urlBuilder->buildReturnUrl($transactionId);
+
+        $redirectUrl = $this->urlBuilder->buildReturnUrl($transactionId);
+        $webhookUrl = $this->urlBuilder->buildWebhookURL($transactionId);
+
+        $orderData['redirectUrl'] = $redirectUrl;
         $orderData['webhookUrl'] = $webhookUrl;
         $orderData['payment']['webhookUrl'] = $webhookUrl;
 
 
-        if ($lineItems instanceof OrderLineItemCollection && $this->isSubscriptions($lineItems->getElements())) {
+        if ($settings->isSubscriptionsEnabled() && $lineItems instanceof OrderLineItemCollection && $this->isSubscriptions($lineItems->getElements())) {
             $orderData['payment']['sequenceType'] = 'first';
         }
 
@@ -173,6 +183,11 @@ class MollieOrderBuilder
 
         # add payment specific data
         if ($handler instanceof PaymentHandler) {
+            # set CreditCardPayment singleClickPayment true if Single click payment feature is enabled
+            if ($handler instanceof CreditCardPayment && $settings->isOneClickPaymentsEnabled()) {
+                $handler->setEnableSingleClickPayment(true);
+            }
+
             $orderData = $handler->processPaymentMethodSpecificParameters(
                 $orderData,
                 $order,
@@ -186,7 +201,7 @@ class MollieOrderBuilder
         // enrich data with create customer at mollie
         $orderAttributes = new OrderAttributes($order);
 
-        if ($orderAttributes->isTypeSubscription() || $settings->createCustomersAtMollie()) {
+        if ($orderAttributes->isTypeSubscription() || $settings->createCustomersAtMollie() || $settings->isOneClickPaymentsEnabled()) {
             $orderData = $this->customerEnricher->enrich($orderData, $customer, $settings, $salesChannelContext);
         }
 

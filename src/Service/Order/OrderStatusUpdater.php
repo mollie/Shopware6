@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Service\Order;
 
 use Kiener\MolliePayments\Repository\Order\OrderRepository;
+use Kiener\MolliePayments\Repository\Order\OrderRepositoryInterface;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
@@ -15,14 +16,13 @@ use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachine
 
 class OrderStatusUpdater
 {
-
     /**
      * @var OrderStateService
      */
     private $orderHandler;
 
     /**
-     * @var OrderRepository
+     * @var OrderRepositoryInterface
      */
     private $repoOrders;
 
@@ -39,11 +39,11 @@ class OrderStatusUpdater
 
     /**
      * @param OrderStateService $orderHandler
-     * @param OrderRepository $repoOrders
+     * @param OrderRepositoryInterface $repoOrders
      * @param TransactionTransitionServiceInterface $transactionTransitionService
      * @param LoggerInterface $logger
      */
-    public function __construct(OrderStateService $orderHandler, OrderRepository $repoOrders, TransactionTransitionServiceInterface $transactionTransitionService, LoggerInterface $logger)
+    public function __construct(OrderStateService $orderHandler, OrderRepositoryInterface $repoOrders, TransactionTransitionServiceInterface $transactionTransitionService, LoggerInterface $logger)
     {
         $this->orderHandler = $orderHandler;
         $this->repoOrders = $repoOrders;
@@ -198,7 +198,6 @@ class OrderStatusUpdater
         $addLog = false;
 
         switch ($statusTo) {
-
             case MolliePaymentStatus::MOLLIE_PAYMENT_OPEN:
             case MolliePaymentStatus::MOLLIE_PAYMENT_PENDING:
                 break;

@@ -10,7 +10,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class MollieOrderBuildEventTest extends TestCase
 {
-
     /**
      * This function tests that its possible to assign
      * metadata correctly to our event.
@@ -49,5 +48,4 @@ class MollieOrderBuildEventTest extends TestCase
 
         $this->assertEquals($expected, $event->getMetadata());
     }
-
 }

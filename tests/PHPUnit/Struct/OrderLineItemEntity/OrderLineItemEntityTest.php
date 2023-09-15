@@ -9,7 +9,6 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 
 class OrderLineItemEntityTest extends TestCase
 {
-
     /**
      * This test verifies that nothing breaks if we
      * have NULL instead of a payload array.
@@ -139,5 +138,4 @@ class OrderLineItemEntityTest extends TestCase
 
         $this->assertEquals(true, $attributes->isPromotion());
     }
-
 }

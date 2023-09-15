@@ -31,8 +31,9 @@ module.exports = defineConfig({
         },
     ], 
     e2e: {
+        defaultCommandTimeout: 10000,
         experimentalSessionAndOrigin: true,
-        testIsolation: "strict",
+        testIsolation: true,
         experimentalWebKitSupport: true,
         // We've imported your old cypress plugins here.
         // You may want to clean this up later by importing these.

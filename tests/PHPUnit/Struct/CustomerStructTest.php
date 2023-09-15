@@ -35,8 +35,7 @@ class CustomerStructTest extends TestCase
         string $profileId,
         bool $testMode,
         string $expectedCustomerId
-    )
-    {
+    ) {
         $struct = new CustomerStruct();
         $struct->assign($testData);
 

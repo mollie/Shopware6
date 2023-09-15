@@ -7,10 +7,8 @@ use Kiener\MolliePayments\Struct\Voucher\VoucherType;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Content\Product\ProductEntity;
 
-
 class ProductAttributesTest extends TestCase
 {
-
     /**
      * This test verifies that non-existing custom fields
      * are correctly handled without an error.
@@ -60,6 +58,4 @@ class ProductAttributesTest extends TestCase
 
         $this->assertEquals(VoucherType::TYPE_NOTSET, $attributes->getVoucherType());
     }
-
-
 }

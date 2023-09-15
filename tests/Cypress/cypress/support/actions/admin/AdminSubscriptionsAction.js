@@ -13,7 +13,7 @@ export default class AdminSubscriptionsAction {
      *
      */
     openSubscriptions() {
-        cy.wait(200);
+        cy.wait(1000);
         repoMainMenu.getOrders().click();
         cy.wait(1000);
         repoMainMenu.getSubscriptionsOverview().click();

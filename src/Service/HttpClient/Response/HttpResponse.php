@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Service\HttpClient\Response;
 
 class HttpResponse
 {
-
     /**
      * @var int
      */

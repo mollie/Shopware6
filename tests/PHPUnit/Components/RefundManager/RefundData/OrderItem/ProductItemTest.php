@@ -7,7 +7,6 @@ use MolliePayments\Tests\Traits\OrderTrait;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 
-
 class ProductItemTest extends TestCase
 {
     use OrderTrait;
@@ -70,5 +69,4 @@ class ProductItemTest extends TestCase
 
         $this->assertEquals($expected, $refundManagerItem->toArray());
     }
-
 }

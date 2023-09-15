@@ -1,0 +1,24 @@
+<sw-container columns="1fr" gap="16px">
+    <p>{{ $tc('mollie-payments.modals.shipping.order.description') }}</p>
+
+    <sw-data-grid class="mollie-ship-order-grid"
+                  :dataSource="shippableLineItems"
+                  :columns="getShipOrderColumns"
+                  :plainAppearance="true"
+                  :showSelection="false"
+                  :showPreviews="false"
+                  :showActions="false">
+    </sw-data-grid>
+
+    {% block sw_order_line_items_grid_grid_mollie_ship_item_modal_tracking %}
+        <sw-switch-field v-model="showTrackingInfo"
+                         :label="$tc('mollie-payments.modals.shipping.showTracking')"
+                         :noMarginTop="true"
+                         size="small">
+        </sw-switch-field>
+        <mollie-tracking-info v-if="showTrackingInfo"
+                              :delivery="order.deliveries.first()"
+                              :tracking="tracking">
+        </mollie-tracking-info>
+    {% endblock %}
+</sw-container>

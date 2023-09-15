@@ -11,7 +11,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ApplePayFormatter
 {
-
     /**
      * @var TranslatorInterface
      */

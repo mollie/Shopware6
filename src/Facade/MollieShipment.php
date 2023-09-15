@@ -189,10 +189,10 @@ class MollieShipment implements MollieShipmentInterface
      * @return \Mollie\Api\Resources\Shipment
      */
     public function shipOrderByOrderId(
-        string $orderId,
-        string $trackingCarrier,
-        string $trackingCode,
-        string $trackingUrl,
+        string  $orderId,
+        string  $trackingCarrier,
+        string  $trackingCode,
+        string  $trackingUrl,
         Context $context
     ): \Mollie\Api\Resources\Shipment {
         $order = $this->orderService->getOrder($orderId, $context);
@@ -214,10 +214,10 @@ class MollieShipment implements MollieShipmentInterface
      * @return \Mollie\Api\Resources\Shipment
      */
     public function shipOrderByOrderNumber(
-        string $orderNumber,
-        string $trackingCarrier,
-        string $trackingCode,
-        string $trackingUrl,
+        string  $orderNumber,
+        string  $trackingCarrier,
+        string  $trackingCode,
+        string  $trackingUrl,
         Context $context
     ): \Mollie\Api\Resources\Shipment {
         $order = $this->orderService->getOrderByNumber($orderNumber, $context);
@@ -240,10 +240,10 @@ class MollieShipment implements MollieShipmentInterface
      */
     public function shipOrder(
         OrderEntity $order,
-        string $trackingCarrier,
-        string $trackingCode,
-        string $trackingUrl,
-        Context $context
+        string      $trackingCarrier,
+        string      $trackingCode,
+        string      $trackingUrl,
+        Context     $context
     ): \Mollie\Api\Resources\Shipment {
         $mollieOrderId = $this->orderService->getMollieOrderId($order);
 
@@ -271,12 +271,12 @@ class MollieShipment implements MollieShipmentInterface
      * @return \Mollie\Api\Resources\Shipment
      */
     public function shipItemByOrderId(
-        string $orderId,
-        string $itemIdentifier,
-        int $quantity,
-        string $trackingCarrier,
-        string $trackingCode,
-        string $trackingUrl,
+        string  $orderId,
+        string  $itemIdentifier,
+        int     $quantity,
+        string  $trackingCarrier,
+        string  $trackingCode,
+        string  $trackingUrl,
         Context $context
     ): \Mollie\Api\Resources\Shipment {
         $order = $this->orderService->getOrder($orderId, $context);
@@ -302,12 +302,12 @@ class MollieShipment implements MollieShipmentInterface
      * @return \Mollie\Api\Resources\Shipment
      */
     public function shipItemByOrderNumber(
-        string $orderNumber,
-        string $itemIdentifier,
-        int $quantity,
-        string $trackingCarrier,
-        string $trackingCode,
-        string $trackingUrl,
+        string  $orderNumber,
+        string  $itemIdentifier,
+        int     $quantity,
+        string  $trackingCarrier,
+        string  $trackingCode,
+        string  $trackingUrl,
         Context $context
     ): \Mollie\Api\Resources\Shipment {
         $order = $this->orderService->getOrderByNumber($orderNumber, $context);
@@ -334,12 +334,12 @@ class MollieShipment implements MollieShipmentInterface
      */
     public function shipItem(
         OrderEntity $order,
-        string $itemIdentifier,
-        int $quantity,
-        string $trackingCarrier,
-        string $trackingCode,
-        string $trackingUrl,
-        Context $context
+        string      $itemIdentifier,
+        int         $quantity,
+        string      $trackingCarrier,
+        string      $trackingCode,
+        string      $trackingUrl,
+        Context     $context
     ): \Mollie\Api\Resources\Shipment {
         $mollieOrderId = $this->orderService->getMollieOrderId($order);
 
@@ -464,20 +464,17 @@ class MollieShipment implements MollieShipmentInterface
         });
     }
 
-    private function createTrackingInfoStruct(
-        string $trackingCarrier,
-        string $trackingCode,
-        string $trackingUrl
-    ): ?ShipmentTrackingInfoStruct {
+    private function createTrackingInfoStruct(string $trackingCarrier, string $trackingCode, string $trackingUrl): ?ShipmentTrackingInfoStruct
+    {
         if (empty($trackingCarrier) && empty($trackingCode)) {
             return null;
         }
 
-        if (empty($trackingCarrier) && !empty($trackingCode)) {
+        if (empty($trackingCarrier)) {
             throw new \InvalidArgumentException('Missing Argument for Tracking Carrier!');
         }
 
-        if (!empty($trackingCarrier) && empty($trackingCode)) {
+        if (empty($trackingCode)) {
             throw new \InvalidArgumentException('Missing Argument for Tracking Code!');
         }
 

@@ -11,7 +11,6 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 
 class MollieShippingLineItemBuilder
 {
-
     /**
      * @var PriceCalculator
      */
@@ -43,6 +42,7 @@ class MollieShippingLineItemBuilder
         foreach ($deliveries as $delivery) {
             $i++;
             $shippingPrice = $delivery->getShippingCosts();
+            $qty = $shippingPrice->getQuantity();
             $totalPrice = $shippingPrice->getTotalPrice();
 
             if ($totalPrice === 0.0) {
@@ -54,7 +54,7 @@ class MollieShippingLineItemBuilder
             $mollieLineItem = new MollieLineItem(
                 OrderLineType::TYPE_SHIPPING_FEE,
                 sprintf('Delivery costs %s', $i),
-                1,
+                $qty,
                 $price,
                 $delivery->getId(),
                 sprintf('mol-delivery-%s', $i),

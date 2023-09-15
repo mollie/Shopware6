@@ -14,7 +14,6 @@ use Shopware\Core\System\Country\CountryDefinition;
 
 class CountryExtension extends EntityExtension
 {
-
     /**
      * @return string
      */

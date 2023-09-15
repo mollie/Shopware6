@@ -10,7 +10,6 @@ use Shopware\Core\Framework\Event\FlowEvent;
 
 trait FlowBuilderTestTrait
 {
-
     /**
      * @param OrderEntity $order
      * @param string $actionName
@@ -30,5 +29,4 @@ trait FlowBuilderTestTrait
             ['data' => 'not-empty']
         );
     }
-
 }

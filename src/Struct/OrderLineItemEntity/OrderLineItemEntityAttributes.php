@@ -7,7 +7,6 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 
 class OrderLineItemEntityAttributes
 {
-
     /**
      * @var OrderLineItemEntity
      */
@@ -44,6 +43,11 @@ class OrderLineItemEntityAttributes
      */
     private $subscriptionRepetitionCount;
 
+    /**
+     * @var bool
+     */
+    private $isPromotionProduct;
+
 
     /**
      * @param OrderLineItemEntity $lineItem
@@ -54,6 +58,8 @@ class OrderLineItemEntityAttributes
 
         $this->voucherType = $this->getCustomFieldValue($lineItem, 'voucher_type');
         $this->mollieOrderLineID = $this->getCustomFieldValue($lineItem, 'order_line_id');
+
+        $this->isPromotionProduct = $lineItem->getType() === 'promotion';
 
         $this->subscriptionProduct = (bool)$this->getCustomFieldValue($lineItem, 'subscription_enabled');
         $this->subscriptionInterval = (int)$this->getCustomFieldValue($lineItem, 'subscription_interval');
@@ -86,6 +92,14 @@ class OrderLineItemEntityAttributes
     public function getMollieOrderLineID(): string
     {
         return $this->mollieOrderLineID;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPromotionProduct(): bool
+    {
+        return $this->isPromotionProduct;
     }
 
     /**

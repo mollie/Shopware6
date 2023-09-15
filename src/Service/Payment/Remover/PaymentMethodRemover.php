@@ -165,9 +165,6 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
 
     /**
      * @param Context $context
-     * @throws MissingRequestException
-     * @throws OrderNotFoundException
-     * @throws BadRequestException
      * @return OrderEntity
      */
     public function getOrder(Context $context): OrderEntity

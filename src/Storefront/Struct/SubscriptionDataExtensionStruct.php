@@ -6,7 +6,6 @@ use Shopware\Core\Framework\Struct\Struct;
 
 class SubscriptionDataExtensionStruct extends Struct
 {
-
     /**
      * @var bool
      */

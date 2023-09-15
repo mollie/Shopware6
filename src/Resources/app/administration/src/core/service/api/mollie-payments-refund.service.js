@@ -36,7 +36,7 @@ export default class MolliePaymentsRefundService extends ApiService {
      * @param data
      * @returns {*}
      */
-    refund(data = {orderId: null, amount: null, description: '', items: []}) {
+    refund(data = {orderId: null, amount: null, description: '', internalDescription: '', items: []}) {
         return this.__post('/refund', data);
     }
 
@@ -45,7 +45,7 @@ export default class MolliePaymentsRefundService extends ApiService {
      * @param data
      * @returns {*}
      */
-    refundAll(data = {orderId: null, description: ''}) {
+    refundAll(data = {orderId: null, description: '', internalDescription: ''}) {
         return this.__post('/refund', data);
     }
 

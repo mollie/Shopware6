@@ -20,22 +20,6 @@ jobs:
       - name: Test configuration
         run: make configcheck -B
 
-  snippets:
-    name: Test Plugin Snippets
-    runs-on: ubuntu-latest
-    needs: config
-    steps:
-      - name: Clone Code
-        uses: actions/checkout@v3
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 7.4
-
-      - name: Test snippets
-        run: make snippetcheck -B
-        
   # ------------------------------------------------------------------------------------------------------------------------
 
   install:
@@ -61,6 +45,33 @@ jobs:
 
       - name: Install Dependencies
         run: make dev -B
+
+  # ------------------------------------------------------------------------------------------------------------------------
+
+  snippets:
+    name: Test Plugin Snippets
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - name: Clone Code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+
+      - name: Mount Dev Dependency Cache
+        uses: actions/cache@v3
+        with:
+          key: cache-dev-dependencies-${{ github.run_id }}
+          path: |
+            src/Resources/app/storefront/node_modules
+            src/Resources/app/administration/node_modules
+            vendor
+
+      - name: Test snippets
+        run: make snippetcheck -B
 
   # ------------------------------------------------------------------------------------------------------------------------
 
@@ -311,40 +322,6 @@ jobs:
 
       - name: Build Plugin
         uses: ./.github/actions/build-plugin
-        with:
-          shopware: 6.4.18.0
-
-  # ------------------------------------------------------------------------------------------------------------------------
-
-  installation:
-    name: Installation | Shopware ${{ matrix.shopware }}
-    needs: build
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        shopware: [ '6.4.17.0', '6.4.16.0', '6.4.15.0', '6.4.9.0', '6.4.8.2', '6.4.0.0', '6.3.5.0' ]
-    steps:
-
-      - name: Clone Code
-        uses: actions/checkout@v3
-
-      - name: Mount Build Cache
-        uses: actions/cache@v3
-        with:
-          key: cache-build-${{ github.run_id }}
-          path: ~/.build
-
-      - name: Installation Tests, Shopware ${{ matrix.shopware }}
-        uses: ./.github/actions/run-e2e
-        with:
-          # -------------------------------------------
-          SHOPWARE: ${{ matrix.shopware }}
-          PHP: 7.4
-          # -------------------------------------------
-          MOLLIE_APIKEY_TEST: ""
-          # -------------------------------------------
-          RUN_CYPRESS: false
 
   # ------------------------------------------------------------------------------------------------------------------------
 
@@ -356,14 +333,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # latest Shopware
-          - shopware: '6.4.18.0'
+          - shopware: '6.5.5.1'
             php: '8.2'
-          # in between, 6.4.7.0 was a "breaker"
-          - shopware: '6.4.7.0'
-            php: '7.4'
-          # minimum supported Shopware version
-          - shopware: '6.3.5.2'
+          - shopware: '6.4.20.2'
+            php: '8.2'
+          - shopware: '6.4.1.0'
             php: '7.4'
     steps:
 

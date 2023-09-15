@@ -99,8 +99,9 @@ class SubscriptionDefinition extends EntityDefinition
             new UpdatedAtField(),
 
             # --------------------------------------------------------------------------------------------------------------------------
-            # RUNTIME LOADED
-            (new StringField('mollieStatus', 'mollieStatus'))->addFlags(new Runtime(), new ApiAware()),
+            # RUNTIME FIELDS
+
+            (new DateTimeField('cancelUntil', 'cancelUntil'))->addFlags(new Runtime()),
 
             # --------------------------------------------------------------------------------------------------------------------------
 

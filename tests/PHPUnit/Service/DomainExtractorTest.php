@@ -7,7 +7,6 @@ use PHPUnit\Framework\TestCase;
 
 class DomainExtractorTest extends TestCase
 {
-
     /**
      * This test verifies that we can correctly
      * extract the clean domain from a HTTP url
@@ -73,5 +72,4 @@ class DomainExtractorTest extends TestCase
 
         $this->assertEquals('www.mollie.com', $domain);
     }
-
 }

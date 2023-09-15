@@ -14,7 +14,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class AvailabilityInformationValidator implements CartValidatorInterface
 {
-
     /**
      * @var SettingsService
      */
@@ -38,7 +37,7 @@ class AvailabilityInformationValidator implements CartValidatorInterface
      */
     public function validate(Cart $cart, ErrorCollection $errorCollection, SalesChannelContext $salesChannelContext): void
     {
-        $settings = $this->pluginSettings->getSettings($salesChannelContext->getSalesChannelId());
+        $settings = $this->pluginSettings->getSettings($salesChannelContext->getSalesChannel()->getId());
 
         if (!$settings->isSubscriptionsEnabled()) {
             $this->clearError($cart);

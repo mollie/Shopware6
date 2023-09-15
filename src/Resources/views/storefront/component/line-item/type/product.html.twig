@@ -1,0 +1,11 @@
+{% sw_extends '@Storefront/storefront/component/line-item/type/product.html.twig' %}
+
+
+{% block component_line_item_type_product_order_number %}
+    {{ parent() }}
+    {% if  lineItem.extensions.mollieSubscription.isSubscriptionProduct %}
+        <div class="line-item-ordernumber">
+            {{ lineItem.extensions.mollieSubscription.translatedInterval }}
+        </div>
+    {% endif %}
+{% endblock %}

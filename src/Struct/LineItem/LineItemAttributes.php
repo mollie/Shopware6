@@ -7,7 +7,6 @@ use Shopware\Core\Content\Product\ProductEntity;
 
 class LineItemAttributes
 {
-
     /**
      * @var string
      */
@@ -43,6 +42,10 @@ class LineItemAttributes
      */
     private $subscriptionRepetitionType;
 
+    /**
+     * @var bool
+     */
+    private $isPromotionProduct;
 
     /**
      * @param LineItem $lineItem
@@ -58,6 +61,8 @@ class LineItemAttributes
             $this->productNumber = (string)$payload['productNumber'];
         }
 
+        $this->isPromotionProduct = array_key_exists('promotionId', $payload);
+
         $this->voucherType = $this->getCustomFieldValue($lineItem, 'voucher_type');
 
         $this->subscriptionProduct = (bool)$this->getCustomFieldValue($lineItem, 'subscription_enabled');
@@ -68,11 +73,34 @@ class LineItemAttributes
     }
 
     /**
+     * @return string[]
+     */
+    public static function getKeyList(): array
+    {
+        return [
+            'mollie_payments_product_voucher_type',
+            'mollie_payments_product_subscription_enabled',
+            'mollie_payments_product_subscription_interval',
+            'mollie_payments_product_subscription_interval_unit',
+            'mollie_payments_product_subscription_repetition',
+            'mollie_payments_product_subscription_repetition_type',
+        ];
+    }
+
+    /**
      * @return string
      */
     public function getProductNumber(): string
     {
         return $this->productNumber;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPromotionProduct(): bool
+    {
+        return $this->isPromotionProduct;
     }
 
     /**
@@ -106,7 +134,6 @@ class LineItemAttributes
     {
         $this->subscriptionProduct = $subscriptionProduct;
     }
-
 
     /**
      * @return int
@@ -189,10 +216,8 @@ class LineItemAttributes
         $foundValue = '';
 
         if ($lineItem->getPayload() !== null) {
-
             # check if we have customFields in our payload
             if (array_key_exists('customFields', $lineItem->getPayload())) {
-
                 # load the custom fields
                 $customFields = $lineItem->getPayload()['customFields'];
 

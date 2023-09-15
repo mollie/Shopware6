@@ -8,7 +8,6 @@ use Shopware\Core\Framework\Migration\MigrationStep;
 
 class Migration1652444730SubscriptionAddresses extends MigrationStep
 {
-
     /**
      * @return int
      */

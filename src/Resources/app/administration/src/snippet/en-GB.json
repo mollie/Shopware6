@@ -1,6 +1,9 @@
 {
   "global": {
     "businessEvents": {
+      "mollie_checkout_order_success": " Order successful",
+      "mollie_checkout_order_failed": " Order failed",
+      "mollie_checkout_order_canceled": " Order canceled",
       "mollie_webhook_received_All": " Mollie Webhook Received (All)",
       "mollie_webhook_received_status_authorized": " Mollie Webhook Received (Authorized)",
       "mollie_webhook_received_status_failed": " Mollie Webhook Received (Failed)",
@@ -77,6 +80,10 @@
         "info2": "These settings can lead to a different grand total than the total sum of line items. When Mollie cross-checks these amounts and finds that they don’t match, it causes a checkout error.",
         "info3": "You can use this feature to avoid rounding issues in your checkout. When enabled, it adds a separate line item in your Mollie Dashboard for the difference in rounding, and your customers pay the grand total calculated by Shopware."
       },
+      "order": {
+        "bankTransferDueDateKlarnaLimitReached": "It is not possible to use Klarna Pay now, Klarna Slice it or Klarna Pay later as method when your expiry date is more than 28 days in the future, unless another maximum is agreed between the merchant and Klarna.",
+        "bankTransferDueDateLimitReached": "It is not possible to set the order life time higher than 100 days."
+      },
       "support": {
         "modalTitle": "Request support from Mollie",
         "btnCancel": "Cancel",
@@ -151,7 +158,7 @@
           "btnResetLine": "Reset Line",
           "checkDeductPromotion": "Deduct promotion"
         },
-        "roundDiffItemAdded" : "Automatic rounding item was added"
+        "roundDiffItemAdded": "Automatic rounding item was added"
       },
       "instructions": {
         "linkResetTutorials": "Reset Tutorials",
@@ -167,7 +174,9 @@
         "titlePartialItems": "Partial Refund (with items)",
         "textPartialItems": "If you want to mark quantities and items as refunded in Mollie, use the form above. Set your quantities and provide a custom amount for every item that will be refunded. The total sum will then be visible in the final refund amount text field. Remember, it's still possible to adjust this final amount before starting your refund.",
         "titlePartialPromotions": "Partial Refund (with promotions)",
-        "textPartialPromotions": "If you have a promotion in your cart, then your promotion is a separate line item. If you want to refund all discounted items, go ahead and refund their total values and the full promotion line item itself. However, if you only want to refund a few items that were discounted, you can deduct the applied discount automatically for every single line item. You can of course always change values if they are not correct."
+        "textPartialPromotions": "If you have a promotion in your cart, then your promotion is a separate line item. If you want to refund all discounted items, go ahead and refund their total values and the full promotion line item itself. However, if you only want to refund a few items that were discounted, you can deduct the applied discount automatically for every single line item. You can of course always change values if they are not correct.",
+        "titleRoundingDiff": "Rounding difference",
+        "textRoundingDiff": "A full refund will include rounding differences"
       },
       "summary": {
         "dataLoading": "Data is loading...",
@@ -180,11 +189,16 @@
         "captionRefunded": "Refunded amount",
         "captionRemaining": "Refundable amount",
         "btnFixDiff": "Fix Difference",
-        "placeholderDescription": "add an optional description for your refund",
+        "placeholderDescription": "Enter bank/card statement description for consumer. Max 140 characters",
+        "lblDescription": "Description (optional) ({characters}/140 characters)",
+        "descriptionHelp": "This will be shown on the consumer's bank or card statement when possible. The message will be truncated after 140 characters.",
+        "placeholderInternalDescription": "Enter your internal description",
+        "lblInternalDescription": "Internal description (optional)",
+        "internalDescriptionHelp": "This will be shown as a local description in the administration interface.",
         "checkVerification": "I have verified the total refund amount and the configured quantities to refund and re-stock.",
         "btnRefund": "Refund",
         "btnFullRefund": "Full Refund",
-        "roundDiffItemAdded" : "Rounding item"
+        "roundDiffItemAdded": "Rounding item"
       },
       "refunds": {
         "title": "Refunds in the Mollie Dashboard",
@@ -194,6 +208,7 @@
             "amount": "Amount",
             "status": "Status",
             "description": "Description",
+            "internalDescription": "Internal description",
             "composition": "Composition",
             "date": "Date"
           },
@@ -308,13 +323,13 @@
       "TYPE_WEEKS": "Week(s)",
       "TYPE_MONTHS": "Month(s)",
       "confirm": {
-        "cancelTitle" : "End subscription?",
+        "cancelTitle": "End subscription?",
         "cancel": "Cancel your customer's subscription.",
-        "pauseTitle" : "Pause subscription?",
+        "pauseTitle": "Pause subscription?",
         "pause": "Put the subscription on hold until you resume it again.",
-        "resumeTitle" : "Resume subscription?",
+        "resumeTitle": "Resume subscription?",
         "resume": "Continue the subscription again.",
-        "skipTitle" : "Skip next instalment?",
+        "skipTitle": "Skip next instalment?",
         "skip": "Skip the next instalment in the subscription. It continues automatically afterwards."
       },
       "alerts": {
@@ -328,12 +343,12 @@
         "columns": {
           "customer": "Customer",
           "status": "Status",
-          "canceledAt": "Canceled at",
           "description": "Description",
-          "createdAt": "Created at",
           "amount": "Amount",
           "nextPaymentAt": "Next Payment",
-          "prePaymentReminder": "Reminded at"
+          "prePaymentReminder": "Reminded at",
+          "canceledAt": "Canceled at",
+          "createdAt": "Created at"
         },
         "action": {
           "edit": "Edit subscription"
@@ -347,6 +362,7 @@
         "labelQuantity": "Quantity",
         "labelMollieSubscription": "Mollie Subscription",
         "labelMollieCustomer": "Mollie customer",
+        "labelMandateId": "Mandate",
         "labelShopwareCustomer": "Shopware customer",
         "labelCreatedAt": "Created at",
         "buttonShowShopwareOrder": "Show Shopware order",
@@ -356,7 +372,6 @@
         "labelStatus": "Status",
         "labelNextPaymentAt": "Next payment at",
         "labelLastRemindedAt": "Last reminded at",
-        "labelMandateId": "Mandate",
         "labelCanceledAt": "Canceled at",
         "buttonPauseSubscription": "Pause subscription",
         "buttonResumeSubscription": "Resume subscription",
@@ -392,6 +407,7 @@
   },
   "sw-order": {
     "detailExtended": {
+      "titleCreditCardData" : "Credit Card data",
       "buttonMolliePaymentLink": "Copy to Clipboard",
       "columnRefunded": "Refunded",
       "columnShipped": "Shipped",
@@ -427,6 +443,29 @@
       "mollie_subscription": {
         "label": "Subscriptions"
       }
+    }
+  },
+  "sw-flow": {
+    "triggers": {
+      "mollie": "Mollie",
+      "refund": "Refund",
+      "subscription": "Subscription",
+      "webhookReceived": "Webhooks",
+      "status": "Status",
+      "started": "Started",
+      "ended": "Ended",
+      "paused": "Paused",
+      "renewalReminder": "Renewal Reminder",
+      "renewed": "Renewed",
+      "resumed": "Resumed",
+      "skipped": "Skipped",
+      "all": "All",
+      "canceled": "Canceled",
+      "expired": "Expired",
+      "partiallyRefunded": "Refunded (partially)",
+      "orderSuccess" : "Order successful",
+      "orderFailed" : "Order failed",
+      "orderCanceled" : "Order canceled"
     }
   }
 }

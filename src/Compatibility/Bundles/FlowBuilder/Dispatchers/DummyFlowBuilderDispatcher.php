@@ -6,7 +6,6 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatche
 
 class DummyFlowBuilderDispatcher implements FlowBuilderDispatcherAdapterInterface
 {
-
     /**
      * @param mixed $event
      * @return void

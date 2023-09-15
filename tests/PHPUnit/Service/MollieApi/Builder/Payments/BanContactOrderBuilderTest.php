@@ -2,7 +2,6 @@
 
 namespace MolliePayments\Tests\Service\MollieApi\Builder\Payments;
 
-
 use DateTime;
 use DateTimeZone;
 use Faker\Extension\Container;

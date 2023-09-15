@@ -1,3 +1,7 @@
+import Shopware from "Services/shopware/Shopware";
+
+const shopware = new Shopware();
+
 export default class PDPRepository {
 
     /**
@@ -5,15 +9,31 @@ export default class PDPRepository {
      * @returns {*}
      */
     getAddToCartButton() {
-        return cy.get('.buy-widget-container > .col-8 > .btn');
+        if (shopware.isVersionGreaterEqual('6.5')) {
+            // our apple pay button is also the same class
+            // but for now we cannot change it, so we use the first button
+            // which is the shopware one (if it would select the wrong one as first
+            // the rest of tests wouldnt work anyway, so thats ok).
+            return cy.get('.btn-buy').first();
+        } else {
+            return cy.get('.buy-widget-container > .col-8 > .btn');
+        }
     }
 
     /**
      *
      * @returns {*}
      */
-    getQuantity() {
+    getQuantityDropdown() {
         return cy.get('.col-4 > .custom-select');
+    }
+
+    /**
+     *
+     * @returns {*}
+     */
+    getQuantityBtnUp() {
+        return cy.get('.btn-plus');
     }
 
     /**

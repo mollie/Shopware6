@@ -20,10 +20,11 @@ $snippets = [
 ];
 
 foreach ($snippets['admin'] as $scopeName => $files) {
-
     # all files of our scope belong together
     # meaning, they need to be "identical"
     $scopeSnippetCount = null;
+
+    $foundSnippets = [];
 
     foreach ($files as $file) {
         $snippetJson = file_get_contents($file);
@@ -39,12 +40,6 @@ foreach ($snippets['admin'] as $scopeName => $files) {
             $scopeSnippetCount = count($allKeys);
         }
 
-        if ($scopeSnippetCount !== count($allKeys)) {
-            echo '** ERROR: Snippets of scope \"' . $scopeName . '\" have a different structure. Please compare those files.' . PHP_EOL;
-            echo PHP_EOL;
-            exit(1);
-        }
-
         foreach ($allKeys as $key) {
             $value = $snippetArrayFlat[$key];
             if (empty($value)) {
@@ -53,8 +48,41 @@ foreach ($snippets['admin'] as $scopeName => $files) {
                 exit(1);
             }
         }
+
+        foreach ($allKeys as $key) {
+            $foundSnippets[$file][] = $key;
+        }
     }
 
+
+    # NOW COMPARE THAT THEY HAVE THE SAME STRUCTURE
+    # ACROSS ALL FILES
+
+    $previousFile = '';
+    $previousKeys = null;
+    foreach ($foundSnippets as $file => $snippetKeys) {
+        if ($previousKeys !== null) {
+            if (!arrayEqual($previousKeys, $snippetKeys)) {
+                echo "Found difference in snippets in these files: " . PHP_EOL;
+                echo "  - A: " . $previousFile . PHP_EOL;
+                echo "  - B: " . $file . PHP_EOL;
+
+                $filtered = array_diff($previousKeys, $snippetKeys);
+                foreach ($filtered as $key) {
+                    echo '           [x]: ' . $key . PHP_EOL;
+                }
+
+                echo PHP_EOL;
+                echo PHP_EOL;
+                echo '** ERROR: Found missing snippets across files!' . PHP_EOL;
+                echo PHP_EOL;
+                exit(1);
+            }
+        }
+
+        $previousFile = $file;
+        $previousKeys = $snippetKeys;
+    }
 }
 
 
@@ -71,7 +99,7 @@ exit(0);
  */
 function array_flat($array, $prefix = '')
 {
-    $result = array();
+    $result = [];
 
     foreach ($array as $key => $value) {
         $new_key = $prefix . (empty($prefix) ? '' : '.') . $key;
@@ -84,4 +112,14 @@ function array_flat($array, $prefix = '')
     }
 
     return $result;
+}
+
+function arrayEqual($a, $b)
+{
+    return (
+        is_array($a)
+        && is_array($b)
+        && count($a) == count($b)
+        && array_diff($a, $b) === array_diff($b, $a)
+    );
 }

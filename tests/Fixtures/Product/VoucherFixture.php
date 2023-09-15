@@ -2,17 +2,15 @@
 
 namespace MolliePayments\Fixtures\Product;
 
-
 use Basecom\FixturePlugin\Fixture;
 use Basecom\FixturePlugin\FixtureBag;
 use Basecom\FixturePlugin\FixtureHelper;
 use MolliePayments\Fixtures\Product\Traits\ProductFixtureTrait;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-
 
 class VoucherFixture extends Fixture
 {
-
     use ProductFixtureTrait;
 
     /**
@@ -21,16 +19,16 @@ class VoucherFixture extends Fixture
     private $helper;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $repoProducts;
 
 
     /**
      * @param FixtureHelper $helper
-     * @param EntityRepositoryInterface $repoProducts
+     * @param EntityRepository $repoProducts
      */
-    public function __construct(FixtureHelper $helper, EntityRepositoryInterface $repoProducts)
+    public function __construct(FixtureHelper $helper, EntityRepository $repoProducts)
     {
         $this->helper = $helper;
         $this->repoProducts = $repoProducts;

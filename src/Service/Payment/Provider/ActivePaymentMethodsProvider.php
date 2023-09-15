@@ -14,7 +14,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterface
 {
-
     /**
      * @var MollieApiFactory
      */

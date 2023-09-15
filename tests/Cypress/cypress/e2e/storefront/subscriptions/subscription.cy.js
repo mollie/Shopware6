@@ -24,6 +24,7 @@ import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatu
 import CreditCardScreenAction from "cypress-mollie/src/actions/screens/CreditCardScreen";
 import DummyBasketScenario from "Scenarios/DummyBasketScenario";
 import SubscriptionDetailsRepository from "Repositories/admin/subscriptions/SubscriptionDetailsRepository";
+import SubscriptionRepository from "Repositories/storefront/account/SubscriptionRepository";
 
 
 const devices = new Devices();
@@ -37,6 +38,7 @@ const repoProductDetailsAdmin = new ProductDetailRepository();
 const repoOrdersDetails = new OrderDetailsRepository();
 const repoAdminSubscriptions = new SubscriptionsListRepository();
 const repoAdminSubscriptonDetails = new SubscriptionDetailsRepository();
+const repoSubscriptionStorefront = new SubscriptionRepository();
 
 const configAction = new ShopConfigurationAction();
 const adminProducts = new AdminProductsAction();
@@ -123,7 +125,7 @@ describe('Subscription', () => {
                         paymentAction.closePaymentsModal();
                     }
 
-                    paymentAction.switchPaymentMethod('Credit card');
+                    paymentAction.switchPaymentMethod('Card');
 
                     shopware.prepareDomainChange();
                     checkout.placeOrderOnConfirm();
@@ -202,7 +204,7 @@ describe('Subscription', () => {
 
                 it('C183210: Subscription page in Administration has links to customer and order', () => {
 
-                    prepareSubscriptionAndOpenDetails();
+                    prepareSubscriptionAndOpenAdminDetails();
 
                     // --------------------------------------------------------------------------------------------------
 
@@ -222,7 +224,7 @@ describe('Subscription', () => {
 
                 it('C183206: Pause subscription in Administration', () => {
 
-                    prepareSubscriptionAndOpenDetails();
+                    prepareSubscriptionAndOpenAdminDetails();
 
                     repoAdminSubscriptonDetails.getStatusField().should('be.visible');
                     vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Active');
@@ -241,7 +243,7 @@ describe('Subscription', () => {
 
                 it('C183208: Resume subscription in Administration', () => {
 
-                    prepareSubscriptionAndOpenDetails();
+                    prepareSubscriptionAndOpenAdminDetails();
 
                     vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Active');
 
@@ -263,7 +265,7 @@ describe('Subscription', () => {
 
                 it('C183207: Skip subscription in Administration', () => {
 
-                    prepareSubscriptionAndOpenDetails();
+                    prepareSubscriptionAndOpenAdminDetails();
 
                     vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Active');
 
@@ -281,7 +283,7 @@ describe('Subscription', () => {
 
                 it('C183209: Cancel subscription in Administration', () => {
 
-                    prepareSubscriptionAndOpenDetails();
+                    prepareSubscriptionAndOpenAdminDetails();
 
                     repoAdminSubscriptonDetails.getStatusField().should('be.visible');
                     vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Active');
@@ -366,7 +368,7 @@ describe('Subscription', () => {
                         paymentAction.openPaymentsModal();
                     }
 
-                    paymentAction.switchPaymentMethod('Credit card');
+                    paymentAction.switchPaymentMethod('Card');
 
                     shopware.prepareDomainChange();
                     checkout.placeOrderOnConfirm();
@@ -387,15 +389,22 @@ describe('Subscription', () => {
 
                 it('C176306: Subscriptions are available in Account', () => {
 
-                    prepareSubscriptionAndOpenDetails();
+                    prepareSubscriptionAndOpenAdminDetails();
 
                     cy.visit('/');
                     topMenu.clickAccountWidgetSubscriptions();
 
                     // side menu needs subscription
+                    cy.wait(2000);
                     cy.contains('.account-aside', 'Subscriptions');
                     // we should at least find 1 subscription
                     cy.get('.account-order-overview').find('.order-table').should('have.length.greaterThan', 0);
+
+                    repoSubscriptionStorefront.getSubscriptionViewButton(0).click();
+                    cy.contains('edit billing address');
+
+                    repoSubscriptionStorefront.getSubscriptionContextMenuButton(0).click();
+                    cy.contains('Repeat subscription');
                 })
 
             })
@@ -409,7 +418,7 @@ function assertAvailablePaymentMethods() {
     cy.contains('paysafecard').should('not.exist');
 
     cy.contains('iDEAL').should('exist');
-    cy.contains('Credit card').should('exist');
+    cy.contains('Card').should('exist');
     cy.contains('SOFORT').should('exist');
     cy.contains('eps').should('exist');
     cy.contains('Bancontact').should('exist');
@@ -418,14 +427,14 @@ function assertAvailablePaymentMethods() {
     cy.contains('PayPal').should('exist');
 }
 
-function prepareSubscriptionAndOpenDetails() {
+function prepareSubscriptionAndOpenAdminDetails() {
     configAction.setupPlugin(true, false, false, true);
     configAction.updateProducts('', true, 3, 'weeks');
 
     const dummyScenario = new DummyBasketScenario(1)
     dummyScenario.execute();
 
-    paymentAction.switchPaymentMethod('Credit card');
+    paymentAction.switchPaymentMethod('Card');
     shopware.prepareDomainChange();
     checkout.placeOrderOnConfirm();
 

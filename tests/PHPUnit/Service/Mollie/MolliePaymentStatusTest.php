@@ -7,14 +7,12 @@ use PHPUnit\Framework\TestCase;
 
 class MolliePaymentStatusTest extends TestCase
 {
-
-
     /**
      * @return array[]
      */
     public function getIsApprovedData()
     {
-        return array(
+        return [
             [true, MolliePaymentStatus::MOLLIE_PAYMENT_AUTHORIZED],
             [true, MolliePaymentStatus::MOLLIE_PAYMENT_PENDING],
             [true, MolliePaymentStatus::MOLLIE_PAYMENT_PAID],
@@ -26,7 +24,7 @@ class MolliePaymentStatusTest extends TestCase
             [false, MolliePaymentStatus::MOLLIE_PAYMENT_REFUNDED],
             [false, MolliePaymentStatus::MOLLIE_PAYMENT_PARTIALLY_REFUNDED],
             [false, MolliePaymentStatus::MOLLIE_PAYMENT_UNKNOWN],
-        );
+        ];
     }
 
     /**
@@ -50,7 +48,7 @@ class MolliePaymentStatusTest extends TestCase
      */
     public function getIsFailedData()
     {
-        return array(
+        return [
             [true, MolliePaymentStatus::MOLLIE_PAYMENT_CANCELED],
             [true, MolliePaymentStatus::MOLLIE_PAYMENT_FAILED],
             [true, MolliePaymentStatus::MOLLIE_PAYMENT_EXPIRED],
@@ -62,7 +60,7 @@ class MolliePaymentStatusTest extends TestCase
             [false, MolliePaymentStatus::MOLLIE_PAYMENT_REFUNDED],
             [false, MolliePaymentStatus::MOLLIE_PAYMENT_PARTIALLY_REFUNDED],
             [false, MolliePaymentStatus::MOLLIE_PAYMENT_UNKNOWN],
-        );
+        ];
     }
 
     /**
@@ -91,5 +89,4 @@ class MolliePaymentStatusTest extends TestCase
 
         $this->assertEquals(true, $isApproved);
     }
-
 }

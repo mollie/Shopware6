@@ -14,6 +14,7 @@ use Kiener\MolliePayments\Service\Refund\Item\RefundItemType;
 use Kiener\MolliePayments\Service\Refund\Mollie\RefundMetadata;
 use Kiener\MolliePayments\Service\Refund\RefundService;
 use Kiener\MolliePayments\Service\Refund\RefundServiceInterface;
+use Kiener\MolliePayments\Struct\MollieApi\OrderLineMetaDataStruct;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Mollie\Api\Resources\OrderLine;
@@ -24,7 +25,6 @@ use Shopware\Core\Framework\Context;
 
 class RefundDataBuilder
 {
-
     /**
      * @var OrderServiceInterface
      */
@@ -129,7 +129,6 @@ class RefundDataBuilder
 
                 # remember, subscriptions have no order
                 if (!$orderAttributes->isTypeSubscription() && $mollieOrder instanceof \Mollie\Api\Resources\Order) {
-
                     # search the mollie line id for the order
                     # because we don't have this in our order items.
                     $mollieLineID = '';
@@ -158,12 +157,12 @@ class RefundDataBuilder
 
         // now search all line items in Mollie that are not recognized in Shopware yet
         if ($mollieOrder instanceof \Mollie\Api\Resources\Order) {
+            $lines = $mollieOrder->lines();
             /** @var OrderLine $mollieLine */
-            foreach ($mollieOrder->lines as $mollieLine) {
-                $metadata = $mollieLine->metadata;
-
-                if (property_exists($metadata, 'type') && (string)$metadata->type === 'rounding') {
-                    $roundingDiffTotal = $mollieLine->totalAmount->value;
+            foreach ($lines as $mollieLine) {
+                $metaDataStruct = new OrderLineMetaDataStruct($mollieLine);
+                if ($metaDataStruct->isRoundingItem()) {
+                    $roundingDiffTotal = $metaDataStruct->getAmount();
                 }
             }
         }

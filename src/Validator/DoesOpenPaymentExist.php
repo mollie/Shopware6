@@ -7,7 +7,6 @@ use Mollie\Api\Types\PaymentStatus;
 
 class DoesOpenPaymentExist
 {
-
     /**
      * @param Payment[] $payments
      * @return bool

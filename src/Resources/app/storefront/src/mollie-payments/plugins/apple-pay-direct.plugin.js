@@ -1,5 +1,4 @@
-import Plugin from 'src/plugin-system/plugin.class';
-import DomAccess from 'src/helper/dom-access.helper';
+import Plugin from '@shopware-storefront-sdk/plugin-system/plugin.class';
 import HttpClient from '../services/HttpClient';
 
 export default class MollieApplePayDirect extends Plugin {
@@ -22,8 +21,11 @@ export default class MollieApplePayDirect extends Plugin {
         // register our off-canvas listener
         // we need to re-init all apple pay button
         // once the offcanvas is loaded (lazy) into the DOM
-        const pluginOffCanvas = window.PluginManager.getPluginInstanceFromElement(document.querySelector('[data-offcanvas-cart]'), 'OffCanvasCart');
-        pluginOffCanvas.$emitter.subscribe('offCanvasOpened', me.onOffCanvasOpened.bind(me));
+        const elementOffcanvas = document.querySelector('[data-offcanvas-cart]');
+        if (elementOffcanvas instanceof HTMLElement) {
+            const pluginOffCanvas = window.PluginManager.getPluginInstanceFromElement(elementOffcanvas, 'OffCanvasCart');
+            pluginOffCanvas.$emitter.subscribe('offCanvasOpened', me.onOffCanvasOpened.bind(me));
+        }
 
         // now update our current page
         this.initCurrentPage();
@@ -127,6 +129,13 @@ export default class MollieApplePayDirect extends Plugin {
 
             // if we have our sQuantity dropdown, use that quantity when adding the product
             var quantitySelects = document.getElementsByClassName('product-detail-quantity-select')
+            if (quantitySelects.length > 0) {
+                quantity = quantitySelects[0].value;
+            }
+
+            // also try our Shopware 6.5 selector
+            const sw65Selector = 'lineItems[' + productId + '][quantity]';
+            quantitySelects = document.getElementsByName(sw65Selector)
             if (quantitySelects.length > 0) {
                 quantity = quantitySelects[0].value;
             }
@@ -329,11 +338,17 @@ export default class MollieApplePayDirect extends Plugin {
         form.action = checkoutURL;
         form.method = 'POST';
 
+        let street = payment.shippingContact.addressLines[0];
+
+        if (payment.shippingContact.addressLines.length > 1) {
+            street += ' ' + payment.shippingContact.addressLines[1];
+        }
+
         // add billing data
         form.insertAdjacentElement('beforeend', createInput('email', payment.shippingContact.emailAddress));
         form.insertAdjacentElement('beforeend', createInput('lastname', payment.shippingContact.familyName));
         form.insertAdjacentElement('beforeend', createInput('firstname', payment.shippingContact.givenName));
-        form.insertAdjacentElement('beforeend', createInput('street', payment.shippingContact.addressLines[0]));
+        form.insertAdjacentElement('beforeend', createInput('street', street));
         form.insertAdjacentElement('beforeend', createInput('postalCode', payment.shippingContact.postalCode));
         form.insertAdjacentElement('beforeend', createInput('city', payment.shippingContact.locality));
         form.insertAdjacentElement('beforeend', createInput('countryCode', payment.shippingContact.countryCode));
@@ -353,7 +368,7 @@ export default class MollieApplePayDirect extends Plugin {
     getShopUrl(button) {
         // get sales channel base URL
         // so that our shop slug is correctly
-        let shopSlug = DomAccess.getDataAttribute(button, 'data-shop-url');
+        let shopSlug = button.getAttribute('data-shop-url');
 
         // remove trailing slash if existing
         if (shopSlug.substr(-1) === '/') {

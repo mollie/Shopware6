@@ -14,3 +14,7 @@ src/Resources/public/administration/js/
 /tests/Cypress/Cypress.env.json
 /tests/Cypress/cypress/results
 /src/Resources/app/administration/.stryker-tmp
+/.phpunuhi/
+/src/Resources/public/static
+/src/Resources/public/js
+/src/Resources/public/mollie-payments.js
