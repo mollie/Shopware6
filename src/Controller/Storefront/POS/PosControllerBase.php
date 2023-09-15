@@ -169,6 +169,7 @@ class PosControllerBase extends StorefrontController
         return new JsonResponse([
             'ready' => $ready,
             'redirectUrl' => $url,
+            'status' => $status
         ]);
     }
 }
