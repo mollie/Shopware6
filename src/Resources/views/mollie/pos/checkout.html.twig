@@ -193,7 +193,7 @@
                 </a>
             </div>
             {% if changeStatusUrl %}
-                <a href="{{ changeStatusUrl }}" title="Change Status in Test Mode" target="_blank" class="m-button">
+                <a href="{{ changeStatusUrl }}" title="Change Status in Test Mode" target="_blank" id="statusChange" class="m-button">
                     Change Status in Test Mode
                     <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path d="M17.17 32.92l9.17-9.17-9.17-9.17 2.83-2.83 12 12-12 12z"/><path d="M0-.25h48v48h-48z" fill="none"/></svg>
                 </a>
@@ -214,6 +214,7 @@
 
 <script>
     const returnButton = document.getElementById('returnButton');
+    const statusChangeButton = document.getElementById('statusChange');
     const loadingElements = Array.from(document.getElementsByClassName('loading'));
     const successElements = Array.from(document.getElementsByClassName('success'));
     const failedElements = Array.from(document.getElementsByClassName('failed'));
@@ -228,6 +229,9 @@
 
             if (json.ready) {
                 clearInterval(interval);
+                if(statusChangeButton !== null){
+                    statusChangeButton.style.display = 'none';
+                }
                 loadingElements.forEach(function(element){
                     element.style.display = 'none';
                 });
@@ -255,7 +259,9 @@
                 loadingElements.forEach(function(element){
                     element.style.display = 'none';
                 });
-
+                if(statusChangeButton !== null){
+                    statusChangeButton.style.display = 'none';
+                }
                 returnButton.style.display = 'block';
                 returnButton.href= json.redirectUrl;
 
