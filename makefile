@@ -47,7 +47,9 @@ clean: ## Cleans all dependencies and files
 	rm -rf ./src/Resources/app/storefront/node_modules/*
 	# ------------------------------------------------------
 	rm -rf ./src/Resources/app/storefront/dist/storefront
-	rm -rf ./src/Resources/public
+	# ------------------------------------------------------
+	rm -rf ./src/Resources/public/administration
+	rm -rf ./src/Resources/public/molllie-payments.js
 
 build: ## Installs the plugin, and builds the artifacts using the Shopware build commands.
 	php switch-composer.php prod

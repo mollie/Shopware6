@@ -65,7 +65,7 @@ describe('POS Terminals', () => {
                 shopware.prepareDomainChange();
                 checkout.placeOrderOnConfirm();
 
-                cy.contains('waiting for payment');
+                cy.contains('Follow the instructions on the terminal');
             })
         })
     })
