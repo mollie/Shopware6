@@ -25,6 +25,9 @@
             "ideal": {
                 "selectBank": "Bank auswählen"
             },
+            "pos": {
+                "selectTerminal": "Terminal auswählen"
+            },
             "mandate": {
                 "sectionTitle": "Gespeicherte Karten",
                 "cardTitleLabel": "%name% •••• %number%",

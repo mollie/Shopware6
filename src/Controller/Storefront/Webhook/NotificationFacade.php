@@ -170,11 +170,16 @@ class NotificationFacade
         # is the one, that is really visible in the administration.
         # if we don't add to that one, then the previous one is suddenly visible again
         # which causes confusion and troubles in the end
-        $swTransaction = $this->getOrderTransactions($swOrder->getId(), $context)->last();
+        $swTransaction = $this->repoOrderTransactions->getLatestOrderTransaction($swOrder->getId(), $context);
 
 
         # verify if the customer really paid with Mollie in the end
         $paymentMethod = $swTransaction->getPaymentMethod();
+
+        if (!$paymentMethod instanceof PaymentMethodEntity) {
+            throw new \Exception('Transaction ' . $swTransactionId . ' has no payment method!');
+        }
+
         $paymentMethodAttributes = new PaymentMethodAttributes($paymentMethod);
 
         if (!$paymentMethodAttributes->isMolliePayment()) {
@@ -294,26 +299,6 @@ class NotificationFacade
 
         return $this->repoOrderTransactions->search($criteria, $context)->first();
     }
-
-    /**
-     * @param string $orderID
-     * @param Context $context
-     * @return EntitySearchResult<OrderTransactionEntity>
-     */
-    public function getOrderTransactions(string $orderID, Context $context): EntitySearchResult
-    {
-        $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('order.id', $orderID));
-        $criteria->addAssociation('order');
-        $criteria->addAssociation('paymentMethod');
-        $criteria->addSorting(new FieldSorting('createdAt'));
-
-        /** @var EntitySearchResult<OrderTransactionEntity> $result */
-        $result = $this->repoOrderTransactions->search($criteria, $context);
-
-        return $result;
-    }
-
 
     /**
      * @param OrderTransactionEntity $transaction

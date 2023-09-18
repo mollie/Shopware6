@@ -149,6 +149,19 @@ class Order
     }
 
     /**
+     * @param array<mixed> $params
+     * @param string $orderSalesChannelContextId
+     * @throws ApiException
+     * @return Payment
+     */
+    public function createPayment(array $params, string $orderSalesChannelContextId): Payment
+    {
+        $apiClient = $this->clientFactory->getClient($orderSalesChannelContextId);
+
+        return $apiClient->payments->create($params);
+    }
+
+    /**
      * @param array<mixed> $orderData
      * @param string $orderSalesChannelContextId
      * @param SalesChannelContext $salesChannelContext

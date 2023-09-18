@@ -6,7 +6,6 @@ use Exception;
 use Kiener\MolliePayments\Compatibility\DependencyLoader;
 use Kiener\MolliePayments\Components\Installer\PluginInstaller;
 use Kiener\MolliePayments\Repository\CustomFieldSet\CustomFieldSetRepository;
-use Kiener\MolliePayments\Service\CustomFieldService;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Migration\MigrationCollection;
@@ -93,7 +92,10 @@ class MolliePayments extends Plugin
         # and not our custom one, because our repositories are not yet registered in this function
         /** @var EntityRepository $shopwareRepoCustomFields */
         $shopwareRepoCustomFields = $this->container->get('custom_field_set.repository');
-        $mollieRepoCustomFields = new CustomFieldSetRepository($shopwareRepoCustomFields);
+
+        if ($shopwareRepoCustomFields !== null) {
+            $mollieRepoCustomFields = new CustomFieldSetRepository($shopwareRepoCustomFields);
+        }
 
         $this->runDbMigrations($context->getMigrationCollection());
     }

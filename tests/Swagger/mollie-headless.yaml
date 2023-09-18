@@ -198,6 +198,40 @@ paths:
           description: "successful operation"
 
 
+  /store-api/mollie/pos/terminals:
+    get:
+      tags:
+        - "POS"
+      summary: "Gets a list of available POS terminals"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/mollie/pos/store-terminal/{customerId}/{terminalId}:
+    post:
+      tags:
+        - "POS"
+      summary: "Save the selected terminal for an upcoming payment in Shopware"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      parameters:
+        - name: "customerId"
+          in: "path"
+          description: "Shopware Customer ID"
+          required: true
+        - name: "terminalId"
+          in: "path"
+          description: "Mollie Terminal ID of Mollie, e.g. term_X9X..., ..."
+          required: true
+      responses:
+        "200":
+          description: "successful operation"
+
+
   /store-api/mollie/applepay/enabled:
     get:
       tags:

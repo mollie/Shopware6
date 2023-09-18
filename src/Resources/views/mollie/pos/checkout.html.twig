@@ -1,0 +1,76 @@
+<style>
+
+    .center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-top: -50px;
+        margin-left: -50px;
+
+        text-align: center;
+    }
+
+    .loader {
+        border: 16px solid #f3f3f3; /* Light grey */
+        border-top: 16px solid #3498db; /* Blue */
+        border-radius: 50%;
+        width: 120px;
+        height: 120px;
+        animation: spin 2s linear infinite;
+
+        margin-top: 10px;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+</style>
+
+<script>
+
+    function requestStatus() {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', '/mollie/pos/{{ swOrderId }}/{{ molliePaymentId }}/status');
+        xhr.setRequestHeader('Content-Type', 'application/json');
+
+        xhr.onload = function (response) {
+            console.log(response.target.response);
+            const json = JSON.parse(response.target.response);
+
+            if (json.ready) {
+                window.location.href = json.redirectUrl;
+            }
+        };
+
+        xhr.onerror = function (response) {
+            console.log(response.target.response);
+            const json = JSON.parse(response.target.response);
+
+            if (json.ready) {
+                window.location.href = json.redirectUrl;
+            }
+        };
+
+        xhr.send();
+    }
+
+    setInterval(requestStatus, 2000);
+
+</script>
+<div class="center">
+    waiting for payment...<br/>
+    please see Mollie terminal
+</div>
+<div class="loader center"></div>
+
+{% if changeStatusUrl %}
+    <div class="center" style="margin-top:180px;">
+        <a href="{{ changeStatusUrl }}" target="_blank">Change Status in Test Mode</a>
+    </div>
+{% endif %}

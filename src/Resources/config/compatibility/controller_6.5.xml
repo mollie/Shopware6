@@ -114,6 +114,7 @@
             <argument type="service" id="Kiener\MolliePayments\Controller\Storefront\Webhook\NotificationFacade"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
             <argument type="service" id="Kiener\MolliePayments\Repository\Order\OrderRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepository"/>
             <argument type="service" id="mollie_payments.logger"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
@@ -133,6 +134,21 @@
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
+            </call>
+        </service>
+
+        <service id="Kiener\MolliePayments\Controller\Storefront\POS\Sw65\PosController" public="true">
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+            <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
+            <argument type="service" id="Shopware\Storefront\Framework\Routing\Router"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepository"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+            <call method="setTwig">
+                <argument type="service" id="twig"/>
             </call>
         </service>
 
@@ -192,6 +208,11 @@
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
             <argument type="service" id="mollie_payments.logger"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Controller\StoreApi\POS\Sw65\PosController" public="true">
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+            <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
         </service>
 
     </services>

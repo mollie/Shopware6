@@ -55,7 +55,7 @@ class MollieOrderBuilderTest extends AbstractMollieOrderBuilder
         $customer->setCustomerNumber('5000');
         $order->setOrderCustomer($customer);
 
-        $data = $this->builder->build(
+        $data = $this->builder->buildOrderPayload(
             $order,
             '123',
             'paypal',

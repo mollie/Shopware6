@@ -36,7 +36,7 @@ class RefundHydrator
         $metaData = '';
 
         if (property_exists($refund, 'metadata')) {
-            $metaData = (string)$refund->metadata;
+            $metaData = (string)json_encode($refund->metadata);
         }
 
         $internalDescription = null;

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2ffbf5f15690099f310448e96e981166",
+    "content-hash": "df39369e1089b724abab3f0829158c3d",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -84,16 +84,16 @@
         },
         {
             "name": "mollie/mollie-api-php",
-            "version": "v2.40.1",
+            "version": "v2.61.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mollie/mollie-api-php.git",
-                "reference": "b99ad3662b4141efa9ee8eb83a04c2d3c100f83c"
+                "reference": "d3ec7a191985aa57bec9b4425a665e95b4ba346a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mollie/mollie-api-php/zipball/b99ad3662b4141efa9ee8eb83a04c2d3c100f83c",
-                "reference": "b99ad3662b4141efa9ee8eb83a04c2d3c100f83c",
+                "url": "https://api.github.com/repos/mollie/mollie-api-php/zipball/d3ec7a191985aa57bec9b4425a665e95b4ba346a",
+                "reference": "d3ec7a191985aa57bec9b4425a665e95b4ba346a",
                 "shasum": ""
             },
             "require": {
@@ -101,13 +101,14 @@
                 "ext-curl": "*",
                 "ext-json": "*",
                 "ext-openssl": "*",
-                "php": ">=5.6"
+                "php": "^7.2|^8.0"
             },
             "require-dev": {
-                "eloquent/liberator": "^2.0",
+                "eloquent/liberator": "^2.0||^3.0",
                 "friendsofphp/php-cs-fixer": "^3.0",
                 "guzzlehttp/guzzle": "^6.3 || ^7.0",
-                "phpunit/phpunit": "^5.7 || ^6.5 || ^7.1 || ^8.5 || ^9.5"
+                "phpstan/phpstan": "^1.4",
+                "phpunit/phpunit": "^8.5 || ^9.5"
             },
             "suggest": {
                 "mollie/oauth2-mollie-php": "Use OAuth to authenticate with the Mollie API. This is needed for some endpoints. Visit https://docs.mollie.com/ for more information."
@@ -169,9 +170,9 @@
             ],
             "support": {
                 "issues": "https://github.com/mollie/mollie-api-php/issues",
-                "source": "https://github.com/mollie/mollie-api-php/tree/v2.40.1"
+                "source": "https://github.com/mollie/mollie-api-php/tree/v2.61.0"
             },
-            "time": "2022-01-18T18:16:13+00:00"
+            "time": "2023-07-31T15:37:46+00:00"
         }
     ],
     "packages-dev": [
@@ -15043,5 +15044,5 @@
         "ext-curl": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.3.0"
 }

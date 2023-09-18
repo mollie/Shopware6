@@ -3,11 +3,14 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Repository\OrderTransaction;
 
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 
 class OrderTransactionRepository implements OrderTransactionRepositoryInterface
 {
@@ -42,5 +45,24 @@ class OrderTransactionRepository implements OrderTransactionRepositoryInterface
     public function update(array $data, Context $context): EntityWrittenContainerEvent
     {
         return $this->orderTransactionRepository->update($data, $context);
+    }
+
+    /**
+     * @param string $orderID
+     * @param Context $context
+     * @return OrderTransactionEntity
+     */
+    public function getLatestOrderTransaction(string $orderID, Context $context): OrderTransactionEntity
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('order.id', $orderID));
+        $criteria->addAssociation('order');
+        $criteria->addAssociation('paymentMethod');
+        $criteria->addSorting(new FieldSorting('createdAt'));
+
+        /** @var EntitySearchResult<OrderTransactionEntity> $result */
+        $result = $this->orderTransactionRepository->search($criteria, $context);
+
+        return $result->last();
     }
 }
