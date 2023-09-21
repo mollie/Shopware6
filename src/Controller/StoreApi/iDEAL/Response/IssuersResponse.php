@@ -14,13 +14,13 @@ class IssuersResponse extends StoreApiResponse
 
 
     /**
-     * @param array<mixed> $issuers
+     * @param array<mixed> $terminals
      */
-    public function __construct(array $issuers)
+    public function __construct(array $terminals)
     {
         $this->object = new ArrayStruct(
             [
-                'issuers' => $issuers,
+                'issuers' => $terminals,
             ],
             'mollie_payments_ideal_issuers'
         );

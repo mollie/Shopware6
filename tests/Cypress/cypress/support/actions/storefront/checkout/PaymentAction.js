@@ -60,6 +60,10 @@ export default class PaymentAction {
                 this.selectIDealIssuer('bunq');
             }
 
+            if (paymentName === 'POS Terminal') {
+                this.selectPosTerminal();
+            }
+
         } else {
             this.openPaymentsModal();
             this.selectPaymentMethod(paymentName);
@@ -67,6 +71,10 @@ export default class PaymentAction {
             // we have to select an iDEAL issuer now (required)
             if (paymentName === 'iDEAL') {
                 this.selectIDealIssuer('bunq');
+            }
+
+            if (paymentName === 'POS Terminal') {
+                this.selectPosTerminal();
             }
 
             this.closePaymentsModal();
@@ -84,7 +92,7 @@ export default class PaymentAction {
 
         // always make sure that the iFrame is loaded
         cy.wait(2500);
- 
+
         // that iframe seems to need a bit. had some missing characters recently
         // so we click in a textfield, wait and then type
         const clickTimeMS = 100;
@@ -132,6 +140,14 @@ export default class PaymentAction {
      */
     selectIDealIssuer(issuer) {
         cy.get('#iDealIssuer').select(issuer);
+    }
+
+    /**
+     *
+     */
+    selectPosTerminal() {
+        const testTerminalID = 'Test terminal';
+        cy.get('#posTerminals').select(testTerminalID);
     }
 
 }

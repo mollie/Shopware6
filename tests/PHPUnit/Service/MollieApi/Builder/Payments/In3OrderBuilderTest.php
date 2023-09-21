@@ -42,7 +42,7 @@ class In3OrderBuilderTest extends AbstractMollieOrderBuilder
 
         $order = $this->getOrderEntity($amountTotal, $taxStatus, $currencyISO, $lineItems, $orderNumber);
 
-        $actual = $this->builder->build(
+        $actual = $this->builder->buildOrderPayload(
             $order,
             $transactionId,
             $paymentMethod,

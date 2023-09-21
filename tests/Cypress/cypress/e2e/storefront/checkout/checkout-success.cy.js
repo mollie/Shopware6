@@ -57,6 +57,7 @@ const payments = [
     {caseId: 'C4127', key: 'belfius', name: 'Belfius'},
     {caseId: 'C4121', key: 'giftcard', name: 'Gift cards'},
     {caseId: 'C4143', key: 'voucher', name: 'Voucher'},
+    {caseId: 'C1341120', key: 'pointofsale', name: 'POS Terminal'},
     // unfortunately address and product prices need to match, so we cannot do in3 automatically for now
     // {caseId: '', key: 'in3', name: 'in3'},
 ];
@@ -145,7 +146,7 @@ context("Checkout Tests", () => {
                     } else if (payment.key === 'credit-card') {
 
                         cy.wait(2000);
-                        
+
                         mollieCreditCard.enterValidCard();
                         mollieCreditCard.submitForm();
                         molliePayment.selectPaid();

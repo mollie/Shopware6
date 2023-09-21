@@ -11,6 +11,7 @@ use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\Profile;
 use Mollie\Api\Resources\Subscription;
+use Mollie\Api\Resources\Terminal;
 use Mollie\Api\Types\PaymentMethod;
 
 class MollieGateway implements MollieGatewayInterface
@@ -114,6 +115,24 @@ class MollieGateway implements MollieGatewayInterface
         }
 
         return $issuers;
+    }
+
+    /**
+     * @throws \Mollie\Api\Exceptions\ApiException
+     * @return array|Terminal[]
+     */
+    public function getPosTerminals(): array
+    {
+        $terminals = $this->apiClient->terminals->page();
+
+        $list = [];
+
+        /** @var Terminal $terminal */
+        foreach ($terminals as $terminal) {
+            $list[] = $terminal;
+        }
+
+        return $list;
     }
 
     /**

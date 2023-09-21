@@ -19,6 +19,7 @@ use Kiener\MolliePayments\Handler\Method\KlarnaPayNowPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaSliceItPayment;
 use Kiener\MolliePayments\Handler\Method\PayPalPayment;
 use Kiener\MolliePayments\Handler\Method\PaySafeCardPayment;
+use Kiener\MolliePayments\Handler\Method\PosPayment;
 use Kiener\MolliePayments\Handler\Method\Przelewy24Payment;
 use Kiener\MolliePayments\Handler\Method\SofortPayment;
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
@@ -110,7 +111,8 @@ class PaymentMethodServiceTest extends TestCase
             Przelewy24Payment::class,
             SofortPayment::class,
             VoucherPayment::class,
-            In3Payment::class
+            In3Payment::class,
+            PosPayment::class,
         ];
 
         $handlers = $this->paymentMethodService->getPaymentHandlers();

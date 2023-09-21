@@ -36,6 +36,7 @@ class CustomerService implements CustomerServiceInterface
     public const CUSTOM_FIELDS_KEY_MANDATE_ID = 'mandate_id';
     public const CUSTOM_FIELDS_KEY_SHOULD_SAVE_CARD_DETAIL = 'shouldSaveCardDetail';
     public const CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER = 'preferred_ideal_issuer';
+    public const CUSTOM_FIELDS_KEY_PREFERRED_POS_TERMINAL = 'preferred_pos_terminal';
 
     /**
      * @var CountryRepositoryInterface
@@ -285,6 +286,28 @@ class CustomerService implements CustomerServiceInterface
         $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER] = $issuerId;
 
         // Store the custom fields on the customer
+        return $this->customerRepository->update([[
+            'id' => $customer->getId(),
+            'customFields' => $customFields
+        ]], $context);
+    }
+
+    /**
+     * @param CustomerEntity $customer
+     * @param string $terminalId
+     * @param Context $context
+     * @return EntityWrittenContainerEvent
+     */
+    public function setPosTerminal(CustomerEntity $customer, string $terminalId, Context $context): EntityWrittenContainerEvent
+    {
+        $customFields = $customer->getCustomFields();
+
+        if (!is_array($customFields)) {
+            $customFields = [];
+        }
+
+        $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_PREFERRED_POS_TERMINAL] = $terminalId;
+
         return $this->customerRepository->update([[
             'id' => $customer->getId(),
             'customFields' => $customFields
