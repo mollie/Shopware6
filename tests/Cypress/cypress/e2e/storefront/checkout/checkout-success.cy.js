@@ -57,7 +57,6 @@ const payments = [
     {caseId: 'C4127', key: 'belfius', name: 'Belfius'},
     {caseId: 'C4121', key: 'giftcard', name: 'Gift cards'},
     {caseId: 'C4143', key: 'voucher', name: 'Voucher'},
-    {caseId: 'C1341120', key: 'pointofsale', name: 'POS Terminal'},
     // unfortunately address and product prices need to match, so we cannot do in3 automatically for now
     // {caseId: '', key: 'in3', name: 'in3'},
 ];
@@ -166,6 +165,20 @@ context("Checkout Tests", () => {
                     cy.contains('Thank you for your order');
                 })
 
+            })
+
+            it('C1341120: Pay with POS Terminal', () => {
+
+                scenarioDummyBasket.execute();
+
+                paymentAction.switchPaymentMethod('POS Terminal');
+
+                shopware.prepareDomainChange();
+                checkout.placeOrderOnConfirm();
+
+                cy.url().should('include', '/mollie/pos/checkout?sw=');
+
+                cy.contains('Follow the instructions on the terminal');
             })
         })
     })
