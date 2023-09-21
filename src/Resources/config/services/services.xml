@@ -67,7 +67,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Hydrator\RefundHydrator"/>
             <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
-            <argument type="service" id="mollie_refund_item.repository"/>
+
         </service>
 
         <service id="Kiener\MolliePayments\Service\Stock\StockManager">
@@ -178,6 +178,9 @@
 
             <tag name="mollie_payments.mail.attachment_generator"/>
         </service>
+
+        <service id="Kiener\MolliePayments\Service\Refund\Mollie\DataCompressor"/>
+
 
     </services>
 </container>

@@ -16,6 +16,7 @@ use Kiener\MolliePayments\Exception\CouldNotCreateMollieRefundException;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Service\OrderServiceInterface;
 use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
+use Kiener\MolliePayments\Service\Refund\Mollie\DataCompressor;
 use Kiener\MolliePayments\Service\Refund\RefundServiceInterface;
 use Kiener\MolliePayments\Struct\MollieApi\OrderLineMetaDataStruct;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
@@ -128,6 +129,7 @@ class RefundManager implements RefundManagerInterface
         /** @var null|\Mollie\Api\Resources\Order $mollieOrder */
         $mollieOrder = null;
 
+
         if ($orderAttributes->isTypeSubscription()) {
             # pure subscription orders do not
             # have a real mollie order
@@ -213,29 +215,34 @@ class RefundManager implements RefundManagerInterface
             );
         }
 
-
-        if (!$refund instanceof Refund) {
+        if (! $refund instanceof Refund) {
             # a problem happened, lets finish with an exception
             throw new CouldNotCreateMollieRefundException('', (string)$order->getOrderNumber());
         }
 
         $refundAmount = (float)$refund->amount->value;
 
+        $refundMetaData = $refund->metadata;
 
+        if (! property_exists($refundMetaData, 'type')) {
+            throw new CouldNotCreateMollieRefundException('', (string)$order->getOrderNumber());
+        }
+
+        $refundData = [
+            'orderId' => $order->getId(),
+            'orderVersionId' => $order->getVersionId(),
+            'mollieRefundId' => $refund->id,
+            'publicDescription' => $request->getDescription(),
+            'internalDescription' => $request->getInternalDescription(),
+
+        ];
+        $refundItems = $this->convertToRepositoryArray($serviceItems, $refundMetaData->type);
+        if (count($refundItems) > 0) {
+            $refundData['refundItems'] = $refundItems;
+        }
         # SAVE LOCAL REFUND
         # ---------------------------------------------------------------------------------------------
-        $this->refundRepository->create(
-            [
-                [
-                    'orderId' => $order->getId(),
-                    'orderVersionId' => $order->getVersionId(),
-                    'mollieRefundId' => $refund->id,
-                    'publicDescription' => $request->getDescription(),
-                    'internalDescription' => $request->getInternalDescription(),
-                ]
-            ],
-            $context
-        );
+        $this->refundRepository->create([$refundData], $context);
 
 
         # DISPATCH FLOW BUILDER
@@ -440,5 +447,30 @@ class RefundManager implements RefundManagerInterface
         }
 
         return $serviceItems;
+    }
+
+    /**
+     * @param RefundItem[] $serviceItems
+     * @param string $type
+     * @return array
+     */
+    private function convertToRepositoryArray(array $serviceItems, string $type): array
+    {
+        $data = [];
+        foreach ($serviceItems as $item) {
+            if ($item->getQuantity() <= 0) {
+                continue;
+            }
+
+            $data[] = [
+                'type' => $type,
+                'orderLineItemId' => $item->getShopwareLineID(),
+                'mollieLineId' => $item->getMollieLineID(),
+                'reference' => $item->getShopwareReference(),
+                'quantity' => $item->getQuantity(),
+                'amount' => $item->getAmount(),
+            ];
+        }
+        return $data;
     }
 }

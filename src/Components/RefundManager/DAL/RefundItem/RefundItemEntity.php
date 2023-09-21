@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\RefundManager\DAL\RefundItem;
 
+use Kiener\MolliePayments\Components\RefundManager\DAL\Refund\RefundEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
@@ -13,10 +14,12 @@ final class RefundItemEntity extends Entity
 
     protected string $type;
     protected string $refundId;
+    protected ?RefundEntity $refund;
+    protected string $reference;
     protected string $mollieLineId;
     protected int $quantity;
     protected float $amount;
-    protected ?string $lineItemId;
+    protected ?string $orderLineItemId;
     protected ?OrderLineItemEntity $orderLineItem;
 
     /**
@@ -102,17 +105,17 @@ final class RefundItemEntity extends Entity
     /**
      * @return string
      */
-    public function getLineItemId(): ?string
+    public function getOrderLineItemId(): ?string
     {
-        return $this->lineItemId;
+        return $this->orderLineItemId;
     }
 
     /**
-     * @param string $lineItemId
+     * @param string $orderLineItemId
      */
-    public function setLineItemId(string $lineItemId): void
+    public function setOrderLineItemId(string $orderLineItemId): void
     {
-        $this->lineItemId = $lineItemId;
+        $this->orderLineItemId = $orderLineItemId;
     }
 
     /**
@@ -129,5 +132,37 @@ final class RefundItemEntity extends Entity
     public function setOrderLineItem(OrderLineItemEntity $orderLineItem): void
     {
         $this->orderLineItem = $orderLineItem;
+    }
+
+    /**
+     * @return null|RefundEntity
+     */
+    public function getRefund(): ?RefundEntity
+    {
+        return $this->refund;
+    }
+
+    /**
+     * @param null|RefundEntity $refund
+     */
+    public function setRefund(?RefundEntity $refund): void
+    {
+        $this->refund = $refund;
+    }
+
+    /**
+     * @return string
+     */
+    public function getReference(): string
+    {
+        return $this->reference;
+    }
+
+    /**
+     * @param string $reference
+     */
+    public function setReference(string $reference): void
+    {
+        $this->reference = $reference;
     }
 }

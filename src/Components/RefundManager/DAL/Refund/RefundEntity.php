@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Components\RefundManager\DAL\Refund;
 
+use Kiener\MolliePayments\Components\RefundManager\DAL\RefundItem\RefundItemCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
 
@@ -35,6 +36,17 @@ class RefundEntity extends Entity
      * @var null|string
      */
     protected $internalDescription;
+
+    /**
+     * @var RefundItemCollection
+     */
+    protected $refundItems;
+
+    public function __construct()
+    {
+        $this->refundItems = new RefundItemCollection();
+    }
+
 
     /**
      * @return string
@@ -119,5 +131,21 @@ class RefundEntity extends Entity
     public function setInternalDescription(?string $internalDescription): void
     {
         $this->internalDescription = $internalDescription;
+    }
+
+    /**
+     * @return RefundItemCollection
+     */
+    public function getRefundItems(): RefundItemCollection
+    {
+        return $this->refundItems;
+    }
+
+    /**
+     * @param RefundItemCollection $refundItems
+     */
+    public function setRefundItems(RefundItemCollection $refundItems): void
+    {
+        $this->refundItems = $refundItems;
     }
 }

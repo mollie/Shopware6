@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Service\Refund\Mollie;
 
 use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
+use Shopware\Core\Framework\Uuid\Uuid;
 
 class RefundMetadata
 {
@@ -31,7 +32,6 @@ class RefundMetadata
     {
         $this->type = $type;
         $this->items = $items;
-
         $this->dataCompression = new DataCompressor();
     }
 
@@ -39,10 +39,10 @@ class RefundMetadata
      * @param array<mixed> $metadata
      * @return RefundMetadata
      */
-    public static function fromArray(array $metadata): RefundMetadata
+    public static function fromArray(?\stdClass $metadata): RefundMetadata
     {
-        $type = (string)$metadata['type'];
-        $composition = (isset($metadata['composition'])) ? (array)$metadata['composition'] : [];
+        $type = (string)$metadata->type;
+        $composition = property_exists($metadata, 'composition') ? $metadata->composition : [];
 
         $items = [];
 
@@ -82,8 +82,9 @@ class RefundMetadata
     {
         $data = [
             'type' => $this->type,
+            'referenceId' => $this->referenceId
         ];
-
+        /*
         foreach ($this->items as $item) {
             if ($item->getQuantity() <= 0) {
                 continue;
@@ -98,7 +99,7 @@ class RefundMetadata
                 'quantity' => $item->getQuantity(),
                 'amount' => $item->getAmount(),
             ];
-        }
+        }*/
 
         return (string)json_encode($data);
     }

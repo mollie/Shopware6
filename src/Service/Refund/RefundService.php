@@ -21,6 +21,8 @@ use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\Refund;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Currency\CurrencyEntity;
 
 class RefundService implements RefundServiceInterface
@@ -44,6 +46,7 @@ class RefundService implements RefundServiceInterface
      * @var MollieGatewayInterface
      */
     private $gwMollie;
+
 
 
     /**
@@ -76,11 +79,11 @@ class RefundService implements RefundServiceInterface
         $mollieOrder = $this->mollie->getMollieOrder($mollieOrderId, $order->getSalesChannelId());
 
 
-        $metadata = new RefundMetadata(RefundItemType::FULL, $refundItems);
-
         $params = [
             'description' => $description,
-            'metadata' => $metadata->toString(),
+            'metadata' =>  [
+                'type' => RefundItemType::FULL
+            ],
         ];
 
 
@@ -125,8 +128,6 @@ class RefundService implements RefundServiceInterface
      */
     public function refundPartial(OrderEntity $order, string $description, string $internalDescription, float $amount, array $lineItems, Context $context): Refund
     {
-        $metadata = new RefundMetadata(RefundItemType::PARTIAL, $lineItems);
-
         $payment = $this->getPayment($order);
 
         $refund = $payment->refund([
@@ -135,7 +136,9 @@ class RefundService implements RefundServiceInterface
                 'currency' => ($order->getCurrency() instanceof CurrencyEntity) ? $order->getCurrency()->getIsoCode() : '',
             ],
             'description' => $description,
-            'metadata' => $metadata->toString(),
+            'metadata' => [
+                'type' => RefundItemType::PARTIAL
+            ],
         ]);
 
         if (!$refund instanceof Refund) {
@@ -210,6 +213,10 @@ class RefundService implements RefundServiceInterface
                 if ($refund->status === 'canceled') {
                     continue;
                 }
+                /**
+                 * TODO: remove old compositions
+                 */
+
                 $refundsArray[] = $this->refundHydrator->hydrate($refund, $order);
             }
 

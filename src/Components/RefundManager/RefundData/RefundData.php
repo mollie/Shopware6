@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Components\RefundManager\RefundData;
 
+use Kiener\MolliePayments\Components\RefundManager\DAL\RefundItem\RefundItemEntity;
 use Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem\AbstractItem;
 use Mollie\Api\Resources\Refund;
 
@@ -135,10 +136,10 @@ class RefundData
         /** @var array<mixed> $refundsArray */
         $refundsArray = $this->refunds;
         foreach ($refundsArray as $refundIndex => $refund) {
-            if (isset($refund['metadata']['composition']) && is_array($refund['metadata']['composition'])) {
-                foreach ($refund['metadata']['composition'] as $compositionIndex => $composition) {
+            if (property_exists($refund['metadata'], 'composition') && is_array($refund['metadata']->composition)) {
+                foreach ($refund['metadata']->composition as $compositionIndex => $composition) {
                     if ((bool)$composition['swReference'] === false) {
-                        $refundsArray[$refundIndex]['metadata']['composition'][$compositionIndex]['label'] = self::ROUNDING_ITEM_LABEL;
+                        $refundsArray[$refundIndex]['metadata']->composition[$compositionIndex]['label'] = self::ROUNDING_ITEM_LABEL;
                     }
                 }
             }

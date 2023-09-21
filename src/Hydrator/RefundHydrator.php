@@ -3,8 +3,10 @@
 namespace Kiener\MolliePayments\Hydrator;
 
 use Kiener\MolliePayments\Components\RefundManager\DAL\Order\OrderExtension;
+use Kiener\MolliePayments\Components\RefundManager\DAL\OrderLineItem\OrderLineItemExtension;
 use Kiener\MolliePayments\Components\RefundManager\DAL\Refund\RefundCollection;
 use Kiener\MolliePayments\Components\RefundManager\DAL\Refund\RefundEntity;
+use Kiener\MolliePayments\Components\RefundManager\DAL\RefundItem\RefundItemEntity;
 use Mollie\Api\Resources\Refund;
 use Shopware\Core\Checkout\Order\OrderEntity;
 
@@ -36,8 +38,9 @@ class RefundHydrator
         $metaData = '';
 
         if (property_exists($refund, 'metadata')) {
-            $metaData = (string)$refund->metadata;
+            $metaData = $refund->metadata;
         }
+
 
         $internalDescription = null;
 
@@ -52,8 +55,24 @@ class RefundHydrator
             $shopwareRefund = $shopwareRefunds->first();
             if ($shopwareRefund !== null) {
                 $internalDescription = $shopwareRefund->getInternalDescription();
+
+                $refundLineItems = $shopwareRefund->getRefundItems()->getElements();
+                $metaData->composition = [];
+                /** @var RefundItemEntity $refundLineItem */
+                foreach ($refundLineItems as $refundLineItem) {
+                    $metaData->composition[]=[
+                        'swLineId' => (string)$refundLineItem->getOrderLineItemId(),
+                        'mollieLineId' => $refundLineItem->getMollieLineId(),
+                        'swReference' => $refundLineItem->getReference(),
+                        'quantity' => $refundLineItem->getQuantity(),
+                        'amount' => $refundLineItem->getAmount()
+                    ];
+                }
             }
         }
+
+
+
 
         return [
             'id' => $refund->id,
@@ -70,7 +89,7 @@ class RefundHydrator
             'isProcessing' => $refund->isProcessing(),
             'isQueued' => $refund->isQueued(),
             'isTransferred' => $refund->isTransferred(),
-            'metadata' => json_decode($metaData, true),
+            'metadata' => $metaData
         ];
     }
 }

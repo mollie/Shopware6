@@ -8,9 +8,16 @@
         <service id="Kiener\MolliePayments\Components\RefundManager\DAL\Refund\RefundDefinition">
             <tag name="shopware.entity.definition" entity="mollie_refund"/>
         </service>
-
+        <service id="Kiener\MolliePayments\Components\RefundManager\DAL\RefundItem\RefundItemDefinition">
+            <tag name="shopware.entity.definition" entity="mollie_refund_item"/>
+        </service>
         <service id="Kiener\MolliePayments\Components\RefundManager\DAL\Order\OrderExtension">
             <tag name="shopware.entity.extension"/>
         </service>
+
+        <service id="Kiener\MolliePayments\Components\RefundManager\DAL\OrderLineItem\OrderLineItemExtension">
+            <tag name="shopware.entity.extension"/>
+        </service>
+
     </services>
 </container>
