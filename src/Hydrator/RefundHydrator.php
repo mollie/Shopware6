@@ -33,10 +33,10 @@ class RefundHydrator
             ];
         }
 
-        $metaData = '';
+        $metaData = [];
 
         if (property_exists($refund, 'metadata')) {
-            $metaData = (string)json_encode($refund->metadata);
+            $metaData = $refund->metadata;
         }
 
         $internalDescription = null;
@@ -70,7 +70,7 @@ class RefundHydrator
             'isProcessing' => $refund->isProcessing(),
             'isQueued' => $refund->isQueued(),
             'isTransferred' => $refund->isTransferred(),
-            'metadata' => json_decode($metaData, true),
+            'metadata' => $metaData,
         ];
     }
 }

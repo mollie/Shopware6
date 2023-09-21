@@ -275,7 +275,13 @@ class RefundDataBuilder
                 continue;
             }
 
-            $metadata = RefundMetadata::fromArray($refund['metadata']);
+            $meta = $refund['metadata'];
+
+            if (is_string($meta)) {
+                $meta = json_decode($meta, true);
+            }
+
+            $metadata = RefundMetadata::fromArray($meta);
 
             # if we do have a FULL item refund then
             # we must NOT substract our item again.
