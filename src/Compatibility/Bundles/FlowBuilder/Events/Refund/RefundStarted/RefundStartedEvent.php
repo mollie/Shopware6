@@ -10,6 +10,7 @@ use Shopware\Core\Framework\Event\BusinessEventInterface;
 use Shopware\Core\Framework\Event\EventData\EntityType;
 use Shopware\Core\Framework\Event\EventData\EventDataCollection;
 use Shopware\Core\Framework\Event\EventData\MailRecipientStruct;
+use Shopware\Core\Framework\Event\EventData\ScalarValueType;
 use Shopware\Core\Framework\Event\MailAware;
 use Shopware\Core\Framework\Event\OrderAware;
 use Shopware\Core\Framework\Event\SalesChannelAware;
@@ -59,6 +60,7 @@ class RefundStartedEvent extends Event implements OrderAware, MailAware, SalesCh
     public static function getAvailableData(): EventDataCollection
     {
         return (new EventDataCollection())
+            ->add('amount', new ScalarValueType(ScalarValueType::TYPE_FLOAT))
             ->add('order', new EntityType(OrderDefinition::class));
     }
 
