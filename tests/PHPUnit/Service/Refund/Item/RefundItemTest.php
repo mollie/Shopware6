@@ -21,9 +21,10 @@ class RefundItemTest extends TestCase
         $item = new RefundItem(
             '',
             '',
-            '',
             1,
             14.9899999,
+            '',
+            ''
         );
 
         $this->assertEquals(14.99, $item->getAmount());

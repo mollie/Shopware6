@@ -4,9 +4,7 @@ namespace Kiener\MolliePayments\Migration;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
-use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Migration\MigrationStep;
-use Shopware\Core\Framework\Uuid\Uuid;
 
 class Migration1644753635CreateSubscription extends MigrationStep
 {

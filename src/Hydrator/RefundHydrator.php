@@ -35,9 +35,9 @@ class RefundHydrator
             ];
         }
 
-        $metaData = '';
+        $metaData = new \stdClass();
 
-        if (property_exists($refund, 'metadata')) {
+        if (property_exists($refund, 'metadata') && $refund->metadata instanceof \stdClass) {
             $metaData = $refund->metadata;
         }
 
@@ -57,11 +57,14 @@ class RefundHydrator
                 $internalDescription = $shopwareRefund->getInternalDescription();
 
                 $refundLineItems = $shopwareRefund->getRefundItems()->getElements();
+
                 $metaData->composition = [];
                 /** @var RefundItemEntity $refundLineItem */
                 foreach ($refundLineItems as $refundLineItem) {
+                    $metaData->type = $refundLineItem->getType();
                     $metaData->composition[]=[
                         'swLineId' => (string)$refundLineItem->getOrderLineItemId(),
+                        'swLineVersionId' => (string)$refundLineItem->getOrderLineItemVersionId(),
                         'mollieLineId' => $refundLineItem->getMollieLineId(),
                         'swReference' => $refundLineItem->getReference(),
                         'quantity' => $refundLineItem->getQuantity(),

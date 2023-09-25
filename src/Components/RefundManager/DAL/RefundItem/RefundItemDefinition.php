@@ -47,10 +47,10 @@ final class RefundItemDefinition extends EntityDefinition
             (new FkField('refund_id', 'refundId', RefundDefinition::class))->addFlags(new ApiAware()),
             (new ManyToOneAssociationField('refund', 'refund_id', RefundDefinition::class))->addFlags(new ApiAware()),
             (new IntField('quantity', 'quantity'))->addFlags(new Required(), new ApiAware()),
-            (new StringField('reference', 'reference'))->addFlags(new Required(), new ApiAware()),
+            (new StringField('reference', 'reference'))->addFlags(new ApiAware()),
             (new FloatField('amount', 'amount'))->addFlags(new Required(), new ApiAware()),
             (new StringField('mollie_line_id', 'mollieLineId'))->addFlags(new Required(), new ApiAware()),
-            (new FkField('order_line_item_id', 'orderLineItemId', OrderLineItemDefinition::class))->addFlags(new Required(), new ApiAware()),
+            (new FkField('order_line_item_id', 'orderLineItemId', OrderLineItemDefinition::class))->addFlags(new ApiAware()),
             new ReferenceVersionField(OrderLineItemDefinition::class, 'order_line_item_version_id'),
             (new OneToOneAssociationField('orderLineItem', 'order_line_item_id', 'id', OrderLineItemDefinition::class, false))->addFlags(new ApiAware()),
         ]);

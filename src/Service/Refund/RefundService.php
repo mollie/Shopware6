@@ -81,9 +81,6 @@ class RefundService implements RefundServiceInterface
 
         $params = [
             'description' => $description,
-            'metadata' =>  [
-                'type' => RefundItemType::FULL
-            ],
         ];
 
 
@@ -135,10 +132,7 @@ class RefundService implements RefundServiceInterface
                 'value' => number_format($amount, 2, '.', ''),
                 'currency' => ($order->getCurrency() instanceof CurrencyEntity) ? $order->getCurrency()->getIsoCode() : '',
             ],
-            'description' => $description,
-            'metadata' => [
-                'type' => RefundItemType::PARTIAL
-            ],
+            'description' => $description
         ]);
 
         if (!$refund instanceof Refund) {

@@ -88,7 +88,9 @@ class MolliePayments extends Plugin
     public function install(InstallContext $context): void
     {
         parent::install($context);
-
+        if ($this->container === null) {
+            throw new Exception('Container is not initialized');
+        }
         # that's the only part we use the Shopware repository directly,
         # and not our custom one, because our repositories are not yet registered in this function
         /** @var EntityRepository $shopwareRepoCustomFields */
@@ -164,6 +166,9 @@ class MolliePayments extends Plugin
      */
     private function preparePlugin(Context $context): void
     {
+        if ($this->container === null) {
+            throw new Exception('Container is not initialized');
+        }
         /** @var PluginInstaller $pluginInstaller */
         $pluginInstaller = $this->container->get(PluginInstaller::class);
 

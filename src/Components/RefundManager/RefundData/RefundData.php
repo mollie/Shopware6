@@ -136,7 +136,7 @@ class RefundData
         /** @var array<mixed> $refundsArray */
         $refundsArray = $this->refunds;
         foreach ($refundsArray as $refundIndex => $refund) {
-            if (property_exists($refund['metadata'], 'composition') && is_array($refund['metadata']->composition)) {
+            if (isset($refund['metadata']) && property_exists($refund['metadata'], 'composition') && is_array($refund['metadata']->composition)) {
                 foreach ($refund['metadata']->composition as $compositionIndex => $composition) {
                     if ((bool)$composition['swReference'] === false) {
                         $refundsArray[$refundIndex]['metadata']->composition[$compositionIndex]['label'] = self::ROUNDING_ITEM_LABEL;

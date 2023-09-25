@@ -12,15 +12,51 @@ final class RefundItemEntity extends Entity
 {
     use EntityIdTrait;
 
-    protected string $type;
-    protected string $refundId;
-    protected ?RefundEntity $refund;
-    protected string $reference;
-    protected string $mollieLineId;
-    protected int $quantity;
-    protected float $amount;
-    protected ?string $orderLineItemId;
-    protected ?OrderLineItemEntity $orderLineItem;
+    /**
+     * @var string
+     */
+    protected $type;
+
+    /**
+     * @var string
+     */
+    protected $refundId;
+    /**
+     * @var null|RefundEntity
+     */
+    protected $refund;
+    /**
+     * @var string
+     */
+    protected $reference;
+    /**
+     * @var string
+     */
+    protected $mollieLineId;
+
+    /**
+     * @var int
+     */
+    protected $quantity;
+
+    /**
+     * @var float
+     */
+    protected $amount;
+    /**
+     * @var null|string
+     */
+    protected $orderLineItemId;
+
+    /**
+     * @var null|string
+     */
+    protected $orderLineItemVersionId;
+
+    /**
+     * @var null|OrderLineItemEntity
+     */
+    protected $orderLineItem;
 
     /**
      * @return string
@@ -164,5 +200,13 @@ final class RefundItemEntity extends Entity
     public function setReference(string $reference): void
     {
         $this->reference = $reference;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getOrderLineItemVersionId(): ?string
+    {
+        return $this->orderLineItemVersionId;
     }
 }

@@ -28,8 +28,8 @@ class Migration1672671475RefundItem extends MigrationStep
                       `created_at` datetime(3) NOT NULL,
                       `updated_at` datetime(3) DEFAULT NULL,
                       PRIMARY KEY (`id`),
-                      KEY `fk.order_line_item_id` (`order_line_item_id`),
-                      CONSTRAINT `fk.order_line_item_id` FOREIGN KEY (`order_line_item_id`) REFERENCES `order_line_item` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+                      KEY `fk.order_line_item_id` (`order_line_item_id`,`order_line_item_version_id`),
+                      CONSTRAINT `fk.order_line_item_id` FOREIGN KEY (`order_line_item_id`,`order_line_item_version_id`) REFERENCES `order_line_item` (`id`,`version_id`) ON DELETE SET NULL ON UPDATE CASCADE,
                       KEY `fk.refund_id` (`refund_id`),
                       CONSTRAINT `fk.refund_id` FOREIGN KEY (`refund_id`) REFERENCES `mollie_refund` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

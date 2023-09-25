@@ -3,14 +3,9 @@
 namespace Kiener\MolliePayments\Service\Refund\Mollie;
 
 use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
-use Shopware\Core\Framework\Uuid\Uuid;
 
 class RefundMetadata
 {
-    /**
-     * @var DataCompressor
-     */
-    private $dataCompression;
 
     /**
      * @var string
@@ -32,14 +27,13 @@ class RefundMetadata
     {
         $this->type = $type;
         $this->items = $items;
-        $this->dataCompression = new DataCompressor();
     }
 
     /**
-     * @param array<mixed> $metadata
+     * @param \stdClass $metadata
      * @return RefundMetadata
      */
-    public static function fromArray(?\stdClass $metadata): RefundMetadata
+    public static function fromArray(\stdClass $metadata): RefundMetadata
     {
         $type = (string)$metadata->type;
         $composition = property_exists($metadata, 'composition') ? $metadata->composition : [];
@@ -48,11 +42,12 @@ class RefundMetadata
 
         foreach ($composition as $compItem) {
             $items[] = new RefundItem(
-                $compItem['swLineId'],
                 $compItem['mollieLineId'],
-                $compItem['swReference'],
+                (string)$compItem['swReference'],
                 $compItem['quantity'],
-                $compItem['amount']
+                $compItem['amount'],
+                $compItem['swLineId'],
+                $compItem['swLineVersionId']
             );
         }
 
@@ -73,34 +68,5 @@ class RefundMetadata
     public function getComposition(): array
     {
         return $this->items;
-    }
-
-    /**
-     * @return string
-     */
-    public function toString(): string
-    {
-        $data = [
-            'type' => $this->type,
-            'referenceId' => $this->referenceId
-        ];
-        /*
-        foreach ($this->items as $item) {
-            if ($item->getQuantity() <= 0) {
-                continue;
-            }
-
-            $swLineId = $this->dataCompression->compress($item->getShopwareLineID());
-
-            $data['composition'][] = [
-                'swLineId' => $swLineId,
-                'mollieLineId' => $item->getMollieLineID(),
-                'swReference' => $item->getShopwareReference(),
-                'quantity' => $item->getQuantity(),
-                'amount' => $item->getAmount(),
-            ];
-        }*/
-
-        return (string)json_encode($data);
     }
 }
