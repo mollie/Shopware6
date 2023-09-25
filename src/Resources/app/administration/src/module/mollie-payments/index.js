@@ -49,7 +49,7 @@ systemConfig.getValues('MolliePayments').then(config => {
         version: '1.0.0',
         targetVersion: '1.0.0',
         color: '#333',
-        icon: 'default-money-card',
+        icon: 'regular-shopping-bag',
         entity: 'mollie_subscription',
 
         routes: {
