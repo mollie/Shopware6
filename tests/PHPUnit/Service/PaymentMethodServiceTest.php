@@ -22,6 +22,7 @@ use Kiener\MolliePayments\Handler\Method\PaySafeCardPayment;
 use Kiener\MolliePayments\Handler\Method\PosPayment;
 use Kiener\MolliePayments\Handler\Method\Przelewy24Payment;
 use Kiener\MolliePayments\Handler\Method\SofortPayment;
+use Kiener\MolliePayments\Handler\Method\TwintPayment;
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Kiener\MolliePayments\Repository\Media\MediaRepositoryInterface;
 use Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepositoryInterface;
@@ -70,8 +71,7 @@ class PaymentMethodServiceTest extends TestCase
         $paymentMethod->setId('id-123');
         $paymentMethod->setHandlerIdentifier('handler-id-123');
 
-        $this->context = $this->createMock(Context::class);
-        ;
+        $this->context = $this->createMock(Context::class);;
         $this->mediaRepository = new FakeMediaRepository(new MediaDefinition());
         $this->paymentMethodRepository = new FakePaymentMethodRepository($paymentMethod);
 
@@ -113,6 +113,7 @@ class PaymentMethodServiceTest extends TestCase
             VoucherPayment::class,
             In3Payment::class,
             PosPayment::class,
+            TwintPayment::class,
         ];
 
         $handlers = $this->paymentMethodService->getPaymentHandlers();
