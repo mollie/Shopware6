@@ -10,6 +10,7 @@
 
         <service id="Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionDefinition">
             <tag name="shopware.entity.definition" entity="mollie_subscription"/>
+            <tag name="shopware.composite_search.definition" priority="1500"/>
         </service>
 
         <service id="Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressDefinition">

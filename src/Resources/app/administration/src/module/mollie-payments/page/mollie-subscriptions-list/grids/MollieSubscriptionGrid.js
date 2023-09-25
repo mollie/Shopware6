@@ -35,7 +35,7 @@ export default class MollieSubscriptionGrid {
                 property: 'status',
                 label: app.$tc('mollie-payments.subscriptions.list.columns.status'),
                 allowResize: true,
-                sortable: false, // this data doesnt really existing in the database, so sorting would throw an error
+                sortable: true,
             },
             {
                 property: 'amount',

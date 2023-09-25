@@ -1,5 +1,14 @@
 {% block mollie_payments_subscription_list %}
     <sw-page class="mollie-subscriptions">
+        {% block mollie_payments_subscription_list_search_bar %}
+            <template #search-bar>
+                <sw-search-bar initialSearchType="mollie_subscription"
+                               :initialSearch="term"
+                               @search="onSearch">
+                </sw-search-bar>
+            </template>
+        {% endblock %}
+
         {% block mollie_payments_subscription_list_smart_bar_header %}
             <template slot="smart-bar-header">
                 {% block mollie_payments_subscription_list_smart_bar_header_title %}
@@ -104,6 +113,16 @@
                     {% endblock %}
                 </sw-entity-listing>
             {% endblock %}
+        </template>
+
+        <template #sidebar>
+            <sw-sidebar>
+                <sw-sidebar-item
+                    :icon="compatibilityIcons.refresh"
+                    :title="$tc('sw-product.list.titleSidebarItemRefresh')"
+                    @click="onRefresh"
+                />
+            </sw-sidebar>
         </template>
     </sw-page>
 {% endblock %}
