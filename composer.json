@@ -65,7 +65,8 @@
     "require": {
         "php": ">=7.4",
         "ext-curl": "*",
-        "mollie/mollie-api-php": "2.61.0"
+        "mollie/mollie-api-php": "2.61.0",
+        "composer-runtime-api": "^2.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5",
