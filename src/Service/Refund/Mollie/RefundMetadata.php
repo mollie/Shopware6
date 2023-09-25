@@ -85,10 +85,6 @@ class RefundMetadata
         ];
 
         foreach ($this->items as $item) {
-            if ($item->getQuantity() <= 0) {
-                continue;
-            }
-
             $swLineId = $this->dataCompression->compress($item->getShopwareLineID());
 
             $data['composition'][] = [
