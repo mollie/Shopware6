@@ -5,11 +5,12 @@ namespace MolliePayments\Fixtures\Product;
 use Basecom\FixturePlugin\Fixture;
 use Basecom\FixturePlugin\FixtureBag;
 use Basecom\FixturePlugin\FixtureHelper;
+use MolliePayments\Fixtures\Category\CategoryFixture;
 use MolliePayments\Fixtures\Product\Traits\ProductFixtureTrait;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 
-class RoundingProducts extends Fixture
+class CheapProducts extends Fixture
 {
     use ProductFixtureTrait;
 
@@ -46,17 +47,26 @@ class RoundingProducts extends Fixture
     }
 
     /**
+     * @return string[]
+     */
+    public function dependsOn(): array
+    {
+        return [
+            CategoryFixture::class
+        ];
+    }
+
+
+    /**
      * @param FixtureBag $bag
      * @return void
      */
     public function load(FixtureBag $bag): void
     {
-        $category = 'Rounding';
-        $image = 'tshirt-white.png';
-        $description = 'Product to test rounding issues.';
+        $category = 'Cheap';
+        $image = 'tshirt-black.png';
+        $description = 'Mollie Product for testing purpose in development environment. You can use this cheap products for LIVE tests or other scenarios';
 
-        $this->createProduct('7d1abedd2d22436385580e2ff42431b9', 'Product A 4 Decimals', 'MOL_ROUNDING_1', $category, $description, 2.7336, $image, false, [], $this->repoProducts, $this->helper);
-        $this->createProduct('6d1abedd2d22436485580f3ff42431b9', 'Product B 4 Decimals', 'MOL_ROUNDING_2', $category, $description, 2.9334, $image, false, [], $this->repoProducts, $this->helper);
-        $this->createProduct('1a2abeed2d22436485580f3ff42431b9', 'Product C 4 Decimals', 'MOL_ROUNDING_3', $category, $description, 1.6494, $image, false, [], $this->repoProducts, $this->helper);
+        $this->createProduct('1d3eefdd2d22436385580e2fb43431b9', 'Cheap Mollie Shirt', 'MOL_CHEAP_1', $category, $description, 1, $image, true, [], $this->repoProducts, $this->helper);
     }
 }
