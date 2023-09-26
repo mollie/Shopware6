@@ -26,7 +26,7 @@
                 "selectBank": "Select bank"
             },
             "pos": {
-              "selectTerminal": "Terminal auswählen"
+              "selectTerminal": "Select terminal"
             },
             "mandate": {
                 "sectionTitle": "Saved cards",
