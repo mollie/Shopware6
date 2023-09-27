@@ -96,7 +96,7 @@ class RefundHydrator
             'isProcessing' => $refund->isProcessing(),
             'isQueued' => $refund->isQueued(),
             'isTransferred' => $refund->isTransferred(),
-            'metadata' => $metaData
+            'metadata' => $metaData,
         ];
     }
 }

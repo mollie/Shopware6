@@ -20,8 +20,10 @@ use Kiener\MolliePayments\Handler\Method\KlarnaPayNowPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaSliceItPayment;
 use Kiener\MolliePayments\Handler\Method\PayPalPayment;
 use Kiener\MolliePayments\Handler\Method\PaySafeCardPayment;
+use Kiener\MolliePayments\Handler\Method\PosPayment;
 use Kiener\MolliePayments\Handler\Method\Przelewy24Payment;
 use Kiener\MolliePayments\Handler\Method\SofortPayment;
+use Kiener\MolliePayments\Handler\Method\TwintPayment;
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Kiener\MolliePayments\MolliePayments;
 use Kiener\MolliePayments\Repository\Media\MediaRepository;
@@ -43,7 +45,9 @@ use Shopware\Core\Framework\Plugin\Util\PluginIdProvider;
 
 class PaymentMethodService
 {
-    /** @var MediaService */
+    /**
+     * @var MediaService
+     */
     private $mediaService;
 
     /**
@@ -51,7 +55,9 @@ class PaymentMethodService
      */
     private $paymentRepository;
 
-    /** @var PluginIdProvider */
+    /**
+     * @var PluginIdProvider
+     */
     private $pluginIdProvider;
 
     /**
@@ -59,7 +65,9 @@ class PaymentMethodService
      */
     private $mediaRepository;
 
-    /** @var HttpClientInterface */
+    /**
+     * @var HttpClientInterface
+     */
     private $httpClient;
 
 
@@ -266,11 +274,8 @@ class PaymentMethodService
      *
      * @return EntityWrittenContainerEvent
      */
-    public function setPaymentMethodActivated(
-        string  $paymentMethodId,
-        bool    $active,
-        Context $context
-    ): EntityWrittenContainerEvent {
+    public function setPaymentMethodActivated(string $paymentMethodId, bool $active, Context $context): EntityWrittenContainerEvent
+    {
         return $this->paymentRepository->upsert(
             [
                 [
@@ -382,7 +387,9 @@ class PaymentMethodService
             Przelewy24Payment::class,
             SofortPayment::class,
             VoucherPayment::class,
-            In3Payment::class
+            In3Payment::class,
+            PosPayment::class,
+            TwintPayment::class,
             // IngHomePayPayment::class, // not allowed anymore
             // DirectDebitPayment::class, // only allowed when updating subsriptions, aka => not allowed anymore
         ];

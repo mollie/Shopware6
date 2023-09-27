@@ -43,7 +43,7 @@ Component.register('mollie-pluginconfig-section-order-lifetime-warning', {
                 this.klarnaOrderLifeTimeReached = limitDetector.isKlarnaOrderLifeTimeReached(value);
 
 
-                orderLifeTimeElement.addEventListener("keyup", (event) => {
+                orderLifeTimeElement.addEventListener('keyup', (event) => {
                     const value =  parseInt(event.target.value);
 
                     this.oderLifeTimeLimitReached = limitDetector.isOderLifeTimeLimitReached(value);

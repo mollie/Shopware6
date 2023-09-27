@@ -25,6 +25,9 @@
             "ideal": {
                 "selectBank": "Select bank"
             },
+            "pos": {
+              "selectTerminal": "Select terminal"
+            },
             "mandate": {
                 "sectionTitle": "Saved cards",
                 "cardTitleLabel": "%name% •••• %number%",

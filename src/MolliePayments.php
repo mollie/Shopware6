@@ -6,7 +6,7 @@ use Exception;
 use Kiener\MolliePayments\Compatibility\DependencyLoader;
 use Kiener\MolliePayments\Components\Installer\PluginInstaller;
 use Kiener\MolliePayments\Repository\CustomFieldSet\CustomFieldSetRepository;
-use Kiener\MolliePayments\Service\CustomFieldService;
+use Psr\Container\ContainerInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Migration\MigrationCollection;
@@ -94,8 +94,11 @@ class MolliePayments extends Plugin
         # that's the only part we use the Shopware repository directly,
         # and not our custom one, because our repositories are not yet registered in this function
         /** @var EntityRepository $shopwareRepoCustomFields */
-        $shopwareRepoCustomFields = $this->container->get('custom_field_set.repository');
-        $mollieRepoCustomFields = new CustomFieldSetRepository($shopwareRepoCustomFields);
+        $shopwareRepoCustomFields = $container->get('custom_field_set.repository');
+
+        if ($shopwareRepoCustomFields !== null) {
+            $mollieRepoCustomFields = new CustomFieldSetRepository($shopwareRepoCustomFields);
+        }
 
         $this->runDbMigrations($context->getMigrationCollection());
     }
@@ -170,7 +173,7 @@ class MolliePayments extends Plugin
             throw new Exception('Container is not initialized');
         }
         /** @var PluginInstaller $pluginInstaller */
-        $pluginInstaller = $this->container->get(PluginInstaller::class);
+        $pluginInstaller = $container->get(PluginInstaller::class);
 
         $pluginInstaller->install($context);
     }

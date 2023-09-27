@@ -1,5 +1,8 @@
 {
   "global": {
+    "entities": {
+      "mollie_subscription": "Mollie Abonnement | Mollie Abonnementen"
+    },
     "businessEvents": {
       "mollie_checkout_order_success": " Bestelling succesvol",
       "mollie_checkout_order_failed": " Bestelling mislukt",
@@ -20,7 +23,7 @@
       "mollie_subscription_cancelled": " Mollie abonnement opgezegd",
       "mollie_subscription_paused": " Mollie abonnement gepauzeerd",
       "mollie_subscription_resumed": " Mollie abonnement hervat",
-      "mollie_subscription_skipped": " Mollie subscription overgeslagen",
+      "mollie_subscription_skipped": " Mollie abonnement overgeslagen",
       "mollie_subscription_renewed": " Mollie abonnement verlengd",
       "mollie_subscription_renewal_reminder": " Mollie herinnering voor abonnementsverlenging"
     }
@@ -28,6 +31,7 @@
   "mollie-payments": {
     "pluginTitle": "Mollie",
     "pluginDescription": "Mollie Module",
+    "searchPlaceholder": "Zoek in abonnementen...",
     "general": {
       "mainMenuItemGeneral": "Mollie betalingen",
       "descriptionTextModule": "Mollie betalingen",
@@ -274,6 +278,7 @@
         "cancelButton": "Niet verzenden"
       }
     },
+
     "sw-flow": {
       "actions": {
         "shipOrder": {
@@ -442,6 +447,15 @@
       },
       "mollie_subscription": {
         "label": "Abonnementen"
+      }
+    }
+  },
+  "sw-profile": {
+    "tabSearchPreferences": {
+      "modules": {
+        "mollie_subscription": {
+          "description": "Beschrijving"
+        }
       }
     }
   },

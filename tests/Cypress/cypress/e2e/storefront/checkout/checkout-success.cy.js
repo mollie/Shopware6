@@ -145,7 +145,7 @@ context("Checkout Tests", () => {
                     } else if (payment.key === 'credit-card') {
 
                         cy.wait(2000);
-                        
+
                         mollieCreditCard.enterValidCard();
                         mollieCreditCard.submitForm();
                         molliePayment.selectPaid();
@@ -165,6 +165,20 @@ context("Checkout Tests", () => {
                     cy.contains('Thank you for your order');
                 })
 
+            })
+
+            it('C1341120: Pay with POS Terminal', () => {
+
+                scenarioDummyBasket.execute();
+
+                paymentAction.switchPaymentMethod('POS Terminal');
+
+                shopware.prepareDomainChange();
+                checkout.placeOrderOnConfirm();
+
+                cy.url().should('include', '/mollie/pos/checkout?sw=');
+
+                cy.contains('Follow the instructions on the terminal');
             })
         })
     })

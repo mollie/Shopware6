@@ -6,6 +6,7 @@ use Kiener\MolliePayments\Components\Subscription\Exception\SubscriptionSkippedE
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Repository\Order\OrderRepository;
 use Kiener\MolliePayments\Repository\Order\OrderRepositoryInterface;
+use Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepositoryInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
@@ -38,19 +39,26 @@ class WebhookControllerBase extends StorefrontController
      */
     private $repoOrders;
 
+    /**
+     * @var OrderTransactionRepositoryInterface
+     */
+    private $repoOrderTransactions;
+
 
     /**
      * @param NotificationFacade $notificationFacade
      * @param SubscriptionManager $subscriptionManager
      * @param OrderRepositoryInterface $repoOrders
+     * @param OrderTransactionRepositoryInterface $repoOrderTransactions
      * @param LoggerInterface $logger
      */
-    public function __construct(NotificationFacade $notificationFacade, SubscriptionManager $subscriptionManager, OrderRepositoryInterface $repoOrders, LoggerInterface $logger)
+    public function __construct(NotificationFacade $notificationFacade, SubscriptionManager $subscriptionManager, OrderRepositoryInterface $repoOrders, OrderTransactionRepositoryInterface $repoOrderTransactions, LoggerInterface $logger)
     {
         $this->logger = $logger;
         $this->subscriptions = $subscriptionManager;
         $this->notificationFacade = $notificationFacade;
         $this->repoOrders = $repoOrders;
+        $this->repoOrderTransactions = $repoOrderTransactions;
     }
 
     /**
@@ -148,8 +156,7 @@ class WebhookControllerBase extends StorefrontController
 
 
             # now lets grab the latest order transaction of our new order
-            /** @var OrderTransactionEntity $latestTransaction */
-            $latestTransaction = $this->notificationFacade->getOrderTransactions($swOrder->getId(), $context->getContext())->last();
+            $latestTransaction = $this->repoOrderTransactions->getLatestOrderTransaction($swOrder->getId(), $context->getContext());
 
             # now simply redirect to the official webhook
             # that handles the full order, validates the payment and

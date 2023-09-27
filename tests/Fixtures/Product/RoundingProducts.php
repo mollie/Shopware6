@@ -55,8 +55,8 @@ class RoundingProducts extends Fixture
         $image = 'tshirt-white.png';
         $description = 'Product to test rounding issues.';
 
-        $this->createProduct('7d1abedd2d22436385580e2ff42431b9', 'Product A 4 Decimals', 'MOL_ROUNDING_1', $category, $description, 2.7336, $image, [], $this->repoProducts, $this->helper);
-        $this->createProduct('6d1abedd2d22436485580f3ff42431b9', 'Product B 4 Decimals', 'MOL_ROUNDING_2', $category, $description, 2.9334, $image, [], $this->repoProducts, $this->helper);
-        $this->createProduct('1a2abeed2d22436485580f3ff42431b9', 'Product C 4 Decimals', 'MOL_ROUNDING_3', $category, $description, 1.6494, $image, [], $this->repoProducts, $this->helper);
+        $this->createProduct('7d1abedd2d22436385580e2ff42431b9', 'Product A 4 Decimals', 'MOL_ROUNDING_1', $category, $description, 2.7336, $image, false, [], $this->repoProducts, $this->helper);
+        $this->createProduct('6d1abedd2d22436485580f3ff42431b9', 'Product B 4 Decimals', 'MOL_ROUNDING_2', $category, $description, 2.9334, $image, false, [], $this->repoProducts, $this->helper);
+        $this->createProduct('1a2abeed2d22436485580f3ff42431b9', 'Product C 4 Decimals', 'MOL_ROUNDING_3', $category, $description, 1.6494, $image, false, [], $this->repoProducts, $this->helper);
     }
 }
