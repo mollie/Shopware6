@@ -108,7 +108,7 @@ class FakeRefundService implements RefundServiceInterface
      * @param OrderEntity $order
      * @return array
      */
-    public function getRefunds(OrderEntity $order): array
+    public function getRefunds(OrderEntity $order, Context $context): array
     {
         // TODO: Implement getRefunds() method.
     }

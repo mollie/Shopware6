@@ -47,6 +47,10 @@ class RefundService implements RefundServiceInterface
      */
     private $gwMollie;
 
+    /**
+     * @var CompositionRepairServiceInterface
+     */
+    private $compositionRepairService;
 
 
     /**
@@ -55,12 +59,13 @@ class RefundService implements RefundServiceInterface
      * @param RefundHydrator $refundHydrator
      * @param MollieGatewayInterface $gwMollie
      */
-    public function __construct(Order $mollie, OrderService $orders, RefundHydrator $refundHydrator, MollieGatewayInterface $gwMollie)
+    public function __construct(Order $mollie, OrderService $orders, RefundHydrator $refundHydrator, MollieGatewayInterface $gwMollie, CompositionRepairServiceInterface $compositionRepairService)
     {
         $this->mollie = $mollie;
         $this->orders = $orders;
         $this->refundHydrator = $refundHydrator;
         $this->gwMollie = $gwMollie;
+        $this->compositionRepairService = $compositionRepairService;
     }
 
 
@@ -189,7 +194,7 @@ class RefundService implements RefundServiceInterface
      * @throws CouldNotExtractMollieOrderIdException
      * @return array<mixed>
      */
-    public function getRefunds(OrderEntity $order): array
+    public function getRefunds(OrderEntity $order, Context  $context): array
     {
         $orderAttributes = new OrderAttributes($order);
 
@@ -207,9 +212,13 @@ class RefundService implements RefundServiceInterface
                 if ($refund->status === 'canceled') {
                     continue;
                 }
-                /**
-                 * TODO: remove old compositions
-                 */
+                if (property_exists($refund, 'metadata')) {
+                    /** @var \stdClass|string $metadata */
+                    $metadata = $refund->metadata;
+                    if (is_string($metadata)) {
+                        $order = $this->compositionRepairService->updateRefundItems($refund, $order, $context);
+                    }
+                }
 
                 $refundsArray[] = $this->refundHydrator->hydrate($refund, $order);
             }

@@ -209,4 +209,12 @@ final class RefundItemEntity extends Entity
     {
         return $this->orderLineItemVersionId;
     }
+
+    /**
+     * @param null|string $orderLineItemVersionId
+     */
+    public function setOrderLineItemVersionId(?string $orderLineItemVersionId): void
+    {
+        $this->orderLineItemVersionId = $orderLineItemVersionId;
+    }
 }

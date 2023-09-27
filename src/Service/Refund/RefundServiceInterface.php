@@ -43,7 +43,7 @@ interface RefundServiceInterface
      * @param OrderEntity $order
      * @return Refund[]
      */
-    public function getRefunds(OrderEntity $order): array;
+    public function getRefunds(OrderEntity $order, Context  $context): array;
 
     /**
      * @param OrderEntity $order

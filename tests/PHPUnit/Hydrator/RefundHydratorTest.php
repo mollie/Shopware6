@@ -116,7 +116,7 @@ class RefundHydratorTest extends TestCase
             'isProcessing' => $status == RefundStatus::STATUS_PROCESSING,
             'isQueued' => $status == RefundStatus::STATUS_QUEUED,
             'isTransferred' => $status == RefundStatus::STATUS_REFUNDED,
-            'metadata' => new \stdClass(),
+            'metadata' => null,
         ];
     }
 

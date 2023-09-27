@@ -267,7 +267,7 @@ class RefundControllerBase extends AbstractController
         try {
             $order = $this->orderService->getOrder($orderId, $context);
 
-            $refunds = $this->refundService->getRefunds($order);
+            $refunds = $this->refundService->getRefunds($order, $context);
 
             return $this->json($refunds);
         } catch (\Throwable $e) {
