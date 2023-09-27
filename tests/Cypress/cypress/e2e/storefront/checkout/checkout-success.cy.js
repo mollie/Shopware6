@@ -167,19 +167,6 @@ context("Checkout Tests", () => {
 
             })
 
-            it('C1341120: Pay with POS Terminal', () => {
-
-                scenarioDummyBasket.execute();
-
-                paymentAction.switchPaymentMethod('POS Terminal');
-
-                shopware.prepareDomainChange();
-                checkout.placeOrderOnConfirm();
-
-                cy.url().should('include', '/mollie/pos/checkout?sw=');
-
-                cy.contains('Follow the instructions on the terminal');
-            })
         })
     })
 
