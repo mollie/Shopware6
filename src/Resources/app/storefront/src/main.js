@@ -1,4 +1,4 @@
-import MollieRegistration from "./register";
+import MollieRegistration from './register';
 
 // this file will register all plugins according to shopware standard
 // we use our custom webpack so that it's available for Shopware 6.4 and 6.5.

@@ -6,6 +6,7 @@ use Kiener\MolliePayments\Gateway\Mollie\Model\Issuer;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\Subscription;
+use Mollie\Api\Resources\Terminal;
 
 interface MollieGatewayInterface
 {
@@ -28,6 +29,11 @@ interface MollieGatewayInterface
      * @return Issuer[]
      */
     public function getIDealIssuers(): array;
+
+    /**
+     * @return Terminal[]
+     */
+    public function getPosTerminals(): array;
 
     /**
      * @param string $orderId

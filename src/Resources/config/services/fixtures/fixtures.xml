@@ -48,5 +48,11 @@
             <tag name="basecom.fixture"/>
         </service>
 
+        <service id="MolliePayments\Fixtures\Product\CheapProducts">
+            <argument type="service" id="Basecom\FixturePlugin\FixtureHelper"/>
+            <argument type="service" id="product.repository"/>
+            <tag name="basecom.fixture"/>
+        </service>
+
     </services>
 </container>

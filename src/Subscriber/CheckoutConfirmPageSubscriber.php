@@ -4,7 +4,9 @@ namespace Kiener\MolliePayments\Subscriber;
 
 use Exception;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
+use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
+use Kiener\MolliePayments\Handler\Method\PosPayment;
 use Kiener\MolliePayments\Repository\Language\LanguageRepositoryInterface;
 use Kiener\MolliePayments\Repository\Locale\LocaleRepositoryInterface;
 use Kiener\MolliePayments\Service\CustomerService;
@@ -15,6 +17,7 @@ use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Method;
+use Mollie\Api\Resources\Terminal;
 use Mollie\Api\Types\PaymentMethod;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -61,6 +64,12 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     private $mandateService;
 
     /**
+     * @var MollieGatewayInterface
+     */
+    private $mollieGateway;
+
+
+    /**
      * @return array<mixed>>
      */
     public static function getSubscribedEvents(): array
@@ -79,14 +88,16 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
      * @param LanguageRepositoryInterface $languageRepositoryInterface
      * @param LocaleRepositoryInterface $localeRepositoryInterface
      * @param MandateServiceInterface $mandateService
+     * @param MollieGatewayInterface $mollieGateway
      */
-    public function __construct(MollieApiFactory $apiFactory, SettingsService $settingsService, LanguageRepositoryInterface $languageRepositoryInterface, LocaleRepositoryInterface $localeRepositoryInterface, MandateServiceInterface $mandateService)
+    public function __construct(MollieApiFactory $apiFactory, SettingsService $settingsService, LanguageRepositoryInterface $languageRepositoryInterface, LocaleRepositoryInterface $localeRepositoryInterface, MandateServiceInterface $mandateService, MollieGatewayInterface $mollieGateway)
     {
         $this->apiFactory = $apiFactory;
         $this->settingsService = $settingsService;
         $this->repoLanguages = $languageRepositoryInterface;
         $this->repoLocales = $localeRepositoryInterface;
         $this->mandateService = $mandateService;
+        $this->mollieGateway = $mollieGateway;
     }
 
 
@@ -100,11 +111,13 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
         # current request
         $this->settings = $this->settingsService->getSettings($args->getSalesChannelContext()->getSalesChannel()->getId());
 
+        $scId = $args->getSalesChannelContext()->getSalesChannel()->getId();
+
         # now use our factory to get the correct
         # client with the correct sales channel settings
-        $this->apiClient = $this->apiFactory->getClient(
-            $args->getSalesChannelContext()->getSalesChannel()->getId()
-        );
+        $this->apiClient = $this->apiFactory->getClient($scId);
+
+        $this->mollieGateway->switchClient($scId);
 
         $this->addMollieLocaleVariableToPage($args);
         $this->addMollieProfileIdVariableToPage($args);
@@ -112,6 +125,7 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
         $this->addMollieComponentsVariableToPage($args);
         $this->addMollieIdealIssuersVariableToPage($args);
         $this->addMollieSingleClickPaymentDataToPage($args);
+        $this->addMolliePosTerminalsVariableToPage($args);
     }
 
     /**
@@ -319,6 +333,34 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
                 'ideal_issuers' => $ideal->issuers,
                 'preferred_issuer' => $preferredIssuer,
             ]);
+        }
+    }
+
+    /**
+     * Adds ideal issuers variable to the storefront.
+     *
+     * @param AccountEditOrderPageLoadedEvent|CheckoutConfirmPageLoadedEvent $args
+     */
+    private function addMolliePosTerminalsVariableToPage($args): void
+    {
+        try {
+            $terminalsArray = [];
+
+            $terminals = $this->mollieGateway->getPosTerminals();
+
+            foreach ($terminals as $terminal) {
+                $terminalsArray[] = [
+                    'id' => $terminal->id,
+                    'name' => $terminal->description,
+                ];
+            }
+
+            $args->getPage()->assign(
+                [
+                    'mollie_terminals' => $terminalsArray
+                ]
+            );
+        } catch (Exception $e) {
         }
     }
 

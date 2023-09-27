@@ -12,6 +12,7 @@ class RefundStartedEvent651 extends RefundStartedEvent implements ScalarValuesAw
     public function getValues(): array
     {
         return [
+            'amount' => $this->amount,
             'order' => $this->order,
         ];
     }

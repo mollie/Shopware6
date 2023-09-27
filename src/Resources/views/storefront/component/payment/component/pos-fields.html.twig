@@ -1,0 +1,14 @@
+<div class="mollie-pos-terminals d-none"
+     data-mollie-template-pos-terminal
+     data-customer-id="{{ context.customer.id }}"
+     data-shop-url="{{ seoUrl('frontend.home.page') }}">
+
+    {% if page.mollie_terminals %}
+        <select id="posTerminals" name="mollie_pos_terminals" class="custom-select form-select" form="confirmOrderForm">
+            <option value="">{{ "molliePayments.components.pos.selectTerminal"|trans|striptags }}</option>
+            {% for terminal in page.mollie_terminals %}
+                <option value="{{ terminal.id }}"{% if terminal.id is same as(page.preferred_terminal) %} selected{% endif %}>{{ terminal.name }}</option>
+            {% endfor %}
+        </select>
+    {% endif %}
+</div>

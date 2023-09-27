@@ -17,6 +17,8 @@ import './components/mollie-ship-order';
 import './page/mollie-subscriptions-list';
 import './page/mollie-subscriptions-detail';
 
+import defaultSearchConfiguration from './default-search-configuration';
+
 // eslint-disable-next-line no-undef
 const {Module, ApiService, Plugin} = Shopware;
 
@@ -27,10 +29,10 @@ const resolve = Plugin.addBootPromise();
 const systemConfig = ApiService.getByName('systemConfigApiService')
 systemConfig.getValues('MolliePayments').then(config => {
 
-    const navigationRoutes = [];
+    const navigation = [];
 
     if(config['MolliePayments.config.subscriptionsEnabled']) {
-        navigationRoutes.push({
+        navigation.push({
             id: 'mollie-subscriptions',
             label: 'mollie-payments.subscriptions.navigation.title',
             path: 'mollie.payments.subscriptions',
@@ -42,13 +44,13 @@ systemConfig.getValues('MolliePayments').then(config => {
 
     Module.register('mollie-payments', {
         type: 'plugin',
-        name: 'mollie-payments.pluginTitle',
         title: 'mollie-payments.general.mainMenuItemGeneral',
         description: 'mollie-payments.general.descriptionTextModule',
         version: '1.0.0',
         targetVersion: '1.0.0',
         color: '#333',
-        icon: 'default-action-settings',
+        icon: 'regular-shopping-bag',
+        entity: 'mollie_subscription',
 
         routes: {
             subscriptions: {
@@ -76,7 +78,9 @@ systemConfig.getValues('MolliePayments').then(config => {
             },
         },
 
-        navigation: navigationRoutes,
+        navigation,
+
+        defaultSearchConfiguration,
     });
 
     // Now tell Shopware it's okay to load the administration

@@ -17,11 +17,13 @@ trait ProductFixtureTrait
      * @param string $description
      * @param float $price
      * @param string $image
+     * @param bool $shippingFree
      * @param array $customFields
      * @param EntityRepository $repoProducts
      * @param FixtureHelper $helper
+     * @return void
      */
-    protected function createProduct(string $id, string $name, string $number, string $categoryName, string $description, float $price, string $image, array $customFields, EntityRepository $repoProducts, FixtureHelper $helper): void
+    protected function createProduct(string $id, string $name, string $number, string $categoryName, string $description, float $price, string $image, bool $shippingFree, array $customFields, EntityRepository $repoProducts, FixtureHelper $helper): void
     {
         # just reuse the product one ;)
         $mediaId = $id;
@@ -83,6 +85,7 @@ trait ProductFixtureTrait
                     ],
                     'coverId' => $coverId,
                     'customFields' => $customFields,
+                    'shippingFree' => $shippingFree,
                 ]
             ],
             Context::createDefaultContext()

@@ -25,13 +25,13 @@ class UpdateOrderLineItems
     }
 
     /**
-     * @param Order $mollieOrder
+     * @param OrderLine[] $orderLines
      * @param SalesChannelContext $salesChannelContext
+     * @return void
      */
-    public function updateOrderLineItems(Order $mollieOrder, SalesChannelContext $salesChannelContext): void
+    public function updateOrderLineItems(array $orderLines, SalesChannelContext $salesChannelContext): void
     {
-        /** @var OrderLine $orderLine */
-        foreach ($mollieOrder->lines() as $orderLine) {
+        foreach ($orderLines as $orderLine) {
             if ($orderLine->type === OrderLineType::TYPE_SHIPPING_FEE) {
                 continue;
             }
