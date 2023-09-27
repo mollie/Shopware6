@@ -79,30 +79,30 @@ class CompositionMigrationService implements CompositionMigrationServiceInterfac
 
         $dataToSave = [];
         foreach ($oldCompositions as $composition) {
-            $reference = $composition->swReference;
-            if (strlen($reference) === 0) {
-                $reference = RoundingDifferenceFixer::DEFAULT_TITLE;
+            $label = $composition->swReference;
+            if (strlen($label) === 0) {
+                $label = RoundingDifferenceFixer::DEFAULT_TITLE;
             }
 
-            $row = [
-                'type' => $oldMetadata->type,
-                'mollieLineId' => $composition->mollieLineId,
-                'label' => $reference,
-                'quantity' => $composition->quantity,
-                'amount' => $composition->amount,
-                'refundId' => $shopwareRefund->getId(),
-                'oderLineItemId' => null,
-                'oderLineItemVersionId' => null,
-            ];
-
-
+            $orderLineItemId = null;
+            $orderLineItemVersionId = null;
             $orderLineItem = $this->filterByMollieId($orderLineItems, $composition->mollieLineId);
 
             if ($orderLineItem instanceof OrderLineItemEntity) {
-                $row['orderLineItemId'] = $orderLineItem->getId();
-                $row['orderLineItemVersionId'] = $orderLineItem->getVersionId();
+                $orderLineItemId = $orderLineItem->getId();
+                $orderLineItemVersionId = $orderLineItem->getVersionId();
             }
 
+            $row = RefundItemEntity::createEntryArray(
+                $oldMetadata->type,
+                $composition->mollieLineId,
+                $label,
+                $composition->quantity,
+                $composition->amount,
+                $orderLineItemId,
+                $orderLineItemVersionId,
+                $shopwareRefund->getId()
+            );
 
             $dataToSave[] = $row;
         }

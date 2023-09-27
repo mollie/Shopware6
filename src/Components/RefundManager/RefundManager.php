@@ -6,6 +6,7 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatche
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactoryInterface;
 use Kiener\MolliePayments\Components\RefundManager\Builder\RefundDataBuilder;
+use Kiener\MolliePayments\Components\RefundManager\DAL\RefundItem\RefundItemEntity;
 use Kiener\MolliePayments\Components\RefundManager\DAL\Repository\RefundRepositoryInterface;
 use Kiener\MolliePayments\Components\RefundManager\Integrators\StockManagerInterface;
 use Kiener\MolliePayments\Components\RefundManager\RefundData\RefundData;
@@ -466,16 +467,18 @@ class RefundManager implements RefundManagerInterface
             if ($item->getQuantity() <= 0) {
                 continue;
             }
+            $row =  RefundItemEntity::createEntryArray(
+                $type,
+                $item->getMollieLineID(),
+                $item->getShopwareReference(),
+                $item->getQuantity(),
+                $item->getAmount(),
+                $item->getShopwareLineID(),
+                $item->getShopwareLineVersionId(),
+                null
+            );
 
-            $data[] = [
-                'type' => $type,
-                'orderLineItemId' => $item->getShopwareLineID(),
-                'orderLineItemVersionId' => $item->getShopwareLineVersionId(),
-                'mollieLineId' => $item->getMollieLineID(),
-                'label' => (string)$item->getShopwareReference(),
-                'quantity' => $item->getQuantity(),
-                'amount' => $item->getAmount(),
-            ];
+            $data[] = $row;
         }
         return $data;
     }
