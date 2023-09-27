@@ -37,7 +37,7 @@ class RefundHydrator
 
         $metaData = new \stdClass();
 
-        if (property_exists($refund, 'metadata')) {
+        if (property_exists($refund, 'metadata') && $refund->metadata !== null) {
             /** @var \stdClass|string $metaData */
             $metaData = $refund->metadata;
             if (is_string($metaData)) {

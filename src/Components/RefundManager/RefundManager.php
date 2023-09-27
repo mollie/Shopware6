@@ -169,6 +169,7 @@ class RefundManager implements RefundManagerInterface
 
 
             if ($orderAttributes->isTypeSubscription()) {
+                $refundType = RefundItemType::PARTIAL;
                 # we only have a transaction in the case of a subscription
                 $refund = $this->refundService->refundPartial(
                     $order,
@@ -179,6 +180,7 @@ class RefundManager implements RefundManagerInterface
                     $context
                 );
             } else {
+                $refundType = RefundItemType::FULL;
                 $refund = $this->refundService->refundFull(
                     $order,
                     $request->getDescription(),
