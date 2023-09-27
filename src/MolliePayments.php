@@ -94,7 +94,7 @@ class MolliePayments extends Plugin
         # that's the only part we use the Shopware repository directly,
         # and not our custom one, because our repositories are not yet registered in this function
         /** @var EntityRepository $shopwareRepoCustomFields */
-        $shopwareRepoCustomFields = $container->get('custom_field_set.repository');
+        $shopwareRepoCustomFields = $this->container->get('custom_field_set.repository');
 
         if ($shopwareRepoCustomFields !== null) {
             $mollieRepoCustomFields = new CustomFieldSetRepository($shopwareRepoCustomFields);
@@ -173,7 +173,7 @@ class MolliePayments extends Plugin
             throw new Exception('Container is not initialized');
         }
         /** @var PluginInstaller $pluginInstaller */
-        $pluginInstaller = $container->get(PluginInstaller::class);
+        $pluginInstaller = $this->container->get(PluginInstaller::class);
 
         $pluginInstaller->install($context);
     }
