@@ -18,7 +18,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
 
-class CompositionRepairService implements CompositionRepairServiceInterface
+class CompositionMigrationService implements CompositionMigrationServiceInterface
 {
     /**
      * @var EntityRepository
@@ -63,14 +63,20 @@ class CompositionRepairService implements CompositionRepairServiceInterface
         }
 
         $refundLineItems = $shopwareRefund->getRefundItems()->getElements();
+
+        /**
+         * Exit criteria, if we have refund line items, then we exit here
+         */
         if (count($refundLineItems) > 0) {
             return $order;
         }
+
         /** @var ?OrderLineItemCollection $orderLineItems */
         $orderLineItems = $order->getLineItems();
         if ($orderLineItems === null) {
             return $order;
         }
+
         $dataToSave = [];
         foreach ($oldCompositions as $composition) {
             $reference = $composition->swReference;
@@ -81,14 +87,17 @@ class CompositionRepairService implements CompositionRepairServiceInterface
             $row = [
                 'type' => $oldMetadata->type,
                 'mollieLineId' => $composition->mollieLineId,
-                'reference' => $reference,
+                'label' => $reference,
                 'quantity' => $composition->quantity,
                 'amount' => $composition->amount,
                 'refundId' => $shopwareRefund->getId(),
                 'oderLineItemId' => null,
                 'oderLineItemVersionId' => null,
             ];
+
+
             $orderLineItem = $this->filterByMollieId($orderLineItems, $composition->mollieLineId);
+
             if ($orderLineItem instanceof OrderLineItemEntity) {
                 $row['orderLineItemId'] = $orderLineItem->getId();
                 $row['orderLineItemVersionId'] = $orderLineItem->getVersionId();
@@ -97,7 +106,13 @@ class CompositionRepairService implements CompositionRepairServiceInterface
 
             $dataToSave[] = $row;
         }
+
         $entityWrittenContainerEvent = $this->refundItemRepository->create($dataToSave, $context);
+
+        /**
+         * get the new inserted data from the written container event and create a new refund items collection and assign it to the refund.
+         * php is using here copy by reference so the order will have the new line items inside the refund and we do not need to reload the order entity again
+         */
         $refundItems = $this->createEntitiesByEvent($entityWrittenContainerEvent);
         $shopwareRefund->setRefundItems($refundItems);
         return $order;
@@ -119,7 +134,7 @@ class CompositionRepairService implements CompositionRepairServiceInterface
             $entity->setId($result->getProperty('id'));
             $entity->setUniqueIdentifier($result->getProperty('id'));
             $entity->setQuantity($result->getProperty('quantity'));
-            $entity->setReference($result->getProperty('reference'));
+            $entity->setLabel($result->getProperty('label'));
             $entity->setAmount($result->getProperty('amount'));
             $entity->setRefundId($result->getProperty('refundId'));
             $entity->setMollieLineId($result->getProperty('mollieLineId'));

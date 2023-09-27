@@ -48,7 +48,7 @@ class RefundService implements RefundServiceInterface
     private $gwMollie;
 
     /**
-     * @var CompositionRepairServiceInterface
+     * @var CompositionMigrationServiceInterface
      */
     private $compositionRepairService;
 
@@ -59,7 +59,7 @@ class RefundService implements RefundServiceInterface
      * @param RefundHydrator $refundHydrator
      * @param MollieGatewayInterface $gwMollie
      */
-    public function __construct(Order $mollie, OrderService $orders, RefundHydrator $refundHydrator, MollieGatewayInterface $gwMollie, CompositionRepairServiceInterface $compositionRepairService)
+    public function __construct(Order $mollie, OrderService $orders, RefundHydrator $refundHydrator, MollieGatewayInterface $gwMollie, CompositionMigrationServiceInterface $compositionRepairService)
     {
         $this->mollie = $mollie;
         $this->orders = $orders;

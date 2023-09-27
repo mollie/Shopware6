@@ -7,7 +7,7 @@ use Mollie\Api\Resources\Refund;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 
-interface CompositionRepairServiceInterface
+interface CompositionMigrationServiceInterface
 {
     public function updateRefundItems(Refund $refund, OrderEntity $order, Context $context): OrderEntity;
 }

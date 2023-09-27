@@ -8,12 +8,14 @@ use Kiener\MolliePayments\Components\RefundManager\DAL\RefundItem\RefundItemDefi
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityExtension;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\CascadeDelete;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\ManyToOneAssociationField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\OneToManyAssociationField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\OneToOneAssociationField;
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 
-final class OrderLineItemExtension extends EntityExtension
+class OrderLineItemExtension extends EntityExtension
 {
-    const ORDER_LINE_ITEM_PROPERTY_NAME = 'refundLineItem';
+    const ORDER_LINE_ITEM_PROPERTY_NAME = 'mollieRefundLineItems';
 
     /**
      * @return string
@@ -28,6 +30,6 @@ final class OrderLineItemExtension extends EntityExtension
      */
     public function extendFields(FieldCollection $collection): void
     {
-        $collection->add(new OneToOneAssociationField(self::ORDER_LINE_ITEM_PROPERTY_NAME, 'id', 'order_line_item_id', RefundItemDefinition::class));
+        $collection->add(new OneToManyAssociationField(self::ORDER_LINE_ITEM_PROPERTY_NAME, RefundItemDefinition::class, 'order_line_item_id'));
     }
 }

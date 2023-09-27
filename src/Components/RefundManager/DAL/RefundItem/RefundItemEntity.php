@@ -21,14 +21,17 @@ final class RefundItemEntity extends Entity
      * @var string
      */
     protected $refundId;
+
     /**
      * @var null|RefundEntity
      */
     protected $refund;
+
     /**
      * @var string
      */
-    protected $reference;
+    protected $label;
+
     /**
      * @var string
      */
@@ -43,6 +46,7 @@ final class RefundItemEntity extends Entity
      * @var float
      */
     protected $amount;
+
     /**
      * @var null|string
      */
@@ -189,17 +193,17 @@ final class RefundItemEntity extends Entity
     /**
      * @return string
      */
-    public function getReference(): string
+    public function getLabel(): string
     {
-        return $this->reference;
+        return $this->label;
     }
 
     /**
-     * @param string $reference
+     * @param string $label
      */
-    public function setReference(string $reference): void
+    public function setLabel(string $label): void
     {
-        $this->reference = $reference;
+        $this->label = $label;
     }
 
     /**

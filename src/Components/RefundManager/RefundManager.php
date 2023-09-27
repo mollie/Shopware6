@@ -472,7 +472,7 @@ class RefundManager implements RefundManagerInterface
                 'orderLineItemId' => $item->getShopwareLineID(),
                 'orderLineItemVersionId' => $item->getShopwareLineVersionId(),
                 'mollieLineId' => $item->getMollieLineID(),
-                'reference' => (string)$item->getShopwareReference(),
+                'label' => (string)$item->getShopwareReference(),
                 'quantity' => $item->getQuantity(),
                 'amount' => $item->getAmount(),
             ];

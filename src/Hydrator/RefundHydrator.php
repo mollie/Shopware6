@@ -70,7 +70,7 @@ class RefundHydrator
                         'swLineId' => (string)$refundLineItem->getOrderLineItemId(),
                         'swLineVersionId' => (string)$refundLineItem->getOrderLineItemVersionId(),
                         'mollieLineId' => $refundLineItem->getMollieLineId(),
-                        'swReference' => $refundLineItem->getReference(),
+                        'swReference' => $refundLineItem->getLabel(),
                         'quantity' => $refundLineItem->getQuantity(),
                         'amount' => $refundLineItem->getAmount()
                     ];

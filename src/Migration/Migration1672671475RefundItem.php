@@ -21,7 +21,7 @@ class Migration1672671475RefundItem extends MigrationStep
                       `order_line_item_version_id` binary(16) NULL,
                       `mollie_line_id` VARCHAR(255),
                       `type` VARCHAR(255),
-                      `reference` VARCHAR(255),
+                      `label` VARCHAR(255),
                       `refund_id` binary(16) NOT NULL,
                       `quantity` INT(10),
                       `amount` DOUBLE,
