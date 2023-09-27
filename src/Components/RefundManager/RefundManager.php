@@ -6,6 +6,7 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatche
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactoryInterface;
 use Kiener\MolliePayments\Components\RefundManager\Builder\RefundDataBuilder;
+use Kiener\MolliePayments\Components\RefundManager\DAL\RefundItem\RefundItemEntity;
 use Kiener\MolliePayments\Components\RefundManager\DAL\Repository\RefundRepositoryInterface;
 use Kiener\MolliePayments\Components\RefundManager\Integrators\StockManagerInterface;
 use Kiener\MolliePayments\Components\RefundManager\RefundData\RefundData;
@@ -13,9 +14,12 @@ use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItemRoundingDiff;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieRefundException;
+use Kiener\MolliePayments\Service\MollieApi\Fixer\RoundingDifferenceFixer;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Service\OrderServiceInterface;
 use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
+use Kiener\MolliePayments\Service\Refund\Item\RefundItemType;
+use Kiener\MolliePayments\Service\Refund\Mollie\DataCompressor;
 use Kiener\MolliePayments\Service\Refund\RefundServiceInterface;
 use Kiener\MolliePayments\Struct\MollieApi\OrderLineMetaDataStruct;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
@@ -127,6 +131,7 @@ class RefundManager implements RefundManagerInterface
 
         /** @var null|\Mollie\Api\Resources\Order $mollieOrder */
         $mollieOrder = null;
+        $refundType = '';
 
         if ($orderAttributes->isTypeSubscription()) {
             # pure subscription orders do not
@@ -165,6 +170,7 @@ class RefundManager implements RefundManagerInterface
 
 
             if ($orderAttributes->isTypeSubscription()) {
+                $refundType = RefundItemType::PARTIAL;
                 # we only have a transaction in the case of a subscription
                 $refund = $this->refundService->refundPartial(
                     $order,
@@ -175,6 +181,7 @@ class RefundManager implements RefundManagerInterface
                     $context
                 );
             } else {
+                $refundType = RefundItemType::FULL;
                 $refund = $this->refundService->refundFull(
                     $order,
                     $request->getDescription(),
@@ -186,6 +193,7 @@ class RefundManager implements RefundManagerInterface
         } elseif ($request->isFullRefundWithItems($order)) {
             $this->appendRoundingItemFromMollieOrder($request, $mollieOrder);
             $serviceItems = $this->convertToRefundItems($request, $order, $mollieOrder);
+            $refundType = RefundItemType::FULL;
             $refund = $this->refundService->refundFull(
                 $order,
                 $request->getDescription(),
@@ -194,6 +202,7 @@ class RefundManager implements RefundManagerInterface
                 $context
             );
         } elseif ($request->isPartialAmountOnly()) {
+            $refundType = RefundItemType::PARTIAL;
             $refund = $this->refundService->refundPartial(
                 $order,
                 $request->getDescription(),
@@ -203,6 +212,7 @@ class RefundManager implements RefundManagerInterface
                 $context
             );
         } elseif ($request->isPartialAmountWithItems($order)) {
+            $refundType = RefundItemType::PARTIAL;
             $refund = $this->refundService->refundPartial(
                 $order,
                 $request->getDescription(),
@@ -213,8 +223,7 @@ class RefundManager implements RefundManagerInterface
             );
         }
 
-
-        if (!$refund instanceof Refund) {
+        if (! $refund instanceof Refund) {
             # a problem happened, lets finish with an exception
             throw new CouldNotCreateMollieRefundException('', (string)$order->getOrderNumber());
         }
@@ -222,20 +231,22 @@ class RefundManager implements RefundManagerInterface
         $refundAmount = (float)$refund->amount->value;
 
 
+
+        $refundData = [
+            'orderId' => $order->getId(),
+            'orderVersionId' => $order->getVersionId(),
+            'mollieRefundId' => $refund->id,
+            'publicDescription' => $request->getDescription(),
+            'internalDescription' => $request->getInternalDescription(),
+
+        ];
+        $refundItems = $this->convertToRepositoryArray($serviceItems, $refundType);
+        if (count($refundItems) > 0) {
+            $refundData['refundItems'] = $refundItems;
+        }
         # SAVE LOCAL REFUND
         # ---------------------------------------------------------------------------------------------
-        $this->refundRepository->create(
-            [
-                [
-                    'orderId' => $order->getId(),
-                    'orderVersionId' => $order->getVersionId(),
-                    'mollieRefundId' => $refund->id,
-                    'publicDescription' => $request->getDescription(),
-                    'internalDescription' => $request->getInternalDescription(),
-                ]
-            ],
-            $context
-        );
+        $this->refundRepository->create([$refundData], $context);
 
 
         # DISPATCH FLOW BUILDER
@@ -379,8 +390,9 @@ class RefundManager implements RefundManagerInterface
 
         foreach ($request->getItems() as $requestItem) {
             $mollieLineID = '';
-            $shopwareReferenceID = '';
-
+            $shopwareReferenceID = RoundingDifferenceFixer::DEFAULT_TITLE;
+            $orderLineItemId = null;
+            $orderLineItemVersionId = null;
             $orderItem = $this->getOrderItem($order, $requestItem->getLineId());
 
             # if we have a real line item, then extract
@@ -388,11 +400,11 @@ class RefundManager implements RefundManagerInterface
             if ($orderItem instanceof OrderLineItemEntity) {
                 $orderItemAttributes = new OrderLineItemEntityAttributes($orderItem);
                 $mollieLineID = $orderItemAttributes->getMollieOrderLineID();
-
+                $orderLineItemId = $orderItem->getId();
+                $orderLineItemVersionId = $orderItem->getVersionId();
+                $shopwareReferenceID = (string)$orderItem->getReferencedId();
                 if (isset($orderItem->getPayload()['productNumber'])) {
                     $shopwareReferenceID = (string)$orderItem->getPayload()['productNumber'];
-                } else {
-                    $shopwareReferenceID = (string)$orderItem->getReferencedId();
                 }
             } else {
                 # yeah i know complexity...but for now lets keep it compact :)
@@ -431,14 +443,43 @@ class RefundManager implements RefundManagerInterface
             # for our refund service with all
             # required information
             $serviceItems[] = new RefundItem(
-                $requestItem->getLineId(),
                 $mollieLineID,
                 (string)$shopwareReferenceID,
                 $requestItem->getQuantity(),
-                $requestItem->getAmount()
+                $requestItem->getAmount(),
+                $orderLineItemId,
+                $orderLineItemVersionId
             );
         }
 
         return $serviceItems;
+    }
+
+    /**
+     * @param RefundItem[] $serviceItems
+     * @param string $type
+     * @return array<mixed>
+     */
+    private function convertToRepositoryArray(array $serviceItems, string $type): array
+    {
+        $data = [];
+        foreach ($serviceItems as $item) {
+            if ($item->getQuantity() <= 0) {
+                continue;
+            }
+            $row =  RefundItemEntity::createEntryArray(
+                $type,
+                $item->getMollieLineID(),
+                $item->getShopwareReference(),
+                $item->getQuantity(),
+                $item->getAmount(),
+                $item->getShopwareLineID(),
+                $item->getShopwareLineVersionId(),
+                null
+            );
+
+            $data[] = $row;
+        }
+        return $data;
     }
 }

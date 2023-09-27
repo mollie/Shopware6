@@ -76,7 +76,7 @@ class RefundDataBuilder
 
 
         try {
-            $refunds = $this->refundService->getRefunds($order);
+            $refunds = $this->refundService->getRefunds($order, $context);
         } catch (PaymentNotFoundException $ex) {
             # if we dont have a payment, then theres also no refunds
             # we still need our data, only with an empty list of refunds

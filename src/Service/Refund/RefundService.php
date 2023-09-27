@@ -21,6 +21,8 @@ use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\Refund;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Currency\CurrencyEntity;
 
 class RefundService implements RefundServiceInterface
@@ -45,6 +47,11 @@ class RefundService implements RefundServiceInterface
      */
     private $gwMollie;
 
+    /**
+     * @var CompositionMigrationServiceInterface
+     */
+    private $compositionRepairService;
+
 
     /**
      * @param Order $mollie
@@ -52,12 +59,13 @@ class RefundService implements RefundServiceInterface
      * @param RefundHydrator $refundHydrator
      * @param MollieGatewayInterface $gwMollie
      */
-    public function __construct(Order $mollie, OrderService $orders, RefundHydrator $refundHydrator, MollieGatewayInterface $gwMollie)
+    public function __construct(Order $mollie, OrderService $orders, RefundHydrator $refundHydrator, MollieGatewayInterface $gwMollie, CompositionMigrationServiceInterface $compositionRepairService)
     {
         $this->mollie = $mollie;
         $this->orders = $orders;
         $this->refundHydrator = $refundHydrator;
         $this->gwMollie = $gwMollie;
+        $this->compositionRepairService = $compositionRepairService;
     }
 
 
@@ -76,11 +84,8 @@ class RefundService implements RefundServiceInterface
         $mollieOrder = $this->mollie->getMollieOrder($mollieOrderId, $order->getSalesChannelId());
 
 
-        $metadata = new RefundMetadata(RefundItemType::FULL, $refundItems);
-
         $params = [
             'description' => $description,
-            'metadata' => $metadata->toString(),
         ];
 
 
@@ -125,8 +130,6 @@ class RefundService implements RefundServiceInterface
      */
     public function refundPartial(OrderEntity $order, string $description, string $internalDescription, float $amount, array $lineItems, Context $context): Refund
     {
-        $metadata = new RefundMetadata(RefundItemType::PARTIAL, $lineItems);
-
         $payment = $this->getPayment($order);
 
         $refund = $payment->refund([
@@ -134,8 +137,7 @@ class RefundService implements RefundServiceInterface
                 'value' => number_format($amount, 2, '.', ''),
                 'currency' => ($order->getCurrency() instanceof CurrencyEntity) ? $order->getCurrency()->getIsoCode() : '',
             ],
-            'description' => $description,
-            'metadata' => $metadata->toString(),
+            'description' => $description
         ]);
 
         if (!$refund instanceof Refund) {
@@ -192,7 +194,7 @@ class RefundService implements RefundServiceInterface
      * @throws CouldNotExtractMollieOrderIdException
      * @return array<mixed>
      */
-    public function getRefunds(OrderEntity $order): array
+    public function getRefunds(OrderEntity $order, Context  $context): array
     {
         $orderAttributes = new OrderAttributes($order);
 
@@ -210,6 +212,14 @@ class RefundService implements RefundServiceInterface
                 if ($refund->status === 'canceled') {
                     continue;
                 }
+                if (property_exists($refund, 'metadata')) {
+                    /** @var \stdClass|string $metadata */
+                    $metadata = $refund->metadata;
+                    if (is_string($metadata)) {
+                        $order = $this->compositionRepairService->updateRefundItems($refund, $order, $context);
+                    }
+                }
+
                 $refundsArray[] = $this->refundHydrator->hydrate($refund, $order);
             }
 
