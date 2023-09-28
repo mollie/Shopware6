@@ -30,6 +30,11 @@ class RefundEntity extends Entity
     /**
      * @var null|string
      */
+    protected $type;
+
+    /**
+     * @var null|string
+     */
     protected $publicDescription;
 
     /**
@@ -42,6 +47,10 @@ class RefundEntity extends Entity
      */
     protected $refundItems;
 
+
+    /**
+     *
+     */
     public function __construct()
     {
         $this->refundItems = new RefundItemCollection();
@@ -97,6 +106,16 @@ class RefundEntity extends Entity
     public function setMollieRefundId(?string $mollieRefundId): void
     {
         $this->mollieRefundId = $mollieRefundId;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(?string $type): void
+    {
+        $this->type = $type;
     }
 
     /**

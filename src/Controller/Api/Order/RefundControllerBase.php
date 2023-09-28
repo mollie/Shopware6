@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Controller\Api\Order;
 
+use Kiener\MolliePayments\Components\RefundManager\RefundData\RefundData;
 use Kiener\MolliePayments\Components\RefundManager\RefundManagerInterface;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
@@ -116,11 +117,16 @@ class RefundControllerBase extends AbstractController
 
             $order = $this->orderService->getOrder($orderId, $context);
 
-            $data = $this->refundManager->getData($order, $context);
+            $refundData = $this->refundManager->getData($order, $context);
 
-            return $this->json($data->toArray());
+            return $this->json($refundData->toArray());
         } catch (\Throwable $e) {
-            $this->logger->error($e->getMessage());
+            $this->logger->error(
+                $e->getMessage(),
+                [
+                    'error' => $e,
+                ]
+            );
             return $this->buildErrorResponse($e->getMessage());
         }
     }
