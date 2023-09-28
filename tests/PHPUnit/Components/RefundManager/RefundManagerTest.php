@@ -52,6 +52,10 @@ class RefundManagerTest extends TestCase
      */
     private $fakeRefundRespository;
 
+    /**
+     * @var Context
+     */
+    private $fakeContext;
 
     /**
      * @return void
@@ -91,6 +95,8 @@ class RefundManagerTest extends TestCase
             $this->fakeRefundRespository,
             new NullLogger()
         );
+
+        $this->fakeContext = $this->createDummyMock(Context::class, $this);
     }
 
     /**
@@ -175,21 +181,82 @@ class RefundManagerTest extends TestCase
     }
 
     /**
-     * This test verifies that we can also refund line items with quantity 0.
-     * This is necessary because sometimes you have already refunded all quantities, but still want to add another amount value.
-     * In this case, you also want a composition-reference to the line item, which requires a qty of 0 to work.
-     * The test will start a request with a quantity of 0, and we verify that the DAL create function gets a
-     * correct payload, including the refund item.
+     * This test verifies that we can also refund line items with quantity 0 as long as they have an amount.
+     *  This is necessary because sometimes you have already refunded all quantities, but still want to add another amount value.
+     *  In this case, you also want a composition-reference to the line item, which requires a qty of 0 to work.
+     *  The test will start a request with a quantity of 0 and a valid price, and we verify that the DAL create function gets a
+     *  correct payload, including the refund item.
      *
+     * @testWith [ 0, 19.99 ]
+     *            [ 1, 0 ]
+     *            [ 0, -5 ]
+     *
+     * @param int $qty
+     * @param float $itemPrice
      * @return void
      * @throws \Mollie\Api\Exceptions\ApiException
      */
-    public function testItemsWithQuantityZeroAreAdded(): void
+    public function testValidItemsAreAdded(int $qty, float $itemPrice): void
     {
-        /** @var Context $fakeContext */
-        $fakeContext = $this->createDummyMock(Context::class, $this);
+        $order = $this->buildValidOrder();
+
+        $refundRequest = new RefundRequest('', '', '', 2);
+        $refundRequest->addItem(new RefundRequestItem('line-1', $itemPrice, $qty, 0));
+
+        $this->manager->refund($order, $refundRequest, $this->fakeContext);
+
+        $dalCreateData = $this->fakeRefundRespository->getReceivedCreateData();
+
+        $expectedItems = [
+            [
+                "mollieLineId" => "odl_123",
+                "label" => "product-id-1",
+                "quantity" => $qty,
+                "amount" => $itemPrice,
+                "orderLineItemId" => "line-1",
+                'orderLineItemVersionId' => null,
+            ]
+        ];
+
+        $this->assertEquals($expectedItems, $dalCreateData[0]['refundItems'], 'Make sure that valid items are being added to the DAL payload.');
+    }
+
+    /**
+     * This test verifies that invalid items, even though they are sent with the request, are NOT being added to the DAL payload aka into the database.
+     * We have a strict definition on what is valid or invalid.
+     * So we build invalid items and make sure no refundItems are saved into the database.
+     *
+     * @testWith [ 0, 0 ]
+     *           [ -1, 20 ]
+     *
+     * @param int $qty
+     * @param float $itemPrice
+     * @return void
+     * @return void
+     * @throws \Mollie\Api\Exceptions\ApiException
+     * /
+     * @throws \Mollie\Api\Exceptions\ApiException
+     */
+    public function testInvalidItemsAreNotAdded(int $qty, float $itemPrice): void
+    {
+        $order = $this->buildValidOrder();
+
+        $refundRequest = new RefundRequest('', '', '', 2);
+        $refundRequest->addItem(new RefundRequestItem('line-1', $itemPrice, $qty, 0));
+
+        $this->manager->refund($order, $refundRequest, $this->fakeContext);
+
+        $dalCreateData = $this->fakeRefundRespository->getReceivedCreateData();
+
+        $this->assertArrayNotHasKey('refundItems', $dalCreateData[0], 'Make sure that invalid items are not added to the DAL payload');
+    }
 
 
+    /**
+     * @return OrderEntity
+     */
+    private function buildValidOrder(): OrderEntity
+    {
         $order = new OrderEntity();
         $order->setId('O1');
         $order->setAmountTotal(19.99);
@@ -210,37 +277,7 @@ class RefundManagerTest extends TestCase
 
         $order->setLineItems(new OrderLineItemCollection([$item1]));
 
-
-        $refundRequest = new RefundRequest('', '', '', 2);
-
-        # now create a request with an item with quantity 0
-        # but with a valid unit price
-        $refundRequest->addItem(
-            new RefundRequestItem('line-1',
-                19.99,
-                0,
-                0
-            )
-        );
-
-
-        $this->manager->refund($order, $refundRequest, $fakeContext);
-
-
-        $dalCreateData = $this->fakeRefundRespository->getReceivedCreateData();
-
-        $expectedItems = [
-            [
-                "mollieLineId" => "odl_123",
-                "label" => "product-id-1",
-                "quantity" => 0,
-                "amount" => 19.99,
-                "orderLineItemId" => "line-1",
-                'orderLineItemVersionId' => null,
-            ]
-        ];
-
-        $this->assertEquals($expectedItems, $dalCreateData[0]['refundItems'], 'Make sure that items with quantity 0 are being added');
+        return $order;
     }
 
 }

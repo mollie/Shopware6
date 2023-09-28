@@ -505,6 +505,14 @@ class RefundManager implements RefundManagerInterface
         $data = [];
 
         foreach ($serviceItems as $item) {
+            if ($item->getQuantity() === 0 && $item->getAmount() === 0.0) {
+                continue;
+            }
+
+            if ($item->getQuantity() < 0) {
+                continue;
+            }
+
             $row = RefundItemEntity::createArray(
                 $item->getMollieLineID(),
                 $item->getShopwareReference(),
