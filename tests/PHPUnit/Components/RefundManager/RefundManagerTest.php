@@ -6,7 +6,6 @@ namespace MolliePayments\Tests\Components\RefundManager;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund\RefundStarted\RefundStartedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Components\RefundManager\Builder\RefundDataBuilder;
-use Kiener\MolliePayments\Components\RefundManager\DAL\Repository\RefundRepositoryInterface;
 use Kiener\MolliePayments\Components\RefundManager\RefundManager;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
@@ -17,6 +16,7 @@ use MolliePayments\Tests\Fakes\FakeOrderService;
 use MolliePayments\Tests\Fakes\FakeRefundService;
 use MolliePayments\Tests\Fakes\FlowBuilder\FakeFlowBuilderDispatcher;
 use MolliePayments\Tests\Fakes\FlowBuilder\FakeFlowBuilderFactory;
+use MolliePayments\Tests\Fakes\Repositories\FakeRefundRepository;
 use MolliePayments\Tests\Fakes\StockUpdater\FakeStockManager;
 use MolliePayments\Tests\Traits\MockTrait;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -47,10 +47,15 @@ class RefundManagerTest extends TestCase
      */
     private $fakeStockUpdater;
 
+    /**
+     * @var FakeRefundRepository
+     */
+    private $fakeRefundRespository;
+
 
     /**
-     * @throws \Exception
      * @return void
+     * @throws \Exception
      */
     protected function setUp(): void
     {
@@ -73,6 +78,7 @@ class RefundManagerTest extends TestCase
         $this->fakeFlowBuilderDispatcher = new FakeFlowBuilderDispatcher();
         $flowBuilderEventFactory = new FlowBuilderEventFactory('6.4.8.0'); # use any higher version so that we get real events
 
+        $this->fakeRefundRespository = new FakeRefundRepository();
 
         $this->manager = new RefundManager(
             new RefundDataBuilder($fakeOrderService, $fakeRefundService, $fakeOrder),
@@ -82,7 +88,7 @@ class RefundManagerTest extends TestCase
             new FakeFlowBuilderFactory($this->fakeFlowBuilderDispatcher),
             $flowBuilderEventFactory,
             $this->fakeStockUpdater,
-            $this->createMock(RefundRepositoryInterface::class),
+            $this->fakeRefundRespository,
             new NullLogger()
         );
     }
@@ -91,8 +97,8 @@ class RefundManagerTest extends TestCase
      * This test verifies that our correct flow builder
      * event is fired with all required data.
      *
-     * @throws \Mollie\Api\Exceptions\ApiException
      * @return void
+     * @throws \Mollie\Api\Exceptions\ApiException
      */
     public function testFlowBuilderDispatching()
     {
@@ -129,8 +135,8 @@ class RefundManagerTest extends TestCase
      * order line item entities for that ID and extract the product ID.
      * This will be passed on with the quantity for the stock reset.
      *
-     * @throws \Mollie\Api\Exceptions\ApiException
      * @return void
+     * @throws \Mollie\Api\Exceptions\ApiException
      */
     public function testStockReset()
     {
@@ -167,4 +173,74 @@ class RefundManagerTest extends TestCase
         $this->assertEquals(1, $this->fakeStockUpdater->getQuantity());
         $this->assertEquals('r-xyz-123', $this->fakeStockUpdater->getMollieRefundID());
     }
+
+    /**
+     * This test verifies that we can also refund line items with quantity 0.
+     * This is necessary because sometimes you have already refunded all quantities, but still want to add another amount value.
+     * In this case, you also want a composition-reference to the line item, which requires a qty of 0 to work.
+     * The test will start a request with a quantity of 0, and we verify that the DAL create function gets a
+     * correct payload, including the refund item.
+     *
+     * @return void
+     * @throws \Mollie\Api\Exceptions\ApiException
+     */
+    public function testItemsWithQuantityZeroAreAdded(): void
+    {
+        /** @var Context $fakeContext */
+        $fakeContext = $this->createDummyMock(Context::class, $this);
+
+
+        $order = new OrderEntity();
+        $order->setId('O1');
+        $order->setAmountTotal(19.99);
+        $order->setSalesChannelId('SC1');
+
+        $item1 = new OrderLineItemEntity();
+        $item1->setId('line-1');
+        $item1->setUnitPrice(19.99);
+        $item1->setLabel('Product T-Shirt');
+        $item1->setReferencedId('product-id-1');
+
+        # required to mark as mollie line item so that its even found
+        $item1->setPayload([
+            'customFields' => [
+                'mollie_payments_product_order_line_id' => 'odl_123'
+            ]
+        ]);
+
+        $order->setLineItems(new OrderLineItemCollection([$item1]));
+
+
+        $refundRequest = new RefundRequest('', '', '', 2);
+
+        # now create a request with an item with quantity 0
+        # but with a valid unit price
+        $refundRequest->addItem(
+            new RefundRequestItem('line-1',
+                19.99,
+                0,
+                0
+            )
+        );
+
+
+        $this->manager->refund($order, $refundRequest, $fakeContext);
+
+
+        $dalCreateData = $this->fakeRefundRespository->getReceivedCreateData();
+
+        $expectedItems = [
+            [
+                "mollieLineId" => "odl_123",
+                "label" => "product-id-1",
+                "quantity" => 0,
+                "amount" => 19.99,
+                "orderLineItemId" => "line-1",
+                'orderLineItemVersionId' => null,
+            ]
+        ];
+
+        $this->assertEquals($expectedItems, $dalCreateData[0]['refundItems'], 'Make sure that items with quantity 0 are being added');
+    }
+
 }

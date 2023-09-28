@@ -154,6 +154,7 @@ class RefundManager implements RefundManagerInterface
         # to grab additional data that we need for the actual refund.
         $serviceItems = $this->convertToRefundItems($request, $order, $mollieOrder);
 
+
         # ------------------------------------------------------------------------
         # DIFFERENT TYPES OF REFUND
         # ------------------------------------------------------------------------
@@ -251,10 +252,12 @@ class RefundManager implements RefundManagerInterface
             'internalDescription' => $request->getInternalDescription(),
         ];
 
-        $refundItems = $this->convertToRepositoryArray($serviceItems, $refundType);
+        $refundItems = $this->convertToRepositoryArray($serviceItems);
+
         if (count($refundItems) > 0) {
             $refundData['refundItems'] = $refundItems;
         }
+
 
         # SAVE LOCAL REFUND
         # ---------------------------------------------------------------------------------------------
@@ -495,18 +498,13 @@ class RefundManager implements RefundManagerInterface
 
     /**
      * @param RefundItem[] $serviceItems
-     * @param string $type
      * @return array<mixed>
      */
-    private function convertToRepositoryArray(array $serviceItems, string $type): array
+    private function convertToRepositoryArray(array $serviceItems): array
     {
         $data = [];
 
         foreach ($serviceItems as $item) {
-            if ($item->getQuantity() <= 0) {
-                continue;
-            }
-
             $row = RefundItemEntity::createArray(
                 $item->getMollieLineID(),
                 $item->getShopwareReference(),

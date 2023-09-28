@@ -505,7 +505,14 @@ Component.register('mollie-refund-manager', {
                 if (entry.swReference.length > 0) {
                     label = entry.swReference;
                 }
-                result.push(label + ' (' + entry.quantity + ' x ' + entry.amount + ' ' + me.order.currency.symbol + ')');
+
+                // we also allow line-item specific refunds with qty 0
+                // in this case, we should not display it to avoid mathematical confusion
+                if (entry.quantity > 0) {
+                    result.push(label + ' (' + entry.quantity + ' x ' + entry.amount + ' ' + me.order.currency.symbol + ')');
+                } else {
+                    result.push(label + ' (' + entry.amount + ' ' + me.order.currency.symbol + ')');
+                }
             });
 
             return result;
