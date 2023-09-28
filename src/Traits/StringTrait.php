@@ -1,6 +1,7 @@
 <?php
 
-namespace MolliePayments\Tests\Traits;
+namespace Kiener\MolliePayments\Traits;
+
 
 trait StringTrait
 {
