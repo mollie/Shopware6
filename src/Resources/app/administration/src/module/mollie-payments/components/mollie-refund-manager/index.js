@@ -55,7 +55,7 @@ Component.register('mollie-refund-manager', {
             pendingRefunds: 0,
             checkVerifyRefund: false,
             refundDescription: '',
-            refundInternalDescription:'',
+            refundInternalDescription: '',
             roundingDiff: 0,
             // -------------------------------
             // tutorials
@@ -128,8 +128,8 @@ Component.register('mollie-refund-manager', {
          * Return the title with a count
          * @returns {*}
          */
-        descriptionCharacterCountingTitle(){
-            return this.$tc('mollie-payments.refund-manager.summary.lblDescription',0,{characters:this.refundDescription.length})
+        descriptionCharacterCountingTitle() {
+            return this.$tc('mollie-payments.refund-manager.summary.lblDescription', 0, {characters: this.refundDescription.length})
         },
 
     },
@@ -491,7 +491,7 @@ Component.register('mollie-refund-manager', {
 
         getRefundCompositions(item) {
 
-            if (!item || !item.metadata || !item.metadata.composition) {
+            if (!item || !item.metadata || !item.metadata.composition || item.metadata.composition.length <= 0) {
                 return [
                     this.$tc('mollie-payments.refund-manager.refunds.grid.lblNoComposition'),
                 ];
@@ -502,7 +502,7 @@ Component.register('mollie-refund-manager', {
 
             item.metadata.composition.forEach(function (entry) {
                 let label = entry.label;
-                if(entry.swReference.length > 0){
+                if (entry.swReference.length > 0) {
                     label = entry.swReference;
                 }
                 result.push(label + ' (' + entry.quantity + ' x ' + entry.amount + ' ' + me.order.currency.symbol + ')');
