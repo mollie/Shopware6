@@ -43,7 +43,6 @@ final class RefundItemDefinition extends EntityDefinition
     {
         return new FieldCollection([
             (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey(), new ApiAware()),
-            (new StringField('type', 'type'))->addFlags(new Required(), new ApiAware()),
             (new FkField('refund_id', 'refundId', RefundDefinition::class))->addFlags(new ApiAware()),
             (new ManyToOneAssociationField('refund', 'refund_id', RefundDefinition::class))->addFlags(new ApiAware()),
             (new IntField('quantity', 'quantity'))->addFlags(new Required(), new ApiAware()),

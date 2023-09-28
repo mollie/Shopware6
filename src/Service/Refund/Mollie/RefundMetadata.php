@@ -18,7 +18,6 @@ class RefundMetadata
     private $items;
 
 
-
     /**
      * @param string $type
      * @param RefundItem[] $items
@@ -68,5 +67,19 @@ class RefundMetadata
     public function getComposition(): array
     {
         return $this->items;
+    }
+
+    /**
+     * Used as storage payload inside the Mollie API database.
+     *
+     * @return string
+     */
+    public function toMolliePayload(): string
+    {
+        $data = [
+            'type' => $this->type,
+        ];
+
+        return (string)json_encode($data);
     }
 }

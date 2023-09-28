@@ -76,6 +76,13 @@ class RefundDataBuilder
 
 
         try {
+
+            # **********************************************************************************
+            # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            #
+            # ATTENTION, this will load the refunds from Mollie, but also from the database
+            # we will add our database data to the Mollie metadata.composition and therefore "fake" a response of Mollie,
+            # so that we can reuse the old code from below, even though Mollie does not really have a metadata.composition.
             $refunds = $this->refundService->getRefunds($order, $context);
         } catch (PaymentNotFoundException $ex) {
             # if we dont have a payment, then theres also no refunds

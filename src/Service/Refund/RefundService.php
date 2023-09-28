@@ -83,9 +83,11 @@ class RefundService implements RefundServiceInterface
         $mollieOrderId = $this->orders->getMollieOrderId($order);
         $mollieOrder = $this->mollie->getMollieOrder($mollieOrderId, $order->getSalesChannelId());
 
+        $metadata = new RefundMetadata(RefundItemType::FULL, $refundItems);
 
         $params = [
             'description' => $description,
+            'metadata' => $metadata->toMolliePayload(),
         ];
 
 
@@ -130,6 +132,8 @@ class RefundService implements RefundServiceInterface
      */
     public function refundPartial(OrderEntity $order, string $description, string $internalDescription, float $amount, array $lineItems, Context $context): Refund
     {
+        $metadata = new RefundMetadata(RefundItemType::PARTIAL, $lineItems);
+
         $payment = $this->getPayment($order);
 
         $refund = $payment->refund([
@@ -137,7 +141,8 @@ class RefundService implements RefundServiceInterface
                 'value' => number_format($amount, 2, '.', ''),
                 'currency' => ($order->getCurrency() instanceof CurrencyEntity) ? $order->getCurrency()->getIsoCode() : '',
             ],
-            'description' => $description
+            'description' => $description,
+            'metadata' => $metadata->toMolliePayload(),
         ]);
 
         if (!$refund instanceof Refund) {
@@ -150,10 +155,10 @@ class RefundService implements RefundServiceInterface
     /**
      * @param OrderEntity $order
      * @param string $refundId
-     * @throws CouldNotExtractMollieOrderIdException
      * @throws CouldNotFetchMollieOrderException
      * @throws PaymentNotFoundException
      * @throws CouldNotCancelMollieRefundException
+     * @throws CouldNotExtractMollieOrderIdException
      * @return bool
      */
     public function cancel(OrderEntity $order, string $refundId): bool
@@ -188,13 +193,13 @@ class RefundService implements RefundServiceInterface
 
     /**
      * @param OrderEntity $order
-     * @throws CouldNotFetchMollieOrderException
      * @throws CouldNotFetchMollieRefundsException
      * @throws PaymentNotFoundException
      * @throws CouldNotExtractMollieOrderIdException
+     * @throws CouldNotFetchMollieOrderException
      * @return array<mixed>
      */
-    public function getRefunds(OrderEntity $order, Context  $context): array
+    public function getRefunds(OrderEntity $order, Context $context): array
     {
         $orderAttributes = new OrderAttributes($order);
 
@@ -212,6 +217,9 @@ class RefundService implements RefundServiceInterface
                 if ($refund->status === 'canceled') {
                     continue;
                 }
+
+                # if we have a metadata entry, then make sure to
+                # migrate those compositions (if existing) to our database storage (for legacy refunds)
                 if (property_exists($refund, 'metadata')) {
                     /** @var \stdClass|string $metadata */
                     $metadata = $refund->metadata;
@@ -231,9 +239,9 @@ class RefundService implements RefundServiceInterface
 
     /**
      * @param OrderEntity $order
-     * @throws PaymentNotFoundException
      * @throws CouldNotExtractMollieOrderIdException
      * @throws CouldNotFetchMollieOrderException
+     * @throws PaymentNotFoundException
      * @return float
      */
     public function getRemainingAmount(OrderEntity $order): float
@@ -271,9 +279,9 @@ class RefundService implements RefundServiceInterface
 
     /**
      * @param OrderEntity $order
-     * @throws PaymentNotFoundException
      * @throws CouldNotExtractMollieOrderIdException
      * @throws CouldNotFetchMollieOrderException
+     * @throws PaymentNotFoundException
      * @return float
      */
     public function getRefundedAmount(OrderEntity $order): float

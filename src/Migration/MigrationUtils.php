@@ -51,6 +51,23 @@ class MigrationUtils
 
     /**
      * @param string $table
+     * @param string $column
+     * @throws Exception
+     * @return void
+     */
+    public function deleteColumn(string $table, string $column): void
+    {
+        $colQuery = $this->connection->executeQuery("SHOW COLUMNS FROM " . $table . " LIKE '" . $column . "'")->fetch();
+
+        # only delete if existing
+        if ($colQuery !== false) {
+            $sql = "ALTER TABLE " . $table . " DROP " . $column;
+            $this->connection->exec($sql);
+        }
+    }
+
+    /**
+     * @param string $table
      * @param string $keyName
      * @param array<mixed> $columns
      * @throws Exception

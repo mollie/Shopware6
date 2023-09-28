@@ -34,12 +34,12 @@ class CompositionMigrationService implements CompositionMigrationServiceInterfac
     {
         /** @var \stdClass|string $oldMetadata */
         $oldMetadata = $refund->metadata;
-        if (! is_string($oldMetadata)) {
+        if (!is_string($oldMetadata)) {
             return $order;
         }
 
         $oldMetadata = json_decode($oldMetadata);
-        if (! property_exists($oldMetadata, 'composition') && ! is_array($oldMetadata->composition)) {
+        if (!property_exists($oldMetadata, 'composition') || !is_array($oldMetadata->composition)) {
             return $order;
         }
 
@@ -93,8 +93,7 @@ class CompositionMigrationService implements CompositionMigrationServiceInterfac
                 $orderLineItemVersionId = $orderLineItem->getVersionId();
             }
 
-            $row = RefundItemEntity::createEntryArray(
-                $oldMetadata->type,
+            $row = RefundItemEntity::createArray(
                 $composition->mollieLineId,
                 $label,
                 $composition->quantity,
@@ -130,22 +129,23 @@ class CompositionMigrationService implements CompositionMigrationServiceInterfac
         $results = $writtenEvent->getWriteResults();
 
         foreach ($results as $result) {
-            $entity = new RefundItemEntity();
-            $entity->setId($result->getProperty('id'));
-            $entity->setUniqueIdentifier($result->getProperty('id'));
-            $entity->setQuantity($result->getProperty('quantity'));
-            $entity->setLabel($result->getProperty('label'));
-            $entity->setAmount($result->getProperty('amount'));
-            $entity->setRefundId($result->getProperty('refundId'));
-            $entity->setMollieLineId($result->getProperty('mollieLineId'));
+            $swRefundItem = new RefundItemEntity();
+            $swRefundItem->setId($result->getProperty('id'));
+            $swRefundItem->setUniqueIdentifier($result->getProperty('id'));
+            $swRefundItem->setQuantity($result->getProperty('quantity'));
+            $swRefundItem->setLabel($result->getProperty('label'));
+            $swRefundItem->setAmount($result->getProperty('amount'));
+            $swRefundItem->setRefundId($result->getProperty('refundId'));
+            $swRefundItem->setMollieLineId($result->getProperty('mollieLineId'));
+
             if ($result->getProperty('orderLineItemId') !== null && $result->getProperty('orderLineItemVersionId') !== null) {
-                $entity->setOrderLineItemId($result->getProperty('orderLineItemId'));
-                $entity->setOrderLineItemVersionId($result->getProperty('orderLineItemVersionId'));
+                $swRefundItem->setOrderLineItemId($result->getProperty('orderLineItemId'));
+                $swRefundItem->setOrderLineItemVersionId($result->getProperty('orderLineItemVersionId'));
             }
 
-            $entity->setType($result->getProperty('type'));
-            $entity->setCreatedAt($result->getProperty('createdAt'));
-            $collection->add($entity);
+            $swRefundItem->setCreatedAt($result->getProperty('createdAt'));
+
+            $collection->add($swRefundItem);
         }
         return $collection;
     }
@@ -159,7 +159,7 @@ class CompositionMigrationService implements CompositionMigrationServiceInterfac
             if ($customFields === null) {
                 continue;
             }
-            if (! isset($customFields['mollie_payments']['order_line_id'])) {
+            if (!isset($customFields['mollie_payments']['order_line_id'])) {
                 continue;
             }
             if ($customFields['mollie_payments']['order_line_id'] === $mollieLineId) {

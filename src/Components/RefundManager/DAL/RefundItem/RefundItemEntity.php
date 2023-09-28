@@ -15,11 +15,6 @@ final class RefundItemEntity extends Entity
     /**
      * @var string
      */
-    protected $type;
-
-    /**
-     * @var string
-     */
     protected $refundId;
 
     /**
@@ -62,21 +57,6 @@ final class RefundItemEntity extends Entity
      */
     protected $orderLineItem;
 
-    /**
-     * @return string
-     */
-    public function getType(): string
-    {
-        return $this->type;
-    }
-
-    /**
-     * @param string $type
-     */
-    public function setType(string $type): void
-    {
-        $this->type = $type;
-    }
 
     /**
      * @return string
@@ -223,7 +203,6 @@ final class RefundItemEntity extends Entity
     }
 
     /**
-     * @param string $type
      * @param string $mollieLineId
      * @param string $label
      * @param int $quantity
@@ -233,22 +212,21 @@ final class RefundItemEntity extends Entity
      * @param null|string $refundId
      * @return array<mixed>
      */
-    public static function createEntryArray(string $type, string $mollieLineId, string $label, int $quantity, float $amount, ?string $oderLineItemId, ?string $oderLineItemVersionId, ?string $refundId): array
+    public static function createArray(string $mollieLineId, string $label, int $quantity, float $amount, ?string $oderLineItemId, ?string $oderLineItemVersionId, ?string $refundId): array
     {
-        $row =  [
-            'type' => $type,
+        $row = [
             'mollieLineId' => $mollieLineId,
             'label' => $label,
             'quantity' => $quantity,
             'amount' => $amount,
-            'oderLineItemId' => $oderLineItemId,
-            'oderLineItemVersionId' => $oderLineItemVersionId,
+            'orderLineItemId' => $oderLineItemId,
+            'orderLineItemVersionId' => $oderLineItemVersionId,
         ];
 
         /**
          * refundId is not given when we create a new entry because the id is created by shopware dal
          */
-        if ($refundId !== null) {
+        if ($refundId !== null && $refundId !== '') {
             $row['refundId'] = $refundId;
         }
 
