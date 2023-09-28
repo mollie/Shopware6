@@ -23,8 +23,8 @@ use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Struct\MolliePaymentPrepareData;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Mollie\Api\Exceptions\ApiException;
-use Mollie\Api\Resources\Order as MollieOrder;
 use Mollie\Api\Resources\OrderLine;
+use MolliePayments\Tests\Traits\StringTrait;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
@@ -34,6 +34,8 @@ use Twig\Extension\CoreExtension;
 
 class MolliePaymentDoPay
 {
+    use StringTrait;
+
     /**
      * @var OrderDataExtractor
      */
@@ -172,7 +174,7 @@ class MolliePaymentDoPay
         # this is the case, if we already have a Mollie Order ID in our custom fields.
         # in this case, we just add a new payment (transaction) to the existing order in Mollie.
         # DO NEVER reuse a POS payment, because that only works with payments and not with orders!!!
-        if (!$paymentHandler instanceof PosPayment && !empty($mollieOrderId)) {
+        if (!$paymentHandler instanceof PosPayment && $this->stringStartsWith($mollieOrderId, 'ord_')) {
             try {
                 return $this->handleNextPaymentAttempt(
                     $order,
@@ -194,7 +196,7 @@ class MolliePaymentDoPay
         }
 
         $this->logger->debug(
-            'Start first payment attempt for order: ' . $order->getOrderNumber(),
+            'Start payment attempt for order: ' . $order->getOrderNumber(),
             [
                 'salesChannel' => $salesChannelContext->getSalesChannel()->getName(),
                 'mollieID' => '-',
