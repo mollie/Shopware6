@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Traits;
 
-
 trait StringTrait
 {
 
@@ -19,5 +18,4 @@ trait StringTrait
 
         return false;
     }
-
 }
