@@ -166,8 +166,7 @@ context("Order Refunds", () => {
             cy.contains(REFUND_DESCRIPTION).should('not.exist')
         })
 
-        // TODO attention this is skipped because of a bug in Mollie. they dont' clear up deleted refunds. line items are still refunded.
-        it.skip('C273581: Canceled refunds should not be visible', () => {
+        it('C273581: Canceled refunds should not be visible', () => {
 
             createOrderAndOpenAdmin();
 
@@ -184,7 +183,7 @@ context("Order Refunds", () => {
             repoRefundManager.getFullRefundButton().should('be.disabled');
 
             // check if refund quantity input field is visible
-            repoRefundManager.getFirstRefundedQuantityInputField().should('be.visible');
+            repoRefundManager.getFirstLineItemQuantityInput().should('be.visible');
 
             // now start the full refund
             refundManager.fullRefund(REFUND_DESCRIPTION, '');
@@ -200,10 +199,10 @@ context("Order Refunds", () => {
             refundManager.cancelPendingRefund();
 
             // after cancel, the refund input field should be visible again
-            repoRefundManager.getFirstRefundedQuantityInputField().should('be.visible');
+            repoRefundManager.getFirstLineItemQuantityInput().should('be.visible');
 
-            // now start the partial refund
-            refundManager.partialAmountRefund(2, REFUND_DESCRIPTION);
+            // now start another full refund
+            refundManager.fullRefund(REFUND_DESCRIPTION, '');
 
             cy.contains(CANCELED_REFUND_STATUS_LABEL).should('not.exist');
 
