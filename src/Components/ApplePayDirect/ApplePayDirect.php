@@ -460,11 +460,6 @@ class ApplePayDirect
 
         $paymentData = $this->molliePayments->startMolliePayment(ApplePayPayment::PAYMENT_METHOD_NAME, $asyncPaymentTransition, $context, $this->paymentHandler);
 
-        if (empty($paymentData->getCheckoutURL())) {
-            throw new \Exception('Error when creating Apple Pay Direct order in Mollie');
-        }
-
-
         # now also update the custom fields of our order
         # we want to have the mollie metadata in the
         # custom fields in Shopware too
