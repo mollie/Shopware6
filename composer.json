@@ -43,7 +43,7 @@
     "autoload": {
         "psr-4": {
             "Kiener\\MolliePayments\\": "src/",
-            "Mollie\\Api\\": "vendor/mollie/mollie-api-php/src/",
+            "Mollie\\Api\\": "vendor_manual/mollie/mollie-api-php/src/",
             "Shopware\\Core\\": "polyfill/Shopware/Core/"
         }
     },

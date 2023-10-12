@@ -28,12 +28,12 @@ prod: ## Installs all production dependencies
 	cd src/Resources/app/storefront && npm install --production
 
 dev: ## Installs all dev dependencies
-	curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt install shopware-cli
 	php switch-composer.php dev
 	@composer validate
 	@composer install
 	cd src/Resources/app/administration && npm install
 	cd src/Resources/app/storefront && npm install
+	curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt install shopware-cli
 
 install: ## [deprecated] Installs all production dependencies. Please use "make prod" now.
 	@make prod -B
