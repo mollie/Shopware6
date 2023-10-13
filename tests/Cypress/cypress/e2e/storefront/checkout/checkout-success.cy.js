@@ -40,23 +40,23 @@ const device = devices.getFirstDevice();
 
 
 const payments = [
-    {caseId: 'C4101', key: 'credit-card', name: 'Card'},
-    {caseId: 'C4111', key: 'paypal', name: 'PayPal'},
-    {caseId: 'C466903', key: 'billie', name: 'Billie'},
-    {caseId: 'C4114', key: 'klarnapaynow', name: 'Pay now'},
-    {caseId: 'C4115', key: 'klarnapaylater', name: 'Pay later'},
-    {caseId: 'C4117', key: 'klarnasliceit', name: 'Slice it'},
-    {caseId: 'C4118', key: 'ideal', name: 'iDEAL'},
-    {caseId: 'C4116', key: 'sofort', name: 'SOFORT'},
-    {caseId: 'C4120', key: 'eps', name: 'eps'},
-    {caseId: 'C4122', key: 'giropay', name: 'Giropay'},
-    {caseId: 'C4123', key: 'mistercash', name: 'Bancontact'},
-    {caseId: 'C4125', key: 'przelewy24', name: 'Przelewy24'},
-    {caseId: 'C4126', key: 'kbc', name: 'KBC'},
-    {caseId: 'C4128', key: 'banktransfer', name: 'Banktransfer'},
-    {caseId: 'C4127', key: 'belfius', name: 'Belfius'},
-    {caseId: 'C4121', key: 'giftcard', name: 'Gift cards'},
-    {caseId: 'C4143', key: 'voucher', name: 'Voucher'},
+    {caseId: 'C4101', key: 'credit-card', name: 'Card', sanity: false},
+    {caseId: 'C4111', key: 'paypal', name: 'PayPal', sanity: true},
+    {caseId: 'C466903', key: 'billie', name: 'Billie', sanity: false},
+    {caseId: 'C4114', key: 'klarnapaynow', name: 'Pay now', sanity: false},
+    {caseId: 'C4115', key: 'klarnapaylater', name: 'Pay later', sanity: false},
+    {caseId: 'C4117', key: 'klarnasliceit', name: 'Slice it', sanity: false},
+    {caseId: 'C4118', key: 'ideal', name: 'iDEAL', sanity: false},
+    {caseId: 'C4116', key: 'sofort', name: 'SOFORT', sanity: false},
+    {caseId: 'C4120', key: 'eps', name: 'eps', sanity: false},
+    {caseId: 'C4122', key: 'giropay', name: 'Giropay', sanity: false},
+    {caseId: 'C4123', key: 'mistercash', name: 'Bancontact', sanity: false},
+    {caseId: 'C4125', key: 'przelewy24', name: 'Przelewy24', sanity: false},
+    {caseId: 'C4126', key: 'kbc', name: 'KBC', sanity: false},
+    {caseId: 'C4128', key: 'banktransfer', name: 'Banktransfer', sanity: false},
+    {caseId: 'C4127', key: 'belfius', name: 'Belfius', sanity: false},
+    {caseId: 'C4121', key: 'giftcard', name: 'Gift cards', sanity: false},
+    {caseId: 'C4143', key: 'voucher', name: 'Voucher', sanity: false},
     // unfortunately address and product prices need to match, so we cannot do in3 automatically for now
     // {caseId: '', key: 'in3', name: 'in3'},
 ];
@@ -82,7 +82,9 @@ context("Checkout Tests", () => {
         context(devices.getDescription(device), () => {
             payments.forEach(payment => {
 
-                it(payment.caseId + ': Pay with ' + payment.name, () => {
+                const sanityString = (payment.sanity) ? ' @sanity' : '';
+
+                it(payment.caseId + ': Pay with ' + payment.name + sanityString, () => {
 
                     scenarioDummyBasket.execute();
 
