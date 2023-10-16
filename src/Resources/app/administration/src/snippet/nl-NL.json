@@ -274,8 +274,8 @@
           "url": "Url",
           "invalid": "Voer zowel Carrier als Code in"
         },
-        "confirmButton": "Verzenden",
-        "cancelButton": "Niet verzenden"
+        "confirmButton": "Bestelling verzenden",
+        "cancelButton": "Annuleren"
       }
     },
 

@@ -274,8 +274,8 @@
           "url": "Url",
           "invalid": "Bitte geben Sie sowohl Spediteur als auch Code ein"
         },
-        "confirmButton": "Versenden",
-        "cancelButton": "Nicht versenden"
+        "confirmButton": "Bestellung versenden",
+        "cancelButton": "Abbrechen"
       }
     },
     "sw-flow": {
