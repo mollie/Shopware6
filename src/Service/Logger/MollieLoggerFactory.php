@@ -35,7 +35,11 @@ class MollieLoggerFactory
      * @var string
      */
     private $retentionDays;
-    private string $dsn;
+
+    /**
+     * @var string
+     */
+    private $dsn;
 
 
     /**
