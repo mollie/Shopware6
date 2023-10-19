@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Controller\Api\Order;
 
 use Exception;
 use Kiener\MolliePayments\Facade\MollieShipment;
+use Kiener\MolliePayments\Traits\Api\ApiTrait;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Shipment;
 use Psr\Log\LoggerInterface;
@@ -18,6 +19,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ShippingControllerBase extends AbstractController
 {
+    use ApiTrait;
+
     /**
      * @var MollieShipment
      */
@@ -225,13 +228,8 @@ class ShippingControllerBase extends AbstractController
      * @param Context $context
      * @return JsonResponse
      */
-    public function getShipOrderResponse(
-        string  $orderId,
-        string  $trackingCarrier,
-        string  $trackingCode,
-        string  $trackingUrl,
-        Context $context
-    ): JsonResponse {
+    public function getShipOrderResponse(string $orderId, string $trackingCarrier, string $trackingCode, string $trackingUrl, Context $context): JsonResponse
+    {
         try {
             if (empty($orderId)) {
                 throw new \InvalidArgumentException('Missing Argument for Order ID!');
@@ -247,14 +245,7 @@ class ShippingControllerBase extends AbstractController
 
             return $this->shipmentToJson($shipment);
         } catch (\Exception $e) {
-            $data = [
-                'orderId' => $orderId,
-                'trackingCarrier' => $trackingCarrier,
-                'trackingCode' => $trackingCode,
-                'trackingUrl' => $trackingUrl,
-            ];
-
-            return $this->exceptionToJson($e, $data);
+            return $this->buildErrorResponse($e->getMessage());
         }
     }
 

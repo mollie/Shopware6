@@ -6,7 +6,7 @@ export default class FullShippingRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getShippingButton() {
-        return cy.get('.sw-modal__footer > .sw-button--primary', {timeout: 10000});
+        return cy.get('.btn-ship-order', {timeout: 10000});
     }
 
     /**

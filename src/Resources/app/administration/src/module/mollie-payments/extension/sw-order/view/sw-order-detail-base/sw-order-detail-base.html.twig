@@ -1,33 +1,34 @@
-{% block sw_order_detail_base_line_items_grid %}
-    <sw-order-line-items-grid :order="order"
-                              :context="versionContext"
-                              :editable="isEditing"
-                              ref="sw-order-line-item-grid"
-                              :remainingAmount="remainingAmount"
-                              :refundedAmount="refundedAmount"
-                              :voucherAmount="voucherAmount"
-                              :refunds="refunds"
-                              @refund-success="saveAndReload"
-                              @refund-cancelled="saveAndReload"
-                              @ship-order-success="saveAndReload"
-                              @ship-item-success="saveAndReload"
-                              @item-delete="saveAndRecalculate"
-                              @item-edit="recalculateAndReload"
-                              @existing-item-edit="saveAndRecalculate"
-                              @item-added="recalculateAndReload"
-                              @item-cancel="recalculateAndReload">
-    </sw-order-line-items-grid>
-{% endblock %}
+<!--
+**********************************************************************************
+**********************************************************************************
 
+SHOPWARE 6.4
+- summary line item for refund and shipping data
+
+**********************************************************************************
+**********************************************************************************
+-->
 {% block sw_order_detail_base_line_items_summary_entries %}
     {% parent %}
-    <dt v-if="refundedAmount > 0"><strong>{{ $tc('sw-order.detailExtended.totalRefunds') }}</strong></dt>
-    <dd v-if="refundedAmount > 0"><strong>{{ refundedAmount | currency(order.currency.shortName) }}</strong></dd>
+    <dt v-if="isMollieOrder && refundedAmount > 0">
+        <strong>{{ $tc('sw-order.detailExtended.totalRefunds') }}</strong>
+    </dt>
+    <dd v-if="isMollieOrder && refundedAmount > 0">
+        <strong>{{ refundedAmount | currency(order.currency.shortName) }}</strong>
+    </dd>
 
-    <dt v-if="refundAmountPending > 0"><strong>{{ $tc('sw-order.detailExtended.totalRefundsPending') }}</strong></dt>
-    <dd v-if="refundAmountPending > 0"><strong>{{ refundAmountPending | currency(order.currency.shortName) }}</strong></dd>
+    <dt v-if="isMollieOrder && refundAmountPending > 0">
+        <strong>{{ $tc('sw-order.detailExtended.totalRefundsPending') }}</strong>
+    </dt>
+    <dd v-if="isMollieOrder && refundAmountPending > 0">
+        <strong>{{ refundAmountPending | currency(order.currency.shortName) }}</strong>
+    </dd>
 
-    <dt v-if="shippedQuantity > 0"><strong>{{ $tc('sw-order.detailExtended.totalShipments', 0, { quantity: shippedQuantity }) }}</strong></dt>
-    <dd v-if="shippedQuantity > 0"><strong>{{ shippedAmount | currency(order.currency.shortName) }}</strong></dd>
+    <dt v-if="isMollieOrder && shippedQuantity > 0">
+        <strong>{{ $tc('sw-order.detailExtended.totalShipments', 0, { quantity: shippedQuantity }) }}</strong>
+    </dt>
+    <dd v-if="isMollieOrder && shippedQuantity > 0">
+        <strong>{{ shippedAmount | currency(order.currency.shortName) }}</strong>
+    </dd>
 {% endblock %}
 

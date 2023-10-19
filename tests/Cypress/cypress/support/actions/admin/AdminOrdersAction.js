@@ -37,8 +37,12 @@ export default class AdminOrdersAction {
      */
     openRefundManager() {
         cy.wait(1000);
-        // forceClick because if a Shopware update exists, that dialog is above our button
-        repoOrdersDetails.getMollieActionsButton().click({force: true, waitForAnimations: false});
+
+        if (shopware.isVersionLower('6.5')) {
+            // forceClick because if a Shopware update exists, that dialog is above our button
+            repoOrdersDetails.getMollieActionsButton().click({force: true, waitForAnimations: false});
+        }
+
         cy.wait(2000);
         repoOrdersDetails.getMollieRefundManagerButton().click({force: true, waitForAnimations: false});
         // here are automatic reloads and things as it seems
@@ -57,7 +61,7 @@ export default class AdminOrdersAction {
 
         cy.wait(800);
 
-        // match with case insensitive option because shopware
+        // match with case-insensitive option because shopware
         // switched from "In progress" to "In Progress" with 6.4.11.0 for example
         cy.contains(repoOrdersList.getLatestOrderStatusLabelSelector(), status, {matchCase: false});
     }
@@ -99,7 +103,7 @@ export default class AdminOrdersAction {
     openLineItemShipping(nthItem) {
 
         cy.wait(2000);
-        
+
         repoOrdersDetails.getLineItemActionsButton(nthItem).click({force: true})
 
         repoOrdersDetails.getLineItemActionsButtonShipThroughMollie().should('not.have.class', 'is--disabled');

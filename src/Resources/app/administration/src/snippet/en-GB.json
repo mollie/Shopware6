@@ -274,8 +274,8 @@
           "url": "Url",
           "invalid": "Please enter both Carrier and Code"
         },
-        "confirmButton": "Ship",
-        "cancelButton": "Do not ship"
+        "confirmButton": "Ship order",
+        "cancelButton": "Cancel"
       }
     },
     "sw-flow": {
