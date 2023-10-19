@@ -61,7 +61,6 @@ class MollieLoggerFactory
      */
     public function createLogger(): LoggerInterface
     {
-
         if ($this->dsn === '' || $this->dsn === 'mysql://_placeholder.test') {
             // deployment server without database
             return new Logger(self::CHANNEL);
