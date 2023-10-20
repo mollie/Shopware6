@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b7e4c9d8c0ebc060bece77ee2d8533d7",
+    "content-hash": "e084648ac484bfc5442cb243b2d8a543",
     "packages": [],
     "packages-dev": [
         {
@@ -63,16 +63,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.282.2",
+            "version": "3.283.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "b9b4013f68f1bd5f219f9784c1b2a47da02c1261"
+                "reference": "0f73ec85852312a6e971cfe2eebfd7c8091cca34"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/b9b4013f68f1bd5f219f9784c1b2a47da02c1261",
-                "reference": "b9b4013f68f1bd5f219f9784c1b2a47da02c1261",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/0f73ec85852312a6e971cfe2eebfd7c8091cca34",
+                "reference": "0f73ec85852312a6e971cfe2eebfd7c8091cca34",
                 "shasum": ""
             },
             "require": {
@@ -152,9 +152,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.282.2"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.283.8"
             },
-            "time": "2023-10-03T18:07:23+00:00"
+            "time": "2023-10-19T19:26:52+00:00"
         },
         {
             "name": "boxblinkracer/phpunuhi",
@@ -162,12 +162,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/boxblinkracer/phpunuhi.git",
-                "reference": "df3fb5c625c1105860ee26eaad116945f6b6e1ef"
+                "reference": "4ae37dddeee2acf3814678b636a260e5dfd78db8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/boxblinkracer/phpunuhi/zipball/df3fb5c625c1105860ee26eaad116945f6b6e1ef",
-                "reference": "df3fb5c625c1105860ee26eaad116945f6b6e1ef",
+                "url": "https://api.github.com/repos/boxblinkracer/phpunuhi/zipball/4ae37dddeee2acf3814678b636a260e5dfd78db8",
+                "reference": "4ae37dddeee2acf3814678b636a260e5dfd78db8",
                 "shasum": ""
             },
             "require": {
@@ -220,9 +220,9 @@
             ],
             "support": {
                 "issues": "https://github.com/boxblinkracer/phpunuhi/issues",
-                "source": "https://github.com/boxblinkracer/phpunuhi/tree/v1.13.0"
+                "source": "https://github.com/boxblinkracer/phpunuhi/tree/main"
             },
-            "time": "2023-09-03T12:32:03+00:00"
+            "time": "2023-10-14T06:04:40+00:00"
         },
         {
             "name": "brick/math",
@@ -1194,6 +1194,76 @@
                 }
             ],
             "time": "2022-05-20T20:07:39+00:00"
+        },
+        {
+            "name": "doctrine/collections",
+            "version": "1.8.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/doctrine/collections.git",
+                "reference": "2b44dd4cbca8b5744327de78bafef5945c7e7b5e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/doctrine/collections/zipball/2b44dd4cbca8b5744327de78bafef5945c7e7b5e",
+                "reference": "2b44dd4cbca8b5744327de78bafef5945c7e7b5e",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/deprecations": "^0.5.3 || ^1",
+                "php": "^7.1.3 || ^8.0"
+            },
+            "require-dev": {
+                "doctrine/coding-standard": "^9.0 || ^10.0",
+                "phpstan/phpstan": "^1.4.8",
+                "phpunit/phpunit": "^7.5 || ^8.5 || ^9.1.5",
+                "vimeo/psalm": "^4.22"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Doctrine\\Common\\Collections\\": "lib/Doctrine/Common/Collections"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Guilherme Blanco",
+                    "email": "guilhermeblanco@gmail.com"
+                },
+                {
+                    "name": "Roman Borschel",
+                    "email": "roman@code-factory.org"
+                },
+                {
+                    "name": "Benjamin Eberlei",
+                    "email": "kontakt@beberlei.de"
+                },
+                {
+                    "name": "Jonathan Wage",
+                    "email": "jonwage@gmail.com"
+                },
+                {
+                    "name": "Johannes Schmitt",
+                    "email": "schmittjoh@gmail.com"
+                }
+            ],
+            "description": "PHP Doctrine Collections library that adds additional functionality on top of PHP arrays.",
+            "homepage": "https://www.doctrine-project.org/projects/collections.html",
+            "keywords": [
+                "array",
+                "collections",
+                "iterators",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/doctrine/collections/issues",
+                "source": "https://github.com/doctrine/collections/tree/1.8.0"
+            },
+            "time": "2022-09-01T20:12:10+00:00"
         },
         {
             "name": "doctrine/dbal",
@@ -2382,16 +2452,16 @@
         },
         {
             "name": "firebase/php-jwt",
-            "version": "v6.8.1",
+            "version": "v6.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/firebase/php-jwt.git",
-                "reference": "5dbc8959427416b8ee09a100d7a8588c00fb2e26"
+                "reference": "f03270e63eaccf3019ef0f32849c497385774e11"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/firebase/php-jwt/zipball/5dbc8959427416b8ee09a100d7a8588c00fb2e26",
-                "reference": "5dbc8959427416b8ee09a100d7a8588c00fb2e26",
+                "url": "https://api.github.com/repos/firebase/php-jwt/zipball/f03270e63eaccf3019ef0f32849c497385774e11",
+                "reference": "f03270e63eaccf3019ef0f32849c497385774e11",
                 "shasum": ""
             },
             "require": {
@@ -2439,9 +2509,9 @@
             ],
             "support": {
                 "issues": "https://github.com/firebase/php-jwt/issues",
-                "source": "https://github.com/firebase/php-jwt/tree/v6.8.1"
+                "source": "https://github.com/firebase/php-jwt/tree/v6.9.0"
             },
-            "time": "2023-07-14T18:33:00+00:00"
+            "time": "2023-10-05T00:24:42+00:00"
         },
         {
             "name": "friendsofphp/php-cs-fixer",
@@ -2694,16 +2764,16 @@
         },
         {
             "name": "google/cloud-core",
-            "version": "v1.52.5",
+            "version": "v1.52.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/google-cloud-php-core.git",
-                "reference": "28765cf75bd028ed063b0422b9c85bb9a54c41ca"
+                "reference": "f79480d1e2b31a695ae98b42ca10b67b41da9fb1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/google-cloud-php-core/zipball/28765cf75bd028ed063b0422b9c85bb9a54c41ca",
-                "reference": "28765cf75bd028ed063b0422b9c85bb9a54c41ca",
+                "url": "https://api.github.com/repos/googleapis/google-cloud-php-core/zipball/f79480d1e2b31a695ae98b42ca10b67b41da9fb1",
+                "reference": "f79480d1e2b31a695ae98b42ca10b67b41da9fb1",
                 "shasum": ""
             },
             "require": {
@@ -2719,7 +2789,7 @@
             "require-dev": {
                 "erusev/parsedown": "^1.6",
                 "google/cloud-common-protos": "^0.4",
-                "google/gax": "^1.19.1",
+                "google/gax": "^1.24.0",
                 "opis/closure": "^3",
                 "phpdocumentor/reflection": "^5.0",
                 "phpspec/prophecy-phpunit": "^2.0",
@@ -2753,9 +2823,9 @@
             ],
             "description": "Google Cloud PHP shared dependency, providing functionality useful to all components.",
             "support": {
-                "source": "https://github.com/googleapis/google-cloud-php-core/tree/v1.52.5"
+                "source": "https://github.com/googleapis/google-cloud-php-core/tree/v1.52.7"
             },
-            "time": "2023-09-30T16:50:41+00:00"
+            "time": "2023-10-16T22:54:31+00:00"
         },
         {
             "name": "google/cloud-storage",
@@ -3111,16 +3181,16 @@
         },
         {
             "name": "google/protobuf",
-            "version": "v3.24.3",
+            "version": "v3.24.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/protocolbuffers/protobuf-php.git",
-                "reference": "2fc191fc5e137829081b8700086ac6ed7003b925"
+                "reference": "672d69e25f71b9364fdf1810eb8a8573defdc404"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/protocolbuffers/protobuf-php/zipball/2fc191fc5e137829081b8700086ac6ed7003b925",
-                "reference": "2fc191fc5e137829081b8700086ac6ed7003b925",
+                "url": "https://api.github.com/repos/protocolbuffers/protobuf-php/zipball/672d69e25f71b9364fdf1810eb8a8573defdc404",
+                "reference": "672d69e25f71b9364fdf1810eb8a8573defdc404",
                 "shasum": ""
             },
             "require": {
@@ -3149,9 +3219,9 @@
                 "proto"
             ],
             "support": {
-                "source": "https://github.com/protocolbuffers/protobuf-php/tree/v3.24.3"
+                "source": "https://github.com/protocolbuffers/protobuf-php/tree/v3.24.4"
             },
-            "time": "2023-09-07T15:39:13+00:00"
+            "time": "2023-10-04T17:22:47+00:00"
         },
         {
             "name": "grpc/grpc",
@@ -4403,16 +4473,16 @@
         },
         {
             "name": "league/mime-type-detection",
-            "version": "1.13.0",
+            "version": "1.14.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/mime-type-detection.git",
-                "reference": "a6dfb1194a2946fcdc1f38219445234f65b35c96"
+                "reference": "b6a5854368533df0295c5761a0253656a2e52d9e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/mime-type-detection/zipball/a6dfb1194a2946fcdc1f38219445234f65b35c96",
-                "reference": "a6dfb1194a2946fcdc1f38219445234f65b35c96",
+                "url": "https://api.github.com/repos/thephpleague/mime-type-detection/zipball/b6a5854368533df0295c5761a0253656a2e52d9e",
+                "reference": "b6a5854368533df0295c5761a0253656a2e52d9e",
                 "shasum": ""
             },
             "require": {
@@ -4443,7 +4513,7 @@
             "description": "Mime-type detection for Flysystem",
             "support": {
                 "issues": "https://github.com/thephpleague/mime-type-detection/issues",
-                "source": "https://github.com/thephpleague/mime-type-detection/tree/1.13.0"
+                "source": "https://github.com/thephpleague/mime-type-detection/tree/1.14.0"
             },
             "funding": [
                 {
@@ -4455,7 +4525,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-08-05T12:09:49+00:00"
+            "time": "2023-10-17T14:13:20+00:00"
         },
         {
             "name": "league/oauth2-server",
@@ -5864,16 +5934,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.8.2",
+            "version": "1.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "c53312ecc575caf07b0e90dee43883fdf90ca67c"
+                "reference": "71b28a67f01ac231f9a8f1ce242270bf4ec1f99c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/c53312ecc575caf07b0e90dee43883fdf90ca67c",
-                "reference": "c53312ecc575caf07b0e90dee43883fdf90ca67c",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/71b28a67f01ac231f9a8f1ce242270bf4ec1f99c",
+                "reference": "71b28a67f01ac231f9a8f1ce242270bf4ec1f99c",
                 "shasum": ""
             },
             "require": {
@@ -5897,9 +5967,13 @@
                 "MIT"
             ],
             "description": "PHPStan - PHP Static Analysis Tool",
+            "keywords": [
+                "dev",
+                "static analysis"
+            ],
             "support": {
                 "issues": "https://github.com/phpstan/phpstan/issues",
-                "source": "https://github.com/phpstan/phpstan/tree/1.8.2"
+                "source": "https://github.com/phpstan/phpstan/tree/1.10.0"
             },
             "funding": [
                 {
@@ -5911,15 +5985,11 @@
                     "type": "github"
                 },
                 {
-                    "url": "https://www.patreon.com/phpstan",
-                    "type": "patreon"
-                },
-                {
                     "url": "https://tidelift.com/funding/github/packagist/phpstan/phpstan",
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-07-20T09:57:31+00:00"
+            "time": "2023-02-21T13:50:49+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -7273,16 +7343,16 @@
         },
         {
             "name": "sanmai/pipeline",
-            "version": "v6.8.1",
+            "version": "v6.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sanmai/pipeline.git",
-                "reference": "2e88e466dd49f20c10a15330b3953d4d49c326e3"
+                "reference": "c48f45c22c3ce4140d071f7658fb151df1cc08ea"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sanmai/pipeline/zipball/2e88e466dd49f20c10a15330b3953d4d49c326e3",
-                "reference": "2e88e466dd49f20c10a15330b3953d4d49c326e3",
+                "url": "https://api.github.com/repos/sanmai/pipeline/zipball/c48f45c22c3ce4140d071f7658fb151df1cc08ea",
+                "reference": "c48f45c22c3ce4140d071f7658fb151df1cc08ea",
                 "shasum": ""
             },
             "require": {
@@ -7326,7 +7396,7 @@
             "description": "General-purpose collections pipeline",
             "support": {
                 "issues": "https://github.com/sanmai/pipeline/issues",
-                "source": "https://github.com/sanmai/pipeline/tree/v6.8.1"
+                "source": "https://github.com/sanmai/pipeline/tree/v6.9"
             },
             "funding": [
                 {
@@ -7334,7 +7404,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-06-15T09:14:47+00:00"
+            "time": "2023-10-08T11:56:54+00:00"
         },
         {
             "name": "scssphp/scssphp",
@@ -8693,17 +8763,21 @@
         },
         {
             "name": "shopware/conflicts",
-            "version": "0.0.2",
+            "version": "0.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/shopware/conflicts.git",
-                "reference": "b5414fb0e06ca91d32c896b21c55ad80e261477e"
+                "reference": "4118427f96c9cd622463119e43d461b816dac41f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/shopware/conflicts/zipball/b5414fb0e06ca91d32c896b21c55ad80e261477e",
-                "reference": "b5414fb0e06ca91d32c896b21c55ad80e261477e",
+                "url": "https://api.github.com/repos/shopware/conflicts/zipball/4118427f96c9cd622463119e43d461b816dac41f",
+                "reference": "4118427f96c9cd622463119e43d461b816dac41f",
                 "shasum": ""
+            },
+            "require": {
+                "doctrine/collections": "*",
+                "shopware/core": "<6.5.0.0"
             },
             "conflict": {
                 "symfony/cache": "6.2.3 || 5.4.17",
@@ -8718,9 +8792,9 @@
             "description": "Shopware 6 conflicting packages",
             "support": {
                 "issues": "https://github.com/shopware/conflicts/issues",
-                "source": "https://github.com/shopware/conflicts/tree/0.0.2"
+                "source": "https://github.com/shopware/conflicts/tree/0.1.0"
             },
-            "time": "2022-12-29T08:29:43+00:00"
+            "time": "2023-10-11T13:56:03+00:00"
         },
         {
             "name": "shopware/core",
@@ -9051,6 +9125,73 @@
                 "source": "https://github.com/shopwareLabs/dompdf/tree/v1.0.3"
             },
             "time": "2022-04-20T12:38:36+00:00"
+        },
+        {
+            "name": "spaze/phpstan-disallowed-calls",
+            "version": "v2.16.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spaze/phpstan-disallowed-calls.git",
+                "reference": "c7a80cc9747e6307bfa6f5ea88ed3f9b1804790c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spaze/phpstan-disallowed-calls/zipball/c7a80cc9747e6307bfa6f5ea88ed3f9b1804790c",
+                "reference": "c7a80cc9747e6307bfa6f5ea88ed3f9b1804790c",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.2 || ^8.0",
+                "phpstan/phpstan": "^1.10"
+            },
+            "require-dev": {
+                "nette/neon": "^3.2",
+                "nikic/php-parser": "^4.13",
+                "php-parallel-lint/php-console-highlighter": "^1.0",
+                "php-parallel-lint/php-parallel-lint": "^1.2",
+                "phpunit/phpunit": "^8.5 || ^10.1",
+                "spaze/coding-standard": "^1.7",
+                "symfony/polyfill-php80": "^1.27"
+            },
+            "type": "phpstan-extension",
+            "extra": {
+                "phpstan": {
+                    "includes": [
+                        "extension.neon"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Spaze\\PHPStan\\Rules\\Disallowed\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michal Špaček",
+                    "email": "mail@michalspacek.cz",
+                    "homepage": "https://www.michalspacek.cz"
+                }
+            ],
+            "description": "PHPStan rules to detect disallowed method & function calls, constant, namespace & superglobal usages",
+            "keywords": [
+                "static analysis"
+            ],
+            "support": {
+                "issues": "https://github.com/spaze/phpstan-disallowed-calls/issues",
+                "source": "https://github.com/spaze/phpstan-disallowed-calls/tree/v2.16.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/spaze",
+                    "type": "github"
+                }
+            ],
+            "time": "2023-07-26T11:37:27+00:00"
         },
         {
             "name": "squirrelphp/twig-php-syntax",

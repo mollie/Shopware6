@@ -8,7 +8,22 @@ parameters:
         # legacy code that is not working with abstract/interface changes
         - ./src/Compatibility/Storefront/Route/PaymentMethodRoute/RemovePaymentMethodRoute63.php
         - ./src/Service/Mail/MailService63.php
+    disallowedFunctionCalls:
+        - function: 'var_dump()'
+          message: 'use some logger instead'
+        - function: 'var_export()'
+          message: 'use some logger instead'
+        - function: 'dd()'
+          message: 'use some logger instead'
+        - function: 'print_r()'
+          message: 'use some logger instead'
+        - function: 'putenv()'
+          message: 'might overwrite existing variables'
+
 services:
     - class: MolliePayments\PHPStan\Rules\NoManufacturerRule
       tags:
         - phpstan.rules.rule
+
+includes:
+    - vendor/spaze/phpstan-disallowed-calls/extension.neon
