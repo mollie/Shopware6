@@ -36,17 +36,24 @@ class MollieLoggerFactory
      */
     private $retentionDays;
 
+    /**
+     * @var string
+     */
+    private $dsn;
+
 
     /**
      * @param SettingsService $settingsService
      * @param string $filename
      * @param string $retentionDays
+     * @param string $dsn
      */
-    public function __construct(SettingsService $settingsService, string $filename, string $retentionDays)
+    public function __construct(SettingsService $settingsService, string $filename, string $retentionDays, string $dsn)
     {
         $this->settingsService = $settingsService;
         $this->filename = $filename;
         $this->retentionDays = $retentionDays;
+        $this->dsn = $dsn;
     }
 
     /**
@@ -54,6 +61,11 @@ class MollieLoggerFactory
      */
     public function createLogger(): LoggerInterface
     {
+        if ($this->dsn === '' || $this->dsn === 'mysql://_placeholder.test') {
+            // deployment server without database
+            return new Logger(self::CHANNEL);
+        }
+
         $config = $this->settingsService->getSettings();
 
         # 100 = DEBUG, 200 = INFO
