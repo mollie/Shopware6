@@ -356,7 +356,8 @@
         },
         "action": {
           "edit": "Edit subscription"
-        }
+        },
+        "deletedCustomer": "Deleted customer"
       },
       "detail": {
         "title": "Mollie subscription",

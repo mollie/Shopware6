@@ -357,7 +357,8 @@
         },
         "action": {
           "edit": "Abonnement bewerken"
-        }
+        },
+        "deletedCustomer": "Klant verwijderd"
       },
       "detail": {
         "title": "Mollie Abonnement",

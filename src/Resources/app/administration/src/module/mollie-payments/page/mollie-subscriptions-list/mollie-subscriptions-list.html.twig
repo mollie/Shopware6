@@ -50,8 +50,13 @@
                     {% endblock %}
 
                     {% block mollie_payments_subscription_list_content_customer %}
-                        <template #column-customerId="{ item }">
-                            {{ item.customer.firstName }} {{ item.customer.lastName }}
+                        <template #column-customerId="{ item }" >
+                            <div v-if="item.customer">
+                                {{ item.customer.firstName }} {{ item.customer.lastName }}
+                            </div>
+                            <div v-else>
+                                {{ $tc('mollie-payments.subscriptions.list.deletedCustomer') }}
+                            </div>
                         </template>
                     {% endblock %}
 

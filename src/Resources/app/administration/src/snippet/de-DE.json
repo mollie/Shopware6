@@ -356,7 +356,8 @@
         },
         "action": {
           "edit": "Abonnement bearbeiten"
-        }
+        },
+        "deletedCustomer": "Gelöschter Kunde"
       },
       "detail": {
         "title": "Mollie Abonnements",
