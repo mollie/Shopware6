@@ -3,11 +3,23 @@
 {% block page_checkout_main_content %}
 
     {% if mollie_applepay_enabled %}
-        <div id="mollie_hide_applepay" data-mollie-template-applepay-checkout data-mollie-apple-pay-payment-method-options="{{ {
-            shopUrl: seoUrl('frontend.home.page'),
-            hideAlways: false
-        }
-        |json_encode }}"></div>
+        <div id="mollie_hide_applepay" data-mollie-template-applepay-checkout
+             data-mollie-apple-pay-payment-method-options="{{ {
+                 shopUrl: seoUrl('frontend.home.page'),
+                 hideAlways: false
+             }
+             |json_encode }}"></div>
+    {% endif %}
+
+
+    {% if mollie_paypalexpress_enabled %}
+        <div id="mollie_hide_ppe" data-mollie-template-ppe-checkout
+             data-mollie-paypal-express-payment-method-options="{{ {
+                 shopUrl: seoUrl('frontend.home.page'),
+                 hideAlways: false,
+                 isUsed: mollie_paypalexpress_used
+             }
+             |json_encode }}"></div>
     {% endif %}
 
     {% if page.enable_credit_card_components == true %}

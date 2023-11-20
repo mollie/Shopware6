@@ -115,7 +115,7 @@ class CustomerService implements CustomerServiceInterface
      *
      * @return null|string
      */
-    public function customerLogin(CustomerEntity $customer, SalesChannelContext $context): ?string
+    public function loginCustomer(CustomerEntity $customer, SalesChannelContext $context): ?string
     {
         /** @var null|string $newToken */
         $newToken = null;
@@ -318,8 +318,8 @@ class CustomerService implements CustomerServiceInterface
      * @param string $customerId
      * @param string $salesChannelId
      * @param Context $context
-     * @throws CustomerCouldNotBeFoundException
      * @return string
+     * @throws CustomerCouldNotBeFoundException
      */
     public function getMollieCustomerId(string $customerId, string $salesChannelId, Context $context): string
     {
@@ -380,8 +380,8 @@ class CustomerService implements CustomerServiceInterface
     /**
      * @param string $customerId
      * @param Context $context
-     * @throws CustomerCouldNotBeFoundException
      * @return CustomerStruct
+     * @throws CustomerCouldNotBeFoundException
      */
     public function getCustomerStruct(string $customerId, Context $context): CustomerStruct
     {
@@ -451,7 +451,7 @@ class CustomerService implements CustomerServiceInterface
      * @param SalesChannelContext $context
      * @return null|CustomerEntity
      */
-    public function createApplePayDirectCustomer(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, string $paymentMethodId, SalesChannelContext $context): ?CustomerEntity
+    public function createGuestAccount(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, string $paymentMethodId, SalesChannelContext $context): ?CustomerEntity
     {
         $customerId = Uuid::randomHex();
         $addressId = Uuid::randomHex();
@@ -618,5 +618,35 @@ class CustomerService implements CustomerServiceInterface
             $settings->isTestMode(),
             $context
         );
+    }
+
+
+    public function setPaypalExpress(CustomerEntity $customer, Context $context): void
+    {
+        // Get existing custom fields
+        $customFields = $customer->getCustomFields();
+
+        // If custom fields are empty, create a new array
+        if (!is_array($customFields)) {
+            $customFields = [];
+        }
+
+        // Store the card token in the custom fields
+        $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS]['is_ppe'] = true;
+
+        $this->logger->debug("Setting PPE Marker", [
+            'customerId' => $customer->getId(),
+            'customFields' => $customFields,
+        ]);
+
+        // Store the custom fields on the customer
+        $this->customerRepository->update(
+            [
+                [
+                    'id' => $customer->getId(),
+                    'customFields' => $customFields
+                ]
+            ],
+            $context);
     }
 }

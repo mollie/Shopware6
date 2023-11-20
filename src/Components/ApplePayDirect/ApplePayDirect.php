@@ -351,7 +351,7 @@ class ApplePayDirect
         # if we are not logged in,
         # then we have to create a new guest customer for our express order
         if (!$this->customerService->isCustomerLoggedIn($context)) {
-            $customer = $this->customerService->createApplePayDirectCustomer(
+            $customer = $this->customerService->createGuestAccount(
                 $firstname,
                 $lastname,
                 $email,
@@ -371,7 +371,7 @@ class ApplePayDirect
             # now start the login of our customer.
             # Our SalesChannelContext will be correctly updated after our
             # forward to the finish-payment page.
-            $this->customerService->customerLogin($customer, $context);
+            $this->customerService->loginCustomer($customer, $context);
         }
 
         # also (always) update our payment method to use Apple Pay for our cart

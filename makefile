@@ -12,11 +12,18 @@ NODE_VERSION:=$(shell node -v)
 
 
 help:
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+	@printf "\033[33mInstallation:%-30s\033[0m %s\n"
+	@grep -E '^[a-zA-Z_-]+:.*?##1 .*$$' $(firstword $(MAKEFILE_LIST)) | awk 'BEGIN {FS = ":.*?##1 "}; {printf "\033[33m  - %-30s\033[0m %s\n", $$1, $$2}'
+	@echo "---------------------------------------------------------------------------------------------------------"
+	@printf "\033[36mDevelopment:%-30s\033[0m %s\n"
+	@grep -E '^[a-zA-Z_-]+:.*?##2 .*$$' $(firstword $(MAKEFILE_LIST)) | awk 'BEGIN {FS = ":.*?##2 "}; {printf "\033[36m  - %-30s\033[0m %s\n", $$1, $$2}'
+	@echo "---------------------------------------------------------------------------------------------------------"
+	@printf "\033[35mDevOps:%-30s\033[0m %s\n"
+	@grep -E '^[a-zA-Z_-]+:.*?##3 .*$$' $(firstword $(MAKEFILE_LIST)) | awk 'BEGIN {FS = ":.*?##3 "}; {printf "\033[35m  - %-30s\033[0m %s\n", $$1, $$2}'
 
 # ------------------------------------------------------------------------------------------------------------
 
-prod: ## Installs all production dependencies
+prod: ##1 Installs all production dependencies
 	# do not switch to production composer PROD, otherwise it would
 	# also install shopware in here -> we just need it for the release composer.json file
 	# so just switch to our dev dependency variant
@@ -27,7 +34,7 @@ prod: ## Installs all production dependencies
 	cd src/Resources/app/administration && npm install --omit=dev
 	cd src/Resources/app/storefront && npm install --production
 
-dev: ## Installs all dev dependencies
+dev: ##1 Installs all dev dependencies
 	php switch-composer.php dev
 	@composer validate
 	@composer install
@@ -35,10 +42,10 @@ dev: ## Installs all dev dependencies
 	cd src/Resources/app/storefront && npm install
 	curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt install shopware-cli
 
-install: ## [deprecated] Installs all production dependencies. Please use "make prod" now.
+install: ##1 [deprecated] Installs all production dependencies. Please use "make prod" now.
 	@make prod -B
 
-clean: ## Cleans all dependencies and files
+clean: ##1 Cleans all dependencies and files
 	rm -rf vendor/*
 	# ------------------------------------------------------
 	rm -rf .reports | true
@@ -51,7 +58,7 @@ clean: ## Cleans all dependencies and files
 	rm -rf ./src/Resources/public/administration
 	rm -rf ./src/Resources/public/molllie-payments.js
 
-build: ## Installs the plugin, and builds the artifacts using the Shopware build commands.
+build: ##3 Installs the plugin, and builds the artifacts using the Shopware build commands.
 	php switch-composer.php prod
 	cd ../../.. && export NODE_OPTIONS=--openssl-legacy-provider && shopware-cli extension build custom/plugins/MolliePayments
 	php switch-composer.php dev
@@ -65,67 +72,67 @@ build: ## Installs the plugin, and builds the artifacts using the Shopware build
 	cd ../../.. && php bin/console --no-debug assets:install
 	cd ../../.. && php bin/console --no-debug cache:clear
 
-fixtures: ## Installs all available testing fixtures of the Mollie plugin
+fixtures: ##3 Installs all available testing fixtures of the Mollie plugin
 	cd ../../.. && php bin/console --no-debug cache:clear
 	cd ../../.. && php bin/console --no-debug fixture:load:group mollie
 
 # ------------------------------------------------------------------------------------------------------------
 
-phpcheck: ## Starts the PHP syntax checks
+phpcheck: ##2 Starts the PHP syntax checks
 	@find . -name '*.php' -not -path "./vendor/*" -not -path "./tests/*" | xargs -n 1 -P4 php -l
 
-phpmin: ## Starts the PHP compatibility checks
+phpmin: ##2 Starts the PHP compatibility checks
 	@php vendor/bin/phpcs -p --standard=PHPCompatibility --extensions=php --runtime-set testVersion 7.2 ./src
 
-csfix: ## Starts the PHP CS Fixer
+csfix: ##2 Starts the PHP CS Fixer
 	@PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config=./.php_cs.php --dry-run
 
-stan: ## Starts the PHPStan Analyser
+stan: ##2 Starts the PHPStan Analyser
 	@php vendor/bin/phpstan analyse -c ./.phpstan.neon
 
-phpunit: ## Starts all PHPUnit Tests
+phpunit: ##2 Starts all PHPUnit Tests
 	@XDEBUG_MODE=coverage php vendor/bin/phpunit --configuration=phpunit.xml --coverage-html ./.reports/phpunit/coverage
 
-infection: ## Starts all Infection/Mutation tests
+infection: ##2 Starts all Infection/Mutation tests
 	@XDEBUG_MODE=coverage php vendor/bin/infection --configuration=./.infection.json --log-verbosity=all --debug
 
-insights: ## Starts the PHPInsights Analyser
+insights: ##2 Starts the PHPInsights Analyser
 	@php vendor/bin/phpinsights analyse --no-interaction
 
-jest: ## Starts all Jest tests
+jest: ##2 Starts all Jest tests
 	cd ./src/Resources/app/administration && ./node_modules/.bin/jest --config=.jest.config.js --coverage
 	cd ./src/Resources/app/storefront && ./node_modules/.bin/jest --config=.jest.config.js --coverage
 
-stryker: ## Starts the Stryker Jest Mutation Tests
+stryker: ##2 Starts the Stryker Jest Mutation Tests
 	cd ./src/Resources/app/administration && ./node_modules/.bin/stryker run .stryker.conf.json
 	@# Storefront has no tests at the moment
 	@# cd ./src/Resources/app/storefront && ./node_modules/.bin/stryker run .stryker.conf.json
 
-eslint: ## Starts the ESLinter
+eslint: ##2 Starts the ESLinter
 	cd ./src/Resources/app/administration && ./node_modules/.bin/eslint --config ./.eslintrc.json ./src
 	cd ./src/Resources/app/storefront && ./node_modules/.bin/eslint --config ./.eslintrc.json ./src
 
-stylelint: ## Starts the Stylelinter
+stylelint: ##2 Starts the Stylelinter
 	cd ./src/Resources/app/administration && ./node_modules/.bin/stylelint --allow-empty-input ./src/**/*.scss
 	cd ./src/Resources/app/storefront && ./node_modules/.bin/stylelint --allow-empty-input ./src/**/*.scss
 
-configcheck: ## Tests and verifies the plugin configuration file
+configcheck: ##2 Tests and verifies the plugin configuration file
 	cd ./tests/Custom && php verify-plugin-config.php
 
 # ------------------------------------------------------------------------------------------------------------
 
-snippetcheck: ## Tests and verifies all plugin snippets
+snippetcheck: ##2 Tests and verifies all plugin snippets
 	php vendor/bin/phpunuhi validate --configuration=./.phpunuhi.xml --report-format=junit --report-output=./.phpunuhi/junit.xml
 
-snippetexport: ## Exports all snippets
+snippetexport: ##2 Exports all snippets
 	php vendor/bin/phpunuhi export --configuration=./.phpunuhi.xml --dir=./.phpunuhi
 
-snippetimport: ## Imports the provided snippet set [set=xyz file=xz.csv]
+snippetimport: ##2 Imports the provided snippet set [set=xyz file=xz.csv]
 	php vendor/bin/phpunuhi import --configuration=./.phpunuhi.xml --set=$(set) --file=$(file) --intent=1
 
 # ------------------------------------------------------------------------------------------------------------
 
-pr: ## Prepares everything for a Pull Request
+pr: ##2 Prepares everything for a Pull Request
 	@PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config=./.php_cs.php
 	@make phpcheck -B
 	@make phpmin -B
@@ -141,7 +148,7 @@ pr: ## Prepares everything for a Pull Request
 
 # -------------------------------------------------------------------------------------------------
 
-release: ## Builds a PROD version and creates a ZIP file in plugins/.build.
+release: ##3 Builds a PROD version and creates a ZIP file in plugins/.build.
 ifneq (,$(findstring v12,$(NODE_VERSION)))
 	$(warning Attention, reqruires Node v14 or higher to build a release!)
 	@exit 1

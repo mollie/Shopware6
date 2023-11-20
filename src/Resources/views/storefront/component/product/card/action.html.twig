@@ -26,6 +26,14 @@
             {% endblock %}
         {% endif %}
 
+        {% if mollie_paypalexpress_enabled and ('plp' not in mollie_paypalexpress_restrictions) %}
+            {% block component_offcanvas_cart_actions_checkout_mollie_paypal_express_component %}
+                <div class="mt-2">
+                    {% include '@MolliePayments/mollie/component/paypal-express-button.twig' %}
+                </div>
+            {% endblock %}
+        {% endif %}
+
     {% endblock %}
 
 {% endblock %}

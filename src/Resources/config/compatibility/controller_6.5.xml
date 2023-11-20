@@ -168,6 +168,16 @@
             </call>
         </service>
 
+        <service id="Kiener\MolliePayments\Controller\Storefront\PaypalExpress\Sw65\PaypalExpressController" public="true">
+            <argument type="service" id="Kiener\MolliePayments\Components\PaypalExpress\PayPalExpress"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\CartService"/>
+            <argument type="service" id="router"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+
         <service id="Kiener\MolliePayments\Controller\Api\Subscription\Sw65\SubscriptionController" public="true">
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
             <call method="setContainer">

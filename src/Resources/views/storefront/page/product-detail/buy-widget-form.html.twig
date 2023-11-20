@@ -29,6 +29,15 @@
                 </div>
             {% endblock %}
         {% endif %}
+
+        {% if mollie_paypalexpress_enabled and ('pdp' not in mollie_paypalexpress_restrictions) %}
+            {% block page_product_detail_buy_container_mollie_paypal_express_component %}
+                <div class="row g-2 form-row mt-2 justify-content-end">
+                    {% include '@MolliePayments/mollie/component/paypal-express-button.twig' with {cols: 'col-8'} %}
+                </div>
+            {% endblock %}
+        {% endif %}
+
     {% endblock %}
 
 {% endblock %}
@@ -39,7 +48,9 @@
 {% block page_product_detail_buy_button %}
 
     {% if mollie_subscriptions_enabled and page.product.customFields.mollie_payments_product_subscription_enabled %}
-        <button class="btn btn-primary btn-block btn-buy" title="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}" aria-label="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}">
+        <button class="btn btn-primary btn-block btn-buy"
+                title="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}"
+                aria-label="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}">
             {{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}
         </button>
     {% else %}

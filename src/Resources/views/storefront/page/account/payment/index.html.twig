@@ -9,6 +9,12 @@
         |json_encode }}"></div>
     {% endif %}
 
+    <div id="mollie_hide_ppe" data-mollie-template-ppe-account data-mollie-paypal-express-payment-method-options="{{ {
+        shopUrl: seoUrl('frontend.home.page'),
+        hideAlways: true
+    }
+    |json_encode }}"></div>
+
     {{ parent() }}
 {% endblock %}
 

@@ -148,8 +148,7 @@
             </call>
         </service>
 
-        <service id="Kiener\MolliePayments\Controller\Storefront\ApplePayDirect\Sw6\ApplePayDirectController"
-                 public="true">
+        <service id="Kiener\MolliePayments\Controller\Storefront\ApplePayDirect\Sw6\ApplePayDirectController" public="true">
             <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect"/>
             <argument type="service" id="router"/>
             <argument type="service" id="mollie_payments.logger"/>
@@ -160,6 +159,15 @@
                       id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Repository\Customer\CustomerRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+
+        <service id="Kiener\MolliePayments\Controller\Storefront\PaypalExpress\Sw6\PaypalExpressController" public="true">
+            <argument type="service" id="Kiener\MolliePayments\Components\PaypalExpress\PayPalExpress"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\CartService"/>
+            <argument type="service" id="router"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
