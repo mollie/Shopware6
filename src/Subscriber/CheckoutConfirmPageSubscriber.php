@@ -24,6 +24,7 @@ use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\System\Language\LanguageEntity;
 use Shopware\Storefront\Page\Account\Order\AccountEditOrderPageLoadedEvent;
 use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -55,10 +56,6 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
      */
     private $repoLanguages;
 
-    /**
-     * @var LocaleRepositoryInterface
-     */
-    private $repoLocales;
 
     /**
      * @var MandateServiceInterface
@@ -92,16 +89,14 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
      * @param MollieApiFactory $apiFactory
      * @param SettingsService $settingsService
      * @param LanguageRepositoryInterface $languageRepositoryInterface
-     * @param LocaleRepositoryInterface $localeRepositoryInterface
      * @param MandateServiceInterface $mandateService
      * @param MollieGatewayInterface $mollieGateway
      */
-    public function __construct(MollieApiFactory $apiFactory, SettingsService $settingsService, LanguageRepositoryInterface $languageRepositoryInterface, LocaleRepositoryInterface $localeRepositoryInterface, MandateServiceInterface $mandateService, MollieGatewayInterface $mollieGateway)
+    public function __construct(MollieApiFactory $apiFactory, SettingsService $settingsService, LanguageRepositoryInterface $languageRepositoryInterface, MandateServiceInterface $mandateService, MollieGatewayInterface $mollieGateway)
     {
         $this->apiFactory = $apiFactory;
         $this->settingsService = $settingsService;
         $this->repoLanguages = $languageRepositoryInterface;
-        $this->repoLocales = $localeRepositoryInterface;
         $this->mandateService = $mandateService;
         $this->mollieGateway = $mollieGateway;
     }
@@ -113,11 +108,8 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
      */
     public function addDataToPage($args): void
     {
-        # load our settings for the
-        # current request
-        $this->settings = $this->settingsService->getSettings($args->getSalesChannelContext()->getSalesChannel()->getId());
-
         $scId = $args->getSalesChannelContext()->getSalesChannel()->getId();
+
         $currentSelectedPaymentMethod = $args->getSalesChannelContext()->getPaymentMethod();
         $mollieAttributes = new PaymentMethodAttributes($currentSelectedPaymentMethod);
 
@@ -125,6 +117,11 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
         if (! $mollieAttributes->isMolliePayment()) {
             return;
         }
+
+        # load our settings for the
+        # current request
+        $this->settings = $this->settingsService->getSettings($scId);
+
         # now use our factory to get the correct
         # client with the correct sales channel settings
         $this->apiClient = $this->apiFactory->getClient($scId);
@@ -178,7 +175,6 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
          */
         $locale = '';
 
-        $context = $args->getContext();
         $salesChannelContext = $args->getSalesChannelContext();
 
 
@@ -187,17 +183,16 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
             $languageId = $salesChannel->getLanguageId();
             if ($languageId !== null) {
                 $languageCriteria = new Criteria();
+                $languageCriteria->addAssociation('locale');
                 $languageCriteria->addFilter(new EqualsFilter('id', $languageId));
 
-                $languages = $this->repoLanguages->search($languageCriteria, $args->getContext());
+                $languagesResult = $this->repoLanguages->search($languageCriteria, $args->getContext());
+                /** @var LanguageEntity $language */
+                $language = $languagesResult->first();
 
-                $localeId = $languages->first()->getLocaleId();
-
-                $localeCriteria = new Criteria();
-                $localeCriteria->addFilter(new EqualsFilter('id', $localeId));
-
-                $locales = $this->repoLocales->search($localeCriteria, $args->getContext());
-                $locale = $locales->first()->getCode();
+                if ($language !== null) {
+                    $locale = $language->getLocale()->getCode();
+                }
             }
         }
 

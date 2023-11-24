@@ -149,7 +149,6 @@
             <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Repository\Language\LanguageRepository"/>
-            <argument type="service" id="Kiener\MolliePayments\Repository\Locale\LocaleRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MandateService"/>
             <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
             <tag name="kernel.event_subscriber"/>
