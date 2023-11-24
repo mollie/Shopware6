@@ -190,7 +190,7 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
                 /** @var LanguageEntity $language */
                 $language = $languagesResult->first();
 
-                if ($language !== null) {
+                if ($language !== null && $language->getLocale() !== null) {
                     $locale = $language->getLocale()->getCode();
                 }
             }
