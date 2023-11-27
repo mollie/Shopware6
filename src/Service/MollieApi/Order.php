@@ -398,7 +398,7 @@ class Order
     {
         $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId);
         $shipment = [];
-        if($trackingInfoStruct instanceof ShipmentTrackingInfoStruct){
+        if ($trackingInfoStruct instanceof ShipmentTrackingInfoStruct) {
             $shipment['tracking'] = $trackingInfoStruct->toArray();
         }
         /** @var OrderLine $orderLine */

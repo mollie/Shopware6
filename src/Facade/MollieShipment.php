@@ -11,6 +11,7 @@ use Kiener\MolliePayments\Service\MollieApi\Shipment;
 use Kiener\MolliePayments\Service\MolliePaymentExtractor;
 use Kiener\MolliePayments\Service\OrderDeliveryService;
 use Kiener\MolliePayments\Service\OrderService;
+use Kiener\MolliePayments\Service\TrackingInfoStructFactory;
 use Kiener\MolliePayments\Service\Transition\DeliveryTransitionServiceInterface;
 use Kiener\MolliePayments\Struct\MollieApi\ShipmentTrackingInfoStruct;
 use Psr\Log\LoggerInterface;
@@ -63,9 +64,15 @@ class MollieShipment implements MollieShipmentInterface
     private $orderDataExtractor;
 
     /**
+     * @var TrackingInfoStructFactory
+     */
+    private $trackingInfoStructFactory;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
+
 
     /**
      * @param MolliePaymentExtractor $extractor
@@ -77,7 +84,7 @@ class MollieShipment implements MollieShipmentInterface
      * @param OrderDataExtractor $orderDataExtractor
      * @param LoggerInterface $logger
      */
-    public function __construct(MolliePaymentExtractor $extractor, DeliveryTransitionServiceInterface $deliveryTransitionService, Order $mollieApiOrderService, Shipment $mollieApiShipmentService, OrderDeliveryService $orderDeliveryService, OrderService $orderService, OrderDataExtractor $orderDataExtractor, LoggerInterface $logger)
+    public function __construct(MolliePaymentExtractor $extractor, DeliveryTransitionServiceInterface $deliveryTransitionService, Order $mollieApiOrderService, Shipment $mollieApiShipmentService, OrderDeliveryService $orderDeliveryService, OrderService $orderService, OrderDataExtractor $orderDataExtractor, TrackingInfoStructFactory $trackingInfoStructFactory, LoggerInterface $logger)
     {
         $this->extractor = $extractor;
         $this->deliveryTransitionService = $deliveryTransitionService;
@@ -87,6 +94,7 @@ class MollieShipment implements MollieShipmentInterface
         $this->orderService = $orderService;
         $this->orderDataExtractor = $orderDataExtractor;
         $this->logger = $logger;
+        $this->trackingInfoStructFactory = $trackingInfoStructFactory;
     }
 
     /**
@@ -161,7 +169,6 @@ class MollieShipment implements MollieShipmentInterface
         $lastTransaction = $this->extractor->extractLastMolliePayment($order->getTransactions());
 
         if (!$lastTransaction instanceof OrderTransactionEntity) {
-
             $this->logger->info(
                 sprintf(
                     'The last transaction of the order (%s) is not a mollie payment! No shipment will be sent to mollie',
@@ -172,7 +179,7 @@ class MollieShipment implements MollieShipmentInterface
             return false;
         }
 
-        $trackingInfoStruct = $this->createTrackingInfoStructFromDelivery($delivery);
+        $trackingInfoStruct = $this->trackingInfoStructFactory->createFromDelivery($delivery);
 
         $addedMollieShipment = $this->mollieApiOrderService->setShipment($mollieOrderId, $trackingInfoStruct, $order->getSalesChannelId());
 
@@ -254,7 +261,7 @@ class MollieShipment implements MollieShipmentInterface
         $shipment = $this->mollieApiShipmentService->shipOrder(
             $mollieOrderId,
             $order->getSalesChannelId(),
-            $this->createTrackingInfoStruct($trackingCarrier, $trackingCode, $trackingUrl)
+            $this->trackingInfoStructFactory->create($trackingCarrier, $trackingCode, $trackingUrl)
         );
 
         $delivery = $this->orderDataExtractor->extractDelivery($order, $context);
@@ -375,7 +382,7 @@ class MollieShipment implements MollieShipmentInterface
             $order->getSalesChannelId(),
             $mollieOrderLineId,
             $quantity,
-            $this->createTrackingInfoStruct($trackingCarrier, $trackingCode, $trackingUrl)
+            $this->trackingInfoStructFactory->create($trackingCarrier, $trackingCode, $trackingUrl)
         );
 
         $delivery = $this->orderDataExtractor->extractDelivery($order, $context);
@@ -466,39 +473,5 @@ class MollieShipment implements MollieShipmentInterface
             // Otherwise, this lineItem does not match the itemIdentifier at all.
             return false;
         });
-    }
-    private function createTrackingInfoStructFromDelivery(OrderDeliveryEntity $orderDeliveryEntity):?ShipmentTrackingInfoStruct{
-        $trackingCodes = $orderDeliveryEntity->getTrackingCodes();
-        $shippingMethod = $orderDeliveryEntity->getShippingMethod();
-        if($shippingMethod === null){
-            return null;
-        }
-        if (count($trackingCodes) !== 1) {
-            return null;
-        }
-
-        return $this->createTrackingInfoStruct((string)$shippingMethod->getName(),$trackingCodes[0], (string)$shippingMethod->getTrackingUrl());
-    }
-
-    private function createTrackingInfoStruct(string $trackingCarrier, string $trackingCode, string $trackingUrl): ?ShipmentTrackingInfoStruct
-    {
-        if (empty($trackingCarrier) && empty($trackingCode)) {
-            return null;
-        }
-
-        if (empty($trackingCarrier)) {
-            throw new \InvalidArgumentException('Missing Argument for Tracking Carrier!');
-        }
-
-        if (empty($trackingCode)) {
-            throw new \InvalidArgumentException('Missing Argument for Tracking Code!');
-        }
-
-        $trackingUrl = trim(sprintf($trackingUrl, $trackingCode));
-        if (filter_var($trackingUrl, FILTER_VALIDATE_URL) === false) {
-            $trackingUrl = '';
-        }
-
-        return new ShipmentTrackingInfoStruct($trackingCarrier, $trackingCode, $trackingUrl);
     }
 }

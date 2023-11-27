@@ -11,6 +11,7 @@ use Kiener\MolliePayments\Service\MollieApi\Shipment;
 use Kiener\MolliePayments\Service\MolliePaymentExtractor;
 use Kiener\MolliePayments\Service\OrderDeliveryService;
 use Kiener\MolliePayments\Service\OrderService;
+use Kiener\MolliePayments\Service\TrackingInfoStructFactory;
 use Kiener\MolliePayments\Service\Transition\DeliveryTransitionService;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
@@ -100,6 +101,8 @@ class SetShipmentTest extends TestCase
             $this->createMock(CustomerService::class)
         );
 
+        $trackingStructFactory = new TrackingInfoStructFactory();
+
         $this->mollieShipment = new MollieShipment(
             $this->extractor,
             $this->deliveryTransitionService,
@@ -108,6 +111,7 @@ class SetShipmentTest extends TestCase
             $this->orderDeliveryService,
             $this->orderService,
             $this->orderDataExtractor,
+            $trackingStructFactory,
             $this->logger
         );
         $this->orderNumber = 'fooOrderNumber';
