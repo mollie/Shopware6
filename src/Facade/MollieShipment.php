@@ -161,6 +161,7 @@ class MollieShipment implements MollieShipmentInterface
         $lastTransaction = $this->extractor->extractLastMolliePayment($order->getTransactions());
 
         if (!$lastTransaction instanceof OrderTransactionEntity) {
+
             $this->logger->info(
                 sprintf(
                     'The last transaction of the order (%s) is not a mollie payment! No shipment will be sent to mollie',
@@ -170,7 +171,9 @@ class MollieShipment implements MollieShipmentInterface
 
             return false;
         }
+
         $trackingInfoStruct = $this->createTrackingInfoStructFromDelivery($delivery);
+
         $addedMollieShipment = $this->mollieApiOrderService->setShipment($mollieOrderId, $trackingInfoStruct, $order->getSalesChannelId());
 
         if ($addedMollieShipment) {
@@ -467,11 +470,14 @@ class MollieShipment implements MollieShipmentInterface
     private function createTrackingInfoStructFromDelivery(OrderDeliveryEntity $orderDeliveryEntity):?ShipmentTrackingInfoStruct{
         $trackingCodes = $orderDeliveryEntity->getTrackingCodes();
         $shippingMethod = $orderDeliveryEntity->getShippingMethod();
-        if (count($trackingCodes) !== 1 && ! $shippingMethod instanceof ShippingMethodEntity) {
+        if($shippingMethod === null){
+            return null;
+        }
+        if (count($trackingCodes) !== 1) {
             return null;
         }
 
-        return $this->createTrackingInfoStruct($shippingMethod->getName(),$trackingCodes[0], $shippingMethod->getTrackingUrl());
+        return $this->createTrackingInfoStruct((string)$shippingMethod->getName(),$trackingCodes[0], (string)$shippingMethod->getTrackingUrl());
     }
 
     private function createTrackingInfoStruct(string $trackingCarrier, string $trackingCode, string $trackingUrl): ?ShipmentTrackingInfoStruct

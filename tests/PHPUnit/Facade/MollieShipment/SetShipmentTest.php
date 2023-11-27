@@ -188,7 +188,7 @@ class SetShipmentTest extends TestCase
         $deliveryId = $delivery->getId();
         $this->orderDeliveryService->method('getDelivery')->willReturn($delivery);
         $this->mollieApiOrderService->method('setShipment')
-            ->with($mollieOrderId, $salesChannelId)
+            ->with($mollieOrderId, null, $salesChannelId)
             ->willReturn(false);
 
         // custom fields for shipping are never written
@@ -201,6 +201,7 @@ class SetShipmentTest extends TestCase
     public function testThatOrderDeliveryCustomFieldsAreWrittenWhenApiCallSuccessful(): void
     {
         $transaction = $this->createTransaction('Kiener\MolliePayments\Handler\Method\FooMethod');
+
         $order = $this->createOrder($transaction);
         $mollieOrderId = 'foo';
         $customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY] = $mollieOrderId;
@@ -215,7 +216,7 @@ class SetShipmentTest extends TestCase
         $deliveryId = $delivery->getId();
         $this->orderDeliveryService->method('getDelivery')->willReturn($delivery);
         $this->mollieApiOrderService->method('setShipment')
-            ->with($mollieOrderId, $salesChannelId)
+            ->with($mollieOrderId, null,$salesChannelId)
             ->willReturn(true);
 
         // custom fields for shipping are written
