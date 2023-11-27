@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Service\MollieApi\Builder;
 
 use Kiener\MolliePayments\Event\MollieOrderBuildEvent;
+use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher;
@@ -107,7 +108,31 @@ class MollieOrderBuilder
      * @throws \Exception
      * @return array<mixed>
      */
-    public function build(OrderEntity $order, string $transactionId, string $paymentMethod, SalesChannelContext $salesChannelContext, ?PaymentHandler $handler, array $paymentData = []): array
+    public function buildPaymentsPayload(OrderEntity $order, string $transactionId, string $paymentMethod, SalesChannelContext $salesChannelContext, ?PaymentHandler $handler, array $paymentData = []): array
+    {
+        $orderPayload = $this->buildOrderPayload($order, $transactionId, $paymentMethod, $salesChannelContext, $handler, $paymentData);
+
+        return [
+            'amount' => $orderPayload['amount'],
+            'method' => $orderPayload['method'],
+            'description' => $orderPayload['orderNumber'],
+            'locale' => $orderPayload['locale'],
+            'redirectUrl' => $orderPayload['redirectUrl'],
+            'webhookUrl' => $orderPayload['webhookUrl'],
+        ];
+    }
+
+    /**
+     * @param OrderEntity $order
+     * @param string $transactionId
+     * @param string $paymentMethod
+     * @param SalesChannelContext $salesChannelContext
+     * @param null|PaymentHandler $handler
+     * @param array<mixed> $paymentData
+     * @throws CustomerCouldNotBeFoundException
+     * @return array<mixed>
+     */
+    public function buildOrderPayload(OrderEntity $order, string $transactionId, string $paymentMethod, SalesChannelContext $salesChannelContext, ?PaymentHandler $handler, array $paymentData = []): array
     {
         /** @var MollieSettingStruct $settings */
         $settings = $this->settingsService->getSettings($order->getSalesChannelId());

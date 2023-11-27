@@ -9,7 +9,7 @@ use Mollie\Api\Types\OrderLineType;
 
 class RoundingDifferenceFixer
 {
-    private const DEFAULT_TITLE = 'Automatic Rounding Difference';
+    public const DEFAULT_TITLE = 'Automatic Rounding Difference';
     private const DEFAULT_SKU = '';
 
 

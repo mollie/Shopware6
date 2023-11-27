@@ -8,6 +8,7 @@ use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Exception\MollieOrderCancelledException;
 use Kiener\MolliePayments\Exception\MollieOrderExpiredException;
 use Kiener\MolliePayments\Exception\PaymentUrlException;
+use Kiener\MolliePayments\Handler\Method\PosPayment;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\CustomFieldService;
@@ -21,8 +22,9 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Struct\MolliePaymentPrepareData;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
+use Kiener\MolliePayments\Traits\StringTrait;
 use Mollie\Api\Exceptions\ApiException;
-use Mollie\Api\Resources\Order as MollieOrder;
+use Mollie\Api\Resources\OrderLine;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
@@ -32,6 +34,8 @@ use Twig\Extension\CoreExtension;
 
 class MolliePaymentDoPay
 {
+    use StringTrait;
+
     /**
      * @var OrderDataExtractor
      */
@@ -134,6 +138,8 @@ class MolliePaymentDoPay
      */
     public function startMolliePayment(string $paymentMethod, AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext, PaymentHandler $paymentHandler): MolliePaymentPrepareData
     {
+        $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannelId());
+
         # this is the current order transaction
         # of this payment attempt in Shopware
         $swOrderTransactionID = $transactionStruct->getOrderTransaction()->getId();
@@ -167,7 +173,8 @@ class MolliePaymentDoPay
         # now let's check if we have another payment attempt for an existing order.
         # this is the case, if we already have a Mollie Order ID in our custom fields.
         # in this case, we just add a new payment (transaction) to the existing order in Mollie.
-        if (!empty($mollieOrderId)) {
+        # DO NEVER reuse a POS payment, because that only works with payments and not with orders!!!
+        if (!$paymentHandler instanceof PosPayment && $this->stringStartsWith($mollieOrderId, 'ord_')) {
             try {
                 return $this->handleNextPaymentAttempt(
                     $order,
@@ -189,7 +196,7 @@ class MolliePaymentDoPay
         }
 
         $this->logger->debug(
-            'Start first payment attempt for order: ' . $order->getOrderNumber(),
+            'Start payment attempt for order: ' . $order->getOrderNumber(),
             [
                 'salesChannel' => $salesChannelContext->getSalesChannel()->getName(),
                 'mollieID' => '-',
@@ -204,7 +211,7 @@ class MolliePaymentDoPay
 
         # let's create our real Mollie order
         # for this payment in Shopware.
-        $mollieOrder = $this->createMollieOrder($order, $paymentMethod, $transactionStruct, $salesChannelContext, $paymentHandler);
+        $molliePaymentData = $this->createMollieOrder($order, $paymentMethod, $transactionStruct, $salesChannelContext, $paymentHandler);
 
         # now create subscriptions from our order for
         # all products that are configured to be a subscription.
@@ -214,8 +221,8 @@ class MolliePaymentDoPay
 
         # now update our custom struct values
         # and immediately set our Mollie Order ID and more
-        $orderCustomFields->setMollieOrderId($mollieOrder->id);
-        $orderCustomFields->setMolliePaymentUrl($mollieOrder->getCheckoutUrl());
+        $orderCustomFields->setMollieOrderId($molliePaymentData->getId());
+        $orderCustomFields->setMolliePaymentUrl($molliePaymentData->getCheckoutUrl());
 
         # if we have a subscription, make sure
         # to remember the ID in our order
@@ -226,14 +233,27 @@ class MolliePaymentDoPay
         # we save that data in both, the order and
         # the order line items
         $this->updaterOrderCustomFields->updateOrder($order->getId(), $orderCustomFields, $salesChannelContext->getContext());
-        $this->updaterLineItemCustomFields->updateOrderLineItems($mollieOrder, $salesChannelContext);
+        $this->updaterLineItemCustomFields->updateOrderLineItems($molliePaymentData->getMollieLineItems(), $salesChannelContext);
 
 
         # this condition somehow looks weird to me (TODO)
         $checkoutURL = $orderCustomFields->getMolliePaymentUrl() ?? $orderCustomFields->getTransactionReturnUrl() ?? $transactionStruct->getReturnUrl();
 
+        if (empty($checkoutURL)) {
+            # see if we have a POS payment
+            if ($paymentHandler instanceof PosPayment) {
+                # TODO use route builder?! but its only a temp solution...mollie will build a page anyway
+                $checkoutURL = '/mollie/pos/checkout?sw=' . $order->getId() . '&mo=' . $molliePaymentData->getId();
 
-        return new MolliePaymentPrepareData((string)$checkoutURL, (string)$mollieOrder->id);
+                # if we are in test mode then
+                # also include the status change url
+                if ($settings->isTestMode() && !empty($molliePaymentData->getChangeStatusUrl())) {
+                    $checkoutURL .= '&cs=' . urlencode($molliePaymentData->getChangeStatusUrl());
+                }
+            }
+        }
+
+        return new MolliePaymentPrepareData((string)$checkoutURL, (string)$molliePaymentData->getId());
     }
 
     /**
@@ -368,13 +388,42 @@ class MolliePaymentDoPay
      * @param SalesChannelContext $salesChannelContext
      * @param PaymentHandler $paymentHandler
      * @throws \Exception
-     * @return MollieOrder
+     * @return MolliePaymentData
      */
-    private function createMollieOrder(OrderEntity $orderEntity, string $paymentMethod, AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext, PaymentHandler $paymentHandler): \Mollie\Api\Resources\Order
+    private function createMollieOrder(OrderEntity $orderEntity, string $paymentMethod, AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext, PaymentHandler $paymentHandler): MolliePaymentData
     {
         $salesChannelID = $orderEntity->getSalesChannelId();
 
-        $params = $this->orderBuilder->build(
+        if ($paymentHandler instanceof PosPayment) {
+            $params = $this->orderBuilder->buildPaymentsPayload(
+                $orderEntity,
+                $transactionStruct->getOrderTransaction()->getId(),
+                $paymentMethod,
+                $salesChannelContext,
+                $paymentHandler
+            );
+
+            # add our additional custom terminalID parameter
+            $params['terminalId'] = $paymentHandler->getTerminalId();
+
+            $molliePayment = $this->mollieGateway->createPayment($params, $salesChannelID);
+
+            $changeStatusUrl = '';
+
+            if (property_exists($molliePayment->_links, 'changePaymentState')) {
+                $changeStatusUrl = (string)$molliePayment->_links->changePaymentState->href;
+            }
+
+
+            return new MolliePaymentData(
+                $molliePayment->id,
+                (string)$molliePayment->getCheckoutUrl(),
+                [],
+                $changeStatusUrl
+            );
+        }
+
+        $params = $this->orderBuilder->buildOrderPayload(
             $orderEntity,
             $transactionStruct->getOrderTransaction()->getId(),
             $paymentMethod,
@@ -382,10 +431,20 @@ class MolliePaymentDoPay
             $paymentHandler
         );
 
-        return $this->mollieGateway->createOrder(
+        $mollieOrder = $this->mollieGateway->createOrder(
             $params,
             $salesChannelID,
             $salesChannelContext
+        );
+
+        /** @var OrderLine[] $orderLines */
+        $orderLines = $mollieOrder->lines;
+
+        return new MolliePaymentData(
+            $mollieOrder->id,
+            (string)$mollieOrder->getCheckoutUrl(),
+            $orderLines,
+            ''
         );
     }
 }

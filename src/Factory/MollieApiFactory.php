@@ -136,7 +136,7 @@ class MollieApiFactory
         try {
             # in some rare peaks, the Mollie API might take a bit more time.
             # so we set it a higher connect timeout, and also a high enough response timeout
-            $connectTimeout = 5;
+            $connectTimeout = 10;
             $responseTimeout = 10;
             $httpClient = new MollieHttpClient($connectTimeout, $responseTimeout);
 

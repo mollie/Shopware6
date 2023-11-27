@@ -3,7 +3,7 @@
 {% block page_checkout_cart_shipping_costs_form_group_payment_method %}
     <div class="form-group">
         <label for="paymentMethodId">{{ "checkout.paymentMethod"|trans|sw_sanitize }}</label>
-        <select class="custom-select" type="text" id="paymentMethodId" name="paymentMethodId">
+        <select class="custom-select form-select" type="text" id="paymentMethodId" name="paymentMethodId">
             {% for payment in page.paymentMethods %}
                 <option value="{{ payment.id }}"
                         {% if payment.id == context.paymentMethod.id %} selected="selected"{% endif %}>

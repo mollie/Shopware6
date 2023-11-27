@@ -76,7 +76,14 @@ class RefundDataBuilder
 
 
         try {
-            $refunds = $this->refundService->getRefunds($order);
+
+            # **********************************************************************************
+            # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            #
+            # ATTENTION, this will load the refunds from Mollie, but also from the database
+            # we will add our database data to the Mollie metadata.composition and therefore "fake" a response of Mollie,
+            # so that we can reuse the old code from below, even though Mollie does not really have a metadata.composition.
+            $refunds = $this->refundService->getRefunds($order, $context);
         } catch (PaymentNotFoundException $ex) {
             # if we dont have a payment, then theres also no refunds
             # we still need our data, only with an empty list of refunds
@@ -275,7 +282,13 @@ class RefundDataBuilder
                 continue;
             }
 
-            $metadata = RefundMetadata::fromArray($refund['metadata']);
+            $meta = $refund['metadata'];
+
+            if (is_string($meta)) {
+                $meta = json_decode($meta, true);
+            }
+
+            $metadata = RefundMetadata::fromArray($meta);
 
             # if we do have a FULL item refund then
             # we must NOT substract our item again.

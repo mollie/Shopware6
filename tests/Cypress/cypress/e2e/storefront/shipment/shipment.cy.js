@@ -54,7 +54,7 @@ context("Order Shipping", () => {
 
     context(devices.getDescription(device), () => {
 
-        it('C4039: Full Shipping in Administration', () => {
+        it('C4039: Full Shipping in Administration @sanity', () => {
 
             createOrderAndOpenAdmin(2, 1);
 

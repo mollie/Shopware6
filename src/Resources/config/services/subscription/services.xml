@@ -10,6 +10,7 @@
 
         <service id="Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionDefinition">
             <tag name="shopware.entity.definition" entity="mollie_subscription"/>
+            <tag name="shopware.composite_search.definition" priority="1500"/>
         </service>
 
         <service id="Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressDefinition">
@@ -35,6 +36,7 @@
         <service id="Kiener\MolliePayments\Components\Subscription\DAL\Salutation\SalutationExtension">
             <tag name="shopware.entity.extension"/>
         </service>
+
 
         <service id="Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Enricher\LiveDataEnricher">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>

@@ -1,4 +1,4 @@
-import RefundItemService from "../../../../src/module/mollie-payments/components/mollie-refund-manager/services/RefundItemService";
+import RefundItemService from '../../../../src/module/mollie-payments/components/mollie-refund-manager/services/RefundItemService';
 
 const service = new RefundItemService();
 
@@ -47,12 +47,17 @@ test('Item can be refunded if not fully refunded', () => {
     expect(isRefundable).toBe(true);
 });
 
-test('Item cannot be refunded if already fully refunded', () => {
+test('Item can still be refunded if already fully refunded', () => {
+    // we have the use case that a merchant refunds an item with qty 1
+    // but with half the price.
+    // the customer complains and the merchant refunds the rest.
+    // the merchant wants a reference to the refunded item and tries to use qty 0, so that
+    // it will appear in the composition. Therefore isRefundable needs to be TRUE
     item.refunded = 5;
     item.shopware.quantity = 5;
 
     const isRefundable = service.isRefundable(item);
-    expect(isRefundable).toBe(false);
+    expect(isRefundable).toBe(true);
 });
 
 test('Item cannot be refunded if price is 0,00', () => {

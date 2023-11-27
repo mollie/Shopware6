@@ -10,6 +10,7 @@ use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Types\OrderStatus;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Framework\Api\Context\SalesChannelApiSource;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Shopware\Core\System\StateMachine\Event\StateMachineStateChangeEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -88,6 +89,15 @@ class CancelOrderSubscriber implements EventSubscriberInterface
     public function onOrderStateChanges(StateMachineStateChangeEvent $event): void
     {
         if ($event->getTransitionSide() !== StateMachineStateChangeEvent::STATE_MACHINE_TRANSITION_SIDE_ENTER) {
+            return;
+        }
+
+        $apiSource = $event->getContext()->getSource();
+
+        if ($apiSource instanceof SalesChannelApiSource) {
+            # do NOT cancel directly within the context of a Storefront
+            # the user might retry the payment if the first one is cancelled
+            # and we must never cancel the full order, because then he cannot retry the payment.
             return;
         }
 

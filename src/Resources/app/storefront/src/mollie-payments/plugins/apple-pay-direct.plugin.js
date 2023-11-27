@@ -338,11 +338,17 @@ export default class MollieApplePayDirect extends Plugin {
         form.action = checkoutURL;
         form.method = 'POST';
 
+        let street = payment.shippingContact.addressLines[0];
+
+        if (payment.shippingContact.addressLines.length > 1) {
+            street += ' ' + payment.shippingContact.addressLines[1];
+        }
+
         // add billing data
         form.insertAdjacentElement('beforeend', createInput('email', payment.shippingContact.emailAddress));
         form.insertAdjacentElement('beforeend', createInput('lastname', payment.shippingContact.familyName));
         form.insertAdjacentElement('beforeend', createInput('firstname', payment.shippingContact.givenName));
-        form.insertAdjacentElement('beforeend', createInput('street', payment.shippingContact.addressLines[0]));
+        form.insertAdjacentElement('beforeend', createInput('street', street));
         form.insertAdjacentElement('beforeend', createInput('postalCode', payment.shippingContact.postalCode));
         form.insertAdjacentElement('beforeend', createInput('city', payment.shippingContact.locality));
         form.insertAdjacentElement('beforeend', createInput('countryCode', payment.shippingContact.countryCode));

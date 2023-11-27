@@ -1,6 +1,9 @@
 import template from './sw-order-detail-general.html.twig';
 import './sw-order-detail-general.scss';
 import OrderAttributes from '../../../../../../core/models/OrderAttributes';
+import RefundManager from '../../../../components/mollie-refund-manager/RefundManager';
+import MollieShipping from '../../../../components/mollie-ship-order/MollieShipping';
+import MollieShippingEvents from '../../../../components/mollie-ship-order/MollieShippingEvents';
 
 // eslint-disable-next-line no-undef
 const {Component, Mixin} = Shopware;
@@ -12,34 +15,56 @@ Component.override('sw-order-detail-general', {
         Mixin.getByName('notification'),
     ],
 
-    data() {
-        return {
-            configShowRefundManager: false,
-            remainingAmount: 0.0,
-            refundedAmount: 0.0,
-            voucherAmount: 0.0,
-            refundAmountPending: 0.0,
-            refunds: [],
-            shippedAmount: 0,
-            shippedQuantity: 0,
-
-            isRefundManagerPossible: false,
-            isShippingPossible: false,
-            molliePaymentUrl: '',
-            molliePaymentUrlCopied: false,
-        }
-    },
-
     inject: [
         'MolliePaymentsRefundService',
         'MolliePaymentsShippingService',
         'MolliePaymentsOrderService',
         'MolliePaymentsConfigService',
+        'acl',
     ],
 
+    data() {
+        return {
+            // -------------------------------------
+            // services
+            refundManagerService: null,
+            shippingManagerService: null,
+            // -------------------------------------
+            // card data
+            molliePaymentUrl: '',
+            molliePaymentUrlCopied: false,
+            isRefundManagerPossible: false,
+            showRefundModal: false,
+            isShippingPossible: false,
+            showShippingModal: false,
+            // -------------------------------------
+            // summary data
+            remainingAmount: 0.0,
+            refundedAmount: 0.0,
+            voucherAmount: 0.0,
+            refundAmountPending: 0.0,
+            shippedAmount: 0,
+            shippedQuantity: 0,
+        }
+    },
+
     computed: {
+
+        /**
+         *
+         * @returns {boolean}
+         */
         isMollieOrder() {
-            return (this.order.customFields !== null && 'mollie_payments' in this.order.customFields);
+            const attr = new OrderAttributes(this.order);
+            return attr.isMollieOrder();
+        },
+
+        /**
+         *
+         * @returns {*}
+         */
+        hasCreditCardData() {
+            return this._creditCardData().hasCreditCardData();
         },
 
         /**
@@ -71,30 +96,17 @@ Component.override('sw-order-detail-general', {
          * @returns {null|string|*}
          */
         mollieOrderId() {
-
             const orderAttributes = new OrderAttributes(this.order);
-
-            if (orderAttributes.getOrderId() !== '') {
-                return orderAttributes.getOrderId();
-            }
-
-            if (orderAttributes.getPaymentId() !== '') {
-                return orderAttributes.getPaymentId();
-            }
-
-            return null;
+            return orderAttributes.getMollieID();
         },
-        mollieThirdPartyPaymentId() {
-            if (
-                !!this.order
-                && !!this.order.customFields
-                && !!this.order.customFields.mollie_payments
-                && !!this.order.customFields.mollie_payments.third_party_payment_id
-            ) {
-                return this.order.customFields.mollie_payments.third_party_payment_id;
-            }
 
-            return null;
+        /**
+         *
+         * @returns {*|null}
+         */
+        mollieThirdPartyPaymentId() {
+            const orderAttributes = new OrderAttributes(this.order);
+            return orderAttributes.getPaymentRef();
         },
 
         /**
@@ -103,7 +115,7 @@ Component.override('sw-order-detail-general', {
          */
         isSubscription() {
             const orderAttributes = new OrderAttributes(this.order);
-            return (orderAttributes.getSwSubscriptionId() !== '');
+            return orderAttributes.isSubscription();
         },
 
         /**
@@ -123,35 +135,81 @@ Component.override('sw-order-detail-general', {
             return this.molliePaymentUrl !== '';
         },
 
-        hasCreditCardData() {
-            return this._creditCardData().hasCreditCardData();
-        },
     },
 
     watch: {
+
+        /**
+         *
+         */
         order() {
             this.getMollieData();
         },
+
     },
 
+
+    /**
+     *
+     */
     created() {
         this.createdComponent();
     },
 
     methods: {
 
+        /**
+         *
+         */
         createdComponent() {
+
             this.molliePaymentUrl = '';
+            this.isShippingPossible = false;
+            this.isRefundManagerPossible = false;
 
-            if (this.mollieOrderId) {
-                this.MolliePaymentsOrderService.getPaymentUrl({orderId: this.order.id}).then(response => {
-                    this.molliePaymentUrl = (response.url !== null) ? response.url : '';
-                });
-
-                this.MolliePaymentsConfigService.getRefundManagerConfig(this.order.salesChannelId).then((response) => {
-                    this.configShowRefundManager = response.enabled;
-                });
+            if (!this.mollieOrderId) {
+                return;
             }
+
+            this.refundedManagerService = new RefundManager(this.MolliePaymentsConfigService, this.acl);
+            this.shippingManagerService = new MollieShipping(this.MolliePaymentsShippingService);
+
+            this.$root.$on(MollieShippingEvents.EventShippedOrder, () => {
+                this.onCloseShippingManager();
+                // let's reload our page so that the
+                // full order is updated like shipping status and more
+                location.reload();
+            });
+
+            this.getMollieData();
+        },
+
+        /**
+         *
+         */
+        onOpenRefundManager() {
+            this.showRefundModal = true;
+        },
+
+        /**
+         *
+         */
+        onCloseRefundManager() {
+            this.showRefundModal = false;
+        },
+
+        /**
+         *
+         */
+        onOpenShippingManager() {
+            this.showShippingModal = true;
+        },
+
+        /**
+         *
+         */
+        onCloseShippingManager() {
+            this.showShippingModal = false;
         },
 
         /**+
@@ -163,20 +221,41 @@ Component.override('sw-order-detail-general', {
             return orderAttributes.getCreditCardAttributes();
         },
 
+        /**
+         *
+         */
         copyPaymentUrlToClipboard() {
             // eslint-disable-next-line no-undef
             Shopware.Utils.dom.copyToClipboard(this.molliePaymentUrl);
             this.molliePaymentUrlCopied = true;
         },
 
+        /**
+         *
+         * @param value
+         */
         onMolliePaymentUrlProcessFinished(value) {
             this.molliePaymentUrlCopied = value;
         },
 
+        /**
+         *
+         */
         getMollieData() {
             if (!this.isMollieOrder) {
                 return
             }
+
+            this.MolliePaymentsOrderService.getPaymentUrl({orderId: this.order.id}).then(response => {
+                this.molliePaymentUrl = (response.url !== null) ? response.url : '';
+            });
+
+            this.shippingManagerService.isShippingPossible(this.order).then((enabled) => {
+                this.isShippingPossible = enabled;
+            });
+
+            this.isRefundManagerPossible = this.refundedManagerService.isRefundManagerAvailable(this.order.salesChannelId);
+
 
             this.MolliePaymentsRefundService.getRefundManagerData(
                 {
@@ -187,7 +266,6 @@ Component.override('sw-order-detail-general', {
                     this.refundedAmount = response.totals.refunded;
                     this.voucherAmount = response.totals.voucherAmount;
                     this.refundAmountPending = response.totals.pendingRefunds;
-                    this.refunds = response.refunds;
                 })
                 .catch((response) => {
                     this.createNotificationError({
@@ -201,32 +279,6 @@ Component.override('sw-order-detail-general', {
                     this.shippedAmount = Math.round(response.amount * 100) / 100;
                     this.shippedQuantity = response.quantity;
                 });
-        },
-
-        onOpenRefundManager() {
-            this.$refs.swOrderLineItemsGrid.onOpenRefundManager();
-        },
-
-        onOpenShipOrderModal() {
-            this.$refs.swOrderLineItemsGrid.onOpenShipOrderModal();
-        },
-
-        onRefundManagerPossible(refundManagerPossible) {
-
-            if (!this.configShowRefundManager) {
-                this.isRefundManagerPossible = false;
-                return;
-            }
-
-            this.isRefundManagerPossible = refundManagerPossible;
-        },
-
-        /**
-         *
-         * @param shippingPossible
-         */
-        onShippingPossible(shippingPossible) {
-            this.isShippingPossible = shippingPossible;
         },
 
     },

@@ -234,7 +234,12 @@ class ApplePayDirectControllerBase extends StorefrontController
                 'session' => $session,
             ]);
         } catch (\Throwable $ex) {
-            $this->logger->error('Apple Pay Direct error when creating payment session: ' . $ex->getMessage());
+            $this->logger->error(
+                'Apple Pay Direct error when creating payment session: ' . $ex->getMessage(),
+                [
+                    'error' => $ex,
+                ]
+            );
 
             return new JsonResponse(['success' => false,], 500);
         }
@@ -414,7 +419,12 @@ class ApplePayDirectControllerBase extends StorefrontController
 
             $order = $this->applePay->createOrder($context);
         } catch (Throwable $ex) {
-            $this->logger->error('Apple Pay Direct error when finishing payment: ' . $ex->getMessage());
+            $this->logger->error(
+                'Apple Pay Direct error when finishing payment: ' . $ex->getMessage(),
+                [
+                    'error' => $ex,
+                ]
+            );
 
             # if we have an error here, we have to redirect to the confirm page
             $returnUrl = $this->getCheckoutConfirmPage($this->router);
@@ -450,7 +460,12 @@ class ApplePayDirectControllerBase extends StorefrontController
 
             return new RedirectResponse($returnUrl);
         } catch (Throwable $ex) {
-            $this->logger->error('Apple Pay Direct error when finishing Mollie payment: ' . $ex->getMessage());
+            $this->logger->error(
+                'Apple Pay Direct error when finishing Mollie payment: ' . $ex->getMessage(),
+                [
+                    'error' => $ex,
+                ]
+            );
 
             # we already have a valid Order ID.
             # so we just need to make sure to edit that order

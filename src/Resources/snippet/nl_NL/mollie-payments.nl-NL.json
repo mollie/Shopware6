@@ -25,6 +25,9 @@
             "ideal": {
                 "selectBank": "Selecteer bank"
             },
+          "pos": {
+            "selectTerminal": "Selecteer terminal"
+          },
             "mandate": {
                 "sectionTitle": "Opgeslagen kaarten",
                 "cardTitleLabel": "%name% •••• %number%",

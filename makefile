@@ -28,12 +28,12 @@ prod: ## Installs all production dependencies
 	cd src/Resources/app/storefront && npm install --production
 
 dev: ## Installs all dev dependencies
-	curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt install shopware-cli
 	php switch-composer.php dev
 	@composer validate
 	@composer install
 	cd src/Resources/app/administration && npm install
 	cd src/Resources/app/storefront && npm install
+	curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt install shopware-cli
 
 install: ## [deprecated] Installs all production dependencies. Please use "make prod" now.
 	@make prod -B
@@ -47,7 +47,9 @@ clean: ## Cleans all dependencies and files
 	rm -rf ./src/Resources/app/storefront/node_modules/*
 	# ------------------------------------------------------
 	rm -rf ./src/Resources/app/storefront/dist/storefront
-	rm -rf ./src/Resources/public
+	# ------------------------------------------------------
+	rm -rf ./src/Resources/public/administration
+	rm -rf ./src/Resources/public/molllie-payments.js
 
 build: ## Installs the plugin, and builds the artifacts using the Shopware build commands.
 	php switch-composer.php prod
@@ -57,15 +59,15 @@ build: ## Installs the plugin, and builds the artifacts using the Shopware build
 	# CUSTOM WEBPACK
 	cd ./src/Resources/app/storefront && make build -B
 	# -----------------------------------------------------
-	cd ../../.. && php bin/console theme:refresh
-	cd ../../.. && php bin/console theme:compile
-	cd ../../.. && php bin/console theme:refresh
-	cd ../../.. && php bin/console assets:install
-	cd ../../.. && php bin/console cache:clear
+	cd ../../.. && php bin/console --no-debug theme:refresh
+	cd ../../.. && php bin/console --no-debug theme:compile
+	cd ../../.. && php bin/console --no-debug theme:refresh
+	cd ../../.. && php bin/console --no-debug assets:install
+	cd ../../.. && php bin/console --no-debug cache:clear
 
 fixtures: ## Installs all available testing fixtures of the Mollie plugin
-	cd ../../.. && php bin/console cache:clear
-	cd ../../.. && php bin/console fixture:load:group mollie
+	cd ../../.. && php bin/console --no-debug cache:clear
+	cd ../../.. && php bin/console --no-debug fixture:load:group mollie
 
 # ------------------------------------------------------------------------------------------------------------
 

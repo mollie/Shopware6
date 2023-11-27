@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Service;
 
 use Kiener\MolliePayments\Components\RefundManager\DAL\Order\OrderExtension;
+use Kiener\MolliePayments\Components\RefundManager\DAL\OrderLineItem\OrderLineItemExtension;
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderLineIdException;
 use Kiener\MolliePayments\Exception\OrderNumberNotFoundException;
@@ -103,7 +104,7 @@ class OrderService implements OrderServiceInterface
         $criteria->addAssociation('transactions.paymentMethod');
         $criteria->addAssociation('transactions.paymentMethod.appPaymentMethod.app');
         $criteria->addAssociation('transactions.stateMachineState');
-        $criteria->addAssociation(OrderExtension::REFUND_PROPERTY_NAME); # for refund manager
+        $criteria->addAssociation(OrderExtension::REFUND_PROPERTY_NAME.'.refundItems'); # for refund manager
 
 
         $order = $this->orderRepository->search($criteria, $context)->first();

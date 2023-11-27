@@ -10,6 +10,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument>%kernel.logs_dir%/mollie_%kernel.environment%.log</argument>
             <argument>14</argument>
+            <argument>%env(DATABASE_URL)%</argument>
         </service>
 
         <service id="mollie_payments.logger" class="Monolog\Logger">
@@ -67,7 +68,14 @@
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Hydrator\RefundHydrator"/>
             <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Refund\CompositionMigrationService"/>
         </service>
+
+
+        <service id="Kiener\MolliePayments\Service\Refund\CompositionMigrationService">
+            <argument type="service" id="mollie_refund_item.repository"/>
+        </service>
+
 
         <service id="Kiener\MolliePayments\Service\Stock\StockManager">
             <argument type="service" id="Doctrine\DBAL\Connection"/>
@@ -177,6 +185,9 @@
 
             <tag name="mollie_payments.mail.attachment_generator"/>
         </service>
+
+
+
 
     </services>
 </container>

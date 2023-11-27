@@ -52,7 +52,13 @@ export default class RefundItemService {
             return false;
         }
 
-        return (item.refunded < item.shopware.quantity);
+        // we have the use case that a merchant refunds an item with qty 1
+        // but with half the price.
+        // the customer complains and the merchant refunds the rest.
+        // the merchant wants a reference to the refunded item and tries to use qty 0, so that
+        // it will appear in the composition.
+        // Therefore isRefundable needs to be TRUE.
+        return true;
     }
 
     // ---------------------------------------------------------------------------------------------------------
@@ -73,7 +79,7 @@ export default class RefundItemService {
     setStockReset(item, value) {
 
         // only do this, if not yet configured
-        if(item.resetStock > 0) {
+        if (item.resetStock > 0) {
             return;
         }
 

@@ -1,8 +1,19 @@
 <?php
 
-return PhpCsFixer\Config::create()
-    ->setUsingCache(false)
-    ->setRules([
+$finder = \PhpCsFixer\Finder::create()->in([
+    __DIR__ . '/src',
+]);
+
+$finder->exclude(
+    [
+        'Resources'
+    ]
+);
+
+$config = new \PhpCsFixer\Config();
+
+$config->setRules(
+    [
         '@PSR2' => true,
         'array_syntax' => ['syntax' => 'short'],
         'ordered_imports' => true,
@@ -14,9 +25,12 @@ return PhpCsFixer\Config::create()
         'phpdoc_order' => true,
         'phpdoc_trim_consecutive_blank_line_separation' => true,
         'phpdoc_types_order' => true,
-        'yoda_style' => null,
-    ])
-    ->setFinder(
-        PhpCsFixer\Finder::create()
-            ->exclude(['Resources'])
-            ->in(__DIR__ . '/src'));
+        'yoda_style' => false,
+    ]
+);
+
+$config->setFinder($finder);
+
+$config->setUsingCache(false);
+
+return $config;

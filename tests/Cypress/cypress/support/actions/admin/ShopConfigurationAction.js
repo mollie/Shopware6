@@ -116,6 +116,7 @@ export default class ShopConfigurationAction {
                 for (const product of products) {
                     const row = {
                         "id": product.id,
+                        "shippingFree": false,
                         "customFields": customFields,
                     };
                     data.push(row);
