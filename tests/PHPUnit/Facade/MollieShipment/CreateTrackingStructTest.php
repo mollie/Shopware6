@@ -123,6 +123,6 @@ class CreateTrackingStructTest extends TestCase
                 $this->assertInstanceOf(ShipmentTrackingInfoStruct::class, $trackingInfoStruct);
             });
 
-        $this->shipmentFacade->shipOrder($this->order, 'Mollie', '123456789', '', $this->context);
+        $this->shipmentFacade->shipOrder($this->order, 'Mollie', '123456789', 'https://foo.bar?code=%s', $this->context);
     }
 }

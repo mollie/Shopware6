@@ -8,6 +8,11 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 
 class TrackingInfoStructFactory
 {
+    /**
+     * Mollie throws an error with length >= 100
+     */
+    const MAX_TRACKING_CODE_LENGTH = 99;
+
     public function createFromDelivery(OrderDeliveryEntity $orderDeliveryEntity):?ShipmentTrackingInfoStruct
     {
         $trackingCodes = $orderDeliveryEntity->getTrackingCodes();
@@ -15,6 +20,11 @@ class TrackingInfoStructFactory
         if ($shippingMethod === null) {
             return null;
         }
+        /**
+         * mollie accepts only one tracking struct with code per shippment
+         *
+         * https://docs.mollie.com/reference/v2/shipments-api/create-shipment
+         */
         if (count($trackingCodes) !== 1) {
             return null;
         }
@@ -36,9 +46,17 @@ class TrackingInfoStructFactory
             throw new \InvalidArgumentException('Missing Argument for Tracking Code!');
         }
 
-        $trackingUrl = trim($trackingUrl . $trackingCode);
+        if (strpos($trackingUrl, '%s') === false) {
+            throw new \InvalidArgumentException('Missing %s as code placeholder in Tracking URL');
+        }
+
+        $trackingUrl = trim(sprintf($trackingUrl, $trackingCode));
 
         if (filter_var($trackingUrl, FILTER_VALIDATE_URL) === false) {
+            $trackingUrl = '';
+        }
+
+        if (mb_strlen($trackingCode) > self::MAX_TRACKING_CODE_LENGTH) {
             $trackingUrl = '';
         }
 
