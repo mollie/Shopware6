@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Controller\Storefront\iDEAL;
 
+use Kiener\MolliePayments\Handler\Method\iDealPayment;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
@@ -44,6 +45,11 @@ class iDealControllerBase extends StorefrontController
     public function storeIssuer(SalesChannelContext $context, string $customerId, string $issuerId): JsonResponse
     {
         $result = null;
+
+        # if we have a "reset" value, then empty our stored issuer
+        if ($issuerId === iDealPayment::ISSUER_RESET_VALUE) {
+            $issuerId = '';
+        }
 
         $customer = $this->customerService->getCustomer($customerId, $context->getContext());
 

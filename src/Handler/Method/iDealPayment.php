@@ -17,6 +17,7 @@ class iDealPayment extends PaymentHandler
     /** @var string */
     protected $paymentMethod = self::PAYMENT_METHOD_NAME;
 
+    public const ISSUER_RESET_VALUE = 'ideal_reset';
 
     /**
      * @param array<mixed> $orderData
