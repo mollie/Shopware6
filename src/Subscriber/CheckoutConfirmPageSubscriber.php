@@ -12,6 +12,7 @@ use Kiener\MolliePayments\Repository\Locale\LocaleRepositoryInterface;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\MandateServiceInterface;
+use Kiener\MolliePayments\Service\SalesChannel\SalesChannelLocale;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
@@ -52,10 +53,9 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     private $settings;
 
     /**
-     * @var LanguageRepositoryInterface
+     * @var SalesChannelLocale
      */
-    private $repoLanguages;
-
+    private $salesChannelLocale;
 
     /**
      * @var MandateServiceInterface
@@ -88,17 +88,17 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     /**
      * @param MollieApiFactory $apiFactory
      * @param SettingsService $settingsService
-     * @param LanguageRepositoryInterface $languageRepositoryInterface
      * @param MandateServiceInterface $mandateService
      * @param MollieGatewayInterface $mollieGateway
+     * @param SalesChannelLocale $salesChannelLocale
      */
-    public function __construct(MollieApiFactory $apiFactory, SettingsService $settingsService, LanguageRepositoryInterface $languageRepositoryInterface, MandateServiceInterface $mandateService, MollieGatewayInterface $mollieGateway)
+    public function __construct(MollieApiFactory $apiFactory, SettingsService $settingsService, MandateServiceInterface $mandateService, MollieGatewayInterface $mollieGateway, SalesChannelLocale $salesChannelLocale)
     {
         $this->apiFactory = $apiFactory;
         $this->settingsService = $settingsService;
-        $this->repoLanguages = $languageRepositoryInterface;
         $this->mandateService = $mandateService;
         $this->mollieGateway = $mollieGateway;
+        $this->salesChannelLocale = $salesChannelLocale;
     }
 
 
@@ -114,7 +114,7 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
         $mollieAttributes = new PaymentMethodAttributes($currentSelectedPaymentMethod);
 
         # load additional data only for mollie payment methods
-        if (! $mollieAttributes->isMolliePayment()) {
+        if (!$mollieAttributes->isMolliePayment()) {
             return;
         }
 
@@ -144,75 +144,9 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
      */
     private function addMollieLocaleVariableToPage($args): void
     {
-        /**
-         * Build an array of available locales.
-         */
-        $availableLocales = [
-            'en_US',
-            'en_GB',
-            'nl_NL',
-            'fr_FR',
-            'it_IT',
-            'de_DE',
-            'de_AT',
-            'de_CH',
-            'es_ES',
-            'ca_ES',
-            'nb_NO',
-            'pt_PT',
-            'sv_SE',
-            'fi_FI',
-            'da_DK',
-            'is_IS',
-            'hu_HU',
-            'pl_PL',
-            'lv_LV',
-            'lt_LT'
-        ];
-
-        /**
-         * Get the language object from the sales channel context.
-         */
-        $locale = '';
-
         $salesChannelContext = $args->getSalesChannelContext();
 
-
-        $salesChannel = $salesChannelContext->getSalesChannel();
-        if ($salesChannel !== null) {
-            $languageId = $salesChannel->getLanguageId();
-            if ($languageId !== null) {
-                $languageCriteria = new Criteria();
-                $languageCriteria->addAssociation('locale');
-                $languageCriteria->addFilter(new EqualsFilter('id', $languageId));
-
-                $languagesResult = $this->repoLanguages->search($languageCriteria, $args->getContext());
-                /** @var LanguageEntity $language */
-                $language = $languagesResult->first();
-
-                if ($language !== null && $language->getLocale() !== null) {
-                    $locale = $language->getLocale()->getCode();
-                }
-            }
-        }
-
-
-        /**
-         * Set the locale based on the current storefront.
-         */
-
-
-        if ($locale !== null && $locale !== '') {
-            $locale = str_replace('-', '_', $locale);
-        }
-
-        /**
-         * Check if the shop locale is available.
-         */
-        if ($locale === '' || !in_array($locale, $availableLocales, true)) {
-            $locale = 'en_GB';
-        }
-
+        $locale = $this->salesChannelLocale->getLocale($salesChannelContext);
 
         $args->getPage()->assign([
             'mollie_locale' => $locale,
