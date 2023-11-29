@@ -142,6 +142,18 @@ paths:
         "200":
           description: "successful operation"
 
+  /store-api/mollie/config:
+    get:
+      tags:
+        - "Mollie Config"
+      summary: "Gets the basic Mollie configuration like Profile IDs and more for component integration."
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      responses:
+        "200":
+          description: "successful operation"
+
   /store-api/mollie/creditcard/store-token/{customerId}/{cardToken}:
     post:
       tags:

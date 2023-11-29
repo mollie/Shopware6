@@ -185,6 +185,13 @@
         <!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
         <!-- Store API Controller -->
 
+        <service id="Kiener\MolliePayments\Controller\StoreApi\Config\Sw6\ConfigController" public="true">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\ConfigService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SalesChannel\SalesChannelLocale"/>
+            <argument type="service" id="mollie_payments.logger"/>
+        </service>
+
         <service id="Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Sw6\ApplePayDirectController"
                  public="true">
             <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect"/>

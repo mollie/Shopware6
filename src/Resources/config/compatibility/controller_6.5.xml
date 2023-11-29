@@ -153,14 +153,16 @@
             </call>
         </service>
 
-        <service id="Kiener\MolliePayments\Controller\Storefront\ApplePayDirect\Sw65\ApplePayDirectController" public="true">
+        <service id="Kiener\MolliePayments\Controller\Storefront\ApplePayDirect\Sw65\ApplePayDirectController"
+                 public="true">
             <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect"/>
             <argument type="service" id="router"/>
             <argument type="service" id="mollie_payments.logger"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Cart\CartBackupService"/>
             <argument type="service" id="session.flash_bag" on-invalid="null"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
-            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
+            <argument type="service"
+                      id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Repository\Customer\CustomerRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <call method="setContainer">
@@ -176,7 +178,8 @@
         </service>
 
         <service id="Kiener\MolliePayments\Controller\Storefront\Account\Sw65\AccountController" public="true">
-            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Page\Account\SubscriptionPageLoader"/>
+            <argument type="service"
+                      id="Kiener\MolliePayments\Components\Subscription\Page\Account\SubscriptionPageLoader"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
             <argument type="service" id="mollie_payments.logger"/>
             <call method="setContainer">
@@ -190,7 +193,15 @@
         <!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
         <!-- Store API Controller -->
 
-        <service id="Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Sw65\ApplePayDirectController" public="true">
+        <service id="Kiener\MolliePayments\Controller\StoreApi\Config\Sw65\ConfigController" public="true">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\ConfigService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SalesChannel\SalesChannelLocale"/>
+            <argument type="service" id="mollie_payments.logger"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Sw65\ApplePayDirectController"
+                 public="true">
             <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect"/>
             <argument type="service" id="mollie_payments.logger"/>
         </service>
@@ -207,7 +218,8 @@
 
         <service id="Kiener\MolliePayments\Controller\StoreApi\Subscription\Sw65\SubscriptionController" public="true">
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
+            <argument type="service"
+                      id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
             <argument type="service" id="mollie_payments.logger"/>
         </service>
 
