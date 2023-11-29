@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Controller\StoreApi\iDEAL;
 use Kiener\MolliePayments\Controller\StoreApi\iDEAL\Response\IssuersResponse;
 use Kiener\MolliePayments\Controller\StoreApi\iDEAL\Response\StoreIssuerResponse;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
+use Kiener\MolliePayments\Handler\Method\iDealPayment;
 use Kiener\MolliePayments\Service\CustomerService;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
@@ -81,6 +82,11 @@ class iDealControllerBase
 
         if (!$customer instanceof CustomerEntity) {
             throw new \Exception('Customer with ID ' . $customerId . ' not found in Shopware');
+        }
+
+        # if we have a "reset" value, then empty our stored issuer
+        if ($issuerId === iDealPayment::ISSUER_RESET_VALUE) {
+            $issuerId = '';
         }
 
         $result = $this->customerService->setIDealIssuer(
