@@ -591,7 +591,7 @@
             <name>subscriptionsAllowPauseResume</name>
             <defaultValue>false</defaultValue>
             <label>Allow customers to pause and resume running subscriptions</label>
-            <label lang="de-DE">Kunden elrauben laufende Abonnements zu pausieren und fortzusetzen</label>
+            <label lang="de-DE">Kunden erlauben laufende Abonnements zu pausieren und fortzusetzen</label>
             <label lang="nl-NL">Laat klanten lopende abonnementen onderbreken en hervatten</label>
             <helpText>If enabled, customers are allowed to pause and also resume their subscriptions in their account.</helpText>
             <helpText lang="de-DE">Wenn diese Option aktiviert ist, können Kunden ihre Abonnements in ihrem Konto pausieren und auch fortsetzen.</helpText>
