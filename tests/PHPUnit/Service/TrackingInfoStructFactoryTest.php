@@ -66,6 +66,7 @@ class TrackingInfoStructFactoryTest extends TestCase
 
         $deliveryEntity->setShippingMethod($shippingMethod);
         $trackingInfoStruct = $this->factory->createFromDelivery($deliveryEntity);
+
         $this->assertNull($trackingInfoStruct);
     }
 
@@ -83,12 +84,59 @@ class TrackingInfoStructFactoryTest extends TestCase
 
     }
 
-    public function testExceptionIsThrownWithoutPlaceholderInUrl(): void
+    public function testUrlWithCodeIsInvalid(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $trackingInfoStruct = $this->factory->create('Test', 'testCode', 'https://test.foo?code');
+        $expectedCode = '/123 4%foo=bar?test';
+        $expectedCarrier = 'Test carrier';
+        $trackingInfoStruct = $this->factory->create($expectedCarrier, $expectedCode, 'https://test.foo?code=%s');
+        $expectedUrl = '';
 
-        $this->assertNull($trackingInfoStruct);
+        $this->assertNotNull($trackingInfoStruct);
+        $this->assertSame($expectedCode, $trackingInfoStruct->getCode());
+        $this->assertSame($expectedUrl, $trackingInfoStruct->getUrl());
+        $this->assertSame($expectedCarrier, $trackingInfoStruct->getCarrier());
+    }
+
+    public function testInfoStructWithCommaSeparator(): void
+    {
+        $expectedCode = '1234';
+        $givenCode = $expectedCode . ',' . str_repeat('-', 100);
+        $expectedCarrier = 'Test carrier';
+        $trackingInfoStruct = $this->factory->create($expectedCarrier, $givenCode, 'https://test.foo?code=%s');
+        $expectedUrl = 'https://test.foo?code=1234';
+
+        $this->assertNotNull($trackingInfoStruct);
+        $this->assertSame($expectedCode, $trackingInfoStruct->getCode());
+        $this->assertSame($expectedUrl, $trackingInfoStruct->getUrl());
+        $this->assertSame($expectedCarrier, $trackingInfoStruct->getCarrier());
+    }
+
+    public function testInfoStructWithSemicolonSeparator(): void
+    {
+        $expectedCode = '1234';
+        $givenCode = $expectedCode . ';' . str_repeat('-', 100);
+        $expectedCarrier = 'Test carrier';
+        $trackingInfoStruct = $this->factory->create($expectedCarrier, $givenCode, 'https://test.foo?code=%s');
+        $expectedUrl = 'https://test.foo?code=1234';
+
+        $this->assertNotNull($trackingInfoStruct);
+        $this->assertSame($expectedCode, $trackingInfoStruct->getCode());
+        $this->assertSame($expectedUrl, $trackingInfoStruct->getUrl());
+        $this->assertSame($expectedCarrier, $trackingInfoStruct->getCarrier());
+    }
+
+    public function testCommaSeparatorHasHigherPriority(): void
+    {
+        $expectedCode = '1234';
+        $givenCode = $expectedCode . ',5678;' . str_repeat('-', 100);
+        $expectedCarrier = 'Test carrier';
+        $trackingInfoStruct = $this->factory->create($expectedCarrier, $givenCode, 'https://test.foo?code=%s');
+        $expectedUrl = 'https://test.foo?code=1234';
+
+        $this->assertNotNull($trackingInfoStruct);
+        $this->assertSame($expectedCode, $trackingInfoStruct->getCode());
+        $this->assertSame($expectedUrl, $trackingInfoStruct->getUrl());
+        $this->assertSame($expectedCarrier, $trackingInfoStruct->getCarrier());
     }
 
     /**
@@ -102,6 +150,7 @@ class TrackingInfoStructFactoryTest extends TestCase
 
         $trackingInfoStruct = $this->factory->create('test', $trackingCode, 'https://foo.bar/%s');
         $expected = '';
+        
         $this->assertSame($expected, $trackingInfoStruct->getUrl());
 
     }
@@ -114,6 +163,7 @@ class TrackingInfoStructFactoryTest extends TestCase
             ['some<code'],
             ['some>code'],
             ['some#code'],
+            ['some#<>{},' . str_repeat('1', 200)],
             [str_repeat('1', 200)],
         ];
     }

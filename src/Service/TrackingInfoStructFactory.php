@@ -13,7 +13,7 @@ class TrackingInfoStructFactory
      */
     const MAX_TRACKING_CODE_LENGTH = 99;
 
-    public function createFromDelivery(OrderDeliveryEntity $orderDeliveryEntity):?ShipmentTrackingInfoStruct
+    public function createFromDelivery(OrderDeliveryEntity $orderDeliveryEntity): ?ShipmentTrackingInfoStruct
     {
         $trackingCodes = $orderDeliveryEntity->getTrackingCodes();
         $shippingMethod = $orderDeliveryEntity->getShippingMethod();
@@ -21,7 +21,8 @@ class TrackingInfoStructFactory
             return null;
         }
         /**
-         * mollie accepts only one tracking struct with code per shippment
+         * Currently we create one shipping in mollie for one order. one shipping object can have only one tracking code.
+         * When we have multiple Tracking Codes, we do not know which tracking code we should send to mollie. So we just dont send any tracking information at all
          *
          * https://docs.mollie.com/reference/v2/shipments-api/create-shipment
          */
@@ -29,10 +30,15 @@ class TrackingInfoStructFactory
             return null;
         }
 
-        return $this->create((string)$shippingMethod->getName(), $trackingCodes[0], (string)$shippingMethod->getTrackingUrl());
+        return $this->createInfoStruct((string)$shippingMethod->getName(), $trackingCodes[0], (string)$shippingMethod->getTrackingUrl());
     }
 
     public function create(string $trackingCarrier, string $trackingCode, string $trackingUrl): ?ShipmentTrackingInfoStruct
+    {
+        return $this->createInfoStruct($trackingCarrier, $trackingCode, $trackingUrl);
+    }
+
+    private function createInfoStruct(string $trackingCarrier, string $trackingCode, string $trackingUrl): ?ShipmentTrackingInfoStruct
     {
         if (empty($trackingCarrier) && empty($trackingCode)) {
             return null;
@@ -46,17 +52,25 @@ class TrackingInfoStructFactory
             throw new \InvalidArgumentException('Missing Argument for Tracking Code!');
         }
 
-        if (strpos($trackingUrl, '%s') === false) {
-            throw new \InvalidArgumentException('Missing %s as code placeholder in Tracking URL');
+        # we just have to completely remove those codes, so that no tracking happens, but a shipping works.
+        # still, if we find multiple codes (because separators exist), then we use the first one only
+        if (mb_strlen($trackingCode) > self::MAX_TRACKING_CODE_LENGTH) {
+            if (strpos($trackingCode, ',') !== false) {
+                $trackingCode = trim(explode(',', $trackingCode)[0]);
+            } elseif (strpos($trackingCode, ';') !== false) {
+                $trackingCode = trim(explode(';', $trackingCode)[0]);
+            }
+
+            # if we are still too long, then simply remove the code
+            if (mb_strlen($trackingCode) > self::MAX_TRACKING_CODE_LENGTH) {
+                return new ShipmentTrackingInfoStruct($trackingCarrier, '', '');
+            }
         }
+
 
         $trackingUrl = trim(sprintf($trackingUrl, $trackingCode));
 
         if (filter_var($trackingUrl, FILTER_VALIDATE_URL) === false) {
-            $trackingUrl = '';
-        }
-
-        if (mb_strlen($trackingCode) > self::MAX_TRACKING_CODE_LENGTH) {
             $trackingUrl = '';
         }
 
