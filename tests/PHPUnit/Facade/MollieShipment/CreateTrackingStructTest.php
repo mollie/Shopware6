@@ -10,6 +10,7 @@ use Kiener\MolliePayments\Service\MollieApi\Shipment;
 use Kiener\MolliePayments\Service\MolliePaymentExtractor;
 use Kiener\MolliePayments\Service\OrderDeliveryService;
 use Kiener\MolliePayments\Service\OrderService;
+use Kiener\MolliePayments\Service\TrackingInfoStructFactory;
 use Kiener\MolliePayments\Service\Transition\DeliveryTransitionService;
 use Kiener\MolliePayments\Struct\MollieApi\ShipmentTrackingInfoStruct;
 use Mollie\Api\Resources\Shipment as ShipmentResource;
@@ -71,6 +72,7 @@ class CreateTrackingStructTest extends TestCase
             'extractDelivery' => $this->delivery
         ]);
 
+
         $this->shipmentFacade = new MollieShipment(
             $this->createMock(MolliePaymentExtractor::class),
             $this->createMock(DeliveryTransitionService::class),
@@ -79,6 +81,7 @@ class CreateTrackingStructTest extends TestCase
             $this->createMock(OrderDeliveryService::class),
             $this->orderService,
             $this->orderDataExtractor,
+            new TrackingInfoStructFactory(),
             new NullLogger(),
         );
 
@@ -120,6 +123,6 @@ class CreateTrackingStructTest extends TestCase
                 $this->assertInstanceOf(ShipmentTrackingInfoStruct::class, $trackingInfoStruct);
             });
 
-        $this->shipmentFacade->shipOrder($this->order, 'Mollie', '123456789', '', $this->context);
+        $this->shipmentFacade->shipOrder($this->order, 'Mollie', '123456789', 'https://foo.bar?code=%s', $this->context);
     }
 }

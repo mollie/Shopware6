@@ -11,6 +11,7 @@ use Kiener\MolliePayments\Service\MollieApi\Shipment;
 use Kiener\MolliePayments\Service\MolliePaymentExtractor;
 use Kiener\MolliePayments\Service\OrderDeliveryService;
 use Kiener\MolliePayments\Service\OrderService;
+use Kiener\MolliePayments\Service\TrackingInfoStructFactory;
 use Kiener\MolliePayments\Service\Transition\DeliveryTransitionService;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
@@ -100,6 +101,8 @@ class SetShipmentTest extends TestCase
             $this->createMock(CustomerService::class)
         );
 
+        $trackingStructFactory = new TrackingInfoStructFactory();
+
         $this->mollieShipment = new MollieShipment(
             $this->extractor,
             $this->deliveryTransitionService,
@@ -108,6 +111,7 @@ class SetShipmentTest extends TestCase
             $this->orderDeliveryService,
             $this->orderService,
             $this->orderDataExtractor,
+            $trackingStructFactory,
             $this->logger
         );
         $this->orderNumber = 'fooOrderNumber';
@@ -188,7 +192,7 @@ class SetShipmentTest extends TestCase
         $deliveryId = $delivery->getId();
         $this->orderDeliveryService->method('getDelivery')->willReturn($delivery);
         $this->mollieApiOrderService->method('setShipment')
-            ->with($mollieOrderId, $salesChannelId)
+            ->with($mollieOrderId, null, $salesChannelId)
             ->willReturn(false);
 
         // custom fields for shipping are never written
@@ -201,6 +205,7 @@ class SetShipmentTest extends TestCase
     public function testThatOrderDeliveryCustomFieldsAreWrittenWhenApiCallSuccessful(): void
     {
         $transaction = $this->createTransaction('Kiener\MolliePayments\Handler\Method\FooMethod');
+
         $order = $this->createOrder($transaction);
         $mollieOrderId = 'foo';
         $customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY] = $mollieOrderId;
@@ -211,10 +216,11 @@ class SetShipmentTest extends TestCase
         $order->setSalesChannel($salesChannel);
         $order->setSalesChannelId($salesChannelId);
         $delivery = $this->createDelivery($order);
+
         $deliveryId = $delivery->getId();
         $this->orderDeliveryService->method('getDelivery')->willReturn($delivery);
         $this->mollieApiOrderService->method('setShipment')
-            ->with($mollieOrderId, $salesChannelId)
+            ->with($mollieOrderId, null,$salesChannelId)
             ->willReturn(true);
 
         // custom fields for shipping are written
@@ -236,7 +242,7 @@ class SetShipmentTest extends TestCase
     {
         $delivery = new OrderDeliveryEntity();
         $delivery->setId(Uuid::randomHex());
-
+        $delivery->setTrackingCodes([]);
         if ($order instanceof OrderEntity) {
             $delivery->setOrder($order);
         }
