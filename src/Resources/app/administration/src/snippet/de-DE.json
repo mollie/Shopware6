@@ -261,7 +261,8 @@
         "order": {
           "description": "Die folgenden Artikelmengen werden versandt.",
           "itemHeader": "Artikel",
-          "quantityHeader": "Menge"
+          "quantityHeader": "Menge",
+          "originalQuantityHeader": "Menge (verschickbar)"
         },
         "availableTracking": {
           "label": "Verfügbare Tracking-Codes",
@@ -275,7 +276,9 @@
           "invalid": "Bitte geben Sie sowohl Spediteur als auch Code ein"
         },
         "confirmButton": "Bestellung versenden",
-        "cancelButton": "Abbrechen"
+        "cancelButton": "Abbrechen",
+        "selectAllButton": "Alle auswählen",
+        "resetButton": "Zurücksetzen"
       }
     },
     "sw-flow": {

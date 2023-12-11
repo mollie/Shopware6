@@ -261,7 +261,8 @@
         "order": {
           "description": "De volgende product aantallen zullen worden verzonden.",
           "itemHeader": "Product",
-          "quantityHeader": "Aantal"
+          "quantityHeader": "Aantal",
+          "originalQuantityHeader": "Aantal (verzendbaar)"
         },
         "availableTracking": {
           "label": "Beschikbare tracking codes",
@@ -275,7 +276,9 @@
           "invalid": "Voer zowel Carrier als Code in"
         },
         "confirmButton": "Bestelling verzenden",
-        "cancelButton": "Annuleren"
+        "cancelButton": "Annuleren",
+        "selectAllButton": "Selecteer alles",
+        "resetButton": "Resetten"
       }
     },
 

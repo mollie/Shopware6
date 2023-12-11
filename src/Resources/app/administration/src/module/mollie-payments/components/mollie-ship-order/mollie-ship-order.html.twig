@@ -1,5 +1,14 @@
-<sw-container columns="1fr" gap="16px">
+<sw-container columns="1fr" gap="16px" class="mollie-ship-order">
     <p>{{ $tc('mollie-payments.modals.shipping.order.description') }}</p>
+
+    <sw-container columns="1fr 1fr 4fr">
+        <sw-button variant="context" size="small" @click="btnSelectAllItems_Click()">
+            {{ $tc('mollie-payments.modals.shipping.selectAllButton') }}
+        </sw-button>
+        <sw-button variant="context" size="small" @click="btnResetItems_Click()">
+            {{ $tc('mollie-payments.modals.shipping.resetButton') }}
+        </sw-button>
+    </sw-container>
 
     {% block sw_order_line_items_grid_grid_mollie_ship_item_modal_items %}
         <sw-data-grid class="mollie-ship-order-grid"
@@ -9,16 +18,34 @@
                       :showSelection="false"
                       :showPreviews="false"
                       :showActions="false">
+
+            <template #column-itemselect="{ item }">
+                <sw-checkbox-field v-if="item.originalQuantity > 0"
+                                   :bordered="false"
+                                   v-model="item.selected">
+                </sw-checkbox-field>
+            </template>
+
+            <template #column-quantity="{ item }">
+                <sw-text-field :disabled="item.originalQuantity === 0"
+                               class="mollie-ship-order-grid-quantity"
+                               v-model="item.quantity">
+                </sw-text-field>
+            </template>
+
         </sw-data-grid>
     {% endblock %}
 
-    <sw-button variant="primary"
-               size="small"
-               class="btn-ship-order"
-               style="margin-bottom:20px;"
-               @click="onShipOrder">
-        {{ $tc('mollie-payments.modals.shipping.confirmButton') }}
-    </sw-button>
+    <sw-container columns="1fr 1fr">
+        <div></div>
+        <sw-button variant="primary"
+                   size="small"
+                   class="btn-ship-order"
+                   style="margin-bottom:20px;"
+                   @click="onShipOrder">
+            {{ $tc('mollie-payments.modals.shipping.confirmButton') }}
+        </sw-button>
+    </sw-container>
 
     {% block sw_order_line_items_grid_grid_mollie_ship_item_modal_tracking %}
         <sw-switch-field v-model="showTrackingInfo"

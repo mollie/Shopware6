@@ -14,7 +14,12 @@ class OrderLineItemNotFoundException extends ShopwareHttpException
      */
     public function __construct(string $identifier, array $parameters = [], \Throwable $previous = null)
     {
-        $message = sprintf('Order lineitem with identifier %s could not be found', $identifier);
+        if (empty($identifier)) {
+            $message = 'Could not find an OrderLineItem. No identifier/productNumber provided';
+        } else {
+            $message = sprintf('OrderLineItem with identifier: "%s" could not be found', $identifier);
+        }
+
         parent::__construct($message, $parameters, $previous);
     }
 

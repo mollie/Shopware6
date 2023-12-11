@@ -12,6 +12,10 @@ class OrderLineItemEntityAttributes
      */
     private $item;
 
+    /**
+     * @var string
+     */
+    private $productNumber;
 
     /**
      * @var string
@@ -54,7 +58,15 @@ class OrderLineItemEntityAttributes
      */
     public function __construct(OrderLineItemEntity $lineItem)
     {
+        $this->productNumber = '';
+
         $this->item = $lineItem;
+
+        $payload = $lineItem->getPayload();
+
+        if (is_array($payload) && array_key_exists('productNumber', $payload)) {
+            $this->productNumber = (string)$payload['productNumber'];
+        }
 
         $this->voucherType = $this->getCustomFieldValue($lineItem, 'voucher_type');
         $this->mollieOrderLineID = $this->getCustomFieldValue($lineItem, 'order_line_id');
@@ -65,6 +77,15 @@ class OrderLineItemEntityAttributes
         $this->subscriptionInterval = (int)$this->getCustomFieldValue($lineItem, 'subscription_interval');
         $this->subscriptionIntervalUnit = (string)$this->getCustomFieldValue($lineItem, 'subscription_interval_unit');
         $this->subscriptionRepetitionCount = (int)$this->getCustomFieldValue($lineItem, 'subscription_repetition');
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getProductNumber(): string
+    {
+        return (string)$this->productNumber;
     }
 
     /**
