@@ -54,4 +54,47 @@ class OrderAttributesTest extends TestCase
 
         $this->assertEquals(true, $attributes->isTypeSubscription());
     }
+
+    public function testReadBankDataFromCustomFields()
+    {
+
+        $expectedBankName = 'Stichting Mollie Payments';
+        $expectedBankBIC = 'TESTNL10';
+        $expectedBankAccount = 'NL10TEST000100100';
+        $order = new OrderEntity();
+        $order->setCustomFields([
+            'mollie_payments' => [
+                'bankName' => $expectedBankName,
+                'bankBic' => $expectedBankBIC,
+                'bankAccount' => $expectedBankAccount,
+            ]
+        ]);
+
+        $attributes = new OrderAttributes($order);
+
+        $this->assertSame($expectedBankName, $attributes->getBankName());
+        $this->assertSame($expectedBankBIC, $attributes->getBankBic());
+        $this->assertSame($expectedBankAccount, $attributes->getBankAccount());
+    }
+
+    public function testBankTransferDetailsAreSetFromApiStruct()
+    {
+        $expectedBankName = 'Stichting Mollie Payments';
+        $expectedBankBIC = 'TESTNL10';
+        $expectedBankAccount = 'NL10TEST000100100';
+
+        $bankTransferDetails = new \stdClass();
+        $bankTransferDetails->bankName = $expectedBankName;
+        $bankTransferDetails->bankAccount = $expectedBankAccount;
+        $bankTransferDetails->bankBic = $expectedBankBIC;
+
+        $order = new OrderEntity();
+
+        $attributes = new OrderAttributes($order);
+        $attributes->setBankTransferDetails($bankTransferDetails);
+
+        $this->assertSame($expectedBankName, $attributes->getBankName());
+        $this->assertSame($expectedBankBIC, $attributes->getBankBic());
+        $this->assertSame($expectedBankAccount, $attributes->getBankAccount());
+    }
 }
