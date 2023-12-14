@@ -33,7 +33,7 @@ dev: ## Installs all dev dependencies
 	@composer install
 	cd src/Resources/app/administration && npm install
 	cd src/Resources/app/storefront && npm install
-	curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt install -y shopware-cli=0.3.18
+	curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt install -y --allow-downgrades shopware-cli=0.3.18
 
 install: ## [deprecated] Installs all production dependencies. Please use "make prod" now.
 	@make prod -B
