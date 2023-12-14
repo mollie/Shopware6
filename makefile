@@ -25,7 +25,7 @@ prod: ## Installs all production dependencies
 	@composer validate
 	@composer install --no-dev
 	cd src/Resources/app/administration && npm install --omit=dev
-	cd src/Resources/app/storefront && npm install --production
+	cd src/Resources/app/storefront && npm install --omit=dev
 
 dev: ## Installs all dev dependencies
 	php switch-composer.php dev
@@ -33,7 +33,7 @@ dev: ## Installs all dev dependencies
 	@composer install
 	cd src/Resources/app/administration && npm install
 	cd src/Resources/app/storefront && npm install
-	curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt install shopware-cli
+	curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt install shopware-cli=0.3.18
 
 install: ## [deprecated] Installs all production dependencies. Please use "make prod" now.
 	@make prod -B
