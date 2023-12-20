@@ -17,14 +17,16 @@ class ConfigResponse extends StoreApiResponse
      * @param string $profileId
      * @param bool $isTestMode
      * @param string $defaultLocale
+     * @param bool $oneClickEnabled
      */
-    public function __construct(string $profileId, bool $isTestMode, string $defaultLocale)
+    public function __construct(string $profileId, bool $isTestMode, string $defaultLocale, bool $oneClickEnabled)
     {
         $this->object = new ArrayStruct(
             [
                 'profileId' => $profileId,
                 'testMode' => $isTestMode,
                 'locale' => $defaultLocale,
+                'oneClickPayments' => $oneClickEnabled,
             ],
             'mollie_payments_config'
         );
