@@ -25,6 +25,9 @@ it('C2040032: Mollie Config can be retrieved using Store-API', () => {
 
         cy.wrap(response).its('locale').should('exist');
         cy.wrap(response).its('locale').should('not.eql', '');
+
+        cy.wrap(response).its('oneClickPayments').should('exist');
+        cy.wrap(response).its('oneClickPayments').should('not.eql', '');
     });
 })
 

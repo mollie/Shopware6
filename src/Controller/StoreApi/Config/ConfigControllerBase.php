@@ -78,7 +78,8 @@ class ConfigControllerBase
             return new ConfigResponse(
                 $profileId,
                 $settings->isTestMode(),
-                $locale
+                $locale,
+                $settings->isOneClickPaymentsEnabled()
             );
         } catch (\Exception $e) {
             $this->logger->error(
