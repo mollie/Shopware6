@@ -16,6 +16,7 @@ use Mollie\Api\Resources\Payment;
 use Mollie\Api\Types\PaymentMethod;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\SalesChannel\OrderService as ShopwareOrderService;
@@ -53,26 +54,32 @@ class OrderService implements OrderServiceInterface
     private $updateOrderTransactionCustomFields;
 
     /**
+     * @var OrderDeliveryService
+     */
+    private $orderDeliveryService;
+
+    /**
      * @var LoggerInterface
      */
     protected $logger;
-
 
     /**
      * @param OrderRepositoryInterface $orderRepository
      * @param ShopwareOrderService $swOrderService
      * @param Order $mollieOrderService
-     * @param UpdateOrderCustomFields $customFieldsUpdater
-     * @param UpdateOrderTransactionCustomFields $orderTransactionCustomFields
+     * @param UpdateOrderCustomFields $updateOrderCustomFields
+     * @param UpdateOrderTransactionCustomFields $updateOrderTransactionCustomFields
+     * @param OrderDeliveryService $orderDeliveryService
      * @param LoggerInterface $logger
      */
-    public function __construct(OrderRepositoryInterface $orderRepository, ShopwareOrderService $swOrderService, Order $mollieOrderService, UpdateOrderCustomFields $customFieldsUpdater, UpdateOrderTransactionCustomFields $orderTransactionCustomFields, LoggerInterface $logger)
+    public function __construct(OrderRepositoryInterface $orderRepository, ShopwareOrderService $swOrderService, Order $mollieOrderService, UpdateOrderCustomFields $updateOrderCustomFields, UpdateOrderTransactionCustomFields $updateOrderTransactionCustomFields, OrderDeliveryService $orderDeliveryService, LoggerInterface $logger)
     {
         $this->orderRepository = $orderRepository;
         $this->swOrderService = $swOrderService;
         $this->mollieOrderService = $mollieOrderService;
-        $this->updateOrderCustomFields = $customFieldsUpdater;
-        $this->updateOrderTransactionCustomFields = $orderTransactionCustomFields;
+        $this->updateOrderCustomFields = $updateOrderCustomFields;
+        $this->updateOrderTransactionCustomFields = $updateOrderTransactionCustomFields;
+        $this->orderDeliveryService = $orderDeliveryService;
         $this->logger = $logger;
     }
 
@@ -104,7 +111,7 @@ class OrderService implements OrderServiceInterface
         $criteria->addAssociation('transactions.paymentMethod');
         $criteria->addAssociation('transactions.paymentMethod.appPaymentMethod.app');
         $criteria->addAssociation('transactions.stateMachineState');
-        $criteria->addAssociation(OrderExtension::REFUND_PROPERTY_NAME.'.refundItems'); # for refund manager
+        $criteria->addAssociation(OrderExtension::REFUND_PROPERTY_NAME . '.refundItems'); # for refund manager
 
 
         $order = $this->orderRepository->search($criteria, $context)->first();
@@ -141,6 +148,29 @@ class OrderService implements OrderServiceInterface
         );
 
         throw new OrderNumberNotFoundException($orderNumber);
+    }
+
+    /**
+     * @param string $deliveryId
+     * @param Context $context
+     * @throws \Exception
+     * @return OrderEntity
+     */
+    public function getOrderByDeliveryId(string $deliveryId, Context $context): OrderEntity
+    {
+        $delivery = $this->orderDeliveryService->getDelivery($deliveryId, $context);
+
+        if (!$delivery instanceof OrderDeliveryEntity) {
+            throw new \Exception('Delivery with id ' . $deliveryId . ' not found');
+        }
+
+        $order = $delivery->getOrder();
+
+        if (!$order instanceof OrderEntity) {
+            throw new \Exception('Order with id ' . $delivery->getOrderId() . ' not found');
+        }
+
+        return $order;
     }
 
     /**

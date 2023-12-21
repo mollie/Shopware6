@@ -49,7 +49,7 @@ clean: ## Cleans all dependencies and files
 	rm -rf ./src/Resources/app/storefront/dist/storefront
 	# ------------------------------------------------------
 	rm -rf ./src/Resources/public/administration
-	rm -rf ./src/Resources/public/molllie-payments.js
+	rm -rf ./src/Resources/public/mollie-payments.js
 
 build: ## Installs the plugin, and builds the artifacts using the Shopware build commands.
 	# -----------------------------------------------------

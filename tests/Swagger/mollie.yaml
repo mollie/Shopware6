@@ -51,7 +51,7 @@ paths:
       summary: "Search for an order number"
       description: "Please insert your order number in the POST body."
       security:
-        - AdminAPI: []
+        - AdminAPI: [ ]
       requestBody:
         content:
           application/json:
@@ -95,19 +95,119 @@ paths:
         "200":
           description: "successful operation"
 
-
-  /api/mollie/ship/order?number={number}:
-    get:
+  /api/mollie/ship/order:
+    post:
       tags:
         - "Shipping (Operational)"
-      summary: "Full shipment"
+      summary: "Full shipment (all or rest of items)"
       security:
-        - AdminAPI: []
-      parameters:
-        - name: "number"
-          in: "path"
-          description: "Shopware order number"
-          required: true
+        - AdminAPI: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orderNumber:
+                  type: string
+                  description: The Shopware order number
+                trackingCode:
+                  type: string
+                  description: The tracking code of the order
+                trackingCarrier:
+                  type: string
+                  description: The tracking carrier of the order
+                trackingUrl:
+                  type: string
+                  description: The tracking URL of the order
+              required:
+                - orderNumber
+      responses:
+        "200":
+          description: "successful operation"
+
+  /api/mollie/ship/order/batch:
+    post:
+      tags:
+        - "Shipping (Operational)"
+      summary: "Full shipment with selected items"
+      security:
+        - AdminAPI: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orderNumber:
+                  type: string
+                  description: The Shopware order number
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      productNumber:
+                        type: string
+                        description: The Shopware product number
+                      quantity:
+                        type: integer
+                        description: The quantity of the product
+                        default: 1
+                trackingCode:
+                  type: string
+                  description: The tracking code of the order
+                trackingCarrier:
+                  type: string
+                  description: The tracking carrier of the order
+                trackingUrl:
+                  type: string
+                  description: The tracking URL of the order
+              required:
+                - orderNumber
+                - items
+      responses:
+        "200":
+          description: "successful operation"
+
+  /api/mollie/ship/item:
+    post:
+      tags:
+        - "Shipping (Operational)"
+      summary: "Ship a provided line item."
+      security:
+        - AdminAPI: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orderNumber:
+                  type: string
+                  description: The Shopware order number
+                productNumber:
+                  type: string
+                  description: The Shopware product number
+                quantity:
+                  type: integer
+                  description: The quantity of the product
+                  default: 1
+                trackingCode:
+                  type: string
+                  description: The tracking code of the order
+                trackingCarrier:
+                  type: string
+                  description: The tracking carrier of the order
+                trackingUrl:
+                  type: string
+                  description: The tracking URL of the order
+              required:
+                - orderNumber
+                - productNumber
       responses:
         "200":
           description: "successful operation"
@@ -116,9 +216,9 @@ paths:
     get:
       tags:
         - "Shipping (Operational)"
-      summary: "Partial shipment"
+      summary: "Ship a provided line item, deprecated - please use the POST request version!"
       security:
-        - AdminAPI: []
+        - AdminAPI: [ ]
       parameters:
         - name: "order"
           in: "path"
@@ -127,9 +227,26 @@ paths:
         - name: "item"
           in: "path"
           description: "product number"
+          required: true
         - name: "quantity"
           in: "path"
           description: "quantity"
+      responses:
+        "200":
+          description: "successful operation"
+
+  /api/mollie/ship/order?number={number}:
+    get:
+      tags:
+        - "Shipping (Operational)"
+      summary: "Full shipment (all or rest of items), deprecated - please use the POST request version!"
+      security:
+        - AdminAPI: [ ]
+      parameters:
+        - name: "number"
+          in: "path"
+          description: "Shopware order number"
+          required: true
       responses:
         "200":
           description: "successful operation"
@@ -140,7 +257,7 @@ paths:
         - "Refunds (Operational)"
       summary: "Full Refund"
       security:
-        - AdminAPI: []
+        - AdminAPI: [ ]
       parameters:
         - name: "number"
           in: "path"
@@ -159,7 +276,7 @@ paths:
         - "Refunds (Operational)"
       summary: "Partial Refund"
       security:
-        - AdminAPI: []
+        - AdminAPI: [ ]
       parameters:
         - name: "number"
           in: "path"
@@ -181,7 +298,7 @@ paths:
         - "Refunds (Technical)"
       summary: "Get data from Refund Manager"
       security:
-        - AdminAPI: []
+        - AdminAPI: [ ]
       requestBody:
         content:
           application/json:
@@ -201,7 +318,7 @@ paths:
         - "Refunds (Technical)"
       summary: "Refund with Refund Manager"
       security:
-        - AdminAPI: []
+        - AdminAPI: [ ]
       requestBody:
         content:
           application/json:
@@ -248,27 +365,27 @@ paths:
           description: "successful operation"
 
   /mollie/webhook/subscription/{subscriptionId}:
-      post:
-        tags:
-          - "Webhooks"
-        summary: "Start a subscription renewal or update an existing subscription order and payment status."
-        parameters:
-          - in: "path"
-            name: "subscriptionId"
-            description: "ID of the Shopware Subscription"
-            required: true
-        requestBody:
-          content:
-            application/x-www-form-urlencoded:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    description: "The matching transaction ID of Mollie that was captured. tr_xyz, ..."
-        responses:
-          "200":
-            description: "successful operation"
+    post:
+      tags:
+        - "Webhooks"
+      summary: "Start a subscription renewal or update an existing subscription order and payment status."
+      parameters:
+        - in: "path"
+          name: "subscriptionId"
+          description: "ID of the Shopware Subscription"
+          required: true
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: "The matching transaction ID of Mollie that was captured. tr_xyz, ..."
+      responses:
+        "200":
+          description: "successful operation"
 
   /mollie/webhook/subscription/{subscriptionId}/renew:
     post:

@@ -162,7 +162,7 @@ class OrderTest extends TestCase
             [OrderLineType::TYPE_STORE_CREDIT, 1, false],
 
             // These two types are not (yet) being used by the Mollie plugin, so there should not be any order lines
-            // with these types in the Mollie order, and we cannot ship them using Facade/MollieShipment::shipItem.
+            // with these types in the Mollie order, and we cannot ship them using Facade/ShipmentManager::shipItem.
             // Therefore we mark the (Shopware) order completely shipped.
             [OrderLineType::TYPE_GIFT_CARD, 0, true],
             [OrderLineType::TYPE_GIFT_CARD, 1, true],

@@ -37,7 +37,7 @@ SHOPWARE 6.5
         {% block sw_order_detail_general_mollie_shipping %}
             <sw-modal v-if="showShippingModal"
                       :title="$tc('mollie-payments.modals.shipping.title')"
-                      variant="small"
+                      variant="large"
                       @modal-close="onCloseShippingManager">
                 <mollie-ship-order :order="order">
                 </mollie-ship-order>

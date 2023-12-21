@@ -60,6 +60,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
             <argument type="service" id="Kiener\MolliePayments\Service\UpdateOrderCustomFields"/>
             <argument type="service" id="Kiener\MolliePayments\Service\UpdateOrderTransactionCustomFields"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderDeliveryService"/>
             <argument type="service" id="mollie_payments.logger"/>
         </service>
 
@@ -86,6 +87,13 @@
         <service id="Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor">
             <argument type="service" id="mollie_payments.logger"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Service\MollieApi\OrderDeliveryExtractor">
+            <argument type="service" id="mollie_payments.logger"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Service\MollieApi\OrderItemsExtractor">
         </service>
 
         <service id="Kiener\MolliePayments\Service\UpdateOrderCustomFields">

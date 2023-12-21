@@ -16,9 +16,30 @@ export default class ShipThroughMollieAction {
     /**
      *
      */
-    shipOrder() {
+    shipFullOrder() {
 
         cy.wait(2000);
+
+        // select all items, otherwise
+        // nothing would be shipped
+        repoShippingFull.getSelectAllItemsButton().click();
+
+        repoShippingFull.getShippingButton().click(forceOption);
+
+        // here are automatic reloads and things as it seems
+        // I really want to test the real UX, so we just wait like a human
+        cy.wait(4000);
+    }
+
+    /**
+     *
+     */
+    shipBatchOrder() {
+
+        cy.wait(2000);
+
+        // select our first item
+        repoShippingFull.getFirstItemSelectCheckbox().click();
 
         repoShippingFull.getShippingButton().click(forceOption);
 

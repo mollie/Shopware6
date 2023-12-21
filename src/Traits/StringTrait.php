@@ -18,4 +18,16 @@ trait StringTrait
 
         return false;
     }
+
+    /**
+     *
+     */
+    protected function stringContains(string $haystack, string $needle): bool
+    {
+        if (strpos($haystack, $needle) !== false) {
+            return true;
+        }
+
+        return false;
+    }
 }

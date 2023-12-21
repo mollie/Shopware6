@@ -6,7 +6,7 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Actions\RefundOrderA
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Actions\ShipOrderAction;
 use Mollie\Api\Resources\Refund;
 use Mollie\Api\Types\RefundStatus;
-use MolliePayments\Tests\Fakes\FakeMollieShipment;
+use MolliePayments\Tests\Fakes\FakeShipmentManager;
 use MolliePayments\Tests\Fakes\FakeOrderService;
 use MolliePayments\Tests\Traits\FlowBuilderTestTrait;
 use PHPUnit\Framework\TestCase;
@@ -50,7 +50,7 @@ class ShipOrderActionTest extends TestCase
         $order->setOrderNumber('ord-123');
 
         $fakeOrderService = new FakeOrderService($order);
-        $fakeShipment = new FakeMollieShipment();
+        $fakeShipment = new FakeShipmentManager();
 
         $flowEvent = $this->buildOrderStateFlowEvent($order, 'action.mollie.order.ship');
 
