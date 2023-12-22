@@ -9,7 +9,6 @@
         <service id="Kiener\MolliePayments\Service\Logger\MollieLoggerFactory" class="Kiener\MolliePayments\Service\Logger\MollieLoggerFactory">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument>%kernel.logs_dir%/mollie_%kernel.environment%.log</argument>
-            <argument>14</argument>
             <argument>%env(DATABASE_URL)%</argument>
         </service>
 
