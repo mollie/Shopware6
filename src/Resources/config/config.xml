@@ -49,6 +49,16 @@
             <helpText lang="de-DE">Mollie hat eine eigene LOG Datei im Shopware Log Verzeichnis. Dieser Modus kümmert sich um erweiterte Informationen in diesen Log Dateien, die zusätzlich bei der Analyse von Fehlern beitragen können.</helpText>
             <helpText lang="nl-NL">Mollie heeft een op maat logbestand in de Shopware logboek-map. Deze functie maakt uitgebreide logs mogelijk met meer informatie die helpen bij het oplossen van problemen.</helpText>
         </input-field>
+        <input-field type="int">
+            <name>logFileDays</name>
+            <label>Keep log files (days)</label>
+            <label lang="de-DE">Log-Dateien aufbewahren (Tage)</label>
+            <label lang="nl-NL">Logbestanden bijhouden (dagen)</label>
+            <defaultValue>14</defaultValue>
+            <helpText>Set the number of days how long log files are kept until they will be automatically deleted.</helpText>
+            <helpText lang="de-DE">Legen Sie die Anzahl der Tage fest, wie lange Protokolldateien aufbewahrt werden, bis sie automatisch gelöscht werden.</helpText>
+            <helpText lang="nl-NL">Stel het aantal dagen in hoe lang logbestanden worden bewaard totdat ze automatisch worden verwijderd.</helpText>
+        </input-field>
         <component name="mollie-pluginconfig-section-api">
             <name>molliePluginConfigSectionApi</name>
         </component>
