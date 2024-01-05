@@ -76,12 +76,25 @@ class PaymentMethodServiceTest extends TestCase
         $this->paymentMethodRepository = new FakePaymentMethodRepository($paymentMethod);
 
         $this->paymentMethodService = new PaymentMethodService(
+            '6.5.6.0',
             $this->createMock(MediaService::class),
             $this->mediaRepository,
             $this->paymentMethodRepository,
             $this->createMock(PluginIdProvider::class),
             new FakeHttpClient()
         );
+    }
+
+    /**
+     * Starting with Shopware 6.5.7.0 a new technical name is
+     * required for a payment method.
+     * This test verifies that our used prefix is always the same.
+     *
+     * @return void
+     */
+    public function testTechnicalPaymentMethodPrefix(): void
+    {
+        $this->assertEquals('payment_mollie_', PaymentMethodService::TECHNICAL_NAME_PREFIX);
     }
 
     /**

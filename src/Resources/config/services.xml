@@ -86,6 +86,7 @@
         </service>
 
         <service id="Kiener\MolliePayments\Service\PaymentMethodService" class="Kiener\MolliePayments\Service\PaymentMethodService" public="true">
+            <argument>%kernel.shopware_version%</argument>
             <argument type="service" id="Shopware\Core\Content\Media\MediaService"/>
             <argument type="service" id="Kiener\MolliePayments\Repository\Media\MediaRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepository"/>
