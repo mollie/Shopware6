@@ -159,6 +159,7 @@ class PaymentMethodService
                 $existingPaymentMethod = null;
             }
 
+            $technicalName = '';
 
             if ($existingPaymentMethod instanceof PaymentMethodEntity) {
 
@@ -183,18 +184,14 @@ class PaymentMethodService
                     'name' => $existingPaymentMethod->getName(),
                 ];
 
-                # starting with Shopware 6.5.7.0 this has to be filled out
-                # so that you can still save the payment method in the administration
-                if ($this->versionCompare->gte('6.5.7.0')) {
-                    $paymentMethodData['technicalName'] = self::TECHNICAL_NAME_PREFIX . $mollieName;
-                }
-
-                $upsertData[] = $paymentMethodData;
+                # we do a string cast here, since getTechnicalName will be not nullable in the future
+                $technicalName = (string)$existingPaymentMethod->getTechnicalName();
             } else {
                 # let's create a full parameter list of everything
                 # that our new payment method needs to have
 
                 $mollieName = $paymentMethod['description'];
+
 
                 $paymentMethodData = [
                     'handlerIdentifier' => $paymentMethod['handler'],
@@ -209,15 +206,19 @@ class PaymentMethodService
                         'mollie_payment_method_name' => $mollieName
                     ],
                 ];
-
-                # starting with Shopware 6.5.7.0 this has to be filled out
-                # so that you can still save the payment method in the administration
-                if ($this->versionCompare->gte('6.5.7.0')) {
-                    $paymentMethodData['technicalName'] = self::TECHNICAL_NAME_PREFIX . $mollieName;
-                }
-
-                $upsertData[] = $paymentMethodData;
             }
+
+            if (mb_strlen($technicalName) > 0) {
+                $technicalName = self::TECHNICAL_NAME_PREFIX . $mollieName;
+            }
+
+            # starting with Shopware 6.5.7.0 this has to be filled out
+            # so that you can still save the payment method in the administration
+            if ($this->versionCompare->gte('6.5.7.0')) {
+                $paymentMethodData['technicalName'] = $technicalName;
+            }
+
+            $upsertData[] = $paymentMethodData;
         }
 
         if (count($upsertData) > 0) {
