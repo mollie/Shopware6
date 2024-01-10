@@ -184,8 +184,11 @@ class PaymentMethodService
                     'name' => $existingPaymentMethod->getName(),
                 ];
 
-                # we do a string cast here, since getTechnicalName will be not nullable in the future
-                $technicalName = (string)$existingPaymentMethod->getTechnicalName();
+                if ($this->versionCompare->gte('6.5.7.0')) {
+                    # we do a string cast here, since getTechnicalName will be not nullable in the future
+                    $technicalName = (string)$existingPaymentMethod->getTechnicalName();
+                }
+
             } else {
                 # let's create a full parameter list of everything
                 # that our new payment method needs to have
