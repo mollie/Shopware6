@@ -162,10 +162,6 @@ class PaymentMethodService
             $technicalName = '';
 
             if ($existingPaymentMethod instanceof PaymentMethodEntity) {
-
-                # extract the existing name
-                $mollieName = $paymentMethod['name'];
-
                 $paymentMethodData = [
                     # ALWAYS ADD THE ID, otherwise upsert would create NEW entries!
                     'id' => $existingPaymentMethod->getId(),
@@ -174,9 +170,6 @@ class PaymentMethodService
                     # make sure to repair some fields in here
                     # so that Mollie does always work for our wonderful customers :)
                     'pluginId' => $pluginId,
-                    'customFields' => [
-                        'mollie_payment_method_name' => $mollieName,
-                    ],
                     # ------------------------------------------
                     # unfortunately some fields are required (*sigh)
                     # so we need to provide those with the value of
@@ -191,28 +184,25 @@ class PaymentMethodService
             } else {
                 # let's create a full parameter list of everything
                 # that our new payment method needs to have
-
-                $mollieName = $paymentMethod['description'];
-
-
                 $paymentMethodData = [
                     'handlerIdentifier' => $paymentMethod['handler'],
                     'pluginId' => $pluginId,
                     # ------------------------------------------
-                    'name' => $mollieName,
+                    'name' => $paymentMethod['description'],
                     'description' => '',
                     'mediaId' => $mediaId,
                     'afterOrderEnabled' => true,
-                    # ------------------------------------------
-                    'customFields' => [
-                        'mollie_payment_method_name' => $mollieName
-                    ],
                 ];
             }
 
             if (mb_strlen($technicalName) > 0) {
-                $technicalName = self::TECHNICAL_NAME_PREFIX . $mollieName;
+                $technicalName = self::TECHNICAL_NAME_PREFIX .  $paymentMethod['name'];
             }
+
+            # custom field name is required to be specific, because we use it in the template to display components
+            $paymentMethodData['customFields'] = [
+                'mollie_payment_method_name' => $paymentMethod['name']
+            ];
 
             # starting with Shopware 6.5.7.0 this has to be filled out
             # so that you can still save the payment method in the administration
