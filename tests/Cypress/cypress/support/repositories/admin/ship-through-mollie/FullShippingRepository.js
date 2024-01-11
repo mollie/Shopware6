@@ -14,7 +14,7 @@ export default class FullShippingRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getFirstItemSelectCheckbox() {
-        return cy.get('.sw-data-grid__row--0 > .sw-data-grid__cell--itemselect > .sw-data-grid__cell-content');
+        return cy.get('.sw-data-grid__row--0 > .sw-data-grid__cell--itemselect > .sw-data-grid__cell-content input');
     }
 
     /**
