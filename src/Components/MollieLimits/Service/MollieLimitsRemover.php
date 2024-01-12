@@ -6,6 +6,7 @@ use Exception;
 use Kiener\MolliePayments\Exception\MissingCartServiceException;
 use Kiener\MolliePayments\Exception\MissingRequestException;
 use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
+use Kiener\MolliePayments\Service\MollieApi\OrderItemsExtractor;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\Payment\Provider\ActivePaymentMethodsProviderInterface;
 use Kiener\MolliePayments\Service\Payment\Remover\PaymentMethodRemover;
@@ -35,10 +36,10 @@ class MollieLimitsRemover extends PaymentMethodRemover
      * @param OrderService $orderService
      * @param SettingsService $settingsService
      * @param ActivePaymentMethodsProviderInterface $paymentMethodsProvider
-     * @param OrderDataExtractor $orderDataExtractor
+     * @param OrderItemsExtractor $orderDataExtractor
      * @param LoggerInterface $logger
      */
-    public function __construct(ContainerInterface $container, RequestStack $requestStack, OrderService $orderService, SettingsService $settingsService, ActivePaymentMethodsProviderInterface $paymentMethodsProvider, OrderDataExtractor $orderDataExtractor, LoggerInterface $logger)
+    public function __construct(ContainerInterface $container, RequestStack $requestStack, OrderService $orderService, SettingsService $settingsService, ActivePaymentMethodsProviderInterface $paymentMethodsProvider, OrderItemsExtractor $orderDataExtractor, LoggerInterface $logger)
     {
         parent::__construct($container, $requestStack, $orderService, $settingsService, $orderDataExtractor, $logger);
 

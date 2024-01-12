@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Service;
 
+use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Handler\Method\BanContactPayment;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
@@ -45,6 +46,12 @@ use Shopware\Core\Framework\Plugin\Util\PluginIdProvider;
 
 class PaymentMethodService
 {
+
+    /**
+     *
+     */
+    public const TECHNICAL_NAME_PREFIX = 'payment_mollie_';
+
     /**
      * @var MediaService
      */
@@ -70,21 +77,29 @@ class PaymentMethodService
      */
     private $httpClient;
 
+    /**
+     * @var VersionCompare
+     */
+    private $versionCompare;
+
 
     /**
+     * @param string $shopwareVersion
      * @param MediaService $mediaService
      * @param MediaRepositoryInterface $mediaRepository
      * @param PaymentMethodRepositoryInterface $paymentRepository
      * @param PluginIdProvider $pluginIdProvider
      * @param HttpClientInterface $httpClient
      */
-    public function __construct(MediaService $mediaService, MediaRepositoryInterface $mediaRepository, PaymentMethodRepositoryInterface $paymentRepository, PluginIdProvider $pluginIdProvider, HttpClientInterface $httpClient)
+    public function __construct(string $shopwareVersion, MediaService $mediaService, MediaRepositoryInterface $mediaRepository, PaymentMethodRepositoryInterface $paymentRepository, PluginIdProvider $pluginIdProvider, HttpClientInterface $httpClient)
     {
         $this->mediaService = $mediaService;
         $this->mediaRepository = $mediaRepository;
         $this->paymentRepository = $paymentRepository;
         $this->pluginIdProvider = $pluginIdProvider;
         $this->httpClient = $httpClient;
+
+        $this->versionCompare = new VersionCompare($shopwareVersion);
     }
 
 
@@ -144,6 +159,7 @@ class PaymentMethodService
                 $existingPaymentMethod = null;
             }
 
+            $technicalName = '';
 
             if ($existingPaymentMethod instanceof PaymentMethodEntity) {
                 $paymentMethodData = [
@@ -154,9 +170,6 @@ class PaymentMethodService
                     # make sure to repair some fields in here
                     # so that Mollie does always work for our wonderful customers :)
                     'pluginId' => $pluginId,
-                    'customFields' => [
-                        'mollie_payment_method_name' => $paymentMethod['name'],
-                    ],
                     # ------------------------------------------
                     # unfortunately some fields are required (*sigh)
                     # so we need to provide those with the value of
@@ -164,7 +177,10 @@ class PaymentMethodService
                     'name' => $existingPaymentMethod->getName(),
                 ];
 
-                $upsertData[] = $paymentMethodData;
+                if ($this->versionCompare->gte('6.5.7.0')) {
+                    # we do a string cast here, since getTechnicalName will be not nullable in the future
+                    $technicalName = (string)$existingPaymentMethod->getTechnicalName(); /** @phpstan-ignore-line */
+                }
             } else {
                 # let's create a full parameter list of everything
                 # that our new payment method needs to have
@@ -176,14 +192,25 @@ class PaymentMethodService
                     'description' => '',
                     'mediaId' => $mediaId,
                     'afterOrderEnabled' => true,
-                    # ------------------------------------------
-                    'customFields' => [
-                        'mollie_payment_method_name' => $paymentMethod['name'],
-                    ],
                 ];
-
-                $upsertData[] = $paymentMethodData;
             }
+
+            if (mb_strlen($technicalName) > 0) {
+                $technicalName = self::TECHNICAL_NAME_PREFIX .  $paymentMethod['name'];
+            }
+
+            # custom field name is required to be specific, because we use it in the template to display components
+            $paymentMethodData['customFields'] = [
+                'mollie_payment_method_name' => $paymentMethod['name']
+            ];
+
+            # starting with Shopware 6.5.7.0 this has to be filled out
+            # so that you can still save the payment method in the administration
+            if ($this->versionCompare->gte('6.5.7.0')) {
+                $paymentMethodData['technicalName'] = $technicalName;
+            }
+
+            $upsertData[] = $paymentMethodData;
         }
 
         if (count($upsertData) > 0) {

@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Service\Payment\Remover;
 
 use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
+use Kiener\MolliePayments\Service\MollieApi\OrderItemsExtractor;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
@@ -20,10 +21,10 @@ class RegularPaymentRemover extends PaymentMethodRemover
      * @param RequestStack $requestStack
      * @param OrderService $orderService
      * @param SettingsService $settingsService
-     * @param OrderDataExtractor $orderDataExtractor
+     * @param OrderItemsExtractor $orderDataExtractor
      * @param LoggerInterface $logger
      */
-    public function __construct(ContainerInterface $container, RequestStack $requestStack, OrderService $orderService, SettingsService $settingsService, OrderDataExtractor $orderDataExtractor, LoggerInterface $logger)
+    public function __construct(ContainerInterface $container, RequestStack $requestStack, OrderService $orderService, SettingsService $settingsService, OrderItemsExtractor $orderDataExtractor, LoggerInterface $logger)
     {
         parent::__construct($container, $requestStack, $orderService, $settingsService, $orderDataExtractor, $logger);
     }

@@ -4,6 +4,7 @@ namespace MolliePayments\Tests\Service\MollieApi;
 
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieOrderException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
+use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\MollieApi\Order as MollieOrderApi;
 use Kiener\MolliePayments\Service\MollieApi\Payment as MolliePaymentApi;
 use Kiener\MolliePayments\Service\MollieApi\RequestAnonymizer\MollieRequestAnonymizer;
@@ -75,7 +76,8 @@ class OrderTest extends TestCase
             $this->buildRoutingBuilder($this, ''),
             new MollieRequestAnonymizer('*'),
             new NullLogger(),
-            $this->createMock(SettingsService::class)
+            $this->createMock(SettingsService::class),
+            $this->createMock(CustomerService::class),
         );
     }
 
@@ -162,7 +164,7 @@ class OrderTest extends TestCase
             [OrderLineType::TYPE_STORE_CREDIT, 1, false],
 
             // These two types are not (yet) being used by the Mollie plugin, so there should not be any order lines
-            // with these types in the Mollie order, and we cannot ship them using Facade/MollieShipment::shipItem.
+            // with these types in the Mollie order, and we cannot ship them using Facade/ShipmentManager::shipItem.
             // Therefore we mark the (Shopware) order completely shipped.
             [OrderLineType::TYPE_GIFT_CARD, 0, true],
             [OrderLineType::TYPE_GIFT_CARD, 1, true],

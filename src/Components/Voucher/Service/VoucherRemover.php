@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Components\Voucher\Service;
 use Kiener\MolliePayments\Service\Cart\Voucher\VoucherCartCollector;
 use Kiener\MolliePayments\Service\Cart\Voucher\VoucherService;
 use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
+use Kiener\MolliePayments\Service\MollieApi\OrderItemsExtractor;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\Payment\Remover\PaymentMethodRemover;
 use Kiener\MolliePayments\Service\SettingsService;
@@ -34,10 +35,10 @@ class VoucherRemover extends PaymentMethodRemover
      * @param OrderService $orderService
      * @param SettingsService $settingsService
      * @param VoucherService $voucherService
-     * @param OrderDataExtractor $orderDataExtractor
+     * @param OrderItemsExtractor $orderDataExtractor
      * @param LoggerInterface $logger
      */
-    public function __construct(ContainerInterface $container, RequestStack $requestStack, OrderService $orderService, SettingsService $settingsService, VoucherService $voucherService, OrderDataExtractor $orderDataExtractor, LoggerInterface $logger)
+    public function __construct(ContainerInterface $container, RequestStack $requestStack, OrderService $orderService, SettingsService $settingsService, VoucherService $voucherService, OrderItemsExtractor $orderDataExtractor, LoggerInterface $logger)
     {
         parent::__construct($container, $requestStack, $orderService, $settingsService, $orderDataExtractor, $logger);
 

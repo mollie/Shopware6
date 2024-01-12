@@ -34,25 +34,18 @@ class MollieLoggerFactory
     /**
      * @var string
      */
-    private $retentionDays;
-
-    /**
-     * @var string
-     */
     private $dsn;
 
 
     /**
      * @param SettingsService $settingsService
      * @param string $filename
-     * @param string $retentionDays
      * @param string $dsn
      */
-    public function __construct(SettingsService $settingsService, string $filename, string $retentionDays, string $dsn)
+    public function __construct(SettingsService $settingsService, string $filename, string $dsn)
     {
         $this->settingsService = $settingsService;
         $this->filename = $filename;
-        $this->retentionDays = $retentionDays;
         $this->dsn = $dsn;
     }
 
@@ -70,8 +63,9 @@ class MollieLoggerFactory
 
         # 100 = DEBUG, 200 = INFO
         $minLevel = ($config->isDebugMode()) ? 100 : 200;
+        $retentionDays = $config->getLogFileDays();
 
-        $fileHandler = new RotatingFileHandler($this->filename, (int)$this->retentionDays, $minLevel);
+        $fileHandler = new RotatingFileHandler($this->filename, $retentionDays, $minLevel);
 
         $processors = [];
         $processors[] = new AnonymousWebProcessor(new WebProcessor(), new URLAnonymizer());

@@ -3,9 +3,12 @@ declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service;
 
+use Kiener\MolliePayments\Components\ShipmentManager\Exceptions\NoDeliveriesFoundExceptions;
 use Kiener\MolliePayments\Service\TrackingInfoStructFactory;
 use PHPUnit\Framework\TestCase;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 
 /**
@@ -24,24 +27,31 @@ class TrackingInfoStructFactoryTest extends TestCase
     }
 
 
-    public function testInfoStructCreatedByDelivery(): void
+    /**
+     * @return void
+     * @throws \Kiener\MolliePayments\Components\ShipmentManager\Exceptions\NoDeliveriesFoundException
+     */
+    public function testTrackingFromOrder(): void
     {
         $expectedCode = '1234';
         $expectedCarrier = 'Test carrier';
         $expectedUrl = 'https://test.foo?code=1234';
-        $deliveryEntity = new OrderDeliveryEntity();
-        $deliveryEntity->setUniqueIdentifier('testDelivery');
-        $deliveryEntity->setTrackingCodes([
-            $expectedCode
-        ]);
 
         $shippingMethod = new ShippingMethodEntity();
         $shippingMethod->setName($expectedCarrier);
         $shippingMethod->setUniqueIdentifier('testShippingMethod');
         $shippingMethod->setTrackingUrl('https://test.foo?code=%s');
 
+        $deliveryEntity = new OrderDeliveryEntity();
+        $deliveryEntity->setUniqueIdentifier('testDelivery');
         $deliveryEntity->setShippingMethod($shippingMethod);
-        $trackingInfoStruct = $this->factory->createFromDelivery($deliveryEntity);
+        $deliveryEntity->setTrackingCodes([$expectedCode]);
+
+        $order = new OrderEntity();
+        $order->setDeliveries(new OrderDeliveryCollection([$deliveryEntity]));
+
+
+        $trackingInfoStruct = $this->factory->trackingFromOrder($order);
 
         $this->assertNotNull($trackingInfoStruct);
         $this->assertSame($expectedCode, $trackingInfoStruct->getCode());
@@ -49,39 +59,49 @@ class TrackingInfoStructFactoryTest extends TestCase
         $this->assertSame($expectedCarrier, $trackingInfoStruct->getCarrier());
     }
 
+    /**
+     * @return void
+     * @throws NoDeliveriesFoundExceptions
+     */
     public function testOnlyOneCodeAccepted(): void
     {
-
-        $deliveryEntity = new OrderDeliveryEntity();
-        $deliveryEntity->setUniqueIdentifier('testDelivery');
-        $deliveryEntity->setTrackingCodes([
-            '1234',
-            'test'
-        ]);
-
         $shippingMethod = new ShippingMethodEntity();
         $shippingMethod->setName('Test carrier');
         $shippingMethod->setUniqueIdentifier('testShippingMethod');
         $shippingMethod->setTrackingUrl('https://test.foo?code=%s');
 
+        $deliveryEntity = new OrderDeliveryEntity();
+        $deliveryEntity->setUniqueIdentifier('testDelivery');
         $deliveryEntity->setShippingMethod($shippingMethod);
-        $trackingInfoStruct = $this->factory->createFromDelivery($deliveryEntity);
+        $deliveryEntity->setTrackingCodes([
+            '1234',
+            'test'
+        ]);
+
+        $order = new OrderEntity();
+        $order->setDeliveries(new OrderDeliveryCollection([$deliveryEntity]));
+
+        $trackingInfoStruct = $this->factory->trackingFromOrder($order);
 
         $this->assertNull($trackingInfoStruct);
     }
 
+    /**
+     * @return void
+     */
     public function testInfoStructCreatedByArguments(): void
     {
-        $expectedCode = '1234';
-        $expectedCarrier = 'Test carrier';
-        $trackingInfoStruct = $this->factory->create($expectedCarrier, $expectedCode, 'https://test.foo?code=%s');
-        $expectedUrl = 'https://test.foo?code=1234';
+        $trackingInfoStruct = $this->factory->create(
+            'Test carrier',
+            '1234',
+            'https://test.foo?code=%s'
+        );
 
         $this->assertNotNull($trackingInfoStruct);
-        $this->assertSame($expectedCode, $trackingInfoStruct->getCode());
-        $this->assertSame($expectedUrl, $trackingInfoStruct->getUrl());
-        $this->assertSame($expectedCarrier, $trackingInfoStruct->getCarrier());
 
+        $this->assertSame('1234', $trackingInfoStruct->getCode());
+        $this->assertSame('https://test.foo?code=1234', $trackingInfoStruct->getUrl());
+        $this->assertSame('Test carrier', $trackingInfoStruct->getCarrier());
     }
 
     public function testUrlWithCodeIsInvalid(): void
@@ -139,22 +159,10 @@ class TrackingInfoStructFactoryTest extends TestCase
         $this->assertSame($expectedCarrier, $trackingInfoStruct->getCarrier());
     }
 
+
     /**
-     * @dataProvider invalidCodes
-     * @param string $url
-     * @param string $trackingCode
-     * @return void
+     * @return array
      */
-    public function testInvalidTrackingCodeCharacter(string $trackingCode): void
-    {
-
-        $trackingInfoStruct = $this->factory->create('test', $trackingCode, 'https://foo.bar/%s');
-        $expected = '';
-        
-        $this->assertSame($expected, $trackingInfoStruct->getUrl());
-
-    }
-
     public function invalidCodes(): array
     {
         return [
@@ -167,4 +175,40 @@ class TrackingInfoStructFactoryTest extends TestCase
             [str_repeat('1', 200)],
         ];
     }
+
+    /**
+     * @dataProvider invalidCodes
+     * @param string $invalidCode
+     * @return void
+     */
+    public function testUrlEmptyOnInvalidCodes(string $invalidCode): void
+    {
+        $trackingInfoStruct = $this->factory->create('test', $invalidCode, 'https://foo.bar/%s');
+
+        $this->assertSame('', $trackingInfoStruct->getUrl());
+    }
+
+
+    /**
+     * @return array
+     */
+    public function invalidShippingUrlPatterns(): array
+    {
+        return [
+            ['%s%'],
+        ];
+    }
+
+    /**
+     * @dataProvider invalidShippingUrlPatterns
+     * @param string $invalidPattern
+     * @return void
+     */
+    public function testUrlEmptyOnInvalidShippingURLs(string $invalidPattern): void
+    {
+        $trackingInfoStruct = $this->factory->create('test', 'valid-code', 'https://foo.bar/' . $invalidPattern);
+
+        $this->assertSame('', $trackingInfoStruct->getUrl());
+    }
+
 }

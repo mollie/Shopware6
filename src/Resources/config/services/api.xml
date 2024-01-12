@@ -26,6 +26,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\RequestAnonymizer\MollieRequestAnonymizer"/>
             <argument type="service" id="mollie_payments.logger"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\MollieApi\Shipment">

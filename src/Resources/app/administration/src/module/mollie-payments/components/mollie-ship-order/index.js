@@ -1,4 +1,5 @@
 import template from './mollie-ship-order.html.twig';
+import './mollie-ship-order.scss';
 import MollieShippingEvents from './MollieShippingEvents';
 import MollieShipping from './MollieShipping';
 
@@ -52,11 +53,22 @@ Component.register('mollie-ship-order', {
         getShipOrderColumns() {
             return [
                 {
+                    property: 'itemselect',
+                    label: '',
+                },
+                {
                     property: 'label',
                     label: this.$tc('mollie-payments.modals.shipping.order.itemHeader'),
-                }, {
+                },
+                {
                     property: 'quantity',
                     label: this.$tc('mollie-payments.modals.shipping.order.quantityHeader'),
+                    width: '160px',
+                },
+                {
+                    property: 'originalQuantity',
+                    label: this.$tc('mollie-payments.modals.shipping.order.originalQuantityHeader'),
+                    width: '160px',
                 },
             ];
         },
@@ -93,6 +105,15 @@ Component.register('mollie-ship-order', {
             const shipping = new MollieShipping(this.MolliePaymentsShippingService);
 
             shipping.getShippableItems(this.order).then((items) => {
+
+                // this is required to make sure the "select all" works
+                // because we need to have a default value
+                for (let i = 0; i < items.length; i++) {
+                    const item = items[i];
+                    item.selected = false;
+                    item.originalQuantity = item.quantity;
+                }
+
                 this.shippableLineItems = items;
             });
 
@@ -108,16 +129,51 @@ Component.register('mollie-ship-order', {
         /**
          *
          */
+        btnSelectAllItems_Click() {
+            for (let i = 0; i < this.shippableLineItems.length; i++) {
+                const item = this.shippableLineItems[i];
+                if (item.originalQuantity > 0) {
+                    item.selected = true;
+                }
+            }
+        },
+
+        /**
+         *
+         */
+        btnResetItems_Click() {
+            for (let i = 0; i < this.shippableLineItems.length; i++) {
+                const item = this.shippableLineItems[i];
+                item.selected = false;
+                item.quantity = item.originalQuantity;
+            }
+        },
+
+        /**
+         *
+         */
         onShipOrder() {
 
-            const params = {
-                orderId: this.order.id,
-                trackingCarrier: this.tracking.carrier,
-                trackingCode: this.tracking.code,
-                trackingUrl: this.tracking.url,
-            };
+            var shippingItems = [];
 
-            this.MolliePaymentsShippingService.shipOrder(params)
+            for (let i = 0; i < this.shippableLineItems.length; i++) {
+                const item = this.shippableLineItems[i];
+
+                if (item.selected) {
+                    shippingItems.push({
+                        'id': item.id,
+                        'quantity': item.quantity,
+                    })
+                }
+            }
+
+            this.MolliePaymentsShippingService.shipOrder(
+                this.order.id,
+                this.tracking.carrier,
+                this.tracking.code,
+                this.tracking.url,
+                shippingItems,
+            )
                 .then(() => {
 
                     // send global event

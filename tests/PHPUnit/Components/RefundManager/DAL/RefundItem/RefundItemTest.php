@@ -77,4 +77,15 @@ class RefundItemTest extends TestCase
         $this->assertArrayNotHasKey('refundId', $payload);
     }
 
+    /**
+     * This test verifies that no errors is thrown if the label have a null value from the database
+     * @return void
+     */
+    public function testLabelHaveEmptyValueOnNUll(): void
+    {
+        $refundItem = new RefundItemEntity();
+        $refundItem->label = null;
+
+        $this->assertSame('',$refundItem->getLabel());
+    }
 }

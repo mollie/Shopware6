@@ -171,6 +171,10 @@ paths:
           in: "path"
           description: "Credit Card Token from the Mollie API Response"
           required: true
+        - name: "shouldSaveCardDetail"
+          in: "path"
+          description: "(optional) If provided with TRUE, the credit card data will lead to a new reusable mandate inside Mollie for this customer."
+          required: false
       responses:
         "200":
           description: "successful operation"

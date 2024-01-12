@@ -261,7 +261,8 @@
         "order": {
           "description": "The following item quantities will be shipped.",
           "itemHeader": "Item",
-          "quantityHeader": "Quantity"
+          "quantityHeader": "Quantity",
+          "originalQuantityHeader": "Quantity (shippable)"
         },
         "availableTracking": {
           "label": "Available tracking codes",
@@ -275,7 +276,9 @@
           "invalid": "Please enter both Carrier and Code"
         },
         "confirmButton": "Ship order",
-        "cancelButton": "Cancel"
+        "cancelButton": "Cancel",
+        "selectAllButton": "Select all",
+        "resetButton": "Reset"
       }
     },
     "sw-flow": {

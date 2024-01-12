@@ -2,9 +2,7 @@
 
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Actions;
 
-use Kiener\MolliePayments\Facade\MollieShipment;
-use Kiener\MolliePayments\Facade\MollieShipmentInterface;
-use Kiener\MolliePayments\Service\OrderService;
+use Kiener\MolliePayments\Components\ShipmentManager\ShipmentManagerInterface;
 use Kiener\MolliePayments\Service\OrderServiceInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Flow\Dispatching\Action\FlowAction;
@@ -27,20 +25,20 @@ class ShipOrderAction extends FlowAction implements EventSubscriberInterface
     private $orderService;
 
     /**
-     * @var MollieShipmentInterface
+     * @var ShipmentManagerInterface
      */
-    private $shipmentFacade;
+    private $shipment;
 
 
     /**
      * @param OrderServiceInterface $orderService
-     * @param MollieShipmentInterface $shipment
+     * @param ShipmentManagerInterface $shipment
      * @param LoggerInterface $logger
      */
-    public function __construct(OrderServiceInterface $orderService, MollieShipmentInterface $shipment, LoggerInterface $logger)
+    public function __construct(OrderServiceInterface $orderService, ShipmentManagerInterface $shipment, LoggerInterface $logger)
     {
         $this->orderService = $orderService;
-        $this->shipmentFacade = $shipment;
+        $this->shipment = $shipment;
         $this->logger = $logger;
     }
 
@@ -122,13 +120,9 @@ class ShipOrderAction extends FlowAction implements EventSubscriberInterface
 
             $this->logger->info('Starting Shipment through Flow Builder Action for order: ' . $orderNumber);
 
-            $this->shipmentFacade->shipOrder(
-                $order,
-                '',
-                '',
-                '',
-                $context
-            );
+            # ship (all or) the rest of the order without providing any specific tracking information.
+            # this will ensure tracking data is automatically taken from the order
+            $this->shipment->shipOrderRest($order, null, $context);
         } catch (\Exception $ex) {
             $this->logger->error(
                 'Error when shipping order with Flow Builder Action',

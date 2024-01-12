@@ -1,0 +1,9 @@
+.mollie-ship-order {
+    .mollie-ship-order-grid {
+        .mollie-ship-order-grid-quantity {
+            input:not([disabled]) {
+                background-color: #fff5e0;
+            }
+        }
+    }
+}

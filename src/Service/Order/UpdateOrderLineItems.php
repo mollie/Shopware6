@@ -6,6 +6,8 @@ use Kiener\MolliePayments\Repository\OrderLineItem\OrderLineItemRepositoryInterf
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Types\OrderLineType;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class UpdateOrderLineItems
@@ -29,7 +31,7 @@ class UpdateOrderLineItems
      * @param SalesChannelContext $salesChannelContext
      * @return void
      */
-    public function updateOrderLineItems(array $orderLines, SalesChannelContext $salesChannelContext): void
+    public function updateOrderLineItems(array $orderLines, OrderLineItemCollection $shopwareOrderLines, SalesChannelContext $salesChannelContext): void
     {
         foreach ($orderLines as $orderLine) {
             if ($orderLine->type === OrderLineType::TYPE_SHIPPING_FEE) {
@@ -41,13 +43,20 @@ class UpdateOrderLineItems
             if (empty($shopwareLineItemId)) {
                 continue;
             }
+            /** @var OrderLineItemEntity $shopwareLine */
+            $shopwareLine  = $shopwareOrderLines->get($shopwareLineItemId);
+            if (!$shopwareLine instanceof OrderLineItemEntity) {
+                continue;
+            }
+
+            ## we need some customfields for later when we edit an order, for example subscription information
+            $originalCustomFields = $shopwareLine->getPayload()['customFields'] ?? [];
+            $originalCustomFields['order_line_id'] = $orderLine->id;
 
             $data = [
-                'id' => $shopwareLineItemId,
+                'id' => $shopwareLine->getId(),
                 'customFields' => [
-                    'mollie_payments' => [
-                        'order_line_id' => $orderLine->id
-                    ]
+                    'mollie_payments' => $originalCustomFields
                 ]
             ];
 

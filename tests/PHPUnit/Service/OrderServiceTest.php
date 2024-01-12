@@ -6,6 +6,8 @@ use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderLineIdException;
 use Kiener\MolliePayments\Exception\OrderNumberNotFoundException;
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
+use Kiener\MolliePayments\Service\DeliveryService;
+use Kiener\MolliePayments\Service\OrderDeliveryService;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Service\UpdateOrderTransactionCustomFields;
@@ -51,6 +53,7 @@ class OrderServiceTest extends TestCase
             $this->createMock(\Kiener\MolliePayments\Service\MollieApi\Order::class),
             $this->createMock(UpdateOrderCustomFields::class),
             $this->createMock(UpdateOrderTransactionCustomFields::class),
+            $this->createMock(OrderDeliveryService::class),
             new NullLogger()
         );
     }
