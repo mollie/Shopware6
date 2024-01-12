@@ -4,6 +4,7 @@ namespace MolliePayments\Tests\Service\MollieApi;
 
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieOrderException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
+use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\MollieApi\Order as MollieOrderApi;
 use Kiener\MolliePayments\Service\MollieApi\Payment as MolliePaymentApi;
 use Kiener\MolliePayments\Service\MollieApi\RequestAnonymizer\MollieRequestAnonymizer;
@@ -75,7 +76,8 @@ class OrderTest extends TestCase
             $this->buildRoutingBuilder($this, ''),
             new MollieRequestAnonymizer('*'),
             new NullLogger(),
-            $this->createMock(SettingsService::class)
+            $this->createMock(SettingsService::class),
+            $this->createMock(CustomerService::class),
         );
     }
 

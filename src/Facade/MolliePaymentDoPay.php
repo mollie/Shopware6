@@ -26,6 +26,7 @@ use Kiener\MolliePayments\Traits\StringTrait;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\OrderLine;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -230,10 +231,14 @@ class MolliePaymentDoPay
             $orderCustomFields->setSubscriptionData($subscriptionId, '');
         }
 
+        /**
+         * @var OrderLineItemCollection $orderLineItems
+         */
+        $orderLineItems = $order->getLineItems();
         # we save that data in both, the order and
         # the order line items
         $this->updaterOrderCustomFields->updateOrder($order->getId(), $orderCustomFields, $salesChannelContext->getContext());
-        $this->updaterLineItemCustomFields->updateOrderLineItems($molliePaymentData->getMollieLineItems(), $salesChannelContext);
+        $this->updaterLineItemCustomFields->updateOrderLineItems($molliePaymentData->getMollieLineItems(), $orderLineItems, $salesChannelContext);
 
 
         # this condition somehow looks weird to me (TODO)
