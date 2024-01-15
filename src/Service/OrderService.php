@@ -252,7 +252,7 @@ class OrderService implements OrderServiceInterface
         $thirdPartyPaymentId = '';
         $molliePaymentID = '';
         $creditCardDetails = null;
-
+        $bankTransferDetails = null;
         try {
             // Add the transaction ID to the order's custom fields
             // We might need this later on for reconciliation
@@ -268,6 +268,7 @@ class OrderService implements OrderServiceInterface
             # check if we have a Bank Transfer reference
             if (isset($molliePayment->details, $molliePayment->details->transferReference)) {
                 $thirdPartyPaymentId = $molliePayment->details->transferReference;
+                $bankTransferDetails = $molliePayment->details;
             }
 
             # check for creditcard
@@ -287,6 +288,7 @@ class OrderService implements OrderServiceInterface
         $customFieldsStruct->setMolliePaymentId($molliePaymentID);
         $customFieldsStruct->setThirdPartyPaymentId($thirdPartyPaymentId);
         $customFieldsStruct->setCreditCardDetails($creditCardDetails);
+        $customFieldsStruct->setBankTransferDetails($bankTransferDetails);
 
         $this->updateOrderCustomFields->updateOrder(
             $order->getId(),
