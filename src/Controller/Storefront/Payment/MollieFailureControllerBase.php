@@ -12,17 +12,22 @@ use Kiener\MolliePayments\Exception\MissingMollieOrderIdException;
 use Kiener\MolliePayments\Exception\MissingOrderInTransactionException;
 use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeFetchedException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
+use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
 use Kiener\MolliePayments\Service\MollieApi\Order as MollieServiceOrder;
 use Kiener\MolliePayments\Service\Order\OrderStateService;
+use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\TransactionService;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
+use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Order;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
+use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\OrderStates;
@@ -88,6 +93,16 @@ class MollieFailureControllerBase extends StorefrontController
     private $orderStatusConverter;
 
     /**
+     * @var SettingsService
+     */
+    private $settingsService;
+
+    /**
+     * @var CustomerService
+     */
+    private $customerService;
+
+    /**
      * @param RouterInterface $router
      * @param CompatibilityGatewayInterface $compatibilityGateway
      * @param MollieApiFactory $apiFactory
@@ -99,7 +114,7 @@ class MollieFailureControllerBase extends StorefrontController
      * @param MollieServiceOrder $mollieOrderService
      * @param OrderStatusConverter $orderStatusConverter
      */
-    public function __construct(RouterInterface $router, CompatibilityGatewayInterface $compatibilityGateway, MollieApiFactory $apiFactory, OrderStateService $orderStateService, TransactionService $transactionService, LoggerInterface $logger, TransactionTransitionServiceInterface $transactionTransitionService, FlowBuilderFactoryInterface $flowBuilderFactory, MollieServiceOrder $mollieOrderService, OrderStatusConverter $orderStatusConverter)
+    public function __construct(RouterInterface $router, CompatibilityGatewayInterface $compatibilityGateway, MollieApiFactory $apiFactory, OrderStateService $orderStateService, TransactionService $transactionService, LoggerInterface $logger, TransactionTransitionServiceInterface $transactionTransitionService, FlowBuilderFactoryInterface $flowBuilderFactory, MollieServiceOrder $mollieOrderService, OrderStatusConverter $orderStatusConverter, SettingsService $settingsService, CustomerService $customerService)
     {
         $this->router = $router;
         $this->compatibilityGateway = $compatibilityGateway;
@@ -112,6 +127,8 @@ class MollieFailureControllerBase extends StorefrontController
         $this->orderStatusConverter = $orderStatusConverter;
 
         $this->eventDispatcher = $flowBuilderFactory->createDispatcher();
+        $this->settingsService = $settingsService;
+        $this->customerService = $customerService;
     }
 
     /**
@@ -240,7 +257,30 @@ class MollieFailureControllerBase extends StorefrontController
         # if its a failed status, then we have to create a new payment
         # otherwise no payment would exist, and we are not able to redirect to the payment screen
         if (MolliePaymentStatus::isFailedStatus('', $paymentStatus)) {
-            $mollieOrder->createPayment([]);
+            $settings = $this->settingsService->getSettings($context->getSalesChannelId());
+            $paymentData = [];
+
+            if ($settings->isSubscriptionsEnabled()) {
+                /** @var OrderLineItemCollection $lineItems */
+                $lineItems = $order->getLineItems();
+                /** @var OrderCustomerEntity $customer */
+                $customer = $order->getOrderCustomer();
+                /** @var string $customerId */
+                $customerId = $customer->getCustomerId();
+
+                # mollie customer ID is required for recurring payments, see https://docs.mollie.com/reference/v2/orders-api/create-order-payment
+                $mollieCustomerId = $this->customerService->getMollieCustomerId($customerId, $context->getSalesChannelId(), $context->getContext());
+
+                foreach ($lineItems as $lineItem) {
+                    $attributes = new OrderLineItemEntityAttributes($lineItem);
+                    if ($attributes->isSubscriptionProduct()) {
+                        $paymentData['sequenceType'] = 'first';
+                        $paymentData['customerId'] = $mollieCustomerId;
+                        break;
+                    }
+                }
+            }
+            $mollieOrder->createPayment($paymentData);
         }
 
         $redirectUrl = (string)$orderAttributes->getMolliePaymentUrl();
