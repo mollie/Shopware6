@@ -205,7 +205,8 @@ class MolliePaymentFinalize
         if ($this->settingsService->getMollieCypressMode() && $orderAttributes->isTypeSubscription()) {
             if ($mollieOrder->payments() !== null && count($mollieOrder->payments()) > 0) {
                 $paymentDetails = new MolliePaymentDetails();
-                $mandateId = $paymentDetails->getMandateId($mollieOrder->payments()[0]);
+                $lasMolliePayment = count($mollieOrder->payments()) -1;
+                $mandateId = $paymentDetails->getMandateId($mollieOrder->payments()[$lasMolliePayment]);
                 $this->subscriptionManager->confirmSubscription($order, $mandateId, $salesChannelContext->getContext());
             }
         }
