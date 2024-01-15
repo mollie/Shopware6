@@ -75,7 +75,7 @@ describe('Subscription', () => {
             });
 
             describe('Storefront + Administration', function () {
-                it('Purchase subscription after failed payment and verify data in Administration', () =>{
+                it('C2339889: Purchase subscription after failed payment and verify data in Administration', () =>{
                     configAction.setupPlugin(true, false, false, true);
                     configAction.updateProducts('', true, 3, 'weeks');
 
@@ -189,7 +189,7 @@ describe('Subscription', () => {
                     cy.contains(repoAdminSubscriptonDetails.getHistoryStatusToSelector(0), 'active', {matchCase: false});
                     cy.contains(repoAdminSubscriptonDetails.getHistoryCommentSelector(0), 'confirmed');
                 })
-                
+
                 it('C4066: Purchase subscription and verify data in Administration', () => {
 
                     configAction.setupPlugin(true, false, false, true);
