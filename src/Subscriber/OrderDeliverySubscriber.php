@@ -121,7 +121,6 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
             $this->mollieShipment->shipOrderRest($order, null, $event->getContext());
         } catch (\Throwable $ex) {
             $this->logger->error('Failed to transfer delivery state to mollie: '.$ex->getMessage());
-            # do nothing in error in subscriber
             return;
         }
     }
