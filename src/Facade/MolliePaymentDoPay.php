@@ -8,6 +8,7 @@ use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Exception\MollieOrderCancelledException;
 use Kiener\MolliePayments\Exception\MollieOrderExpiredException;
 use Kiener\MolliePayments\Exception\PaymentUrlException;
+use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
 use Kiener\MolliePayments\Handler\Method\PosPayment;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\CustomerService;
@@ -255,6 +256,11 @@ class MolliePaymentDoPay
                 if ($settings->isTestMode() && !empty($molliePaymentData->getChangeStatusUrl())) {
                     $checkoutURL .= '&cs=' . urlencode($molliePaymentData->getChangeStatusUrl());
                 }
+            }
+
+            # if we save credit card information, we do not get a checkout url, so we have to use transactionStruct
+            if ($paymentHandler instanceof CreditCardPayment) {
+                $checkoutURL = $transactionStruct->getReturnUrl();
             }
         }
 
