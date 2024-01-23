@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e1eda73b34c0600f1aabc7e016fca71f",
+    "content-hash": "40fe21aa04e3cd2a19c569d548e951ca",
     "packages": [],
     "packages-dev": [
         {
@@ -63,16 +63,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.296.5",
+            "version": "3.296.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "23b009f305278e227bc5149bcb8fc9c1503fb130"
+                "reference": "da296909ceb8a4c156c4e849fe1c43ec9e2bb4b0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/23b009f305278e227bc5149bcb8fc9c1503fb130",
-                "reference": "23b009f305278e227bc5149bcb8fc9c1503fb130",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/da296909ceb8a4c156c4e849fe1c43ec9e2bb4b0",
+                "reference": "da296909ceb8a4c156c4e849fe1c43ec9e2bb4b0",
                 "shasum": ""
             },
             "require": {
@@ -152,9 +152,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.296.5"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.296.7"
             },
-            "time": "2024-01-18T19:06:27+00:00"
+            "time": "2024-01-22T19:11:58+00:00"
         },
         {
             "name": "boxblinkracer/phpunuhi",
@@ -162,12 +162,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/boxblinkracer/phpunuhi.git",
-                "reference": "775dc6146b07f4a612775d5d462f7dccbf59e7d3"
+                "reference": "3286aa7bd310bebb02a9c83b7e739eb082849a17"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/boxblinkracer/phpunuhi/zipball/775dc6146b07f4a612775d5d462f7dccbf59e7d3",
-                "reference": "775dc6146b07f4a612775d5d462f7dccbf59e7d3",
+                "url": "https://api.github.com/repos/boxblinkracer/phpunuhi/zipball/3286aa7bd310bebb02a9c83b7e739eb082849a17",
+                "reference": "3286aa7bd310bebb02a9c83b7e739eb082849a17",
                 "shasum": ""
             },
             "require": {
@@ -188,7 +188,7 @@
                 "phpstan/phpstan": "*",
                 "phpunit/phpunit": "^9.6",
                 "povils/phpmnd": "^3.3",
-                "rector/rector": "^0.18.12",
+                "rector/rector": "0.19.1",
                 "roave/security-advisories": "dev-latest",
                 "rregeer/phpunit-coverage-check": "^0.3.1",
                 "spaze/phpstan-disallowed-calls": "^3.0",
@@ -226,9 +226,9 @@
             ],
             "support": {
                 "issues": "https://github.com/boxblinkracer/phpunuhi/issues",
-                "source": "https://github.com/boxblinkracer/phpunuhi/tree/main"
+                "source": "https://github.com/boxblinkracer/phpunuhi/tree/v1.16.0"
             },
-            "time": "2024-01-17T18:15:03+00:00"
+            "time": "2024-01-21T22:35:43+00:00"
         },
         {
             "name": "brick/math",
