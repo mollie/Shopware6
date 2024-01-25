@@ -9,11 +9,14 @@ use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
 use Kiener\MolliePayments\Handler\PaymentHandler;
+use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\MollieApi\Payment as MolliePayment;
 use Kiener\MolliePayments\Service\MollieApi\Payment as PaymentApiService;
 use Kiener\MolliePayments\Service\MollieApi\RequestAnonymizer\MollieRequestAnonymizer;
 use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 use Kiener\MolliePayments\Service\SettingsService;
+use Kiener\MolliePayments\Struct\MollieApi\ShipmentTrackingInfoStruct;
+use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Order as MollieOrder;
 use Mollie\Api\Resources\OrderLine;
@@ -25,7 +28,10 @@ use Mollie\Api\Types\PaymentStatus;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class Order
@@ -61,6 +67,11 @@ class Order
     private $settingsService;
 
     /**
+     * @var CustomerService
+     */
+    private $customerService;
+
+    /**
      * @param MollieApiFactory $clientFactory
      * @param MolliePayment $paymentApiService
      * @param RoutingBuilder $routingBuilder
@@ -68,7 +79,7 @@ class Order
      * @param LoggerInterface $logger
      * @param SettingsService $settingsService
      */
-    public function __construct(MollieApiFactory $clientFactory, PaymentApiService $paymentApiService, RoutingBuilder $routingBuilder, MollieRequestAnonymizer $requestAnonymizer, LoggerInterface $logger, SettingsService $settingsService)
+    public function __construct(MollieApiFactory $clientFactory, PaymentApiService $paymentApiService, RoutingBuilder $routingBuilder, MollieRequestAnonymizer $requestAnonymizer, LoggerInterface $logger, SettingsService $settingsService, CustomerService $customerService)
     {
         $this->clientFactory = $clientFactory;
         $this->logger = $logger;
@@ -76,6 +87,7 @@ class Order
         $this->routingBuilder = $routingBuilder;
         $this->requestAnonymizer = $requestAnonymizer;
         $this->settingsService = $settingsService;
+        $this->customerService = $customerService;
     }
 
     /**
@@ -357,6 +369,22 @@ class Order
             $paymentHandler->setEnableSingleClickPayment(true);
         }
 
+        $lineItems = $order->getLineItems();
+
+        if ($settings->isSubscriptionsEnabled() && $lineItems instanceof OrderLineItemCollection) {
+            # mollie customer ID is required for recurring payments, see https://docs.mollie.com/reference/v2/orders-api/create-order-payment
+            $mollieCustomerId = $this->customerService->getMollieCustomerId($customer->getId(), $salesChannelContext->getSalesChannelId(), $salesChannelContext->getContext());
+
+            foreach ($lineItems as $lineItem) {
+                $attributes = new OrderLineItemEntityAttributes($lineItem);
+                if ($attributes->isSubscriptionProduct()) {
+                    $newPaymentData['payment']['sequenceType'] = 'first';
+                    $newPaymentData['payment']['customerId'] = $mollieCustomerId;
+                    break;
+                }
+            }
+        }
+
         # now we have to add payment specific data
         # like we would do with initial orders too
         $tmpOrder = $paymentHandler->processPaymentMethodSpecificParameters($newPaymentData, $order, $salesChannelContext, $customer);
@@ -391,14 +419,17 @@ class Order
         return $mollieOrder->status === 'created' ? $mollieOrder->getCheckoutUrl() : null;
     }
 
-    public function setShipment(string $mollieOrderId, string $salesChannelId): bool
+    public function setShipment(string $mollieOrderId, ?ShipmentTrackingInfoStruct $trackingInfoStruct, string $salesChannelId): bool
     {
         $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId);
-
+        $shipment = [];
+        if ($trackingInfoStruct instanceof ShipmentTrackingInfoStruct) {
+            $shipment['tracking'] = $trackingInfoStruct->toArray();
+        }
         /** @var OrderLine $orderLine */
         foreach ($mollieOrder->lines() as $orderLine) {
             if ($orderLine->shippableQuantity > 0) {
-                $mollieOrder->shipAll();
+                $mollieOrder->shipAll($shipment);
 
                 return true;
             }

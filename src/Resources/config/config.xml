@@ -62,6 +62,16 @@
                 uitgebreide logs mogelijk met meer informatie die helpen bij het oplossen van problemen.
             </helpText>
         </input-field>
+        <input-field type="int">
+            <name>logFileDays</name>
+            <label>Keep log files (days)</label>
+            <label lang="de-DE">Log-Dateien aufbewahren (Tage)</label>
+            <label lang="nl-NL">Logbestanden bijhouden (dagen)</label>
+            <defaultValue>14</defaultValue>
+            <helpText>Set the number of days how long log files are kept until they will be automatically deleted.</helpText>
+            <helpText lang="de-DE">Legen Sie die Anzahl der Tage fest, wie lange Protokolldateien aufbewahrt werden, bis sie automatisch gelöscht werden.</helpText>
+            <helpText lang="nl-NL">Stel het aantal dagen in hoe lang logbestanden worden bewaard totdat ze automatisch worden verwijderd.</helpText>
+        </input-field>
         <component name="mollie-pluginconfig-section-api">
             <name>molliePluginConfigSectionApi</name>
         </component>
@@ -842,7 +852,7 @@
             <name>subscriptionsAllowPauseResume</name>
             <defaultValue>false</defaultValue>
             <label>Allow customers to pause and resume running subscriptions</label>
-            <label lang="de-DE">Kunden elrauben laufende Abonnements zu pausieren und fortzusetzen</label>
+            <label lang="de-DE">Kunden erlauben laufende Abonnements zu pausieren und fortzusetzen</label>
             <label lang="nl-NL">Laat klanten lopende abonnementen onderbreken en hervatten</label>
             <helpText>If enabled, customers are allowed to pause and also resume their subscriptions in their account.
             </helpText>

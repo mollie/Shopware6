@@ -8,7 +8,7 @@ runs:
     - name: Start Docker
       shell: bash
       run: |
-        docker run --rm --name shop --env NODE_VERSION=18 --env PHP_VERSION=8.1 -d dockware/dev:6.5.7.2
+        docker run --rm --name shop --env NODE_VERSION=18 --env PHP_VERSION=8.1 -d dockware/dev:6.5.8.2
         sleep 20
         docker logs shop
 

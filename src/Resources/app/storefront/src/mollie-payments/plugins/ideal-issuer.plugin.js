@@ -204,8 +204,14 @@ export default class MollieIDealIssuer extends Plugin {
 
         const client = new HttpClient();
 
+        var selectedIssuer = issuersDropdown.value;
+
+        if (selectedIssuer === undefined || selectedIssuer === null || selectedIssuer === '') {
+            selectedIssuer = 'ideal_reset';
+        }
+
         client.get(
-            shopUrl + '/mollie/ideal/store-issuer/' + customerId + '/' + issuersDropdown.value,
+            shopUrl + '/mollie/ideal/store-issuer/' + customerId + '/' + selectedIssuer,
             function () {
                 onCompleted('issuer updated successfully');
             },

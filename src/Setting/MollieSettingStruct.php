@@ -52,6 +52,11 @@ class MollieSettingStruct extends Struct
     protected $debugMode = false;
 
     /**
+     * @var int
+     */
+    protected $logFileDays = 0;
+
+    /**
      * @var bool
      */
     protected $useMolliePaymentMethodLimits = false;
@@ -336,6 +341,29 @@ class MollieSettingStruct extends Struct
         $this->testMode = $testMode;
         return $this;
     }
+
+    /**
+     * @return int
+     */
+    public function getLogFileDays(): int
+    {
+        if ($this->logFileDays === 0) {
+            // better be safe than sorry, default was always 14
+            return 14;
+        }
+
+        return $this->logFileDays;
+    }
+
+    /**
+     * @param int $logFileDays
+     * @return void
+     */
+    public function setLogFileDays(int $logFileDays): void
+    {
+        $this->logFileDays = $logFileDays;
+    }
+
 
     /**
      * @return bool

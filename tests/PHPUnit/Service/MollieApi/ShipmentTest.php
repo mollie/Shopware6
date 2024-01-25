@@ -106,7 +106,7 @@ class ShipmentTest extends TestCase
             ->method('shipAll')
             ->willReturn($this->createMock(MollieShipment::class));
 
-        $this->shipmentApiService->shipOrder('mollieOrderId', 'salesChannelId');
+        $this->shipmentApiService->shipOrder('mollieOrderId', 'salesChannelId', [], null);
     }
 
     /**
@@ -121,7 +121,7 @@ class ShipmentTest extends TestCase
 
         $this->expectException(MollieOrderCouldNotBeShippedException::class);
 
-        $this->shipmentApiService->shipOrder('mollieOrderId', 'salesChannelId');
+        $this->shipmentApiService->shipOrder('mollieOrderId', 'salesChannelId', [], null);
     }
 
     /**
@@ -134,7 +134,7 @@ class ShipmentTest extends TestCase
             ->method('createShipment')
             ->willReturn($this->createMock(MollieShipment::class));
 
-        $this->shipmentApiService->shipItem('mollieOrderId', 'salesChannelId', 'mollieOrderLineId', 1);
+        $this->shipmentApiService->shipItem('mollieOrderId', 'salesChannelId', 'mollieOrderLineId', 1, null);
     }
 
     /**
@@ -149,7 +149,7 @@ class ShipmentTest extends TestCase
 
         $this->expectException(MollieOrderCouldNotBeShippedException::class);
 
-        $this->shipmentApiService->shipItem('mollieOrderId', 'salesChannelId', 'mollieOrderLineId', 1);
+        $this->shipmentApiService->shipItem('mollieOrderId', 'salesChannelId', 'mollieOrderLineId', 1, null);
     }
 
     /**

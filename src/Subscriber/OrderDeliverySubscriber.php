@@ -2,10 +2,14 @@
 
 namespace Kiener\MolliePayments\Subscriber;
 
-use Kiener\MolliePayments\Facade\MollieShipment;
+use Kiener\MolliePayments\Components\ShipmentManager\ShipmentManager;
+use Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepositoryInterface;
+use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
+use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Shopware\Core\System\StateMachine\Event\StateMachineStateChangeEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -18,27 +22,41 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
     private $settings;
 
     /**
-     * @var MollieShipment
+     * @var ShipmentManager
      */
     private $mollieShipment;
+
+    /**
+     * @var OrderService
+     */
+    private $orderService;
+
+    /**
+     * @var OrderTransactionRepositoryInterface
+     */
+    private $repoOrderTransactions;
 
     /**
      * @var LoggerInterface
      */
     private $logger;
 
-
     /**
      * @param SettingsService $settings
-     * @param MollieShipment $mollieShipment
+     * @param ShipmentManager $mollieShipment
+     * @param OrderService $orderService
+     * @param OrderTransactionRepositoryInterface $repoOrderTransactions
      * @param LoggerInterface $logger
      */
-    public function __construct(SettingsService $settings, MollieShipment $mollieShipment, LoggerInterface $logger)
+    public function __construct(SettingsService $settings, ShipmentManager $mollieShipment, OrderService $orderService, OrderTransactionRepositoryInterface $repoOrderTransactions, LoggerInterface $logger)
     {
         $this->settings = $settings;
         $this->mollieShipment = $mollieShipment;
+        $this->orderService = $orderService;
+        $this->repoOrderTransactions = $repoOrderTransactions;
         $this->logger = $logger;
     }
+
 
     /**
      * @return array<mixed>
@@ -75,17 +93,35 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
             return;
         }
 
-        /** @var ?OrderEntity $mollieOrder */
-        $mollieOrder = $this->mollieShipment->isMollieOrder($event->getTransition()->getEntityId(), $event->getContext());
+        $orderDeliveryId = $event->getTransition()->getEntityId();
 
-        # don't do anything for orders of other PSPs.
-        # the code below would also create logs until we refactor it, which is wrong for other PSPs
-        if (!$mollieOrder instanceof OrderEntity) {
+        try {
+            $order = $this->orderService->getOrderByDeliveryId($orderDeliveryId, $event->getContext());
+
+            $swTransaction = $this->repoOrderTransactions->getLatestOrderTransaction($order->getId(), $event->getContext());
+
+            # verify if the customer really paid with Mollie in the end
+            $paymentMethod = $swTransaction->getPaymentMethod();
+
+            if (!$paymentMethod instanceof PaymentMethodEntity) {
+                throw new \Exception('Transaction ' . $swTransaction->getId() . ' has no payment method!');
+            }
+
+            $paymentMethodAttributes = new PaymentMethodAttributes($paymentMethod);
+
+            if (!$paymentMethodAttributes->isMolliePayment()) {
+                # just skip it if it has been paid
+                # with another payment provider
+                # do NOT throw an error
+                return;
+            }
+
+            $this->logger->info('Starting Shipment through Order Delivery Transition for order: ' . $order->getOrderNumber());
+
+            $this->mollieShipment->shipOrderRest($order, null, $event->getContext());
+        } catch (\Throwable $ex) {
+            $this->logger->error('Failed to transfer delivery state to mollie: '.$ex->getMessage());
             return;
         }
-        
-        $this->logger->info('Starting Shipment through Order Delivery Transition for order: ' . $mollieOrder->getOrderNumber());
-
-        $this->mollieShipment->setShipment($event->getTransition()->getEntityId(), $event->getContext());
     }
 }

@@ -31,6 +31,11 @@ class CustomerStruct extends Struct
     private $creditCardToken;
 
     /**
+     * @var bool
+     */
+    private $shouldSaveCardDetail;
+
+    /**
      * TODO: we need to get rid off this one day, no magic -> we need to explicitly load the values from the MySQL JSON
      * @param string $key
      * @param mixed $value
@@ -154,6 +159,11 @@ class CustomerStruct extends Struct
         if (!empty((string)$this->creditCardToken)) {
             $mollieData['credit_card_token'] = (string)$this->creditCardToken;
         }
+
+        if (!empty($this->shouldSaveCardDetail)) {
+            $mollieData['shouldSaveCardDetail'] = $this->shouldSaveCardDetail;
+        }
+
 
         $fullCustomField = [
             'mollie_payments' => $mollieData

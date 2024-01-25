@@ -175,7 +175,7 @@ final class RefundItemEntity extends Entity
      */
     public function getLabel(): string
     {
-        return $this->label;
+        return (string) $this->label;
     }
 
     /**

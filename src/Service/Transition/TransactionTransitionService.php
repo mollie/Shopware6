@@ -72,7 +72,6 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
     public function reOpenTransaction(OrderTransactionEntity $transaction, Context $context): void
     {
         $currentStatus = ($transaction->getStateMachineState() instanceof StateMachineStateEntity) ? $transaction->getStateMachineState()->getTechnicalName() : '';
-        $currentStatusName = ($transaction->getStateMachineState() instanceof StateMachineStateEntity) ? $transaction->getStateMachineState()->getName() : '';
 
         if ($this->isFinalOrTargetStatus($currentStatus, [OrderTransactionStates::STATE_OPEN])) {
             return;
@@ -85,7 +84,7 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
             $this->logger->error(
                 sprintf(
                     'It is not allowed to change status to open from %s. Aborting reopen transition',
-                    $currentStatusName
+                    $currentStatus
                 )
             );
 

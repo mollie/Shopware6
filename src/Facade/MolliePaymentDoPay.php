@@ -8,6 +8,7 @@ use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Exception\MollieOrderCancelledException;
 use Kiener\MolliePayments\Exception\MollieOrderExpiredException;
 use Kiener\MolliePayments\Exception\PaymentUrlException;
+use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
 use Kiener\MolliePayments\Handler\Method\PosPayment;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\CustomerService;
@@ -26,6 +27,7 @@ use Kiener\MolliePayments\Traits\StringTrait;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\OrderLine;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -230,10 +232,14 @@ class MolliePaymentDoPay
             $orderCustomFields->setSubscriptionData($subscriptionId, '');
         }
 
+        /**
+         * @var OrderLineItemCollection $orderLineItems
+         */
+        $orderLineItems = $order->getLineItems();
         # we save that data in both, the order and
         # the order line items
         $this->updaterOrderCustomFields->updateOrder($order->getId(), $orderCustomFields, $salesChannelContext->getContext());
-        $this->updaterLineItemCustomFields->updateOrderLineItems($molliePaymentData->getMollieLineItems(), $salesChannelContext);
+        $this->updaterLineItemCustomFields->updateOrderLineItems($molliePaymentData->getMollieLineItems(), $orderLineItems, $salesChannelContext);
 
 
         # this condition somehow looks weird to me (TODO)
@@ -250,6 +256,11 @@ class MolliePaymentDoPay
                 if ($settings->isTestMode() && !empty($molliePaymentData->getChangeStatusUrl())) {
                     $checkoutURL .= '&cs=' . urlencode($molliePaymentData->getChangeStatusUrl());
                 }
+            }
+
+            # if we save credit card information, we do not get a checkout url, so we have to use transactionStruct
+            if ($paymentHandler instanceof CreditCardPayment) {
+                $checkoutURL = $transactionStruct->getReturnUrl();
             }
         }
 

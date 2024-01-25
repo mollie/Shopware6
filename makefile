@@ -32,7 +32,7 @@ prod: ##1 Installs all production dependencies
 	@composer validate
 	@composer install --no-dev
 	cd src/Resources/app/administration && npm install --omit=dev
-	cd src/Resources/app/storefront && npm install --production
+	cd src/Resources/app/storefront && npm install --omit=dev
 
 dev: ##1 Installs all dev dependencies
 	php switch-composer.php dev
@@ -40,7 +40,7 @@ dev: ##1 Installs all dev dependencies
 	@composer install
 	cd src/Resources/app/administration && npm install
 	cd src/Resources/app/storefront && npm install
-	curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt install shopware-cli
+	curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt install -y --allow-downgrades shopware-cli=0.3.18
 
 install: ##1 [deprecated] Installs all production dependencies. Please use "make prod" now.
 	@make prod -B
@@ -56,15 +56,17 @@ clean: ##1 Cleans all dependencies and files
 	rm -rf ./src/Resources/app/storefront/dist/storefront
 	# ------------------------------------------------------
 	rm -rf ./src/Resources/public/administration
-	rm -rf ./src/Resources/public/molllie-payments.js
+	rm -rf ./src/Resources/public/mollie-payments.js
 
 build: ##3 Installs the plugin, and builds the artifacts using the Shopware build commands.
+	# -----------------------------------------------------
+	# CUSTOM WEBPACK
+	php switch-composer.php dev
+	cd ./src/Resources/app/storefront && make build -B
+	# -----------------------------------------------------
 	php switch-composer.php prod
 	cd ../../.. && export NODE_OPTIONS=--openssl-legacy-provider && shopware-cli extension build custom/plugins/MolliePayments
 	php switch-composer.php dev
-	# -----------------------------------------------------
-	# CUSTOM WEBPACK
-	cd ./src/Resources/app/storefront && make build -B
 	# -----------------------------------------------------
 	cd ../../.. && php bin/console --no-debug theme:refresh
 	cd ../../.. && php bin/console --no-debug theme:compile

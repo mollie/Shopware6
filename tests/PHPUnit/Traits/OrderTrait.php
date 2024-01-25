@@ -9,8 +9,11 @@ use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTax;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
+use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Content\Media\MediaEntity;
 use Shopware\Core\Content\Product\Aggregate\ProductMedia\ProductMediaCollection;
 use Shopware\Core\Content\Product\Aggregate\ProductMedia\ProductMediaEntity;
@@ -25,6 +28,57 @@ use Shopware\Core\System\Salutation\SalutationEntity;
 
 trait OrderTrait
 {
+
+    /**
+     * @param string $mollieOrderID
+     * @return OrderEntity
+     */
+    protected function buildMollieOrder(string $mollieOrderID): OrderEntity
+    {
+        $order = new OrderEntity();
+        $order->setId(Uuid::randomHex());
+        $order->setSalesChannelId(Uuid::randomHex());
+
+        $order->setCustomFields([
+            'mollie_payments' => [
+                'order_id' => $mollieOrderID,
+                'payment_id' => 'tr_unit_test',
+            ]]);
+
+
+        $shippingMethod = new ShippingMethodEntity();
+        $shippingMethod->setId(Uuid::randomHex());
+        $shippingMethod->setName('Test Shipping Method');
+        $shippingMethod->setTrackingUrl('https://www.mollie.com/search?q=%s');
+
+        $delivery = new OrderDeliveryEntity();
+        $delivery->setId(Uuid::randomHex());
+        $delivery->setTrackingCodes([]);
+        $delivery->setShippingMethod($shippingMethod);
+
+        $order->setDeliveries(new OrderDeliveryCollection([$delivery]));
+
+        return $order;
+    }
+
+    /**
+     * @param string $productNumber
+     * @return OrderLineItemEntity
+     */
+    protected function buildLineItemEntity(string $productNumber): OrderLineItemEntity
+    {
+        $lineItem = new OrderLineItemEntity();
+
+        $lineItem->setId(Uuid::randomHex());
+
+        $lineItem->setPayload([
+            'productNumber' => $productNumber,
+        ]);
+
+        return $lineItem;
+    }
+
+
     public function getCustomerAddressEntity(
         string  $firstName,
         string  $lastName,
@@ -78,7 +132,8 @@ trait OrderTrait
         string $seoUrl = '',
         string $imageUrl = '',
         int    $position = 1
-    ): OrderLineItemEntity {
+    ): OrderLineItemEntity
+    {
         $productId = Uuid::randomHex();
         $totalPrice = $quantity * $unitPrice;
         $calculatedTax = new CalculatedTax($taxAmount, $taxRate, $totalPrice);

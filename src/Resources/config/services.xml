@@ -43,11 +43,6 @@
 
 
         <!-- Helpers -->
-        <service id="Kiener\MolliePayments\Helper\DeliveryStateHelper" class="Kiener\MolliePayments\Helper\DeliveryStateHelper">
-            <argument type="service" id="Kiener\MolliePayments\Service\DeliveryService"/>
-            <argument type="service" id="Shopware\Core\System\StateMachine\StateMachineRegistry"/>
-        </service>
-
         <service id="Kiener\MolliePayments\Service\Order\OrderStateService" class="Kiener\MolliePayments\Service\Order\OrderStateService">
             <argument type="service" id="mollie_payments.logger"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Transition\OrderTransitionService"/>
@@ -91,6 +86,7 @@
         </service>
 
         <service id="Kiener\MolliePayments\Service\PaymentMethodService" class="Kiener\MolliePayments\Service\PaymentMethodService" public="true">
+            <argument>%kernel.shopware_version%</argument>
             <argument type="service" id="Shopware\Core\Content\Media\MediaService"/>
             <argument type="service" id="Kiener\MolliePayments\Repository\Media\MediaRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepository"/>
@@ -148,9 +144,9 @@
         <service id="Kiener\MolliePayments\Subscriber\CheckoutConfirmPageSubscriber" class="Kiener\MolliePayments\Subscriber\CheckoutConfirmPageSubscriber">
             <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="Kiener\MolliePayments\Repository\Language\LanguageRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MandateService"/>
             <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SalesChannel\SalesChannelLocale"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
@@ -176,6 +172,9 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument key="$envAppUrl">%env(default::APP_URL)%</argument>
         </service>
+
+        <service id="Kiener\MolliePayments\Service\TrackingInfoStructFactory"/>
+
 
     </services>
 

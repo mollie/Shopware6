@@ -61,6 +61,8 @@ export default class MollieShipping {
             const lineItem = order.lineItems[i];
 
             finalItems.push({
+                id: lineItem.id,
+                mollieId: lineItem.mollieOrderLineId,
                 label: lineItem.label,
                 quantity: this._shippableQuantity(lineItem),
             });

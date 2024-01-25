@@ -27,6 +27,8 @@ class OrderDeliveryService
     {
         $criteria = new Criteria([$orderDeliveryId]);
         $criteria->addAssociation('order.transactions.paymentMethod');
+        $criteria->addAssociation('order.deliveries.shippingMethod');
+        $criteria->addAssociation('shippingMethod');
         $result = $this->orderDeliveryRepository->search($criteria, $context);
 
         return $result->first();
