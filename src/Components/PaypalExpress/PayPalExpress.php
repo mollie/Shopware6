@@ -8,6 +8,9 @@ use Kiener\MolliePayments\Service\CartServiceInterface;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Kiener\MolliePayments\Service\Router\RoutingBuilder;
+use Kiener\MolliePayments\Struct\Address\AddressStruct;
+use Mollie\Api\Resources\Session;
+use Ramsey\Uuid\Uuid;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -73,7 +76,7 @@ class PayPalExpress
         try {
             $methodID = $this->getActivePaypalExpressID($context);
 
-            return (!empty($methodID));
+            return (! empty($methodID));
         } catch (\Exception $ex) {
             return false;
         }
@@ -99,10 +102,10 @@ class PayPalExpress
     /**
      * @param Cart $cart
      * @param SalesChannelContext $context
-     * @return string
+     * @return Session
      * @throws \Mollie\Api\Exceptions\ApiException
      */
-    public function startSession(Cart $cart, SalesChannelContext $context): string
+    public function startSession(Cart $cart, SalesChannelContext $context): Session
     {
         $mollie = $this->mollieApiFactory->getClient($context->getSalesChannelId());
 
@@ -116,63 +119,62 @@ class PayPalExpress
                 $context->getCurrency()->getIsoCode()
             ),
             'description' => 'test',
-            #  'redirectUrl' => $this->urlBuilder->buildPaypalExpressRedirectUrl(),
-            #   'cancelUrl' => $this->urlBuilder->buildPaypalExpressCancelUrl(),
+            'redirectUrl' => $this->urlBuilder->buildPaypalExpressRedirectUrl(),
+            'cancelUrl' => $this->urlBuilder->buildPaypalExpressCancelUrl(),
         ];
 
-        $session = $mollie->sessions->create($params);
+        return $mollie->sessions->create($params);
+    }
 
-        $redirectUrl = $session->getRedirectUrl();
+    public function loadSession(string $sessionId, SalesChannelContext $context)
+    {
+        $mollie = $this->mollieApiFactory->getClient($context->getSalesChannelId());
+        return $mollie->sessions->get($sessionId);
 
-        if (empty($redirectUrl)) {
-            return '';
-            #          throw new \Exception('Paypal Express RedirectURL is empty! Cannot proceed');
-        }
-
-        return $redirectUrl;
     }
 
 
+
     /**
-     * @param string $firstname
-     * @param string $lastname
-     * @param string $email
-     * @param string $street
-     * @param string $zipcode
-     * @param string $city
-     * @param string $countryCode
-     * @param string $paymentToken
+     * @param AddressStruct $shippingAddress
      * @param SalesChannelContext $context
+     * @param AddressStruct|null $billingAddress
      * @return SalesChannelContext
      * @throws \Exception
      */
-    public function prepareCustomer(string $firstname, string $lastname, string $email, string $street, string $zipcode, string $city, string $countryCode, string $paymentToken, SalesChannelContext $context): SalesChannelContext
+    public function prepareCustomer(AddressStruct $shippingAddress, SalesChannelContext $context, ?AddressStruct $billingAddress = null): SalesChannelContext
     {
-        if (empty($paymentToken)) {
-            throw new \Exception('PaymentToken not found!');
-        }
 
 
         $paypalExpressId = $this->getActivePaypalExpressID($context);
 
         # if we are not logged in,
         # then we have to create a new guest customer for our express order
-        if (!$this->customerService->isCustomerLoggedIn($context)) {
-            $customer = $this->customerService->createGuestAccount(
-                $firstname,
-                $lastname,
-                $email,
-                '',
-                $street,
-                $zipcode,
-                $city,
-                $countryCode,
-                $paypalExpressId,
-                $context
-            );
+        if (! $this->customerService->isCustomerLoggedIn($context)) {
 
-            if (!$customer instanceof CustomerEntity) {
+            # find existing customer by email
+            $customer = $this->customerService->findCustomerByEmail($shippingAddress->getEmail(), $context->getContext());
+
+            $updateShippingAddress = true;
+            if ($customer === null) {
+
+                $updateShippingAddress = false;
+                $customer = $this->customerService->createGuestAccount(
+                    $shippingAddress,
+                    $paypalExpressId,
+                    $context,
+                    $billingAddress
+                );
+            }
+
+
+            if (! $customer instanceof CustomerEntity) {
                 throw new \Exception('Error when creating customer!');
+            }
+
+            # if we have an existing customer, we want reuse his shipping adress instead of creating new one
+            if ($updateShippingAddress) {
+                $this->customerService->upsertAddresses($customer, $shippingAddress, $context->getContext(),$billingAddress);
             }
 
             # now start the login of our customer.
@@ -183,6 +185,16 @@ class PayPalExpress
 
         # also (always) update our payment method to use Apple Pay for our cart
         return $this->cartService->updatePaymentMethod($context, $paypalExpressId);
+    }
+
+    public function createMollieAddressId(string $firstName, string $lastName, string $email, string $street, string $addressAdditional, string $zipCode, string $city, string $country): string
+    {
+        return md5(implode('-', [$firstName, $lastName, $email, $street, $addressAdditional, $zipCode, $city, $country]));
+    }
+
+    public function setBillingAddress(CustomerEntity $customer, string $firstname, string $lastname, string $email, string $street, string $zipcode, string $city, string $countryCode, SalesChannelContext $context)
+    {
+
     }
 
 

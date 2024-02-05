@@ -4,7 +4,9 @@ namespace Kiener\MolliePayments\Subscriber;
 
 use Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect;
 use Kiener\MolliePayments\Components\PaypalExpress\PayPalExpress;
+use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\CustomerServiceInterface;
+use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Storefront\Event\StorefrontRenderEvent;
@@ -78,7 +80,7 @@ class PaypalExpressSubscriber implements EventSubscriberInterface
             if ($customer instanceof CustomerEntity) {
                 $customFields = $customer->getCustomFields();
                 if ($customFields !== null && isset($customFields['mollie_payments'])) {
-                    $isPPE = (bool)$customFields['mollie_payments']['is_ppe'];
+                    $isPPE = (bool)$customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS]['ppe_session_id'];
                 }
             }
         }

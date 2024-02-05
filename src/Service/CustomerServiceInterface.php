@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
+use Kiener\MolliePayments\Struct\Address\AddressStruct;
 use Kiener\MolliePayments\Struct\CustomerStruct;
 use Kiener\MolliePayments\Struct\Mandate\MandateCollection;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
@@ -47,7 +48,7 @@ interface CustomerServiceInterface
      */
     public function getAddressArray($address, CustomerEntity $customer): array;
 
-    public function createGuestAccount(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, string $paymentMethodId, SalesChannelContext $context): ?CustomerEntity;
+    public function createGuestAccount(AddressStruct $shippingAddress, string $paymentMethodId, SalesChannelContext $context, ?AddressStruct $billingAddress = null): ?CustomerEntity;
 
     public function getCountryId(string $countryCode, Context $context): ?string;
 
@@ -55,5 +56,5 @@ interface CustomerServiceInterface
 
     public function createMollieCustomer(string $customerId, string $salesChannelId, Context $context): void;
 
-    public function setPaypalExpress(CustomerEntity $customer, Context $context);
+    public function setPaypalExpress(CustomerEntity $customer,string $paypalExpressSessionId, Context $context);
 }

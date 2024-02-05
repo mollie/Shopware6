@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Controller\Storefront\PaypalExpress;
 use Kiener\MolliePayments\Components\PaypalExpress\PayPalExpress;
 use Kiener\MolliePayments\Service\CartService;
 use Kiener\MolliePayments\Service\CustomerServiceInterface;
+use Kiener\MolliePayments\Struct\Address\AddressStruct;
 use Kiener\MolliePayments\Traits\Storefront\RedirectTrait;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Validation\DataBag\DataBag;
@@ -14,6 +15,8 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,7 +28,7 @@ class PaypalExpressControllerBase extends StorefrontController
 
     use RedirectTrait;
 
-
+    private const SESSION_ID_KEY = 'mollie_ppe_session_id';
     /**
      * @var PayPalExpress
      */
@@ -45,6 +48,7 @@ class PaypalExpressControllerBase extends StorefrontController
      * @var CustomerServiceInterface
      */
     private $customerService;
+
 
     /**
      * @param PayPalExpress $paypalExpress
@@ -119,15 +123,14 @@ class PaypalExpressControllerBase extends StorefrontController
      * @return Response
      * @throws \Mollie\Api\Exceptions\ApiException
      */
-    public function startCheckout(SalesChannelContext $context): Response
+    public function startCheckout(Request $request, SalesChannelContext $context): Response
     {
         $cart = $this->cartService->getCalculatedMainCart($context);
 
-        $url = $this->paypalExpress->startSession($cart, $context);
+        $session = $this->paypalExpress->startSession($cart, $context);
+        $request->getSession()->set(self::SESSION_ID_KEY, $session->id);
 
-        $url = '/mollie/paypal-express/finish';
-
-        return new RedirectResponse($url);
+        return new RedirectResponse($session->getRedirectUrl());
     }
 
     /**
@@ -136,21 +139,20 @@ class PaypalExpressControllerBase extends StorefrontController
      * @param SalesChannelContext $context
      * @return Response
      */
-    public function finishCheckout(SalesChannelContext $context): Response
+    public function finishCheckout(Request $request, SalesChannelContext $context): Response
     {
-        # register account
-        $newContext = $this->paypalExpress->prepareCustomer(
-            'Mollie',
-            'Mollie',
-            'cd@dasistweb.de',
-            'test',
-            'test',
-            'test',
-            'DE',
-            'token-123',
-            $context
-        );
+        $payPalExpressSessionId = $request->getSession()->get(self::SESSION_ID_KEY);
 
+        $payPalExpressSession = $this->paypalExpress->loadSession($payPalExpressSessionId, $context);
+
+        $shippingAddress = AddressStruct::createFromApiResponse($payPalExpressSession->shippingAddress);
+        $billingAddress = null;
+        if ($payPalExpressSession->billingAddress !== null) {
+            $billingAddress = AddressStruct::createFromApiResponse($payPalExpressSession->billingAddress);
+        }
+
+        # create new account or find existing and login
+        $newContext = $this->paypalExpress->prepareCustomer($shippingAddress, $context, $billingAddress);
 
         /** @var CustomerEntity $customer */
         $customer = $this->customerService->getCustomer(
@@ -158,7 +160,8 @@ class PaypalExpressControllerBase extends StorefrontController
             $newContext->getContext()
         );
 
-        $this->customerService->setPaypalExpress($customer, $context->getContext());
+
+        $this->customerService->setPaypalExpress($customer, $payPalExpressSessionId, $context->getContext());
 
         # redirect to confirm page
         $returnUrl = $this->getCheckoutConfirmPage($this->router);

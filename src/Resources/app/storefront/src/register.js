@@ -5,7 +5,6 @@ import MollieApplePayDirect from './mollie-payments/plugins/apple-pay-direct.plu
 import MollieApplePayPaymentMethod from './mollie-payments/plugins/apple-pay-payment-method.plugin';
 import MollieCreditCardMandateManage from './mollie-payments/plugins/creditcard-mandate-manage.plugin';
 import MolliePosTerminalPlugin from './mollie-payments/plugins/pos-terminal.plugin';
-import MolliePayPalExpressPaymentMethod from './mollie-payments/plugins/paypal-express-payment-method.plugin';
 
 
 export default class MollieRegistration {
@@ -29,11 +28,6 @@ export default class MollieRegistration {
         pluginManager.register('MollieApplePayPaymentMethod', MollieApplePayPaymentMethod, '[data-mollie-template-applepay-account]');
         pluginManager.register('MollieApplePayPaymentMethod', MollieApplePayPaymentMethod, '[data-mollie-template-applepay-checkout]');
 
-
-        // hide paypal express if not started with it
-        // -----------------------------------------------------------------------------
-        pluginManager.register('MolliePayPalExpressPaymentMethod', MolliePayPalExpressPaymentMethod, '[data-mollie-template-ppe-account]');
-        pluginManager.register('MolliePayPalExpressPaymentMethod', MolliePayPalExpressPaymentMethod, '[data-mollie-template-ppe-checkout]');
 
 
         // showing credit card components in the checkout

@@ -6,12 +6,14 @@ use Exception;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieCustomerException;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
+use Kiener\MolliePayments\Repository\Address\CustomerAddressRepositoryInterface;
 use Kiener\MolliePayments\Repository\Country\CountryRepository;
 use Kiener\MolliePayments\Repository\Country\CountryRepositoryInterface;
 use Kiener\MolliePayments\Repository\Customer\CustomerRepositoryInterface;
 use Kiener\MolliePayments\Repository\Salutation\SalutationRepository;
 use Kiener\MolliePayments\Repository\Salutation\SalutationRepositoryInterface;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
+use Kiener\MolliePayments\Struct\Address\AddressStruct;
 use Kiener\MolliePayments\Struct\CustomerStruct;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
@@ -22,6 +24,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\AndFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface;
@@ -37,6 +40,7 @@ class CustomerService implements CustomerServiceInterface
     public const CUSTOM_FIELDS_KEY_SHOULD_SAVE_CARD_DETAIL = 'shouldSaveCardDetail';
     public const CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER = 'preferred_ideal_issuer';
     public const CUSTOM_FIELDS_KEY_PREFERRED_POS_TERMINAL = 'preferred_pos_terminal';
+    public const CUSTOM_FIELDS_KEY_PAYPAL_EXPRESS_ADDRESS_ID = 'ppe_address_id';
 
     /**
      * @var CountryRepositoryInterface
@@ -198,7 +202,7 @@ class CustomerService implements CustomerServiceInterface
         $customFields = $customer->getCustomFields();
 
         // If custom fields are empty, create a new array
-        if (!is_array($customFields)) {
+        if (! is_array($customFields)) {
             $customFields = [];
         }
 
@@ -278,7 +282,7 @@ class CustomerService implements CustomerServiceInterface
         $customFields = $customer->getCustomFields();
 
         // If custom fields are empty, create a new array
-        if (!is_array($customFields)) {
+        if (! is_array($customFields)) {
             $customFields = [];
         }
 
@@ -302,7 +306,7 @@ class CustomerService implements CustomerServiceInterface
     {
         $customFields = $customer->getCustomFields();
 
-        if (!is_array($customFields)) {
+        if (! is_array($customFields)) {
             $customFields = [];
         }
 
@@ -389,7 +393,7 @@ class CustomerService implements CustomerServiceInterface
 
         $customer = $this->getCustomer($customerId, $context);
 
-        if (!($customer instanceof CustomerEntity)) {
+        if (! ($customer instanceof CustomerEntity)) {
             throw new CustomerCouldNotBeFoundException($customerId);
         }
 
@@ -400,7 +404,7 @@ class CustomerService implements CustomerServiceInterface
             $struct->setLegacyCustomerId($customFields[self::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID]);
         }
         $molliePaymentsCustomFields = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS] ?? [];
-        if (!is_array($molliePaymentsCustomFields)) {
+        if (! is_array($molliePaymentsCustomFields)) {
             $this->logger->warning('Customer customFields for MolliePayments are invalid. Array is expected', [
                 'currentCustomFields' => $molliePaymentsCustomFields
             ]);
@@ -451,13 +455,14 @@ class CustomerService implements CustomerServiceInterface
      * @param SalesChannelContext $context
      * @return null|CustomerEntity
      */
-    public function createGuestAccount(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, string $paymentMethodId, SalesChannelContext $context): ?CustomerEntity
+    public function createGuestAccount(AddressStruct $shippingAddress, string $paymentMethodId, SalesChannelContext $context, ?AddressStruct $billingAddress = null): ?CustomerEntity
     {
         $customerId = Uuid::randomHex();
-        $addressId = Uuid::randomHex();
+        $shippingAddressId = Uuid::randomHex();
+
+        $billingAddressId = $shippingAddressId;
 
         $salutationId = $this->getSalutationId($context->getContext());
-        $countryId = $this->getCountryId($countryISO2, $context->getContext());
 
         $customerNumber = $this->valueGenerator->getValue(
             'customer',
@@ -465,34 +470,65 @@ class CustomerService implements CustomerServiceInterface
             $context->getSalesChannelId()
         );
 
+        $addresses = [
+            [
+                'id' => $shippingAddressId,
+                'customerId' => $customerId,
+                'countryId' => $this->getCountryId($shippingAddress->getCountryCode(), $context->getContext()),
+                'salutationId' => $salutationId,
+                'firstName' => $shippingAddress->getFirstName(),
+                'lastName' => $shippingAddress->getLastName(),
+                'street' => $shippingAddress->getStreet(),
+                'additional_address_line1' => $shippingAddress->getStreetAdditional(),
+                'zipcode' => $shippingAddress->getZipCode(),
+                'city' => $shippingAddress->getCity(),
+                'phoneNumber' => '',
+                'customFields' => [
+                    CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS => [
+                        self::CUSTOM_FIELDS_KEY_PAYPAL_EXPRESS_ADDRESS_ID => $shippingAddress->getMollieAddressId()
+                    ]
+                ]
+            ],
+        ];
+
+        if ($billingAddress !== null) {
+            $billingAddressId = Uuid::randomHex();
+            $addresses[] = [
+                'id' => $billingAddressId,
+                'customerId' => $customerId,
+                'countryId' => $this->getCountryId($billingAddress->getCountryCode(), $context->getContext()),
+                'salutationId' => $salutationId,
+                'firstName' => $billingAddress->getFirstName(),
+                'lastName' => $billingAddress->getLastName(),
+                'street' => $billingAddress->getStreet(),
+                'additional_address_line1' => $billingAddress->getStreetAdditional(),
+                'zipcode' => $billingAddress->getZipCode(),
+                'city' => $billingAddress->getCity(),
+                'phoneNumber' => '',
+                'customFields' => [
+                    CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS => [
+                        self::CUSTOM_FIELDS_KEY_PAYPAL_EXPRESS_ADDRESS_ID => $billingAddress->getMollieAddressId()
+                    ]
+                ]
+            ];
+        }
+
+
         $customer = [
             'id' => $customerId,
             'salutationId' => $salutationId,
-            'firstName' => $firstname,
-            'lastName' => $lastname,
+            'firstName' => $shippingAddress->getFirstName(),
+            'lastName' => $shippingAddress->getLastName(),
             'customerNumber' => $customerNumber,
             'guest' => true,
-            'email' => $email,
+            'email' => $shippingAddress->getEmail(),
             'password' => Uuid::randomHex(),
             'defaultPaymentMethodId' => $paymentMethodId,
             'groupId' => $context->getSalesChannel()->getCustomerGroupId(),
             'salesChannelId' => $context->getSalesChannel()->getId(),
-            'defaultBillingAddressId' => $addressId,
-            'defaultShippingAddressId' => $addressId,
-            'addresses' => [
-                [
-                    'id' => $addressId,
-                    'customerId' => $customerId,
-                    'countryId' => $countryId,
-                    'salutationId' => $salutationId,
-                    'firstName' => $firstname,
-                    'lastName' => $lastname,
-                    'street' => $street,
-                    'zipcode' => $zipCode,
-                    'city' => $city,
-                    'phoneNumber' => $phone,
-                ],
-            ],
+            'defaultBillingAddressId' => $shippingAddressId,
+            'defaultShippingAddressId' => $billingAddressId,
+            'addresses' => $addresses,
         ];
 
         // Add the customer to the database
@@ -519,7 +555,7 @@ class CustomerService implements CustomerServiceInterface
             /** @var string[] $countries */
             $countries = $this->countryRepository->searchIds($criteria, $context)->getIds();
 
-            return !empty($countries) ? (string)$countries[0] : null;
+            return ! empty($countries) ? (string)$countries[0] : null;
         } catch (Exception $e) {
             return null;
         }
@@ -542,7 +578,7 @@ class CustomerService implements CustomerServiceInterface
             /** @var string[] $salutations */
             $salutations = $this->salutationRepository->searchIds($criteria, $context)->getIds();
 
-            return !empty($salutations) ? (string)$salutations[0] : null;
+            return ! empty($salutations) ? (string)$salutations[0] : null;
         } catch (Exception $e) {
             return null;
         }
@@ -605,7 +641,7 @@ class CustomerService implements CustomerServiceInterface
 
         $customer = $this->getCustomer($customerId, $context);
 
-        if (!($customer instanceof CustomerEntity)) {
+        if (! ($customer instanceof CustomerEntity)) {
             throw new CustomerCouldNotBeFoundException($customerId);
         }
 
@@ -621,18 +657,18 @@ class CustomerService implements CustomerServiceInterface
     }
 
 
-    public function setPaypalExpress(CustomerEntity $customer, Context $context): void
+    public function setPaypalExpress(CustomerEntity $customer, string $paypalExpressSessionId, Context $context): void
     {
         // Get existing custom fields
         $customFields = $customer->getCustomFields();
 
         // If custom fields are empty, create a new array
-        if (!is_array($customFields)) {
+        if (! is_array($customFields)) {
             $customFields = [];
         }
 
         // Store the card token in the custom fields
-        $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS]['is_ppe'] = true;
+        $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS]['ppe_session_id'] = $paypalExpressSessionId;
 
         $this->logger->debug("Setting PPE Marker", [
             'customerId' => $customer->getId(),
@@ -648,5 +684,36 @@ class CustomerService implements CustomerServiceInterface
                 ]
             ],
             $context);
+    }
+
+    public function findCustomerByEmail(string $email, Context $context): ?CustomerEntity
+    {
+        $criteria = new Criteria();
+        $criteria->addAssociation('addresses.country');
+        $criteria->addFilter(new EqualsFilter('email', $email));
+
+        $searchResult = $this->customerRepository->search($criteria, $context);
+        if ($searchResult->getTotal() === 0) {
+            return null;
+        }
+
+        $customerEntity = $searchResult->first();
+        // csfixer might adds here a simple return $searchResult->first() and phpstan cannot find the correct return type. thats why we added this if statement
+        if ($customerEntity === null) {
+            return null;
+        }
+
+        return $customerEntity;
+
+    }
+
+    public function upsertAddresses(CustomerEntity $customer, AddressStruct $shippingAddress, Context $context, ?AddressStruct $billingAddress = null)
+    {
+
+
+
+        $customer = [
+
+        ];
     }
 }
