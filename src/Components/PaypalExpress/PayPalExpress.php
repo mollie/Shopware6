@@ -145,8 +145,10 @@ class PayPalExpress
     public function prepareCustomer(AddressStruct $shippingAddress, SalesChannelContext $context, ?AddressStruct $billingAddress = null): SalesChannelContext
     {
 
-
+        $updateShippingAddress = true;
         $paypalExpressId = $this->getActivePaypalExpressID($context);
+
+        $customer = $context->getCustomer();
 
         # if we are not logged in,
         # then we have to create a new guest customer for our express order
@@ -155,7 +157,7 @@ class PayPalExpress
             # find existing customer by email
             $customer = $this->customerService->findCustomerByEmail($shippingAddress->getEmail(), $context->getContext());
 
-            $updateShippingAddress = true;
+
             if ($customer === null) {
 
                 $updateShippingAddress = false;
@@ -172,29 +174,20 @@ class PayPalExpress
                 throw new \Exception('Error when creating customer!');
             }
 
-            # if we have an existing customer, we want reuse his shipping adress instead of creating new one
-            if ($updateShippingAddress) {
-                $this->customerService->upsertAddresses($customer, $shippingAddress, $context->getContext(),$billingAddress);
-            }
-
             # now start the login of our customer.
             # Our SalesChannelContext will be correctly updated after our
             # forward to the finish-payment page.
             $this->customerService->loginCustomer($customer, $context);
         }
 
+        # if we have an existing customer, we want reuse his shipping address instead of creating new one
+        if ($updateShippingAddress) {
+            $this->customerService->reuseOrCreateAddresses($customer, $shippingAddress, $context->getContext(),$billingAddress);
+        }
+
+
         # also (always) update our payment method to use Apple Pay for our cart
         return $this->cartService->updatePaymentMethod($context, $paypalExpressId);
-    }
-
-    public function createMollieAddressId(string $firstName, string $lastName, string $email, string $street, string $addressAdditional, string $zipCode, string $city, string $country): string
-    {
-        return md5(implode('-', [$firstName, $lastName, $email, $street, $addressAdditional, $zipCode, $city, $country]));
-    }
-
-    public function setBillingAddress(CustomerEntity $customer, string $firstname, string $lastname, string $email, string $street, string $zipcode, string $city, string $countryCode, SalesChannelContext $context)
-    {
-
     }
 
 

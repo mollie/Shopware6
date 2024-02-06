@@ -79,8 +79,8 @@ class PaypalExpressSubscriber implements EventSubscriberInterface
 
             if ($customer instanceof CustomerEntity) {
                 $customFields = $customer->getCustomFields();
-                if ($customFields !== null && isset($customFields['mollie_payments'])) {
-                    $isPPE = (bool)$customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS]['ppe_session_id'];
+                if ($customFields !== null && isset($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS])) {
+                    $isPPE = (bool)($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS]['ppe_auth_id'] ?? false);
                 }
             }
         }

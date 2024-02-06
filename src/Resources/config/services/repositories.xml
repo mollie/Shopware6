@@ -35,6 +35,11 @@
             <argument type="service" id="customer.repository"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Repository\CustomerAddress\CustomerAddressRepository">
+            <argument type="service" id="customer_address.repository"/>
+        </service>
+
+
         <service id="Kiener\MolliePayments\Repository\Salutation\SalutationRepository">
             <argument type="service" id="salutation.repository"/>
         </service>

@@ -143,6 +143,10 @@ class PaypalExpressControllerBase extends StorefrontController
     {
         $payPalExpressSessionId = $request->getSession()->get(self::SESSION_ID_KEY);
 
+        if($payPalExpressSessionId === null){
+            throw new \Exception('Session does not exists');
+        }
+
         $payPalExpressSession = $this->paypalExpress->loadSession($payPalExpressSessionId, $context);
 
         $shippingAddress = AddressStruct::createFromApiResponse($payPalExpressSession->shippingAddress);
@@ -161,7 +165,7 @@ class PaypalExpressControllerBase extends StorefrontController
         );
 
 
-        $this->customerService->setPaypalExpress($customer, $payPalExpressSessionId, $context->getContext());
+        $this->customerService->setPaypalExpress($customer, $payPalExpressSession->authenticationId, $context->getContext());
 
         # redirect to confirm page
         $returnUrl = $this->getCheckoutConfirmPage($this->router);

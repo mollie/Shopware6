@@ -79,7 +79,13 @@ final class AddressStruct
         $address->firstName = 'Mollie';
         $address->lastName = 'Mollie';
         $address->email = 'cd@dasistweb.de';
-        return new AddressStruct($address->firstName, $address->lastName, $address->email, $address->streetAndNumber, $address->streetAdditional, $address->postalCode, $address->city, $address->country);
+
+        $streetAdditional = '';
+        if(property_exists($address,'streetAdditional')){
+            $streetAdditional = $address->streetAdditional;
+        }
+
+        return new AddressStruct($address->firstName, $address->lastName, $address->email, $address->streetAndNumber, $streetAdditional, $address->postalCode, $address->city, $address->country);
     }
 
     public function getFirstName(): string
@@ -124,6 +130,7 @@ final class AddressStruct
 
     public function getMollieAddressId(): string
     {
+
         return md5(implode('-', [$this->firstName, $this->lastName, $this->email, $this->street, $this->streetAdditional, $this->zipCode, $this->city, $this->countryCode]));
     }
 
