@@ -183,5 +183,13 @@
             <tag name="shopware.payment.method.async"/>
         </service>
 
+        <!-- Blick PaymentHandler -->
+        <service id="Kiener\MolliePayments\Handler\Method\BlikPayment">
+            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="service_container"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+
+
     </services>
 </container>

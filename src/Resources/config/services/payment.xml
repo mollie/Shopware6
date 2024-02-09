@@ -17,7 +17,8 @@
             <tag name="mollie_payments.payment_method.remover.sw64"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Components\MollieLimits\Service\MollieLimitsRemover">
+
+        <service id="Kiener\MolliePayments\Components\MollieAvailability\Service\MolliePaymentMethodAvailabilityRemover">
             <argument type="service" id="service_container"/>
             <argument type="service" id="request_stack"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
