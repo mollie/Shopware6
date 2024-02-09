@@ -165,7 +165,7 @@
         <input-field type="bool">
             <name>useMolliePaymentMethodLimits</name>
             <defaultValue>false</defaultValue>
-            <label>Use mollie's availability rules for payment methods</label>
+            <label>Use Mollie's availability rules for payment methods</label>
             <label lang="de-DE">Mollies Verfügbarkeitsregeln für Zahlungsarten verwenden</label>
             <label lang="nl-NL">Gebruik de beschikbaarheidsregels van Mollie voor betaalmethoden</label>
             <helpText>Automatically hides payment methods in the checkout based on the availability rules for payment methods. Only active payment methods from your mollie dashboard will be shown. If the payment method has a cart limit, currency restriction or billing address restriction, it will be hidden during checkout.</helpText>
