@@ -165,11 +165,11 @@
         <input-field type="bool">
             <name>useMolliePaymentMethodLimits</name>
             <defaultValue>false</defaultValue>
-            <label>Use Mollie Payment Method Limits</label>
-            <label lang="de-DE">Mollies Limits für Zahlungsarten verwenden</label>
-            <label lang="nl-NL">Mollie's limieten voor betaalmethoden gebruiken</label>
-            <helpText>Automatically hides payment methods in the checkout based on the limits of Mollie. For instance, if you can only accept credit card payments up to 500 euros, the checkout for a cart of 600 euros will not display credit card as a payment method.</helpText>
-            <helpText lang="de-DE">Blendet automatisch Zahlungsart im Checkout basierend auf den Limits von Mollie aus. Wenn Sie beispielsweise nur Kreditkartenzahlungen bis zu 500 Euro akzeptieren können, wird an der Kasse für einen Warenkorb von 600 Euro keine Kreditkarte als Zahlungsarte angezeigt.</helpText>
+            <label>Use mollie's availability rules for payment methods</label>
+            <label lang="de-DE">Mollies Verfügbarkeitsregeln für Zahlungsarten verwenden</label>
+            <label lang="nl-NL">Gebruik de beschikbaarheidsregels van Mollie voor betaalmethoden</label>
+            <helpText>Automatically hides payment methods in the checkout based on the availability rules for payment methods. Only active payment methods from your mollie dashboard will be shown. If the payment method has a cart limit, currency restriction or billing address restriction, it will be hidden during checkout.</helpText>
+            <helpText lang="de-DE">Blendet automatisch Zahlungsart im Checkout basierend auf Verfügbarkeitsregeln von Mollie. Es werden nur die aktiven Zahlungsarten aus dem Mollie Dashboard angezeigt. Wenn die Zahlungsart eine Einschränkung auf den Warenkorbwert, Währung oder Rechnungsadresse hat, wird diese auch ausgeblendet.</helpText>
             <helpText lang="nl-NL">Verbergt automatisch betaalmethoden in de checkout op basis van Mollie's limieten. Als je bijvoorbeeld alleen creditcardbetalingen tot 500 euro kan accepteren, wordt bij een winkelwagen van 600 euro geen creditcard weergegeven als betaalmethode bij het afrekenen.</helpText>
         </input-field>
         <input-field type="text">

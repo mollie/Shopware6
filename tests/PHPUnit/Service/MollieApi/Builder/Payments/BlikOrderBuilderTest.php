@@ -5,6 +5,7 @@ namespace MolliePayments\Tests\Service\MollieApi\Builder\Payments;
 use DateTime;
 use DateTimeZone;
 use Faker\Extension\Container;
+use Kiener\MolliePayments\Handler\Method\BlikPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaPayLaterPayment;
 use Kiener\MolliePayments\Handler\Method\TwintPayment;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
@@ -15,14 +16,15 @@ use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Currency\CurrencyEntity;
 
-class TwintOrderBuilderTest extends AbstractMollieOrderBuilder
+class BlikOrderBuilderTest extends AbstractMollieOrderBuilder
 {
     public function testOrderBuild(): void
     {
         $redirectWebhookUrl = 'https://foo';
         $this->router->method('generate')->willReturn($redirectWebhookUrl);
 
-        $this->paymentHandler = new TwintPayment(
+
+        $this->paymentHandler = new BlikPayment(
             $this->loggerService,
             new FakeContainer()
         );

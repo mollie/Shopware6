@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Handler\Method\BanContactPayment;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Kiener\MolliePayments\Handler\Method\BelfiusPayment;
 use Kiener\MolliePayments\Handler\Method\BilliePayment;
+use Kiener\MolliePayments\Handler\Method\BlikPayment;
 use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
 use Kiener\MolliePayments\Handler\Method\EpsPayment;
 use Kiener\MolliePayments\Handler\Method\GiftCardPayment;
@@ -127,6 +128,7 @@ class PaymentMethodServiceTest extends TestCase
             In3Payment::class,
             PosPayment::class,
             TwintPayment::class,
+            BlikPayment::class,
         ];
 
         $handlers = $this->paymentMethodService->getPaymentHandlers();

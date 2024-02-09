@@ -1,6 +1,6 @@
 <?php
 
-namespace Kiener\MolliePayments\Components\MollieLimits\Service;
+namespace Kiener\MolliePayments\Components\MollieAvailability\Service;
 
 use Exception;
 use Kiener\MolliePayments\Exception\MissingCartServiceException;
@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class MollieLimitsRemover extends PaymentMethodRemover
+class MolliePaymentMethodAvailabilityRemover extends PaymentMethodRemover
 {
     /**
      * @var ActivePaymentMethodsProviderInterface
@@ -78,6 +78,7 @@ class MollieLimitsRemover extends PaymentMethodRemover
 
             $price = $cart->getPrice()->getTotalPrice();
         }
+        $countryIsoCode = null;
 
         if ($this->isOrderRoute()) {
             try {
@@ -90,15 +91,27 @@ class MollieLimitsRemover extends PaymentMethodRemover
             }
 
             $price = $order->getAmountTotal();
+
+            $billingAddress = $order->getBillingAddress();
+            if ($billingAddress === null) {
+                return $originalData;
+            }
+            $billingCountry = $billingAddress->getCountry();
+            if ($billingCountry === null) {
+                return $originalData;
+            }
+            $countryIsoCode = $billingCountry->getIso();
         }
 
         if (!isset($price)) {
             return $originalData;
         }
 
+
         $availableMolliePayments = $this->paymentMethodsProvider->getActivePaymentMethodsForAmount(
             $price,
             $context->getCurrency()->getIsoCode(),
+            (string) $countryIsoCode,
             [
                 $context->getSalesChannel()->getId(),
             ]
