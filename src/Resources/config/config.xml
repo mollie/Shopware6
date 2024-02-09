@@ -170,7 +170,7 @@
             <label lang="nl-NL">Gebruik de beschikbaarheidsregels van Mollie voor betaalmethoden</label>
             <helpText>Automatically hides payment methods in the checkout based on the availability rules for payment methods. Only active payment methods from your mollie dashboard will be shown. If the payment method has a cart limit, currency restriction or billing address restriction, it will be hidden during checkout.</helpText>
             <helpText lang="de-DE">Blendet automatisch Zahlungsart im Checkout basierend auf Verfügbarkeitsregeln von Mollie. Es werden nur die aktiven Zahlungsarten aus dem Mollie Dashboard angezeigt. Wenn die Zahlungsart eine Einschränkung auf den Warenkorbwert, Währung oder Rechnungsadresse hat, wird diese auch ausgeblendet.</helpText>
-            <helpText lang="nl-NL">Verbergt automatisch betaalmethoden in de checkout op basis van Mollie's limieten. Als je bijvoorbeeld alleen creditcardbetalingen tot 500 euro kan accepteren, wordt bij een winkelwagen van 600 euro geen creditcard weergegeven als betaalmethode bij het afrekenen.</helpText>
+            <helpText lang="nl-NL">Automatische betalingsmethode wordt verborgen tijdens het afrekenen op basis van beschikbaarheidsregels van Mollie. Alleen actieve betalingsmethoden uit het Mollie-dashboard worden weergegeven. Als de betalingsmethode beperkingen heeft op de winkelwagenwaarde, valuta of factuuradres, wordt deze ook verborgen.</helpText>
         </input-field>
         <input-field type="text">
             <name>formatOrderNumber</name>

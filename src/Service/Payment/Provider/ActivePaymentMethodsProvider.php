@@ -52,7 +52,7 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
      * @param array<mixed> $salesChannelIDs
      * @return Method[]
      */
-    public function getActivePaymentMethodsForAmount(float $price, string $currency,string $billingCountryCode, array $salesChannelIDs): array
+    public function getActivePaymentMethodsForAmount(float $price, string $currency, string $billingCountryCode, array $salesChannelIDs): array
     {
         if ($price < 0.01) {
             return [];

@@ -76,7 +76,7 @@
           "failed": "De betaalmethoden konden niet worden geupdated."
         },
         "mollieLimits": {
-          "link": "Open betalingslimieten van Mollie"
+          "link": "Toon Mollie-beschikbaarheidsregels voor betaalmethoden"
         }
       },
       "rounding": {

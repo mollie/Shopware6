@@ -15,5 +15,5 @@ interface ActivePaymentMethodsProviderInterface
      * @param array<string> $salesChannelIDs
      * @return array<Method>
      */
-    public function getActivePaymentMethodsForAmount(float $price, string $currency,string $billingCountryCode, array $salesChannelIDs): array;
+    public function getActivePaymentMethodsForAmount(float $price, string $currency, string $billingCountryCode, array $salesChannelIDs): array;
 }

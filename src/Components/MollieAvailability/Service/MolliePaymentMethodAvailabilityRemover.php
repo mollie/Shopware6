@@ -65,6 +65,8 @@ class MolliePaymentMethodAvailabilityRemover extends PaymentMethodRemover
         if (!$this->isAllowedRoute()) {
             return $originalData;
         }
+        $billingAddress = null;
+        $countryIsoCode = null;
 
         if ($this->isCartRoute()) {
             try {
@@ -77,8 +79,12 @@ class MolliePaymentMethodAvailabilityRemover extends PaymentMethodRemover
             }
 
             $price = $cart->getPrice()->getTotalPrice();
+            $customer = $context->getCustomer();
+            if ($customer !== null) {
+                $billingAddress = $customer->getDefaultBillingAddress();
+            }
         }
-        $countryIsoCode = null;
+
 
         if ($this->isOrderRoute()) {
             try {
@@ -93,19 +99,19 @@ class MolliePaymentMethodAvailabilityRemover extends PaymentMethodRemover
             $price = $order->getAmountTotal();
 
             $billingAddress = $order->getBillingAddress();
-            if ($billingAddress === null) {
-                return $originalData;
-            }
-            $billingCountry = $billingAddress->getCountry();
-            if ($billingCountry === null) {
-                return $originalData;
-            }
-            $countryIsoCode = $billingCountry->getIso();
         }
 
         if (!isset($price)) {
             return $originalData;
         }
+
+        if ($billingAddress !== null) {
+            $billingCountry = $billingAddress->getCountry();
+            if ($billingCountry !== null) {
+                $countryIsoCode = $billingCountry->getIso();
+            }
+        }
+
 
 
         $availableMolliePayments = $this->paymentMethodsProvider->getActivePaymentMethodsForAmount(
