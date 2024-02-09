@@ -48,10 +48,11 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
      *
      * @param float $price
      * @param string $currency
+     * @param string $billingCountryCode
      * @param array<mixed> $salesChannelIDs
      * @return Method[]
      */
-    public function getActivePaymentMethodsForAmount(float $price, string $currency, array $salesChannelIDs): array
+    public function getActivePaymentMethodsForAmount(float $price, string $currency, string $billingCountryCode, array $salesChannelIDs): array
     {
         if ($price < 0.01) {
             return [];
@@ -61,8 +62,12 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
             'amount' => [
                 'value' => $this->priceFormatter->formatValue($price),
                 'currency' => strtoupper($currency),
-            ]
+            ],
         ];
+
+        if (mb_strlen($billingCountryCode) > 0) {
+            $params['billingCountry'] = $billingCountryCode;
+        }
 
         return $this->getActivePaymentMethods($params, $salesChannelIDs);
     }

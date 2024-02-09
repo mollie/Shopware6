@@ -1,6 +1,6 @@
 <?php
 
-namespace Kiener\MolliePayments\Components\MollieLimits\Service;
+namespace Kiener\MolliePayments\Components\MollieAvailability\Service;
 
 use Exception;
 use Kiener\MolliePayments\Exception\MissingCartServiceException;
@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class MollieLimitsRemover extends PaymentMethodRemover
+class MolliePaymentMethodAvailabilityRemover extends PaymentMethodRemover
 {
     /**
      * @var ActivePaymentMethodsProviderInterface
@@ -65,6 +65,8 @@ class MollieLimitsRemover extends PaymentMethodRemover
         if (!$this->isAllowedRoute()) {
             return $originalData;
         }
+        $billingAddress = null;
+        $countryIsoCode = null;
 
         if ($this->isCartRoute()) {
             try {
@@ -77,7 +79,12 @@ class MollieLimitsRemover extends PaymentMethodRemover
             }
 
             $price = $cart->getPrice()->getTotalPrice();
+            $customer = $context->getCustomer();
+            if ($customer !== null) {
+                $billingAddress = $customer->getDefaultBillingAddress();
+            }
         }
+
 
         if ($this->isOrderRoute()) {
             try {
@@ -90,15 +97,27 @@ class MollieLimitsRemover extends PaymentMethodRemover
             }
 
             $price = $order->getAmountTotal();
+
+            $billingAddress = $order->getBillingAddress();
         }
 
         if (!isset($price)) {
             return $originalData;
         }
 
+        if ($billingAddress !== null) {
+            $billingCountry = $billingAddress->getCountry();
+            if ($billingCountry !== null) {
+                $countryIsoCode = $billingCountry->getIso();
+            }
+        }
+
+
+
         $availableMolliePayments = $this->paymentMethodsProvider->getActivePaymentMethodsForAmount(
             $price,
             $context->getCurrency()->getIsoCode(),
+            (string) $countryIsoCode,
             [
                 $context->getSalesChannel()->getId(),
             ]
