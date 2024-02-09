@@ -15,9 +15,11 @@
 
         {% if mollie_paypalexpress_enabled and ('offcanvas' not in mollie_paypalexpress_restrictions) %}
             {% block component_offcanvas_cart_actions_checkout_mollie_paypal_express_component %}
-                <div class="mt-2 justify-content-end">
-                    {% include '@MolliePayments/mollie/component/paypal-express-button.twig' %}
-                </div>
+                <form action="{{ path('frontend.mollie.paypal-express.start', {   }) }}" method="GET">
+                    <div class="mt-2 justify-content-end">
+                        {% include '@MolliePayments/mollie/component/paypal-express-button.twig' %}
+                    </div>
+                </form>
             {% endblock %}
         {% endif %}
 

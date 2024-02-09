@@ -1,5 +1,6 @@
 {% sw_extends '@Storefront/storefront/page/product-detail/buy-widget-form.html.twig' %}
 
+
 {% block page_product_detail_buy_container %}
     {{ parent() }}
 
@@ -30,17 +31,40 @@
             {% endblock %}
         {% endif %}
 
-        {% if mollie_paypalexpress_enabled and ('pdp' not in mollie_paypalexpress_restrictions) %}
-            {% block page_product_detail_buy_container_mollie_paypal_express_component %}
-                <div class="row g-2 form-row mt-2 justify-content-end">
-                    {% include '@MolliePayments/mollie/component/paypal-express-button.twig' with {cols: 'col-8'} %}
-                </div>
-            {% endblock %}
-        {% endif %}
-
     {% endblock %}
 
+
 {% endblock %}
+
+{% block page_product_detail_buy_form_inner %}
+    {{ parent() }}
+
+    {% block page_product_detail_buy_container_paypal_express %}
+        {% if mollie_paypalexpress_enabled and ('pdp' not in mollie_paypalexpress_restrictions) %}
+            {% block page_product_detail_buy_container_mollie_paypal_express_component %}
+                {% set product = page.product %}
+                <form action="{{ path('frontend.mollie.paypal-express.start') }}"
+                      method="POST">
+                    <input type="hidden" name="productId" value="{{ product.id }}">
+                    <input
+                            type="hidden"
+                            name="quantity"
+                            class="product-detail-quantity-input"
+                            min="{{ product.minPurchase }}"
+                            max="{{ product.calculatedMaxPurchase }}"
+                            step="{{ product.purchaseSteps }}"
+                            value="{{ product.minPurchase }}"
+                            aria-label="{{ "component.product.quantitySelect.label"|trans|striptags }}"
+                    />
+                    <div class="row g-2 form-row mt-2 justify-content-end">
+                        {% include '@MolliePayments/mollie/component/paypal-express-button.twig' with {cols: 'col-8'} %}
+                    </div>
+                </form>
+            {% endblock %}
+        {% endif %}
+    {% endblock %}
+{% endblock %}
+
 
 
 

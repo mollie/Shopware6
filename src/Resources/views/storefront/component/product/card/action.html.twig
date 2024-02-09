@@ -25,19 +25,23 @@
                 </div>
             {% endblock %}
         {% endif %}
+    {% endblock %}
 
+    {% block component_product_box_action_buy_paypal_express %}
         {% if mollie_paypalexpress_enabled and ('plp' not in mollie_paypalexpress_restrictions) %}
             {% block component_offcanvas_cart_actions_checkout_mollie_paypal_express_component %}
-                <div class="mt-2">
-                    {% include '@MolliePayments/mollie/component/paypal-express-button.twig' %}
-                </div>
+                <form action="{{ path('frontend.mollie.paypal-express.start') }}"
+                      method="POST">
+                    <input type="hidden" name="productId" value="{{ product.id }}">
+                    <div class="mt-2">
+                        {% include '@MolliePayments/mollie/component/paypal-express-button.twig' %}
+                    </div>
+                </form>
             {% endblock %}
         {% endif %}
-
     {% endblock %}
 
 {% endblock %}
-
 
 
 {% block page_product_detail_product_buy_button %}

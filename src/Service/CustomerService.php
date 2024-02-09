@@ -367,8 +367,8 @@ class CustomerService implements CustomerServiceInterface
         $customer = null;
 
         try {
-            $criteria = new Criteria();
-            $criteria->addFilter(new EqualsFilter('id', $customerId));
+            $criteria = new Criteria([$customerId]);
+
             $criteria->addAssociations([
                 'defaultShippingAddress.country',
                 'defaultBillingAddress.country',
@@ -781,7 +781,7 @@ class CustomerService implements CustomerServiceInterface
             'firstName' => $address->getFirstName(),
             'lastName' => $address->getLastName(),
             'street' => $address->getStreet(),
-            'additional_address_line1' => $address->getStreetAdditional(),
+            'additionalAddressLine1' => $address->getStreetAdditional(),
             'zipcode' => $address->getZipCode(),
             'city' => $address->getCity(),
             'phoneNumber' => '',

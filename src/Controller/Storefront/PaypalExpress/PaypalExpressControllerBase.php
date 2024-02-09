@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Service\CartService;
 use Kiener\MolliePayments\Service\CustomerServiceInterface;
 use Kiener\MolliePayments\Struct\Address\AddressStruct;
 use Kiener\MolliePayments\Traits\Storefront\RedirectTrait;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Validation\DataBag\DataBag;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister;
@@ -49,6 +50,11 @@ class PaypalExpressControllerBase extends StorefrontController
      */
     private $customerService;
 
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
 
     /**
      * @param PayPalExpress $paypalExpress
@@ -56,12 +62,13 @@ class PaypalExpressControllerBase extends StorefrontController
      * @param RouterInterface $router
      * @param CustomerServiceInterface $customerService
      */
-    public function __construct(PayPalExpress $paypalExpress, CartService $cartService, RouterInterface $router, CustomerServiceInterface $customerService)
+    public function __construct(PayPalExpress $paypalExpress, CartService $cartService, RouterInterface $router, CustomerServiceInterface $customerService, LoggerInterface $logger)
     {
         $this->paypalExpress = $paypalExpress;
         $this->cartService = $cartService;
         $this->router = $router;
         $this->customerService = $customerService;
+        $this->logger = $logger;
     }
 
 
@@ -117,7 +124,7 @@ class PaypalExpressControllerBase extends StorefrontController
     }
 
     /**
-     * @Route("/mollie/paypal-express/start", defaults={"csrf_protected"=true}, name="frontend.mollie.paypal-express.start", options={"seo"="false"}, methods={"GET"})
+     * @Route("/mollie/paypal-express/start", defaults={"csrf_protected"=true}, name="frontend.mollie.paypal-express.start", options={"seo"="false"}, methods={"GET","POST"})
      *
      * @param SalesChannelContext $context
      * @return Response
@@ -125,6 +132,12 @@ class PaypalExpressControllerBase extends StorefrontController
      */
     public function startCheckout(Request $request, SalesChannelContext $context): Response
     {
+        $productId = $request->get('productId');
+        $quantity = (int)$request->get('quantity',1);
+        if($request->isMethod(Request::METHOD_POST) && $productId !== null){
+            $this->cartService->addProduct($productId,$quantity,$context);
+        }
+
         $cart = $this->cartService->getCalculatedMainCart($context);
 
         $session = $this->paypalExpress->startSession($cart, $context);
@@ -143,15 +156,26 @@ class PaypalExpressControllerBase extends StorefrontController
     {
         $payPalExpressSessionId = $request->getSession()->get(self::SESSION_ID_KEY);
 
+        $returnUrl = $this->getCheckoutCartPage($this->router);
+
+
         if($payPalExpressSessionId === null){
-            throw new \Exception('Session does not exists');
+
+            $this->logger->error('Failed to finish checkout, session not exists');
+
+            return new RedirectResponse($returnUrl);
         }
 
         $payPalExpressSession = $this->paypalExpress->loadSession($payPalExpressSessionId, $context);
+        if($payPalExpressSession->shippingAddress === null){
 
+            $this->logger->error('Failed to finish checkout, got session without shipping address');
+
+            return new RedirectResponse($returnUrl);
+        }
         $shippingAddress = AddressStruct::createFromApiResponse($payPalExpressSession->shippingAddress);
         $billingAddress = null;
-        if ($payPalExpressSession->billingAddress !== null) {
+        if ($payPalExpressSession->billingAddress instanceof \stdClass) {
             $billingAddress = AddressStruct::createFromApiResponse($payPalExpressSession->billingAddress);
         }
 
@@ -167,9 +191,7 @@ class PaypalExpressControllerBase extends StorefrontController
 
         $this->customerService->setPaypalExpress($customer, $payPalExpressSession->authenticationId, $context->getContext());
 
-        # redirect to confirm page
         $returnUrl = $this->getCheckoutConfirmPage($this->router);
-
         return new RedirectResponse($returnUrl);
     }
 

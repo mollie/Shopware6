@@ -1,37 +1,37 @@
-{% set theme = '' %}
-{% set shape = '' %}
-{% set image = asset('bundles/molliepayments/static/ppe-primary.png', 'asset') %}
+{% block mollie_paypal_express %}
+    {% set theme = '' %}
+    {% set shape = '' %}
+    {% set image = asset('bundles/molliepayments/static/ppe-primary.png', 'asset') %}
 
 
-{% if mollie_paypalexpress_style == 1 %}
-    {% set theme = 'gold' %}
-{% elseif mollie_paypalexpress_style == 2 %}
-    {% set theme = 'blue' %}
-    {% set image = asset('bundles/molliepayments/static/ppe-white.png', 'asset') %}
-{% elseif mollie_paypalexpress_style == 3 %}
-    {% set theme = 'silver' %}
-{% elseif mollie_paypalexpress_style == 4 %}
-    {% set theme = 'white' %}
-{% elseif mollie_paypalexpress_style == 5 %}
-    {% set theme = 'black' %}
-    {% set image = asset('bundles/molliepayments/static/ppe-white.png', 'asset') %}
-{% else %}
-    {% set themeso  = 'gold' %}
-{% endif %}
+    {% if mollie_paypalexpress_style == 1 %}
+        {% set theme = 'gold' %}
+    {% elseif mollie_paypalexpress_style == 2 %}
+        {% set theme = 'blue' %}
+        {% set image = asset('bundles/molliepayments/static/ppe-white.png', 'asset') %}
+    {% elseif mollie_paypalexpress_style == 3 %}
+        {% set theme = 'silver' %}
+    {% elseif mollie_paypalexpress_style == 4 %}
+        {% set theme = 'white' %}
+    {% elseif mollie_paypalexpress_style == 5 %}
+        {% set theme = 'black' %}
+        {% set image = asset('bundles/molliepayments/static/ppe-white.png', 'asset') %}
+    {% else %}
+        {% set themeso  = 'gold' %}
+    {% endif %}
 
 
-{% if mollie_paypalexpress_shape == 1 %}
-    {% set shape = 'rect' %}
-{% else %}
-    {% set shape  = 'pill' %}
-{% endif %}
+    {% if mollie_paypalexpress_shape == 1 %}
+        {% set shape = 'rect' %}
+    {% else %}
+        {% set shape  = 'pill' %}
+    {% endif %}
 
 
-<div class="{{ cols }}">
-    <form action="{{ path('frontend.mollie.paypal-express.start', {   }) }}" method="GET">
-        <button class="mollie-paypal-button paypal-button-{{ shape }} paypal-theme-{{ theme }}">
-            <img src="{{ image }}" width="80px;">
+    <div class="{{ cols }}">
+        <button name="paypal-express" class="mollie-paypal-button paypal-button-{{ shape }} paypal-theme-{{ theme }}">
+            <img src="{{ image }}" width="80px;"/>
             <p style="font-weight: 100;margin:0;margin-left:8px">Checkout</p>
         </button>
-    </form>
-</div>
+    </div>
+{% endblock %}

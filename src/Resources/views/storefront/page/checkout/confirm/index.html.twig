@@ -12,16 +12,6 @@
     {% endif %}
 
 
-    {% if mollie_paypalexpress_enabled %}
-        <div id="mollie_hide_ppe" data-mollie-template-ppe-checkout
-             data-mollie-paypal-express-payment-method-options="{{ {
-                 shopUrl: seoUrl('frontend.home.page'),
-                 hideAlways: false,
-                 isUsed: mollie_paypalexpress_used
-             }
-             |json_encode }}"></div>
-    {% endif %}
-
     {% if page.enable_credit_card_components == true %}
         <script src="https://js.mollie.com/v1/mollie.js"></script>
     {% endif %}

@@ -70,22 +70,6 @@ class PaypalExpressSubscriber implements EventSubscriberInterface
 
         $restrictions = $settings->getPaypalExpressRestrictions();
 
-        $isPPE = false;
-        if ($paymentEnabled) {
-            $customer = $this->customerService->getCustomer(
-                (string)$event->getSalesChannelContext()->getCustomerId(),
-                $event->getContext()
-            );
-
-            if ($customer instanceof CustomerEntity) {
-                $customFields = $customer->getCustomFields();
-                if ($customFields !== null && isset($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS])) {
-                    $isPPE = (bool)($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS]['ppe_auth_id'] ?? false);
-                }
-            }
-        }
-
-        $event->setParameter('mollie_paypalexpress_used', $isPPE);
         $event->setParameter('mollie_paypalexpress_style', $style);
         $event->setParameter('mollie_paypalexpress_shape', $shape);
         $event->setParameter('mollie_paypalexpress_restrictions', $restrictions);
