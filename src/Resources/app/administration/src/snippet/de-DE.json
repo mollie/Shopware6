@@ -76,7 +76,7 @@
           "failed": "Die Zahlungsarten konnten nicht aktualisiert werden."
         },
         "mollieLimits": {
-          "link": "Zeige Mollie Verfügbarkeitsregeln für Zahlungsarten"
+          "link": "Zeige Mollie-Verfügbarkeitregeln für Zahlungsmethoden"
         }
       },
       "rounding": {

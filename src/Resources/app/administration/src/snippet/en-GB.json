@@ -76,7 +76,7 @@
           "failed": "The payment methods couldn't be updated."
         },
         "mollieLimits": {
-          "link": "Show Mollie availability rules for payment methods"
+          "link": "Show mollie availability rules for payment methods"
         }
       },
       "rounding": {
