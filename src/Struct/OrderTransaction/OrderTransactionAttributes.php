@@ -109,12 +109,12 @@ class OrderTransactionAttributes
             $this->setMollieOrderId((string)$customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY]);
         }
 
-        if (isset($customFields[CustomFieldsInterface::MOLLIE_KEY]['payment_id'])) {
-            $this->setMolliePaymentId((string)$customFields['mollie_payments']['payment_id']);
+        if (isset($customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::PAYMENT_KEY])) {
+            $this->setMolliePaymentId((string)$customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::PAYMENT_KEY]);
         }
 
-        if (isset($customFields[CustomFieldsInterface::MOLLIE_KEY]['third_party_payment_id'])) {
-            $this->setThirdPartyPaymentId((string)$customFields[CustomFieldsInterface::MOLLIE_KEY]['third_party_payment_id']);
+        if (isset($customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::THIRD_PARTY_PAYMENT_KEY])) {
+            $this->setThirdPartyPaymentId((string)$customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::THIRD_PARTY_PAYMENT_KEY]);
         }
     }
 }
