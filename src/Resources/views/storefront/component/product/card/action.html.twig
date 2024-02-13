@@ -31,8 +31,10 @@
         {% if mollie_paypalexpress_enabled and ('plp' not in mollie_paypalexpress_restrictions) %}
             {% block component_offcanvas_cart_actions_checkout_mollie_paypal_express_component %}
                 <form action="{{ path('frontend.mollie.paypal-express.start') }}"
+                      data-form-csrf-handler="true"
                       method="POST">
                     <input type="hidden" name="productId" value="{{ product.id }}">
+                    {{ sw_csrf('frontend.mollie.paypal-express.start') }}
                     <div class="mt-2">
                         {% include '@MolliePayments/mollie/component/paypal-express-button.twig' %}
                     </div>

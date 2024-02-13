@@ -43,8 +43,10 @@
         {% if mollie_paypalexpress_enabled and ('pdp' not in mollie_paypalexpress_restrictions) %}
             {% block page_product_detail_buy_container_mollie_paypal_express_component %}
                 {% set product = page.product %}
-                <form action="{{ path('frontend.mollie.paypal-express.start') }}"
+                <form id="molliePayPalExpressProductDetailForm" action="{{ path('frontend.mollie.paypal-express.start') }}"
+                      data-form-csrf-handler="true"
                       method="POST">
+                    {{ sw_csrf('frontend.mollie.paypal-express.start') }}
                     <input type="hidden" name="productId" value="{{ product.id }}">
                     <input
                             type="hidden"
