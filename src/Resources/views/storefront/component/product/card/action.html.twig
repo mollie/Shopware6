@@ -34,7 +34,11 @@
                       data-form-csrf-handler="true"
                       method="POST">
                     <input type="hidden" name="productId" value="{{ product.id }}">
-                    {{ sw_csrf('frontend.mollie.paypal-express.start') }}
+                    {% if mollie_csrf_available %}
+                        {% include '@MolliePayments/storefront/csrf/components/paypal-express-button-csrf.twig' %}
+                    {% endif %}
+
+
                     <div class="mt-2">
                         {% include '@MolliePayments/mollie/component/paypal-express-button.twig' %}
                     </div>
