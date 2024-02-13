@@ -4,7 +4,7 @@ namespace Kiener\MolliePayments\Handler\Method;
 
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\CustomerService;
-use Kiener\MolliePayments\Service\CustomFieldService;
+use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Mollie\Api\Types\PaymentMethod;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -49,13 +49,13 @@ class CreditCardPayment extends PaymentHandler
     public function processPaymentMethodSpecificParameters(array $orderData, OrderEntity $orderEntity, SalesChannelContext $salesChannelContext, CustomerEntity $customer): array
     {
         $customFields = $customer->getCustomFields() ?? [];
-        $cardToken = $customFields['mollie_payments']['credit_card_token'] ?? '';
+        $cardToken = $customFields[CustomFieldsInterface::MOLLIE_KEY]['credit_card_token'] ?? '';
 
         if (!empty($cardToken)) {
             $orderData['payment']['cardToken'] = $cardToken;
             $this->customerService->setCardToken($customer, '', $salesChannelContext);
 
-            $isSaveCardToken = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_SHOULD_SAVE_CARD_DETAIL] ?? false;
+            $isSaveCardToken = $customFields[CustomFieldsInterface::MOLLIE_KEY][CustomerService::CUSTOM_FIELDS_KEY_SHOULD_SAVE_CARD_DETAIL] ?? false;
             # change payment sequenceType to first if this is a single-click payment
             if ($this->enableSingleClickPayment && $isSaveCardToken) {
                 $orderData['payment']['sequenceType'] = PaymentHandler::PAYMENT_SEQUENCE_TYPE_FIRST;
@@ -70,7 +70,7 @@ class CreditCardPayment extends PaymentHandler
             return $orderData;
         }
 
-        $mandateId = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_MANDATE_ID] ?? '';
+        $mandateId = $customFields[CustomFieldsInterface::MOLLIE_KEY][CustomerService::CUSTOM_FIELDS_KEY_MANDATE_ID] ?? '';
         if (empty($mandateId)) {
             return $orderData;
         }

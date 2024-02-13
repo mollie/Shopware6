@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Struct\Order;
 
+use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -529,7 +530,7 @@ class OrderAttributes
         }
 
         return [
-            'mollie_payments' => $mollieData,
+            CustomFieldsInterface::MOLLIE_KEY => $mollieData,
         ];
     }
 
@@ -575,9 +576,9 @@ class OrderAttributes
         $customFields = $order->getCustomFields();
 
         # check if we have a mollie entry
-        if ($customFields !== null && array_key_exists('mollie_payments', $customFields)) {
+        if ($customFields !== null && array_key_exists(CustomFieldsInterface::MOLLIE_KEY, $customFields)) {
             # load the mollie entry
-            $mollieData = $customFields['mollie_payments'];
+            $mollieData = $customFields[CustomFieldsInterface::MOLLIE_KEY];
             # assign our value if we have it
             $foundValue = (array_key_exists($keyName, $mollieData)) ? (string)$mollieData[$keyName] : '';
         }

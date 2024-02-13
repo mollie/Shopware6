@@ -40,7 +40,7 @@ class CustomerServiceTest extends TestCase
     public function setUp(): void
     {
         $this->customerRepository = new FakeCustomerRepository(new CustomerDefinition());
-    
+
         $this->settingsService = $this->createMock(SettingsService::class);
 
         $this->customerService = new CustomerService(

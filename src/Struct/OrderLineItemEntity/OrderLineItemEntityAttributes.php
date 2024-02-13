@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Struct\OrderLineItemEntity;
 
+use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Struct\Voucher\VoucherType;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 
@@ -205,9 +206,9 @@ class OrderLineItemEntityAttributes
 
                     # old structure
                     # check if we have a mollie entry
-                    if ($foundValue === '' && array_key_exists('mollie_payments', $customFields)) {
+                    if ($foundValue === '' && array_key_exists(CustomFieldsInterface::MOLLIE_KEY, $customFields)) {
                         # load the mollie entry
-                        $mollieData = $customFields['mollie_payments'];
+                        $mollieData = $customFields[CustomFieldsInterface::MOLLIE_KEY];
                         # assign our value if we have it
                         $foundValue = (array_key_exists($keyName, $mollieData)) ? (string)$mollieData[$keyName] : '';
                     }
@@ -230,9 +231,9 @@ class OrderLineItemEntityAttributes
 
                 # old structure
                 # check if we have a mollie entry
-                if ($foundValue === '' && array_key_exists('mollie_payments', $customFields)) {
+                if ($foundValue === '' && array_key_exists(CustomFieldsInterface::MOLLIE_KEY, $customFields)) {
                     # load the mollie entry
-                    $mollieData = $customFields['mollie_payments'];
+                    $mollieData = $customFields[CustomFieldsInterface::MOLLIE_KEY];
                     # assign our value if we have it
                     $foundValue = (array_key_exists($keyName, $mollieData)) ? (string)$mollieData[$keyName] : '';
                 }

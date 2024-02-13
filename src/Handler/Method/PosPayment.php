@@ -4,7 +4,7 @@ namespace Kiener\MolliePayments\Handler\Method;
 
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\CustomerService;
-use Kiener\MolliePayments\Service\CustomFieldService;
+use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Mollie\Api\Types\PaymentMethod;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -37,7 +37,7 @@ class PosPayment extends PaymentHandler
     {
         $customFields = $customer->getCustomFields() ?? [];
 
-        $this->selectedTerminalId = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_PREFERRED_POS_TERMINAL] ?? '';
+        $this->selectedTerminalId = $customFields[CustomFieldsInterface::MOLLIE_KEY][CustomerService::CUSTOM_FIELDS_KEY_PREFERRED_POS_TERMINAL] ?? '';
 
         return $orderData;
     }

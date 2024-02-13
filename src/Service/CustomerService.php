@@ -210,9 +210,9 @@ class CustomerService implements CustomerServiceInterface
         }
 
         // Store the card token in the custom fields
-        $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_CREDIT_CARD_TOKEN] = $cardToken;
+        $customFields[CustomFieldsInterface::MOLLIE_KEY][self::CUSTOM_FIELDS_KEY_CREDIT_CARD_TOKEN] = $cardToken;
         // Store shouldSaveCardDetail in the custom fields
-        $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_SHOULD_SAVE_CARD_DETAIL] = $shouldSaveCardDetail;
+        $customFields[CustomFieldsInterface::MOLLIE_KEY][self::CUSTOM_FIELDS_KEY_SHOULD_SAVE_CARD_DETAIL] = $shouldSaveCardDetail;
 
         $this->logger->debug("Setting Credit Card Token", [
             'customerId' => $customer->getId(),
@@ -241,7 +241,7 @@ class CustomerService implements CustomerServiceInterface
         $customFields = $customer->getCustomFields() ?? [];
 
         // Store the mandate id in the custom fields
-        $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_MANDATE_ID] = $mandateId;
+        $customFields[CustomFieldsInterface::MOLLIE_KEY][self::CUSTOM_FIELDS_KEY_MANDATE_ID] = $mandateId;
 
         $this->logger->debug("Setting Credit Card Mandate Id", [
             'customerId' => $customer->getId(),
@@ -290,7 +290,7 @@ class CustomerService implements CustomerServiceInterface
         }
 
         // Store the card token in the custom fields
-        $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER] = $issuerId;
+        $customFields[CustomFieldsInterface::MOLLIE_KEY][self::CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER] = $issuerId;
 
         // Store the custom fields on the customer
         return $this->customerRepository->update([[
@@ -313,7 +313,7 @@ class CustomerService implements CustomerServiceInterface
             $customFields = [];
         }
 
-        $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_PREFERRED_POS_TERMINAL] = $terminalId;
+        $customFields[CustomFieldsInterface::MOLLIE_KEY][self::CUSTOM_FIELDS_KEY_PREFERRED_POS_TERMINAL] = $terminalId;
 
         return $this->customerRepository->update([[
             'id' => $customer->getId(),
@@ -406,7 +406,7 @@ class CustomerService implements CustomerServiceInterface
         if (isset($customFields[self::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID])) {
             $struct->setLegacyCustomerId($customFields[self::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID]);
         }
-        $molliePaymentsCustomFields = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS] ?? [];
+        $molliePaymentsCustomFields = $customFields[CustomFieldsInterface::MOLLIE_KEY] ?? [];
         if (! is_array($molliePaymentsCustomFields)) {
             $this->logger->warning('Customer customFields for MolliePayments are invalid. Array is expected', [
                 'currentCustomFields' => $molliePaymentsCustomFields
@@ -648,7 +648,7 @@ class CustomerService implements CustomerServiceInterface
         $criteria = new Criteria();
         $criteria->addFilter(new AndFilter([
             new EqualsFilter('customerId', $customer->getId()),
-            new EqualsAnyFilter('customFields.' . CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS . '.' . self::CUSTOM_FIELDS_KEY_PAYPAL_EXPRESS_ADDRESS_ID, $mollieAddressIds)
+            new EqualsAnyFilter('customFields.' . CustomFieldsInterface::MOLLIE_KEY . '.' . self::CUSTOM_FIELDS_KEY_PAYPAL_EXPRESS_ADDRESS_ID, $mollieAddressIds)
         ]));
 
         $customerAddressSearchResult = $this->customerAddressRepository->search($criteria, $context);
@@ -690,7 +690,7 @@ class CustomerService implements CustomerServiceInterface
             }
 
             // skip addresses without custom fields, those are configured by the customer in backend
-            $mollieAddressId = $addressCustomFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_PAYPAL_EXPRESS_ADDRESS_ID] ?? null;
+            $mollieAddressId = $addressCustomFields[CustomFieldsInterface::MOLLIE_KEY][self::CUSTOM_FIELDS_KEY_PAYPAL_EXPRESS_ADDRESS_ID] ?? null;
             if ($mollieAddressId === null) {
                 continue;
             }
@@ -757,7 +757,7 @@ class CustomerService implements CustomerServiceInterface
             'city' => $address->getCity(),
             'phoneNumber' => '',
             'customFields' => [
-                CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS => [
+                CustomFieldsInterface::MOLLIE_KEY => [
                     self::CUSTOM_FIELDS_KEY_PAYPAL_EXPRESS_ADDRESS_ID => $address->getMollieAddressId()
                 ]
             ]

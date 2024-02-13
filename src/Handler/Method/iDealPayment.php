@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Handler\Method;
 
 use Kiener\MolliePayments\Handler\PaymentHandler;
+use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Mollie\Api\Types\PaymentMethod;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -30,7 +31,7 @@ class iDealPayment extends PaymentHandler
     {
         $customFields = $customer->getCustomFields() ?? [];
 
-        $issuer = $customFields['mollie_payments']['preferred_ideal_issuer'] ?? '';
+        $issuer = $customFields[CustomFieldsInterface::MOLLIE_KEY]['preferred_ideal_issuer'] ?? '';
         $paymentIssuer = $orderData['payment']['issuer'] ?? '';
 
         if (empty($issuer)) {

@@ -2,6 +2,8 @@
 
 namespace Kiener\MolliePayments\Struct\OrderTransaction;
 
+use Kiener\MolliePayments\Service\CustomFieldsInterface;
+
 class OrderTransactionAttributes
 {
     /**
@@ -99,20 +101,20 @@ class OrderTransactionAttributes
      */
     private function setCustomFields(array $customFields): void
     {
-        if (!isset($customFields['mollie_payments'])) {
+        if (!isset($customFields[CustomFieldsInterface::MOLLIE_KEY])) {
             return;
         }
 
-        if (isset($customFields['mollie_payments']['order_id'])) {
-            $this->setMollieOrderId((string)$customFields['mollie_payments']['order_id']);
+        if (isset($customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY])) {
+            $this->setMollieOrderId((string)$customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY]);
         }
 
-        if (isset($customFields['mollie_payments']['payment_id'])) {
+        if (isset($customFields[CustomFieldsInterface::MOLLIE_KEY]['payment_id'])) {
             $this->setMolliePaymentId((string)$customFields['mollie_payments']['payment_id']);
         }
 
-        if (isset($customFields['mollie_payments']['third_party_payment_id'])) {
-            $this->setThirdPartyPaymentId((string)$customFields['mollie_payments']['third_party_payment_id']);
+        if (isset($customFields[CustomFieldsInterface::MOLLIE_KEY]['third_party_payment_id'])) {
+            $this->setThirdPartyPaymentId((string)$customFields[CustomFieldsInterface::MOLLIE_KEY]['third_party_payment_id']);
         }
     }
 }
