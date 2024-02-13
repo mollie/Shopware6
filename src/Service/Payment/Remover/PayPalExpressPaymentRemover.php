@@ -28,7 +28,7 @@ class PayPalExpressPaymentRemover extends PaymentMethodRemover
 
         if ($this->isOrderRoute()) {
             $order = $this->getOrder($context->getContext());
-            $showPPEOnly = (bool)$order->getCustomFields()[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::PAYPAL_EXPRESS_AUTHENTICATE_ID] ?? false;
+            $showPPEOnly = (bool)($order->getCustomFields()[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::PAYPAL_EXPRESS_AUTHENTICATE_ID] ?? false);
         }
         if ($this->isCartRoute()) {
             $cart = $this->getCart($context);

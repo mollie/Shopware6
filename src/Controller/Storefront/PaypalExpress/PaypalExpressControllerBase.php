@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Service\CartService;
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Struct\Address\AddressStruct;
 use Kiener\MolliePayments\Traits\Storefront\RedirectTrait;
+use Mollie\Api\Exceptions\ApiException;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -59,8 +60,9 @@ class PaypalExpressControllerBase extends StorefrontController
     /**
      * @Route("/mollie/paypal-express/start", defaults={"csrf_protected"=true}, name="frontend.mollie.paypal-express.start", options={"seo"="false"}, methods={"GET","POST"})
      *
+     * @param Request $request
      * @param SalesChannelContext $context
-     * @throws \Mollie\Api\Exceptions\ApiException
+     * @throws ApiException
      * @return Response
      */
     public function startCheckout(Request $request, SalesChannelContext $context): Response
@@ -108,7 +110,7 @@ class PaypalExpressControllerBase extends StorefrontController
      * @param SalesChannelContext $context
      * @return Response
      */
-    public function finishCheckout(Request $request, SalesChannelContext $context): Response
+    public function finishCheckout(SalesChannelContext $context): Response
     {
         $cart = $this->cartService->getCalculatedMainCart($context);
         $cartExtension = $cart->getExtension(CustomFieldsInterface::MOLLIE_KEY);
@@ -132,12 +134,16 @@ class PaypalExpressControllerBase extends StorefrontController
         $payPalExpressSession = $this->paypalExpress->loadSession($payPalExpressSessionId, $context);
 
         if ($payPalExpressSession->shippingAddress === null) {
-            $this->logger->error('Failed to finish checkout, got session without shipping address', [
-                'sessionId' => $payPalExpressSession->id,
-                'status' => $payPalExpressSession->status
-            ]);
+            # try 2nd time, to reduce redirects and customer complains
+            $payPalExpressSession = $this->paypalExpress->loadSession($payPalExpressSessionId, $context);
+            if ($payPalExpressSession->shippingAddress === null) {
+                $this->logger->error('Failed to finish checkout, got session without shipping address', [
+                    'sessionId' => $payPalExpressSession->id,
+                    'status' => $payPalExpressSession->status
+                ]);
 
-            return new RedirectResponse($returnUrl);
+                return new RedirectResponse($returnUrl);
+            }
         }
 
         $shippingAddress = AddressStruct::createFromApiResponse($payPalExpressSession->shippingAddress);
@@ -147,10 +153,7 @@ class PaypalExpressControllerBase extends StorefrontController
             $billingAddress = AddressStruct::createFromApiResponse($payPalExpressSession->billingAddress);
         }
 
-        # create new account or find existing and login
-        $this->paypalExpress->prepareCustomer($shippingAddress, $context, $billingAddress);
-
-
+        # we have to update the cart extension before a new user is created and logged in, otherwise the extension is not saved
         $cartExtension = new ArrayStruct([
             CustomFieldsInterface::PAYPAL_EXPRESS_AUTHENTICATE_ID => $payPalExpressSession->authenticationId
         ]);
@@ -158,6 +161,13 @@ class PaypalExpressControllerBase extends StorefrontController
         $this->cartService->updateCart($cart);
 
         $this->cartService->persistCart($cart, $context);
+
+
+        # create new account or find existing and login
+        $this->paypalExpress->prepareCustomer($shippingAddress, $context, $billingAddress);
+
+
+
 
         $returnUrl = $this->getCheckoutConfirmPage($this->router);
         return new RedirectResponse($returnUrl);

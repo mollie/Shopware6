@@ -106,9 +106,10 @@ class OrderAttributes
     private $bankBic;
 
     /**
-     * @var
+     * @var string
      */
     private $payPalExpressAuthenticateId;
+
     /**
      * @param OrderEntity $order
      */
@@ -133,7 +134,7 @@ class OrderAttributes
         $this->bankAccount = $this->getCustomFieldValue($order, 'bankAccount');
         $this->bankBic = $this->getCustomFieldValue($order, 'bankBic');
         $this->timezone = $this->getCustomFieldValue($order, 'timezone');
-        $this->payPalExpressAuthenticateId = $this->getCustomFieldValue($order,CustomFieldsInterface::PAYPAL_EXPRESS_AUTHENTICATE_ID);
+        $this->payPalExpressAuthenticateId = $this->getCustomFieldValue($order, CustomFieldsInterface::PAYPAL_EXPRESS_AUTHENTICATE_ID);
     }
 
     /**
@@ -546,7 +547,7 @@ class OrderAttributes
             $mollieData['bankBic'] = $this->bankBic;
         }
 
-        if((string)$this->payPalExpressAuthenticateId !== ''){
+        if ((string)$this->payPalExpressAuthenticateId !== '') {
             $mollieData[CustomFieldsInterface::PAYPAL_EXPRESS_AUTHENTICATE_ID] = $this->payPalExpressAuthenticateId;
         }
 
