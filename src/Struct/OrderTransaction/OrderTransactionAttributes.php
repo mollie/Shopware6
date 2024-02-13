@@ -90,9 +90,9 @@ class OrderTransactionAttributes
         }
 
         return [
-            'order_id' => $this->mollieOrderId,
-            'payment_id' => $this->molliePaymentId,
-            'third_party_payment_id' => $this->thirdPartyPaymentId,
+            CustomFieldsInterface::ORDER_KEY => $this->mollieOrderId,
+            CustomFieldsInterface::PAYMENT_KEY => $this->molliePaymentId,
+            CustomFieldsInterface::THIRD_PARTY_PAYMENT_KEY => $this->thirdPartyPaymentId,
         ];
     }
 
