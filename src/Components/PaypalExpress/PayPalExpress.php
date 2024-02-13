@@ -84,26 +84,20 @@ class PayPalExpress
 
     /**
      * @param SalesChannelContext $context
-     * @return string
      * @throws \Exception
+     * @return string
      */
     public function getActivePaypalExpressID(SalesChannelContext $context): string
     {
         return $this->repoPaymentMethods->getActivePaypalExpressID($context->getContext());
     }
 
-    public function getActivePaypalID(SalesChannelContext $context)
-    {
-        return $this->repoPaymentMethods->getActivePaypalID($context->getContext());
-
-    }
-
 
     /**
      * @param Cart $cart
      * @param SalesChannelContext $context
-     * @return Session
      * @throws \Mollie\Api\Exceptions\ApiException
+     * @return Session
      */
     public function startSession(Cart $cart, SalesChannelContext $context): Session
     {
@@ -126,11 +120,12 @@ class PayPalExpress
         return $mollie->sessions->create($params);
     }
 
-    public function loadSession(string $sessionId, SalesChannelContext $context)
+    public function loadSession(string $sessionId, SalesChannelContext $context): Session
     {
+        //we need to wait here 2 seconds, until mollie get the data from paypal api
+        usleep(2000);
         $mollie = $this->mollieApiFactory->getClient($context->getSalesChannelId());
         return $mollie->sessions->get($sessionId);
-
     }
 
 
@@ -138,13 +133,12 @@ class PayPalExpress
     /**
      * @param AddressStruct $shippingAddress
      * @param SalesChannelContext $context
-     * @param AddressStruct|null $billingAddress
-     * @return SalesChannelContext
+     * @param null|AddressStruct $billingAddress
      * @throws \Exception
+     * @return SalesChannelContext
      */
     public function prepareCustomer(AddressStruct $shippingAddress, SalesChannelContext $context, ?AddressStruct $billingAddress = null): SalesChannelContext
     {
-
         $updateShippingAddress = true;
         $paypalExpressId = $this->getActivePaypalExpressID($context);
 
@@ -152,14 +146,14 @@ class PayPalExpress
 
         # if we are not logged in,
         # then we have to create a new guest customer for our express order
-        if (! $this->customerService->isCustomerLoggedIn($context)) {
+        # check here for instance because of phpstan
+        if ($customer === null) {
 
             # find existing customer by email
             $customer = $this->customerService->findCustomerByEmail($shippingAddress->getEmail(), $context->getContext());
 
 
             if ($customer === null) {
-
                 $updateShippingAddress = false;
                 $customer = $this->customerService->createGuestAccount(
                     $shippingAddress,
@@ -182,13 +176,11 @@ class PayPalExpress
 
         # if we have an existing customer, we want reuse his shipping address instead of creating new one
         if ($updateShippingAddress) {
-            $this->customerService->reuseOrCreateAddresses($customer, $shippingAddress, $context->getContext(),$billingAddress);
+            $this->customerService->reuseOrCreateAddresses($customer, $shippingAddress, $context->getContext(), $billingAddress);
         }
 
 
         # also (always) update our payment method to use Apple Pay for our cart
         return $this->cartService->updatePaymentMethod($context, $paypalExpressId);
     }
-
-
 }

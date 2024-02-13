@@ -53,6 +53,6 @@ trait RedirectTrait
 
     public function getCheckoutCartPage(RouterInterface $router):string
     {
-        return $router->generate('frontend.checkout.cart.page',[],$router::ABSOLUTE_URL);
+        return $router->generate('frontend.checkout.cart.page', [], $router::ABSOLUTE_URL);
     }
 }

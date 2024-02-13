@@ -6,9 +6,9 @@ use Exception;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieCustomerException;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
-use Kiener\MolliePayments\Repository\CustomerAddress\CustomerAddressRepositoryInterface;
 use Kiener\MolliePayments\Repository\Country\CountryRepositoryInterface;
 use Kiener\MolliePayments\Repository\Customer\CustomerRepositoryInterface;
+use Kiener\MolliePayments\Repository\CustomerAddress\CustomerAddressRepositoryInterface;
 use Kiener\MolliePayments\Repository\Salutation\SalutationRepositoryInterface;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
 use Kiener\MolliePayments\Struct\Address\AddressStruct;
@@ -325,8 +325,8 @@ class CustomerService implements CustomerServiceInterface
      * @param string $customerId
      * @param string $salesChannelId
      * @param Context $context
-     * @return string
      * @throws CustomerCouldNotBeFoundException
+     * @return string
      */
     public function getMollieCustomerId(string $customerId, string $salesChannelId, Context $context): string
     {
@@ -387,8 +387,8 @@ class CustomerService implements CustomerServiceInterface
     /**
      * @param string $customerId
      * @param Context $context
-     * @return CustomerStruct
      * @throws CustomerCouldNotBeFoundException
+     * @return CustomerStruct
      */
     public function getCustomerStruct(string $customerId, Context $context): CustomerStruct
     {
@@ -446,16 +446,10 @@ class CustomerService implements CustomerServiceInterface
     }
 
     /**
-     * @param string $firstname
-     * @param string $lastname
-     * @param string $email
-     * @param string $phone
-     * @param string $street
-     * @param string $zipCode
-     * @param string $city
-     * @param string $countryISO2
+     * @param AddressStruct $shippingAddress
      * @param string $paymentMethodId
      * @param SalesChannelContext $context
+     * @param null|AddressStruct $billingAddress
      * @return null|CustomerEntity
      */
     public function createGuestAccount(AddressStruct $shippingAddress, string $paymentMethodId, SalesChannelContext $context, ?AddressStruct $billingAddress = null): ?CustomerEntity
@@ -626,35 +620,6 @@ class CustomerService implements CustomerServiceInterface
     }
 
 
-    public function setPaypalExpress(CustomerEntity $customer, string $paypalExpressAuthId, Context $context): void
-    {
-        // Get existing custom fields
-        $customFields = $customer->getCustomFields();
-
-        // If custom fields are empty, create a new array
-        if (! is_array($customFields)) {
-            $customFields = [];
-        }
-
-        // Store the card token in the custom fields
-        $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS]['ppe_auth_id'] = $paypalExpressAuthId;
-
-        $this->logger->debug("Setting PPE Marker", [
-            'customerId' => $customer->getId(),
-            'customFields' => $customFields,
-        ]);
-
-        // Store the custom fields on the customer
-        $this->customerRepository->update(
-            [
-                [
-                    'id' => $customer->getId(),
-                    'customFields' => $customFields
-                ]
-            ],
-            $context);
-    }
-
     public function findCustomerByEmail(string $email, Context $context): ?CustomerEntity
     {
         $criteria = new Criteria();
@@ -672,10 +637,9 @@ class CustomerService implements CustomerServiceInterface
         }
 
         return $customerEntity;
-
     }
 
-    public function reuseOrCreateAddresses(CustomerEntity $customer, AddressStruct $shippingAddress, Context $context, ?AddressStruct $billingAddress = null)
+    public function reuseOrCreateAddresses(CustomerEntity $customer, AddressStruct $shippingAddress, Context $context, ?AddressStruct $billingAddress = null): EntityWrittenContainerEvent
     {
         $mollieAddressIds = [$shippingAddress->getMollieAddressId()];
         if ($billingAddress !== null) {
@@ -771,13 +735,20 @@ class CustomerService implements CustomerServiceInterface
         return $this->customerRepository->upsert([$customer], $context);
     }
 
-    private function createShopwareAddressArray(string $addressId, string $customerId, string $salutationId, AddressStruct $address, Context $context): array
+    /**
+     * @param string $addressId
+     * @param string $customerId
+     * @param null|string $salutationId
+     * @param AddressStruct $address
+     * @param Context $context
+     * @return array<mixed>
+     */
+    private function createShopwareAddressArray(string $addressId, string $customerId, ?string $salutationId, AddressStruct $address, Context $context): array
     {
-        return [
+        $addressArray = [
             'id' => $addressId,
             'customerId' => $customerId,
             'countryId' => $this->getCountryId($address->getCountryCode(), $context),
-            'salutationId' => $salutationId,
             'firstName' => $address->getFirstName(),
             'lastName' => $address->getLastName(),
             'street' => $address->getStreet(),
@@ -791,5 +762,9 @@ class CustomerService implements CustomerServiceInterface
                 ]
             ]
         ];
+        if ($salutationId !== null) {
+            $addressArray['salutationId'] = $salutationId;
+        }
+        return $addressArray;
     }
 }

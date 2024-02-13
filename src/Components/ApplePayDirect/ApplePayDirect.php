@@ -20,6 +20,7 @@ use Kiener\MolliePayments\Service\DomainExtractor;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\ShopService;
+use Kiener\MolliePayments\Struct\Address\AddressStruct;
 use Mollie\Api\Exceptions\ApiException;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
@@ -234,7 +235,7 @@ class ApplePayDirect
     {
         # if we already have a backup cart, then do NOT backup again.
         # because this could backup our temp. apple pay cart
-        if (!$this->cartBackupService->isBackupExisting($context)) {
+        if (! $this->cartBackupService->isBackupExisting($context)) {
             $this->cartBackupService->backupCart($context);
         }
 
@@ -350,21 +351,16 @@ class ApplePayDirect
 
         # if we are not logged in,
         # then we have to create a new guest customer for our express order
-        if (!$this->customerService->isCustomerLoggedIn($context)) {
+        if (! $this->customerService->isCustomerLoggedIn($context)) {
+            $address = new AddressStruct($firstname, $lastname, $email, $street, '', $zipcode, $city, $countryCode);
+
             $customer = $this->customerService->createGuestAccount(
-                $firstname,
-                $lastname,
-                $email,
-                '',
-                $street,
-                $zipcode,
-                $city,
-                $countryCode,
+                $address,
                 $applePayID,
                 $context
             );
 
-            if (!$customer instanceof CustomerEntity) {
+            if (! $customer instanceof CustomerEntity) {
                 throw new \Exception('Error when creating customer!');
             }
 
@@ -446,7 +442,7 @@ class ApplePayDirect
         $transactions = $order->getTransactions();
         $transaction = $transactions->last();
 
-        if (!$transaction instanceof OrderTransactionEntity) {
+        if (! $transaction instanceof OrderTransactionEntity) {
             throw new \Exception('Created Apple Pay Direct order has not OrderTransaction!');
         }
 

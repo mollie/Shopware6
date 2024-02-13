@@ -55,6 +55,4 @@ interface CustomerServiceInterface
     public function getSalutationId(Context $context): ?string;
 
     public function createMollieCustomer(string $customerId, string $salesChannelId, Context $context): void;
-
-    public function setPaypalExpress(CustomerEntity $customer, string $paypalExpressAuthId, Context $context);
 }

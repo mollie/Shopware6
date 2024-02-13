@@ -27,22 +27,21 @@ class CustomerAddressRepository implements CustomerAddressRepositoryInterface
 
     public function upsert(array $data, Context $context): EntityWrittenContainerEvent
     {
-        return $this->customerAddressRepository->upsert($data,$context);
+        return $this->customerAddressRepository->upsert($data, $context);
     }
 
     public function create(array $data, Context $context): EntityWrittenContainerEvent
     {
-        return $this->customerAddressRepository->create($data,$context);
+        return $this->customerAddressRepository->create($data, $context);
     }
 
     public function search(Criteria $criteria, Context $context): EntitySearchResult
     {
-        return $this->customerAddressRepository->search($criteria,$context);
+        return $this->customerAddressRepository->search($criteria, $context);
     }
 
     public function update(array $data, Context $context): EntityWrittenContainerEvent
     {
-        return $this->customerAddressRepository->update($data,$context);
+        return $this->customerAddressRepository->update($data, $context);
     }
-
 }

@@ -73,19 +73,12 @@ final class AddressStruct
      */
     public static function createFromApiResponse(\stdClass $address)
     {
-        /**
-         * TODO: remove once molllie fixed the data in the api
-         */
-        $address->firstName = 'Mollie';
-        $address->lastName = 'Mollie';
-        $address->email = 'cd@dasistweb.de';
-
         $streetAdditional = '';
-        if(property_exists($address,'streetAdditional')){
+        if (property_exists($address, 'streetAdditional')) {
             $streetAdditional = $address->streetAdditional;
         }
 
-        return new AddressStruct($address->firstName, $address->lastName, $address->email, $address->streetAndNumber, $streetAdditional, $address->postalCode, $address->city, $address->country);
+        return new AddressStruct($address->givenName, $address->familyName, $address->email, $address->streetAndNumber, $streetAdditional, $address->postalCode, $address->city, $address->country);
     }
 
     public function getFirstName(): string
@@ -130,8 +123,6 @@ final class AddressStruct
 
     public function getMollieAddressId(): string
     {
-
         return md5(implode('-', [$this->firstName, $this->lastName, $this->email, $this->street, $this->streetAdditional, $this->zipCode, $this->city, $this->countryCode]));
     }
-
 }

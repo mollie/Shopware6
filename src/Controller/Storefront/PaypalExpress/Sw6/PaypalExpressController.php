@@ -10,5 +10,4 @@ use Shopware\Core\Framework\Routing\Annotation\RouteScope;
  */
 class PaypalExpressController extends PaypalExpressControllerBase
 {
-
 }

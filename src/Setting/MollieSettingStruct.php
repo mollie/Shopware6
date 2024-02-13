@@ -532,8 +532,8 @@ class MollieSettingStruct extends Struct
     /**
      * returns bank transfer due date in YYYY-MM-DD format or null
      *
-     * @return null|string
      * @throws Exception
+     * @return null|string
      */
     public function getPaymentMethodBankTransferDueDate(): ?string
     {
@@ -566,8 +566,8 @@ class MollieSettingStruct extends Struct
     }
 
     /**
-     * @return string
      * @throws Exception
+     * @return string
      */
     public function getOrderLifetimeDate(): ?string
     {
@@ -986,14 +986,20 @@ class MollieSettingStruct extends Struct
         $this->paypalExpressButtonShape = $paypalExpressButtonShape;
     }
 
+    /**
+     * @return string[]
+     */
     public function getPaypalExpressRestrictions(): array
     {
         return $this->paypalExpressRestrictions;
     }
 
+    /**
+     * @param array<string> $paypalExpressRestrictions
+     * @return void
+     */
     public function setPaypalExpressRestrictions(array $paypalExpressRestrictions): void
     {
         $this->paypalExpressRestrictions = $paypalExpressRestrictions;
     }
-
 }
