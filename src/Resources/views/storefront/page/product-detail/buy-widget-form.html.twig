@@ -54,12 +54,7 @@
                     <input
                             type="hidden"
                             name="quantity"
-                            class="product-detail-quantity-input"
-                            min="{{ product.minPurchase }}"
-                            max="{{ product.calculatedMaxPurchase }}"
-                            step="{{ product.purchaseSteps }}"
                             value="{{ product.minPurchase }}"
-                            aria-label="{{ "component.product.quantitySelect.label"|trans|striptags }}"
                     />
                     <div class="row g-2 form-row mt-2 justify-content-end">
                         {% include '@MolliePayments/mollie/component/paypal-express-button.twig' with {cols: 'col-8'} %}

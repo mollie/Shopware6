@@ -225,7 +225,7 @@ describe('Subscription', () => {
                 it('C4067: Subscription Indicator on PDP can be turned ON @core', () => {
 
                     configAction.updateProducts('', true, 3, 'weeks');
-                    configAction.setupPlugin(true, false, false, true);
+                    configAction.setupPlugin(true, false, false, true,[]);
                     cy.wait(2000);
 
                     cy.visit('/');
@@ -241,7 +241,7 @@ describe('Subscription', () => {
                 it('C4068: Subscription Indicator on PDP can be turned OFF @core', () => {
 
                     configAction.updateProducts('', true, 3, 'weeks');
-                    configAction.setupPlugin(true, false, false, false);
+                    configAction.setupPlugin(true, false, false, false,[]);
                     cy.wait(2000);
 
                     cy.visit('/');
@@ -333,7 +333,7 @@ describe('Subscription', () => {
 
 
 function purchaseSubscriptionAndGoToPayment(){
-    configAction.setupPlugin(true, false, false, true);
+    configAction.setupPlugin(true, false, false, true,[]);
     configAction.updateProducts('', true, 3, 'weeks');
 
     dummyUserScenario.execute();
@@ -452,7 +452,7 @@ function assertAvailablePaymentMethods() {
 }
 
 function prepareSubscriptionAndOpenAdminDetails() {
-    configAction.setupPlugin(true, false, false, true);
+    configAction.setupPlugin(true, false, false, true,[]);
     configAction.updateProducts('', true, 3, 'weeks');
 
     const dummyScenario = new DummyBasketScenario(1)

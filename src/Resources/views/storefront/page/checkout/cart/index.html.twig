@@ -31,7 +31,7 @@
 
     {% if mollie_paypalexpress_enabled and ('cart' not in mollie_paypalexpress_restrictions) %}
         {% block page_checkout_aside_actions_mollie_paypal_express_component %}
-            <form action="{{ path('frontend.mollie.paypal-express.start', {   }) }}" method="GET">
+            <form id="molliePayPalExpressCartForm" action="{{ path('frontend.mollie.paypal-express.start', {   }) }}" method="GET">
                 <div class="mt-2">
                     {% include '@MolliePayments/mollie/component/paypal-express-button.twig' %}
                 </div>

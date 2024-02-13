@@ -6,7 +6,7 @@
 
     {% if mollie_paypalexpress_enabled and ('register' not in mollie_paypalexpress_restrictions) %}
         {% block page_checkout_address_mollie_paypal_express_component %}
-            <form action="{{ path('frontend.mollie.paypal-express.start', {   }) }}" method="GET">
+            <form id="molliePayPalExpressRegisterForm" action="{{ path('frontend.mollie.paypal-express.start', {   }) }}" method="GET">
                 <div class="mt-3 mb-3">
                     {% include '@MolliePayments/mollie/component/paypal-express-button.twig' with {cols: 'col-5'} %}
                 </div>
