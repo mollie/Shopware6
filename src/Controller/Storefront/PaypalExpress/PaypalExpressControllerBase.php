@@ -83,7 +83,6 @@ class PaypalExpressControllerBase extends StorefrontController
 
         if ($oldSessionId !== null) {
             $session = $this->paypalExpress->loadSession($oldSessionId, $context);
-            ;
         } else {
             $session = $this->paypalExpress->startSession($cart, $context);
 
@@ -134,16 +133,12 @@ class PaypalExpressControllerBase extends StorefrontController
         $payPalExpressSession = $this->paypalExpress->loadSession($payPalExpressSessionId, $context);
 
         if ($payPalExpressSession->shippingAddress === null) {
-            # try 2nd time, to reduce redirects and customer complains
-            $payPalExpressSession = $this->paypalExpress->loadSession($payPalExpressSessionId, $context);
-            if ($payPalExpressSession->shippingAddress === null) {
-                $this->logger->error('Failed to finish checkout, got session without shipping address', [
-                    'sessionId' => $payPalExpressSession->id,
-                    'status' => $payPalExpressSession->status
-                ]);
+            $this->logger->error('Failed to finish checkout, got session without shipping address', [
+                'sessionId' => $payPalExpressSession->id,
+                'status' => $payPalExpressSession->status
+            ]);
 
-                return new RedirectResponse($returnUrl);
-            }
+            return new RedirectResponse($returnUrl);
         }
 
         $shippingAddress = AddressStruct::createFromApiResponse($payPalExpressSession->shippingAddress);

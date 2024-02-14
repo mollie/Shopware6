@@ -19,6 +19,15 @@ class PayPalExpress
 {
 
     /**
+     * define how often we ask the session until we get the shipping address
+     */
+    private const SESSION_MAX_RETRY = 5;
+
+    /**
+     * define how long we will wait for the session response
+     */
+    private const SESSION_BASE_TIMEOUT = 2000;
+    /**
      * @var PaymentMethodRepository
      */
     private $repoPaymentMethods;
@@ -122,10 +131,21 @@ class PayPalExpress
 
     public function loadSession(string $sessionId, SalesChannelContext $context): Session
     {
-        //we need to wait here 2 seconds, until mollie get the data from paypal api
-        usleep(2000);
         $mollie = $this->mollieApiFactory->getClient($context->getSalesChannelId());
-        return $mollie->sessions->get($sessionId);
+        /**
+         * if we load the session from mollie api, we dont get the shipping address at first time. usually it takes several seconds until the data from paypal is transfered to mollie
+         * so we try to load the session at least 5 times with increased waiting time.
+         */
+        for ($i = 1; $i <= self::SESSION_MAX_RETRY; $i++) {
+            $sleepTimer = self::SESSION_BASE_TIMEOUT * $i;
+            usleep($sleepTimer);
+            $session = $mollie->sessions->get($sessionId);
+            if ($session->shippingAddress !== null) {
+                break;
+            }
+        }
+
+        return $session;
     }
 
 
