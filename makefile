@@ -180,7 +180,7 @@ endif
 	php switch-composer.php prod
 	# -------------------------------------------------------------------------------------------------
 	@echo "CREATE ZIP FILE"
-	cd .. && zip -qq -r -0 ./.build/MolliePayments.zip MolliePayments/ -x '*.editorconfig' '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*' '*/makefile' '*.DS_Store' '*/.shopware-extension.yml' '*/switch-composer.php' '*/phpunit.xml' '*/.phpunuhi.xml' '*/.infection.json' '*/phpunit.autoload.php' '*/.phpstan*' '*/.php_cs.php' '*/phpinsights.php'
+	cd .. && zip -qq -r -0 ./.build/MolliePayments.zip MolliePayments/* -x '*.editorconfig' '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*' '*/makefile' '*.DS_Store' '*/.shopware-extension.yml' '*/switch-composer.php' '*/phpunit.xml' '*/.phpunuhi.xml' '*/.infection.json' '*/phpunit.autoload.php' '*/.phpstan*' '*/.php_cs.php' '*/phpinsights.php'
 	# -------------------------------------------------------------------------------------------------
 	@echo "RESET COMPOSER.JSON"
 	php switch-composer.php dev
