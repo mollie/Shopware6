@@ -64,11 +64,5 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Subscriber\PaymentMethodRouteCacheKeySubscriber">
-            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-
     </services>
 </container>
