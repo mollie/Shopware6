@@ -148,7 +148,9 @@ Component.override('sw-order-detail-general', {
 
     },
 
-
+    created() {
+        this.createdComponent();
+    },
 
     methods: {
 
