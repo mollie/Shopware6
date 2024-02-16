@@ -151,19 +151,34 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
         return false;
     }
 
+    /**
+     * @param Cart $cart
+     * @param array<mixed> $cacheParts
+     * @return array<mixed>
+     */
     private function addCartAmountKey(Cart $cart, array $cacheParts): array
     {
         $cacheParts[] = $cart->getPrice()->getTotalPrice();
         return $cacheParts;
     }
 
-    private function addCurrencyCodeKey(SalesChannelContext $context, array $cacheParts)
+    /**
+     * @param SalesChannelContext $context
+     * @param array<mixed> $cacheParts
+     * @return array<mixed>
+     */
+    private function addCurrencyCodeKey(SalesChannelContext $context, array $cacheParts):array
     {
         $cacheParts[] = $context->getCurrency()->getIsoCode();
         return $cacheParts;
     }
 
-    private function addBillingAddressKey(SalesChannelContext $context, array $cacheParts)
+    /**
+     * @param SalesChannelContext $context
+     * @param array<mixed> $cacheParts
+     * @return array<mixed>
+     */
+    private function addBillingAddressKey(SalesChannelContext $context, array $cacheParts):array
     {
         $customer = $context->getCustomer();
 
