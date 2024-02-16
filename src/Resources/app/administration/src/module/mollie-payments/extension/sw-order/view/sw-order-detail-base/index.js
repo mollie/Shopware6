@@ -49,12 +49,6 @@ Component.override('sw-order-detail-base', {
         },
     },
 
-    /**
-     *
-     */
-    created() {
-        this.createdComponent();
-    },
 
 
     methods: {
