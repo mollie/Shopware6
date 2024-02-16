@@ -34,6 +34,15 @@
                 </div>
             {% endblock %}
         {% endif %}
+
+        {% if mollie_paypalexpress_enabled and ('pdp' not in mollie_paypalexpress_restrictions) %}
+            {% block page_product_detail_buy_container_mollie_paypal_express_component %}
+                <div class="row g-2 form-row mt-2 justify-content-end">
+                    {% include '@MolliePayments/mollie/component/paypal-express-button.twig' with {cols: 'col-8'} %}
+                </div>
+            {% endblock %}
+        {% endif %}
+
     {% endblock %}
 
 {% endblock %}

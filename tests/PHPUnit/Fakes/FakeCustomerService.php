@@ -5,6 +5,7 @@ namespace MolliePayments\Tests\Fakes;
 
 use Exception;
 use Kiener\MolliePayments\Service\CustomerServiceInterface;
+use Kiener\MolliePayments\Struct\Address\AddressStruct;
 use Kiener\MolliePayments\Struct\CustomerStruct;
 use Kiener\MolliePayments\Struct\Mandate\MandateCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
@@ -28,7 +29,7 @@ final class FakeCustomerService implements CustomerServiceInterface
         $this->throwException = $throwException;
     }
 
-    public function customerLogin(CustomerEntity $customer, SalesChannelContext $context): ?string
+    public function loginCustomer(CustomerEntity $customer, SalesChannelContext $context): ?string
     {
         return null;
     }
@@ -83,7 +84,7 @@ final class FakeCustomerService implements CustomerServiceInterface
         return [];
     }
 
-    public function createApplePayDirectCustomer(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, string $paymentMethodId, SalesChannelContext $context): ?CustomerEntity
+    public function createGuestAccount(AddressStruct $shippingAddress, string $paymentMethodId, SalesChannelContext $context, ?AddressStruct $billingAddress = null): ?CustomerEntity
     {
         return null;
     }

@@ -5,9 +5,10 @@ import MollieApplePayDirect from './mollie-payments/plugins/apple-pay-direct.plu
 import MollieApplePayPaymentMethod from './mollie-payments/plugins/apple-pay-payment-method.plugin';
 import MollieCreditCardMandateManage from './mollie-payments/plugins/creditcard-mandate-manage.plugin';
 import MolliePosTerminalPlugin from './mollie-payments/plugins/pos-terminal.plugin';
+import PayPalExpressPlugin from './mollie-payments/plugins/paypal-express.plugin';
 
 
-export default class MolliRegistration {
+export default class MollieRegistration {
 
     /**
      *
@@ -23,10 +24,14 @@ export default class MolliRegistration {
         // this is just the iDEAL dropdown..not quite sure why its not bound to the DOM -> TODO?
         pluginManager.register('MollieIDealIssuer', MollieIDealIssuer);
 
+        // fix quantity select on PDP Page
+        pluginManager.register('PayPalExpressPlugin',PayPalExpressPlugin);
+
         // hiding the standard Apple Pay method in the checkout and account area
         // -----------------------------------------------------------------------------
         pluginManager.register('MollieApplePayPaymentMethod', MollieApplePayPaymentMethod, '[data-mollie-template-applepay-account]');
         pluginManager.register('MollieApplePayPaymentMethod', MollieApplePayPaymentMethod, '[data-mollie-template-applepay-checkout]');
+
 
 
         // showing credit card components in the checkout

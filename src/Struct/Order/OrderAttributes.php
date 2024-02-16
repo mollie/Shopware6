@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Struct\Order;
 
+use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -105,6 +106,11 @@ class OrderAttributes
     private $bankBic;
 
     /**
+     * @var string
+     */
+    private $payPalExpressAuthenticateId;
+
+    /**
      * @param OrderEntity $order
      */
     public function __construct(OrderEntity $order)
@@ -128,6 +134,7 @@ class OrderAttributes
         $this->bankAccount = $this->getCustomFieldValue($order, 'bankAccount');
         $this->bankBic = $this->getCustomFieldValue($order, 'bankBic');
         $this->timezone = $this->getCustomFieldValue($order, 'timezone');
+        $this->payPalExpressAuthenticateId = $this->getCustomFieldValue($order, CustomFieldsInterface::PAYPAL_EXPRESS_AUTHENTICATE_ID);
     }
 
     /**
@@ -444,6 +451,18 @@ class OrderAttributes
         }
     }
 
+    public function getPayPalExpressAuthenticateId(): string
+    {
+        return $this->payPalExpressAuthenticateId;
+    }
+
+    public function setPayPalExpressAuthenticateId(string $payPalExpressAuthenticateId): void
+    {
+        $this->payPalExpressAuthenticateId = $payPalExpressAuthenticateId;
+    }
+
+
+
     /**
      * @return array<string,mixed>
      */
@@ -528,8 +547,12 @@ class OrderAttributes
             $mollieData['bankBic'] = $this->bankBic;
         }
 
+        if ((string)$this->payPalExpressAuthenticateId !== '') {
+            $mollieData[CustomFieldsInterface::PAYPAL_EXPRESS_AUTHENTICATE_ID] = $this->payPalExpressAuthenticateId;
+        }
+
         return [
-            'mollie_payments' => $mollieData,
+            CustomFieldsInterface::MOLLIE_KEY => $mollieData,
         ];
     }
 
@@ -575,9 +598,9 @@ class OrderAttributes
         $customFields = $order->getCustomFields();
 
         # check if we have a mollie entry
-        if ($customFields !== null && array_key_exists('mollie_payments', $customFields)) {
+        if ($customFields !== null && array_key_exists(CustomFieldsInterface::MOLLIE_KEY, $customFields)) {
             # load the mollie entry
-            $mollieData = $customFields['mollie_payments'];
+            $mollieData = $customFields[CustomFieldsInterface::MOLLIE_KEY];
             # assign our value if we have it
             $foundValue = (array_key_exists($keyName, $mollieData)) ? (string)$mollieData[$keyName] : '';
         }
