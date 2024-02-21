@@ -1,8 +1,9 @@
 {% sw_extends '@Storefront/storefront/base.html.twig' %}
 
 {% block base_main %}
-    
+
     {% block mollie_payments_js_control %}
+        {# pages where apple pay requires js with their mollie_applepaydirect_restrictions names as values #}
         {% set onlyShowHere = {
             'frontend.checkout.confirm.page' : '',
             'frontend.checkout.cart.page' : 'cart',
@@ -19,6 +20,8 @@
         {% if currentRoute == 'frontend.checkout.cart.page' or currentRoute == 'frontend.checkout.confirm.page' %}
             {% set implementJS = true %}
         {% endif %}
+
+        {# requirement check for apple pay #}
         {% if mollie_applepaydirect_enabled %}
             {% if currentRoute in onlyShowHere|keys and onlyShowHere[currentRoute] not in mollie_applepaydirect_restrictions %}
                 {% set implementJS = true %}
