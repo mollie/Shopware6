@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Shopware\Core\Framework\Event;
 
 
-if (interface_exists(__NAMESPACE__.'/OrderWare')) {
+if (interface_exists(__NAMESPACE__.'/OrderAware')) {
     return;
 }
 
