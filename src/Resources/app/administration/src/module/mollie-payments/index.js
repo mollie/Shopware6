@@ -31,7 +31,7 @@ systemConfig.getValues('MolliePayments').then(config => {
 
     const navigation = [];
 
-    if(config['MolliePayments.config.subscriptionsEnabled']) {
+    if (config['MolliePayments.config.subscriptionsEnabled']) {
         navigation.push({
             id: 'mollie-subscriptions',
             label: 'mollie-payments.subscriptions.navigation.title',
@@ -83,6 +83,9 @@ systemConfig.getValues('MolliePayments').then(config => {
         defaultSearchConfiguration,
     });
 
+}).catch((error) => {
+    //here we might get an error because the user dont have the permissions to read system config, we ignore it and dont show mollie plugin at all
+}).finally(() => {
     // Now tell Shopware it's okay to load the administration
     resolve();
 });
