@@ -207,6 +207,18 @@ class ConfigControllerBase extends AbstractController
     }
 
     /**
+     * @Route("/api/_action/mollie/config/subscription", name="api.action.mollie.config.subscription-enabled", methods={"POST"})
+     * @return JsonResponse
+     */
+    public function isSubscriptionEnabled():JsonResponse
+    {
+        $config = $this->settings->getSettings();
+        return new JsonResponse([
+            'enabled' => $config->isSubscriptionsEnabled()
+        ]);
+    }
+
+    /**
      * @param string $snippetName
      * @param string $locale
      * @return string
