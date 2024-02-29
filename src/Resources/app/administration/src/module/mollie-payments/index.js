@@ -19,19 +19,24 @@ import './page/mollie-subscriptions-detail';
 
 import defaultSearchConfiguration from './default-search-configuration';
 
+
 // eslint-disable-next-line no-undef
-const {Module, ApiService, Plugin} = Shopware;
+const {Module,Plugin,Service} = Shopware;
 
 // Tell Shopware to wait loading until we call resolve.
 const resolve = Plugin.addBootPromise();
 
-// Because we first have to load our config from the database
-const systemConfig = ApiService.getByName('systemConfigApiService')
-systemConfig.getValues('MolliePayments').then(config => {
+/**
+ *
+ * @type {MolliePaymentsConfigService}
+ */
+const configService = Service('MolliePaymentsConfigService');
 
+// Because we first have to check if subscription is enabled or not
+configService.getSubscriptionConfig().then(result => {
     const navigation = [];
 
-    if(config['MolliePayments.config.subscriptionsEnabled']) {
+    if (result.enabled === true) {
         navigation.push({
             id: 'mollie-subscriptions',
             label: 'mollie-payments.subscriptions.navigation.title',
@@ -83,6 +88,7 @@ systemConfig.getValues('MolliePayments').then(config => {
         defaultSearchConfiguration,
     });
 
+}).finally(()=>{
     // Now tell Shopware it's okay to load the administration
     resolve();
 });
