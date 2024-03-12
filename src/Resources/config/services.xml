@@ -21,6 +21,7 @@
         <import resource="services/scheduled_tasks.xml"/>
         <import resource="services/subscription/services.xml"/>
         <import resource="services/refundmanager/services.xml"/>
+        <import resource="services/controller.xml"/>
     </imports>
 
 
@@ -174,6 +175,11 @@
         </service>
 
         <service id="Kiener\MolliePayments\Service\TrackingInfoStructFactory"/>
+
+
+        <service id="Kiener\MolliePayments\Subscriber\KernelSubscriber">
+            <tag name="kernel.event_subscriber"/>
+        </service>
 
 
     </services>

@@ -71,8 +71,6 @@ class DependencyLoader
 
         if ($versionCompare->gte('6.5')) {
             $loader->load('compatibility/controller_6.5.xml');
-        } else {
-            $loader->load('compatibility/controller.xml');
         }
 
 
