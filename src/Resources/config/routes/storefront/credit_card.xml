@@ -6,16 +6,19 @@
 
     <route id="frontend.mollie.components.storeCardToken" path="/mollie/components/store-card-token/{customerId}/{cardToken}" methods="GET">
         <default key="_controller">Kiener\MolliePayments\Controller\Storefront\CreditCard\CreditCardControllerBase::storeCardToken</default>
+        <default key="_routeScope">storefront</default>
         <option key="seo">false</option>
     </route>
 
     <route id="frontend.mollie.components.storeMandateId" path="/mollie/components/store-mandate-id/{customerId}/{mandateId}" methods="GET">
         <default key="_controller">Kiener\MolliePayments\Controller\Storefront\CreditCard\CreditCardControllerBase::storeMandateId</default>
+        <default key="_routeScope">storefront</default>
         <option key="seo">false</option>
     </route>
 
     <route id="frontend.mollie.components.revokeMandate" path="/mollie/components/revoke-mandate/{customerId}/{mandateId}" methods="GET">
         <default key="_controller">Kiener\MolliePayments\Controller\Storefront\CreditCard\CreditCardControllerBase::revokeMandate</default>
+        <default key="_routeScope">storefront</default>
         <option key="seo">false</option>
     </route>
 </routes>

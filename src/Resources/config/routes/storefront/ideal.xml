@@ -4,4 +4,10 @@
         xsi:schemaLocation="http://symfony.com/schema/routing
         https://symfony.com/schema/routing/routing-1.0.xsd">
 
+    <route id="frontend.mollie.ideal.storeIssuer" path="/mollie/ideal/store-issuer/{customerId}/{issuerId}" methods="GET">
+        <default key="_controller">Kiener\MolliePayments\Controller\Storefront\iDeal\iDealControllerBase::storeIssuer</default>
+        <default key="_routeScope">storefront</default>
+        <option key="seo">false</option>
+    </route>
+
 </routes>

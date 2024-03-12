@@ -59,8 +59,6 @@ class DependencyLoader
         # load other data
         if ($versionCompare->gte('6.4')) {
             $loader->load('compatibility/services_6.4.xml');
-        } elseif ($versionCompare->gte('6.3.5.0')) {
-            $loader->load('compatibility/services_6.3.5.0.xml');
         }
 
         if ($versionCompare->gte('6.5')) {

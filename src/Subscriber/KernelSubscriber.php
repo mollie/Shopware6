@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Subscriber;
 
-
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\PlatformRequest;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -23,10 +22,9 @@ class KernelSubscriber implements EventSubscriberInterface
     {
         $attributes = $event->getRequest()->attributes;
 
-        /** @var RouteScope|null|string $routeScope */
+        /** @var null|RouteScope|string $routeScope */
         $routeScope = $attributes->get(PlatformRequest::ATTRIBUTE_ROUTE_SCOPE);
         if (is_string($routeScope)) {
-
             $routeScope = new RouteScope(['scopes'=>[$routeScope]]);
 
             $attributes->set(PlatformRequest::ATTRIBUTE_ROUTE_SCOPE, $routeScope);
