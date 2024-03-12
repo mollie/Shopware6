@@ -67,10 +67,6 @@ class DependencyLoader
             $loader->load('compatibility/snippets.xml');
         }
 
-        if ($versionCompare->gte('6.5')) {
-            $loader->load('compatibility/controller_6.5.xml');
-        }
-
 
         $composerDevReqsInstalled = file_exists(__DIR__ . '/../../vendor/bin/phpunit');
 
