@@ -22,6 +22,7 @@
         <import resource="services/subscription/services.xml"/>
         <import resource="services/refundmanager/services.xml"/>
         <import resource="services/controller.xml"/>
+        <import resource="services/snippets.xml"/>
     </imports>
 
 
@@ -181,6 +182,36 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Compatibility\CompatibilityFactory" class="Kiener\MolliePayments\Compatibility\CompatibilityFactory">
+            <argument>%kernel.shopware_version%</argument>
+            <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextService"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway" class="Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway">
+            <factory service="Kiener\MolliePayments\Compatibility\CompatibilityFactory" method="createGateway"/>
+        </service>
+
+
+        <service id="Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\RemovePaymentMethodRoute64"
+                 decorates="Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRoute">
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\RemovePaymentMethodRoute64.inner"/>
+
+            <argument type="tagged" tag="mollie_payments.payment_method.remover.sw64"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\Cache\CachedPaymentMethodRoute64">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <!-- Mail -->
+        <service id="mollie_payments.mail_service" class="Kiener\MolliePayments\Service\Mail\MailService">
+            <argument type="service" id="Shopware\Core\Framework\Validation\DataValidator"/>
+            <argument type="service" id="Shopware\Core\Content\Mail\Service\MailFactory"/>
+            <argument type="service" id="Shopware\Core\Content\Mail\Service\MailSender"/>
+        </service>
 
     </services>
 
