@@ -24,8 +24,14 @@ class KernelSubscriber implements EventSubscriberInterface
 
         /** @var null|RouteScope|string $routeScope */
         $routeScope = $attributes->get(PlatformRequest::ATTRIBUTE_ROUTE_SCOPE);
+
         if (is_string($routeScope)) {
-            $routeScope = new RouteScope(['scopes'=>[$routeScope]]);
+            $routeScope = [$routeScope];
+            
+            if (class_exists(RouteScope::class)) {
+                $routeScope = new RouteScope(['scopes' => [$routeScope]]);
+            }
+
 
             $attributes->set(PlatformRequest::ATTRIBUTE_ROUTE_SCOPE, $routeScope);
         }
