@@ -64,7 +64,7 @@ context("Plugin Config", () => {
             cy.contains('Request support from Mollie');
 
             // the modal should show the Shopware version number
-            cy.contains("v" + shopware.getVersion());
+            cy.contains("v" + shopware.getDisplayedVersion());
 
             // the send button is disabled until data is filled in
             cy.get('.sw-button-process').should('be.disabled');

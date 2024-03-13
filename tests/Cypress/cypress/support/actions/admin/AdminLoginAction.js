@@ -15,6 +15,7 @@ export default class AdminLoginAction {
         cy.get('#sw-field--password').type('shopware');
 
         cy.get('.sw-button').click();
+        cy.wait(2000);
     }
 
 }
