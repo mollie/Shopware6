@@ -181,7 +181,6 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             # that cancel the Shopware order in a coordinated way by Shopware
             throw $ex;
         } catch (Throwable $ex) {
-            dd($ex);
             # this processes all unhandled exceptions.
             # we need to log whatever happens in here, and then also
             # throw an exception that breaks the order in a coordinated way.
