@@ -22,7 +22,7 @@ class KernelSubscriber implements EventSubscriberInterface
     {
         $attributes = $event->getRequest()->attributes;
 
-        /** @var null|RouteScope|string $routeScope */
+        /** @var null|RouteScope|string $routeScopeValue */
         $routeScopeValue = $attributes->get(PlatformRequest::ATTRIBUTE_ROUTE_SCOPE);
 
         if (is_string($routeScopeValue)) {
