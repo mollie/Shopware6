@@ -15,29 +15,27 @@
             </sw-alert>
 
             <sw-container columns="1fr 1fr" gap="16px">
-                <sw-text-field v-model="name"
+                <sw-text-field data-testid="name" v-model="name"
                                :label="$tc('mollie-payments.config.support.form.name')"
                                :placeholder="userName"
                                size="medium">
-
                 </sw-text-field>
-                <sw-email-field v-model="email"
+                <sw-email-field data-testid="email" v-model="email"
                                 :label="$tc('mollie-payments.config.support.form.email')"
                                 :placeholder="user.email"
                                 size="medium">
-
                 </sw-email-field>
             </sw-container>
-            <sw-single-select v-model="recipientLocale"
+            <sw-single-select data-testid="recepient" v-model="recipientLocale"
                               :label="$tc('mollie-payments.config.support.form.recipient')"
                               :options="recipientOptions"
                               size="medium">
             </sw-single-select>
-            <sw-text-field v-model="subject"
+            <sw-text-field data-testid="subject" v-model="subject"
                            :label="$tc('mollie-payments.config.support.form.subject')"
                            size="medium">
             </sw-text-field>
-            <sw-text-editor v-model="message"
+            <sw-text-editor data-testid="message"  v-model="message"
                             :label="$tc('mollie-payments.config.support.form.message')">
             </sw-text-editor>
         </sw-container>

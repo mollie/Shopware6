@@ -70,13 +70,13 @@ context("Plugin Config", () => {
             cy.get('.sw-button-process').should('be.disabled');
 
             // now fill in our data
-            cy.get('#sw-field--name').type('John');
-            cy.get('#sw-field--email').type('test@localhost.com');
-            cy.get('#sw-field--subject').type('Cypress Test Request');
-            cy.get('.sw-text-editor').type('This is an automated request by Cypress and should not be sent.');
+            cy.get('input[data-testid="name"]').type('John');
+            cy.get('[data-testid="email"] input').type('test@localhost.com');
+            cy.get('input[data-testid="subject"]').type('Cypress Test Request');
+            cy.get('[data-testid="message"] [contenteditable="true"]').type('This is an automated request by Cypress and should not be sent.');
 
             // now click somewhere else
-            cy.get('#sw-field--name').click();
+            cy.get('input[data-testid="name"]').click();
 
             // the send button should be enabled now
             cy.get('.sw-button-process').should('not.be.disabled');
