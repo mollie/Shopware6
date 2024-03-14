@@ -166,7 +166,6 @@ class MolliePaymentFinalize
 
                 # fire flow builder event
                 $this->fireFlowBuilderEvent(self::FLOWBUILDER_CANCELED, $order, $salesChannelContext->getContext());
-                
                 /** @phpstan-ignore-next-line  */
                 throw PaymentException::customerCanceled($orderTransactionID, $message);
             } else {

@@ -172,6 +172,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
 
         try {
             $this->finalizeFacade->finalize($transaction, $salesChannelContext);
+            /** @phpstan-ignore-next-line  */
         } catch (PaymentException $ex) {
             $this->logger->error(
                 'Error when finalizing order ' . $transaction->getOrder()->getOrderNumber() . ', Mollie ID: ' . $molliedID . ', ' . $ex->getMessage()
@@ -189,6 +190,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             $this->logger->error(
                 'Unknown Error when finalizing order ' . $transaction->getOrder()->getOrderNumber() . ', Mollie ID: ' . $molliedID . ', ' . $ex->getMessage()
             );
+            /** @phpstan-ignore-next-line  */
             throw PaymentException::asyncFinalizeInterrupted($transaction->getOrderTransaction()->getId(), 'An unknown error happened when finalizing the order. Please see the Shopware logs for more. It can be that the payment in Mollie was succesful and the Shopware order is now cancelled or failed!');
         }
     }
