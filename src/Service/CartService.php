@@ -61,6 +61,7 @@ class CartService implements CartServiceInterface
         $cart = $this->getCalculatedMainCart($context);
         $data = [
             'id' => $productId,
+            'referencedId' => $productId,
             'quantity' => $quantity
         ];
         $productItem = $this->productItemFactory->create($data, $context);
