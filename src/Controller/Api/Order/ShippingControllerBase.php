@@ -57,7 +57,6 @@ class ShippingControllerBase extends AbstractController
 
 
     /**
-     * @Route("/api/_action/mollie/ship/status", name="api.action.mollie.ship.status", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -69,7 +68,6 @@ class ShippingControllerBase extends AbstractController
     }
 
     /**
-     * @Route("/api/v{version}/_action/mollie/ship/status", name="api.action.mollie.ship.status.legacy", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -81,7 +79,6 @@ class ShippingControllerBase extends AbstractController
     }
 
     /**
-     * @Route("/api/_action/mollie/ship/total", name="api.action.mollie.ship.total", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -93,7 +90,6 @@ class ShippingControllerBase extends AbstractController
     }
 
     /**
-     * @Route("/api/v{version}/_action/mollie/ship/total", name="api.action.mollie.ship.total.legacy", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -110,7 +106,6 @@ class ShippingControllerBase extends AbstractController
      * This shipment is based on ship all or rest of items automatically.
      * It can be used by 3rd parties, ERP systems and more.
      *
-     * @Route("/api/mollie/ship/order", name="api.mollie.ship.order", methods={"POST"})
      *
      * @param Request $request
      * @param Context $context
@@ -172,7 +167,6 @@ class ShippingControllerBase extends AbstractController
      * It can be used by 3rd parties, ERP systems and more.
      * This comes without tracking information. Please use the POST version.
      *
-     * @Route("/api/mollie/ship/order", name="api.mollie.ship.order.deprecated", methods={"GET"})
      *
      * @param QueryDataBag $query
      * @param Context $context
@@ -219,7 +213,6 @@ class ShippingControllerBase extends AbstractController
      * This shipment requires a valid list of line items to be provided.
      * It can be used by 3rd parties, ERP systems and more.
      *
-     * @Route("/api/mollie/ship/order/batch", name="api.mollie.ship.order.batch", methods={"POST"})
      *
      * @param Request $request
      * @param Context $context
@@ -323,7 +316,6 @@ class ShippingControllerBase extends AbstractController
      * This is the custom operational route for shipping items using the API.
      * It can be used by 3rd parties, ERP systems and more.
      *
-     * @Route("/api/mollie/ship/item", name="api.mollie.ship.item", methods={"POST"})
      *
      * @param Request $request
      * @param Context $context
@@ -397,7 +389,6 @@ class ShippingControllerBase extends AbstractController
      * It can be used by 3rd parties, ERP systems and more.
      *  This comes without tracking information. Please use the POST version.
      *
-     * @Route("/api/mollie/ship/item", name="api.mollie.ship.item.deprecated", methods={"GET"})
      *
      * @param QueryDataBag $query
      * @param Context $context
@@ -455,7 +446,6 @@ class ShippingControllerBase extends AbstractController
     /**
      * This is the plain action API route that is used in the Shopware Administration.
      *
-     * @Route("/api/_action/mollie/ship", name="api.action.mollie.ship.order", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -485,7 +475,6 @@ class ShippingControllerBase extends AbstractController
     }
 
     /**
-     * @Route("/api/v{version}/_action/mollie/ship", name="api.action.mollie.ship.order.legacy", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -517,7 +506,6 @@ class ShippingControllerBase extends AbstractController
     /**
      * This is the plain action API route that is used in the Shopware Administration.
      *
-     * @Route("/api/_action/mollie/ship/item", name="api.action.mollie.ship.item", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -544,7 +532,6 @@ class ShippingControllerBase extends AbstractController
     }
 
     /**
-     * @Route("/api/v{version}/_action/mollie/ship/item", name="api.action.mollie.ship.item.legacy", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context

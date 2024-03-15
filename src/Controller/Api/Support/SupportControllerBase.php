@@ -36,7 +36,6 @@ class SupportControllerBase extends AbstractController
     }
 
     /**
-     * @Route("/api/_action/mollie/support/request", name="api.action.mollie.support.request", methods={"POST"})
      *
      * @param Request $request
      * @param Context $context
@@ -64,7 +63,6 @@ class SupportControllerBase extends AbstractController
     }
 
     /**
-     * @Route("/api/v{version}/_action/mollie/support/request", name="api.action.mollie.support.request.legacy", methods={"POST"})
      *
      * @param Request $request
      * @param Context $context
