@@ -4,7 +4,7 @@ import MollieSubscriptionGrid from './grids/MollieSubscriptionGrid';
 import SubscriptionService from '../../../../core/service/subscription/subscription.service';
 
 // eslint-disable-next-line no-undef
-const {Component, Mixin, Application} = Shopware;
+const {Component, Mixin, Application, Filter} = Shopware;
 
 // eslint-disable-next-line no-undef
 const {Criteria} = Shopware.Data;
@@ -103,8 +103,8 @@ Component.register('mollie-subscriptions-list', {
             };
         },
         currencyFilter() {
-            return Shopware.Filter.getByName('currency');
-        }
+            return Filter.getByName('currency');
+        },
     },
 
     methods: {
