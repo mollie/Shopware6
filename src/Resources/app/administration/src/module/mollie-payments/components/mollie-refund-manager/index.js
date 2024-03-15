@@ -132,6 +132,10 @@ Component.register('mollie-refund-manager', {
             return this.$tc('mollie-payments.refund-manager.summary.lblDescription', 0, {characters: this.refundDescription.length})
         },
 
+        currencyFilter() {
+            return Shopware.Filter.getByName('currency');
+        }
+
     },
 
     methods: {

@@ -41,6 +41,10 @@ Component.override('sw-order-detail-base', {
             const attr = new OrderAttributes(this.order);
             return attr.isMollieOrder();
         },
+
+        currencyFilter() {
+            return Shopware.Filter.getByName('currency');
+        }
     },
 
     watch: {

@@ -102,6 +102,9 @@ Component.register('mollie-subscriptions-list', {
                 refresh: map.has('icons-regular-undo') ? 'regular-undo' : 'default-arrow-360-left',
             };
         },
+        currencyFilter() {
+            return Shopware.Filter.getByName('currency');
+        }
     },
 
     methods: {

@@ -135,6 +135,10 @@ Component.override('sw-order-detail-general', {
             return this.molliePaymentUrl !== '';
         },
 
+        currencyFilter() {
+            return Shopware.Filter.getByName('currency');
+        }
+
     },
 
     watch: {

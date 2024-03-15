@@ -62,7 +62,7 @@
 
                     {% block mollie_payments_subscription_list_content_amount %}
                         <template #column-amount="{ item }">
-                            {{ item.amount | currency(item.currency) }}
+                            {{ currencyFilter( item.amount , item.currency.isoCode, item.totalRounding.decimals) }}
                         </template>
                     {% endblock %}
 
