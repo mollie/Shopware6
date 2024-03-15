@@ -77,7 +77,7 @@
                                      v-model:value="item.refundAmount"
                                      v-if="isItemRefundable(item) && !isItemPromotion(item)"
                                      :allowEmpty="true"
-                                     :class="{ 'tutorial-active' : tutorialPartialQuantityVisible || tutorialPartialPromotionsVisible || (tutorialRefundShipping && isItemDelivery(item)), 'input-mode-active' : item.refundMode == 'amount', 'input-mode-inactive' : item.refundMode == 'quantity' }"
+                                     :class="{ 'tutorial-active' : tutorialPartialQuantityVisible || tutorialPartialPromotionsVisible || (tutorialRefundShipping && isItemDelivery(item)), 'input-mode-active' : item.refundMode == 'amount', 'input-mode-inactive' : item.refundMode == 'quantity'}"
                                      @change="onItemAmountChanged(item)">
                         <template #suffix>
                             {{ order.currency.symbol }}
@@ -325,7 +325,9 @@
                                          v-model="refundAmount"
                                          v-model:value="refundAmount"
                                          :min="0"
-                                         :class="{ 'tutorial-active' : tutorialPartialAmountRefundVisible || tutorialPartialQuantityVisible || tutorialPartialPromotionsVisible || tutorialRefundShipping }">
+                                         :class="{ 'tutorial-active' : tutorialPartialAmountRefundVisible || tutorialPartialQuantityVisible || tutorialPartialPromotionsVisible || tutorialRefundShipping }"
+                                         class="refund-amount"
+                        >
                             <template #suffix>
                                 {{ order.currency.symbol }}
                             </template>
@@ -342,7 +344,7 @@
                                        type="textarea"
                                        v-model="refundDescription"
                                        v-model:value="refundDescription"
-                                       class="field-description"
+                                       class="field-description refund-description"
                                        :label="descriptionCharacterCountingTitle"
                                        :placeholder="$tc('mollie-payments.refund-manager.summary.placeholderDescription')"
                                        :helpText="$tc('mollie-payments.refund-manager.summary.descriptionHelp')">
@@ -352,7 +354,7 @@
                                        type="textarea"
                                        v-model="refundInternalDescription"
                                        v-model:value="refundInternalDescription"
-                                       class="field-description"
+                                       class="field-description refund-internal-description"
                                        :label="$tc('mollie-payments.refund-manager.summary.lblInternalDescription')"
                                        :placeholder="$tc('mollie-payments.refund-manager.summary.placeholderInternalDescription')"
                                        :helpText="$tc('mollie-payments.refund-manager.summary.internalDescriptionHelp')">
@@ -427,7 +429,7 @@
                     </sw-container>
                 </template>
                 <template #column-createdAt="{ item }">
-                    {{ item.createdAt | date({hour: '2-digit', minute: '2-digit'}) }}
+                    {{ dateFilter(item.createdAt, { hour: '2-digit', minute: '2-digit' }) }}
                 </template>
                 <template #column-composition="{ item }">
                     <sw-label v-for="composition in getRefundCompositions(item)"

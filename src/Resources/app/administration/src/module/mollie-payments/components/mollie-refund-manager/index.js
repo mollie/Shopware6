@@ -135,6 +135,10 @@ Component.register('mollie-refund-manager', {
         currencyFilter() {
             return Filter.getByName('currency');
         },
+
+        dateFilter() {
+            return Filter.getByName('date');
+        },
     },
 
     methods: {
