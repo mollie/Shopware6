@@ -1,21 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mollie\Api\Endpoints;
 
+use Mollie\Api\Resources\Chargeback;
+use Mollie\Api\Resources\ChargebackCollection;
 use Mollie\Api\Resources\LazyCollection;
-use Mollie\Api\Resources\Payment;
-use Mollie\Api\Resources\PaymentCollection;
 
-class SettlementPaymentEndpoint extends CollectionEndpointAbstract
+class SettlementChargebackEndpoint extends CollectionEndpointAbstract
 {
-    protected $resourcePath = "settlements_payments";
+    protected $resourcePath = "settlements_chargebacks";
 
     /**
      * @inheritDoc
      */
     protected function getResourceObject()
     {
-        return new Payment($this->client);
+        return new Chargeback($this->client);
     }
 
     /**
@@ -23,21 +25,21 @@ class SettlementPaymentEndpoint extends CollectionEndpointAbstract
      */
     protected function getResourceCollectionObject($count, $_links)
     {
-        return new PaymentCollection($this->client, $count, $_links);
+        return new ChargebackCollection($this->client, $count, $_links);
     }
 
     /**
-     * Retrieves a collection of Payments from Mollie.
+     * Retrieves a collection of Settlement Chargebacks from Mollie.
      *
      * @param string $settlementId
-     * @param string $from The first payment ID you want to include in your list.
-     * @param int $limit
+     * @param string|null $from The first chargeback ID you want to include in your list.
+     * @param int|null $limit
      * @param array $parameters
      *
      * @return mixed
      * @throws \Mollie\Api\Exceptions\ApiException
      */
-    public function pageForId($settlementId, $from = null, $limit = null, array $parameters = [])
+    public function pageForId(string $settlementId, string $from = null, int $limit = null, array $parameters = [])
     {
         $this->parentId = $settlementId;
 
@@ -45,7 +47,7 @@ class SettlementPaymentEndpoint extends CollectionEndpointAbstract
     }
 
     /**
-     * Create an iterator for iterating over payments for the given settlement id, retrieved from Mollie.
+     * Create an iterator for iterating over chargeback for the given settlement id, retrieved from Mollie.
      *
      * @param string $settlementId
      * @param string $from The first resource ID you want to include in your list.
