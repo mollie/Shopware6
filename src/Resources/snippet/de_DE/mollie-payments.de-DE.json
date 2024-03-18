@@ -43,6 +43,10 @@
                 "deleteButton": "Löschen",
                 "deleteConfirmation": "Sind Sie sicher, dass Sie die Zahlart löschen möchten?",
                 "title": "Bestätigung zum Löschen"
+            },
+            "bancomatPay": {
+              "headLine": "Telefonnummer",
+              "phoneErrorMessage": "Die Telefonnummer ist im E.164-Format erforderlich. Zum Beispiel +31208202070"
             }
         },
         "messages": {

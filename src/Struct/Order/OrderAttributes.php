@@ -105,6 +105,11 @@ class OrderAttributes
     private $bankBic;
 
     /**
+     * @var string
+     */
+    private $bancomatPayPhoneNumber;
+
+    /**
      * @param OrderEntity $order
      */
     public function __construct(OrderEntity $order)
@@ -128,6 +133,7 @@ class OrderAttributes
         $this->bankAccount = $this->getCustomFieldValue($order, 'bankAccount');
         $this->bankBic = $this->getCustomFieldValue($order, 'bankBic');
         $this->timezone = $this->getCustomFieldValue($order, 'timezone');
+        $this->bancomatPayPhoneNumber = $this->getCustomFieldValue($order, 'bancomatPayPhoneNumber');
     }
 
     /**
@@ -445,6 +451,24 @@ class OrderAttributes
     }
 
     /**
+     * @return string
+     */
+    public function getBancomatPayPhoneNumber(): string
+    {
+        return $this->bancomatPayPhoneNumber;
+    }
+
+    /**
+     * @param string $bancomatPayPhoneNumber
+     * @return void
+     */
+    public function setBancomatPayPhoneNumber(string $bancomatPayPhoneNumber): void
+    {
+        $this->bancomatPayPhoneNumber = $bancomatPayPhoneNumber;
+    }
+
+
+    /**
      * @return array<string,mixed>
      */
     public function toArray(): array
@@ -528,6 +552,9 @@ class OrderAttributes
             $mollieData['bankBic'] = $this->bankBic;
         }
 
+        if ($this->bancomatPayPhoneNumber !== '') {
+            $mollieData['bancomatPayPhoneNumber'] = $this->bancomatPayPhoneNumber;
+        }
         return [
             'mollie_payments' => $mollieData,
         ];

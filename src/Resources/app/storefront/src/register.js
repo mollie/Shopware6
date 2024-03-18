@@ -5,6 +5,7 @@ import MollieApplePayDirect from './mollie-payments/plugins/apple-pay-direct.plu
 import MollieApplePayPaymentMethod from './mollie-payments/plugins/apple-pay-payment-method.plugin';
 import MollieCreditCardMandateManage from './mollie-payments/plugins/creditcard-mandate-manage.plugin';
 import MolliePosTerminalPlugin from './mollie-payments/plugins/pos-terminal.plugin';
+import MollieBancomatPlugin from "./mollie-payments/plugins/bancomat-plugin";
 
 
 export default class MolliRegistration {
@@ -42,6 +43,8 @@ export default class MolliRegistration {
         // POS Terminal
         // -----------------------------------------------------------------------------
         pluginManager.register('MolliePosTerminal', MolliePosTerminalPlugin, '[data-mollie-template-pos-terminal]');
+
+        pluginManager.register('MollieBancomatPlugin',MollieBancomatPlugin);
     }
 
 }

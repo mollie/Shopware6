@@ -43,6 +43,10 @@
                 "deleteButton": "Delete",
                 "deleteConfirmation": "Are you sure you want to delete?",
                 "title": "Delete Confirmation"
+            },
+            "bancomatPay": {
+              "headLine": "Phone number",
+              "phoneErrorMessage": "Phone Number is required in the E.164 format. For example +31208202070"
             }
         },
         "messages": {
