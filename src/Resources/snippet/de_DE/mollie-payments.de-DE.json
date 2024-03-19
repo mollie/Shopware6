@@ -46,7 +46,7 @@
             },
             "bancomatPay": {
               "headLine": "Telefonnummer",
-              "phoneErrorMessage": "Die Telefonnummer ist im E.164-Format erforderlich. Zum Beispiel +31208202070"
+              "phoneErrorMessage": "Die Telefonnummer ist erforderlich. Zum Beispiel +31208202070"
             }
         },
         "messages": {

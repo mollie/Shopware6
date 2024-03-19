@@ -17,7 +17,7 @@
     {% set includeJsInHeader = false %}
 
     {# js always required on this pages #}
-    {% if currentRoute == 'frontend.checkout.cart.page' or currentRoute == 'frontend.checkout.confirm.page' %}
+    {% if currentRoute == 'frontend.checkout.cart.page' or currentRoute == 'frontend.checkout.confirm.page'  or currentRoute == 'frontend.account.edit-order.page' %}
         {% set includeJsInHeader = true %}
     {% endif %}
 

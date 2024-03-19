@@ -33,8 +33,6 @@ describe('Bancomat Pay', () => {
             scenarioDummyBasket.execute();
 
             paymentAction.switchPaymentMethod('Bancomat Pay');
-
-            // payment would only work using currency CHF which cannot be done at the moment
         })
 
     })

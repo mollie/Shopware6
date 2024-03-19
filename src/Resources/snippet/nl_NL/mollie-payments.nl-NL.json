@@ -46,7 +46,7 @@
             },
             "bancomatPay": {
               "headLine": "Telefoonnummer",
-              "phoneErrorMessage": "Telefoonnummer is vereist in het E.164-formaat. Bijvoorbeeld +31208202070"
+              "phoneErrorMessage": "Telefoonnummer is vereist. Bijvoorbeeld +31208202070"
             }
         },
         "messages": {
