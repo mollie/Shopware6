@@ -15,7 +15,7 @@ class In3Payment extends PaymentHandler
     /**
      *
      */
-    public const PAYMENT_METHOD_DESCRIPTION = 'in3';
+    public const PAYMENT_METHOD_DESCRIPTION = 'iDeal IN3';
 
     /**
      * @var string

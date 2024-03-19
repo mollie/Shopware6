@@ -182,8 +182,12 @@ class PaymentMethodService
                 $translations = $existingPaymentMethod->getTranslations();
 
                 if ($translations !== null) {
+                    $paymentMethodData['translations'][Defaults::LANGUAGE_SYSTEM] = [
+                        'name' => $existingPaymentMethod->getName()
+                    ];
+
                     foreach ($translations as $translation) {
-                        $paymentMethodData['translations'][$translation->getLanguageId()]=[
+                        $paymentMethodData['translations'][$translation->getLanguageId()] = [
                             'name' => $translation->getName()
                         ];
                     }
