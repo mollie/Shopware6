@@ -17,6 +17,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Customer\CustomerDefinition;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Checkout\Customer\SalesChannel\AbstractRegisterRoute;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
@@ -52,7 +53,8 @@ class CustomerServiceTest extends TestCase
             $this->settingsService,
             'does.not.matter.here',
             $this->createMock(NumberRangeValueGeneratorInterface::class),
-            $this->createMock(ConfigService::class)
+            $this->createMock(ConfigService::class),
+            $this->createMock(AbstractRegisterRoute::class),
         );
     }
 

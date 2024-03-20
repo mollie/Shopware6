@@ -69,6 +69,7 @@
             <argument>%kernel.shopware_version%</argument>
             <argument type="service" id="Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface"/>
             <argument type="service" id="Kiener\MolliePayments\Service\ConfigService"/>
+            <argument type="service" id="Shopware\Core\Checkout\Customer\SalesChannel\RegisterRoute"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\MandateService" class="Kiener\MolliePayments\Service\MandateService">

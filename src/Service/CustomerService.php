@@ -6,10 +6,8 @@ use Exception;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieCustomerException;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
-use Kiener\MolliePayments\Repository\Country\CountryRepository;
 use Kiener\MolliePayments\Repository\Country\CountryRepositoryInterface;
 use Kiener\MolliePayments\Repository\Customer\CustomerRepositoryInterface;
-use Kiener\MolliePayments\Repository\Salutation\SalutationRepository;
 use Kiener\MolliePayments\Repository\Salutation\SalutationRepositoryInterface;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
 use Kiener\MolliePayments\Struct\CustomerStruct;
@@ -18,12 +16,14 @@ use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEnt
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Customer\Event\CustomerBeforeLoginEvent;
 use Shopware\Core\Checkout\Customer\Event\CustomerLoginEvent;
+use Shopware\Core\Checkout\Customer\SalesChannel\AbstractRegisterRoute;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
-use Shopware\Core\Framework\Uuid\Uuid;
+use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
+use Shopware\Core\Framework\Validation\Exception\ConstraintViolationException;
 use Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -78,6 +78,11 @@ class CustomerService implements CustomerServiceInterface
     /** @var NumberRangeValueGeneratorInterface */
     private $valueGenerator;
 
+    /**
+     * @var AbstractRegisterRoute
+     */
+    private $abstractRegisterRoute;
+
 
     /**
      * @param CountryRepositoryInterface $countryRepository
@@ -92,8 +97,20 @@ class CustomerService implements CustomerServiceInterface
      * @param NumberRangeValueGeneratorInterface $valueGenerator
      * @param ConfigService $configService
      */
-    public function __construct(CountryRepositoryInterface $countryRepository, CustomerRepositoryInterface $customerRepository, Customer $customerApiService, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger, SalesChannelContextPersister $salesChannelContextPersister, SalutationRepositoryInterface $salutationRepository, SettingsService $settingsService, string $shopwareVersion, NumberRangeValueGeneratorInterface $valueGenerator, ConfigService $configService)
-    {
+    public function __construct(
+        CountryRepositoryInterface $countryRepository,
+        CustomerRepositoryInterface $customerRepository,
+        Customer $customerApiService,
+        EventDispatcherInterface $eventDispatcher,
+        LoggerInterface $logger,
+        SalesChannelContextPersister $salesChannelContextPersister,
+        SalutationRepositoryInterface $salutationRepository,
+        SettingsService $settingsService,
+        string $shopwareVersion,
+        NumberRangeValueGeneratorInterface $valueGenerator,
+        ConfigService $configService,
+        AbstractRegisterRoute $abstractRegisterRoute
+    ) {
         $this->countryRepository = $countryRepository;
         $this->customerRepository = $customerRepository;
         $this->customerApiService = $customerApiService;
@@ -105,6 +122,7 @@ class CustomerService implements CustomerServiceInterface
         $this->shopwareVersion = $shopwareVersion;
         $this->valueGenerator = $valueGenerator;
         $this->configService = $configService;
+        $this->abstractRegisterRoute = $abstractRegisterRoute;
     }
 
     /**
@@ -451,54 +469,37 @@ class CustomerService implements CustomerServiceInterface
      * @param SalesChannelContext $context
      * @return null|CustomerEntity
      */
-    public function createApplePayDirectCustomer(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, string $paymentMethodId, SalesChannelContext $context): ?CustomerEntity
+    public function createApplePayDirectCustomer(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, SalesChannelContext $context): ?CustomerEntity
     {
-        $customerId = Uuid::randomHex();
-        $addressId = Uuid::randomHex();
-
-        $salutationId = $this->getSalutationId($context->getContext());
         $countryId = $this->getCountryId($countryISO2, $context->getContext());
 
-        $customerNumber = $this->valueGenerator->getValue(
-            'customer',
-            $context->getContext(),
-            $context->getSalesChannelId()
-        );
+        $data = new RequestDataBag();
+        $data->set('guest', true);
+        $data->set('firstName', $firstname);
+        $data->set('lastName', $lastname);
+        $data->set('email', $email);
 
-        $customer = [
-            'id' => $customerId,
-            'salutationId' => $salutationId,
-            'firstName' => $firstname,
-            'lastName' => $lastname,
-            'customerNumber' => $customerNumber,
-            'guest' => true,
-            'email' => $email,
-            'password' => Uuid::randomHex(),
-            'defaultPaymentMethodId' => $paymentMethodId,
-            'groupId' => $context->getSalesChannel()->getCustomerGroupId(),
-            'salesChannelId' => $context->getSalesChannel()->getId(),
-            'defaultBillingAddressId' => $addressId,
-            'defaultShippingAddressId' => $addressId,
-            'addresses' => [
-                [
-                    'id' => $addressId,
-                    'customerId' => $customerId,
-                    'countryId' => $countryId,
-                    'salutationId' => $salutationId,
-                    'firstName' => $firstname,
-                    'lastName' => $lastname,
-                    'street' => $street,
-                    'zipcode' => $zipCode,
-                    'city' => $city,
-                    'phoneNumber' => $phone,
-                ],
-            ],
-        ];
+        $billingAddress = new RequestDataBag();
+        $billingAddress->set('street', $street);
+        $billingAddress->set('zipcode', $zipCode);
+        $billingAddress->set('city', $city);
+        $billingAddress->set('phoneNumber', $phone);
+        $billingAddress->set('countryId', $countryId);
 
-        // Add the customer to the database
-        $this->customerRepository->upsert([$customer], $context->getContext());
+        $data->set('billingAddress', $billingAddress);
 
-        return $this->getCustomer($customerId, $context->getContext());
+        try {
+            $response = $this->abstractRegisterRoute->register($data, $context, false);
+            return $response->getCustomer();
+        } catch (ConstraintViolationException $e) {
+            $errors = [];
+            /** we have to store the errors in an array because getErrors returns a generator */
+            foreach ($e->getErrors() as $error) {
+                $errors[]=$error;
+            }
+            $this->logger->error($e->getMessage(), ['errors'=>$errors]);
+            return null;
+        }
     }
 
     /**
