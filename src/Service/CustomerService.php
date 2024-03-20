@@ -24,7 +24,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\Framework\Validation\Exception\ConstraintViolationException;
-use Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -75,8 +74,6 @@ class CustomerService implements CustomerServiceInterface
     /** @var string */
     private $shopwareVersion;
 
-    /** @var NumberRangeValueGeneratorInterface */
-    private $valueGenerator;
 
     /**
      * @var AbstractRegisterRoute
@@ -94,7 +91,6 @@ class CustomerService implements CustomerServiceInterface
      * @param SalutationRepositoryInterface $salutationRepository
      * @param SettingsService $settingsService
      * @param string $shopwareVersion
-     * @param NumberRangeValueGeneratorInterface $valueGenerator
      * @param ConfigService $configService
      */
     public function __construct(
@@ -107,7 +103,6 @@ class CustomerService implements CustomerServiceInterface
         SalutationRepositoryInterface $salutationRepository,
         SettingsService $settingsService,
         string $shopwareVersion,
-        NumberRangeValueGeneratorInterface $valueGenerator,
         ConfigService $configService,
         AbstractRegisterRoute $abstractRegisterRoute
     ) {
@@ -120,7 +115,6 @@ class CustomerService implements CustomerServiceInterface
         $this->salutationRepository = $salutationRepository;
         $this->settingsService = $settingsService;
         $this->shopwareVersion = $shopwareVersion;
-        $this->valueGenerator = $valueGenerator;
         $this->configService = $configService;
         $this->abstractRegisterRoute = $abstractRegisterRoute;
     }
@@ -465,7 +459,6 @@ class CustomerService implements CustomerServiceInterface
      * @param string $zipCode
      * @param string $city
      * @param string $countryISO2
-     * @param string $paymentMethodId
      * @param SalesChannelContext $context
      * @return null|CustomerEntity
      */

@@ -52,7 +52,6 @@ class CustomerServiceTest extends TestCase
             $this->createMock(SalutationRepository::class),
             $this->settingsService,
             'does.not.matter.here',
-            $this->createMock(NumberRangeValueGeneratorInterface::class),
             $this->createMock(ConfigService::class),
             $this->createMock(AbstractRegisterRoute::class),
         );
