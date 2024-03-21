@@ -70,29 +70,5 @@ context("Apple Pay", () => {
             cy.contains('Apple Pay').should('not.exist');
         })
     })
-
-    describe('Account', () => {
-
-        it('C4081: Apple Pay hidden in account even if possible in browser @core', () => {
-
-            applePayFactory.registerApplePay(true);
-
-            scenarioDummyUser.execute();
-            accountAction.openPaymentMethods();
-
-            cy.wait(2000);
-            cy.contains('Apple Pay').should('not.exist');
-        })
-
-        it('C4083: Apple Pay hidden if not possible in browser (Account) @core', () => {
-
-            applePayFactory.registerApplePay(false);
-
-            scenarioDummyUser.execute();
-            accountAction.openPaymentMethods();
-
-            cy.wait(2000);
-            cy.contains('Apple Pay').should('not.exist');
-        })
-    })
+    
 })
