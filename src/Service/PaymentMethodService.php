@@ -17,6 +17,7 @@ use Kiener\MolliePayments\Handler\Method\iDealPayment;
 use Kiener\MolliePayments\Handler\Method\In3Payment;
 use Kiener\MolliePayments\Handler\Method\IngHomePayPayment;
 use Kiener\MolliePayments\Handler\Method\KbcPayment;
+use Kiener\MolliePayments\Handler\Method\KlarnaOnePayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaPayLaterPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaPayNowPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaSliceItPayment;
@@ -430,6 +431,7 @@ class PaymentMethodService
             KlarnaPayLaterPayment::class,
             KlarnaPayNowPayment::class,
             KlarnaSliceItPayment::class,
+            KlarnaOnePayment::class,
             PayPalPayment::class,
             PaySafeCardPayment::class,
             Przelewy24Payment::class,
