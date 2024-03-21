@@ -117,7 +117,8 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
                 $this->paymentMethod,
                 $transaction,
                 $salesChannelContext,
-                $this
+                $this,
+                $dataBag
             );
 
             $paymentUrl = $paymentData->getCheckoutURL();
