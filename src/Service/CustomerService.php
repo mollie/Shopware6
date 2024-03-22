@@ -11,12 +11,13 @@ use Kiener\MolliePayments\Repository\Customer\CustomerRepositoryInterface;
 use Kiener\MolliePayments\Repository\Salutation\SalutationRepositoryInterface;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
 use Kiener\MolliePayments\Struct\CustomerStruct;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Customer\Event\CustomerBeforeLoginEvent;
 use Shopware\Core\Checkout\Customer\Event\CustomerLoginEvent;
-use Shopware\Core\Checkout\Customer\SalesChannel\AbstractRegisterRoute;
+use Shopware\Core\Checkout\Customer\SalesChannel\RegisterRoute;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
@@ -76,9 +77,9 @@ class CustomerService implements CustomerServiceInterface
 
 
     /**
-     * @var AbstractRegisterRoute
+     * @var ContainerInterface
      */
-    private $abstractRegisterRoute;
+    private $container;
 
 
     /**
@@ -104,7 +105,7 @@ class CustomerService implements CustomerServiceInterface
         SettingsService $settingsService,
         string $shopwareVersion,
         ConfigService $configService,
-        AbstractRegisterRoute $abstractRegisterRoute
+        ContainerInterface $container //we have to inject the container, because in SW 6.4.20.2 we have circular injection for the register route
     ) {
         $this->countryRepository = $countryRepository;
         $this->customerRepository = $customerRepository;
@@ -116,7 +117,7 @@ class CustomerService implements CustomerServiceInterface
         $this->settingsService = $settingsService;
         $this->shopwareVersion = $shopwareVersion;
         $this->configService = $configService;
-        $this->abstractRegisterRoute = $abstractRegisterRoute;
+        $this->container = $container;
     }
 
     /**
@@ -465,8 +466,10 @@ class CustomerService implements CustomerServiceInterface
     public function createApplePayDirectCustomer(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, SalesChannelContext $context): ?CustomerEntity
     {
         $countryId = $this->getCountryId($countryISO2, $context->getContext());
+        $salutationId = $this->getSalutationId($context->getContext());
 
         $data = new RequestDataBag();
+        $data->set('salutationId', $salutationId);
         $data->set('guest', true);
         $data->set('firstName', $firstname);
         $data->set('lastName', $lastname);
@@ -482,7 +485,8 @@ class CustomerService implements CustomerServiceInterface
         $data->set('billingAddress', $billingAddress);
 
         try {
-            $response = $this->abstractRegisterRoute->register($data, $context, false);
+            $abstractRegisterRoute = $this->container->get(RegisterRoute::class);
+            $response = $abstractRegisterRoute->register($data, $context, false);
             return $response->getCustomer();
         } catch (ConstraintViolationException $e) {
             $errors = [];

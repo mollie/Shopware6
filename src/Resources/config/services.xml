@@ -68,7 +68,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument>%kernel.shopware_version%</argument>
             <argument type="service" id="Kiener\MolliePayments\Service\ConfigService"/>
-            <argument type="service" id="Shopware\Core\Checkout\Customer\SalesChannel\RegisterRoute"/>
+            <argument type="service" id="service_container"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\MandateService" class="Kiener\MolliePayments\Service\MandateService">
