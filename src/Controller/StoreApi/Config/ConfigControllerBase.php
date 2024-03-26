@@ -50,7 +50,6 @@ class ConfigControllerBase
 
 
     /**
-     * @Route("/store-api/mollie/config", name="store-api.mollie.config", methods={"GET"})
      *
      * @param SalesChannelContext $context
      * @throws \Exception

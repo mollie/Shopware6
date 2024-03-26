@@ -6,6 +6,7 @@ use Exception;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatcherAdapterInterface;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactoryInterface;
 use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGatewayInterface;
+use Kiener\MolliePayments\Controller\Storefront\AbstractStoreFrontController;
 use Kiener\MolliePayments\Event\PaymentPageFailEvent;
 use Kiener\MolliePayments\Exception\CouldNotFetchTransactionException;
 use Kiener\MolliePayments\Exception\MissingMollieOrderIdException;
@@ -25,22 +26,17 @@ use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttribut
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Order;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\OrderStates;
-use Shopware\Core\Framework\Event\BusinessEventDispatcher;
-use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\RouterInterface;
 
-class MollieFailureControllerBase extends StorefrontController
+class MollieFailureControllerBase extends AbstractStoreFrontController
 {
     /**
      * @var RouterInterface
@@ -131,8 +127,8 @@ class MollieFailureControllerBase extends StorefrontController
         $this->customerService = $customerService;
     }
 
+
     /**
-     * @Route("/mollie/payment/failed/{transactionId}", defaults={"csrf_protected"=false}, name="frontend.mollie.payment-failed", options={"seo"="false"}, methods={"GET", "POST"})
      *
      * @param SalesChannelContext $salesChannelContext
      * @param string $transactionId
@@ -205,7 +201,6 @@ class MollieFailureControllerBase extends StorefrontController
 
 
     /**
-     * @Route("/mollie/payment/retry/{transactionId}", defaults={"csrf_protected"=false}, name="frontend.mollie.payment.retry", options={"seo"="false"}, methods={"GET", "POST"})
      *
      * @param SalesChannelContext $context
      * @param string $transactionId

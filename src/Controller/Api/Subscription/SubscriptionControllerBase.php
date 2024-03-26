@@ -31,7 +31,6 @@ class SubscriptionControllerBase extends AbstractController
     }
 
     /**
-     * @Route("/api/_action/mollie/subscriptions/cancel", name="api.action.mollie.subscription.cancel", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -52,7 +51,6 @@ class SubscriptionControllerBase extends AbstractController
     }
 
     /**
-     * @Route("/api/v{version}/_action/mollie/subscriptions/cancel", name="api.action.mollie.subscription.cancel_legacy", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -64,7 +62,6 @@ class SubscriptionControllerBase extends AbstractController
     }
 
     /**
-     * @Route("/api/_action/mollie/subscriptions/pause", name="api.action.mollie.subscription.pause", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -85,7 +82,6 @@ class SubscriptionControllerBase extends AbstractController
     }
 
     /**
-     * @Route("/api/v{version}/_action/mollie/subscriptions/pause", name="api.action.mollie.subscription.pause_legacy", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -97,7 +93,6 @@ class SubscriptionControllerBase extends AbstractController
     }
 
     /**
-     * @Route("/api/_action/mollie/subscriptions/resume", name="api.action.mollie.subscription.resume", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -118,7 +113,6 @@ class SubscriptionControllerBase extends AbstractController
     }
 
     /**
-     * @Route("/api/v{version}/_action/mollie/subscriptions/resume", name="api.action.mollie.subscription.resume_legacy", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -130,7 +124,6 @@ class SubscriptionControllerBase extends AbstractController
     }
 
     /**
-     * @Route("/api/_action/mollie/subscriptions/skip", name="api.action.mollie.subscription.skip", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -152,7 +145,6 @@ class SubscriptionControllerBase extends AbstractController
     }
 
     /**
-     * @Route("/api/v{version}/_action/mollie/subscriptions/skip", name="api.action.mollie.subscription.skip_legacy", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param Context $context

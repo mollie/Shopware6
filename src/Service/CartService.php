@@ -5,8 +5,8 @@ namespace Kiener\MolliePayments\Service;
 use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway;
 use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGatewayInterface;
 use Shopware\Core\Checkout\Cart\Cart;
+use Shopware\Core\Checkout\Cart\LineItemFactoryHandler\ProductLineItemFactory;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService as SalesChannelCartService;
-use Shopware\Core\Content\Product\Cart\ProductLineItemFactory;
 use Shopware\Core\Framework\Validation\DataBag\DataBag;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Shopware\Core\System\SalesChannel\SalesChannel\SalesChannelContextSwitcher;
@@ -59,8 +59,12 @@ class CartService implements CartServiceInterface
     public function addProduct(string $productId, int $quantity, SalesChannelContext $context): Cart
     {
         $cart = $this->getCalculatedMainCart($context);
-
-        $productItem = $this->productItemFactory->create($productId, ['quantity' => $quantity]);
+        $data = [
+            'id' => $productId,
+            'referencedId' => $productId,
+            'quantity' => $quantity
+        ];
+        $productItem = $this->productItemFactory->create($data, $context);
 
         return $this->swCartService->add($cart, $productItem, $context);
     }

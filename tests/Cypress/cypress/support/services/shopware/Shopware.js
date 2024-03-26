@@ -14,6 +14,14 @@ export default class Shopware {
     }
 
     /**
+     * sometimes we test RC versions, and shopware display the version differently in the admin
+     * @returns {string}
+     */
+    getDisplayedVersion(){
+        return Cypress.env().SHOPWARE.replace('-rc',' RC ');
+    }
+
+    /**
      *
      * @returns {string}
      */

@@ -22,14 +22,18 @@
             <template #column-itemselect="{ item }">
                 <sw-checkbox-field v-if="item.originalQuantity > 0"
                                    :bordered="false"
-                                   v-model="item.selected">
+                                   v-model="item.selected"
+                                   v-model:value="item.selected"
+                >
                 </sw-checkbox-field>
             </template>
 
             <template #column-quantity="{ item }">
                 <sw-text-field :disabled="item.originalQuantity === 0"
                                class="mollie-ship-order-grid-quantity"
-                               v-model="item.quantity">
+                               v-model="item.quantity"
+                               v-model:value="item.quantity"
+                >
                 </sw-text-field>
             </template>
 
@@ -48,7 +52,7 @@
     </sw-container>
 
     {% block sw_order_line_items_grid_grid_mollie_ship_item_modal_tracking %}
-        <sw-switch-field v-model="showTrackingInfo"
+        <sw-switch-field v-model:value="showTrackingInfo" v-model="showTrackingInfo"
                          :label="$tc('mollie-payments.modals.shipping.showTracking')"
                          :noMarginTop="true"
                          size="small">

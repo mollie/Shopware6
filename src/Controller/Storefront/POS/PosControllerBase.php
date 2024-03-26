@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Controller\Storefront\POS;
 
+use Kiener\MolliePayments\Controller\Storefront\AbstractStoreFrontController;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepositoryInterface;
 use Kiener\MolliePayments\Service\CustomerService;
@@ -11,14 +12,12 @@ use Kiener\MolliePayments\Service\Order\OrderStatusUpdater;
 use Kiener\MolliePayments\Traits\Storefront\RedirectTrait;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\RouterInterface;
 
-class PosControllerBase extends StorefrontController
+class PosControllerBase extends AbstractStoreFrontController
 {
     use RedirectTrait;
 
@@ -71,7 +70,6 @@ class PosControllerBase extends StorefrontController
     }
 
     /**
-     * @Route("/mollie/pos/store-terminal/{customerId}/{terminalId}", name="frontend.mollie.pos.storeTerminal", options={"seo"="false"}, methods={"GET"})
      *
      * @param SalesChannelContext $context
      * @param string $customerId
@@ -102,7 +100,6 @@ class PosControllerBase extends StorefrontController
     }
 
     /**
-     * @Route("/mollie/pos/checkout", name="frontend.mollie.pos.checkout", options={"seo"="false"}, methods={"GET"})
      *
      * @param Request $request
      * @param SalesChannelContext $salesChannelContext
@@ -127,7 +124,6 @@ class PosControllerBase extends StorefrontController
     }
 
     /**
-     * @Route("/mollie/pos/{orderId}/{molliePaymentId}/status", name="frontend.mollie.pos.checkout_status", options={"seo"="false"}, methods={"GET"})
      *
      * @param SalesChannelContext $context
      * @param string $orderId

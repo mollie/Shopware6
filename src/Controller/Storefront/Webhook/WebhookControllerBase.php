@@ -4,20 +4,16 @@ namespace Kiener\MolliePayments\Controller\Storefront\Webhook;
 
 use Kiener\MolliePayments\Components\Subscription\Exception\SubscriptionSkippedException;
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
-use Kiener\MolliePayments\Repository\Order\OrderRepository;
+use Kiener\MolliePayments\Controller\Storefront\AbstractStoreFrontController;
 use Kiener\MolliePayments\Repository\Order\OrderRepositoryInterface;
 use Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepositoryInterface;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
-use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
 
-class WebhookControllerBase extends StorefrontController
+class WebhookControllerBase extends AbstractStoreFrontController
 {
     /**
      * @var NotificationFacade
@@ -62,7 +58,6 @@ class WebhookControllerBase extends StorefrontController
     }
 
     /**
-     * @Route("/mollie/webhook/{swTransactionId}", defaults={"csrf_protected"=false}, name="frontend.mollie.webhook", options={"seo"="false"}, methods={"GET", "POST"})
      *
      * @param SalesChannelContext $context
      * @param string $swTransactionId
@@ -93,7 +88,6 @@ class WebhookControllerBase extends StorefrontController
     }
 
     /**
-     * @Route("/mollie/webhook/subscription/{swSubscriptionId}", defaults={"csrf_protected"=false}, name="frontend.mollie.webhook.subscription", options={"seo"="false"}, methods={"GET", "POST"})
      *
      * @param string $swSubscriptionId
      * @param Request $request
@@ -107,7 +101,6 @@ class WebhookControllerBase extends StorefrontController
     }
 
     /**
-     * @Route("/mollie/webhook/subscription/{swSubscriptionId}/renew", defaults={"csrf_protected"=false}, name="frontend.mollie.webhook.subscription.renew", options={"seo"="false"}, methods={"GET", "POST"})
      *
      * @param string $swSubscriptionId
      * @param Request $request

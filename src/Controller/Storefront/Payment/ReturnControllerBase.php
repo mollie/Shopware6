@@ -2,15 +2,13 @@
 
 namespace Kiener\MolliePayments\Controller\Storefront\Payment;
 
+use Kiener\MolliePayments\Controller\Storefront\AbstractStoreFrontController;
 use Kiener\MolliePayments\Facade\Controller\PaymentReturnFacade;
 use Mollie\Api\Exceptions\ApiException;
-use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 
-class ReturnControllerBase extends StorefrontController
+class ReturnControllerBase extends AbstractStoreFrontController
 {
     /**
      * @var PaymentReturnFacade
@@ -27,7 +25,6 @@ class ReturnControllerBase extends StorefrontController
     }
 
     /**
-     * @Route("/mollie/payment/{swTransactionId}", defaults={"csrf_protected"=false}, name="frontend.mollie.payment", options={"seo"="false"}, methods={"GET", "POST"})
      *
      * @param SalesChannelContext $salesChannelContext
      * @param string $swTransactionId

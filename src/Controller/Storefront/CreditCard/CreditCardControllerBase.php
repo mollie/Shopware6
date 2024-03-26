@@ -3,18 +3,16 @@
 namespace Kiener\MolliePayments\Controller\Storefront\CreditCard;
 
 use Exception;
+use Kiener\MolliePayments\Controller\Storefront\AbstractStoreFrontController;
 use Kiener\MolliePayments\Service\CustomerServiceInterface;
 use Kiener\MolliePayments\Service\MandateServiceInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
 
-class CreditCardControllerBase extends StorefrontController
+class CreditCardControllerBase extends AbstractStoreFrontController
 {
     /**
      * @var CustomerServiceInterface
@@ -45,7 +43,6 @@ class CreditCardControllerBase extends StorefrontController
     }
 
     /**
-     * @Route("/mollie/components/store-card-token/{customerId}/{cardToken}", name="frontend.mollie.components.storeCardToken", options={"seo"="false"}, methods={"GET"})
      *
      * @param SalesChannelContext $context
      * @param string $customerId
@@ -80,7 +77,6 @@ class CreditCardControllerBase extends StorefrontController
     }
 
     /**
-     * @Route("/mollie/components/store-mandate-id/{customerId}/{mandateId}", name="frontend.mollie.components.storeMandateId", options={"seo"="false"}, methods={"GET"})
      *
      * @param SalesChannelContext $context
      * @param string $customerId
@@ -113,7 +109,6 @@ class CreditCardControllerBase extends StorefrontController
     }
 
     /**
-     * @Route("/mollie/components/revoke-mandate/{customerId}/{mandateId}", name="frontend.mollie.components.revokeMandate", options={"seo"="false"}, methods={"GET"})
      *
      * @param SalesChannelContext $context
      * @param string $customerId

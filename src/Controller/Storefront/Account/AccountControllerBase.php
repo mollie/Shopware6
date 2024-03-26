@@ -4,19 +4,17 @@ namespace Kiener\MolliePayments\Controller\Storefront\Account;
 
 use Kiener\MolliePayments\Components\Subscription\Page\Account\SubscriptionPageLoader;
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
+use Kiener\MolliePayments\Controller\Storefront\AbstractStoreFrontController;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\Content\Media\Pathname\UrlGeneratorInterface;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 
-class AccountControllerBase extends StorefrontController
+class AccountControllerBase extends AbstractStoreFrontController
 {
     /**
      * @var SubscriptionPageLoader
@@ -47,9 +45,6 @@ class AccountControllerBase extends StorefrontController
     }
 
 
-    /**
-     * @Route("/account/mollie/subscriptions", name="frontend.account.mollie.subscriptions.page", options={"seo"="false"}, methods={"GET", "POST"}, defaults={"XmlHttpRequest"=true})
-     */
     public function subscriptionsList(Request $request, SalesChannelContext $salesChannelContext): Response
     {
         if (!$this->isLoggedIn($salesChannelContext)) {
@@ -67,7 +62,6 @@ class AccountControllerBase extends StorefrontController
     }
 
     /**
-     * @Route("/account/mollie/subscriptions/{subscriptionId}/billing/update", name="frontend.account.mollie.subscriptions.billing.update", methods={"POST"})
      *
      * @param string $subscriptionId
      * @param RequestDataBag $data
@@ -132,7 +126,6 @@ class AccountControllerBase extends StorefrontController
     }
 
     /**
-     * @Route("/account/mollie/subscriptions/{subscriptionId}/shipping/update", name="frontend.account.mollie.subscriptions.shipping.update", methods={"POST"})
      *
      * @param string $subscriptionId
      * @param RequestDataBag $data
@@ -197,7 +190,6 @@ class AccountControllerBase extends StorefrontController
     }
 
     /**
-     * @Route("/account/mollie/subscriptions/{swSubscriptionId}/payment/update", name="frontend.account.mollie.subscriptions.payment.update", methods={"POST"})
      *
      * @param string $swSubscriptionId
      * @param SalesChannelContext $salesChannelContext
@@ -230,7 +222,6 @@ class AccountControllerBase extends StorefrontController
     }
 
     /**
-     * @Route("/account/mollie/subscriptions/{swSubscriptionId}/payment/update/finish", name="frontend.account.mollie.subscriptions.payment.update-success", methods={"GET", "POST"})
      *
      * @param string $swSubscriptionId
      * @param SalesChannelContext $salesChannelContext
@@ -257,7 +248,6 @@ class AccountControllerBase extends StorefrontController
     }
 
     /**
-     * @Route("/account/mollie/subscriptions/{swSubscriptionId}/pause", name="frontend.account.mollie.subscriptions.pause", methods={"POST"})
      * @param string $swSubscriptionId
      */
     public function pauseSubscription(string $swSubscriptionId, SalesChannelContext $context): Response
@@ -281,7 +271,6 @@ class AccountControllerBase extends StorefrontController
     }
 
     /**
-     * @Route("/account/mollie/subscriptions/{swSubscriptionId}/skip", name="frontend.account.mollie.subscriptions.skip", methods={"POST"})
      * @param string $swSubscriptionId
      */
     public function skipSubscription(string $swSubscriptionId, SalesChannelContext $context): Response
@@ -305,7 +294,6 @@ class AccountControllerBase extends StorefrontController
     }
 
     /**
-     * @Route("/account/mollie/subscriptions/{swSubscriptionId}/resume", name="frontend.account.mollie.subscriptions.resume", methods={"POST"})
      * @param string $swSubscriptionId
      */
     public function resumeSubscription(string $swSubscriptionId, SalesChannelContext $context): Response
@@ -329,7 +317,6 @@ class AccountControllerBase extends StorefrontController
     }
 
     /**
-     * @Route("/account/mollie/subscriptions/{subscriptionId}/cancel", name="frontend.account.mollie.subscriptions.cancel", methods={"POST"})
      * @param mixed $subscriptionId
      */
     public function cancelSubscription($subscriptionId, SalesChannelContext $context): Response

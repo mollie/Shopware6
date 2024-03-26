@@ -46,42 +46,6 @@ class MolliePayments extends Plugin
 
 
     /**
-     * @return void
-     */
-    public function boot(): void
-    {
-        parent::boot();
-    }
-
-    /**
-     * @param RoutingConfigurator $routes
-     * @param string $environment
-     * @return void
-     */
-    public function configureRoutes(RoutingConfigurator $routes, string $environment): void
-    {
-        if (!$this->isActive()) {
-            return;
-        }
-
-        /** @var Container $container */
-        $container = $this->container;
-
-        $loader = new DependencyLoader($container);
-
-        $routeDir = $loader->getRoutesPath($this->getPath());
-
-        $fileSystem = new Filesystem();
-
-        if ($fileSystem->exists($routeDir)) {
-            $routes->import($routeDir . '/{routes}/*' . Kernel::CONFIG_EXTS, 'glob');
-            $routes->import($routeDir . '/{routes}/' . $environment . '/**/*' . Kernel::CONFIG_EXTS, 'glob');
-            $routes->import($routeDir . '/{routes}' . Kernel::CONFIG_EXTS, 'glob');
-            $routes->import($routeDir . '/{routes}_' . $environment . Kernel::CONFIG_EXTS, 'glob');
-        }
-    }
-
-    /**
      * @param InstallContext $context
      * @return void
      */
@@ -121,25 +85,6 @@ class MolliePayments extends Plugin
             $this->runDbMigrations($context->getMigrationCollection());
         }
     }
-
-    /**
-     * @param InstallContext $context
-     * @return void
-     */
-    public function postInstall(InstallContext $context): void
-    {
-        parent::postInstall($context);
-    }
-
-    /**
-     * @param UninstallContext $context
-     * @return void
-     */
-    public function uninstall(UninstallContext $context): void
-    {
-        parent::uninstall($context);
-    }
-
     /**
      * @param ActivateContext $context
      * @throws \Doctrine\DBAL\Exception
@@ -154,14 +99,6 @@ class MolliePayments extends Plugin
         $this->runDbMigrations($context->getMigrationCollection());
     }
 
-    /**
-     * @param DeactivateContext $context
-     * @return void
-     */
-    public function deactivate(DeactivateContext $context): void
-    {
-        parent::deactivate($context);
-    }
 
     /**
      * @param Context $context

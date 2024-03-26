@@ -17,8 +17,7 @@ use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\AsynchronousPaymentHandlerInterface;
-use Shopware\Core\Checkout\Payment\Exception\AsyncPaymentFinalizeException;
-use Shopware\Core\Checkout\Payment\Exception\CustomerCanceledAsyncPaymentException;
+use Shopware\Core\Checkout\Payment\PaymentException;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -173,7 +172,8 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
 
         try {
             $this->finalizeFacade->finalize($transaction, $salesChannelContext);
-        } catch (AsyncPaymentFinalizeException|CustomerCanceledAsyncPaymentException $ex) {
+            /** @phpstan-ignore-next-line  */
+        } catch (PaymentException $ex) {
             $this->logger->error(
                 'Error when finalizing order ' . $transaction->getOrder()->getOrderNumber() . ', Mollie ID: ' . $molliedID . ', ' . $ex->getMessage()
             );
@@ -190,11 +190,8 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             $this->logger->error(
                 'Unknown Error when finalizing order ' . $transaction->getOrder()->getOrderNumber() . ', Mollie ID: ' . $molliedID . ', ' . $ex->getMessage()
             );
-
-            throw new AsyncPaymentFinalizeException(
-                $transaction->getOrderTransaction()->getId(),
-                'An unknown error happened when finalizing the order. Please see the Shopware logs for more. It can be that the payment in Mollie was succesful and the Shopware order is now cancelled or failed!'
-            );
+            /** @phpstan-ignore-next-line  */
+            throw PaymentException::asyncFinalizeInterrupted($transaction->getOrderTransaction()->getId(), 'An unknown error happened when finalizing the order. Please see the Shopware logs for more. It can be that the payment in Mollie was succesful and the Shopware order is now cancelled or failed!');
         }
     }
 

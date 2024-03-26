@@ -6,7 +6,7 @@ export default class RefundManagerRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getAmountField() {
-        return cy.get('#sw-field--refundAmount');
+        return cy.get('.refund-amount input');
     }
 
     /**
@@ -22,7 +22,7 @@ export default class RefundManagerRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getDescription() {
-        return cy.get('#sw-field--refundDescription');
+        return cy.get('.refund-description textarea');
     }
 
     /**
@@ -30,7 +30,7 @@ export default class RefundManagerRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getInternalDescription() {
-        return cy.get('#sw-field--refundInternalDescription');
+        return cy.get('.refund-internal-description textarea');
     }
 
     /**

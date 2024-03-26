@@ -19,8 +19,7 @@ use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
-use Shopware\Core\Checkout\Payment\Exception\AsyncPaymentFinalizeException;
-use Shopware\Core\Checkout\Payment\Exception\CustomerCanceledAsyncPaymentException;
+use Shopware\Core\Checkout\Payment\PaymentException;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -167,15 +166,16 @@ class MolliePaymentFinalize
 
                 # fire flow builder event
                 $this->fireFlowBuilderEvent(self::FLOWBUILDER_CANCELED, $order, $salesChannelContext->getContext());
-
-                throw new CustomerCanceledAsyncPaymentException($orderTransactionID, $message);
+                /** @phpstan-ignore-next-line  */
+                throw PaymentException::customerCanceled($orderTransactionID, $message);
             } else {
                 $message = sprintf('Payment for order %s (%s) failed. The Mollie payment status was not successful for this payment attempt.', $order->getOrderNumber(), $mollieOrder->id);
 
                 # fire flow builder event
                 $this->fireFlowBuilderEvent(self::FLOWBUILDER_FAILED, $order, $salesChannelContext->getContext());
 
-                throw new AsyncPaymentFinalizeException($orderTransactionID, $message);
+                /** @phpstan-ignore-next-line  */
+                throw PaymentException::asyncFinalizeInterrupted($orderTransactionID, $message);
             }
         }
 

@@ -159,18 +159,18 @@ SHOPWARE 6.5
         <strong>{{ $tc('sw-order.detailExtended.totalRefunds') }}</strong>
     </dt>
     <dd v-if="isMollieOrder && refundedAmount > 0">
-        {{ refundedAmount | currency(order.currency.shortName) }}
+        {{ currencyFilter( refundedAmount, order.currency.isoCode, order.totalRounding.decimals) }}
     </dd>
     <dt v-if="isMollieOrder && refundAmountPending > 0">
         <strong>{{ $tc('sw-order.detailExtended.totalRefundsPending') }}</strong>
     </dt>
     <dd v-if="isMollieOrder && refundAmountPending > 0">
-        {{ refundAmountPending | currency(order.currency.shortName) }}
+        {{ currencyFilter( refundAmountPending, order.currency.isoCode, order.totalRounding.decimals) }}
     </dd>
     <dt v-if="isMollieOrder && shippedQuantity > 0">
         <strong>{{ $tc('sw-order.detailExtended.totalShipments', 0, { quantity: shippedQuantity }) }}</strong>
     </dt>
     <dd v-if="isMollieOrder && shippedQuantity > 0">
-        {{ shippedAmount | currency(order.currency.shortName) }}
+        {{ currencyFilter( shippedAmount, order.currency.isoCode, order.totalRounding.decimals) }}
     </dd>
 {% endblock %}
