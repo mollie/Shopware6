@@ -35,8 +35,10 @@ class Migration1711618833SubscriptionCurrency extends MigrationStep
         //load used currencies
         $sql = "SELECT DISTINCT `currency` FROM `mollie_subscription`";
         $statement = $connection->executeQuery($sql);
-        $currencies = array_keys($statement->fetchAllAssociativeIndexed());
-
+        $currencies = [];
+        while ($row = $statement->fetchAssociative()) {
+            $currencies[]=$row['currency'];
+        }
         //get the data for each currency
         $sql = "SELECT HEX(`id`) as `id`,`iso_code`,`item_rounding`,`total_rounding` FROM `currency` WHERE `iso_code` IN(:currencies)";
         $statement = $connection->executeQuery($sql, [
