@@ -106,7 +106,6 @@ class ShippingControllerBase extends AbstractController
      * This shipment is based on ship all or rest of items automatically.
      * It can be used by 3rd parties, ERP systems and more.
      *
-     *
      * @param Request $request
      * @param Context $context
      * @return JsonResponse
@@ -167,7 +166,6 @@ class ShippingControllerBase extends AbstractController
      * It can be used by 3rd parties, ERP systems and more.
      * This comes without tracking information. Please use the POST version.
      *
-     *
      * @param QueryDataBag $query
      * @param Context $context
      * @return JsonResponse
@@ -212,7 +210,6 @@ class ShippingControllerBase extends AbstractController
      * This is the custom operational route for batch shipping of orders using the API.
      * This shipment requires a valid list of line items to be provided.
      * It can be used by 3rd parties, ERP systems and more.
-     *
      *
      * @param Request $request
      * @param Context $context
@@ -316,7 +313,6 @@ class ShippingControllerBase extends AbstractController
      * This is the custom operational route for shipping items using the API.
      * It can be used by 3rd parties, ERP systems and more.
      *
-     *
      * @param Request $request
      * @param Context $context
      * @throws \Exception
@@ -389,7 +385,6 @@ class ShippingControllerBase extends AbstractController
      * It can be used by 3rd parties, ERP systems and more.
      *  This comes without tracking information. Please use the POST version.
      *
-     *
      * @param QueryDataBag $query
      * @param Context $context
      * @throws \Exception
@@ -445,7 +440,6 @@ class ShippingControllerBase extends AbstractController
 
     /**
      * This is the plain action API route that is used in the Shopware Administration.
-     *
      *
      * @param RequestDataBag $data
      * @param Context $context
@@ -505,7 +499,6 @@ class ShippingControllerBase extends AbstractController
 
     /**
      * This is the plain action API route that is used in the Shopware Administration.
-     *
      *
      * @param RequestDataBag $data
      * @param Context $context

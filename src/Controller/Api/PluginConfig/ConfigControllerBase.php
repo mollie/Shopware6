@@ -163,7 +163,6 @@ class ConfigControllerBase extends AbstractController
      * Depending on these settings, the merchant might have configured a different behaviour
      * for fields, flows and actions.
      *
-     *
      * @param Request $request
      * @param Context $context
      * @return JsonResponse
