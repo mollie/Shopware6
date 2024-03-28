@@ -81,27 +81,27 @@
 
                     {% block mollie_payments_subscription_list_content_next_payment_date %}
                         <template #column-nextPaymentAt="{ item }">
-                            {{ item.nextPaymentAt | date({hour: '2-digit',minute: '2-digit',day: '2-digit',month: '2-digit',year: 'numeric'}) }}
+                            {{ dateFilter(item.nextPaymentAt, { hour: '2-digit', minute: '2-digit', day: '2-digit',month: '2-digit',year: 'numeric' }) }}
                         </template>
                     {% endblock %}
 
                     {% block mollie_payments_subscription_list_content_pre_payment_reminder %}
                         <template #column-lastRemindedAt="{ item }">
-                            {{ item.lastRemindedAt | date({hour: '2-digit',minute: '2-digit',day: '2-digit',month: '2-digit',year: 'numeric'}) }}
+                            {{ dateFilter(item.lastRemindedAt, { hour: '2-digit', minute: '2-digit', day: '2-digit',month: '2-digit',year: 'numeric' }) }}
                         </template>
                     {% endblock %}
 
                     {% block mollie_payments_subscription_list_content_created_at %}
                         <template #column-createdAt="{ item }">
                             <router-link :to="{ name: 'mollie.payments.subscription_detail', params: { id: item.id } }">
-                                {{ item.createdAt | date({hour: '2-digit',minute: '2-digit',day: '2-digit',month: '2-digit',year: 'numeric'}) }}
+                                {{ dateFilter(item.createdAt, { hour: '2-digit', minute: '2-digit', day: '2-digit',month: '2-digit',year: 'numeric' }) }}
                             </router-link>
                         </template>
                     {% endblock %}
 
                     {% block mollie_payments_subscription_list_content_canceled_at %}
                         <template #column-canceledAt="{ item }">
-                            {{ item.canceledAt | date({hour: '2-digit',minute: '2-digit',day: '2-digit',month: '2-digit',year: 'numeric'}) }}
+                            {{ dateFilter(item.canceledAt, { hour: '2-digit', minute: '2-digit', day: '2-digit',month: '2-digit',year: 'numeric' }) }}
                         </template>
                     {% endblock %}
 

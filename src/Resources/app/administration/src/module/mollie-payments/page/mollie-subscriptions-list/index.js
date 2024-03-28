@@ -105,6 +105,11 @@ Component.register('mollie-subscriptions-list', {
         currencyFilter() {
             return Filter.getByName('currency');
         },
+
+
+        dateFilter() {
+            return Filter.getByName('date');
+        },
     },
 
     methods: {
@@ -136,6 +141,7 @@ Component.register('mollie-subscriptions-list', {
 
             criteria.addSorting(Criteria.sort(this.sortBy, this.sortDirection, this.naturalSorting));
             criteria.addAssociation('customer');
+            criteria.addAssociation('currency');
 
             // eslint-disable-next-line no-undef
             this.repoSubscriptions.search(criteria, Shopware.Context.api).then((result) => {

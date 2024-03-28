@@ -9,3 +9,13 @@
         </div>
     {% endif %}
 {% endblock %}
+
+{% block component_line_item_type_product_number %}
+    {{ parent() }}
+    {% if  lineItem.extensions.mollieSubscription.isSubscriptionProduct %}
+        <div class="line-item-product-number">
+            {{ lineItem.extensions.mollieSubscription.translatedInterval }}
+        </div>
+    {% endif %}
+{% endblock %}
+
