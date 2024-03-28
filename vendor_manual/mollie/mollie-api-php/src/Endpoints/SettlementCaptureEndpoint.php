@@ -1,43 +1,42 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mollie\Api\Endpoints;
 
+use Mollie\Api\Resources\Capture;
+use Mollie\Api\Resources\CaptureCollection;
 use Mollie\Api\Resources\LazyCollection;
-use Mollie\Api\Resources\Payment;
-use Mollie\Api\Resources\PaymentCollection;
 
-class SettlementPaymentEndpoint extends CollectionEndpointAbstract
+class SettlementCaptureEndpoint extends CollectionEndpointAbstract
 {
-    protected $resourcePath = "settlements_payments";
+    protected $resourcePath = "settlements_captures";
 
     /**
      * @inheritDoc
      */
     protected function getResourceObject()
     {
-        return new Payment($this->client);
+        return new Capture($this->client);
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function getResourceCollectionObject($count, $_links)
     {
-        return new PaymentCollection($this->client, $count, $_links);
+        return new CaptureCollection($this->client, $count, $_links);
     }
 
     /**
-     * Retrieves a collection of Payments from Mollie.
+     * Retrieves a collection of Settlement Captures from Mollie.
      *
      * @param string $settlementId
-     * @param string $from The first payment ID you want to include in your list.
-     * @param int $limit
+     * @param string|null $from The first capture ID you want to include in your list.
+     * @param int|null $limit
      * @param array $parameters
      *
      * @return mixed
      * @throws \Mollie\Api\Exceptions\ApiException
      */
-    public function pageForId($settlementId, $from = null, $limit = null, array $parameters = [])
+    public function pageForId(string $settlementId, string $from = null, int $limit = null, array $parameters = [])
     {
         $this->parentId = $settlementId;
 
@@ -45,7 +44,7 @@ class SettlementPaymentEndpoint extends CollectionEndpointAbstract
     }
 
     /**
-     * Create an iterator for iterating over payments for the given settlement id, retrieved from Mollie.
+     * Create an iterator for iterating over captures for the given settlement id, retrieved from Mollie.
      *
      * @param string $settlementId
      * @param string $from The first resource ID you want to include in your list.

@@ -24,7 +24,7 @@ use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
 class MolliePayments extends Plugin
 {
-    const PLUGIN_VERSION = '4.5.0';
+    const PLUGIN_VERSION = '4.6.0';
 
 
     /**

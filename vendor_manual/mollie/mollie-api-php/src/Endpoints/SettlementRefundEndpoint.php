@@ -1,43 +1,45 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mollie\Api\Endpoints;
 
 use Mollie\Api\Resources\LazyCollection;
-use Mollie\Api\Resources\Payment;
-use Mollie\Api\Resources\PaymentCollection;
+use Mollie\Api\Resources\Refund;
+use Mollie\Api\Resources\RefundCollection;
 
-class SettlementPaymentEndpoint extends CollectionEndpointAbstract
+class SettlementRefundEndpoint extends CollectionEndpointAbstract
 {
-    protected $resourcePath = "settlements_payments";
-
-    /**
-     * @inheritDoc
-     */
-    protected function getResourceObject()
-    {
-        return new Payment($this->client);
-    }
+    protected $resourcePath = "settlements_refunds";
 
     /**
      * @inheritDoc
      */
     protected function getResourceCollectionObject($count, $_links)
     {
-        return new PaymentCollection($this->client, $count, $_links);
+        return new RefundCollection($this->client, $count, $_links);
     }
 
     /**
-     * Retrieves a collection of Payments from Mollie.
+     * @inheritDoc
+     */
+    protected function getResourceObject()
+    {
+        return new Refund($this->client);
+    }
+
+    /**
+     * Retrieves a collection of Settlement Refunds from Mollie.
      *
      * @param string $settlementId
-     * @param string $from The first payment ID you want to include in your list.
-     * @param int $limit
+     * @param string|null $from The first refund ID you want to include in your list.
+     * @param int|null $limit
      * @param array $parameters
      *
      * @return mixed
      * @throws \Mollie\Api\Exceptions\ApiException
      */
-    public function pageForId($settlementId, $from = null, $limit = null, array $parameters = [])
+    public function pageForId(string $settlementId, string $from = null, int $limit = null, array $parameters = [])
     {
         $this->parentId = $settlementId;
 
@@ -45,7 +47,7 @@ class SettlementPaymentEndpoint extends CollectionEndpointAbstract
     }
 
     /**
-     * Create an iterator for iterating over payments for the given settlement id, retrieved from Mollie.
+     * Create an iterator for iterating over refunds for the given settlement id, retrieved from Mollie.
      *
      * @param string $settlementId
      * @param string $from The first resource ID you want to include in your list.

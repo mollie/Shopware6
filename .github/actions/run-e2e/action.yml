@@ -65,7 +65,7 @@ inputs:
     required: false
   _STORE_API_KEY:
     description: 'This is the Store API Key that is used when launching our Shopware. Its not confidential, its just for here'
-    default: 'SWSCOVFSNKLBYUTKS1VSOEDTUQ'
+    default: 'SWSCOVFSNKLBYUTKS1VSOEDGUQ'
     required: false
   _ZIP_FILE:
     description: 'This is the defined filename of the ZIP file that we use for the installation of the plugin'

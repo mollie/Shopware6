@@ -69,8 +69,8 @@
             <argument type="service" id="Kiener\MolliePayments\Repository\Salutation\SalutationRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument>%kernel.shopware_version%</argument>
-            <argument type="service" id="Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface"/>
             <argument type="service" id="Kiener\MolliePayments\Service\ConfigService"/>
+            <argument type="service" id="service_container"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\MandateService" class="Kiener\MolliePayments\Service\MandateService">
@@ -110,6 +110,7 @@
 
         <service id="Kiener\MolliePayments\Service\ShippingMethodService" class="Kiener\MolliePayments\Service\ShippingMethodService">
             <argument type="service" id="shipping_method.repository"/>
+            <argument type="service" id="Shopware\Core\Checkout\Shipping\SalesChannel\ShippingMethodRoute"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\ShopService" class="Kiener\MolliePayments\Service\ShopService">
