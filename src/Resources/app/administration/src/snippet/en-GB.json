@@ -160,7 +160,8 @@
             "resetStock": "Reset Stock"
           },
           "btnResetLine": "Reset Line",
-          "checkDeductPromotion": "Deduct promotion"
+          "checkDeductPromotion": "Deduct promotion",
+          "checkRefundTax": "Refund VAT"
         },
         "roundDiffItemAdded": "Automatic rounding item was added"
       },

@@ -108,6 +108,7 @@ export default class RefundItemService {
         item.refundAmount = 0;
         item.resetStock = 0;
         item.refundPromotion = false;
+        item.refundTax = false;
     }
 
     // ---------------------------------------------------------------------------------------------------------
@@ -161,6 +162,22 @@ export default class RefundItemService {
     }
 
     /**
+     * Call this event if you have just changed the refund-tax property.
+     * This will make sure to prepare all data accordingly.
+     * @param item
+     */
+    onRefundTaxChanged(item) {
+
+        // do nothing in "amount" mode
+        // because we have a custom amount here
+        if (item.refundMode === REFUND_MODE_AMOUNT) {
+            return;
+        }
+
+        this._calculateItemAmount(item);
+    }
+
+    /**
      * Call this event if you have just changed the promotion-reductions property.
      * This will make sure to prepare all data accordingly.
      * @param item
@@ -190,16 +207,31 @@ export default class RefundItemService {
 
         const newRefundAmount = (item.shopware.unitPrice * item.refundQuantity);
 
+        let refundTaxAmount = 0;
+        if (item.refundTax) {
+            refundTaxAmount += item.shopware.tax.perItemTax * item.refundQuantity;
+
+            if (item.refundQuantity > 0 && item.refundQuantity + item.refunded === item.shopware.quantity) {
+                refundTaxAmount += item.shopware.tax.totalToPerItemRoundingDiff;
+            }
+        }
+
         if (item.refundPromotion) {
             // we have to calculate the amount of a single item, because
             // the promotion discount is the full discount on all of these items.
             const discountPerQty = item.shopware.promotion.discount / item.shopware.promotion.quantity;
             const discount = (item.refundQuantity * discountPerQty);
+            const promotionTaxValuePerQty = item.shopware.promotion.taxValue / item.shopware.promotion.quantity;
 
-            item.refundAmount = newRefundAmount - discount;
+            let promotionTaxValue = 0;
+            if (item.refundTax) {
+                promotionTaxValue = promotionTaxValuePerQty * item.refundQuantity;
+            }
+
+            item.refundAmount = newRefundAmount + refundTaxAmount - discount - promotionTaxValue;
 
         } else {
-            item.refundAmount = newRefundAmount;
+            item.refundAmount = newRefundAmount + refundTaxAmount;
         }
     }
 
