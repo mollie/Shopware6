@@ -214,13 +214,6 @@ export default class RefundItemService {
             if (item.refundQuantity > 0 && item.refundQuantity + item.refunded === item.shopware.quantity) {
                 refundTaxAmount += item.shopware.tax.totalToPerItemRoundingDiff;
             }
-        }
-
-        if (item.refundPromotion) {
-            // we have to calculate the amount of a single item, because
-            // the promotion discount is the full discount on all of these items.
-            const discountPerQty = item.shopware.promotion.discount / item.shopware.promotion.quantity;
-            const discount = (item.refundQuantity * discountPerQty);
             const promotionTaxValuePerQty = item.shopware.promotion.taxValue / item.shopware.promotion.quantity;
 
             let promotionTaxValue = 0;
@@ -228,8 +221,16 @@ export default class RefundItemService {
                 promotionTaxValue = promotionTaxValuePerQty * item.refundQuantity;
             }
 
-            item.refundAmount = newRefundAmount + refundTaxAmount - discount - promotionTaxValue;
+            refundTaxAmount -= promotionTaxValue;
+        }
 
+        if (item.refundPromotion) {
+            // we have to calculate the amount of a single item, because
+            // the promotion discount is the full discount on all of these items.
+            const discountPerQty = item.shopware.promotion.discount / item.shopware.promotion.quantity;
+            const discount = (item.refundQuantity * discountPerQty);
+
+            item.refundAmount = newRefundAmount + refundTaxAmount - discount;
         } else {
             item.refundAmount = newRefundAmount + refundTaxAmount;
         }
