@@ -1,7 +1,6 @@
-{% sw_extends '@Storefront/storefront/base.html.twig' %}
+{% sw_extends '@Storefront/storefront/layout/meta.html.twig' %}
 
-{% block base_main %}
-
+{% block layout_head_javascript_hmr_mode %}
 
     {# pages where apple pay requires js with their mollie_applepaydirect_restrictions names as values #}
     {% set onlyShowHere = {
@@ -11,7 +10,6 @@
         'frontend.account.edit-order.page' : '',
         'frontend.detail.page' : 'pdp'
     } %}
-
 
     {% set currentRoute = app.request.attributes.get('_route') %}
     {% set includeJsInHeader = false %}
@@ -36,7 +34,7 @@
     </script>
 
     {% if mollie_javascript_use_shopware != '1' and includeJsInHeader == true %}
-        <script src="{{ asset('bundles/molliepayments/mollie-payments.js', 'asset') }}"></script>
+        <script type="text/javascript" src="{{ asset('bundles/molliepayments/mollie-payments.js', 'asset') }}" defer></script>
     {% endif %}
 
     {{ parent() }}
