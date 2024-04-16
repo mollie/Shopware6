@@ -32,6 +32,7 @@
                     <sw-inherit-wrapper
                             :label="$tc('mollie-payments.vouchers.VOUCHER_TYPE_CAPTION')"
                             v-model="product.customFields.mollie_payments_product_voucher_type"
+                            v-model:value="product.customFields.mollie_payments_product_voucher_type"
                             :has-parent="!!parentProduct.id"
                             :inherited-value="parentProduct.customFields.mollie_payments_product_voucher_type">
                         <template #content="props">
@@ -93,6 +94,7 @@
                     <sw-container columns="1fr" v-if="isDefaultLanguage">
                         <sw-inherit-wrapper
                                 v-model="product.customFields.mollie_payments_product_subscription_enabled"
+                                v-model:value="product.customFields.mollie_payments_product_subscription_enabled"
                                 :has-parent="!!parentProduct.id"
                                 :inherited-value="parentProduct.customFields.mollie_payments_product_subscription_enabled">
                             <template #content="props">
@@ -114,6 +116,7 @@
                         <sw-inherit-wrapper
                                 :label="$tc('mollie-payments.subscriptions.product.mollieSubscriptionIntervalAmount')"
                                 v-model="product.customFields.mollie_payments_product_subscription_interval"
+                                v-model:value="product.customFields.mollie_payments_product_subscription_interval"
                                 :has-parent="!!parentProduct.id"
                                 :inherited-value="parentProduct.customFields.mollie_payments_product_subscription_interval">
                             <template #content="props">
@@ -128,6 +131,7 @@
                         <sw-inherit-wrapper
                                 :label="$tc('mollie-payments.subscriptions.product.mollieSubscriptionIntervalType')"
                                 v-model="product.customFields.mollie_payments_product_subscription_interval_unit"
+                                v-model:value="product.customFields.mollie_payments_product_subscription_interval_unit"
                                 :has-parent="!!parentProduct.id"
                                 :inherited-value="parentProduct.customFields.mollie_payments_product_subscription_interval_unit">
                             <template #content="props">
@@ -147,6 +151,7 @@
                         <sw-inherit-wrapper
                                 :label="$tc('mollie-payments.subscriptions.product.mollieSubscriptionRepetitionAmount')"
                                 v-model="product.customFields.mollie_payments_product_subscription_repetition"
+                                v-model:value="product.customFields.mollie_payments_product_subscription_repetition"
                                 :has-parent="!!parentProduct.id"
                                 :inherited-value="parentProduct.customFields.mollie_payments_product_subscription_repetition">
                             <template #content="props">

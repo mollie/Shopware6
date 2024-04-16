@@ -117,12 +117,6 @@ SHOPWARE 6.4
     </template>
 {% endblock %}
 
-{% block sw_order_line_items_grid_grid_actions %}
-    {% parent %}
-    <template #action-modals="{ item }">
-        {% block sw_order_line_items_grid_grid_actions_modals_items %}{% endblock %}
-    </template>
-{% endblock %}
 
 {% block sw_order_line_items_grid_grid_actions_modals_items %}
     {% parent %}
@@ -160,7 +154,9 @@ SHOPWARE 6.4
                                      :step="1"
                                      :min="0"
                                      :max="shippableQuantity(item)"
-                                     v-model="shipQuantity">
+                                     v-model:value="shipQuantity"
+                                     v-model="shipQuantity"
+                    >
                         <template #prefix>
                             {{ $tc('mollie-payments.modals.shipping.item.summary.quantity') }}
                         </template>
@@ -175,7 +171,7 @@ SHOPWARE 6.4
                 {% endblock %}
 
                 {% block sw_order_line_items_grid_grid_mollie_ship_item_modal_tracking %}
-                    <sw-switch-field v-model="showTrackingInfo"
+                    <sw-switch-field v-model:value="showTrackingInfo"  v-model="showTrackingInfo"
                                      :label="$tc('mollie-payments.modals.shipping.showTracking')"
                                      :noMarginTop="true"
                                      size="small">

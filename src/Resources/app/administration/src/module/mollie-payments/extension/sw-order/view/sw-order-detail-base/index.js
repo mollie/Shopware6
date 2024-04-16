@@ -3,7 +3,7 @@ import OrderAttributes from '../../../../../../core/models/OrderAttributes';
 import MollieShippingEvents from '../../../../components/mollie-ship-order/MollieShippingEvents';
 
 // eslint-disable-next-line no-undef
-const {Component, Mixin} = Shopware;
+const {Component, Mixin, Filter} = Shopware;
 
 Component.override('sw-order-detail-base', {
     template,
@@ -40,6 +40,10 @@ Component.override('sw-order-detail-base', {
         isMollieOrder() {
             const attr = new OrderAttributes(this.order);
             return attr.isMollieOrder();
+        },
+
+        currencyFilter() {
+            return Filter.getByName('currency');
         },
     },
 

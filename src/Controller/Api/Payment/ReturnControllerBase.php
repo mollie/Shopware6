@@ -29,7 +29,6 @@ class ReturnControllerBase extends AbstractController
 
 
     /**
-     * @Route("/api/mollie/payment/return/{swTransactionId}", name="api.mollie.payment-return", methods={"GET", "POST"})
      *
      * @param string $swTransactionId
      * @param Context $context
@@ -42,7 +41,6 @@ class ReturnControllerBase extends AbstractController
     }
 
     /**
-     * @Route("/api/v{version}/mollie/payment/return/{swTransactionId}", name="api.mollie.payment-return-legacy", methods={"GET", "POST"})
      *
      * @param string $swTransactionId
      * @param Context $context

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<routes xmlns="http://symfony.com/schema/routing"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://symfony.com/schema/routing
+        https://symfony.com/schema/routing/routing-1.0.xsd">
+
+    <route id="frontend.mollie.pos.storeTerminal" path="/mollie/pos/store-terminal/{customerId}/{terminalId}" methods="GET">
+        <default key="_controller">Kiener\MolliePayments\Controller\Storefront\POS\PosControllerBase::storeTerminal</default>
+        <default key="_routeScope">storefront</default>
+        <option key="seo">false</option>
+    </route>
+
+    <route id="frontend.mollie.pos.checkout" path="/mollie/pos/checkout" methods="GET">
+        <default key="_controller">Kiener\MolliePayments\Controller\Storefront\POS\PosControllerBase::checkoutAction</default>
+        <default key="_routeScope">storefront</default>
+        <option key="seo">false</option>
+    </route>
+
+    <route id="frontend.mollie.pos.checkout_status" path="/mollie/pos/{orderId}/{molliePaymentId}/status" methods="GET">
+        <default key="_controller">Kiener\MolliePayments\Controller\Storefront\POS\PosControllerBase::statusAction</default>
+        <default key="_routeScope">storefront</default>
+        <option key="seo">false</option>
+    </route>
+
+</routes>

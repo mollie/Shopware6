@@ -5,7 +5,7 @@ import MollieRefundsGrid from './grids/MollieRefundsGrid';
 import RefundItemService from './services/RefundItemService';
 
 // eslint-disable-next-line no-undef
-const {Component, Mixin} = Shopware;
+const {Component, Mixin, Filter} = Shopware;
 
 
 Component.register('mollie-refund-manager', {
@@ -132,6 +132,13 @@ Component.register('mollie-refund-manager', {
             return this.$tc('mollie-payments.refund-manager.summary.lblDescription', 0, {characters: this.refundDescription.length})
         },
 
+        currencyFilter() {
+            return Filter.getByName('currency');
+        },
+
+        dateFilter() {
+            return Filter.getByName('date');
+        },
     },
 
     methods: {

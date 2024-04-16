@@ -71,7 +71,7 @@
 
                         <sw-container columns="1fr" gap="0px 30px">
                             {% block sw_order_detail_card_basic_field_description %}
-                                <sw-text-field v-model="subscription.description"
+                                <sw-text-field v-model:value="subscription.description" v-model="subscription.description"
                                                :label="$tc('mollie-payments.subscriptions.detail.labelDescription')"
                                                disabled="disabled">
                                 </sw-text-field>
@@ -80,7 +80,7 @@
 
                         <sw-container columns="1fr 1fr" gap="0px 30px">
                             {% block sw_order_detail_card_basic_field_amount %}
-                                <sw-text-field v-model="subscription.amount"
+                                <sw-text-field v-model:value="subscription.amount" v-model="subscription.amount"
                                                :label="$tc('mollie-payments.subscriptions.detail.labelAmount')"
                                                disabled="disabled">
                                     <template slot="suffix">
@@ -89,7 +89,7 @@
                                 </sw-text-field>
                             {% endblock %}
                             {% block sw_order_detail_card_basic_field_quantity %}
-                                <sw-text-field v-model="subscription.quantity"
+                                <sw-text-field v-model:value="subscription.quantity" v-model="subscription.quantity"
                                                :label="$tc('mollie-payments.subscriptions.detail.labelQuantity')"
                                                disabled="disabled">
                                 </sw-text-field>
@@ -97,13 +97,13 @@
                         </sw-container>
                         <sw-container columns="1fr 1fr" gap="0px 30px">
                             {% block sw_order_detail_card_basic_field_customer_name %}
-                                <sw-text-field v-model="customerFullName"
+                                <sw-text-field v-model:value="customerFullName" v-model="customerFullName"
                                                :label="$tc('mollie-payments.subscriptions.detail.labelShopwareCustomer')"
                                                disabled="disabled">
                                 </sw-text-field>
                             {% endblock %}
                             {% block sw_order_detail_card_basic_field_mollie_customer_id %}
-                                <sw-text-field v-model="subscription.mollieCustomerId"
+                                <sw-text-field class="cy-subscription-customer-id" v-model:value="subscription.mollieCustomerId" v-model="subscription.mollieCustomerId"
                                                :label="$tc('mollie-payments.subscriptions.detail.labelMollieCustomer')"
                                                disabled="disabled">
                                 </sw-text-field>
@@ -111,7 +111,8 @@
                         </sw-container>
                         <sw-container columns="1fr 1fr" gap="0px 30px">
                             {% block sw_order_detail_card_basic_field_created_at %}
-                                <sw-text-field v-model="formattedCreateAt"
+                                <sw-text-field v-model:value="formattedCreateAt" v-model="formattedCreateAt"
+                                               class="cy-subscription-formatted-created-at"
                                                :label="$tc('mollie-payments.subscriptions.detail.labelCreatedAt')"
                                                disabled="disabled">
                                 </sw-text-field>
@@ -135,43 +136,49 @@
                     <sw-card :title="$tc('mollie-payments.subscriptions.detail.cardTitleStatus')" :hero="false" :isLoading="false" :large="false">
                         <sw-container columns="1fr 1fr" gap="0px 30px">
                             {% block sw_order_detail_card_status_field_status %}
-                                <sw-text-field v-model="translatedStatus"
+                                <sw-text-field v-model:value="translatedStatus" v-model="translatedStatus"
                                                :label="$tc('mollie-payments.subscriptions.detail.labelStatus')"
+                                               class="cy-subscription-translated-status"
                                                disabled="disabled">
                                 </sw-text-field>
                             {% endblock %}
                             {% block sw_order_detail_card_status_field_canceled_at %}
-                                <sw-text-field v-model="formattedCanceledAt"
+                                <sw-text-field v-model:value="formattedCanceledAt" v-model="formattedCanceledAt"
                                                :label="$tc('mollie-payments.subscriptions.detail.labelCanceledAt')"
+                                               class="cy-subscription-formatted-canceled-at"
                                                disabled="disabled">
                                 </sw-text-field>
                             {% endblock %}
                         </sw-container>
                         <sw-container columns="1fr 1fr" gap="0px 30px">
                             {% block sw_order_detail_card_status_field_mollie_id %}
-                                <sw-text-field v-model="subscription.mollieId"
+                                <sw-text-field v-model:value="subscription.mollieId"  v-model="subscription.mollieId"
                                                :label="$tc('mollie-payments.subscriptions.detail.labelMollieSubscription')"
+                                               class="cy-subscription-mollie-id"
                                                disabled="disabled">
                                 </sw-text-field>
                             {% endblock %}
                             {% block sw_order_detail_card_status_field_mandate_id %}
-                                <sw-text-field v-model="subscription.mandateId"
+                                <sw-text-field v-model:value="subscription.mandateId"  v-model="subscription.mandateId"
                                                :label="$tc('mollie-payments.subscriptions.detail.labelMandateId')"
+                                               class="cy-subscription-mandate-id"
                                                disabled="disabled">
                                 </sw-text-field>
                             {% endblock %}
                         </sw-container>
                         <sw-container columns="1fr 1fr" gap="0px 30px">
                             {% block sw_order_detail_card_status_field_next_payment_at %}
-                                <sw-text-field v-model="formattedNextPaymentAt"
+                                <sw-text-field v-model:value="formattedNextPaymentAt" v-model="formattedNextPaymentAt"
+                                               class="cy-subscription-formatted-next-payment-at"
                                                :label="$tc('mollie-payments.subscriptions.detail.labelNextPaymentAt')"
                                                disabled="disabled">
                                 </sw-text-field>
                             {% endblock %}
                             {% block sw_order_detail_card_status_field_reminded_at %}
                                 <sw-text-field
-                                        v-model="formattedLastRemindedAt"
+                                        v-model:value="formattedLastRemindedAt" v-model="formattedLastRemindedAt"
                                         :label="$tc('mollie-payments.subscriptions.detail.labelLastRemindedAt')"
+                                        class="cy-subscription-formatted-last-reminded-at"
                                         disabled="disabled">
                                 </sw-text-field>
                             {% endblock %}
@@ -216,7 +223,7 @@
                                      :allowInlineEdit="false">
                                 <template #columns="{ item }">
                                     <sw-grid-column flex="minmax(100px, 1fr)" :label="$tc('mollie-payments.subscriptions.detail.history.colDate')">
-                                        {{ item.createdAt | date({hour: '2-digit',minute: '2-digit',day: '2-digit',month: '2-digit',year: 'numeric'}) }}
+                                        {{ dateFilter(item.createdAt, { hour: '2-digit', minute: '2-digit', day: '2-digit',month: '2-digit',year: 'numeric' }) }}
                                     </sw-grid-column>
 
                                     {% block sw_order_detail_card_history_grid_columns %}

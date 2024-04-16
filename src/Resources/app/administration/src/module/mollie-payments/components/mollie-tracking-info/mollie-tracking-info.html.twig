@@ -18,15 +18,15 @@
         </sw-base-field>
 
         <sw-container columns="1fr" justify="start" gap="16px">
-            <sw-text-field v-model="tracking.carrier"
+            <sw-text-field v-model:value="tracking.carrier"  v-model="tracking.carrier"
                            :label="$tc('mollie-payments.modals.shipping.tracking.carrier')"
                            size="medium"
                            required/>
-            <sw-text-field v-model="tracking.code"
+            <sw-text-field v-model:value="tracking.code" v-model="tracking.code"
                            :label="$tc('mollie-payments.modals.shipping.tracking.code')"
                            size="medium"
                            required/>
-            <sw-text-field v-model="tracking.url"
+            <sw-text-field v-model:value="tracking.url" v-model="tracking.url"
                            size="medium"
                            :label="$tc('mollie-payments.modals.shipping.tracking.url')"/>
         </sw-container>
