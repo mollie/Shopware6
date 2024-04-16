@@ -75,6 +75,7 @@
         "infection/infection": "^0.25.4",
         "boxblinkracer/phpunuhi": "dev-main",
         "spaze/phpstan-disallowed-calls": "^2.16",
+        "laminas/laminas-code": "^3",
         "shopware/core": "*",
         "shopware/administration": "*",
         "shopware/storefront": "*"
