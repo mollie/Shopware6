@@ -87,6 +87,17 @@
                         {{ currencyFilter(  item.refundAmount, order.currency.isoCode, order.totalRounding.decimals) }}
                     </div>
                 </template>
+                <template #column-inputConsiderTax="{ item }">
+                    <div v-if="isItemRefundable(item) && !isTaxStatusGross()">
+                        <sw-checkbox-field :label="$tc('mollie-payments.refund-manager.cart.grid.checkRefundTax')"
+                                           v-model="item.refundTax"
+                                           class="check-refund-tax"
+                                           :class="{ 'tutorial-active': tutorialPartialPromotionsVisible }"
+                                           @change="onItemRefundTaxChanged(item)"
+                                        >
+                        </sw-checkbox-field>
+                    </div>
+                </template>
                 <template #column-inputConsiderPromotion="{ item }">
                     <div v-if="isItemRefundable(item) && !isItemPromotion(item) && isItemDiscounted(item)">
                         <sw-checkbox-field :label="$tc('mollie-payments.refund-manager.cart.grid.checkDeductPromotion')"

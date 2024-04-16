@@ -22,6 +22,11 @@ class ProductItem extends AbstractItem
     private $promotionAffectedQuantity;
 
     /**
+     * @var float
+     */
+    private $promotionTaxValue;
+
+    /**
      * @var int
      */
     private $alreadyRefundedQty;
@@ -31,13 +36,18 @@ class ProductItem extends AbstractItem
      * @param OrderLineItemEntity $lineItem
      * @param array<mixed> $promotionCompositions
      * @param int $alreadyRefundedQuantity
+     * @param float $taxTotal
+     * @param float $taxPerItem
+     * @param float $taxDiff
      */
-    public function __construct(OrderLineItemEntity $lineItem, array $promotionCompositions, int $alreadyRefundedQuantity)
+    public function __construct(OrderLineItemEntity $lineItem, array $promotionCompositions, int $alreadyRefundedQuantity, float $taxTotal, float $taxPerItem, float $taxDiff)
     {
         $this->lineItem = $lineItem;
         $this->alreadyRefundedQty = $alreadyRefundedQuantity;
 
         $this->extractPromotionDiscounts($promotionCompositions);
+
+        parent::__construct($taxTotal, $taxPerItem, $taxDiff);
     }
 
     /**
@@ -48,6 +58,7 @@ class ProductItem extends AbstractItem
     {
         $this->promotionDiscount = 0;
         $this->promotionAffectedQuantity = 0;
+        $this->promotionTaxValue = 0;
 
         foreach ($promotionCompositions as $composition) {
             foreach ($composition as $compItem) {
@@ -56,6 +67,7 @@ class ProductItem extends AbstractItem
                 if ($compItem['id'] === $this->lineItem->getReferencedId()) {
                     $this->promotionDiscount += round((float)$compItem['discount'], 2);
                     $this->promotionAffectedQuantity += (int)$compItem['quantity'];
+                    $this->promotionTaxValue += round((float)$compItem['taxValue'], 2);
                 }
             }
         }
@@ -77,6 +89,7 @@ class ProductItem extends AbstractItem
             $this->lineItem->getTotalPrice(),
             $this->promotionDiscount,
             $this->promotionAffectedQuantity,
+            $this->promotionTaxValue,
             $this->alreadyRefundedQty
         );
     }

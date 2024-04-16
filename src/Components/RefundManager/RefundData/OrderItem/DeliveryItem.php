@@ -23,11 +23,16 @@ class DeliveryItem extends AbstractItem
     /**
      * @param OrderDeliveryEntity $delivery
      * @param int $alreadyRefundedQuantity
+     * @param float $taxTotal
+     * @param float $taxPerItem
+     * @param float $taxDiff
      */
-    public function __construct(OrderDeliveryEntity $delivery, int $alreadyRefundedQuantity)
+    public function __construct(OrderDeliveryEntity $delivery, int $alreadyRefundedQuantity, float $taxTotal, float $taxPerItem, float $taxDiff)
     {
         $this->delivery = $delivery;
         $this->alreadyRefundedQty = $alreadyRefundedQuantity;
+
+        parent::__construct($taxTotal, $taxPerItem, $taxDiff);
     }
 
 
@@ -47,6 +52,7 @@ class DeliveryItem extends AbstractItem
             $this->delivery->getShippingCosts()->getUnitPrice(),
             $this->delivery->getShippingCosts()->getQuantity(),
             $this->delivery->getShippingCosts()->getTotalPrice(),
+            0,
             0,
             0,
             $this->alreadyRefundedQty

@@ -61,6 +61,11 @@ export default class ShopwareOrderGrid {
             },
             {
                 label: '',
+                property: 'inputConsiderTax',
+                align: 'center',
+            },
+            {
+                label: '',
                 property: 'inputConsiderPromotion',
                 align: 'center',
             },
