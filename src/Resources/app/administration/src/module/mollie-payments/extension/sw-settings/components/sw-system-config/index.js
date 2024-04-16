@@ -1,4 +1,5 @@
 
+// eslint-disable-next-line no-undef
 const {Component} = Shopware;
 
 Component.override('sw-system-config', {
