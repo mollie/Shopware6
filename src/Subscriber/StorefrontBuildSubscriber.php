@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Subscriber;
 
+use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Kiener\MolliePayments\Service\SettingsService;
 use Shopware\Storefront\Event\StorefrontRenderEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -13,13 +14,20 @@ class StorefrontBuildSubscriber implements EventSubscriberInterface
      */
     private $settingsService;
 
+    /**
+     * @var VersionCompare
+     */
+    private $versionCompare;
+
 
     /**
      * @param SettingsService $settingsService
+     * @param string $shopwareVersion
      */
-    public function __construct(SettingsService $settingsService)
+    public function __construct(SettingsService $settingsService, string $shopwareVersion)
     {
         $this->settingsService = $settingsService;
+        $this->versionCompare = new VersionCompare($shopwareVersion);
     }
 
     /**
@@ -43,5 +51,6 @@ class StorefrontBuildSubscriber implements EventSubscriberInterface
 
         $useJsValue = (int)$settings->isUseShopwareJavascript();
         $event->setParameter('mollie_javascript_use_shopware', $useJsValue);
+        $event->setParameter('mollie_javascript_check_duplicate', $this->versionCompare->gte('6.6'));
     }
 }

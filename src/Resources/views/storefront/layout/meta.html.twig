@@ -29,6 +29,14 @@
         {% endif %}
     {% endif %}
 
+    {% if includeJsInHeader == true and mollie_javascript_check_duplicate == true %}
+        {% for script in theme_scripts() %}
+            {% if script == 'js/mollie-payments/mollie-payments.js' %}
+                {% set includeJsInHeader = false %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
     <script>
         window.mollie_javascript_use_shopware = '{{ mollie_javascript_use_shopware }}'
     </script>
