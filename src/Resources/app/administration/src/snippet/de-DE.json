@@ -160,7 +160,8 @@
             "resetStock": "Lagerbestand zurücksetzen"
           },
           "btnResetLine": "Zeile zurücksetzen",
-          "checkDeductPromotion": "Rabatt abziehen"
+          "checkDeductPromotion": "Rabatt abziehen",
+          "checkRefundTax": "BTW terugbetalen"
         },
         "roundDiffItemAdded": "Automatische Position für Rundungen wurde hinzugefügt"
       },

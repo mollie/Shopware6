@@ -160,7 +160,8 @@
             "resetStock": "Voorraad resetten"
           },
           "btnResetLine": "Rij resetten",
-          "checkDeductPromotion": "Promotie aftrekken"
+          "checkDeductPromotion": "Promotie aftrekken",
+          "checkRefundTax": "Refund VAT"
         },
         "roundDiffItemAdded": "Automatisch afrondingsitem toegevoegd"
       },

@@ -1,4 +1,4 @@
-import ProductAttributes from "../../../src/core/models/ProductAttributes";
+import ProductAttributes from '../../../src/core/models/ProductAttributes';
 
 
 test('Attributes do not crash with NULL custom fields', () => {

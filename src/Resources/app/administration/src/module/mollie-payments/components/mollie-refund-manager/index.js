@@ -5,7 +5,7 @@ import MollieRefundsGrid from './grids/MollieRefundsGrid';
 import RefundItemService from './services/RefundItemService';
 
 // eslint-disable-next-line no-undef
-const {Component, Mixin} = Shopware;
+const {Component, Mixin, Filter} = Shopware;
 
 
 Component.register('mollie-refund-manager', {
@@ -132,6 +132,13 @@ Component.register('mollie-refund-manager', {
             return this.$tc('mollie-payments.refund-manager.summary.lblDescription', 0, {characters: this.refundDescription.length})
         },
 
+        currencyFilter() {
+            return Filter.getByName('currency');
+        },
+
+        dateFilter() {
+            return Filter.getByName('date');
+        },
     },
 
     methods: {
@@ -201,6 +208,13 @@ Component.register('mollie-refund-manager', {
         },
 
         /**
+         * Gets if the order tax status is gross
+         */
+        isTaxStatusGross() {
+            return this.order.taxStatus === 'gross';
+        },
+
+        /**
          * This automatically selects all items by
          * assigning their maximum quantity to be refunded.
          * We iterate through all items and just mark them
@@ -257,6 +271,17 @@ Component.register('mollie-refund-manager', {
          */
         onItemAmountChanged(item) {
             this.itemService.onAmountChanged(item);
+            this._calculateFinalAmount();
+        },
+
+        /**
+         * This will be executed if the user changes the
+         * configuration to either activate or deactivate the
+         * Tax Refund in case of Net Orders.
+         * @param item
+         */
+        onItemRefundTaxChanged(item) {
+            this.itemService.onRefundTaxChanged(item);
             this._calculateFinalAmount();
         },
 

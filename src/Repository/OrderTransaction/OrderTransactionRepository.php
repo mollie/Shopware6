@@ -57,6 +57,7 @@ class OrderTransactionRepository implements OrderTransactionRepositoryInterface
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('order.id', $orderID));
         $criteria->addAssociation('order');
+        $criteria->addAssociation('stateMachineState');
         $criteria->addAssociation('paymentMethod');
         $criteria->addSorting(new FieldSorting('createdAt'));
 

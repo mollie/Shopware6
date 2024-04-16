@@ -6,6 +6,7 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatche
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect;
+use Kiener\MolliePayments\Controller\Storefront\AbstractStoreFrontController;
 use Kiener\MolliePayments\Repository\Customer\CustomerRepositoryInterface;
 use Kiener\MolliePayments\Service\Cart\CartBackupService;
 use Kiener\MolliePayments\Service\OrderService;
@@ -15,19 +16,16 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\RouterInterface;
 use Throwable;
 
-class ApplePayDirectControllerBase extends StorefrontController
+class ApplePayDirectControllerBase extends AbstractStoreFrontController
 {
     use RedirectTrait;
 
@@ -113,7 +111,6 @@ class ApplePayDirectControllerBase extends StorefrontController
 
 
     /**
-     * @Route("/mollie/apple-pay/available", defaults={"csrf_protected"=true}, name="frontend.mollie.apple-pay.available", options={"seo"="false"}, methods={"GET"})
      *
      * @param SalesChannelContext $context
      * @return JsonResponse
@@ -144,8 +141,6 @@ class ApplePayDirectControllerBase extends StorefrontController
      * this is not about Apple Pay Direct - but the namespace of the URL is a good one (/apple-pay)
      * and I don't want to create all kinds of new controllers
      *
-     * @Route("/mollie/apple-pay/applepay-id", defaults={"csrf_protected"=true}, name="frontend.mollie.apple-pay.id", options={"seo"="false"}, methods={"GET"})
-     *
      * @param SalesChannelContext $context
      * @return JsonResponse
      */
@@ -169,7 +164,6 @@ class ApplePayDirectControllerBase extends StorefrontController
     }
 
     /**
-     * @Route("/mollie/apple-pay/add-product", defaults={"csrf_protected"=false}, name="frontend.mollie.apple-pay.add-product", options={"seo"="false"}, methods={"POST"})
      *
      * @param SalesChannelContext $context
      * @param Request $request
@@ -214,7 +208,6 @@ class ApplePayDirectControllerBase extends StorefrontController
     }
 
     /**
-     * @Route("/mollie/apple-pay/validate", defaults={"csrf_protected"=false}, name="frontend.mollie.apple-pay.validate", options={"seo"="false"}, methods={"POST"})
      *
      * @param SalesChannelContext $context
      * @param Request $request
@@ -246,7 +239,6 @@ class ApplePayDirectControllerBase extends StorefrontController
     }
 
     /**
-     * @Route("/mollie/apple-pay/shipping-methods", defaults={"XmlHttpRequest"=true, "csrf_protected"=false}, name="frontend.mollie.apple-pay.shipping-methods", options={"seo"="false"}, methods={"POST"})
      *
      * @param SalesChannelContext $context
      * @param Request $request
@@ -288,7 +280,6 @@ class ApplePayDirectControllerBase extends StorefrontController
     }
 
     /**
-     * @Route("/mollie/apple-pay/set-shipping", defaults={"XmlHttpRequest"=true, "csrf_protected"=false}, name="frontend.mollie.apple-pay.set-shipping", options={"seo"="false"}, methods={"POST"})
      *
      * @param SalesChannelContext $context
      * @param Request $request
@@ -330,7 +321,6 @@ class ApplePayDirectControllerBase extends StorefrontController
     }
 
     /**
-     * @Route("/mollie/apple-pay/start-payment", defaults={"XmlHttpRequest"=true, "csrf_protected"=false}, name="frontend.mollie.apple-pay.start-payment", options={"seo"="false"}, methods={"POST"})
      *
      * @param SalesChannelContext $context
      * @param Request $request
@@ -392,7 +382,6 @@ class ApplePayDirectControllerBase extends StorefrontController
     }
 
     /**
-     * @Route("/mollie/apple-pay/finish-payment", defaults={"XmlHttpRequest"=true, "csrf_protected"=false}, name="frontend.mollie.apple-pay.finish-payment", options={"seo"="false"}, methods={"GET"})
      *
      * @param SalesChannelContext $context
      * @param Request $request
@@ -484,7 +473,6 @@ class ApplePayDirectControllerBase extends StorefrontController
     }
 
     /**
-     * @Route("/mollie/apple-pay/restore-cart", defaults={"csrf_protected"=false}, name="frontend.mollie.apple-pay.restore-cart", options={"seo"="false"}, methods={"POST"})
      *
      * @param SalesChannelContext $context
      * @return JsonResponse

@@ -1,5 +1,5 @@
-import ProductService from "../../../../src/core/service/product/product.service";
-import ProductAttributes from "../../../../src/core/models/ProductAttributes";
+import ProductService from '../../../../src/core/service/product/product.service';
+import ProductAttributes from '../../../../src/core/models/ProductAttributes';
 
 const productService = new ProductService();
 

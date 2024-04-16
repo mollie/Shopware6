@@ -95,7 +95,10 @@ export default class StoreApiLoginAction {
                     );
 
                     cy.wrap(loginPromise).then((response) => {
-                        const loginToken = response.data.contextToken;
+                        let loginToken = response.data.contextToken;
+                        if(loginToken === undefined){
+                            loginToken = response.headers["sw-context-token"];
+                        }
                         this.client.setContextToken(loginToken);
                         cy.log('Context-Token: ' + loginToken);
                     });

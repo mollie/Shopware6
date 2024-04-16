@@ -39,7 +39,6 @@ class iDealControllerBase
 
 
     /**
-     * @Route("/store-api/mollie/ideal/issuers", name="store-api.mollie.ideal.issuers", methods={"GET"})
      *
      * @param SalesChannelContext $context
      * @return StoreApiResponse
@@ -68,7 +67,6 @@ class iDealControllerBase
     }
 
     /**
-     * @Route("/store-api/mollie/ideal/store-issuer/{customerId}/{issuerId}", name="store-api.mollie.ideal.store-issuer", methods={"POST"})
      *
      * @param string $customerId
      * @param string $issuerId

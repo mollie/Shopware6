@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<routes xmlns="http://symfony.com/schema/routing"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://symfony.com/schema/routing
+        https://symfony.com/schema/routing/routing-1.0.xsd">
+
+    <route id="api.mollie.webhook" path="/api/mollie/webhook/{swTransactionId}" methods="GET|POST">
+        <default key="_controller">Kiener\MolliePayments\Controller\Api\Webhook\WebhookControllerBase::webhookAction</default>
+        <default key="_routeScope">api</default>
+        <default key="auth_required"><bool>false</bool></default>
+        <default key="auth_enabled"><bool>false</bool></default>
+    </route>
+
+    <route id="api.mollie.webhook-legacy" path="/api/v{version}/mollie/webhook/{swTransactionId}" methods="GET|POST">
+        <default key="_controller">Kiener\MolliePayments\Controller\Api\Webhook\WebhookControllerBase::webhookLegacyAction</default>
+        <default key="_routeScope">api</default>
+        <default key="auth_required"><bool>false</bool></default>
+        <default key="auth_enabled"><bool>false</bool></default>
+    </route>
+
+    <route id="api.mollie.webhook_subscription" path="/api/mollie/webhook/subscription/{swSubscriptionId}" methods="GET|POST">
+        <default key="_controller">Kiener\MolliePayments\Controller\Api\Webhook\WebhookControllerBase::webhookSubscriptionAction</default>
+        <default key="_routeScope">api</default>
+        <default key="auth_required"><bool>false</bool></default>
+        <default key="auth_enabled"><bool>false</bool></default>
+    </route>
+
+    <route id="api.mollie.webhook_subscription-legacy" path="/api/v{version}/mollie/webhook/subscription/{swSubscriptionId}" methods="GET|POST">
+        <default key="_controller">Kiener\MolliePayments\Controller\Api\Webhook\WebhookControllerBase::webhookSubscriptionLegacyAction</default>
+        <default key="_routeScope">api</default>
+        <default key="auth_required"><bool>false</bool></default>
+        <default key="auth_enabled"><bool>false</bool></default>
+    </route>
+
+    <route id="api.mollie.webhook_subscription_renew" path="/api/mollie/webhook/subscription/{swSubscriptionId}/renew" methods="GET|POST">
+        <default key="_controller">Kiener\MolliePayments\Controller\Api\Webhook\WebhookControllerBase::webhookSubscriptionRenewAction</default>
+        <default key="_routeScope">api</default>
+        <default key="auth_required"><bool>false</bool></default>
+        <default key="auth_enabled"><bool>false</bool></default>
+    </route>
+
+    <route id="api.mollie.webhook_subscription_renew-legacy" path="/api/v{version}/mollie/webhook/subscription/{swSubscriptionId}/renew" methods="GET|POST">
+        <default key="_controller">Kiener\MolliePayments\Controller\Api\Webhook\WebhookControllerBase::webhookSubscriptionRenewLegacyAction</default>
+        <default key="_routeScope">api</default>
+        <default key="auth_required"><bool>false</bool></default>
+        <default key="auth_enabled"><bool>false</bool></default>
+    </route>
+
+    <route id="api.mollie.webhook_subscription_paymentmethod" path="/api/mollie/webhook/subscription/{swSubscriptionId}/mandate/update" methods="GET|POST">
+        <default key="_controller">Kiener\MolliePayments\Controller\Api\Webhook\WebhookControllerBase::webhookSubscriptionMandateUpdatedAction</default>
+        <default key="_routeScope">api</default>
+        <default key="auth_required"><bool>false</bool></default>
+        <default key="auth_enabled"><bool>false</bool></default>
+    </route>
+
+    <route id="api.mollie.webhook_subscription_paymentmethod-legacy" path="/api/v{version}/mollie/webhook/subscription/{swSubscriptionId}/mandate/update" methods="GET|POST">
+        <default key="_controller">Kiener\MolliePayments\Controller\Api\Webhook\WebhookControllerBase::webhookSubscriptionMandateUpdatedLegacyAction</default>
+        <default key="_routeScope">api</default>
+        <default key="auth_required"><bool>false</bool></default>
+        <default key="auth_enabled"><bool>false</bool></default>
+    </route>
+</routes>

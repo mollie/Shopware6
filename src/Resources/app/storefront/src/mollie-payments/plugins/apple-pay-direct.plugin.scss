@@ -34,6 +34,7 @@
     min-height: 32px;
     max-height: 64px;
   }
+
   .apple-pay-button-black-with-text {
     background-color: black;
     color: white;
@@ -75,4 +76,8 @@
     margin-left: calc(2px * var(--apple-pay-scale));
     border: none;
   }
+}
+
+.d-none{
+  display:none !important;
 }

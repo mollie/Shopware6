@@ -4,6 +4,8 @@ namespace Kiener\MolliePayments\Service\Order;
 
 use Kiener\MolliePayments\Repository\Order\OrderRepository;
 use Kiener\MolliePayments\Repository\Order\OrderRepositoryInterface;
+use Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepositoryInterface;
+use Kiener\MolliePayments\Repository\StateMachineState\StateMachineStateRepositoryInterface;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
@@ -31,10 +33,16 @@ class OrderStatusUpdater
      */
     private $transactionTransitionService;
 
+
     /**
      * @var LoggerInterface
      */
     private $logger;
+
+    /**
+     * @var StateMachineStateRepositoryInterface
+     */
+    private $stateMachineStateRepository;
 
 
     /**
@@ -43,12 +51,14 @@ class OrderStatusUpdater
      * @param TransactionTransitionServiceInterface $transactionTransitionService
      * @param LoggerInterface $logger
      */
-    public function __construct(OrderStateService $orderHandler, OrderRepositoryInterface $repoOrders, TransactionTransitionServiceInterface $transactionTransitionService, LoggerInterface $logger)
+    public function __construct(OrderStateService $orderHandler, OrderRepositoryInterface $repoOrders, TransactionTransitionServiceInterface $transactionTransitionService, StateMachineStateRepositoryInterface $stateMachineStateRepository, LoggerInterface $logger)
     {
         $this->orderHandler = $orderHandler;
         $this->repoOrders = $repoOrders;
         $this->transactionTransitionService = $transactionTransitionService;
         $this->logger = $logger;
+
+        $this->stateMachineStateRepository = $stateMachineStateRepository;
     }
 
 
@@ -63,13 +73,17 @@ class OrderStatusUpdater
     {
         $currentShopwareState = $transaction->getStateMachineState();
 
-        if (!$currentShopwareState instanceof StateMachineStateEntity) {
-            return;
+
+        if (! $currentShopwareState instanceof StateMachineStateEntity) {
+            $currentShopwareState = $this->stateMachineStateRepository->findByStateId($transaction->getStateId(), $context);
+            if (! $currentShopwareState instanceof StateMachineStateEntity) {
+                return;
+            }
         }
 
         $order = $transaction->getOrder();
 
-        if (!$order instanceof OrderEntity) {
+        if (! $order instanceof OrderEntity) {
             return;
         }
 
@@ -171,7 +185,7 @@ class OrderStatusUpdater
 
         # let's check if we have configured a final order state.
         # if so, we need to verify, if a transition is even allowed
-        if (!empty($settings->getOrderStateFinalState())) {
+        if (! empty($settings->getOrderStateFinalState())) {
             $currentId = ($stateMachine instanceof StateMachineStateEntity) ? $stateMachine->getId() : '';
 
             # test if our current order does already have
@@ -186,7 +200,7 @@ class OrderStatusUpdater
                 # once our final state is reached, we only allow transitions
                 # to chargebacks and refunds.
                 # all other transitions will not happen.
-                if (!in_array($statusTo, $allowedList)) {
+                if (! in_array($statusTo, $allowedList)) {
                     return;
                 }
             }
