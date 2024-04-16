@@ -1,0 +1,9 @@
+{% sw_extends '@Storefront/storefront/base.html.twig' %}
+
+{% block base_script_hmr_mode %}
+
+    {{ parent() }}
+
+    {% sw_include '@Shopware/mollie/head.html.twig' %}
+
+{% endblock %}
