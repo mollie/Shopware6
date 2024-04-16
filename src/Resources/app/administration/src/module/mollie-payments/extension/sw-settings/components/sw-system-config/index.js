@@ -1,5 +1,5 @@
-const {Component} = Shopware;
 
+const {Component} = Shopware;
 
 Component.override('sw-system-config', {
     provide() {

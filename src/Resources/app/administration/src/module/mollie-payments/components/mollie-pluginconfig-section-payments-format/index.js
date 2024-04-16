@@ -47,7 +47,7 @@ Component.register('mollie-pluginconfig-section-payments-format', {
          */
         getFormat(ordernumber, customerNumber) {
 
-            const template = this.actualConfigData[this.currentSalesChannelId]["MolliePayments.config.formatOrderNumber"];
+            const template = this.actualConfigData[this.currentSalesChannelId]['MolliePayments.config.formatOrderNumber'];
 
             const stringUtils = new StringUtils();
 
