@@ -18,10 +18,10 @@ export default class AdminOrdersAction {
      */
     openOrders() {
         cy.intercept('**').as('page')
-        repoMainMenu.getOrders().click({force: true});
+        repoMainMenu.getOrders().click(forceOption);
         cy.wait('@page');
         cy.intercept('**').as('page')
-        repoMainMenu.getOrdersOverview().click({force: true});
+        repoMainMenu.getOrdersOverview().click(forceOption);
         cy.wait('@page');
     }
 
@@ -29,7 +29,7 @@ export default class AdminOrdersAction {
      *
      */
     openLastOrder() {
-        repoOrdersList.getLatestOrderNumber().click({force: true});
+        repoOrdersList.getLatestOrderNumber().click(forceOption);
     }
 
 
@@ -80,18 +80,17 @@ export default class AdminOrdersAction {
      *
      */
     openShipThroughMollie() {
-        cy.intercept('**').as('page')
+        cy.wait(2000);
         if (shopware.isVersionLower('6.5')) {
-            repoOrdersDetails.getMollieActionsButton().click({force: true});
-            cy.wait('@page');
+            repoOrdersDetails.getMollieActionsButton().click(forceOption);
         }
-
+        cy.wait('@page');
         repoOrdersDetails.getMollieActionButtonShipThroughMollie().should('not.have.class', 'sw-button--disabled');
-        repoOrdersDetails.getMollieActionButtonShipThroughMollie().click({force: true});
+        repoOrdersDetails.getMollieActionButtonShipThroughMollie().click(forceOption);
 
         // here are automatic reloads and things as it seems
         // I really want to test the real UX, so we just wait like a human
-        cy.wait('@page');
+        cy.wait(4000);
     }
 
     /**
@@ -102,11 +101,11 @@ export default class AdminOrdersAction {
 
 
         cy.intercept('**').as('page')
-        repoOrdersDetails.getLineItemActionsButton(nthItem).click({force: true})
+        repoOrdersDetails.getLineItemActionsButton(nthItem).click(forceOption)
 
         repoOrdersDetails.getLineItemActionsButtonShipThroughMollie().should('not.have.class', 'is--disabled');
 
-        repoOrdersDetails.getLineItemActionsButtonShipThroughMollie().click({force: true});
+        repoOrdersDetails.getLineItemActionsButtonShipThroughMollie().click(forceOption);
 
         // here are automatic reloads and things as it seems
         // I really want to test the real UX, so we just wait like a human
