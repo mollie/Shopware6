@@ -121,4 +121,12 @@ export default class RefundManagerRepository {
         return cy.get('.order-container-top-left > .sw-button-group > :nth-child(1)');
     }
 
+    /**
+     * 
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getFirstRefundQuantityInput(){
+        return cy.get('.cy-input-quantity input')
+    }
+
 }
