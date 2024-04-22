@@ -166,7 +166,7 @@ class MolliePaymentFinalize
 
                 # fire flow builder event
                 $this->fireFlowBuilderEvent(self::FLOWBUILDER_CANCELED, $order, $salesChannelContext->getContext());
-                /** @phpstan-ignore-next-line  */
+
                 throw PaymentException::customerCanceled($orderTransactionID, $message);
             } else {
                 $message = sprintf('Payment for order %s (%s) failed. The Mollie payment status was not successful for this payment attempt.', $order->getOrderNumber(), $mollieOrder->id);
@@ -174,7 +174,6 @@ class MolliePaymentFinalize
                 # fire flow builder event
                 $this->fireFlowBuilderEvent(self::FLOWBUILDER_FAILED, $order, $salesChannelContext->getContext());
 
-                /** @phpstan-ignore-next-line  */
                 throw PaymentException::asyncFinalizeInterrupted($orderTransactionID, $message);
             }
         }
