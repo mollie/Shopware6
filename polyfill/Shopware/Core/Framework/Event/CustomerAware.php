@@ -6,7 +6,7 @@ if (interface_exists(__NAMESPACE__ . '/CustomerAware')) {
     return;
 }
 
-interface CustomerAware extends FlowEventAware
+interface CustomerAware extends BusinessEventInterface
 {
     public const CUSTOMER_ID = 'customerId';
 
