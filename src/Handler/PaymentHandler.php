@@ -17,6 +17,8 @@ use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\AsynchronousPaymentHandlerInterface;
+use Shopware\Core\Checkout\Payment\Exception\AsyncPaymentFinalizeException;
+use Shopware\Core\Checkout\Payment\Exception\CustomerCanceledAsyncPaymentException;
 use Shopware\Core\Checkout\Payment\PaymentException;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -173,7 +175,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         try {
             $this->finalizeFacade->finalize($transaction, $salesChannelContext);
             /** @phpstan-ignore-next-line  */
-        } catch (PaymentException $ex) {
+        } catch (AsyncPaymentFinalizeException|CustomerCanceledAsyncPaymentException|PaymentException $ex) {
             $this->logger->error(
                 'Error when finalizing order ' . $transaction->getOrder()->getOrderNumber() . ', Mollie ID: ' . $molliedID . ', ' . $ex->getMessage()
             );

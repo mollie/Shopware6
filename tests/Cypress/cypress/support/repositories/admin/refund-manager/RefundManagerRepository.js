@@ -122,7 +122,7 @@ export default class RefundManagerRepository {
     }
 
     /**
-     * 
+     *
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getFirstRefundQuantityInput(){
