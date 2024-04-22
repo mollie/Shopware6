@@ -84,7 +84,7 @@ export default class AdminOrdersAction {
         if (shopware.isVersionLower('6.5')) {
             repoOrdersDetails.getMollieActionsButton().click(forceOption);
         }
-        cy.wait('@page');
+
         repoOrdersDetails.getMollieActionButtonShipThroughMollie().should('not.have.class', 'sw-button--disabled');
         repoOrdersDetails.getMollieActionButtonShipThroughMollie().click(forceOption);
 
@@ -117,35 +117,36 @@ export default class AdminOrdersAction {
      * @param trackingCode
      */
     setTrackingCode(trackingCode) {
-        cy.intercept('**').as('page')
+
         if (shopware.isVersionLower('6.5')) {
             repoOrdersDetails.getEditButton().click();
         }
+        cy.wait(2000);
 
 
 
         // Tracking Code is added on OrderDetails Tab, therefore we need to open a new tab first
         // and navigating back after tracking code is set. since 6.5
         if (shopware.isVersionGreaterEqual('6.5')) {
-
+            cy.wait(1000);
             repoOrdersDetails.getOrderDetailsTab().click();
         }
 
         repoOrdersDetails.getTrackingCode(trackingCode).type(trackingCode, forceOption);
         repoOrdersDetails.getTrackingCodeAddButton().click();
 
-
+        cy.wait(1000);
 
         repoOrdersDetails.getSaveButton().click();
 
         if (shopware.isVersionGreaterEqual('6.5')) {
-
+            cy.wait(2000);
             repoOrdersDetails.getOrderDetailsGeneralTab().click();
         }
 
         // here are automatic reloads and things as it seems
         // I really want to test the real UX, so we just wait like a human
-        cy.wait('@page');
+        cy.wait(4000);
     }
 
     addTrackingCodeToLineItem(quantity, shippingMethodName, trackingCode) {
