@@ -17,12 +17,11 @@ export default class AdminOrdersAction {
      *
      */
     openOrders() {
-        cy.intercept('**').as('page')
+        cy.wait(1000);
         repoMainMenu.getOrders().click(forceOption);
-        cy.wait('@page');
-        cy.intercept('**').as('page')
+        cy.wait(1000);
         repoMainMenu.getOrdersOverview().click(forceOption);
-        cy.wait('@page');
+        cy.wait(4000);
     }
 
     /**
