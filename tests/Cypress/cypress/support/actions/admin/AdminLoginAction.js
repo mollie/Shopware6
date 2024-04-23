@@ -12,7 +12,7 @@ export default class AdminLoginAction {
 
         cy.get('#sw-field--username').type('admin');
         cy.get('#sw-field--password').type('shopware');
-        
+
         cy.get('.sw-button').click();
         cy.wait(4000);
     }
