@@ -8,18 +8,13 @@ export default class AdminLoginAction {
         // increase our viewport for admin
         // otherwise we don't see a lot (page height)
         cy.viewport(1920, 1500);
-
-
-
-
         cy.visit('/admin');
 
         cy.get('#sw-field--username').type('admin');
         cy.get('#sw-field--password').type('shopware');
 
-        cy.intercept('/admin').as('admin');
         cy.get('.sw-button').click();
-        cy.wait('@admin');
+        cy.wait(4000);
     }
 
 }

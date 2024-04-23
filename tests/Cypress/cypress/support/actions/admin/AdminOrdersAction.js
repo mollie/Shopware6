@@ -17,19 +17,18 @@ export default class AdminOrdersAction {
      *
      */
     openOrders() {
-        cy.intercept('**').as('page')
-        repoMainMenu.getOrders().click({force: true});
-        cy.wait('@page');
-        cy.intercept('**').as('page')
-        repoMainMenu.getOrdersOverview().click({force: true});
-        cy.wait('@page');
+        cy.wait(1000);
+        repoMainMenu.getOrders().click(forceOption);
+        cy.wait(1000);
+        repoMainMenu.getOrdersOverview().click(forceOption);
+        cy.wait(4000);
     }
 
     /**
      *
      */
     openLastOrder() {
-        repoOrdersList.getLatestOrderNumber().click({force: true});
+        repoOrdersList.getLatestOrderNumber().click(forceOption);
     }
 
 
@@ -80,18 +79,17 @@ export default class AdminOrdersAction {
      *
      */
     openShipThroughMollie() {
-        cy.intercept('**').as('page')
+        cy.wait(2000);
         if (shopware.isVersionLower('6.5')) {
-            repoOrdersDetails.getMollieActionsButton().click({force: true});
-            cy.wait('@page');
+            repoOrdersDetails.getMollieActionsButton().click(forceOption);
         }
 
         repoOrdersDetails.getMollieActionButtonShipThroughMollie().should('not.have.class', 'sw-button--disabled');
-        repoOrdersDetails.getMollieActionButtonShipThroughMollie().click({force: true});
+        repoOrdersDetails.getMollieActionButtonShipThroughMollie().click(forceOption);
 
         // here are automatic reloads and things as it seems
         // I really want to test the real UX, so we just wait like a human
-        cy.wait('@page');
+        cy.wait(4000);
     }
 
     /**
@@ -102,11 +100,11 @@ export default class AdminOrdersAction {
 
 
         cy.intercept('**').as('page')
-        repoOrdersDetails.getLineItemActionsButton(nthItem).click({force: true})
+        repoOrdersDetails.getLineItemActionsButton(nthItem).click(forceOption)
 
         repoOrdersDetails.getLineItemActionsButtonShipThroughMollie().should('not.have.class', 'is--disabled');
 
-        repoOrdersDetails.getLineItemActionsButtonShipThroughMollie().click({force: true});
+        repoOrdersDetails.getLineItemActionsButtonShipThroughMollie().click(forceOption);
 
         // here are automatic reloads and things as it seems
         // I really want to test the real UX, so we just wait like a human
@@ -118,35 +116,36 @@ export default class AdminOrdersAction {
      * @param trackingCode
      */
     setTrackingCode(trackingCode) {
-        cy.intercept('**').as('page')
+
         if (shopware.isVersionLower('6.5')) {
             repoOrdersDetails.getEditButton().click();
         }
+        cy.wait(2000);
 
 
 
         // Tracking Code is added on OrderDetails Tab, therefore we need to open a new tab first
         // and navigating back after tracking code is set. since 6.5
         if (shopware.isVersionGreaterEqual('6.5')) {
-
+            cy.wait(1000);
             repoOrdersDetails.getOrderDetailsTab().click();
         }
 
         repoOrdersDetails.getTrackingCode(trackingCode).type(trackingCode, forceOption);
         repoOrdersDetails.getTrackingCodeAddButton().click();
 
-
+        cy.wait(1000);
 
         repoOrdersDetails.getSaveButton().click();
 
         if (shopware.isVersionGreaterEqual('6.5')) {
-
+            cy.wait(2000);
             repoOrdersDetails.getOrderDetailsGeneralTab().click();
         }
 
         // here are automatic reloads and things as it seems
         // I really want to test the real UX, so we just wait like a human
-        cy.wait('@page');
+        cy.wait(4000);
     }
 
     addTrackingCodeToLineItem(quantity, shippingMethodName, trackingCode) {

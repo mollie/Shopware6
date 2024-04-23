@@ -156,6 +156,7 @@ SHOPWARE 6.4
                                      :max="shippableQuantity(item)"
                                      v-model:value="shipQuantity"
                                      v-model="shipQuantity"
+                                     class="cy-ship-quantity"
                     >
                         <template #prefix>
                             {{ $tc('mollie-payments.modals.shipping.item.summary.quantity') }}

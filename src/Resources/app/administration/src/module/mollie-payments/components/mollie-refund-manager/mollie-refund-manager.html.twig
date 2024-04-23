@@ -64,7 +64,7 @@
                                      v-model:value="item.refundQuantity"
                                      v-if="isItemRefundable(item)"
                                      :allowEmpty="true"
-                                     :class="{ 'tutorial-active' : tutorialPartialQuantityVisible || tutorialPartialPromotionsVisible || (tutorialRefundShipping && isItemDelivery(item)), 'input-mode-active' : item.refundMode == 'quantity', 'input-mode-inactive' : item.refundMode == 'amount' }"
+                                     :class="{ 'cy-input-quantity':true,'tutorial-active' : tutorialPartialQuantityVisible || tutorialPartialPromotionsVisible || (tutorialRefundShipping && isItemDelivery(item)), 'input-mode-active' : item.refundMode == 'quantity', 'input-mode-inactive' : item.refundMode == 'amount' }"
                                      @change="onItemQtyChanged(item)">
                         <template #suffix>
                             {{ $tc('mollie-payments.refund-manager.general.unitQuantity') }}
@@ -91,6 +91,7 @@
                     <div v-if="isItemRefundable(item) && !isTaxStatusGross()">
                         <sw-checkbox-field :label="$tc('mollie-payments.refund-manager.cart.grid.checkRefundTax')"
                                            v-model="item.refundTax"
+                                           v-model:value="item.refundTax"
                                            class="check-refund-tax"
                                            :class="{ 'tutorial-active': tutorialPartialPromotionsVisible }"
                                            @change="onItemRefundTaxChanged(item)"

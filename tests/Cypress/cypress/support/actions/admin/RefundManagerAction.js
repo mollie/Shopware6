@@ -9,7 +9,7 @@ const repoRefundManager = new RefundManagerRepository();
 // we have to force it
 // because due to scrolling it might not
 // always be visible
-const forceOption = {force: true};
+const forceOption = {force: true,timeout:10000};
 
 
 export default class RefundManagerAction {
@@ -71,6 +71,7 @@ export default class RefundManagerAction {
      *
      */
     selectAllItems() {
+        repoRefundManager.getFirstRefundQuantityInput().should('be.visible');
         repoRefundManager.getSelectAllItemsButton().click(forceOption);
     }
 

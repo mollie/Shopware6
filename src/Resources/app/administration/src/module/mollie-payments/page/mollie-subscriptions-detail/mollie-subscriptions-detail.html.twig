@@ -84,7 +84,7 @@
                                                :label="$tc('mollie-payments.subscriptions.detail.labelAmount')"
                                                disabled="disabled">
                                     <template slot="suffix">
-                                        {{ subscription.currency }}
+                                        {{ subscription.currency.symbol }}
                                     </template>
                                 </sw-text-field>
                             {% endblock %}
