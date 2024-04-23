@@ -15,6 +15,7 @@ use Kiener\MolliePayments\Struct\Address\AddressStruct;
 use Kiener\MolliePayments\Struct\CustomerStruct;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressDefinition;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Customer\Event\CustomerBeforeLoginEvent;
@@ -27,6 +28,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\AndFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\Framework\Validation\Exception\ConstraintViolationException;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister;
@@ -103,18 +105,18 @@ class CustomerService implements CustomerServiceInterface
      * @param ConfigService $configService
      */
     public function __construct(
-        CountryRepositoryInterface $countryRepository,
-        CustomerRepositoryInterface $customerRepository,
+        CountryRepositoryInterface         $countryRepository,
+        CustomerRepositoryInterface        $customerRepository,
         CustomerAddressRepositoryInterface $customerAddressRepository,
-        Customer $customerApiService,
-        EventDispatcherInterface $eventDispatcher,
-        LoggerInterface $logger,
-        SalesChannelContextPersister $salesChannelContextPersister,
-        SalutationRepositoryInterface $salutationRepository,
-        SettingsService $settingsService,
-        string $shopwareVersion,
-        ConfigService $configService,
-        ContainerInterface $container //we have to inject the container, because in SW 6.4.20.2 we have circular injection for the register route
+        Customer                           $customerApiService,
+        EventDispatcherInterface           $eventDispatcher,
+        LoggerInterface                    $logger,
+        SalesChannelContextPersister       $salesChannelContextPersister,
+        SalutationRepositoryInterface      $salutationRepository,
+        SettingsService                    $settingsService,
+        string                             $shopwareVersion,
+        ConfigService                      $configService,
+        ContainerInterface                 $container //we have to inject the container, because in SW 6.4.20.2 we have circular injection for the register route
     ) {
         $this->countryRepository = $countryRepository;
         $this->customerRepository = $customerRepository;
@@ -710,17 +712,20 @@ class CustomerService implements CustomerServiceInterface
 
 
         $shippingAddressData = new RequestDataBag();
+        $shippingAddressData->set('firstName', $shippingAddress->getFirstName());
+        $shippingAddressData->set('lastName', $shippingAddress->getLastName());
         $shippingAddressData->set('street', $shippingAddress->getStreet());
         $shippingAddressData->set('additionalAddressLine1', $shippingAddress->getStreetAdditional());
         $shippingAddressData->set('zipcode', $shippingAddress->getZipCode());
         $shippingAddressData->set('city', $shippingAddress->getCity());
         $shippingAddressData->set('countryId', $countryId);
-        $shippingAddressData->set('customFields', [
-            CustomFieldsInterface::MOLLIE_KEY => [
-                self::CUSTOM_FIELDS_KEY_PAYPAL_EXPRESS_ADDRESS_ID => $shippingAddress->getMollieAddressId()
-            ]
+        $customFields = new RequestDataBag();
+        $customFields->set(CustomerAddressDefinition::ENTITY_NAME, [
+            CustomFieldsInterface::MOLLIE_KEY => [self::CUSTOM_FIELDS_KEY_PAYPAL_EXPRESS_ADDRESS_ID => $shippingAddress->getMollieAddressId()]
         ]);
+        $shippingAddressData->set('customFields', $customFields);
         $data->set('shippingAddress', $shippingAddressData);
+        $data->set('billingAddress', $shippingAddressData);
 
         if ($billingAddress !== null) {
             $countryId = $this->getCountryId($billingAddress->getCountryCode(), $context->getContext());
@@ -731,11 +736,11 @@ class CustomerService implements CustomerServiceInterface
             $billingAddressData->set('zipcode', $billingAddress->getZipCode());
             $billingAddressData->set('city', $billingAddress->getCity());
             $billingAddressData->set('countryId', $countryId);
-            $billingAddressData->set('customFields', [
-                CustomFieldsInterface::MOLLIE_KEY => [
-                    self::CUSTOM_FIELDS_KEY_PAYPAL_EXPRESS_ADDRESS_ID => $billingAddress->getMollieAddressId()
-                ]
+            $customFields = new RequestDataBag();
+            $customFields->set(CustomerAddressDefinition::ENTITY_NAME, [
+                CustomFieldsInterface::MOLLIE_KEY => [self::CUSTOM_FIELDS_KEY_PAYPAL_EXPRESS_ADDRESS_ID => $billingAddress->getMollieAddressId()]
             ]);
+            $billingAddressData->set('customFields', $customFields);
 
             $data->set('billingAddress', $shippingAddressData);
         }
@@ -748,9 +753,9 @@ class CustomerService implements CustomerServiceInterface
             $errors = [];
             /** we have to store the errors in an array because getErrors returns a generator */
             foreach ($e->getErrors() as $error) {
-                $errors[]=$error;
+                $errors[] = $error;
             }
-            $this->logger->error($e->getMessage(), ['errors'=>$errors]);
+            $this->logger->error($e->getMessage(), ['errors' => $errors]);
             return null;
         }
     }
