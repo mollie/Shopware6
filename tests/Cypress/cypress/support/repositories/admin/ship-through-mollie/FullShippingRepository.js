@@ -54,7 +54,7 @@ export default class FullShippingRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getTrackingCarrier() {
-        return cy.get('#sw-field--tracking-carrier');
+        return cy.get('.cy-trackiing-carrier input');
     }
 
     /**
@@ -62,7 +62,7 @@ export default class FullShippingRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getTrackingCode() {
-        return cy.get('#sw-field--tracking-code');
+        return cy.get('.cy-tracking-code input');
     }
 
     /**
@@ -70,7 +70,7 @@ export default class FullShippingRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getTrackingUrl() {
-        return cy.get('#sw-field--tracking-url');
+        return cy.get('.cy-tracking-url input');
     }
 
 }

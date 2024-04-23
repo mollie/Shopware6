@@ -62,7 +62,7 @@ export default class RefundManagerRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getFirstLineItemQuantityInput() {
-        return cy.get('.sw-data-grid__cell--inputQuantity  #sw-field--item-refundQuantity').first();
+        return cy.get('.cy-input-quantity input').first();
     }
 
     /**
