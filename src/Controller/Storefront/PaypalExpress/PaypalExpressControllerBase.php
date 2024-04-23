@@ -58,8 +58,6 @@ class PaypalExpressControllerBase extends StorefrontController
     }
 
     /**
-     * @Route("/mollie/paypal-express/start", defaults={"csrf_protected"=true}, name="frontend.mollie.paypal-express.start", options={"seo"="false"}, methods={"GET","POST"})
-     *
      * @param Request $request
      * @param SalesChannelContext $context
      * @throws ApiException
@@ -104,8 +102,6 @@ class PaypalExpressControllerBase extends StorefrontController
     }
 
     /**
-     * @Route("/mollie/paypal-express/finish", defaults={"csrf_protected"=true}, name="frontend.mollie.paypal-express.finish", options={"seo"="false"}, methods={"GET"})
-     *
      * @param SalesChannelContext $context
      * @return Response
      */

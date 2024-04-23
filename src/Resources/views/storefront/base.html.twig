@@ -22,11 +22,14 @@
     {% endif %}
 
     {# requirement check for apple pay direct #}
-    {% if mollie_applepaydirect_enabled == true or mollie_applepay_enabled == true %}
-        {% if currentRoute in onlyShowHere|keys and onlyShowHere[currentRoute] not in mollie_applepaydirect_restrictions %}
+    {% if mollie_applepaydirect_enabled == true or mollie_applepay_enabled == true or mollie_paypalexpress_enabled == true %}
+
+        {% if currentRoute in onlyShowHere|keys and (onlyShowHere[currentRoute] not in mollie_applepaydirect_restrictions  or onlyShowHere[currentRoute] not in mollie_paypalexpress_restrictions) %}
             {% set includeJsInHeader = true %}
         {% endif %}
-        {% if 'offcanvas' not in mollie_applepaydirect_restrictions %}
+
+
+        {% if 'offcanvas' not in mollie_applepaydirect_restrictions or 'offcanvas' not in mollie_paypalexpress_restrictions %}
             {% set includeJsInHeader = true %}
         {% endif %}
     {% endif %}

@@ -462,54 +462,6 @@ class CustomerService implements CustomerServiceInterface
     }
 
     /**
-     * @param string $firstname
-     * @param string $lastname
-     * @param string $email
-     * @param string $phone
-     * @param string $street
-     * @param string $zipCode
-     * @param string $city
-     * @param string $countryISO2
-     * @param SalesChannelContext $context
-     * @return null|CustomerEntity
-     */
-    public function createApplePayDirectCustomer(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, SalesChannelContext $context): ?CustomerEntity
-    {
-        $countryId = $this->getCountryId($countryISO2, $context->getContext());
-        $salutationId = $this->getSalutationId($context->getContext());
-
-        $data = new RequestDataBag();
-        $data->set('salutationId', $salutationId);
-        $data->set('guest', true);
-        $data->set('firstName', $firstname);
-        $data->set('lastName', $lastname);
-        $data->set('email', $email);
-
-        $billingAddress = new RequestDataBag();
-        $billingAddress->set('street', $street);
-        $billingAddress->set('zipcode', $zipCode);
-        $billingAddress->set('city', $city);
-        $billingAddress->set('phoneNumber', $phone);
-        $billingAddress->set('countryId', $countryId);
-
-        $data->set('billingAddress', $billingAddress);
-
-        try {
-            $abstractRegisterRoute = $this->container->get(RegisterRoute::class);
-            $response = $abstractRegisterRoute->register($data, $context, false);
-            return $response->getCustomer();
-        } catch (ConstraintViolationException $e) {
-            $errors = [];
-            /** we have to store the errors in an array because getErrors returns a generator */
-            foreach ($e->getErrors() as $error) {
-                $errors[]=$error;
-            }
-            $this->logger->error($e->getMessage(), ['errors'=>$errors]);
-            return null;
-        }
-    }
-
-    /**
      * Returns a country id by its iso code.
      *
      * @param string $countryCode
@@ -743,6 +695,66 @@ class CustomerService implements CustomerServiceInterface
         }
         return $this->customerRepository->upsert([$customer], $context);
     }
+
+    public function createGuestAccount(AddressStruct $shippingAddress, string $paymentMethodId, SalesChannelContext $context, ?AddressStruct $billingAddress = null): ?CustomerEntity
+    {
+        $countryId = $this->getCountryId($shippingAddress->getCountryCode(), $context->getContext());
+        $salutationId = $this->getSalutationId($context->getContext());
+
+        $data = new RequestDataBag();
+        $data->set('salutationId', $salutationId);
+        $data->set('guest', true);
+        $data->set('firstName', $shippingAddress->getFirstName());
+        $data->set('lastName', $shippingAddress->getLastName());
+        $data->set('email', $shippingAddress->getEmail());
+
+
+        $shippingAddressData = new RequestDataBag();
+        $shippingAddressData->set('street', $shippingAddress->getStreet());
+        $shippingAddressData->set('additionalAddressLine1', $shippingAddress->getStreetAdditional());
+        $shippingAddressData->set('zipcode', $shippingAddress->getZipCode());
+        $shippingAddressData->set('city', $shippingAddress->getCity());
+        $shippingAddressData->set('countryId', $countryId);
+        $shippingAddressData->set('customFields', [
+            CustomFieldsInterface::MOLLIE_KEY => [
+                self::CUSTOM_FIELDS_KEY_PAYPAL_EXPRESS_ADDRESS_ID => $shippingAddress->getMollieAddressId()
+            ]
+        ]);
+        $data->set('shippingAddress', $shippingAddressData);
+
+        if ($billingAddress !== null) {
+            $countryId = $this->getCountryId($billingAddress->getCountryCode(), $context->getContext());
+
+            $billingAddressData = new RequestDataBag();
+            $billingAddressData->set('street', $billingAddress->getStreet());
+            $billingAddressData->set('additionalAddressLine1', $billingAddress->getStreetAdditional());
+            $billingAddressData->set('zipcode', $billingAddress->getZipCode());
+            $billingAddressData->set('city', $billingAddress->getCity());
+            $billingAddressData->set('countryId', $countryId);
+            $billingAddressData->set('customFields', [
+                CustomFieldsInterface::MOLLIE_KEY => [
+                    self::CUSTOM_FIELDS_KEY_PAYPAL_EXPRESS_ADDRESS_ID => $billingAddress->getMollieAddressId()
+                ]
+            ]);
+
+            $data->set('billingAddress', $shippingAddressData);
+        }
+
+        try {
+            $abstractRegisterRoute = $this->container->get(RegisterRoute::class);
+            $response = $abstractRegisterRoute->register($data, $context, false);
+            return $response->getCustomer();
+        } catch (ConstraintViolationException $e) {
+            $errors = [];
+            /** we have to store the errors in an array because getErrors returns a generator */
+            foreach ($e->getErrors() as $error) {
+                $errors[]=$error;
+            }
+            $this->logger->error($e->getMessage(), ['errors'=>$errors]);
+            return null;
+        }
+    }
+
 
     /**
      * @param string $addressId

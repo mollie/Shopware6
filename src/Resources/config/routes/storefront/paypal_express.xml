@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<routes xmlns="http://symfony.com/schema/routing"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://symfony.com/schema/routing
+        https://symfony.com/schema/routing/routing-1.0.xsd">
+
+    <route id="frontend.mollie.paypal-express.start" path="/mollie/paypal-express/start" methods="GET|POST">
+        <default key="_controller">Kiener\MolliePayments\Controller\Storefront\PaypalExpress\PaypalExpressControllerBase::startCheckout</default>
+        <default key="_routeScope">storefront</default>
+        <default key="csrf_protected"><bool>true</bool></default>
+        <option key="seo">false</option>
+    </route>
+
+    <route id="frontend.mollie.paypal-express.finish" path="/mollie/paypal-express/finish" methods="GET">
+        <default key="_controller">Kiener\MolliePayments\Controller\Storefront\PaypalExpress\PaypalExpressControllerBase::finishCheckout</default>
+        <default key="_routeScope">storefront</default>
+        <default key="csrf_protected"><bool>true</bool></default>
+        <option key="seo">false</option>
+    </route>
+
+</routes>
