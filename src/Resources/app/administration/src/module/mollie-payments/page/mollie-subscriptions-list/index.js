@@ -4,7 +4,7 @@ import MollieSubscriptionGrid from './grids/MollieSubscriptionGrid';
 import SubscriptionService from '../../../../core/service/subscription/subscription.service';
 
 // eslint-disable-next-line no-undef
-const {Component, Mixin, Application} = Shopware;
+const {Component, Mixin, Application, Filter} = Shopware;
 
 // eslint-disable-next-line no-undef
 const {Criteria} = Shopware.Data;
@@ -102,6 +102,14 @@ Component.register('mollie-subscriptions-list', {
                 refresh: map.has('icons-regular-undo') ? 'regular-undo' : 'default-arrow-360-left',
             };
         },
+        currencyFilter() {
+            return Filter.getByName('currency');
+        },
+
+
+        dateFilter() {
+            return Filter.getByName('date');
+        },
     },
 
     methods: {
@@ -133,6 +141,7 @@ Component.register('mollie-subscriptions-list', {
 
             criteria.addSorting(Criteria.sort(this.sortBy, this.sortDirection, this.naturalSorting));
             criteria.addAssociation('customer');
+            criteria.addAssociation('currency');
 
             // eslint-disable-next-line no-undef
             this.repoSubscriptions.search(criteria, Shopware.Context.api).then((result) => {

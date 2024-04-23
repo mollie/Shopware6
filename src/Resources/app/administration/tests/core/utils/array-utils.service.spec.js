@@ -1,4 +1,4 @@
-import ArrayUtilsService from "../../../src/core/service/utils/array-utils.service";
+import ArrayUtilsService from '../../../src/core/service/utils/array-utils.service';
 
 const utils = new ArrayUtilsService();
 

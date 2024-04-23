@@ -9,7 +9,6 @@ export default class AdminPluginAction {
      *
      */
     openPluginConfiguration() {
-
         if (shopware.isVersionGreaterEqual('6.4')) {
             cy.visit('/admin#/sw/extension/config/MolliePayments');
         } else {

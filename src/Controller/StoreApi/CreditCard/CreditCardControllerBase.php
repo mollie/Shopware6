@@ -42,7 +42,6 @@ class CreditCardControllerBase
 
 
     /**
-     * @Route("/store-api/mollie/creditcard/store-token/{customerId}/{cardToken}", name="store-api.mollie.creditcard.store-token", methods={"POST"})
      *
      * @param string $customerId
      * @param string $cardToken
@@ -69,7 +68,6 @@ class CreditCardControllerBase
     }
 
     /**
-     * @Route("/store-api/mollie/creditcard/store-mandate-id/{customerId}/{mandateId}", name="store-api.mollie.creditcard.store-mandate-id", methods={"POST"})
      *
      * @param string $customerId
      * @param string $mandateId
@@ -94,7 +92,6 @@ class CreditCardControllerBase
     }
 
     /**
-     * @Route("/store-api/mollie/mandate/revoke/{customerId}/{mandateId}", name="store-api.mollie.mandate.revoke", methods={"POST"})
      *
      * @param string $customerId
      * @param string $mandateId
@@ -110,7 +107,6 @@ class CreditCardControllerBase
     }
 
     /**
-     * @Route("/store-api/mollie/mandates/{customerId}", name="store-api.mollie.mandates", methods={"GET"})
      *
      * @param string $customerId
      * @param SalesChannelContext $context

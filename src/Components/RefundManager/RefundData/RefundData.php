@@ -45,6 +45,11 @@ class RefundData
     private $roundingItemTotal;
 
     /**
+     * @var string
+     */
+    private $taxStatus;
+
+    /**
      * @param AbstractItem[] $cartItems
      * @param Refund[] $refunds
      * @param float $amountVouchers
@@ -53,7 +58,7 @@ class RefundData
      * @param float $amountRemaining
      * @param float $roundingItemTotal
      */
-    public function __construct(array $cartItems, array $refunds, float $amountVouchers, float $amountPendingRefunds, float $amountCompletedRefunds, float $amountRemaining, float $roundingItemTotal)
+    public function __construct(array $cartItems, array $refunds, float $amountVouchers, float $amountPendingRefunds, float $amountCompletedRefunds, float $amountRemaining, float $roundingItemTotal, string $taxStatus)
     {
         $this->orderItems = $cartItems;
         $this->refunds = $refunds;
@@ -62,6 +67,7 @@ class RefundData
         $this->amountCompletedRefunds = $amountCompletedRefunds;
         $this->amountRemaining = $amountRemaining;
         $this->roundingItemTotal = $roundingItemTotal;
+        $this->taxStatus = $taxStatus;
     }
 
     /**
@@ -120,6 +126,14 @@ class RefundData
         return $this->roundingItemTotal;
     }
 
+    /**
+     * @return string
+     */
+    public function getTaxStatus(): string
+    {
+        return $this->taxStatus;
+    }
+
 
     /**
      * @return array<mixed>
@@ -155,6 +169,7 @@ class RefundData
             ],
             'cart' => $hydratedOrderItems,
             'refunds' => $refundsArray,
+            'taxStatus' => $this->taxStatus,
         ];
     }
 }

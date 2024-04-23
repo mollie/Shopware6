@@ -11,6 +11,7 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionE
 use Kiener\MolliePayments\Components\Subscription\Exception\SubscriptionNotFoundException;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Pricing\CashRoundingConfig;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -61,6 +62,7 @@ class SubscriptionRepository
         $criteria = new Criteria([$id]);
         $criteria->addAssociation('customer');
         $criteria->addAssociation('historyEntries');
+        $criteria->addAssociation('currency');
 
         $result = $this->repoSubscriptions->search($criteria, $context);
 
@@ -80,6 +82,7 @@ class SubscriptionRepository
     public function findByMandateId(string $customerId, string $mandateId, Context $context): SubscriptionCollection
     {
         $criteria = new Criteria();
+        $criteria->addAssociation('currency');
         $criteria->addFilter(new EqualsFilter('customerId', $customerId));
         $criteria->addFilter(new EqualsFilter('mandateId', $mandateId));
 
@@ -111,6 +114,7 @@ class SubscriptionRepository
         $criteria = new Criteria();
         $criteria->addAssociation('customer');
         $criteria->addAssociation('historyEntries');
+        $criteria->addAssociation('currency');
         $criteria->addFilter(new EqualsFilter('customerId', $swCustomerId));
 
         if (!$includedPending) {
@@ -137,7 +141,7 @@ class SubscriptionRepository
 
         $criteria = new Criteria();
         $criteria->addAssociation('customer');
-
+        $criteria->addAssociation('currency');
         # subscription is not canceled
         $criteria->addFilter(new EqualsFilter('canceledAt', null));
         $criteria->addFilter(new EqualsFilter('salesChannelId', $salesChannelId));
@@ -157,6 +161,7 @@ class SubscriptionRepository
     {
         $criteria = new Criteria();
         $criteria->addAssociation('customer');
+        $criteria->addAssociation('currency');
 
         $criteria->addFilter(new EqualsFilter('orderId', $orderId));
         $criteria->addFilter(new EqualsFilter('mollieId', null));
@@ -185,6 +190,18 @@ class SubscriptionRepository
      */
     public function insertSubscription(SubscriptionEntity $subscription, string $status, Context $context): void
     {
+        $totalRoundingValue = null;
+        $totalRounding = $subscription->getTotalRounding();
+        if ($totalRounding instanceof CashRoundingConfig) {
+            $totalRoundingValue = $totalRounding->jsonSerialize();
+        }
+
+        $itemRoundingValue = null;
+        $itemRounding = $subscription->getItemRounding();
+        if ($itemRounding instanceof CashRoundingConfig) {
+            $itemRoundingValue = $itemRounding->jsonSerialize();
+        }
+
         $this->repoSubscriptions->create(
             [
                 [
@@ -204,11 +221,13 @@ class SubscriptionRepository
                     'description' => $subscription->getDescription(),
                     'amount' => $subscription->getAmount(),
                     'quantity' => $subscription->getQuantity(),
-                    'currency' => $subscription->getCurrency(),
+                    'currencyId' => $subscription->getCurrencyId(),
                     'metadata' => $subscription->getMetadata()->toArray(),
                     'productId' => $subscription->getProductId(),
                     'orderId' => $subscription->getOrderId(),
                     'salesChannelId' => $subscription->getSalesChannelId(),
+                    'totalRounding' => $totalRoundingValue,
+                    'itemRounding' => $itemRoundingValue,
                 ]
             ],
             $context

@@ -11,6 +11,7 @@ use MolliePayments\Tests\Fakes\FakePluginSettings;
 use MolliePayments\Tests\Fakes\FakeRouter;
 use MolliePayments\Tests\Traits\BuilderTestTrait;
 use PHPUnit\Framework\TestCase;
+use Shopware\Core\System\Currency\CurrencyEntity;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -32,7 +33,9 @@ class MollieDataBuilderTest extends TestCase
 
         $subscription = new SubscriptionEntity();
         $subscription->setId('ID123');
-        $subscription->setCurrency('USD');
+        $currency = new CurrencyEntity();
+        $currency->setIsoCode('USD');
+        $subscription->setCurrency($currency);
         $subscription->setAmount(10.5);
         $subscription->setDescription('Subscription Product A');
 

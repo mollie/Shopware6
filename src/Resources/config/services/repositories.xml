@@ -94,6 +94,11 @@
             <argument type="service" id="mollie_subscription_history.repository"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Repository\StateMachineState\StateMachineStateRepository">
+            <argument type="service" id="state_machine_state.repository"/>
+        </service>
+
+
 
     </services>
 </container>

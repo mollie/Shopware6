@@ -50,6 +50,7 @@ interface CustomerServiceInterface
 
     public function createGuestAccount(AddressStruct $shippingAddress, string $paymentMethodId, SalesChannelContext $context, ?AddressStruct $billingAddress = null): ?CustomerEntity;
 
+    public function createApplePayDirectCustomer(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, SalesChannelContext $context): ?CustomerEntity;
     public function getCountryId(string $countryCode, Context $context): ?string;
 
     public function getSalutationId(Context $context): ?string;

@@ -12,6 +12,8 @@
 
      {% if(isMollieSubscription == true) %}
          {# we must require a registration, so hide the "do not create customer" checkbox #}
+         {# but the form field is still required to be true, otherwise we continue as guest #}
+         <input type="hidden" name="createCustomerAccount" value="true">
      {% else %}
          {{ parent() }}
      {% endif %}

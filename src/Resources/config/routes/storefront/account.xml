@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<routes xmlns="http://symfony.com/schema/routing"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://symfony.com/schema/routing
+        https://symfony.com/schema/routing/routing-1.0.xsd">
+
+    <route id="frontend.account.mollie.subscriptions.page"
+           path="/account/mollie/subscriptions"
+           methods="GET|POST">
+        <default key="_controller">Kiener\MolliePayments\Controller\Storefront\Account\AccountControllerBase::subscriptionsList</default>
+        <default key="_routeScope">storefront</default>
+        <default key="XmlHttpRequest"><bool>true</bool></default>
+        <option key="seo">false</option>
+    </route>
+
+    <route id="frontend.account.mollie.subscriptions.billing.update"
+           path="/account/mollie/subscriptions/{subscriptionId}/billing/update"
+           methods="POST">
+        <default key="_controller">Kiener\MolliePayments\Controller\Storefront\Account\AccountControllerBase::updateBilling</default>
+        <default key="_routeScope">storefront</default>
+    </route>
+
+    <route id="frontend.account.mollie.subscriptions.shipping.update"
+           path="/account/mollie/subscriptions/{subscriptionId}/shipping/update"
+           methods="POST">
+        <default key="_controller">Kiener\MolliePayments\Controller\Storefront\Account\AccountControllerBase::updateShipping</default>
+        <default key="_routeScope">storefront</default>
+    </route>
+
+    <route id="frontend.account.mollie.subscriptions.payment.update"
+           path="/account/mollie/subscriptions/{swSubscriptionId}/payment/update"
+           methods="POST">
+        <default key="_controller">Kiener\MolliePayments\Controller\Storefront\Account\AccountControllerBase::updatePaymentStart</default>
+        <default key="_routeScope">storefront</default>
+    </route>
+
+    <route id="frontend.account.mollie.subscriptions.payment.update-success"
+           path="/account/mollie/subscriptions/{swSubscriptionId}/payment/update/finish"
+           methods="GET|POST">
+        <default key="_controller">Kiener\MolliePayments\Controller\Storefront\Account\AccountControllerBase::updatePaymentFinish</default>
+        <default key="_routeScope">storefront</default>
+    </route>
+
+    <route id="frontend.account.mollie.subscriptions.pause"
+           path="/account/mollie/subscriptions/{swSubscriptionId}/pause"
+           methods="POST">
+        <default key="_controller">Kiener\MolliePayments\Controller\Storefront\Account\AccountControllerBase::pauseSubscription</default>
+        <default key="_routeScope">storefront</default>
+    </route>
+
+    <route id="frontend.account.mollie.subscriptions.skip"
+           path="/account/mollie/subscriptions/{swSubscriptionId}/skip"
+           methods="POST">
+        <default key="_controller">Kiener\MolliePayments\Controller\Storefront\Account\AccountControllerBase::skipSubscription</default>
+        <default key="_routeScope">storefront</default>
+    </route>
+
+    <route id="frontend.account.mollie.subscriptions.resume"
+           path="/account/mollie/subscriptions/{swSubscriptionId}/resume"
+           methods="POST">
+        <default key="_controller">Kiener\MolliePayments\Controller\Storefront\Account\AccountControllerBase::resumeSubscription</default>
+        <default key="_routeScope">storefront</default>
+    </route>
+
+    <route id="frontend.account.mollie.subscriptions.cancel"
+           path="/account/mollie/subscriptions/{subscriptionId}/cancel"
+           methods="POST">
+        <default key="_controller">Kiener\MolliePayments\Controller\Storefront\Account\AccountControllerBase::cancelSubscription</default>
+        <default key="_routeScope">storefront</default>
+    </route>
+
+    
+</routes>

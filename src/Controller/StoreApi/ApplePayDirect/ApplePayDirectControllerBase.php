@@ -45,7 +45,6 @@ class ApplePayDirectControllerBase
 
 
     /**
-     * @Route("/store-api/mollie/applepay/enabled", name="store-api.mollie.apple-pay.enabled", methods={"GET"})
      *
      * @param SalesChannelContext $context
      * @throws \Exception
@@ -59,7 +58,6 @@ class ApplePayDirectControllerBase
     }
 
     /**
-     * @Route("/store-api/mollie/applepay/id", name="store-api.mollie.apple-pay.id", methods={"GET"})
      *
      * @param SalesChannelContext $context
      * @throws \Exception
@@ -82,7 +80,6 @@ class ApplePayDirectControllerBase
     }
 
     /**
-     * @Route("/store-api/mollie/applepay/add-product", name="store-api.mollie.apple-pay.add-product", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param SalesChannelContext $context
@@ -108,7 +105,6 @@ class ApplePayDirectControllerBase
     }
 
     /**
-     * @Route("/store-api/mollie/applepay/validate", name="store-api.mollie.apple-pay.validate", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param SalesChannelContext $context
@@ -129,7 +125,6 @@ class ApplePayDirectControllerBase
     }
 
     /**
-     * @Route("/store-api/mollie/applepay/cart", name="store-api.mollie.apple-pay.cart", methods={"GET"})
      *
      * @param SalesChannelContext $context
      * @throws \Throwable
@@ -144,7 +139,6 @@ class ApplePayDirectControllerBase
 
 
     /**
-     * @Route("/store-api/mollie/applepay/shipping-methods", name="store-api.mollie.apple-pay.shipping-methods", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param SalesChannelContext $context
@@ -165,7 +159,6 @@ class ApplePayDirectControllerBase
     }
 
     /**
-     * @Route("/store-api/mollie/applepay/shipping-method", name="store-api.mollie.apple-pay.set-shipping-methods", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param SalesChannelContext $context
@@ -186,7 +179,6 @@ class ApplePayDirectControllerBase
     }
 
     /**
-     * @Route("/store-api/mollie/applepay/pay",  name="store-api.mollie.apple-pay.pay", methods={"POST"})
      *
      * @param RequestDataBag $data
      * @param SalesChannelContext $context
@@ -259,7 +251,6 @@ class ApplePayDirectControllerBase
     }
 
     /**
-     * @Route("/store-api/mollie/applepay/restore-cart", name="store-api.mollie.apple-pay.restore-cart", methods={"POST"})
      *
      * @param SalesChannelContext $context
      * @return StoreApiResponse

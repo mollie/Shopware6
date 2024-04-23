@@ -11,6 +11,8 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\Subscr
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
+use Shopware\Core\Framework\DataAbstractionLayer\Pricing\CashRoundingConfig;
+use Shopware\Core\System\Currency\CurrencyEntity;
 
 class SubscriptionEntity extends Entity
 {
@@ -58,7 +60,7 @@ class SubscriptionEntity extends Entity
     protected $quantity;
 
     /**
-     * @var string
+     * @var ?CurrencyEntity
      */
     protected $currency;
 
@@ -143,6 +145,20 @@ class SubscriptionEntity extends Entity
      */
     protected $historyEntries;
 
+    /**
+     * @var string
+     */
+    protected $currencyId;
+
+    /**
+     * @var ?CashRoundingConfig
+     */
+    protected $totalRounding;
+
+    /**
+     * @var ?CashRoundingConfig
+     */
+    protected $itemRounding;
     # --------------------------------------------------------------------------------
 
     /**
@@ -277,17 +293,17 @@ class SubscriptionEntity extends Entity
     }
 
     /**
-     * @return string
+     * @return ?CurrencyEntity
      */
-    public function getCurrency(): string
+    public function getCurrency(): ?CurrencyEntity
     {
-        return (string)$this->currency;
+        return $this->currency;
     }
 
     /**
-     * @param string $currency
+     * @param CurrencyEntity $currency
      */
-    public function setCurrency(string $currency): void
+    public function setCurrency(CurrencyEntity $currency): void
     {
         $this->currency = $currency;
     }
@@ -668,5 +684,36 @@ class SubscriptionEntity extends Entity
     public function setHistoryEntries(SubscriptionHistoryCollection $historyEntries): void
     {
         $this->historyEntries = $historyEntries;
+    }
+
+    public function setCurrencyId(string $currencyId):void
+    {
+        $this->currencyId = $currencyId;
+    }
+
+    public function getCurrencyId(): ?string
+    {
+        return $this->currencyId;
+    }
+
+
+    public function setTotalRounding(?CashRoundingConfig $totalRounding): void
+    {
+        $this->totalRounding = $totalRounding;
+    }
+
+    public function getTotalRounding(): ?CashRoundingConfig
+    {
+        return $this->totalRounding;
+    }
+
+    public function getItemRounding(): ?CashRoundingConfig
+    {
+        return $this->itemRounding;
+    }
+
+    public function setItemRounding(?CashRoundingConfig $itemRounding): void
+    {
+        $this->itemRounding = $itemRounding;
     }
 }

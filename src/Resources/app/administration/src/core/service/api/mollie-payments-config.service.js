@@ -56,6 +56,21 @@ export default class MolliePaymentsConfigService extends ApiService {
             });
     }
 
+    getSubscriptionConfig(){
+        return this.httpClient
+            .post(
+                `_action/${this.getApiBasePath()}/config/subscription`,
+                {
+                    locale: this.currentLocale,
+                },
+                {
+                    headers: this.getBasicHeaders(),
+                }
+            ).then((response) => {
+                return ApiService.handleResponse(response);
+            });
+    }
+
     /**
      *
      * @param salesChannelId

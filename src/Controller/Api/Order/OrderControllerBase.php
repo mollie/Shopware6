@@ -28,7 +28,6 @@ class OrderControllerBase extends AbstractController
     }
 
     /**
-     * @Route("/api/_action/mollie/order/payment-url", name="api.action.mollie.order.payment-url", methods={"POST"})
      *
      * @param Request $request
      *
@@ -42,7 +41,6 @@ class OrderControllerBase extends AbstractController
     }
 
     /**
-     * @Route("/api/v{version}/_action/mollie/order/payment-url", name="api.action.mollie.order.payment-url.legacy", methods={"POST"})
      *
      * @param Request $request
      *

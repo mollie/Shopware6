@@ -42,14 +42,14 @@
                     {{ item.shopware.label }}
                 </template>
                 <template #column-shopware.unitPrice="{ item }">
-                    {{ item.shopware.unitPrice | currency(order.currency.shortName) }}
+                    {{ currencyFilter( item.shopware.unitPrice, order.currency.isoCode, order.totalRounding.decimals) }}
                 </template>
                 <template #column-shopware.totalPrice="{ item }">
                     <div v-if="isItemPromotion(item)">
                         -
                     </div>
                     <div v-if="!isItemPromotion(item)">
-                        {{ item.shopware.totalPrice | currency(order.currency.shortName) }}
+                        {{ currencyFilter( item.shopware.totalPrice , order.currency.isoCode, order.totalRounding.decimals) }}
                     </div>
                 </template>
                 <template #column-shopware.quantity="{ item }">
@@ -61,9 +61,10 @@
                 <template #column-inputQuantity="{ item }">
                     <sw-number-field numberType="float"
                                      v-model="item.refundQuantity"
+                                     v-model:value="item.refundQuantity"
                                      v-if="isItemRefundable(item)"
                                      :allowEmpty="true"
-                                     :class="{ 'tutorial-active' : tutorialPartialQuantityVisible || tutorialPartialPromotionsVisible || (tutorialRefundShipping && isItemDelivery(item)), 'input-mode-active' : item.refundMode == 'quantity', 'input-mode-inactive' : item.refundMode == 'amount' }"
+                                     :class="{ 'cy-input-quantity':true,'tutorial-active' : tutorialPartialQuantityVisible || tutorialPartialPromotionsVisible || (tutorialRefundShipping && isItemDelivery(item)), 'input-mode-active' : item.refundMode == 'quantity', 'input-mode-inactive' : item.refundMode == 'amount' }"
                                      @change="onItemQtyChanged(item)">
                         <template #suffix>
                             {{ $tc('mollie-payments.refund-manager.general.unitQuantity') }}
@@ -73,22 +74,36 @@
                 <template #column-inputAmount="{ item }">
                     <sw-number-field numberType="float"
                                      v-model="item.refundAmount"
+                                     v-model:value="item.refundAmount"
                                      v-if="isItemRefundable(item) && !isItemPromotion(item)"
                                      :allowEmpty="true"
-                                     :class="{ 'tutorial-active' : tutorialPartialQuantityVisible || tutorialPartialPromotionsVisible || (tutorialRefundShipping && isItemDelivery(item)), 'input-mode-active' : item.refundMode == 'amount', 'input-mode-inactive' : item.refundMode == 'quantity' }"
+                                     :class="{ 'tutorial-active' : tutorialPartialQuantityVisible || tutorialPartialPromotionsVisible || (tutorialRefundShipping && isItemDelivery(item)), 'input-mode-active' : item.refundMode == 'amount', 'input-mode-inactive' : item.refundMode == 'quantity'}"
                                      @change="onItemAmountChanged(item)">
                         <template #suffix>
                             {{ order.currency.symbol }}
                         </template>
                     </sw-number-field>
                     <div v-if="isItemPromotion(item)">
-                        {{ item.refundAmount | currency(order.currency.shortName) }}
+                        {{ currencyFilter(  item.refundAmount, order.currency.isoCode, order.totalRounding.decimals) }}
+                    </div>
+                </template>
+                <template #column-inputConsiderTax="{ item }">
+                    <div v-if="isItemRefundable(item) && !isTaxStatusGross()">
+                        <sw-checkbox-field :label="$tc('mollie-payments.refund-manager.cart.grid.checkRefundTax')"
+                                           v-model="item.refundTax"
+                                           v-model:value="item.refundTax"
+                                           class="check-refund-tax"
+                                           :class="{ 'tutorial-active': tutorialPartialPromotionsVisible }"
+                                           @change="onItemRefundTaxChanged(item)"
+                                        >
+                        </sw-checkbox-field>
                     </div>
                 </template>
                 <template #column-inputConsiderPromotion="{ item }">
                     <div v-if="isItemRefundable(item) && !isItemPromotion(item) && isItemDiscounted(item)">
                         <sw-checkbox-field :label="$tc('mollie-payments.refund-manager.cart.grid.checkDeductPromotion')"
                                            v-model="item.refundPromotion"
+                                           v-model:value="item.refundPromotion"
                                            class="check-deduct-promotion"
                                            :class="{ 'tutorial-active': tutorialPartialPromotionsVisible }"
                                            @change="onItemPromotionDeductionChanged(item)">
@@ -98,6 +113,7 @@
                 <template #column-inputStock=" { item }">
                     <sw-number-field numberType="float"
                                      v-model="item.resetStock"
+                                     v-model:value="item.resetStock"
                                      v-if="isItemRefundable(item) && !isItemPromotion(item) && !isItemDelivery(item)"
                                      :class="{ 'tutorial-active' : tutorialResetStock }"
                                      :allowEmpty="true">
@@ -108,7 +124,7 @@
                 </template>
             </sw-data-grid>
             <div v-if="roundingDiff > 0" class="rounding-item-info-container color-rounding-item">
-                {{ $tc('mollie-payments.refund-manager.cart.roundDiffItemAdded') }} ({{ roundingDiff | currency(order.currency.shortName) }})
+                {{ $tc('mollie-payments.refund-manager.cart.roundDiffItemAdded') }} ({{ currencyFilter( roundingDiff , order.currency.isoCode, order.totalRounding.decimals) }})
             </div>
         </sw-card>
         {# --------------------------------------------------------------------------------------------- #}
@@ -239,10 +255,10 @@
                                         {{ $tc('mollie-payments.refund-manager.summary.captionTotal') }}
                                     </dt>
                                     <dd class="summary-item-value">
-                                        {{ order.amountNet | currency(order.currency.shortName) }}
+                                        {{ currencyFilter( order.amountNet , order.currency.isoCode, order.totalRounding.decimals) }}
                                     </dd>
                                     <dd class="summary-item-value">
-                                        {{ order.amountTotal | currency(order.currency.shortName) }}
+                                        {{ currencyFilter( order.amountTotal , order.currency.isoCode, order.totalRounding.decimals) }}
                                     </dd>
                                 </template>
                             {% endblock %}
@@ -253,7 +269,7 @@
                                     </dt>
                                     <dd class="summary-item-value"></dd>
                                     <dd class="summary-item-value">
-                                        {{ order.positionPrice | currency(order.currency.translated.shortName) }}
+                                        {{ currencyFilter( order.positionPrice , order.currency.isoCode, order.totalRounding.decimals) }}
                                     </dd>
                                 </template>
                             {% endblock %}
@@ -265,7 +281,7 @@
                                     </dt>
                                     <dd class="summary-item-value"></dd>
                                     <dd class="summary-item-value">
-                                        ({{ roundingDiff | currency(order.currency.shortName) }})
+                                        ({{ currencyFilter( roundingDiff , order.currency.isoCode, order.totalRounding.decimals) }})
                                     </dd>
                                 </template>
                             {% endblock %}
@@ -276,7 +292,7 @@
                                     </dt>
                                     <dd class="summary-item-value"></dd>
                                     <dd class="summary-item-value">
-                                        - {{ voucherAmount | currency(order.currency.shortName) }}
+                                        - {{ currencyFilter( voucherAmount , order.currency.isoCode, order.totalRounding.decimals) }}
                                     </dd>
                                 </template>
                             {% endblock %}
@@ -286,7 +302,7 @@
                                 </dt>
                                 <dd class="summary-item-value"></dd>
                                 <dd class="summary-item-value">
-                                    - {{ pendingRefunds | currency(order.currency.shortName) }}
+                                    - {{ currencyFilter( pendingRefunds , order.currency.isoCode, order.totalRounding.decimals) }}
                                 </dd>
                             {% endblock %}
                             {% block sw_order_line_items_grid_refund_summary_amount_refunded %}
@@ -295,7 +311,7 @@
                                 </dt>
                                 <dd class="summary-item-value"></dd>
                                 <dd class="summary-item-value">
-                                    - {{ refundedAmount | currency(order.currency.shortName) }}
+                                    - {{ currencyFilter( refundedAmount , order.currency.isoCode, order.totalRounding.decimals) }}
                                 </dd>
                             {% endblock %}
                             {% block sw_order_line_items_grid_refund_summary_amount_remaining %}
@@ -307,7 +323,7 @@
                                     <sw-label variant="neutral"
                                               size="medium"
                                               :class="{ 'summary-item-value-remaining' : true,  'summary-fix-available' : isButtonFixDiffAvailable() }">
-                                        = {{ remainingAmount | currency(order.currency.shortName) }}
+                                        = {{ currencyFilter( remainingAmount , order.currency.isoCode, order.totalRounding.decimals) }}
                                     </sw-label>
                                 </dd>
                             {% endblock %}
@@ -319,8 +335,11 @@
                                          numberType="float"
                                          size="medium"
                                          v-model="refundAmount"
+                                         v-model:value="refundAmount"
                                          :min="0"
-                                         :class="{ 'tutorial-active' : tutorialPartialAmountRefundVisible || tutorialPartialQuantityVisible || tutorialPartialPromotionsVisible || tutorialRefundShipping }">
+                                         :class="{ 'tutorial-active' : tutorialPartialAmountRefundVisible || tutorialPartialQuantityVisible || tutorialPartialPromotionsVisible || tutorialRefundShipping }"
+                                         class="refund-amount"
+                        >
                             <template #suffix>
                                 {{ order.currency.symbol }}
                             </template>
@@ -336,7 +355,8 @@
                     <sw-textarea-field v-if="isAclRefundAllowed"
                                        type="textarea"
                                        v-model="refundDescription"
-                                       class="field-description"
+                                       v-model:value="refundDescription"
+                                       class="field-description refund-description"
                                        :label="descriptionCharacterCountingTitle"
                                        :placeholder="$tc('mollie-payments.refund-manager.summary.placeholderDescription')"
                                        :helpText="$tc('mollie-payments.refund-manager.summary.descriptionHelp')">
@@ -345,7 +365,8 @@
                     <sw-textarea-field v-if="isAclRefundAllowed"
                                        type="textarea"
                                        v-model="refundInternalDescription"
-                                       class="field-description"
+                                       v-model:value="refundInternalDescription"
+                                       class="field-description refund-internal-description"
                                        :label="$tc('mollie-payments.refund-manager.summary.lblInternalDescription')"
                                        :placeholder="$tc('mollie-payments.refund-manager.summary.placeholderInternalDescription')"
                                        :helpText="$tc('mollie-payments.refund-manager.summary.internalDescriptionHelp')">
@@ -353,6 +374,7 @@
                     {# --------------------------------------------------------------------------------------------- #}
                     <sw-checkbox-field v-if="isAclRefundAllowed && configVerifyRefund"
                                        v-model="checkVerifyRefund"
+                                       v-model:value="checkVerifyRefund"
                                        :label="$tc('mollie-payments.refund-manager.summary.checkVerification')"
                                        :bordered="true">
                     </sw-checkbox-field>
@@ -401,7 +423,7 @@
                           :isLoading="isRefundDataLoading">
                 <template #column-amount.value="{ item }">
                     <sw-container columns="1fr auto" gap="8px" align="center">
-                        {{ item.amount.value | currency(item.amount.currency) }}
+                        {{ currencyFilter(  item.amount.value  , order.currency.isoCode, order.totalRounding.decimals) }}
                         <sw-help-text :text="item.description"></sw-help-text>
                     </sw-container>
                 </template>
@@ -419,7 +441,7 @@
                     </sw-container>
                 </template>
                 <template #column-createdAt="{ item }">
-                    {{ item.createdAt | date({hour: '2-digit', minute: '2-digit'}) }}
+                    {{ dateFilter(item.createdAt, { hour: '2-digit', minute: '2-digit' }) }}
                 </template>
                 <template #column-composition="{ item }">
                     <sw-label v-for="composition in getRefundCompositions(item)"

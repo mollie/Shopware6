@@ -21,11 +21,9 @@ export default class MollieApplePayDirect extends Plugin {
         // register our off-canvas listener
         // we need to re-init all apple pay button
         // once the offcanvas is loaded (lazy) into the DOM
-        const elementOffcanvas = document.querySelector('[data-offcanvas-cart]');
-        if (elementOffcanvas instanceof HTMLElement) {
-            const pluginOffCanvas = window.PluginManager.getPluginInstanceFromElement(elementOffcanvas, 'OffCanvasCart');
-            pluginOffCanvas.$emitter.subscribe('offCanvasOpened', me.onOffCanvasOpened.bind(me));
-        }
+
+        const pluginOffCanvas = window.PluginManager.getPluginList().OffCanvasCart.get("instances")[0];
+        pluginOffCanvas.$emitter.subscribe('offCanvasOpened', me.onOffCanvasOpened.bind(me));
 
         // now update our current page
         this.initCurrentPage();
@@ -58,10 +56,12 @@ export default class MollieApplePayDirect extends Plugin {
         if (!window.ApplePaySession || !window.ApplePaySession.canMakePayments()) {
             // hide our wrapping Apple Pay containers
             // to avoid any wrong margins being displayed
+
             if (applePayContainers) {
-                for (let i = 0; i < applePayContainers.length; i++) {
-                    applePayContainers[i].style.display = 'none';
-                }
+                applePayContainers.forEach(function (container){
+                    container.style.display = 'none';
+                    container.classList.add('d-none');
+                });
             }
             return;
         }
@@ -74,8 +74,8 @@ export default class MollieApplePayDirect extends Plugin {
         // we start by fetching the shop url from the data attribute.
         // we need this as prefix for our ajax calls, so that we always
         // call the correct sales channel and its controllers.
-        const button = applePayButtons[0];
-        const shopUrl = me.getShopUrl(button);
+
+        const shopUrl = me.getShopUrl(applePayButtons[0]);
 
         // verify if apple pay is even allowed
         // in our current sales channel
@@ -85,6 +85,10 @@ export default class MollieApplePayDirect extends Plugin {
                 if (data.available === undefined || data.available === false) {
                     return;
                 }
+
+                applePayContainers.forEach(function (container){
+                    container.classList.remove('d-none');
+                });
 
                 applePayButtons.forEach(function (button) {
                     // Remove display none

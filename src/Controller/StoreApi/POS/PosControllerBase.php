@@ -38,7 +38,6 @@ class PosControllerBase
 
 
     /**
-     * @Route("/store-api/mollie/pos/terminals", name="store-api.mollie.pos.terminals", methods={"GET"})
      *
      * @param SalesChannelContext $context
      * @return StoreApiResponse
@@ -62,7 +61,6 @@ class PosControllerBase
     }
 
     /**
-     * @Route("/store-api/mollie/pos/store-terminal/{customerId}/{terminalID}", name="store-api.mollie.pos.store-terminal", methods={"POST"})
      *
      * @param string $customerId
      * @param string $terminalID

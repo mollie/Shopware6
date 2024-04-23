@@ -17,6 +17,7 @@ use Kiener\MolliePayments\Handler\Method\iDealPayment;
 use Kiener\MolliePayments\Handler\Method\In3Payment;
 use Kiener\MolliePayments\Handler\Method\IngHomePayPayment;
 use Kiener\MolliePayments\Handler\Method\KbcPayment;
+use Kiener\MolliePayments\Handler\Method\KlarnaOnePayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaPayLaterPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaPayNowPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaSliceItPayment;
@@ -38,6 +39,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEnti
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Content\Media\MediaCollection;
 use Shopware\Core\Content\Media\MediaService;
+use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
@@ -176,8 +178,21 @@ class PaymentMethodService
                     # unfortunately some fields are required (*sigh)
                     # so we need to provide those with the value of
                     # the existing method!!!
-                    'name' => $existingPaymentMethod->getName(),
+                    'name' => $existingPaymentMethod->getName()
                 ];
+                $translations = $existingPaymentMethod->getTranslations();
+
+                if ($translations !== null) {
+                    $paymentMethodData['translations'][Defaults::LANGUAGE_SYSTEM] = [
+                        'name' => $existingPaymentMethod->getName()
+                    ];
+
+                    foreach ($translations as $translation) {
+                        $paymentMethodData['translations'][$translation->getLanguageId()] = [
+                            'name' => $translation->getName()
+                        ];
+                    }
+                }
 
                 if ($this->versionCompare->gte('6.5.7.0')) {
                     # we do a string cast here, since getTechnicalName will be not nullable in the future
@@ -194,6 +209,11 @@ class PaymentMethodService
                     'description' => '',
                     'mediaId' => $mediaId,
                     'afterOrderEnabled' => true,
+                    'translations'=>[
+                        Defaults::LANGUAGE_SYSTEM=>[
+                            'name' => $paymentMethod['description']
+                        ]
+                    ]
                 ];
             }
 
@@ -378,6 +398,7 @@ class PaymentMethodService
         // Fetch ID for update
         $paymentCriteria = new Criteria();
         $paymentCriteria->addFilter(new EqualsFilter('handlerIdentifier', $handlerIdentifier));
+        $paymentCriteria->addAssociation('translations');
 
         // Get payment IDs
         $paymentMethods = $this->paymentRepository->search($paymentCriteria, $context);
@@ -411,6 +432,7 @@ class PaymentMethodService
             KlarnaPayLaterPayment::class,
             KlarnaPayNowPayment::class,
             KlarnaSliceItPayment::class,
+            KlarnaOnePayment::class,
             PayPalPayment::class,
             PayPalExpressPayment::class,
             PaySafeCardPayment::class,

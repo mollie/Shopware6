@@ -8,6 +8,7 @@ use Shopware\Core\Checkout\Customer\CustomerDefinition;
 use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\CashRoundingConfigField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\CreatedAtField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\DateTimeField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\FkField;
@@ -25,6 +26,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\OneToOneAssociationField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\UpdatedAtField;
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
+use Shopware\Core\System\Currency\CurrencyDefinition;
 use Shopware\Core\System\SalesChannel\SalesChannelDefinition;
 
 class SubscriptionDefinition extends EntityDefinition
@@ -72,7 +74,7 @@ class SubscriptionDefinition extends EntityDefinition
             (new StringField('description', 'description'))->addFlags(new ApiAware()),
             (new FloatField('amount', 'amount'))->addFlags(new ApiAware()),
             (new IntField('quantity', 'quantity'))->addFlags(new ApiAware()),
-            (new StringField('currency', 'currency'))->addFlags(new ApiAware()),
+            (new FkField('currency_id', 'currencyId', CurrencyDefinition::class))->addFlags(new ApiAware(), new Required()),
             (new JsonField('metadata', 'metadata')),
 
             # --------------------------------------------------------------------------------------------------------------------------
@@ -94,7 +96,7 @@ class SubscriptionDefinition extends EntityDefinition
 
             (new FkField('billing_address_id', 'billingAddressId', SalesChannelDefinition::class))->addFlags(new ApiAware()),
             (new FkField('shipping_address_id', 'shippingAddressId', SalesChannelDefinition::class))->addFlags(new ApiAware()),
-
+            (new FkField('currency_id', 'currencyId', CurrencyDefinition::class))->addFlags(new ApiAware()),
             new CreatedAtField(),
             new UpdatedAtField(),
 
@@ -106,13 +108,15 @@ class SubscriptionDefinition extends EntityDefinition
             # --------------------------------------------------------------------------------------------------------------------------
 
             new ManyToOneAssociationField('customer', 'customer_id', CustomerDefinition::class, 'id', false),
-
+            new ManyToOneAssociationField('currency', 'currency_id', CurrencyDefinition::class, 'id', false),
             new OneToManyAssociationField('addresses', SubscriptionAddressDefinition::class, 'subscription_id'),
             new OneToManyAssociationField('historyEntries', SubscriptionHistoryDefinition::class, 'subscription_id'),
 
             new OneToOneAssociationField('billingAddress', 'billing_address_id', 'id', SubscriptionAddressDefinition::class, true),
             new OneToOneAssociationField('shippingAddress', 'shipping_address_id', 'id', SubscriptionAddressDefinition::class, true),
 
+            (new CashRoundingConfigField('total_rounding', 'totalRounding'))->addFlags(new Required()),
+            (new CashRoundingConfigField('item_rounding', 'itemRounding'))->addFlags(new Required()),
         ]);
     }
 }

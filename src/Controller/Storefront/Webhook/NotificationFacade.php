@@ -313,7 +313,8 @@ class NotificationFacade
                 'AND',
                 [
                     new ContainsFilter('handlerIdentifier', 'Kiener\MolliePayments\Handler\Method'),
-                    new EqualsFilter('customFields.mollie_payment_method_name', $mollieOrder->method)
+                    new EqualsFilter('customFields.mollie_payment_method_name', $mollieOrder->method),
+                    new EqualsFilter('active', true)
                 ]
             )
         );

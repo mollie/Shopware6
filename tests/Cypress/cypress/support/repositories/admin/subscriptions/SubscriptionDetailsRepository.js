@@ -1,35 +1,35 @@
 export default class SubscriptionDetailsRepository {
 
     getMollieCustomerIdField() {
-        return cy.get('#sw-field--subscription-mollieCustomerId');
+        return cy.get('.cy-subscription-customer-id input');
     }
 
     getCreatedAtField() {
-        return cy.get('#sw-field--formattedCreateAt');
+        return cy.get('.cy-subscription-formatted-created-at input');
     }
 
     getMollieSubscriptionIdField() {
-        return cy.get('#sw-field--subscription-mollieId');
+        return cy.get('.cy-subscription-mollie-id input');
     }
 
     getMandateField() {
-        return cy.get('#sw-field--subscription-mandateId');
+        return cy.get('.cy-subscription-mandate-id input');
     }
 
     getCanceledAtField() {
-        return cy.get('#sw-field--formattedCanceledAt');
+        return cy.get('.cy-subscription-formatted-canceled-at input');
     }
 
     getStatusField() {
-        return cy.get('#sw-field--translatedStatus');
+        return cy.get('.cy-subscription-translated-status input');
     }
 
     getNextPaymentAtField() {
-        return cy.get('#sw-field--formattedNextPaymentAt');
+        return cy.get('.cy-subscription-formatted-next-payment-at input');
     }
 
     getLastRemindedAtField() {
-        return cy.get('#sw-field--formattedLastRemindedAt');
+        return cy.get('.cy-subscription-formatted-last-reminded-at input');
     }
 
     getPauseButton() {
