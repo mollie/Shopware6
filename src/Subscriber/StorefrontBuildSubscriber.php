@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Subscriber;
 use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Kiener\MolliePayments\Service\SettingsService;
 use Shopware\Storefront\Event\StorefrontRenderEvent;
+use Shopware\Storefront\Theme\StorefrontPluginRegistryInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class StorefrontBuildSubscriber implements EventSubscriberInterface
@@ -13,6 +14,11 @@ class StorefrontBuildSubscriber implements EventSubscriberInterface
      * @var SettingsService
      */
     private $settingsService;
+
+    /**
+     * @var StorefrontPluginRegistryInterface
+     */
+    private $pluginRegistry;
 
     /**
      * @var VersionCompare
@@ -24,9 +30,10 @@ class StorefrontBuildSubscriber implements EventSubscriberInterface
      * @param SettingsService $settingsService
      * @param string $shopwareVersion
      */
-    public function __construct(SettingsService $settingsService, string $shopwareVersion)
+    public function __construct(SettingsService $settingsService, StorefrontPluginRegistryInterface $pluginRegistry, string $shopwareVersion)
     {
         $this->settingsService = $settingsService;
+        $this->pluginRegistry = $pluginRegistry;
         $this->versionCompare = new VersionCompare($shopwareVersion);
     }
 
@@ -51,6 +58,12 @@ class StorefrontBuildSubscriber implements EventSubscriberInterface
 
         $useJsValue = (int)$settings->isUseShopwareJavascript();
         $event->setParameter('mollie_javascript_use_shopware', $useJsValue);
-        $event->setParameter('mollie_javascript_check_duplicate', $this->versionCompare->gte('6.6'));
+
+        $mollieJavascriptAlreadyExists = false;
+        if($this->versionCompare->gte('6.6')) {
+            $molliePayments = $this->pluginRegistry->getConfigurations()->getByTechnicalName('MolliePayments');
+            $mollieJavascriptAlreadyExists = $molliePayments && ($molliePayments->getScriptFiles()->count() > 0);
+        }
+        $event->setParameter('mollie_javascript_already_exists', $mollieJavascriptAlreadyExists);
     }
 }
