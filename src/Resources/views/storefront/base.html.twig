@@ -21,10 +21,12 @@
         {% set includeJsInHeader = true %}
     {% endif %}
 
+    {% set restrictions = mollie_applepaydirect_restrictions | merge(mollie_paypalexpress_restrictions) %}
+
     {# requirement check for apple pay direct #}
     {% if mollie_applepaydirect_enabled == true or mollie_applepay_enabled == true or mollie_paypalexpress_enabled == true %}
 
-        {% if currentRoute in onlyShowHere|keys and (onlyShowHere[currentRoute] not in mollie_applepaydirect_restrictions  or onlyShowHere[currentRoute] not in mollie_paypalexpress_restrictions) %}
+        {% if currentRoute in onlyShowHere|keys and onlyShowHere[currentRoute] not in restrictions %}
             {% set includeJsInHeader = true %}
         {% endif %}
 

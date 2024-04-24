@@ -1,6 +1,6 @@
 {% sw_extends '@Storefront/storefront/component/buy-widget/buy-widget-form.html.twig' %}
 
-{% block buy_widget_buy_button %}
+{% block buy_widget_buy_container %}
 
     {% if mollie_subscriptions_enabled and product.customFields.mollie_payments_product_subscription_enabled %}
         <button class="btn btn-primary btn-block btn-buy" title="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}" aria-label="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}">
@@ -35,14 +35,35 @@
             {% endblock %}
         {% endif %}
 
-        {% if mollie_paypalexpress_enabled and ('pdp' not in mollie_paypalexpress_restrictions) %}
-            {% block page_product_detail_buy_container_mollie_paypal_express_component %}
-                <div class="row g-2 form-row mt-2 justify-content-end">
-                    {% include '@MolliePayments/mollie/component/paypal-express-button.twig' with {cols: 'col-8'} %}
-                </div>
-            {% endblock %}
-        {% endif %}
 
     {% endblock %}
 
+{% endblock %}
+
+{% block buy_widget_buy_form_inner %}
+    {{ parent() }}
+
+    {% block page_product_detail_buy_container_paypal_express %}
+        {% if mollie_paypalexpress_enabled and ('pdp' not in mollie_paypalexpress_restrictions) %}
+            {% block page_product_detail_buy_container_mollie_paypal_express_component %}
+                {% set product = page.product %}
+                <form id="molliePayPalExpressProductDetailForm" action="{{ path('frontend.mollie.paypal-express.start') }}"
+                      data-form-csrf-handler="true"
+                      method="POST">
+                    {% if mollie_csrf_available %}
+                        {% include '@MolliePayments/storefront/csrf/components/paypal-express-button-csrf.twig' %}
+                    {% endif %}
+                    <input type="hidden" name="productId" value="{{ product.id }}" />
+                    <input
+                            type="hidden"
+                            name="quantity"
+                            value="{{ product.minPurchase }}"
+                    />
+                    <div class="row g-2 form-row mt-2 justify-content-end">
+                        {% include '@MolliePayments/mollie/component/paypal-express-button.twig' with {cols: 'col-8'} %}
+                    </div>
+                </form>
+            {% endblock %}
+        {% endif %}
+    {% endblock %}
 {% endblock %}
