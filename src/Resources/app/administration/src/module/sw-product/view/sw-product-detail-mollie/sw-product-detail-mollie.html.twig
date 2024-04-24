@@ -40,7 +40,10 @@
                                     class="mollie-voucher-type"
                                     :disabled="props.isInherited"
                                     :value="props.currentValue"
-                                    @change="props.updateCurrentValue">
+                                    v-model:value="props.currentValue"
+                                    @change="props.updateCurrentValue"
+                                    @update:value="props.updateCurrentValue"
+                            >
                                 <option v-for="type in voucherTypes" :key="type.key" :value="type.key">
                                     {{ type.name }}
                                 </option>
@@ -104,7 +107,10 @@
                                         class="mollie-subscription-enabled"
                                         :disabled="props.isInherited"
                                         :value="props.currentValue"
-                                        @change="props.updateCurrentValue">
+                                        v-model:value="props.currentValue"
+                                        @change="props.updateCurrentValue"
+                                        @update:value="props.updateCurrentValue"
+                                >
                                 </sw-switch-field>
                             </template>
                         </sw-inherit-wrapper>
@@ -124,7 +130,10 @@
                                         numberType="int"
                                         :disabled="props.isInherited"
                                         :value="props.currentValue"
-                                        @change="props.updateCurrentValue">
+                                        v-model:value="props.currentValue"
+                                        @change="props.updateCurrentValue"
+                                        @update:value="props.updateCurrentValue"
+                                >
                                 </sw-number-field>
                             </template>
                         </sw-inherit-wrapper> 
@@ -139,7 +148,10 @@
                                         :options="subscriptionIntervalTypes"
                                         :disabled="props.isInherited"
                                         :value="props.currentValue"
-                                        @change="props.updateCurrentValue">
+                                        v-model:value="props.currentValue"
+                                        @change="props.updateCurrentValue"
+                                        @update:value="props.updateCurrentValue"
+                                >
                                 </sw-single-select>
                             </template>
                         </sw-inherit-wrapper>
@@ -150,7 +162,6 @@
                     <sw-container columns="1fr 1fr" gap="30px">
                         <sw-inherit-wrapper
                                 :label="$tc('mollie-payments.subscriptions.product.mollieSubscriptionRepetitionAmount')"
-                                v-model="product.customFields.mollie_payments_product_subscription_repetition"
                                 v-model:value="product.customFields.mollie_payments_product_subscription_repetition"
                                 :has-parent="!!parentProduct.id"
                                 :inherited-value="parentProduct.customFields.mollie_payments_product_subscription_repetition">
@@ -159,7 +170,10 @@
                                         :placeholder="$tc('mollie-payments.subscriptions.product.mollieSubscriptionRepetitionPlaceholder')"
                                         :disabled="props.isInherited"
                                         :value="props.currentValue"
-                                        @change="props.updateCurrentValue">
+                                        v-model:value="props.currentValue"
+                                        @change="props.updateCurrentValue"
+                                        @update:value="props.updateCurrentValue"
+                                >
                                 </sw-text-field>
                             </template>
                         </sw-inherit-wrapper>

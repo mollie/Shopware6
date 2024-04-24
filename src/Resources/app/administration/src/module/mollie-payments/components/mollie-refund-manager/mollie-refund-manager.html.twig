@@ -65,7 +65,9 @@
                                      v-if="isItemRefundable(item)"
                                      :allowEmpty="true"
                                      :class="{ 'cy-input-quantity':true,'tutorial-active' : tutorialPartialQuantityVisible || tutorialPartialPromotionsVisible || (tutorialRefundShipping && isItemDelivery(item)), 'input-mode-active' : item.refundMode == 'quantity', 'input-mode-inactive' : item.refundMode == 'amount' }"
-                                     @change="onItemQtyChanged(item)">
+                                     @change="onItemQtyChanged(item)"
+                                     @update:value="onItemQtyChanged(item)"
+                    >
                         <template #suffix>
                             {{ $tc('mollie-payments.refund-manager.general.unitQuantity') }}
                         </template>
@@ -78,7 +80,8 @@
                                      v-if="isItemRefundable(item) && !isItemPromotion(item)"
                                      :allowEmpty="true"
                                      :class="{ 'tutorial-active' : tutorialPartialQuantityVisible || tutorialPartialPromotionsVisible || (tutorialRefundShipping && isItemDelivery(item)), 'input-mode-active' : item.refundMode == 'amount', 'input-mode-inactive' : item.refundMode == 'quantity'}"
-                                     @change="onItemAmountChanged(item)">
+                                     @change="onItemAmountChanged(item)"
+                                     @update:value="onItemAmountChanged(item)">
                         <template #suffix>
                             {{ order.currency.symbol }}
                         </template>
@@ -95,6 +98,7 @@
                                            class="check-refund-tax"
                                            :class="{ 'tutorial-active': tutorialPartialPromotionsVisible }"
                                            @change="onItemRefundTaxChanged(item)"
+                                           @update:value="onItemRefundTaxChanged(item)"
                                         >
                         </sw-checkbox-field>
                     </div>
@@ -106,7 +110,9 @@
                                            v-model:value="item.refundPromotion"
                                            class="check-deduct-promotion"
                                            :class="{ 'tutorial-active': tutorialPartialPromotionsVisible }"
-                                           @change="onItemPromotionDeductionChanged(item)">
+                                           @change="onItemPromotionDeductionChanged(item)"
+                                           @update:value="onItemPromotionDeductionChanged(item)"
+                        >
                         </sw-checkbox-field>
                     </div>
                 </template>
