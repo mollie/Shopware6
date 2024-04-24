@@ -60,7 +60,7 @@ class StorefrontBuildSubscriber implements EventSubscriberInterface
         $event->setParameter('mollie_javascript_use_shopware', $useJsValue);
 
         $mollieJavascriptAlreadyExists = false;
-        if($this->versionCompare->gte('6.6')) {
+        if ($this->versionCompare->gte('6.6')) {
             $molliePayments = $this->pluginRegistry->getConfigurations()->getByTechnicalName('MolliePayments');
             $mollieJavascriptAlreadyExists = $molliePayments && ($molliePayments->getScriptFiles()->count() > 0);
         }
