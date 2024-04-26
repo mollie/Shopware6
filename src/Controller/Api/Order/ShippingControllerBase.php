@@ -333,10 +333,10 @@ class ShippingControllerBase extends AbstractController
 
             $orderNumber = (string)$jsonData['orderNumber'];
             $itemProductNumber = (string)$jsonData['productNumber'];
-            $quantity = (int)$jsonData['quantity'];
-            $trackingCarrier = (string)$jsonData['trackingCarrier'];
-            $trackingCode = (string)$jsonData['trackingCode'];
-            $trackingUrl = (string)$jsonData['trackingUrl'];
+            $quantity = (int)($jsonData['quantity'] ?? 0);
+            $trackingCarrier = (string)($jsonData['trackingCarrier'] ?? '');
+            $trackingCode = (string)($jsonData['trackingCode'] ?? '');
+            $trackingUrl = (string)($jsonData['trackingUrl'] ?? '');
 
             if ($orderNumber === '') {
                 throw new \InvalidArgumentException('Missing Argument for Order Number!');
