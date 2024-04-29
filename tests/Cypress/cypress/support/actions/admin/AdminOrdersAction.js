@@ -36,17 +36,18 @@ export default class AdminOrdersAction {
      *
      */
     openRefundManager() {
-        cy.intercept('**').as('page')
+        cy.wait(1000);
 
         if (shopware.isVersionLower('6.5')) {
             // forceClick because if a Shopware update exists, that dialog is above our button
             repoOrdersDetails.getMollieActionsButton().click({force: true, waitForAnimations: false});
         }
 
+        cy.wait(2000);
         repoOrdersDetails.getMollieRefundManagerButton().click({force: true, waitForAnimations: false});
         // here are automatic reloads and things as it seems
         // I really want to test the real UX, so we just wait like a human
-        cy.wait('@page');
+        cy.wait(4000);
     }
 
 
