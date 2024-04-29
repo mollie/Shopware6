@@ -8,7 +8,7 @@ $composerContent = json_decode($composerContent, true);
 
 
 // >= 6.4.0.0 
-const SW_VERSIONS_RELEASE = '6.4.0.0 - 6.7.0.0';
+const SW_VERSIONS_RELEASE = '6.4.1.0 - 6.7.0.0';
 const SW_VERSIONS_DEV = '*';
 
 
