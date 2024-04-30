@@ -1,7 +1,7 @@
 {
     "name": "kiener/mollie-payments-plugin",
     "description": "Mollie Payments",
-    "version": "v4.7.0",
+    "version": "v4.7.1",
     "type": "shopware-platform-plugin",
     "license": "MIT",
     "authors": [
