@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Subscriber;
 
+use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\PlatformRequest;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -11,6 +12,20 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class KernelSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var VersionCompare
+     */
+    private $versionCompare;
+
+    /**
+     * @param VersionCompare $versionCompare
+     */
+    public function __construct(VersionCompare $versionCompare)
+    {
+        $this->versionCompare = $versionCompare;
+    }
+
+
     public static function getSubscribedEvents(): array
     {
         return [
@@ -25,6 +40,11 @@ class KernelSubscriber implements EventSubscriberInterface
      */
     public function onModifyRouteScope(ControllerEvent $event): void
     {
+        //there are cases where the class RouteScope still exists even in SW 6.5
+        if ($this->versionCompare->gte('6.5.0.0')) {
+            return;
+        }
+
         if (! class_exists(RouteScope::class)) {
             return;
         }

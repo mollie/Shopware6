@@ -180,6 +180,7 @@
 
 
         <service id="Kiener\MolliePayments\Subscriber\KernelSubscriber">
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\VersionCompare"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
@@ -206,6 +207,11 @@
             <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
             <tag name="kernel.event_subscriber"/>
         </service>
+
+        <service id="Kiener\MolliePayments\Compatibility\VersionCompare">
+            <argument>%kernel.shopware_version%</argument>
+        </service>
+
 
         <!-- Mail -->
         <service id="mollie_payments.mail_service" class="Kiener\MolliePayments\Service\Mail\MailService">
