@@ -8,56 +8,56 @@
            path="/store-api/mollie/subscription"
            methods="GET">
         <default key="_controller">Kiener\MolliePayments\Controller\StoreApi\Subscription\SubscriptionControllerBase::getSubscriptions</default>
-        <default key="_routeScope">store-api</default>
+        <default key="_routeScope"><list><string>store-api</string></list></default>
     </route>
 
     <route id="store-api.mollie.subscription.billing_update"
            path="/store-api/mollie/subscription/{subscriptionId}/billing/update"
            methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\StoreApi\Subscription\SubscriptionControllerBase::updateBilling</default>
-        <default key="_routeScope">store-api</default>
+        <default key="_routeScope"><list><string>store-api</string></list></default>
     </route>
 
     <route id="store-api.mollie.subscription.shipping_update"
            path="/store-api/mollie/subscription/{subscriptionId}/shipping/update"
            methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\StoreApi\Subscription\SubscriptionControllerBase::updateShipping</default>
-        <default key="_routeScope">store-api</default>
+        <default key="_routeScope"><list><string>store-api</string></list></default>
     </route>
 
     <route id="store-api.mollie.subscription.payment_update"
            path="/store-api/mollie/subscription/{subscriptionId}/payment/update"
            methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\StoreApi\Subscription\SubscriptionControllerBase::updatePayment</default>
-        <default key="_routeScope">store-api</default>
+        <default key="_routeScope"><list><string>store-api</string></list></default>
     </route>
 
     <route id="store-api.mollie.subscription.pause"
            path="/store-api/mollie/subscription/{subscriptionId}/pause"
            methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\StoreApi\Subscription\SubscriptionControllerBase::pause</default>
-        <default key="_routeScope">store-api</default>
+        <default key="_routeScope"><list><string>store-api</string></list></default>
     </route>
 
     <route id="store-api.mollie.subscription.resume"
            path="/store-api/mollie/subscription/{subscriptionId}/resume"
            methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\StoreApi\Subscription\SubscriptionControllerBase::resume</default>
-        <default key="_routeScope">store-api</default>
+        <default key="_routeScope"><list><string>store-api</string></list></default>
     </route>
 
     <route id="store-api.mollie.subscription.skip"
            path="/store-api/mollie/subscription/{subscriptionId}/skip"
            methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\StoreApi\Subscription\SubscriptionControllerBase::skip</default>
-        <default key="_routeScope">store-api</default>
+        <default key="_routeScope"><list><string>store-api</string></list></default>
     </route>
 
     <route id="store-api.mollie.subscription.cancel"
            path="/store-api/mollie/subscription/{subscriptionId}/cancel"
            methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\StoreApi\Subscription\SubscriptionControllerBase::cancel</default>
-        <default key="_routeScope">store-api</default>
+        <default key="_routeScope"><list><string>store-api</string></list></default>
     </route>
 
 </routes>

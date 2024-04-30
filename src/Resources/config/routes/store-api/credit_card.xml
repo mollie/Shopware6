@@ -8,27 +8,27 @@
            path="/store-api/mollie/creditcard/store-token/{customerId}/{cardToken}"
            methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\StoreApi\CreditCard\CreditCardControllerBase::saveCardToken</default>
-        <default key="_routeScope">store-api</default>
+        <default key="_routeScope"><list><string>store-api</string></list></default>
     </route>
 
     <route id="store-api.mollie.creditcard.store-mandate-id"
            path="/store-api/mollie/creditcard/store-mandate-id/{customerId}/{mandateId}"
            methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\StoreApi\CreditCard\CreditCardControllerBase::saveMandateId</default>
-        <default key="_routeScope">store-api</default>
+        <default key="_routeScope"><list><string>store-api</string></list></default>
     </route>
 
     <route id="store-api.mollie.mandate.revoke"
            path="/store-api/mollie/mandate/revoke/{customerId}/{mandateId}"
            methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\StoreApi\CreditCard\CreditCardControllerBase::revokeMandate</default>
-        <default key="_routeScope">store-api</default>
+        <default key="_routeScope"><list><string>store-api</string></list></default>
     </route>
 
     <route id="store-api.mollie.mandates"
            path="/store-api/mollie/mandates/{customerId}"
            methods="GET">
         <default key="_controller">Kiener\MolliePayments\Controller\StoreApi\CreditCard\CreditCardControllerBase::getMandates</default>
-        <default key="_routeScope">store-api</default>
+        <default key="_routeScope"><list><string>store-api</string></list></default>
     </route>
 </routes>

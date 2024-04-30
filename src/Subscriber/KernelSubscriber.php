@@ -18,21 +18,30 @@ class KernelSubscriber implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * the route scopes are added as array to routes.xml in SW 6.4 those are inside RouteScope class. so we convert our array to class
+     * @param ControllerEvent $event
+     * @return void
+     */
     public function onModifyRouteScope(ControllerEvent $event): void
     {
+        if (! class_exists(RouteScope::class)) {
+            return;
+        }
+
         $attributes = $event->getRequest()->attributes;
 
-        /** @var null|RouteScope|string $routeScopeValue */
-        $routeScopeValue = $attributes->get(PlatformRequest::ATTRIBUTE_ROUTE_SCOPE);
+        /** @var null|array<string>|RouteScope $routeScope */
+        $routeScope = $attributes->get(PlatformRequest::ATTRIBUTE_ROUTE_SCOPE);
 
-        if (is_string($routeScopeValue)) {
-            $routeScope = [$routeScopeValue];
-            
-            if (class_exists(RouteScope::class)) {
-                $routeScope = new RouteScope(['scopes' => [$routeScopeValue]]);
-            }
-
-            $attributes->set(PlatformRequest::ATTRIBUTE_ROUTE_SCOPE, $routeScope);
+        if ($routeScope === null) {
+            return;
         }
+        if ($routeScope instanceof RouteScope) {
+            return;
+        }
+
+        $routeScope = new RouteScope(['scopes' => $routeScope]);
+        $attributes->set(PlatformRequest::ATTRIBUTE_ROUTE_SCOPE, $routeScope);
     }
 }

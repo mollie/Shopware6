@@ -6,14 +6,14 @@
 
     <route id="api.action.mollie.support.request" path="/api/_action/mollie/support/request" methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\Support\SupportControllerBase::requestSupport</default>
-        <default key="_routeScope">api</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
         <default key="auth_required"><bool>true</bool></default>
         <default key="auth_enabled"><bool>true</bool></default>
     </route>
 
     <route id="api.action.mollie.support.request.legacy" path="/api/v{version}/_action/mollie/support/request" methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\Support\SupportControllerBase::requestSupportLegacy</default>
-        <default key="_routeScope">api</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
         <default key="auth_required"><bool>true</bool></default>
         <default key="auth_enabled"><bool>true</bool></default>
     </route>

@@ -11,7 +11,7 @@
         <requirement key="swTransactionId">.*</requirement>
         <default key="_controller">Kiener\MolliePayments\Controller\Storefront\Payment\ReturnControllerBase::payment</default>
         <default key="csrf_protected"><bool>false</bool></default>
-        <default key="_routeScope">storefront</default>
+        <default key="_routeScope"><list><string>storefront</string></list></default>
         <option key="seo">false</option>
     </route>
 </routes>

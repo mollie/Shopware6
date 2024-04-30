@@ -5,14 +5,14 @@
         https://symfony.com/schema/routing/routing-1.0.xsd">
     <route id="api.action.mollie.order.payment-url" path="/api/_action/mollie/order/payment-url" methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\Order\OrderControllerBase::paymentUrl</default>
-        <default key="_routeScope">api</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
         <default key="auth_required"><bool>true</bool></default>
         <default key="auth_enabled"><bool>true</bool></default>
     </route>
 
     <route id="api.action.mollie.order.payment-url.legacy" path="/api/v{version}/_action/mollie/order/payment-url" methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\Order\OrderControllerBase::paymentUrlLegacy</default>
-        <default key="_routeScope">api</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
         <default key="auth_required"><bool>true</bool></default>
         <default key="auth_enabled"><bool>true</bool></default>
     </route>

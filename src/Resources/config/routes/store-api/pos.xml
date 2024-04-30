@@ -8,13 +8,13 @@
            path="/store-api/mollie/pos/terminals"
            methods="GET">
         <default key="_controller">Kiener\MolliePayments\Controller\StoreApi\POS\PosControllerBase::getIssuers</default>
-        <default key="_routeScope">store-api</default>
+        <default key="_routeScope"><list><string>store-api</string></list></default>
     </route>
 
     <route id="store-api.mollie.pos.store-terminal"
            path="/store-api/mollie/pos/store-terminal/{customerId}/{terminalID}"
            methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\StoreApi\POS\PosControllerBase::saveTerminalId</default>
-        <default key="_routeScope">store-api</default>
+        <default key="_routeScope"><list><string>store-api</string></list></default>
     </route>
 </routes>

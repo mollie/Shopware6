@@ -9,6 +9,6 @@
            path="/store-api/mollie/config"
            methods="GET">
         <default key="_controller">Kiener\MolliePayments\Controller\StoreApi\Config\ConfigControllerBase::getConfig</default>
-        <default key="_routeScope">store-api</default>
+        <default key="_routeScope"><list><string>store-api</string></list></default>
     </route>
 </routes>
