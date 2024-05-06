@@ -51,11 +51,6 @@ class RegularPaymentRemover extends PaymentMethodRemover
             if ($attributes->getMollieIdentifier() === PaymentMethod::INGHOMEPAY) {
                 $originalData->getPaymentMethods()->remove($key);
             }
-
-            # currently for bancomat, you cannot update the phone number, so customer might stuck in order edit. we remove the payment method for now and will enable it when the mollie api allows to change that
-            if ($this->isOrderRoute() && $attributes->getMollieIdentifier() === PaymentMethod::BANCOMATPAY) {
-                $originalData->getPaymentMethods()->remove($key);
-            }
         }
 
         return $originalData;
