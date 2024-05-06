@@ -46,7 +46,7 @@ class ProductItemTest extends TestCase
      */
     public function testToArray(): void
     {
-        $refundManagerItem = new ProductItem($this->lineItem, [], 0);
+        $refundManagerItem = new ProductItem($this->lineItem, [], 0, 1.23, 2.34, 3.45);
 
         $expected = [
             'refunded' => 0,
@@ -61,9 +61,15 @@ class ProductItemTest extends TestCase
                 'promotion' => [
                     'discount' => 0,
                     'quantity' => 0,
+                    'taxValue' => 0,
                 ],
                 'isPromotion' => false,
                 'isDelivery' => false,
+                'tax' => [
+                    'totalItemTax' => 1.23,
+                    'perItemTax' => 2.34,
+                    'totalToPerItemRoundingDiff' => 3.45,
+                ],
             ],
         ];
 

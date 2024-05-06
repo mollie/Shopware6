@@ -46,6 +46,7 @@ class TransactionService
 
         $transactionCriteria->addAssociation('order.currency');
         $transactionCriteria->addAssociation('order.lineItems');
+        $transactionCriteria->addAssociation('order.stateMachineState');
 
         /** @var OrderTransactionCollection $transactions */
         $transactions = $this->orderTransactionRepository->search(

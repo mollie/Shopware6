@@ -1,0 +1,11 @@
+/* stylelint-disable selector-id-pattern, declaration-no-important */
+.js-apple-pay .d-none,
+.js-apple-pay-container .d-none,
+.mollie-pos-terminals .d-none,
+.mollie-components-credit-card .d-none,
+#mollieCreditCardMandateDeleteError .d-none,
+#mollieCreditCardMandateDeleteSuccess .d-none,
+.mollie-ideal-issuer .d-none {
+    display: none !important;
+}
+/* stylelint-enable selector-id-pattern, declaration-no-important */

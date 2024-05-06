@@ -14,6 +14,7 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
+use Shopware\Core\System\Currency\CurrencyEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class MailTemplateInstaller
@@ -77,11 +78,14 @@ class MailTemplateInstaller
         # ----------------------------------------------------------------------------------------------
         # update our sample data for the admin mail preview
 
+        $currencyEntity = new CurrencyEntity();
+        $currencyEntity->setIsoCode('EUR');
+
         $subscription = new SubscriptionEntity();
         $subscription->setDescription('1x Sample Product (Order #1233, 24.99 EUR)');
         $subscription->setQuantity(1);
         $subscription->setAmount(24.99);
-        $subscription->setCurrency('EUR');
+        $subscription->setCurrency($currencyEntity);
         $subscription->setMollieCustomerId('cst_123456');
         $subscription->setMollieId('sub_123456');
         $subscription->setNextPaymentAt(new \DateTime());

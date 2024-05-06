@@ -3,13 +3,19 @@
 {% block buy_widget_buy_button %}
 
     {% if mollie_subscriptions_enabled and product.customFields.mollie_payments_product_subscription_enabled %}
-        <button class="btn btn-primary btn-block btn-buy" title="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}" aria-label="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}">
-            {{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}
-        </button>
+        <div class="d-grid">
+            <button class="btn btn-primary btn-block btn-buy" title="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}" aria-label="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}">
+                {{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}
+            </button>
+        </div>
     {% else %}
         {{ parent() }}
     {% endif %}
 
+{% endblock %}
+
+{% block buy_widget_buy_button_container %}
+    {{ parent() }}
     {% block page_product_detail_buy_container_apple_direct %}
         {# this is for Shopware < 6.4 #}
         {% set buyableLegacy = (not page.product.isCloseout or (page.product.availableStock >= page.product.minPurchase)) and page.product.childCount <= 0 %}
@@ -29,11 +35,12 @@
 
         {% if mollie_applepaydirect_enabled and ('pdp' not in mollie_applepaydirect_restrictions) and ((buyableLegacy) or (buyable and productPrice) > 0) %}
             {% block page_product_detail_buy_container_apple_direct_component %}
+
                 <div class="row g-2 form-row mt-2 justify-content-end js-apple-pay-container mollie-apple-pay-direct-pdp">
                     {% include '@MolliePayments/mollie/component/apple-pay-direct-button.twig' with {cols: 'col-8'} %}
                 </div>
+
             {% endblock %}
         {% endif %}
     {% endblock %}
-
 {% endblock %}

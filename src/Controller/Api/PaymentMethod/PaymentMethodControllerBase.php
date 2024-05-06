@@ -35,7 +35,6 @@ class PaymentMethodControllerBase extends AbstractController
     }
 
     /**
-     * @Route("/api/_action/mollie/payment-method/update-methods", name="api.mollie.payment-method.update-methods", methods={"GET"})
      *
      * @param Context $context
      * @return JsonResponse
@@ -46,7 +45,6 @@ class PaymentMethodControllerBase extends AbstractController
     }
 
     /**
-     * @Route("/api/v{version}/_action/mollie/payment-method/update-methods", name="api.mollie.payment-method.update-methods.legacy", methods={"GET"})
      *
      * @param Context $context
      * @return JsonResponse

@@ -1,43 +1,9 @@
 {% sw_extends '@Storefront/storefront/base.html.twig' %}
 
-{% block base_main %}
-
-
-    {# pages where apple pay requires js with their mollie_applepaydirect_restrictions names as values #}
-    {% set onlyShowHere = {
-        'frontend.checkout.confirm.page' : '',
-        'frontend.checkout.cart.page' : 'cart',
-        'frontend.navigation.page' : 'plp',
-        'frontend.account.edit-order.page' : '',
-        'frontend.detail.page' : 'pdp'
-    } %}
-
-
-    {% set currentRoute = app.request.attributes.get('_route') %}
-    {% set includeJsInHeader = false %}
-
-    {# js always required on this pages #}
-    {% if currentRoute == 'frontend.checkout.cart.page' or currentRoute == 'frontend.checkout.confirm.page'  or currentRoute == 'frontend.account.edit-order.page' %}
-        {% set includeJsInHeader = true %}
-    {% endif %}
-
-    {# requirement check for apple pay direct #}
-    {% if mollie_applepaydirect_enabled == true or mollie_applepay_enabled == true %}
-        {% if currentRoute in onlyShowHere|keys and onlyShowHere[currentRoute] not in mollie_applepaydirect_restrictions %}
-            {% set includeJsInHeader = true %}
-        {% endif %}
-        {% if 'offcanvas' not in mollie_applepaydirect_restrictions %}
-            {% set includeJsInHeader = true %}
-        {% endif %}
-    {% endif %}
-
-    <script>
-        window.mollie_javascript_use_shopware = '{{ mollie_javascript_use_shopware }}'
-    </script>
-
-    {% if mollie_javascript_use_shopware != '1' and includeJsInHeader == true %}
-        <script src="{{ asset('bundles/molliepayments/mollie-payments.js', 'asset') }}"></script>
-    {% endif %}
+{% block base_script_hmr_mode %}
 
     {{ parent() }}
+
+    {% sw_include '@Shopware/mollie/head.html.twig' %}
+
 {% endblock %}

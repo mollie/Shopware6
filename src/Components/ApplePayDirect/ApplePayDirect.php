@@ -361,7 +361,6 @@ class ApplePayDirect
                 $zipcode,
                 $city,
                 $countryCode,
-                $applePayID,
                 $context
             );
 

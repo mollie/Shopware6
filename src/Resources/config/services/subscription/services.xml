@@ -37,6 +37,11 @@
             <tag name="shopware.entity.extension"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Components\Subscription\DAL\Currency\CurrencyExtension">
+            <tag name="shopware.entity.extension"/>
+        </service>
+
+
 
         <service id="Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Enricher\LiveDataEnricher">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>

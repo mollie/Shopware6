@@ -10,7 +10,7 @@ if (interface_exists(__NAMESPACE__ . '/MailAware')) {
 use Shopware\Core\Framework\Event\EventData\MailRecipientStruct;
 
 
-interface MailAware extends FlowEventAware
+interface MailAware extends BusinessEventInterface
 {
     public const MAIL_STRUCT = 'mailStruct';
 

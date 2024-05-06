@@ -56,7 +56,6 @@ class SubscriptionControllerBase
 
 
     /**
-     * @Route("/store-api/mollie/subscription", name="store-api.mollie.subscription", methods={"GET"})
      *
      * @param SalesChannelContext $context
      * @throws \Throwable
@@ -85,7 +84,6 @@ class SubscriptionControllerBase
     }
 
     /**
-     * @Route("/store-api/mollie/subscription/{subscriptionId}/billing/update", name="store-api.mollie.subscription.billing_update", methods={"POST"})
      *
      * @param string $subscriptionId
      * @param RequestDataBag $data
@@ -142,7 +140,6 @@ class SubscriptionControllerBase
     }
 
     /**
-     * @Route("/store-api/mollie/subscription/{subscriptionId}/shipping/update", name="store-api.mollie.subscription.shipping_update", methods={"POST"})
      *
      * @param string $subscriptionId
      * @param RequestDataBag $data
@@ -200,7 +197,6 @@ class SubscriptionControllerBase
     }
 
     /**
-     * @Route("/store-api/mollie/subscription/{subscriptionId}/payment/update", name="store-api.mollie.subscription.payment_update", methods={"POST"})
      *
      * @param string $subscriptionId
      * @param RequestDataBag $data
@@ -230,7 +226,6 @@ class SubscriptionControllerBase
     }
 
     /**
-     * @Route("/store-api/mollie/subscription/{subscriptionId}/pause", name="store-api.mollie.subscription.pause", methods={"POST"})
      *
      * @param string $subscriptionId
      * @param SalesChannelContext $context
@@ -256,7 +251,6 @@ class SubscriptionControllerBase
     }
 
     /**
-     * @Route("/store-api/mollie/subscription/{subscriptionId}/resume", name="store-api.mollie.subscription.resume", methods={"POST"})
      *
      * @param string $subscriptionId
      * @param SalesChannelContext $context
@@ -282,7 +276,6 @@ class SubscriptionControllerBase
     }
 
     /**
-     * @Route("/store-api/mollie/subscription/{subscriptionId}/skip", name="store-api.mollie.subscription.skip", methods={"POST"})
      *
      * @param string $subscriptionId
      * @param SalesChannelContext $context
@@ -308,7 +301,6 @@ class SubscriptionControllerBase
     }
 
     /**
-     * @Route("/store-api/mollie/subscription/{subscriptionId}/cancel", name="store-api.mollie.subscription.cancel", methods={"POST"})
      *
      * @param string $subscriptionId
      * @param SalesChannelContext $context

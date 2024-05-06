@@ -6,7 +6,7 @@ import MollieShipping from '../../../../components/mollie-ship-order/MollieShipp
 import MollieShippingEvents from '../../../../components/mollie-ship-order/MollieShippingEvents';
 
 // eslint-disable-next-line no-undef
-const {Component, Mixin} = Shopware;
+const {Component, Mixin, Filter} = Shopware;
 
 Component.override('sw-order-detail-general', {
     template,
@@ -135,6 +135,10 @@ Component.override('sw-order-detail-general', {
             return this.molliePaymentUrl !== '';
         },
 
+        currencyFilter() {
+            return Filter.getByName('currency');
+        },
+
     },
 
     watch: {
@@ -250,7 +254,10 @@ Component.override('sw-order-detail-general', {
                 this.isShippingPossible = enabled;
             });
 
-            this.isRefundManagerPossible = this.refundedManagerService.isRefundManagerAvailable(this.order.salesChannelId);
+            this.refundedManagerService.isRefundManagerAvailable(this.order.salesChannelId).then((possible)=>{
+                this.isRefundManagerPossible =possible;
+            });
+
 
 
             this.MolliePaymentsRefundService.getRefundManagerData(

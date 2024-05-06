@@ -19,7 +19,9 @@ use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Refund;
+use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 
@@ -112,15 +114,19 @@ class RefundDataBuilder
                     $alreadyRefundedQty = $this->getRefundedQuantity($mollieOrderLineId, $mollieOrder, $refunds);
                 }
 
+                $taxTotal = round($this->calculateLineItemTaxTotal($item), 2);
+                $taxPerItem = floor($taxTotal / $item->getQuantity() * 100) / 100;
+                $taxDiff = round($taxTotal - ($taxPerItem * $item->getQuantity()), 2);
+
                 # this is just a way to move the promotions to the last positions of our array.
                 # also, shipping-free promotions have their discount item in the deliveries,...so here would just
                 # be a 0,00 value line item, that we want to skip.
                 if ($lineItemAttribute->isPromotion()) {
                     if ($item->getTotalPrice() !== 0.0) {
-                        $refundPromotionItems[] = PromotionItem::fromOrderLineItem($item, $alreadyRefundedQty);
+                        $refundPromotionItems[] = PromotionItem::fromOrderLineItem($item, $alreadyRefundedQty, $taxTotal, $taxPerItem, $taxDiff);
                     }
                 } else {
-                    $refundItems[] = new ProductItem($item, $promotionCompositions, $alreadyRefundedQty);
+                    $refundItems[] = new ProductItem($item, $promotionCompositions, $alreadyRefundedQty, $taxTotal, $taxPerItem, $taxDiff);
                 }
             }
         }
@@ -151,10 +157,14 @@ class RefundDataBuilder
                     $alreadyRefundedQty = $this->getRefundedQuantity($mollieLineID, $mollieOrder, $refunds);
                 }
 
+                $taxTotal = round($this->calculateDeliveryEntityTaxTotal($delivery), 2);
+                $taxPerItem = floor($taxTotal / $delivery->getShippingCosts()->getQuantity() * 100) / 100;
+                $taxDiff = round($taxTotal - ($taxPerItem * $delivery->getShippingCosts()->getQuantity()), 2);
+
                 if ($delivery->getShippingCosts()->getTotalPrice() < 0) {
-                    $refundPromotionItems[] = PromotionItem::fromOrderDeliveryItem($delivery, $alreadyRefundedQty);
+                    $refundPromotionItems[] = PromotionItem::fromOrderDeliveryItem($delivery, $alreadyRefundedQty, $taxTotal, $taxPerItem, $taxDiff);
                 } else {
-                    $refundDeliveryItems[] = new DeliveryItem($delivery, $alreadyRefundedQty);
+                    $refundDeliveryItems[] = new DeliveryItem($delivery, $alreadyRefundedQty, $taxTotal, $taxPerItem, $taxDiff);
                 }
             }
         }
@@ -178,6 +188,8 @@ class RefundDataBuilder
         # we first need products, then promotions and as last type we add the deliveries
         $refundItems = array_merge($refundItems, $refundPromotionItems, $refundDeliveryItems);
 
+        // get the tax status of the order
+        $taxStatus = $order->getTaxStatus();
 
         # now fetch some basic values from the API
         # TODO: these API calls should be removed one day, once I have more time (this refund manager is indeed huge) for now it's fine
@@ -205,7 +217,8 @@ class RefundDataBuilder
             $pendingRefundAmount,
             $refundedTotal,
             $remaining,
-            $roundingDiffTotal
+            $roundingDiffTotal,
+            $taxStatus
         );
     }
 
@@ -242,11 +255,45 @@ class RefundDataBuilder
 
         foreach ($order->getLineItems() as $item) {
             if (isset($item->getPayload()['composition'])) {
-                $promotionCompositions[] = $item->getPayload()['composition'];
+                $promotionComposition = $item->getPayload()['composition'];
+
+                $promotionComposition = $this->calculatePromotionCompositionTax($item, $promotionComposition);
+
+                $promotionCompositions[] = $promotionComposition;
             }
         }
 
         return $promotionCompositions;
+    }
+
+    /**
+     * @param OrderLineItemEntity $item
+     * @param array<int, mixed> $promotionComposition
+     * @return array<int, mixed>
+     */
+    private function calculatePromotionCompositionTax(OrderLineItemEntity $item, array $promotionComposition): array
+    {
+        $lineItemAttribute = new OrderLineItemEntityAttributes($item);
+        if ($lineItemAttribute->isPromotion()) {
+            $taxTotal = round($this->calculateLineItemTaxTotal($item), 2);
+            $lineItemTotal = $item->getTotalPrice();
+            $lastIndex = array_keys($promotionComposition)[count($promotionComposition) - 1];
+
+            $taxSum = 0;
+
+            foreach ($promotionComposition as $i => &$composition) {
+                $partialTax = round($taxTotal * $composition['discount'] / $lineItemTotal, 2);
+
+                if ($i === $lastIndex) {
+                    $partialTax = -$taxTotal - $taxSum;
+                }
+
+                $composition['taxValue'] = $partialTax;
+                $taxSum += $partialTax;
+            }
+        }
+
+        return $promotionComposition;
     }
 
     /**
@@ -284,9 +331,17 @@ class RefundDataBuilder
 
             $meta = $refund['metadata'];
 
+            // refund initiated within mollie dashboard, so no metadata is set
+            if ($meta instanceof \stdClass) {
+                continue;
+            }
+
             if (is_string($meta)) {
+                /** @var \stdClass $meta */
                 $meta = json_decode($meta, true);
             }
+
+
 
             $metadata = RefundMetadata::fromArray($meta);
 
@@ -311,5 +366,49 @@ class RefundDataBuilder
         }
 
         return $refundedQty;
+    }
+
+    /**
+     * @param OrderLineItemEntity $item
+     * @return float
+     */
+    private function calculateLineItemTaxTotal(OrderLineItemEntity $item): float
+    {
+        $taxTotal = 0;
+
+        $price = $item->getPrice();
+
+        if (!$price instanceof CalculatedPrice) {
+            return $taxTotal;
+        }
+
+        return $this->calculateTax($price);
+    }
+
+    /**
+     * @param OrderDeliveryEntity $delivery
+     * @return float
+     */
+    private function calculateDeliveryEntityTaxTotal(OrderDeliveryEntity $delivery): float
+    {
+        $shippingCosts = $delivery->getShippingCosts();
+
+        return $this->calculateTax($shippingCosts);
+    }
+
+    /**
+     * @param CalculatedPrice $price
+     * @return float
+     */
+    private function calculateTax(CalculatedPrice $price): float
+    {
+        $calculatedTaxes = $price->getCalculatedTaxes();
+        $taxTotal = 0;
+
+        foreach ($calculatedTaxes as $calculatedTax) {
+            $taxTotal += $calculatedTax->getTax();
+        }
+
+        return $taxTotal;
     }
 }
