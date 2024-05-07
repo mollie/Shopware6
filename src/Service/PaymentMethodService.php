@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Service;
 
 use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
+use Kiener\MolliePayments\Handler\Method\BancomatPayment;
 use Kiener\MolliePayments\Handler\Method\BanContactPayment;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Kiener\MolliePayments\Handler\Method\BelfiusPayment;
@@ -441,6 +442,7 @@ class PaymentMethodService
             PosPayment::class,
             TwintPayment::class,
             BlikPayment::class,
+            BancomatPayment::class,
             // IngHomePayPayment::class, // not allowed anymore
             // DirectDebitPayment::class, // only allowed when updating subsriptions, aka => not allowed anymore
         ];

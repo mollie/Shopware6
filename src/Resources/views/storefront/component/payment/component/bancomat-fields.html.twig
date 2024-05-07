@@ -1,0 +1,17 @@
+{% if context.paymentMethod.translated.customFields.mollie_payment_method_name == 'bancomatpay' %}
+    <div class="mollie-bancomat-pay">
+
+        <label for="mollieBancomatPayPhone">{{ "molliePayments.components.bancomatPay.headLine"|trans|striptags }}:</label>
+        <input id="mollieBancomatPayPhone"
+               placeholder="+49123456789"
+               name="mollieBancomatPayPhone" form="confirmOrderForm" type="text" pattern="\+[1-9]\d{1,14}"
+               class="form-control"
+               value="{{ context.customer.activeBillingAddress.phoneNumber }}"
+              />
+        <small class="form-text js-validation-message invalid-feedback d-none"
+               data-form-validation-invalid-phone="true" invalid="true">
+            {{ "molliePayments.components.bancomatPay.phoneErrorMessage"|trans|striptags }}
+        </small>
+
+    </div>
+{% endif %}

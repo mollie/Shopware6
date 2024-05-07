@@ -43,6 +43,10 @@
                 "deleteButton": "Delete",
                 "deleteConfirmation": "Are you sure you want to delete?",
                 "title": "Delete Confirmation"
+            },
+            "bancomatPay": {
+              "headLine": "Phone number",
+              "phoneErrorMessage": "Phone Number is required. For example +31208202070"
             }
         },
         "messages": {
