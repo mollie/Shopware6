@@ -15,10 +15,14 @@ class ProductAttributesTest extends TestCase
      */
     public function testEmptyCustomFields()
     {
-        $method = new ProductEntity();
-        $method->setCustomFields([]);
+        $product = new ProductEntity();
+        $product->setCustomFields([]);
+        $product->setTranslated([
+            'customFields' => $product->getCustomFields()
+        ]);
 
-        $attributes = new ProductAttributes($method);
+
+        $attributes = new ProductAttributes($product);
 
         $this->assertEquals('', $attributes->getVoucherType());
     }
@@ -30,15 +34,18 @@ class ProductAttributesTest extends TestCase
      */
     public function testVoucherType()
     {
-        $method = new ProductEntity();
-        $method->setCustomFields([
+        $product = new ProductEntity();
+        $product->setCustomFields([
             'mollie_payments_product_voucher_type' => VoucherType::TYPE_ECO,
             'mollie_payments' => [
                 'voucher_type' => VoucherType::TYPE_MEAL
             ]
         ]);
+        $product->setTranslated([
+            'customFields' => $product->getCustomFields()
+        ]);
 
-        $attributes = new ProductAttributes($method);
+        $attributes = new ProductAttributes($product);
 
         $this->assertEquals(VoucherType::TYPE_ECO, $attributes->getVoucherType());
     }
@@ -49,12 +56,15 @@ class ProductAttributesTest extends TestCase
      */
     public function testUnknownVoucherType()
     {
-        $method = new ProductEntity();
-        $method->setCustomFields([
+        $product = new ProductEntity();
+        $product->setCustomFields([
             'mollie_payments_product_voucher_type' => '5',
         ]);
+        $product->setTranslated([
+            'customFields' => $product->getCustomFields()
+        ]);
 
-        $attributes = new ProductAttributes($method);
+        $attributes = new ProductAttributes($product);
 
         $this->assertEquals(VoucherType::TYPE_NOTSET, $attributes->getVoucherType());
     }

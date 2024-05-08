@@ -143,7 +143,7 @@ class ProductAttributes
         $foundValue = '';
 
 
-        $customFields = $product->getCustomFields();
+        $customFields = $product->getTranslated()['customFields'];
 
         # ---------------------------------------------------------------------------
         # search in new structure
