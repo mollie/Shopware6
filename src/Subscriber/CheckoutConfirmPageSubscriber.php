@@ -124,7 +124,6 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
         $this->addMollieProfileIdVariableToPage($args);
         $this->addMollieTestModeVariableToPage($args);
         $this->addMollieComponentsVariableToPage($args);
-        $this->addMollieIdealIssuersVariableToPage($args, $mollieAttributes);
         $this->addMollieSingleClickPaymentDataToPage($args, $mollieAttributes);
         $this->addMolliePosTerminalsVariableToPage($args, $mollieAttributes);
     }
@@ -212,62 +211,6 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
         ]);
     }
 
-    /**
-     * Adds ideal issuers variable to the storefront.
-     *
-     * @param AccountEditOrderPageLoadedEvent|CheckoutConfirmPageLoadedEvent $args
-     * @param PaymentMethodAttributes $selectedPayment
-     */
-    private function addMollieIdealIssuersVariableToPage($args, $selectedPayment): void
-    {
-        // do not load ideal issuers if not required
-        if ($selectedPayment->getMollieIdentifier() !== PaymentMethod::IDEAL) {
-            return;
-        }
-        $customFields = [];
-        $ideal = null;
-        $preferredIssuer = '';
-
-        $mollieProfileId = $this->loadMollieProfileId();
-
-        // Get custom fields from the customer in the sales channel context
-        if ($args->getSalesChannelContext()->getCustomer() !== null) {
-            $customFields = $args->getSalesChannelContext()->getCustomer()->getCustomFields();
-        }
-
-        // Get the preferred issuer from the custom fields
-        if (
-            is_array($customFields)
-            && isset($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER])
-            && (string)$customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER] !== ''
-        ) {
-            $preferredIssuer = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER];
-        }
-
-
-        $parameters = [
-            'include' => 'issuers',
-        ];
-
-        if ($this->apiClient->usesOAuth()) {
-            $parameters['profileId'] = $mollieProfileId;
-        }
-
-        // Get issuers from the API
-        try {
-            $ideal = $this->apiClient->methods->get(PaymentMethod::IDEAL, $parameters);
-        } catch (Exception $e) {
-            //
-        }
-
-        // Assign issuers to storefront
-        if ($ideal instanceof Method) {
-            $args->getPage()->assign([
-                'ideal_issuers' => $ideal->issuers,
-                'preferred_issuer' => $preferredIssuer,
-            ]);
-        }
-    }
 
     /**
      * Adds ideal issuers variable to the storefront.

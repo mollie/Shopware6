@@ -26,7 +26,6 @@ interface CustomerServiceInterface
      * @return EntityWrittenContainerEvent
      */
     public function saveCustomerCustomFields(string $customerID, array $customFields, Context $context): EntityWrittenContainerEvent;
-    public function setIDealIssuer(CustomerEntity $customer, string $issuerId, Context $context): EntityWrittenContainerEvent;
     public function getMollieCustomerId(string $customerId, string $salesChannelId, Context $context): string;
     public function setMollieCustomerId(string $customerId, string $mollieCustomerId, string $profileId, bool $testMode, Context $context): void;
     public function getCustomer(string $customerId, Context $context): ?CustomerEntity;
