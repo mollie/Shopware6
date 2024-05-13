@@ -15,6 +15,7 @@ import PaymentMethodsScreenAction from "cypress-mollie/src/actions/screens/Payme
 import KBCScreen from "cypress-mollie/src/actions/screens/KBCScreen";
 import GiftCardsScreenAction from "cypress-mollie/src/actions/screens/GiftCardsScreen";
 import CreditCardScreen from "cypress-mollie/src/actions/screens/CreditCardScreen";
+import IDealScreen from "cypress-mollie/src/actions/screens/IDealScreen";
 
 
 const devices = new Devices();
@@ -28,6 +29,7 @@ const paymentAction = new PaymentAction();
 const mollieSandbox = new MollieSandbox();
 const molliePayment = new PaymentScreenAction();
 const mollieKBC = new KBCScreen();
+const idealScreen = new IDealScreen();
 const mollieVoucher = new VoucherScreenAction();
 const mollieGiftCards = new GiftCardsScreenAction();
 const molliePaymentMethods = new PaymentMethodsScreenAction();
@@ -136,7 +138,9 @@ context("Checkout Tests", () => {
                         molliePayment.selectPaid();
                         molliePaymentMethods.selectPaypal();
                         molliePayment.selectPaid();
-
+                    } else if(payment.key === 'ideal'){
+                        idealScreen.selectING();
+                        molliePayment.selectPaid();
                     } else if (payment.key === 'giftcard') {
 
                         mollieGiftCards.selectBeautyCards();
