@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Tests\Service;
 
+use Kiener\MolliePayments\Handler\Method\AlmaPayment;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Handler\Method\BancomatPayment;
 use Kiener\MolliePayments\Handler\Method\BanContactPayment;
@@ -133,6 +134,7 @@ class PaymentMethodServiceTest extends TestCase
             TwintPayment::class,
             BlikPayment::class,
             BancomatPayment::class,
+            AlmaPayment::class,
         ];
 
         $handlers = $this->paymentMethodService->getPaymentHandlers();
