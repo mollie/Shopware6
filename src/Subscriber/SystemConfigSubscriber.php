@@ -53,6 +53,10 @@ class SystemConfigSubscriber implements EventSubscriberInterface
     public function onSystemConfigWritten(EntityWrittenEvent $event): void
     {
         foreach ($event->getPayloads() as $payload) {
+            if (! isset($payload['configurationKey'])) {
+                continue;
+            }
+
             $this->checkSystemConfigChange(
                 (string)$payload['configurationKey'],
                 $payload['configurationValue'],
