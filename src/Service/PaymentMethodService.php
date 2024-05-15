@@ -23,6 +23,7 @@ use Kiener\MolliePayments\Handler\Method\KlarnaOnePayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaPayLaterPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaPayNowPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaSliceItPayment;
+use Kiener\MolliePayments\Handler\Method\MyBankPayment;
 use Kiener\MolliePayments\Handler\Method\PayPalPayment;
 use Kiener\MolliePayments\Handler\Method\PaySafeCardPayment;
 use Kiener\MolliePayments\Handler\Method\PosPayment;
@@ -444,6 +445,7 @@ class PaymentMethodService
             TwintPayment::class,
             BlikPayment::class,
             BancomatPayment::class,
+            MyBankPayment::class,
             AlmaPayment::class,
             // IngHomePayPayment::class, // not allowed anymore
             // DirectDebitPayment::class, // only allowed when updating subsriptions, aka => not allowed anymore

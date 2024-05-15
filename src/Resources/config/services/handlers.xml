@@ -212,6 +212,13 @@
         </service>
 
 
+        <!-- MyBank PaymentHandler-->
+        <service id="Kiener\MolliePayments\Handler\Method\MyBankPayment">
+            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="service_container"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+
 
 
     </services>
