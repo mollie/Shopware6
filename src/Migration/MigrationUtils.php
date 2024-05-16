@@ -68,7 +68,7 @@ class MigrationUtils
 
     public function columnExists(string $table, string $column): bool
     {
-        return $this->connection->executeQuery("SHOW COLUMNS FROM " . $table . " LIKE '" . $column . "'")->fetch();
+        return $this->connection->executeQuery("SHOW COLUMNS FROM " . $table . " LIKE '" . $column . "'")->fetchOne();
     }
 
     /**
