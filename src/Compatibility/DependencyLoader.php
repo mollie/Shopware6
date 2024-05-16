@@ -6,6 +6,7 @@ use Composer\Autoload\ClassLoader;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
 class DependencyLoader
@@ -15,13 +16,19 @@ class DependencyLoader
      */
     private $container;
 
+    /**
+     * @var VersionCompare
+     */
+    private $versionCompare;
+
 
     /**
      * @param Container $container
      */
-    public function __construct(Container $container)
+    public function __construct(ContainerInterface $container, VersionCompare $versionCompare)
     {
         $this->container = $container;
+        $this->versionCompare = $versionCompare;
     }
 
     /**
@@ -29,10 +36,6 @@ class DependencyLoader
      */
     public function loadServices(): void
     {
-        /** @var string $version */
-        $version = $this->container->getParameter('kernel.shopware_version');
-
-        $versionCompare = new VersionCompare($version);
 
 
         /** @var ContainerBuilder $containerBuilder */
@@ -44,21 +47,22 @@ class DependencyLoader
         # load Flow Builder
         $loader->load('compatibility/flowbuilder/all_versions.xml');
 
-        if ($versionCompare->gte('6.4.6.0')) {
+        if ($this->versionCompare->gte('6.4.6.0')) {
             $loader->load('compatibility/flowbuilder/6.4.6.0.xml');
         }
 
 
-        $composerDevReqsInstalled = file_exists(__DIR__ . '/../../vendor/bin/phpunit');
+        $composerDevReqsInstalled = file_exists(__DIR__.'/../../vendor/bin/phpunit');
 
         if ($composerDevReqsInstalled) {
-            $dirFixtures = __DIR__ . '/../../tests/Fixtures';
+            $dirFixtures = (string)realpath(__DIR__ . '/../../tests/Fixtures/');
 
             if (is_dir($dirFixtures)) {
                 # we need to tell Shopware to load our custom fixtures
                 # from our TEST autoload-dev area....
                 $classLoader = new ClassLoader();
                 $classLoader->addPsr4("MolliePayments\\Fixtures\\", $dirFixtures, true);
+
                 $classLoader->register();
 
                 $loader->load('services/fixtures/fixtures.xml');
@@ -71,11 +75,6 @@ class DependencyLoader
      */
     public function prepareStorefrontBuild(): void
     {
-        /** @var string $version */
-        $version = $this->container->getParameter('kernel.shopware_version');
-
-        $versionCompare = new VersionCompare($version);
-
         $pluginRoot = __DIR__ . '/../..';
 
         $distFileFolder = $pluginRoot . '/src/Resources/app/storefront/dist/storefront/js';
@@ -84,7 +83,7 @@ class DependencyLoader
             mkdir($distFileFolder, 0777, true);
         }
 
-        if ($versionCompare->gte('6.5')) {
+        if ($this->versionCompare->gte('6.5')) {
             $file = $pluginRoot . '/src/Resources/app/storefront/dist/mollie-payments-65.js';
             $target = $distFileFolder . '/mollie-payments.js';
         } else {

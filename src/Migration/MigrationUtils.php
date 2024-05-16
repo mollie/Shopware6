@@ -31,7 +31,7 @@ class MigrationUtils
      */
     public function createColumn(string $table, string $column, string $type, string $default, string $after): void
     {
-        $colQuery = $this->connection->executeQuery("SHOW COLUMNS FROM " . $table . " LIKE '" . $column . "'")->fetch();
+        $colQuery = $this->columnExists($table, $column);
 
         # only create if not yet existing
         if ($colQuery === false) {
@@ -57,13 +57,18 @@ class MigrationUtils
      */
     public function deleteColumn(string $table, string $column): void
     {
-        $colQuery = $this->connection->executeQuery("SHOW COLUMNS FROM " . $table . " LIKE '" . $column . "'")->fetch();
+        $colQuery = $this->columnExists($table, $column);
 
         # only delete if existing
         if ($colQuery !== false) {
             $sql = "ALTER TABLE " . $table . " DROP " . $column;
             $this->connection->exec($sql);
         }
+    }
+
+    public function columnExists(string $table, string $column): bool
+    {
+        return $this->connection->executeQuery("SHOW COLUMNS FROM " . $table . " LIKE '" . $column . "'")->fetch();
     }
 
     /**
