@@ -36,6 +36,8 @@ function moveToDev(array $composerContent, string $swVersion)
     unset($composerContent['require']["shopware/administration"]);
     unset($composerContent['require']["shopware/storefront"]);
 
+    $composerContent['autoload']['psr-4']['MolliePayments\\Fixtures\\']  = "tests/Fixtures/";
+
     return $composerContent;
 }
 
@@ -54,5 +56,6 @@ function moveToProd(array $composerContent, string $swVersion)
     unset($composerContent['require-dev']["shopware/administration"]);
     unset($composerContent['require-dev']["shopware/storefront"]);
 
+    unset($composerContent['autoload']['psr-4']['MolliePayments\\Fixtures\\']);
     return $composerContent;
 }

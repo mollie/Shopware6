@@ -44,7 +44,8 @@
         "psr-4": {
             "Kiener\\MolliePayments\\": "src/",
             "Mollie\\Api\\": "vendor_manual/mollie/mollie-api-php/src/",
-            "Shopware\\Core\\": "polyfill/Shopware/Core/"
+            "Shopware\\Core\\": "polyfill/Shopware/Core/",
+            "MolliePayments\\Fixtures\\": "tests/Fixtures/"
         }
     },
     "autoload-dev": {

@@ -51,7 +51,7 @@ class CategoryFixture extends Fixture
      * @param FixtureBag $bag
      * @return void
      */
-    public function load(FixtureBag $bag): void
+    public function load(): void
     {
         $appendCategory = $this->helper->Category()->getByName('Free time & electronics');
 

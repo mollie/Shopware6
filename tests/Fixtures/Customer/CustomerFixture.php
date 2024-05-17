@@ -55,7 +55,7 @@ class CustomerFixture extends Fixture
      * @param FixtureBag $bag
      * @return void
      */
-    public function load(FixtureBag $bag): void
+    public function load(): void
     {
         $salesChannel = $this->helper->SalesChannel()->getStorefrontSalesChannel();
 
