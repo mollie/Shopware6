@@ -21,8 +21,6 @@ prod: ## Installs all production dependencies
 	# also install shopware in here -> we just need it for the release composer.json file
 	# so just switch to our dev dependency variant
 	php switch-composer.php dev
-	# since we changed composer autoload, we need to refresh the plugin list so autoload section is updated in db
-	cd ../../.. && php bin/console --no-debug plugin:refresh
 	# ----------------------------------------------------------------
 	@composer validate
 	@composer install --no-dev
@@ -31,7 +29,6 @@ prod: ## Installs all production dependencies
 
 dev: ## Installs all dev dependencies
 	php switch-composer.php dev
-	cd ../../.. && php bin/console --no-debug plugin:refresh
 	@composer validate
     # we have to run update in dev mode, because dev dependencies are not compatible with newer php version. should be updated when support for 6.4 is dropped
 	@composer update
