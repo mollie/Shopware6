@@ -58,6 +58,5 @@ class StorefrontBuildSubscriber implements EventSubscriberInterface
 
         $useJsValue = (int)$settings->isUseShopwareJavascript();
         $event->setParameter('mollie_javascript_use_shopware', $useJsValue);
-
     }
 }
