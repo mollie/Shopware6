@@ -1,6 +1,4 @@
-import Plugin from '@shopware-storefront-sdk/plugin-system/plugin.class';
-
-export default class MollieBancomatPlugin extends Plugin {
+export default class MollieBancomatPlugin extends window.PluginBaseClass {
 
     init() {
 

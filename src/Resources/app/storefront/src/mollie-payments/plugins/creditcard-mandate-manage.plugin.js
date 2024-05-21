@@ -1,10 +1,9 @@
-import Plugin from '@shopware-storefront-sdk/plugin-system/plugin.class';
 import HttpClient from '../services/HttpClient';
 
 /**
  * This plugin manage the credit card mandate of customer
  */
-export default class MollieCreditCardMandateManage extends Plugin {
+export default class MollieCreditCardMandateManage extends window.PluginBaseClass {
     static options = {
         shopUrl: null,
         customerId: null,

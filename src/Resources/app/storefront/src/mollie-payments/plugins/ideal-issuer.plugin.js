@@ -1,8 +1,7 @@
-import Plugin from '@shopware-storefront-sdk/plugin-system/plugin.class';
 import HttpClient from '../services/HttpClient'
 
 
-export default class MollieIDealIssuer extends Plugin {
+export default class MollieIDealIssuer extends window.PluginBaseClass {
 
     _shopUrl = '';
     _customerId = '';

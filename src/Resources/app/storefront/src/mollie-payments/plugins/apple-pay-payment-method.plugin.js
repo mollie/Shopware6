@@ -1,7 +1,6 @@
-import Plugin from '@shopware-storefront-sdk/plugin-system/plugin.class';
 import HttpClient from '../services/HttpClient';
 
-export default class MollieApplePayPaymentMethod extends Plugin {
+export default class MollieApplePayPaymentMethod extends window.PluginBaseClass {
 
     /**
      *

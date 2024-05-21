@@ -31,7 +31,7 @@
         window.mollie_javascript_use_shopware = '{{ mollie_javascript_use_shopware }}'
     </script>
 
-    {% if mollie_javascript_already_exists == false and mollie_javascript_use_shopware != '1' and includeJsInHeader == true %}
+    {% if mollie_javascript_use_shopware != '1' and includeJsInHeader == true %}
         <script type="text/javascript" src="{{ asset('bundles/molliepayments/mollie-payments.js', 'asset') }}" defer></script>
     {% endif %}
 
