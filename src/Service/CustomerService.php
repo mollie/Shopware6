@@ -276,7 +276,34 @@ class CustomerService implements CustomerServiceInterface
         ]], $context);
     }
 
+    /**
+     * Stores the ideal issuer in the custom fields of the customer.
+     *
+     * @param CustomerEntity $customer
+     * @param string $issuerId
+     * @param Context $context
+     *
+     * @return EntityWrittenContainerEvent
+     */
+    public function setIDealIssuer(CustomerEntity $customer, string $issuerId, Context $context): EntityWrittenContainerEvent
+    {
+        // Get existing custom fields
+        $customFields = $customer->getCustomFields();
 
+        // If custom fields are empty, create a new array
+        if (!is_array($customFields)) {
+            $customFields = [];
+        }
+
+        // Store the card token in the custom fields
+        $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][self::CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER] = $issuerId;
+
+        // Store the custom fields on the customer
+        return $this->customerRepository->update([[
+            'id' => $customer->getId(),
+            'customFields' => $customFields
+        ]], $context);
+    }
 
     /**
      * @param CustomerEntity $customer

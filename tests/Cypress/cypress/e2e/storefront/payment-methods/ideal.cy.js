@@ -44,6 +44,7 @@ describe('iDEAL Issuers', () => {
                 }
 
                 paymentAction.selectPaymentMethod('iDEAL');
+                paymentAction.selectIDealIssuer('bunq');
             })
         })
     })

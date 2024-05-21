@@ -1,5 +1,6 @@
 import MollieCreditCardComponents from './mollie-payments/plugins/creditcard-components.plugin';
 import MollieCreditCardComponentsSw64 from './mollie-payments/plugins/creditcard-components-sw64.plugin';
+import MollieIDealIssuer from './mollie-payments/plugins/ideal-issuer.plugin';
 import MollieApplePayDirect from './mollie-payments/plugins/apple-pay-direct.plugin';
 import MollieApplePayPaymentMethod from './mollie-payments/plugins/apple-pay-payment-method.plugin';
 import MollieCreditCardMandateManage from './mollie-payments/plugins/creditcard-mandate-manage.plugin';
@@ -20,7 +21,8 @@ export default class MolliRegistration {
         // -----------------------------------------------------------------------------
         // hide apple pay direct buttons across the whole shop, if not available
         pluginManager.register('MollieApplePayDirect', MollieApplePayDirect);
-
+        // this is just the iDEAL dropdown..not quite sure why its not bound to the DOM -> TODO?
+        pluginManager.register('MollieIDealIssuer', MollieIDealIssuer);
 
         // hiding the standard Apple Pay method in the checkout and account area
         // -----------------------------------------------------------------------------

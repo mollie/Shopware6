@@ -3,13 +3,16 @@
 namespace Kiener\MolliePayments\Gateway\Mollie;
 
 use Kiener\MolliePayments\Factory\MollieApiFactory;
+use Kiener\MolliePayments\Gateway\Mollie\Model\Issuer;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Mollie\Api\MollieApiClient;
+use Mollie\Api\Resources\Method;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\Profile;
 use Mollie\Api\Resources\Subscription;
 use Mollie\Api\Resources\Terminal;
+use Mollie\Api\Types\PaymentMethod;
 
 class MollieGateway implements MollieGatewayInterface
 {
@@ -85,7 +88,34 @@ class MollieGateway implements MollieGatewayInterface
         return (string)$orgId;
     }
 
+    /**
+     * @throws \Mollie\Api\Exceptions\ApiException
+     * @return Issuer[]
+     */
+    public function getIDealIssuers(): array
+    {
+        $parameters = [
+            'include' => 'issuers',
+        ];
 
+        /** @var Method $iDeal */
+        $iDeal = $this->apiClient->methods->get(PaymentMethod::IDEAL, $parameters);
+
+        $issuers = [];
+
+        /** @var \Mollie\Api\Resources\Issuer $issuer */
+        foreach ($iDeal->issuers as $issuer) {
+            $issuers[] = new Issuer(
+                $issuer->id,
+                $issuer->name,
+                $issuer->image->size1x,
+                $issuer->image->size2x,
+                $issuer->image->svg
+            );
+        }
+
+        return $issuers;
+    }
 
     /**
      * @throws \Mollie\Api\Exceptions\ApiException

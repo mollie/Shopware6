@@ -31,6 +31,8 @@
         {% sw_include '@MolliePayments/storefront/component/payment/component/cc-fields.html.twig' with {
             showIfActive: false
         } %}
+    {% elseif payment.translated.customFields.mollie_payment_method_name == 'ideal' %}
+        {% sw_include '@MolliePayments/storefront/component/payment/component/ideal-fields.html.twig' %}
     {% elseif payment.translated.customFields.mollie_payment_method_name == 'pointofsale' %}
         {% sw_include '@MolliePayments/storefront/component/payment/component/pos-fields.html.twig' %}
     {% elseif payment.translated.customFields.mollie_payment_method_name == 'bancomatpay' %}

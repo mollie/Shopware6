@@ -130,7 +130,13 @@ export default class PaymentAction {
         cy.wait(1000);
     }
 
-
+    /**
+     *
+     * @param issuer
+     */
+    selectIDealIssuer(issuer) {
+        cy.get('#iDealIssuer').select(issuer);
+    }
 
     /**
      *
