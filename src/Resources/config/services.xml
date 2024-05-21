@@ -213,6 +213,10 @@
             <argument>%kernel.shopware_version%</argument>
         </service>
 
+        <service id="Kiener\MolliePayments\Subscriber\CartConvertedSubscriber">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
 
         <!-- Mail -->
         <service id="mollie_payments.mail_service" class="Kiener\MolliePayments\Service\Mail\MailService">
