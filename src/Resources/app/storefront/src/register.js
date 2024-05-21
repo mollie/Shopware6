@@ -6,6 +6,7 @@ import MollieApplePayPaymentMethod from './mollie-payments/plugins/apple-pay-pay
 import MollieCreditCardMandateManage from './mollie-payments/plugins/creditcard-mandate-manage.plugin';
 import MolliePosTerminalPlugin from './mollie-payments/plugins/pos-terminal.plugin';
 import PayPalExpressPlugin from './mollie-payments/plugins/paypal-express.plugin';
+import MollieBancomatPlugin from './mollie-payments/plugins/bancomat-plugin';
 
 
 export default class MollieRegistration {
@@ -33,7 +34,6 @@ export default class MollieRegistration {
         pluginManager.register('MollieApplePayPaymentMethod', MollieApplePayPaymentMethod, '[data-mollie-template-applepay-checkout]');
 
 
-
         // showing credit card components in the checkout
         // we have 2 versions for < Shopware 6.4 and >= Shopware 6.4
         // -----------------------------------------------------------------------------
@@ -47,6 +47,8 @@ export default class MollieRegistration {
         // POS Terminal
         // -----------------------------------------------------------------------------
         pluginManager.register('MolliePosTerminal', MolliePosTerminalPlugin, '[data-mollie-template-pos-terminal]');
+
+        pluginManager.register('MollieBancomatPlugin',MollieBancomatPlugin);
     }
 
 }

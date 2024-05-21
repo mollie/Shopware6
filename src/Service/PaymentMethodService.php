@@ -3,7 +3,9 @@
 namespace Kiener\MolliePayments\Service;
 
 use Kiener\MolliePayments\Compatibility\VersionCompare;
+use Kiener\MolliePayments\Handler\Method\AlmaPayment;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
+use Kiener\MolliePayments\Handler\Method\BancomatPayment;
 use Kiener\MolliePayments\Handler\Method\BanContactPayment;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Kiener\MolliePayments\Handler\Method\BelfiusPayment;
@@ -22,6 +24,7 @@ use Kiener\MolliePayments\Handler\Method\KlarnaPayLaterPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaPayNowPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaSliceItPayment;
 use Kiener\MolliePayments\Handler\Method\PayPalExpressPayment;
+use Kiener\MolliePayments\Handler\Method\MyBankPayment;
 use Kiener\MolliePayments\Handler\Method\PayPalPayment;
 use Kiener\MolliePayments\Handler\Method\PaySafeCardPayment;
 use Kiener\MolliePayments\Handler\Method\PosPayment;
@@ -443,6 +446,9 @@ class PaymentMethodService
             PosPayment::class,
             TwintPayment::class,
             BlikPayment::class,
+            BancomatPayment::class,
+            MyBankPayment::class,
+            AlmaPayment::class,
             // IngHomePayPayment::class, // not allowed anymore
             // DirectDebitPayment::class, // only allowed when updating subsriptions, aka => not allowed anymore
         ];

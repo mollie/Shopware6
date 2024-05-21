@@ -5,7 +5,7 @@ export default class OffCanvasRepository {
      * @returns {*}
      */
     getCartButton() {
-        return cy.get('.btn-link');
+        return cy.get('.offcanvas-cart-actions .btn-link');
     }
 
     /**

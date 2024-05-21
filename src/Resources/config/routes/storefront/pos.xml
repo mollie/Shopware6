@@ -6,19 +6,19 @@
 
     <route id="frontend.mollie.pos.storeTerminal" path="/mollie/pos/store-terminal/{customerId}/{terminalId}" methods="GET">
         <default key="_controller">Kiener\MolliePayments\Controller\Storefront\POS\PosControllerBase::storeTerminal</default>
-        <default key="_routeScope">storefront</default>
+        <default key="_routeScope"><list><string>storefront</string></list></default>
         <option key="seo">false</option>
     </route>
 
     <route id="frontend.mollie.pos.checkout" path="/mollie/pos/checkout" methods="GET">
         <default key="_controller">Kiener\MolliePayments\Controller\Storefront\POS\PosControllerBase::checkoutAction</default>
-        <default key="_routeScope">storefront</default>
+        <default key="_routeScope"><list><string>storefront</string></list></default>
         <option key="seo">false</option>
     </route>
 
     <route id="frontend.mollie.pos.checkout_status" path="/mollie/pos/{orderId}/{molliePaymentId}/status" methods="GET">
         <default key="_controller">Kiener\MolliePayments\Controller\Storefront\POS\PosControllerBase::statusAction</default>
-        <default key="_routeScope">storefront</default>
+        <default key="_routeScope"><list><string>storefront</string></list></default>
         <option key="seo">false</option>
     </route>
 

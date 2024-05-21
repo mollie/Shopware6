@@ -9,7 +9,7 @@
            path="/api/v{version}/_action/mollie/config/test-api-keys"
            methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\PluginConfig\ConfigControllerBase::testApiKeys</default>
-        <default key="_routeScope">api</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
         <default key="_auth_required">true</default>
         <default key="_auth_enabled">true</default>
     </route>
@@ -18,7 +18,7 @@
            path="/api/_action/mollie/config/test-api-keys"
            methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\PluginConfig\ConfigControllerBase::testApiKeys64</default>
-        <default key="_routeScope">api</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
         <default key="_auth_required">true</default>
         <default key="_auth_enabled">true</default>
     </route>
@@ -27,7 +27,7 @@
            path="/api/_action/mollie/config/validate/flowbuilder"
            methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\PluginConfig\ConfigControllerBase::validateFlowBuilder</default>
-        <default key="_routeScope">api</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
         <default key="_auth_required">true</default>
         <default key="_auth_enabled">true</default>
     </route>
@@ -36,7 +36,7 @@
            path="/api/_action/mollie/config/refund-manager"
            methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\PluginConfig\ConfigControllerBase::getRefundManagerConfig</default>
-        <default key="_routeScope">api</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
         <default key="_auth_required">true</default>
         <default key="_auth_enabled">true</default>
     </route>
@@ -45,7 +45,7 @@
            path="/api/v{version}/_action/mollie/config/refund-manager"
            methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\PluginConfig\ConfigControllerBase::getRefundManagerConfigLegacy</default>
-        <default key="_routeScope">api</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
         <default key="_auth_required">true</default>
         <default key="_auth_enabled">true</default>
     </route>
@@ -54,7 +54,7 @@
            path="/api/_action/mollie/config/subscription"
            methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\PluginConfig\ConfigControllerBase::getSubscriptionConfig</default>
-        <default key="_routeScope">api</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
         <default key="_auth_required">true</default>
         <default key="_auth_enabled">true</default>
     </route>

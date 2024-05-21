@@ -111,6 +111,11 @@ class OrderAttributes
     private $payPalExpressAuthenticateId;
 
     /**
+     * @var string
+     */
+    private $bancomatPayPhoneNumber;
+
+    /**
      * @param OrderEntity $order
      */
     public function __construct(OrderEntity $order)
@@ -134,6 +139,7 @@ class OrderAttributes
         $this->bankAccount = $this->getCustomFieldValue($order, 'bankAccount');
         $this->bankBic = $this->getCustomFieldValue($order, 'bankBic');
         $this->timezone = $this->getCustomFieldValue($order, 'timezone');
+        $this->bancomatPayPhoneNumber = $this->getCustomFieldValue($order, 'bancomatPayPhoneNumber');
         $this->payPalExpressAuthenticateId = $this->getCustomFieldValue($order, CustomFieldsInterface::PAYPAL_EXPRESS_AUTHENTICATE_ID);
     }
 
@@ -464,6 +470,24 @@ class OrderAttributes
 
 
     /**
+     * @return string
+     */
+    public function getBancomatPayPhoneNumber(): string
+    {
+        return $this->bancomatPayPhoneNumber;
+    }
+
+    /**
+     * @param string $bancomatPayPhoneNumber
+     * @return void
+     */
+    public function setBancomatPayPhoneNumber(string $bancomatPayPhoneNumber): void
+    {
+        $this->bancomatPayPhoneNumber = $bancomatPayPhoneNumber;
+    }
+
+
+    /**
      * @return array<string,mixed>
      */
     public function toArray(): array
@@ -547,6 +571,9 @@ class OrderAttributes
             $mollieData['bankBic'] = $this->bankBic;
         }
 
+        if ($this->bancomatPayPhoneNumber !== '') {
+            $mollieData['bancomatPayPhoneNumber'] = $this->bancomatPayPhoneNumber;
+        }
         if ((string)$this->payPalExpressAuthenticateId !== '') {
             $mollieData[CustomFieldsInterface::PAYPAL_EXPRESS_AUTHENTICATE_ID] = $this->payPalExpressAuthenticateId;
         }

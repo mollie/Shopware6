@@ -20,6 +20,12 @@ class Migration1711618833SubscriptionCurrency extends MigrationStep
 
     public function update(Connection $connection): void
     {
+        $utils = new MigrationUtils($connection);
+
+        // sometimes there is a problem with migration, so we check if the currency field was removed, if it not there anymore, we dont need to run the migration
+        if (!$utils->columnExists('mollie_subscription', 'currency')) {
+            return;
+        }
         // add new columns
         $sql = "ALTER TABLE `mollie_subscription` 
                 ADD COLUMN `currency_id` BINARY(16) NULL AFTER `currency`,
@@ -63,8 +69,7 @@ class Migration1711618833SubscriptionCurrency extends MigrationStep
         }
 
         //delete unsused column
-        $sql = "ALTER TABLE  `mollie_subscription` DROP COLUMN `currency`";
-        $connection->executeStatement($sql);
+        $utils->deleteColumn('mollie_subscription', 'currency');
     }
 
     /**

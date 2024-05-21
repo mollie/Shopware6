@@ -214,10 +214,10 @@ export default class RefundItemService {
             if (item.refundQuantity > 0 && item.refundQuantity + item.refunded === item.shopware.quantity) {
                 refundTaxAmount += item.shopware.tax.totalToPerItemRoundingDiff;
             }
-            const promotionTaxValuePerQty = item.shopware.promotion.taxValue / item.shopware.promotion.quantity;
 
             let promotionTaxValue = 0;
-            if (item.refundTax) {
+            if (item.refundTax && item.shopware.promotion.taxValue > 0) {
+                const promotionTaxValuePerQty = item.shopware.promotion.taxValue / item.shopware.promotion.quantity;
                 promotionTaxValue = promotionTaxValuePerQty * item.refundQuantity;
             }
 

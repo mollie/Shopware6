@@ -6,7 +6,7 @@
 
     <route id="frontend.mollie.ideal.storeIssuer" path="/mollie/ideal/store-issuer/{customerId}/{issuerId}" methods="GET">
         <default key="_controller">Kiener\MolliePayments\Controller\Storefront\iDEAL\iDealControllerBase::storeIssuer</default>
-        <default key="_routeScope">storefront</default>
+        <default key="_routeScope"><list><string>storefront</string></list></default>
         <option key="seo">false</option>
     </route>
 

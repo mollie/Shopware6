@@ -49,7 +49,7 @@ class SubscriptionFixture extends Fixture
      * @param FixtureBag $bag
      * @return void
      */
-    public function load(FixtureBag $bag): void
+    public function load(): void
     {
         $category = 'Subscriptions';
         $image = 'champagne.png';

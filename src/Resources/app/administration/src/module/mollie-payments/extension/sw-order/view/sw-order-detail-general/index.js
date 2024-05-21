@@ -254,7 +254,10 @@ Component.override('sw-order-detail-general', {
                 this.isShippingPossible = enabled;
             });
 
-            this.isRefundManagerPossible = this.refundedManagerService.isRefundManagerAvailable(this.order.salesChannelId);
+            this.refundedManagerService.isRefundManagerAvailable(this.order.salesChannelId).then((possible)=>{
+                this.isRefundManagerPossible =possible;
+            });
+
 
 
             this.MolliePaymentsRefundService.getRefundManagerData(

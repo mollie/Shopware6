@@ -2,14 +2,20 @@
 
 {% block buy_widget_buy_container %}
 
-    {% if mollie_subscriptions_enabled and product.customFields.mollie_payments_product_subscription_enabled %}
-        <button class="btn btn-primary btn-block btn-buy" title="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}" aria-label="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}">
-            {{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}
-        </button>
+    {% if mollie_subscriptions_enabled and product.translated.customFields.mollie_payments_product_subscription_enabled %}
+        <div class="d-grid">
+            <button class="btn btn-primary btn-block btn-buy" title="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}" aria-label="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}">
+                {{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}
+            </button>
+        </div>
     {% else %}
         {{ parent() }}
     {% endif %}
 
+{% endblock %}
+
+{% block buy_widget_buy_button_container %}
+    {{ parent() }}
     {% block page_product_detail_buy_container_apple_direct %}
         {# this is for Shopware < 6.4 #}
         {% set buyableLegacy = (not page.product.isCloseout or (page.product.availableStock >= page.product.minPurchase)) and page.product.childCount <= 0 %}
@@ -66,4 +72,5 @@
             {% endblock %}
         {% endif %}
     {% endblock %}
+
 {% endblock %}

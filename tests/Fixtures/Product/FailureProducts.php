@@ -61,7 +61,7 @@ class FailureProducts extends Fixture
      * @param FixtureBag $bag
      * @return void
      */
-    public function load(FixtureBag $bag): void
+    public function load(): void
     {
         $category = 'Failures';
         $image = 'tshirt-black-fail.png';

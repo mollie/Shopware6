@@ -295,6 +295,7 @@ class NotificationFacade
         $criteria->addAssociation('order.lineItems');
         $criteria->addAssociation('order.currency');
         $criteria->addAssociation('order.transactions');
+        $criteria->addAssociation('order.stateMachineState');
         $criteria->addAssociation('paymentMethod');
 
         return $this->repoOrderTransactions->search($criteria, $context)->first();

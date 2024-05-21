@@ -52,10 +52,13 @@
 
 {% block page_product_detail_product_buy_button %}
 
-    {% if mollie_subscriptions_enabled and product.customFields.mollie_payments_product_subscription_enabled %}
-        <button class="btn btn-block btn-buy" title="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}">
-            {{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}
-        </button>
+
+    {% if mollie_subscriptions_enabled and product.translated.customFields.mollie_payments_product_subscription_enabled %}
+        <div class="d-grid">
+            <button class="btn btn-block btn-buy" title="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}">
+                {{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}
+            </button>
+        </div>
     {% else %}
         {{ parent() }}
     {% endif %}

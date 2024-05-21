@@ -1,6 +1,5 @@
 {% sw_extends '@Storefront/storefront/page/product-detail/buy-widget-form.html.twig' %}
 
-
 {% block page_product_detail_buy_container %}
     {{ parent() }}
 
@@ -30,9 +29,7 @@
                 </div>
             {% endblock %}
         {% endif %}
-
     {% endblock %}
-
 
 {% endblock %}
 
@@ -69,10 +66,8 @@
 
 {% block page_product_detail_buy_button %}
 
-    {% if mollie_subscriptions_enabled and page.product.customFields.mollie_payments_product_subscription_enabled %}
-        <button class="btn btn-primary btn-block btn-buy"
-                title="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}"
-                aria-label="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}">
+    {% if mollie_subscriptions_enabled and page.product.translated.customFields.mollie_payments_product_subscription_enabled %}
+        <button class="btn btn-primary btn-block btn-buy" title="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}" aria-label="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}">
             {{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}
         </button>
     {% else %}

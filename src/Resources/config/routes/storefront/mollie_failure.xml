@@ -9,7 +9,7 @@
            methods="GET|POST">
         <requirement key="transactionId">.*</requirement>
         <default key="_controller">Kiener\MolliePayments\Controller\Storefront\Payment\MollieFailureControllerBase::paymentFailedAction</default>
-        <default key="_routeScope">storefront</default>
+        <default key="_routeScope"><list><string>storefront</string></list></default>
         <default key="csrf_protected"><bool>false</bool></default>
         <option key="seo">false</option>
     </route>
@@ -19,7 +19,7 @@
            methods="GET|POST">
         <requirement key="transactionId">.*</requirement>
         <default key="_controller">Kiener\MolliePayments\Controller\Storefront\Payment\MollieFailureControllerBase::retry</default>
-        <default key="_routeScope">storefront</default>
+        <default key="_routeScope"><list><string>storefront</string></list></default>
         <default key="csrf_protected"><bool>false</bool></default>
         <option key="seo">false</option>
     </route>

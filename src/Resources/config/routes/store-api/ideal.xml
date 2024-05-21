@@ -8,14 +8,14 @@
            path="/store-api/mollie/ideal/issuers"
            methods="GET">
         <default key="_controller">Kiener\MolliePayments\Controller\StoreApi\iDEAL\iDealControllerBase::getIssuers</default>
-        <default key="_routeScope">store-api</default>
+        <default key="_routeScope"><list><string>store-api</string></list></default>
     </route>
 
     <route id="store-api.mollie.ideal.store-issuer"
            path="/store-api/mollie/ideal/store-issuer/{customerId}/{issuerId}"
            methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\StoreApi\iDEAL\iDealControllerBase::saveIssuer</default>
-        <default key="_routeScope">store-api</default>
+        <default key="_routeScope"><list><string>store-api</string></list></default>
     </route>
 
 </routes>

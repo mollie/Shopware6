@@ -150,8 +150,8 @@ class MollieLineItemBuilderTest extends TestCase
                 'value' => '0.78'
             ],
             'sku' => 'product-123',
-            'imageUrl' => urlencode('https://phpunit.mollie.local/my-product-1.png'),
-            'productUrl' => urlencode('https://phpunit.mollie.local/my-product-1'),
+            'imageUrl' => 'https://phpunit.mollie.local/my-product-1.png',
+            'productUrl' => 'https://phpunit.mollie.local/my-product-1',
             'metadata' => [
                 'orderLineItemId' => 'line-1'
             ]

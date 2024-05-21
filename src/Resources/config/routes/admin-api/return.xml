@@ -5,14 +5,14 @@
         https://symfony.com/schema/routing/routing-1.0.xsd">
     <route id="api.mollie.payment-return" path="/api/mollie/payment/return/{swTransactionId}" methods="GET|POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\Payment\ReturnControllerBase::returnAction</default>
-        <default key="_routeScope">api</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
         <default key="auth_required"><bool>false</bool></default>
         <default key="auth_enabled"><bool>false</bool></default>
     </route>
 
     <route id="api.mollie.payment-return-legacy" path="/api/v{version}/mollie/payment/return/{swTransactionId}" methods="GET|POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\Payment\ReturnControllerBase::returnActionLegacy</default>
-        <default key="_routeScope">api</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
         <default key="auth_required"><bool>false</bool></default>
         <default key="auth_enabled"><bool>false</bool></default>
     </route>

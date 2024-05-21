@@ -165,8 +165,8 @@ class MollieLineItemBuilder
                 $price,
                 $item->getId(),
                 $extraData->getSku(),
-                urlencode((string)$extraData->getImageUrl()),
-                urlencode((string)$extraData->getProductUrl())
+                (string)$extraData->getImageUrl(),
+                (string)$extraData->getProductUrl()
             );
 
             $lines->add($mollieLineItem);

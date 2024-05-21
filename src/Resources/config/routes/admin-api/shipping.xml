@@ -7,91 +7,91 @@
 
     <route id="api.action.mollie.ship.status" path="/api/_action/mollie/ship/status" methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\Order\ShippingControllerBase::status</default>
-        <default key="_routeScope">api</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
         <default key="auth_required"><bool>true</bool></default>
         <default key="auth_enabled"><bool>true</bool></default>
     </route>
 
     <route id="api.action.mollie.ship.status.legacy" path="/api/v{version}/_action/mollie/ship/status" methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\Order\ShippingControllerBase::statusLegacy</default>
-        <default key="_routeScope">api</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
         <default key="auth_required"><bool>true</bool></default>
         <default key="auth_enabled"><bool>true</bool></default>
     </route>
 
     <route id="api.action.mollie.ship.total" path="/api/_action/mollie/ship/total" methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\Order\ShippingControllerBase::total</default>
-        <default key="_routeScope">api</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
         <default key="auth_required"><bool>true</bool></default>
         <default key="auth_enabled"><bool>true</bool></default>
     </route>
 
     <route id="api.action.mollie.ship.total.legacy" path="/api/v{version}/_action/mollie/ship/total" methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\Order\ShippingControllerBase::totalLegacy</default>
-        <default key="_routeScope">api</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
         <default key="auth_required"><bool>true</bool></default>
         <default key="auth_enabled"><bool>true</bool></default>
     </route>
 
     <route id="api.mollie.ship.order" path="/api/mollie/ship/order" methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\Order\ShippingControllerBase::shipOrderOperational</default>
-        <default key="_routeScope">api</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
         <default key="auth_required"><bool>true</bool></default>
         <default key="auth_enabled"><bool>true</bool></default>
     </route>
 
     <route id="api.mollie.ship.order.deprecated" path="/api/mollie/ship/order" methods="GET">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\Order\ShippingControllerBase::shipOrderOperationalDeprecated</default>
-        <default key="_routeScope">api</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
         <default key="auth_required"><bool>true</bool></default>
         <default key="auth_enabled"><bool>true</bool></default>
     </route>
 
     <route id="api.mollie.ship.order.batch" path="/api/mollie/ship/order/batch" methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\Order\ShippingControllerBase::shipOrderBatchOperational</default>
-        <default key="_routeScope">api</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
         <default key="auth_required"><bool>true</bool></default>
         <default key="auth_enabled"><bool>true</bool></default>
     </route>
 
     <route id="api.mollie.ship.item" path="/api/mollie/ship/item" methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\Order\ShippingControllerBase::shipItemOperational</default>
-        <default key="_routeScope">api</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
         <default key="auth_required"><bool>true</bool></default>
         <default key="auth_enabled"><bool>true</bool></default>
     </route>
 
     <route id="api.mollie.ship.item.deprecated" path="/api/mollie/ship/item" methods="GET">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\Order\ShippingControllerBase::shipItemOperationalDeprecated</default>
-        <default key="_routeScope">api</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
         <default key="auth_required"><bool>true</bool></default>
         <default key="auth_enabled"><bool>true</bool></default>
     </route>
 
     <route id="api.action.mollie.ship.order" path="/api/_action/mollie/ship" methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\Order\ShippingControllerBase::shipOrderAdmin</default>
-        <default key="_routeScope">api</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
         <default key="auth_required"><bool>true</bool></default>
         <default key="auth_enabled"><bool>true</bool></default>
     </route>
 
     <route id="api.action.mollie.ship.order.legacy" path="/api/v{version}/_action/mollie/ship" methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\Order\ShippingControllerBase::shipOrderAdminLegacy</default>
-        <default key="_routeScope">api</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
         <default key="auth_required"><bool>true</bool></default>
         <default key="auth_enabled"><bool>true</bool></default>
     </route>
 
     <route id="api.action.mollie.ship.item" path="/api/_action/mollie/ship/item" methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\Order\ShippingControllerBase::shipItemAdmin</default>
-        <default key="_routeScope">api</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
         <default key="auth_required"><bool>true</bool></default>
         <default key="auth_enabled"><bool>true</bool></default>
     </route>
 
     <route id="api.action.mollie.ship.item.legacy" path="/api/v{version}/_action/mollie/ship/item" methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\Order\ShippingControllerBase::shipItemAdminLegacy</default>
-        <default key="_routeScope">api</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
         <default key="auth_required"><bool>true</bool></default>
         <default key="auth_enabled"><bool>true</bool></default>
     </route>

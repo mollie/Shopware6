@@ -331,9 +331,17 @@ class RefundDataBuilder
 
             $meta = $refund['metadata'];
 
+            // refund initiated within mollie dashboard, so no metadata is set
+            if ($meta instanceof \stdClass) {
+                continue;
+            }
+
             if (is_string($meta)) {
+                /** @var \stdClass $meta */
                 $meta = json_decode($meta, true);
             }
+
+
 
             $metadata = RefundMetadata::fromArray($meta);
 

@@ -31,6 +31,7 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
+use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Twig\Environment;
 use Twig\Extension\CoreExtension;
@@ -136,10 +137,11 @@ class MolliePaymentDoPay
      * @param AsyncPaymentTransactionStruct $transactionStruct
      * @param SalesChannelContext $salesChannelContext
      * @param PaymentHandler $paymentHandler
+     * @param RequestDataBag $dataBag
      * @throws ApiException
      * @return MolliePaymentPrepareData
      */
-    public function startMolliePayment(string $paymentMethod, AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext, PaymentHandler $paymentHandler): MolliePaymentPrepareData
+    public function startMolliePayment(string $paymentMethod, AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext, PaymentHandler $paymentHandler, RequestDataBag $dataBag): MolliePaymentPrepareData
     {
         $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannelId());
 
@@ -171,6 +173,16 @@ class MolliePaymentDoPay
         # we are working on in this case. this is empty for first orders
         # but filled if we do another payment attempt for an existing order.
         $mollieOrderId = $orderCustomFields->getMollieOrderId();
+
+
+        $bancomatPayPhoneNumber = $dataBag->get('mollieBancomatPayPhone');
+
+        if ($bancomatPayPhoneNumber !== null) {
+            ## we need to pass the custom fields now, so we can use them in create order and display the number on failed orders
+            $orderCustomFields->setBancomatPayPhoneNumber($bancomatPayPhoneNumber);
+            $order->setCustomFields($orderCustomFields->toArray());
+            $this->updaterOrderCustomFields->updateOrder($order->getId(), $orderCustomFields, $salesChannelContext->getContext());
+        }
 
 
         # now let's check if we have another payment attempt for an existing order.
@@ -212,6 +224,7 @@ class MolliePaymentDoPay
         # We just try to create the customer before we create the actual order.
         $this->createCustomerAtMollie($order, $salesChannelContext);
 
+
         # let's create our real Mollie order
         # for this payment in Shopware.
         $molliePaymentData = $this->createMollieOrder($order, $paymentMethod, $transactionStruct, $salesChannelContext, $paymentHandler);
@@ -232,6 +245,7 @@ class MolliePaymentDoPay
         if (!empty($subscriptionId)) {
             $orderCustomFields->setSubscriptionData($subscriptionId, '');
         }
+
 
         /**
          * @var OrderLineItemCollection $orderLineItems

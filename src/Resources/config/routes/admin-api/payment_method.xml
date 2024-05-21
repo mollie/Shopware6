@@ -6,14 +6,14 @@
 
     <route id="api.mollie.payment-method.update-methods" path="/api/_action/mollie/payment-method/update-methods" methods="GET">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\PaymentMethod\PaymentMethodControllerBase::updatePaymentMethods</default>
-        <default key="_routeScope">api</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
         <default key="auth_required"><bool>true</bool></default>
         <default key="auth_enabled"><bool>true</bool></default>
     </route>
 
     <route id="api.mollie.payment-method.update-methods.legacy" path="/api/v{version}/_action/mollie/payment-method/update-methods" methods="GET">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\PaymentMethod\PaymentMethodControllerBase::updatePaymentMethodsLegacy</default>
-        <default key="_routeScope">api</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
         <default key="auth_required"><bool>true</bool></default>
         <default key="auth_enabled"><bool>true</bool></default>
     </route>
