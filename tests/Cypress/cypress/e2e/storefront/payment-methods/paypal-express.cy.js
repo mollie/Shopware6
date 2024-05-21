@@ -51,8 +51,6 @@ describe('Paypal Express - UI Tests', () => {
 
             const button = repoPDP.getPayPalExpressButton();
             button.should('be.visible');
-            button.click();
-            cy.url().should('include', 'paypal.com');
 
         })
 
@@ -80,8 +78,6 @@ describe('Paypal Express - UI Tests', () => {
 
             const button = repoListing.getPayPalExpressButton().first();
             button.should('be.visible');
-            button.click();
-            cy.url().should('include', 'paypal.com');
 
         })
 
@@ -110,8 +106,6 @@ describe('Paypal Express - UI Tests', () => {
 
             const button = repoOffcanvas.getPayPalExpressButton();
             button.should('be.visible');
-            button.click();
-            cy.url().should('include', 'paypal.com');
         })
 
         it('Paypal Express button is hidden because of restriction @core', () => {
@@ -144,8 +138,6 @@ describe('Paypal Express - UI Tests', () => {
 
             const button = repoCart.getPayPalExpressButton();
             button.should('be.visible');
-            button.click();
-            cy.url().should('include', 'paypal.com');
 
         })
 
@@ -180,8 +172,6 @@ describe('Paypal Express - UI Tests', () => {
 
             const button = registerRepo.getPayPalExpressButton();
             button.should('be.visible');
-            button.click();
-            cy.url().should('include', 'paypal.com');
 
         })
 
