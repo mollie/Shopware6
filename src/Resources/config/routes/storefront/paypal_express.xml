@@ -6,14 +6,14 @@
 
     <route id="frontend.mollie.paypal-express.start" path="/mollie/paypal-express/start" methods="GET|POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Storefront\PaypalExpress\PaypalExpressControllerBase::startCheckout</default>
-        <default key="_routeScope">storefront</default>
+        <default key="_routeScope"><list><string>storefront</string></list></default>
         <default key="csrf_protected"><bool>true</bool></default>
         <option key="seo">false</option>
     </route>
 
     <route id="frontend.mollie.paypal-express.finish" path="/mollie/paypal-express/finish" methods="GET">
         <default key="_controller">Kiener\MolliePayments\Controller\Storefront\PaypalExpress\PaypalExpressControllerBase::finishCheckout</default>
-        <default key="_routeScope">storefront</default>
+        <default key="_routeScope"><list><string>storefront</string></list></default>
         <default key="csrf_protected"><bool>true</bool></default>
         <option key="seo">false</option>
     </route>
