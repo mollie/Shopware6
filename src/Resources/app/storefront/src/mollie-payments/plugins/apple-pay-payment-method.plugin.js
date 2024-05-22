@@ -1,6 +1,7 @@
 import HttpClient from '../services/HttpClient';
+import Plugin from "../Plugin";
 
-export default class MollieApplePayPaymentMethod extends window.PluginBaseClass {
+export default class MollieApplePayPaymentMethod extends Plugin {
 
     /**
      *

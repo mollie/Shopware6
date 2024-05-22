@@ -1,9 +1,10 @@
 import HttpClient from '../services/HttpClient';
+import Plugin from "../Plugin";
 
 /**
  * This plugin manage the credit card mandate of the customer
  */
-export default class MollieCreditCardMandate extends window.PluginBaseClass {
+export default class MollieCreditCardMandate extends Plugin {
     static options = {
         newCardMandateOption: null,
         mollieCreditCardFormClass: '.mollie-components-credit-card',

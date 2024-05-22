@@ -1,4 +1,6 @@
-export default class MollieBancomatPlugin extends window.PluginBaseClass {
+import Plugin from "../Plugin";
+
+export default class MollieBancomatPlugin extends Plugin {
 
     init() {
 

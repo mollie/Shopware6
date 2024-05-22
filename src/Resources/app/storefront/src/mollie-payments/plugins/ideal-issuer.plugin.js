@@ -1,7 +1,8 @@
 import HttpClient from '../services/HttpClient'
+import Plugin from "../Plugin";
 
 
-export default class MollieIDealIssuer extends window.PluginBaseClass {
+export default class MollieIDealIssuer extends Plugin {
 
     _shopUrl = '';
     _customerId = '';
