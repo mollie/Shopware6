@@ -5,9 +5,6 @@ import MollieRegistration from './register';
 // if it's however necessary to use the built-in all.js, then this would
 // also work, as long as its built in the Shopware version that uses it.
 
-if (window.mollie_javascript_use_shopware !== undefined && window.mollie_javascript_use_shopware === '1') {
+const molliePlugins = new MollieRegistration();
 
-    const molliePlugins = new MollieRegistration();
-
-    molliePlugins.register();
-}
+molliePlugins.register();
