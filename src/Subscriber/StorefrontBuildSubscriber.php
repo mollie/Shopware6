@@ -27,7 +27,8 @@ class StorefrontBuildSubscriber implements EventSubscriberInterface
 
     /**
      * @param SettingsService $settingsService
-     * @param string $shopwareVersion
+     * @param StorefrontPluginRegistryInterface $pluginRegistry
+     * @param VersionCompare $versionCompare
      */
     public function __construct(SettingsService $settingsService, StorefrontPluginRegistryInterface $pluginRegistry, VersionCompare $versionCompare)
     {
