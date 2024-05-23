@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Subscriber;
 use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Kiener\MolliePayments\Service\SettingsService;
 use Shopware\Storefront\Event\StorefrontRenderEvent;
+use Shopware\Storefront\Theme\StorefrontPluginConfiguration\StorefrontPluginConfiguration;
 use Shopware\Storefront\Theme\StorefrontPluginRegistryInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -25,16 +26,16 @@ class StorefrontBuildSubscriber implements EventSubscriberInterface
      */
     private $versionCompare;
 
-
     /**
      * @param SettingsService $settingsService
-     * @param string $shopwareVersion
+     * @param StorefrontPluginRegistryInterface $pluginRegistry
+     * @param VersionCompare $versionCompare
      */
-    public function __construct(SettingsService $settingsService, StorefrontPluginRegistryInterface $pluginRegistry, string $shopwareVersion)
+    public function __construct(SettingsService $settingsService, StorefrontPluginRegistryInterface $pluginRegistry, VersionCompare $versionCompare)
     {
         $this->settingsService = $settingsService;
         $this->pluginRegistry = $pluginRegistry;
-        $this->versionCompare = new VersionCompare($shopwareVersion);
+        $this->versionCompare = $versionCompare;
     }
 
     /**
@@ -60,10 +61,20 @@ class StorefrontBuildSubscriber implements EventSubscriberInterface
         $event->setParameter('mollie_javascript_use_shopware', $useJsValue);
 
         $mollieJavascriptAlreadyExists = false;
+
         if ($this->versionCompare->gte('6.6')) {
-            $molliePayments = $this->pluginRegistry->getConfigurations()->getByTechnicalName('MolliePayments');
-            $mollieJavascriptAlreadyExists = $molliePayments && ($molliePayments->getScriptFiles()->count() > 0);
+            $plugin = $this->pluginRegistry->getConfigurations()->getByTechnicalName('MolliePayments');
+
+            if ($plugin instanceof StorefrontPluginConfiguration) {
+                $scriptFiles = $plugin->getScriptFiles();
+
+                if ($useJsValue === 0) {
+                    $scriptFiles->remove(0);
+                }
+                $mollieJavascriptAlreadyExists = $scriptFiles->count() > 0;
+            }
         }
+
         $event->setParameter('mollie_javascript_already_exists', $mollieJavascriptAlreadyExists);
     }
 }

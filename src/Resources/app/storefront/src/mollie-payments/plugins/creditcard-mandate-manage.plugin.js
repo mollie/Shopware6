@@ -1,5 +1,5 @@
-import Plugin from '@shopware-storefront-sdk/plugin-system/plugin.class';
 import HttpClient from '../services/HttpClient';
+import Plugin from "../Plugin";
 
 /**
  * This plugin manage the credit card mandate of customer

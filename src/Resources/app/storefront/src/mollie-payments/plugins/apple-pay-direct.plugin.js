@@ -1,5 +1,5 @@
-import Plugin from '@shopware-storefront-sdk/plugin-system/plugin.class';
 import HttpClient from '../services/HttpClient';
+import Plugin from "../Plugin";
 
 export default class MollieApplePayDirect extends Plugin {
 
