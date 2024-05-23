@@ -76,6 +76,5 @@ class StorefrontBuildSubscriber implements EventSubscriberInterface
         }
 
         $event->setParameter('mollie_javascript_already_exists', $mollieJavascriptAlreadyExists);
-        $event->setParameter('mollie_javascript_already_exists', false);
     }
 }
