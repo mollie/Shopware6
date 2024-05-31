@@ -63,16 +63,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.308.1",
+            "version": "3.308.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "bf5f1221d4c5c67d3213150fb91dfb5ce627227b"
+                "reference": "d119265faba226b3fab1514b6fa27a2986b91453"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/bf5f1221d4c5c67d3213150fb91dfb5ce627227b",
-                "reference": "bf5f1221d4c5c67d3213150fb91dfb5ce627227b",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/d119265faba226b3fab1514b6fa27a2986b91453",
+                "reference": "d119265faba226b3fab1514b6fa27a2986b91453",
                 "shasum": ""
             },
             "require": {
@@ -152,9 +152,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.308.1"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.308.6"
             },
-            "time": "2024-05-22T18:05:56+00:00"
+            "time": "2024-05-30T18:08:56+00:00"
         },
         {
             "name": "boxblinkracer/phpunuhi",
@@ -162,12 +162,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/boxblinkracer/phpunuhi.git",
-                "reference": "6cf63848137db6f3e992e224a6ad20a2a6132e2f"
+                "reference": "85899a406d6844a9cd99822b227a10200fa24846"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/boxblinkracer/phpunuhi/zipball/6cf63848137db6f3e992e224a6ad20a2a6132e2f",
-                "reference": "6cf63848137db6f3e992e224a6ad20a2a6132e2f",
+                "url": "https://api.github.com/repos/boxblinkracer/phpunuhi/zipball/85899a406d6844a9cd99822b227a10200fa24846",
+                "reference": "85899a406d6844a9cd99822b227a10200fa24846",
                 "shasum": ""
             },
             "require": {
@@ -226,9 +226,9 @@
             ],
             "support": {
                 "issues": "https://github.com/boxblinkracer/phpunuhi/issues",
-                "source": "https://github.com/boxblinkracer/phpunuhi/tree/v1.20.0"
+                "source": "https://github.com/boxblinkracer/phpunuhi/tree/main"
             },
-            "time": "2024-05-18T07:25:41+00:00"
+            "time": "2024-05-31T05:49:41+00:00"
         },
         {
             "name": "brick/math",
@@ -5340,16 +5340,16 @@
         },
         {
             "name": "orhanerday/open-ai",
-            "version": "5.1",
+            "version": "5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/orhanerday/open-ai.git",
-                "reference": "386c7f65a50cbfb0fbdbebcd72f7e6c7a6039c84"
+                "reference": "d8c78fe2f5fed59e0ba458f90b5589ed9f13a367"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/orhanerday/open-ai/zipball/386c7f65a50cbfb0fbdbebcd72f7e6c7a6039c84",
-                "reference": "386c7f65a50cbfb0fbdbebcd72f7e6c7a6039c84",
+                "url": "https://api.github.com/repos/orhanerday/open-ai/zipball/d8c78fe2f5fed59e0ba458f90b5589ed9f13a367",
+                "reference": "d8c78fe2f5fed59e0ba458f90b5589ed9f13a367",
                 "shasum": ""
             },
             "require": {
@@ -5387,7 +5387,7 @@
             ],
             "support": {
                 "issues": "https://github.com/orhanerday/open-ai/issues",
-                "source": "https://github.com/orhanerday/open-ai/tree/5.1"
+                "source": "https://github.com/orhanerday/open-ai/tree/5.2"
             },
             "funding": [
                 {
@@ -5395,7 +5395,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-01-25T06:43:19+00:00"
+            "time": "2024-05-29T12:31:54+00:00"
         },
         {
             "name": "padaliyajay/php-autoprefixer",
