@@ -88,6 +88,7 @@ class CartService implements CartServiceInterface
         $this->swCartService->setCart($cart);
     }
 
+
     /**
      * @param Cart $cart
      * @return float
@@ -157,5 +158,10 @@ class CartService implements CartServiceInterface
         $scID = $this->compatibilityGateway->getSalesChannelID($context);
 
         return $this->compatibilityGateway->getSalesChannelContext($scID, $context->getToken());
+    }
+
+    public function persistCart(Cart $cart, SalesChannelContext $context):Cart
+    {
+        return $this->swCartService->recalculate($cart, $context);
     }
 }

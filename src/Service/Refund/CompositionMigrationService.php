@@ -8,6 +8,7 @@ use Kiener\MolliePayments\Components\RefundManager\DAL\Refund\RefundCollection;
 use Kiener\MolliePayments\Components\RefundManager\DAL\Refund\RefundEntity;
 use Kiener\MolliePayments\Components\RefundManager\DAL\RefundItem\RefundItemCollection;
 use Kiener\MolliePayments\Components\RefundManager\DAL\RefundItem\RefundItemEntity;
+use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Service\MollieApi\Fixer\RoundingDifferenceFixer;
 use Mollie\Api\Resources\Refund;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
@@ -159,10 +160,10 @@ class CompositionMigrationService implements CompositionMigrationServiceInterfac
             if ($customFields === null) {
                 continue;
             }
-            if (!isset($customFields['mollie_payments']['order_line_id'])) {
+            if (!isset($customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_LINE_KEY])) {
                 continue;
             }
-            if ($customFields['mollie_payments']['order_line_id'] === $mollieLineId) {
+            if ($customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_LINE_KEY] === $mollieLineId) {
                 $foundItem = $lineItem;
                 break;
             }

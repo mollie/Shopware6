@@ -244,6 +244,21 @@ class MollieSettingStruct extends Struct
     protected $useShopwareJavascript = false;
 
     /**
+     * @var int
+     */
+    protected $paypalExpressButtonStyle = 1;
+
+    /**
+     * @var int
+     */
+    protected $paypalExpressButtonShape = 1;
+
+    /**
+     * @var array<mixed>
+     */
+    protected $paypalExpressRestrictions = [];
+
+    /**
      * @return string
      */
     public function getLiveApiKey(): string
@@ -949,5 +964,42 @@ class MollieSettingStruct extends Struct
     public function setUseShopwareJavascript(bool $useShopwareJavascript): void
     {
         $this->useShopwareJavascript = $useShopwareJavascript;
+    }
+
+    public function getPaypalExpressButtonStyle(): int
+    {
+        return $this->paypalExpressButtonStyle;
+    }
+
+    public function setPaypalExpressButtonStyle(int $paypalExpressButtonStyle): void
+    {
+        $this->paypalExpressButtonStyle = $paypalExpressButtonStyle;
+    }
+
+    public function getPaypalExpressButtonShape(): int
+    {
+        return $this->paypalExpressButtonShape;
+    }
+
+    public function setPaypalExpressButtonShape(int $paypalExpressButtonShape): void
+    {
+        $this->paypalExpressButtonShape = $paypalExpressButtonShape;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getPaypalExpressRestrictions(): array
+    {
+        return $this->paypalExpressRestrictions;
+    }
+
+    /**
+     * @param array<string> $paypalExpressRestrictions
+     * @return void
+     */
+    public function setPaypalExpressRestrictions(array $paypalExpressRestrictions): void
+    {
+        $this->paypalExpressRestrictions = $paypalExpressRestrictions;
     }
 }

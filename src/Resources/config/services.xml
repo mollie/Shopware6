@@ -62,6 +62,7 @@
         <service id="Kiener\MolliePayments\Service\CustomerService" class="Kiener\MolliePayments\Service\CustomerService">
             <argument type="service" id="Kiener\MolliePayments\Repository\Country\CountryRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Repository\Customer\CustomerRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\CustomerAddress\CustomerAddressRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Customer"/>
             <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="mollie_payments.logger"/>
@@ -210,6 +211,10 @@
 
         <service id="Kiener\MolliePayments\Compatibility\VersionCompare">
             <argument>%kernel.shopware_version%</argument>
+        </service>
+
+        <service id="Kiener\MolliePayments\Subscriber\CartConvertedSubscriber">
+            <tag name="kernel.event_subscriber"/>
         </service>
 
 

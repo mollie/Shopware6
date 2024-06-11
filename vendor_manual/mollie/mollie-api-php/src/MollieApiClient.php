@@ -30,6 +30,7 @@ use Mollie\Api\Endpoints\PermissionEndpoint;
 use Mollie\Api\Endpoints\ProfileEndpoint;
 use Mollie\Api\Endpoints\ProfileMethodEndpoint;
 use Mollie\Api\Endpoints\RefundEndpoint;
+use Mollie\Api\Endpoints\SessionEndpoint;
 use Mollie\Api\Endpoints\SettlementCaptureEndpoint;
 use Mollie\Api\Endpoints\SettlementChargebackEndpoint;
 use Mollie\Api\Endpoints\SettlementPaymentEndpoint;
@@ -50,7 +51,7 @@ class MollieApiClient
     /**
      * Version of our client.
      */
-    public const CLIENT_VERSION = "2.65.0";
+    public const CLIENT_VERSION = "2.62.0";
 
     /**
      * Endpoint of the remote API.
@@ -364,6 +365,13 @@ class MollieApiClient
     public $clientLinks;
 
     /**
+     * RESTful Session resource.
+     *
+     * @var SessionEndpoint
+     */
+    public $sessions;
+
+    /**
      * @param \GuzzleHttp\ClientInterface|\Mollie\Api\HttpAdapter\MollieHttpAdapterInterface|null $httpClient
      * @param \Mollie\Api\HttpAdapter\MollieHttpAdapterPickerInterface|null $httpAdapterPicker,
      * @param \Mollie\Api\Idempotency\IdempotencyKeyGeneratorContract $idempotencyKeyGenerator,
@@ -421,6 +429,7 @@ class MollieApiClient
         $this->organizationPartners = new OrganizationPartnerEndpoint($this);
         $this->clients = new ClientEndpoint($this);
         $this->clientLinks = new ClientLinkEndpoint($this);
+        $this->sessions = new SessionEndpoint($this);
     }
 
     protected function initializeVersionStrings()

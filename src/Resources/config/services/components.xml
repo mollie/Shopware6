@@ -41,6 +41,15 @@
             <argument type="service" id="Kiener\MolliePayments\Repository\Order\OrderAddressRepository"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Components\PaypalExpress\PayPalExpress" public="true">
+           <argument type="service" id="Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepository"/>
+           <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
+           <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder"/>
+           <argument type="service" id="Kiener\MolliePayments\Service\Router\RoutingBuilder"/>
+           <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\CartService"/>
+        </service>
+
         <service id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingBuilder">
             <argument type="service" id="Kiener\MolliePayments\Service\CartService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\ShippingMethodService"/>

@@ -22,6 +22,7 @@ use Kiener\MolliePayments\Handler\Method\KlarnaPayLaterPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaPayNowPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaSliceItPayment;
 use Kiener\MolliePayments\Handler\Method\MyBankPayment;
+use Kiener\MolliePayments\Handler\Method\PayPalExpressPayment;
 use Kiener\MolliePayments\Handler\Method\PayPalPayment;
 use Kiener\MolliePayments\Handler\Method\PaySafeCardPayment;
 use Kiener\MolliePayments\Handler\Method\PosPayment;
@@ -126,6 +127,7 @@ class PaymentMethodServiceTest extends TestCase
             KlarnaSliceItPayment::class,
             KlarnaOnePayment::class,
             PayPalPayment::class,
+            PayPalExpressPayment::class,
             PaySafeCardPayment::class,
             Przelewy24Payment::class,
             SofortPayment::class,

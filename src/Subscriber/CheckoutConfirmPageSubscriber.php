@@ -7,7 +7,7 @@ use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
 use Kiener\MolliePayments\Service\CustomerService;
-use Kiener\MolliePayments\Service\CustomFieldService;
+use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Service\MandateServiceInterface;
 use Kiener\MolliePayments\Service\SalesChannel\SalesChannelLocale;
 use Kiener\MolliePayments\Service\SettingsService;
@@ -238,10 +238,10 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
         // Get the preferred issuer from the custom fields
         if (
             is_array($customFields)
-            && isset($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER])
-            && (string)$customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER] !== ''
+            && isset($customFields[CustomFieldsInterface::MOLLIE_KEY][CustomerService::CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER])
+            && (string)$customFields[CustomFieldsInterface::MOLLIE_KEY][CustomerService::CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER] !== ''
         ) {
-            $preferredIssuer = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS][CustomerService::CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER];
+            $preferredIssuer = $customFields[CustomFieldsInterface::MOLLIE_KEY][CustomerService::CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER];
         }
 
 

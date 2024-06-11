@@ -33,7 +33,7 @@ class UpdateOrderTransactionCustomFields
         $data = [
             'id' => $shopwareOrderTransactionId,
             'customFields' => [
-                'mollie_payments' => $struct->toArray(),
+                CustomFieldsInterface::MOLLIE_KEY => $struct->toArray(),
             ]
         ];
 

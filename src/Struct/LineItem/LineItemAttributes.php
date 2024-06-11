@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Struct\LineItem;
 
+use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Content\Product\ProductEntity;
 
@@ -233,9 +234,9 @@ class LineItemAttributes
                 # and load, but we migrate to the new one
                 # check if we have customFields
                 if ($foundValue === '') {
-                    if ($customFields !== null && array_key_exists('mollie_payments', $customFields)) {
+                    if ($customFields !== null && array_key_exists(CustomFieldsInterface::MOLLIE_KEY, $customFields)) {
                         # load the mollie entry
-                        $mollieData = $customFields['mollie_payments'];
+                        $mollieData = $customFields[CustomFieldsInterface::MOLLIE_KEY];
                         # assign our value if we have it
                         $foundValue = (array_key_exists($keyName, $mollieData)) ? (string)$mollieData[$keyName] : '';
                     }
