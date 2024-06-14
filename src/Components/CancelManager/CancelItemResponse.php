@@ -8,9 +8,12 @@ namespace Kiener\MolliePayments\Components\CancelManager;
  */
 class CancelItemResponse implements \JsonSerializable
 {
-    private $message;
-    private $success = true;
+    private string $message;
+    private bool $success = true;
 
+    /**
+     * @var array<mixed>
+     */
     private array $data = [];
 
     public function isSuccessful(): bool
@@ -19,14 +22,17 @@ class CancelItemResponse implements \JsonSerializable
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getMessage()
+    public function getMessage(): string
     {
         return $this->message;
     }
 
 
+    /**
+     * @return false|string
+     */
     public function jsonSerialize(): mixed
     {
         return json_encode(['success' => $this->success, 'message' => $this->message]);
@@ -40,6 +46,10 @@ class CancelItemResponse implements \JsonSerializable
         return $clone;
     }
 
+    /**
+     * @param array<mixed> $data
+     * @return $this
+     */
     public function withData(array $data): self
     {
         $clone = clone $this;
@@ -47,9 +57,11 @@ class CancelItemResponse implements \JsonSerializable
         return $clone;
     }
 
-    public function getData():array
+    /**
+     * @return array<mixed>
+     */
+    public function getData(): array
     {
         return $this->data;
     }
-
 }

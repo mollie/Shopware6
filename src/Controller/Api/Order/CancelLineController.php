@@ -15,13 +15,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CancelLineController extends AbstractController
 {
-
     private MollieApiFactory $clientFactory;
     private CancelItemFacade $cancelItemFacade;
 
     public function __construct(MollieApiFactory $clientFactory, CancelItemFacade $cancelItemFacade)
     {
-
         $this->clientFactory = $clientFactory;
         $this->cancelItemFacade = $cancelItemFacade;
     }

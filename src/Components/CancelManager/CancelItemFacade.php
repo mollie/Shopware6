@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Components\CancelManager;
 
 use Kiener\MolliePayments\Factory\MollieApiFactory;
+use Mollie\Api\MollieApiClient;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -11,11 +12,10 @@ use Psr\Log\LoggerInterface;
  */
 class CancelItemFacade
 {
-    /** @var \Mollie\Api\MollieApiClient */
-    private $client;
+    private MollieApiClient $client;
 
-    /** @var LoggerInterface */
-    private $logger;
+
+    private LoggerInterface $logger;
 
     public function __construct(MollieApiFactory $clientFactory, LoggerInterface $logger)
     {
@@ -57,12 +57,10 @@ class CancelItemFacade
             $this->logger->info('Item cancelled successful', ['orderId' => $orderId, 'mollieLineId' => $mollieLineId, 'quantity' => $quantity]);
 
             $response = $response->withData($lines);
-
         } catch (\Throwable $e) {
             $response = $response->failedWithMessage($e->getMessage());
         }
 
         return $response;
     }
-
 }
