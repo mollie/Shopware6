@@ -1,5 +1,6 @@
 import template from './mollie-cancel-item.html.twig';
 
+// eslint-disable-next-line no-undef
 const {Component, Mixin} = Shopware;
 
 Component.register('mollie-cancel-item', {

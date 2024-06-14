@@ -286,7 +286,7 @@
         "title": "Product in Mollie afkorting",
         "confirmButton": "Product in Mollie afkorting",
         "cancelButton": "Annuleren",
-        "updateShopwareItem": "Voorraad resetten",
+        "resetStock": "Voorraad resetten",
         "item": {
           "success": "Product geannuleerd",
           "failed": {
@@ -436,6 +436,7 @@
       "buttonMolliePaymentLink": "Kopieer naar Klembord",
       "columnRefunded": "Terugbetaald",
       "columnShipped": "Verzonden",
+      "columnCanceled": "Geannuleerd",
       "labelMollieOrderId": "Mollie Order ID",
       "labelMollieThirdPartyPaymentId": "Betalingskenmerk",
       "labelMolliePaymentLink": "Mollie Checkout URL",
