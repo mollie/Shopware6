@@ -37,7 +37,8 @@
       "descriptionTextModule": "Mollie Payments Zahlungen",
       "btnMollieActions": "Mollie Aktionen",
       "refundThroughMollie": "Rückerstattung über Mollie",
-      "shipThroughMollie": "Versand melden"
+      "shipThroughMollie": "Versand melden",
+      "cancelMollieItem": "Abbrechen bei Mollie"
     },
     "config": {
       "info": {
@@ -280,6 +281,12 @@
         "cancelButton": "Abbrechen",
         "selectAllButton": "Alle auswählen",
         "resetButton": "Zurücksetzen"
+      },
+      "cancel": {
+        "title": "Produkt in Mollie abbrechen",
+        "confirmButton": "Produkt in Mollie abbrechen",
+        "cancelButton": "Schließen",
+        "resetStock": "Bestand zurücksetzen"
       }
     },
     "sw-flow": {
@@ -420,6 +427,7 @@
       "buttonMolliePaymentLink": "In die Zwischenablage kopieren",
       "columnRefunded": "Rückerstattet",
       "columnShipped": "Versandt",
+      "columnCanceled": "Abgebrochen",
       "labelMollieOrderId": "Mollie Bestell ID",
       "labelMollieThirdPartyPaymentId": "Zahlungsreferenz",
       "labelMolliePaymentLink": "Mollie Checkout URL",

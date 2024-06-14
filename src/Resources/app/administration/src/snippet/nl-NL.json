@@ -37,7 +37,8 @@
       "descriptionTextModule": "Mollie betalingen",
       "btnMollieActions": "Mollie acties",
       "refundThroughMollie": "Terugbetaling via Mollie",
-      "shipThroughMollie": "Verzending door Mollie"
+      "shipThroughMollie": "Verzending door Mollie",
+      "cancelMollieItem": "Opzeggen bij Mollie"
     },
     "config": {
       "info": {
@@ -280,6 +281,12 @@
         "cancelButton": "Annuleren",
         "selectAllButton": "Selecteer alles",
         "resetButton": "Resetten"
+      },
+      "cancel": {
+        "title": "Product in Mollie afkorting",
+        "confirmButton": "Product in Mollie afkorting",
+        "cancelButton": "Annuleren",
+        "updateShopwareItem": "Voorraad resetten"
       }
     },
 
