@@ -5,9 +5,11 @@ import MolliePaymentsRefundService from '../core/service/api/mollie-payments-ref
 import MolliePaymentsShippingService from '../core/service/api/mollie-payments-shipping.service';
 import MolliePaymentsSupportService from '../core/service/api/mollie-payments-support.service';
 import MolliePaymentsSubscriptionService from '../core/service/api/mollie-subscription.service';
+import MolliePaymentsItemCancelService from "../core/service/api/mollie-payments-item-cancel.service";
 
 import '../module/mollie-payments/rules/mollie-lineitem-subscription-rule';
 import '../module/mollie-payments/rules/mollie-cart-subscription-rule';
+
 
 
 // eslint-disable-next-line no-undef
@@ -57,6 +59,12 @@ Application.addServiceProvider('MolliePaymentsSubscriptionService', (container) 
     const initContainer = Application.getContainer('init');
 
     return new MolliePaymentsSubscriptionService(initContainer.httpClient, container.loginService);
+});
+
+Application.addServiceProvider('MolliePaymentsItemCancelService', (container) => {
+    const initContainer = Application.getContainer('init');
+
+    return new MolliePaymentsItemCancelService(initContainer.httpClient, container.loginService);
 });
 
 

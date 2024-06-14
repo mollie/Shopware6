@@ -15,6 +15,7 @@ import './components/mollie-refund-manager';
 import './components/mollie-external-link';
 import './components/mollie-internal-link';
 import './components/mollie-ship-order';
+import './components/mollie-cancel-item';
 import './page/mollie-subscriptions-list';
 import './page/mollie-subscriptions-detail';
 
