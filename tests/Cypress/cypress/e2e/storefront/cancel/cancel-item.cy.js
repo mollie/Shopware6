@@ -42,24 +42,24 @@ context("Cancel Authorized items", () => {
     });
 
     context(devices.getDescription(device), () => {
-        it ('Cancel items from order', () => {
+        it('Cancel items from order', () => {
             createOrderAndOpenAdmin('Pay now');
 
 
             orderDetailsRepository.getLineItemActionsButton(1).should('be.visible').click({force: true});
 
             orderDetailsRepository.getLineItemActionsButtonCancelThroughMollie().should('not.have.class', 'is--disabled');
-            orderDetailsRepository.getLineItemActionsButtonCancelThroughMollie().click({force:true});
+            orderDetailsRepository.getLineItemActionsButtonCancelThroughMollie().click({force: true});
             cancelItemRepository.getQuantityInput().type(2);
             cancelItemRepository.getItemLabel().should('not.be.empty');
-            cancelItemRepository.getConfirmButton().click({force:true});
-            orderDetailsRepository.getLineItemCancelled().should('contain.text',2);
+            cancelItemRepository.getConfirmButton().click({force: true});
+            orderDetailsRepository.getLineItemCancelled().should('contain.text', 2);
             orderDetailsRepository.getLineItemActionsButton(1).click({force: true});
             orderDetailsRepository.getLineItemActionsButtonCancelThroughMollie().should('have.class', 'is--disabled');
 
-        }) ;
+        });
 
-        it('Check cancel button on non authorized order',() =>{
+        it('Check cancel button on non authorized order', () => {
             createOrderAndOpenAdmin('PayPal');
 
 
@@ -79,7 +79,13 @@ function createOrderAndOpenAdmin(paymentMethod) {
     checkout.placeOrderOnConfirm();
 
     mollieSandbox.initSandboxCookie();
-    molliePayment.selectAuthorized();
+    
+    if (paymentMethod === 'PayPal') {
+        molliePayment.selectPaid();
+    } else {
+        molliePayment.selectAuthorized();
+    }
+
 
     adminLogin.login();
     adminOrders.openOrders();
