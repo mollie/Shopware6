@@ -4,12 +4,20 @@
         variant="small">
 
     <sw-container columns="30% 1fr" gap="16px">
-        <div>
-            <sw-number-field v-model="canceled" v-model:value="canceled" numberType="int" :step="1" :min="1"
-                             :max="item.cancelableQuantity" :value="1">
+        <div class="cy-cancel-item-quantity">
+            <sw-number-field
+                    v-model:value="canceledQuantity"
+                    v-model="canceledQuantity"
+                    numberType="int"
+
+                    :value="canceledQuantity"
+                    :step="1"
+                    :min="1"
+                    :max="item.cancelableQuantity"
+            >
             </sw-number-field>
         </div>
-        <div>
+        <div class="cy-cancel-item-label">
             <div v-if="item.payload && item.payload.options"
                  class="sw-order-line-items-grid__item-payload-options">
                 <sw-product-variant-info :variations="item.payload.options">
@@ -30,6 +38,7 @@
     <sw-switch-field v-model:value="resetStock" v-model="resetStock"
                      :label="$tc('mollie-payments.modals.cancel.resetStock')"
                      :noMarginTop="true"
+                     class="cy-cancel-item-stock"
                      size="small">
     </sw-switch-field>
     <template #modal-footer>
@@ -38,7 +47,7 @@
         </sw-button>
         <sw-button variant="primary"
                    size="small"
-                   class="btn-cancel-item"
+                   class="btn-cancel-item cy-cancel-item-confirm"
                    @click="submit"
         >
             {{ $tc('mollie-payments.modals.cancel.confirmButton') }}

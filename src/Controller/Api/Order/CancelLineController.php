@@ -59,7 +59,7 @@ class CancelLineController extends AbstractController
     {
         $orderId = $request->get('mollieOrderId');
         $mollieLineId = $request->get('mollieLineId');
-        $quantity = $request->get('quantityCanceled');
+        $quantity = $request->get('canceledQuantity');
         $resetStock = $request->get('resetStock', false);
 
         $result = $this->cancelItemFacade->cancelItem($orderId, $mollieLineId, $quantity, $resetStock);

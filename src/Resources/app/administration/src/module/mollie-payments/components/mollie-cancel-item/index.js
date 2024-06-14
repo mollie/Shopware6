@@ -13,7 +13,7 @@ Component.register('mollie-cancel-item', {
     data() {
         return {
             cancelableQuantity: 0,
-            canceled: 0,
+            canceledQuantity: 1,
             resetStock: false,
             isLoading: false,
         };
@@ -34,10 +34,11 @@ Component.register('mollie-cancel-item', {
                 mollieOrderId: this.item.mollieOrderId,
                 mollieLineId: this.item.mollieId,
                 shopwareItemId: this.item.shopwareItemId,
-                quantityCanceled: this.canceled,
+                canceledQuantity: this.canceledQuantity,
                 resetStock: this.resetStock,
             }).then((response) => {
                 this.isLoading = false;
+
                 if(response.success){
                     this.createNotificationSuccess({
                         message: this.$tc('mollie-payments.modals.cancel.item.success'),
@@ -47,7 +48,7 @@ Component.register('mollie-cancel-item', {
                         message: this.$tc('mollie-payments.modals.cancel.item.failed.'+response.message),
                     });
                 }
-
+                this.$emit('update-cancel-status');
                 this.$emit('close');
             }).catch(error => {
                 this.isLoading = false;

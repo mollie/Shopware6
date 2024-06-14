@@ -25,8 +25,9 @@ export default class MolliePaymentsItemCancelService extends ApiService {
     cancel(data = {
         mollieOrderId: null,
         mollieLineId: null,
-        amountCanceled: 0,
+        canceledQuantity: 0,
         resetStock: false,
+        shopwareItemId: null,
     }) {
         return this.__post('/cancel', data);
     }

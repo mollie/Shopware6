@@ -8,7 +8,7 @@ namespace Kiener\MolliePayments\Components\CancelManager;
  */
 class CancelItemResponse
 {
-    private string $message;
+    private string $message = '';
     private bool $success = true;
 
     /**
