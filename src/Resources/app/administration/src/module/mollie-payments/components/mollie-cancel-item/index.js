@@ -1,4 +1,4 @@
-import template from "./mollie-cancel-item.html.twig";
+import template from './mollie-cancel-item.html.twig';
 
 const {Component, Mixin} = Shopware;
 
@@ -38,9 +38,16 @@ Component.register('mollie-cancel-item', {
                 resetStock: this.resetStock,
             }).then((response) => {
                 this.isLoading = false;
-                this.createNotificationSuccess({
-                    message: this.$tc('mollie-payments.modals.shipping.item.success'),
-                });
+                if(response.success){
+                    this.createNotificationSuccess({
+                        message: this.$tc('mollie-payments.modals.cancel.item.success'),
+                    });
+                }else{
+                    this.createNotificationError({
+                        message: this.$tc('mollie-payments.modals.cancel.item.failed.'+response.message),
+                    });
+                }
+
                 this.$emit('close');
             }).catch(error => {
                 this.isLoading = false;

@@ -32,7 +32,7 @@ class CancelItemFacade
 
             if ($quantity === 0) {
                 $this->logger->error('Cancelling item failed, quantity is 0', $logArguments);
-                return $response->failedWithMessage('Quantity is empty');
+                return $response->failedWithMessage('quantityZero');
             }
 
             $mollieOrder = $this->client->orders->get($orderId);
@@ -41,11 +41,13 @@ class CancelItemFacade
 
             if ($orderLine === null) {
                 $this->logger->error('Cancelling item failed, lineItem does not exists in order', $logArguments);
-                return $response->failedWithMessage(sprintf('Line ID %s does not exists in order %s', $mollieLineId, $orderId));
+                return $response->failedWithMessage('invalidLine');
             }
             if ($quantity > $orderLine->cancelableQuantity) {
+                $logArguments['cancelableQuantity'] = $orderLine->cancelableQuantity;
+
                 $this->logger->error('Cancelling item failed, cancelableQuantity is too high', $logArguments);
-                return $response->failedWithMessage(sprintf('Quantity too high, you can cancel up to %d items', $orderLine->cancelableQuantity));
+                return $response->failedWithMessage('quantityTooHigh');
             }
 
             $lines = [

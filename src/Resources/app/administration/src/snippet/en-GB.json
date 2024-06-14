@@ -286,7 +286,15 @@
         "title": "Cancel item at mollie",
         "confirmButton": "Cancel item at mollie",
         "cancelButton": "Close modal",
-        "resetStock": "Reset stocks"
+        "resetStock": "Reset stocks",
+        "item": {
+          "success": "Product canceled successfully",
+          "failed": {
+            "quantityZero": "Quantity is 0",
+            "invalidLine": "Product does not exist in the order",
+            "quantityTooHigh": "Quantity is too high"
+          }
+        }
       }
     },
     "sw-flow": {

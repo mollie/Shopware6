@@ -30,7 +30,7 @@ class CancelItemFacadeTest extends TestCase
         $response = $cancelManager->cancelItem('test', 'test', 0, false);
 
         $this->assertFalse($response->isSuccessful());
-        $this->assertStringContainsString('Quantity is empty', $response->getMessage());
+        $this->assertSame('quantityZero', $response->getMessage());
     }
 
     public function testLineItemNotExistsInOrder(): void
@@ -41,7 +41,7 @@ class CancelItemFacadeTest extends TestCase
         $response = $cancelManager->cancelItem('test', 'invalid', 1, false);
 
         $this->assertFalse($response->isSuccessful());
-        $this->assertStringContainsString('not exists in order', $response->getMessage());
+        $this->assertSame('invalidLine', $response->getMessage());
     }
 
     public function testQuantityTooHigh(): void
@@ -52,7 +52,7 @@ class CancelItemFacadeTest extends TestCase
         $response = $cancelManager->cancelItem('test', 'valid', 100, false);
 
         $this->assertFalse($response->isSuccessful());
-        $this->assertStringContainsString('Quantity too high', $response->getMessage());
+        $this->assertSame('quantityTooHigh', $response->getMessage());
     }
 
     public function testApiExceptionInMessage():void

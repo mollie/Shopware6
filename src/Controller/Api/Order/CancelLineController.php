@@ -63,6 +63,6 @@ class CancelLineController extends AbstractController
         $resetStock = $request->get('resetStock', false);
 
         $result = $this->cancelItemFacade->cancelItem($orderId, $mollieLineId, $quantity, $resetStock);
-        return new JsonResponse($result);
+        return new JsonResponse($result->toArray());
     }
 }

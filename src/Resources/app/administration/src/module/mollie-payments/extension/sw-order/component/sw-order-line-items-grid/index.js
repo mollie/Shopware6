@@ -220,7 +220,7 @@ Component.override('sw-order-line-items-grid', {
         },
 
         onOpenCancelItemModal(item){
-          this.cancelItemModal = item.id;
+            this.cancelItemModal = item.id;
         },
         closeCancelItemModal(){
             this.cancelItemModal = null;

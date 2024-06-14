@@ -103,6 +103,7 @@
 
         <service id="Kiener\MolliePayments\Controller\Api\Order\CancelLineController">
             <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\CancelManager\CancelItemFacade"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>

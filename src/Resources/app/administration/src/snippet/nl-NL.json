@@ -286,7 +286,15 @@
         "title": "Product in Mollie afkorting",
         "confirmButton": "Product in Mollie afkorting",
         "cancelButton": "Annuleren",
-        "updateShopwareItem": "Voorraad resetten"
+        "updateShopwareItem": "Voorraad resetten",
+        "item": {
+          "success": "Product geannuleerd",
+          "failed": {
+            "quantityZero": "Aantal is 0",
+            "invalidLine": "Product bestaat niet in de bestelling",
+            "quantityTooHigh": "Het aantal is te hoog"
+          }
+        }
       }
     },
 

@@ -286,7 +286,15 @@
         "title": "Produkt in Mollie abbrechen",
         "confirmButton": "Produkt in Mollie abbrechen",
         "cancelButton": "Schließen",
-        "resetStock": "Bestand zurücksetzen"
+        "resetStock": "Bestand zurücksetzen",
+        "item": {
+          "success": "Produkt erfolgreich abgebrochen",
+          "failed": {
+            "quantityZero": "Menge ist 0",
+            "invalidLine": "Produkt exestiert nicht in der Bestellung",
+            "quantityTooHigh": "Menge ist zu hoch"
+          }
+        }
       }
     },
     "sw-flow": {
