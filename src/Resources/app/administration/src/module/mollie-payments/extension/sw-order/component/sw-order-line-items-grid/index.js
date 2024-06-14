@@ -345,10 +345,10 @@ Component.override('sw-order-line-items-grid', {
         },
         canceledQuantity(item){
             const itemStatus = this.cancelStatus[item.id];
-            if(itemStatus === undefined){
+            if(itemStatus === undefined || itemStatus === null){
                 return '~';
             }
-            return itemStatus.quantityCanceled
+            return itemStatus.quantityCanceled;
         },
         isCancelable(item){
             const itemStatus = this.cancelStatus[item.id];
