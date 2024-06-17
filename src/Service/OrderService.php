@@ -98,6 +98,7 @@ class OrderService implements OrderServiceInterface
         $criteria->addAssociation('billingAddress');    # important for subscription creation
         $criteria->addAssociation('billingAddress.country');
         $criteria->addAssociation('orderCustomer');
+        $criteria->addAssociation('stateMachineState');
         $criteria->addAssociation('orderCustomer.customer');
         $criteria->addAssociation('orderCustomer.salutation');
         $criteria->addAssociation('language');
