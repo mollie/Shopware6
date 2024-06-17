@@ -3,7 +3,7 @@
 namespace Shopware\Core\System\Snippet\Files;
 
 
-if (class_exists(__NAMESPACE__.'/AbstractSnippetFile')) {
+if (class_exists(__NAMESPACE__.'\\AbstractSnippetFile')) {
     return;
 }
 
