@@ -79,7 +79,7 @@ class StockManager implements StockManagerInterface
         $update->execute(
             [
                 'id' => Uuid::fromHexToBytes($productID),
-                'auantity' => $quantity,
+                'quantity' => $quantity,
                 'now' => (new \DateTime())->format(Defaults::STORAGE_DATE_TIME_FORMAT),
             ]
         );
