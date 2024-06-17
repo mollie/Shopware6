@@ -22,7 +22,7 @@ export default class CancelItemRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getResetStockToggle(){
-        return cy.get('.cy-cancel-item-stock .sw-field')
+        return cy.get('.cy-cancel-item-stock input')
     }
 
     /**

@@ -50,7 +50,8 @@ context("Cancel Authorized items", () => {
 
             orderDetailsRepository.getLineItemActionsButtonCancelThroughMollie().should('not.have.class', 'is--disabled');
             orderDetailsRepository.getLineItemActionsButtonCancelThroughMollie().click({force: true});
-            cancelItemRepository.getQuantityInput().type(2);
+            cancelItemRepository.getQuantityInput().clear().type(2);
+            cancelItemRepository.getResetStockToggle().click({force:true});
             cancelItemRepository.getItemLabel().should('not.be.empty');
             cancelItemRepository.getConfirmButton().click({force: true});
             orderDetailsRepository.getLineItemCancelled().should('contain.text', 2);
