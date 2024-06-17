@@ -37,7 +37,8 @@
       "descriptionTextModule": "Mollie betalingen",
       "btnMollieActions": "Mollie acties",
       "refundThroughMollie": "Terugbetaling via Mollie",
-      "shipThroughMollie": "Verzending door Mollie"
+      "shipThroughMollie": "Verzending door Mollie",
+      "cancelMollieItem": "Opzeggen via Mollie"
     },
     "config": {
       "info": {
@@ -280,6 +281,20 @@
         "cancelButton": "Annuleren",
         "selectAllButton": "Selecteer alles",
         "resetButton": "Resetten"
+      },
+      "cancel": {
+        "title": "Product in Mollie afkorting",
+        "confirmButton": "Product in Mollie afkorting",
+        "cancelButton": "Annuleren",
+        "resetStock": "Voorraad resetten",
+        "item": {
+          "success": "Product geannuleerd",
+          "failed": {
+            "quantityZero": "Aantal is 0",
+            "invalidLine": "Product bestaat niet in de bestelling",
+            "quantityTooHigh": "Het aantal is te hoog"
+          }
+        }
       }
     },
 
@@ -421,6 +436,7 @@
       "buttonMolliePaymentLink": "Kopieer naar Klembord",
       "columnRefunded": "Terugbetaald",
       "columnShipped": "Verzonden",
+      "columnCanceled": "Geannuleerd",
       "labelMollieOrderId": "Mollie Order ID",
       "labelMollieThirdPartyPaymentId": "Betalingskenmerk",
       "labelMolliePaymentLink": "Mollie Checkout URL",
