@@ -283,8 +283,8 @@
         "resetButton": "Reset"
       },
       "cancel": {
-        "title": "Cancel item at mollie",
-        "confirmButton": "Cancel item at mollie",
+        "title": "Cancel item through mollie",
+        "confirmButton": "Cancel item through mollie",
         "cancelButton": "Close modal",
         "resetStock": "Reset stocks",
         "item": {

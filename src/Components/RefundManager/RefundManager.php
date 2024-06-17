@@ -286,8 +286,7 @@ class RefundManager implements RefundManagerInterface
                 # and now simply call our stock manager
                 $this->stockManager->increaseStock(
                     $orderItem,
-                    $item->getStockIncreaseQty(),
-                    $refund->id
+                    $item->getStockIncreaseQty()
                 );
             }
         }

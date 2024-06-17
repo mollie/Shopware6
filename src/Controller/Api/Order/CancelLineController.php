@@ -26,7 +26,7 @@ class CancelLineController extends AbstractController
 
     public function statusAction(Request $request, Context $context): Response
     {
-        $orderId = $request->get('mollieId');
+        $orderId = $request->get('mollieOrderId');
         $result = [];
         $client = $this->clientFactory->getClient();
         $mollieOrder = $client->orders->get($orderId);
@@ -57,12 +57,13 @@ class CancelLineController extends AbstractController
 
     public function cancelAction(Request $request, Context $context): Response
     {
-        $orderId = $request->get('mollieOrderId');
+        $mollieOrderId = $request->get('mollieOrderId');
         $mollieLineId = $request->get('mollieLineId');
         $quantity = $request->get('canceledQuantity');
+        $shopwareOrderLineId = $request->get('shopwareLineId');
         $resetStock = $request->get('resetStock', false);
 
-        $result = $this->cancelItemFacade->cancelItem($orderId, $mollieLineId, $quantity, $resetStock);
+        $result = $this->cancelItemFacade->cancelItem($mollieOrderId, $mollieLineId, $shopwareOrderLineId, $quantity, $resetStock, $context);
         return new JsonResponse($result->toArray());
     }
 }

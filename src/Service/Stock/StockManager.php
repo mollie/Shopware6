@@ -51,11 +51,10 @@ class StockManager implements StockManagerInterface
     /**
      * @param OrderLineItemEntity $lineItem
      * @param int $quantity
-     * @param string $mollieRefundID
      * @throws \Doctrine\DBAL\Exception
      * @return void
      */
-    public function increaseStock(OrderLineItemEntity $lineItem, int $quantity, string $mollieRefundID): void
+    public function increaseStock(OrderLineItemEntity $lineItem, int $quantity): void
     {
         if ($this->isEnabled() === false) {
             return;
@@ -74,13 +73,13 @@ class StockManager implements StockManagerInterface
         $productID = (string)$lineItem->getReferencedId();
 
         $update = $this->connection->prepare(
-            'UPDATE product SET available_stock = available_stock + :refundQuantity, sales = sales - :refundQuantity, updated_at = :now WHERE id = :id'
+            'UPDATE product SET available_stock = available_stock + :quantity, sales = sales - :quantity, updated_at = :now WHERE id = :id'
         );
 
         $update->execute(
             [
                 'id' => Uuid::fromHexToBytes($productID),
-                'refundQuantity' => $quantity,
+                'auantity' => $quantity,
                 'now' => (new \DateTime())->format(Defaults::STORAGE_DATE_TIME_FORMAT),
             ]
         );

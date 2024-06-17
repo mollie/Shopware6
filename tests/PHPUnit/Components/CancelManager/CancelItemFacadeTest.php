@@ -7,12 +7,12 @@ use Kiener\MolliePayments\Components\CancelManager\CancelItemFacade;
 
 use MolliePayments\Tests\Fakes\CancelItemFacadeBuilder;
 use PHPUnit\Framework\TestCase;
+use Shopware\Core\Framework\Context;
 
 /**
  * @coversDefaultClass \Kiener\MolliePayments\Components\CancelManager\CancelItemFacade
  *
  */
-
 class CancelItemFacadeTest extends TestCase
 {
 
@@ -26,8 +26,9 @@ class CancelItemFacadeTest extends TestCase
     public function testItemQuantityIsZero(): void
     {
         $cancelManager = $this->cancelManagerBuilder->bild();
+        $context = Context::createDefaultContext();
 
-        $response = $cancelManager->cancelItem('test', 'test', 0, false);
+        $response = $cancelManager->cancelItem('test', 'test', 'lineId', 0, false, $context);
 
         $this->assertFalse($response->isSuccessful());
         $this->assertSame('quantityZero', $response->getMessage());
@@ -37,8 +38,9 @@ class CancelItemFacadeTest extends TestCase
     {
         $cancelManagerBuilder = $this->cancelManagerBuilder->withDefaultOrder();
         $cancelManager = $cancelManagerBuilder->bild();
+        $context = Context::createDefaultContext();
 
-        $response = $cancelManager->cancelItem('test', 'invalid', 1, false);
+        $response = $cancelManager->cancelItem('test', 'invalid', 'lineId', 1, false, $context);
 
         $this->assertFalse($response->isSuccessful());
         $this->assertSame('invalidLine', $response->getMessage());
@@ -48,19 +50,21 @@ class CancelItemFacadeTest extends TestCase
     {
         $cancelManagerBuilder = $this->cancelManagerBuilder->withDefaultOrder();
         $cancelManager = $cancelManagerBuilder->bild();
+        $context = Context::createDefaultContext();
 
-        $response = $cancelManager->cancelItem('test', 'valid', 100, false);
+        $response = $cancelManager->cancelItem('test', 'valid', 'lineId', 100, false, $context);
 
         $this->assertFalse($response->isSuccessful());
         $this->assertSame('quantityTooHigh', $response->getMessage());
     }
 
-    public function testApiExceptionInMessage():void
+    public function testApiExceptionInMessage(): void
     {
         $cancelManagerBuilder = $this->cancelManagerBuilder->withInvalidOrder();
         $cancelManager = $cancelManagerBuilder->bild();
+        $context = Context::createDefaultContext();
 
-        $response = $cancelManager->cancelItem('', 'valid', 100, false);
+        $response = $cancelManager->cancelItem('', 'valid', 'lineId', 100, false, $context);
 
         $this->assertFalse($response->isSuccessful());
         $this->assertStringContainsString('Invalid order', $response->getMessage());
@@ -70,8 +74,9 @@ class CancelItemFacadeTest extends TestCase
     {
         $cancelManagerBuilder = $this->cancelManagerBuilder->withDefaultOrder();
         $cancelManager = $cancelManagerBuilder->bild();
+        $context = Context::createDefaultContext();
 
-        $response = $cancelManager->cancelItem('test', 'valid', 1, false);
+        $response = $cancelManager->cancelItem('test', 'valid', 'lineId', 1, false, $context);
 
         $expectedData = [
             'id' => 'valid',
@@ -80,5 +85,42 @@ class CancelItemFacadeTest extends TestCase
 
         $this->assertTrue($response->isSuccessful());
         $this->assertSame($expectedData, $response->getData());
+    }
+
+    public function testOrderLineItemNotFound(): void
+    {
+        $cancelManagerBuilder = $this->cancelManagerBuilder->withDefaultOrder();
+
+        $cancelManager = $cancelManagerBuilder->bild();
+        $context = Context::createDefaultContext();
+
+        $response = $cancelManager->cancelItem('test', 'valid', 'invalidLineId', 1, true, $context);
+
+
+        $this->assertFalse($response->isSuccessful());
+        $this->assertSame('invalidShopwareLineId', $response->getMessage());
+    }
+
+    public function testOrderLineStockResetSuccessful(): void
+    {
+        $cancelManagerBuilder = $this->cancelManagerBuilder->withDefaultOrder();
+        $cancelManagerBuilder = $cancelManagerBuilder->withValidOrderLine();
+
+        $cancelManager = $cancelManagerBuilder->bild();
+        $stockManager = $cancelManagerBuilder->getStockManager();
+
+        $context = Context::createDefaultContext();
+
+        $response = $cancelManager->cancelItem('test', 'valid', 'lineId', 1, true, $context);
+
+        $expectedData = [
+            'id' => 'valid',
+            'quantity' => 1
+        ];
+
+        $this->assertTrue($response->isSuccessful());
+        $this->assertSame($expectedData, $response->getData());
+        $this->assertTrue($stockManager->isCalled());
+        $this->assertSame($expectedData['quantity'], (int)$stockManager->getQuantity());
     }
 }

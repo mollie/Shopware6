@@ -255,7 +255,7 @@ Component.override('sw-order-line-items-grid', {
         async loadMollieCancelStatus(){
 
             await this.MolliePaymentsItemCancelService
-                .status({mollieId: this.mollieId})
+                .status({mollieOrderId: this.mollieId})
                 .then((response)=>{
                     this.cancelStatus = response
                 })
@@ -352,7 +352,7 @@ Component.override('sw-order-line-items-grid', {
         },
         isCancelable(item){
             const itemStatus = this.cancelStatus[item.id];
-            if(itemStatus === undefined){
+            if(itemStatus === undefined || itemStatus === null){
                 return false;
             }
 

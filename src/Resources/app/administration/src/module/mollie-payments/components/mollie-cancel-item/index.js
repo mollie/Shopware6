@@ -34,7 +34,7 @@ Component.register('mollie-cancel-item', {
             this.MolliePaymentsItemCancelService.cancel({
                 mollieOrderId: this.item.mollieOrderId,
                 mollieLineId: this.item.mollieId,
-                shopwareItemId: this.item.shopwareItemId,
+                shopwareLineId: this.item.shopwareItemId,
                 canceledQuantity: this.canceledQuantity,
                 resetStock: this.resetStock,
             }).then((response) => {

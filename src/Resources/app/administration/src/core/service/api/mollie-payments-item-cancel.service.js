@@ -18,16 +18,16 @@ export default class MolliePaymentsItemCancelService extends ApiService {
      * @param data
      * @returns {*}
      */
-    status(data = {orderId: null}) {
+    status(data = {mollieOrderId: null}) {
         return this.__post('/status', data);
     }
 
     cancel(data = {
         mollieOrderId: null,
         mollieLineId: null,
+        shopwareLineId: null,
         canceledQuantity: 0,
         resetStock: false,
-        shopwareItemId: null,
     }) {
         return this.__post('/cancel', data);
     }

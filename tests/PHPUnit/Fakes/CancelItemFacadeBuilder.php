@@ -5,6 +5,7 @@ namespace MolliePayments\Tests\Fakes;
 
 use Kiener\MolliePayments\Components\CancelManager\CancelItemFacade;
 use Kiener\MolliePayments\Components\CancelManager\CancelManagerInterface;
+use Kiener\MolliePayments\Components\RefundManager\Integrators\StockManagerInterface;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Mollie\Api\Endpoints\OrderEndpoint;
 use Mollie\Api\Exceptions\ApiException;
@@ -12,8 +13,13 @@ use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\OrderLineCollection;
+use MolliePayments\Tests\Fakes\Repositories\FakeOrderLineItemRepository;
+use MolliePayments\Tests\Fakes\Repositories\FakeOrderRepository;
+use MolliePayments\Tests\Fakes\StockUpdater\FakeStockManager;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 
 /**
  * @final
@@ -24,15 +30,20 @@ class CancelItemFacadeBuilder
     /** @var MollieApiClient */
     private $mollieClient;
 
-    /** @var TestCase  */
+    /** @var TestCase */
     private $testCase;
+
+    private OrderLineItemCollection $itemCollection;
+
+    private StockManagerInterface $stockManager;
 
     public function __construct(TestCase $testCase)
     {
         $this->testCase = $testCase;
 
         $this->mollieClient = $testCase->getMockBuilder(MollieApiClient::class)->disableOriginalConstructor()->getMock();
-
+        $this->itemCollection = new OrderLineItemCollection();
+        $this->stockManager = new FakeStockManager();
     }
 
     public function withInvalidOrder(): self
@@ -67,12 +78,33 @@ class CancelItemFacadeBuilder
         return $this;
     }
 
+    public function withValidOrderLine(): self
+    {
+        $fakeShopwareOrderLine = new OrderLineItemEntity();
+        $fakeShopwareOrderLine->setId('validLineId');
+        $fakeShopwareOrderLine->setLabel('Valid orderline');
+        $this->itemCollection->add($fakeShopwareOrderLine);
+
+        return $this;
+    }
+
+    public function getStockManager(): FakeStockManager
+    {
+        return $this->stockManager;
+    }
+
+
+
+
     public function bild(): CancelItemFacade
     {
         /** @var MollieApiFactory $mollieFactory */
         $mollieFactory = $this->testCase->getMockBuilder(MollieApiFactory::class)->disableOriginalConstructor()->getMock();
         $mollieFactory->method('getClient')->willReturn($this->mollieClient);
-        return new CancelItemFacade($mollieFactory, new NullLogger());
+
+        $orderLineRepository = new FakeOrderLineItemRepository($this->itemCollection);
+
+        return new CancelItemFacade($mollieFactory, $orderLineRepository, $this->stockManager, new NullLogger());
     }
 
 }
