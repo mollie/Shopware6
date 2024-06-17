@@ -38,7 +38,7 @@
       "btnMollieActions": "Mollie Actions",
       "refundThroughMollie": "Refund through Mollie",
       "shipThroughMollie": "Ship through Mollie",
-      "cancelMollieItem": "Cancel at Mollie"
+      "cancelMollieItem": "Cancel through Mollie"
     },
     "config": {
       "info": {

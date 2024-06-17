@@ -38,7 +38,7 @@
       "btnMollieActions": "Mollie acties",
       "refundThroughMollie": "Terugbetaling via Mollie",
       "shipThroughMollie": "Verzending door Mollie",
-      "cancelMollieItem": "Opzeggen bij Mollie"
+      "cancelMollieItem": "Opzeggen via Mollie"
     },
     "config": {
       "info": {

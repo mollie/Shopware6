@@ -42,7 +42,7 @@ context("Cancel Authorized items", () => {
     });
 
     context(devices.getDescription(device), () => {
-        it('Cancel items from order', () => {
+        it('C3259233: Cancel items from order', () => {
             createOrderAndOpenAdmin('Pay now');
 
 
@@ -60,7 +60,7 @@ context("Cancel Authorized items", () => {
 
         });
 
-        it('Check cancel button on non authorized order', () => {
+        it('C3259299: Check cancel button on non authorized order', () => {
             createOrderAndOpenAdmin('PayPal');
 
 
