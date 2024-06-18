@@ -86,7 +86,7 @@ export default class CheckoutAction {
      *
      */
     placeOrderOnEdit() {
-        cy.get('#confirmOrderForm > .btn').click();
+        cy.get('#confirmOrderForm .btn').click();
     }
 
     /**
