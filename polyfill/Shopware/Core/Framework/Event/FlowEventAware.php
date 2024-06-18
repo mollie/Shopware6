@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Shopware\Core\Framework\Event;
 
-if (interface_exists(__NAMESPACE__ . '/FlowEventAware')) {
+if (interface_exists(__NAMESPACE__ . '\\FlowEventAware')) {
     return;
 }
 

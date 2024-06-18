@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Shopware\Core\Checkout\Payment;
 
 
-if (class_exists(__NAMESPACE__ . '/PaymentException')) {
+if (class_exists(__NAMESPACE__ . '\\PaymentException')) {
     return;
 }
 

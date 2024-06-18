@@ -2,7 +2,7 @@
 
 namespace Shopware\Core\Framework\Event;
 
-if (interface_exists(__NAMESPACE__ . '/BusinessEventInterface')) {
+if (interface_exists(__NAMESPACE__ . '\\BusinessEventInterface')) {
     return;
 }
 

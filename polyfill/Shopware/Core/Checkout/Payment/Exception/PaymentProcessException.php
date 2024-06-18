@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 namespace Shopware\Core\Checkout\Payment\Exception;
-if (class_exists(__NAMESPACE__ . '/PaymentProcessException')) {
+if (class_exists(__NAMESPACE__ . '\\PaymentProcessException')) {
     return;
 }
 use Shopware\Core\Framework\Log\Package;
