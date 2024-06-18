@@ -36,7 +36,7 @@ export default class OrderDetailsRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getLineItemActionsButtonCancelThroughMollie() {
-        return cy.get('.sw-context-button__menu-popover', {timeout: 15000}).contains('Cancel at Mollie');
+        return cy.get('.sw-context-button__menu-popover', {timeout: 15000}).contains('Cancel through Mollie');
     }
 
     getLineItemCancelled(){
