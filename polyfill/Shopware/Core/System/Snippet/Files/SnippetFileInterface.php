@@ -2,8 +2,7 @@
 
 namespace Shopware\Core\System\Snippet\Files;
 
-
-if (interface_exists(__NAMESPACE__.'\\SnippetFileInterface')) {
+if (interface_exists(SnippetFileInterface::class)) {
     return;
 }
 

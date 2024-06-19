@@ -2,13 +2,11 @@
 
 namespace Shopware\Core\Framework\Event;
 
-if (interface_exists(__NAMESPACE__ . '\\MailAware')) {
+if (interface_exists(MailAware::class)) {
     return;
 }
 
-
 use Shopware\Core\Framework\Event\EventData\MailRecipientStruct;
-
 
 interface MailAware extends BusinessEventInterface
 {
