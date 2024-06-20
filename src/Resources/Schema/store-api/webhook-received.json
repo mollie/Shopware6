@@ -1,0 +1,128 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Mollie Webhook Endpoint",
+    "description": "Endpoint to handle Mollie webhooks.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/mollie/webhook/{swTransactionId}": {
+      "get": {
+        "summary": "Handle Mollie Webhook (GET)",
+        "operationId": "handleMollieWebhookGet",
+        "parameters": [
+          {
+            "name": "swTransactionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The Shopware transaction ID."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Mollie webhook handled successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true,
+                      "description": "Indicates if the webhook was successfully processed."
+                    }
+                  },
+                  "required": ["success"]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Failed to handle Mollie webhook.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false,
+                      "description": "Indicates if the webhook processing failed."
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "Invalid webhook data.",
+                      "description": "Error message describing the reason for failure."
+                    }
+                  },
+                  "required": ["success", "error"]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Handle Mollie Webhook (POST)",
+        "operationId": "handleMollieWebhookPost",
+        "parameters": [
+          {
+            "name": "swTransactionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The Shopware transaction ID."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Mollie webhook handled successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true,
+                      "description": "Indicates if the webhook was successfully processed."
+                    }
+                  },
+                  "required": ["success"]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Failed to handle Mollie webhook.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false,
+                      "description": "Indicates if the webhook processing failed."
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "Invalid webhook data.",
+                      "description": "Error message describing the reason for failure."
+                    }
+                  },
+                  "required": ["success", "error"]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

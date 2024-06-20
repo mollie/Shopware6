@@ -1,0 +1,134 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Mollie Subscription Mandate Update Webhook Endpoint",
+    "description": "Endpoint for handling Mollie subscription mandate update webhook notifications.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/mollie/webhook/subscription/{swSubscriptionId}/mandate/update": {
+      "get": {
+        "summary": "Handle Mollie Subscription Mandate Update Webhook Notification (GET)",
+        "operationId": "handleMollieSubscriptionMandateUpdateWebhookGet",
+        "parameters": [
+          {
+            "name": "swSubscriptionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the subscription associated with the mandate update webhook."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Webhook handled successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  },
+                  "required": ["success"]
+                },
+                "example": {
+                  "success": true
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["success", "error"]
+                },
+                "example": {
+                  "success": false,
+                  "error": "Unprocessable entity error message."
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Handle Mollie Subscription Mandate Update Webhook Notification (POST)",
+        "operationId": "handleMollieSubscriptionMandateUpdateWebhookPost",
+        "parameters": [
+          {
+            "name": "swSubscriptionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the subscription associated with the mandate update webhook."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Webhook handled successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  },
+                  "required": ["success"]
+                },
+                "example": {
+                  "success": true
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["success", "error"]
+                },
+                "example": {
+                  "success": false,
+                  "error": "Unprocessable entity error message."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

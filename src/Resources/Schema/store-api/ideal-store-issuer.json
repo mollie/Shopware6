@@ -1,0 +1,72 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Store iDEAL Issuer Endpoint",
+    "description": "Endpoint to store the iDEAL issuer for a customer.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/mollie/ideal/store-issuer/{customerId}/{issuerId}": {
+      "get": {
+        "summary": "Store iDEAL Issuer",
+        "operationId": "storeIdealIssuer",
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the customer."
+          },
+          {
+            "name": "issuerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the iDEAL issuer."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success response indicating the iDEAL issuer was stored.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true,
+                      "description": "Indicates if the operation was successful."
+                    },
+                    "customerId": {
+                      "type": "string",
+                      "description": "The ID of the customer."
+                    },
+                    "result": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "A list of serialized exceptions, if any."
+                    }
+                  },
+                  "required": ["success", "customerId", "result"]
+                },
+                "example": {
+                  "success": true,
+                  "customerId": "customer123",
+                  "result": ["Exception1", "Exception2"]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

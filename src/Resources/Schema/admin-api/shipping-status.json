@@ -1,0 +1,110 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Mollie Ship Status API",
+    "description": "API for retrieving shipping status for Mollie orders.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/_action/mollie/ship/status": {
+      "post": {
+        "summary": "Retrieve Mollie Order Shipping Status",
+        "description": "Retrieves the shipping status for a Mollie order.",
+        "operationId": "retrieveMollieShipStatus",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "orderId": {
+                    "type": "string",
+                    "description": "The ID of the order."
+                  }
+                },
+                "required": ["orderId"]
+              },
+              "example": {
+                "orderId": "123e4567-e89b-12d3-a456-426614174000"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Shipping status retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "The ID of the order line item."
+                      },
+                      "mollieOrderLineId": {
+                        "type": "string",
+                        "description": "The ID of the Mollie order line."
+                      },
+                      "quantity": {
+                        "type": "integer",
+                        "description": "The total quantity of the order line item."
+                      },
+                      "quantityShippable": {
+                        "type": "integer",
+                        "description": "The quantity of the order line item that is shippable."
+                      },
+                      "quantityShipped": {
+                        "type": "integer",
+                        "description": "The quantity of the order line item that has been shipped."
+                      }
+                    },
+                    "required": ["id", "mollieOrderLineId", "quantity", "quantityShippable", "quantityShipped"]
+                  }
+                },
+                "example": [
+                  {
+                    "id": "item_1",
+                    "mollieOrderLineId": "mollie_item_1",
+                    "quantity": 2,
+                    "quantityShippable": 2,
+                    "quantityShipped": 0
+                  },
+                  {
+                    "id": "item_2",
+                    "mollieOrderLineId": "mollie_item_2",
+                    "quantity": 1,
+                    "quantityShippable": 0,
+                    "quantityShipped": 0
+                  }
+                ]
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Internal server error occurred."
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Internal server error occurred."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

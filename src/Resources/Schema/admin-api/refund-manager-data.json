@@ -1,0 +1,178 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Mollie Refund Manager API",
+    "description": "API for managing refunds for a Mollie order.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/_action/mollie/refund-manager/data": {
+      "post": {
+        "summary": "Get Refund Manager Data",
+        "description": "Retrieves refund manager data for a Mollie order.",
+        "operationId": "getRefundManagerData",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "orderId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "The UUID of the order."
+                  }
+                },
+                "required": ["orderId"]
+              },
+              "example": {
+                "orderId": "123e4567-e89b-12d3-a456-426614174000"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Refund manager data successfully retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "totals": {
+                      "type": "object",
+                      "properties": {
+                        "remaining": {
+                          "type": "number",
+                          "format": "float",
+                          "example": 50.00
+                        },
+                        "voucherAmount": {
+                          "type": "number",
+                          "format": "float",
+                          "example": 10.00
+                        },
+                        "pendingRefunds": {
+                          "type": "number",
+                          "format": "float",
+                          "example": 5.00
+                        },
+                        "refunded": {
+                          "type": "number",
+                          "format": "float",
+                          "example": 35.00
+                        },
+                        "roundingDiff": {
+                          "type": "number",
+                          "format": "float",
+                          "example": 0.00
+                        }
+                      }
+                    },
+                    "cart": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "itemId": {
+                            "type": "string",
+                            "example": "item_123456"
+                          },
+                          "quantity": {
+                            "type": "integer",
+                            "example": 1
+                          },
+                          "price": {
+                            "type": "number",
+                            "format": "float",
+                            "example": 50.00
+                          }
+                        }
+                      }
+                    },
+                    "refunds": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "refundId": {
+                            "type": "string",
+                            "example": "refund_123456"
+                          },
+                          "amount": {
+                            "type": "number",
+                            "format": "float",
+                            "example": 10.00
+                          }
+                        }
+                      }
+                    },
+                    "taxStatus": {
+                      "type": "string",
+                      "example": "included"
+                    }
+                  }
+                },
+                "example": {
+                  "totals": {
+                    "remaining": 50.00,
+                    "voucherAmount": 10.00,
+                    "pendingRefunds": 5.00,
+                    "refunded": 35.00,
+                    "roundingDiff": 0.00
+                  },
+                  "cart": [
+                    {
+                      "itemId": "item_123456",
+                      "quantity": 1,
+                      "price": 50.00
+                    }
+                  ],
+                  "refunds": [
+                    {
+                      "refundId": "refund_123456",
+                      "amount": 10.00
+                    }
+                  ],
+                  "taxStatus": "included"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "example": [
+                        "Error message"
+                      ]
+                    }
+                  }
+                },
+                "example": {
+                  "success": false,
+                  "errors": [
+                    "Error message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

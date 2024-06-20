@@ -1,0 +1,59 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Mollie Order Payment URL API",
+    "description": "API for generating a payment URL for a Mollie order.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/_action/mollie/order/payment-url": {
+      "post": {
+        "summary": "Generate Mollie Order Payment URL",
+        "description": "Creates a payment URL for a Mollie order.",
+        "operationId": "paymentUrl",
+        "responses": {
+          "201": {
+            "description": "Payment URL successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri",
+                      "example": "https://example.com"
+                    }
+                  }
+                },
+                "example": {
+                  "url": "https://example.com"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {}
+                },
+                "example": []
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "EmptyArray": {
+        "type": "array",
+        "items": {}
+      }
+    }
+  }
+}

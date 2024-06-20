@@ -1,0 +1,74 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Revoke Mandate Endpoint",
+    "description": "Endpoint to revoke the mandate for a customer.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/mollie/components/revoke-mandate/{customerId}/{mandateId}": {
+      "get": {
+        "summary": "Revoke Mandate",
+        "operationId": "revokeMandate",
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the customer."
+          },
+          {
+            "name": "mandateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the mandate."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success response indicating the mandate was revoked.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true,
+                      "description": "Indicates if the operation was successful."
+                    },
+                    "customerId": {
+                      "type": "string",
+                      "description": "The ID of the customer."
+                    },
+                    "mandateId": {
+                      "type": "string",
+                      "description": "The ID of the mandate."
+                    },
+                    "result": {
+                      "type": "string",
+                      "description": "The result of the operation, including any errors."
+                    }
+                  },
+                  "required": ["success", "customerId", "mandateId", "result"]
+                },
+                "example": {
+                  "success": true,
+                  "customerId": "customer123",
+                  "mandateId": "mandate456",
+                  "result": "Error details or success message"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
