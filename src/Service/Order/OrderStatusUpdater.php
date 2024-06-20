@@ -186,7 +186,7 @@ class OrderStatusUpdater
         # let's check if we have configured a final order state.
         # if so, we need to verify, if a transition is even allowed
         if (! empty($settings->getOrderStateFinalState())) {
-            $currentId = ($stateMachine instanceof StateMachineStateEntity) ? $stateMachine->getId() : '';
+            $currentId = ($stateMachine instanceof StateMachineStateEntity) ? $stateMachine->getId() : $order->getStateId();
 
             # test if our current order does already have
             # our configured final order state

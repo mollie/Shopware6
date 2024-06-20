@@ -58,5 +58,13 @@
             <argument type="service" id="Nyholm\Psr7\Factory\Psr17Factory"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Components\CancelManager\CancelItemFacade">
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\OrderLineItem\OrderLineItemRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Stock\StockManager"/>
+            <argument type="service" id="mollie_payments.logger"/>
+        </service>
+
+
     </services>
 </container>

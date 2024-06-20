@@ -25,7 +25,7 @@ use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
 class MolliePayments extends Plugin
 {
-    const PLUGIN_VERSION = '4.8.0';
+    const PLUGIN_VERSION = '4.8.1';
 
 
     /**
@@ -101,6 +101,27 @@ class MolliePayments extends Plugin
         $this->preparePlugin($context->getContext());
 
         $this->runDbMigrations($context->getMigrationCollection());
+    }
+
+    public function boot(): void
+    {
+        parent::boot();
+
+        if ($this->container === null) {
+            return;
+        }
+        /** @var Container $container */
+        $container = $this->container;
+        
+        $shopwareVersion = $container->getParameter('kernel.shopware_version');
+        if (!is_string($shopwareVersion)) {
+            $shopwareVersion = Kernel::SHOPWARE_FALLBACK_VERSION;
+        }
+        # load the dependencies that are compatible
+        # with our current shopware version
+
+        $loader = new DependencyLoader($container, new VersionCompare($shopwareVersion));
+        $loader->registerFixturesAutoloader();
     }
 
 

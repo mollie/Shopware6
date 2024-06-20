@@ -1,0 +1,62 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Mollie Payment Method Update API",
+    "description": "API for updating payment methods for Mollie.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/_action/mollie/payment-method/update-methods": {
+      "get": {
+        "summary": "Update Mollie Payment Methods",
+        "description": "Updates the payment methods for Mollie.",
+        "operationId": "paymentMethodUpdate",
+        "responses": {
+          "200": {
+            "description": "Payment methods successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                },
+                "example": {
+                  "success": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error message"
+                    },
+                    "success": {
+                      "type": "string",
+                      "example": "false"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Error message",
+                  "success": "false"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "POS Checkout Endpoint",
+    "description": "Endpoint to render the POS checkout template.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/mollie/pos/checkout": {
+      "get": {
+        "summary": "Render POS Checkout",
+        "operationId": "renderPosCheckout",
+        "responses": {
+          "200": {
+            "description": "Successfully rendered the POS checkout template.",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string",
+                  "description": "HTML content of the rendered template."
+                },
+                "example": "<html><body><h1>POS Checkout</h1></body></html>"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

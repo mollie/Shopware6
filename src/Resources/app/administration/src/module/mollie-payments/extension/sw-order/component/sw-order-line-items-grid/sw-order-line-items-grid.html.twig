@@ -115,6 +115,9 @@ SHOPWARE 6.4
     <template #column-shippedQuantity="{ item }">
         {{ shippedQuantity(item) }}
     </template>
+    <template #column-canceledQuantity="{ item }">
+        {{ canceledQuantity(item) }}
+    </template>
 {% endblock %}
 
 
@@ -198,6 +201,11 @@ SHOPWARE 6.4
             </template>
         </sw-modal>
     {% endblock %}
+    {% block sw_order_line_items_grid_grid_mollie_cancel_item_modal %}
+        <mollie-cancel-item @close="closeCancelItemModal" @update-cancel-status="loadMollieCancelStatus" v-if="isMollieOrder && cancelItemModal === item.id" :item="getCancelData(item)">
+
+        </mollie-cancel-item>
+    {% endblock %}
 {% endblock %}
 
 {% block sw_order_line_items_grid_grid_actions_show %}
@@ -205,5 +213,10 @@ SHOPWARE 6.4
     <sw-context-menu-item :disabled="!isShippable(item)"
                           @click="onOpenShipItemModal(item)">
         {{ $tc('mollie-payments.general.shipThroughMollie') }}
+    </sw-context-menu-item>
+
+    <sw-context-menu-item :disabled="!isCancelable(item)"
+                          @click="onOpenCancelItemModal(item)">
+        {{ $tc('mollie-payments.general.cancelMollieItem') }}
     </sw-context-menu-item>
 {% endblock %}
