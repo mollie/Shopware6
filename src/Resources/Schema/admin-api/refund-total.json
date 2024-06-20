@@ -1,0 +1,109 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Mollie Refund Total API",
+    "description": "API for retrieving the total refund information for a Mollie order.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/_action/mollie/refund/total": {
+      "post": {
+        "summary": "Get Total Refund Information",
+        "description": "Retrieves the total refund information for a Mollie order.",
+        "operationId": "getTotalRefundInfo",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "orderId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "The UUID of the order."
+                  }
+                },
+                "required": ["orderId"]
+              },
+              "example": {
+                "orderId": "123e4567-e89b-12d3-a456-426614174000"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Total refund information successfully retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "remaining": {
+                      "type": "number",
+                      "format": "float",
+                      "example": 50.00
+                    },
+                    "refunded": {
+                      "type": "number",
+                      "format": "float",
+                      "example": 35.00
+                    },
+                    "voucherAmount": {
+                      "type": "number",
+                      "format": "float",
+                      "example": 10.00
+                    },
+                    "pendingRefunds": {
+                      "type": "number",
+                      "format": "float",
+                      "example": 5.00
+                    }
+                  }
+                },
+                "example": {
+                  "remaining": 50.00,
+                  "refunded": 35.00,
+                  "voucherAmount": 10.00,
+                  "pendingRefunds": 5.00
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "example": [
+                        "Error message"
+                      ]
+                    }
+                  }
+                },
+                "example": {
+                  "success": false,
+                  "errors": [
+                    "Error message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

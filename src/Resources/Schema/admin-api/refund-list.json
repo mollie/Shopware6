@@ -1,0 +1,121 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Mollie Refund List API",
+    "description": "API for listing refund items for a Mollie order.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/_action/mollie/refund/list": {
+      "post": {
+        "summary": "List Refund Items for Mollie Order",
+        "description": "Retrieves a list of refund items for a Mollie order.",
+        "operationId": "listRefundItems",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "orderId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "The UUID of the order."
+                  }
+                },
+                "required": ["orderId"]
+              },
+              "example": {
+                "orderId": "123e4567-e89b-12d3-a456-426614174000"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "List of refund items successfully retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "swLineId": {
+                        "type": "string",
+                        "example": "line_123456"
+                      },
+                      "swLineVersionId": {
+                        "type": "string",
+                        "example": "version_123456"
+                      },
+                      "mollieLineId": {
+                        "type": "string",
+                        "example": "mollie_line_123456"
+                      },
+                      "swReference": {
+                        "type": "string",
+                        "example": "Product ABC"
+                      },
+                      "quantity": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "amount": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 50.00
+                      }
+                    }
+                  }
+                },
+                "example": [
+                  {
+                    "swLineId": "line_123456",
+                    "swLineVersionId": "version_123456",
+                    "mollieLineId": "mollie_line_123456",
+                    "swReference": "Product ABC",
+                    "quantity": 1,
+                    "amount": 50.00
+                  }
+                ]
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "example": [
+                        "Error message"
+                      ]
+                    }
+                  }
+                },
+                "example": {
+                  "success": false,
+                  "errors": [
+                    "Error message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
