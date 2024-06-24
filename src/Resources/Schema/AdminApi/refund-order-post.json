@@ -1,0 +1,111 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Mollie Refund API",
+    "description": "API for processing a refund for a Mollie order.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/_action/mollie/refund": {
+      "post": {
+        "summary": "Process Refund for Mollie Order",
+        "description": "Processes a refund for a Mollie order.",
+        "operationId": "processRefund",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "orderId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "The UUID of the order."
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "The refund description."
+                  },
+                  "internalDescription": {
+                    "type": "string",
+                    "description": "Internal description for the refund."
+                  },
+                  "amount": {
+                    "type": "number",
+                    "format": "float",
+                    "description": "The refund amount."
+                  }
+                },
+                "required": ["orderId", "description", "internalDescription", "amount"]
+              },
+              "example": {
+                "orderId": "123e4567-e89b-12d3-a456-426614174000",
+                "description": "Refund for order 123456",
+                "internalDescription": "Customer requested refund",
+                "amount": 100.00
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Refund successfully processed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "refundId": {
+                      "type": "string",
+                      "example": "refund_123456"
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "refundId": "refund_123456"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "example": [
+                        "Error message"
+                      ]
+                    }
+                  }
+                },
+                "example": {
+                  "success": false,
+                  "errors": [
+                    "Error message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

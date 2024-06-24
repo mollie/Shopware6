@@ -1,0 +1,56 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Mollie Mandate Revoke Endpoint",
+    "description": "Endpoint to revoke a Mollie mandate.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/mollie/mandate/revoke/{customerId}/{mandateId}": {
+      "post": {
+        "summary": "Revoke Mollie Mandate",
+        "operationId": "revokeMollieMandate",
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The customer ID."
+          },
+          {
+            "name": "mandateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The mandate ID."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response indicating the mandate revocation was successful.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true,
+                      "description": "Indicates if revoking the mandate was successful."
+                    }
+                  },
+                  "required": ["success"]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
