@@ -177,7 +177,6 @@ class RefundManagerTest extends TestCase
         $this->assertEquals('Product T-Shirt', $this->fakeStockUpdater->getLineItemLabel());
         $this->assertEquals('product-id-1', $this->fakeStockUpdater->getProductID());
         $this->assertEquals(1, $this->fakeStockUpdater->getQuantity());
-        $this->assertEquals('r-xyz-123', $this->fakeStockUpdater->getMollieRefundID());
     }
 
     /**

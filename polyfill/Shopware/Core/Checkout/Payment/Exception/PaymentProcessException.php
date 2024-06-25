@@ -1,9 +1,11 @@
 <?php declare(strict_types=1);
 
 namespace Shopware\Core\Checkout\Payment\Exception;
-if (class_exists(__NAMESPACE__ . '/PaymentProcessException')) {
+
+if (class_exists(PaymentProcessException::class)) {
     return;
 }
+
 use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\ShopwareHttpException;
 use Symfony\Component\HttpFoundation\Response;

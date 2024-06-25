@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments;
 
 use Exception;
 use Kiener\MolliePayments\Compatibility\DependencyLoader;
+use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Kiener\MolliePayments\Components\Installer\PluginInstaller;
 use Kiener\MolliePayments\Repository\CustomFieldSet\CustomFieldSetRepository;
 use Psr\Container\ContainerInterface;
@@ -24,7 +25,7 @@ use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
 class MolliePayments extends Plugin
 {
-    const PLUGIN_VERSION = '4.7.2';
+    const PLUGIN_VERSION = '4.9.0';
 
 
     /**
@@ -36,10 +37,13 @@ class MolliePayments extends Plugin
         parent::build($container);
 
         $this->container = $container;
-
+        $shopwareVersion = $this->container->getParameter('kernel.shopware_version');
+        if (!is_string($shopwareVersion)) {
+            $shopwareVersion= Kernel::SHOPWARE_FALLBACK_VERSION;
+        }
         # load the dependencies that are compatible
         # with our current shopware version
-        $loader = new DependencyLoader($this->container);
+        $loader = new DependencyLoader($this->container, new VersionCompare($shopwareVersion));
         $loader->loadServices();
         $loader->prepareStorefrontBuild();
     }
@@ -97,6 +101,27 @@ class MolliePayments extends Plugin
         $this->preparePlugin($context->getContext());
 
         $this->runDbMigrations($context->getMigrationCollection());
+    }
+
+    public function boot(): void
+    {
+        parent::boot();
+
+        if ($this->container === null) {
+            return;
+        }
+        /** @var Container $container */
+        $container = $this->container;
+        
+        $shopwareVersion = $container->getParameter('kernel.shopware_version');
+        if (!is_string($shopwareVersion)) {
+            $shopwareVersion = Kernel::SHOPWARE_FALLBACK_VERSION;
+        }
+        # load the dependencies that are compatible
+        # with our current shopware version
+
+        $loader = new DependencyLoader($container, new VersionCompare($shopwareVersion));
+        $loader->registerFixturesAutoloader();
     }
 
 

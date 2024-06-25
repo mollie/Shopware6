@@ -438,8 +438,8 @@ function assertValidSubscriptionInAdmin(){
 }
 
 function assertAvailablePaymentMethods() {
-    cy.contains('Pay later').should('not.exist');
-    cy.contains('paysafecard').should('not.exist');
+    cy.get('.payment-methods input.klarnapaylater').should('not.exist');
+    cy.get('.payment-methods input.paysafecard').should('not.exist');
 
     cy.contains('iDEAL').should('exist');
     cy.contains('Card').should('exist');

@@ -49,7 +49,7 @@ class RoundingProducts extends Fixture
      * @param FixtureBag $bag
      * @return void
      */
-    public function load(FixtureBag $bag): void
+    public function load(): void
     {
         $category = 'Rounding';
         $image = 'tshirt-white.png';

@@ -43,7 +43,7 @@
         <service id="Kiener\MolliePayments\Subscriber\StorefrontBuildSubscriber">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Shopware\Storefront\Theme\StorefrontPluginRegistry"/>
-            <argument>%kernel.shopware_version%</argument>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\VersionCompare"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 

@@ -2,7 +2,7 @@
 
 namespace Shopware\Core\Framework\Event;
 
-if (interface_exists(__NAMESPACE__ . '/CustomerAware')) {
+if (interface_exists(CustomerAware::class)) {
     return;
 }
 

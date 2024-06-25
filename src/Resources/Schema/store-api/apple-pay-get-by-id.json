@@ -1,0 +1,45 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Apple Pay ID Endpoint",
+    "description": "Endpoint to retrieve Apple Pay ID.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/store-api/mollie/applepay/id": {
+      "get": {
+        "summary": "Retrieve Apple Pay ID",
+        "operationId": "retrieveApplePayId",
+        "responses": {
+          "200": {
+            "description": "Apple Pay ID retrieval response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true,
+                      "description": "Indicates if the operation was successful."
+                    },
+                    "id": {
+                      "type": "string",
+                      "example": "applepay_12345",
+                      "description": "The Apple Pay ID."
+                    }
+                  },
+                  "required": ["success", "id"]
+                },
+                "example": {
+                  "success": true,
+                  "id": "applepay_12345"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

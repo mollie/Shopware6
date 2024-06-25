@@ -1,0 +1,54 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Mollie Payment Failed Endpoint",
+    "description": "Endpoint to handle failed Mollie payments.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/mollie/payment/failed/{transactionId}": {
+      "get": {
+        "summary": "Handle Failed Payment (GET)",
+        "operationId": "handleFailedPaymentGet",
+        "parameters": [
+          {
+            "name": "transactionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the transaction."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully handled the failed payment.",
+            "content": {}
+          }
+        }
+      },
+      "post": {
+        "summary": "Handle Failed Payment (POST)",
+        "operationId": "handleFailedPaymentPost",
+        "parameters": [
+          {
+            "name": "transactionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the transaction."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully handled the failed payment.",
+            "content": {}
+          }
+        }
+      }
+    }
+  }
+}

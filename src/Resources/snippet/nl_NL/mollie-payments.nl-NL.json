@@ -43,6 +43,10 @@
                 "deleteButton": "Verwijderen",
                 "deleteConfirmation": "Weet je zeker dat je dat wilt verwijderen?",
                 "title": "Bevestiging verwijderen"
+            },
+            "bancomatPay": {
+              "headLine": "Telefoonnummer",
+              "phoneErrorMessage": "Telefoonnummer is vereist. Bijvoorbeeld +31208202070"
             }
         },
         "messages": {

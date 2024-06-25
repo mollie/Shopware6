@@ -5,7 +5,7 @@
 
      {% set isMollieSubscription = false %}
      {% for element in page.cart.data.elements %}
-         {% if(element._entityName == "product" and element.customFields.mollie_payments_product_subscription_enabled) %}
+         {% if(element._entityName == "product" and element.translated.customFields.mollie_payments_product_subscription_enabled) %}
              {% set isMollieSubscription = true %}
          {% endif %}
      {% endfor %}

@@ -1,0 +1,56 @@
+<sw-modal
+        @modal-close="close"
+        :title="$tc('mollie-payments.modals.cancel.title')"
+        variant="small">
+
+    <sw-container columns="30% 1fr" gap="16px">
+        <div class="cy-cancel-item-quantity">
+            <sw-number-field
+                    v-model:value="canceledQuantity"
+                    v-model="canceledQuantity"
+                    numberType="int"
+
+                    :value="canceledQuantity"
+                    :step="1"
+                    :min="1"
+                    :max="item.cancelableQuantity"
+            >
+            </sw-number-field>
+        </div>
+        <div class="cy-cancel-item-label">
+            <div v-if="item.payload && item.payload.options"
+                 class="sw-order-line-items-grid__item-payload-options">
+                <sw-product-variant-info :variations="item.payload.options">
+                    <div class="sw-order-line-items-grid__item-label">
+                        {{ item.label }}
+                    </div>
+                </sw-product-variant-info>
+            </div>
+            <div v-else
+                 class="sw-order-line-items-grid__item-payload-options">
+                    <span class="sw-order-line-items-grid__item-label">
+                        {{ item.label }}
+                    </span>
+            </div>
+        </div>
+    </sw-container>
+
+    <sw-switch-field v-model:value="resetStock" v-model="resetStock"
+                     :label="$tc('mollie-payments.modals.cancel.resetStock')"
+                     :noMarginTop="true"
+                     class="cy-cancel-item-stock"
+                     size="small">
+    </sw-switch-field>
+    <template #modal-footer>
+        <sw-button size="small" @click="close">
+            {{ $tc('mollie-payments.modals.cancel.cancelButton') }}
+        </sw-button>
+        <sw-button variant="primary"
+                   size="small"
+                   class="btn-cancel-item cy-cancel-item-confirm"
+                   @click="submit"
+        >
+            {{ $tc('mollie-payments.modals.cancel.confirmButton') }}
+        </sw-button>
+    </template>
+</sw-modal>

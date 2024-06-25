@@ -49,7 +49,7 @@ class VoucherFixture extends Fixture
      * @param FixtureBag $bag
      * @return void
      */
-    public function load(FixtureBag $bag): void
+    public function load(): void
     {
         $category = 'Voucher';
         $image = 'tshirt-white.png';
