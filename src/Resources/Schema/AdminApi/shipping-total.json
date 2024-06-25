@@ -1,0 +1,89 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Mollie Shipping Total API",
+    "description": "API for retrieving total shipping information for Mollie orders.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/_action/mollie/ship/total": {
+      "post": {
+        "summary": "Retrieve Total Shipping Information",
+        "description": "Retrieves the total shipping information for a Mollie order.",
+        "operationId": "retrieveTotalShippingInfo",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "orderId": {
+                    "type": "string",
+                    "description": "The ID of the order."
+                  }
+                },
+                "required": ["orderId"]
+              },
+              "example": {
+                "orderId": "123e4567-e89b-12d3-a456-426614174000"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Total shipping information retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "amount": {
+                        "type": "number",
+                        "format": "float",
+                        "description": "The total amount of shipping."
+                      },
+                      "quantity": {
+                        "type": "integer",
+                        "description": "The total quantity of items."
+                      }
+                    },
+                    "required": ["amount", "quantity"]
+                  }
+                },
+                "example": [
+                  {
+                    "amount": 10.5,
+                    "quantity": 3
+                  }
+                ]
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Internal server error occurred."
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Internal server error occurred."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

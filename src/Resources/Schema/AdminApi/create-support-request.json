@@ -1,0 +1,104 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Mollie Support Request API",
+    "description": "API for submitting support requests to Mollie.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/_action/mollie/support/request": {
+      "post": {
+        "summary": "Submit Support Request to Mollie",
+        "description": "Submits a support request to Mollie.",
+        "operationId": "submitSupportRequest",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "The name of the person submitting the request."
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "The email address of the person submitting the request."
+                  },
+                  "recipientLocale": {
+                    "type": "string",
+                    "description": "The locale of the recipient for the support request."
+                  },
+                  "subject": {
+                    "type": "string",
+                    "description": "The subject of the support request."
+                  },
+                  "message": {
+                    "type": "string",
+                    "description": "The message content of the support request."
+                  }
+                },
+                "required": ["name", "email", "recipientLocale", "subject", "message"],
+                "example": {
+                  "name": "John Doe",
+                  "email": "john.doe@example.com",
+                  "recipientLocale": "en_US",
+                  "subject": "Issue with payment processing",
+                  "message": "I'm encountering issues with processing payments."
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Support request submitted successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  },
+                  "required": ["success"]
+                },
+                "example": {
+                  "success": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["success", "error"]
+                },
+                "example": {
+                  "success": false,
+                  "error": "Internal server error occurred."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

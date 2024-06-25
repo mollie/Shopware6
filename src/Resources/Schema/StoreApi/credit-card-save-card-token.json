@@ -1,0 +1,73 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Mollie Credit Card Store Token Endpoint",
+    "description": "Endpoint to store a Mollie credit card token.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/mollie/creditcard/store-token/{customerId}/{cardToken}": {
+      "post": {
+        "summary": "Store Mollie Credit Card Token",
+        "operationId": "storeMollieCreditCardToken",
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The customer ID."
+          },
+          {
+            "name": "cardToken",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The credit card token."
+          }
+        ],
+        "requestBody": {
+          "description": "Optional body with a boolean key `shouldSaveCardDetail`.",
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "shouldSaveCardDetail": {
+                    "type": "boolean",
+                    "description": "Indicates whether to save card details."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response indicating success or failure.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true,
+                      "description": "Indicates if storing the token was successful."
+                    }
+                  },
+                  "required": ["success"]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

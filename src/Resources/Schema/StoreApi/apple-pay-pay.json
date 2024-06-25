@@ -1,0 +1,140 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Apple Pay Pay Endpoint",
+    "description": "Endpoint to initiate a payment with Apple Pay integration.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/mollie/applepay/pay": {
+      "post": {
+        "summary": "Initiate Apple Pay Payment",
+        "operationId": "initiateApplePayPayment",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "description": "The email of the customer."
+                  },
+                  "firstname": {
+                    "type": "string",
+                    "description": "The firstname of the customer."
+                  },
+                  "lastname": {
+                    "type": "string",
+                    "description": "The lastname of the customer."
+                  },
+                  "street": {
+                    "type": "string",
+                    "description": "The street address of the customer."
+                  },
+                  "city": {
+                    "type": "string",
+                    "description": "The city of the customer."
+                  },
+                  "postalCode": {
+                    "type": "string",
+                    "description": "The postal code of the customer."
+                  },
+                  "countryCode": {
+                    "type": "string",
+                    "description": "The country code of the customer."
+                  },
+                  "paymentToken": {
+                    "type": "string",
+                    "description": "The payment token for Apple Pay."
+                  },
+                  "finishUrl": {
+                    "type": "string",
+                    "description": "The URL to redirect after successful payment."
+                  },
+                  "errorUrl": {
+                    "type": "string",
+                    "description": "The URL to redirect after payment error."
+                  }
+                },
+                "required": ["email", "firstname", "lastname", "street", "city", "postalCode", "countryCode", "paymentToken", "finishUrl", "errorUrl"],
+                "example": {
+                  "email": "john.doe@example.com",
+                  "firstname": "John",
+                  "lastname": "Doe",
+                  "street": "123 Apple Pay St",
+                  "city": "Apple City",
+                  "postalCode": "12345",
+                  "countryCode": "US",
+                  "paymentToken": "applepay_payment_token_123",
+                  "finishUrl": "https://example.com/success",
+                  "errorUrl": "https://example.com/error"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success response with payment details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true,
+                      "description": "Indicates if the operation was successful."
+                    },
+                    "url": {
+                      "type": "string",
+                      "description": "The URL to redirect to."
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Additional message (optional)."
+                    }
+                  },
+                  "required": ["success", "url"]
+                },
+                "example": {
+                  "success": true,
+                  "url": "https://applepay.mollie.com/redirect",
+                  "message": "Payment initiated successfully."
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error response indicating payment initiation failure.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false,
+                      "description": "Indicates if the operation was successful."
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Error message."
+                    }
+                  },
+                  "required": ["success", "message"]
+                },
+                "example": {
+                  "success": false,
+                  "message": "Failed to initiate payment."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

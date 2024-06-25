@@ -1,0 +1,56 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Mollie Credit Card Store Mandate ID Endpoint",
+    "description": "Endpoint to store a Mollie credit card mandate ID.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/mollie/creditcard/store-mandate-id/{customerId}/{mandateId}": {
+      "post": {
+        "summary": "Store Mollie Credit Card Mandate ID",
+        "operationId": "storeMollieCreditCardMandateId",
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The customer ID."
+          },
+          {
+            "name": "mandateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The mandate ID."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response indicating success or failure.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true,
+                      "description": "Indicates if storing the mandate ID was successful."
+                    }
+                  },
+                  "required": ["success"]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
