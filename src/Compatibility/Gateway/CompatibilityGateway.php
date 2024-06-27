@@ -54,11 +54,11 @@ class CompatibilityGateway implements CompatibilityGatewayInterface
 
     /**
      * @param string $salesChannelID
-     * @param string $domainID
+     * @param ?string $domainID
      * @param string $token
      * @return SalesChannelContext
      */
-    public function getSalesChannelContext(string $salesChannelID, string $domainID, string $token): SalesChannelContext
+    public function getSalesChannelContext(string $salesChannelID, ?string $domainID, string $token): SalesChannelContext
     {
         if ($this->versionGTE('6.4')) {
             $params = new SalesChannelContextServiceParameters($salesChannelID, $token, null, null, $domainID, null, null);
