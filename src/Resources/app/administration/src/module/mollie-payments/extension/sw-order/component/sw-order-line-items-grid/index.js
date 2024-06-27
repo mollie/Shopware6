@@ -344,6 +344,10 @@ Component.override('sw-order-line-items-grid', {
             return itemShippingStatus.quantityShipped;
         },
         canceledQuantity(item){
+
+            if(this.cancelStatus === undefined || this.cancelStatus === null){
+                return '~';
+            }
             const itemStatus = this.cancelStatus[item.id];
             if(itemStatus === undefined || itemStatus === null){
                 return '~';
