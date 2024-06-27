@@ -355,6 +355,11 @@ Component.override('sw-order-line-items-grid', {
             return itemStatus.quantityCanceled;
         },
         isCancelable(item){
+
+            if(this.cancelStatus === undefined || this.cancelStatus === null){
+                return false;
+            }
+
             const itemStatus = this.cancelStatus[item.id];
             if(itemStatus === undefined || itemStatus === null){
                 return false;
@@ -364,6 +369,9 @@ Component.override('sw-order-line-items-grid', {
         },
 
         getCancelData(item){
+            if(this.cancelStatus === undefined || this.cancelStatus === null){
+                return {};
+            }
             const itemStatus = this.cancelStatus[item.id];
             if(itemStatus === undefined){
                 return {};
