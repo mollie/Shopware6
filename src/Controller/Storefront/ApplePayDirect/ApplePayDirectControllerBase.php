@@ -234,7 +234,7 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
                 ]
             );
 
-            return new JsonResponse(['success' => false,], 500);
+            return new JsonResponse(['success' => false], 500);
         }
     }
 
@@ -342,6 +342,7 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
             $zipcode = (string)$request->get('postalCode', '');
             $city = (string)$request->get('city', '');
             $countryCode = (string)$request->get('countryCode', '');
+            $phone = (string)$request->get('phone', '');
 
             $paymentToken = (string)$request->get('paymentToken', '');
 
@@ -358,6 +359,7 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
                 $zipcode,
                 $city,
                 $countryCode,
+                $phone,
                 $paymentToken,
                 $context
             );

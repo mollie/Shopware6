@@ -243,6 +243,12 @@ class MollieSettingStruct extends Struct
      */
     protected $useShopwareJavascript = false;
 
+
+    /**
+     * @var bool
+     */
+    protected $phoneNumberFieldRequired = false;
+
     /**
      * @return string
      */
@@ -949,5 +955,15 @@ class MollieSettingStruct extends Struct
     public function setUseShopwareJavascript(bool $useShopwareJavascript): void
     {
         $this->useShopwareJavascript = $useShopwareJavascript;
+    }
+
+    public function isPhoneNumberFieldRequired(): bool
+    {
+        return $this->phoneNumberFieldRequired;
+    }
+
+    public function setPhoneNumberFieldRequired(bool $phoneNumberFieldRequired): void
+    {
+        $this->phoneNumberFieldRequired = $phoneNumberFieldRequired;
     }
 }
