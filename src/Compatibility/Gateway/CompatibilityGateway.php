@@ -44,14 +44,24 @@ class CompatibilityGateway implements CompatibilityGatewayInterface
     }
 
     /**
+     * @param SalesChannelContext $context
+     * @return string
+     */
+    public function getDomainId(SalesChannelContext $context): ?string
+    {
+        return $context->getDomainId();
+    }
+
+    /**
      * @param string $salesChannelID
+     * @param ?string $domainID
      * @param string $token
      * @return SalesChannelContext
      */
-    public function getSalesChannelContext(string $salesChannelID, string $token): SalesChannelContext
+    public function getSalesChannelContext(string $salesChannelID, ?string $domainID, string $token): SalesChannelContext
     {
         if ($this->versionGTE('6.4')) {
-            $params = new SalesChannelContextServiceParameters($salesChannelID, $token);
+            $params = new SalesChannelContextServiceParameters($salesChannelID, $token, null, null, $domainID, null, null);
             return $this->contextService->get($params);
         }
 
@@ -79,12 +89,12 @@ class CompatibilityGateway implements CompatibilityGatewayInterface
     public function getChargebackOrderTransactionState(): string
     {
         // In progress state did not exist before 6.2, so set to open instead.
-        if (!$this->versionGTE('6.2')) {
+        if (! $this->versionGTE('6.2')) {
             return OrderTransactionStates::STATE_OPEN;
         }
 
         // Chargeback state did not exist before 6.2.3, so set to in progress instead.
-        if (!$this->versionGTE('6.2.3')) {
+        if (! $this->versionGTE('6.2.3')) {
             return OrderTransactionStates::STATE_IN_PROGRESS;
         }
 
