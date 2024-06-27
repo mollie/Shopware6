@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3984ab6d192c82cfa8ff0f2a93f24a02",
+    "content-hash": "2fd7023341e812dab05c034e90fbcea6",
     "packages": [],
     "packages-dev": [
         {
             "name": "aws/aws-crt-php",
-            "version": "v1.2.5",
+            "version": "v1.2.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/awslabs/aws-crt-php.git",
-                "reference": "0ea1f04ec5aa9f049f97e012d1ed63b76834a31b"
+                "reference": "a63485b65b6b3367039306496d49737cf1995408"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/awslabs/aws-crt-php/zipball/0ea1f04ec5aa9f049f97e012d1ed63b76834a31b",
-                "reference": "0ea1f04ec5aa9f049f97e012d1ed63b76834a31b",
+                "url": "https://api.github.com/repos/awslabs/aws-crt-php/zipball/a63485b65b6b3367039306496d49737cf1995408",
+                "reference": "a63485b65b6b3367039306496d49737cf1995408",
                 "shasum": ""
             },
             "require": {
@@ -57,22 +57,22 @@
             ],
             "support": {
                 "issues": "https://github.com/awslabs/aws-crt-php/issues",
-                "source": "https://github.com/awslabs/aws-crt-php/tree/v1.2.5"
+                "source": "https://github.com/awslabs/aws-crt-php/tree/v1.2.6"
             },
-            "time": "2024-04-19T21:30:56+00:00"
+            "time": "2024-06-13T17:21:28+00:00"
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.314.6",
+            "version": "3.315.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "d04da330b0201edab71edd33a03b8d5ad6e4a313"
+                "reference": "a7f6026f00771025c32548dac321541face0dedc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/d04da330b0201edab71edd33a03b8d5ad6e4a313",
-                "reference": "d04da330b0201edab71edd33a03b8d5ad6e4a313",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/a7f6026f00771025c32548dac321541face0dedc",
+                "reference": "a7f6026f00771025c32548dac321541face0dedc",
                 "shasum": ""
             },
             "require": {
@@ -152,9 +152,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.314.6"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.315.0"
             },
-            "time": "2024-06-20T18:09:51+00:00"
+            "time": "2024-06-26T18:08:22+00:00"
         },
         {
             "name": "boxblinkracer/phpunuhi",
@@ -908,16 +908,16 @@
         },
         {
             "name": "deeplcom/deepl-php",
-            "version": "v1.7.2",
+            "version": "v1.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DeepLcom/deepl-php.git",
-                "reference": "bb52c54794d2d6caf1136f5a579ff96fd1db78b3"
+                "reference": "13e0477593efed3dfb1ad0d75be13970dcd30057"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DeepLcom/deepl-php/zipball/bb52c54794d2d6caf1136f5a579ff96fd1db78b3",
-                "reference": "bb52c54794d2d6caf1136f5a579ff96fd1db78b3",
+                "url": "https://api.github.com/repos/DeepLcom/deepl-php/zipball/13e0477593efed3dfb1ad0d75be13970dcd30057",
+                "reference": "13e0477593efed3dfb1ad0d75be13970dcd30057",
                 "shasum": ""
             },
             "require": {
@@ -965,9 +965,9 @@
             ],
             "support": {
                 "issues": "https://github.com/DeepLcom/deepl-php/issues",
-                "source": "https://github.com/DeepLcom/deepl-php/tree/v1.7.2"
+                "source": "https://github.com/DeepLcom/deepl-php/tree/v1.8.0"
             },
-            "time": "2024-04-24T09:24:26+00:00"
+            "time": "2024-06-26T11:08:07+00:00"
         },
         {
             "name": "defuse/php-encryption",
