@@ -14,14 +14,15 @@ interface CompatibilityGatewayInterface
 
     /**
      * @param string $salesChannelID
-     * @param ?string $token
+     * @param ?string $domainID
+     * @param string $token
      * @return SalesChannelContext
      */
     public function getSalesChannelContext(string $salesChannelID, ?string $domainID, string $token): SalesChannelContext;
 
     /**
      * @param SalesChannelContext $context
-     * @return string
+     * @return ?string
      */
     public function getDomainId(SalesChannelContext $context): ?string;
 
