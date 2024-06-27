@@ -118,7 +118,6 @@ class PaymentMethodServiceTest extends TestCase
             CreditCardPayment::class,
             EpsPayment::class,
             GiftCardPayment::class,
-            GiroPayPayment::class,
             iDealPayment::class,
             KbcPayment::class,
             KlarnaPayLaterPayment::class,
