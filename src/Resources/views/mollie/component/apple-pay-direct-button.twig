@@ -21,6 +21,7 @@
         <input type="hidden" name="id" value="{{ productId }}"/>
         <input type="hidden" name="currency" value="{{ context.currency.translated.shortName }}"/>
         <input type="hidden" name="countryCode" value="{{ context.shippingLocation.country.iso }}"/>
+        <input type="hidden" name="withPhone" value="{{ mollie_applepaydirect_phonenumber_required }}">
 
         {% if productId %}
             {% set mode = 'productMode' %}

@@ -334,7 +334,7 @@ class ApplePayDirect
      * @throws \Exception
      * @return SalesChannelContext
      */
-    public function prepareCustomer(string $firstname, string $lastname, string $email, string $street, string $zipcode, string $city, string $countryCode, string $paymentToken, SalesChannelContext $context): SalesChannelContext
+    public function prepareCustomer(string $firstname, string $lastname, string $email, string $street, string $zipcode, string $city, string $countryCode, string $phone, string $paymentToken, SalesChannelContext $context): SalesChannelContext
     {
         if (empty($paymentToken)) {
             throw new \Exception('PaymentToken not found!');
@@ -356,7 +356,7 @@ class ApplePayDirect
                 $firstname,
                 $lastname,
                 $email,
-                '',
+                $phone,
                 $street,
                 $zipcode,
                 $city,

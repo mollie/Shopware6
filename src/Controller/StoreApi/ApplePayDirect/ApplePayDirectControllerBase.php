@@ -194,6 +194,7 @@ class ApplePayDirectControllerBase
         $city = (string)$data->get('city', '');
         $zipcode = (string)$data->get('postalCode', '');
         $countryCode = (string)$data->get('countryCode', '');
+        $phone = (string)$data->get('phone', '');
 
         $paymentToken = (string)$data->get('paymentToken', '');
         $finishUrl = (string)$data->get('finishUrl', '');
@@ -215,6 +216,7 @@ class ApplePayDirectControllerBase
             $zipcode,
             $city,
             $countryCode,
+            $phone,
             $paymentToken,
             $context
         );

@@ -126,6 +126,8 @@ export default class MollieApplePayDirect extends Plugin {
         const countryCode = form.querySelector('input[name="countryCode"]').value;
         const currency = form.querySelector('input[name="currency"]').value;
         const mode = form.querySelector('input[name="mode"]').value;
+        const withPhone = parseInt(form.querySelector('input[name="withPhone"]').value);
+
 
         // this helps us to figure out if we are in
         // "product" mode to purchase a single product, or in "cart" mode
@@ -152,7 +154,7 @@ export default class MollieApplePayDirect extends Plugin {
             me.addProductToCart(productId, quantity, shopUrl);
         }
 
-        var session = me.createApplePaySession(isProductMode, countryCode, currency, shopUrl);
+        var session = me.createApplePaySession(isProductMode, countryCode, currency,withPhone, shopUrl);
         session.begin();
     }
 
@@ -178,20 +180,26 @@ export default class MollieApplePayDirect extends Plugin {
      * @param country
      * @param currency
      * @param shopSlug
+     * @param withPhone
      * @returns {ApplePaySession}
      */
-    createApplePaySession(isProductMode, country, currency, shopSlug) {
+    createApplePaySession(isProductMode, country, currency, withPhone, shopSlug) {
 
         const me = this;
+        var shippingFields = [
+            'name',
+            'email',
+            'postalAddress',
+        ];
+
+        if(withPhone === 1){
+            shippingFields.push('phone');
+        }
 
         var request = {
             countryCode: country,
             currencyCode: currency,
-            requiredShippingContactFields: [
-                'name',
-                'email',
-                'postalAddress',
-            ],
+            requiredShippingContactFields: shippingFields,
             supportedNetworks: [
                 'amex',
                 'maestro',
@@ -216,6 +224,9 @@ export default class MollieApplePayDirect extends Plugin {
                     validationUrl: event.validationURL,
                 }),
                 (validationData) => {
+                    if(validationData.success === false){
+                        throw new Error('Validation failed for URL: '+ event.validationURL);
+                    }
                     const data = JSON.parse(validationData.session);
                     session.completeMerchantValidation(data);
                 },
@@ -360,6 +371,11 @@ export default class MollieApplePayDirect extends Plugin {
         form.insertAdjacentElement('beforeend', createInput('street', street));
         form.insertAdjacentElement('beforeend', createInput('postalCode', payment.shippingContact.postalCode));
         form.insertAdjacentElement('beforeend', createInput('city', payment.shippingContact.locality));
+
+        if(payment.shippingContact.phoneNumber.length > 0){
+            form.insertAdjacentElement('beforeend', createInput('phone', payment.shippingContact.phoneNumber));
+        }
+
         form.insertAdjacentElement('beforeend', createInput('countryCode', payment.shippingContact.countryCode));
         // also add our payment token
         form.insertAdjacentElement('beforeend', createInput('paymentToken', paymentToken));
