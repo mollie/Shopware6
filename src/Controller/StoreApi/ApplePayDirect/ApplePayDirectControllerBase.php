@@ -113,7 +113,7 @@ class ApplePayDirectControllerBase
      */
     public function createPaymentSession(RequestDataBag $data, SalesChannelContext $context): StoreApiResponse
     {
-        $validationURL = $data->getAlnum('validationUrl');
+        $validationURL = $data->get('validationUrl');
 
         if (empty($validationURL)) {
             throw new \Exception('Please provide a validation url!');
