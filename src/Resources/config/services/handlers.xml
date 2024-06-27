@@ -78,12 +78,6 @@
             <tag name="shopware.payment.method.async"/>
         </service>
 
-        <!-- GiroPay PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\GiroPayPayment" class="Kiener\MolliePayments\Handler\Method\GiroPayPayment">
-            <argument type="service" id="mollie_payments.logger"/>
-            <argument type="service" id="service_container"/>
-            <tag name="shopware.payment.method.async"/>
-        </service>
 
         <!-- iDeal PaymentHandler -->
         <service id="Kiener\MolliePayments\Handler\Method\iDealPayment" class="Kiener\MolliePayments\Handler\Method\iDealPayment">

@@ -64,10 +64,6 @@ export default class PaymentAction {
             this.openPaymentsModal();
             this.selectPaymentMethod(paymentName);
 
-            // we have to select an iDEAL issuer now (required)
-            if (paymentName === 'iDEAL') {
-                this.selectIDealIssuer('bunq');
-            }
 
             if (paymentName === 'POS Terminal') {
                 this.selectPosTerminal();

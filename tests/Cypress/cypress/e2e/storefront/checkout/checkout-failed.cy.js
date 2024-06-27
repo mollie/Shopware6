@@ -71,7 +71,7 @@ context("Checkout Failure Tests", () => {
 
                 // select giro pay and mark it as "paid"
                 mollieSandbox.initSandboxCookie();
-                molliePaymentList.selectGiropay();
+                molliePaymentList.selectiDEAL();
                 molliePaymentStatus.selectPaid();
 
                 cy.url().should('include', '/checkout/finish');
@@ -102,7 +102,7 @@ context("Checkout Failure Tests", () => {
 
                 // select giro pay and mark it as "paid"
                 mollieSandbox.initSandboxCookie();
-                molliePaymentList.selectGiropay();
+                molliePaymentList.selectiDEAL();
                 molliePaymentStatus.selectPaid();
 
                 cy.url().should('include', '/checkout/finish');
@@ -173,7 +173,7 @@ context("Checkout Failure Tests", () => {
                 }
 
 
-                paymentAction.switchPaymentMethod('Giropay');
+                paymentAction.switchPaymentMethod('iDEAL');
 
                 checkout.placeOrderOnEdit();
 
@@ -206,7 +206,7 @@ context("Checkout Failure Tests", () => {
                     cy.contains('We received your order, but the payment was aborted');
                 }
 
-                paymentAction.switchPaymentMethod('Giropay');
+                paymentAction.switchPaymentMethod('iDEAL');
 
                 checkout.placeOrderOnEdit();
 
