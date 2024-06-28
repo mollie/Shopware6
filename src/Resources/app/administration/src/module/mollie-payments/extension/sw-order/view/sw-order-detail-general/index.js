@@ -221,12 +221,20 @@ Component.override('sw-order-detail-general', {
             return orderAttributes.getCreditCardAttributes();
         },
 
+
+
         /**
          *
          */
         copyPaymentUrlToClipboard() {
+            let fallback = async function(e) {
+                await navigator.clipboard.writeText(e)
+            };
+
             // eslint-disable-next-line no-undef
-            Shopware.Utils.dom.copyToClipboard(this.molliePaymentUrl);
+            let clipboard = typeof Shopware.Utils.dom.copyToClipboard === 'function' ? Shopware.Utils.dom.copyToClipboard : fallback;
+            // eslint-disable-next-line no-undef
+            clipboard(this.molliePaymentUrl);
             this.molliePaymentUrlCopied = true;
         },
 
