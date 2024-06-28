@@ -156,7 +156,7 @@
         <service id="Kiener\MolliePayments\Service\SalesChannel\SalesChannelDataExtractor">
         </service>
 
-        <service id="Kiener\MolliePayments\Service\SalesChannel\SalesChannelLocale">
+        <service id="Kiener\MolliePayments\Service\MollieLocaleService">
             <argument type="service" id="Kiener\MolliePayments\Repository\Language\LanguageRepository"/>
         </service>
 

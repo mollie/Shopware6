@@ -8,6 +8,7 @@ use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher;
 use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
+use Kiener\MolliePayments\Service\MollieLocaleService;
 use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
@@ -63,6 +64,11 @@ class MollieOrderBuilder
     private $urlBuilder;
 
     /**
+     * @var MollieLocaleService
+     */
+    private $mollieLocaleService;
+
+    /**
      * @var EventDispatcherInterface
      */
     private $eventDispatcher;
@@ -81,10 +87,11 @@ class MollieOrderBuilder
      * @param MollieOrderAddressBuilder $addressBuilder
      * @param MollieOrderCustomerEnricher $customerEnricher
      * @param RoutingBuilder $urlBuilder
+     * @param MollieLocaleService $mollieLocaleService
      * @param EventDispatcherInterface $eventDispatcher
      * @param LoggerInterface $logger
      */
-    public function __construct(SettingsService $settingsService, OrderDataExtractor $extractor, MollieOrderPriceBuilder $priceBuilder, MollieLineItemBuilder $lineItemBuilder, MollieOrderAddressBuilder $addressBuilder, MollieOrderCustomerEnricher $customerEnricher, RoutingBuilder $urlBuilder, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger)
+    public function __construct(SettingsService $settingsService, OrderDataExtractor $extractor, MollieOrderPriceBuilder $priceBuilder, MollieLineItemBuilder $lineItemBuilder, MollieOrderAddressBuilder $addressBuilder, MollieOrderCustomerEnricher $customerEnricher, RoutingBuilder $urlBuilder, MollieLocaleService $mollieLocaleService, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger)
     {
         $this->settingsService = $settingsService;
         $this->extractor = $extractor;
@@ -93,6 +100,7 @@ class MollieOrderBuilder
         $this->addressBuilder = $addressBuilder;
         $this->customerEnricher = $customerEnricher;
         $this->urlBuilder = $urlBuilder;
+        $this->mollieLocaleService = $mollieLocaleService;
         $this->eventDispatcher = $eventDispatcher;
         $this->logger = $logger;
     }
@@ -141,6 +149,7 @@ class MollieOrderBuilder
         $currency = $this->extractor->extractCurrency($order, $salesChannelContext);
         $locale = $this->extractor->extractLocale($order, $salesChannelContext);
         $localeCode = ($locale instanceof LocaleEntity) ? $locale->getCode() : self::MOLLIE_DEFAULT_LOCALE_CODE;
+        $localeCode = $this->mollieLocaleService->getMollieLocale($localeCode);
         $lineItems = $order->getLineItems();
         $isVerticalTaxCalculation = $this->isVerticalTaxCalculation($salesChannelContext);
 
