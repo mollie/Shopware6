@@ -9,6 +9,7 @@ use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\CustomFieldService;
 use Kiener\MolliePayments\Service\MandateServiceInterface;
+use Kiener\MolliePayments\Service\MollieLocaleService;
 use Kiener\MolliePayments\Service\SalesChannel\SalesChannelLocale;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
@@ -45,9 +46,9 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     private $settings;
 
     /**
-     * @var SalesChannelLocale
+     * @var MollieLocaleService
      */
-    private $salesChannelLocale;
+    private $mollieLocaleService;
 
     /**
      * @var MandateServiceInterface
@@ -82,15 +83,15 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
      * @param SettingsService $settingsService
      * @param MandateServiceInterface $mandateService
      * @param MollieGatewayInterface $mollieGateway
-     * @param SalesChannelLocale $salesChannelLocale
+     * @param MollieLocaleService $mollieLocaleService
      */
-    public function __construct(MollieApiFactory $apiFactory, SettingsService $settingsService, MandateServiceInterface $mandateService, MollieGatewayInterface $mollieGateway, SalesChannelLocale $salesChannelLocale)
+    public function __construct(MollieApiFactory $apiFactory, SettingsService $settingsService, MandateServiceInterface $mandateService, MollieGatewayInterface $mollieGateway, MollieLocaleService $mollieLocaleService)
     {
         $this->apiFactory = $apiFactory;
         $this->settingsService = $settingsService;
         $this->mandateService = $mandateService;
         $this->mollieGateway = $mollieGateway;
-        $this->salesChannelLocale = $salesChannelLocale;
+        $this->mollieLocaleService = $mollieLocaleService;
     }
 
 
@@ -137,7 +138,7 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     {
         $salesChannelContext = $args->getSalesChannelContext();
 
-        $locale = $this->salesChannelLocale->getLocale($salesChannelContext);
+        $locale = $this->mollieLocaleService->getLocale($salesChannelContext);
 
         $args->getPage()->assign([
             'mollie_locale' => $locale,

@@ -212,7 +212,7 @@
         <service id="Kiener\MolliePayments\Controller\StoreApi\Config\ConfigControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\ConfigService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SalesChannel\SalesChannelLocale"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieLocaleService"/>
             <argument type="service" id="mollie_payments.logger"/>
             <tag name="controller.service_arguments"/>
         </service>

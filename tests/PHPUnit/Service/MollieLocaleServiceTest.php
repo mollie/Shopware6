@@ -1,15 +1,15 @@
 <?php
 
-namespace Kiener\MolliePayments\Tests\Service\SalesChannel;
+namespace Kiener\MolliePayments\Tests\Service;
 
-use Kiener\MolliePayments\Service\SalesChannel\SalesChannelLocale;
+use Kiener\MolliePayments\Service\MollieLocaleService;
 use MolliePayments\Tests\Fakes\Repositories\FakeLanguageRepository;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\System\Language\LanguageEntity;
 use Shopware\Core\System\Locale\LocaleEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
-class SalesChannelLocaleTest extends TestCase
+class MollieLocaleServiceTest extends TestCase
 {
 
     /**
@@ -46,7 +46,7 @@ class SalesChannelLocaleTest extends TestCase
             return $list[0];
         }, $this->getAvailableLocales());
 
-        $this->assertEquals($expected, SalesChannelLocale::AVAILABLE_LOCALES);
+        $this->assertEquals($expected, MollieLocaleService::AVAILABLE_LOCALES);
     }
 
 
@@ -95,7 +95,7 @@ class SalesChannelLocaleTest extends TestCase
 
         $repoLanguages = new FakeLanguageRepository($scLanguage);
 
-        $service = new SalesChannelLocale($repoLanguages);
+        $service = new MollieLocaleService($repoLanguages);
 
         $detectedLocale = $service->getLocale($this->fakeSalesChannelContext);
 
@@ -112,7 +112,7 @@ class SalesChannelLocaleTest extends TestCase
 
         $repoLanguages = new FakeLanguageRepository($scLanguage);
 
-        $service = new SalesChannelLocale($repoLanguages);
+        $service = new MollieLocaleService($repoLanguages);
 
         $detectedLocale = $service->getLocale($this->fakeSalesChannelContext);
 
@@ -129,7 +129,7 @@ class SalesChannelLocaleTest extends TestCase
     {
         $repoLanguages = new FakeLanguageRepository(null);
 
-        $service = new SalesChannelLocale($repoLanguages);
+        $service = new MollieLocaleService($repoLanguages);
 
         $detectedLocale = $service->getLocale($this->fakeSalesChannelContext);
 
@@ -155,4 +155,39 @@ class SalesChannelLocaleTest extends TestCase
         return $scLanguage;
     }
 
+    /**
+     * @dataProvider mollieLocaleDataProvider
+     */
+    public function testProvidesMollieLocale(string $input, string $expected): void
+    {
+        $service = new MollieLocaleService(new FakeLanguageRepository(null));
+
+        $this->assertEquals($expected, $service->getMollieLocale($input));
+    }
+
+    public function mollieLocaleDataProvider(): array
+    {
+        return [
+            'en_US' => ['en-US', 'en_US'],
+            'en_GB' => ['en-GB', 'en_GB'],
+            'nl_NL' => ['nl-NL', 'nl_NL'],
+            'fr_FR' => ['fr-FR', 'fr_FR'],
+            'it_IT' => ['it-IT', 'it_IT'],
+            'de_DE' => ['de-DE', 'de_DE'],
+            'de_AT' => ['de-AT', 'de_AT'],
+            'de_CH' => ['de-CH', 'de_CH'],
+            'es_ES' => ['es-ES', 'es_ES'],
+            'ca_ES' => ['ca-ES', 'ca_ES'],
+            'nb_NO' => ['nb-NO', 'nb_NO'],
+            'pt_PT' => ['pt-PT', 'pt_PT'],
+            'sv_SE' => ['sv-SE', 'sv_SE'],
+            'fi_FI' => ['fi-FI', 'fi_FI'],
+            'da_DK' => ['da-DK', 'da_DK'],
+            'is_IS' => ['is-IS', 'is_IS'],
+            'hu_HU' => ['hu-HU', 'hu_HU'],
+            'pl_PL' => ['pl-PL', 'pl_PL'],
+            'lv_LV' => ['lv-LV', 'lv_LV'],
+            'lt_LT' => ['lt-LT', 'lt_LT']
+        ];
+    }
 }

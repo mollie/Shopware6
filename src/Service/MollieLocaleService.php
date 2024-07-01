@@ -1,11 +1,12 @@
 <?php
+declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Service\SalesChannel;
+namespace Kiener\MolliePayments\Service;
 
 use Kiener\MolliePayments\Repository\Language\LanguageRepositoryInterface;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
-class SalesChannelLocale
+class MollieLocaleService
 {
     public const AVAILABLE_LOCALES = [
         'en_US',
@@ -30,21 +31,15 @@ class SalesChannelLocale
         'lt_LT'
     ];
 
-
     /**
      * @var LanguageRepositoryInterface
      */
     private $repoLanguages;
 
-
-    /**
-     * @param LanguageRepositoryInterface $repoLanguages
-     */
     public function __construct(LanguageRepositoryInterface $repoLanguages)
     {
         $this->repoLanguages = $repoLanguages;
     }
-
 
     /**
      * @param SalesChannelContext $salesChannelContext
@@ -64,6 +59,11 @@ class SalesChannelLocale
             $locale = $language->getLocale()->getCode();
         }
 
+        return $this->getMollieLocale($locale);
+    }
+
+    public function getMollieLocale(?string $locale): string
+    {
         # Set the locale based on the current storefront.
         if ($locale !== null && $locale !== '') {
             $locale = str_replace('-', '_', $locale);
