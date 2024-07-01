@@ -7,16 +7,16 @@ use Basecom\FixturePlugin\Fixture;
 use Basecom\FixturePlugin\FixtureBag;
 use Basecom\FixturePlugin\FixtureHelper;
 use Shopware\Core\Content\Category\CategoryEntity;
+use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\Uuid\Uuid;
 
 class CategoryFixture extends Fixture
 {
-    /**
-     * @var FixtureHelper
-     */
-    private $helper;
 
     /**
      * @var EntityRepository
@@ -53,19 +53,24 @@ class CategoryFixture extends Fixture
      */
     public function load(): void
     {
-        $appendCategory = $this->helper->Category()->getByName('Free time & electronics');
+        $context = new Context(new SystemSource());
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('name', 'Free time & electronics'));
+        $categorySearchResult = $this->categoryRepository->search($criteria, $context);
 
-        if (!$appendCategory instanceof CategoryEntity) {
-            $appendCategory = $this->helper->Category()->getFirst();
-        }
+        /** @var CategoryEntity $category */
+        $category = $categorySearchResult->first();
 
-        $afterCatId = ($appendCategory instanceof CategoryEntity) ? $appendCategory->getId() : null;
+        $afterCatId = $category->getId();
+        $parentId = $category->getParentId();
+        $cmsPageId = $category->getCmsPageId();
 
-        $this->createCategory('0d8eefdd6d12456335280e2ff42431b9', "Voucher", $afterCatId);
-        $this->createCategory('0d9eefdd6d12456335280e2ff42431b2', "Subscriptions", $afterCatId);
-        $this->createCategory('0d9eefdd6d12456335280e2ff42431b9', "Failures", $afterCatId);
-        $this->createCategory('2a2eefdd6d12456335280e2ff42431b9', "Rounding", $afterCatId);
-        $this->createCategory('2a2eefdd6d12456335280e2ff42432b3', "Cheap", $afterCatId);
+
+        $this->createCategory(Uuid::fromStringToHex('Voucher'), "Voucher", $context, $afterCatId, $parentId, $cmsPageId);
+        $this->createCategory(Uuid::fromStringToHex('Subscriptions'), "Subscriptions", $context, $afterCatId, $parentId, $cmsPageId);
+        $this->createCategory(Uuid::fromStringToHex('Failures'), "Failures", $context, $afterCatId, $parentId, $cmsPageId);
+        $this->createCategory(Uuid::fromStringToHex('Rounding'), "Rounding", $context, $afterCatId, $parentId, $cmsPageId);
+        $this->createCategory(Uuid::fromStringToHex('Cheap'), "Cheap", $context, $afterCatId, $parentId, $cmsPageId);
     }
 
     /**
@@ -73,9 +78,8 @@ class CategoryFixture extends Fixture
      * @param string $name
      * @param null|string $afterCategoryId
      */
-    private function createCategory(string $id, string $name, ?string $afterCategoryId): void
+    private function createCategory(string $id, string $name, Context $context, ?string $afterCategoryId, ?string $parentId, ?string $cmsPageId): void
     {
-        $parentRoot = $this->helper->Category()->getRootCategory();
 
         $this->categoryRepository->upsert([
             [
@@ -94,10 +98,10 @@ class CategoryFixture extends Fixture
                 'displayNestedProducts' => true,
                 'visible' => true,
                 'type' => 'page',
-                'cmsPageId' => $this->helper->Cms()->getDefaultCategoryLayout()->getId(),
-                'parentId' => $parentRoot->getId(),
+                'cmsPageId' => $cmsPageId,
+                'parentId' => $parentId,
                 'afterCategoryId' => $afterCategoryId,
             ],
-        ], Context::createDefaultContext());
+        ], $context);
     }
 }

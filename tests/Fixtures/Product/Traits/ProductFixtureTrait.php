@@ -3,9 +3,11 @@
 namespace MolliePayments\Fixtures\Product\Traits;
 
 use Basecom\FixturePlugin\FixtureHelper;
+use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\Uuid\Uuid;
 
 trait ProductFixtureTrait
 {
@@ -53,7 +55,7 @@ trait ProductFixtureTrait
                 [
                     'id' => $id,
                     'name' => $name,
-                    'taxId' => $helper->SalesChannel()->getTax19()->getId(),
+                    'taxId' => $helper->Tax()->getTax19()->getId(),
                     'productNumber' => $number,
                     'description' => $description,
                     'visibilities' => [
@@ -65,13 +67,13 @@ trait ProductFixtureTrait
                     ],
                     'categories' => [
                         [
-                            'id' => $helper->Category()->getByName($categoryName)->getId(),
+                            'id' => Uuid::fromStringToHex($categoryName),
                         ]
                     ],
                     'stock' => 10,
                     'price' => [
                         [
-                            'currencyId' => $helper->SalesChannel()->getCurrencyEuro()->getId(),
+                            'currencyId' => Defaults::CURRENCY,
                             'gross' => $price,
                             'net' => $price,
                             'linked' => true,
