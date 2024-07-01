@@ -13,10 +13,6 @@ class RoundingProducts extends Fixture
 {
     use ProductFixtureTrait;
 
-    /**
-     * @var FixtureHelper
-     */
-    private $helper;
 
     /**
      * @var EntityRepository

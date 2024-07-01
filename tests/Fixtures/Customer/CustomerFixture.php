@@ -6,9 +6,9 @@ namespace MolliePayments\Fixtures\Customer;
 use Basecom\FixturePlugin\Fixture;
 use Basecom\FixturePlugin\FixtureBag;
 use Basecom\FixturePlugin\FixtureHelper;
-use Kiener\MolliePayments\Repository\Customer\CustomerRepositoryInterface;
+use Basecom\FixturePlugin\Utils\SalutationUtils;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 
 class CustomerFixture extends Fixture
 {
@@ -19,10 +19,6 @@ class CustomerFixture extends Fixture
     private const ADDRESS_ID_DE = 'e27ddeb4e85f4a0f9a912a09f07701b0';
 
 
-    /**
-     * @var FixtureHelper
-     */
-    private $helper;
 
     /**
      * @var EntityRepository
@@ -34,7 +30,7 @@ class CustomerFixture extends Fixture
      * @param FixtureHelper $helper
      * @param EntityRepository $customerRepository
      */
-    public function __construct(FixtureHelper $helper, $customerRepository)
+    public function __construct(FixtureHelper $helper,EntityRepository $customerRepository)
     {
         $this->helper = $helper;
         $this->customerRepository = $customerRepository;
@@ -66,16 +62,16 @@ class CustomerFixture extends Fixture
             'defaultPaymentMethodId' => $this->helper->PaymentMethod()->getInvoicePaymentMethod()->getId(),
             'defaultBillingAddress' => [
                 'id' => self::ADDRESS_ID_NL,
-                'salutationId' => $this->helper->Customer()->getNotSpecifiedSalutation()->getId(),
+                'salutationId' => $this->helper->Salutation()->getNotSpecifiedSalutation()->getId(),
                 'firstName' => 'Mollie NL',
                 'lastName' => 'Test',
                 'zipcode' => '1015 CW',
                 'street' => 'Keizersgracht 126',
                 'city' => 'Amsterdam',
-                'countryId' => $this->helper->SalesChannel()->getCountry('NL')->getId(),
+                'countryId' => $this->helper->LanguageAndLocale()->getCountry('NL')->getId(),
             ],
             'defaultShippingAddressId' => self::ADDRESS_ID_NL,
-            'salutationId' => $this->helper->Customer()->getNotSpecifiedSalutation()->getId(),
+            'salutationId' => $this->helper->Salutation()->getNotSpecifiedSalutation()->getId(),
             'customerNumber' => '1122',
             'firstName' => 'Mollie NL',
             'lastName' => 'Test',

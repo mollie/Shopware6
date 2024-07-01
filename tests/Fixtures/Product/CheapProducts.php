@@ -15,11 +15,6 @@ class CheapProducts extends Fixture
     use ProductFixtureTrait;
 
     /**
-     * @var FixtureHelper
-     */
-    private $helper;
-
-    /**
      * @var EntityRepository
      */
     private $repoProducts;
