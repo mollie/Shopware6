@@ -10,7 +10,7 @@ use Shopware\Core\System\SystemConfig\SystemConfigService;
 
 class SettingsService implements PluginSettingsServiceInterface
 {
-    public const SYSTEM_CONFIG_DOMAIN = 'MolliePayments.config.';
+    public const SYSTEM_CONFIG_DOMAIN = 'MolliePayments.config';
     private const SYSTEM_CORE_CONFIG_DOMAIN = 'core';
 
     private const PHONE_NUMBER_FIELD_REQUIRED = 'phoneNumberFieldRequired';
@@ -18,11 +18,6 @@ class SettingsService implements PluginSettingsServiceInterface
     const TEST_API_KEY = 'testApiKey';
     const LIVE_PROFILE_ID = 'liveProfileId';
     const TEST_PROFILE_ID = 'testProfileId';
-
-    /**
-     * @var array<MollieSettingStruct>
-     */
-    private $settings = [];
 
     /**
      * @var SystemConfigService
@@ -76,13 +71,9 @@ class SettingsService implements PluginSettingsServiceInterface
      */
     public function getSettings(?string $salesChannelId = null): MollieSettingStruct
     {
-        $cacheKey = $salesChannelId ?? 'all';
-
-        if (isset($this->settings[$cacheKey]) && $this->settings[$cacheKey] instanceof MollieSettingStruct) {
-            return $this->settings[$cacheKey];
-        }
         $structData = [];
-        $systemConfigData = $this->systemConfigService->getDomain(self::SYSTEM_CONFIG_DOMAIN, $salesChannelId, true);
+        /** @var array<mixed> $systemConfigData */
+        $systemConfigData = $this->systemConfigService->get(self::SYSTEM_CONFIG_DOMAIN, $salesChannelId, );
 
         foreach ($systemConfigData as $key => $value) {
             if (stripos($key, self::SYSTEM_CONFIG_DOMAIN) !== false) {
@@ -92,7 +83,8 @@ class SettingsService implements PluginSettingsServiceInterface
             }
         }
 
-        $coreSettings = $this->systemConfigService->getDomain(self::SYSTEM_CORE_CONFIG_DOMAIN, $salesChannelId, true);
+        /** @var array<mixed> $coreSettings */
+        $coreSettings = $this->systemConfigService->get(self::SYSTEM_CORE_CONFIG_DOMAIN, $salesChannelId);
         foreach ($coreSettings as $key => $value) {
             if (strpos($key, self::PHONE_NUMBER_FIELD_REQUIRED)) {
                 $structData[self::PHONE_NUMBER_FIELD_REQUIRED] = $value;
@@ -100,9 +92,7 @@ class SettingsService implements PluginSettingsServiceInterface
             }
         }
 
-
-        $this->settings[$cacheKey] = (new MollieSettingStruct())->assign($structData);
-        return $this->settings[$cacheKey] ;
+        return (new MollieSettingStruct())->assign($structData);
     }
 
     /**
