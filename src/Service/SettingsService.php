@@ -73,7 +73,7 @@ class SettingsService implements PluginSettingsServiceInterface
     {
         $structData = [];
         /** @var array<mixed> $systemConfigData */
-        $systemConfigData = $this->systemConfigService->get(self::SYSTEM_CONFIG_DOMAIN, $salesChannelId, );
+        $systemConfigData = $this->systemConfigService->get(self::SYSTEM_CONFIG_DOMAIN, $salesChannelId,);
 
         foreach ($systemConfigData as $key => $value) {
             if (stripos($key, self::SYSTEM_CONFIG_DOMAIN) !== false) {
@@ -124,7 +124,7 @@ class SettingsService implements PluginSettingsServiceInterface
      */
     public function set(string $key, $value, ?string $salesChannelId = null): void
     {
-        $this->systemConfigService->set(self::SYSTEM_CONFIG_DOMAIN . $key, $value, $salesChannelId);
+        $this->systemConfigService->set(self::SYSTEM_CONFIG_DOMAIN . '.' . $key, $value, $salesChannelId);
     }
 
     /**
@@ -133,7 +133,7 @@ class SettingsService implements PluginSettingsServiceInterface
      */
     public function delete(string $key, ?string $salesChannelId = null): void
     {
-        $this->systemConfigService->delete(self::SYSTEM_CONFIG_DOMAIN . $key, $salesChannelId);
+        $this->systemConfigService->delete(self::SYSTEM_CONFIG_DOMAIN . '.' . $key, $salesChannelId);
     }
 
     /**
@@ -145,7 +145,7 @@ class SettingsService implements PluginSettingsServiceInterface
     {
         $key = $testMode ? self::TEST_PROFILE_ID : self::LIVE_PROFILE_ID;
 
-        if (!is_null($profileId)) {
+        if (! is_null($profileId)) {
             $this->set($key, $profileId, $salesChannelId);
         } else {
             $this->delete($key, $salesChannelId);
