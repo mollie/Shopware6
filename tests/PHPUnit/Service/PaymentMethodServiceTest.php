@@ -27,6 +27,7 @@ use Kiener\MolliePayments\Handler\Method\PaySafeCardPayment;
 use Kiener\MolliePayments\Handler\Method\PosPayment;
 use Kiener\MolliePayments\Handler\Method\Przelewy24Payment;
 use Kiener\MolliePayments\Handler\Method\SofortPayment;
+use Kiener\MolliePayments\Handler\Method\TrustlyPayment;
 use Kiener\MolliePayments\Handler\Method\TwintPayment;
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Kiener\MolliePayments\Repository\Media\MediaRepositoryInterface;
@@ -136,6 +137,7 @@ class PaymentMethodServiceTest extends TestCase
             BancomatPayment::class,
             MyBankPayment::class,
             AlmaPayment::class,
+            TrustlyPayment::class,
         ];
 
         $handlers = $this->paymentMethodService->getPaymentHandlers();
