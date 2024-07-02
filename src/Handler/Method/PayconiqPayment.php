@@ -12,5 +12,4 @@ class PayconiqPayment extends PaymentHandler
 
     /** @var string */
     protected $paymentMethod = self::PAYMENT_METHOD_NAME;
-
 }
