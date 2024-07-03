@@ -599,7 +599,7 @@ class OrderAttributes
     {
         $foundValue = '';
 
-        $customFields = $order->getCustomFields();
+        $customFields = $order->getCustomFields() ?? [];
 
         # check if we have a mollie entry
         if ($customFields !== null && array_key_exists('mollie_payments', $customFields)) {
