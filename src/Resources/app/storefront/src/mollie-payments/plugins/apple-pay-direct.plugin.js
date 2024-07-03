@@ -372,7 +372,7 @@ export default class MollieApplePayDirect extends Plugin {
         form.insertAdjacentElement('beforeend', createInput('postalCode', payment.shippingContact.postalCode));
         form.insertAdjacentElement('beforeend', createInput('city', payment.shippingContact.locality));
 
-        if(payment.shippingContact.phoneNumber.length > 0){
+        if(payment.shippingContact.phoneNumber !== undefined && payment.shippingContact.phoneNumber.length > 0){
             form.insertAdjacentElement('beforeend', createInput('phone', payment.shippingContact.phoneNumber));
         }
 
