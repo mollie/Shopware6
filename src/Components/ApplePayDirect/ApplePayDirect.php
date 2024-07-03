@@ -352,7 +352,7 @@ class ApplePayDirect
         # if we are not logged in,
         # then we have to create a new guest customer for our express order
         if (!$this->customerService->isCustomerLoggedIn($context)) {
-            $customer = $this->customerService->createApplePayDirectCustomer(
+            $customer = $this->customerService->createApplePayDirectCustomerIfNotExists(
                 $firstname,
                 $lastname,
                 $email,

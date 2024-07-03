@@ -95,17 +95,17 @@ class CustomerService implements CustomerServiceInterface
      * @param ConfigService $configService
      */
     public function __construct(
-        CountryRepositoryInterface $countryRepository,
-        CustomerRepositoryInterface $customerRepository,
-        Customer $customerApiService,
-        EventDispatcherInterface $eventDispatcher,
-        LoggerInterface $logger,
-        SalesChannelContextPersister $salesChannelContextPersister,
+        CountryRepositoryInterface    $countryRepository,
+        CustomerRepositoryInterface   $customerRepository,
+        Customer                      $customerApiService,
+        EventDispatcherInterface      $eventDispatcher,
+        LoggerInterface               $logger,
+        SalesChannelContextPersister  $salesChannelContextPersister,
         SalutationRepositoryInterface $salutationRepository,
-        SettingsService $settingsService,
-        string $shopwareVersion,
-        ConfigService $configService,
-        ContainerInterface $container //we have to inject the container, because in SW 6.4.20.2 we have circular injection for the register route
+        SettingsService               $settingsService,
+        string                        $shopwareVersion,
+        ConfigService                 $configService,
+        ContainerInterface            $container //we have to inject the container, because in SW 6.4.20.2 we have circular injection for the register route
     ) {
         $this->countryRepository = $countryRepository;
         $this->customerRepository = $customerRepository;
@@ -211,7 +211,7 @@ class CustomerService implements CustomerServiceInterface
         $customFields = $customer->getCustomFields();
 
         // If custom fields are empty, create a new array
-        if (!is_array($customFields)) {
+        if (! is_array($customFields)) {
             $customFields = [];
         }
 
@@ -277,7 +277,6 @@ class CustomerService implements CustomerServiceInterface
     }
 
 
-
     /**
      * @param CustomerEntity $customer
      * @param string $terminalId
@@ -288,7 +287,7 @@ class CustomerService implements CustomerServiceInterface
     {
         $customFields = $customer->getCustomFields();
 
-        if (!is_array($customFields)) {
+        if (! is_array($customFields)) {
             $customFields = [];
         }
 
@@ -375,7 +374,7 @@ class CustomerService implements CustomerServiceInterface
 
         $customer = $this->getCustomer($customerId, $context);
 
-        if (!($customer instanceof CustomerEntity)) {
+        if (! ($customer instanceof CustomerEntity)) {
             throw new CustomerCouldNotBeFoundException($customerId);
         }
 
@@ -386,7 +385,7 @@ class CustomerService implements CustomerServiceInterface
             $struct->setLegacyCustomerId($customFields[self::CUSTOM_FIELDS_KEY_MOLLIE_CUSTOMER_ID]);
         }
         $molliePaymentsCustomFields = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS] ?? [];
-        if (!is_array($molliePaymentsCustomFields)) {
+        if (! is_array($molliePaymentsCustomFields)) {
             $this->logger->warning('Customer customFields for MolliePayments are invalid. Array is expected', [
                 'currentCustomFields' => $molliePaymentsCustomFields
             ]);
@@ -436,10 +435,15 @@ class CustomerService implements CustomerServiceInterface
      * @param SalesChannelContext $context
      * @return null|CustomerEntity
      */
-    public function createApplePayDirectCustomer(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, SalesChannelContext $context): ?CustomerEntity
+    public function createApplePayDirectCustomerIfNotExists(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, SalesChannelContext $context): ?CustomerEntity
     {
         $countryId = $this->getCountryId($countryISO2, $context->getContext());
         $salutationId = $this->getSalutationId($context->getContext());
+
+        $customer = $this->findCustomerByEmail($email, $context);
+        if ($customer instanceof CustomerEntity) {
+            return $customer;
+        }
 
         $data = new RequestDataBag();
         $data->set('salutationId', $salutationId);
@@ -465,9 +469,9 @@ class CustomerService implements CustomerServiceInterface
             $errors = [];
             /** we have to store the errors in an array because getErrors returns a generator */
             foreach ($e->getErrors() as $error) {
-                $errors[]=$error;
+                $errors[] = $error;
             }
-            $this->logger->error($e->getMessage(), ['errors'=>$errors]);
+            $this->logger->error($e->getMessage(), ['errors' => $errors]);
             return null;
         }
     }
@@ -490,7 +494,7 @@ class CustomerService implements CustomerServiceInterface
             /** @var string[] $countries */
             $countries = $this->countryRepository->searchIds($criteria, $context)->getIds();
 
-            return !empty($countries) ? (string)$countries[0] : null;
+            return ! empty($countries) ? (string)$countries[0] : null;
         } catch (Exception $e) {
             return null;
         }
@@ -513,7 +517,7 @@ class CustomerService implements CustomerServiceInterface
             /** @var string[] $salutations */
             $salutations = $this->salutationRepository->searchIds($criteria, $context)->getIds();
 
-            return !empty($salutations) ? (string)$salutations[0] : null;
+            return ! empty($salutations) ? (string)$salutations[0] : null;
         } catch (Exception $e) {
             return null;
         }
@@ -576,7 +580,7 @@ class CustomerService implements CustomerServiceInterface
 
         $customer = $this->getCustomer($customerId, $context);
 
-        if (!($customer instanceof CustomerEntity)) {
+        if (! ($customer instanceof CustomerEntity)) {
             throw new CustomerCouldNotBeFoundException($customerId);
         }
 
@@ -589,5 +593,37 @@ class CustomerService implements CustomerServiceInterface
             $settings->isTestMode(),
             $context
         );
+    }
+
+    private function findCustomerByEmail(string $email, SalesChannelContext $context): ?CustomerEntity
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('email', $email));
+        $criteria->addFilter(new EqualsFilter('guest', true));
+        $criteria->addFilter(new EqualsFilter('active', true));
+
+        $searchResult = $this->customerRepository->search($criteria, $context->getContext());
+
+        if ($searchResult->getTotal() === 0) {
+            return null;
+        }
+
+        /** @var CustomerEntity $foundCustomer */
+        $foundCustomer = $searchResult->first();
+
+        $boundCustomers = $searchResult->filter(function (CustomerEntity $customerEntity) use ($context) {
+            return $customerEntity->getBoundSalesChannelId() === $context->getSalesChannelId();
+        });
+
+        if ($boundCustomers->getTotal() > 0) {
+            $foundCustomer = $boundCustomers->first();
+        }
+
+        $bindCustomers = $this->configService->getSystemConfigService()->get('core.systemWideLoginRegistration.isCustomerBoundToSalesChannel');
+
+        if ($bindCustomers && $foundCustomer->getBoundSalesChannelId() === null) {
+            return null;
+        }
+        return $foundCustomer;
     }
 }
