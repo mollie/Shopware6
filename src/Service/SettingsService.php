@@ -11,7 +11,7 @@ use Shopware\Core\System\SystemConfig\SystemConfigService;
 class SettingsService implements PluginSettingsServiceInterface
 {
     public const SYSTEM_CONFIG_DOMAIN = 'MolliePayments.config';
-    private const SYSTEM_CORE_CONFIG_DOMAIN = 'core';
+    private const SYSTEM_CORE_LOGIN_REGISTRATION_CONFIG_DOMAIN = 'core.loginRegistration';
 
     private const PHONE_NUMBER_FIELD_REQUIRED = 'phoneNumberFieldRequired';
     const LIVE_API_KEY = 'liveApiKey';
@@ -84,13 +84,9 @@ class SettingsService implements PluginSettingsServiceInterface
         }
 
         /** @var array<mixed> $coreSettings */
-        $coreSettings = $this->systemConfigService->get(self::SYSTEM_CORE_CONFIG_DOMAIN, $salesChannelId);
-        foreach ($coreSettings as $key => $value) {
-            if (strpos($key, self::PHONE_NUMBER_FIELD_REQUIRED)) {
-                $structData[self::PHONE_NUMBER_FIELD_REQUIRED] = $value;
-                break;
-            }
-        }
+        $coreSettings = $this->systemConfigService->get(self::SYSTEM_CORE_LOGIN_REGISTRATION_CONFIG_DOMAIN, $salesChannelId);
+
+        $structData[self::PHONE_NUMBER_FIELD_REQUIRED] = $coreSettings[self::PHONE_NUMBER_FIELD_REQUIRED];
 
         return (new MollieSettingStruct())->assign($structData);
     }
