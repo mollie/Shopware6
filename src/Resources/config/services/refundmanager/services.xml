@@ -19,5 +19,16 @@
             <tag name="shopware.entity.extension"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Components\RefundManager\Elasticsearch\RefundAdminSearchIndexer">
+
+            <argument type="service" id="Doctrine\DBAL\Connection"/>
+            <argument type="service" id="Shopware\Core\Framework\DataAbstractionLayer\Dbal\Common\IteratorFactory" />
+            <argument type="service" id="mollie_refund.repository"/>
+            <argument>%elasticsearch.indexing_batch_size%</argument>
+
+            <tag name="shopware.elastic.admin-searcher-index"  key="mollie_refund"/>
+        </service>
+
+
     </services>
 </container>
