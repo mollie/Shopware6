@@ -86,7 +86,7 @@ class SettingsService implements PluginSettingsServiceInterface
         /** @var array<mixed> $coreSettings */
         $coreSettings = $this->systemConfigService->get(self::SYSTEM_CORE_LOGIN_REGISTRATION_CONFIG_DOMAIN, $salesChannelId);
 
-        $structData[self::PHONE_NUMBER_FIELD_REQUIRED] = $coreSettings[self::PHONE_NUMBER_FIELD_REQUIRED];
+        $structData[self::PHONE_NUMBER_FIELD_REQUIRED] = $coreSettings[self::PHONE_NUMBER_FIELD_REQUIRED] ?? false;
 
         return (new MollieSettingStruct())->assign($structData);
     }
