@@ -37,7 +37,8 @@
         "optimize-autoloader": true,
         "allow-plugins": {
             "infection/extension-installer": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "symfony/runtime": true
         }
     },
     "autoload": {
@@ -71,14 +72,14 @@
         "shopware/elasticsearch": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.5",
-        "phpstan/phpstan": "1.10.0",
-        "friendsofphp/php-cs-fixer": "^2.18",
-        "phpcompatibility/php-compatibility": "^9.3",
+        "phpunit/phpunit": "^9",
+        "phpstan/phpstan": "^1",
+        "friendsofphp/php-cs-fixer": "^3",
+        "phpcompatibility/php-compatibility": "^9",
         "squizlabs/php_codesniffer": "^3.6",
-        "infection/infection": "^0.25.4",
+        "infection/infection": "^0",
         "boxblinkracer/phpunuhi": "dev-main",
-        "spaze/phpstan-disallowed-calls": "^2.16"
+        "spaze/phpstan-disallowed-calls": "^3"
     },
     "scripts": {
         "post-install-cmd": [
