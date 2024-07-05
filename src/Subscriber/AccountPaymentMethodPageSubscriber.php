@@ -3,7 +3,6 @@
 namespace Kiener\MolliePayments\Subscriber;
 
 use Exception;
-use Kiener\MolliePayments\Service\CustomerServiceInterface;
 use Kiener\MolliePayments\Service\MandateServiceInterface;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;

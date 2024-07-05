@@ -2,9 +2,7 @@
 
 namespace Kiener\MolliePayments\Service\Order;
 
-use Kiener\MolliePayments\Repository\Order\OrderRepository;
 use Kiener\MolliePayments\Repository\Order\OrderRepositoryInterface;
-use Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepositoryInterface;
 use Kiener\MolliePayments\Repository\StateMachineState\StateMachineStateRepositoryInterface;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;

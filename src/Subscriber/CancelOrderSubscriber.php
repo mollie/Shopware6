@@ -7,7 +7,6 @@ use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Mollie\Api\Exceptions\ApiException;
-use Mollie\Api\MollieApiClient;
 use Mollie\Api\Types\OrderStatus;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Api\Context\SalesChannelApiSource;

@@ -2,9 +2,7 @@
 
 namespace Kiener\MolliePayments\Service\Router;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\RouterInterface;
 
 class RoutingDetector
 {

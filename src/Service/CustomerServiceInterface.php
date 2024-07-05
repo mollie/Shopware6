@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Service;
 
 use Kiener\MolliePayments\Struct\CustomerStruct;
-use Kiener\MolliePayments\Struct\Mandate\MandateCollection;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;

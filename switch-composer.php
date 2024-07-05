@@ -28,13 +28,10 @@ file_put_contents(__DIR__ . '/composer.json', json_encode($composerContent, JSON
  */
 function moveToDev(array $composerContent, string $swVersion)
 {
-    $composerContent['require-dev']["shopware/core"] = $swVersion;
-    $composerContent['require-dev']["shopware/administration"] = $swVersion;
-    $composerContent['require-dev']["shopware/storefront"] = $swVersion;
-
-    unset($composerContent['require']["shopware/core"]);
-    unset($composerContent['require']["shopware/administration"]);
-    unset($composerContent['require']["shopware/storefront"]);
+    $composerContent['require']["shopware/core"] = $swVersion;
+    $composerContent['require']["shopware/administration"] = $swVersion;
+    $composerContent['require']["shopware/storefront"] = $swVersion;
+    $composerContent['require']["shopware/elasticsearch"] = $swVersion;
 
     return $composerContent;
 }
@@ -49,10 +46,7 @@ function moveToProd(array $composerContent, string $swVersion)
     $composerContent['require']["shopware/core"] = $swVersion;
     $composerContent['require']["shopware/administration"] = $swVersion;
     $composerContent['require']["shopware/storefront"] = $swVersion;
-
-    unset($composerContent['require-dev']["shopware/core"]);
-    unset($composerContent['require-dev']["shopware/administration"]);
-    unset($composerContent['require-dev']["shopware/storefront"]);
+    $composerContent['require']["shopware/elasticsearch"] = $swVersion;
 
     return $composerContent;
 }

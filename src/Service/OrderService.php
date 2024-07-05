@@ -3,7 +3,6 @@
 namespace Kiener\MolliePayments\Service;
 
 use Kiener\MolliePayments\Components\RefundManager\DAL\Order\OrderExtension;
-use Kiener\MolliePayments\Components\RefundManager\DAL\OrderLineItem\OrderLineItemExtension;
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderLineIdException;
 use Kiener\MolliePayments\Exception\OrderNumberNotFoundException;

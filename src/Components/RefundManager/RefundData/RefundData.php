@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Components\RefundManager\RefundData;
 
-use Kiener\MolliePayments\Components\RefundManager\DAL\RefundItem\RefundItemEntity;
 use Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem\AbstractItem;
 use Mollie\Api\Resources\Refund;
 

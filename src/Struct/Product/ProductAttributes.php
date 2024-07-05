@@ -2,10 +2,7 @@
 
 namespace Kiener\MolliePayments\Struct\Product;
 
-use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Kiener\MolliePayments\Struct\Voucher\VoucherType;
-use Shopware\Core\Checkout\Cart\LineItem\LineItem;
-use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Content\Product\ProductEntity;
 
 class ProductAttributes

@@ -19,7 +19,6 @@ use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
-use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 use Kiener\MolliePayments\Service\SettingsService;
 use Psr\Log\LoggerInterface;
