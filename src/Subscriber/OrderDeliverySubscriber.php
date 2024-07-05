@@ -8,7 +8,6 @@ use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Shopware\Core\System\StateMachine\Event\StateMachineStateChangeEvent;

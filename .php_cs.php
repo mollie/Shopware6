@@ -26,6 +26,7 @@ $config->setRules(
         'phpdoc_trim_consecutive_blank_line_separation' => true,
         'phpdoc_types_order' => true,
         'yoda_style' => false,
+        'no_unused_imports' => true,
     ]
 );
 

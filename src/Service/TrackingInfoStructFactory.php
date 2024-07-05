@@ -7,7 +7,6 @@ use Kiener\MolliePayments\Components\ShipmentManager\Exceptions\NoDeliveriesFoun
 use Kiener\MolliePayments\Struct\MollieApi\ShipmentTrackingInfoStruct;
 use Kiener\MolliePayments\Traits\StringTrait;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
-use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 
 class TrackingInfoStructFactory

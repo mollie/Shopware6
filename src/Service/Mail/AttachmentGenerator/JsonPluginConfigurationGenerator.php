@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Service\Mail\AttachmentGenerator;
 
 use Kiener\MolliePayments\Service\ConfigService;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class JsonPluginConfigurationGenerator extends AbstractPluginConfigurationGenerator
 {

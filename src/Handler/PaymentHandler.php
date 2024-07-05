@@ -2,8 +2,6 @@
 
 namespace Kiener\MolliePayments\Handler;
 
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Exception\PaymentUrlException;
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Facade\MolliePaymentFinalize;

@@ -9,11 +9,9 @@ use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingBui
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
-use Kiener\MolliePayments\Repository\Order\OrderAddressRepository;
 use Kiener\MolliePayments\Repository\Order\OrderAddressRepositoryInterface;
 use Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepository;
 use Kiener\MolliePayments\Service\Cart\CartBackupService;
-use Kiener\MolliePayments\Service\CartService;
 use Kiener\MolliePayments\Service\CartServiceInterface;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\DomainExtractor;

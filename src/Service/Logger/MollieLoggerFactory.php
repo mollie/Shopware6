@@ -3,7 +3,6 @@
 namespace Kiener\MolliePayments\Service\Logger;
 
 use Kiener\MolliePayments\Service\Logger\Processors\AnonymousWebProcessor;
-use Kiener\MolliePayments\Service\Logger\Processors\SessionProcessor;
 use Kiener\MolliePayments\Service\Logger\Services\URLAnonymizer;
 use Kiener\MolliePayments\Service\SettingsService;
 use Monolog\Handler\RotatingFileHandler;

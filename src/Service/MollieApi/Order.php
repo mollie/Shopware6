@@ -28,10 +28,8 @@ use Mollie\Api\Types\PaymentStatus;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class Order

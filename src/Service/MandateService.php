@@ -3,18 +3,14 @@
 namespace Kiener\MolliePayments\Service;
 
 use Exception;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
-use Kiener\MolliePayments\Exception\CouldNotFetchMollieCustomerException;
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieCustomerMandatesException;
 use Kiener\MolliePayments\Exception\CouldNotRevokeMollieCustomerMandateException;
-use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Service\MollieApi\Mandate as MandateApiService;
 use Kiener\MolliePayments\Struct\Mandate\CreditCardDetailStruct;
 use Kiener\MolliePayments\Struct\Mandate\MandateCollection;
 use Kiener\MolliePayments\Struct\Mandate\MandateStruct;
 use Mollie\Api\Resources\Mandate;
-use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 

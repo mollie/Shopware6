@@ -20,7 +20,6 @@ use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class BaseAction
 {

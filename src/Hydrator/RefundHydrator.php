@@ -3,7 +3,6 @@
 namespace Kiener\MolliePayments\Hydrator;
 
 use Kiener\MolliePayments\Components\RefundManager\DAL\Order\OrderExtension;
-use Kiener\MolliePayments\Components\RefundManager\DAL\OrderLineItem\OrderLineItemExtension;
 use Kiener\MolliePayments\Components\RefundManager\DAL\Refund\RefundCollection;
 use Kiener\MolliePayments\Components\RefundManager\DAL\Refund\RefundEntity;
 use Kiener\MolliePayments\Components\RefundManager\DAL\RefundItem\RefundItemEntity;
