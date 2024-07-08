@@ -46,6 +46,7 @@ class LineItemDataExtractor
 
     private function encodePathAndQuery(string $fullUrl):string
     {
+        $fullUrl .= '&width=1920&height={height}';
         $urlParts = parse_url($fullUrl);
 
         $scheme = isset($urlParts['scheme']) ? $urlParts['scheme'] . '://' : '';
@@ -70,11 +71,61 @@ class LineItemDataExtractor
             $path = implode('/', $pathParts);
         }
 
-        $query = isset($urlParts['query']) ? '?' . $urlParts['query'] : '';
+        $query = '';
+        if (isset($urlParts['query'])) {
+            $urlParts['query'] = $this->sanitizeQuery(explode('&', $urlParts['query']));
+            $query = '?' . implode('&', $urlParts['query']);
+        }
 
 
         $fragment = isset($urlParts['fragment']) ? '#' . $urlParts['fragment'] : '';
 
         return trim($scheme.$user.$pass.$host.$port.$path.$query.$fragment);
+    }
+
+    /**
+     * Sanitizes an array of query strings by URL encoding their components.
+     *
+     * This method takes an array of query strings, where each string is expected to be in the format
+     * 'key=value'. It applies the sanitizeQueryPart method to each query string to ensure the keys
+     * and values are URL encoded, making them safe for use in URLs.
+     *
+     * @param array $query An array of query strings to be sanitized.
+     * @return array The sanitized array with URL encoded query strings.
+     */
+    private function sanitizeQuery(array $query): array
+    {
+        // Use array_map to apply the sanitizeQueryPart method to each element of the $query array
+        return array_map([$this, 'sanitizeQueryPart'], $query);
+    }
+
+    /**
+     * Sanitizes a single query string part by URL encoding its key and value.
+     *
+     * This method takes a query string part, expected to be in the format 'key=value', splits it into
+     * its key and value components, URL encodes each component, and then recombines them into a single
+     * query string part.
+     *
+     * @param string $queryPart A single query string part to be sanitized.
+     * @return string The sanitized query string part with URL encoded components.
+     */
+    private function sanitizeQueryPart(string $queryPart): string
+    {
+        // If the query part does not contain an '=', return it as is
+        if (strpos($queryPart, '=') === false) {
+            return$queryPart;
+        }
+
+        //  Split the query part into key and value based on the '=' delimiter
+        [$key, $value] = explode('=', $queryPart);
+
+        //  URL encode the key (first element of the split array)
+        $key = rawurlencode($key);
+
+        //  URL encode the value (second element of the split array)
+        $value = rawurlencode($value);
+
+        // Join the key and value back into a single string with '=' and return it
+        return sprintf('%s=%s', $key, $value);
     }
 }
