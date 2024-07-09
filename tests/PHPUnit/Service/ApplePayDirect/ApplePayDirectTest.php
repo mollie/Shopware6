@@ -3,9 +3,15 @@
 namespace Kiener\MolliePayments\Tests\Service\ApplePayDirect;
 
 use Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect;
+use Kiener\MolliePayments\Components\ApplePayDirect\Exceptions\ApplePayValidationUrlAllowListCanNotBeEmptyException;
+use Kiener\MolliePayments\Components\ApplePayDirect\Exceptions\ApplePayValidationUrlNotInAllowListException;
+use Kiener\MolliePayments\Components\ApplePayDirect\Gateways\ApplePayValidationUrlAllowListGateway;
+use Kiener\MolliePayments\Components\ApplePayDirect\Models\ApplePayValidationUrlAllowListItem;
+use Kiener\MolliePayments\Components\ApplePayDirect\Models\Collections\ApplePayValidationUrlAllowList;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDomainVerificationService;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayFormatter;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingBuilder;
+use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayValidationUrlSanitizer;
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
@@ -41,22 +47,18 @@ class ApplePayDirectTest extends TestCase
 {
     use MockTrait;
 
-    /**
-     * This test verifies that our Apple Pay Cart is correctly
-     * built from a provided Shopware Cart object.
-     */
-    public function testBuildApplePayCart(): void
+    private SalesChannelContext $scContext;
+
+    private $validationUrlAllowListGateway;
+    private ApplePayDirect $applePay;
+
+    protected function setUp(): void
     {
         $swCart = $this->buildShopwareCart();
 
-        /** @var SalesChannelContext $scContext */
-        $scContext = $this->createDummyMock(SalesChannelContext::class, $this);
+        $this->scContext = $this->createDummyMock(SalesChannelContext::class, $this);
 
-
-        $fakeCartService = new FakeCartService($swCart, $scContext);
-
-        /** @var ShippingMethodService $shippingMethodService */
-        $shippingMethodService = $this->createDummyMock(ShippingMethodService::class, $this);
+        $fakeCartService = new FakeCartService($swCart, $this->scContext);
 
         /** @var ApplePayDomainVerificationService $domainVerification */
         $domainVerification = $this->createDummyMock(ApplePayDomainVerificationService::class, $this);
@@ -97,8 +99,11 @@ class ApplePayDirectTest extends TestCase
         /** @var OrderAddressRepository $repoOrderAdresses */
         $repoOrderAdresses = $this->createDummyMock(OrderAddressRepository::class, $this);
 
+        $this->validationUrlAllowListGateway = $this->createDummyMock(ApplePayValidationUrlAllowListGateway::class, $this);
 
-        $applePay = new ApplePayDirect(
+        $validationUrlSanitizer = new ApplePayValidationUrlSanitizer();
+
+        $this->applePay = new ApplePayDirect(
             $domainVerification,
             $payment,
             $doPay,
@@ -112,10 +117,19 @@ class ApplePayDirectTest extends TestCase
             $apiFactory,
             $shopService,
             $orderService,
-            $repoOrderAdresses
+            $repoOrderAdresses,
+            $this->validationUrlAllowListGateway,
+            $validationUrlSanitizer
         );
+    }
 
-        $apCart = $applePay->getCart($scContext);
+    /**
+     * This test verifies that our Apple Pay Cart is correctly
+     * built from a provided Shopware Cart object.
+     */
+    public function testBuildApplePayCart(): void
+    {
+        $apCart = $this->applePay->getCart($this->scContext);
 
         $this->assertEquals(34.99, $apCart->getAmount());
         $this->assertEquals(5, $apCart->getTaxes()->getPrice());
@@ -131,6 +145,49 @@ class ApplePayDirectTest extends TestCase
         $this->assertEquals(1, $apCart->getShippings()[0]->getQuantity());
     }
 
+    public function testThrowsExceptionWhenAllowListIsEmpty(): void
+    {
+        $this->validationUrlAllowListGateway->expects($this->once())
+            ->method('getAllowList')
+            ->willReturn(ApplePayValidationUrlAllowList::create());
+
+        $this->expectException(ApplePayValidationUrlAllowListCanNotBeEmptyException::class);
+        $this->expectExceptionMessage('The Apple Pay validation URL allow list can not be empty. Please check the configuration.');
+
+        $this->applePay->validateValidationUrl('https://example.com');
+    }
+
+    public function testThrowsExceptionWhenUrlIsNotInAllowList(): void
+    {
+        $allowList = ApplePayValidationUrlAllowList::create(
+            ApplePayValidationUrlAllowListItem::create('https://example.com/')
+        );
+        $this->validationUrlAllowListGateway->expects($this->once())
+            ->method('getAllowList')
+            ->willReturn($allowList);
+
+        $testUrl = 'https://example.org/';
+
+        $this->expectException(ApplePayValidationUrlNotInAllowListException::class);
+        $this->expectExceptionMessage(sprintf('The given URL %s is not in the Apple Pay validation URL allow list.', $testUrl));
+
+        $this->applePay->validateValidationUrl($testUrl);
+    }
+
+    public function testProvidesValidValidationUrl(): void
+    {
+        $allowList = ApplePayValidationUrlAllowList::create(
+            ApplePayValidationUrlAllowListItem::create($expected = 'https://example.com/')
+        );
+
+        $this->validationUrlAllowListGateway->expects($this->once())
+            ->method('getAllowList')
+            ->willReturn($allowList);
+
+        $actual = $this->applePay->validateValidationUrl($expected);
+
+        $this->assertSame($expected, $actual);
+    }
 
     /**
      * @return Cart

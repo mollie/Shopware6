@@ -117,6 +117,7 @@ class ApplePayDirectControllerBase
             throw new \Exception('Please provide a validation url!');
         }
 
+        $validationURL = $this->applePay->validateValidationUrl($validationURL);
         $session = $this->applePay->createPaymentSession($validationURL, $context);
 
         return new CreateSessionResponse($session);

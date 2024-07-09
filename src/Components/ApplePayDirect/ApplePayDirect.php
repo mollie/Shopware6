@@ -2,10 +2,14 @@
 
 namespace Kiener\MolliePayments\Components\ApplePayDirect;
 
+use Kiener\MolliePayments\Components\ApplePayDirect\Exceptions\ApplePayValidationUrlAllowListCanNotBeEmptyException;
+use Kiener\MolliePayments\Components\ApplePayDirect\Exceptions\ApplePayValidationUrlNotInAllowListException;
+use Kiener\MolliePayments\Components\ApplePayDirect\Gateways\ApplePayValidationUrlAllowListGateway;
 use Kiener\MolliePayments\Components\ApplePayDirect\Models\ApplePayCart;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDomainVerificationService;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayFormatter;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingBuilder;
+use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayValidationUrlSanitizer;
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
@@ -105,6 +109,16 @@ class ApplePayDirect
      */
     private $repoOrderAdresses;
 
+    /**
+     * @var ApplePayValidationUrlAllowListGateway
+     */
+    private $validationUrlAllowListGateway;
+
+    /**
+     * @var ApplePayValidationUrlSanitizer
+     */
+    private $validationUrlSanitizer;
+
 
     /**
      * @param ApplePayDomainVerificationService $domainFileDownloader
@@ -121,8 +135,10 @@ class ApplePayDirect
      * @param ShopService $shopService
      * @param OrderService $orderService
      * @param OrderAddressRepositoryInterface $repoOrderAdresses
+     * @param ApplePayValidationUrlAllowListGateway $validationUrlAllowListGateway
+     * @param ApplePayValidationUrlSanitizer $validationUrlSanitizer
      */
-    public function __construct(ApplePayDomainVerificationService $domainFileDownloader, ApplePayPayment $paymentHandler, MolliePaymentDoPay $molliePayments, CartServiceInterface $cartService, ApplePayFormatter $formatter, ApplePayShippingBuilder $shippingBuilder, SettingsService $pluginSettings, CustomerService $customerService, PaymentMethodRepository $repoPaymentMethods, CartBackupService $cartBackupService, MollieApiFactory $mollieApiFactory, ShopService $shopService, OrderService $orderService, OrderAddressRepositoryInterface $repoOrderAdresses)
+    public function __construct(ApplePayDomainVerificationService $domainFileDownloader, ApplePayPayment $paymentHandler, MolliePaymentDoPay $molliePayments, CartServiceInterface $cartService, ApplePayFormatter $formatter, ApplePayShippingBuilder $shippingBuilder, SettingsService $pluginSettings, CustomerService $customerService, PaymentMethodRepository $repoPaymentMethods, CartBackupService $cartBackupService, MollieApiFactory $mollieApiFactory, ShopService $shopService, OrderService $orderService, OrderAddressRepositoryInterface $repoOrderAdresses, ApplePayValidationUrlAllowListGateway $validationUrlAllowListGateway, ApplePayValidationUrlSanitizer $validationUrlSanitizer)
     {
         $this->domainFileDownloader = $domainFileDownloader;
         $this->paymentHandler = $paymentHandler;
@@ -138,6 +154,8 @@ class ApplePayDirect
         $this->shopService = $shopService;
         $this->orderService = $orderService;
         $this->repoOrderAdresses = $repoOrderAdresses;
+        $this->validationUrlAllowListGateway = $validationUrlAllowListGateway;
+        $this->validationUrlSanitizer = $validationUrlSanitizer;
     }
 
 
@@ -471,6 +489,29 @@ class ApplePayDirect
 
 
         return $paymentData->getMollieID();
+    }
+
+    /**
+     * @param string $validationUrl
+     * @throws ApplePayValidationUrlAllowListCanNotBeEmptyException
+     * @throws ApplePayValidationUrlNotInAllowListException
+     * @return string
+     */
+    public function validateValidationUrl(string $validationUrl): string
+    {
+        $allowList = $this->validationUrlAllowListGateway->getAllowList();
+
+        if ($allowList->isEmpty()) {
+            throw new ApplePayValidationUrlAllowListCanNotBeEmptyException();
+        }
+
+        $validationUrl = $this->validationUrlSanitizer->sanitizeValidationUrl($validationUrl);
+
+        if ($allowList->contains($validationUrl) === false) {
+            throw new ApplePayValidationUrlNotInAllowListException($validationUrl);
+        }
+
+        return $validationUrl;
     }
 
     /**

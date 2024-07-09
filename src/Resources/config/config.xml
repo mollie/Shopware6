@@ -152,6 +152,15 @@
                 </option>
             </options>
         </input-field>
+        <input-field type="text">
+            <name>ApplePayValidationAllowList</name>
+            <label>Allowed Domains for Apple Pay Validation</label>
+            <label lang="de-DE">Zulässige Domains für die Apple Pay Validierung</label>
+            <label lang="nl-NL">Toegestane domeinen voor Apple Pay validatie</label>
+            <helpText>Enter the domains that are allowed for Apple Pay validation, separated by commas.</helpText>
+            <helpText lang="de-DE">Geben Sie die Domains ein, die für die Apple Pay Validierung zugelassen sind, getrennt durch Kommas.</helpText>
+            <helpText lang="nl-NL">Voer de domeinen in die zijn toegestaan voor Apple Pay validatie, gescheiden door komma's.</helpText>
+        </input-field>
         <input-field type="bool">
             <name>createCustomersAtMollie</name>
             <label>Create customers at Mollie</label>
