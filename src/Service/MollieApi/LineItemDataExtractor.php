@@ -46,7 +46,6 @@ class LineItemDataExtractor
 
     private function encodePathAndQuery(string $fullUrl):string
     {
-        $fullUrl .= '&width=1920&height={height}';
         $urlParts = parse_url($fullUrl);
 
         $scheme = isset($urlParts['scheme']) ? $urlParts['scheme'] . '://' : '';
