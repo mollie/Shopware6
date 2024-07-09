@@ -111,7 +111,6 @@ class LineItemDataExtractor
      */
     private function sanitizeQueryPart(string $queryPart): string
     {
-        // If the query part does not contain an '=', return it as is
         if (strpos($queryPart, '=') === false) {
             return$queryPart;
         }
@@ -119,13 +118,9 @@ class LineItemDataExtractor
         //  Split the query part into key and value based on the '=' delimiter
         [$key, $value] = explode('=', $queryPart);
 
-        //  URL encode the key (first element of the split array)
         $key = rawurlencode($key);
-
-        //  URL encode the value (second element of the split array)
         $value = rawurlencode($value);
 
-        // Join the key and value back into a single string with '=' and return it
         return sprintf('%s=%s', $key, $value);
     }
 }
