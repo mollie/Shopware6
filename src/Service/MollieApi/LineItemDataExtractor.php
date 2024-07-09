@@ -89,8 +89,8 @@ class LineItemDataExtractor
      * 'key=value'. It applies the sanitizeQueryPart method to each query string to ensure the keys
      * and values are URL encoded, making them safe for use in URLs.
      *
-     * @param array $query An array of query strings to be sanitized.
-     * @return array The sanitized array with URL encoded query strings.
+     * @param string[] $query An array of query strings to be sanitized.
+     * @return string[] The sanitized array with URL encoded query strings.
      */
     private function sanitizeQuery(array $query): array
     {
