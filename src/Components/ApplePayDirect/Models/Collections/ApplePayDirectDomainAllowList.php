@@ -4,19 +4,19 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Components\ApplePayDirect\Models\Collections;
 
 use Countable;
-use Kiener\MolliePayments\Components\ApplePayDirect\Models\ApplePayValidationUrlAllowListItem;
+use Kiener\MolliePayments\Components\ApplePayDirect\Models\ApplePayDirectDomainAllowListItem;
 
-class ApplePayValidationUrlAllowList implements Countable
+class ApplePayDirectDomainAllowList implements Countable
 {
     /**
-     * @var ApplePayValidationUrlAllowListItem[]
+     * @var ApplePayDirectDomainAllowListItem[]
      */
     private $allowList;
 
     /**
-     * ApplePayValidationUrlAllowList constructor.
+     * ApplePayDirectDomainAllowList constructor.
      *
-     * @param ApplePayValidationUrlAllowListItem[] $allowList
+     * @param ApplePayDirectDomainAllowListItem[] $allowList
      */
     private function __construct(array $allowList = [])
     {
@@ -24,12 +24,12 @@ class ApplePayValidationUrlAllowList implements Countable
     }
 
     /**
-     * Create a new ApplePayAllowList
+     * Create a new ApplePayDirectDomainAllowList
      *
-     * @param ApplePayValidationUrlAllowListItem ...$items
-     * @return ApplePayValidationUrlAllowList
+     * @param ApplePayDirectDomainAllowListItem ...$items
+     * @return ApplePayDirectDomainAllowList
      */
-    public static function create(ApplePayValidationUrlAllowListItem ...$items): self
+    public static function create(ApplePayDirectDomainAllowListItem ...$items): self
     {
         return new self($items);
     }

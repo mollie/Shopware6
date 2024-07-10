@@ -3,15 +3,15 @@
 namespace Kiener\MolliePayments\Tests\Service\ApplePayDirect;
 
 use Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect;
-use Kiener\MolliePayments\Components\ApplePayDirect\Exceptions\ApplePayValidationUrlAllowListCanNotBeEmptyException;
-use Kiener\MolliePayments\Components\ApplePayDirect\Exceptions\ApplePayValidationUrlNotInAllowListException;
-use Kiener\MolliePayments\Components\ApplePayDirect\Gateways\ApplePayValidationUrlAllowListGateway;
-use Kiener\MolliePayments\Components\ApplePayDirect\Models\ApplePayValidationUrlAllowListItem;
-use Kiener\MolliePayments\Components\ApplePayDirect\Models\Collections\ApplePayValidationUrlAllowList;
+use Kiener\MolliePayments\Components\ApplePayDirect\Exceptions\ApplePayDirectDomainAllowListCanNotBeEmptyException;
+use Kiener\MolliePayments\Components\ApplePayDirect\Exceptions\ApplePayDirectDomainNotInAllowListException;
+use Kiener\MolliePayments\Components\ApplePayDirect\Gateways\ApplePayDirectDomainAllowListGateway;
+use Kiener\MolliePayments\Components\ApplePayDirect\Models\ApplePayDirectDomainAllowListItem;
+use Kiener\MolliePayments\Components\ApplePayDirect\Models\Collections\ApplePayDirectDomainAllowList;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDomainVerificationService;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayFormatter;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingBuilder;
-use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayValidationUrlSanitizer;
+use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDirectDomainSanitizer;
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
@@ -23,8 +23,11 @@ use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\ShippingMethodService;
 use Kiener\MolliePayments\Service\ShopService;
+use Mollie\Api\Endpoints\WalletEndpoint;
+use Mollie\Api\MollieApiClient;
 use MolliePayments\Tests\Fakes\FakeCartService;
 use MolliePayments\Tests\Traits\MockTrait;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\Delivery\Struct\Delivery;
@@ -51,6 +54,11 @@ class ApplePayDirectTest extends TestCase
 
     private $validationUrlAllowListGateway;
     private ApplePayDirect $applePay;
+
+    /**
+     * @var MollieApiFactory|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $apiFactory;
 
     protected function setUp(): void
     {
@@ -88,7 +96,7 @@ class ApplePayDirectTest extends TestCase
         $cartBackupService = $this->createDummyMock(CartBackupService::class, $this);
 
         /** @var MollieApiFactory $apiFactory */
-        $apiFactory = $this->createDummyMock(MollieApiFactory::class, $this);
+        $this->apiFactory = $this->createDummyMock(MollieApiFactory::class, $this);
 
         /** @var ShopService $shopService */
         $shopService = $this->createDummyMock(ShopService::class, $this);
@@ -99,9 +107,9 @@ class ApplePayDirectTest extends TestCase
         /** @var OrderAddressRepository $repoOrderAdresses */
         $repoOrderAdresses = $this->createDummyMock(OrderAddressRepository::class, $this);
 
-        $this->validationUrlAllowListGateway = $this->createDummyMock(ApplePayValidationUrlAllowListGateway::class, $this);
+        $this->validationUrlAllowListGateway = $this->createDummyMock(ApplePayDirectDomainAllowListGateway::class, $this);
 
-        $validationUrlSanitizer = new ApplePayValidationUrlSanitizer();
+        $validationUrlSanitizer = new ApplePayDirectDomainSanitizer();
 
         $this->applePay = new ApplePayDirect(
             $domainVerification,
@@ -114,7 +122,7 @@ class ApplePayDirectTest extends TestCase
             $customerService,
             $repoPaymentMethods,
             $cartBackupService,
-            $apiFactory,
+            $this->apiFactory,
             $shopService,
             $orderService,
             $repoOrderAdresses,
@@ -145,46 +153,55 @@ class ApplePayDirectTest extends TestCase
         $this->assertEquals(1, $apCart->getShippings()[0]->getQuantity());
     }
 
-    public function testThrowsExceptionWhenAllowListIsEmpty(): void
+    public function testThrowsExceptionWhenAllowListIsEmptyWhileTryingToCreatePaymentSession(): void
     {
         $this->validationUrlAllowListGateway->expects($this->once())
             ->method('getAllowList')
-            ->willReturn(ApplePayValidationUrlAllowList::create());
+            ->willReturn(ApplePayDirectDomainAllowList::create());
 
-        $this->expectException(ApplePayValidationUrlAllowListCanNotBeEmptyException::class);
-        $this->expectExceptionMessage('The Apple Pay validation URL allow list can not be empty. Please check the configuration.');
+        $this->expectException(ApplePayDirectDomainAllowListCanNotBeEmptyException::class);
+        $this->expectExceptionMessage('The Apple Pay Direct domain allow list can not be empty. Please check the configuration.');
 
-        $this->applePay->validateValidationUrl('https://example.com');
+        $this->applePay->createPaymentSession('https://example.com', 'example.com', $this->scContext);
     }
 
-    public function testThrowsExceptionWhenUrlIsNotInAllowList(): void
+    public function testThrowsExceptionWhenUrlIsNotInAllowListWhileTryingToCreatePaymentSession(): void
     {
-        $allowList = ApplePayValidationUrlAllowList::create(
-            ApplePayValidationUrlAllowListItem::create('https://example.com/')
+        $allowList = ApplePayDirectDomainAllowList::create(
+            ApplePayDirectDomainAllowListItem::create('example.com')
         );
         $this->validationUrlAllowListGateway->expects($this->once())
             ->method('getAllowList')
             ->willReturn($allowList);
 
-        $testUrl = 'https://example.org/';
+        $testDomain = 'example.org';
 
-        $this->expectException(ApplePayValidationUrlNotInAllowListException::class);
-        $this->expectExceptionMessage(sprintf('The given URL %s is not in the Apple Pay validation URL allow list.', $testUrl));
+        $this->expectException(ApplePayDirectDomainNotInAllowListException::class);
+        $this->expectExceptionMessage(sprintf('The given URL %s is not in the Apple Pay Direct domain allow list.', $testDomain));
 
-        $this->applePay->validateValidationUrl($testUrl);
+        $this->applePay->createPaymentSession('https://example.org', $testDomain, $this->scContext);
     }
 
-    public function testProvidesValidValidationUrl(): void
+    public function testCanCreatePaymentSession(): void
     {
-        $allowList = ApplePayValidationUrlAllowList::create(
-            ApplePayValidationUrlAllowListItem::create($expected = 'https://example.com/')
+        $allowList = ApplePayDirectDomainAllowList::create(
+            ApplePayDirectDomainAllowListItem::create($domain = 'example.com')
         );
 
         $this->validationUrlAllowListGateway->expects($this->once())
             ->method('getAllowList')
             ->willReturn($allowList);
 
-        $actual = $this->applePay->validateValidationUrl($expected);
+        $client = $this->createMock(MollieApiClient::class);
+        $client->wallets = $this->createMock(WalletEndpoint::class);
+        $this->apiFactory->expects($this->once())
+            ->method('getLiveClient')
+            ->willReturn($client);
+
+        $client->wallets->expects($this->once())->method('requestApplePayPaymentSession')
+            ->willReturn($expected = random_bytes(16));
+
+        $actual = $this->applePay->createPaymentSession('https://example.com', $domain, $this->scContext);
 
         $this->assertSame($expected, $actual);
     }

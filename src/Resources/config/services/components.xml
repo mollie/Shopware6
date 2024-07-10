@@ -5,12 +5,6 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
 
-        <service id="Kiener\MolliePayments\Components\ApplePayDirect\Subscriber\ApplePayConfigSubscriber">
-            <tag name="kernel.event_subscriber"/>
-            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
-            <argument type="service" id="sales_channel_domain.repository"/>
-        </service>
-
 
         <service id="Kiener\MolliePayments\Components\RefundManager\RefundManager">
             <argument type="service" id="Kiener\MolliePayments\Components\RefundManager\Builder\RefundDataBuilder"/>
@@ -46,8 +40,8 @@
             <argument type="service" id="Kiener\MolliePayments\Service\ShopService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Repository\Order\OrderAddressRepository"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\Gateways\ApplePayValidationUrlAllowListGateway"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayValidationUrlSanitizer"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\Gateways\ApplePayDirectDomainAllowListGateway"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDirectDomainSanitizer"/>
         </service>
 
         <service id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingBuilder">
@@ -56,10 +50,10 @@
             <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayFormatter"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayValidationUrlSanitizer"/>
+        <service id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDirectDomainSanitizer"/>
 
-        <service id="Kiener\MolliePayments\Components\ApplePayDirect\Gateways\ApplePayValidationUrlAllowListGateway">
-            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
+        <service id="Kiener\MolliePayments\Components\ApplePayDirect\Gateways\ApplePayDirectDomainAllowListGateway">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
         </service>
 
 

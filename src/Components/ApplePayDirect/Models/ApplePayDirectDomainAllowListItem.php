@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\ApplePayDirect\Models;
 
-class ApplePayValidationUrlAllowListItem
+class ApplePayDirectDomainAllowListItem
 {
     /**
      * @var string
@@ -11,7 +11,7 @@ class ApplePayValidationUrlAllowListItem
     private $value;
 
     /**
-     * ApplePayValidationUrlAllowListItem constructor.
+     * ApplePayDirectDomainAllowListItem constructor.
      *
      * @param string $value
      */
@@ -20,19 +20,27 @@ class ApplePayValidationUrlAllowListItem
         $this->value = $value;
     }
 
+    /**
+     * Create a new ApplePayDirectDomainAllowListItem
+     *
+     * @param string $value
+     * @return self
+     */
     public static function create(string $value): self
     {
         if (empty($value)) {
             throw new \InvalidArgumentException(sprintf('The value of %s must not be empty', self::class));
         }
 
+        # we need to have a protocol before the parse url command
+        # in order to have it work correctly
         if (strpos($value, 'http') !== 0) {
             $value = 'https://' . $value;
         }
 
-        if (substr($value, -1) !== '/') {
-            $value .= '/';
-        }
+        # now extract the raw domain without protocol
+        # and without any sub shop urls
+        $value = (string)parse_url($value, PHP_URL_HOST);
 
         return new self($value);
     }

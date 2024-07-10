@@ -221,7 +221,7 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
 
             $validationURL = (string)$content['validationUrl'];
 
-            $session = $this->applePay->createPaymentSession($validationURL, $context);
+            $session = $this->applePay->createPaymentSession($validationURL, '', $context);
 
             return new JsonResponse([
                 'session' => $session,
