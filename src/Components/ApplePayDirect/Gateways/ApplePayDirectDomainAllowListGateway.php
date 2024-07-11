@@ -34,9 +34,9 @@ class ApplePayDirectDomainAllowListGateway
     public function getAllowList(SalesChannelContext $context): ApplePayDirectDomainAllowList
     {
         $settings = $this->settingsService->getSettings($context->getSalesChannel()->getId());
-        $allowList = $settings->applePayDirectDomainAllowList ?? '';
+        $allowList = $settings->getApplePayDirectDomainAllowList();
 
-        if (empty($allowList) || !is_string($allowList)) {
+        if (empty($allowList)) {
             return ApplePayDirectDomainAllowList::create();
         }
 

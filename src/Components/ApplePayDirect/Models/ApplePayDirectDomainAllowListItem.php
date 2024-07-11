@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\ApplePayDirect\Models;
 
+use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDirectDomainSanitizer;
+
 class ApplePayDirectDomainAllowListItem
 {
     /**
@@ -32,15 +34,7 @@ class ApplePayDirectDomainAllowListItem
             throw new \InvalidArgumentException(sprintf('The value of %s must not be empty', self::class));
         }
 
-        # we need to have a protocol before the parse url command
-        # in order to have it work correctly
-        if (strpos($value, 'http') !== 0) {
-            $value = 'https://' . $value;
-        }
-
-        # now extract the raw domain without protocol
-        # and without any sub shop urls
-        $value = (string)parse_url($value, PHP_URL_HOST);
+        $value = (new ApplePayDirectDomainSanitizer())->sanitizeDomain($value);
 
         return new self($value);
     }

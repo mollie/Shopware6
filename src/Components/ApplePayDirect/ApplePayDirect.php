@@ -6,10 +6,10 @@ use Kiener\MolliePayments\Components\ApplePayDirect\Exceptions\ApplePayDirectDom
 use Kiener\MolliePayments\Components\ApplePayDirect\Exceptions\ApplePayDirectDomainNotInAllowListException;
 use Kiener\MolliePayments\Components\ApplePayDirect\Gateways\ApplePayDirectDomainAllowListGateway;
 use Kiener\MolliePayments\Components\ApplePayDirect\Models\ApplePayCart;
+use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDirectDomainSanitizer;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDomainVerificationService;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayFormatter;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingBuilder;
-use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDirectDomainSanitizer;
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
@@ -281,10 +281,10 @@ class ApplePayDirect
      * @param string $validationURL
      * @param string $domain
      * @param SalesChannelContext $context
-     * @return string
      * @throws ApiException
      * @throws ApplePayDirectDomainAllowListCanNotBeEmptyException
      * @throws ApplePayDirectDomainNotInAllowListException
+     * @return string
      */
     public function createPaymentSession(string $validationURL, string $domain, SalesChannelContext $context): string
     {
@@ -529,9 +529,9 @@ class ApplePayDirect
      *
      * @param SalesChannelContext $context
      * @param string $domain
-     * @return string
      * @throws ApplePayDirectDomainAllowListCanNotBeEmptyException
      * @throws ApplePayDirectDomainNotInAllowListException
+     * @return string
      */
     private function getValidDomain(string $domain, SalesChannelContext $context): string
     {

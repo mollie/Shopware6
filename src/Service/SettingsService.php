@@ -18,7 +18,6 @@ class SettingsService implements PluginSettingsServiceInterface
     const TEST_API_KEY = 'testApiKey';
     const LIVE_PROFILE_ID = 'liveProfileId';
     const TEST_PROFILE_ID = 'testProfileId';
-    const APPLE_PAY_DIRECT_DOMAIN_ALLOW_LIST = 'applePayDirectDomainAllowList';
 
     /**
      * @var SystemConfigService

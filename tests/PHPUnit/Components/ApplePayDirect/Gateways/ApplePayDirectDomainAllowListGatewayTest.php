@@ -6,6 +6,7 @@ namespace MolliePayments\Tests\Components\ApplePayDirect\Gateways;
 
 use Kiener\MolliePayments\Components\ApplePayDirect\Gateways\ApplePayDirectDomainAllowListGateway;
 use Kiener\MolliePayments\Service\SettingsService;
+use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Context;
@@ -45,8 +46,7 @@ class ApplePayDirectDomainAllowListGatewayTest extends TestCase
 
     public function testProvidesEmptyAllowList(): void
     {
-        $struct = $this->createMock(\Kiener\MolliePayments\Setting\MollieSettingStruct::class);
-        $struct->{SettingsService::APPLE_PAY_DIRECT_DOMAIN_ALLOW_LIST} = '';
+        $struct = $this->createConfiguredMock(MollieSettingStruct::class, ['getApplePayDirectDomainAllowList' => '']);
         $this->service->expects($this->once())->method('getSettings')->willReturn($struct);
         $allowList = $this->gateway->getAllowList($this->scContext);
 
@@ -56,8 +56,7 @@ class ApplePayDirectDomainAllowListGatewayTest extends TestCase
     public function testProvidesAllowList(): void
     {
         $allowListString = 'https://example.com,https://example-url.org';
-        $struct = $this->createMock(\Kiener\MolliePayments\Setting\MollieSettingStruct::class);
-        $struct->{SettingsService::APPLE_PAY_DIRECT_DOMAIN_ALLOW_LIST} = $allowListString;
+        $struct = $this->createConfiguredMock(MollieSettingStruct::class, ['getApplePayDirectDomainAllowList' => $allowListString]);
         $this->service->expects($this->once())->method('getSettings')->willReturn($struct);
 
         $allowList = $this->gateway->getAllowList($this->scContext);
