@@ -34,6 +34,7 @@ class ApplePayDirectDomainSanitizerTest extends TestCase
             'removes shop language slug if provided' => ['https://example.com/shop/de', 'example.com'],
             'removes shop language slug and trailing slash if provided' => ['example.com/shop/de/', 'example.com'],
             'removes shop language slug and trailing slash if provided and protocol' => ['https://example.com/shop/de/', 'example.com'],
+            'sub domains are not removed' => ['sub.example.com', 'sub.example.com'],
         ];
     }
 }
