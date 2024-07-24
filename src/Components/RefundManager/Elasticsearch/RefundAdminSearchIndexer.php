@@ -76,8 +76,7 @@ class RefundAdminSearchIndexer extends AbstractAdminIndexer
             SELECT LOWER(HEX(mollie_refund.id)) as id,
                    type,
                    public_description,
-                   internal_description,
-             
+                   internal_description
             FROM mollie_refund
             WHERE mollie_refund.id IN (:ids)
             GROUP BY mollie_refund.id
