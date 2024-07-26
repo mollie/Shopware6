@@ -2,7 +2,11 @@
 
 namespace Kiener\MolliePayments\Components\ApplePayDirect;
 
+use Kiener\MolliePayments\Components\ApplePayDirect\Exceptions\ApplePayDirectDomainAllowListCanNotBeEmptyException;
+use Kiener\MolliePayments\Components\ApplePayDirect\Exceptions\ApplePayDirectDomainNotInAllowListException;
+use Kiener\MolliePayments\Components\ApplePayDirect\Gateways\ApplePayDirectDomainAllowListGateway;
 use Kiener\MolliePayments\Components\ApplePayDirect\Models\ApplePayCart;
+use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDirectDomainSanitizer;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDomainVerificationService;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayFormatter;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingBuilder;
@@ -105,6 +109,16 @@ class ApplePayDirect
      */
     private $repoOrderAdresses;
 
+    /**
+     * @var ApplePayDirectDomainAllowListGateway
+     */
+    private $applePayDirectDomainAllowListGateway;
+
+    /**
+     * @var ApplePayDirectDomainSanitizer
+     */
+    private $domainSanitizer;
+
 
     /**
      * @param ApplePayDomainVerificationService $domainFileDownloader
@@ -121,8 +135,10 @@ class ApplePayDirect
      * @param ShopService $shopService
      * @param OrderService $orderService
      * @param OrderAddressRepositoryInterface $repoOrderAdresses
+     * @param ApplePayDirectDomainAllowListGateway $domainAllowListGateway
+     * @param ApplePayDirectDomainSanitizer $domainSanitizer
      */
-    public function __construct(ApplePayDomainVerificationService $domainFileDownloader, ApplePayPayment $paymentHandler, MolliePaymentDoPay $molliePayments, CartServiceInterface $cartService, ApplePayFormatter $formatter, ApplePayShippingBuilder $shippingBuilder, SettingsService $pluginSettings, CustomerService $customerService, PaymentMethodRepository $repoPaymentMethods, CartBackupService $cartBackupService, MollieApiFactory $mollieApiFactory, ShopService $shopService, OrderService $orderService, OrderAddressRepositoryInterface $repoOrderAdresses)
+    public function __construct(ApplePayDomainVerificationService $domainFileDownloader, ApplePayPayment $paymentHandler, MolliePaymentDoPay $molliePayments, CartServiceInterface $cartService, ApplePayFormatter $formatter, ApplePayShippingBuilder $shippingBuilder, SettingsService $pluginSettings, CustomerService $customerService, PaymentMethodRepository $repoPaymentMethods, CartBackupService $cartBackupService, MollieApiFactory $mollieApiFactory, ShopService $shopService, OrderService $orderService, OrderAddressRepositoryInterface $repoOrderAdresses, ApplePayDirectDomainAllowListGateway $domainAllowListGateway, ApplePayDirectDomainSanitizer $domainSanitizer)
     {
         $this->domainFileDownloader = $domainFileDownloader;
         $this->paymentHandler = $paymentHandler;
@@ -138,6 +154,8 @@ class ApplePayDirect
         $this->shopService = $shopService;
         $this->orderService = $orderService;
         $this->repoOrderAdresses = $repoOrderAdresses;
+        $this->applePayDirectDomainAllowListGateway = $domainAllowListGateway;
+        $this->domainSanitizer = $domainSanitizer;
     }
 
 
@@ -261,18 +279,16 @@ class ApplePayDirect
 
     /**
      * @param string $validationURL
+     * @param string $domain
      * @param SalesChannelContext $context
      * @throws ApiException
+     * @throws ApplePayDirectDomainAllowListCanNotBeEmptyException
+     * @throws ApplePayDirectDomainNotInAllowListException
      * @return string
      */
-    public function createPaymentSession(string $validationURL, SalesChannelContext $context): string
+    public function createPaymentSession(string $validationURL, string $domain, SalesChannelContext $context): string
     {
-        # make sure to get rid of any http prefixes or
-        # also any sub shop slugs like /de or anything else
-        # that would NOT work with Mollie and Apple Pay!
-        $domainExtractor = new DomainExtractor();
-        $domain = $domainExtractor->getCleanDomain($this->shopService->getShopUrl(true));
-
+        $domain = $this->getValidDomain($domain, $context);
         # we always have to use the LIVE api key for
         # our first domain validation for Apple Pay!
         # the rest will be done with our test API key (if test mode active), or also Live API key (no test mode)
@@ -506,5 +522,40 @@ class ApplePayDirect
         }
 
         return $appleCart;
+    }
+
+    /**
+     * This method will return a valid domain if not provided by the user it will use the shop domain
+     *
+     * @param SalesChannelContext $context
+     * @param string $domain
+     * @throws ApplePayDirectDomainAllowListCanNotBeEmptyException
+     * @throws ApplePayDirectDomainNotInAllowListException
+     * @return string
+     */
+    private function getValidDomain(string $domain, SalesChannelContext $context): string
+    {
+        #   if we have no domain, then we need to use the shop domain
+        if (empty($domain)) {
+            # make sure to get rid of any http prefixes or
+            # also any sub shop slugs like /de or anything else
+            # that would NOT work with Mollie and Apple Pay!
+            $domainExtractor = new DomainExtractor();
+            return $domainExtractor->getCleanDomain($this->shopService->getShopUrl(true));
+        }
+
+        $allowList = $this->applePayDirectDomainAllowListGateway->getAllowList($context);
+
+        if ($allowList->isEmpty()) {
+            throw new ApplePayDirectDomainAllowListCanNotBeEmptyException();
+        }
+
+        $sanitizedDomain = $this->domainSanitizer->sanitizeDomain($domain);
+
+        if ($allowList->contains($sanitizedDomain) === false) {
+            throw new ApplePayDirectDomainNotInAllowListException($sanitizedDomain);
+        }
+
+        return $sanitizedDomain;
     }
 }
