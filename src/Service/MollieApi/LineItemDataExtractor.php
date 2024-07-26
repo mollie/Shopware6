@@ -111,7 +111,7 @@ class LineItemDataExtractor
     private function sanitizeQueryPart(string $queryPart): string
     {
         if (strpos($queryPart, '=') === false) {
-            return$queryPart;
+            return $queryPart;
         }
 
         //  Split the query part into key and value based on the '=' delimiter
