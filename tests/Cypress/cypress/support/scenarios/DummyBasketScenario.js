@@ -68,6 +68,7 @@ export default class DummyBasketScenario {
         }
 
         checkout.goToCheckoutInOffCanvas();
+        checkout.changeBillingCountry('Germany');
     }
 
 }

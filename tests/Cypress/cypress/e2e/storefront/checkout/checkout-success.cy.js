@@ -91,6 +91,10 @@ context("Checkout Tests", () => {
 
                     scenarioDummyBasket.execute();
 
+                    if(payment.key === 'payconiq'){
+                        checkout.changeBillingCountry('Belgium');
+                    }
+
                     paymentAction.switchPaymentMethod(payment.name);
 
 
