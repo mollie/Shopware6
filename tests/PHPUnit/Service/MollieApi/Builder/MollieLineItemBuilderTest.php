@@ -9,6 +9,7 @@ use Kiener\MolliePayments\Service\MollieApi\Builder\MollieShippingLineItemBuilde
 use Kiener\MolliePayments\Service\MollieApi\Fixer\RoundingDifferenceFixer;
 use Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\PriceCalculator;
+use Kiener\MolliePayments\Service\UrlParsingService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
 use Mollie\Api\Types\OrderLineType;
@@ -38,7 +39,7 @@ class MollieLineItemBuilderTest extends TestCase
         $this->builder = new MollieLineItemBuilder(
             (new IsOrderLineItemValid()),
             (new PriceCalculator()),
-            (new LineItemDataExtractor()),
+            (new LineItemDataExtractor(new UrlParsingService())),
             new FakeCompatibilityGateway(),
             new RoundingDifferenceFixer(),
             new MollieLineItemHydrator(new MollieOrderPriceBuilder()),

@@ -3,6 +3,7 @@
 namespace MolliePayments\Tests\Service\MollieApi;
 
 use Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor;
+use Kiener\MolliePayments\Service\UrlParsingService;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Content\Media\MediaEntity;
@@ -17,7 +18,7 @@ class LineItemDataExtractorTest extends TestCase
 {
     public function testWithMissingProduct(): void
     {
-        $extractor = new LineItemDataExtractor();
+        $extractor = new LineItemDataExtractor(new UrlParsingService());
         $lineItemId = Uuid::randomHex();
         $lineItem = new OrderLineItemEntity();
         $lineItem->setId($lineItemId);
@@ -31,7 +32,7 @@ class LineItemDataExtractorTest extends TestCase
     public function testNoMediaNoSeo(): void
     {
         $expected = 'foo';
-        $extractor = new LineItemDataExtractor();
+        $extractor = new LineItemDataExtractor(new UrlParsingService());
         $lineItem = new OrderLineItemEntity();
         $product = new ProductEntity();
         $product->setProductNumber($expected);
@@ -47,7 +48,7 @@ class LineItemDataExtractorTest extends TestCase
     {
         $expectedImageUrl = 'https://bar.baz';
         $expectedProductNumber = 'foo';
-        $extractor = new LineItemDataExtractor();
+        $extractor = new LineItemDataExtractor(new UrlParsingService());
         $lineItem = new OrderLineItemEntity();
         $product = new ProductEntity();
         $product->setProductNumber($expectedProductNumber);
@@ -71,7 +72,7 @@ class LineItemDataExtractorTest extends TestCase
     {
         $expectedSeoUrl = 'https://bar.foo';
         $expectedProductNumber = 'foo';
-        $extractor = new LineItemDataExtractor();
+        $extractor = new LineItemDataExtractor(new UrlParsingService());
         $lineItem = new OrderLineItemEntity();
         $product = new ProductEntity();
         $product->setProductNumber($expectedProductNumber);
@@ -93,7 +94,7 @@ class LineItemDataExtractorTest extends TestCase
         $expectedImageUrl = 'https://bar.baz';
         $expectedSeoUrl = 'https://bar.foo';
         $expectedProductNumber = 'foo';
-        $extractor = new LineItemDataExtractor();
+        $extractor = new LineItemDataExtractor(new UrlParsingService());
         $lineItem = new OrderLineItemEntity();
         $product = new ProductEntity();
         $product->setProductNumber($expectedProductNumber);
