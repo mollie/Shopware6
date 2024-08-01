@@ -176,7 +176,11 @@
             <argument key="$envAppUrl">%env(default::APP_URL)%</argument>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\TrackingInfoStructFactory"/>
+        <service id="Kiener\MolliePayments\Service\UrlParsingService"/>
+
+        <service id="Kiener\MolliePayments\Service\TrackingInfoStructFactory">
+            <argument type="service" id="Kiener\MolliePayments\Service\UrlParsingService"/>
+        </service>
 
 
         <service id="Kiener\MolliePayments\Subscriber\KernelSubscriber">
