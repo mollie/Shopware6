@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Service\Logger;
 
+use Doctrine\DBAL\Connection;
 use Kiener\MolliePayments\Service\Logger\Processors\AnonymousWebProcessor;
 use Kiener\MolliePayments\Service\Logger\Services\URLAnonymizer;
 use Kiener\MolliePayments\Service\SettingsService;
@@ -31,21 +32,21 @@ class MollieLoggerFactory
     private $filename;
 
     /**
-     * @var string
+     * @var Connection
      */
-    private $dsn;
+    private $connection;
 
 
     /**
      * @param SettingsService $settingsService
      * @param string $filename
-     * @param string $dsn
+     * @param Connection $connection
      */
-    public function __construct(SettingsService $settingsService, string $filename, string $dsn)
+    public function __construct(SettingsService $settingsService, string $filename, Connection $connection)
     {
         $this->settingsService = $settingsService;
         $this->filename = $filename;
-        $this->dsn = $dsn;
+        $this->connection = $connection;
     }
 
     /**
@@ -53,7 +54,7 @@ class MollieLoggerFactory
      */
     public function createLogger(): LoggerInterface
     {
-        if ($this->dsn === '' || $this->dsn === 'mysql://_placeholder.test') {
+        if (!$this->connection->isConnected()) {
             // deployment server without database
             return new Logger(self::CHANNEL);
         }
