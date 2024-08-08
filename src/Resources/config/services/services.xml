@@ -113,7 +113,9 @@
 
         <service id="Kiener\MolliePayments\Service\MollieApi\PriceCalculator"/>
 
-        <service id="Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor"/>
+        <service id="Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor">
+            <argument type="service" id="Kiener\MolliePayments\Service\UrlParsingService"/>
+        </service>
 
 
         <service id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater">

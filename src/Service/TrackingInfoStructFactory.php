@@ -13,6 +13,16 @@ class TrackingInfoStructFactory
 {
     use StringTrait;
 
+    /**
+     * @var UrlParsingService
+     */
+    private $urlParsingService;
+
+    public function __construct(UrlParsingService $urlParsingService)
+    {
+        $this->urlParsingService = $urlParsingService;
+    }
+
 
     /**
      * Mollie throws an error with length >= 100
@@ -91,6 +101,11 @@ class TrackingInfoStructFactory
             throw new \InvalidArgumentException('Missing Argument for Tracking Code!');
         }
 
+        // determine if the provided tracking code is actually a tracking URL
+        if (empty($trackingUrl) === true || $this->urlParsingService->isUrl($trackingCode)) {
+            [$trackingCode, $trackingUrl] = $this->urlParsingService->parseTrackingCodeFromUrl($trackingCode);
+        }
+
         # we just have to completely remove those codes, so that no tracking happens, but a shipping works.
         # still, if we find multiple codes (because separators exist), then we use the first one only
         if (mb_strlen($trackingCode) > self::MAX_TRACKING_CODE_LENGTH) {
@@ -114,13 +129,8 @@ class TrackingInfoStructFactory
 
         $trackingUrl = trim(sprintf($trackingUrl, $trackingCode));
 
-        if (filter_var($trackingUrl, FILTER_VALIDATE_URL) === false) {
-            $trackingUrl = '';
-        }
-
-        # following characters are not allowed in the tracking URL {,},<,>,#
-        if (preg_match_all('/[{}<>#]/m', $trackingUrl)) {
-            $trackingUrl = '';
+        if ($this->urlParsingService->isUrl($trackingUrl) === false) {
+            return new ShipmentTrackingInfoStruct($trackingCarrier, $trackingCode, '');
         }
 
         return new ShipmentTrackingInfoStruct($trackingCarrier, $trackingCode, $trackingUrl);
