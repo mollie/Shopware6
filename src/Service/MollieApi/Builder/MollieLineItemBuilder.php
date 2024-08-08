@@ -14,6 +14,7 @@ use Kiener\MolliePayments\Struct\MollieLineItemCollection;
 use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
 use Mollie\Api\Types\OrderLineType;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
+use Shopware\Core\Checkout\Cart\Price\Struct\AbsolutePriceDefinition;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
@@ -146,6 +147,11 @@ class MollieLineItemBuilder
             $this->orderLineItemValidator->validate($item);
             $extraData = $this->lineItemDataExtractor->extractExtraData($item);
             $itemPrice = $item->getPrice();
+            $itemPriceDefinition = $item->getPriceDefinition();
+
+            if ($itemPriceDefinition instanceof AbsolutePriceDefinition) {
+                $item->setQuantity(1);
+            }
 
             if (!$itemPrice instanceof CalculatedPrice) {
                 throw new MissingPriceLineItemException((string)$item->getProductId());
