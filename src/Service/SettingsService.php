@@ -12,8 +12,10 @@ class SettingsService implements PluginSettingsServiceInterface
 {
     public const SYSTEM_CONFIG_DOMAIN = 'MolliePayments.config';
     private const SYSTEM_CORE_LOGIN_REGISTRATION_CONFIG_DOMAIN = 'core.loginRegistration';
+    private const SYSTEM_CORE_CART_CONFIG_DOMAIN = 'core.cart';
 
     private const PHONE_NUMBER_FIELD_REQUIRED = 'phoneNumberFieldRequired';
+    private const PAYMENT_FINALIZE_TRANSACTION_TIME = 'paymentFinalizeTransactionTime';
     const LIVE_API_KEY = 'liveApiKey';
     const TEST_API_KEY = 'testApiKey';
     const LIVE_PROFILE_ID = 'liveProfileId';
@@ -87,6 +89,10 @@ class SettingsService implements PluginSettingsServiceInterface
         $coreSettings = $this->systemConfigService->get(self::SYSTEM_CORE_LOGIN_REGISTRATION_CONFIG_DOMAIN, $salesChannelId);
 
         $structData[self::PHONE_NUMBER_FIELD_REQUIRED] = $coreSettings[self::PHONE_NUMBER_FIELD_REQUIRED] ?? false;
+
+        /** @var array<mixed> $cartSettings */
+        $cartSettings = $this->systemConfigService->get(self::SYSTEM_CORE_CART_CONFIG_DOMAIN, $salesChannelId);
+        $structData[self::PAYMENT_FINALIZE_TRANSACTION_TIME] = $cartSettings[self::PAYMENT_FINALIZE_TRANSACTION_TIME] ?? 1800;
 
         return (new MollieSettingStruct())->assign($structData);
     }

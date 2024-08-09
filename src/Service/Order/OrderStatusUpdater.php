@@ -16,6 +16,7 @@ use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachine
 
 class OrderStatusUpdater
 {
+    public const ORDER_STATE_FORCE_OPEN = 'order-state-force-open';
     /**
      * @var OrderStateService
      */
@@ -101,7 +102,7 @@ class OrderStatusUpdater
                 {
                     # if we are already in_progress...then don't switch to OPEN again
                     # otherwise SEPA bank transfer would switch back to OPEN
-                    if ($currentShopwareStatusKey !== OrderTransactionStates::STATE_IN_PROGRESS) {
+                    if ($currentShopwareStatusKey !== OrderTransactionStates::STATE_IN_PROGRESS || $context->hasState(self::ORDER_STATE_FORCE_OPEN)) {
                         $addLog = true;
                         $this->transactionTransitionService->reOpenTransaction($transaction, $context);
                     }

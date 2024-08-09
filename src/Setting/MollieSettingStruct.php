@@ -256,6 +256,11 @@ class MollieSettingStruct extends Struct
     protected $applePayDirectDomainAllowList = '';
 
     /**
+     * @var int
+     */
+    protected $paymentFinalizeTransactionTime;
+
+    /**
      * @return string
      */
     public function getLiveApiKey(): string
@@ -981,5 +986,15 @@ class MollieSettingStruct extends Struct
     public function setApplePayDirectDomainAllowList(string $applePayDirectDomainAllowList): void
     {
         $this->applePayDirectDomainAllowList = $applePayDirectDomainAllowList;
+    }
+
+    public function getPaymentFinalizeTransactionTime(): int
+    {
+        return $this->paymentFinalizeTransactionTime;
+    }
+
+    public function setPaymentFinalizeTransactionTime(int $paymentFinalizeTransactionTime): void
+    {
+        $this->paymentFinalizeTransactionTime = $paymentFinalizeTransactionTime;
     }
 }
