@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Subscriber;
 
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
+use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Order\OrderStatusUpdater;
 use Kiener\MolliePayments\Service\Order\OrderTimeService;
 use Kiener\MolliePayments\Service\SettingsService;
@@ -71,11 +72,15 @@ class OrderEditSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $finalizeTransactionTimeInMinutes = $this->settingsService->getSettings()->getPaymentFinalizeTransactionTime();
+            $settings = $this->settingsService->getSettings();
+            $finalizeTransactionTimeInMinutes = $settings->getPaymentFinalizeTransactionTime();
             $finalizeTransactionTimeInHours = (int) ceil($finalizeTransactionTimeInMinutes / 60);
 
-            if ($this->orderTimeService->isOrderAgeGreaterThan($order, $finalizeTransactionTimeInHours) === false
-                || $this->orderUsesSepaPayment($order)) {
+            if ($this->orderUsesSepaPayment($order)) {
+                $finalizeTransactionTimeInHours = (int) ceil($settings->getPaymentMethodBankTransferDueDateDays() / 24);
+            }
+
+            if ($this->orderTimeService->isOrderAgeGreaterThan($order, $finalizeTransactionTimeInHours) === false) {
                 continue;
             }
 
@@ -85,7 +90,7 @@ class OrderEditSubscriber implements EventSubscriberInterface
             // this forces the order to be open again
             $context->addState(OrderStatusUpdater::ORDER_STATE_FORCE_OPEN);
             try {
-                $this->orderStatusUpdater->updatePaymentStatus($lastTransaction, self::OPEN_ORDER_STATE, $context);
+                $this->orderStatusUpdater->updatePaymentStatus($lastTransaction, MolliePaymentStatus::MOLLIE_PAYMENT_CANCELED, $context);
             } catch (\Exception $exception) {
             }
         }
