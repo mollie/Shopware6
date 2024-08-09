@@ -66,5 +66,12 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Subscriber\OrderEditSubscriber">
+            <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderTimeService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <tag name="kernel.event_subscriber" />
+        </service>
+
     </services>
 </container>

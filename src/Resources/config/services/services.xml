@@ -115,6 +115,7 @@
 
         <service id="Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor"/>
 
+        <service id="Kiener\MolliePayments\Service\Order\OrderTimeService"/>
 
         <service id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater">
             <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStateService"/>
