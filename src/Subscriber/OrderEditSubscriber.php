@@ -15,7 +15,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class OrderEditSubscriber implements EventSubscriberInterface
 {
-    private const OPEN_ORDER_STATE = 'open';
     /**
      * @var OrderStatusUpdater
      */
