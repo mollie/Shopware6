@@ -6,6 +6,7 @@ namespace MolliePayments\Tests\Service\Cart\Subscription;
 
 use Kiener\MolliePayments\Event\MollieSubscriptionCartItemAddedEvent;
 use Kiener\MolliePayments\Service\Cart\Subscription\SubscriptionCartCollector;
+use Kiener\MolliePayments\Service\Cart\Subscription\SubscriptionProductIdentifier;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\CartBehavior;
@@ -19,19 +20,23 @@ class SubscriptionCartCollectorTest extends TestCase
 {
     const SUBSCRIPTION_ENABLED = 'mollie_payments_product_subscription_enabled';
     private $dispatcher;
-
+    private $identifier;
     private $collector;
-
     private $data;
 
     protected function setUp(): void
     {
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->collector = new SubscriptionCartCollector($this->dispatcher);
+        $this->identifier = $this->createMock(SubscriptionProductIdentifier::class);
+        $this->collector = new SubscriptionCartCollector($this->dispatcher, $this->identifier);
         $this->data = $this->createMock(CartDataCollection::class);
         $this->original = $this->createMock(Cart::class);
         $this->context = $this->createMock(SalesChannelContext::class);
         $this->behavior = $this->createMock(CartBehavior::class);
+
+        $this->identifier->method('isSubscriptionProduct')->willReturnCallback(function (CheckoutCartLineItem $lineItem) {
+            return $lineItem->getPayloadValue(self::SUBSCRIPTION_ENABLED)[self::SUBSCRIPTION_ENABLED] ?? false;
+        });
     }
 
     public function testDispatchesEventWhenAProductIsAMollieSubscriptionProduct(): void
@@ -58,18 +63,6 @@ class SubscriptionCartCollectorTest extends TestCase
         $regularProduct = $this->createLineItemMockWithPayloadValue([self::SUBSCRIPTION_ENABLED => false,]);
 
         $this->configureGetLineItemsMethodOfCart($regularProduct);
-
-        // we expect the event to not be dispatched
-        $this->dispatcher->expects($this->never())->method('dispatch');
-
-        $this->collector->collect($this->data, $this->original, $this->context, $this->behavior);
-    }
-
-    public function testDoesNotDispatchEventWhenCustomFieldsIsMissingSubscriptionData(): void
-    {
-        $incorrectlyConfiguredProduct = $this->createLineItemMockWithPayloadValue((object)[self::SUBSCRIPTION_ENABLED => false,]);
-
-        $this->configureGetLineItemsMethodOfCart($incorrectlyConfiguredProduct);
 
         // we expect the event to not be dispatched
         $this->dispatcher->expects($this->never())->method('dispatch');

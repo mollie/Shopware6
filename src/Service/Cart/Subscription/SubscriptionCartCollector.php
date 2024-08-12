@@ -8,7 +8,6 @@ use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\CartBehavior;
 use Shopware\Core\Checkout\Cart\CartDataCollectorInterface;
 use Shopware\Core\Checkout\Cart\LineItem\CartDataCollection;
-use Shopware\Core\Checkout\Cart\LineItem\LineItem as CheckoutCartLineItem;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -20,21 +19,26 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class SubscriptionCartCollector implements CartDataCollectorInterface
 {
-    private const SUBSCRIPTION_ENABLED = 'mollie_payments_product_subscription_enabled';
-
     /**
      * @var EventDispatcherInterface
      */
     private $dispatcher;
 
     /**
+     * @var SubscriptionProductIdentifier
+     */
+    private $subscriptionProductIdentifier;
+
+    /**
      * SubscriptionCartCollector constructor.
      *
      * @param EventDispatcherInterface $dispatcher The event dispatcher
+     * @param SubscriptionProductIdentifier $subscriptionProductIdentifier
      */
-    public function __construct(EventDispatcherInterface $dispatcher)
+    public function __construct(EventDispatcherInterface $dispatcher, SubscriptionProductIdentifier $subscriptionProductIdentifier)
     {
         $this->dispatcher = $dispatcher;
+        $this->subscriptionProductIdentifier = $subscriptionProductIdentifier;
     }
 
     /**
@@ -49,27 +53,10 @@ class SubscriptionCartCollector implements CartDataCollectorInterface
     {
         $events = [];
         foreach ($original->getLineItems() as $lineItem) {
-            if ($this->lineItemIsSubscriptionProduct($lineItem)) {
+            if ($this->subscriptionProductIdentifier->isSubscriptionProduct($lineItem)) {
                 $events[] = new MollieSubscriptionCartItemAddedEvent($context, $lineItem);
             }
         }
         array_map([$this->dispatcher, 'dispatch'], $events);
-    }
-
-    /**
-     * Checks if a line item is a subscription product.
-     *
-     * @param CheckoutCartLineItem $lineItem The line item to check
-     * @return bool True if the line item is a subscription product, false otherwise
-     */
-    private function lineItemIsSubscriptionProduct(CheckoutCartLineItem $lineItem): bool
-    {
-        $customFields = $lineItem->getPayloadValue('customFields');
-
-        if (is_array($customFields) === false || isset($customFields[self::SUBSCRIPTION_ENABLED]) === false) {
-            return false;
-        }
-
-        return (bool)$customFields[self::SUBSCRIPTION_ENABLED];
     }
 }
