@@ -64,7 +64,7 @@ class OrderEditSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $lastTransaction = $transactions->filter(Closure::fromCallable([$this, 'sortTransactionsByDate']));
+            $lastTransaction = $transactions->filter(Closure::fromCallable([$this, 'sortTransactionsByDate']))->last();
 
             $lastStatus = $lastTransaction->getStateMachineState()->getTechnicalName();
 
@@ -129,7 +129,7 @@ class OrderEditSubscriber implements EventSubscriberInterface
     {
         $customFields = $order->getCustomFields();
 
-        return is_array($customFields) && !count($customFields) && isset($customFields['mollie_payments']);
+        return is_array($customFields) && count($customFields) && isset($customFields['mollie_payments']);
     }
 
     /**
