@@ -5,7 +5,6 @@ namespace Kiener\MolliePayments\Handler\Method;
 
 use Kiener\MolliePayments\Handler\PaymentHandler;
 
-
 class RivertyPayment extends PaymentHandler
 {
     public const PAYMENT_METHOD_NAME = 'riverty';
