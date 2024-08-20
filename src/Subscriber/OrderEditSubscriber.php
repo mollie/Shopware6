@@ -10,6 +10,7 @@ use Kiener\MolliePayments\Service\Order\OrderTimeService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Checkout\Order\OrderStates;
 use Shopware\Storefront\Page\Account\Order\AccountOrderPageLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -67,7 +68,7 @@ class OrderEditSubscriber implements EventSubscriberInterface
             $lastStatus = $lastTransaction->getStateMachineState()->getTechnicalName();
 
             // disregard any orders that are not in progress
-            if ($lastStatus !== 'in_progress') {
+            if ($lastStatus !== OrderStates::STATE_IN_PROGRESS) {
                 continue;
             }
 
