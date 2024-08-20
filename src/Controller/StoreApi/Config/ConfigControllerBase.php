@@ -9,7 +9,6 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
-use Symfony\Component\Routing\Annotation\Route;
 
 class ConfigControllerBase
 {

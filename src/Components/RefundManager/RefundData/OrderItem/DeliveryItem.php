@@ -2,10 +2,7 @@
 
 namespace Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem;
 
-use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
-use Mollie\Api\Resources\Refund;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
-use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 
 class DeliveryItem extends AbstractItem
 {

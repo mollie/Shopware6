@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Service\Mail;
 
-use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Mail\Service\AbstractMailFactory;
 use Shopware\Core\Content\Mail\Service\AbstractMailSender;
 use Shopware\Core\Content\MailTemplate\Exception\MailTransportFailedException;

@@ -9,7 +9,7 @@
         <service id="Kiener\MolliePayments\Service\Logger\MollieLoggerFactory" class="Kiener\MolliePayments\Service\Logger\MollieLoggerFactory">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument>%kernel.logs_dir%/mollie_%kernel.environment%.log</argument>
-            <argument>%env(DATABASE_URL)%</argument>
+            <argument type="service" id="Doctrine\DBAL\Connection"/>
         </service>
 
         <service id="mollie_payments.logger" class="Monolog\Logger">
@@ -113,7 +113,9 @@
 
         <service id="Kiener\MolliePayments\Service\MollieApi\PriceCalculator"/>
 
-        <service id="Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor"/>
+        <service id="Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor">
+            <argument type="service" id="Kiener\MolliePayments\Service\UrlParsingService"/>
+        </service>
 
 
         <service id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater">

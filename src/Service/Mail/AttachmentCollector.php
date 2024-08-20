@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Service\Mail;
 
-use Kiener\MolliePayments\Service\Mail\AttachmentGenerator\GeneratorInterface;
 use Shopware\Core\Framework\Context;
 
 class AttachmentCollector

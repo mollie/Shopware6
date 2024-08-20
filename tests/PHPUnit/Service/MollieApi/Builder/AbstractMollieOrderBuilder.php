@@ -23,6 +23,7 @@ use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 use Kiener\MolliePayments\Service\Router\RoutingDetector;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
+use Kiener\MolliePayments\Service\UrlParsingService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
 use MolliePayments\Tests\Fakes\FakeCompatibilityGateway;
@@ -180,7 +181,7 @@ abstract class AbstractMollieOrderBuilder extends TestCase
             new MollieLineItemBuilder(
                 new IsOrderLineItemValid(),
                 new PriceCalculator(),
-                new LineItemDataExtractor(),
+                new LineItemDataExtractor(new UrlParsingService()),
                 new FakeCompatibilityGateway(),
                 new RoundingDifferenceFixer(),
                 new MollieLineItemHydrator(new MollieOrderPriceBuilder()),

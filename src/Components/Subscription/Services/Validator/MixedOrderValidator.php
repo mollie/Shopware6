@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Components\Subscription\Services\Validator;
 
-use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;

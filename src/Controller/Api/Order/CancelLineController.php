@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Controller\Api\Order;
 
 use Kiener\MolliePayments\Components\CancelManager\CancelItemFacade;
-use Kiener\MolliePayments\Components\CancelManager\CancelManagerInterface;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Mollie\Api\Resources\OrderLine;
 use Shopware\Core\Framework\Context;

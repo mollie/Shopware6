@@ -152,6 +152,28 @@
                 </option>
             </options>
         </input-field>
+        <input-field type="text">
+            <name>applePayDirectDomainAllowList</name>
+            <label>Allowed Domains for Apple Pay Direct</label>
+            <label lang="de-DE">Zulässige Domains für die Apple Pay Direct</label>
+            <label lang="nl-NL">Toegestane domeinen voor Apple Pay Direct</label>
+            <helpText>
+                Enter the domains that are allowed for Apple Pay Direct, separated by commas.
+                This setting is optional and only required if you are using a headless setup
+                and want to provide an alternative domain for your Apple Pay Direct integration.
+            </helpText>
+            <helpText lang="de-DE">
+                Geben Sie die Domains ein, die für die Apple Pay Direct zugelassen sind, getrennt durch Kommas.
+                Diese Einstellung ist optional und nur erforderlich, wenn Sie ein Headless-Setup verwenden
+                und eine alternative Domain für Ihre Apple Pay Direct Integration bereitstellen möchten.
+            </helpText>
+            <helpText lang="nl-NL">
+                Voer de domeinen in die zijn toegestaan voor Apple Pay Direct, gescheiden door komma's.
+                Deze instelling is optioneel en alleen nodig als u een headless setup gebruikt
+                en een alternatieve domein voor uw Apple Pay Direct integratie wilt opgeven.
+            </helpText>
+        </input-field>
+
         <input-field type="bool">
             <name>createCustomersAtMollie</name>
             <label>Create customers at Mollie</label>

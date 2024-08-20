@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Controller\Api\Order;
 
-use Kiener\MolliePayments\Components\RefundManager\RefundData\RefundData;
 use Kiener\MolliePayments\Components\RefundManager\RefundManagerInterface;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
@@ -12,12 +11,10 @@ use Kiener\MolliePayments\Service\Refund\RefundService;
 use Kiener\MolliePayments\Traits\Api\ApiTrait;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\Validation\DataBag\QueryDataBag;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Annotation\Route;
 
 class RefundControllerBase extends AbstractController
 {

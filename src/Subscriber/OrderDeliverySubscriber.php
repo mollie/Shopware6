@@ -8,7 +8,6 @@ use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Shopware\Core\System\StateMachine\Event\StateMachineStateChangeEvent;
@@ -120,7 +119,7 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
 
             $this->mollieShipment->shipOrderRest($order, null, $event->getContext());
         } catch (\Throwable $ex) {
-            $this->logger->error('Failed to transfer delivery state to mollie: '.$ex->getMessage());
+            $this->logger->error('Failed to transfer delivery state to mollie: '.$ex->getMessage(), ['exception' => $ex]);
             return;
         }
     }

@@ -13,11 +13,9 @@ use Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Response\PaymentRes
 use Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Response\RestoreCartResponse;
 use Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Response\SetShippingMethodResponse;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
-use Symfony\Component\Routing\Annotation\Route;
 use Throwable;
 
 class ApplePayDirectControllerBase
@@ -114,12 +112,13 @@ class ApplePayDirectControllerBase
     public function createPaymentSession(RequestDataBag $data, SalesChannelContext $context): StoreApiResponse
     {
         $validationURL = $data->get('validationUrl');
+        $domain = (string)$data->get('domain');
 
         if (empty($validationURL)) {
             throw new \Exception('Please provide a validation url!');
         }
 
-        $session = $this->applePay->createPaymentSession($validationURL, $context);
+        $session = $this->applePay->createPaymentSession($validationURL, $domain, $context);
 
         return new CreateSessionResponse($session);
     }

@@ -9,6 +9,7 @@ use Kiener\MolliePayments\Service\MollieApi\Builder\MollieShippingLineItemBuilde
 use Kiener\MolliePayments\Service\MollieApi\Fixer\RoundingDifferenceFixer;
 use Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\PriceCalculator;
+use Kiener\MolliePayments\Service\UrlParsingService;
 use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
 use MolliePayments\Tests\Fakes\FakeCompatibilityGateway;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
@@ -81,7 +82,7 @@ trait PaymentBuilderTrait
         $mollieLineItemBuilder = new MollieLineItemBuilder(
             new IsOrderLineItemValid(),
             new PriceCalculator(),
-            new LineItemDataExtractor(),
+            new LineItemDataExtractor(new UrlParsingService()),
             new FakeCompatibilityGateway(),
             new RoundingDifferenceFixer(),
             new MollieLineItemHydrator(new MollieOrderPriceBuilder()),

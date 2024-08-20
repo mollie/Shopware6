@@ -6,7 +6,6 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
-use Shopware\Core\Content\MailTemplate\MailTemplateEntity;
 use Shopware\Core\Framework\Struct\Struct;
 
 class MollieSettingStruct extends Struct
@@ -15,6 +14,8 @@ class MollieSettingStruct extends Struct
 
     public const ORDER_EXPIRES_AT_MIN_DAYS = 1;
     public const ORDER_EXPIRES_AT_MAX_DAYS = 100;
+
+    const APPLE_PAY_DIRECT_DOMAIN_ALLOW_LIST = 'applePayDirectDomainAllowList';
 
     /**
      * @var string
@@ -248,6 +249,11 @@ class MollieSettingStruct extends Struct
      * @var bool
      */
     protected $phoneNumberFieldRequired = false;
+
+    /**
+     * @var string
+     */
+    protected $applePayDirectDomainAllowList = '';
 
     /**
      * @return string
@@ -965,5 +971,15 @@ class MollieSettingStruct extends Struct
     public function setPhoneNumberFieldRequired(bool $phoneNumberFieldRequired): void
     {
         $this->phoneNumberFieldRequired = $phoneNumberFieldRequired;
+    }
+
+    public function getApplePayDirectDomainAllowList(): string
+    {
+        return $this->applePayDirectDomainAllowList;
+    }
+
+    public function setApplePayDirectDomainAllowList(string $applePayDirectDomainAllowList): void
+    {
+        $this->applePayDirectDomainAllowList = $applePayDirectDomainAllowList;
     }
 }

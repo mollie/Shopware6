@@ -6,10 +6,8 @@ use Exception;
 use Kiener\MolliePayments\MolliePayments;
 use Kiener\MolliePayments\Service\MollieApi\Client\MollieHttpClient;
 use Kiener\MolliePayments\Service\SettingsService;
-use Mollie\Api\Exceptions\IncompatiblePlatform;
 use Mollie\Api\MollieApiClient;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Framework\Context;
 use Shopware\Core\Kernel;
 
 class MollieApiFactory

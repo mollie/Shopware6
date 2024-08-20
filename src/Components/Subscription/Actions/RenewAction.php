@@ -7,7 +7,6 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFact
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Components\Subscription\Actions\Base\BaseAction;
 use Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\MollieStatus;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionStatus;
 use Kiener\MolliePayments\Components\Subscription\Exception\SubscriptionSkippedException;
 use Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder;

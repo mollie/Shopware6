@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Service;
 
 use Kiener\MolliePayments\Struct\CustomerStruct;
-use Kiener\MolliePayments\Struct\Mandate\MandateCollection;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
@@ -37,7 +36,7 @@ interface CustomerServiceInterface
      * @return array<string, mixed>
      */
     public function getAddressArray($address, CustomerEntity $customer): array;
-    public function createApplePayDirectCustomer(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, SalesChannelContext $context): ?CustomerEntity;
+    public function createApplePayDirectCustomerIfNotExists(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, SalesChannelContext $context): ?CustomerEntity;
     public function getCountryId(string $countryCode, Context $context): ?string;
     public function getSalutationId(Context $context): ?string;
     public function createMollieCustomer(string $customerId, string $salesChannelId, Context $context): void;

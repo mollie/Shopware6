@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Service\Payment\Remover;
 
-use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\OrderItemsExtractor;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;

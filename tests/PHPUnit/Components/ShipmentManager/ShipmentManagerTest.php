@@ -14,6 +14,7 @@ use Kiener\MolliePayments\Service\OrderDeliveryService;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\TrackingInfoStructFactory;
 use Kiener\MolliePayments\Service\Transition\DeliveryTransitionService;
+use Kiener\MolliePayments\Service\UrlParsingService;
 use MolliePayments\Tests\Fakes\FakeShipment;
 use MolliePayments\Tests\Traits\OrderTrait;
 use PHPUnit\Framework\TestCase;
@@ -65,7 +66,7 @@ class ShipmentManagerTest extends TestCase
             $orderService,
             $deliveryExtractor,
             new OrderItemsExtractor(),
-            new TrackingInfoStructFactory()
+            new TrackingInfoStructFactory(new UrlParsingService())
         );
 
         $this->context = $this->getMockBuilder(Context::class)->disableOriginalConstructor()->getMock();

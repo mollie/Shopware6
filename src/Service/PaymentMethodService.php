@@ -14,7 +14,6 @@ use Kiener\MolliePayments\Handler\Method\BlikPayment;
 use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
 use Kiener\MolliePayments\Handler\Method\EpsPayment;
 use Kiener\MolliePayments\Handler\Method\GiftCardPayment;
-use Kiener\MolliePayments\Handler\Method\GiroPayPayment;
 use Kiener\MolliePayments\Handler\Method\iDealPayment;
 use Kiener\MolliePayments\Handler\Method\In3Payment;
 use Kiener\MolliePayments\Handler\Method\IngHomePayPayment;
@@ -24,16 +23,17 @@ use Kiener\MolliePayments\Handler\Method\KlarnaPayLaterPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaPayNowPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaSliceItPayment;
 use Kiener\MolliePayments\Handler\Method\MyBankPayment;
+use Kiener\MolliePayments\Handler\Method\PayconiqPayment;
 use Kiener\MolliePayments\Handler\Method\PayPalPayment;
 use Kiener\MolliePayments\Handler\Method\PaySafeCardPayment;
 use Kiener\MolliePayments\Handler\Method\PosPayment;
 use Kiener\MolliePayments\Handler\Method\Przelewy24Payment;
 use Kiener\MolliePayments\Handler\Method\RivertyPayment;
 use Kiener\MolliePayments\Handler\Method\SofortPayment;
+use Kiener\MolliePayments\Handler\Method\TrustlyPayment;
 use Kiener\MolliePayments\Handler\Method\TwintPayment;
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Kiener\MolliePayments\MolliePayments;
-use Kiener\MolliePayments\Repository\Media\MediaRepository;
 use Kiener\MolliePayments\Repository\Media\MediaRepositoryInterface;
 use Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepositoryInterface;
 use Kiener\MolliePayments\Service\HttpClient\HttpClientInterface;
@@ -447,6 +447,8 @@ class PaymentMethodService
             BancomatPayment::class,
             MyBankPayment::class,
             AlmaPayment::class,
+            TrustlyPayment::class,
+            PayconiqPayment::class,
             RivertyPayment::class,
             // IngHomePayPayment::class, // not allowed anymore
             // DirectDebitPayment::class, // only allowed when updating subsriptions, aka => not allowed anymore

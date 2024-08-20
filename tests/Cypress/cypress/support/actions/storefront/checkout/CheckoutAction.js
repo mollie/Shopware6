@@ -110,4 +110,13 @@ export default class CheckoutAction {
         cy.get('.header-minimal-back-to-shop > .btn').click();
     }
 
+    changeBillingCountry(billingCountry){
+
+        cy.get('.js-confirm-overview-addresses .card:eq(0) .card-actions a[data-address-editor]').click();
+        cy.wait(2000);
+        cy.get('.address-editor-edit').click();
+        cy.wait(1000);
+        cy.get('select.country-select:eq(0)').select(billingCountry);
+        cy.get('.address-form-actions:eq(0) button').click();
+    }
 }
