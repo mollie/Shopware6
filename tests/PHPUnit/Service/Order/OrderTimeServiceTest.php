@@ -37,9 +37,6 @@ class OrderTimeServiceTest extends TestCase
 
         $entity->method('getTransactions')->willReturn($transactions);
 
-//        $stateMachineState = $this->createMock(StateMachineStateEntity::class);
-//        $stateMachineState->method('getCreatedAt')->willReturn($time);
-
         $transaction->method('getCreatedAt')->willReturn($time);
 
         return $entity;
