@@ -16,7 +16,7 @@ class OrderTimeService
 
     public function __construct(?DateTime $now = null)
     {
-        $this->now = $now ?? new DateTime('now');
+        $this->now = $now ?? new DateTime();
     }
 
     /**
