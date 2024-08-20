@@ -60,6 +60,8 @@ const payments = [
     {caseId: 'C4143', key: 'voucher', name: 'Voucher', sanity: false},
     {caseId: 'C3362894', key: 'trustly', name: 'Trustly', sanity: false},
     {caseId: 'C3362897', key: 'payconiq', name: 'Payconiq', sanity: false},
+    {caseId: 'C3713510', key: 'riverty', name: 'Riverty', sanity: false},
+    {caseId: 'C3713512', key: 'satispay', name: 'Satispay', sanity: false},
     // unfortunately address and product prices need to match, so we cannot do in3 automatically for now
     // {caseId: '', key: 'in3', name: 'in3'},
 ];
