@@ -234,6 +234,14 @@
             <tag name="shopware.payment.method.async"/>
         </service>
 
+        <!-- Satispay PaymentHandler -->
+        <service id="Kiener\MolliePayments\Handler\Method\SatispayPayment">
+            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="service_container"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+
+
 
     </services>
 </container>
