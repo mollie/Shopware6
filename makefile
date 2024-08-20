@@ -81,11 +81,7 @@ phpmin: ## Starts the PHP compatibility checks
 	@php vendor/bin/phpcs -p --standard=PHPCompatibility --extensions=php --runtime-set testVersion 7.4 ./src
 
 csfix: ## Starts the PHP CS Fixer
-ifndef fix
 	@PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config=./.php_cs.php --dry-run
-else
-	@PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config=./.php_cs.php
-endif
 
 stan: ## Starts the PHPStan Analyser
 	@php vendor/bin/phpstan analyse -c ./.phpstan.neon
