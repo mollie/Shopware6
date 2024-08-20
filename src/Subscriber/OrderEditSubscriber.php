@@ -127,6 +127,6 @@ class OrderEditSubscriber implements EventSubscriberInterface
     {
         $customFields = $order->getCustomFields();
 
-        return is_array($customFields) && !empty($customFields) && isset($customFields['mollie_payments']);
+        return is_array($customFields) && !count($customFields) && isset($customFields['mollie_payments']);
     }
 }
