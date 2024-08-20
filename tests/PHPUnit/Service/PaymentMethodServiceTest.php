@@ -27,6 +27,7 @@ use Kiener\MolliePayments\Handler\Method\PayPalPayment;
 use Kiener\MolliePayments\Handler\Method\PaySafeCardPayment;
 use Kiener\MolliePayments\Handler\Method\PosPayment;
 use Kiener\MolliePayments\Handler\Method\Przelewy24Payment;
+use Kiener\MolliePayments\Handler\Method\RivertyPayment;
 use Kiener\MolliePayments\Handler\Method\SofortPayment;
 use Kiener\MolliePayments\Handler\Method\TrustlyPayment;
 use Kiener\MolliePayments\Handler\Method\TwintPayment;
@@ -140,6 +141,7 @@ class PaymentMethodServiceTest extends TestCase
             AlmaPayment::class,
             TrustlyPayment::class,
             PayconiqPayment::class,
+            RivertyPayment::class
         ];
 
         $handlers = $this->paymentMethodService->getPaymentHandlers();
