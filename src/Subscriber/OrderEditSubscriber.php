@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Subscriber;
 
+use Closure;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Order\OrderStatusUpdater;
@@ -63,7 +64,7 @@ class OrderEditSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $lastTransaction = $transactions->last();
+            $lastTransaction = $transactions->filter(Closure::fromCallable([$this, 'sortTransactionsByDate']));
 
             $lastStatus = $lastTransaction->getStateMachineState()->getTechnicalName();
 
@@ -129,5 +130,15 @@ class OrderEditSubscriber implements EventSubscriberInterface
         $customFields = $order->getCustomFields();
 
         return is_array($customFields) && !count($customFields) && isset($customFields['mollie_payments']);
+    }
+
+    /**
+     * @param OrderTransactionEntity $a
+     * @param OrderTransactionEntity $b
+     * @return int
+     */
+    private function sortTransactionsByDate(OrderTransactionEntity $a, OrderTransactionEntity $b): int
+    {
+        return $a->getCreatedAt() <=> $b->getCreatedAt();
     }
 }
