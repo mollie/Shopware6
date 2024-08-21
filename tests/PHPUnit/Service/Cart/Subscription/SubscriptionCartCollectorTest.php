@@ -12,6 +12,7 @@ use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\CartBehavior;
 use Shopware\Core\Checkout\Cart\LineItem\CartDataCollection;
 use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
+use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem as CheckoutCartLineItem;
@@ -20,23 +21,17 @@ class SubscriptionCartCollectorTest extends TestCase
 {
     const SUBSCRIPTION_ENABLED = 'mollie_payments_product_subscription_enabled';
     private $dispatcher;
-    private $identifier;
     private $collector;
     private $data;
 
     protected function setUp(): void
     {
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->identifier = $this->createMock(SubscriptionProductIdentifier::class);
-        $this->collector = new SubscriptionCartCollector($this->dispatcher, $this->identifier);
+        $this->collector = new SubscriptionCartCollector($this->dispatcher);
         $this->data = $this->createMock(CartDataCollection::class);
         $this->original = $this->createMock(Cart::class);
         $this->context = $this->createMock(SalesChannelContext::class);
         $this->behavior = $this->createMock(CartBehavior::class);
-
-        $this->identifier->method('isSubscriptionProduct')->willReturnCallback(function (CheckoutCartLineItem $lineItem) {
-            return $lineItem->getPayloadValue(self::SUBSCRIPTION_ENABLED)[self::SUBSCRIPTION_ENABLED] ?? false;
-        });
     }
 
     public function testDispatchesEventWhenAProductIsAMollieSubscriptionProduct(): void
@@ -72,12 +67,10 @@ class SubscriptionCartCollectorTest extends TestCase
 
     private function createLineItemMockWithPayloadValue($value): CheckoutCartLineItem
     {
-        return $this->createConfiguredMock(
-            CheckoutCartLineItem::class,
-            [
-                'getPayloadValue' => $value
-            ]
-        );
+        return (new CheckoutCartLineItem(
+            Uuid::randomBytes(),
+            'product'
+        ))->setPayload(['customFields' => $value]);
     }
 
     private function configureGetLineItemsMethodOfCart(CheckoutCartLineItem ...$items): void

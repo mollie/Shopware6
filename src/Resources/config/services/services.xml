@@ -136,13 +136,9 @@
             <argument type="service" id="mollie_payments.logger"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\Cart\Subscription\SubscriptionProductIdentifier"/>
-
-
         <service id="Kiener\MolliePayments\Service\Cart\Subscription\SubscriptionCartCollector">
             <tag name="shopware.cart.collector" priority="1999" />
             <argument type="service" id="event_dispatcher"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Cart\Subscription\SubscriptionProductIdentifier"/>
         </service>
 
 

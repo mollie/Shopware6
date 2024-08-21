@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Service\Cart\Subscription;
 
 use Kiener\MolliePayments\Event\MollieSubscriptionCartItemAddedEvent;
+use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\CartBehavior;
 use Shopware\Core\Checkout\Cart\CartDataCollectorInterface;
@@ -25,20 +26,13 @@ class SubscriptionCartCollector implements CartDataCollectorInterface
     private $dispatcher;
 
     /**
-     * @var SubscriptionProductIdentifier
-     */
-    private $subscriptionProductIdentifier;
-
-    /**
      * SubscriptionCartCollector constructor.
      *
      * @param EventDispatcherInterface $dispatcher The event dispatcher
-     * @param SubscriptionProductIdentifier $subscriptionProductIdentifier
      */
-    public function __construct(EventDispatcherInterface $dispatcher, SubscriptionProductIdentifier $subscriptionProductIdentifier)
+    public function __construct(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
-        $this->subscriptionProductIdentifier = $subscriptionProductIdentifier;
     }
 
     /**
@@ -53,7 +47,7 @@ class SubscriptionCartCollector implements CartDataCollectorInterface
     {
         $events = [];
         foreach ($original->getLineItems() as $lineItem) {
-            if ($this->subscriptionProductIdentifier->isSubscriptionProduct($lineItem)) {
+            if ((new LineItemAttributes($lineItem))->isSubscriptionProduct()) {
                 $events[] = new MollieSubscriptionCartItemAddedEvent($context, $lineItem);
             }
         }
