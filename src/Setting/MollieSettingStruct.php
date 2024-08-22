@@ -251,6 +251,11 @@ class MollieSettingStruct extends Struct
     protected $phoneNumberFieldRequired = false;
 
     /**
+     * @var bool
+     */
+    protected $showPhoneNumberField = false;
+
+    /**
      * @var string
      */
     protected $applePayDirectDomainAllowList = '';
@@ -977,6 +982,17 @@ class MollieSettingStruct extends Struct
     {
         $this->phoneNumberFieldRequired = $phoneNumberFieldRequired;
     }
+
+    public function isPhoneNumberFieldShown():bool
+    {
+        return $this->showPhoneNumberField;
+    }
+
+    public function setShowPhoneNumberField(bool $showPhoneNumberField): void
+    {
+        $this->showPhoneNumberField = $showPhoneNumberField;
+    }
+
 
     public function getApplePayDirectDomainAllowList(): string
     {
