@@ -64,7 +64,9 @@ class OrderEditSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $lastTransaction = $transactions->filter(Closure::fromCallable([$this, 'sortTransactionsByDate']))->last();
+            $transactions->sort(Closure::fromCallable([$this, 'sortTransactionsByDate']));
+
+            $lastTransaction = $transactions->last();
 
             $lastStatus = $lastTransaction->getStateMachineState()->getTechnicalName();
 
@@ -75,13 +77,12 @@ class OrderEditSubscriber implements EventSubscriberInterface
 
             $settings = $this->settingsService->getSettings();
             $finalizeTransactionTimeInMinutes = $settings->getPaymentFinalizeTransactionTime();
-            $finalizeTransactionTimeInHours = (int) ceil($finalizeTransactionTimeInMinutes / 60);
 
             if ($this->orderUsesSepaPayment($order)) {
-                $finalizeTransactionTimeInHours = (int) ceil($settings->getPaymentMethodBankTransferDueDateDays() / 24);
+                $finalizeTransactionTimeInMinutes = (int) ceil($settings->getPaymentMethodBankTransferDueDateDays() / 24 / 60);
             }
 
-            if ($this->orderTimeService->isOrderAgeGreaterThan($order, $finalizeTransactionTimeInHours) === false) {
+            if ($this->orderTimeService->isOrderAgeGreaterThan($order, $finalizeTransactionTimeInMinutes) === false) {
                 continue;
             }
 
