@@ -9,7 +9,6 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
 
 #[\Symfony\Component\Messenger\Attribute\AsMessageHandler(handles: RenewalReminderTask::class)]
-/** @phpstan-ignore-next-line  */
 #[\Symfony\Component\Messenger\Attribute\AsMessageHandler(handles: RenewalReminderTaskDev::class)]
 class RenewalReminderTaskHandler extends ScheduledTaskHandler
 {
