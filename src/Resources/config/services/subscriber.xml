@@ -67,9 +67,7 @@
         </service>
 
         <service id="Kiener\MolliePayments\Subscriber\OrderEditSubscriber">
-            <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderTimeService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderExpireService"/>
             <tag name="kernel.event_subscriber" />
         </service>
 

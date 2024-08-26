@@ -8,6 +8,8 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
 
+#[\Symfony\Component\Messenger\Attribute\AsMessageHandler(handles: RenewalReminderTask::class)]
+#[\Symfony\Component\Messenger\Attribute\AsMessageHandler(handles: RenewalReminderTaskDev::class)]
 class RenewalReminderTaskHandler extends ScheduledTaskHandler
 {
     /**
@@ -28,7 +30,8 @@ class RenewalReminderTaskHandler extends ScheduledTaskHandler
      */
     public function __construct(ScheduledTaskRepositoryInterface $scheduledTaskRepository, SubscriptionManager $subscriptionManager, LoggerInterface $logger)
     {
-        parent::__construct($scheduledTaskRepository->getRepository());
+        /** @phpstan-ignore-next-line  */
+        parent::__construct($scheduledTaskRepository->getRepository(), $logger);
 
         $this->subscriptionManager = $subscriptionManager;
         $this->logger = $logger;
