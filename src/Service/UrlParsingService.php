@@ -31,26 +31,20 @@ class UrlParsingService
      */
     public function parseTrackingCodeFromUrl(string $value): array
     {
-        // Case 1: Query parameter
-        if ((bool)preg_match('#(code|shipment|track|tracking)=([a-zA-Z0-9]+)#i', $value, $matches)) {
-            return [$matches[2], $value];
+        $urlQuery = parse_url($value, PHP_URL_QUERY);
+        if ($urlQuery === null) {
+            $urlQuery = parse_url($value, PHP_URL_FRAGMENT);
         }
-
-        // Case 2: Path-based tracking
-        if ((bool)preg_match('#/(code|shipment|track|tracking)/([a-zA-Z0-9]+)/#i', $value, $matches)) {
-            return [$matches[2], $value];
+        if ($urlQuery === null) {
+            return ['', $value];
         }
+        $urlQuery = (string)$urlQuery;
+        $urlWithoutQuery = str_replace($urlQuery, '', $value);
 
-        // Case 3: Hash-based tracking
-        if ((bool)preg_match('#\#(code|shipment|track|tracking)=([a-zA-Z0-9]+)#i', $value, $matches)) {
-            return [$matches[2], $value];
-        }
-
-        // could not determine code
-        return ['', $value];
+        return [$urlQuery, $urlWithoutQuery . '%s'];
     }
 
-    public function encodePathAndQuery(string $fullUrl):string
+    public function encodePathAndQuery(string $fullUrl): string
     {
         $urlParts = parse_url($fullUrl);
 
@@ -62,7 +56,7 @@ class UrlParsingService
 
         $user = isset($urlParts['user']) ? $urlParts['user'] : '';
 
-        $pass = isset($urlParts['pass']) ? ':' . $urlParts['pass']  : '';
+        $pass = isset($urlParts['pass']) ? ':' . $urlParts['pass'] : '';
 
         $pass = ($user || $pass) ? "$pass@" : '';
 
@@ -85,7 +79,7 @@ class UrlParsingService
 
         $fragment = isset($urlParts['fragment']) ? '#' . rawurlencode($urlParts['fragment']) : '';
 
-        return trim($scheme.$user.$pass.$host.$port.$path.$query.$fragment);
+        return trim($scheme . $user . $pass . $host . $port . $path . $query . $fragment);
     }
 
     /**
