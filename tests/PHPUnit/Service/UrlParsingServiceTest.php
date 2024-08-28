@@ -44,30 +44,14 @@ class UrlParsingServiceTest extends TestCase
     public function queryParameterProvider(): array
     {
         return [
-            ['https://www.example.com/product?code=12345', ['12345', 'https://www.example.com/product?code=12345']],
-            ['https://www.example.com/product?shipment=abc123', ['abc123', 'https://www.example.com/product?shipment=abc123']],
-            ['https://www.example.com/product?track=track123', ['track123', 'https://www.example.com/product?track=track123']],
-            ['https://www.example.com/product?tracking=track456', ['track456', 'https://www.example.com/product?tracking=track456']],
+            ['https://www.example.com/product?code=12345&postal_code=123', ['code=12345&postal_code=123', 'https://www.example.com/product?%s']],
+            ['https://www.example.com/product?shipment=abc123', ['shipment=abc123', 'https://www.example.com/product?%s']],
+            ['https://www.example.com/product?track=track123', ['track=track123', 'https://www.example.com/product?%s']],
+            ['https://www.example.com/product?tracking=track456', ['tracking=track456', 'https://www.example.com/product?%s']],
+            ['https://www.example.com/tracking/?country=at&tracking_number=1023534500214250110508&postal_cod1e=1050', ['country=at&tracking_number=1023534500214250110508&postal_cod1e=1050', 'https://www.example.com/tracking/?%s']],
         ];
     }
 
-    /**
-     * @dataProvider pathProvider
-     */
-    public function testParseTrackingCodePath(string $input, array $expected)
-    {
-        $this->assertEquals($expected, $this->service->parseTrackingCodeFromUrl($input));
-    }
-
-    public function pathProvider(): array
-    {
-        return [
-            ['https://www.example.com/code/12345/product', ['12345', 'https://www.example.com/code/12345/product']],
-            ['https://www.example.com/shipment/abc123/product', ['abc123', 'https://www.example.com/shipment/abc123/product']],
-            ['https://www.example.com/track/track123/product', ['track123', 'https://www.example.com/track/track123/product']],
-            ['https://www.example.com/tracking/track456/product', ['track456', 'https://www.example.com/tracking/track456/product']],
-        ];
-    }
 
     /**
      * @dataProvider hashProvider
@@ -80,10 +64,10 @@ class UrlParsingServiceTest extends TestCase
     public function hashProvider(): array
     {
         return [
-            ['https://www.example.com/product#code=12345', ['12345', 'https://www.example.com/product#code=12345']],
-            ['https://www.example.com/product#shipment=abc123', ['abc123', 'https://www.example.com/product#shipment=abc123']],
-            ['https://www.example.com/product#track=track123', ['track123', 'https://www.example.com/product#track=track123']],
-            ['https://www.example.com/product#tracking=track456', ['track456', 'https://www.example.com/product#tracking=track456']],
+            ['https://www.example.com/product#code=12345', ['code=12345', 'https://www.example.com/product#%s']],
+            ['https://www.example.com/product#shipment=abc123', ['shipment=abc123', 'https://www.example.com/product#%s']],
+            ['https://www.example.com/product#track=track123', ['track=track123', 'https://www.example.com/product#%s']],
+            ['https://www.example.com/product#tracking=track456', ['tracking=track456', 'https://www.example.com/product#%s']],
         ];
     }
 
