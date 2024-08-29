@@ -148,11 +148,9 @@ class MollieLineItemBuilder
 
             /** Filter out the product from customized products plugin */
             if ($item->getType() === self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS) {
-
                 $lineItemChildren = $item->getChildren();
 
                 if ($lineItemChildren instanceof OrderLineItemCollection && $lineItemChildren->count() > 0) {
-
                     $filteredItems = $lineItemChildren->filter(function (OrderLineItemEntity $lineItemEntity) {
                         return $lineItemEntity->getType() !== self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS_OPTIONS;
                     });
@@ -161,8 +159,6 @@ class MollieLineItemBuilder
                         $item = $filteredItems->first();
                     }
                 }
-
-
             }
             $this->orderLineItemValidator->validate($item);
             $extraData = $this->lineItemDataExtractor->extractExtraData($item);
