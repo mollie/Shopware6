@@ -95,12 +95,11 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
      * @param OrderService $orderService
      * @throws \Exception
      */
-    public function __construct(ApplePayDirect $applePay, RouterInterface $router, LoggerInterface $logger, CartBackupService $cartBackup, ?FlashBag $sessionFlashBag, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, CustomerRepositoryInterface $repoCustomers, OrderService $orderService)
+    public function __construct(ApplePayDirect $applePay, RouterInterface $router, LoggerInterface $logger, CartBackupService $cartBackup, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, CustomerRepositoryInterface $repoCustomers, OrderService $orderService)
     {
         $this->applePay = $applePay;
         $this->router = $router;
         $this->logger = $logger;
-        $this->flashBag = $sessionFlashBag;
         $this->cartBackupService = $cartBackup;
         $this->repoCustomers = $repoCustomers;
         $this->orderService = $orderService;
@@ -332,7 +331,7 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
             # we clear our cart backup now
             # we are in the user redirection process where a restoring wouldnt make sense
             # because from now on we would end on the cart page where we could even switch payment method.
-            $this->cartBackupService->clearBackup($context);
+            //    $this->cartBackupService->clearBackup($context);
 
 
             $email = (string)$request->get('email', '');
@@ -375,10 +374,8 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
             # if we have an error here, we have to redirect to the confirm page
             $returnUrl = $this->getCheckoutConfirmPage($this->router);
             # also add an error for our target page
-            if ($this->flashBag !== null) {
-                $this->flashBag->add('danger', $this->trans(self::SNIPPET_ERROR));
-            }
 
+            $this->addFlash('danger', $this->trans(self::SNIPPET_ERROR));
             return new RedirectResponse($returnUrl);
         }
     }
@@ -420,10 +417,8 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
             # if we have an error here, we have to redirect to the confirm page
             $returnUrl = $this->getCheckoutConfirmPage($this->router);
             # also add an error for our target page
-            if ($this->flashBag !== null) {
-                $this->flashBag->add('danger', $this->trans(self::SNIPPET_ERROR));
-            }
 
+            $this->addFlash('danger', $this->trans(self::SNIPPET_ERROR));
             return new RedirectResponse($returnUrl);
         }
 
@@ -463,9 +458,7 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
             $returnUrl = $this->getEditOrderPage($order->getId(), $this->router);
 
             # also add an error for our target page
-            if ($this->flashBag !== null) {
-                $this->flashBag->add('danger', $this->trans(self::SNIPPET_ERROR));
-            }
+            $this->addFlash('danger', $this->trans(self::SNIPPET_ERROR));
 
             # fire our custom storefront event
             $this->fireFlowBuilderStorefrontEvent(self::FLOWBUILDER_FAILED, $order, $context->getContext());

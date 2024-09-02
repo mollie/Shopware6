@@ -355,12 +355,6 @@ class ApplePayDirect
         }
 
 
-        # we clear our cart backup now
-        # we are in the user redirection process where a restoring wouldn't make sense
-        # because from now on we would end on the cart page where we could even switch payment method.
-        $this->cartBackupService->clearBackup($context);
-
-
         $applePayID = $this->getActiveApplePayID($context);
 
         # if we are not logged in,
