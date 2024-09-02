@@ -21,10 +21,10 @@ class ExpressCartItemAddRoute extends AbstractCartItemAddRoute
     private $cartItemAddRoute;
 
     /**
-     * @var CartBackupService
+     * @var ContainerInterface
      */
+    private $container;
 
-    private $cartBackupService;
     /**
      * @var CartServiceInterface
      */
@@ -33,7 +33,7 @@ class ExpressCartItemAddRoute extends AbstractCartItemAddRoute
     public function __construct(AbstractCartItemAddRoute $cartItemAddRoute, ContainerInterface $container, CartServiceInterface $cartService)
     {
         $this->cartItemAddRoute = $cartItemAddRoute;
-        $this->cartBackupService = $container->get(CartBackupService::class);
+        $this->container = $container;
         $this->cartService = $cartService;
     }
 
@@ -58,9 +58,9 @@ class ExpressCartItemAddRoute extends AbstractCartItemAddRoute
         if ($isExpressCheckout === false) {
             return $this->getDecorated()->add($request, $cart, $context, $items);
         }
-
-        if (!$this->cartBackupService->isBackupExisting($context)) {
-            $this->cartBackupService->backupCart($context);
+        $cartBackupService = $this->container->get(CartBackupService::class); //Shopware 6.4 have circular injection, we have to use contaier
+        if (!$cartBackupService->isBackupExisting($context)) {
+            $cartBackupService->backupCart($context);
         }
 
         $cart = $this->cartService->getCalculatedMainCart($context);
