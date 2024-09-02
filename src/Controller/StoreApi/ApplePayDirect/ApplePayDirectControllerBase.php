@@ -203,29 +203,29 @@ class ApplePayDirectControllerBase
         if (empty($paymentToken)) {
             throw new \Exception('PaymentToken not found!');
         }
-
-        # make sure to create a customer if necessary
-        # then update to our apple pay payment method
-        # and return the new context
-        $newContext = $this->applePay->prepareCustomer(
-            $firstname,
-            $lastname,
-            $email,
-            $street,
-            $zipcode,
-            $city,
-            $countryCode,
-            $phone,
-            $paymentToken,
-            $context
-        );
-
-        # we only start our TRY/CATCH here!
-        # we always need to throw exceptions on an API level
-        # but if something BELOW breaks, we want to navigate to the error page.
-        # customers are ready, data is ready, but the handling has a problem.
-
         try {
+            # make sure to create a customer if necessary
+            # then update to our apple pay payment method
+            # and return the new context
+            $newContext = $this->applePay->prepareCustomer(
+                $firstname,
+                $lastname,
+                $email,
+                $street,
+                $zipcode,
+                $city,
+                $countryCode,
+                $phone,
+                $paymentToken,
+                $context
+            );
+
+            # we only start our TRY/CATCH here!
+            # we always need to throw exceptions on an API level
+            # but if something BELOW breaks, we want to navigate to the error page.
+            # customers are ready, data is ready, but the handling has a problem.
+
+
             # create our new Shopware Order
             $order = $this->applePay->createOrder($newContext);
 

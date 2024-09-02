@@ -71,5 +71,11 @@
             <tag name="kernel.event_subscriber" />
         </service>
 
+        <service id="Kiener\MolliePayments\Subscriber\ExpressCartRestoreSubscriber">
+            <argument type="service" id="Kiener\MolliePayments\Service\Cart\CartBackupService"/>
+            <tag name="kernel.event_subscriber" />
+        </service>
+
+
     </services>
 </container>
