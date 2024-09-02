@@ -234,7 +234,6 @@
         <service id="Kiener\MolliePayments\Checkout\Cart\ExpressCartItemAddRoute" decorates="Shopware\Core\Checkout\Cart\SalesChannel\CartItemAddRoute" public="true">
             <argument type="service" id=".inner"/>
             <argument type="service" id="service_container"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\CartService"/>
         </service>
 
 

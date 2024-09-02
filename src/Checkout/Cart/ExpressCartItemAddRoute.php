@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Checkout\Cart;
 
 use Kiener\MolliePayments\Service\Cart\CartBackupService;
-use Kiener\MolliePayments\Service\CartServiceInterface;
+use Kiener\MolliePayments\Service\CartService;
 use Psr\Container\ContainerInterface;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
@@ -25,16 +25,10 @@ class ExpressCartItemAddRoute extends AbstractCartItemAddRoute
      */
     private $container;
 
-    /**
-     * @var CartServiceInterface
-     */
-    private $cartService;
-
-    public function __construct(AbstractCartItemAddRoute $cartItemAddRoute, ContainerInterface $container, CartServiceInterface $cartService)
+    public function __construct(AbstractCartItemAddRoute $cartItemAddRoute, ContainerInterface $container)
     {
         $this->cartItemAddRoute = $cartItemAddRoute;
         $this->container = $container;
-        $this->cartService = $cartService;
     }
 
     public function getDecorated(): AbstractCartItemAddRoute
@@ -63,11 +57,13 @@ class ExpressCartItemAddRoute extends AbstractCartItemAddRoute
             $cartBackupService->backupCart($context);
         }
 
-        $cart = $this->cartService->getCalculatedMainCart($context);
+        $cartService = $this->container->get(CartService::class);
+
+        $cart = $cartService->getCalculatedMainCart($context);
 
         # clear existing cart and also update it to save it
         $cart->setLineItems(new LineItemCollection());
-        $this->cartService->updateCart($cart);
+        $cartService->updateCart($cart);
 
         return $this->getDecorated()->add($request, $cart, $context, $items);
     }
