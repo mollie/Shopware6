@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Checkout\Cart;
 
 use Kiener\MolliePayments\Service\Cart\CartBackupService;
 use Kiener\MolliePayments\Service\CartServiceInterface;
+use Psr\Container\ContainerInterface;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
 use Shopware\Core\Checkout\Cart\SalesChannel\AbstractCartItemAddRoute;
@@ -29,10 +30,10 @@ class ExpressCartItemAddRoute extends AbstractCartItemAddRoute
      */
     private $cartService;
 
-    public function __construct(AbstractCartItemAddRoute $cartItemAddRoute, CartBackupService $cartBackupService, CartServiceInterface $cartService)
+    public function __construct(AbstractCartItemAddRoute $cartItemAddRoute, ContainerInterface $container, CartServiceInterface $cartService)
     {
         $this->cartItemAddRoute = $cartItemAddRoute;
-        $this->cartBackupService = $cartBackupService;
+        $this->cartBackupService = $container->get(CartBackupService::class);
         $this->cartService = $cartService;
     }
 
