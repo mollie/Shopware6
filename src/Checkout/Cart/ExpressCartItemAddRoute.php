@@ -41,6 +41,13 @@ class ExpressCartItemAddRoute extends AbstractCartItemAddRoute
         return $this->cartItemAddRoute;
     }
 
+    /**
+     * @param Request $request
+     * @param Cart $cart
+     * @param SalesChannelContext $context
+     * @param ?array<mixed> $items
+     * @return CartResponse
+     */
     public function add(Request $request, Cart $cart, SalesChannelContext $context, ?array $items): CartResponse
     {
         //we have to create a new request from global variables, because the request is not set here in the route
