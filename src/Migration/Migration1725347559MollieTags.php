@@ -44,32 +44,21 @@ class Migration1725347559MollieTags extends MigrationStep
         string $id,
         string $name
     ): void {
-        // Create a new QueryBuilder instance
-        $queryBuilder = $connection->createQueryBuilder();
+        $query = <<<SQL
+        INSERT INTO tag 
+        (id, name, created_at, updated_at) 
+        VALUES (:id, :name, :created_at, :updated_at)
+        SQL;
 
-        // Build the INSERT query
-        $queryBuilder
-            ->insert('tag')
-            ->values([
-                'id' => ':id',
-                'name' => ':name',
-                'created_at' => ':created_at',
-                'updated_at' => ':updated_at',
-            ])
-            ->setParameters([
-                'id' => Uuid::fromHexToBytes($id),
-                'name' => $name,
-                'created_at' => (new \DateTime())->format('Y-m-d H:i:s'), // current timestamp
-                'updated_at' => null,
-            ]);
+        $stmt = $connection->prepare($query);
 
-        if (method_exists($queryBuilder, 'executeStatement')) {
-            // Execute the query (Shopware >= 6.4)
-            $queryBuilder->executeStatement();
-            return;
-        }
+        $parameters = [
+            'id' => Uuid::fromHexToBytes($id),
+            'name' => $name,
+            'created_at' => (new \DateTime())->format('Y-m-d H:i:s'),
+            'updated_at' => null,
+        ];
 
-        // Execute the query (Shopware < 6.4)
-        $queryBuilder->execute();
+        $stmt->execute($parameters);
     }
 }
