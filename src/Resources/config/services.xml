@@ -224,6 +224,12 @@
             <argument type="service" id="Shopware\Core\Content\Mail\Service\MailSender"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Service\Tags\OrderTagService">
+            <argument id="order.repository" type="service"/>
+            <argument id="tag.repository" type="service"/>
+        </service>
+
+
     </services>
 
 </container>
