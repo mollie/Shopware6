@@ -63,7 +63,13 @@ class Migration1725347559MollieTags extends MigrationStep
                 'updated_at' => null,
             ]);
 
-        /** @phpstan-ignore-next-line for what ever reason stan says this line doesn't exist, but it does */
-        $queryBuilder->executeStatement();
+        if (method_exists($queryBuilder, 'executeStatement')) {
+            // Execute the query (Shopware >= 6.4)
+            $queryBuilder->executeStatement();
+            return;
+        }
+
+        // Execute the query (Shopware < 6.4)
+        $queryBuilder->execute();
     }
 }
