@@ -13,6 +13,7 @@ use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
 
 #[\Symfony\Component\Messenger\Attribute\AsMessageHandler(handles: ExpireOrderTask::class)]
@@ -40,6 +41,8 @@ class ExpireOrderTaskHandler extends ScheduledTaskHandler
         $criteria = new Criteria();
         $criteria->addAssociation('transactions.stateMachineState');
         $criteria->getAssociation('transactions.stateMachineState')->addFilter(new EqualsFilter('technicalName', OrderStates::STATE_IN_PROGRESS));
+        $criteria->addSorting(new FieldSorting('orderDateTime', FieldSorting::DESCENDING));
+        $criteria->setLimit(10);
 
         $this->logger->debug('Search for orders which are in progress state');
 
