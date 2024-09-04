@@ -40,7 +40,7 @@ class ExpireOrderTaskHandler extends ScheduledTaskHandler
 
         $criteria = new Criteria();
         $criteria->addAssociation('transactions.stateMachineState');
-        $criteria->getAssociation('transactions.stateMachineState')->addFilter(new EqualsFilter('technicalName', OrderStates::STATE_IN_PROGRESS));
+        $criteria->addFilter(new EqualsFilter('transactions.stateMachineState.technicalName', OrderStates::STATE_IN_PROGRESS));
         $criteria->addSorting(new FieldSorting('orderDateTime', FieldSorting::DESCENDING));
         $criteria->setLimit(10);
 
