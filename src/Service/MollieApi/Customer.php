@@ -43,10 +43,10 @@ class Customer
      * @throws CouldNotCreateMollieCustomerException
      * @return MollieCustomer
      */
-    public function createCustomerAtMollie(CustomerEntity $customer): MollieCustomer
+    public function createCustomerAtMollie(CustomerEntity $customer, string $salesChannelId): MollieCustomer
     {
         try {
-            $apiClient = $this->clientFactory->getClient($customer->getSalesChannelId());
+            $apiClient = $this->clientFactory->getClient($salesChannelId);
 
             return $apiClient->customers->create([
                 'name' => $customer->getFirstName() . ' ' . $customer->getLastName(),

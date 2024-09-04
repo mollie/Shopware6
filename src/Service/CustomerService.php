@@ -584,7 +584,7 @@ class CustomerService implements CustomerServiceInterface
             throw new CustomerCouldNotBeFoundException($customerId);
         }
 
-        $mollieCustomer = $this->customerApiService->createCustomerAtMollie($customer);
+        $mollieCustomer = $this->customerApiService->createCustomerAtMollie($customer, $salesChannelId);
 
         $this->setMollieCustomerId(
             $customerId,
