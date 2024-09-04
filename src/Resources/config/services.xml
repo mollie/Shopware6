@@ -231,6 +231,11 @@
             <argument type="service" id="Shopware\Core\Content\Mail\Service\MailSender"/>
         </service>
 
+
+        <service id="Kiener\MolliePayments\Service\Tags\OrderTagService">
+            <argument id="order.repository" type="service"/>
+            <argument id="tag.repository" type="service"/>
+        </service>
         <service id="Kiener\MolliePayments\Checkout\Cart\ExpressCartItemAddRoute" decorates="Shopware\Core\Checkout\Cart\SalesChannel\CartItemAddRoute" public="true">
             <argument type="service" id=".inner"/>
             <argument type="service" id="service_container"/>
