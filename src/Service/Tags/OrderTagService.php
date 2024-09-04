@@ -54,9 +54,8 @@ class OrderTagService
             throw CouldNotTagOrderException::forSubscription(sprintf('Order with ID "%s" not found', $orderId));
         }
 
-        // Fetch or create the tag
         $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('id', $subscriptionTag->getId()));
+        $criteria->addFilter(new EqualsFilter('name', $subscriptionTag->getName()));
         /** @var null|TagEntity $tag */
         $tag = $this->tagRepository->search($criteria, $context)->first();
 
@@ -88,6 +87,6 @@ class OrderTagService
      */
     private function serializeTag(TagEntity $tag): array
     {
-        return ['id' => $tag->getId(),];
+        return ['id' => $tag->getId()];
     }
 }
