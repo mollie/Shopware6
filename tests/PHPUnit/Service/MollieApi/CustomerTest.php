@@ -74,7 +74,7 @@ class CustomerTest extends TestCase
             'getSalesChannelId' => 'buzz',
         ]);
 
-        $actualInstance = $this->customerApiService->createCustomerAtMollie($customerMock);
+        $actualInstance = $this->customerApiService->createCustomerAtMollie($customerMock,'buzz');
         $this->assertInstanceOf(Customer::class, $actualInstance);
     }
 
@@ -91,7 +91,7 @@ class CustomerTest extends TestCase
             'getSalesChannelId' => 'buzz',
         ]);
 
-        $this->customerApiService->createCustomerAtMollie($customerMock);
+        $this->customerApiService->createCustomerAtMollie($customerMock,'buzz');
     }
 
     /**
