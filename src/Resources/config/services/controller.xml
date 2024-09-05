@@ -11,6 +11,13 @@
         <!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
         <!-- Admin API Controller -->
 
+        <service id="Kiener\MolliePayments\Controller\Api\PluginConfig\Services\MollieRefundConfigService">
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\RefundManager\RefundManager"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+        </service>
+
+
         <service id="Kiener\MolliePayments\Controller\Api\PluginConfig\ConfigControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Shopware\Administration\Snippet\CachedSnippetFinder"/>
@@ -20,6 +27,9 @@
                 <argument type="service" id="service_container"/>
             </call>
             <tag name="controller.service_arguments"/>
+            <argument type="service" id="Kiener\MolliePayments\Controller\Api\PluginConfig\Services\MollieRefundConfigService"/>
+
+
         </service>
 
         <service id="Kiener\MolliePayments\Controller\Api\PaymentMethod\PaymentMethodControllerBase">

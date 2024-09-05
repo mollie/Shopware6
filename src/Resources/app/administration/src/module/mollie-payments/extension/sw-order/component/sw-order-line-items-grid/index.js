@@ -167,7 +167,7 @@ Component.override('sw-order-line-items-grid', {
                 this.isShippingPossible = enabled;
             });
 
-            this.isRefundManagerPossible = this.refundedManagerService.isRefundManagerAvailable(this.order.salesChannelId);
+            this.isRefundManagerPossible = this.refundedManagerService.isRefundManagerAvailable(this.order.salesChannelId, this.order.id);
 
             await this.loadMollieShippingStatus();
             await this.loadMollieCancelStatus();

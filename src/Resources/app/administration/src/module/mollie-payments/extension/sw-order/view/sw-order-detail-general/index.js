@@ -262,7 +262,7 @@ Component.override('sw-order-detail-general', {
                 this.isShippingPossible = enabled;
             });
 
-            this.refundedManagerService.isRefundManagerAvailable(this.order.salesChannelId).then((possible)=>{
+            this.refundedManagerService.isRefundManagerAvailable(this.order.salesChannelId, this.order.id).then((possible)=>{
                 this.isRefundManagerPossible =possible;
             });
 
