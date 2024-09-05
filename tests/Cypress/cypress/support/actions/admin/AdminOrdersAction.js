@@ -99,8 +99,8 @@ export default class AdminOrdersAction {
      */
     openLineItemShipping(nthItem) {
 
+        cy.wait(2000);
 
-        cy.intercept('**').as('page')
         repoOrdersDetails.getLineItemActionsButton(nthItem).click(forceOption)
 
         repoOrdersDetails.getLineItemActionsButtonShipThroughMollie().should('not.have.class', 'is--disabled');
@@ -109,7 +109,8 @@ export default class AdminOrdersAction {
 
         // here are automatic reloads and things as it seems
         // I really want to test the real UX, so we just wait like a human
-        cy.wait('@page');
+        cy.wait(4000);
+
     }
 
     /**
