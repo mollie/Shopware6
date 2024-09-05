@@ -35,7 +35,7 @@ class CancelLineController extends AbstractController
             /** @var OrderLine $line */
             foreach ($lines as $line) {
                 $metadata = $line->metadata;
-                if (! property_exists($metadata, 'orderLineItemId')) {
+                if (!is_object($metadata) || ! property_exists($metadata, 'orderLineItemId')) {
                     continue;
                 }
                 $id = $metadata->orderLineItemId;
