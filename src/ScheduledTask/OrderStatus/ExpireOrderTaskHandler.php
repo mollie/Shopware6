@@ -34,7 +34,7 @@ class ExpireOrderTaskHandler extends ScheduledTaskHandler
 
     public function run(): void
     {
-        $this->logger->info('Start resetting in_progress orders');
+        $this->logger->debug('Start resetting in_progress orders');
 
         $context = new Context(new SystemSource());
 
