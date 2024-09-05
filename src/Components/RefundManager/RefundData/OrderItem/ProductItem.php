@@ -110,4 +110,14 @@ class ProductItem extends AbstractItem
 
         return (string)$this->lineItem->getPayload()['productNumber'];
     }
+
+    public function getAlreadyRefundedQty(): int
+    {
+        return $this->alreadyRefundedQty;
+    }
+
+    public function getId(): string
+    {
+        return $this->lineItem->getId();
+    }
 }
