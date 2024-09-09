@@ -266,6 +266,11 @@ class MollieSettingStruct extends Struct
     protected $paymentFinalizeTransactionTime;
 
     /**
+     * @var bool
+     */
+    protected $requireDataProtectionCheckbox = false;
+
+    /**
      * @return string
      */
     public function getLiveApiKey(): string
@@ -1012,5 +1017,15 @@ class MollieSettingStruct extends Struct
     public function setPaymentFinalizeTransactionTime(int $paymentFinalizeTransactionTime): void
     {
         $this->paymentFinalizeTransactionTime = $paymentFinalizeTransactionTime;
+    }
+
+    public function isRequireDataProtectionCheckbox(): bool
+    {
+        return $this->requireDataProtectionCheckbox;
+    }
+
+    public function setRequireDataProtectionCheckbox(bool $requireDataProtectionCheckbox): void
+    {
+        $this->requireDataProtectionCheckbox = $requireDataProtectionCheckbox;
     }
 }

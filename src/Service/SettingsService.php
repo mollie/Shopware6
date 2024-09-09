@@ -18,6 +18,8 @@ class SettingsService implements PluginSettingsServiceInterface
 
     private const PHONE_NUMBER_FIELD = 'showPhoneNumberField';
 
+    private const REQUIRE_DATA_PROTECTION ='requireDataProtectionCheckbox';
+
     private const PAYMENT_FINALIZE_TRANSACTION_TIME = 'paymentFinalizeTransactionTime';
     const LIVE_API_KEY = 'liveApiKey';
     const TEST_API_KEY = 'testApiKey';
@@ -94,6 +96,8 @@ class SettingsService implements PluginSettingsServiceInterface
         $structData[self::PHONE_NUMBER_FIELD_REQUIRED] = $coreSettings[self::PHONE_NUMBER_FIELD_REQUIRED] ?? false;
 
         $structData[self::PHONE_NUMBER_FIELD] = $coreSettings[self::PHONE_NUMBER_FIELD] ?? false;
+
+        $structData[self::REQUIRE_DATA_PROTECTION] = $coreSettings[self::REQUIRE_DATA_PROTECTION] ?? false;
 
         /** @var array<mixed> $cartSettings */
         $cartSettings = $this->systemConfigService->get(self::SYSTEM_CORE_CART_CONFIG_DOMAIN, $salesChannelId);

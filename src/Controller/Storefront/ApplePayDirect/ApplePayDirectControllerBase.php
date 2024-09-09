@@ -324,6 +324,7 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
             $city = (string)$request->get('city', '');
             $countryCode = (string)$request->get('countryCode', '');
             $phone = (string)$request->get('phone', '');
+            $acceptedDataProtection = (int)$request->get('acceptedDataProtection', '0');
 
             $paymentToken = (string)$request->get('paymentToken', '');
 
@@ -342,6 +343,7 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
                 $countryCode,
                 $phone,
                 $paymentToken,
+                $acceptedDataProtection,
                 $context
             );
 
