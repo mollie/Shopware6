@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Components\ShipmentManager\Exceptions\NoDeliveriesFoun
 use Kiener\MolliePayments\Service\TrackingInfoStructFactory;
 use Kiener\MolliePayments\Service\UrlParsingService;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -24,7 +25,7 @@ class TrackingInfoStructFactoryTest extends TestCase
 
     public function setUp(): void
     {
-        $this->factory = new TrackingInfoStructFactory(new UrlParsingService());
+        $this->factory = new TrackingInfoStructFactory(new UrlParsingService(), new NullLogger());
     }
 
 

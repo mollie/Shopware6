@@ -66,7 +66,7 @@ class ShipmentManagerTest extends TestCase
             $orderService,
             $deliveryExtractor,
             new OrderItemsExtractor(),
-            new TrackingInfoStructFactory(new UrlParsingService())
+            new TrackingInfoStructFactory(new UrlParsingService(), new NullLogger())
         );
 
         $this->context = $this->getMockBuilder(Context::class)->disableOriginalConstructor()->getMock();
