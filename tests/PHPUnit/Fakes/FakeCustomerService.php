@@ -83,7 +83,7 @@ final class FakeCustomerService implements CustomerServiceInterface
         return [];
     }
 
-    public function createApplePayDirectCustomerIfNotExists(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, SalesChannelContext $context): ?CustomerEntity
+    public function createApplePayDirectCustomerIfNotExists(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2,int $acceptedDataProtection, SalesChannelContext $context): ?CustomerEntity
     {
         return null;
     }

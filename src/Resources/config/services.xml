@@ -128,7 +128,7 @@
             <argument type="service" id="Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepository"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\Cart\CartBackupService" class="Kiener\MolliePayments\Service\Cart\CartBackupService">
+        <service id="Kiener\MolliePayments\Service\Cart\CartBackupService" class="Kiener\MolliePayments\Service\Cart\CartBackupService" public="true">
             <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
         </service>
 

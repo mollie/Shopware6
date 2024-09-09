@@ -30,10 +30,9 @@ export default class MollieApplePayDirect extends Plugin {
         }
 
 
-
         const submitForm = document.querySelector('#productDetailPageBuyProductForm');
 
-        if(submitForm !== null){
+        if (submitForm !== null) {
             this.checkSubmitButton(submitForm);
             submitForm.addEventListener('change', (event) => {
                 this.checkSubmitButton(event.target.closest('form#productDetailPageBuyProductForm'));
@@ -86,7 +85,6 @@ export default class MollieApplePayDirect extends Plugin {
         const shopUrl = me.getShopUrl(applePayButtons[0]);
 
 
-
         // verify if apple pay is even allowed
         // in our current sales channel
         me.client.get(
@@ -102,7 +100,7 @@ export default class MollieApplePayDirect extends Plugin {
 
                 applePayButtons.forEach(function (button) {
 
-                    if(button.hasAttribute('disabled')){
+                    if (button.hasAttribute('disabled')) {
                         button.classList.add('d-none');
                         button.removeEventListener('click', me.onButtonClick);
                         return;
@@ -118,24 +116,24 @@ export default class MollieApplePayDirect extends Plugin {
         );
     }
 
-    checkSubmitButton(form){
+    checkSubmitButton(form) {
         const buyButton = form.querySelector('.btn-buy');
 
-        if(buyButton === null){
+        if (buyButton === null) {
             return;
         }
 
         const applePayButton = form.querySelector('.js-apple-pay');
 
-        if(applePayButton === null){
+        if (applePayButton === null) {
             return;
         }
 
-        if(applePayButton.hasAttribute('disabled')){
+        if (applePayButton.hasAttribute('disabled')) {
             applePayButton.removeAttribute('disabled');
         }
-        if(buyButton.hasAttribute('disabled')){
-            applePayButton.setAttribute('disabled','disabled');
+        if (buyButton.hasAttribute('disabled')) {
+            applePayButton.setAttribute('disabled', 'disabled');
         }
 
     }
@@ -164,7 +162,20 @@ export default class MollieApplePayDirect extends Plugin {
         const currency = form.querySelector('input[name="currency"]').value;
         const mode = form.querySelector('input[name="mode"]').value;
         const withPhone = parseInt(form.querySelector('input[name="withPhone"]').value);
+        const dataProtection = form.querySelector('input[name="acceptedDataProtection"]');
 
+        form.classList.remove('was-validated');
+
+        if (dataProtection !== null) {
+            const dataProtectionValue = dataProtection.checked ? 1: 0;
+            form.classList.add('was-validated');
+
+            dataProtection.classList.remove('is-invalid');
+            if (dataProtectionValue === 0) {
+                dataProtection.classList.add('is-invalid');
+                return;
+            }
+        }
 
         // this helps us to figure out if we are in
         // "product" mode to purchase a single product, or in "cart" mode
@@ -192,7 +203,7 @@ export default class MollieApplePayDirect extends Plugin {
 
         }
         const applePaySessionFactory = new ApplePaySessionFactory();
-        const session = applePaySessionFactory.create(isProductMode,countryCode,currency,withPhone,shopSlug);
+        const session = applePaySessionFactory.create(isProductMode, countryCode, currency, withPhone, shopSlug, dataProtection);
         session.begin();
 
     }

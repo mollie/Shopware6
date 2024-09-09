@@ -51,7 +51,7 @@ runs:
         unzip ~/.build/MolliePayments.zip -d ~/.build/MolliePayments
 
     - name: Store ZIP file in Github
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: MolliePayments-Shopware
         retention-days: 4

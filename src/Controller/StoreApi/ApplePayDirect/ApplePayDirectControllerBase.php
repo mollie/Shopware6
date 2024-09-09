@@ -195,6 +195,8 @@ class ApplePayDirectControllerBase
         $countryCode = (string)$data->get('countryCode', '');
         $phone = (string)$data->get('phone', '');
 
+        $acceptedDataProtection = (int)$data->get('acceptedDataProtection', '0');
+
         $paymentToken = (string)$data->get('paymentToken', '');
         $finishUrl = (string)$data->get('finishUrl', '');
         $errorUrl = (string)$data->get('errorUrl', '');
@@ -217,6 +219,7 @@ class ApplePayDirectControllerBase
                 $countryCode,
                 $phone,
                 $paymentToken,
+                $acceptedDataProtection,
                 $context
             );
 

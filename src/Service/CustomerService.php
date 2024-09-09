@@ -23,6 +23,7 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\Framework\Validation\Exception\ConstraintViolationException;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister;
@@ -435,7 +436,7 @@ class CustomerService implements CustomerServiceInterface
      * @param SalesChannelContext $context
      * @return null|CustomerEntity
      */
-    public function createApplePayDirectCustomerIfNotExists(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, SalesChannelContext $context): ?CustomerEntity
+    public function createApplePayDirectCustomerIfNotExists(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, int $acceptedDataProtection, SalesChannelContext $context): ?CustomerEntity
     {
         $countryId = $this->getCountryId($countryISO2, $context->getContext());
         $salutationId = $this->getSalutationId($context->getContext());
@@ -451,6 +452,7 @@ class CustomerService implements CustomerServiceInterface
         $data->set('firstName', $firstname);
         $data->set('lastName', $lastname);
         $data->set('email', $email);
+        $data->set('acceptedDataProtection', $acceptedDataProtection);
 
         $billingAddress = new RequestDataBag();
         $billingAddress->set('street', $street);
@@ -601,6 +603,8 @@ class CustomerService implements CustomerServiceInterface
         $criteria->addFilter(new EqualsFilter('email', $email));
         $criteria->addFilter(new EqualsFilter('guest', true));
         $criteria->addFilter(new EqualsFilter('active', true));
+        $criteria->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING));
+
 
         $searchResult = $this->customerRepository->search($criteria, $context->getContext());
 
