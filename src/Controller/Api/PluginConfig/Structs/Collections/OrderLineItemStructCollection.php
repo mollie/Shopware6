@@ -35,4 +35,15 @@ class OrderLineItemStructCollection extends StructCollection
 
         throw LineItemNotPartOfCollectionConfigException::create($id);
     }
+
+    public function getRefundableQuantity(): int
+    {
+        $refundableQuantity = 0;
+
+        foreach ($this as $item) {
+            $refundableQuantity += $item->getRefundableQuantity();
+        }
+
+        return $refundableQuantity;
+    }
 }

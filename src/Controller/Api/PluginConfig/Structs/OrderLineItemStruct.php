@@ -13,11 +13,6 @@ class OrderLineItemStruct extends Struct
     private $id;
 
     /**
-     * @var bool
-     */
-    private $isShipped = false;
-
-    /**
      * @var int
      */
     private $refundedCount = 0;
@@ -32,6 +27,11 @@ class OrderLineItemStruct extends Struct
      */
     private $orderedQuantity = 0;
 
+    /**
+     * @var int
+     */
+    private $refundableQuantity = 0;
+
     final private function __construct(string $id)
     {
         $this->id = $id;
@@ -40,17 +40,6 @@ class OrderLineItemStruct extends Struct
     public static function createWithId(string $id): self
     {
         return new self($id);
-    }
-
-    public function isShipped(): bool
-    {
-        return $this->isShipped;
-    }
-
-    public function setIsShipped(bool $isShipped): OrderLineItemStruct
-    {
-        $this->isShipped = $isShipped;
-        return $this;
     }
 
     public function getId(): string
@@ -88,6 +77,17 @@ class OrderLineItemStruct extends Struct
     public function setRefundedCount(int $refundedCount): OrderLineItemStruct
     {
         $this->refundedCount = $refundedCount;
+        return $this;
+    }
+
+    public function getRefundableQuantity(): int
+    {
+        return $this->refundableQuantity;
+    }
+
+    public function setRefundableQuantity(int $refundableQuantity): OrderLineItemStruct
+    {
+        $this->refundableQuantity = $refundableQuantity;
         return $this;
     }
 }
