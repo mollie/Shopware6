@@ -65,7 +65,7 @@ class MollieRefundConfigService
 
             foreach ($mollieOrder->lines() as $line) {
                 $structs[] = OrderLineItemStruct::createWithId($line->metadata->orderLineItemId)
-                    ->setIsShipped($line->quantityShipped >= 1)
+                    ->setRefundableQuantity($line->refundableQuantity)
                     ->setOrderedQuantity($line->quantity);
             }
 
@@ -106,9 +106,13 @@ class MollieRefundConfigService
                 break;
             }
 
-            // only shipped items can be refunded
             // only items that have not been fully refunded can be refunded
-            if ($lineItem->isShipped() && $lineItem->getRefundedCount() < $lineItem->getOrderedQuantity()) {
+            if ($lineItem->getRefundedCount() < $lineItem->getOrderedQuantity()) {
+                $hasRefundableItems = true;
+                break;
+            }
+
+            if ($lineItem->getRefundableQuantity() > 0) {
                 $hasRefundableItems = true;
                 break;
             }

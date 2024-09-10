@@ -62,7 +62,7 @@ class MollieRefundConfigServiceTest extends TestCase
             ->method('hasPendingRefund')
             ->willReturn(true);
 
-        $lineItem->expects($this->never())->method('isShipped');
+        $lineItem->expects($this->never())->method('getRefundableQuantity');
         $lineItem->expects($this->never())->method('getRefundedCount');
         $lineItem->expects($this->never())->method('getOrderedQuantity');
 
@@ -74,7 +74,7 @@ class MollieRefundConfigServiceTest extends TestCase
         );
     }
 
-    public function testRefundManagerIsDisabledWhenNoItemIsMarkedAsShipped(): void
+    public function testRefundManagerIsEnabledWhenRefundableQuantityForLineItemIsGreaterThanZero(): void
     {
         $lineItems = OrderLineItemStructCollection::create(
             $lineItem = $this->createMock(OrderLineItemStruct::class)
@@ -85,16 +85,21 @@ class MollieRefundConfigServiceTest extends TestCase
             ->willReturn(false);
 
         $lineItem->expects($this->once())
-            ->method('isShipped')
-            ->willReturn(false);
+            ->method('getRefundableQuantity')
+            ->willReturn(1);
 
-        $lineItem->expects($this->never())->method('getRefundedCount');
-        $lineItem->expects($this->never())->method('getOrderedQuantity');
+        $lineItem->expects($this->once())
+            ->method('getRefundedCount')
+            ->willReturn(6);
+
+        $lineItem->expects($this->once())
+            ->method('getOrderedQuantity')
+            ->willReturn(5);
 
         $result = $this->service->createResponse($lineItems, $this->config);
 
         static::assertSame(
-            '{"enabled":false,"autoStockReset":true,"verifyRefund":true,"showInstructions":true}',
+            '{"enabled":true,"autoStockReset":true,"verifyRefund":true,"showInstructions":true}',
             $result->getContent()
         );
     }
@@ -110,8 +115,8 @@ class MollieRefundConfigServiceTest extends TestCase
             ->willReturn(false);
 
         $lineItem->expects($this->once())
-            ->method('isShipped')
-            ->willReturn(true);
+            ->method('getRefundableQuantity')
+            ->willReturn(0);
 
         $lineItem->expects($this->once())
             ->method('getRefundedCount')
