@@ -52,7 +52,12 @@ class Shipment implements ShipmentInterface
             $options = [];
 
             if ($tracking instanceof ShipmentTrackingInfoStruct) {
-                $options['tracking'] = $tracking->toArray();
+                $trackingData = $tracking->toArray();
+
+                /** Make sure that tracking data is only set when the code has a value */
+                if ($trackingData['code'] !== '') {
+                    $options['tracking'] = $trackingData;
+                }
             }
 
             $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId);
@@ -105,7 +110,12 @@ class Shipment implements ShipmentInterface
             ];
 
             if ($tracking instanceof ShipmentTrackingInfoStruct) {
-                $options['tracking'] = $tracking->toArray();
+                $trackingData = $tracking->toArray();
+
+                /** Make sure that tracking data is only set when the code has a value */
+                if ($trackingData['code'] !== '') {
+                    $options['tracking'] = $trackingData;
+                }
             }
 
             $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId);
