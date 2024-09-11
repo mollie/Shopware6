@@ -115,6 +115,7 @@
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler"/>
             <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Tags\OrderTagService"/>
         </service>
 
         <service id="Kiener\MolliePayments\Components\Subscription\Actions\ConfirmAction">
@@ -291,6 +292,16 @@
             <argument type="service" id="Kiener\MolliePayments\Repository\Order\OrderAddressRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing\OrderCloneService"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Subscription\Elasticsearch\SubscriptionAdminSearchIndexer">
+            <argument type="service" id="Doctrine\DBAL\Connection"/>
+            <argument type="service" id="Shopware\Core\Framework\DataAbstractionLayer\Dbal\Common\IteratorFactory" />
+            <argument type="service" id="mollie_subscription.repository"/>
+            <argument>%elasticsearch.indexing_batch_size%</argument>
+
+            <tag name="shopware.elastic.admin-searcher-index" key="mollie_subscription"/>
+
         </service>
 
     </services>

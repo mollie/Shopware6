@@ -2,9 +2,7 @@
 
 namespace Kiener\MolliePayments\Service\Order;
 
-use Kiener\MolliePayments\Repository\Order\OrderRepository;
 use Kiener\MolliePayments\Repository\Order\OrderRepositoryInterface;
-use Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepositoryInterface;
 use Kiener\MolliePayments\Repository\StateMachineState\StateMachineStateRepositoryInterface;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
@@ -18,6 +16,7 @@ use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachine
 
 class OrderStatusUpdater
 {
+    public const ORDER_STATE_FORCE_OPEN = 'order-state-force-open';
     /**
      * @var OrderStateService
      */
@@ -103,7 +102,7 @@ class OrderStatusUpdater
                 {
                     # if we are already in_progress...then don't switch to OPEN again
                     # otherwise SEPA bank transfer would switch back to OPEN
-                    if ($currentShopwareStatusKey !== OrderTransactionStates::STATE_IN_PROGRESS) {
+                    if ($currentShopwareStatusKey !== OrderTransactionStates::STATE_IN_PROGRESS || $context->hasState(self::ORDER_STATE_FORCE_OPEN)) {
                         $addLog = true;
                         $this->transactionTransitionService->reOpenTransaction($transaction, $context);
                     }
@@ -186,7 +185,7 @@ class OrderStatusUpdater
         # let's check if we have configured a final order state.
         # if so, we need to verify, if a transition is even allowed
         if (! empty($settings->getOrderStateFinalState())) {
-            $currentId = ($stateMachine instanceof StateMachineStateEntity) ? $stateMachine->getId() : '';
+            $currentId = ($stateMachine instanceof StateMachineStateEntity) ? $stateMachine->getId() : $order->getStateId();
 
             # test if our current order does already have
             # our configured final order state

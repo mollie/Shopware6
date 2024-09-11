@@ -11,6 +11,13 @@
         <!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
         <!-- Admin API Controller -->
 
+        <service id="Kiener\MolliePayments\Controller\Api\PluginConfig\Services\MollieRefundConfigService">
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\RefundManager\RefundManager"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+        </service>
+
+
         <service id="Kiener\MolliePayments\Controller\Api\PluginConfig\ConfigControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Shopware\Administration\Snippet\CachedSnippetFinder"/>
@@ -20,6 +27,9 @@
                 <argument type="service" id="service_container"/>
             </call>
             <tag name="controller.service_arguments"/>
+            <argument type="service" id="Kiener\MolliePayments\Controller\Api\PluginConfig\Services\MollieRefundConfigService"/>
+
+
         </service>
 
         <service id="Kiener\MolliePayments\Controller\Api\PaymentMethod\PaymentMethodControllerBase">
@@ -101,6 +111,16 @@
             <tag name="controller.service_arguments"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Controller\Api\Order\CancelLineController">
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\CancelManager\CancelItemFacade"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+            <tag name="controller.service_arguments"/>
+        </service>
+
+
         <!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
         <!-- Storefront Controller -->
 
@@ -153,13 +173,6 @@
             <tag name="controller.service_arguments"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Controller\Storefront\iDEAL\iDealControllerBase" >
-            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-            <tag name="controller.service_arguments"/>
-        </service>
 
         <service id="Kiener\MolliePayments\Controller\Storefront\POS\PosControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
@@ -178,8 +191,6 @@
             <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect"/>
             <argument type="service" id="router"/>
             <argument type="service" id="mollie_payments.logger"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Cart\CartBackupService"/>
-            <argument type="service" id="session.flash_bag" on-invalid="null"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
             <argument type="service"
                       id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
@@ -221,7 +232,7 @@
         <service id="Kiener\MolliePayments\Controller\StoreApi\Config\ConfigControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\ConfigService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SalesChannel\SalesChannelLocale"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieLocaleService"/>
             <argument type="service" id="mollie_payments.logger"/>
             <tag name="controller.service_arguments"/>
         </service>
@@ -238,11 +249,6 @@
             <tag name="controller.service_arguments"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Controller\StoreApi\iDEAL\iDealControllerBase">
-            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
-            <tag name="controller.service_arguments"/>
-        </service>
 
         <service id="Kiener\MolliePayments\Controller\StoreApi\Subscription\SubscriptionControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>

@@ -1,16 +1,12 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Shopware\Core\Checkout\Payment;
-
-
-if (class_exists(__NAMESPACE__ . '/PaymentException')) {
-    return;
-}
-
-
 use Shopware\Core\Checkout\Payment\Exception\AsyncPaymentFinalizeException;
 use Shopware\Core\Checkout\Payment\Exception\CustomerCanceledAsyncPaymentException;
+
+if (class_exists(PaymentException::class) && !class_exists(AsyncPaymentFinalizeException::class) && !class_exists(CustomerCanceledAsyncPaymentException::class)) {
+    return;
+}
 
 
 class PaymentException extends \Exception

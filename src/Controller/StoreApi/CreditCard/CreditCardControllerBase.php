@@ -8,14 +8,11 @@ use Kiener\MolliePayments\Controller\StoreApi\CreditCard\Response\RevokeMandateR
 use Kiener\MolliePayments\Controller\StoreApi\CreditCard\Response\StoreCardTokenResponse;
 use Kiener\MolliePayments\Controller\StoreApi\CreditCard\Response\StoreMandateIdResponse;
 use Kiener\MolliePayments\Service\CustomerService;
-use Kiener\MolliePayments\Service\MandateService;
 use Kiener\MolliePayments\Service\MandateServiceInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
-use Symfony\Component\Routing\Annotation\Route;
 
 class CreditCardControllerBase
 {

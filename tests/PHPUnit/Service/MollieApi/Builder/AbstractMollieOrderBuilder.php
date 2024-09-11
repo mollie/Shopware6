@@ -6,6 +6,7 @@ use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Facade\MolliePaymentFinalize;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Hydrator\MollieLineItemHydrator;
+use Kiener\MolliePayments\Repository\Language\LanguageRepositoryInterface;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieLineItemBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderAddressBuilder;
@@ -17,17 +18,21 @@ use Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher;
 use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\PriceCalculator;
+use Kiener\MolliePayments\Service\MollieLocaleService;
 use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 use Kiener\MolliePayments\Service\Router\RoutingDetector;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
+use Kiener\MolliePayments\Service\UrlParsingService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
 use MolliePayments\Tests\Fakes\FakeCompatibilityGateway;
 use MolliePayments\Tests\Fakes\FakeEventDispatcher;
 use MolliePayments\Tests\Fakes\FakePluginSettings;
+use MolliePayments\Tests\Fakes\Repositories\FakeLanguageRepository;
 use MolliePayments\Tests\Traits\OrderTrait;
 use MolliePayments\Tests\Utils\Traits\PaymentBuilderTrait;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -47,7 +52,7 @@ abstract class AbstractMollieOrderBuilder extends TestCase
     use PaymentBuilderTrait;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|SettingsService
+     * @var MockObject|SettingsService
      */
     protected $settingsService;
     /**
@@ -55,11 +60,11 @@ abstract class AbstractMollieOrderBuilder extends TestCase
      */
     protected $loggerService;
     /**
-     * @var OrderDataExtractor|\PHPUnit\Framework\MockObject\MockObject
+     * @var OrderDataExtractor|MockObject
      */
     protected $orderDataExtractor;
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|RouterInterface
+     * @var MockObject|RouterInterface
      */
     protected $router;
     /**
@@ -67,7 +72,7 @@ abstract class AbstractMollieOrderBuilder extends TestCase
      */
     protected $builder;
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|SalesChannelContext
+     * @var MockObject|SalesChannelContext
      */
     protected $salesChannelContext;
     /**
@@ -95,21 +100,26 @@ abstract class AbstractMollieOrderBuilder extends TestCase
      */
     protected $localeCode;
     /**
-     * @var MolliePaymentDoPay|\PHPUnit\Framework\MockObject\MockObject
+     * @var MolliePaymentDoPay|MockObject
      */
     protected $mollieDoPaymentFacade;
     /**
-     * @var MolliePaymentFinalize|\PHPUnit\Framework\MockObject\MockObject
+     * @var MolliePaymentFinalize|MockObject
      */
     protected $molliePaymentFinalize;
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|TransactionTransitionServiceInterface
+     * @var MockObject|TransactionTransitionServiceInterface
      */
     protected $transitionService;
     /**
      * @var MollieSettingStruct
      */
     protected $settingStruct;
+
+    /**
+     * @var MollieLocaleService|MockObject
+     */
+    private $mollieLocaleService;
 
     public function setUp(): void
     {
@@ -160,7 +170,9 @@ abstract class AbstractMollieOrderBuilder extends TestCase
             $routingDetector,
             new FakePluginSettings(''),
             ''
-        );
+        );;
+
+        $this->mollieLocaleService = new MollieLocaleService($this->createMock(LanguageRepositoryInterface::class));
 
         $this->builder = new MollieOrderBuilder(
             $this->settingsService,
@@ -169,7 +181,7 @@ abstract class AbstractMollieOrderBuilder extends TestCase
             new MollieLineItemBuilder(
                 new IsOrderLineItemValid(),
                 new PriceCalculator(),
-                new LineItemDataExtractor(),
+                new LineItemDataExtractor(new UrlParsingService()),
                 new FakeCompatibilityGateway(),
                 new RoundingDifferenceFixer(),
                 new MollieLineItemHydrator(new MollieOrderPriceBuilder()),
@@ -178,6 +190,7 @@ abstract class AbstractMollieOrderBuilder extends TestCase
             new MollieOrderAddressBuilder(),
             new MollieOrderCustomerEnricher($this->createMock(CustomerService::class)),
             $routingBuilder,
+            $this->mollieLocaleService,
             new FakeEventDispatcher(),
             $this->loggerService
         );

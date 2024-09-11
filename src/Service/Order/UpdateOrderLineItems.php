@@ -34,6 +34,7 @@ class UpdateOrderLineItems
      */
     public function updateOrderLineItems(array $orderLines, OrderLineItemCollection $shopwareOrderLines, SalesChannelContext $salesChannelContext): void
     {
+        $updateLines = [];
         foreach ($orderLines as $orderLine) {
             if ($orderLine->type === OrderLineType::TYPE_SHIPPING_FEE) {
                 continue;
@@ -45,8 +46,8 @@ class UpdateOrderLineItems
                 continue;
             }
             /** @var OrderLineItemEntity $shopwareLine */
-            $shopwareLine  = $shopwareOrderLines->get($shopwareLineItemId);
-            if (!$shopwareLine instanceof OrderLineItemEntity) {
+            $shopwareLine = $shopwareOrderLines->get($shopwareLineItemId);
+            if (! $shopwareLine instanceof OrderLineItemEntity) {
                 continue;
             }
 
@@ -54,14 +55,16 @@ class UpdateOrderLineItems
             $originalCustomFields = $shopwareLine->getPayload()['customFields'] ?? [];
             $originalCustomFields['order_line_id'] = $orderLine->id;
 
-            $data = [
+            $updateLines[] = [
                 'id' => $shopwareLine->getId(),
                 'customFields' => [
                     CustomFieldsInterface::MOLLIE_KEY => $originalCustomFields
-                ]
+                ],
             ];
-
-            $this->orderLineRepository->update([$data], $salesChannelContext->getContext());
         }
+        if (count($updateLines) === 0) {
+            return;
+        }
+        $this->orderLineRepository->update($updateLines, $salesChannelContext->getContext());
     }
 }

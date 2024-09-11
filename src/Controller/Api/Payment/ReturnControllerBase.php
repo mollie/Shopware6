@@ -5,11 +5,8 @@ namespace Kiener\MolliePayments\Controller\Api\Payment;
 use Kiener\MolliePayments\Facade\Controller\PaymentReturnFacade;
 use Mollie\Api\Exceptions\ApiException;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 
 class ReturnControllerBase extends AbstractController
 {

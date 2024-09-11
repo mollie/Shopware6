@@ -1,0 +1,123 @@
+{
+  "checkout": {
+    "mollie-payments-cart-error-method-invalid": "Il metodo di pagamento attualmente selezionato non è disponibile per i prodotti in abbonamento.",
+    "mollie-payments-cart-error-mixedcart": "Il suo carrello contiene più articoli in combinazione con articoli in abbonamento. Si prega di notare che è possibile acquistare solo 1 articolo in abbonamento alla volta.",
+    "mollie-payments-cart-error-paymentmethod-availability": "Non tutti i metodi di pagamento sono disponibili quando si ordinano prodotti in abbonamento.",
+    "mollie-payments-cart-guest-account": "Gli account ospiti non possono essere utilizzati per ordini in abbonamento."
+  },
+  "error": {
+    "mollie-payments-cart-error-method-invalid": "Il metodo di pagamento attualmente selezionato non è disponibile per i prodotti in abbonamento.",
+    "mollie-payments-cart-error-mixedcart": "Il suo carrello contiene più articoli in combinazione con articoli in abbonamento. Si prega di notare che è possibile acquistare solo 1 articolo in abbonamento alla volta.",
+    "mollie-payments-cart-error-paymentmethod-availability": "Non tutti i metodi di pagamento sono disponibili quando si ordinano prodotti in abbonamento.",
+    "mollie-payments-cart-guest-account": "Gli account ospiti non possono essere utilizzati per ordini in abbonamento."
+  },
+  "molliePayments": {
+    "components": {
+      "creditCard": {
+        "cardExpiryDateLabel": "Data di scadenza",
+        "cardHolderLabel": "Nome sulla carta",
+        "cardNumberLabel": "Numero di carta",
+        "cardVerificationCodeLabel": "CVC/CVV",
+        "creditCardTagLine": "Pagamento protetto e alimentato da",
+        "headLine": "Inserire i dati della carta",
+        "saveCardDetailLabel": "Salva i dati della carta per i pagamenti futuri"
+      },
+      "ideal": {
+        "selectBank": "Selezionare la banca"
+      },
+      "pos": {
+        "selectTerminal": "Selezionare il terminale"
+      },
+      "mandate": {
+        "sectionTitle": "Carte salvate",
+        "cardTitleLabel": "%name% ---- %number%",
+        "deleteSuccessMessage": "La carta è stata cancellata con successo",
+        "deleteErrorMessage": "Si è verificato un problema durante la rimozione della carta",
+        "newCard": "Nuova carta",
+        "remove": "Rimuovere",
+        "subscriptionBadge": "Abbonamento"
+      },
+      "mandateRemoveModal": {
+        "cancelButton": "Annullare",
+        "cardSubscription": "Questa carta è utilizzata per un abbonamento. Si prega di annullare l'abbonamento prima di rimuovere questa carta.",
+        "deleteButton": "Cancellare",
+        "deleteConfirmation": "È sicuro di voler cancellare?",
+        "title": "Conferma di cancellazione"
+      },
+      "bancomatPay": {
+        "headLine": "Numero di telefono",
+        "phoneErrorMessage": "Il numero di telefono è obbligatorio. Ad esempio +31208202070"
+      }
+    },
+    "messages": {
+      "payment": {
+        "buttonPayThroughMollie": "Pagare con un altro metodo di pagamento",
+        "buttonReturnToShop": "Ritorno al negozio",
+        "error": "Pagamento non riuscito",
+        "failed": "Il pagamento non è riuscito o è stato annullato. Sarà reindirizzato a Mollie, dove potrà completare il pagamento con il metodo di sua scelta. "
+      },
+      "redirecting": "Reindirizzamento a: "
+    },
+    "payments": {
+      "applePayDirect": {
+        "captionSubtotal": "Subtotale",
+        "captionTaxes": "Tasse",
+        "paymentError": "Il pagamento con Apple Pay non è andato a buon fine."
+      }
+    },
+    "subscriptions": {
+      "account": {
+        "btnEditBillingAddress": "modifica l'indirizzo di fatturazione",
+        "btnEditShippingAddress": "modifica l'indirizzo di spedizione",
+        "cancelSubscription": "L'abbonamento è stato annullato",
+        "errorCancelSubscription": "Non è stato possibile annullare l'abbonamento a causa di un errore. Si prega di contattare il nostro supporto.",
+        "errorPause": "Si è verificato un errore durante la pausa del suo abbonamento",
+        "errorResume": "Si è verificato un errore durante la ripresa del suo abbonamento",
+        "errorSkip": "Si è verificato un errore durante il salto del suo abbonamento",
+        "errorUpdateAddress": "Si è verificato un errore durante l'aggiornamento del suo indirizzo",
+        "errorUpdatePayment": "Si è verificato un errore durante l'aggiornamento del suo metodo di pagamento",
+        "headlineBillingAddress": "Indirizzo di fatturazione",
+        "headlineShippingAddress": "Indirizzo di spedizione",
+        "mollieSubscriptionAmount": "Importo",
+        "mollieSubscriptionCancel": "Annullare l'abbonamento",
+        "mollieSubscriptionCancelUntil": "Annullamento possibile fino a",
+        "mollieSubscriptionContextMenuReorder": "Ripetere l'abbonamento",
+        "mollieSubscriptionId": "Id",
+        "mollieSubscriptionNextPayment": "Prossimo pagamento il",
+        "mollieSubscriptionPause": "Metti in pausa abbonamento",
+        "mollieSubscriptionResume": "Riprendi abbonamento",
+        "mollieSubscriptionSkip": "Salta abbonamento",
+        "mollieSubscriptionUpdatePayment": "Aggiornare pagamento",
+        "mollieSubscriptionsHeadline": "Abbonamento:",
+        "mollieSubscriptionsInfoEmpty": "Non ci sono ancora abbonamenti.",
+        "mollieSubscriptionsLink": "Abbonamenti",
+        "mollieSubscriptionsTitle": "Abbonamenti",
+        "mollieSubscriptionsWelcome": "I suoi abbonamenti recenti:",
+        "orderActionHide": "Nascondere",
+        "orderActionView": "Visualizzare",
+        "shippingEqualToBilling": "Uguale all'indirizzo di fatturazione",
+        "successPause": "Il suo abbonamento è stato messo in pausa",
+        "successResume": "Il suo abbonamento verrà ora ripreso",
+        "successSkip": "Il suo abbonamento è stato saltato",
+        "successUpdateAddress": "Il suo indirizzo è stato aggiornato con successo",
+        "successUpdatePayment": "Il metodo di pagamento è stato aggiornato con successo"
+      },
+      "options": {
+        "everyDay": "Ogni giorno",
+        "everyDays": "Ogni %value% giorni",
+        "everyMonth": "Ogni mese",
+        "everyMonths": "Ogni %value% mesi",
+        "everyWeek": "Ogni settimana",
+        "everyWeeks": "Ogni %value% settimane",
+        "repetitionCount": "%value% volta/e"
+      },
+      "product": {
+        "addToCartText": "Abbonarsi",
+        "information": "Prodotto in abbonamento"
+      }
+    },
+    "testMode": {
+      "label": "Modalità test"
+    }
+  }
+}

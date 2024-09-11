@@ -3,6 +3,8 @@
 namespace Kiener\MolliePayments\Controller\Api\PluginConfig;
 
 use Exception;
+use Kiener\MolliePayments\Controller\Api\PluginConfig\Exceptions\MollieRefundConfigException;
+use Kiener\MolliePayments\Controller\Api\PluginConfig\Services\MollieRefundConfigService;
 use Kiener\MolliePayments\Service\MollieApi\ApiKeyValidator;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
@@ -31,15 +33,25 @@ class ConfigControllerBase extends AbstractController
     protected $apiKeyValidator;
 
     /**
+     * @var MollieRefundConfigService
+     */
+    private $configMollieRefundService;
+
+    /**
      * @param SettingsService $settings
      * @param SnippetFinderInterface $snippetFinder
      * @param ApiKeyValidator $apiKeyValidator
      */
-    public function __construct(SettingsService $settings, SnippetFinderInterface $snippetFinder, ApiKeyValidator $apiKeyValidator)
-    {
+    public function __construct(
+        SettingsService $settings,
+        SnippetFinderInterface $snippetFinder,
+        ApiKeyValidator $apiKeyValidator,
+        MollieRefundConfigService $configMollieRefundService
+    ) {
         $this->settings = $settings;
         $this->snippetFinder = $snippetFinder;
         $this->apiKeyValidator = $apiKeyValidator;
+        $this->configMollieRefundService = $configMollieRefundService;
     }
 
     /**
@@ -174,6 +186,7 @@ class ConfigControllerBase extends AbstractController
         // employees of the merchant.
         // so depending on the order, we grab the matching sales channel configuration.
         $salesChannelID = (string)$request->get('salesChannelId');
+        $orderId = (string)$request->get('orderId');
 
         if (empty($salesChannelID)) {
             $config = $this->settings->getSettings('');
@@ -181,12 +194,11 @@ class ConfigControllerBase extends AbstractController
             $config = $this->settings->getSettings($salesChannelID);
         }
 
-        return new JsonResponse([
-            'enabled' => $config->isRefundManagerEnabled(),
-            'autoStockReset' => $config->isRefundManagerAutoStockReset(),
-            'verifyRefund' => $config->isRefundManagerVerifyRefund(),
-            'showInstructions' => $config->isRefundManagerShowInstructions(),
-        ]);
+        try {
+            return $this->configMollieRefundService->createConfigControllerResponse($orderId, $config, $salesChannelID, $context);
+        } catch (MollieRefundConfigException $exception) {
+            return ConfigControllerResponse::createFromMollieSettingStruct($config);
+        }
     }
 
     /**

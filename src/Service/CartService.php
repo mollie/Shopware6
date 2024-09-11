@@ -115,8 +115,9 @@ class CartService implements CartServiceInterface
         $this->contextSwitcher->update($dataBag, $context);
 
         $scID = $this->compatibilityGateway->getSalesChannelID($context);
+        $dID = $this->compatibilityGateway->getDomainId($context);
 
-        return $this->compatibilityGateway->getSalesChannelContext($scID, $context->getToken());
+        return $this->compatibilityGateway->getSalesChannelContext($scID, $dID, $context->getToken());
     }
 
     /**
@@ -135,8 +136,9 @@ class CartService implements CartServiceInterface
         $this->contextSwitcher->update($dataBag, $context);
 
         $scID = $this->compatibilityGateway->getSalesChannelID($context);
+        $dID = $this->compatibilityGateway->getDomainId($context);
 
-        return $this->compatibilityGateway->getSalesChannelContext($scID, $context->getToken());
+        return $this->compatibilityGateway->getSalesChannelContext($scID, $dID, $context->getToken());
     }
 
 
@@ -156,8 +158,9 @@ class CartService implements CartServiceInterface
         $this->contextSwitcher->update($dataBag, $context);
 
         $scID = $this->compatibilityGateway->getSalesChannelID($context);
+        $dID = $this->compatibilityGateway->getDomainId($context);
 
-        return $this->compatibilityGateway->getSalesChannelContext($scID, $context->getToken());
+        return $this->compatibilityGateway->getSalesChannelContext($scID, $dID, $context->getToken());
     }
 
     public function persistCart(Cart $cart, SalesChannelContext $context):Cart

@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Service\Cart\Voucher;
 
-use Kiener\MolliePayments\Controller\Api\PaymentMethodController;
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepositoryInterface;
 use Kiener\MolliePayments\Service\CustomFieldsInterface;

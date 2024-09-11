@@ -14,6 +14,7 @@ use Kiener\MolliePayments\Struct\MollieLineItemCollection;
 use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
 use Mollie\Api\Types\OrderLineType;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
+use Shopware\Core\Checkout\Cart\Price\Struct\AbsolutePriceDefinition;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
@@ -23,6 +24,7 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 class MollieLineItemBuilder
 {
     public const LINE_ITEM_TYPE_CUSTOM_PRODUCTS = 'customized-products';
+    public const LINE_ITEM_TYPE_CUSTOM_PRODUCTS_OPTIONS = 'customized-products-option';
 
 
     /**
@@ -137,17 +139,37 @@ class MollieLineItemBuilder
     {
         $lines = new MollieLineItemCollection();
 
-        if (!$lineItems instanceof OrderLineItemCollection || $lineItems->count() === 0) {
+        if (! $lineItems instanceof OrderLineItemCollection || $lineItems->count() === 0) {
             return $lines;
         }
 
 
         foreach ($lineItems as $item) {
+
+            /** Filter out the product from customized products plugin */
+            if ($item->getType() === self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS) {
+                $lineItemChildren = $item->getChildren();
+
+                if ($lineItemChildren instanceof OrderLineItemCollection && $lineItemChildren->count() > 0) {
+                    $filteredItems = $lineItemChildren->filter(function (OrderLineItemEntity $lineItemEntity) {
+                        return $lineItemEntity->getType() !== self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS_OPTIONS;
+                    });
+
+                    if ($filteredItems instanceof OrderLineItemCollection && $filteredItems->count() === 1) {
+                        $item = $filteredItems->first();
+                    }
+                }
+            }
             $this->orderLineItemValidator->validate($item);
             $extraData = $this->lineItemDataExtractor->extractExtraData($item);
             $itemPrice = $item->getPrice();
+            $itemPriceDefinition = $item->getPriceDefinition();
 
-            if (!$itemPrice instanceof CalculatedPrice) {
+            if ($itemPriceDefinition instanceof AbsolutePriceDefinition) {
+                $item->setQuantity(1);
+            }
+
+            if (! $itemPrice instanceof CalculatedPrice) {
                 throw new MissingPriceLineItemException((string)$item->getProductId());
             }
 

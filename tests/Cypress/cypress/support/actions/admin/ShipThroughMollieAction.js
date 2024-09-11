@@ -54,6 +54,7 @@ export default class ShipThroughMollieAction {
      */
     shipLineItem(qty) {
         repoShippingItem.getInputQuantity().clear(forceOption).type(qty, forceOption);
+        cy.wait(500);
         repoShippingItem.getShippingButton().click(forceOption);
 
         // here are automatic reloads and things as it seems

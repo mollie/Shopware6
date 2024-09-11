@@ -1,4 +1,5 @@
 {% block mollie_apple_pay_direct %}
+
     <div class="mollie-apple-pay-direct {{ cols }}">
         {% if page.product %}
             {# this is for older shopware versions #}
@@ -21,6 +22,7 @@
         <input type="hidden" name="id" value="{{ productId }}"/>
         <input type="hidden" name="currency" value="{{ context.currency.translated.shortName }}"/>
         <input type="hidden" name="countryCode" value="{{ context.shippingLocation.country.iso }}"/>
+        <input type="hidden" name="withPhone" value="{{ mollie_applepaydirect_phonenumber_required }}">
 
         {% if productId %}
             {% set mode = 'productMode' %}
@@ -31,6 +33,11 @@
         <input type="hidden" name="mode" value="{{ mode }}"/>
 
         {% block mollie_apple_pay_direct_button %}
+
+            {% if mollie_express_required_data_protection %}
+                {% sw_include '@Storefront/storefront/component/privacy-notice.html.twig' %}
+            {% endif %}
+
             <button type="submit" data-shop-url="{{ seoUrl('frontend.home.page') }}" class="btn btn-primary btn-block btn-buy apple-pay-button-with-text apple-pay-button-black js-apple-pay w-100 d-none">
                 {# space to match height other buttons #}
                 &nbsp;

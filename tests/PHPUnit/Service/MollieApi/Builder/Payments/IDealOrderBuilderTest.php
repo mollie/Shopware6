@@ -27,10 +27,6 @@ class IDealOrderBuilderTest extends AbstractMollieOrderBuilder
             new FakeContainer()
         );
 
-        $preferredIdealIssuer = 'preferredIssuer';
-        $this->customer->setCustomFields([
-            'mollie_payments' => ['preferred_ideal_issuer' => $preferredIdealIssuer]
-        ]);
 
         $transactionId = Uuid::randomHex();
         $amountTotal = 27.0;
@@ -58,8 +54,7 @@ class IDealOrderBuilderTest extends AbstractMollieOrderBuilder
             'method' => $paymentMethod,
             'orderNumber' => $orderNumber,
             'payment' => [
-                'webhookUrl' => $redirectWebhookUrl,
-                'issuer' => $preferredIdealIssuer
+                'webhookUrl' => $redirectWebhookUrl
             ],
             'redirectUrl' => $redirectWebhookUrl,
             'webhookUrl' => $redirectWebhookUrl,

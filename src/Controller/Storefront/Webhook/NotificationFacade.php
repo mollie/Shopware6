@@ -26,13 +26,10 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEnti
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 
 class NotificationFacade
 {
@@ -144,6 +141,15 @@ class NotificationFacade
 
         if (!$swTransaction instanceof OrderTransactionEntity) {
             throw new \Exception('Transaction ' . $swTransactionId . ' not found in Shopware');
+        }
+
+        # Apple pay direct creates a payment and then updates order/transaction custom fields, sometimes the webhook is quicker than the process. so we wait once and then read the custom fields again
+        if ($swTransaction->getCustomFields() === null) {
+            sleep(2);
+            $swTransaction = $this->getTransaction($swTransactionId, $context);
+            if (!$swTransaction instanceof OrderTransactionEntity) {
+                throw new \Exception('Transaction ' . $swTransactionId . ' not found in Shopware');
+            }
         }
 
         # -----------------------------------------------------------------------------------------------------
@@ -288,8 +294,7 @@ class NotificationFacade
      */
     private function getTransaction(string $transactionId, Context $context): ?OrderTransactionEntity
     {
-        $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('id', $transactionId));
+        $criteria = new Criteria([$transactionId]);
         $criteria->addAssociation('order');
         $criteria->addAssociation('order.salesChannel');
         $criteria->addAssociation('order.lineItems');
@@ -297,6 +302,7 @@ class NotificationFacade
         $criteria->addAssociation('order.transactions');
         $criteria->addAssociation('order.stateMachineState');
         $criteria->addAssociation('paymentMethod');
+        $criteria->addAssociation('stateMachineState');
 
         return $this->repoOrderTransactions->search($criteria, $context)->first();
     }

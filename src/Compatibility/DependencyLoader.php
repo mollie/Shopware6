@@ -51,16 +51,34 @@ class DependencyLoader
             $loader->load('compatibility/flowbuilder/6.4.6.0.xml');
         }
 
-
-        $composerDevReqsInstalled = file_exists(__DIR__.'/../../vendor/bin/phpunit');
-
-        if ($composerDevReqsInstalled) {
-            $dirFixtures = (string)realpath(__DIR__ . '/../../tests/Fixtures/');
-
-            if (is_dir($dirFixtures)) {
-                $loader->load('services/fixtures/fixtures.xml');
-            }
+        if ($this->shouldLoadFixtures()) {
+            $loader->load('services/fixtures/fixtures.xml');
         }
+    }
+
+    public function registerFixturesAutoloader():void
+    {
+        if ($this->shouldLoadFixtures() === false) {
+            return;
+        }
+
+        $dirFixtures = (string)realpath(__DIR__ . '/../../tests/Fixtures/');
+        # we need to tell Shopware to load our custom fixtures
+        # from our TEST autoload-dev area....
+        $classLoader = new ClassLoader();
+        $classLoader->addPsr4("MolliePayments\\Fixtures\\", $dirFixtures, true);
+
+        $classLoader->register();
+    }
+
+    private function shouldLoadFixtures():bool
+    {
+        $composerDevReqsInstalled = file_exists(__DIR__.'/../../vendor/bin/phpunit');
+        if ($composerDevReqsInstalled === false) {
+            return  false;
+        }
+        $dirFixtures = (string)realpath(__DIR__ . '/../../tests/Fixtures/');
+        return is_dir($dirFixtures);
     }
 
     /**

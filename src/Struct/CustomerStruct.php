@@ -22,11 +22,6 @@ class CustomerStruct extends Struct
     private $customerIds = [];
 
     /**
-     * @var ?string
-     */
-    private $preferredIdealIssuer;
-
-    /**
      * @var string
      */
     private $creditCardToken;
@@ -99,21 +94,6 @@ class CustomerStruct extends Struct
         $this->customerIds = $customerIds;
     }
 
-    /**
-     * @return null|string
-     */
-    public function getPreferredIdealIssuer(): ?string
-    {
-        return $this->preferredIdealIssuer;
-    }
-
-    /**
-     * @param null|string $preferredIdealIssuer
-     */
-    public function setPreferredIdealIssuer(?string $preferredIdealIssuer): void
-    {
-        $this->preferredIdealIssuer = $preferredIdealIssuer;
-    }
 
     /**
      * @param null|string $creditCardToken
@@ -153,9 +133,6 @@ class CustomerStruct extends Struct
             }
         }
 
-        if (!empty((string)$this->preferredIdealIssuer)) {
-            $mollieData['preferred_ideal_issuer'] = (string)$this->preferredIdealIssuer;
-        }
 
         if (!empty((string)$this->creditCardToken)) {
             $mollieData['credit_card_token'] = (string)$this->creditCardToken;

@@ -106,7 +106,8 @@ class MolliePaymentFinalize
      */
     public function finalize(AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext): void
     {
-        $order = $transactionStruct->getOrder();
+        $order = $this->orderService->getOrder($transactionStruct->getOrder()->getId(), $salesChannelContext->getContext());
+
         $customFields = $order->getCustomFields() ?? [];
         $customFieldsStruct = new OrderAttributes($order);
         $mollieOrderId = $customFieldsStruct->getMollieOrderId();

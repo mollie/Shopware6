@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Struct\LineItem;
 
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
-use Shopware\Core\Content\Product\ProductEntity;
 
 class LineItemAttributes
 {

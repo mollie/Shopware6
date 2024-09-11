@@ -28,6 +28,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\AndFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\Framework\Validation\Exception\ConstraintViolationException;
@@ -288,34 +289,6 @@ class CustomerService implements CustomerServiceInterface
         ]], $context);
     }
 
-    /**
-     * Stores the ideal issuer in the custom fields of the customer.
-     *
-     * @param CustomerEntity $customer
-     * @param string $issuerId
-     * @param Context $context
-     *
-     * @return EntityWrittenContainerEvent
-     */
-    public function setIDealIssuer(CustomerEntity $customer, string $issuerId, Context $context): EntityWrittenContainerEvent
-    {
-        // Get existing custom fields
-        $customFields = $customer->getCustomFields();
-
-        // If custom fields are empty, create a new array
-        if (! is_array($customFields)) {
-            $customFields = [];
-        }
-
-        // Store the card token in the custom fields
-        $customFields[CustomFieldsInterface::MOLLIE_KEY][self::CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER] = $issuerId;
-
-        // Store the custom fields on the customer
-        return $this->customerRepository->update([[
-            'id' => $customer->getId(),
-            'customFields' => $customFields
-        ]], $context);
-    }
 
     /**
      * @param CustomerEntity $customer
@@ -464,6 +437,54 @@ class CustomerService implements CustomerServiceInterface
     }
 
     /**
+     * @param string $firstname
+     * @param string $lastname
+     * @param string $email
+     * @param string $phone
+     * @param string $street
+     * @param string $zipCode
+     * @param string $city
+     * @param string $countryISO2
+     * @param SalesChannelContext $context
+     * @return null|CustomerEntity
+     */
+    public function createApplePayDirectCustomer(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, SalesChannelContext $context): ?CustomerEntity
+    {
+        $countryId = $this->getCountryId($countryISO2, $context->getContext());
+        $salutationId = $this->getSalutationId($context->getContext());
+
+        $data = new RequestDataBag();
+        $data->set('salutationId', $salutationId);
+        $data->set('guest', true);
+        $data->set('firstName', $firstname);
+        $data->set('lastName', $lastname);
+        $data->set('email', $email);
+
+        $billingAddress = new RequestDataBag();
+        $billingAddress->set('street', $street);
+        $billingAddress->set('zipcode', $zipCode);
+        $billingAddress->set('city', $city);
+        $billingAddress->set('phoneNumber', $phone);
+        $billingAddress->set('countryId', $countryId);
+
+        $data->set('billingAddress', $billingAddress);
+
+        try {
+            $abstractRegisterRoute = $this->container->get(RegisterRoute::class);
+            $response = $abstractRegisterRoute->register($data, $context, false);
+            return $response->getCustomer();
+        } catch (ConstraintViolationException $e) {
+            $errors = [];
+            /** we have to store the errors in an array because getErrors returns a generator */
+            foreach ($e->getErrors() as $error) {
+                $errors[]=$error;
+            }
+            $this->logger->error($e->getMessage(), ['errors'=>$errors]);
+            return null;
+        }
+    }
+
+    /**
      * Returns a country id by its iso code.
      *
      * @param string $countryCode
@@ -571,7 +592,7 @@ class CustomerService implements CustomerServiceInterface
             throw new CustomerCouldNotBeFoundException($customerId);
         }
 
-        $mollieCustomer = $this->customerApiService->createCustomerAtMollie($customer);
+        $mollieCustomer = $this->customerApiService->createCustomerAtMollie($customer, $salesChannelId);
 
         $this->setMollieCustomerId(
             $customerId,
@@ -587,19 +608,34 @@ class CustomerService implements CustomerServiceInterface
     {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('email', $email));
+        $criteria->addFilter(new EqualsFilter('guest', true));
+        $criteria->addFilter(new EqualsFilter('active', true));
+        $criteria->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING));
 
-        $searchResult = $this->customerRepository->search($criteria, $context);
+
+        $searchResult = $this->customerRepository->search($criteria, $context->getContext());
+
         if ($searchResult->getTotal() === 0) {
             return null;
         }
 
-        $customerEntity = $searchResult->first();
-        // csfixer might adds here a simple return $searchResult->first() and phpstan cannot find the correct return type. thats why we added this if statement
-        if ($customerEntity === null) {
-            return null;
+        /** @var CustomerEntity $foundCustomer */
+        $foundCustomer = $searchResult->first();
+
+        $boundCustomers = $searchResult->filter(function (CustomerEntity $customerEntity) use ($context) {
+            return $customerEntity->getBoundSalesChannelId() === $context->getSalesChannelId();
+        });
+
+        if ($boundCustomers->getTotal() > 0) {
+            $foundCustomer = $boundCustomers->first();
         }
 
-        return $customerEntity;
+        $bindCustomers = $this->configService->getSystemConfigService()->get('core.systemWideLoginRegistration.isCustomerBoundToSalesChannel');
+
+        if ($bindCustomers && $foundCustomer->getBoundSalesChannelId() === null) {
+            return null;
+        }
+        return $foundCustomer;
     }
 
     public function reuseOrCreateAddresses(CustomerEntity $customer, AddressStruct $shippingAddress, Context $context, ?AddressStruct $billingAddress = null): EntityWrittenContainerEvent
@@ -709,7 +745,7 @@ class CustomerService implements CustomerServiceInterface
         $data->set('firstName', $shippingAddress->getFirstName());
         $data->set('lastName', $shippingAddress->getLastName());
         $data->set('email', $shippingAddress->getEmail());
-
+        $data->set('acceptedDataProtection', $acceptedDataProtection);
 
         $shippingAddressData = new RequestDataBag();
         $shippingAddressData->set('firstName', $shippingAddress->getFirstName());

@@ -54,11 +54,7 @@ export default class PaymentAction {
             // to see all payment methods
             this.showAllPaymentMethods();
             this.selectPaymentMethod(paymentName);
-
-            // we have to select an iDEAL issuer now (required)
-            if (paymentName === 'iDEAL') {
-                this.selectIDealIssuer('bunq');
-            }
+            
 
             if (paymentName === 'POS Terminal') {
                 this.selectPosTerminal();
@@ -68,10 +64,6 @@ export default class PaymentAction {
             this.openPaymentsModal();
             this.selectPaymentMethod(paymentName);
 
-            // we have to select an iDEAL issuer now (required)
-            if (paymentName === 'iDEAL') {
-                this.selectIDealIssuer('bunq');
-            }
 
             if (paymentName === 'POS Terminal') {
                 this.selectPosTerminal();
@@ -134,13 +126,7 @@ export default class PaymentAction {
         cy.wait(1000);
     }
 
-    /**
-     *
-     * @param issuer
-     */
-    selectIDealIssuer(issuer) {
-        cy.get('#iDealIssuer').select(issuer);
-    }
+
 
     /**
      *

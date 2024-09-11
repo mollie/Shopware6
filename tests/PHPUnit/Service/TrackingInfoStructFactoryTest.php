@@ -5,7 +5,9 @@ namespace MolliePayments\Tests\Service;
 
 use Kiener\MolliePayments\Components\ShipmentManager\Exceptions\NoDeliveriesFoundExceptions;
 use Kiener\MolliePayments\Service\TrackingInfoStructFactory;
+use Kiener\MolliePayments\Service\UrlParsingService;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -23,7 +25,7 @@ class TrackingInfoStructFactoryTest extends TestCase
 
     public function setUp(): void
     {
-        $this->factory = new TrackingInfoStructFactory();
+        $this->factory = new TrackingInfoStructFactory(new UrlParsingService(), new NullLogger());
     }
 
 
@@ -159,34 +161,6 @@ class TrackingInfoStructFactoryTest extends TestCase
         $this->assertSame($expectedCarrier, $trackingInfoStruct->getCarrier());
     }
 
-
-    /**
-     * @return array
-     */
-    public function invalidCodes(): array
-    {
-        return [
-            ['some{code'],
-            ['some}code'],
-            ['some<code'],
-            ['some>code'],
-            ['some#code'],
-            ['some#<>{},' . str_repeat('1', 200)],
-            [str_repeat('1', 200)],
-        ];
-    }
-
-    /**
-     * @dataProvider invalidCodes
-     * @param string $invalidCode
-     * @return void
-     */
-    public function testUrlEmptyOnInvalidCodes(string $invalidCode): void
-    {
-        $trackingInfoStruct = $this->factory->create('test', $invalidCode, 'https://foo.bar/%s');
-
-        $this->assertSame('', $trackingInfoStruct->getUrl());
-    }
 
 
     /**

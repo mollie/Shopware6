@@ -7,25 +7,20 @@ use Kiener\MolliePayments\Compatibility\DependencyLoader;
 use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Kiener\MolliePayments\Components\Installer\PluginInstaller;
 use Kiener\MolliePayments\Repository\CustomFieldSet\CustomFieldSetRepository;
-use Psr\Container\ContainerInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Migration\MigrationCollection;
 use Shopware\Core\Framework\Plugin;
 use Shopware\Core\Framework\Plugin\Context\ActivateContext;
-use Shopware\Core\Framework\Plugin\Context\DeactivateContext;
 use Shopware\Core\Framework\Plugin\Context\InstallContext;
-use Shopware\Core\Framework\Plugin\Context\UninstallContext;
 use Shopware\Core\Framework\Plugin\Context\UpdateContext;
 use Shopware\Core\Kernel;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
 class MolliePayments extends Plugin
 {
-    const PLUGIN_VERSION = '4.8.0';
+    const PLUGIN_VERSION = '4.10.1';
 
 
     /**
@@ -101,6 +96,27 @@ class MolliePayments extends Plugin
         $this->preparePlugin($context->getContext());
 
         $this->runDbMigrations($context->getMigrationCollection());
+    }
+
+    public function boot(): void
+    {
+        parent::boot();
+
+        if ($this->container === null) {
+            return;
+        }
+        /** @var Container $container */
+        $container = $this->container;
+        
+        $shopwareVersion = $container->getParameter('kernel.shopware_version');
+        if (!is_string($shopwareVersion)) {
+            $shopwareVersion = Kernel::SHOPWARE_FALLBACK_VERSION;
+        }
+        # load the dependencies that are compatible
+        # with our current shopware version
+
+        $loader = new DependencyLoader($container, new VersionCompare($shopwareVersion));
+        $loader->registerFixturesAutoloader();
     }
 
 

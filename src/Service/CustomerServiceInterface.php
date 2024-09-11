@@ -5,7 +5,6 @@ namespace Kiener\MolliePayments\Service;
 
 use Kiener\MolliePayments\Struct\Address\AddressStruct;
 use Kiener\MolliePayments\Struct\CustomerStruct;
-use Kiener\MolliePayments\Struct\Mandate\MandateCollection;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
@@ -30,9 +29,6 @@ interface CustomerServiceInterface
      * @return EntityWrittenContainerEvent
      */
     public function saveCustomerCustomFields(string $customerID, array $customFields, Context $context): EntityWrittenContainerEvent;
-
-    public function setIDealIssuer(CustomerEntity $customer, string $issuerId, Context $context): EntityWrittenContainerEvent;
-
     public function getMollieCustomerId(string $customerId, string $salesChannelId, Context $context): string;
 
     public function setMollieCustomerId(string $customerId, string $mollieCustomerId, string $profileId, bool $testMode, Context $context): void;

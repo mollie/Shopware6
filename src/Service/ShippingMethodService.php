@@ -7,6 +7,8 @@ use Shopware\Core\Checkout\Shipping\ShippingMethodCollection;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -61,6 +63,13 @@ class ShippingMethodService
         $request = new Request();
         $request->query->set('onlyAvailable', '1');
 
-        return $this->shippingMethodRoute->load($request, $salesChannelContext, new Criteria())->getShippingMethods();
+        $criteria = (new Criteria())
+            ->addFilter(new EqualsFilter('active', true))
+            ->addFilter(new EqualsFilter('salesChannels.id', $salesChannelContext->getSalesChannel()->getId()))
+            ->addFilter(new EqualsAnyFilter('availabilityRuleId', $salesChannelContext->getRuleIds()))
+            ->addAssociation('prices')
+            ->addAssociation('salesChannels');
+
+        return $this->shippingMethodRoute->load($request, $salesChannelContext, $criteria)->getShippingMethods();
     }
 }

@@ -3,7 +3,6 @@
 namespace Kiener\MolliePayments\Service;
 
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
-use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 
 class ConfigService

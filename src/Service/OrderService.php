@@ -3,7 +3,6 @@
 namespace Kiener\MolliePayments\Service;
 
 use Kiener\MolliePayments\Components\RefundManager\DAL\Order\OrderExtension;
-use Kiener\MolliePayments\Components\RefundManager\DAL\OrderLineItem\OrderLineItemExtension;
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderLineIdException;
 use Kiener\MolliePayments\Exception\OrderNumberNotFoundException;
@@ -98,6 +97,7 @@ class OrderService implements OrderServiceInterface
         $criteria->addAssociation('billingAddress');    # important for subscription creation
         $criteria->addAssociation('billingAddress.country');
         $criteria->addAssociation('orderCustomer');
+        $criteria->addAssociation('stateMachineState');
         $criteria->addAssociation('orderCustomer.customer');
         $criteria->addAssociation('orderCustomer.salutation');
         $criteria->addAssociation('language');
@@ -108,6 +108,7 @@ class OrderService implements OrderServiceInterface
         $criteria->addAssociation('deliveries.shippingOrderAddress.country');
         $criteria->addAssociation('deliveries.shippingMethod');
         $criteria->addAssociation('deliveries.positions.orderLineItem');
+        $criteria->addAssociation('deliveries.stateMachineState');
         $criteria->addAssociation('transactions.paymentMethod');
         $criteria->addAssociation('transactions.paymentMethod.appPaymentMethod.app');
         $criteria->addAssociation('transactions.stateMachineState');

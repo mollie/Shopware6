@@ -6,7 +6,6 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
-use Shopware\Core\Content\MailTemplate\MailTemplateEntity;
 use Shopware\Core\Framework\Struct\Struct;
 
 class MollieSettingStruct extends Struct
@@ -15,6 +14,8 @@ class MollieSettingStruct extends Struct
 
     public const ORDER_EXPIRES_AT_MIN_DAYS = 1;
     public const ORDER_EXPIRES_AT_MAX_DAYS = 100;
+
+    const APPLE_PAY_DIRECT_DOMAIN_ALLOW_LIST = 'applePayDirectDomainAllowList';
 
     /**
      * @var string
@@ -242,6 +243,32 @@ class MollieSettingStruct extends Struct
      * @var bool
      */
     protected $useShopwareJavascript = false;
+
+
+    /**
+     * @var bool
+     */
+    protected $phoneNumberFieldRequired = false;
+
+    /**
+     * @var bool
+     */
+    protected $showPhoneNumberField = false;
+
+    /**
+     * @var string
+     */
+    protected $applePayDirectDomainAllowList = '';
+
+    /**
+     * @var int
+     */
+    protected $paymentFinalizeTransactionTime;
+
+    /**
+     * @var bool
+     */
+    protected $requireDataProtectionCheckbox = false;
 
     /**
      * @var int
@@ -964,6 +991,57 @@ class MollieSettingStruct extends Struct
     public function setUseShopwareJavascript(bool $useShopwareJavascript): void
     {
         $this->useShopwareJavascript = $useShopwareJavascript;
+    }
+
+    public function isPhoneNumberFieldRequired(): bool
+    {
+        return $this->phoneNumberFieldRequired;
+    }
+
+    public function setPhoneNumberFieldRequired(bool $phoneNumberFieldRequired): void
+    {
+        $this->phoneNumberFieldRequired = $phoneNumberFieldRequired;
+    }
+
+    public function isPhoneNumberFieldShown():bool
+    {
+        return $this->showPhoneNumberField;
+    }
+
+    public function setShowPhoneNumberField(bool $showPhoneNumberField): void
+    {
+        $this->showPhoneNumberField = $showPhoneNumberField;
+    }
+
+
+    public function getApplePayDirectDomainAllowList(): string
+    {
+        return $this->applePayDirectDomainAllowList;
+    }
+
+    public function setApplePayDirectDomainAllowList(string $applePayDirectDomainAllowList): void
+    {
+        $this->applePayDirectDomainAllowList = $applePayDirectDomainAllowList;
+    }
+
+    public function getPaymentFinalizeTransactionTime(): int
+    {
+        return $this->paymentFinalizeTransactionTime;
+    }
+
+    public function setPaymentFinalizeTransactionTime(int $paymentFinalizeTransactionTime): void
+    {
+        $this->paymentFinalizeTransactionTime = $paymentFinalizeTransactionTime;
+    }
+
+    public function isRequireDataProtectionCheckbox(): bool
+    {
+        return $this->requireDataProtectionCheckbox;
+    }
+
+    public function setRequireDataProtectionCheckbox(bool $requireDataProtectionCheckbox): void
+    {
+        $this->requireDataProtectionCheckbox = $requireDataProtectionCheckbox;
     }
 
     public function getPaypalExpressButtonStyle(): int

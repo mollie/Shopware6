@@ -10,13 +10,21 @@ use Shopware\Core\System\SystemConfig\SystemConfigService;
 
 class SettingsService implements PluginSettingsServiceInterface
 {
-    public const SYSTEM_CONFIG_DOMAIN = 'MolliePayments.config.';
+    public const SYSTEM_CONFIG_DOMAIN = 'MolliePayments.config';
+    private const SYSTEM_CORE_LOGIN_REGISTRATION_CONFIG_DOMAIN = 'core.loginRegistration';
+    private const SYSTEM_CORE_CART_CONFIG_DOMAIN = 'core.cart';
 
+    private const PHONE_NUMBER_FIELD_REQUIRED = 'phoneNumberFieldRequired';
+
+    private const PHONE_NUMBER_FIELD = 'showPhoneNumberField';
+
+    private const REQUIRE_DATA_PROTECTION ='requireDataProtectionCheckbox';
+
+    private const PAYMENT_FINALIZE_TRANSACTION_TIME = 'paymentFinalizeTransactionTime';
     const LIVE_API_KEY = 'liveApiKey';
     const TEST_API_KEY = 'testApiKey';
     const LIVE_PROFILE_ID = 'liveProfileId';
     const TEST_PROFILE_ID = 'testProfileId';
-
 
     /**
      * @var SystemConfigService
@@ -71,7 +79,8 @@ class SettingsService implements PluginSettingsServiceInterface
     public function getSettings(?string $salesChannelId = null): MollieSettingStruct
     {
         $structData = [];
-        $systemConfigData = $this->systemConfigService->getDomain(self::SYSTEM_CONFIG_DOMAIN, $salesChannelId, true);
+        /** @var array<mixed> $systemConfigData */
+        $systemConfigData = $this->systemConfigService->get(self::SYSTEM_CONFIG_DOMAIN, $salesChannelId);
 
         foreach ($systemConfigData as $key => $value) {
             if (stripos($key, self::SYSTEM_CONFIG_DOMAIN) !== false) {
@@ -80,6 +89,19 @@ class SettingsService implements PluginSettingsServiceInterface
                 $structData[$key] = $value;
             }
         }
+
+        /** @var array<mixed> $coreSettings */
+        $coreSettings = $this->systemConfigService->get(self::SYSTEM_CORE_LOGIN_REGISTRATION_CONFIG_DOMAIN, $salesChannelId);
+
+        $structData[self::PHONE_NUMBER_FIELD_REQUIRED] = $coreSettings[self::PHONE_NUMBER_FIELD_REQUIRED] ?? false;
+
+        $structData[self::PHONE_NUMBER_FIELD] = $coreSettings[self::PHONE_NUMBER_FIELD] ?? false;
+
+        $structData[self::REQUIRE_DATA_PROTECTION] = $coreSettings[self::REQUIRE_DATA_PROTECTION] ?? false;
+
+        /** @var array<mixed> $cartSettings */
+        $cartSettings = $this->systemConfigService->get(self::SYSTEM_CORE_CART_CONFIG_DOMAIN, $salesChannelId);
+        $structData[self::PAYMENT_FINALIZE_TRANSACTION_TIME] = $cartSettings[self::PAYMENT_FINALIZE_TRANSACTION_TIME] ?? 1800;
 
         return (new MollieSettingStruct())->assign($structData);
     }
@@ -113,7 +135,7 @@ class SettingsService implements PluginSettingsServiceInterface
      */
     public function set(string $key, $value, ?string $salesChannelId = null): void
     {
-        $this->systemConfigService->set(self::SYSTEM_CONFIG_DOMAIN . $key, $value, $salesChannelId);
+        $this->systemConfigService->set(self::SYSTEM_CONFIG_DOMAIN . '.' . $key, $value, $salesChannelId);
     }
 
     /**
@@ -122,7 +144,7 @@ class SettingsService implements PluginSettingsServiceInterface
      */
     public function delete(string $key, ?string $salesChannelId = null): void
     {
-        $this->systemConfigService->delete(self::SYSTEM_CONFIG_DOMAIN . $key, $salesChannelId);
+        $this->systemConfigService->delete(self::SYSTEM_CONFIG_DOMAIN . '.' . $key, $salesChannelId);
     }
 
     /**
@@ -134,7 +156,7 @@ class SettingsService implements PluginSettingsServiceInterface
     {
         $key = $testMode ? self::TEST_PROFILE_ID : self::LIVE_PROFILE_ID;
 
-        if (!is_null($profileId)) {
+        if (! is_null($profileId)) {
             $this->set($key, $profileId, $salesChannelId);
         } else {
             $this->delete($key, $salesChannelId);

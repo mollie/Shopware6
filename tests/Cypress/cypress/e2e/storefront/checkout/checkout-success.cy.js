@@ -15,6 +15,7 @@ import PaymentMethodsScreenAction from "cypress-mollie/src/actions/screens/Payme
 import KBCScreen from "cypress-mollie/src/actions/screens/KBCScreen";
 import GiftCardsScreenAction from "cypress-mollie/src/actions/screens/GiftCardsScreen";
 import CreditCardScreen from "cypress-mollie/src/actions/screens/CreditCardScreen";
+import IDealScreen from "cypress-mollie/src/actions/screens/IDealScreen";
 
 
 const devices = new Devices();
@@ -28,6 +29,7 @@ const paymentAction = new PaymentAction();
 const mollieSandbox = new MollieSandbox();
 const molliePayment = new PaymentScreenAction();
 const mollieKBC = new KBCScreen();
+const idealScreen = new IDealScreen();
 const mollieVoucher = new VoucherScreenAction();
 const mollieGiftCards = new GiftCardsScreenAction();
 const molliePaymentMethods = new PaymentMethodsScreenAction();
@@ -49,7 +51,6 @@ const payments = [
     {caseId: 'C4118', key: 'ideal', name: 'iDEAL', sanity: false},
     {caseId: 'C4116', key: 'sofort', name: 'SOFORT', sanity: false},
     {caseId: 'C4120', key: 'eps', name: 'eps', sanity: false},
-    {caseId: 'C4122', key: 'giropay', name: 'Giropay', sanity: false},
     {caseId: 'C4123', key: 'mistercash', name: 'Bancontact', sanity: false},
     {caseId: 'C4125', key: 'przelewy24', name: 'Przelewy24', sanity: false},
     {caseId: 'C4126', key: 'kbc', name: 'KBC', sanity: false},
@@ -57,6 +58,10 @@ const payments = [
     {caseId: 'C4127', key: 'belfius', name: 'Belfius', sanity: false},
     {caseId: 'C4121', key: 'giftcard', name: 'Gift cards', sanity: false},
     {caseId: 'C4143', key: 'voucher', name: 'Voucher', sanity: false},
+    {caseId: 'C3362894', key: 'trustly', name: 'Trustly', sanity: false},
+    {caseId: 'C3362897', key: 'payconiq', name: 'Payconiq', sanity: false},
+    {caseId: 'C3713510', key: 'riverty', name: 'Riverty', sanity: false},
+    {caseId: 'C3713512', key: 'satispay', name: 'Satispay', sanity: false},
     // unfortunately address and product prices need to match, so we cannot do in3 automatically for now
     // {caseId: '', key: 'in3', name: 'in3'},
 ];
@@ -87,6 +92,10 @@ context("Checkout Tests", () => {
                 it(payment.caseId + ': Pay with ' + payment.name + sanityString, () => {
 
                     scenarioDummyBasket.execute();
+
+                    if(payment.key === 'payconiq'){
+                        checkout.changeBillingCountry('Belgium');
+                    }
 
                     paymentAction.switchPaymentMethod(payment.name);
 
@@ -136,7 +145,9 @@ context("Checkout Tests", () => {
                         molliePayment.selectPaid();
                         molliePaymentMethods.selectPaypal();
                         molliePayment.selectPaid();
-
+                    } else if(payment.key === 'ideal'){
+                        idealScreen.selectING();
+                        molliePayment.selectPaid();
                     } else if (payment.key === 'giftcard') {
 
                         mollieGiftCards.selectBeautyCards();

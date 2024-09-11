@@ -6,9 +6,6 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatche
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactoryInterface;
 use Kiener\MolliePayments\Components\RefundManager\Builder\RefundDataBuilder;
-use Kiener\MolliePayments\Components\RefundManager\DAL\Order\OrderExtension;
-use Kiener\MolliePayments\Components\RefundManager\DAL\Refund\RefundCollection;
-use Kiener\MolliePayments\Components\RefundManager\DAL\Refund\RefundEntity;
 use Kiener\MolliePayments\Components\RefundManager\DAL\RefundItem\RefundItemEntity;
 use Kiener\MolliePayments\Components\RefundManager\DAL\Repository\RefundRepositoryInterface;
 use Kiener\MolliePayments\Components\RefundManager\Integrators\StockManagerInterface;
@@ -22,7 +19,6 @@ use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Service\OrderServiceInterface;
 use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
 use Kiener\MolliePayments\Service\Refund\Item\RefundItemType;
-use Kiener\MolliePayments\Service\Refund\Mollie\DataCompressor;
 use Kiener\MolliePayments\Service\Refund\RefundServiceInterface;
 use Kiener\MolliePayments\Struct\MollieApi\OrderLineMetaDataStruct;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
@@ -286,8 +282,7 @@ class RefundManager implements RefundManagerInterface
                 # and now simply call our stock manager
                 $this->stockManager->increaseStock(
                     $orderItem,
-                    $item->getStockIncreaseQty(),
-                    $refund->id
+                    $item->getStockIncreaseQty()
                 );
             }
         }

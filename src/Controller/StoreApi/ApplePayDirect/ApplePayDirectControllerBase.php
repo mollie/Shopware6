@@ -13,11 +13,9 @@ use Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Response\PaymentRes
 use Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Response\RestoreCartResponse;
 use Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Response\SetShippingMethodResponse;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
-use Symfony\Component\Routing\Annotation\Route;
 use Throwable;
 
 class ApplePayDirectControllerBase
@@ -113,13 +111,14 @@ class ApplePayDirectControllerBase
      */
     public function createPaymentSession(RequestDataBag $data, SalesChannelContext $context): StoreApiResponse
     {
-        $validationURL = $data->getAlnum('validationUrl');
+        $validationURL = $data->get('validationUrl');
+        $domain = (string)$data->get('domain');
 
         if (empty($validationURL)) {
             throw new \Exception('Please provide a validation url!');
         }
 
-        $session = $this->applePay->createPaymentSession($validationURL, $context);
+        $session = $this->applePay->createPaymentSession($validationURL, $domain, $context);
 
         return new CreateSessionResponse($session);
     }
@@ -194,6 +193,9 @@ class ApplePayDirectControllerBase
         $city = (string)$data->get('city', '');
         $zipcode = (string)$data->get('postalCode', '');
         $countryCode = (string)$data->get('countryCode', '');
+        $phone = (string)$data->get('phone', '');
+
+        $acceptedDataProtection = (int)$data->get('acceptedDataProtection', '0');
 
         $paymentToken = (string)$data->get('paymentToken', '');
         $finishUrl = (string)$data->get('finishUrl', '');
@@ -203,28 +205,30 @@ class ApplePayDirectControllerBase
         if (empty($paymentToken)) {
             throw new \Exception('PaymentToken not found!');
         }
-
-        # make sure to create a customer if necessary
-        # then update to our apple pay payment method
-        # and return the new context
-        $newContext = $this->applePay->prepareCustomer(
-            $firstname,
-            $lastname,
-            $email,
-            $street,
-            $zipcode,
-            $city,
-            $countryCode,
-            $paymentToken,
-            $context
-        );
-
-        # we only start our TRY/CATCH here!
-        # we always need to throw exceptions on an API level
-        # but if something BELOW breaks, we want to navigate to the error page.
-        # customers are ready, data is ready, but the handling has a problem.
-
         try {
+            # make sure to create a customer if necessary
+            # then update to our apple pay payment method
+            # and return the new context
+            $newContext = $this->applePay->prepareCustomer(
+                $firstname,
+                $lastname,
+                $email,
+                $street,
+                $zipcode,
+                $city,
+                $countryCode,
+                $phone,
+                $paymentToken,
+                $acceptedDataProtection,
+                $context
+            );
+
+            # we only start our TRY/CATCH here!
+            # we always need to throw exceptions on an API level
+            # but if something BELOW breaks, we want to navigate to the error page.
+            # customers are ready, data is ready, but the handling has a problem.
+
+
             # create our new Shopware Order
             $order = $this->applePay->createOrder($newContext);
 

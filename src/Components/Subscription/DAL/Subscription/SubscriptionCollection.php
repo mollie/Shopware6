@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Components\Subscription\DAL\Subscription;
 
-use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 
 /**

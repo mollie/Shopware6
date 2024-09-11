@@ -6,10 +6,8 @@ use Exception;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
-use Kiener\MolliePayments\Service\CustomerService;
-use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Service\MandateServiceInterface;
-use Kiener\MolliePayments\Service\SalesChannel\SalesChannelLocale;
+use Kiener\MolliePayments\Service\MollieLocaleService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
@@ -45,9 +43,9 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     private $settings;
 
     /**
-     * @var SalesChannelLocale
+     * @var MollieLocaleService
      */
-    private $salesChannelLocale;
+    private $mollieLocaleService;
 
     /**
      * @var MandateServiceInterface
@@ -82,15 +80,15 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
      * @param SettingsService $settingsService
      * @param MandateServiceInterface $mandateService
      * @param MollieGatewayInterface $mollieGateway
-     * @param SalesChannelLocale $salesChannelLocale
+     * @param MollieLocaleService $mollieLocaleService
      */
-    public function __construct(MollieApiFactory $apiFactory, SettingsService $settingsService, MandateServiceInterface $mandateService, MollieGatewayInterface $mollieGateway, SalesChannelLocale $salesChannelLocale)
+    public function __construct(MollieApiFactory $apiFactory, SettingsService $settingsService, MandateServiceInterface $mandateService, MollieGatewayInterface $mollieGateway, MollieLocaleService $mollieLocaleService)
     {
         $this->apiFactory = $apiFactory;
         $this->settingsService = $settingsService;
         $this->mandateService = $mandateService;
         $this->mollieGateway = $mollieGateway;
-        $this->salesChannelLocale = $salesChannelLocale;
+        $this->mollieLocaleService = $mollieLocaleService;
     }
 
 
@@ -124,7 +122,6 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
         $this->addMollieProfileIdVariableToPage($args);
         $this->addMollieTestModeVariableToPage($args);
         $this->addMollieComponentsVariableToPage($args);
-        $this->addMollieIdealIssuersVariableToPage($args, $mollieAttributes);
         $this->addMollieSingleClickPaymentDataToPage($args, $mollieAttributes);
         $this->addMolliePosTerminalsVariableToPage($args, $mollieAttributes);
     }
@@ -138,7 +135,7 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     {
         $salesChannelContext = $args->getSalesChannelContext();
 
-        $locale = $this->salesChannelLocale->getLocale($salesChannelContext);
+        $locale = $this->mollieLocaleService->getLocale($salesChannelContext);
 
         $args->getPage()->assign([
             'mollie_locale' => $locale,
@@ -212,62 +209,6 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
         ]);
     }
 
-    /**
-     * Adds ideal issuers variable to the storefront.
-     *
-     * @param AccountEditOrderPageLoadedEvent|CheckoutConfirmPageLoadedEvent $args
-     * @param PaymentMethodAttributes $selectedPayment
-     */
-    private function addMollieIdealIssuersVariableToPage($args, $selectedPayment): void
-    {
-        // do not load ideal issuers if not required
-        if ($selectedPayment->getMollieIdentifier() !== PaymentMethod::IDEAL) {
-            return;
-        }
-        $customFields = [];
-        $ideal = null;
-        $preferredIssuer = '';
-
-        $mollieProfileId = $this->loadMollieProfileId();
-
-        // Get custom fields from the customer in the sales channel context
-        if ($args->getSalesChannelContext()->getCustomer() !== null) {
-            $customFields = $args->getSalesChannelContext()->getCustomer()->getCustomFields();
-        }
-
-        // Get the preferred issuer from the custom fields
-        if (
-            is_array($customFields)
-            && isset($customFields[CustomFieldsInterface::MOLLIE_KEY][CustomerService::CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER])
-            && (string)$customFields[CustomFieldsInterface::MOLLIE_KEY][CustomerService::CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER] !== ''
-        ) {
-            $preferredIssuer = $customFields[CustomFieldsInterface::MOLLIE_KEY][CustomerService::CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER];
-        }
-
-
-        $parameters = [
-            'include' => 'issuers',
-        ];
-
-        if ($this->apiClient->usesOAuth()) {
-            $parameters['profileId'] = $mollieProfileId;
-        }
-
-        // Get issuers from the API
-        try {
-            $ideal = $this->apiClient->methods->get(PaymentMethod::IDEAL, $parameters);
-        } catch (Exception $e) {
-            //
-        }
-
-        // Assign issuers to storefront
-        if ($ideal instanceof Method) {
-            $args->getPage()->assign([
-                'ideal_issuers' => $ideal->issuers,
-                'preferred_issuer' => $preferredIssuer,
-            ]);
-        }
-    }
 
     /**
      * Adds ideal issuers variable to the storefront.

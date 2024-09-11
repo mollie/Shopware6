@@ -6,13 +6,31 @@ namespace Kiener\MolliePayments\Service;
 use Kiener\MolliePayments\Components\ShipmentManager\Exceptions\NoDeliveriesFoundException;
 use Kiener\MolliePayments\Struct\MollieApi\ShipmentTrackingInfoStruct;
 use Kiener\MolliePayments\Traits\StringTrait;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
-use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 
 class TrackingInfoStructFactory
 {
     use StringTrait;
+
+    /**
+     * @var UrlParsingService
+     */
+    private $urlParsingService;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    public function __construct(
+        UrlParsingService $urlParsingService,
+        LoggerInterface $logger
+    ) {
+        $this->urlParsingService = $urlParsingService;
+        $this->logger = $logger;
+    }
 
 
     /**
@@ -54,6 +72,8 @@ class TrackingInfoStructFactory
             return null;
         }
 
+        $this->logger->info(sprintf('Creating tracking information for shipment with shipping method %s. Order: "%s"', $shippingMethod->getName(), $order->getOrderNumber()));
+
         return $this->createInfoStruct(
             (string)$shippingMethod->getName(),
             $trackingCodes[0],
@@ -81,6 +101,7 @@ class TrackingInfoStructFactory
     private function createInfoStruct(string $trackingCarrier, string $trackingCode, string $trackingUrl): ?ShipmentTrackingInfoStruct
     {
         if (empty($trackingCarrier) && empty($trackingCode)) {
+            $this->logger->debug('No tracking information provided for shipment.');
             return null;
         }
 
@@ -92,21 +113,50 @@ class TrackingInfoStructFactory
             throw new \InvalidArgumentException('Missing Argument for Tracking Code!');
         }
 
+        $this->logger->debug('Creating tracking information for shipment.', [
+            'trackingCarrier' => $trackingCarrier,
+            'trackingCode' => $trackingCode,
+            'trackingUrl' => $trackingUrl
+        ]);
+
+        // determine if the provided tracking code is actually a tracking URL
+        if (empty($trackingUrl) === true || $this->urlParsingService->isUrl($trackingCode)) {
+            $this->logger->debug('Tracking code is a URL, parsing tracking code from URL.', [
+                'trackingCode' => $trackingCode,
+                'trackingUrl' => $trackingUrl
+            ]);
+
+            [$trackingCode, $trackingUrl] = $this->urlParsingService->parseTrackingCodeFromUrl($trackingCode);
+
+            $this->logger->debug('Parsed tracking code from URL.', [
+                'trackingCode' => $trackingCode,
+                'trackingUrl' => $trackingUrl
+            ]);
+        }
+
         # we just have to completely remove those codes, so that no tracking happens, but a shipping works.
         # still, if we find multiple codes (because separators exist), then we use the first one only
         if (mb_strlen($trackingCode) > self::MAX_TRACKING_CODE_LENGTH) {
+            $this->logger->debug('Tracking code is too long, truncating.', ['trackingCode' => $trackingCode]);
             if (strpos($trackingCode, ',') !== false) {
                 $trackingCode = trim(explode(',', $trackingCode)[0]);
             } elseif (strpos($trackingCode, ';') !== false) {
                 $trackingCode = trim(explode(';', $trackingCode)[0]);
             }
 
+            $this->logger->debug('Truncated tracking code.', ['trackingCode' => $trackingCode]);
+
             # if we are still too long, then simply remove the code
             if (mb_strlen($trackingCode) > self::MAX_TRACKING_CODE_LENGTH) {
-                return new ShipmentTrackingInfoStruct($trackingCarrier, '', '');
+                $this->logger->warning('Tracking code is still too long, removing.', ['trackingCode' => $trackingCode]);
+                return null;
             }
         }
 
+        if (mb_strlen($trackingCode) === 0) {
+            $this->logger->warning('Tracking Code is empty');
+            return null;
+        }
 
         # had the use case of this pattern, and it broke the sprintf below
         if ($this->stringContains($trackingUrl, '%s%')) {
@@ -115,13 +165,8 @@ class TrackingInfoStructFactory
 
         $trackingUrl = trim(sprintf($trackingUrl, $trackingCode));
 
-        if (filter_var($trackingUrl, FILTER_VALIDATE_URL) === false) {
-            $trackingUrl = '';
-        }
-
-        # following characters are not allowed in the tracking URL {,},<,>,#
-        if (preg_match_all('/[{}<>#]/m', $trackingUrl)) {
-            $trackingUrl = '';
+        if ($this->urlParsingService->isUrl($trackingUrl) === false) {
+            return new ShipmentTrackingInfoStruct($trackingCarrier, $trackingCode, '');
         }
 
         return new ShipmentTrackingInfoStruct($trackingCarrier, $trackingCode, $trackingUrl);

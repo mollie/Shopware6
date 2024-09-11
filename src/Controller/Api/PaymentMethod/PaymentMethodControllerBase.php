@@ -5,11 +5,9 @@ namespace Kiener\MolliePayments\Controller\Api\PaymentMethod;
 use Kiener\MolliePayments\Service\PaymentMethodService;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\ShopwareHttpException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Annotation\Route;
 use Throwable;
 
 class PaymentMethodControllerBase extends AbstractController

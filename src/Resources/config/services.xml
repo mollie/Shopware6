@@ -50,6 +50,13 @@
             <argument type="service" id="Kiener\MolliePayments\Service\Transition\OrderTransitionService"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Service\Order\OrderExpireService">
+            <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderTimeService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="mollie_payments.logger"/>
+        </service>
+
 
         <service id="kiener.mollie_payments.http.client.factory" class="Kiener\MolliePayments\Service\HttpClient\PluginHttpClientFactory"/>
 
@@ -122,7 +129,7 @@
             <argument type="service" id="Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepository"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\Cart\CartBackupService" class="Kiener\MolliePayments\Service\Cart\CartBackupService">
+        <service id="Kiener\MolliePayments\Service\Cart\CartBackupService" class="Kiener\MolliePayments\Service\Cart\CartBackupService" public="true">
             <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
         </service>
 
@@ -150,7 +157,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MandateService"/>
             <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SalesChannel\SalesChannelLocale"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieLocaleService"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
@@ -177,7 +184,12 @@
             <argument key="$envAppUrl">%env(default::APP_URL)%</argument>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\TrackingInfoStructFactory"/>
+        <service id="Kiener\MolliePayments\Service\UrlParsingService"/>
+
+        <service id="Kiener\MolliePayments\Service\TrackingInfoStructFactory">
+            <argument type="service" id="Kiener\MolliePayments\Service\UrlParsingService"/>
+            <argument type="service" id="mollie_payments.logger"/>
+        </service>
 
 
         <service id="Kiener\MolliePayments\Subscriber\KernelSubscriber">
@@ -224,6 +236,17 @@
             <argument type="service" id="Shopware\Core\Content\Mail\Service\MailFactory"/>
             <argument type="service" id="Shopware\Core\Content\Mail\Service\MailSender"/>
         </service>
+
+
+        <service id="Kiener\MolliePayments\Service\Tags\OrderTagService">
+            <argument id="order.repository" type="service"/>
+            <argument id="tag.repository" type="service"/>
+        </service>
+        <service id="Kiener\MolliePayments\Checkout\Cart\ExpressCartItemAddRoute" decorates="Shopware\Core\Checkout\Cart\SalesChannel\CartItemAddRoute" public="true">
+            <argument type="service" id=".inner"/>
+            <argument type="service" id="service_container"/>
+        </service>
+
 
     </services>
 

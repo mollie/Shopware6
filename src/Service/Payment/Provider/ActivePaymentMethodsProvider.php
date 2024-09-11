@@ -4,13 +4,10 @@ namespace Kiener\MolliePayments\Service\Payment\Provider;
 
 use Exception;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
-use Kiener\MolliePayments\Service\Logger\MollieLogger;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Method;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Cart\Cart;
-use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterface
 {

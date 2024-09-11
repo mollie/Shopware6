@@ -1,0 +1,109 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Mollie API",
+    "description": "API for Mollie payment integration.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/mollie/mandates/{customerId}": {
+      "get": {
+        "summary": "Get Customer Mandates",
+        "description": "Retrieves a list of mandates for the specified customer.",
+        "operationId": "getCustomerMandates",
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the customer whose mandates are being retrieved."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of customer mandates.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/mandate"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreditCardDetailStruct": {
+        "type": "object",
+        "properties": {
+          "cardNumber": {
+            "type": "string"
+          },
+          "expiryDate": {
+            "type": "string"
+          }
+        }
+      },
+      "mandate": {
+        "type": "object",
+        "properties": {
+          "resource": {
+            "type": "string",
+            "nullable": true
+          },
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "mode": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "nullable": true
+          },
+          "method": {
+            "type": "string",
+            "nullable": true
+          },
+          "details": {
+            "$ref": "#/components/schemas/CreditCardDetailStruct"
+          },
+          "customerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "mandateReference": {
+            "type": "string",
+            "nullable": true
+          },
+          "signatureDate": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "nullable": true
+          },
+          "beingUsedForSubscription": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "details",
+          "beingUsedForSubscription"
+        ]
+      }
+    }
+  }
+}

@@ -5,6 +5,7 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
 
+
         <service id="Kiener\MolliePayments\Components\RefundManager\RefundManager">
             <argument type="service" id="Kiener\MolliePayments\Components\RefundManager\Builder\RefundDataBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
@@ -39,6 +40,8 @@
             <argument type="service" id="Kiener\MolliePayments\Service\ShopService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Repository\Order\OrderAddressRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\Gateways\ApplePayDirectDomainAllowListGateway"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDirectDomainSanitizer"/>
         </service>
 
         <service id="Kiener\MolliePayments\Components\PaypalExpress\PayPalExpress" public="true">
@@ -56,6 +59,13 @@
             <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayFormatter"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDirectDomainSanitizer"/>
+
+        <service id="Kiener\MolliePayments\Components\ApplePayDirect\Gateways\ApplePayDirectDomainAllowListGateway">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+        </service>
+
+
         <service id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayFormatter">
             <argument type="service" id="translator"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Router\RoutingDetector"/>
@@ -66,6 +76,14 @@
             <argument type="service" id="kiener.mollie_payments.http.client"/>
             <argument type="service" id="Nyholm\Psr7\Factory\Psr17Factory"/>
         </service>
+
+        <service id="Kiener\MolliePayments\Components\CancelManager\CancelItemFacade">
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\OrderLineItem\OrderLineItemRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Stock\StockManager"/>
+            <argument type="service" id="mollie_payments.logger"/>
+        </service>
+
 
     </services>
 </container>

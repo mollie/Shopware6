@@ -31,6 +31,17 @@ export default class OrderDetailsRepository {
     getMollieActionButtonShipThroughMollie() {
         return cy.get('.sw-order-line-items-grid__actions-ship-button');
     }
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getLineItemActionsButtonCancelThroughMollie() {
+        return cy.get('.sw-context-button__menu-popover', {timeout: 15000}).contains('Cancel through Mollie');
+    }
+
+    getLineItemCancelled(){
+        return cy.get('.sw-data-grid__cell--canceledQuantity');
+    }
 
     /**
      *

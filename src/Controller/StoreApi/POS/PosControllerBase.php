@@ -6,11 +6,9 @@ use Kiener\MolliePayments\Controller\StoreApi\POS\Response\StoreTerminalResponse
 use Kiener\MolliePayments\Controller\StoreApi\POS\Response\TerminalsResponse;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Service\CustomerService;
-use Mollie\Api\Resources\Terminal;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
-use Symfony\Component\Routing\Annotation\Route;
 
 class PosControllerBase
 {
