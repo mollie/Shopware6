@@ -143,6 +143,15 @@ class NotificationFacade
             throw new \Exception('Transaction ' . $swTransactionId . ' not found in Shopware');
         }
 
+        # Apple pay direct creates a payment and then updates order/transaction custom fields, sometimes the webhook is quicker than the process. so we wait once and then read the custom fields again
+        if ($swTransaction->getCustomFields() === null) {
+            sleep(2);
+            $swTransaction = $this->getTransaction($swTransactionId, $context);
+            if (!$swTransaction instanceof OrderTransactionEntity) {
+                throw new \Exception('Transaction ' . $swTransactionId . ' not found in Shopware');
+            }
+        }
+
         # -----------------------------------------------------------------------------------------------------
 
         $swOrder = $swTransaction->getOrder();
@@ -285,8 +294,7 @@ class NotificationFacade
      */
     private function getTransaction(string $transactionId, Context $context): ?OrderTransactionEntity
     {
-        $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('id', $transactionId));
+        $criteria = new Criteria([$transactionId]);
         $criteria->addAssociation('order');
         $criteria->addAssociation('order.salesChannel');
         $criteria->addAssociation('order.lineItems');
