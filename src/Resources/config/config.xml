@@ -300,6 +300,36 @@
             <helpText lang="de-DE">Diese Funktion kann benutzt werden, um die Anleitungen auszublenden, sofern man einmal mit dem Refund Manager vetraut ist.</helpText>
             <helpText lang="nl-NL">Toont of verbergt de handleiding. Als het storend is, kan je het direkt deactiveren als je eenmaal vertrouwd bent met de Refund Manager.</helpText>
         </input-field>
+        <input-field type="bool">
+            <name>refundManagerCreateCreditNotes</name>
+            <defaultValue>true</defaultValue>
+            <label>Create Credit Notes</label>
+            <label lang="de-DE">Gutschriften erstellen</label>
+            <label lang="nl-NL">Creditnota's maken</label>
+            <helpText>Automatically create a credit note in Shopware when a refund is processed.</helpText>
+            <helpText lang="de-DE">Erstellt automatisch eine Gutschrift in Shopware, wenn eine Rückerstattung verarbeitet wird.</helpText>
+            <helpText lang="nl-NL">Maak automatisch een creditnota in Shopware wanneer een terugbetaling wordt verwerkt.</helpText>
+        </input-field>
+        <input-field type="text">
+            <name>refundManagerCreateCreditNotesPrefix</name>
+            <defaultValue>Refund: </defaultValue>
+            <label>Credit Note Prefix</label>
+            <label lang="de-DE">Gutschrift Präfix</label>
+            <label lang="nl-NL">Creditnota voorvoegsel</label>
+            <helpText>Prefix for the credit note number. Credit note consist of prefix, original line item name and suffix</helpText>
+            <helpText lang="de-DE">Präfix für die Gutschriftsnummer. Die Gutschrift besteht aus Präfix, ursprünglichem Positionsnamen und Suffix</helpText>
+            <helpText lang="nl-NL">Voorvoegsel voor het creditnotanummer. De creditnota bestaat uit een voorvoegsel, de oorspronkelijke naam van het line item en een achtervoegsel.</helpText>
+        </input-field>
+        <input-field type="text">
+            <name>refundManagerCreateCreditNotesSuffix</name>
+            <defaultValue />
+            <label>Credit Note Suffix</label>
+            <label lang="de-DE">Gutschrift Suffix</label>
+            <label lang="nl-NL">Creditnota achtervoegsel</label>
+            <helpText>Suffix for the credit note number. Credit note consist of prefix, original line item name and suffix</helpText>
+            <helpText lang="de-DE">Suffix für die Gutschriftsnummer. Die Gutschrift besteht aus Präfix, ursprünglichem Positionsnamen und Suffix</helpText>
+            <helpText lang="nl-NL">Achtervoegsel voor het creditnotanummer. De creditnota bestaat uit een voorvoegsel, de oorspronkelijke naam van het line item en een achtervoegsel.</helpText>
+        </input-field>
     </card>
     <card>
         <title>Order State Automation</title>

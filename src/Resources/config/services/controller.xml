@@ -56,6 +56,8 @@
             <argument type="service" id="Kiener\MolliePayments\Components\RefundManager\RefundManager"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Refund\RefundService"/>
             <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Refund\RefundCreditNoteService"/>
+
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>

@@ -7,6 +7,8 @@ use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Service\OrderService;
+use Kiener\MolliePayments\Service\Refund\Exceptions\CreditNoteException;
+use Kiener\MolliePayments\Service\Refund\RefundCreditNoteService;
 use Kiener\MolliePayments\Service\Refund\RefundService;
 use Kiener\MolliePayments\Traits\Api\ApiTrait;
 use Psr\Log\LoggerInterface;
@@ -40,6 +42,11 @@ class RefundControllerBase extends AbstractController
      */
     private $logger;
 
+    /**
+     * @var RefundCreditNoteService
+     */
+    private $creditNoteService;
+
 
     /**
      * @param OrderService $orderService
@@ -47,12 +54,18 @@ class RefundControllerBase extends AbstractController
      * @param RefundService $refundService
      * @param LoggerInterface $logger
      */
-    public function __construct(OrderService $orderService, RefundManagerInterface $refundManager, RefundService $refundService, LoggerInterface $logger)
-    {
+    public function __construct(
+        OrderService $orderService,
+        RefundManagerInterface $refundManager,
+        RefundService $refundService,
+        LoggerInterface $logger,
+        RefundCreditNoteService $creditNoteService
+    ) {
         $this->orderService = $orderService;
         $this->refundManager = $refundManager;
         $this->refundService = $refundService;
         $this->logger = $logger;
+        $this->creditNoteService = $creditNoteService;
     }
 
 
@@ -168,7 +181,7 @@ class RefundControllerBase extends AbstractController
             $items = $itemsBag->all();
         }
 
-        return $this->refundAction(
+        $response = $this->refundAction(
             $orderId,
             '',
             $description,
@@ -177,6 +190,18 @@ class RefundControllerBase extends AbstractController
             $items,
             $context
         );
+
+        if ($response->getStatusCode() === 200 && $response->getContent() !== false) {
+            $refundId = json_decode($response->getContent(), true)['refundId'];
+            try {
+                $this->creditNoteService->addCreditNoteToOrder($orderId, $refundId, $items, $context);
+            } catch (CreditNoteException $exception) {
+                $this->logger->error($exception->getMessage(), ['code' => $exception->getCode(),]);
+                return $this->buildErrorResponse($exception->getMessage());
+            }
+        }
+
+        return $response;
     }
 
     /**
@@ -187,7 +212,20 @@ class RefundControllerBase extends AbstractController
      */
     public function cancel(RequestDataBag $data, Context $context): JsonResponse
     {
-        return $this->cancelRefundAction($data->getAlnum('orderId'), $data->get('refundId'), $context);
+        $orderId = $data->getAlnum('orderId');
+        $refundId = $data->get('refundId');
+        $response = $this->cancelRefundAction($orderId, $refundId, $context);
+
+        if ($response->getStatusCode() === 200) {
+            try {
+                $this->creditNoteService->cancelCreditNoteToOrder($orderId, $refundId, $context);
+            } catch (CreditNoteException $exception) {
+                $this->logger->error($exception->getMessage(), ['code' => $exception->getCode(),]);
+                return $this->buildErrorResponse($exception->getMessage());
+            }
+        }
+
+        return $response;
     }
 
     /**

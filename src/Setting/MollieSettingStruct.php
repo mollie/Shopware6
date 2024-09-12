@@ -271,6 +271,21 @@ class MollieSettingStruct extends Struct
     protected $requireDataProtectionCheckbox = false;
 
     /**
+     * @var bool
+     */
+    protected $refundManagerCreateCreditNotesEnabled = true;
+
+    /**
+     * @var string
+     */
+    protected $refundManagerCreateCreditNotesPrefix = '';
+
+    /**
+     * @var string
+     */
+    protected $refundManagerCreateCreditNotesSuffix = '';
+
+    /**
      * @return string
      */
     public function getLiveApiKey(): string
@@ -1027,5 +1042,35 @@ class MollieSettingStruct extends Struct
     public function setRequireDataProtectionCheckbox(bool $requireDataProtectionCheckbox): void
     {
         $this->requireDataProtectionCheckbox = $requireDataProtectionCheckbox;
+    }
+
+    public function isRefundManagerCreateCreditNotesEnabled(): bool
+    {
+        return $this->refundManagerCreateCreditNotesEnabled;
+    }
+
+    public function setRefundManagerCreateCreditNotesEnabled(bool $refundManagerCreateCreditNotesEnabled): void
+    {
+        $this->refundManagerCreateCreditNotesEnabled = $refundManagerCreateCreditNotesEnabled;
+    }
+
+    public function getRefundManagerCreateCreditNotesPrefix(): string
+    {
+        return $this->refundManagerCreateCreditNotesPrefix;
+    }
+
+    public function setRefundManagerCreateCreditNotesPrefix(string $refundManagerCreateCreditNotesPrefix): void
+    {
+        $this->refundManagerCreateCreditNotesPrefix = $refundManagerCreateCreditNotesPrefix;
+    }
+
+    public function getRefundManagerCreateCreditNotesSuffix(): string
+    {
+        return $this->refundManagerCreateCreditNotesSuffix;
+    }
+
+    public function setRefundManagerCreateCreditNotesSuffix(string $refundManagerCreateCreditNotesSuffix): void
+    {
+        $this->refundManagerCreateCreditNotesSuffix = $refundManagerCreateCreditNotesSuffix;
     }
 }
