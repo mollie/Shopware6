@@ -337,42 +337,6 @@
                 en een alternatieve domein voor uw Apple Pay Direct integratie wilt opgeven.
             </helpText>
         </input-field>
-
-        <input-field type="bool">
-            <name>createCustomersAtMollie</name>
-            <label>Create customers at Mollie</label>
-            <label lang="de-DE">Kunden bei Mollie anlegen</label>
-            <label lang="nl-NL">Klanten creëren bij Mollie</label>
-            <defaultValue>false</defaultValue>
-            <helpText>Automatically have customers being created inside your Mollie Dashboard to see all payments of a specific customer.</helpText>
-            <helpText lang="de-DE">Erstellt automatisch Kunden im Mollie Dashboard. Dadurch hat man einen zusätzlichen Überblick über alle Zahlungen dieses Kunden innerhalb von Mollie.</helpText>
-            <helpText lang="nl-NL">Automatisch klanten laten aanmaken in het Mollie Dashboard om alle betalingen van een specifieke klant te zien.</helpText>
-        </input-field>
-        <input-field type="bool">
-            <name>useMolliePaymentMethodLimits</name>
-            <defaultValue>false</defaultValue>
-            <label>Use Mollie's availability rules for payment methods</label>
-            <label lang="de-DE">Mollies Verfügbarkeitsregeln für Zahlungsarten verwenden</label>
-            <label lang="nl-NL">Gebruik de beschikbaarheidsregels van Mollie voor betaalmethoden</label>
-            <helpText>Automatically hides payment methods in the checkout based on the availability rules for payment methods. Only active payment methods from your mollie dashboard will be shown. If the payment method has a cart limit, currency restriction or billing address restriction, it will be hidden during checkout.</helpText>
-            <helpText lang="de-DE">Blendet automatisch Zahlungsart im Checkout basierend auf Verfügbarkeitsregeln von Mollie. Es werden nur die aktiven Zahlungsarten aus dem Mollie Dashboard angezeigt. Wenn die Zahlungsart eine Einschränkung auf den Warenkorbwert, Währung oder Rechnungsadresse hat, wird diese auch ausgeblendet.</helpText>
-            <helpText lang="nl-NL">Automatische betalingsmethode wordt verborgen tijdens het afrekenen op basis van beschikbaarheidsregels van Mollie. Alleen actieve betalingsmethoden uit het Mollie-dashboard worden weergegeven. Als de betalingsmethode beperkingen heeft op de winkelwagenwaarde, valuta of factuuradres, wordt deze ook verborgen.</helpText>
-        </input-field>
-        <input-field type="text">
-            <name>formatOrderNumber</name>
-            <label>Custom format for Mollie order numbers (Dashboard, PayPal, ...)</label>
-            <label lang="de-DE">Format für Mollie Bestellnummern (Dashboard, PayPal, ...)</label>
-            <label lang="nl-NL">Aangepast formaat voor Mollie bestelnummers (Dashboard, PayPal, ...)</label>
-            <helpText>If set, this format will be used before the order number in the Mollie dashboard. This will also be passed on to PayPal as invoice number.</helpText>
-            <helpText lang="de-DE">Wenn gesetzt, wird dieses Format vor der Bestellnummer im Mollie-Dashboard verwendet. Dieser Wert wird auch an PayPal als Rechnungsnummber übergeben</helpText>
-            <helpText lang="nl-NL">Indien ingesteld, wordt dit formaat vóór het bestelnummer in het Mollie-dashboard gebruikt. Dit wordt ook als factuurnummer doorgegeven aan PayPal.</helpText>
-        </input-field>
-        <component name="mollie-pluginconfig-section-payments-format">
-            <name>molliePluginConfigSectionPaymentsFormat</name>
-        </component>
-        <component name="mollie-pluginconfig-section-payments">
-            <name>molliePluginConfigSectionPayments</name>
-        </component>
     </card>
 
 
