@@ -196,6 +196,7 @@ Component.override('sw-order-detail-general', {
          */
         onCloseRefundManager() {
             this.showRefundModal = false;
+            location.reload();
         },
 
         /**

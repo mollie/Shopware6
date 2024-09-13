@@ -188,6 +188,7 @@ Component.override('sw-order-line-items-grid', {
          */
         onCloseRefundManager() {
             this.showRefundModal = false;
+            location.reload();
         },
 
         //==== Shipping =============================================================================================//
