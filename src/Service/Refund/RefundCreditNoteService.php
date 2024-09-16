@@ -104,8 +104,8 @@ class RefundCreditNoteService
             $totalPrice *= -1;
             $unitPrice *= -1;
             $data['lineItems'][] = [
-                'id' => Uuid::fromStringToHex($lineItemId),
-                'identifier' => Uuid::fromStringToHex($lineItem->getIdentifier()),
+                'id' => Uuid::fromBytesToHex(md5($lineItemId, true)), #@todo remove once 6.4 reached end of life
+                'identifier' => Uuid::fromBytesToHex(md5($lineItem->getIdentifier(), true)),#@todo remove once 6.4 reached end of life
                 'quantity' => $quantity,
                 'label' => sprintf('%s%s%s', $this->prefix, $lineItem->getLabel(), $this->suffix),
                 'type' => LineItem::CREDIT_LINE_ITEM_TYPE,
