@@ -7,6 +7,8 @@ class CreditNoteException extends \Exception
 {
     public const CODE_ADDING_CREDIT_NOTE_LINE_ITEMS = 1;
     public const CODE_REMOVING_CREDIT_NOTE_LINE_ITEMS = 2;
+    public const CODE_WARNING_LEVEL = 3;
+
     final private function __construct(string $message, int $code)
     {
         parent::__construct($message, $code);
@@ -17,8 +19,8 @@ class CreditNoteException extends \Exception
         return new self($message, self::CODE_ADDING_CREDIT_NOTE_LINE_ITEMS);
     }
 
-    public static function forRemovingLineItems(string $message): CreditNoteException
+    public static function forRemovingLineItems(string $message, int $code = self::CODE_REMOVING_CREDIT_NOTE_LINE_ITEMS): CreditNoteException
     {
-        return new self($message, self::CODE_REMOVING_CREDIT_NOTE_LINE_ITEMS);
+        return new self($message, $code);
     }
 }
