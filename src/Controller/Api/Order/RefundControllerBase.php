@@ -191,7 +191,7 @@ class RefundControllerBase extends AbstractController
             $context
         );
 
-        if ($response->getStatusCode() === 200 && $response->getContent() !== false) {
+        if ($response->getStatusCode() === 200 && $response->getContent() !== false && count($items) > 0) {
             $refundId = json_decode($response->getContent(), true)['refundId'];
             try {
                 $this->creditNoteService->addCreditNoteToOrder($orderId, $refundId, $items, $context);
@@ -220,8 +220,13 @@ class RefundControllerBase extends AbstractController
             try {
                 $this->creditNoteService->cancelCreditNoteToOrder($orderId, $refundId, $context);
             } catch (CreditNoteException $exception) {
-                $this->logger->error($exception->getMessage(), ['code' => $exception->getCode(),]);
-                return $this->buildErrorResponse($exception->getMessage());
+                if ($exception->getCode() === CreditNoteException::CODE_REMOVING_CREDIT_NOTE_LINE_ITEMS) {
+                    $this->logger->error($exception->getMessage(), ['code' => $exception->getCode(),]);
+                    return $this->buildErrorResponse($exception->getMessage());
+                }
+                if ($exception->getCode() === CreditNoteException::CODE_WARNING_LEVEL) {
+                    $this->logger->warning($exception->getMessage(), ['code' => $exception->getCode(),]);
+                }
             }
         }
 

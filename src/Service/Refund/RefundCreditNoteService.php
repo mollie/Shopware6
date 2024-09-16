@@ -150,7 +150,10 @@ class RefundCreditNoteService
         $lineItems = $order->getLineItems();
 
         if ($lineItems === null) {
-            throw CreditNoteException::forRemovingLineItems(sprintf('No line items found for order. OrderID: %s RefundID: %s', $orderId, $refundId));
+            throw CreditNoteException::forRemovingLineItems(
+                sprintf('No line items found for order. OrderID: %s RefundID: %s', $orderId, $refundId),
+                CreditNoteException::CODE_WARNING_LEVEL
+            );
         }
 
         $ids = [];
@@ -170,7 +173,10 @@ class RefundCreditNoteService
         }
 
         if (empty($ids)) {
-            throw CreditNoteException::forRemovingLineItems(sprintf('No credit note line items found for order. OrderID: %s RefundID: %s', $orderId, $refundId));
+            throw CreditNoteException::forRemovingLineItems(
+                sprintf('No credit note line items found for order. OrderID: %s RefundID: %s', $orderId, $refundId),
+                CreditNoteException::CODE_WARNING_LEVEL
+            );
         }
 
         $this->orderLineItemRepository->delete($ids, $context);
