@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Migration;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Result;
 use Kiener\MolliePayments\Struct\Tags\AbstractTag;
 use Kiener\MolliePayments\Struct\Tags\SubscriptionTag;
 use Shopware\Core\Framework\Log\Package;
@@ -44,6 +45,13 @@ class Migration1725347559MollieTags extends MigrationStep
         string $id,
         string $name
     ): void {
+        // migration must be able to run multiple times in succession
+        // with every install of the mollie plugin all migrations are run
+        // since tags don't count as plugin data, they're not purged and they must not be created again
+        if ($this->tagExists($connection, $id)) {
+            return;
+        }
+
         $query = <<<SQL
         INSERT INTO tag 
         (id, name, created_at, updated_at) 
@@ -60,5 +68,22 @@ class Migration1725347559MollieTags extends MigrationStep
         ];
 
         $stmt->execute($parameters);
+    }
+
+    private function tagExists(Connection $connection, string $id): bool
+    {
+        $qb = $connection->createQueryBuilder();
+        $qb->select('id')
+            ->from('tag')
+            ->where('id = :id')
+            ->setParameter('id', Uuid::fromHexToBytes($id));
+
+        $result = $qb->execute();
+
+        if ($result instanceof Result) {
+            return $result->rowCount() > 0;
+        }
+
+        return false;
     }
 }
