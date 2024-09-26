@@ -286,6 +286,11 @@ class MollieSettingStruct extends Struct
     protected $refundManagerCreateCreditNotesSuffix = '';
 
     /**
+     * @var bool
+     */
+    protected $automaticOrderExpire = false;
+
+    /**
      * @return string
      */
     public function getLiveApiKey(): string
@@ -1072,5 +1077,15 @@ class MollieSettingStruct extends Struct
     public function setRefundManagerCreateCreditNotesSuffix(string $refundManagerCreateCreditNotesSuffix): void
     {
         $this->refundManagerCreateCreditNotesSuffix = $refundManagerCreateCreditNotesSuffix;
+    }
+
+    public function isAutomaticOrderExpire(): bool
+    {
+        return $this->automaticOrderExpire;
+    }
+
+    public function setAutomaticOrderExpire(bool $automaticOrderExpire): void
+    {
+        $this->automaticOrderExpire = $automaticOrderExpire;
     }
 }
