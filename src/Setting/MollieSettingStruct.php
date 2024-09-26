@@ -265,6 +265,11 @@ class MollieSettingStruct extends Struct
      */
     protected $paymentFinalizeTransactionTime;
 
+
+    /**
+     * @var bool
+     */
+    protected $automaticOrderExpire = false;
     /**
      * @return string
      */
@@ -1012,5 +1017,16 @@ class MollieSettingStruct extends Struct
     public function setPaymentFinalizeTransactionTime(int $paymentFinalizeTransactionTime): void
     {
         $this->paymentFinalizeTransactionTime = $paymentFinalizeTransactionTime;
+    }
+
+
+    public function isAutomaticOrderExpire(): bool
+    {
+        return $this->automaticOrderExpire;
+    }
+
+    public function setAutomaticOrderExpire(bool $automaticOrderExpire): void
+    {
+        $this->automaticOrderExpire = $automaticOrderExpire;
     }
 }
