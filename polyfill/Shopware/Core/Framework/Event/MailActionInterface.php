@@ -2,18 +2,19 @@
 
 namespace Shopware\Core\Framework\Event;
 
-if (interface_exists(MailAware::class)) {
+if (interface_exists(MailActionInterface::class)) {
     return;
 }
 
 use Shopware\Core\Framework\Event\EventData\MailRecipientStruct;
+use Shopware\Core\Framework\Log\Package;
 
-interface MailAware extends MailActionInterface
+/**
+ * @deprecated tag:v6.5.0 - Will be removed in v6.5.0 Use MailAware instead
+ */
+#[Package('business-ops')]
+interface MailActionInterface extends BusinessEventInterface
 {
-    public const MAIL_STRUCT = 'mailStruct';
-
-    public const SALES_CHANNEL_ID = 'salesChannelId';
-
     public function getMailStruct(): MailRecipientStruct;
 
     public function getSalesChannelId(): ?string;
