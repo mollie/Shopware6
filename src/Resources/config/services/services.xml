@@ -216,6 +216,13 @@
             <tag name="mollie_payments.mail.attachment_generator"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Components\OrderExpiration\ExpireAction">
+            <argument type="service" id="Kiener\MolliePayments\Repository\Order\OrderRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderExpireService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="mollie_payments.logger"/>
+        </service>
 
 
 
