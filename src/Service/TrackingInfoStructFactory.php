@@ -120,7 +120,7 @@ class TrackingInfoStructFactory
         ]);
 
         // determine if the provided tracking code is actually a tracking URL
-        if (empty($trackingUrl) === true || $this->urlParsingService->isUrl($trackingCode)) {
+        if (empty($trackingUrl) === true && $this->urlParsingService->isUrl($trackingCode)) {
             $this->logger->debug('Tracking code is a URL, parsing tracking code from URL.', [
                 'trackingCode' => $trackingCode,
                 'trackingUrl' => $trackingUrl
