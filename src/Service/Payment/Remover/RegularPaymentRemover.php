@@ -8,6 +8,7 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
 use Mollie\Api\Types\PaymentMethod;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRouteResponse;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -50,8 +51,29 @@ class RegularPaymentRemover extends PaymentMethodRemover
             if ($attributes->getMollieIdentifier() === PaymentMethod::INGHOMEPAY) {
                 $originalData->getPaymentMethods()->remove($key);
             }
+
+            # hiding billie for none business customers
+            if ($attributes->getMollieIdentifier() === PaymentMethod::BILLIE && $this->isBusinessAccount($context) === false) {
+                $originalData->getPaymentMethods()->remove($key);
+            }
         }
 
         return $originalData;
+    }
+
+    private function isBusinessAccount(SalesChannelContext $context): bool
+    {
+        $customer = $context->getCustomer();
+
+        if ($customer === null) {
+            return false;
+        }
+
+        if (method_exists($customer, 'getAccountType') === false) {
+            $billingAddress = $customer->getDefaultBillingAddress();
+            return $billingAddress && !empty($billingAddress->getCompany());
+        }
+
+        return $customer->getAccountType() === CustomerEntity::ACCOUNT_TYPE_BUSINESS;
     }
 }
