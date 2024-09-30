@@ -85,7 +85,11 @@ class RefundCreditNoteService
 
         $data = ['id' => $orderId, 'lineItems' => []];
 
-        foreach ($lineItems as ['id' => $lineItemId]) {
+        foreach ($lineItems as ['id' => $lineItemId, 'amount' => $amount]) {
+            if ($amount === 0) {
+                // refund manager front end sends all line items, even if they are not going to be refunded
+                continue;
+            }
             $lineItem = $this->orderLineItemRepository->search(new Criteria([$lineItemId]), $context)->first();
             if (!$lineItem instanceof OrderLineItemEntity) {
                 continue;
