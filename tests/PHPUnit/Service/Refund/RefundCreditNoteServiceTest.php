@@ -116,7 +116,7 @@ class RefundCreditNoteServiceTest extends TestCase
     public function testCanAddRefundLineItems(): void
     {
         $data = [
-            ['id' => $lineItemId = Uuid::randomBytes()]
+            ['id' => $lineItemId = Uuid::randomBytes(), 'amount' => 1]
         ];
 
         $price = $this->createConfiguredMock(CalculatedPrice::class, [
@@ -185,7 +185,7 @@ class RefundCreditNoteServiceTest extends TestCase
         $this->expectException(CreditNoteException::class);
 
         $data = [
-            ['id' => Uuid::randomBytes()]
+            ['id' => Uuid::randomBytes(), 'amount' => 1]
         ];
 
         $searchResult = $this->createConfiguredMock(EntitySearchResult::class, ['first' => null]);

@@ -112,7 +112,7 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
     {
         $statusTechnical = $this->getStatusTechnicalName($delivery);
 
-        if ($statusTechnical === OrderDeliveryStates::STATE_PARTIALLY_SHIPPED) {
+        if ($statusTechnical === OrderDeliveryStates::STATE_PARTIALLY_SHIPPED || $statusTechnical === OrderDeliveryStates::STATE_PARTIALLY_RETURNED) {
             return;
         }
 
