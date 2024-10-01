@@ -21,7 +21,7 @@ export default class MollieApplePayPaymentMethod extends Plugin {
         }
 
         // support for < Shopware 6.4
-        this.hideApplePay('.checkout-main .payment-method-input.applepay');
+        this.hideApplePay('.payment-method-input.applepay');
 
         // support for >= Shopware 6.4
         // we have to find the dynamic ID and use that
@@ -30,7 +30,7 @@ export default class MollieApplePayPaymentMethod extends Plugin {
         client.get(
             shopUrl + '/mollie/apple-pay/applepay-id',
             (data) => {
-                me.hideApplePay('.checkout-main #paymentMethod' + data.id);
+                me.hideApplePay('#paymentMethod' + data.id);
             }
         );
 
