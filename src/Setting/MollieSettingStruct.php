@@ -273,7 +273,7 @@ class MollieSettingStruct extends Struct
     /**
      * @var bool
      */
-    protected $refundManagerCreateCreditNotesEnabled = true;
+    protected $refundManagerCreateCreditNotesEnabled = false;
 
     /**
      * @var string

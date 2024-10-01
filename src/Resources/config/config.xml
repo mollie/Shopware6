@@ -312,7 +312,7 @@
         </input-field>
         <input-field type="bool">
             <name>refundManagerCreateCreditNotes</name>
-            <defaultValue>true</defaultValue>
+            <defaultValue>false</defaultValue>
             <label>Create Credit Notes</label>
             <label lang="de-DE">Gutschriften erstellen</label>
             <label lang="nl-NL">Creditnota's maken</label>
