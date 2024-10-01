@@ -126,7 +126,7 @@ class RefundCreditNoteService
         }
 
         if (empty($data['lineItems'])) {
-            throw CreditNoteException::forAddingLineItems(sprintf('No credit note line items found for order. OrderID: %s RefundID: %s', $orderId, $refundId));
+            throw CreditNoteException::forAddingLineItems(sprintf('No credit note line items found for order. OrderID: %s RefundID: %s', $orderId, $refundId), CreditNoteException::CODE_WARNING_LEVEL);
         }
 
         $this->logger->debug('Adding credit note to order', ['orderId' => $orderId, 'refundId' => $refundId, 'lineItems' => $data['lineItems']]);

@@ -196,8 +196,13 @@ class RefundControllerBase extends AbstractController
             try {
                 $this->creditNoteService->addCreditNoteToOrder($orderId, $refundId, $items, $context);
             } catch (CreditNoteException $exception) {
-                $this->logger->error($exception->getMessage(), ['code' => $exception->getCode(),]);
-                return $this->buildErrorResponse($exception->getMessage());
+                if ($exception->getCode() === CreditNoteException::CODE_ADDING_CREDIT_NOTE_LINE_ITEMS) {
+                    $this->logger->error($exception->getMessage(), ['code' => $exception->getCode(),]);
+                    return $this->buildErrorResponse($exception->getMessage());
+                }
+                if ($exception->getCode() === CreditNoteException::CODE_WARNING_LEVEL) {
+                    $this->logger->warning($exception->getMessage(), ['code' => $exception->getCode(),]);
+                }
             }
         }
 
