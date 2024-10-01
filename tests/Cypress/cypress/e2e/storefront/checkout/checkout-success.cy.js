@@ -49,7 +49,6 @@ const payments = [
     {caseId: 'C4115', key: 'klarnapaylater', name: 'Pay later', sanity: false},
     {caseId: 'C4117', key: 'klarnasliceit', name: 'Slice it', sanity: false},
     {caseId: 'C4118', key: 'ideal', name: 'iDEAL', sanity: false},
-    {caseId: 'C4116', key: 'sofort', name: 'SOFORT', sanity: false},
     {caseId: 'C4120', key: 'eps', name: 'eps', sanity: false},
     {caseId: 'C4123', key: 'mistercash', name: 'Bancontact', sanity: false},
     {caseId: 'C4125', key: 'przelewy24', name: 'Przelewy24', sanity: false},
