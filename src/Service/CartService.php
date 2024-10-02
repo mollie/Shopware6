@@ -118,11 +118,12 @@ class CartService implements CartServiceInterface
             SalesChannelContextService::COUNTRY_ID => $countryID
         ];
         $customer = $context->getCustomer();
+
         if ($customer instanceof CustomerEntity) {
             $applePayAddressId = $this->shippingAddressFaker->createFakeShippingAddress($countryID, $customer, $context->getContext());
-
             $dataBagData[SalesChannelContextService::SHIPPING_ADDRESS_ID] = $applePayAddressId;
         }
+
         $dataBag->add($dataBagData);
 
         $this->contextSwitcher->update($dataBag, $context);
