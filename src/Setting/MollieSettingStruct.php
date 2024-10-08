@@ -273,7 +273,7 @@ class MollieSettingStruct extends Struct
     /**
      * @var bool
      */
-    protected $refundManagerCreateCreditNotesEnabled = false;
+    protected $refundManagerCreateCreditNotes = false;
 
     /**
      * @var string
@@ -1051,12 +1051,12 @@ class MollieSettingStruct extends Struct
 
     public function isRefundManagerCreateCreditNotesEnabled(): bool
     {
-        return $this->refundManagerCreateCreditNotesEnabled;
+        return $this->refundManagerCreateCreditNotes;
     }
 
-    public function setRefundManagerCreateCreditNotesEnabled(bool $refundManagerCreateCreditNotesEnabled): void
+    public function setRefundManagerCreateCreditNotesEnabled(bool $refundManagerCreateCreditNotes): void
     {
-        $this->refundManagerCreateCreditNotesEnabled = $refundManagerCreateCreditNotesEnabled;
+        $this->refundManagerCreateCreditNotes = $refundManagerCreateCreditNotes;
     }
 
     public function getRefundManagerCreateCreditNotesPrefix(): string
