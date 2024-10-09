@@ -35,6 +35,7 @@ module.exports = defineConfig({
         experimentalSessionAndOrigin: true,
         testIsolation: true,
         experimentalWebKitSupport: true,
+        experimentalRunAllSpecs: true,
         // We've imported your old cypress plugins here.
         // You may want to clean this up later by importing these.
         setupNodeEvents(on, config) {
