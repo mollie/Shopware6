@@ -36,7 +36,7 @@ class UrlParsingService
             $urlQuery = parse_url($value, PHP_URL_FRAGMENT);
         }
         if ($urlQuery === null) {
-            return ['', $value];
+            return [$value,''];
         }
         $urlQuery = (string)$urlQuery;
         $urlWithoutQuery = str_replace($urlQuery, '', $value);

@@ -44,4 +44,14 @@ class CustomerAddressRepository implements CustomerAddressRepositoryInterface
     {
         return $this->customerAddressRepository->update($data, $context);
     }
+
+    /**
+     * @param array<mixed> $ids
+     * @param Context $context
+     * @return EntityWrittenContainerEvent
+     */
+    public function delete(array $ids, Context $context): EntityWrittenContainerEvent
+    {
+        return $this->customerAddressRepository->delete($ids, $context);
+    }
 }

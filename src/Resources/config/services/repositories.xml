@@ -98,6 +98,10 @@
             <argument type="service" id="state_machine_state.repository"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Repository\CustomerAddress\CustomerAddressRepository">
+            <argument type="service" id="customer_address.repository"/>
+        </service>
+
 
 
     </services>

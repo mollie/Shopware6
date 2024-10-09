@@ -271,6 +271,26 @@ class MollieSettingStruct extends Struct
     protected $requireDataProtectionCheckbox = false;
 
     /**
+     * @var bool
+     */
+    protected $refundManagerCreateCreditNotes = false;
+
+    /**
+     * @var string
+     */
+    protected $refundManagerCreateCreditNotesPrefix = '';
+
+    /**
+     * @var string
+     */
+    protected $refundManagerCreateCreditNotesSuffix = '';
+
+    /**
+     * @var bool
+     */
+    protected $automaticOrderExpire = false;
+
+    /**
      * @var int
      */
     protected $paypalExpressButtonStyle = 1;
@@ -1042,6 +1062,46 @@ class MollieSettingStruct extends Struct
     public function setRequireDataProtectionCheckbox(bool $requireDataProtectionCheckbox): void
     {
         $this->requireDataProtectionCheckbox = $requireDataProtectionCheckbox;
+    }
+
+    public function isRefundManagerCreateCreditNotesEnabled(): bool
+    {
+        return $this->refundManagerCreateCreditNotes;
+    }
+
+    public function setRefundManagerCreateCreditNotesEnabled(bool $refundManagerCreateCreditNotes): void
+    {
+        $this->refundManagerCreateCreditNotes = $refundManagerCreateCreditNotes;
+    }
+
+    public function getRefundManagerCreateCreditNotesPrefix(): string
+    {
+        return $this->refundManagerCreateCreditNotesPrefix;
+    }
+
+    public function setRefundManagerCreateCreditNotesPrefix(string $refundManagerCreateCreditNotesPrefix): void
+    {
+        $this->refundManagerCreateCreditNotesPrefix = $refundManagerCreateCreditNotesPrefix;
+    }
+
+    public function getRefundManagerCreateCreditNotesSuffix(): string
+    {
+        return $this->refundManagerCreateCreditNotesSuffix;
+    }
+
+    public function setRefundManagerCreateCreditNotesSuffix(string $refundManagerCreateCreditNotesSuffix): void
+    {
+        $this->refundManagerCreateCreditNotesSuffix = $refundManagerCreateCreditNotesSuffix;
+    }
+
+    public function isAutomaticOrderExpire(): bool
+    {
+        return $this->automaticOrderExpire;
+    }
+
+    public function setAutomaticOrderExpire(bool $automaticOrderExpire): void
+    {
+        $this->automaticOrderExpire = $automaticOrderExpire;
     }
 
     public function getPaypalExpressButtonStyle(): int

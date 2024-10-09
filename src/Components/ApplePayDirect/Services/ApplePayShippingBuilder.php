@@ -97,6 +97,8 @@ class ApplePayShippingBuilder
 
         $availableShippingMethods = $this->shippingMethods->getActiveShippingMethods($context);
 
+        $this->cartService->clearFakeAddressIfExists($context);
+
         foreach ($availableShippingMethods as $method) {
             # temporary switch to our shipping method.
             # we will then load the cart for this shipping method

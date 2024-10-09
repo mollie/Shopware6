@@ -82,11 +82,13 @@ class SettingsService implements PluginSettingsServiceInterface
         /** @var array<mixed> $systemConfigData */
         $systemConfigData = $this->systemConfigService->get(self::SYSTEM_CONFIG_DOMAIN, $salesChannelId);
 
-        foreach ($systemConfigData as $key => $value) {
-            if (stripos($key, self::SYSTEM_CONFIG_DOMAIN) !== false) {
-                $structData[substr($key, strlen(self::SYSTEM_CONFIG_DOMAIN))] = $value;
-            } else {
-                $structData[$key] = $value;
+        if (count($systemConfigData) !== 0) {
+            foreach ($systemConfigData as $key => $value) {
+                if (stripos($key, self::SYSTEM_CONFIG_DOMAIN) !== false) {
+                    $structData[substr($key, strlen(self::SYSTEM_CONFIG_DOMAIN))] = $value;
+                } else {
+                    $structData[$key] = $value;
+                }
             }
         }
 

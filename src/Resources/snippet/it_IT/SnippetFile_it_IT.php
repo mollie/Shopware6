@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Resources\snippet\nl_NL;
+namespace Kiener\MolliePayments\Resources\snippet\it_IT;
 
 use Shopware\Core\System\Snippet\Files\SnippetFileInterface;
 

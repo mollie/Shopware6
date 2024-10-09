@@ -385,6 +385,16 @@
             <helpText lang="de-DE">Wenn aktiviert, storniert das Plugin Mollie-Bestellungen automatisch, wenn sie in Shopware storniert werden. Nur Bestellungen, die erstellt, autorisiert oder teilweise versandt wurden, werden storniert. Bei teilweisem Versand werden nur Artikel storniert, die nicht versendet wurden.</helpText>
             <helpText lang="nl-NL">Indien ingeschakeld, zal de plug-in automatisch Mollie-bestellingen annuleren wanneer ze worden geannuleerd in Shopware. Alleen bestellingen die zijn aangemaakt, geautoriseerd of gedeeltelijk zijn verzonden, worden geannuleerd. Indien gedeeltelijk verzonden, worden alleen artikelen geannuleerd die niet zijn verzonden.</helpText>
         </input-field>
+        <input-field type="bool">
+            <name>automaticOrderExpire</name>
+            <defaultValue>false</defaultValue>
+            <label>Automatic Expiration</label>
+            <label lang="de-DE">Automatische Ablauf</label>
+            <label lang="nl-NL">Automatische vervaldatum</label>
+            <helpText>If enabled, the plugin will automatically expire orders with the payment status "In Progress".</helpText>
+            <helpText lang="de-DE">Wenn aktiviert, lässt das Plugin Bestellungen mit dem Status „In Bearbeitung“ und dem Zahlungsstatus „Offen“ oder „Autorisiert“ automatisch ablaufen.</helpText>
+            <helpText lang="nl-NL">Als deze optie is ingeschakeld, verlopen bestellingen met de status 'In uitvoering' en de betalingsstatus 'Open' of 'Geautoriseerd' automatisch.</helpText>
+        </input-field>
     </card>
     <card>
         <title>Refund Manager</title>
@@ -429,6 +439,36 @@
             <helpText>Shows or hides the instructions area. You can simply turn this off in case it's disturbing once you're familiar with the Refund Manager.</helpText>
             <helpText lang="de-DE">Diese Funktion kann benutzt werden, um die Anleitungen auszublenden, sofern man einmal mit dem Refund Manager vetraut ist.</helpText>
             <helpText lang="nl-NL">Toont of verbergt de handleiding. Als het storend is, kan je het direkt deactiveren als je eenmaal vertrouwd bent met de Refund Manager.</helpText>
+        </input-field>
+        <input-field type="bool">
+            <name>refundManagerCreateCreditNotes</name>
+            <defaultValue>false</defaultValue>
+            <label>Create Credit Notes</label>
+            <label lang="de-DE">Gutschriften erstellen</label>
+            <label lang="nl-NL">Creditnota's maken</label>
+            <helpText>Automatically create a credit note in Shopware when a refund is processed.</helpText>
+            <helpText lang="de-DE">Erstellt automatisch eine Gutschrift in Shopware, wenn eine Rückerstattung verarbeitet wird.</helpText>
+            <helpText lang="nl-NL">Maak automatisch een creditnota in Shopware wanneer een terugbetaling wordt verwerkt.</helpText>
+        </input-field>
+        <input-field type="text">
+            <name>refundManagerCreateCreditNotesPrefix</name>
+            <defaultValue>Refund: </defaultValue>
+            <label>Credit Note Prefix</label>
+            <label lang="de-DE">Gutschrift Präfix</label>
+            <label lang="nl-NL">Creditnota voorvoegsel</label>
+            <helpText>Prefix for the credit note number. Credit note consist of prefix, original line item name and suffix</helpText>
+            <helpText lang="de-DE">Präfix für die Gutschriftsnummer. Die Gutschrift besteht aus Präfix, ursprünglichem Positionsnamen und Suffix</helpText>
+            <helpText lang="nl-NL">Voorvoegsel voor het creditnotanummer. De creditnota bestaat uit een voorvoegsel, de oorspronkelijke naam van het line item en een achtervoegsel.</helpText>
+        </input-field>
+        <input-field type="text">
+            <name>refundManagerCreateCreditNotesSuffix</name>
+            <defaultValue />
+            <label>Credit Note Suffix</label>
+            <label lang="de-DE">Gutschrift Suffix</label>
+            <label lang="nl-NL">Creditnota achtervoegsel</label>
+            <helpText>Suffix for the credit note number. Credit note consist of prefix, original line item name and suffix</helpText>
+            <helpText lang="de-DE">Suffix für die Gutschriftsnummer. Die Gutschrift besteht aus Präfix, ursprünglichem Positionsnamen und Suffix</helpText>
+            <helpText lang="nl-NL">Achtervoegsel voor het creditnotanummer. De creditnota bestaat uit een voorvoegsel, de oorspronkelijke naam van het line item en een achtervoegsel.</helpText>
         </input-field>
     </card>
     <card>
