@@ -1,5 +1,0 @@
-parameters:
-	ignoreErrors:
-		-
-			message: "#^Variable \\$mollie might not be defined\\.$#"
-			path: examples/*

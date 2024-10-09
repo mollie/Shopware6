@@ -18,7 +18,7 @@ To use the Mollie API client, the following things are required:
 + Get yourself a free [Mollie account](https://www.mollie.com/signup). No sign up costs.
 + Now you're ready to use the Mollie API client in test mode.
 + Follow [a few steps](https://www.mollie.com/dashboard/?modal=onboarding) to enable payment methods in live mode, and let us handle the rest.
-+ PHP >= 7.0
++ PHP >= 7.2
 + Up-to-date OpenSSL (or other SSL/TLS toolkit)
 
 For leveraging [Mollie Connect](https://docs.mollie.com/oauth/overview) (advanced use cases only), we recommend also installing our [OAuth2 client](https://github.com/mollie/oauth2-mollie-php).
@@ -32,7 +32,7 @@ The easiest way to install the Mollie API client is by using [Composer](http://g
 composer require mollie/mollie-api-php
 ```
 
-To work with the most recent API version, ensure that you are using a version of this API client that is equal to or greater than 2.0.0. If you prefer to continue using the v1 API, make sure your client version is below 2.0.0. For guidance on transitioning from v1 to v2, please refer to the [migration notes](https://docs.mollie.com/migrating-v1-to-v2).
+To work with the most recent API version, ensure that you are using a version of this API client that is equal to or greater than 2.0.0. If you prefer to continue using the v1 API, make sure your client version is below 2.0.0. For guidance on transitioning from v1 to v2, please refer to the [migration notes](https://docs.mollie.com/docs/migrating-from-v1-to-v2).
 
 ### Manual Installation ###
 If you're not familiar with using composer we've added a ZIP file to the releases containing the API client and all the packages normally installed by composer.
