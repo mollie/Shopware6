@@ -46,9 +46,9 @@ class ExpressCartItemAddRoute extends AbstractCartItemAddRoute
     public function add(Request $request, Cart $cart, SalesChannelContext $context, ?array $items): CartResponse
     {
         //we have to create a new request from global variables, because the request is not set here in the route
-        $request = Request::createFromGlobals();
+        $tempRequest = Request::createFromGlobals();
 
-        $isExpressCheckout = (bool)$request->get('isExpressCheckout', false);
+        $isExpressCheckout = (bool)$tempRequest->get('isExpressCheckout', false);
         if ($isExpressCheckout === false) {
             return $this->getDecorated()->add($request, $cart, $context, $items);
         }
