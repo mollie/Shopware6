@@ -30,10 +30,6 @@
         {% endif %}
     {% endblock %}
 
-{% endblock %}
-
-{% block page_product_detail_buy_form_inner %}
-    {{ parent() }}
     {% block page_product_detail_buy_container_paypal_express %}
         {% if mollie_paypalexpress_enabled and ('pdp' not in mollie_paypalexpress_restrictions) %}
             {% block page_product_detail_buy_container_mollie_paypal_express_component %}
@@ -57,8 +53,8 @@
             {% endblock %}
         {% endif %}
     {% endblock %}
-{% endblock %}
 
+{% endblock %}
 
 
 
