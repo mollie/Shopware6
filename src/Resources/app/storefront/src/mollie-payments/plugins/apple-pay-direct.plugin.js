@@ -66,7 +66,8 @@ export default class MollieApplePayDirect extends Plugin {
 
             if (applePayContainers) {
                 applePayContainers.forEach(function (container) {
-                   container.remove();
+                    container.style.display = 'none';
+                    container.classList.add('d-none');
                 });
             }
             return;

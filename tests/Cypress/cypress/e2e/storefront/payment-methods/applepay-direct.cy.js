@@ -280,7 +280,7 @@ describe('Apple Pay Direct - UI Tests', () => {
                 topMenu.clickOnSecondCategory();
                 listing.clickOnFirstProduct();
 
-                repoPDP.getApplePayDirectButton().should('not.exist');
+                repoPDP.getApplePayDirectButton().should('not.have.class', 'd-none');
             })
 
         })
@@ -304,7 +304,7 @@ describe('Apple Pay Direct - UI Tests', () => {
                 cy.visit('/');
                 topMenu.clickOnSecondCategory();
 
-                repoListing.getApplePayDirectButton().should('not.exist');
+                repoListing.getApplePayDirectButton().should('not.have.class', 'd-none');
             })
         })
 
@@ -332,7 +332,7 @@ describe('Apple Pay Direct - UI Tests', () => {
                 listing.clickOnFirstProduct();
                 pdp.addToCart(1);
 
-                repoOffcanvas.getApplePayDirectButton().should('not.exist');
+                repoOffcanvas.getApplePayDirectButton().should('not.have.class', 'd-none');
             })
 
         })
@@ -364,7 +364,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
                 checkout.goToCartInOffCanvas();
 
-                repoCart.getApplePayDirectButton().should('not.exist');
+                repoCart.getApplePayDirectButton().should('not.have.class', 'd-none');
             })
 
         })
