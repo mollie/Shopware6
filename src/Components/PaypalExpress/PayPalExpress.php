@@ -10,7 +10,6 @@ use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 use Kiener\MolliePayments\Struct\Address\AddressStruct;
 use Mollie\Api\Resources\Session;
-use Ramsey\Uuid\Uuid;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -157,7 +156,7 @@ class PayPalExpress
      * @throws \Exception
      * @return SalesChannelContext
      */
-    public function prepareCustomer(AddressStruct $shippingAddress, SalesChannelContext $context, ?AddressStruct $billingAddress = null): SalesChannelContext
+    public function prepareCustomer(AddressStruct $shippingAddress, int $acceptedDataProtection, SalesChannelContext $context, ?AddressStruct $billingAddress = null): SalesChannelContext
     {
         $updateShippingAddress = true;
         $paypalExpressId = $this->getActivePaypalExpressID($context);
@@ -170,7 +169,7 @@ class PayPalExpress
         if ($customer === null) {
 
             # find existing customer by email
-            $customer = $this->customerService->findCustomerByEmail($shippingAddress->getEmail(), $context->getContext());
+            $customer = $this->customerService->findCustomerByEmail($shippingAddress->getEmail(), $context);
 
 
             if ($customer === null) {
@@ -178,6 +177,7 @@ class PayPalExpress
                 $customer = $this->customerService->createGuestAccount(
                     $shippingAddress,
                     $paypalExpressId,
+                    $acceptedDataProtection,
                     $context,
                     $billingAddress
                 );

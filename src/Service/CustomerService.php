@@ -604,7 +604,7 @@ class CustomerService implements CustomerServiceInterface
     }
 
 
-    public function findCustomerByEmail(string $email, Context $context): ?CustomerEntity
+    public function findCustomerByEmail(string $email, SalesChannelContext $context): ?CustomerEntity
     {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('email', $email));
@@ -734,7 +734,7 @@ class CustomerService implements CustomerServiceInterface
         return $this->customerRepository->upsert([$customer], $context);
     }
 
-    public function createGuestAccount(AddressStruct $shippingAddress, string $paymentMethodId, SalesChannelContext $context, ?AddressStruct $billingAddress = null): ?CustomerEntity
+    public function createGuestAccount(AddressStruct $shippingAddress, string $paymentMethodId, int $acceptedDataProtection, SalesChannelContext $context, ?AddressStruct $billingAddress = null): ?CustomerEntity
     {
         $countryId = $this->getCountryId($shippingAddress->getCountryCode(), $context->getContext());
         $salutationId = $this->getSalutationId($context->getContext());

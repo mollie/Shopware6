@@ -13,11 +13,9 @@ use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingBui
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
-use Kiener\MolliePayments\Repository\Order\OrderAddressRepository;
 use Kiener\MolliePayments\Repository\Order\OrderAddressRepositoryInterface;
 use Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepository;
 use Kiener\MolliePayments\Service\Cart\CartBackupService;
-use Kiener\MolliePayments\Service\CartService;
 use Kiener\MolliePayments\Service\CartServiceInterface;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\DomainExtractor;
@@ -363,11 +361,12 @@ class ApplePayDirect
         # if we are not logged in,
         # then we have to create a new guest customer for our express order
         if (! $this->customerService->isCustomerLoggedIn($context)) {
-            $address = new AddressStruct($firstname, $lastname, $email, $street, '', $zipcode, $city, $countryCode);
+            $address = new AddressStruct($firstname, $lastname, $email, $street, '', $zipcode, $city, $countryCode, $phone);
 
             $customer = $this->customerService->createGuestAccount(
                 $address,
                 $applePayID,
+                $acceptedDataProtection,
                 $context
             );
 

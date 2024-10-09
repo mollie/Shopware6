@@ -3,7 +3,6 @@
 namespace Kiener\MolliePayments\Subscriber;
 
 use Kiener\MolliePayments\Components\PaypalExpress\PayPalExpress;
-use Kiener\MolliePayments\Service\CustomerServiceInterface;
 use Kiener\MolliePayments\Service\SettingsService;
 use Shopware\Storefront\Event\StorefrontRenderEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

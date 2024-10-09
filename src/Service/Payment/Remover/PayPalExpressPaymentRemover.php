@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Payment\Remover;
 
-use Kiener\MolliePayments\Controller\Storefront\PaypalExpress\PaypalExpressControllerBase;
 use Kiener\MolliePayments\Handler\Method\PayPalExpressPayment;
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;

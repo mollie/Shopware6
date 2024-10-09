@@ -46,6 +46,11 @@ final class AddressStruct
     private $countryCode;
 
     /**
+     * @var string
+     */
+    private $phone;
+
+    /**
      * @param string $firstName
      * @param string $lastName
      * @param string $email
@@ -55,7 +60,7 @@ final class AddressStruct
      * @param string $city
      * @param string $countryCode
      */
-    public function __construct(string $firstName, string $lastName, string $email, string $street, string $streetAdditional, string $zipCode, string $city, string $countryCode)
+    public function __construct(string $firstName, string $lastName, string $email, string $street, string $streetAdditional, string $zipCode, string $city, string $countryCode, string $phone)
     {
         $this->firstName = $firstName;
         $this->lastName = $lastName;
@@ -65,6 +70,7 @@ final class AddressStruct
         $this->city = $city;
         $this->countryCode = $countryCode;
         $this->email = $email;
+        $this->phone = $phone;
     }
 
     /**
@@ -78,7 +84,7 @@ final class AddressStruct
             $streetAdditional = $address->streetAdditional;
         }
 
-        return new AddressStruct($address->givenName, $address->familyName, $address->email, $address->streetAndNumber, $streetAdditional, $address->postalCode, $address->city, $address->country);
+        return new AddressStruct($address->givenName, $address->familyName, $address->email, $address->streetAndNumber, $streetAdditional, $address->postalCode, $address->city, $address->country, $address->phone);
     }
 
     public function getFirstName(): string
@@ -120,6 +126,12 @@ final class AddressStruct
     {
         return $this->countryCode;
     }
+
+    public function getPhone(): string
+    {
+        return $this->phone;
+    }
+
 
     public function getMollieAddressId(): string
     {

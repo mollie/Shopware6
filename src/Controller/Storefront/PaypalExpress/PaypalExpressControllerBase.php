@@ -15,7 +15,6 @@ use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\RouterInterface;
 
 class PaypalExpressControllerBase extends StorefrontController
@@ -155,9 +154,7 @@ class PaypalExpressControllerBase extends StorefrontController
 
 
         # create new account or find existing and login
-        $this->paypalExpress->prepareCustomer($shippingAddress, $context, $billingAddress);
-
-
+        $this->paypalExpress->prepareCustomer($shippingAddress, 1, $context, $billingAddress);
 
 
         $returnUrl = $this->getCheckoutConfirmPage($this->router);

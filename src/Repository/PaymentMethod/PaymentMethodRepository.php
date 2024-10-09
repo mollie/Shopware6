@@ -2,10 +2,8 @@
 
 namespace Kiener\MolliePayments\Repository\PaymentMethod;
 
-use Kiener\MolliePayments\Components\PaypalExpress\PayPalExpress;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Handler\Method\PayPalExpressPayment;
-use Kiener\MolliePayments\Handler\Method\PayPalPayment;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
