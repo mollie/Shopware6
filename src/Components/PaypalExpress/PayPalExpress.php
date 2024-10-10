@@ -139,7 +139,7 @@ class PayPalExpress
             $sleepTimer = self::SESSION_BASE_TIMEOUT * $i;
             usleep($sleepTimer);
             $session = $mollie->sessions->get($sessionId);
-            if ($session->shippingAddress !== null) {
+            if ($session->methodDetails !== null) {
                 break;
             }
         }

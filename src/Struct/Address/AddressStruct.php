@@ -83,8 +83,13 @@ final class AddressStruct
         if (property_exists($address, 'streetAdditional')) {
             $streetAdditional = $address->streetAdditional;
         }
+        if (property_exists($address, 'familyName')) {
+            $nameParts = explode(' ', $address->familyName);
+            $address->familyName = array_pop($nameParts);
+            $address->givenName = implode(' ', $nameParts);
+        }
 
-        return new AddressStruct($address->givenName, $address->familyName, $address->email, $address->streetAndNumber, $streetAdditional, $address->postalCode, $address->city, $address->country, $address->phone);
+        return new AddressStruct($address->givenName, $address->familyName, $address->email, $address->streetAndNumber, $streetAdditional, $address->postalCode, $address->city, $address->country, (string)$address->phone);
     }
 
     public function getFirstName(): string

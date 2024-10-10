@@ -126,9 +126,19 @@ class PaypalExpressControllerBase extends StorefrontController
         }
 
         $payPalExpressSession = $this->paypalExpress->loadSession($payPalExpressSessionId, $context);
+        $methodDetails = $payPalExpressSession->methodDetails;
 
-        if ($payPalExpressSession->shippingAddress === null) {
-            $this->logger->error('Failed to finish checkout, got session without shipping address', [
+
+        if ($methodDetails->shippingAddress === null) {
+            $this->logger->error('Failed to finish checkout, got methodDetails without shipping address', [
+                'sessionId' => $payPalExpressSession->id,
+                'status' => $payPalExpressSession->status
+            ]);
+
+            return new RedirectResponse($returnUrl);
+        }
+        if ($methodDetails->billingAddress === null) {
+            $this->logger->error('Failed to finish checkout, got methodDetails without billing address', [
                 'sessionId' => $payPalExpressSession->id,
                 'status' => $payPalExpressSession->status
             ]);
@@ -136,12 +146,19 @@ class PaypalExpressControllerBase extends StorefrontController
             return new RedirectResponse($returnUrl);
         }
 
-        $shippingAddress = AddressStruct::createFromApiResponse($payPalExpressSession->shippingAddress);
+        $billingAddress = $methodDetails->billingAddress;
 
-        $billingAddress = null;
-        if ($payPalExpressSession->billingAddress instanceof \stdClass) {
-            $billingAddress = AddressStruct::createFromApiResponse($payPalExpressSession->billingAddress);
-        }
+        $shippingAddress = $methodDetails->shippingAddress;
+        $shippingAddress->streetAdditional = $billingAddress->streetAdditional;
+        $shippingAddress->email = $billingAddress->email;
+        $shippingAddress->phone = $billingAddress->phone;
+
+
+        $billingAddress = AddressStruct::createFromApiResponse($methodDetails->billingAddress);
+
+        $shippingAddress = AddressStruct::createFromApiResponse($methodDetails->shippingAddress);
+
+
 
         # we have to update the cart extension before a new user is created and logged in, otherwise the extension is not saved
         $cartExtension = new ArrayStruct([
