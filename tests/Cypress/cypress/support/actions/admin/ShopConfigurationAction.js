@@ -27,7 +27,7 @@ export default class ShopConfigurationAction {
 
         this.prepareShippingMethods();
 
-        this.setupPlugin(mollieFailureMode, creditCardComponents, applePayDirect, false);
+        this.setupPlugin(mollieFailureMode, creditCardComponents, applePayDirect, false,[]);
 
         this._clearCache();
     }
@@ -40,7 +40,7 @@ export default class ShopConfigurationAction {
      * @param applePayDirect
      * @param subscriptionIndicator
      */
-    setupPlugin(mollieFailureMode, creditCardComponents, applePayDirect, subscriptionIndicator) {
+    setupPlugin(mollieFailureMode, creditCardComponents, applePayDirect, subscriptionIndicator, paypalExpressRestrictions) {
 
         // assign all payment methods to
         // all available sales channels
@@ -52,7 +52,7 @@ export default class ShopConfigurationAction {
 
             channels.forEach(channel => {
                 this._configureSalesChannel(channel.id);
-                this._configureMolliePlugin(channel.id, mollieFailureMode, creditCardComponents, applePayDirect, subscriptionIndicator);
+                this._configureMolliePlugin(channel.id, mollieFailureMode, creditCardComponents, applePayDirect, subscriptionIndicator, paypalExpressRestrictions);
             });
         });
     }
@@ -150,7 +150,7 @@ export default class ShopConfigurationAction {
      * @param subscriptionIndicator
      * @private
      */
-    _configureMolliePlugin(channelId, mollieFailureMode, creditCardComponents, applePayDirect, subscriptionIndicator) {
+    _configureMolliePlugin(channelId, mollieFailureMode, creditCardComponents, applePayDirect, subscriptionIndicator,paypalExpressRestrictions) {
         const data = {};
 
         const config = {
@@ -173,6 +173,8 @@ export default class ShopConfigurationAction {
             "MolliePayments.config.subscriptionsShowIndicator": subscriptionIndicator,
             "MolliePayments.config.subscriptionsAllowPauseResume": true,
             "MolliePayments.config.subscriptionsAllowSkip": true,
+            // ---------------------------------------------------------------
+            "MolliePayments.config.paypalExpressRestrictions":paypalExpressRestrictions
         };
 
         data[null] = config;        // also add for "All Sales Channels" otherwise things in admin wouldnt work

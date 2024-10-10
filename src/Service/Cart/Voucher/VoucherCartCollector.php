@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Service\Cart\Voucher;
 
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepositoryInterface;
+use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Kiener\MolliePayments\Struct\Voucher\VoucherType;
 use Shopware\Core\Checkout\Cart\Cart;
@@ -88,7 +89,7 @@ class VoucherCartCollector implements CartDataCollectorInterface
                     $attributes->setVoucherType($voucherType);
 
                     $customFields = $item->getPayload()['customFields'];
-                    $customFields['mollie_payments'] = $attributes->toArray();
+                    $customFields[CustomFieldsInterface::MOLLIE_KEY] = $attributes->toArray();
 
                     $item->setPayloadValue('customFields', $customFields);
                 }

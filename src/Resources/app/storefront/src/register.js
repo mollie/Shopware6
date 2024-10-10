@@ -4,10 +4,11 @@ import MollieApplePayDirect from './mollie-payments/plugins/apple-pay-direct.plu
 import MollieApplePayPaymentMethod from './mollie-payments/plugins/apple-pay-payment-method.plugin';
 import MollieCreditCardMandateManage from './mollie-payments/plugins/creditcard-mandate-manage.plugin';
 import MolliePosTerminalPlugin from './mollie-payments/plugins/pos-terminal.plugin';
+import PayPalExpressPlugin from './mollie-payments/plugins/paypal-express.plugin';
 import MollieBancomatPlugin from './mollie-payments/plugins/bancomat-plugin';
 
 
-export default class MolliRegistration {
+export default class MollieRegistration {
 
     /**
      *
@@ -21,6 +22,9 @@ export default class MolliRegistration {
         // hide apple pay direct buttons across the whole shop, if not available
         pluginManager.register('MollieApplePayDirect', MollieApplePayDirect);
 
+
+        // fix quantity select on PDP Page
+        pluginManager.register('PayPalExpressPlugin',PayPalExpressPlugin);
 
         // hiding the standard Apple Pay method in the checkout and account area
         // -----------------------------------------------------------------------------
