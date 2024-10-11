@@ -41,7 +41,7 @@ class PayPalExpressConfig
      */
     public function assign(array $structData): array
     {
-        $structData['paypalExpressEnabled'] = $structData['paypalExpressEnabled'] ?? $this->isEnabled();
+        $structData['paypalExpressEnabled'] = $this->isEnabled();
         $structData['paypalExpressButtonStyle'] = $structData['paypalExpressButtonStyle'] ?? $this->buttonStyle;
         $structData['paypalExpressButtonShape'] = $structData['paypalExpressButtonShape'] ?? $this->buttonShape;
         $structData['paypalExpressRestrictions'] = $structData['paypalExpressRestrictions'] ?? $this->restrictions;

@@ -125,7 +125,18 @@ class PaypalExpressControllerBase extends StorefrontController
             return new RedirectResponse($returnUrl);
         }
 
-        $payPalExpressSession = $this->paypalExpress->loadSession($payPalExpressSessionId, $context);
+        try {
+            $payPalExpressSession = $this->paypalExpress->loadSession($payPalExpressSessionId, $context);
+        } catch (\Throwable $e) {
+            $this->logger->critical('Failed to load session from mollie', [
+                'message' => $e->getMessage(),
+                'sessionId' => $payPalExpressSessionId
+            ]);
+            return new RedirectResponse($returnUrl);
+        }
+
+
+
         $methodDetails = $payPalExpressSession->methodDetails;
 
 
@@ -146,32 +157,66 @@ class PaypalExpressControllerBase extends StorefrontController
             return new RedirectResponse($returnUrl);
         }
 
-        $billingAddress = $methodDetails->billingAddress;
+        $billingAddress = null;
 
         $shippingAddress = $methodDetails->shippingAddress;
-        $shippingAddress->streetAdditional = $billingAddress->streetAdditional;
-        $shippingAddress->email = $billingAddress->email;
-        $shippingAddress->phone = $billingAddress->phone;
+        $shippingAddress->phone = '';
+        if ($methodDetails->billingAddress->streetAdditional !== null) {
+            $shippingAddress->streetAdditional = $methodDetails->billingAddress->streetAdditional;
+        }
+        if ($methodDetails->billingAddress->phone !== null) {
+            $shippingAddress->phone = $methodDetails->billingAddress->phone;
+        }
+        if ($methodDetails->billingAddress->email !== null) {
+            $shippingAddress->email = $methodDetails->billingAddress->email;
+        }
+        if ($methodDetails->billingAddress->streetAndNumber !== null) {
+            try {
+                $billingAddress = AddressStruct::createFromApiResponse($methodDetails->billingAddress);
+            } catch (\Throwable $e) {
+                $this->logger->error('Failed to create billing address', [
+                    'message' => $e->getMessage(),
+                    'shippingAddress' => $shippingAddress,
+                    'billingAddress' => $methodDetails->billingAddress
+                ]);
+                return new RedirectResponse($returnUrl);
+            }
+        }
+
+        try {
+            $shippingAddress = AddressStruct::createFromApiResponse($shippingAddress);
+        } catch (\Throwable $e) {
+            $this->logger->error('Failed to create shipping address', [
+                'message' => $e->getMessage(),
+                'shippingAddress' => $shippingAddress,
+                'billingAddress' => $methodDetails->billingAddress
+            ]);
+            return new RedirectResponse($returnUrl);
+        }
 
 
-        $billingAddress = AddressStruct::createFromApiResponse($methodDetails->billingAddress);
 
-        $shippingAddress = AddressStruct::createFromApiResponse($methodDetails->shippingAddress);
+        try {
+            # we have to update the cart extension before a new user is created and logged in, otherwise the extension is not saved
+            $cartExtension = new ArrayStruct([
+                CustomFieldsInterface::PAYPAL_EXPRESS_AUTHENTICATE_ID => $payPalExpressSession->authenticationId
+            ]);
+            $cart->addExtension(CustomFieldsInterface::MOLLIE_KEY, $cartExtension);
 
+            $this->cartService->updateCart($cart);
 
-
-        # we have to update the cart extension before a new user is created and logged in, otherwise the extension is not saved
-        $cartExtension = new ArrayStruct([
-            CustomFieldsInterface::PAYPAL_EXPRESS_AUTHENTICATE_ID => $payPalExpressSession->authenticationId
-        ]);
-        $cart->addExtension(CustomFieldsInterface::MOLLIE_KEY, $cartExtension);
-        $this->cartService->updateCart($cart);
-
-        $this->cartService->persistCart($cart, $context);
+            $this->cartService->persistCart($cart, $context);
 
 
-        # create new account or find existing and login
-        $this->paypalExpress->prepareCustomer($shippingAddress, 1, $context, $billingAddress);
+            # create new account or find existing and login
+            $this->paypalExpress->prepareCustomer($shippingAddress, 1, $context, $billingAddress);
+        } catch (\Throwable $e) {
+            $this->logger->error('Failed to create customer or cart', [
+                'message' => $e->getMessage(),
+            ]);
+            return new RedirectResponse($returnUrl);
+        }
+
 
 
         $returnUrl = $this->getCheckoutConfirmPage($this->router);

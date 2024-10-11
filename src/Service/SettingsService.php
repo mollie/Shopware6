@@ -18,7 +18,7 @@ class SettingsService implements PluginSettingsServiceInterface
 
     private const PHONE_NUMBER_FIELD = 'showPhoneNumberField';
 
-    private const REQUIRE_DATA_PROTECTION ='requireDataProtectionCheckbox';
+    private const REQUIRE_DATA_PROTECTION = 'requireDataProtectionCheckbox';
 
     private const PAYMENT_FINALIZE_TRANSACTION_TIME = 'paymentFinalizeTransactionTime';
     const LIVE_API_KEY = 'liveApiKey';
@@ -53,7 +53,11 @@ class SettingsService implements PluginSettingsServiceInterface
     private $envCypressMode;
     private PayPalExpressConfig $payPalExpressConfig;
 
-    private ?MollieSettingStruct $cachedStruct = null;
+    /**
+     * @var array<string,MollieSettingStruct>
+     */
+    private array $cachedStructs = [];
+
     /**
      * @param SystemConfigService $systemConfigService
      * @param SalesChannelRepositoryInterface $repoSalesChannels
@@ -80,8 +84,10 @@ class SettingsService implements PluginSettingsServiceInterface
      */
     public function getSettings(?string $salesChannelId = null): MollieSettingStruct
     {
-        if ($this->cachedStruct instanceof MollieSettingStruct) {
-            return $this->cachedStruct;
+        $cacheKey = $salesChannelId ?? 'all';
+
+        if (isset($this->cachedStructs[$cacheKey])) {
+            return $this->cachedStructs[$cacheKey];
         }
         $structData = [];
         /** @var array<mixed> $systemConfigData */
@@ -118,9 +124,9 @@ class SettingsService implements PluginSettingsServiceInterface
         }
 
 
-        $this->cachedStruct = (new MollieSettingStruct())->assign($structData);
+        $this->cachedStructs[$cacheKey] = (new MollieSettingStruct())->assign($structData);
 
-        return $this->cachedStruct;
+        return $this->cachedStructs[$cacheKey];
     }
 
     /**
