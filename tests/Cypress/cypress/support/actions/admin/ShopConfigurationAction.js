@@ -174,7 +174,7 @@ export default class ShopConfigurationAction {
             "MolliePayments.config.subscriptionsAllowPauseResume": true,
             "MolliePayments.config.subscriptionsAllowSkip": true,
             // ---------------------------------------------------------------
-            "MolliePayments.config.paypalExpressEnabled": true,
+            "MolliePayments.config.paypalExpressEnabled": 1,
             "MolliePayments.config.paypalExpressRestrictions": paypalExpressRestrictions
         };
 
