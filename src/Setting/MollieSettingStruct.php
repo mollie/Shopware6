@@ -291,6 +291,11 @@ class MollieSettingStruct extends Struct
     protected $automaticOrderExpire = false;
 
     /**
+     * @var bool
+     */
+    protected bool $paypalExpressEnabled = false;
+
+    /**
      * @var int
      */
     protected $paypalExpressButtonStyle = 1;
@@ -1102,6 +1107,16 @@ class MollieSettingStruct extends Struct
     public function setAutomaticOrderExpire(bool $automaticOrderExpire): void
     {
         $this->automaticOrderExpire = $automaticOrderExpire;
+    }
+
+    public function isPaypalExpressEnabled(): bool
+    {
+        return $this->paypalExpressEnabled;
+    }
+
+    public function setPaypalExpressEnabled(bool $paypalExpressEnabled): void
+    {
+        $this->paypalExpressEnabled = $paypalExpressEnabled;
     }
 
     public function getPaypalExpressButtonStyle(): int

@@ -51,8 +51,9 @@ class SettingsService implements PluginSettingsServiceInterface
      * @var string
      */
     private $envCypressMode;
+    private PayPalExpressConfig $payPalExpressConfig;
 
-
+    private ?MollieSettingStruct $cachedStruct = null;
     /**
      * @param SystemConfigService $systemConfigService
      * @param SalesChannelRepositoryInterface $repoSalesChannels
@@ -60,7 +61,7 @@ class SettingsService implements PluginSettingsServiceInterface
      * @param ?string $envDevMode
      * @param ?string $envCypressMode
      */
-    public function __construct(SystemConfigService $systemConfigService, SalesChannelRepositoryInterface $repoSalesChannels, ?string $envShopDomain, ?string $envDevMode, ?string $envCypressMode)
+    public function __construct(SystemConfigService $systemConfigService, SalesChannelRepositoryInterface $repoSalesChannels, PayPalExpressConfig $payPalExpressConfig, ?string $envShopDomain, ?string $envDevMode, ?string $envCypressMode)
     {
         $this->systemConfigService = $systemConfigService;
         $this->repoSalesChannels = $repoSalesChannels;
@@ -68,6 +69,7 @@ class SettingsService implements PluginSettingsServiceInterface
         $this->envShopDomain = (string)$envShopDomain;
         $this->envDevMode = (string)$envDevMode;
         $this->envCypressMode = (string)$envCypressMode;
+        $this->payPalExpressConfig = $payPalExpressConfig;
     }
 
     /**
@@ -78,6 +80,9 @@ class SettingsService implements PluginSettingsServiceInterface
      */
     public function getSettings(?string $salesChannelId = null): MollieSettingStruct
     {
+        if ($this->cachedStruct instanceof MollieSettingStruct) {
+            return $this->cachedStruct;
+        }
         $structData = [];
         /** @var array<mixed> $systemConfigData */
         $systemConfigData = $this->systemConfigService->get(self::SYSTEM_CONFIG_DOMAIN, $salesChannelId);
@@ -105,7 +110,17 @@ class SettingsService implements PluginSettingsServiceInterface
         $cartSettings = $this->systemConfigService->get(self::SYSTEM_CORE_CART_CONFIG_DOMAIN, $salesChannelId);
         $structData[self::PAYMENT_FINALIZE_TRANSACTION_TIME] = $cartSettings[self::PAYMENT_FINALIZE_TRANSACTION_TIME] ?? 1800;
 
-        return (new MollieSettingStruct())->assign($structData);
+        /**
+         * TODO: remove this when we move to config
+         */
+        if ($this->payPalExpressConfig->isEnabled()) {
+            $structData = $this->payPalExpressConfig->assign($structData);
+        }
+
+
+        $this->cachedStruct = (new MollieSettingStruct())->assign($structData);
+
+        return $this->cachedStruct;
     }
 
     /**

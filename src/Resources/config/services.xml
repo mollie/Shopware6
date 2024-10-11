@@ -102,15 +102,25 @@
             <argument type="service" id="Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepository"/>
             <argument type="service" id="Shopware\Core\Framework\Plugin\Util\PluginIdProvider"/>
             <argument type="service" id="kiener.mollie_payments.http.client"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\PayPalExpressConfig"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\ProductService" class="Kiener\MolliePayments\Service\ProductService">
             <argument type="service" id="Kiener\MolliePayments\Repository\Product\ProductRepository"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Service\PayPalExpressConfig">
+            <argument type="string">%env(default::MOLLIE_PAYPAL_EXPRESS_BETA)%</argument>
+            <argument type="string">%env(default::MOLLIE_PAYPAL_EXPRESS_BUTTON_STYLE)%</argument>
+            <argument type="string">%env(default::MOLLIE_PAYPAL_EXPRESS_BUTTON_SHAPE)%</argument>
+            <argument type="string">%env(default::MOLLIE_PAYPAL_EXPRESS_BUTTON_RESTRICTIONS)%</argument>
+        </service>
+
+
         <service id="Kiener\MolliePayments\Service\SettingsService" class="Kiener\MolliePayments\Service\SettingsService">
             <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
             <argument type="service" id="Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\PayPalExpressConfig"/>
             <argument key="$envShopDomain">%env(default::MOLLIE_SHOP_DOMAIN)%</argument>
             <argument key="$envDevMode">%env(default::MOLLIE_DEV_MODE)%</argument>
             <argument key="$envCypressMode">%env(default::MOLLIE_CYPRESS_MODE)%</argument>

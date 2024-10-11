@@ -50,7 +50,7 @@ class PaypalExpressSubscriber implements EventSubscriberInterface
     {
         $settings = $this->settingsService->getSettings($event->getSalesChannelContext()->getSalesChannel()->getId());
 
-        $paymentEnabled = $this->paypal->isPaypalExpressEnabled($event->getSalesChannelContext());
+        $paymentEnabled = $this->paypal->isPaypalExpressEnabled($event->getSalesChannelContext()) && $settings->isPaypalExpressEnabled();
 
         $event->setParameter('mollie_paypalexpress_enabled', $paymentEnabled);
 

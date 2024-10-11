@@ -27,7 +27,7 @@ export default class ShopConfigurationAction {
 
         this.prepareShippingMethods();
 
-        this.setupPlugin(mollieFailureMode, creditCardComponents, applePayDirect, false,[]);
+        this.setupPlugin(mollieFailureMode, creditCardComponents, applePayDirect, false, []);
 
         this._clearCache();
     }
@@ -150,7 +150,7 @@ export default class ShopConfigurationAction {
      * @param subscriptionIndicator
      * @private
      */
-    _configureMolliePlugin(channelId, mollieFailureMode, creditCardComponents, applePayDirect, subscriptionIndicator,paypalExpressRestrictions) {
+    _configureMolliePlugin(channelId, mollieFailureMode, creditCardComponents, applePayDirect, subscriptionIndicator, paypalExpressRestrictions) {
         const data = {};
 
         const config = {
@@ -174,7 +174,8 @@ export default class ShopConfigurationAction {
             "MolliePayments.config.subscriptionsAllowPauseResume": true,
             "MolliePayments.config.subscriptionsAllowSkip": true,
             // ---------------------------------------------------------------
-            "MolliePayments.config.paypalExpressRestrictions":paypalExpressRestrictions
+            "MolliePayments.config.paypalExpressEnabled": true,
+            "MolliePayments.config.paypalExpressRestrictions": paypalExpressRestrictions
         };
 
         data[null] = config;        // also add for "All Sales Channels" otherwise things in admin wouldnt work

@@ -165,7 +165,7 @@
             </helpText>
         </input-field>
     </card>
-    <card>
+    <!--card>
         <title>PayPal Express</title>
         <title lang="de-DE">PayPal Express</title>
         <title lang="nl-NL">PayPal Express</title>
@@ -266,7 +266,7 @@
                 </option>
             </options>
         </input-field>
-    </card>
+    </card -->
     <card>
         <title>Apple Pay</title>
         <title lang="de-DE">Apple Pay</title>

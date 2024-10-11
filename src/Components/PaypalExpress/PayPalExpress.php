@@ -109,7 +109,7 @@ class PayPalExpress
      */
     public function startSession(Cart $cart, SalesChannelContext $context): Session
     {
-        $mollie = $this->mollieApiFactory->getClient($context->getSalesChannelId());
+        $mollie = $this->mollieApiFactory->getLiveClient($context->getSalesChannelId());
 
         $params = [
             'method' => 'paypal',
@@ -130,7 +130,7 @@ class PayPalExpress
 
     public function loadSession(string $sessionId, SalesChannelContext $context): Session
     {
-        $mollie = $this->mollieApiFactory->getClient($context->getSalesChannelId());
+        $mollie = $this->mollieApiFactory->getLiveClient($context->getSalesChannelId());
         /**
          * if we load the session from mollie api, we dont get the shipping address at first time. usually it takes several seconds until the data from paypal is transfered to mollie
          * so we try to load the session at least 5 times with increased waiting time.

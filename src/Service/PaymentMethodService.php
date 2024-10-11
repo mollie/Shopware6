@@ -14,6 +14,7 @@ use Kiener\MolliePayments\Handler\Method\BlikPayment;
 use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
 use Kiener\MolliePayments\Handler\Method\EpsPayment;
 use Kiener\MolliePayments\Handler\Method\GiftCardPayment;
+use Kiener\MolliePayments\Handler\Method\GiroPayPayment;
 use Kiener\MolliePayments\Handler\Method\iDealPayment;
 use Kiener\MolliePayments\Handler\Method\In3Payment;
 use Kiener\MolliePayments\Handler\Method\IngHomePayPayment;
@@ -90,6 +91,7 @@ class PaymentMethodService
      * @var VersionCompare
      */
     private $versionCompare;
+    private PayPalExpressConfig $payPalExpressConfig;
 
 
     /**
@@ -100,7 +102,7 @@ class PaymentMethodService
      * @param PluginIdProvider $pluginIdProvider
      * @param HttpClientInterface $httpClient
      */
-    public function __construct(string $shopwareVersion, MediaService $mediaService, MediaRepositoryInterface $mediaRepository, PaymentMethodRepositoryInterface $paymentRepository, PluginIdProvider $pluginIdProvider, HttpClientInterface $httpClient)
+    public function __construct(string $shopwareVersion, MediaService $mediaService, MediaRepositoryInterface $mediaRepository, PaymentMethodRepositoryInterface $paymentRepository, PluginIdProvider $pluginIdProvider, HttpClientInterface $httpClient, PayPalExpressConfig $payPalExpressConfig)
     {
         $this->mediaService = $mediaService;
         $this->mediaRepository = $mediaRepository;
@@ -109,6 +111,7 @@ class PaymentMethodService
         $this->httpClient = $httpClient;
 
         $this->versionCompare = new VersionCompare($shopwareVersion);
+        $this->payPalExpressConfig = $payPalExpressConfig;
     }
 
 
@@ -121,7 +124,14 @@ class PaymentMethodService
         # we still need the min the database
         # but always disable them :)
         $this->disablePaymentMethod(IngHomePayPayment::class, $context);
-
+        $this->disablePaymentMethod(GiroPayPayment::class, $context);
+        $this->disablePaymentMethod(KlarnaPayLaterPayment::class, $context);
+        $this->disablePaymentMethod(KlarnaPayNowPayment::class, $context);
+        $this->disablePaymentMethod(KlarnaSliceItPayment::class, $context);
+        $this->disablePaymentMethod(SofortPayment::class, $context);
+        if (! $this->payPalExpressConfig->isEnabled()) {
+            $this->disablePaymentMethod(PayPalExpressPayment::class, $context);
+        }
 
         // Get installable payment methods
         $installablePaymentMethods = $this->getInstallablePaymentMethods();
@@ -201,7 +211,8 @@ class PaymentMethodService
 
                 if ($this->versionCompare->gte('6.5.7.0')) {
                     # we do a string cast here, since getTechnicalName will be not nullable in the future
-                    $technicalName = (string)$existingPaymentMethod->getTechnicalName(); /** @phpstan-ignore-line */
+                    /** @phpstan-ignore-next-line  */
+                    $technicalName = (string)$existingPaymentMethod->getTechnicalName();
                 }
             } else {
                 # let's create a full parameter list of everything
@@ -214,8 +225,8 @@ class PaymentMethodService
                     'description' => '',
                     'mediaId' => $mediaId,
                     'afterOrderEnabled' => true,
-                    'translations'=>[
-                        Defaults::LANGUAGE_SYSTEM=>[
+                    'translations' => [
+                        Defaults::LANGUAGE_SYSTEM => [
                             'name' => $paymentMethod['description']
                         ]
                     ]
@@ -223,7 +234,7 @@ class PaymentMethodService
             }
 
             if (mb_strlen($technicalName) === 0) {
-                $technicalName = self::TECHNICAL_NAME_PREFIX .  $paymentMethod['name'];
+                $technicalName = self::TECHNICAL_NAME_PREFIX . $paymentMethod['name'];
             }
 
             # custom field name is required to be specific, because we use it in the template to display components
@@ -258,13 +269,13 @@ class PaymentMethodService
 
         $paymentMethods = $this->paymentRepository->search($paymentCriteria, $context);
 
-        if (!$paymentMethods->count()) {
+        if (! $paymentMethods->count()) {
             return $installableHandlers;
         }
 
         /** @var PaymentMethodEntity $paymentMethod */
         foreach ($paymentMethods->getEntities() as $paymentMethod) {
-            if (!in_array($paymentMethod->getHandlerIdentifier(), $installableHandlers, true)) {
+            if (! in_array($paymentMethod->getHandlerIdentifier(), $installableHandlers, true)) {
                 continue;
             }
 
@@ -283,10 +294,10 @@ class PaymentMethodService
      */
     public function activatePaymentMethods(array $paymentMethods, array $installedHandlers, Context $context): void
     {
-        if (!empty($paymentMethods)) {
+        if (! empty($paymentMethods)) {
             foreach ($paymentMethods as $paymentMethod) {
                 if (
-                    !isset($paymentMethod['handler']) ||
+                    ! isset($paymentMethod['handler']) ||
                     in_array($paymentMethod['handler'], $installedHandlers, true)
                 ) {
                     continue;
@@ -422,7 +433,7 @@ class PaymentMethodService
      */
     public function getPaymentHandlers(): array
     {
-        return [
+        $paymentHandlers = [
             ApplePayPayment::class,
             BanContactPayment::class,
             BankTransferPayment::class,
@@ -433,15 +444,14 @@ class PaymentMethodService
             GiftCardPayment::class,
             iDealPayment::class,
             KbcPayment::class,
-            KlarnaPayLaterPayment::class,
-            KlarnaPayNowPayment::class,
-            KlarnaSliceItPayment::class,
+            // KlarnaPayLaterPayment::class,
+            // KlarnaPayNowPayment::class,
+            // KlarnaSliceItPayment::class,
             KlarnaOnePayment::class,
             PayPalPayment::class,
-            PayPalExpressPayment::class,
             PaySafeCardPayment::class,
             Przelewy24Payment::class,
-            SofortPayment::class,
+            // SofortPayment::class,
             VoucherPayment::class,
             In3Payment::class,
             PosPayment::class,
@@ -457,6 +467,12 @@ class PaymentMethodService
             // IngHomePayPayment::class, // not allowed anymore
             // DirectDebitPayment::class, // only allowed when updating subsriptions, aka => not allowed anymore
         ];
+
+        if ($this->payPalExpressConfig->isEnabled()) {
+            $paymentHandlers[] = PayPalExpressPayment::class;
+        }
+
+        return $paymentHandlers;
     }
 
     /**
@@ -525,7 +541,7 @@ class PaymentMethodService
         $paymentMethodId = $transaction->getPaymentMethodId();
         $paymentMethod = $transaction->getPaymentMethod();
 
-        if (!$paymentMethod instanceof PaymentMethodEntity) {
+        if (! $paymentMethod instanceof PaymentMethodEntity) {
             $criteria = new Criteria([$paymentMethodId]);
             $paymentMethod = $this->paymentRepository->search($criteria, Context::createDefaultContext())->first();
         }
