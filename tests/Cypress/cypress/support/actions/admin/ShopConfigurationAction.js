@@ -18,6 +18,7 @@ export default class ShopConfigurationAction {
      * @param mollieFailureMode
      * @param creditCardComponents
      * @param applePayDirect
+     * @param paypalExpressRestrictions
      */
     setupShop(mollieFailureMode, creditCardComponents, applePayDirect) {
 
@@ -39,6 +40,7 @@ export default class ShopConfigurationAction {
      * @param creditCardComponents
      * @param applePayDirect
      * @param subscriptionIndicator
+     * @param paypalExpressRestrictions
      */
     setupPlugin(mollieFailureMode, creditCardComponents, applePayDirect, subscriptionIndicator, paypalExpressRestrictions) {
 
@@ -148,6 +150,7 @@ export default class ShopConfigurationAction {
      * @param creditCardComponents
      * @param applePayDirect
      * @param subscriptionIndicator
+     * @param paypalExpressRestrictions
      * @private
      */
     _configureMolliePlugin(channelId, mollieFailureMode, creditCardComponents, applePayDirect, subscriptionIndicator, paypalExpressRestrictions) {
@@ -174,7 +177,6 @@ export default class ShopConfigurationAction {
             "MolliePayments.config.subscriptionsAllowPauseResume": true,
             "MolliePayments.config.subscriptionsAllowSkip": true,
             // ---------------------------------------------------------------
-            "MolliePayments.config.paypalExpressEnabled": 1,
             "MolliePayments.config.paypalExpressRestrictions": paypalExpressRestrictions
         };
 
