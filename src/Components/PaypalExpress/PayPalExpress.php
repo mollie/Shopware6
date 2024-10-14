@@ -120,7 +120,6 @@ class PayPalExpress
                 $cart->getPrice()->getTotalPrice(),
                 $context->getCurrency()->getIsoCode()
             ),
-            'description' => 'test',
             'redirectUrl' => $this->urlBuilder->buildPaypalExpressRedirectUrl(),
             'cancelUrl' => $this->urlBuilder->buildPaypalExpressCancelUrl(),
         ];
@@ -135,8 +134,8 @@ class PayPalExpress
          * if we load the session from mollie api, we dont get the shipping address at first time. usually it takes several seconds until the data from paypal is transfered to mollie
          * so we try to load the session at least 5 times with increased waiting time.
          */
-        for ($i = 1; $i <= self::SESSION_MAX_RETRY; $i++) {
-            $sleepTimer = self::SESSION_BASE_TIMEOUT * $i;
+        for ($i = 0; $i < self::SESSION_MAX_RETRY; $i++) {
+            $sleepTimer = self::SESSION_BASE_TIMEOUT * ($i+1);
             usleep($sleepTimer);
             $session = $mollie->sessions->get($sessionId);
             if ($session->methodDetails !== null) {

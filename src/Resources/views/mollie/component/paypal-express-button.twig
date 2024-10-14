@@ -27,9 +27,12 @@
         {% set shape  = 'pill' %}
     {% endif %}
 
+    {% if mollie_csrf_available %}
+        {% include '@MolliePayments/storefront/csrf/components/paypal-express-button-csrf.twig' %}
+    {% endif %}
 
     <div class="{{ cols }}">
-        <button name="paypal-express" class="mollie-paypal-button paypal-button-{{ shape }} paypal-theme-{{ theme }}">
+        <button name="paypal-express" class="mollie-paypal-button mollie-express-button paypal-button-{{ shape }} paypal-theme-{{ theme }}">
             <img src="{{ image }}" width="80px;"/>
             <p style="font-weight: 100;margin:0;margin-left:8px">Checkout</p>
         </button>
