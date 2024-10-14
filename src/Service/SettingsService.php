@@ -93,7 +93,7 @@ class SettingsService implements PluginSettingsServiceInterface
         /** @var array<mixed> $systemConfigData */
         $systemConfigData = $this->systemConfigService->get(self::SYSTEM_CONFIG_DOMAIN, $salesChannelId);
 
-        if (count($systemConfigData) !== 0) {
+        if (is_array($systemConfigData) && count($systemConfigData) > 0) {
             foreach ($systemConfigData as $key => $value) {
                 if (stripos($key, self::SYSTEM_CONFIG_DOMAIN) !== false) {
                     $structData[substr($key, strlen(self::SYSTEM_CONFIG_DOMAIN))] = $value;
@@ -105,16 +105,19 @@ class SettingsService implements PluginSettingsServiceInterface
 
         /** @var array<mixed> $coreSettings */
         $coreSettings = $this->systemConfigService->get(self::SYSTEM_CORE_LOGIN_REGISTRATION_CONFIG_DOMAIN, $salesChannelId);
+        if(is_array($coreSettings) && count($coreSettings) > 0) {
+            $structData[self::PHONE_NUMBER_FIELD_REQUIRED] = $coreSettings[self::PHONE_NUMBER_FIELD_REQUIRED] ?? false;
+            $structData[self::PHONE_NUMBER_FIELD] = $coreSettings[self::PHONE_NUMBER_FIELD] ?? false;
+            $structData[self::REQUIRE_DATA_PROTECTION] = $coreSettings[self::REQUIRE_DATA_PROTECTION] ?? false;
+        }
 
-        $structData[self::PHONE_NUMBER_FIELD_REQUIRED] = $coreSettings[self::PHONE_NUMBER_FIELD_REQUIRED] ?? false;
-
-        $structData[self::PHONE_NUMBER_FIELD] = $coreSettings[self::PHONE_NUMBER_FIELD] ?? false;
-
-        $structData[self::REQUIRE_DATA_PROTECTION] = $coreSettings[self::REQUIRE_DATA_PROTECTION] ?? false;
 
         /** @var array<mixed> $cartSettings */
         $cartSettings = $this->systemConfigService->get(self::SYSTEM_CORE_CART_CONFIG_DOMAIN, $salesChannelId);
-        $structData[self::PAYMENT_FINALIZE_TRANSACTION_TIME] = $cartSettings[self::PAYMENT_FINALIZE_TRANSACTION_TIME] ?? 1800;
+        if(is_array($cartSettings) && count($cartSettings) > 0) {
+            $structData[self::PAYMENT_FINALIZE_TRANSACTION_TIME] = $cartSettings[self::PAYMENT_FINALIZE_TRANSACTION_TIME] ?? 1800;
+        }
+
 
         /**
          * TODO: remove this when we move to config
