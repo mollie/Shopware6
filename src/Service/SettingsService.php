@@ -105,7 +105,7 @@ class SettingsService implements PluginSettingsServiceInterface
 
         /** @var array<mixed> $coreSettings */
         $coreSettings = $this->systemConfigService->get(self::SYSTEM_CORE_LOGIN_REGISTRATION_CONFIG_DOMAIN, $salesChannelId);
-        if(is_array($coreSettings) && count($coreSettings) > 0) {
+        if (is_array($coreSettings) && count($coreSettings) > 0) {
             $structData[self::PHONE_NUMBER_FIELD_REQUIRED] = $coreSettings[self::PHONE_NUMBER_FIELD_REQUIRED] ?? false;
             $structData[self::PHONE_NUMBER_FIELD] = $coreSettings[self::PHONE_NUMBER_FIELD] ?? false;
             $structData[self::REQUIRE_DATA_PROTECTION] = $coreSettings[self::REQUIRE_DATA_PROTECTION] ?? false;
@@ -114,7 +114,7 @@ class SettingsService implements PluginSettingsServiceInterface
 
         /** @var array<mixed> $cartSettings */
         $cartSettings = $this->systemConfigService->get(self::SYSTEM_CORE_CART_CONFIG_DOMAIN, $salesChannelId);
-        if(is_array($cartSettings) && count($cartSettings) > 0) {
+        if (is_array($cartSettings) && count($cartSettings) > 0) {
             $structData[self::PAYMENT_FINALIZE_TRANSACTION_TIME] = $cartSettings[self::PAYMENT_FINALIZE_TRANSACTION_TIME] ?? 1800;
         }
 
