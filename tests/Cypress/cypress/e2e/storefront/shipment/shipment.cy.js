@@ -266,7 +266,7 @@ function createOrderAndOpenAdmin(itemCount, itemQty) {
     const scenarioDummyBasket = new DummyBasketScenario(itemQty, itemCount);
     scenarioDummyBasket.execute();
 
-    paymentAction.switchPaymentMethod('Pay later');
+    paymentAction.switchPaymentMethod('Klarna');
 
     shopware.prepareDomainChange();
     checkout.placeOrderOnConfirm();
