@@ -14,14 +14,12 @@ use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Service\MollieApi\OrderDeliveryExtractor;
 use Kiener\MolliePayments\Service\MollieApi\OrderItemsExtractor;
 use Kiener\MolliePayments\Service\MollieApi\ShipmentInterface;
-use Kiener\MolliePayments\Service\OrderDeliveryService;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\TrackingInfoStructFactory;
 use Kiener\MolliePayments\Service\Transition\DeliveryTransitionServiceInterface;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
-use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -47,10 +45,6 @@ class ShipmentManager implements ShipmentManagerInterface
      */
     private $shipmentService;
 
-    /**
-     * @var OrderDeliveryService
-     */
-    private $orderDeliveryService;
 
     /**
      * @var OrderService
@@ -76,18 +70,16 @@ class ShipmentManager implements ShipmentManagerInterface
      * @param DeliveryTransitionServiceInterface $deliveryTransitionService
      * @param Order $mollieApiOrderService
      * @param ShipmentInterface $shipmentService
-     * @param OrderDeliveryService $orderDeliveryService
      * @param OrderService $orderService
      * @param OrderDeliveryExtractor $orderDataExtractor
      * @param OrderItemsExtractor $orderItemsExtractor
      * @param TrackingInfoStructFactory $trackingFactory
      */
-    public function __construct(DeliveryTransitionServiceInterface $deliveryTransitionService, Order $mollieApiOrderService, ShipmentInterface $shipmentService, OrderDeliveryService $orderDeliveryService, OrderService $orderService, OrderDeliveryExtractor $orderDataExtractor, OrderItemsExtractor $orderItemsExtractor, TrackingInfoStructFactory $trackingFactory)
+    public function __construct(DeliveryTransitionServiceInterface $deliveryTransitionService, Order $mollieApiOrderService, ShipmentInterface $shipmentService, OrderService $orderService, OrderDeliveryExtractor $orderDataExtractor, OrderItemsExtractor $orderItemsExtractor, TrackingInfoStructFactory $trackingFactory)
     {
         $this->deliveryTransitionService = $deliveryTransitionService;
         $this->mollieApiOrderService = $mollieApiOrderService;
         $this->shipmentService = $shipmentService;
-        $this->orderDeliveryService = $orderDeliveryService;
         $this->orderService = $orderService;
         $this->orderDataExtractor = $orderDataExtractor;
         $this->orderItemsExtractor = $orderItemsExtractor;
@@ -191,7 +183,6 @@ class ShipmentManager implements ShipmentManagerInterface
 
         $this->transitionOrder($order, $mollieOrderId, $context);
 
-        $this->markDeliveryCustomFields($order, $context);
 
         return $shipment;
     }
@@ -233,8 +224,6 @@ class ShipmentManager implements ShipmentManagerInterface
         # post-shipping processing
 
         $this->transitionOrder($order, $mollieOrderId, $context);
-
-        $this->markDeliveryCustomFields($order, $context);
 
         return $shipment;
     }
@@ -301,7 +290,6 @@ class ShipmentManager implements ShipmentManagerInterface
 
         $this->transitionOrder($order, $mollieOrderId, $context);
 
-        $this->markDeliveryCustomFields($order, $context);
 
         return $shipment;
     }
@@ -325,28 +313,6 @@ class ShipmentManager implements ShipmentManagerInterface
             $this->deliveryTransitionService->shipDelivery($delivery, $context);
         } else {
             $this->deliveryTransitionService->partialShipDelivery($delivery, $context);
-        }
-    }
-
-    /**
-     * @param OrderEntity $order
-     * @param Context $context
-     * @return void
-     */
-    private function markDeliveryCustomFields(OrderEntity $order, Context $context)
-    {
-        $deliveries = $order->getDeliveries();
-
-        if (!$deliveries instanceof OrderDeliveryCollection) {
-            return;
-        }
-
-        foreach ($deliveries as $delivery) {
-            $values = [
-                CustomFieldsInterface::DELIVERY_SHIPPED => true
-            ];
-
-            $this->orderDeliveryService->updateCustomFields($delivery, $values, $context);
         }
     }
 
