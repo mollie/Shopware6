@@ -21,7 +21,15 @@
 
 {% block page_checkout_aside_actions %}
     {{ parent() }}
-    {% if mollie_applepaydirect_enabled and ('cart' not in mollie_applepaydirect_restrictions) %}
+
+    {% set applePayVisible =  mollie_applepaydirect_enabled and ('cart' not in mollie_applepaydirect_restrictions) %}
+    {% set paypalExpressVisible = mollie_paypalexpress_enabled and ('cart' not in mollie_paypalexpress_restrictions)  %}
+    {% set noticeVisible = applePayVisible or paypalExpressVisible %}
+
+    {% sw_include '@MolliePayments/mollie/component/express-privacy-notice.html.twig' with {visible:noticeVisible} %}
+
+
+    {% if applePayVisible %}
         {% block page_checkout_aside_actions_apple_direct_component %}
             <div class="mt-2 js-apple-pay-container mollie-apple-pay-direct-cart">
                 {% include '@MolliePayments/mollie/component/apple-pay-direct-button.twig' %}
@@ -29,13 +37,11 @@
         {% endblock %}
     {% endif %}
 
-    {% if mollie_paypalexpress_enabled and ('cart' not in mollie_paypalexpress_restrictions) %}
+    {% if paypalExpressVisible %}
         {% block page_checkout_aside_actions_mollie_paypal_express_component %}
-            <form id="molliePayPalExpressCartForm" action="{{ path('frontend.mollie.paypal-express.start', {   }) }}" method="GET">
-                <div class="mt-2">
-                    {% include '@MolliePayments/mollie/component/paypal-express-button.twig' %}
-                </div>
-            </form>
+            <div class="mt-2">
+                {% include '@MolliePayments/mollie/component/paypal-express-button.twig' %}
+            </div>
         {% endblock %}
     {% endif %}
 {% endblock %}
