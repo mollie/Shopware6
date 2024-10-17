@@ -54,7 +54,6 @@ class ShipmentManagerTest extends TestCase
 
         $deliveryTransitionService = $this->createMock(DeliveryTransitionService::class);
         $mollieApiOrderService = $this->getMockBuilder(Order::class)->disableOriginalConstructor()->getMock();
-        $orderDeliveryService = $this->getMockBuilder(OrderDeliveryService::class)->disableOriginalConstructor()->getMock();
         $orderService = $this->getMockBuilder(OrderService::class)->disableOriginalConstructor()->getMock();
         $deliveryExtractor = new OrderDeliveryExtractor(new NullLogger());
 
@@ -62,7 +61,6 @@ class ShipmentManagerTest extends TestCase
             $deliveryTransitionService,
             $mollieApiOrderService,
             $this->fakeShipmentService,
-            $orderDeliveryService,
             $orderService,
             $deliveryExtractor,
             new OrderItemsExtractor(),
