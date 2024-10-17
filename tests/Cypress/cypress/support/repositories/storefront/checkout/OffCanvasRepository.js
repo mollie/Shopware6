@@ -24,4 +24,11 @@ export default class OffCanvasRepository {
         return cy.get('.mollie-apple-pay-direct-offcanvas > div > .js-apple-pay');
     }
 
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getPayPalExpressButton(){
+        return cy.get('#molliePayPalExpressOffcanvasForm button[name="paypal-express"]');
+    }
 }

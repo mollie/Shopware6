@@ -53,6 +53,12 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Subscriber\PaypalExpressSubscriber">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\PaypalExpress\PayPalExpress"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="Kiener\MolliePayments\Subscriber\SubscriptionSubscriber">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="translator"/>

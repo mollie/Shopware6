@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Repository\PaymentMethod;
 
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
+use Kiener\MolliePayments\Handler\Method\PayPalExpressPayment;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
@@ -73,6 +74,27 @@ class PaymentMethodRepository implements PaymentMethodRepositoryInterface
 
         if (count($paymentMethods) <= 0) {
             throw new \Exception('Payment Method Apple Pay Direct not found in system');
+        }
+
+        return (string)$paymentMethods[0];
+    }
+
+    /**
+     * @param Context $context
+     * @throws \Exception
+     * @return string
+     */
+    public function getActivePaypalExpressID(Context $context): string
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('handlerIdentifier', PayPalExpressPayment::class));
+        $criteria->addFilter(new EqualsFilter('active', true));
+
+        /** @var array<string> $paymentMethods */
+        $paymentMethods = $this->repoPaymentMethods->searchIds($criteria, $context)->getIds();
+
+        if (count($paymentMethods) <= 0) {
+            throw new \Exception('Payment Method PayPal Express not found in system');
         }
 
         return (string)$paymentMethods[0];

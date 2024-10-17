@@ -348,7 +348,7 @@ class ShipmentManager implements ShipmentManagerInterface
 
             // Check itemIdentifier against the mollie order_line_id custom field
             $customFields = $lineItem->getCustomFields() ?? [];
-            $mollieOrderLineId = $customFields[CustomFieldsInterface::MOLLIE_KEY]['order_line_id'] ?? null;
+            $mollieOrderLineId = $customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_LINE_KEY] ?? null;
             if (!is_null($mollieOrderLineId) && $mollieOrderLineId === $itemIdentifier) {
                 return true;
             }

@@ -50,4 +50,9 @@ trait RedirectTrait
             $router::ABSOLUTE_URL
         );
     }
+
+    public function getCheckoutCartPage(RouterInterface $router):string
+    {
+        return $router->generate('frontend.checkout.cart.page', [], $router::ABSOLUTE_URL);
+    }
 }

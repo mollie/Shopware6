@@ -43,7 +43,7 @@ context("Cancel Authorized items", () => {
 
     context(devices.getDescription(device), () => {
         it('C3259233: Cancel items from order', () => {
-            createOrderAndOpenAdmin('Pay now');
+            createOrderAndOpenAdmin('Klarna');
 
 
             orderDetailsRepository.getLineItemActionsButton(1).should('be.visible').click({force: true});

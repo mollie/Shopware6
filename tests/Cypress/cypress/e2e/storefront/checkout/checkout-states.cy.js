@@ -88,7 +88,7 @@ context("Order Status Mapping Tests", () => {
         it('C4024: Test Status Authorized', () => {
 
             scenarioDummyBasket.execute();
-            paymentAction.switchPaymentMethod('Pay later');
+            paymentAction.switchPaymentMethod('Klarna');
 
             shopware.prepareDomainChange();
             checkout.placeOrderOnConfirm();

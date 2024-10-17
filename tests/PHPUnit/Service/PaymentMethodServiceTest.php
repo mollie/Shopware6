@@ -22,6 +22,7 @@ use Kiener\MolliePayments\Handler\Method\KlarnaPayLaterPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaPayNowPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaSliceItPayment;
 use Kiener\MolliePayments\Handler\Method\MyBankPayment;
+use Kiener\MolliePayments\Handler\Method\PayPalExpressPayment;
 use Kiener\MolliePayments\Handler\Method\PayconiqPayment;
 use Kiener\MolliePayments\Handler\Method\PayPalPayment;
 use Kiener\MolliePayments\Handler\Method\PaySafeCardPayment;
@@ -36,6 +37,7 @@ use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Kiener\MolliePayments\Repository\Media\MediaRepositoryInterface;
 use Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepositoryInterface;
 use Kiener\MolliePayments\Service\PaymentMethodService;
+use Kiener\MolliePayments\Service\PayPalExpressConfig;
 use MolliePayments\Tests\Fakes\FakeHttpClient;
 use MolliePayments\Tests\Fakes\Repositories\FakeMediaRepository;
 use MolliePayments\Tests\Fakes\Repositories\FakePaymentMethodRepository;
@@ -90,7 +92,8 @@ class PaymentMethodServiceTest extends TestCase
             $this->mediaRepository,
             $this->paymentMethodRepository,
             $this->createMock(PluginIdProvider::class),
-            new FakeHttpClient()
+            new FakeHttpClient(),
+            new PayPalExpressConfig(1),
         );
     }
 
@@ -124,14 +127,10 @@ class PaymentMethodServiceTest extends TestCase
             GiftCardPayment::class,
             iDealPayment::class,
             KbcPayment::class,
-            KlarnaPayLaterPayment::class,
-            KlarnaPayNowPayment::class,
-            KlarnaSliceItPayment::class,
             KlarnaOnePayment::class,
             PayPalPayment::class,
             PaySafeCardPayment::class,
             Przelewy24Payment::class,
-            SofortPayment::class,
             VoucherPayment::class,
             In3Payment::class,
             PosPayment::class,
@@ -144,6 +143,7 @@ class PaymentMethodServiceTest extends TestCase
             PayconiqPayment::class,
             RivertyPayment::class,
             SatispayPayment::class,
+            PayPalExpressPayment::class,
         ];
 
         $handlers = $this->paymentMethodService->getPaymentHandlers();

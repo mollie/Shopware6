@@ -123,19 +123,20 @@ export default class MollieApplePayDirect extends Plugin {
             return;
         }
 
-        const applePayButton = form.querySelector('.js-apple-pay');
+        const expressButtons = form.querySelectorAll('.mollie-express-button');
 
-        if (applePayButton === null) {
+        if (expressButtons.length === 0) {
             return;
         }
 
-        if (applePayButton.hasAttribute('disabled')) {
-            applePayButton.removeAttribute('disabled');
-        }
-        if (buyButton.hasAttribute('disabled')) {
-            applePayButton.setAttribute('disabled', 'disabled');
-        }
-
+        expressButtons.each(function(expressButton){
+            if (expressButton.hasAttribute('disabled')) {
+                expressButton.removeAttribute('disabled');
+            }
+            if (buyButton.hasAttribute('disabled')) {
+                expressButton.setAttribute('disabled', 'disabled');
+            }
+        })
     }
 
     /**

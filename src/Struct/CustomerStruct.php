@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Struct;
 
+use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Shopware\Core\Framework\Struct\Struct;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
@@ -143,7 +144,7 @@ class CustomerStruct extends Struct
 
 
         $fullCustomField = [
-            'mollie_payments' => $mollieData
+            CustomFieldsInterface::MOLLIE_KEY => $mollieData
         ];
 
         # now either reset our old customer ID

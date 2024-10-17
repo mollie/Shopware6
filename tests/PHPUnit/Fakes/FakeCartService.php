@@ -73,4 +73,10 @@ class FakeCartService implements CartServiceInterface
     {
         // TODO: Implement updatePaymentMethod() method.
     }
+
+    public function persistCart(Cart $cart, SalesChannelContext $context): Cart
+    {
+        // TODO: Implement persistCart() method.
+    }
+
 }
