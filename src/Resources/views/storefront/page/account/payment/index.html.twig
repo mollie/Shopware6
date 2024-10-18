@@ -4,7 +4,9 @@
     {% if mollie_applepay_enabled %}
         <div id="mollie_hide_applepay" data-mollie-template-applepay-account data-mollie-apple-pay-payment-method-options="{{ {
             shopUrl: seoUrl('frontend.home.page'),
-            hideAlways: true
+            hideAlways: true,
+            applePayId: apple_pay_payment_method_id,
+            hideApplePayOption: false
         }
         |json_encode }}"></div>
     {% endif %}

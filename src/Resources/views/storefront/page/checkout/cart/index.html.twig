@@ -1,5 +1,19 @@
 {% sw_extends '@Storefront/storefront/page/checkout/cart/index.html.twig' %}
 
+{% block page_checkout_cart %}
+    {% if mollie_applepay_enabled %}
+        <div id="mollie_hide_applepay" data-mollie-template-applepay-account data-mollie-apple-pay-payment-method-options="{{ {
+            shopUrl: seoUrl('frontend.home.page'),
+            hideAlways: true,
+            applePayId: apple_pay_payment_method_id,
+            hideApplePayOption: true
+        }
+        |json_encode }}"></div>
+    {% endif %}
+
+    {{ parent() }}
+{% endblock %}
+
 {% block page_checkout_cart_shipping_costs_form_group_payment_method %}
     <div class="form-group">
         <label for="paymentMethodId">{{ "checkout.paymentMethod"|trans|sw_sanitize }}</label>
