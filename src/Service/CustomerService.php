@@ -746,9 +746,11 @@ class CustomerService implements CustomerServiceInterface
         $data->set('lastName', $shippingAddress->getLastName());
         $data->set('email', $shippingAddress->getEmail());
 
-        if ($acceptedDataProtection !== null) {
-            $data->set('acceptedDataProtection', $acceptedDataProtection);
+        $settings = $this->settingsService->getSettings($context->getSalesChannelId());
+        if ($settings->isRequireDataProtectionCheckbox()) {
+            $data->set('acceptedDataProtection', (bool)$acceptedDataProtection);
         }
+
 
 
         $shippingAddressData = new RequestDataBag();
