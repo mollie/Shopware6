@@ -19,13 +19,18 @@ class CartBackupService
      */
     private $cartService;
 
+    /**
+     * @var AbstractCartPerister 
+     */
+    private $cartPersister;
 
     /**
      * @param CartService $cartService
      */
-    public function __construct(CartService $cartService)
+    public function __construct(CartService $cartService, AbstractCartPerister $cartPersister)
     {
         $this->cartService = $cartService;
+        $this->cartPersister = $cartPersister;
     }
 
 
@@ -35,9 +40,12 @@ class CartBackupService
      */
     public function isBackupExisting(SalesChannelContext $context): bool
     {
-        $backupCart = $this->cartService->getCart(self::BACKUP_TOKEN, $context);
-
-        return ($backupCart->getLineItems()->count() > 0);
+        try {
+            $backupCart = $this->cartPersister->load(self::BACKUP_TOKEN, $context);
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     /**
