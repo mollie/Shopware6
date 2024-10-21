@@ -35,8 +35,8 @@
 
     {% block component_product_box_action_buy_paypal_express %}
         {% if paypalExpressVisible %}
-            {% block component_offcanvas_cart_actions_checkout_mollie_paypal_express_component %}
-                    <div class="mt-2">
+            {% block component_product_box_action_buy_paypal_express_component %}
+                    <div class="mt-2 mollie-paypal-express-plp">
                         {% include '@MolliePayments/mollie/component/paypal-express-button.twig' %}
                     </div>
             {% endblock %}

@@ -1,7 +1,7 @@
 import Plugin from '@shopware-storefront-sdk/plugin-system/plugin.class';
 import {MOLLIE_EXPRESS_CHECKOUT_EVENT} from './mollie-express-actions.plugin';
 import ExpressButtonsRepository from '../repository/ExpressButtonsRepository';
-import PrivacyNoteElement from '../repository/PrivacyNoteElement';
+import {PrivacyNoteElement} from '../repository/PrivacyNoteElement';
 
 export default class PayPalExpressPlugin extends Plugin {
 

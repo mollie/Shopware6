@@ -49,15 +49,8 @@ export default class PDPRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getPayPalExpressButton(){
-        return cy.get('#molliePayPalExpressProductDetailForm button[name="paypal-express"]');
+        return cy.get('.mollie-paypal-express-pdp button[name="paypal-express"]');
     }
 
-    /**
-     *
-     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
-     */
-    getPayPalExpressQuantity(){
-        return cy.get('#molliePayPalExpressProductDetailForm input[name="quantity"]');
-    }
 
 }

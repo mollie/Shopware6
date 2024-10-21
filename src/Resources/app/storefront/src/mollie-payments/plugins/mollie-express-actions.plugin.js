@@ -1,5 +1,5 @@
 import Plugin from '../Plugin';
-import PrivacyNoteElement from '../repository/PrivacyNoteElement';
+import {PrivacyNoteElement} from '../repository/PrivacyNoteElement';
 import BuyButtonRepository from '../repository/BuyButtonRepository';
 import ExpressButtonsRepository from '../repository/ExpressButtonsRepository';
 import ExpressAddToCart from '../services/ExpressAddToCart';
@@ -29,6 +29,8 @@ export class MollieExpressActions extends Plugin {
         if (expressButtons.length === 0) {
             return;
         }
+        const privacyNote = new PrivacyNoteElement();
+        privacyNote.observeButtons();
 
         const buyButtonRepository = new BuyButtonRepository();
 
@@ -63,9 +65,11 @@ export class MollieExpressActions extends Plugin {
                     button.classList.add('d-none');
                     button.removeEventListener('click', this.onButtonClick)
                 }
+
             })
 
         });
+
     }
 
     async onButtonClick(event) {

@@ -44,7 +44,7 @@ class PayPalExpressConfig
         $structData['paypalExpressEnabled'] = $this->isEnabled();
         $structData['paypalExpressButtonStyle'] = $structData['paypalExpressButtonStyle'] ?? $this->buttonStyle;
         $structData['paypalExpressButtonShape'] = $structData['paypalExpressButtonShape'] ?? $this->buttonShape;
-        $structData['paypalExpressRestrictions'] = $structData['paypalExpressRestrictions'] ?? $this->restrictions;
+        $structData['paypalExpressRestrictions'] = array_unique(array_merge($structData['paypalExpressRestrictions'] ?? [], $this->restrictions));
         return $structData;
     }
 }

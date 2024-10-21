@@ -30,6 +30,6 @@ export default class ListingRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getPayPalExpressButton(){
-        return cy.get('.molliePayPalExpressProductListingForm button[name="paypal-express"]')
+        return cy.get('.mollie-paypal-express-plp button[name="paypal-express"]')
     }
 }

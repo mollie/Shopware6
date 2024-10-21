@@ -12,7 +12,7 @@
 
     {% if paypalExpressVisible %}
         {% block page_checkout_address_mollie_paypal_express_component %}
-            <div class="mt-3 mb-3">
+            <div class="mt-3 mb-3 mollie-paypal-express-register">
                 {% include '@MolliePayments/mollie/component/paypal-express-button.twig' with {cols: 'col-5'} %}
             </div>
         {% endblock %}

@@ -59,7 +59,7 @@
     {% block page_product_detail_buy_container_paypal_express %}
         {% if paypalExpressVisible %}
             {% block page_product_detail_buy_container_mollie_paypal_express_component %}
-                <div class="row g-2 form-row mt-2 justify-content-end">
+                <div class="row g-2 form-row mt-2 justify-content-end mollie-paypal-express-pdp">
                     {% include '@MolliePayments/mollie/component/paypal-express-button.twig' with {cols: 'col-8'} %}
                 </div>
             {% endblock %}

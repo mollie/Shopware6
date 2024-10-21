@@ -44,10 +44,6 @@ describe('Paypal Express - UI Tests', () => {
             cy.visit('/');
             topMenu.clickOnSecondCategory();
             listing.clickOnFirstProduct();
-            const quantity = 5;
-            pdp.setQuantity(quantity);
-
-            repoPDP.getPayPalExpressQuantity().should('have.value',quantity);
 
             const button = repoPDP.getPayPalExpressButton();
             button.should('be.visible');

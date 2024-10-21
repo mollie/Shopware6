@@ -1,19 +1,19 @@
 export default class BuyElementRepository {
-    find(button) {
-        let buyElementContainer = button.closest('.product-action');
+    find(target) {
+        let buyElementContainer = target.closest('.product-action');
 
         if (buyElementContainer === null) {
-            buyElementContainer = button.closest('.product-detail-form-container');
+            buyElementContainer = target.closest('.product-detail-form-container');
         }
         if(buyElementContainer === null){
-            buyElementContainer = button.closest('.offcanvas-cart-actions');
+            buyElementContainer = target.closest('.offcanvas-cart-actions');
         }
 
         if(buyElementContainer === null){
-            buyElementContainer = button.closest('.checkout-aside-container');
+            buyElementContainer = target.closest('.checkout-aside-container');
         }
         if(buyElementContainer === null){
-            buyElementContainer = button.closest('.checkout-main');
+            buyElementContainer = target.closest('.checkout-main');
         }
 
         return buyElementContainer;

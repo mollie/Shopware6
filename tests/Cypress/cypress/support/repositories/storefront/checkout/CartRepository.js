@@ -13,6 +13,6 @@ export default class CartRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getPayPalExpressButton(){
-        return cy.get('#molliePayPalExpressCartForm button[name="paypal-express"]');
+        return cy.get('.mollie-paypal-express-cart button[name="paypal-express"]');
     }
 }
