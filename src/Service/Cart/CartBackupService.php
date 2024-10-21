@@ -12,7 +12,7 @@ class CartBackupService
     /**
      *
      */
-    private const BACKUP_TOKEN = 'mollie_backup';
+    private const BACKUP_TOKEN = 'mollie_backup_%s';
 
     /**
      * @var CartService
@@ -35,11 +35,14 @@ class CartBackupService
      */
     public function isBackupExisting(SalesChannelContext $context): bool
     {
-        $backupCart = $this->cartService->getCart(self::BACKUP_TOKEN, $context);
-
+        $backupCart = $this->cartService->getCart($this->getToken($context), $context);
         return ($backupCart->getLineItems()->count() > 0);
     }
 
+    private function getToken(SalesChannelContext $context):string
+    {
+        return sprintf(self::BACKUP_TOKEN, $context->getToken());
+    }
     /**
      * @param SalesChannelContext $context
      */
@@ -47,11 +50,8 @@ class CartBackupService
     {
         $originalCart = $this->cartService->getCart($context->getToken(), $context);
 
-        # additional language shops do not have a name, so make sure it has a string cast
-        $salesChannelName = (string)$context->getSalesChannel()->getName();
-
         # create new cart with our backup token
-        $newCart = $this->cartService->createNew(self::BACKUP_TOKEN);
+        $newCart = $this->cartService->createNew($this->getToken($context));
 
         # assign our items to the backup
         # this is the only thing we really need to backup at this stage.
@@ -89,7 +89,7 @@ class CartBackupService
      */
     public function clearBackup(SalesChannelContext $context): void
     {
-        $backupCart = $this->cartService->getCart(self::BACKUP_TOKEN, $context);
+        $backupCart = $this->cartService->getCart($this->getToken($context), $context);
 
         # removing does not really work
         # but we can set the item count to 0, which means "not existing" for us
