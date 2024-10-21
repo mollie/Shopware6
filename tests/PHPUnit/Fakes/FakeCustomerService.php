@@ -84,7 +84,7 @@ final class FakeCustomerService implements CustomerServiceInterface
         return [];
     }
 
-    public function createGuestAccount(AddressStruct $shippingAddress, string $paymentMethodId, int $acceptedDataProtection, SalesChannelContext $context, ?AddressStruct $billingAddress = null): ?CustomerEntity{
+    public function createGuestAccount(AddressStruct $shippingAddress, string $paymentMethodId,  SalesChannelContext $context,?int $acceptedDataProtection, ?AddressStruct $billingAddress = null): ?CustomerEntity{
         return null;
     }
 

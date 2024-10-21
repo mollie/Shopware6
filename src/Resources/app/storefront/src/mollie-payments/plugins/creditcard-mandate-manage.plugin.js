@@ -1,5 +1,5 @@
 import HttpClient from '../services/HttpClient';
-import Plugin from "../Plugin";
+import Plugin from '../Plugin';
 
 /**
  * This plugin manage the credit card mandate of customer

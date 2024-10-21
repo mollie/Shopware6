@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Controller\Storefront\PaypalExpress;
 use Kiener\MolliePayments\Components\PaypalExpress\PayPalExpress;
 use Kiener\MolliePayments\Service\CartService;
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
+use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\Address\AddressStruct;
 use Kiener\MolliePayments\Traits\Storefront\RedirectTrait;
 use Mollie\Api\Exceptions\ApiException;
@@ -40,6 +41,7 @@ class PaypalExpressControllerBase extends StorefrontController
      * @var LoggerInterface
      */
     private $logger;
+    private SettingsService $settingsService;
 
 
     /**
@@ -48,12 +50,13 @@ class PaypalExpressControllerBase extends StorefrontController
      * @param RouterInterface $router
      * @param LoggerInterface $logger
      */
-    public function __construct(PayPalExpress $paypalExpress, CartService $cartService, RouterInterface $router, LoggerInterface $logger)
+    public function __construct(PayPalExpress $paypalExpress, CartService $cartService, RouterInterface $router, SettingsService $settingsService, LoggerInterface $logger)
     {
         $this->paypalExpress = $paypalExpress;
         $this->cartService = $cartService;
         $this->router = $router;
         $this->logger = $logger;
+        $this->settingsService = $settingsService;
     }
 
     /**
@@ -64,16 +67,21 @@ class PaypalExpressControllerBase extends StorefrontController
      */
     public function startCheckout(Request $request, SalesChannelContext $context): Response
     {
-        $productId = $request->get('productId');
-        $quantity = (int)$request->get('quantity', 1);
-        if ($request->isMethod(Request::METHOD_POST) && $productId !== null) {
-            $this->cartService->addProduct($productId, $quantity, $context);
+        $redirectUrl = $this->getCheckoutCartPage($this->router);
+
+        $settings = $this->settingsService->getSettings($context->getSalesChannelId());
+
+        if ($settings->isPaypalExpressEnabled() === false) {
+            $this->logger->error('Paypal Express is disabled');
+            return new RedirectResponse($redirectUrl);
         }
 
         $cart = $this->cartService->getCalculatedMainCart($context);
 
+
         $cartExtension = $cart->getExtension(CustomFieldsInterface::MOLLIE_KEY);
         $oldSessionId = null;
+
         if ($cartExtension instanceof ArrayStruct) {
             $oldSessionId = $cartExtension[CustomFieldsInterface::PAYPAL_EXPRESS_SESSION_ID_KEY] ?? null;
         }
@@ -83,18 +91,25 @@ class PaypalExpressControllerBase extends StorefrontController
         } else {
             $session = $this->paypalExpress->startSession($cart, $context);
 
-            $cartExtension = new ArrayStruct([
+            $cartExtension = [
                 CustomFieldsInterface::PAYPAL_EXPRESS_SESSION_ID_KEY => $session->id
-            ]);
-            $cart->addExtension(CustomFieldsInterface::MOLLIE_KEY, $cartExtension);
+            ];
 
+            if ($settings->isRequireDataProtectionCheckbox()) {
+                $cartExtension[CustomFieldsInterface::ACCEPTED_DATA_PROTECTION] = (bool)$request->get(CustomFieldsInterface::ACCEPTED_DATA_PROTECTION, false);
+            }
+
+            $cart->addExtension(CustomFieldsInterface::MOLLIE_KEY, new ArrayStruct($cartExtension));
 
             $this->cartService->persistCart($cart, $context);
         }
 
-        $redirectUrl = $session->getRedirectUrl();
-        if ($redirectUrl === null) {
-            $redirectUrl = $this->getCheckoutCartPage($this->router);
+        $sessionRedirect = $session->getRedirectUrl();
+        if ($sessionRedirect !== null) {
+            $this->logger->error('Paypal Express redirect URL is empty', [
+                'sessionId' => $session->id,
+            ]);
+            $redirectUrl = $sessionRedirect;
         }
 
         return new RedirectResponse($redirectUrl);
@@ -106,17 +121,30 @@ class PaypalExpressControllerBase extends StorefrontController
      */
     public function finishCheckout(SalesChannelContext $context): Response
     {
+        $returnUrl = $this->getCheckoutCartPage($this->router);
+
+        $settings = $this->settingsService->getSettings($context->getSalesChannelId());
+
+        if ($settings->isPaypalExpressEnabled() === false) {
+            $this->logger->error('Paypal Express is disabled');
+            return new RedirectResponse($returnUrl);
+        }
+
         $cart = $this->cartService->getCalculatedMainCart($context);
         $cartExtension = $cart->getExtension(CustomFieldsInterface::MOLLIE_KEY);
 
         $payPalExpressSessionId = null;
+        $acceptedDataProtection = null;
 
         if ($cartExtension instanceof ArrayStruct) {
             $payPalExpressSessionId = $cartExtension[CustomFieldsInterface::PAYPAL_EXPRESS_SESSION_ID_KEY] ?? null;
+            if ($settings->isRequireDataProtectionCheckbox()) {
+                $acceptedDataProtection = $cartExtension[CustomFieldsInterface::ACCEPTED_DATA_PROTECTION] ?? false;
+            }
         }
 
 
-        $returnUrl = $this->getCheckoutCartPage($this->router);
+
 
 
         if ($payPalExpressSessionId === null) {
@@ -134,7 +162,6 @@ class PaypalExpressControllerBase extends StorefrontController
             ]);
             return new RedirectResponse($returnUrl);
         }
-
 
 
         $methodDetails = $payPalExpressSession->methodDetails;
@@ -195,7 +222,6 @@ class PaypalExpressControllerBase extends StorefrontController
         }
 
 
-
         try {
             # we have to update the cart extension before a new user is created and logged in, otherwise the extension is not saved
             $cartExtension = new ArrayStruct([
@@ -209,14 +235,13 @@ class PaypalExpressControllerBase extends StorefrontController
 
 
             # create new account or find existing and login
-            $this->paypalExpress->prepareCustomer($shippingAddress, 1, $context, $billingAddress);
+            $this->paypalExpress->prepareCustomer($shippingAddress, $context, $acceptedDataProtection, $billingAddress);
         } catch (\Throwable $e) {
             $this->logger->error('Failed to create customer or cart', [
                 'message' => $e->getMessage(),
             ]);
             return new RedirectResponse($returnUrl);
         }
-
 
 
         $returnUrl = $this->getCheckoutConfirmPage($this->router);

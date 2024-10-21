@@ -31,4 +31,6 @@ interface CustomFieldsInterface
     public const PAYPAL_EXPRESS_SESSION_ID_KEY = 'mollie_ppe_session_id';
 
     public const PAYPAL_EXPRESS_AUTHENTICATE_ID = 'mollie_ppe_auth_id';
+
+    public const ACCEPTED_DATA_PROTECTION = 'acceptedDataProtection';
 }

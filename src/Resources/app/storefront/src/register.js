@@ -6,6 +6,7 @@ import MollieCreditCardMandateManage from './mollie-payments/plugins/creditcard-
 import MolliePosTerminalPlugin from './mollie-payments/plugins/pos-terminal.plugin';
 import PayPalExpressPlugin from './mollie-payments/plugins/paypal-express.plugin';
 import MollieBancomatPlugin from './mollie-payments/plugins/bancomat-plugin';
+import {MollieExpressActions} from './mollie-payments/plugins/mollie-express-actions.plugin';
 
 
 export default class MollieRegistration {
@@ -20,6 +21,7 @@ export default class MollieRegistration {
         // global plugins
         // -----------------------------------------------------------------------------
         // hide apple pay direct buttons across the whole shop, if not available
+        pluginManager.register('MollieExpressActions', MollieExpressActions);
         pluginManager.register('MollieApplePayDirect', MollieApplePayDirect);
 
 

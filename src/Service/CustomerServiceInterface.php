@@ -44,7 +44,7 @@ interface CustomerServiceInterface
      */
     public function getAddressArray($address, CustomerEntity $customer): array;
 
-    public function createGuestAccount(AddressStruct $shippingAddress, string $paymentMethodId, int $acceptedDataProtection, SalesChannelContext $context, ?AddressStruct $billingAddress = null): ?CustomerEntity;
+    public function createGuestAccount(AddressStruct $shippingAddress, string $paymentMethodId, SalesChannelContext $context, ?int $acceptedDataProtection, ?AddressStruct $billingAddress = null): ?CustomerEntity;
 
     public function getCountryId(string $countryCode, Context $context): ?string;
 

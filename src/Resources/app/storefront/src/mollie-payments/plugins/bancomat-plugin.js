@@ -1,4 +1,4 @@
-import Plugin from "../Plugin";
+import Plugin from '../Plugin';
 
 export default class MollieBancomatPlugin extends Plugin {
 

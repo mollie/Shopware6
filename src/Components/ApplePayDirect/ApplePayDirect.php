@@ -349,7 +349,7 @@ class ApplePayDirect
      * @throws \Exception
      * @return SalesChannelContext
      */
-    public function prepareCustomer(string $firstname, string $lastname, string $email, string $street, string $zipcode, string $city, string $countryCode, string $phone, string $paymentToken, int $acceptedDataProtection, SalesChannelContext $context): SalesChannelContext
+    public function prepareCustomer(string $firstname, string $lastname, string $email, string $street, string $zipcode, string $city, string $countryCode, string $phone, string $paymentToken, ?int $acceptedDataProtection, SalesChannelContext $context): SalesChannelContext
     {
         if (empty($paymentToken)) {
             throw new \Exception('PaymentToken not found!');
@@ -366,8 +366,8 @@ class ApplePayDirect
             $customer = $this->customerService->createGuestAccount(
                 $address,
                 $applePayID,
-                $acceptedDataProtection,
-                $context
+                $context,
+                $acceptedDataProtection
             );
 
             if (! $customer instanceof CustomerEntity) {

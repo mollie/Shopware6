@@ -1,6 +1,6 @@
 import HttpClient from '../services/HttpClient';
-import Plugin from "../Plugin";
-import ApplePaySessionFactory from "../services/ApplePaySessionFactory";
+import Plugin from '../Plugin';
+import ApplePaySessionFactory from '../services/ApplePaySessionFactory';
 
 export default class MollieApplePayDirect extends Plugin {
 
@@ -23,7 +23,7 @@ export default class MollieApplePayDirect extends Plugin {
         // we need to re-init all apple pay button
         // once the offcanvas is loaded (lazy) into the DOM
 
-        const pluginOffCanvasInstances = window.PluginManager.getPluginList().OffCanvasCart.get("instances");
+        const pluginOffCanvasInstances = window.PluginManager.getPluginList().OffCanvasCart.get('instances');
         if (pluginOffCanvasInstances.length > 0) {
             const pluginOffCanvas = pluginOffCanvasInstances[0];
             pluginOffCanvas.$emitter.subscribe('offCanvasOpened', me.initCurrentPage.bind(me));
@@ -192,8 +192,8 @@ export default class MollieApplePayDirect extends Plugin {
 
 
             const formData = new FormData(productForm);
-            formData.delete("redirectTo");
-            formData.append("isExpressCheckout", "1");
+            formData.delete('redirectTo');
+            formData.append('isExpressCheckout', '1');
 
 
             fetch(productForm.action, {

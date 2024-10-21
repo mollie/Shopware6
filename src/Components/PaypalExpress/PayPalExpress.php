@@ -155,7 +155,7 @@ class PayPalExpress
      * @throws \Exception
      * @return SalesChannelContext
      */
-    public function prepareCustomer(AddressStruct $shippingAddress, int $acceptedDataProtection, SalesChannelContext $context, ?AddressStruct $billingAddress = null): SalesChannelContext
+    public function prepareCustomer(AddressStruct $shippingAddress, SalesChannelContext $context, ?int $acceptedDataProtection, ?AddressStruct $billingAddress = null): SalesChannelContext
     {
         $updateShippingAddress = true;
         $paypalExpressId = $this->getActivePaypalExpressID($context);
@@ -176,8 +176,8 @@ class PayPalExpress
                 $customer = $this->customerService->createGuestAccount(
                     $shippingAddress,
                     $paypalExpressId,
-                    $acceptedDataProtection,
                     $context,
+                    $acceptedDataProtection,
                     $billingAddress
                 );
             }

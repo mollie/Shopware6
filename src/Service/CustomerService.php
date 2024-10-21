@@ -734,7 +734,7 @@ class CustomerService implements CustomerServiceInterface
         return $this->customerRepository->upsert([$customer], $context);
     }
 
-    public function createGuestAccount(AddressStruct $shippingAddress, string $paymentMethodId, int $acceptedDataProtection, SalesChannelContext $context, ?AddressStruct $billingAddress = null): ?CustomerEntity
+    public function createGuestAccount(AddressStruct $shippingAddress, string $paymentMethodId, SalesChannelContext $context, ?int $acceptedDataProtection, ?AddressStruct $billingAddress = null): ?CustomerEntity
     {
         $countryId = $this->getCountryId($shippingAddress->getCountryCode(), $context->getContext());
         $salutationId = $this->getSalutationId($context->getContext());
@@ -745,7 +745,11 @@ class CustomerService implements CustomerServiceInterface
         $data->set('firstName', $shippingAddress->getFirstName());
         $data->set('lastName', $shippingAddress->getLastName());
         $data->set('email', $shippingAddress->getEmail());
-        $data->set('acceptedDataProtection', $acceptedDataProtection);
+
+        if ($acceptedDataProtection !== null) {
+            $data->set('acceptedDataProtection', $acceptedDataProtection);
+        }
+
 
         $shippingAddressData = new RequestDataBag();
         $shippingAddressData->set('firstName', $shippingAddress->getFirstName());
