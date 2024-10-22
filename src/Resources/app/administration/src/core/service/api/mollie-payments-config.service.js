@@ -3,17 +3,13 @@ const ApiService = Shopware.Classes.ApiService;
 
 export default class MolliePaymentsConfigService extends ApiService {
 
-
-    /**
-     *
-     * @param httpClient
-     * @param loginService
-     * @param currentLocale
-     */
     constructor(httpClient, loginService, currentLocale) {
         super(httpClient, loginService, 'mollie');
 
         this.currentLocale = currentLocale;
+        this.cache = {};
+        // Cache expiration time in milliseconds (e.g., 60 seconds)
+        this.cacheExpirationTime = 60000;
     }
 
     /**
@@ -78,6 +74,16 @@ export default class MolliePaymentsConfigService extends ApiService {
      * @returns {*}
      */
     getRefundManagerConfig(salesChannelId, orderId) {
+        const cacheKey = `${salesChannelId}_${orderId}`;
+
+        const now = new Date().getTime();
+        const cachedEntry = this.cache[cacheKey];
+
+        if (cachedEntry && (now - cachedEntry.timestamp < this.cacheExpirationTime)) {
+            return Promise.resolve(cachedEntry.data);
+        }
+
+        // If there's no valid cache, make the API request
         return this.httpClient
             .post(
                 `_action/${this.getApiBasePath()}/config/refund-manager`,
@@ -89,7 +95,14 @@ export default class MolliePaymentsConfigService extends ApiService {
                     headers: this.getBasicHeaders(),
                 }
             ).then((response) => {
-                return ApiService.handleResponse(response);
+                const responseData = ApiService.handleResponse(response);
+
+                this.cache[cacheKey] = {
+                    data: responseData,
+                    timestamp: now
+                };
+
+                return responseData;
             });
     }
 
