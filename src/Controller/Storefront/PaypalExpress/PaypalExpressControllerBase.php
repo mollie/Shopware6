@@ -106,9 +106,6 @@ class PaypalExpressControllerBase extends StorefrontController
 
         $sessionRedirect = $session->getRedirectUrl();
         if ($sessionRedirect !== null) {
-            $this->logger->error('Paypal Express redirect URL is empty', [
-                'sessionId' => $session->id,
-            ]);
             $redirectUrl = $sessionRedirect;
         }
 

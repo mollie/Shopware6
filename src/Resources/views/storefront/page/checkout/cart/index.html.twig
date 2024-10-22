@@ -31,7 +31,7 @@
 
     {% if applePayVisible %}
         {% block page_checkout_aside_actions_apple_direct_component %}
-            <div class="mt-2 js-apple-pay-container mollie-apple-pay-direct-cart">
+            <div class="mt-2 js-apple-pay-container mollie-apple-pay-direct-cart d-none">
                 {% include '@MolliePayments/mollie/component/apple-pay-direct-button.twig' %}
             </div>
         {% endblock %}

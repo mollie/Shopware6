@@ -112,8 +112,18 @@ stryker: ##2 Starts the Stryker Jest Mutation Tests
 	@# cd ./src/Resources/app/storefront && ./node_modules/.bin/stryker run .stryker.conf.json
 
 eslint: ##2 Starts the ESLinter
+ifndef mode
 	cd ./src/Resources/app/administration && ./node_modules/.bin/eslint --config ./.eslintrc.json ./src
 	cd ./src/Resources/app/storefront && ./node_modules/.bin/eslint --config ./.eslintrc.json ./src
+endif
+ifeq ($(mode), no-dry-run)
+	cd ./src/Resources/app/administration && ./node_modules/.bin/eslint --config ./.eslintrc.json ./src --fix
+	cd ./src/Resources/app/storefront && ./node_modules/.bin/eslint --config ./.eslintrc.json ./src --fix
+endif
+
+
+
+
 
 stylelint: ##2 Starts the Stylelinter
 	cd ./src/Resources/app/administration && ./node_modules/.bin/stylelint --allow-empty-input ./src/**/*.scss
@@ -141,13 +151,13 @@ pr: ##2 Prepares everything for a Pull Request
 	@make phpmin -B
 	@make stan -B
 	@make phpunit -B
-	@make infection -B
 	@make jest -B
-	@make stryker -B
-	@make eslint -B
+	@make eslint mode=no-dry-run -B
 	@make stylelint -B
 	@make configcheck -B
 	@make snippetcheck -B
+	@make stryker -B
+	@make infection -B
 
 # -------------------------------------------------------------------------------------------------
 

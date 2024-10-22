@@ -1,7 +1,7 @@
 import Plugin from '@shopware-storefront-sdk/plugin-system/plugin.class';
-import {MOLLIE_EXPRESS_CHECKOUT_EVENT} from './mollie-express-actions.plugin';
 import ExpressButtonsRepository from '../repository/ExpressButtonsRepository';
 import {PrivacyNoteElement} from '../repository/PrivacyNoteElement';
+import {MOLLIE_BIND_EXPRESS_EVENTS} from './mollie-express-actions.plugin';
 
 export default class PayPalExpressPlugin extends Plugin {
 
@@ -26,14 +26,21 @@ export default class PayPalExpressPlugin extends Plugin {
             return;
         }
 
+        document.dispatchEvent(new CustomEvent(MOLLIE_BIND_EXPRESS_EVENTS, {detail: expressButtons}));
+
         expressButtons.forEach((button) => {
-            button.addEventListener(MOLLIE_EXPRESS_CHECKOUT_EVENT, this.onExpressCheckout)
+            button.addEventListener('click', this.onExpressCheckout)
         });
 
     }
 
     onExpressCheckout(event) {
+
         const clickedButton = event.target;
+        if (!clickedButton.classList.contains('processed')) {
+            return;
+        }
+
 
         const submitUrl = clickedButton.getAttribute('data-form-action');
 

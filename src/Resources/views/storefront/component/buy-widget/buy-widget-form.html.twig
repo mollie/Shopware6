@@ -49,7 +49,7 @@
 
         {% if applePayVisible %}
             {% block page_product_detail_buy_container_apple_direct_component %}
-                <div class="row g-2 form-row mt-2 justify-content-end js-apple-pay-container mollie-apple-pay-direct-pdp">
+                <div class="row g-2 form-row mt-2 justify-content-end js-apple-pay-container mollie-apple-pay-direct-pdp d-none">
                     {% include '@MolliePayments/mollie/component/apple-pay-direct-button.twig' with {cols: 'col-8'} %}
                 </div>
             {% endblock %}

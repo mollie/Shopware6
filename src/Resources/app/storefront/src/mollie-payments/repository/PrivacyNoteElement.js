@@ -1,5 +1,5 @@
 import BuyElementRepository from './BuyElementRepository';
-import ExpressButtonsRepository from "./ExpressButtonsRepository";
+import ExpressButtonsRepository from './ExpressButtonsRepository';
 
 export const TOGGLE_PRIVACY_NOTE_EVENT = 'TogglePrivacyNote';
 
@@ -45,7 +45,13 @@ export class PrivacyNoteElement {
 
             const buyElement = buyElementRepository.find(privacyNote);
             const expressButtonsRepository = new ExpressButtonsRepository(buyElement);
-            const expressButtons = expressButtonsRepository.findAll();
+            const expressButtons = expressButtonsRepository.findAll(':not(.d-none)');
+
+
+            if(expressButtons.length === 0){
+                privacyNote.classList.add('d-none');
+            }
+
 
             expressButtons.forEach((expressButton) => {
 
@@ -55,14 +61,14 @@ export class PrivacyNoteElement {
 
                     mutations.forEach((mutation) => {
 
-                       if(mutation.target.classList.contains('d-none')){
-                           visibleExpressButtons--;
-                       }
+                        if(mutation.target.classList.contains('d-none')){
+                            visibleExpressButtons--;
+                        }
 
                     });
 
 
-                    if(visibleExpressButtons === 0){
+                    if(visibleExpressButtons <= 0){
                         privacyNote.classList.add('d-none');
                     }
 

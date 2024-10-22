@@ -1,10 +1,9 @@
 import Plugin from '../Plugin';
 import {PrivacyNoteElement} from '../repository/PrivacyNoteElement';
 import BuyButtonRepository from '../repository/BuyButtonRepository';
-import ExpressButtonsRepository from '../repository/ExpressButtonsRepository';
 import ExpressAddToCart from '../services/ExpressAddToCart';
 
-export const MOLLIE_EXPRESS_CHECKOUT_EVENT = 'MollieStartExpressCheckout';
+export const MOLLIE_BIND_EXPRESS_EVENTS = 'BindExpressEvents';
 
 export class MollieExpressActions extends Plugin {
 
@@ -23,60 +22,72 @@ export class MollieExpressActions extends Plugin {
     }
 
     bindEvents() {
-        const expressButtonsRepository = new ExpressButtonsRepository();
-        const expressButtons = expressButtonsRepository.findAll();
 
-        if (expressButtons.length === 0) {
-            return;
-        }
         const privacyNote = new PrivacyNoteElement();
         privacyNote.observeButtons();
 
-        const buyButtonRepository = new BuyButtonRepository();
+        document.addEventListener(MOLLIE_BIND_EXPRESS_EVENTS, (event) => {
+            const expressButtons = event.detail;
 
-        expressButtons.forEach((button) => {
-
-
-            button.classList.remove('d-none');
-            button.addEventListener('click', this.onButtonClick)
-
-            const buyButton = buyButtonRepository.find(button);
-            if (!(buyButton instanceof HTMLButtonElement)) {
+            if (expressButtons.length === 0) {
                 return;
             }
 
-            if (buyButton.hasAttribute('disabled')) {
-                button.classList.add('d-none');
-                button.removeEventListener('click', this.onButtonClick)
-            }
 
-            const buyButtonForm = buyButton.closest('form');
-            if (!(buyButtonForm instanceof HTMLFormElement)) {
-                return;
-            }
 
-            buyButtonForm.addEventListener('change', () => {
+            const buyButtonRepository = new BuyButtonRepository();
+
+            expressButtons.forEach((button) => {
+
 
                 button.classList.remove('d-none');
                 button.addEventListener('click', this.onButtonClick)
 
-                if (buyButton.hasAttribute('disabled')) {
+                const buyButton = buyButtonRepository.find(button);
+                if (!(buyButton instanceof HTMLButtonElement)) {
+                    return;
+                }
 
+                if (buyButton.hasAttribute('disabled')) {
                     button.classList.add('d-none');
                     button.removeEventListener('click', this.onButtonClick)
                 }
 
-            })
+                const buyButtonForm = buyButton.closest('form');
+                if (!(buyButtonForm instanceof HTMLFormElement)) {
+                    return;
+                }
+
+                buyButtonForm.addEventListener('change', () => {
+
+                    button.classList.remove('d-none');
+                    button.addEventListener('click', this.onButtonClick)
+
+                    if (buyButton.hasAttribute('disabled')) {
+
+                        button.classList.add('d-none');
+                        button.removeEventListener('click', this.onButtonClick)
+                    }
+
+                })
+
+            });
 
         });
-
     }
 
-    async onButtonClick(event) {
+    onButtonClick(event) {
+
         let target = event.target;
         if (!(target instanceof HTMLButtonElement)) {
             target = target.closest('button');
         }
+
+        if (target.classList.contains('processed')) {
+            return;
+        }
+
+
 
         const privacyNote = new PrivacyNoteElement();
 
@@ -89,11 +100,15 @@ export class MollieExpressActions extends Plugin {
                 return;
             }
         }
-        const mollieEvent = new Event(MOLLIE_EXPRESS_CHECKOUT_EVENT);
+
 
         const expressAddToCart = new ExpressAddToCart();
-        await expressAddToCart.addItemToCart(target).then(() => {
-            target.dispatchEvent(mollieEvent);
-        });
+
+        expressAddToCart.addItemToCart(target);
+
+        target.classList.add('processed');
+        const mollieEvent = new event.constructor(event.type, event);
+        target.dispatchEvent(mollieEvent);
+        target.classList.remove('processed');
     }
 }

@@ -19,7 +19,7 @@ export default class ApplePaySessionFactory {
      * @param shopSlug
      * @param withPhone
      * @param dataProtection
-     * @returns {ApplePaySession}
+     * @returns ApplePaySession
      */
     create(isProductMode, country, currency, withPhone, shopSlug, dataProtection) {
 
