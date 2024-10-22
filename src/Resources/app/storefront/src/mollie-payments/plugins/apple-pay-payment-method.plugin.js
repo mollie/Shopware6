@@ -1,4 +1,3 @@
-import HttpClient from '../services/HttpClient';
 import Plugin from '../Plugin';
 
 export default class MollieApplePayPaymentMethod extends Plugin {
@@ -8,10 +7,8 @@ export default class MollieApplePayPaymentMethod extends Plugin {
      */
     init() {
 
-        const me = this;
 
         const hideAlways = this.options.hideAlways;
-        const shopUrl = this.getShopUrl();
 
         // if we don't want to always hide it,
         // then only hide it, if Apple Pay is not active

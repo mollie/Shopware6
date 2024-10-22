@@ -14,7 +14,6 @@ use Kiener\MolliePayments\Handler\Method\BlikPayment;
 use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
 use Kiener\MolliePayments\Handler\Method\EpsPayment;
 use Kiener\MolliePayments\Handler\Method\GiftCardPayment;
-use Kiener\MolliePayments\Handler\Method\GiroPayPayment;
 use Kiener\MolliePayments\Handler\Method\iDealPayment;
 use Kiener\MolliePayments\Handler\Method\In3Payment;
 use Kiener\MolliePayments\Handler\Method\IngHomePayPayment;
@@ -124,11 +123,7 @@ class PaymentMethodService
         # we still need the min the database
         # but always disable them :)
         $this->disablePaymentMethod(IngHomePayPayment::class, $context);
-        $this->disablePaymentMethod(GiroPayPayment::class, $context);
-        $this->disablePaymentMethod(KlarnaPayLaterPayment::class, $context);
-        $this->disablePaymentMethod(KlarnaPayNowPayment::class, $context);
-        $this->disablePaymentMethod(KlarnaSliceItPayment::class, $context);
-        $this->disablePaymentMethod(SofortPayment::class, $context);
+
         if (! $this->payPalExpressConfig->isEnabled()) {
             $this->disablePaymentMethod(PayPalExpressPayment::class, $context);
         }
@@ -444,14 +439,14 @@ class PaymentMethodService
             GiftCardPayment::class,
             iDealPayment::class,
             KbcPayment::class,
-            // KlarnaPayLaterPayment::class,
-            // KlarnaPayNowPayment::class,
-            // KlarnaSliceItPayment::class,
+            KlarnaPayLaterPayment::class,
+            KlarnaPayNowPayment::class,
+            KlarnaSliceItPayment::class,
             KlarnaOnePayment::class,
             PayPalPayment::class,
             PaySafeCardPayment::class,
             Przelewy24Payment::class,
-            // SofortPayment::class,
+            SofortPayment::class,
             VoucherPayment::class,
             In3Payment::class,
             PosPayment::class,
