@@ -5,31 +5,45 @@
 
     {{ parent() }}
 
+    {% set productPrice = 0 %}
+
+    {% if product.calculatedPrices|length == 1 %}
+        {% set productPrice = product.calculatedPrices.first.unitPrice %}
+    {% else %}
+        {% set productPrice = product.calculatedPrice.unitPrice %}
+        {% if listPrice.percentage > 0 %}
+            {% set productPrice = listPrice.price %}
+        {% endif %}
+    {% endif %}
+
+    {% set applePayVisible = mollie_applepaydirect_enabled and ('plp' not in mollie_applepaydirect_restrictions) and productPrice > 0  %}
+    {% set paypalExpressVisible = mollie_paypalexpress_enabled and ('plp' not in mollie_paypalexpress_restrictions) and productPrice > 0 %}
+    {% set noticeVisible = applePayVisible or paypalExpressVisible %}
+
+    {% sw_include '@MolliePayments/mollie/component/express-privacy-notice.html.twig' with {visible:noticeVisible} %}
+
     {% block component_product_box_action_buy_apple_direct %}
 
-        {% set productPrice = 0 %}
-
-        {% if product.calculatedPrices|length == 1 %}
-            {% set productPrice = product.calculatedPrices.first.unitPrice %}
-        {% else %}
-            {% set productPrice = product.calculatedPrice.unitPrice %}
-            {% if listPrice.percentage > 0 %}
-                {% set productPrice = listPrice.price %}
-            {% endif %}
-        {% endif %}
-
-        {% if mollie_applepaydirect_enabled and ('plp' not in mollie_applepaydirect_restrictions) and productPrice > 0 %}
+        {% if applePayVisible %}
             {% block component_product_box_action_buy_apple_direct_component %}
-                <div class="mt-2 d-none only-support-apple-pay js-apple-pay-container mollie-apple-pay-direct-listing">
+                <div class="mt-2 only-support-apple-pay js-apple-pay-container mollie-apple-pay-direct-listing d-none">
                     {% include '@MolliePayments/mollie/component/apple-pay-direct-button.twig' %}
                 </div>
             {% endblock %}
         {% endif %}
+    {% endblock %}
 
+    {% block component_product_box_action_buy_paypal_express %}
+        {% if paypalExpressVisible %}
+            {% block component_product_box_action_buy_paypal_express_component %}
+                    <div class="mt-2 mollie-paypal-express-plp">
+                        {% include '@MolliePayments/mollie/component/paypal-express-button.twig' %}
+                    </div>
+            {% endblock %}
+        {% endif %}
     {% endblock %}
 
 {% endblock %}
-
 
 
 {% block page_product_detail_product_buy_button %}

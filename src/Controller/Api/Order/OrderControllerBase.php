@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Controller\Api\Order;
 
+use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Service\OrderService;
 use Shopware\Core\Framework\Context;
@@ -56,7 +57,7 @@ class OrderControllerBase extends AbstractController
 
         $customFields = $order->getCustomFields();
 
-        $mollieOrderId = ($customFields !== null && isset($customFields['mollie_payments']['order_id'])) ? $customFields['mollie_payments']['order_id'] : null;
+        $mollieOrderId = ($customFields !== null && isset($customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY])) ? $customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY] : null;
 
         if (is_null($mollieOrderId)) {
             return $this->json([], 404);

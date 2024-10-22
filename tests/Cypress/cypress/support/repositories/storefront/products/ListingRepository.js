@@ -25,4 +25,11 @@ export default class ListingRepository {
         return cy.get('.mollie-apple-pay-direct-listing > div > .js-apple-pay');
     }
 
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getPayPalExpressButton(){
+        return cy.get('.mollie-paypal-express-plp button[name="paypal-express"]')
+    }
 }

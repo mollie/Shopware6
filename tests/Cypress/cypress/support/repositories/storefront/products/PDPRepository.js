@@ -44,4 +44,13 @@ export default class PDPRepository {
         return cy.get('.mollie-apple-pay-direct-pdp > div > .js-apple-pay');
     }
 
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getPayPalExpressButton(){
+        return cy.get('.mollie-paypal-express-pdp button[name="paypal-express"]');
+    }
+
+
 }

@@ -1,4 +1,4 @@
-import HttpClient from "./HttpClient";
+import HttpClient from './HttpClient';
 
 export default class ApplePaySessionFactory {
     /**
@@ -19,7 +19,7 @@ export default class ApplePaySessionFactory {
      * @param shopSlug
      * @param withPhone
      * @param dataProtection
-     * @returns {ApplePaySession}
+     * @returns ApplePaySession
      */
     create(isProductMode, country, currency, withPhone, shopSlug, dataProtection) {
 

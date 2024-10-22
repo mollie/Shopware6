@@ -22,6 +22,7 @@ use Kiener\MolliePayments\Service\DomainExtractor;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\ShopService;
+use Kiener\MolliePayments\Struct\Address\AddressStruct;
 use Mollie\Api\Exceptions\ApiException;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
@@ -251,7 +252,7 @@ class ApplePayDirect
     {
         # if we already have a backup cart, then do NOT backup again.
         # because this could backup our temp. apple pay cart
-        if (!$this->cartBackupService->isBackupExisting($context)) {
+        if (! $this->cartBackupService->isBackupExisting($context)) {
             $this->cartBackupService->backupCart($context);
         }
 
@@ -348,7 +349,7 @@ class ApplePayDirect
      * @throws \Exception
      * @return SalesChannelContext
      */
-    public function prepareCustomer(string $firstname, string $lastname, string $email, string $street, string $zipcode, string $city, string $countryCode, string $phone, string $paymentToken, int $acceptedDataProtection, SalesChannelContext $context): SalesChannelContext
+    public function prepareCustomer(string $firstname, string $lastname, string $email, string $street, string $zipcode, string $city, string $countryCode, string $phone, string $paymentToken, ?int $acceptedDataProtection, SalesChannelContext $context): SalesChannelContext
     {
         if (empty($paymentToken)) {
             throw new \Exception('PaymentToken not found!');
@@ -359,28 +360,24 @@ class ApplePayDirect
 
         # if we are not logged in,
         # then we have to create a new guest customer for our express order
-        if (!$this->customerService->isCustomerLoggedIn($context)) {
-            $customer = $this->customerService->createApplePayDirectCustomerIfNotExists(
-                $firstname,
-                $lastname,
-                $email,
-                $phone,
-                $street,
-                $zipcode,
-                $city,
-                $countryCode,
-                $acceptedDataProtection,
-                $context
+        if (! $this->customerService->isCustomerLoggedIn($context)) {
+            $address = new AddressStruct($firstname, $lastname, $email, $street, '', $zipcode, $city, $countryCode, $phone);
+
+            $customer = $this->customerService->createGuestAccount(
+                $address,
+                $applePayID,
+                $context,
+                $acceptedDataProtection
             );
 
-            if (!$customer instanceof CustomerEntity) {
+            if (! $customer instanceof CustomerEntity) {
                 throw new \Exception('Error when creating customer!');
             }
 
             # now start the login of our customer.
             # Our SalesChannelContext will be correctly updated after our
             # forward to the finish-payment page.
-            $this->customerService->customerLogin($customer, $context);
+            $this->customerService->loginCustomer($customer, $context);
         }
 
         # also (always) update our payment method to use Apple Pay for our cart
@@ -455,7 +452,7 @@ class ApplePayDirect
         $transactions = $order->getTransactions();
         $transaction = $transactions->last();
 
-        if (!$transaction instanceof OrderTransactionEntity) {
+        if (! $transaction instanceof OrderTransactionEntity) {
             throw new \Exception('Created Apple Pay Direct order has not OrderTransaction!');
         }
 

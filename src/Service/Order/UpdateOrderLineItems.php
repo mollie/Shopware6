@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Service\Order;
 
 use Kiener\MolliePayments\Repository\OrderLineItem\OrderLineItemRepositoryInterface;
+use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Types\OrderLineType;
@@ -57,7 +58,7 @@ class UpdateOrderLineItems
             $updateLines[] = [
                 'id' => $shopwareLine->getId(),
                 'customFields' => [
-                    'mollie_payments' => $originalCustomFields
+                    CustomFieldsInterface::MOLLIE_KEY => $originalCustomFields
                 ],
             ];
         }

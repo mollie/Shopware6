@@ -1,5 +1,6 @@
 
-MOLLIE_PHP_VERSION:=2.61.0
+#MOLLIE_PHP_VERSION:=v2.61.0
+MOLLIE_PHP_VERSION:=feature/add-sessions
 
 
 help:
@@ -9,7 +10,7 @@ help:
 
 install: ## Installs all production dependencies
 	rm -rf mollie
-	git clone -b v$(MOLLIE_PHP_VERSION) https://github.com/mollie/mollie-api-php.git mollie/mollie-api-php
+	git clone -b $(MOLLIE_PHP_VERSION) https://github.com/mollie/mollie-api-php.git mollie/mollie-api-php
 	rm -rf mollie/mollie-api-php/.git
 	rm -rf mollie/mollie-api-php/.github
 	rm -rf mollie/mollie-api-php/.gitattributes

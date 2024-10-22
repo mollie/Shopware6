@@ -18,7 +18,7 @@ class SettingsService implements PluginSettingsServiceInterface
 
     private const PHONE_NUMBER_FIELD = 'showPhoneNumberField';
 
-    private const REQUIRE_DATA_PROTECTION ='requireDataProtectionCheckbox';
+    private const REQUIRE_DATA_PROTECTION = 'requireDataProtectionCheckbox';
 
     private const PAYMENT_FINALIZE_TRANSACTION_TIME = 'paymentFinalizeTransactionTime';
     const LIVE_API_KEY = 'liveApiKey';
@@ -51,7 +51,12 @@ class SettingsService implements PluginSettingsServiceInterface
      * @var string
      */
     private $envCypressMode;
+    private PayPalExpressConfig $payPalExpressConfig;
 
+    /**
+     * @var array<string,MollieSettingStruct>
+     */
+    private array $cachedStructs = [];
 
     /**
      * @param SystemConfigService $systemConfigService
@@ -60,7 +65,7 @@ class SettingsService implements PluginSettingsServiceInterface
      * @param ?string $envDevMode
      * @param ?string $envCypressMode
      */
-    public function __construct(SystemConfigService $systemConfigService, SalesChannelRepositoryInterface $repoSalesChannels, ?string $envShopDomain, ?string $envDevMode, ?string $envCypressMode)
+    public function __construct(SystemConfigService $systemConfigService, SalesChannelRepositoryInterface $repoSalesChannels, PayPalExpressConfig $payPalExpressConfig, ?string $envShopDomain, ?string $envDevMode, ?string $envCypressMode)
     {
         $this->systemConfigService = $systemConfigService;
         $this->repoSalesChannels = $repoSalesChannels;
@@ -68,6 +73,7 @@ class SettingsService implements PluginSettingsServiceInterface
         $this->envShopDomain = (string)$envShopDomain;
         $this->envDevMode = (string)$envDevMode;
         $this->envCypressMode = (string)$envCypressMode;
+        $this->payPalExpressConfig = $payPalExpressConfig;
     }
 
     /**
@@ -78,11 +84,16 @@ class SettingsService implements PluginSettingsServiceInterface
      */
     public function getSettings(?string $salesChannelId = null): MollieSettingStruct
     {
+        $cacheKey = $salesChannelId ?? 'all';
+
+        if (isset($this->cachedStructs[$cacheKey])) {
+            return $this->cachedStructs[$cacheKey];
+        }
         $structData = [];
         /** @var array<mixed> $systemConfigData */
         $systemConfigData = $this->systemConfigService->get(self::SYSTEM_CONFIG_DOMAIN, $salesChannelId);
 
-        if (count($systemConfigData) !== 0) {
+        if (is_array($systemConfigData) && count($systemConfigData) > 0) {
             foreach ($systemConfigData as $key => $value) {
                 if (stripos($key, self::SYSTEM_CONFIG_DOMAIN) !== false) {
                     $structData[substr($key, strlen(self::SYSTEM_CONFIG_DOMAIN))] = $value;
@@ -94,18 +105,31 @@ class SettingsService implements PluginSettingsServiceInterface
 
         /** @var array<mixed> $coreSettings */
         $coreSettings = $this->systemConfigService->get(self::SYSTEM_CORE_LOGIN_REGISTRATION_CONFIG_DOMAIN, $salesChannelId);
+        if (is_array($coreSettings) && count($coreSettings) > 0) {
+            $structData[self::PHONE_NUMBER_FIELD_REQUIRED] = $coreSettings[self::PHONE_NUMBER_FIELD_REQUIRED] ?? false;
+            $structData[self::PHONE_NUMBER_FIELD] = $coreSettings[self::PHONE_NUMBER_FIELD] ?? false;
+            $structData[self::REQUIRE_DATA_PROTECTION] = $coreSettings[self::REQUIRE_DATA_PROTECTION] ?? false;
+        }
 
-        $structData[self::PHONE_NUMBER_FIELD_REQUIRED] = $coreSettings[self::PHONE_NUMBER_FIELD_REQUIRED] ?? false;
-
-        $structData[self::PHONE_NUMBER_FIELD] = $coreSettings[self::PHONE_NUMBER_FIELD] ?? false;
-
-        $structData[self::REQUIRE_DATA_PROTECTION] = $coreSettings[self::REQUIRE_DATA_PROTECTION] ?? false;
 
         /** @var array<mixed> $cartSettings */
         $cartSettings = $this->systemConfigService->get(self::SYSTEM_CORE_CART_CONFIG_DOMAIN, $salesChannelId);
-        $structData[self::PAYMENT_FINALIZE_TRANSACTION_TIME] = $cartSettings[self::PAYMENT_FINALIZE_TRANSACTION_TIME] ?? 1800;
+        if (is_array($cartSettings) && count($cartSettings) > 0) {
+            $structData[self::PAYMENT_FINALIZE_TRANSACTION_TIME] = $cartSettings[self::PAYMENT_FINALIZE_TRANSACTION_TIME] ?? 1800;
+        }
 
-        return (new MollieSettingStruct())->assign($structData);
+
+        /**
+         * TODO: remove this when we move to config
+         */
+        if ($this->payPalExpressConfig->isEnabled()) {
+            $structData = $this->payPalExpressConfig->assign($structData);
+        }
+
+
+        $this->cachedStructs[$cacheKey] = (new MollieSettingStruct())->assign($structData);
+
+        return $this->cachedStructs[$cacheKey];
     }
 
     /**

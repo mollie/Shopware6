@@ -1,4 +1,5 @@
 /* stylelint-disable selector-id-pattern, declaration-no-important */
+.mollie-express-button.d-none,
 .js-apple-pay .d-none,
 .js-apple-pay-container .d-none,
 .mollie-pos-terminals .d-none,
@@ -7,5 +8,7 @@
 #mollieCreditCardMandateDeleteSuccess .d-none,
 .mollie-ideal-issuer .d-none {
     display: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 /* stylelint-enable selector-id-pattern, declaration-no-important */

@@ -228,12 +228,12 @@ Component.override('sw-order-detail-general', {
          *
          */
         copyPaymentUrlToClipboard() {
-            let fallback = async function(e) {
+            const fallback = async function(e) {
                 await navigator.clipboard.writeText(e)
             };
 
             // eslint-disable-next-line no-undef
-            let clipboard = typeof Shopware.Utils.dom.copyToClipboard === 'function' ? Shopware.Utils.dom.copyToClipboard : fallback;
+            const clipboard = typeof Shopware.Utils.dom.copyToClipboard === 'function' ? Shopware.Utils.dom.copyToClipboard : fallback;
             // eslint-disable-next-line no-undef
             clipboard(this.molliePaymentUrl);
             this.molliePaymentUrlCopied = true;

@@ -8,4 +8,11 @@ export default class CartRepository {
         return cy.get('.mollie-apple-pay-direct-cart > div > .js-apple-pay');
     }
 
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getPayPalExpressButton(){
+        return cy.get('.mollie-paypal-express-cart button[name="paypal-express"]');
+    }
 }

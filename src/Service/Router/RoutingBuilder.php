@@ -193,6 +193,27 @@ class RoutingBuilder
     }
 
     /**
+     * @return string
+     */
+    public function buildPaypalExpressRedirectUrl(): string
+    {
+        $confirmPage = $this->router->generate('frontend.mollie.paypal-express.finish', [], $this->router::ABSOLUTE_URL);
+
+        return $confirmPage;
+    }
+
+    /**
+     * @return string
+     */
+    public function buildPaypalExpressCancelUrl(): string
+    {
+        $confirmPage = $this->router->generate('frontend.checkout.confirm.page', [], $this->router::ABSOLUTE_URL);
+
+        return $confirmPage;
+    }
+
+
+    /**
      * @param string $url
      * @return string
      */

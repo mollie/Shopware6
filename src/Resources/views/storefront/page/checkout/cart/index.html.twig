@@ -21,10 +21,26 @@
 
 {% block page_checkout_aside_actions %}
     {{ parent() }}
-    {% if mollie_applepaydirect_enabled and ('cart' not in mollie_applepaydirect_restrictions) %}
+
+    {% set applePayVisible =  mollie_applepaydirect_enabled and ('cart' not in mollie_applepaydirect_restrictions) %}
+    {% set paypalExpressVisible = mollie_paypalexpress_enabled and ('cart' not in mollie_paypalexpress_restrictions)  %}
+    {% set noticeVisible = applePayVisible or paypalExpressVisible %}
+
+    {% sw_include '@MolliePayments/mollie/component/express-privacy-notice.html.twig' with {visible:noticeVisible} %}
+
+
+    {% if applePayVisible %}
         {% block page_checkout_aside_actions_apple_direct_component %}
-            <div class="mt-2 js-apple-pay-container mollie-apple-pay-direct-cart">
+            <div class="mt-2 js-apple-pay-container mollie-apple-pay-direct-cart d-none">
                 {% include '@MolliePayments/mollie/component/apple-pay-direct-button.twig' %}
+            </div>
+        {% endblock %}
+    {% endif %}
+
+    {% if paypalExpressVisible %}
+        {% block page_checkout_aside_actions_mollie_paypal_express_component %}
+            <div class="mt-2 mollie-paypal-express-cart">
+                {% include '@MolliePayments/mollie/component/paypal-express-button.twig' %}
             </div>
         {% endblock %}
     {% endif %}

@@ -96,6 +96,7 @@ class CartService implements CartServiceInterface
         $this->swCartService->setCart($cart);
     }
 
+
     /**
      * @param Cart $cart
      * @return float
@@ -185,5 +186,10 @@ class CartService implements CartServiceInterface
         }
 
         $this->shippingAddressFaker->deleteFakeShippingAddress($customer, $context->getContext());
+    }
+
+    public function persistCart(Cart $cart, SalesChannelContext $context):Cart
+    {
+        return $this->swCartService->recalculate($cart, $context);
     }
 }

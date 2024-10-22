@@ -128,6 +128,13 @@
             <tag name="shopware.payment.method.async"/>
         </service>
 
+        <!-- PayPal Express PaymentHandler -->
+        <service id="Kiener\MolliePayments\Handler\Method\PayPalExpressPayment" class="Kiener\MolliePayments\Handler\Method\PayPalExpressPayment">
+            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="service_container"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+
         <!-- PaySafeCard PaymentHandler -->
         <service id="Kiener\MolliePayments\Handler\Method\PaySafeCardPayment" class="Kiener\MolliePayments\Handler\Method\PaySafeCardPayment">
             <argument type="service" id="mollie_payments.logger"/>

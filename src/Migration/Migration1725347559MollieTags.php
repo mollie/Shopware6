@@ -53,7 +53,7 @@ class Migration1725347559MollieTags extends MigrationStep
         }
 
         $query = <<<SQL
-        INSERT INTO tag 
+        REPLACE INTO tag 
         (id, name, created_at, updated_at) 
         VALUES (:id, :name, :created_at, :updated_at)
         SQL;

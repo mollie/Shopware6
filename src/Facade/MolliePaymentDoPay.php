@@ -9,10 +9,11 @@ use Kiener\MolliePayments\Exception\MollieOrderCancelledException;
 use Kiener\MolliePayments\Exception\MollieOrderExpiredException;
 use Kiener\MolliePayments\Exception\PaymentUrlException;
 use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
+use Kiener\MolliePayments\Handler\Method\PayPalExpressPayment;
 use Kiener\MolliePayments\Handler\Method\PosPayment;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\CustomerService;
-use Kiener\MolliePayments\Service\CustomFieldService;
+use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Order;
@@ -276,6 +277,11 @@ class MolliePaymentDoPay
             if ($paymentHandler instanceof CreditCardPayment) {
                 $checkoutURL = $transactionStruct->getReturnUrl();
             }
+
+            # paypal express does not have a redirect since we were already on paypal site before
+            if ($paymentHandler instanceof PayPalExpressPayment) {
+                $checkoutURL = $transactionStruct->getReturnUrl();
+            }
         }
 
         return new MolliePaymentPrepareData((string)$checkoutURL, (string)$molliePaymentData->getId());
@@ -301,8 +307,8 @@ class MolliePaymentDoPay
 
             $customFields = $customer->getCustomFields();
 
-            if (isset($customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS])) {
-                $mollieData = $customFields[CustomFieldService::CUSTOM_FIELDS_KEY_MOLLIE_PAYMENTS];
+            if (isset($customFields[CustomFieldsInterface::MOLLIE_KEY])) {
+                $mollieData = $customFields[CustomFieldsInterface::MOLLIE_KEY];
 
                 $oneClickShouldSaveCard = (isset($mollieData[CustomerService::CUSTOM_FIELDS_KEY_SHOULD_SAVE_CARD_DETAIL])) ? (bool)$mollieData[CustomerService::CUSTOM_FIELDS_KEY_SHOULD_SAVE_CARD_DETAIL] : false;
                 $oneClickIsReused = (isset($mollieData[CustomerService::CUSTOM_FIELDS_KEY_MANDATE_ID])) ? (bool)$mollieData[CustomerService::CUSTOM_FIELDS_KEY_MANDATE_ID] : false;

@@ -373,7 +373,7 @@ jobs:
           MOLLIE_APIKEY_TEST: ${{ secrets.MOLLIE_APIKEY_TEST }}
           # -------------------------------------------
           RUN_CYPRESS: true
-          TESTRAIL: true
+          TESTRAIL: false
           TESTRAIL_DOMAIN: ${{ secrets.TESTRAIL_DOMAIN }}
           TESTRAIL_USERNAME: ${{ secrets.TESTRAIL_USERNAME }}
           TESTRAIL_PASSWORD: ${{ secrets.TESTRAIL_PASSWORD }}
