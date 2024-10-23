@@ -138,7 +138,7 @@ class PayPalExpress
             $sleepTimer = self::SESSION_BASE_TIMEOUT * ($i+1);
             usleep($sleepTimer);
             $session = $mollie->sessions->get($sessionId);
-            if ($session->methodDetails !== null && $session->methodDetails->shippingAddress !== null) {
+            if ($session->methodDetails !== null && property_exists($session->methodDetails, 'shippingAddress') && $session->methodDetails->shippingAddress !== null) {
                 break;
             }
         }
@@ -201,5 +201,12 @@ class PayPalExpress
 
         # also (always) update our payment method to use Apple Pay for our cart
         return $this->cartService->updatePaymentMethod($context, $paypalExpressId);
+    }
+
+    public function cancelSession(string $sessionId, SalesChannelContext $context): Session
+    {
+        $mollie = $this->mollieApiFactory->getLiveClient($context->getSalesChannelId());
+
+        return $mollie->sessions->cancel($sessionId);
     }
 }

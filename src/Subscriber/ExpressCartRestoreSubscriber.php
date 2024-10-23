@@ -4,9 +4,7 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Subscriber;
 
 use Kiener\MolliePayments\Service\Cart\CartBackupService;
-use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
 use Shopware\Storefront\Page\Checkout\Finish\CheckoutFinishPageLoadedEvent;
-use Shopware\Storefront\Page\Checkout\Register\CheckoutRegisterPageLoadedEvent;
 use Shopware\Storefront\Page\PageLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -26,8 +24,6 @@ class ExpressCartRestoreSubscriber implements EventSubscriberInterface
     {
         return [
             CheckoutFinishPageLoadedEvent::class => 'onRestoreBackup',
-            CheckoutConfirmPageLoadedEvent::class => 'onRestoreBackup',
-            CheckoutRegisterPageLoadedEvent::class => 'onRestoreBackup'
         ];
     }
 

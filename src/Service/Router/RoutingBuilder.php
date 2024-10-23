@@ -207,7 +207,7 @@ class RoutingBuilder
      */
     public function buildPaypalExpressCancelUrl(): string
     {
-        $confirmPage = $this->router->generate('frontend.checkout.confirm.page', [], $this->router::ABSOLUTE_URL);
+        $confirmPage = $this->router->generate('frontend.mollie.paypal-express.cancel', [], $this->router::ABSOLUTE_URL);
 
         return $confirmPage;
     }
