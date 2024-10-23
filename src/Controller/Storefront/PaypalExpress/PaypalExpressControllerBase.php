@@ -3,6 +3,7 @@
 namespace Kiener\MolliePayments\Controller\Storefront\PaypalExpress;
 
 use Kiener\MolliePayments\Components\PaypalExpress\PayPalExpress;
+use Kiener\MolliePayments\Service\Cart\CartBackupService;
 use Kiener\MolliePayments\Service\CartService;
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Service\SettingsService;
@@ -42,6 +43,7 @@ class PaypalExpressControllerBase extends StorefrontController
      */
     private $logger;
     private SettingsService $settingsService;
+    private CartBackupService $cartBackupService;
 
 
     /**
@@ -50,13 +52,14 @@ class PaypalExpressControllerBase extends StorefrontController
      * @param RouterInterface $router
      * @param LoggerInterface $logger
      */
-    public function __construct(PayPalExpress $paypalExpress, CartService $cartService, RouterInterface $router, SettingsService $settingsService, LoggerInterface $logger)
+    public function __construct(PayPalExpress $paypalExpress, CartService $cartService, RouterInterface $router, SettingsService $settingsService, CartBackupService $cartBackupService, LoggerInterface $logger)
     {
         $this->paypalExpress = $paypalExpress;
         $this->cartService = $cartService;
         $this->router = $router;
         $this->logger = $logger;
         $this->settingsService = $settingsService;
+        $this->cartBackupService = $cartBackupService;
     }
 
     /**
@@ -112,6 +115,49 @@ class PaypalExpressControllerBase extends StorefrontController
         return new RedirectResponse($redirectUrl);
     }
 
+    public function cancelCheckout(SalesChannelContext $context): Response
+    {
+        $redirectUrl = $this->getCheckoutCartPage($this->router);
+
+        $settings = $this->settingsService->getSettings($context->getSalesChannelId());
+
+        if ($settings->isPaypalExpressEnabled() === false) {
+            $this->logger->error('Paypal Express is disabled');
+            return new RedirectResponse($redirectUrl);
+        }
+
+
+
+        $cart = $this->cartService->getCalculatedMainCart($context);
+
+
+        $cartExtension = $cart->getExtension(CustomFieldsInterface::MOLLIE_KEY);
+        $sessionId = null;
+
+        if ($cartExtension instanceof ArrayStruct) {
+            $sessionId = $cartExtension[CustomFieldsInterface::PAYPAL_EXPRESS_SESSION_ID_KEY] ?? null;
+        }
+
+        $this->cartBackupService->restoreCart($context);
+        $this->cartBackupService->clearBackup($context);
+
+        if ($sessionId === null) {
+            $this->logger->error('Paypal Express session id is null');
+            return new RedirectResponse($redirectUrl);
+        }
+        try {
+            $session = $this->paypalExpress->cancelSession($sessionId, $context);
+        } catch (\Throwable $e) {
+            $this->logger->error('Failed to cancel Session at mollie', [
+                'message' => $e->getMessage(),
+                'sessionId' => $sessionId,
+            ]);
+        }
+
+
+        return new RedirectResponse($redirectUrl);
+    }
+
     /**
      * @param SalesChannelContext $context
      * @return Response
@@ -139,9 +185,6 @@ class PaypalExpressControllerBase extends StorefrontController
                 $acceptedDataProtection = $cartExtension[CustomFieldsInterface::ACCEPTED_DATA_PROTECTION] ?? false;
             }
         }
-
-
-
 
 
         if ($payPalExpressSessionId === null) {

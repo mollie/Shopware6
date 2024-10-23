@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Service\Cart;
 
 use Shopware\Core\Checkout\Cart\AbstractCartPersister;
 use Shopware\Core\Checkout\Cart\Cart;
+use Shopware\Core\Checkout\Cart\CartPersisterInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -21,7 +22,7 @@ class CartBackupService
     private $cartService;
 
     /**
-     * @var AbstractCartPersister
+     * @var AbstractCartPersister|CartPersisterInterface
      */
     private $cartPersister;
     /**
@@ -30,12 +31,13 @@ class CartBackupService
     private array $backupExistingCache;
 
     /**
+     *
      * @param CartService $cartService
+     * @param AbstractCartPersister|CartPersisterInterface $cartPersister
      */
-    public function __construct(CartService $cartService, AbstractCartPersister $cartPersister)
+    public function __construct(CartService $cartService, $cartPersister)
     {
         $this->cartService = $cartService;
-
         $this->cartPersister = $cartPersister;
     }
 
@@ -126,8 +128,11 @@ class CartBackupService
 
     public function replaceToken(string $oldToken, string $currentToken, SalesChannelContext $context): void
     {
-        $oldToken = $this->getToken($oldToken);
-        $currentToken = $this->getToken($currentToken);
-        $this->cartPersister->replace($oldToken, $currentToken, $context);
+        #only cart persister has replace method, so it wont work in shopware 6.4.1.0
+        if ($this->cartPersister instanceof AbstractCartPersister) {
+            $oldToken = $this->getToken($oldToken);
+            $currentToken = $this->getToken($currentToken);
+            $this->cartPersister->replace($oldToken, $currentToken, $context);
+        }
     }
 }

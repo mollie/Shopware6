@@ -18,4 +18,10 @@
         <option key="seo">false</option>
     </route>
 
+    <route id="frontend.mollie.paypal-express.cancel" path="/mollie/paypal-express/cancel" methods="GET">
+        <default key="_controller">Kiener\MolliePayments\Controller\Storefront\PaypalExpress\PaypalExpressControllerBase::cancelCheckout</default>
+        <default key="_routeScope"><list><string>storefront</string></list></default>
+        <default key="csrf_protected"><bool>true</bool></default>
+        <option key="seo">false</option>
+    </route>
 </routes>
