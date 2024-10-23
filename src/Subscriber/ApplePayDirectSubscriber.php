@@ -53,7 +53,13 @@ class ApplePayDirectSubscriber implements EventSubscriberInterface
 
         $shoPhoneNumberField = $settings->isPhoneNumberFieldRequired() || $settings->isPhoneNumberFieldShown();
 
-        $applePayPaymentMethodId = $this->applePay->getActiveApplePayID($event->getSalesChannelContext());
+        $applePayPaymentMethodId = "";
+        
+        try {
+            $applePayPaymentMethodId = $this->applePay->getActiveApplePayID($event->getSalesChannelContext());
+        } catch (\Exception $exception) {
+        }
+
 
         $event->setParameter('mollie_applepaydirect_phonenumber_required', (int)$shoPhoneNumberField);
         $event->setParameter('mollie_applepaydirect_enabled', $applePayDirectEnabled);
