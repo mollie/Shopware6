@@ -56,7 +56,22 @@ class DependencyLoader
         }
     }
 
-    public function registerFixturesAutoloader():void
+    public function registerDependencies(): void
+    {
+        $classLoader = new ClassLoader();
+
+        $this->registerPolyfillsAutoloader($classLoader);
+        $this->registerFixturesAutoloader($classLoader);
+
+        $classLoader->register();
+    }
+
+    private function registerPolyfillsAutoloader(ClassLoader $classLoader): void
+    {
+        $classLoader->addPsr4("Shopware\\Core\\", __DIR__ . '/../../polyfill/Shopware/Core', true);
+    }
+
+    private function registerFixturesAutoloader(ClassLoader $classLoader): void
     {
         if ($this->shouldLoadFixtures() === false) {
             return;
@@ -65,17 +80,14 @@ class DependencyLoader
         $dirFixtures = (string)realpath(__DIR__ . '/../../tests/Fixtures/');
         # we need to tell Shopware to load our custom fixtures
         # from our TEST autoload-dev area....
-        $classLoader = new ClassLoader();
         $classLoader->addPsr4("MolliePayments\\Fixtures\\", $dirFixtures, true);
-
-        $classLoader->register();
     }
 
-    private function shouldLoadFixtures():bool
+    private function shouldLoadFixtures(): bool
     {
-        $composerDevReqsInstalled = file_exists(__DIR__.'/../../vendor/bin/phpunit');
+        $composerDevReqsInstalled = file_exists(__DIR__ . '/../../vendor/bin/phpunit');
         if ($composerDevReqsInstalled === false) {
-            return  false;
+            return false;
         }
         $dirFixtures = (string)realpath(__DIR__ . '/../../tests/Fixtures/');
         return is_dir($dirFixtures);

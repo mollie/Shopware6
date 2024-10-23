@@ -2,10 +2,6 @@
 
 namespace Shopware\Core\Framework\Event;
 
-if (interface_exists(CustomerAware::class)) {
-    return;
-}
-
 interface CustomerAware extends BusinessEventInterface
 {
     public const CUSTOMER_ID = 'customerId';

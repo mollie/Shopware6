@@ -19,6 +19,8 @@ parameters:
           message: 'use some logger instead'
         - function: 'putenv()'
           message: 'might overwrite existing variables'
+    scanDirectories:
+      - polyfill/Shopware
 
 services:
     - class: MolliePayments\PHPStan\Rules\NoManufacturerRule

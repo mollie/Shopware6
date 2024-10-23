@@ -2,10 +2,6 @@
 
 namespace Shopware\Core\Framework\Event;
 
-if (interface_exists(MailActionInterface::class)) {
-    return;
-}
-
 use Shopware\Core\Framework\Event\EventData\MailRecipientStruct;
 use Shopware\Core\Framework\Log\Package;
 
