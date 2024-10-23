@@ -2,10 +2,6 @@
 
 namespace Shopware\Core\System\Snippet\Files;
 
-if (interface_exists(SnippetFileInterface::class)) {
-    return;
-}
-
 interface SnippetFileInterface
 {
     /**

@@ -4,13 +4,10 @@ namespace Shopware\Core\Checkout\Payment;
 use Shopware\Core\Checkout\Payment\Exception\AsyncPaymentFinalizeException;
 use Shopware\Core\Checkout\Payment\Exception\CustomerCanceledAsyncPaymentException;
 
-if (class_exists(PaymentException::class) && !class_exists(AsyncPaymentFinalizeException::class) && !class_exists(CustomerCanceledAsyncPaymentException::class)) {
-    return;
-}
-
 
 class PaymentException extends \Exception
 {
+
     public static function asyncFinalizeInterrupted(string $orderTransactionId, string $errorMessage, ?\Throwable $e = null): AsyncPaymentFinalizeException
     {
         return new AsyncPaymentFinalizeException($orderTransactionId, $errorMessage, $e);

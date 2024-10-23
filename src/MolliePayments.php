@@ -116,7 +116,7 @@ class MolliePayments extends Plugin
         # with our current shopware version
 
         $loader = new DependencyLoader($container, new VersionCompare($shopwareVersion));
-        $loader->registerFixturesAutoloader();
+        $loader->registerDependencies();
     }
 
 
