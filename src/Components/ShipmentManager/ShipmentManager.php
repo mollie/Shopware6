@@ -103,6 +103,18 @@ class ShipmentManager implements ShipmentManagerInterface
     /**
      * @param string $orderId
      * @param Context $context
+     * @return array<mixed>
+     */
+    public function getShopwareStatus(string $orderId, Context $context): array
+    {
+        $order = $this->orderService->getOrder($orderId, $context);
+
+        return $this->orderService->getStatus($order);
+    }
+
+    /**
+     * @param string $orderId
+     * @param Context $context
      * @return array<string, numeric>
      */
     public function getTotals(string $orderId, Context $context): array

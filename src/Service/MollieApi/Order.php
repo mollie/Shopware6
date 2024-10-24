@@ -412,7 +412,11 @@ class Order
 
     public function getPaymentUrl(string $mollieOrderId, string $salesChannelId): ?string
     {
-        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId);
+        try {
+            $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId);
+        } catch (CouldNotFetchMollieOrderException $e) {
+            return null;
+        }
 
         return $mollieOrder->status === 'created' ? $mollieOrder->getCheckoutUrl() : null;
     }

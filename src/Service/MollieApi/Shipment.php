@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Service\MollieApi;
 
+use Kiener\MolliePayments\Exception\CouldNotFetchMollieOrderException;
 use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeShippedException;
 use Kiener\MolliePayments\Service\MollieApi\Models\MollieShippingItem;
 use Kiener\MolliePayments\Struct\MollieApi\ShipmentTrackingInfoStruct;
@@ -174,7 +175,14 @@ class Shipment implements ShipmentInterface
      */
     public function getTotals(string $mollieOrderId, string $salesChannelId): array
     {
-        $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId);
+        try {
+            $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId);
+        } catch (CouldNotFetchMollieOrderException $e) {
+            return [
+                'amount' => 0.0,
+                'quantity' => 0,
+            ];
+        }
 
         $totalAmount = 0.0;
         $totalQuantity = 0;

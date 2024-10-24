@@ -14,6 +14,7 @@ use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItemRoundingDiff;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieRefundException;
+use Kiener\MolliePayments\Exception\CouldNotFetchMollieOrderException;
 use Kiener\MolliePayments\Service\MollieApi\Fixer\RoundingDifferenceFixer;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Service\OrderServiceInterface;
@@ -115,7 +116,20 @@ class RefundManager implements RefundManagerInterface
      */
     public function getData(OrderEntity $order, Context $context): RefundData
     {
-        return $this->builderData->buildRefundData($order, $context);
+        try {
+            return $this->builderData->buildRefundData($order, $context);
+        } catch (CouldNotFetchMollieOrderException $e) {
+            return new RefundData(
+                [],
+                [],
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                $order->getTaxStatus(),
+            );
+        }
     }
 
     /**

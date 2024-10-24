@@ -6,6 +6,7 @@ use Exception;
 use Kiener\MolliePayments\Components\ShipmentManager\Models\ShipmentLineItem;
 use Kiener\MolliePayments\Components\ShipmentManager\Models\TrackingData;
 use Kiener\MolliePayments\Components\ShipmentManager\ShipmentManager;
+use Kiener\MolliePayments\Exception\CouldNotFetchMollieOrderException;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Kiener\MolliePayments\Traits\Api\ApiTrait;
@@ -580,6 +581,8 @@ class ShippingControllerBase extends AbstractController
     {
         try {
             $status = $this->shipment->getStatus($orderId, $context);
+        } catch (CouldNotFetchMollieOrderException $e) {
+            $status = $this->shipment->getShopwareStatus($orderId, $context);
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
