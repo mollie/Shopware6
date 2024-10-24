@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Controller\Api\Order;
 
 use Kiener\MolliePayments\Components\CancelManager\CancelItemFacade;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
+use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\OrderLine;
 use Shopware\Core\Framework\Context;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,7 +29,11 @@ class CancelLineController extends AbstractController
         $orderId = $request->get('mollieOrderId');
         $result = [];
         $client = $this->clientFactory->getClient();
-        $mollieOrder = $client->orders->get($orderId);
+        try {
+            $mollieOrder = $client->orders->get($orderId);
+        } catch (ApiException $e) {
+            return new JsonResponse($result);
+        }
 
         $lines = $mollieOrder->lines();
         if ($lines->count() > 0) {

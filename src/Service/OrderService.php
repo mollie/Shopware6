@@ -365,4 +365,31 @@ class OrderService implements OrderServiceInterface
             $context
         );
     }
+
+    /**
+     * @param OrderEntity $order
+     * @return array<string,array<string,mixed>>
+     */
+    public function getStatus(OrderEntity $order): array
+    {
+        $lineItems = [];
+
+        $orderLineItems = $order->getLineItems();
+
+        if ($orderLineItems === null) {
+            return $lineItems;
+        }
+
+        foreach ($orderLineItems as $lineItem) {
+            $lineItems[$lineItem->getId()] = [
+                'id' => $lineItem->getId(),
+                'mollieOrderLineId' => null,
+                'quantity' => $lineItem->getQuantity(),
+                'quantityShippable' => 0,
+                'quantityShipped' => 0,
+            ];
+        }
+
+        return $lineItems;
+    }
 }
