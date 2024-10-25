@@ -190,7 +190,27 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
      */
     private function performTransition(OrderDeliveryEntity $delivery, string $transitionName, Context $context): void
     {
-        $this->transitionService->performTransition(OrderDeliveryDefinition::ENTITY_NAME, $delivery->getId(), $transitionName, $context);
+        $this->loggerService->debug(
+            sprintf(
+                'Performing transition %s for delivery %s',
+                $transitionName,
+                $delivery->getId()
+            )
+        );
+
+        try {
+            $this->transitionService->performTransition(OrderDeliveryDefinition::ENTITY_NAME, $delivery->getId(), $transitionName, $context);
+        } catch (\Exception $e) {
+            $this->loggerService->error(
+                $e->getMessage(),
+                [
+                    'method' => 'delivery-transition-perform-transition',
+                    'delivery.id' => $delivery->getId(),
+                    'delivery.payload' => $delivery->jsonSerialize(),
+                    'transition' => $transitionName
+                ]
+            );
+        }
     }
 
     /**
