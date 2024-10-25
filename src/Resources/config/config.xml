@@ -14,6 +14,7 @@
         <title>API</title>
         <title lang="de-DE">API</title>
         <title lang="nl-NL">API</title>
+        <title lang="it-IT">API</title>
 
         <input-field type="password">
             <name>liveApiKey</name>
@@ -21,6 +22,7 @@
             <label>Live Key</label>
             <label lang="de-DE">Live Key</label>
             <label lang="nl-NL">Live-sleutel</label>
+            <label lang="it-IT">Chiave Live</label>
         </input-field>
         <input-field type="password">
             <name>testApiKey</name>
@@ -28,36 +30,43 @@
             <label>Test Key</label>
             <label lang="de-DE">Test Key</label>
             <label lang="nl-NL">Test-sleutel</label>
+            <label lang="it-IT">Chiave Test</label>
         </input-field>
         <input-field type="bool">
             <name>testMode</name>
             <label>Test Mode</label>
             <label lang="de-DE">Test Modus</label>
             <label lang="nl-NL">Test Modus</label>
+            <label lang="it-IT">Modalità test</label>
             <defaultValue>true</defaultValue>
             <helpText>Enables the test mode with the Mollie Sandbox payment page. The Storefront will also show (Test Mode) next to the payment method names.</helpText>
             <helpText lang="de-DE">Aktiviert den Testmodus mit der Mollie Sandbox Zahlungsseite. In der Storefront wird (Test Modus) neben den Zahlungsarten angezeigt.</helpText>
             <helpText lang="nl-NL">Staat de test modus toe met de Mollie Sandbox betalingspagina. De Storefront zal ook "(Test Mode)" tonen naast de naam van de betaalmethode.</helpText>
+            <helpText lang="it-IT">Abilita la modalità test con la pagina di pagamento di Mollie Sandbox. Lo Storefront mostrerà anche (Modalità test) accanto ai nomi dei metodi di pagamento.</helpText>
         </input-field>
         <input-field type="bool">
             <name>debugMode</name>
             <label>Debug Mode</label>
             <label lang="de-DE">Debug Modus</label>
             <label lang="nl-NL">Debug Modus</label>
+            <label lang="it-IT">Modalità Debug</label>
             <defaultValue>false</defaultValue>
             <helpText>Mollie has a custom log file in the Shopware log directory. This feature enables the extended logs with more information that could help to solve problems.</helpText>
             <helpText lang="de-DE">Mollie hat eine eigene LOG Datei im Shopware Log Verzeichnis. Dieser Modus kümmert sich um erweiterte Informationen in diesen Log Dateien, die zusätzlich bei der Analyse von Fehlern beitragen können.</helpText>
             <helpText lang="nl-NL">Mollie heeft een op maat logbestand in de Shopware logboek-map. Deze functie maakt uitgebreide logs mogelijk met meer informatie die helpen bij het oplossen van problemen.</helpText>
+            <helpText lang="it-IT">Mollie dispone di un file di log personalizzato nella directory dei log di Shopware. Questa funzione abilita i log estesi con ulteriori informazioni che potrebbero aiutare a risolvere i problemi.</helpText>
         </input-field>
         <input-field type="int">
             <name>logFileDays</name>
             <label>Keep log files (days)</label>
             <label lang="de-DE">Log-Dateien aufbewahren (Tage)</label>
             <label lang="nl-NL">Logbestanden bijhouden (dagen)</label>
+            <label lang="it-IT">Conserva i file di log (giorni)</label>
             <defaultValue>14</defaultValue>
             <helpText>Set the number of days how long log files are kept until they will be automatically deleted.</helpText>
             <helpText lang="de-DE">Legen Sie die Anzahl der Tage fest, wie lange Protokolldateien aufbewahrt werden, bis sie automatisch gelöscht werden.</helpText>
             <helpText lang="nl-NL">Stel het aantal dagen in hoe lang logbestanden worden bewaard totdat ze automatisch worden verwijderd.</helpText>
+            <helpText lang="it-IT">Imposta il numero di giorni per quanto tempo i file di log devono essere conservati prima di essere automaticamente eliminati.</helpText>
         </input-field>
         <component name="mollie-pluginconfig-section-api">
             <name>molliePluginConfigSectionApi</name>
@@ -67,25 +76,30 @@
         <title>Payments</title>
         <title lang="de-DE">Zahlungen</title>
         <title lang="nl-NL">Betalingen</title>
+        <title lang="it-IT">Pagamenti</title>
         <input-field type="bool">
             <name>shopwareFailedPayment</name>
             <label>Use Shopware standard behaviour for failed payments</label>
             <label lang="de-DE">Shopware Standardverhalten für fehlerhafte Zahlungen verwenden</label>
             <label lang="nl-NL">Gebruik de standaard Shopware instelling voor mislukte betalingen</label>
+            <label lang="it-IT">Utilizza il comportamento standard di Shopware per i pagamenti non riusciti</label>
             <defaultValue>true</defaultValue>
             <helpText>Use the default Shopware behaviour on failed payments. If disabled, Mollie will automatically provide a way to retry the payment by redirecting the user to the Mollie payments page.</helpText>
             <helpText lang="de-DE">Aktiviert das Standardverhalten von Shopware für fehlerhafte Zahlungen. Wenn nicht aktiv, kümmert sich das Mollie Plugin um einen erneuten Versuch der Zahlung und leitet den Käufer auf die externe Mollie Zahlungsauswahl.</helpText>
             <helpText lang="nl-NL">Gebruik de standaard Shopware instelling voor mislukte betalingen. Indien uitgeschakeld, zal Mollie automatisch een manier aanbieden om de betaling opnieuw te proberen door de user om te leiden naar de Mollie betalingspagina.</helpText>
+            <helpText lang="it-IT">Usa il comportamento predefinito di Shopware per i pagamenti non riusciti. Se disabilitato, Mollie fornirà automaticamente un modo per riprovare il pagamento reindirizzando l'utente alla pagina dei pagamenti di Mollie.</helpText>
         </input-field>
         <input-field type="bool">
             <name>createCustomersAtMollie</name>
             <label>Create customers at Mollie</label>
             <label lang="de-DE">Kunden bei Mollie anlegen</label>
             <label lang="nl-NL">Klanten creëren bij Mollie</label>
+            <label lang="it-IT">Crea clienti presso Mollie</label>
             <defaultValue>false</defaultValue>
             <helpText>Automatically have customers being created inside your Mollie Dashboard to see all payments of a specific customer.</helpText>
             <helpText lang="de-DE">Erstellt automatisch Kunden im Mollie Dashboard. Dadurch hat man einen zusätzlichen Überblick über alle Zahlungen dieses Kunden innerhalb von Mollie.</helpText>
             <helpText lang="nl-NL">Automatisch klanten laten aanmaken in het Mollie Dashboard om alle betalingen van een specifieke klant te zien.</helpText>
+            <helpText lang="it-IT">Crea automaticamente i clienti all'interno della tua Mollie Dashboard per vedere tutti i pagamenti di un cliente specifico.</helpText>
         </input-field>
         <input-field type="bool">
             <name>useMolliePaymentMethodLimits</name>
@@ -93,18 +107,22 @@
             <label>Use Mollie's availability rules for payment methods</label>
             <label lang="de-DE">Mollies Verfügbarkeitsregeln für Zahlungsarten verwenden</label>
             <label lang="nl-NL">Gebruik de beschikbaarheidsregels van Mollie voor betaalmethoden</label>
+            <label lang="it-IT">Usa le regole di disponibilità di Mollie per i metodi di pagamento</label>
             <helpText>Automatically hides payment methods in the checkout based on the availability rules for payment methods. Only active payment methods from your mollie dashboard will be shown. If the payment method has a cart limit, currency restriction or billing address restriction, it will be hidden during checkout.</helpText>
             <helpText lang="de-DE">Blendet automatisch Zahlungsart im Checkout basierend auf Verfügbarkeitsregeln von Mollie. Es werden nur die aktiven Zahlungsarten aus dem Mollie Dashboard angezeigt. Wenn die Zahlungsart eine Einschränkung auf den Warenkorbwert, Währung oder Rechnungsadresse hat, wird diese auch ausgeblendet.</helpText>
             <helpText lang="nl-NL">Automatische betalingsmethode wordt verborgen tijdens het afrekenen op basis van beschikbaarheidsregels van Mollie. Alleen actieve betalingsmethoden uit het Mollie-dashboard worden weergegeven. Als de betalingsmethode beperkingen heeft op de winkelwagenwaarde, valuta of factuuradres, wordt deze ook verborgen.</helpText>
+            <helpText lang="it-IT">Nasconde automaticamente i metodi di pagamento nel checkout in base alle regole di disponibilità per i metodi di pagamento. Verranno mostrati solo i metodi di pagamento attivi dalla tua Mollie Dashboard. Se il metodo di pagamento ha un limite di carrello, una restrizione di valuta o una restrizione all'indirizzo di fatturazione, verrà nascosto durante il checkout.</helpText>
         </input-field>
         <input-field type="text">
             <name>formatOrderNumber</name>
             <label>Custom format for Mollie order numbers (Dashboard, PayPal, ...)</label>
             <label lang="de-DE">Format für Mollie Bestellnummern (Dashboard, PayPal, ...)</label>
             <label lang="nl-NL">Aangepast formaat voor Mollie bestelnummers (Dashboard, PayPal, ...)</label>
+            <label lang="it-IT">Formato personalizzato per i numeri d'ordine di Mollie (Dashboard, PayPal, ...)</label>
             <helpText>If set, this format will be used before the order number in the Mollie dashboard. This will also be passed on to PayPal as invoice number.</helpText>
             <helpText lang="de-DE">Wenn gesetzt, wird dieses Format vor der Bestellnummer im Mollie-Dashboard verwendet. Dieser Wert wird auch an PayPal als Rechnungsnummber übergeben</helpText>
             <helpText lang="nl-NL">Indien ingesteld, wordt dit formaat vóór het bestelnummer in het Mollie-dashboard gebruikt. Dit wordt ook als factuurnummer doorgegeven aan PayPal.</helpText>
+            <helpText lang="it-IT">Se impostato, questo formato verrà utilizzato prima del numero d'ordine nella Mollie Dashboard. Verrà inoltre passato a PayPal come numero di fattura.</helpText>
         </input-field>
         <component name="mollie-pluginconfig-section-payments-format">
             <name>molliePluginConfigSectionPaymentsFormat</name>
@@ -122,6 +140,7 @@
             <label>Enable Credit Card Components</label>
             <label lang="de-DE">Kreditkarten Komponenten aktivieren</label>
             <label lang="nl-NL">Credit Card componenten activeren</label>
+            <label lang="it-IT">Abilita Componenti Carta di Credito</label>
             <defaultValue>true</defaultValue>
             <helpText>Show credit card input fields directly within your Shopware shop. If disabled, Mollie will show
                 the forms on the Mollie payment page.
@@ -132,12 +151,16 @@
             <helpText lang="nl-NL">Toon credit card invoervelden direct in jouw Shopware shop. Indien uitgeschakeld, zal
                 Mollie de formulieren tonen op de Mollie betaalpagina.
             </helpText>
+            <helpText lang="it-IT">Mostra i campi di inserimento della carta di credito direttamente nel tuo negozio
+                Shopware. Se disabilitato, Mollie mostrerà i moduli nella pagina di pagamento di Mollie.
+            </helpText>
         </input-field>
         <input-field type="bool">
             <name>oneClickPaymentsEnabled</name>
             <label>Enable One-Click Payments</label>
             <label lang="de-DE">One-Click-Zahlungen aktivieren</label>
             <label lang="nl-NL">One-Click betalingen activeren</label>
+            <label lang="it-IT">Abilita i pagamenti con un solo clic</label>
             <defaultValue>false</defaultValue>
             <helpText>Customers can choose to save their credit card data for repeating orders. Sensitive data will only
                 be stored on the Mollie servers and not in Shopware.
@@ -148,12 +171,16 @@
             <helpText lang="nl-NL">Klanten kunnen ervoor kiezen hun creditcardgegevens op te slaan voor toekomstige
                 bestellingen. Gevoelige gegevens worden alleen opgeslagen op de servers van Mollie en niet in Shopware.
             </helpText>
+            <helpText lang="it-IT">I clienti possono scegliere di salvare i dati della propria carta di credito per ordini
+                ripetuti. I dati sensibili saranno memorizzati solo sui server di Mollie e non in Shopware.
+            </helpText>
         </input-field>
         <input-field type="bool">
             <name>oneClickPaymentsCompactView</name>
             <label>Enable One-Click Payments compact view</label>
             <label lang="de-DE">One-Click-Zahlungen Kompaktansicht aktivieren</label>
             <label lang="nl-NL">Compacte weergave van One-Click Payments</label>
+            <label lang="it-IT">Abilita la visualizzazione compatta dei pagamenti con un solo clic</label>
             <defaultValue>false</defaultValue>
             <helpText>If enabled, the stored credit cards will not be displayed as visual cards on the checkout page.
             </helpText>
@@ -163,12 +190,16 @@
             <helpText lang="nl-NL">Indien ingeschakeld, worden de opgeslagen creditcards niet weergegeven als visuele
                 kaarten op de afrekenpagina.
             </helpText>
+            <helpText lang="it-IT">Se abilitato, le carte di credito memorizzate non saranno mostrate come carte visive
+                nella pagina di checkout.
+            </helpText>
         </input-field>
     </card>
     <!--card>
         <title>PayPal Express</title>
         <title lang="de-DE">PayPal Express</title>
         <title lang="nl-NL">PayPal Express</title>
+        <title lang="it-IT">PayPal Express</title>
         <input-field type="single-select">
             <name>paypalExpressButtonStyle</name>
             <label>PayPal Express Button Style</label>
@@ -179,30 +210,35 @@
                     <name>Gold</name>
                     <name lang="de-DE">Gold</name>
                     <name lang="nl-NL">Goud</name>
+                    <name lang="it-IT">Oro</name>
                 </option>
                 <option>
                     <id>2</id>
                     <name>Blue</name>
                     <name lang="de-DE">Blau</name>
                     <name lang="nl-NL">Blauw</name>
+                    <name lang="it-IT">Blu</name>
                 </option>
                 <option>
                     <id>3</id>
                     <name>Silver</name>
                     <name lang="de-DE">Silber</name>
                     <name lang="nl-NL">Zilver</name>
+                    <name lang="it-IT">Argento</name>
                 </option>
                 <option>
                     <id>4</id>
                     <name>White</name>
                     <name lang="de-DE">Weiß</name>
                     <name lang="nl-NL">Wit</name>
+                    <name lang="it-IT">Bianco</name>
                 </option>
                 <option>
                     <id>5</id>
                     <name>Black</name>
                     <name lang="de-DE">Schwarz</name>
                     <name lang="nl-NL">Zwart</name>
+                    <name lang="it-IT">Nero</name>
                 </option>
             </options>
         </input-field>
@@ -216,12 +252,14 @@
                     <name>Rect</name>
                     <name lang="de-DE">Rect</name>
                     <name lang="nl-NL">Rect</name>
+                    <name lang="it-IT">Rect</name>
                 </option>
                 <option>
                     <id>2</id>
                     <name>Pill</name>
                     <name lang="de-DE">Pill</name>
                     <name lang="nl-NL">Pill</name>
+                    <name lang="it-IT">Pill</name>
                 </option>
             </options>
         </input-field>
@@ -230,39 +268,46 @@
             <label>PayPal Express Display Restrictions</label>
             <label lang="de-DE">PayPal Express Anzeige Einschränkungen</label>
             <label lang="nl-NL">PayPal Express weergavebeperkingen</label>
+            <label lang="it-IT">Restrizioni di visualizzazione di PayPal Express</label>
             <helpText>Restrict PayPal Express from being displayed on these pages.</helpText>
             <helpText lang="de-DE">Verhindere die Anzeige von PayPal Express auf den hier gewählten Seiten</helpText>
             <helpText lang="nl-NL">Voorkom dat PayPal Express wordt weergegeven op deze pagina's.</helpText>
+            <helpText lang="it-IT">Limitare la visualizzazione di PayPal Express in queste pagine.</helpText>
             <options>
                 <option>
                     <id>plp</id>
                     <name>Category pages</name>
                     <name lang="de-DE">Kategorieseiten</name>
                     <name lang="nl-NL">Categorie pagina's</name>
+                    <name lang="it-IT">Pagine della categorie</name>
                 </option>
                 <option>
                     <id>pdp</id>
                     <name>Product pages</name>
                     <name lang="de-DE">Produktseiten</name>
                     <name lang="nl-NL">Product pagina's</name>
+                    <name lang="it-IT">Pagine dei prodotti</name>
                 </option>
                 <option>
                     <id>offcanvas</id>
                     <name>Offcanvas cart</name>
                     <name lang="de-DE">Offcanvas Warenkorb</name>
                     <name lang="nl-NL">Offcanvas winkelmand</name>
+                    <name lang="it-IT">Carrello offcanvas</name>
                 </option>
                 <option>
                     <id>cart</id>
                     <name>Cart page</name>
                     <name lang="de-DE">Warenkorbseite</name>
                     <name lang="nl-NL">Winkelmand</name>
+                    <name lang="it-IT">Pagina del carrello</name>
                 </option>
                 <option>
                     <id>register</id>
                     <name>Registration page</name>
                     <name lang="de-DE">Registrierungsseite</name>
                     <name lang="nl-NL">Registratiepagina</name>
+                    <name lang="it-IT">Pagina di registrazione</name>
                 </option>
             </options>
         </input-field>
@@ -271,48 +316,57 @@
         <title>Apple Pay</title>
         <title lang="de-DE">Apple Pay</title>
         <title lang="nl-NL">Apple Pay</title>
+        <title lang="it-IT">Apple Pay</title>
         <input-field type="bool">
             <name>enableApplePayDirect</name>
             <label>Enable Apple Pay Direct</label>
             <label lang="de-DE">Apple Pay Direct aktivieren</label>
             <label lang="nl-NL">Apple Pay Direct activeren</label>
+            <label lang="it-IT">Abilita Apple Pay Direct</label>
             <defaultValue>false</defaultValue>
             <helpText>Show Apple Pay buttons and payment options directly on a product detail page or listing. This feature requires the payment method Apple Pay to be assigned to your Sales Channel.</helpText>
             <helpText lang="de-DE">Zeigt Apple Pay Buttons direkt auf der Produktseite oder Kategorie Seite an. Dieses Feature setzt voraus, dass die Zahlungsart 'Apple Pay' dem Verkaufskanal zugewiesen ist.</helpText>
             <helpText lang="nl-NL">Toon Apple Pay-buttons en betaalopties direct op een productdetailpagina of product listing pagina. Deze functie vereist dat de betaalmethode Apple Pay is toegewezen aan jouw verkoopkanaal.</helpText>
+            <helpText lang="it-IT">Mostra i pulsanti e le opzioni di pagamento Apple Pay direttamente su una pagina di dettaglio del prodotto o nell'elenco dei prodotti. Questa funzione richiede che il metodo di pagamento Apple Pay sia assegnato al tuo Canale di Vendita.</helpText>
         </input-field>
         <input-field type="multi-select">
             <name>applePayDirectRestrictions</name>
             <label>Apple Pay Display Restrictions</label>
             <label lang="de-DE">Apple Pay Anzeige Einschränkungen</label>
             <label lang="nl-NL">Apple Pay weergavebeperkingen</label>
+            <label lang="it-IT">Restrizioni di Visualizzazione di Apple Pay</label>
             <helpText>Restrict Apple Pay Direct from being displayed on these pages.</helpText>
             <helpText lang="de-DE">Verhindere die Anzeige von Apple Pay Direct auf den hier gewählten Seiten</helpText>
             <helpText lang="nl-NL">Voorkom dat Apple Pay Direct wordt weergegeven op deze pagina's.</helpText>
+            <helpText lang="it-IT">Impedisci la visualizzazione di Apple Pay Direct su queste pagine.</helpText>
             <options>
                 <option>
                     <id>plp</id>
                     <name>Category pages</name>
                     <name lang="de-DE">Kategorieseiten</name>
                     <name lang="nl-NL">Categorie pagina's</name>
+                    <name lang="it-IT">Pagine della categorie</name>
                 </option>
                 <option>
                     <id>pdp</id>
                     <name>Product pages</name>
                     <name lang="de-DE">Produktseiten</name>
                     <name lang="nl-NL">Product pagina's</name>
+                    <name lang="it-IT">Pagine dei prodotti</name>
                 </option>
                 <option>
                     <id>offcanvas</id>
                     <name>Offcanvas cart</name>
                     <name lang="de-DE">Offcanvas Warenkorb</name>
                     <name lang="nl-NL">Offcanvas winkelmand</name>
+                    <name lang="it-IT">Carrello offcanvas</name>
                 </option>
                 <option>
                     <id>cart</id>
                     <name>Cart page</name>
                     <name lang="de-DE">Warenkorbseite</name>
                     <name lang="nl-NL">Winkelmand</name>
+                    <name lang="it-IT">Pagina del carrello</name>
                 </option>
             </options>
         </input-field>
@@ -321,6 +375,7 @@
             <label>Allowed Domains for Apple Pay Direct</label>
             <label lang="de-DE">Zulässige Domains für die Apple Pay Direct</label>
             <label lang="nl-NL">Toegestane domeinen voor Apple Pay Direct</label>
+            <label lang="it-IT">Domini consentiti per Apple Pay Direct</label>
             <helpText>
                 Enter the domains that are allowed for Apple Pay Direct, separated by commas.
                 This setting is optional and only required if you are using a headless setup
@@ -336,6 +391,11 @@
                 Deze instelling is optioneel en alleen nodig als u een headless setup gebruikt
                 en een alternatieve domein voor uw Apple Pay Direct integratie wilt opgeven.
             </helpText>
+            <helpText lang="it-IT">
+                Inserisci i domini consentiti per Apple Pay Direct, separati da virgole.
+                Questa impostazione è facoltativa ed è necessaria solo
+                se stai utilizzando una configurazione headless
+            </helpText>
         </input-field>
     </card>
 
@@ -344,14 +404,17 @@
         <title>Order Management</title>
         <title lang="de-DE">Auftragsverwaltung</title>
         <title lang="nl-NL">Order beheer</title>
+        <title lang="it-IT">Gestione degli Ordini</title>
         <input-field type="int">
             <name>paymentMethodBankTransferDueDateDays</name>
             <label>Bank Transfer Due Date (Days)</label>
             <label lang="de-DE">Banküberweisung Fälligkeitsdauer (in Tagen seit Bestelleingang)</label>
             <label lang="nl-NL">Bankoverschrijving vervaldatum (in dagen vanaf ontvangen bestelling)</label>
+            <label lang="it-IT">Data di scadenza del bonifico bancario (giorni)</label>
             <helpText>Assign a custom "due date" for the Bank Transfer payment method. This is the time the customer can pay until the payment expires.</helpText>
             <helpText lang="de-DE">Konfiguration eines eigenen Verfallsdatums für die Zahlungsart 'Bank Transfer'. Dies ist der Zeitraum einer möglichen Zahlung bis die Zahlungsmöglichkeit verfällt.</helpText>
             <helpText lang="nl-NL">Wijs een aangepaste "vervaldatum" toe voor de betaalmethode Bankoverschrijving. Dit is de periode dat de klant kan betalen totdat de betaling vervalt.</helpText>
+            <helpText lang="it-IT">Assegna una "data di scadenza" personalizzata per il metodo di pagamento tramite bonifico bancario. Questo è il tempo entro il quale il cliente può effettuare il pagamento prima che scada.</helpText>
         </input-field>
         <component name="mollie-pluginconfig-section-order-lifetime-warning">
             <name>molliePluginConfigSectionOrderLifeTimeWarning</name>
@@ -361,9 +424,11 @@
             <label>Order Lifetime Days</label>
             <label lang="de-DE">Bestellungs Lebensdauer bei Mollie (in Tagen seit Bestelleingang)</label>
             <label lang="nl-NL">Levensduur bestelling bij Mollie (in dagen vanaf ontvangen bestelling)</label>
+            <label lang="it-IT">Durata dell'Ordine (Giorni)</label>
             <helpText>Configure the lifetime of an order until it expires when not paid. This applies to all payment methods.</helpText>
             <helpText lang="de-DE">Konfiguration der Lebensdauer bis eine Bestellung verfällt, sofern sie nicht bezahlt wurde. Diese Konfiguration wirkt sich auf alle Zahlungsarten aus.</helpText>
             <helpText lang="nl-NL">Configureer de levensduur van een bestelling totdat deze vervalt als er niet betaald is. Dit geldt voor alle betaalmethoden.</helpText>
+            <helpText lang="it-IT">Configura la durata di un ordine fino alla sua scadenza se non pagato. Questo si applica a tutti i metodi di pagamento.</helpText>
         </input-field>
         <input-field type="bool">
             <name>automaticShipping</name>
@@ -371,9 +436,11 @@
             <label>Automatic Shipping</label>
             <label lang="de-DE">Automatischer Versand</label>
             <label lang="nl-NL">Automatische Verzending</label>
+            <label lang="it-IT">Spedizione automatica</label>
             <helpText>If enabled, the plugin will automatically trigger a shipment at Mollie when the delivery status transitions to 'shipped'.</helpText>
             <helpText lang="de-DE">Sofern aktiv, schickt das Plugin automatisch eine Versand Mitteilung an Mollie, sobald der Lieferstatus auf 'verschickt' übergeleitet wird.</helpText>
             <helpText lang="nl-NL">Indien ingeschakeld, zal de plugin automatisch een verzending activeren bij Mollie wanneer de leveringstatus overgaat naar ‘verzonden’.</helpText>
+            <helpText lang="it-IT">Se abilitato, il plugin avvierà automaticamente una spedizione su Mollie quando lo stato di consegna passa a 'spedito'.</helpText>
         </input-field>
         <input-field type="bool">
             <name>automaticCancellation</name>
@@ -381,9 +448,11 @@
             <label>Automatic Cancellation</label>
             <label lang="de-DE">Automatische Stornierung</label>
             <label lang="nl-NL">Automatische annulering</label>
+            <label lang="it-IT">Annullamento automatico</label>
             <helpText>If enabled, the plugin will automatically cancel Mollie orders when being cancelled in Shopware. Only orders that are created, authorized or partially shipped will be cancelled. If partially shipped, only items that where not shipped will be cancelled.</helpText>
             <helpText lang="de-DE">Wenn aktiviert, storniert das Plugin Mollie-Bestellungen automatisch, wenn sie in Shopware storniert werden. Nur Bestellungen, die erstellt, autorisiert oder teilweise versandt wurden, werden storniert. Bei teilweisem Versand werden nur Artikel storniert, die nicht versendet wurden.</helpText>
             <helpText lang="nl-NL">Indien ingeschakeld, zal de plug-in automatisch Mollie-bestellingen annuleren wanneer ze worden geannuleerd in Shopware. Alleen bestellingen die zijn aangemaakt, geautoriseerd of gedeeltelijk zijn verzonden, worden geannuleerd. Indien gedeeltelijk verzonden, worden alleen artikelen geannuleerd die niet zijn verzonden.</helpText>
+            <helpText lang="it-IT">Se abilitato, il plugin annullerà automaticamente gli ordini Mollie quando vengono annullati in Shopware. Verranno annullati solo gli ordini creati, autorizzati o parzialmente spediti. Se parzialmente spediti, verranno annullati solo gli articoli non spediti.</helpText>
         </input-field>
         <input-field type="bool">
             <name>automaticOrderExpire</name>
@@ -391,24 +460,29 @@
             <label>Automatic Expiration</label>
             <label lang="de-DE">Automatische Ablauf</label>
             <label lang="nl-NL">Automatische vervaldatum</label>
+            <label lang="it-IT">Scadenza automatica</label>
             <helpText>If enabled, the plugin will automatically expire orders with the payment status "In Progress".</helpText>
             <helpText lang="de-DE">Wenn aktiviert, lässt das Plugin Bestellungen mit dem Status „In Bearbeitung“ und dem Zahlungsstatus „Offen“ oder „Autorisiert“ automatisch ablaufen.</helpText>
             <helpText lang="nl-NL">Als deze optie is ingeschakeld, verlopen bestellingen met de status 'In uitvoering' en de betalingsstatus 'Open' of 'Geautoriseerd' automatisch.</helpText>
+            <helpText lang="it-IT">Se abilitato, il plugin scadrà automaticamente gli ordini con lo stato di pagamento "In corso".</helpText>
         </input-field>
     </card>
     <card>
         <title>Refund Manager</title>
         <title lang="de-DE">Refund Manager</title>
         <title lang="nl-NL">Refund Manager</title>
+        <title lang="it-IT">Refund Manager</title>
         <input-field type="bool">
             <name>refundManagerEnabled</name>
             <defaultValue>true</defaultValue>
             <label>Enable Refund Manager</label>
             <label lang="de-DE">Refund Manager aktivieren</label>
             <label lang="nl-NL">Refund Manager inschakelen</label>
+            <label lang="it-IT">Abilita Refund Manager</label>
             <helpText>Enable or disable the Refund Manager in the Administration</helpText>
             <helpText lang="de-DE">Aktivieren oder deaktivieren Sie den Refund Manager in der Administration</helpText>
             <helpText lang="nl-NL">Schakel de Refund Manager in of uit in de administratie</helpText>
+            <helpText lang="it-IT">Attivare o disattivare il Gestore dei rimborsi nell'Amministrazione.</helpText>
         </input-field>
         <input-field type="bool">
             <name>refundManagerAutoStockReset</name>
@@ -416,9 +490,11 @@
             <label>Automatically include Stock-Reset</label>
             <label lang="de-DE">Automatisch Lagerbestand zurücksetzen vorbefüllen</label>
             <label lang="nl-NL">Automatisch voorraad-reset instellen</label>
+            <label lang="it-IT">Includi automaticamente Reimpostazione Stock</label>
             <helpText>Automatically set the entered refund quantity also as the quantity to be used to increase the stock again.</helpText>
             <helpText lang="de-DE">Sofern aktiv, wird die eingegebene Rückerstattungsmenge automatisch als Menge für den Lagerbestand verwendet und dieses Feld vorbefüllt.</helpText>
             <helpText lang="nl-NL">Stel de ingevoerde restitutiehoeveelheid automatisch ook in als de hoeveelheid die moet worden gebruikt om de voorraad weer te vergroten</helpText>
+            <helpText lang="it-IT">Imposta automaticamente la quantità di rimborso inserita anche come quantità da utilizzare per aumentare nuovamente lo stock.</helpText>
         </input-field>
         <input-field type="bool">
             <name>refundManagerVerifyRefund</name>
@@ -426,9 +502,11 @@
             <label>Verify Refunds</label>
             <label lang="de-DE">Rückerstattungen überprüfen</label>
             <label lang="nl-NL">Terugbetalingen controleren</label>
+            <label lang="it-IT">Verifica rimborsi</label>
             <helpText>If enabled, a verification checkbox needs to be checked to proceed with the refund. We recommend this to avoid accidental refunds and stock changes.</helpText>
             <helpText lang="de-DE">Wenn aktiv, muss ein Überprüfungskästchen aktiviert werden, um mit der Rückerstattung fortzufahren. Wir empfehlen dies, um versehentliche Rückerstattungen und Bestandsänderungen zu vermeiden.</helpText>
             <helpText lang="nl-NL">Indien actief, moet een selectievakje worden geactiveerd om verder te gaan met de terugbetaling. Wij raden dit aan om onbedoelde terugbetalingen en voorraadwijzigingen te voorkomen.</helpText>
+            <helpText lang="it-IT">Se abilitato, è necessario selezionare una casella di verifica per procedere con il rimborso. Raccomandiamo questa opzione per evitare rimborsi accidentali e modifiche dello stock.</helpText>
         </input-field>
         <input-field type="bool">
             <name>refundManagerShowInstructions</name>
@@ -436,9 +514,11 @@
             <label>Show Instructions</label>
             <label lang="de-DE">Anleitungen anzeigen</label>
             <label lang="nl-NL">Handleiding tonen</label>
+            <label lang="it-IT">Mostra istruzioni</label>
             <helpText>Shows or hides the instructions area. You can simply turn this off in case it's disturbing once you're familiar with the Refund Manager.</helpText>
             <helpText lang="de-DE">Diese Funktion kann benutzt werden, um die Anleitungen auszublenden, sofern man einmal mit dem Refund Manager vetraut ist.</helpText>
             <helpText lang="nl-NL">Toont of verbergt de handleiding. Als het storend is, kan je het direkt deactiveren als je eenmaal vertrouwd bent met de Refund Manager.</helpText>
+            <helpText lang="it-IT">Mostra o nasconde l'area delle istruzioni. Puoi semplicemente disattivarla nel caso in cui diventi fastidiosa una volta che hai preso familiarità con il Gestore Rimborsi.</helpText>
         </input-field>
         <input-field type="bool">
             <name>refundManagerCreateCreditNotes</name>
@@ -446,9 +526,11 @@
             <label>Create Credit Notes</label>
             <label lang="de-DE">Gutschriften erstellen</label>
             <label lang="nl-NL">Creditnota's maken</label>
+            <label lang="it-IT">Crea note di credito</label>
             <helpText>Automatically create a credit note in Shopware when a refund is processed.</helpText>
             <helpText lang="de-DE">Erstellt automatisch eine Gutschrift in Shopware, wenn eine Rückerstattung verarbeitet wird.</helpText>
             <helpText lang="nl-NL">Maak automatisch een creditnota in Shopware wanneer een terugbetaling wordt verwerkt.</helpText>
+            <helpText lang="it-IT">Crea automaticamente una nota di credito in Shopware quando viene elaborato un rimborso.</helpText>
         </input-field>
         <input-field type="text">
             <name>refundManagerCreateCreditNotesPrefix</name>
@@ -456,9 +538,11 @@
             <label>Credit Note Prefix</label>
             <label lang="de-DE">Gutschrift Präfix</label>
             <label lang="nl-NL">Creditnota voorvoegsel</label>
+            <label lang="it-IT">Prefisso della nota di credito</label>
             <helpText>Prefix for the credit note number. Credit note consist of prefix, original line item name and suffix</helpText>
             <helpText lang="de-DE">Präfix für die Gutschriftsnummer. Die Gutschrift besteht aus Präfix, ursprünglichem Positionsnamen und Suffix</helpText>
             <helpText lang="nl-NL">Voorvoegsel voor het creditnotanummer. De creditnota bestaat uit een voorvoegsel, de oorspronkelijke naam van het line item en een achtervoegsel.</helpText>
+            <helpText lang="it-IT">Prefisso per il numero della nota di credito. La nota di credito è composta da prefisso, nome dell'articolo originale e suffisso</helpText>
         </input-field>
         <input-field type="text">
             <name>refundManagerCreateCreditNotesSuffix</name>
@@ -466,51 +550,60 @@
             <label>Credit Note Suffix</label>
             <label lang="de-DE">Gutschrift Suffix</label>
             <label lang="nl-NL">Creditnota achtervoegsel</label>
+            <label lang="it-IT">Suffisso della nota di credito</label>
             <helpText>Suffix for the credit note number. Credit note consist of prefix, original line item name and suffix</helpText>
             <helpText lang="de-DE">Suffix für die Gutschriftsnummer. Die Gutschrift besteht aus Präfix, ursprünglichem Positionsnamen und Suffix</helpText>
             <helpText lang="nl-NL">Achtervoegsel voor het creditnotanummer. De creditnota bestaat uit een voorvoegsel, de oorspronkelijke naam van het line item en een achtervoegsel.</helpText>
+            <helpText lang="it-IT">Suffisso per il numero della nota di credito. La nota di credito è composta da prefisso, nome dell'articolo originale e suffisso</helpText>
         </input-field>
     </card>
     <card>
         <title>Order State Automation</title>
         <title lang="de-DE">Automatisch Order Status setzen</title>
         <title lang="nl-NL">Automatisch bestelstatus instellen</title>
+        <title lang="it-IT">Automazione dello Stato dell'Ordine</title>
 
         <input-field type="single-select">
             <name>orderStateWithAPaidTransaction</name>
             <label>Order state with a paid transaction</label>
             <label lang="de-DE">Bestellstatus bei einer bezahlten Transaktion</label>
             <label lang="nl-NL">Bestelstatus bij een betaalde transactie</label>
+            <label lang="it-IT">Stato dell'ordine per una transazione pagata</label>
             <options>
                 <option>
                     <id>skip</id>
                     <name>Skip this status</name>
                     <name lang="de-DE">nichts machen</name>
                     <name lang="nl-NL">Sla deze status over</name>
+                    <name lang="it-IT">Salta questo stato</name>
                 </option>
                 <option>
                     <id>open</id>
                     <name>Open</name>
                     <name lang="de-DE">Offen</name>
                     <name lang="nl-NL">Open</name>
+                    <name lang="it-IT">Aperto</name>
                 </option>
                 <option>
                     <id>in_progress</id>
                     <name>In progress</name>
                     <name lang="de-DE">In Bearbeitung</name>
                     <name lang="nl-NL">In uitvoering</name>
+                    <name lang="it-IT">In corso</name>
                 </option>
                 <option>
                     <id>completed</id>
                     <name>Completed</name>
                     <name lang="de-DE">Komplett</name>
                     <name lang="nl-NL">Voltooid</name>
+                    <name lang="it-IT">Completato</name>
                 </option>
                 <option>
                     <id>cancelled</id>
                     <name>Cancelled</name>
                     <name lang="de-DE">Abgebrochen</name>
                     <name lang="nl-NL">Geannuleerd</name>
+                    <name lang="it-IT">Annullato</name>
                 </option>
             </options>
         </input-field>
@@ -519,36 +612,42 @@
             <label>Order state with a failed transaction</label>
             <label lang="de-DE">Bestellstatus bei einer fehlgeschlagenen Transaktion</label>
             <label lang="nl-NL">Bestelstatus bij een mislukte transactie</label>
+            <label lang="it-IT">Stato dell'ordine per una transazione non riuscita</label>
             <options>
                 <option>
                     <id>skip</id>
                     <name>Skip this status</name>
                     <name lang="de-DE">nichts machen</name>
                     <name lang="nl-NL">Sla deze status over</name>
+                    <name lang="it-IT">Salta questo stato</name>
                 </option>
                 <option>
                     <id>open</id>
                     <name>Open</name>
                     <name lang="de-DE">Offen</name>
                     <name lang="nl-NL">Open</name>
+                    <name lang="it-IT">Aperto</name>
                 </option>
                 <option>
                     <id>in_progress</id>
                     <name>In progress</name>
                     <name lang="de-DE">In Bearbeitung</name>
                     <name lang="nl-NL">In uitvoering</name>
+                    <name lang="it-IT">In corso</name>
                 </option>
                 <option>
                     <id>completed</id>
                     <name>Completed</name>
                     <name lang="de-DE">Komplett</name>
                     <name lang="nl-NL">Voltooid</name>
+                    <name lang="it-IT">Completato</name>
                 </option>
                 <option>
                     <id>cancelled</id>
                     <name>Cancelled</name>
                     <name lang="de-DE">Abgebrochen</name>
                     <name lang="nl-NL">Geannuleerd</name>
+                    <name lang="it-IT">Annullato</name>
                 </option>
             </options>
         </input-field>
@@ -557,36 +656,42 @@
             <label>Order state with a cancelled transaction</label>
             <label lang="de-DE">Bestellstatus bei einer abgebrochenen Transaktion</label>
             <label lang="nl-NL">Bestelstatus bij een geannuleerde transactie</label>
+            <label lang="it-IT">Stato dell'ordine per una transazione annullata</label>
             <options>
                 <option>
                     <id>skip</id>
                     <name>Skip this status</name>
                     <name lang="de-DE">nichts machen</name>
                     <name lang="nl-NL">Sla deze status over</name>
+                    <name lang="it-IT">Salta questo stato</name>
                 </option>
                 <option>
                     <id>open</id>
                     <name>Open</name>
                     <name lang="de-DE">Offen</name>
                     <name lang="nl-NL">Open</name>
+                    <name lang="it-IT">Aperto</name>
                 </option>
                 <option>
                     <id>in_progress</id>
                     <name>In progress</name>
                     <name lang="de-DE">In Bearbeitung</name>
                     <name lang="nl-NL">In uitvoering</name>
+                    <name lang="it-IT">In corso</name>
                 </option>
                 <option>
                     <id>completed</id>
                     <name>Completed</name>
                     <name lang="de-DE">Komplett</name>
                     <name lang="nl-NL">Voltooid</name>
+                    <name lang="it-IT">Completato</name>
                 </option>
                 <option>
                     <id>cancelled</id>
                     <name>Cancelled</name>
                     <name lang="de-DE">Abgebrochen</name>
                     <name lang="nl-NL">Geannuleerd</name>
+                    <name lang="it-IT">Annullato</name>
                 </option>
             </options>
         </input-field>
@@ -595,36 +700,42 @@
             <label>Order state with a authorized transaction</label>
             <label lang="de-DE">Bestellstatus bei einer authorisierten Transaktion</label>
             <label lang="nl-NL">Bestelstatus bij een geautoriseerde transactie</label>
+            <label lang="it-IT">Stato dell'ordine per una transazione autorizzata</label>
             <options>
                 <option>
                     <id>skip</id>
                     <name>Skip this status</name>
                     <name lang="de-DE">nichts machen</name>
                     <name lang="nl-NL">Sla deze status over</name>
+                    <name lang="it-IT">Salta questo stato</name>
                 </option>
                 <option>
                     <id>open</id>
                     <name>Open</name>
                     <name lang="de-DE">Offen</name>
                     <name lang="nl-NL">Open</name>
+                    <name lang="it-IT">Aperto</name>
                 </option>
                 <option>
                     <id>in_progress</id>
                     <name>In progress</name>
                     <name lang="de-DE">In Bearbeitung</name>
                     <name lang="nl-NL">In uitvoering</name>
+                    <name lang="it-IT">In corso</name>
                 </option>
                 <option>
                     <id>completed</id>
                     <name>Completed</name>
                     <name lang="de-DE">Komplett</name>
                     <name lang="nl-NL">Voltooid</name>
+                    <name lang="it-IT">Completato</name>
                 </option>
                 <option>
                     <id>cancelled</id>
                     <name>Cancelled</name>
                     <name lang="de-DE">Abgebrochen</name>
                     <name lang="nl-NL">Geannuleerd</name>
+                    <name lang="it-IT">Annullato</name>
                 </option>
             </options>
         </input-field>
@@ -633,36 +744,42 @@
             <label>Order state with a charged back transaction</label>
             <label lang="de-DE">Bestellstatus bei einer zurückgebuchten Transaktion</label>
             <label lang="nl-NL">Bestelstatus bij een teruggevorderde transactie</label>
+            <label lang="it-IT">Stato dell'ordine per una transazione rimborsata</label>
             <options>
                 <option>
                     <id>skip</id>
                     <name>Skip this status</name>
                     <name lang="de-DE">nichts machen</name>
                     <name lang="nl-NL">Sla deze status over</name>
+                    <name lang="it-IT">Salta questo stato</name>
                 </option>
                 <option>
                     <id>open</id>
                     <name>Open</name>
                     <name lang="de-DE">Offen</name>
                     <name lang="nl-NL">Open</name>
+                    <name lang="it-IT">Aperto</name>
                 </option>
                 <option>
                     <id>in_progress</id>
                     <name>In progress</name>
                     <name lang="de-DE">In Bearbeitung</name>
                     <name lang="nl-NL">In uitvoering</name>
+                    <name lang="it-IT">In corso</name>
                 </option>
                 <option>
                     <id>completed</id>
                     <name>Completed</name>
                     <name lang="de-DE">Komplett</name>
                     <name lang="nl-NL">Voltooid</name>
+                    <name lang="it-IT">Completato</name>
                 </option>
                 <option>
                     <id>cancelled</id>
                     <name>Cancelled</name>
                     <name lang="de-DE">Abgebrochen</name>
                     <name lang="nl-NL">Geannuleerd</name>
+                    <name lang="it-IT">Annullato</name>
                 </option>
             </options>
         </input-field>
@@ -671,36 +788,42 @@
             <label>Order state with a refund transaction</label>
             <label lang="de-DE">Bestellstatus bei einer zurückerstatteten Transaktion</label>
             <label lang="nl-NL">Bestelstatus bij een terugbetaalde transactie</label>
+            <label lang="it-IT">Stato dell'ordine per una transazione di rimborso</label>
             <options>
                 <option>
                     <id>skip</id>
                     <name>Skip this status</name>
                     <name lang="de-DE">nichts machen</name>
                     <name lang="nl-NL">Sla deze status over</name>
+                    <name lang="it-IT">Salta questo stato</name>
                 </option>
                 <option>
                     <id>open</id>
                     <name>Open</name>
                     <name lang="de-DE">Offen</name>
                     <name lang="nl-NL">Open</name>
+                    <name lang="it-IT">Aperto</name>
                 </option>
                 <option>
                     <id>in_progress</id>
                     <name>In progress</name>
                     <name lang="de-DE">In Bearbeitung</name>
                     <name lang="nl-NL">In uitvoering</name>
+                    <name lang="it-IT">In corso</name>
                 </option>
                 <option>
                     <id>completed</id>
                     <name>Completed</name>
                     <name lang="de-DE">Komplett</name>
                     <name lang="nl-NL">Voltooid</name>
+                    <name lang="it-IT">Completato</name>
                 </option>
                 <option>
                     <id>cancelled</id>
                     <name>Cancelled</name>
                     <name lang="de-DE">Abgebrochen</name>
                     <name lang="nl-NL">Geannuleerd</name>
+                    <name lang="it-IT">Annullato</name>
                 </option>
             </options>
         </input-field>
@@ -709,36 +832,42 @@
             <label>Order state with a partial refund transaction</label>
             <label lang="de-DE">Bestellstatus bei einer teilweise erstatteten Transaktion</label>
             <label lang="nl-NL">Bestelstatus bij een gedeeltelijk terugbetaalde transactie</label>
+            <label lang="it-IT">Stato dell'ordine per una transazione di rimborso parziale</label>
             <options>
                 <option>
                     <id>skip</id>
                     <name>Skip this status</name>
                     <name lang="de-DE">nichts machen</name>
                     <name lang="nl-NL">Sla deze status over</name>
+                    <name lang="it-IT">Salta questo stato</name>
                 </option>
                 <option>
                     <id>open</id>
                     <name>Open</name>
                     <name lang="de-DE">Offen</name>
                     <name lang="nl-NL">Open</name>
+                    <name lang="it-IT">Aperto</name>
                 </option>
                 <option>
                     <id>in_progress</id>
                     <name>In progress</name>
                     <name lang="de-DE">In Bearbeitung</name>
                     <name lang="nl-NL">In uitvoering</name>
+                    <name lang="it-IT">In corso</name>
                 </option>
                 <option>
                     <id>completed</id>
                     <name>Completed</name>
                     <name lang="de-DE">Komplett</name>
                     <name lang="nl-NL">Voltooid</name>
+                    <name lang="it-IT">Completato</name>
                 </option>
                 <option>
                     <id>cancelled</id>
                     <name>Cancelled</name>
                     <name lang="de-DE">Abgebrochen</name>
                     <name lang="nl-NL">Geannuleerd</name>
+                    <name lang="it-IT">Annullato</name>
                 </option>
             </options>
         </input-field>
@@ -748,9 +877,11 @@
             <label>Final order state</label>
             <label lang="de-DE">Finaler Bestellstatus</label>
             <label lang="nl-NL">Definitieve Bestelstatus</label>
+            <label lang="it-IT">Stato finale dell'ordine</label>
             <helpText>If enabled, the plugin will not transition to a new order state, if the final state is already set in the order. Use this feature in combination with plugins and systems if their workflows do not match the one from Mollie.</helpText>
             <helpText lang="de-DE">Wenn aktiv, wechselt das Plugin nicht in einen neuen Bestellstatus, wenn der finale Status bereits in der Bestellung verwendet wird. Verwenden Sie diese Funktion in Kombination mit Plugins und -Systemen, wenn deren Workflows nicht mit denen von Mollie übereinstimmen.</helpText>
             <helpText lang="nl-NL">Indien ingeschakeld, gaat de plug-in niet over naar een nieuwe bestelstatus, als de definitieve status al in de bestelling is ingesteld. Gebruik deze functie in combinatie met plug-ins en -systemen als hun workflows niet overeenkomen met die van Mollie.</helpText>
+            <helpText lang="it-IT">Se abilitato, il plugin non passerà a un nuovo stato dell'ordine se lo stato finale è già impostato nell'ordine. Usa questa funzione in combinazione con plugin e sistemi se i loro flussi di lavoro non corrispondono a quello di Mollie.</helpText>
         </component>
 
     </card>
@@ -759,15 +890,18 @@
         <title>Subscriptions</title>
         <title lang="de-DE">Abonnements</title>
         <title lang="nl-NL">Abonnementen</title>
+        <title lang="it-IT">Abbonamenti</title>
         <input-field type="bool">
             <name>subscriptionsEnabled</name>
             <defaultValue>true</defaultValue>
             <label>Enable Mollie subscriptions</label>
             <label lang="de-DE">Mollie Abonnements aktivieren</label>
             <label lang="nl-NL">Mollie abonnementen activeren</label>
+            <label lang="it-IT">Abilita abbonamenti Mollie</label>
             <helpText>Enables or disables the full subscription functionality. Please reload the administration after changing this setting.</helpText>
             <helpText lang="de-DE">Aktiviert oder deaktiviert die vollständige Abonnementfunktion. Bitte laden Sie die Administration neu, nachdem Sie diese Einstellung geändert haben.</helpText>
             <helpText lang="nl-NL">Schakelt de volledige abonnementsfunctionaliteit in of uit. Herlaad de administratie na het wijzigen van deze instelling.</helpText>
+            <helpText lang="it-IT">Abilita o disabilita la funzionalità completa degli abbonamenti. Ricarica l'amministrazione dopo aver modificato questa impostazione.</helpText>
         </input-field>
         <input-field type="bool">
             <name>subscriptionsShowIndicator</name>
@@ -775,9 +909,11 @@
             <label>Show subscription indicator</label>
             <label lang="de-DE">Abonnementetikett auf Produktseite anzeigen</label>
             <label lang="nl-NL">Label Abonnementen weergeven op productpagina</label>
+            <label lang="it-IT">Mostra indicatore di abbonamento</label>
             <helpText>Shows a subscription indicator on the product detail page of a subscription product.</helpText>
             <helpText lang="de-DE">Zeigt einen Abonnementhinweis auf der Produktdetailseite an.</helpText>
             <helpText lang="nl-NL">Toont een abonnement indicator op de productpagina van een abonnement product.</helpText>
+            <helpText lang="it-IT">Mostra un indicatore di abbonamento nella pagina dei dettagli del prodotto di un prodotto in abbonamento.</helpText>
         </input-field>
         <input-field type="bool">
             <name>subscriptionsAllowAddressEditing</name>
@@ -785,9 +921,11 @@
             <label>Allow customers to edit billing and shipping addresses for running subscriptions</label>
             <label lang="de-DE">Kunden erlauben die Rechnungs- und Lieferadresse zu bearbeiten</label>
             <label lang="nl-NL">Klanten toelaten om factuur- en verzendadressen voor lopende abonnementen te bewerken</label>
+            <label lang="it-IT">Consenti ai clienti di modificare gli indirizzi di fatturazione e spedizione per gli abbonamenti in corso</label>
             <helpText>If enabled, customers are allowed to edit their billing and shipping addresses in the shop. Please consider that no new shipping costs will be calculated for modified addresses. Countries are not allowed to be edited.</helpText>
             <helpText lang="de-DE">Wenn aktiv, dürfen Kunden ihre Rechnungs- und Lieferadressen im Shop bearbeiten. Bitte beachten Sie, dass für geänderte Adressen keine neuen Versandkosten berechnet werden. Länder dürfen nicht bearbeitet werden.</helpText>
             <helpText lang="nl-NL">Indien ingeschakeld, mogen klanten hun factuur- en verzendadres in de shop bewerken. Houd er rekening mee dat er geen nieuwe verzendkosten worden berekend voor gewijzigde adressen. Landen mogen niet worden bewerkt.</helpText>
+            <helpText lang="it-IT">Se abilitato, i clienti possono modificare i propri indirizzi di fatturazione e spedizione nel negozio. Si prega di considerare che per gli indirizzi modificati non verranno calcolati nuovi costi di spedizione. Non è consentito modificare i paesi.</helpText>
         </input-field>
         <input-field type="bool">
             <name>subscriptionsAllowPauseResume</name>
@@ -795,9 +933,11 @@
             <label>Allow customers to pause and resume running subscriptions</label>
             <label lang="de-DE">Kunden erlauben laufende Abonnements zu pausieren und fortzusetzen</label>
             <label lang="nl-NL">Laat klanten lopende abonnementen onderbreken en hervatten</label>
+            <label lang="it-IT">Consenti ai clienti di mettere in pausa e riprendere gli abbonamenti in corso</label>
             <helpText>If enabled, customers are allowed to pause and also resume their subscriptions in their account.</helpText>
             <helpText lang="de-DE">Wenn diese Option aktiviert ist, können Kunden ihre Abonnements in ihrem Konto pausieren und auch fortsetzen.</helpText>
             <helpText lang="nl-NL">Indien ingeschakeld, mogen klanten hun abonnementen onderbreken en hervatten in hun account.</helpText>
+            <helpText lang="it-IT">Se abilitato, i clienti possono mettere in pausa e riprendere i loro abbonamenti nel loro account.</helpText>
         </input-field>
         <input-field type="bool">
             <name>subscriptionsAllowSkip</name>
@@ -805,9 +945,11 @@
             <label>Allow customers to skip an upcoming subscription renewal</label>
             <label lang="de-DE">Kunden erlauben eine anstehende Abonnementverlängerung zu überspringen</label>
             <label lang="nl-NL">Sta klanten toe een lopende abonnementsverlenging over te slaan</label>
+            <label lang="it-IT">Consenti ai clienti di saltare un prossimo rinnovo dell'abbonamento</label>
             <helpText>If enabled, customers are allowed to skip an upcoming renewal of a running subscription. This also takes the last notice period into account.</helpText>
             <helpText lang="de-DE">Wenn diese Option aktiviert ist, können Kunden eine bevorstehende Verlängerung eines laufenden Abonnements überspringen. Dabei wird auch die letzte Kündigungsfrist berücksichtigt.</helpText>
             <helpText lang="nl-NL">Indien ingeschakeld, mogen klanten een aanstaande verlenging van een lopend abonnement overslaan. Hierbij wordt ook rekening gehouden met de laatste opzegtermijn.</helpText>
+            <helpText lang="it-IT">Se abilitato, i clienti possono saltare un prossimo rinnovo di un abbonamento in corso. Viene preso in considerazione anche l'ultimo periodo di preavviso.</helpText>
         </input-field>
         <input-field type="bool">
             <name>subscriptionSkipRenewalsOnFailedPayments</name>
@@ -815,9 +957,11 @@
             <label>Skip subscription renewal if payment fails</label>
             <label lang="de-DE">Abonnementverlängerung überspringen, wenn die Zahlung fehlschlägt</label>
             <label lang="nl-NL">Abonnementverlenging overslaan als de betaling mislukt</label>
+            <label lang="it-IT">Salta il rinnovo dell'abbonamento se il pagamento non riesce</label>
             <helpText>If skipped, the plugin will not create new orders on subscription renewals, if the payment was not successful. If not skipped, then a new order is created and the customer can pay again within Shopware.</helpText>
             <helpText lang="de-DE">Wenn es übersprungen wird, erstellt das Plugin keine neuen Bestellungen bei Abonnementverlängerungen, wenn die Zahlung nicht erfolgreich war. Wenn nicht übersprungen, wird eine neue Bestellung erstellt und der Kunde kann innerhalb von Shopware erneut bezahlen.</helpText>
             <helpText lang="nl-NL">Indien overgeslagen, zal de plug-in geen nieuwe bestellingen maken bij abonnementsverlengingen, als de betaling niet succesvol was. Indien niet overgeslagen, dan wordt er een nieuwe bestelling aangemaakt en kan de klant opnieuw betalen binnen Shopware.</helpText>
+            <helpText lang="it-IT">Se saltato, il plugin non creerà nuovi ordini al momento dei rinnovi degli abbonamenti se il pagamento non è stato completato con successo. Se non è saltato, verrà creato un nuovo ordine e il cliente potrà effettuare nuovamente il pagamento all'interno di Shopware.</helpText>
         </input-field>
         <input-field type="int">
             <name>subscriptionsReminderDays</name>
@@ -825,9 +969,11 @@
             <label>Reminder period before renewal (days)</label>
             <label lang="de-DE">Erinnerungszeitpunkt vor Erneuerung (Tage)</label>
             <label lang="nl-NL">Herinneringsperiode voor verlenging (dagen)</label>
+            <label lang="it-IT">Periodo di promemoria prima del rinnovo (giorni)</label>
             <helpText>Set the days in prior to the renewal for sending renewal reminder events in the system (Flow Builder, Business Events, ...).</helpText>
             <helpText lang="de-DE">Legen Sie die Tage vor der Verlängerung für das Senden von Verlängerungs-Erinnerungsereignissen im System fest (Flow Builder, Business Events, ...).</helpText>
             <helpText lang="nl-NL">Stel de dagen voorafgaand aan de verlenging in voor het verzenden van herinneringsgebeurtenissen in het systeem (Flow Builder, Business Events, ...)</helpText>
+            <helpText lang="it-IT">Imposta il numero di giorni prima del rinnovo per l'invio degli eventi di promemoria del rinnovo nel sistema (Flow Builder, Business Events, ...).</helpText>
         </input-field>
         <input-field type="int">
             <name>subscriptionsCancellationDays</name>
@@ -835,9 +981,11 @@
             <label>Latest notice period before renewal (days)</label>
             <label lang="de-DE">Letzter Kündigungstermin vor Verlängerung (Tagen)</label>
             <label lang="nl-NL">Laatste opzegtermijn voor verlenging (dagen)</label>
+            <label lang="it-IT">Ultimo periodo di preavviso prima del rinnovo (giorni)</label>
             <helpText>Set a notice period for customers before renewing the subscription. If a subscription renews on Friday and you use "2", then it can be cancelled or paused with latest Wednesday. Use "0" to always allow cancellations.</helpText>
             <helpText lang="de-DE">Legen Sie eine Kündigungsfrist für Verlänägerungen von Abonnements fest. Wenn sich ein Abonnement am Freitag verlängert und Sie "2" verwenden, kann es bis spätestens Mittwoch gekündigt oder pausiert werden. Verwenden Sie "0", um Stornierungen immer zuzulassen.</helpText>
             <helpText lang="nl-NL">Stel een opzegtermijn in voor klanten voordat ze het abonnement verlengen. Als een abonnement op vrijdag wordt verlengd en je gebruikt "2", dan kan het uiterlijk woensdag worden opgezegd of onderbroken. Gebruik "0" om annuleringen altijd toe te staan</helpText>
+            <helpText lang="it-IT">Imposta un periodo di preavviso per i clienti prima del rinnovo dell'abbonamento. Se l'abbonamento si rinnova il venerdì e imposti "2", allora può essere annullato o messo in pausa entro e non oltre mercoledì. Usa "0" per permettere sempre le cancellazioni.</helpText>
         </input-field>
     </card>
 
@@ -845,30 +993,36 @@
         <title>Rounding</title>
         <title lang="de-DE">Rundungen</title>
         <title lang="nl-NL">Afrondingen</title>
+        <title lang="it-IT">Arrotondamento</title>
         <input-field type="bool">
             <name>fixRoundingDiffEnabled</name>
             <label>Create line item in Mollie Dashboard</label>
             <label lang="de-DE">Erstelle Position in Mollie Dashboard</label>
             <label lang="nl-NL">Item maken in Mollie Dashboard</label>
+            <label lang="it-IT">Crea voce di dettaglio nella Mollie Dashboard</label>
             <defaultValue>false</defaultValue>
         </input-field>
         <input-field type="text">
             <name>fixRoundingDiffName</name>
             <label>Line item name (optional)</label>
-            <label lang="de-DE">Automatisches Beheben von Rundungsproblemen</label>
-            <label lang="nl-NL">Automatisches Beheben von Rundungsproblemen</label>
+            <label lang="de-DE">Name der Position (optional)</label>
+            <label lang="nl-NL">Naam regelitem (optioneel)</label>
+            <label lang="it-IT">Nome della voce di dettaglio (opzionale)</label>
             <helpText>Set a custom name for your separate line item. This helps if you need to identify it in another system.</helpText>
             <helpText lang="de-DE">Lege einen benutzerdefinierten Namen für die separate Position fest. Dies hilft, wenn diese in einem anderen System identifiert werden muss.</helpText>
             <helpText lang="nl-NL">Stel een aangepaste naam in voor uw afzonderlijke regelitem. Dit is handig als u het in een ander systeem moet identificeren.</helpText>
+            <helpText lang="it-IT">Imposta un nome personalizzato per la tua voce di dettaglio separata. Questo è utile se devi identificarla in un altro sistema.</helpText>
         </input-field>
         <input-field type="text">
             <name>fixRoundingDiffSKU</name>
             <label>Line item SKU (optional)</label>
-            <label lang="de-DE">Automatisches Beheben von Rundungsproblemen</label>
-            <label lang="nl-NL">Automatisches Beheben von Rundungsproblemen</label>
+            <label lang="de-DE">SKU der Position (optional)</label>
+            <label lang="nl-NL">SKU regelitem (optioneel)</label>
+            <label lang="it-IT">SKU della voce di dettaglio (opzionale)</label>
             <helpText>Set a custom SKU value for your separate line item. This helps if you need to identify it in another system.</helpText>
             <helpText lang="de-DE">Lege einen benutzerdefinierten SKU Wert für die separate Position fest. Dies hilft, wenn diese in einem anderen System identifiert werden muss.</helpText>
             <helpText lang="nl-NL">Stel een aangepaste SKU in voor uw afzonderlijke regelitem. Dit is handig als u het in een ander systeem moet identificeren.</helpText>
+            <helpText lang="it-IT">Imposta un valore SKU personalizzato per la tua voce di dettaglio separata. Questo è utile se devi identificarla in un altro sistema.</helpText>
         </input-field>
         <component name="mollie-pluginconfig-section-rounding">
             <name>molliePluginConfigSectionRounding</name>
@@ -879,15 +1033,18 @@
         <title>Javascript</title>
         <title lang="de-DE">Storefront Javascript</title>
         <title lang="nl-NL">Storefront Javascript</title>
+        <title lang="it-IT">Storefront Javascript</title>
         <input-field type="bool">
             <name>useShopwareJavascript</name>
             <label>Use Shopware default Javascript in Storefront (requires manual compilation)</label>
             <label lang="de-DE">Verwenden Sie Shopware-Standard-Javascript in Storefront (erfordert manuelle Kompilierung)</label>
             <label lang="nl-NL">Gebruik Shopware standaard Javascript in Storefront (vereist handmatig bouwen)</label>
+            <label lang="it-IT">Usa il Javascript predefinito di Shopware nella vetrina (richiede la compilazione manuale)</label>
             <defaultValue>false</defaultValue>
             <helpText>You can also bring back Mollie inside the "all.js" of the theme directly. This requires that you rebuild the Storefront on your own.</helpText>
-            <helpText>Sie können Mollie auch direkt in die "all.js" des Themes zurückbringen. Dies erfordert, dass Sie die Storefront selbst neu erstellen.</helpText>
+            <helpText lang="de-DE">Sie können Mollie auch direkt in die "all.js" des Themes zurückbringen. Dies erfordert, dass Sie die Storefront selbst neu erstellen.</helpText>
             <helpText lang="nl-NL">Je kunt Mollie ook rechtstreeks terugbrengen in de "all.js" van het thema. Dit vereist dat je de Storefront zelf herbouwt.</helpText>
+            <helpText lang="it-IT">Puoi anche reintegrare Mollie direttamente all'interno del file "all.js" del tema. Questo richiede che tu ricompili la vetrina autonomamente.</helpText>
         </input-field>
     </card>
 
