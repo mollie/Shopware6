@@ -77,6 +77,11 @@ class OrderStateService
                 $e->getMessage(),
                 [
                     'function' => 'payment-automate-order-state',
+                    'order.id' => $order->getId(),
+                    'order.number' => $order->getOrderNumber(),
+                    'new.state' => $orderState,
+                    'old.state' => $currentStatus,
+                    'trace' => $e->getTraceAsString(),
                 ]
             );
         }
