@@ -8,6 +8,10 @@
   "paths": {
     "/mollie/pos/checkout": {
       "get": {
+        "tags": [
+          "Mollie",
+          "POS"
+        ],
         "summary": "Render POS Checkout",
         "operationId": "renderPosCheckout",
         "responses": {

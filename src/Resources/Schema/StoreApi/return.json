@@ -8,6 +8,10 @@
   "paths": {
     "/mollie/payment/{swTransactionId}": {
       "get": {
+        "tags": [
+          "Mollie",
+          "Payment"
+        ],
         "summary": "Handle Mollie Payment (GET)",
         "operationId": "handleMolliePaymentGet",
         "parameters": [
@@ -29,6 +33,10 @@
         }
       },
       "post": {
+        "tags": [
+          "Mollie",
+          "Payment"
+        ],
         "summary": "Handle Mollie Payment (POST)",
         "operationId": "handleMolliePaymentPost",
         "parameters": [

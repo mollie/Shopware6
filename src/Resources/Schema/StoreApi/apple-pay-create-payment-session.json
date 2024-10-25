@@ -8,6 +8,10 @@
   "paths": {
     "/mollie/applepay/validate/createPaymentSession": {
       "post": {
+        "tags": [
+          "Mollie",
+          "ApplePay"
+        ],
         "summary": "Validate and Create Apple Pay Payment Session",
         "operationId": "validateAndCreateApplePayPaymentSession",
         "requestBody": {

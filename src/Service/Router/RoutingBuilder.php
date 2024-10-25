@@ -197,9 +197,11 @@ class RoutingBuilder
      */
     public function buildPaypalExpressRedirectUrl(): string
     {
-        $confirmPage = $this->router->generate('frontend.mollie.paypal-express.finish', [], $this->router::ABSOLUTE_URL);
-
-        return $confirmPage;
+        $isStoreApiCall = $this->routingDetector->isStoreApiRoute();
+        if ($isStoreApiCall) {
+            return $this->router->generate('store-api.mollie.paypal-express.checkout.finish', [], $this->router::ABSOLUTE_URL);
+        }
+        return $this->router->generate('frontend.mollie.paypal-express.finish', [], $this->router::ABSOLUTE_URL);
     }
 
     /**
@@ -207,9 +209,11 @@ class RoutingBuilder
      */
     public function buildPaypalExpressCancelUrl(): string
     {
-        $confirmPage = $this->router->generate('frontend.mollie.paypal-express.cancel', [], $this->router::ABSOLUTE_URL);
-
-        return $confirmPage;
+        $isStoreApiCall = $this->routingDetector->isStoreApiRoute();
+        if ($isStoreApiCall) {
+            return $this->router->generate('store-api.mollie.paypal-express.checkout.cancel', [], $this->router::ABSOLUTE_URL);
+        }
+        return $this->router->generate('frontend.mollie.paypal-express.cancel', [], $this->router::ABSOLUTE_URL);
     }
 
 

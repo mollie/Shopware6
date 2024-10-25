@@ -8,6 +8,10 @@
   "paths": {
     "/mollie/webhook/subscription/{swSubscriptionId}": {
       "get": {
+        "tags": [
+          "Mollie",
+          "Webhook"
+        ],
         "summary": "Handle Mollie Subscription Webhook (GET)",
         "operationId": "handleMollieSubscriptionWebhookGet",
         "parameters": [
@@ -66,6 +70,10 @@
         }
       },
       "post": {
+        "tags": [
+          "Mollie",
+          "Webhook"
+        ],
         "summary": "Handle Mollie Subscription Webhook (POST)",
         "operationId": "handleMollieSubscriptionWebhookPost",
         "parameters": [

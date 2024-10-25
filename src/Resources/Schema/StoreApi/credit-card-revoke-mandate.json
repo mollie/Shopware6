@@ -8,6 +8,10 @@
   "paths": {
     "/mollie/mandate/revoke/{customerId}/{mandateId}": {
       "post": {
+        "tags": [
+          "Mollie",
+          "Credit Card"
+        ],
         "summary": "Revoke Mollie Mandate",
         "operationId": "revokeMollieMandate",
         "parameters": [

@@ -8,6 +8,10 @@
   "paths": {
     "/mollie/creditcard/store-token/{customerId}/{cardToken}": {
       "post": {
+        "tags": [
+          "Mollie",
+          "Credit Card"
+        ],
         "summary": "Store Mollie Credit Card Token",
         "operationId": "storeMollieCreditCardToken",
         "parameters": [

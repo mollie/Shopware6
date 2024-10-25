@@ -8,6 +8,10 @@
   "paths": {
     "/mollie/creditcard/store-mandate-id/{customerId}/{mandateId}": {
       "post": {
+        "tags": [
+          "Mollie",
+          "Credit Card"
+        ],
         "summary": "Store Mollie Credit Card Mandate ID",
         "operationId": "storeMollieCreditCardMandateId",
         "parameters": [

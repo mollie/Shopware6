@@ -8,6 +8,10 @@
   "paths": {
     "/mollie/applepay/restore-cart": {
       "post": {
+        "tags": [
+          "Mollie",
+          "ApplePay"
+        ],
         "summary": "Restore Apple Pay Cart",
         "operationId": "restoreApplePayCart",
         "responses": {

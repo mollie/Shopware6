@@ -8,6 +8,10 @@
   "paths": {
     "/mollie/applepay/id": {
       "get": {
+        "tags": [
+          "Mollie",
+          "ApplePay"
+        ],
         "summary": "Retrieve Apple Pay ID",
         "operationId": "retrieveApplePayId",
         "responses": {

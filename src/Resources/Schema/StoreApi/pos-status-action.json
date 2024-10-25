@@ -8,6 +8,10 @@
   "paths": {
     "/mollie/pos/{orderId}/{molliePaymentId}/status": {
       "get": {
+        "tags": [
+          "Mollie",
+          "POS"
+        ],
         "summary": "Check POS Payment Status",
         "operationId": "checkPosPaymentStatus",
         "parameters": [
