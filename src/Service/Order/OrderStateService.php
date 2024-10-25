@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Service\Order;
 
-use Exception;
 use Kiener\MolliePayments\Service\Transition\OrderTransitionServiceInterface;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Psr\Log\LoggerInterface;
