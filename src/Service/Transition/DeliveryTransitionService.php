@@ -200,7 +200,7 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
 
         try {
             $this->transitionService->performTransition(OrderDeliveryDefinition::ENTITY_NAME, $delivery->getId(), $transitionName, $context);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->loggerService->error(
                 $e->getMessage(),
                 [

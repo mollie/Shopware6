@@ -303,7 +303,7 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         );
         try {
             $this->transitionService->performTransition(OrderTransactionDefinition::ENTITY_NAME, $entityId, $transitionName, $context);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->logger->error(
                 $e->getMessage(),
                 [

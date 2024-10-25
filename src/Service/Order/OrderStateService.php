@@ -72,7 +72,7 @@ class OrderStateService
             }
 
             return true;
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             $this->logger->error(
                 $e->getMessage(),
                 [
