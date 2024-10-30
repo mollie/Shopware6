@@ -253,9 +253,7 @@ class RoutingBuilder
         # then always use this one and override existing ones
         if ($customDomain !== '') {
             $components = parse_url($url);
-            $host = (is_array($components) && isset($components['host'])) ? (string)$components['host'] : '';
-            # replace old domain with new custom domain
-            $url = str_replace($host, $customDomain, $url);
+            $url = $customDomain . ($components['path'] ?? '');
         }
 
         return $url;
