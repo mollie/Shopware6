@@ -294,6 +294,24 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
 
     private function performTransition(string $entityId, string $transitionName, Context $context): void
     {
-        $this->transitionService->performTransition(OrderTransactionDefinition::ENTITY_NAME, $entityId, $transitionName, $context);
+        $this->logger->debug(
+            sprintf(
+                'Performing transition %s for order transaction %s',
+                $transitionName,
+                $entityId
+            )
+        );
+        try {
+            $this->transitionService->performTransition(OrderTransactionDefinition::ENTITY_NAME, $entityId, $transitionName, $context);
+        } catch (\Throwable $e) {
+            $this->logger->error(
+                $e->getMessage(),
+                [
+                    'method' => 'transaction-transition-service-perform-transition',
+                    'entity.id' => $entityId,
+                    'transition' => $transitionName
+                ]
+            );
+        }
     }
 }
