@@ -8,6 +8,10 @@
   "paths": {
     "/mollie/applepay/pay": {
       "post": {
+        "tags": [
+          "Mollie",
+          "ApplePay"
+        ],
         "summary": "Initiate Apple Pay Payment",
         "operationId": "initiateApplePayPayment",
         "requestBody": {

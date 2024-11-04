@@ -8,6 +8,10 @@
   "paths": {
     "/mollie/pos/store-terminal/{customerId}/{terminalId}": {
       "get": {
+        "tags": [
+          "Mollie",
+          "POS"
+        ],
         "summary": "Store POS Terminal",
         "operationId": "storePosTerminal",
         "parameters": [

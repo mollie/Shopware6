@@ -8,6 +8,10 @@
   "paths": {
     "/mollie/payment/retry/{transactionId}": {
       "get": {
+        "tags": [
+          "Mollie",
+          "Payment"
+        ],
         "summary": "Retry Payment (GET)",
         "operationId": "retryPaymentGet",
         "parameters": [
@@ -29,6 +33,10 @@
         }
       },
       "post": {
+        "tags": [
+          "Mollie",
+          "Payment"
+        ],
         "summary": "Retry Payment (POST)",
         "operationId": "retryPaymentPost",
         "parameters": [

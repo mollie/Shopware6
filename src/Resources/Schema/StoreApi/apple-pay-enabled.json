@@ -8,6 +8,10 @@
   "paths": {
     "/mollie/applepay/enabled": {
       "get": {
+        "tags": [
+          "Mollie",
+          "ApplePay"
+        ],
         "summary": "Check Apple Pay Integration Enabled Status",
         "operationId": "checkApplePayEnabled",
         "responses": {

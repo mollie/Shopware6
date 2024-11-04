@@ -8,6 +8,10 @@
   "paths": {
     "/mollie/applepay/shipping-method": {
       "post": {
+        "tags": [
+          "Mollie",
+          "ApplePay"
+        ],
         "summary": "Select Apple Pay Shipping Method",
         "operationId": "selectApplePayShippingMethod",
         "requestBody": {

@@ -8,6 +8,10 @@
   "paths": {
     "/mollie/mandates/{customerId}": {
       "get": {
+        "tags": [
+          "Mollie",
+          "Credit Card"
+        ],
         "summary": "Get Customer Mandates",
         "description": "Retrieves a list of mandates for the specified customer.",
         "operationId": "getCustomerMandates",

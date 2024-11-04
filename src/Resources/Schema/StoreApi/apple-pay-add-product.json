@@ -8,8 +8,13 @@
   "paths": {
     "/mollie/applepay/add-product": {
       "post": {
-        "summary": "Add Product for Apple Pay",
+        "tags": [
+          "Mollie",
+          "ApplePay"
+        ],
+        "summary": "Add Product for Apple Pay. Deprecated, please use shopware default add to cart request. add `isExpressCheckout=1` to the add to cart request if you wish to buy only one item and temporary save the current user cart ",
         "operationId": "addProductForApplePay",
+        "deprecated": true,
         "requestBody": {
           "required": true,
           "content": {
