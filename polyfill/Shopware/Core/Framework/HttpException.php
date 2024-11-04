@@ -28,5 +28,5 @@ abstract class HttpException extends ShopwareHttpException
     {
         return $this->statusCode;
     }
-    
+
 }

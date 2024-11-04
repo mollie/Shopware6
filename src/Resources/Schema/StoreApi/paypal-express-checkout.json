@@ -1,0 +1,110 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Paypal Express Endpoints",
+    "description": "Paypal Express Endpoints",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/mollie/paypal-express/start": {
+      "get": {
+        "tags": [
+          "Mollie",
+          "Paypal Express"
+        ],
+        "summary": "Starts the checkout for paypal express. The Cart should be prefilled before this request. When using shopware add to cart request, you can add  `isExpressCheckout=1` to save the current user cart and add just this one product in the request",
+        "operationId": "paypalExpressCheckoutStart",
+        "responses": {
+          "200": {
+            "description": "Response indicating success or failure.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sessionId": {
+                      "type": "string",
+                      "example": "sess_xxxx",
+                      "description": "Mollie Paypal express session id"
+                    },
+                    "redirectUrl": {
+                      "type": "string",
+                      "example": "https://www.paypal.com/checkoutnow?token=xxxx",
+                      "description": "The redirect URL to paypal with the token"
+                    }
+                  },
+                  "required": ["sessionId"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mollie/paypal-express/finish": {
+      "get": {
+        "tags": [
+          "Mollie",
+          "Paypal Express"
+        ],
+        "summary": "Redirect target when customer complete payment on paypal.com. ",
+        "operationId": "paypalExpressCheckoutFinish",
+        "responses": {
+          "200": {
+            "description": "Response indicating success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sessionId": {
+                      "type": "string",
+                      "example": "sess_xxxx",
+                      "description": "Mollie Paypal express session id"
+                    },
+                    "authenticateId": {
+                      "type": "string",
+                      "example": "auth_xxx",
+                      "description": "Authenticate ID can be now sent with payment payload to mollie. Authenticate ID is also stored as cart extension and the usual checkout can be done"
+                    }
+                  },
+                  "required": ["sessionId","authenticateId"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mollie/paypal-express/cancel": {
+      "get": {
+        "tags": [
+          "Mollie",
+          "Paypal Express"
+        ],
+        "summary": "Redirect target when customer cancel payment on paypal.com. This route restores the cart if a backup cart was created at the beginning and cancel the session at mollie",
+        "operationId": "paypalExpressCheckoutCancel",
+        "responses": {
+          "200": {
+            "description": "Response indicating success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sessionId": {
+                      "type": "string",
+                      "example": "sess_xxxx",
+                      "description": "Mollie Paypal express session id"
+                    }
+                  },
+                  "required": ["sessionId"]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
