@@ -57,7 +57,7 @@ class RoutingBuilderTest extends TestCase
         # prepare our fake server data
         # assign a current domain to replace.
         # also configure our environment variable
-        $builder = $this->createBuilder('https://local.mollie.shop/notify/123', '123.eu.ngrok.io');
+        $builder = $this->createBuilder('https://local.mollie.shop/notify/123', 'https://123.eu.ngrok.io');
 
         $url = $builder->buildWebhookURL('-');
 
