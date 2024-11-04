@@ -8,7 +8,6 @@ use Kiener\MolliePayments\Service\CartServiceInterface;
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
-
 use Mollie\Api\Resources\Session;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
@@ -70,8 +69,11 @@ trait PayPalExpressMockTrait
         return $cartService;
     }
 
-    private function getPaypalExpress(bool $withSessionId = false, bool $withStartSession = false, bool $withLoadSession = false, bool $withRedirectUrl = false, bool $withAuthenticateId = false, \stdClass $methodDetails = new \stdClass()): PayPalExpress
+    private function getPaypalExpress(bool $withSessionId = false, bool $withStartSession = false, bool $withLoadSession = false, bool $withRedirectUrl = false, bool $withAuthenticateId = false, ?\stdClass $methodDetails = null): PayPalExpress
     {
+        if($methodDetails === null){
+            $methodDetails = new \stdClass();
+        }
         /** @var PayPalExpress $paypalExpress */
         $paypalExpress = $this->createMock(PaypalExpress::class);
         $fakeSession = $this->createMock(Session::class);
