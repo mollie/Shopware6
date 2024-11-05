@@ -63,10 +63,14 @@
             <argument type="service" id="mollie_payments.logger"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Service\Refund\RefundSummarizationService"/>
+
+
         <service id="Kiener\MolliePayments\Service\Refund\RefundCreditNoteService">
             <argument type="service" id="order.repository"/>
             <argument type="service" id="order_line_item.repository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Refund\RefundSummarizationService"/>
             <argument type="service" id="mollie_payments.logger"/>
         </service>
 

@@ -191,7 +191,8 @@ class RefundControllerBase extends AbstractController
             $context
         );
 
-        if ($response->getStatusCode() === 200 && $response->getContent() !== false && count($items) > 0) {
+        if ($response->getStatusCode() === 200 && $response->getContent() !== false && count($items) > 0
+        && $this->creditNoteService->containsRefundedLineItems($items)) {
             $refundId = json_decode($response->getContent(), true)['refundId'];
             try {
                 $this->creditNoteService->addCreditNoteToOrder($orderId, $refundId, $items, $context);

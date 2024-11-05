@@ -49,10 +49,16 @@ class RefundCreditNoteService
      */
     private $logger;
 
+    /**
+     * @var RefundSummarizationService
+     */
+    private $refundSummarizationService;
+
     public function __construct(
         EntityRepository $orderRepository,
         EntityRepository $orderLineItemRepository,
         SettingsService  $settingsService,
+        RefundSummarizationService $refundSummarizationService,
         LoggerInterface  $logger
     ) {
         $this->orderRepository = $orderRepository;
@@ -62,6 +68,7 @@ class RefundCreditNoteService
         $this->prefix = $settings->getRefundManagerCreateCreditNotesPrefix();
         $this->suffix = $settings->getRefundManagerCreateCreditNotesSuffix();
         $this->logger = $logger;
+        $this->refundSummarizationService = $refundSummarizationService;
     }
 
     /**
@@ -184,5 +191,23 @@ class RefundCreditNoteService
         }
 
         $this->orderLineItemRepository->delete($ids, $context);
+    }
+
+    /**
+     * Checks if the provided line items contain any refunded amounts.
+     *
+     * This method evaluates the total refund amount of the given line items by
+     * using the `getLineItemsRefundSum` method from `RefundSummarizationService`.
+     * If the summed refund amount is greater than zero, it indicates that
+     * the items contain refunded line items.
+     *
+     * @param array<int|string, mixed> $items Array of items, each potentially containing an 'amount' field.
+     * @return bool True if the items contain refunded line items (sum of 'amount' > 0), false otherwise.
+     */
+    public function containsRefundedLineItems(array $items): bool
+    {
+        // Checks if the total refund sum of line items is greater than zero,
+        // which indicates that there are refunded line items present.
+        return $this->refundSummarizationService->getLineItemsRefundSum($items) > 0;
     }
 }
