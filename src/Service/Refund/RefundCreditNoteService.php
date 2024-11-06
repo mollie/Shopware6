@@ -10,6 +10,7 @@ use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\Price\Struct\QuantityPriceDefinition;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
+use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
@@ -209,5 +210,52 @@ class RefundCreditNoteService
         // Checks if the total refund sum of line items is greater than zero,
         // which indicates that there are refunded line items present.
         return $this->refundSummarizationService->getLineItemsRefundSum($items) > 0;
+    }
+
+    /**
+     * @param array<int|string, mixed> $items
+     * @param float $refundAmount
+     * @return bool
+     */
+    public function hasCustomAmounts(array $items, float $refundAmount): bool
+    {
+        return $this->refundSummarizationService->customAmountInLineItems($items, $refundAmount) !== 0.0;
+    }
+
+    /**
+     * @param string $orderId
+     * @param string $refundId
+     * @param array<int|string, mixed> $items
+     * @param float $refundAmount
+     * @param Context $context
+     * @throws CreditNoteException
+     */
+    public function addCustomAmountsCreditNote(string $orderId, string $refundId, array $items, float $refundAmount, Context $context): void
+    {
+        $customAmount = $this->refundSummarizationService->customAmountInLineItems($items, $refundAmount);
+
+        if (empty($orderId) || empty($refundId)) {
+            throw CreditNoteException::forAddingLineItems(sprintf('OrderId or RefundId is empty. OrderID: %s RefundID: %s', $orderId, $refundId));
+        }
+
+        $data = ['id' => $orderId, 'lineItems' => []];
+
+        $data['lineItems'][] = [
+            'id' => Uuid::fromBytesToHex(md5($orderId . 'custom-amount', true)), #@todo remove once 6.4 reached end of life
+            'identifier' => Uuid::fromBytesToHex(md5($orderId . 'custom-amount', true)), #@todo remove once 6.4 reached end of life
+            'quantity' => 1,
+            'label' => sprintf('%s%s%s', $this->prefix, $customAmount, $this->suffix),
+            'type' => LineItem::CREDIT_LINE_ITEM_TYPE,
+            'price' => new CalculatedPrice($customAmount, $customAmount, new CalculatedTaxCollection(), new TaxRuleCollection()),
+            'customFields' => [
+                'mollie_payments' => [
+                    'type' => 'refund',
+                    'refundId' => $refundId
+                ],
+            ],
+        ];
+
+        $this->logger->debug('Adding credit note to order', ['orderId' => $orderId, 'refundId' => $refundId, 'lineItems' => $data['lineItems']]);
+        $this->orderRepository->upsert([$data], $context);
     }
 }

@@ -31,4 +31,24 @@ class RefundSummarizationService
         // Sums up all converted amounts and returns the result as the total refund amount
         return array_sum($amounts);
     }
+
+    /**
+     * @param array<int|string, mixed> $items
+     * @param float $refundAmounts
+     * @return float
+     */
+    public function customAmountInLineItems(array $items, float $refundAmounts): float
+    {
+        // Extracts the 'amount' values from each item in the array
+        $amounts = array_column($items, 'amount');
+
+        // Converts each extracted amount to a float to ensure accurate summation
+        $amounts = array_map('floatval', $amounts);
+
+        foreach ($amounts as $amount) {
+            $refundAmounts -= $amount;
+        }
+
+        return (float) $refundAmounts;
+    }
 }

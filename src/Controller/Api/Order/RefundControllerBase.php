@@ -191,17 +191,25 @@ class RefundControllerBase extends AbstractController
             $context
         );
 
-        if ($response->getStatusCode() === 200 && $response->getContent() !== false && count($items) > 0
-        && $this->creditNoteService->containsRefundedLineItems($items)) {
+        if ($response->getStatusCode() === 200 && $response->getContent() !== false && count($items) > 0) {
             $refundId = json_decode($response->getContent(), true)['refundId'];
-            try {
-                $this->creditNoteService->addCreditNoteToOrder($orderId, $refundId, $items, $context);
-            } catch (CreditNoteException $exception) {
-                if ($exception->getCode() === CreditNoteException::CODE_ADDING_CREDIT_NOTE_LINE_ITEMS) {
-                    $this->logger->error($exception->getMessage(), ['code' => $exception->getCode(),]);
-                    return $this->buildErrorResponse($exception->getMessage());
+            if ($this->creditNoteService->containsRefundedLineItems($items)) {
+                try {
+                    $this->creditNoteService->addCreditNoteToOrder($orderId, $refundId, $items, $context);
+                } catch (CreditNoteException $exception) {
+                    if ($exception->getCode() === CreditNoteException::CODE_ADDING_CREDIT_NOTE_LINE_ITEMS) {
+                        $this->logger->error($exception->getMessage(), ['code' => $exception->getCode(),]);
+                        return $this->buildErrorResponse($exception->getMessage());
+                    }
+                    if ($exception->getCode() === CreditNoteException::CODE_WARNING_LEVEL) {
+                        $this->logger->warning($exception->getMessage(), ['code' => $exception->getCode(),]);
+                    }
                 }
-                if ($exception->getCode() === CreditNoteException::CODE_WARNING_LEVEL) {
+            }
+            if ($this->creditNoteService->hasCustomAmounts($items, (float) $amount)) {
+                try {
+                    $this->creditNoteService->addCustomAmountsCreditNote($orderId, $refundId, $items, (float)$amount, $context);
+                } catch (CreditNoteException $e) {
                     $this->logger->warning($exception->getMessage(), ['code' => $exception->getCode(),]);
                 }
             }
