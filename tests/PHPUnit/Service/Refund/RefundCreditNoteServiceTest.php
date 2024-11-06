@@ -6,8 +6,10 @@ namespace MolliePayments\Tests\Service\Refund;
 
 use Kiener\MolliePayments\Service\Refund\Exceptions\CreditNoteException;
 use Kiener\MolliePayments\Service\Refund\RefundCreditNoteService;
+use Kiener\MolliePayments\Service\Refund\RefundSummarizationService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
+use MolliePayments\Tests\Service\Refund\Fakes\RefundSummarizationServiceFake;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -224,7 +226,7 @@ class RefundCreditNoteServiceTest extends TestCase
     }
     
 
-    private function service(): RefundCreditNoteService
+    private function service(?RefundSummarizationService $summarizationService = null): RefundCreditNoteService
     {
         $settingsStruct = new MollieSettingStruct();
         $settingsStruct->setRefundManagerCreateCreditNotesEnabled($this->enabled);
@@ -237,6 +239,7 @@ class RefundCreditNoteServiceTest extends TestCase
             $this->orderRepository,
             $this->orderLineRepository,
             $this->settingsService,
+            $summarizationService ?? new RefundSummarizationServiceFake(),
             $this->logger
         );
     }
