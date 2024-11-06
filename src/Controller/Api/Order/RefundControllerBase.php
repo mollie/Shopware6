@@ -209,7 +209,7 @@ class RefundControllerBase extends AbstractController
             if ($this->creditNoteService->hasCustomAmounts($items, (float) $amount)) {
                 try {
                     $this->creditNoteService->addCustomAmountsCreditNote($orderId, $refundId, $items, (float)$amount, $context);
-                } catch (CreditNoteException $e) {
+                } catch (CreditNoteException $exception) {
                     $this->logger->warning($exception->getMessage(), ['code' => $exception->getCode(),]);
                 }
             }
