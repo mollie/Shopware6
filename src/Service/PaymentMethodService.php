@@ -23,6 +23,7 @@ use Kiener\MolliePayments\Handler\Method\KlarnaPayLaterPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaPayNowPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaSliceItPayment;
 use Kiener\MolliePayments\Handler\Method\MyBankPayment;
+use Kiener\MolliePayments\Handler\Method\PayByBankPayment;
 use Kiener\MolliePayments\Handler\Method\PayconiqPayment;
 use Kiener\MolliePayments\Handler\Method\PayPalExpressPayment;
 use Kiener\MolliePayments\Handler\Method\PayPalPayment;
@@ -459,6 +460,7 @@ class PaymentMethodService
             PayconiqPayment::class,
             RivertyPayment::class,
             SatispayPayment::class,
+            PayByBankPayment::class,
             // IngHomePayPayment::class, // not allowed anymore
             // DirectDebitPayment::class, // only allowed when updating subsriptions, aka => not allowed anymore
         ];
