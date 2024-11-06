@@ -143,6 +143,21 @@ class MollieLineItemBuilder
             return $lines;
         }
 
+        $customizedProducts = $lineItems->filterByType(self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS);
+
+        foreach ($customizedProducts as $customizedProduct) {
+            $productChildren = $customizedProduct->getChildren();
+            if ($productChildren === null) {
+                continue;
+            }
+            $productChildren = $productChildren->filterByType(self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS_OPTIONS);
+            foreach ($productChildren as $productChild) {
+                if ($productChild->getPrice() !== null && $productChild->getPrice()->getTotalPrice() > 0) {
+                    $lineItems->add($productChild);
+                }
+            }
+        }
+
 
         foreach ($lineItems as $item) {
 
