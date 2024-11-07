@@ -19,6 +19,7 @@ use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Refund;
+use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
@@ -99,9 +100,14 @@ class RefundDataBuilder
         $refundItems = [];
         $refundPromotionItems = [];
         $refundDeliveryItems = [];
+        $orderLineItems = $order->getLineItems();
 
-        if ($order->getLineItems() !== null) {
-            foreach ($order->getLineItems() as $item) {
+        if ($orderLineItems !== null) {
+            $orderLineItems = $orderLineItems->filter(function (OrderLineItemEntity $orderLineItemEntity) {
+                return $orderLineItemEntity->getType() !== LineItem::CREDIT_LINE_ITEM_TYPE;
+            });
+
+            foreach ($orderLineItems as $item) {
                 $lineItemAttribute = new OrderLineItemEntityAttributes($item);
                 $mollieOrderLineId = $lineItemAttribute->getMollieOrderLineID();
 

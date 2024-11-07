@@ -245,7 +245,7 @@ class RefundManager implements RefundManagerInterface
             );
         }
 
-        if (!$refund instanceof Refund) {
+        if (! $refund instanceof Refund) {
             # a problem happened, lets finish with an exception
             throw new CouldNotCreateMollieRefundException('', (string)$order->getOrderNumber());
         }
@@ -324,7 +324,7 @@ class RefundManager implements RefundManagerInterface
         # first try to cancel on the mollie side
         $success = $this->refundService->cancel($order, $refundId);
 
-        if (!$success) {
+        if (! $success) {
             return false;
         }
 
@@ -521,12 +521,13 @@ class RefundManager implements RefundManagerInterface
             if ($item->getQuantity() < 0) {
                 continue;
             }
-
+            $quantity = max(1, $item->getQuantity());
+            $amount = round($item->getAmount() / $quantity, 2);
             $row = RefundItemEntity::createArray(
                 $item->getMollieLineID(),
                 $item->getShopwareReference(),
-                $item->getQuantity(),
-                $item->getAmount(),
+                $quantity,
+                $amount,
                 $item->getShopwareLineID(),
                 $item->getShopwareLineVersionId(),
                 null
