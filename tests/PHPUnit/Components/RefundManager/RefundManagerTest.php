@@ -210,7 +210,7 @@ class RefundManagerTest extends TestCase
             [
                 "mollieLineId" => "odl_123",
                 "label" => "product-id-1",
-                "quantity" => $qty,
+                "quantity" => max($qty,1),
                 "amount" => $itemPrice,
                 "orderLineItemId" => "line-1",
                 'orderLineItemVersionId' => null,
