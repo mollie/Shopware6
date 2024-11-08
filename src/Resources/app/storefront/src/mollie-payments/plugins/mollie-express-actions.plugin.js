@@ -34,7 +34,6 @@ export class MollieExpressActions extends Plugin {
             }
 
 
-
             const buyButtonRepository = new BuyButtonRepository();
 
             expressButtons.forEach((button) => {
@@ -100,15 +99,14 @@ export class MollieExpressActions extends Plugin {
                 return;
             }
         }
-
+        target.classList.add('processed');
 
         const expressAddToCart = new ExpressAddToCart();
 
         expressAddToCart.addItemToCart(target);
 
-        target.classList.add('processed');
         const mollieEvent = new event.constructor(event.type, event);
         target.dispatchEvent(mollieEvent);
-        target.classList.remove('processed');
+
     }
 }

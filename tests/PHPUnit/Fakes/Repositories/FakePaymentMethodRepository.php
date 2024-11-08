@@ -11,6 +11,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 use Shopware\Core\Framework\Event\NestedEventCollection;
+use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class FakePaymentMethodRepository implements PaymentMethodRepositoryInterface
 {
@@ -84,4 +85,10 @@ class FakePaymentMethodRepository implements PaymentMethodRepositoryInterface
     {
         return 'phpunit-id';
     }
+
+    public function getActivePaypalExpressID(SalesChannelContext $context): string
+    {
+        return 'phpunit-id';
+    }
+
 }

@@ -97,7 +97,7 @@ class PayPalExpress
      */
     public function getActivePaypalExpressID(SalesChannelContext $context): string
     {
-        return $this->repoPaymentMethods->getActivePaypalExpressID($context->getContext());
+        return $this->repoPaymentMethods->getActivePaypalExpressID($context);
     }
 
 

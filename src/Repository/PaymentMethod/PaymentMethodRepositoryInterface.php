@@ -7,6 +7,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEve
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
+use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 interface PaymentMethodRepositoryInterface
 {
@@ -37,4 +38,10 @@ interface PaymentMethodRepositoryInterface
      * @return string
      */
     public function getActiveApplePayID(Context $context): string;
+
+    /**
+     * @param SalesChannelContext $context
+     * @return string
+     */
+    public function getActivePaypalExpressID(SalesChannelContext $context): string;
 }

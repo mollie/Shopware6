@@ -18,7 +18,7 @@ use Symfony\Component\Routing\RouterInterface;
 class PaypalExpressControllerBase extends StorefrontController
 {
     use RedirectTrait;
-
+    private const SNIPPET_ERROR = 'molliePayments.payments.paypalExpress.paymentError';
     /**
      * @var RouterInterface
      */
@@ -67,6 +67,7 @@ class PaypalExpressControllerBase extends StorefrontController
                 $redirectUrl = $responseRedirectUrl;
             }
         } catch (\Throwable $e) {
+            $this->addFlash('danger', $this->trans(self::SNIPPET_ERROR));
             $this->logger->error(
                 'Failed to start Paypal Express checkout',
                 ['message' => $e->getMessage()]
@@ -82,6 +83,7 @@ class PaypalExpressControllerBase extends StorefrontController
         try {
             $this->cancelCheckoutRoute->cancelCheckout($context);
         } catch (\Throwable $e) {
+            $this->addFlash('danger', $this->trans(self::SNIPPET_ERROR));
             $this->logger->error(
                 'Failed to cancel Paypal Express checkout',
                 ['message' => $e->getMessage()]
@@ -102,6 +104,7 @@ class PaypalExpressControllerBase extends StorefrontController
             $returnUrl = $this->getCheckoutConfirmPage($this->router);
         } catch (\Throwable $e) {
             $returnUrl = $this->getCheckoutCartPage($this->router);
+            $this->addFlash('danger', $this->trans(self::SNIPPET_ERROR));
             $this->logger->error(
                 'Failed to finish Paypal Express Checkout',
                 ['message' => $e->getMessage()]

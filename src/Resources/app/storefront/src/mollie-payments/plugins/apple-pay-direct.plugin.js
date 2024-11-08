@@ -74,7 +74,7 @@ export default class MollieApplePayDirect extends Plugin {
         }
 
         const applePaySessionFactory = new ApplePaySessionFactory();
-        const session = applePaySessionFactory.create(isProductMode, countryCode, currency, withPhone, shopSlug, dataProtection);
+        const session = applePaySessionFactory.create(isProductMode, countryCode, currency, withPhone, shopSlug, dataProtection,clickedButton);
         session.begin();
 
     }

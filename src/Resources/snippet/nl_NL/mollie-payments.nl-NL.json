@@ -63,7 +63,10 @@
                 "captionSubtotal": "Subtotaal",
                 "captionTaxes": "BTW",
                 "paymentError": "De betaling met Apple Pay is mislukt."
-            }
+            },
+          "paypalExpress": {
+            "paymentError": "De betaling met Paypal Express is mislukt."
+          }
         },
         "subscriptions": {
             "account": {

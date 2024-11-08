@@ -63,6 +63,9 @@
         "captionSubtotal": "Subtotale",
         "captionTaxes": "Tasse",
         "paymentError": "Il pagamento con Apple Pay non è andato a buon fine."
+      },
+      "paypalExpress": {
+        "paymentError": "Il pagamento con Paypal Express non è andato a buon fine."
       }
     },
     "subscriptions": {
