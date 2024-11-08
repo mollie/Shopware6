@@ -19,9 +19,10 @@ export default class ApplePaySessionFactory {
      * @param shopSlug
      * @param withPhone
      * @param dataProtection
+     * @param clickedButton
      * @returns ApplePaySession
      */
-    create(isProductMode, country, currency, withPhone, shopSlug, dataProtection) {
+    create(isProductMode, country, currency, withPhone, shopSlug, dataProtection,clickedButton) {
 
         const me = this;
         var shippingFields = [
@@ -166,6 +167,7 @@ export default class ApplePaySessionFactory {
             // now finish our payment by filling a form
             // and submitting it along with our payment token
             me.finishPayment(shopSlug + '/mollie/apple-pay/start-payment', paymentToken, event.payment,dataProtectionValue);
+            clickedButton.classList.remove('processed');
         };
 
         session.oncancel = function () {
@@ -175,6 +177,7 @@ export default class ApplePaySessionFactory {
             if (isProductMode) {
                 me.client.post(shopSlug + '/mollie/apple-pay/restore-cart');
             }
+            clickedButton.classList.remove('processed');
         };
 
         return session;

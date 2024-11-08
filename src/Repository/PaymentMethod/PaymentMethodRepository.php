@@ -11,6 +11,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
+use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class PaymentMethodRepository implements PaymentMethodRepositoryInterface
 {
@@ -80,18 +81,20 @@ class PaymentMethodRepository implements PaymentMethodRepositoryInterface
     }
 
     /**
-     * @param Context $context
+     * @param SalesChannelContext $context
      * @throws \Exception
      * @return string
      */
-    public function getActivePaypalExpressID(Context $context): string
+    public function getActivePaypalExpressID(SalesChannelContext $context): string
     {
         $criteria = new Criteria();
+        $criteria->addAssociation('salesChannels');
         $criteria->addFilter(new EqualsFilter('handlerIdentifier', PayPalExpressPayment::class));
         $criteria->addFilter(new EqualsFilter('active', true));
+        $criteria->addFilter(new EqualsFilter('salesChannels.id', $context->getSalesChannelId()));
 
         /** @var array<string> $paymentMethods */
-        $paymentMethods = $this->repoPaymentMethods->searchIds($criteria, $context)->getIds();
+        $paymentMethods = $this->repoPaymentMethods->searchIds($criteria, $context->getContext())->getIds();
 
         if (count($paymentMethods) <= 0) {
             throw new \Exception('Payment Method PayPal Express not found in system');

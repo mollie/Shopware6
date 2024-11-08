@@ -63,6 +63,9 @@
                 "captionSubtotal": "Zwischensumme",
                 "captionTaxes": "Steuern",
                 "paymentError": "Die Zahlung mit Apple Pay ist fehlgeschlagen."
+            },
+            "paypalExpress": {
+                "paymentError": "Die Zahlung mit Paypal Express ist fehlgeschlagen."
             }
         },
         "subscriptions": {

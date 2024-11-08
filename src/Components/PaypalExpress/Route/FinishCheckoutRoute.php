@@ -119,6 +119,9 @@ class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
             );
         }
 
+        # create new account or find existing and login
+        $this->paypalExpress->prepareCustomer($shippingAddress, $context, $acceptedDataProtection, $billingAddress);
+
         # we have to update the cart extension before a new user is created and logged in, otherwise the extension is not saved
         $cartExtension = new ArrayStruct([
             CustomFieldsInterface::PAYPAL_EXPRESS_AUTHENTICATE_ID => $payPalExpressSession->authenticationId
@@ -130,8 +133,6 @@ class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
         $this->cartService->persistCart($cart, $context);
 
 
-        # create new account or find existing and login
-        $this->paypalExpress->prepareCustomer($shippingAddress, $context, $acceptedDataProtection, $billingAddress);
         return new FinishCheckoutResponse($payPalExpressSession->id, $payPalExpressSession->authenticationId);
     }
 }

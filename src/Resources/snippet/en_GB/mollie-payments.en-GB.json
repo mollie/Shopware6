@@ -63,6 +63,9 @@
                 "captionSubtotal": "Subtotal",
                 "captionTaxes": "Taxes",
                 "paymentError": "The payment with Apple Pay failed."
+            },
+            "paypalExpress": {
+                "paymentError": "The payment with Paypal Express failed."
             }
         },
         "subscriptions": {
