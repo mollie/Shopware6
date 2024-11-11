@@ -45,7 +45,7 @@ export class PrivacyNoteElement {
 
             const buyElement = buyElementRepository.find(privacyNote);
             const expressButtonsRepository = new ExpressButtonsRepository(buyElement);
-            const expressButtons = expressButtonsRepository.findAll(':not(.d-none)');
+            const expressButtons = expressButtonsRepository.findAll();
 
 
             if(expressButtons.length === 0){
