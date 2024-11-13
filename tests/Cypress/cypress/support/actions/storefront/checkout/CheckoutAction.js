@@ -118,5 +118,8 @@ export default class CheckoutAction {
         cy.wait(1000);
         cy.get('select.country-select:eq(0)').select(billingCountry);
         cy.get('.address-form-actions:eq(0) button').click();
+        cy.wait(1000);
+        cy.get('.js-pseudo-modal .modal-dialog .btn-close').click();
+
     }
 }

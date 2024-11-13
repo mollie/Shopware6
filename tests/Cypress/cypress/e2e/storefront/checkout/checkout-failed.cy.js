@@ -198,9 +198,16 @@ context("Checkout Failure Tests", () => {
                 // we are now back in our shop
                 // the payment failed, so shopware says the order is complete
                 // but we still need to complete the payment and edit the order
-                cy.url().should('include', '/account/order/edit/');
-
-                if (shopware.isVersionGreaterEqual('6.4.10.0')) {
+                if (shopware.isVersionGreaterEqual('6.6.8.0')) {
+                    cy.url().should('include', '/account/order');
+                }else {
+                    cy.url().should('include', '/account/order/edit/');
+                }
+                //since shopware 6.6.8.0 a cancelled order cannot be edited or paid
+                if(shopware.isVersionGreaterEqual('6.6.8.0')){
+                    cy.contains('was canceled and cannot be edited afterwards.');
+                    return;
+                } else if(shopware.isVersionGreaterEqual('6.4.10.0')){
                     cy.contains('We have received your order, but the payment was aborted');
                 } else {
                     cy.contains('We received your order, but the payment was aborted');
