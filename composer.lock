@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a10f3b37fec1067dc63fb57f0ffb968f",
+    "content-hash": "86188047fba549bb04645726481d5247",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -62,16 +62,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.325.5",
+            "version": "3.325.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "195d003c902a741de53008c839cbcebddbe1f326"
+                "reference": "55852104253172e66c3358bf4c35281bbd8622b2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/195d003c902a741de53008c839cbcebddbe1f326",
-                "reference": "195d003c902a741de53008c839cbcebddbe1f326",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/55852104253172e66c3358bf4c35281bbd8622b2",
+                "reference": "55852104253172e66c3358bf4c35281bbd8622b2",
                 "shasum": ""
             },
             "require": {
@@ -154,9 +154,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.325.5"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.325.7"
             },
-            "time": "2024-11-08T19:12:57+00:00"
+            "time": "2024-11-12T19:27:31+00:00"
         },
         {
             "name": "brick/math",
@@ -11753,39 +11753,41 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/boxblinkracer/phpunuhi.git",
-                "reference": "4b099256e516e57a3d939436fb22c2bee45036a1"
+                "reference": "8f4c5d43d0133374609c148fce4b9e58c0370117"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/boxblinkracer/phpunuhi/zipball/4b099256e516e57a3d939436fb22c2bee45036a1",
-                "reference": "4b099256e516e57a3d939436fb22c2bee45036a1",
+                "url": "https://api.github.com/repos/boxblinkracer/phpunuhi/zipball/8f4c5d43d0133374609c148fce4b9e58c0370117",
+                "reference": "8f4c5d43d0133374609c148fce4b9e58c0370117",
                 "shasum": ""
             },
             "require": {
                 "deeplcom/deepl-php": "^1.2",
+                "ext-dom": "*",
                 "ext-json": "*",
                 "ext-pdo": "*",
                 "ext-simplexml": "*",
                 "google/cloud-translate": "^1.12",
                 "orhanerday/open-ai": "^5.1",
-                "php": ">=7.2",
+                "php": ">=7.4",
                 "symfony/console": "*",
                 "symfony/dotenv": "*",
                 "symfony/yaml": "*"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^2.18",
-                "infection/infection": "^0.21.5",
-                "phpcompatibility/php-compatibility": "^9.3",
+                "friendsofphp/php-cs-fixer": "*",
+                "infection/infection": "*",
+                "phparkitect/phparkitect": "*",
+                "phpcompatibility/php-compatibility": "*",
                 "phpstan/phpstan": "*",
-                "phpunit/phpunit": "^9.6",
-                "povils/phpmnd": "^3.3",
-                "rector/rector": "1.0.5",
+                "phpunit/phpunit": "*",
+                "povils/phpmnd": "*",
+                "rector/rector": "*",
                 "roave/security-advisories": "dev-latest",
-                "rregeer/phpunit-coverage-check": "^0.3.1",
-                "spaze/phpstan-disallowed-calls": "^3.0",
-                "squizlabs/php_codesniffer": "^3.7",
-                "staabm/phpstan-todo-by": "^0.1.16",
+                "rregeer/phpunit-coverage-check": "*",
+                "spaze/phpstan-disallowed-calls": "*",
+                "squizlabs/php_codesniffer": "*",
+                "staabm/phpstan-todo-by": "*",
                 "svrunit/svrunit": "dev-main"
             },
             "default-branch": true,
@@ -11820,7 +11822,7 @@
                 "issues": "https://github.com/boxblinkracer/phpunuhi/issues",
                 "source": "https://github.com/boxblinkracer/phpunuhi/tree/main"
             },
-            "time": "2024-11-10T15:49:36+00:00"
+            "time": "2024-11-13T08:21:42+00:00"
         },
         {
             "name": "deeplcom/deepl-php",
@@ -14967,16 +14969,16 @@
         },
         {
             "name": "squizlabs/php_codesniffer",
-            "version": "3.10.3",
+            "version": "3.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHP_CodeSniffer.git",
-                "reference": "62d32998e820bddc40f99f8251958aed187a5c9c"
+                "reference": "70c08f8d20c0eb4fe56f26644dd94dae76a7f450"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/62d32998e820bddc40f99f8251958aed187a5c9c",
-                "reference": "62d32998e820bddc40f99f8251958aed187a5c9c",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/70c08f8d20c0eb4fe56f26644dd94dae76a7f450",
+                "reference": "70c08f8d20c0eb4fe56f26644dd94dae76a7f450",
                 "shasum": ""
             },
             "require": {
@@ -15043,7 +15045,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2024-09-18T10:38:58+00:00"
+            "time": "2024-11-12T09:53:29+00:00"
         },
         {
             "name": "symfony/polyfill-php70",
