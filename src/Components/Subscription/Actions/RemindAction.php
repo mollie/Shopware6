@@ -37,6 +37,11 @@ class RemindAction extends BaseAction
      */
     private $reminderValidator;
 
+    /**
+     * @var LoggerInterface
+     */
+    protected $log;
+
 
     /**
      * @param SettingsService $pluginSettings
@@ -95,6 +100,11 @@ class RemindAction extends BaseAction
             if (!$settings->isSubscriptionsEnabled()) {
                 continue;
             }
+
+            $message = 'Starting Subscription Renewal Reminder from Scheduled Tasks for SalesChannel "%s".';
+            $message = sprintf($message, $salesChannel->getName());
+
+            $this->log->info($message);
 
             $daysOffset = $settings->getSubscriptionsReminderDays();
 

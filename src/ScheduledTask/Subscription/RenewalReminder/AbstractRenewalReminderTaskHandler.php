@@ -53,8 +53,6 @@ abstract class AbstractRenewalReminderTaskHandler extends ScheduledTaskHandler
     public function run(): void
     {
         try {
-            $this->logger->info('Starting Subscription Renewal Reminder from Scheduled Tasks.');
-
             $context = new Context(new SystemSource());
 
             $remindedCount = $this->subscriptionManager->remindSubscriptionRenewal($context);
