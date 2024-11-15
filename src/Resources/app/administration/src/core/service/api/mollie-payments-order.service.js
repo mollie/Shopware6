@@ -1,4 +1,6 @@
 // eslint-disable-next-line no-undef
+import MolliePaymentsRefundBundleRepositoryService from './mollie-payments-refund-bundle-repository.service';
+
 const ApiService = Shopware.Classes.ApiService;
 
 class MolliePaymentsOrderService extends ApiService {
@@ -9,17 +11,13 @@ class MolliePaymentsOrderService extends ApiService {
     getPaymentUrl(data = {orderId: null}) {
         const headers = this.getBasicHeaders();
 
-        return this.httpClient
-            .post(
-                `_action/${this.getApiBasePath()}/order/payment-url`,
-                JSON.stringify(data),
-                {
-                    headers: headers,
-                }
-            )
-            .then((response) => {
-                return ApiService.handleResponse(response);
-            });
+        MolliePaymentsRefundBundleRepositoryService.setOrderId(data.orderId);
+        MolliePaymentsRefundBundleRepositoryService.setHeaders(headers);
+        MolliePaymentsRefundBundleRepositoryService.setClient(this.httpClient);
+
+        return MolliePaymentsRefundBundleRepositoryService.fetch().then((response) => {
+            return ApiService.handleResponse(response.data.payment);
+        });
     }
 }
 

@@ -128,7 +128,7 @@ Component.override('sw-order-user-card', {
 
             this.MolliePaymentsOrderService.getPaymentUrl({orderId: this.currentOrder.id})
                 .then(response => {
-                    this.molliePaymentUrl = (response.url !== null) ? response.url : '';
+                    this.molliePaymentUrl = (response.data.payment.url !== null) ? response.data.payment.url : '';
                 })
                 .finally(() => {
                     this.isMolliePaymentUrlLoading = false;

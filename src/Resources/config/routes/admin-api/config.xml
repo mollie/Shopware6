@@ -32,10 +32,19 @@
         <default key="_auth_enabled">true</default>
     </route>
 
-    <route id="api.action.mollie.config.refund-manager"
+    <route id="api.action.mollie.config.refund-manager.config"
            path="/api/_action/mollie/config/refund-manager"
            methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\PluginConfig\ConfigControllerBase::getRefundManagerConfig</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
+        <default key="_auth_required">true</default>
+        <default key="_auth_enabled">true</default>
+    </route>
+
+    <route id="api.action.mollie.config.refund-manager"
+           path="/api/_action/mollie/refund-manager/bundled"
+           methods="POST">
+        <default key="_controller">Kiener\MolliePayments\Controller\Api\Controller\OrderController::getOrderDetails</default>
         <default key="_routeScope"><list><string>api</string></list></default>
         <default key="_auth_required">true</default>
         <default key="_auth_enabled">true</default>
