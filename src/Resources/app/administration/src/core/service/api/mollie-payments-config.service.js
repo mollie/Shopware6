@@ -1,6 +1,6 @@
-// eslint-disable-next-line no-undef
-import MolliePaymentsRefundBundleRepositoryService from './mollie-payments-refund-bundle-repository.service';
 
+import MolliePaymentsRefundBundleRepositoryService from './mollie-payments-refund-bundle-repository.service';
+// eslint-disable-next-line no-undef
 const ApiService = Shopware.Classes.ApiService;
 
 export default class MolliePaymentsConfigService extends ApiService {
