@@ -27,6 +27,7 @@ class PaymentMethodRemoverTest extends TestCase
             'creditcard',
             'paypal',
             'directdebit',
+            'trustly'
         ];
 
         $this->assertEquals($expected, SubscriptionRemover::ALLOWED_METHODS);
