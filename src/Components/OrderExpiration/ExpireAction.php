@@ -78,6 +78,7 @@ class ExpireAction
 
         $criteria = new Criteria();
         $criteria->addAssociation('transactions.stateMachineState');
+        $criteria->addAssociation('transactions.paymentMethod');
         $criteria->addFilter(new EqualsFilter('transactions.stateMachineState.technicalName', OrderTransactionStates::STATE_IN_PROGRESS));
         $criteria->addFilter(new EqualsFilter('salesChannelId', $salesChannelEntity->getId()));
         $criteria->addFilter(new RangeFilter('orderDateTime', [RangeFilter::GTE => $date->format(Defaults::STORAGE_DATE_TIME_FORMAT)]));
