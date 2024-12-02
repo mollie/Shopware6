@@ -77,11 +77,26 @@ class OrderExpireService
             }
 
             $transactions->sort(function (OrderTransactionEntity $a, OrderTransactionEntity $b) {
-                return $a->getCreatedAt() <=> $b->getCreatedAt();
+                if ($a->getCreatedAt() === null || $b->getCreatedAt() === null) {
+                    return -1;
+                }
+                return $a->getCreatedAt()->getTimestamp() <=> $b->getCreatedAt()->getTimestamp();
             });
 
             /** @var OrderTransactionEntity $lastTransaction */
             $lastTransaction = $transactions->last();
+
+            $paymentMethod = $lastTransaction->getPaymentMethod();
+            if ($paymentMethod === null) {
+                $this->logger->warning('Transaction has no payment method', ['orderNumber'=>$order->getOrderNumber(),'transactionId'=>$lastTransaction->getId()]);
+                continue;
+            }
+            $paymentMethodIdentifier = $paymentMethod->getHandlerIdentifier();
+
+            if (strpos($paymentMethodIdentifier, 'Mollie') === false) {
+                $this->logger->debug('Payment method is not a mollie payment, dont touch it', ['identifier'=>$paymentMethodIdentifier]);
+                continue;
+            }
 
             $stateMachineState = $lastTransaction->getStateMachineState();
             if ($stateMachineState === null) {
