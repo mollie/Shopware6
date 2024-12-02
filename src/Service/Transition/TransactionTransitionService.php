@@ -47,7 +47,7 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
     {
         $technicalName = ($transaction->getStateMachineState() instanceof StateMachineStateEntity) ? $transaction->getStateMachineState()->getTechnicalName() : '';
 
-        if ($this->isFinalOrTargetStatus($technicalName, [OrderTransactionStates::ACTION_PROCESS_UNCONFIRMED])) {
+        if ($this->isFinalOrTargetStatus($technicalName, [OrderTransactionStates::STATE_UNCONFIRMED])) {
             return;
         }
 
