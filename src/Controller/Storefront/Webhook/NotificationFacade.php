@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFact
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
+use Kiener\MolliePayments\Exception\WebhookIsTooEarlyException;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepositoryInterface;
@@ -143,15 +144,6 @@ class NotificationFacade
             throw new \Exception('Transaction ' . $swTransactionId . ' not found in Shopware');
         }
 
-        # Apple pay direct creates a payment and then updates order/transaction custom fields, sometimes the webhook is quicker than the process. so we wait once and then read the custom fields again
-        if ($swTransaction->getCustomFields() === null) {
-            sleep(2);
-            $swTransaction = $this->getTransaction($swTransactionId, $context);
-            if (!$swTransaction instanceof OrderTransactionEntity) {
-                throw new \Exception('Transaction ' . $swTransactionId . ' not found in Shopware');
-            }
-        }
-
         # -----------------------------------------------------------------------------------------------------
 
         $swOrder = $swTransaction->getOrder();
@@ -159,6 +151,20 @@ class NotificationFacade
         if (!$swOrder instanceof OrderEntity) {
             throw new OrderNotFoundException('Shopware Order not found for transaction: ' . $swTransactionId);
         }
+
+        $now = new \DateTime();
+        $now->modify("+2 minutes");
+
+        $changedDate = $swOrder->getUpdatedAt();
+        if ($changedDate === null) {
+            $changedDate = $swOrder->getCreatedAt();
+        }
+
+        if ($changedDate !== null && $now < $changedDate) {
+            throw new WebhookIsTooEarlyException((string)$swOrder->getOrderNumber(), $now, $changedDate);
+        }
+
+
 
         # --------------------------------------------------------------------------------------------
 

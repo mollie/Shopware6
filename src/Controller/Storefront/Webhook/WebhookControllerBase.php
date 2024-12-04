@@ -8,6 +8,7 @@ use Kiener\MolliePayments\Controller\Storefront\AbstractStoreFrontController;
 use Kiener\MolliePayments\Repository\Order\OrderRepositoryInterface;
 use Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepositoryInterface;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Framework\ShopwareHttpException;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -69,6 +70,15 @@ class WebhookControllerBase extends AbstractStoreFrontController
             $this->notificationFacade->onNotify($swTransactionId, $context->getContext());
 
             return new JsonResponse(['success' => true]);
+        } catch (ShopwareHttpException $exception) {
+            $this->logger->warning(
+                'Warning in Webhook for Transaction ' . $swTransactionId,
+                [
+                    'error' => $exception->getMessage()
+                ]
+            );
+
+            return new JsonResponse(['success' => false, 'error' => $exception->getMessage()], $exception->getStatusCode());
         } catch (\Throwable $ex) {
             $this->logger->error(
                 'Error in Mollie Webhook for Transaction ' . $swTransactionId,
