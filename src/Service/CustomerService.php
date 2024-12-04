@@ -44,7 +44,7 @@ class CustomerService implements CustomerServiceInterface
     public const CUSTOM_FIELDS_KEY_SHOULD_SAVE_CARD_DETAIL = 'shouldSaveCardDetail';
     public const CUSTOM_FIELDS_KEY_PREFERRED_IDEAL_ISSUER = 'preferred_ideal_issuer';
     public const CUSTOM_FIELDS_KEY_PREFERRED_POS_TERMINAL = 'preferred_pos_terminal';
-    public const CUSTOM_FIELDS_KEY_PAYPAL_EXPRESS_ADDRESS_ID = 'ppe_address_id';
+    public const CUSTOM_FIELDS_KEY_EXPRESS_ADDRESS_ID = 'express_address_id';
 
     /**
      * @var CountryRepositoryInterface
@@ -647,7 +647,7 @@ class CustomerService implements CustomerServiceInterface
         $criteria = new Criteria();
         $criteria->addFilter(new AndFilter([
             new EqualsFilter('customerId', $customer->getId()),
-            new EqualsAnyFilter('customFields.' . CustomFieldsInterface::MOLLIE_KEY . '.' . self::CUSTOM_FIELDS_KEY_PAYPAL_EXPRESS_ADDRESS_ID, $mollieAddressIds)
+            new EqualsAnyFilter('customFields.' . CustomFieldsInterface::MOLLIE_KEY . '.' . self::CUSTOM_FIELDS_KEY_EXPRESS_ADDRESS_ID, $mollieAddressIds)
         ]));
 
         $customerAddressSearchResult = $this->customerAddressRepository->search($criteria, $context);
@@ -689,7 +689,7 @@ class CustomerService implements CustomerServiceInterface
             }
 
             // skip addresses without custom fields, those are configured by the customer in backend
-            $mollieAddressId = $addressCustomFields[CustomFieldsInterface::MOLLIE_KEY][self::CUSTOM_FIELDS_KEY_PAYPAL_EXPRESS_ADDRESS_ID] ?? null;
+            $mollieAddressId = $addressCustomFields[CustomFieldsInterface::MOLLIE_KEY][self::CUSTOM_FIELDS_KEY_EXPRESS_ADDRESS_ID] ?? null;
             if ($mollieAddressId === null) {
                 continue;
             }
@@ -763,7 +763,7 @@ class CustomerService implements CustomerServiceInterface
         $shippingAddressData->set('countryId', $countryId);
         $customFields = new RequestDataBag();
         $customFields->set(CustomerAddressDefinition::ENTITY_NAME, [
-            CustomFieldsInterface::MOLLIE_KEY => [self::CUSTOM_FIELDS_KEY_PAYPAL_EXPRESS_ADDRESS_ID => $shippingAddress->getMollieAddressId()]
+            CustomFieldsInterface::MOLLIE_KEY => [self::CUSTOM_FIELDS_KEY_EXPRESS_ADDRESS_ID => $shippingAddress->getMollieAddressId()]
         ]);
         $shippingAddressData->set('customFields', $customFields);
         $data->set('shippingAddress', $shippingAddressData);
@@ -780,7 +780,7 @@ class CustomerService implements CustomerServiceInterface
             $billingAddressData->set('countryId', $countryId);
             $customFields = new RequestDataBag();
             $customFields->set(CustomerAddressDefinition::ENTITY_NAME, [
-                CustomFieldsInterface::MOLLIE_KEY => [self::CUSTOM_FIELDS_KEY_PAYPAL_EXPRESS_ADDRESS_ID => $billingAddress->getMollieAddressId()]
+                CustomFieldsInterface::MOLLIE_KEY => [self::CUSTOM_FIELDS_KEY_EXPRESS_ADDRESS_ID => $billingAddress->getMollieAddressId()]
             ]);
             $billingAddressData->set('customFields', $customFields);
 
@@ -826,7 +826,7 @@ class CustomerService implements CustomerServiceInterface
             'phoneNumber' => '',
             'customFields' => [
                 CustomFieldsInterface::MOLLIE_KEY => [
-                    self::CUSTOM_FIELDS_KEY_PAYPAL_EXPRESS_ADDRESS_ID => $address->getMollieAddressId()
+                    self::CUSTOM_FIELDS_KEY_EXPRESS_ADDRESS_ID => $address->getMollieAddressId()
                 ]
             ]
         ];
