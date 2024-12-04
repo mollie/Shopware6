@@ -355,20 +355,31 @@ class ApplePayDirect
             throw new \Exception('PaymentToken not found!');
         }
 
-
+        $updateShippingAddress = true;
         $applePayID = $this->getActiveApplePayID($context);
-
+        $customer = $context->getCustomer();
+        $shippingAddress = new AddressStruct($firstname, $lastname, $email, $street, '', $zipcode, $city, $countryCode, $phone);
         # if we are not logged in,
         # then we have to create a new guest customer for our express order
-        if (! $this->customerService->isCustomerLoggedIn($context)) {
-            $address = new AddressStruct($firstname, $lastname, $email, $street, '', $zipcode, $city, $countryCode, $phone);
+        if ($customer === null) {
 
-            $customer = $this->customerService->createGuestAccount(
-                $address,
-                $applePayID,
-                $context,
-                $acceptedDataProtection
-            );
+
+            # find existing customer by email
+            $customer = $this->customerService->findCustomerByEmail($shippingAddress->getEmail(), $context);
+
+            if ($customer === null) {
+                $updateShippingAddress = false;
+
+
+                $customer = $this->customerService->createGuestAccount(
+                    $shippingAddress,
+                    $applePayID,
+                    $context,
+                    $acceptedDataProtection
+                );
+            }
+
+
 
             if (! $customer instanceof CustomerEntity) {
                 throw new \Exception('Error when creating customer!');
@@ -378,6 +389,10 @@ class ApplePayDirect
             # Our SalesChannelContext will be correctly updated after our
             # forward to the finish-payment page.
             $this->customerService->loginCustomer($customer, $context);
+        }
+
+        if ($updateShippingAddress) {
+            $this->customerService->reuseOrCreateAddresses($customer, $shippingAddress, $context->getContext());
         }
 
         # also (always) update our payment method to use Apple Pay for our cart
