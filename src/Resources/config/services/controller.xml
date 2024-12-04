@@ -17,6 +17,21 @@
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Controller\Api\Controller\RequestBagFactory"/>
+
+        <service id="Kiener\MolliePayments\Controller\Api\Controller\OrderController">
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+            <tag name="controller.service_arguments"/>
+            <argument type="service" id="Kiener\MolliePayments\Controller\Api\Controller\RequestBagFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Controller\Api\PluginConfig\ConfigControllerBase"/>
+            <argument type="service" id="Kiener\MolliePayments\Controller\Api\Order\ShippingControllerBase"/>
+            <argument type="service" id="Kiener\MolliePayments\Controller\Api\Order\OrderControllerBase"/>
+            <argument type="service" id="Kiener\MolliePayments\Controller\Api\Order\CancelLineController"/>
+            <argument type="service" id="order.repository"/>
+        </service>
+
 
         <service id="Kiener\MolliePayments\Controller\Api\PluginConfig\ConfigControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
