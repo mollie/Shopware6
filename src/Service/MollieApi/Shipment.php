@@ -181,12 +181,13 @@ class Shipment implements ShipmentInterface
             return [
                 'amount' => 0.0,
                 'quantity' => 0,
+                'shippable' => 0
             ];
         }
 
         $totalAmount = 0.0;
         $totalQuantity = 0;
-
+        $shippableQuantity = 0;
         foreach ($mollieOrder->lines() as $mollieOrderLine) {
             /** @var OrderLine $mollieOrderLine */
             if ($mollieOrderLine->type === OrderLineType::TYPE_SHIPPING_FEE) {
@@ -197,13 +198,14 @@ class Shipment implements ShipmentInterface
             if ($mollieOrderLine->amountShipped) {
                 $totalAmount += floatval($mollieOrderLine->amountShipped->value);
             }
-
+            $shippableQuantity += $mollieOrderLine->shippableQuantity;
             $totalQuantity += $mollieOrderLine->quantityShipped;
         }
 
         return [
             'amount' => $totalAmount,
             'quantity' => $totalQuantity,
+            'shippableQuantity' => $shippableQuantity
         ];
     }
 }

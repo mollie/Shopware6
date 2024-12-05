@@ -263,7 +263,7 @@ Component.override('sw-order-detail-general', {
 
             MolliePaymentsRefundBundleRepositoryService.setOrderId(this.order.id);
             MolliePaymentsRefundBundleRepositoryService.fetch().then((response) => {
-                this.isShippingPossible = response.data.shipping;
+                this.isShippingPossible = response.data.shipping.shippableQuantity > 0;
             });
 
             this.refundedManagerService.isRefundManagerAvailable(this.order.salesChannelId, this.order.id).then((possible)=>{
