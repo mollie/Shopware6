@@ -151,4 +151,8 @@ export default class OrderDetailsRepository {
     getOrderDetailsGeneralTab() {
         return cy.get('.sw-order-detail__tabs .sw-order-detail__tabs-tab-general')
     }
+
+    getMollieRefundManagerDialog(){
+        return cy.get('#modalTitleEl');
+    }
 }
