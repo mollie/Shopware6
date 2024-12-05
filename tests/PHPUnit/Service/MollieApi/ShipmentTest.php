@@ -195,7 +195,8 @@ class ShipmentTest extends TestCase
 
         $expectedTotals = [
             'amount' => 175.0,
-            'quantity' => 5
+            'quantity' => 5,
+            'shippableQuantity' => 4
         ];
 
         $actualTotals = $this->shipmentApiService->getTotals('mollieOrderId', 'salesChannelId');
