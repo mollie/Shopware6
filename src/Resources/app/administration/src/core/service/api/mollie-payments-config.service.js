@@ -85,7 +85,9 @@ export default class MolliePaymentsConfigService extends ApiService {
         MolliePaymentsRefundBundleRepositoryService.setClient(this.httpClient);
         MolliePaymentsRefundBundleRepositoryService.setHeaders(this.getBasicHeaders());
 
-        return MolliePaymentsRefundBundleRepositoryService.fetch()
+        return MolliePaymentsRefundBundleRepositoryService.fetch().then((response) => {
+            return ApiService.handleResponse(response);
+        });
     }
 
 }
