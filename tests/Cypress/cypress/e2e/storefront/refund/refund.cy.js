@@ -73,11 +73,7 @@ context("Order Refunds", () => {
             // now start the partial refund
             refundManager.fullRefund(REFUND_DESCRIPTION, REFUND_INTERNAL_DESCRIPTION);
 
-            cy.wait(5000); // wait for the page to reload
 
-            adminOrders.openRefundManager();
-
-            cy.wait(1500);
 
             // // verify that our refund now exists
             repoRefundManager.getFirstRefundStatusLabel().contains('Pending');
@@ -114,9 +110,6 @@ context("Order Refunds", () => {
             // now start the partial refund
             refundManager.partialAmountRefund(2, REFUND_DESCRIPTION);
 
-            cy.wait(5000); // wait for the page to reload
-
-            adminOrders.openRefundManager();
 
             // verify that our refund now exists
             repoRefundManager.getFirstRefundStatusLabel().contains('Pending');
@@ -154,9 +147,7 @@ context("Order Refunds", () => {
             // now start the partial refund with a custom amount
             refundManager.partialAmountRefund(2, REFUND_DESCRIPTION);
 
-            cy.wait(5000); // wait for the page to reload
 
-            adminOrders.openRefundManager();
 
             // -------------------------------------------------------------------------------
 
@@ -202,9 +193,7 @@ context("Order Refunds", () => {
             // now start the full refund
             refundManager.fullRefund(REFUND_DESCRIPTION, '');
 
-            cy.wait(5000); // wait for the page to reload
 
-            adminOrders.openRefundManager();
 
             // verify that our refund now exists
             repoRefundManager.getFirstRefundStatusLabel().contains('Pending');
@@ -222,9 +211,6 @@ context("Order Refunds", () => {
             // now start another full refund
             refundManager.fullRefund(REFUND_DESCRIPTION, '');
 
-            cy.wait(5000); // wait for the page to reload
-
-            adminOrders.openRefundManager();
 
             cy.contains(CANCELED_REFUND_STATUS_LABEL).should('not.exist');
 

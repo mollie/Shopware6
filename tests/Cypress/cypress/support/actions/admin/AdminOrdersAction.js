@@ -44,11 +44,14 @@ export default class AdminOrdersAction {
         }
 
         cy.wait(2000);
-        repoOrdersDetails.getMollieRefundManagerButton().click({force: true, waitForAnimations: false});
+        repoOrdersDetails.getMollieRefundManagerButton().trigger('click');//the normal click, missed somehow the element randomly
         // here are automatic reloads and things as it seems
         // I really want to test the real UX, so we just wait like a human
         cy.wait(4000);
+        repoOrdersDetails.getMollieRefundManagerDialog().should('be.visible');
     }
+
+
 
 
     /**
