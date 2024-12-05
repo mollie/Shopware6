@@ -8,7 +8,6 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
 use Mollie\Api\Types\PaymentMethod;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRouteResponse;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -34,7 +33,7 @@ class RegularPaymentRemover extends PaymentMethodRemover
      */
     public function removePaymentMethods(PaymentMethodRouteResponse $originalData, SalesChannelContext $context): PaymentMethodRouteResponse
     {
-        if (!$this->isAllowedRoute()) {
+        if (! $this->isAllowedRoute()) {
             return $originalData;
         }
 
@@ -53,7 +52,7 @@ class RegularPaymentRemover extends PaymentMethodRemover
             }
 
             # hiding billie for none business customers
-            if ($attributes->getMollieIdentifier() === PaymentMethod::BILLIE && $this->isBusinessAccount($context) === false) {
+            if ($attributes->getMollieIdentifier() === PaymentMethod::BILLIE && $this->companyNameExists($context) === false) {
                 $originalData->getPaymentMethods()->remove($key);
             }
         }
@@ -61,19 +60,19 @@ class RegularPaymentRemover extends PaymentMethodRemover
         return $originalData;
     }
 
-    private function isBusinessAccount(SalesChannelContext $context): bool
+    private function companyNameExists(SalesChannelContext $context): bool
     {
         $customer = $context->getCustomer();
 
         if ($customer === null) {
             return false;
         }
+        
+        $billingAddress = $customer->getActiveBillingAddress();
 
-        if (method_exists($customer, 'getAccountType') === false) {
+        if ($billingAddress === null) {
             $billingAddress = $customer->getDefaultBillingAddress();
-            return $billingAddress && !empty($billingAddress->getCompany());
         }
-
-        return $customer->getAccountType() === CustomerEntity::ACCOUNT_TYPE_BUSINESS;
+        return $billingAddress && ! empty($billingAddress->getCompany());
     }
 }
