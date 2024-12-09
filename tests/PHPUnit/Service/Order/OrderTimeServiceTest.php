@@ -6,6 +6,7 @@ namespace MolliePayments\Tests\Service\Order;
 
 use Kiener\MolliePayments\Service\Order\OrderTimeService;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -24,7 +25,7 @@ class OrderTimeServiceTest extends TestCase
     {
         $order = $this->orderMockWithLastTransactionTimestamp($orderDate);
 
-        $result = (new OrderTimeService($now))->isOrderAgeGreaterThan($order, $compareValueInMinutes);
+        $result = (new OrderTimeService(new NullLogger(),$now))->isOrderAgeGreaterThan($order, $compareValueInMinutes);
 
         $this->assertSame($expected, $result);
     }
