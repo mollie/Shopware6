@@ -55,4 +55,16 @@ class TrackingData
     {
         return $this->trackingUrl;
     }
+
+    /**
+     * @return array<string,string>
+     */
+    public function toArray(): array
+    {
+        return [
+            'carrier' => $this->carrier,
+            'code' => $this->code,
+            'tracking_url' => $this->trackingUrl,
+        ];
+    }
 }

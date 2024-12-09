@@ -100,6 +100,12 @@ class TrackingInfoStructFactory
      */
     private function createInfoStruct(string $trackingCarrier, string $trackingCode, string $trackingUrl): ?ShipmentTrackingInfoStruct
     {
+        $this->logger->debug('Creating tracking information for shipment.', [
+            'trackingCarrier' => $trackingCarrier,
+            'trackingCode' => $trackingCode,
+            'trackingUrl' => $trackingUrl
+        ]);
+
         if (empty($trackingCarrier) && empty($trackingCode)) {
             $this->logger->debug('No tracking information provided for shipment.');
             return null;
@@ -113,11 +119,6 @@ class TrackingInfoStructFactory
             throw new \InvalidArgumentException('Missing Argument for Tracking Code!');
         }
 
-        $this->logger->debug('Creating tracking information for shipment.', [
-            'trackingCarrier' => $trackingCarrier,
-            'trackingCode' => $trackingCode,
-            'trackingUrl' => $trackingUrl
-        ]);
 
         // determine if the provided tracking code is actually a tracking URL
         if (empty($trackingUrl) === true && $this->urlParsingService->isUrl($trackingCode)) {
