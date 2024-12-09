@@ -51,11 +51,11 @@ class ShipmentManagerTest extends TestCase
     public function setUp(): void
     {
         $this->fakeShipmentService = new FakeShipment();
-
+        $logger = new NullLogger();
         $deliveryTransitionService = $this->createMock(DeliveryTransitionService::class);
         $mollieApiOrderService = $this->getMockBuilder(Order::class)->disableOriginalConstructor()->getMock();
         $orderService = $this->getMockBuilder(OrderService::class)->disableOriginalConstructor()->getMock();
-        $deliveryExtractor = new OrderDeliveryExtractor(new NullLogger());
+        $deliveryExtractor = new OrderDeliveryExtractor($logger);
 
         $this->shipmentManager = new ShipmentManager(
             $deliveryTransitionService,
@@ -64,7 +64,8 @@ class ShipmentManagerTest extends TestCase
             $orderService,
             $deliveryExtractor,
             new OrderItemsExtractor(),
-            new TrackingInfoStructFactory(new UrlParsingService(), new NullLogger())
+            new TrackingInfoStructFactory(new UrlParsingService(), $logger),
+            $logger
         );
 
         $this->context = $this->getMockBuilder(Context::class)->disableOriginalConstructor()->getMock();

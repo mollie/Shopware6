@@ -14,6 +14,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\OrderDeliveryExtractor"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\OrderItemsExtractor"/>
             <argument type="service" id="Kiener\MolliePayments\Service\TrackingInfoStructFactory"/>
+            <argument type="service" id="mollie_payments.logger"/>
         </service>
 
         <service id="Kiener\MolliePayments\Facade\MolliePaymentDoPay" public="true">
