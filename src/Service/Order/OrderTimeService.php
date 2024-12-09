@@ -4,8 +4,10 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Service\Order;
 
 use DateTime;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Defaults;
 
 class OrderTimeService
 {
@@ -14,9 +16,15 @@ class OrderTimeService
      */
     private $now;
 
-    public function __construct(?DateTime $now = null)
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    public function __construct(LoggerInterface $logger, ?DateTime $now = null)
     {
         $this->now = $now ?? new DateTime();
+        $this->logger = $logger;
     }
 
     /**
@@ -42,7 +50,7 @@ class OrderTimeService
             return false;
         }
 
-        $transitionDate = $lastTransaction->getCreatedAt();
+        $transitionDate = $lastTransaction->getUpdatedAt() ?? $lastTransaction->getCreatedAt();
 
         if ($transitionDate === null) {
             return false;
@@ -51,6 +59,13 @@ class OrderTimeService
         $interval = $this->now->diff($transitionDate);
         $diffInHours = $interval->h + ($interval->days * 24);
         $diffInMinutes = $interval->i + ($diffInHours * 60);
+
+        $this->logger->debug('Check if order is expired', [
+            'lastTransactionTime' => $transitionDate->format(Defaults::STORAGE_DATE_TIME_FORMAT),
+            'now' => $this->now->format(Defaults::STORAGE_DATE_TIME_FORMAT),
+            'diffInMinutes' => $diffInMinutes,
+            'minutes'=>$minutes
+        ]);
 
         return $diffInMinutes > $minutes;
     }

@@ -114,7 +114,11 @@ class OrderExpireService
             $finalizeTransactionTimeInMinutes = $settings->getPaymentFinalizeTransactionTime();
 
             if ($this->orderUsesSepaPayment($lastTransaction)) {
-                $finalizeTransactionTimeInMinutes = (int)ceil($settings->getPaymentMethodBankTransferDueDateDays() / 24 / 60);
+                $bankTransferDueDays = $settings->getPaymentMethodBankTransferDueDateDays();
+                if ($bankTransferDueDays === null) {
+                    $bankTransferDueDays = BankTransferPayment::DUE_DATE_MIN_DAYS;
+                }
+                $finalizeTransactionTimeInMinutes = 60 * 60 * 24 * $bankTransferDueDays;
             }
 
             if ($this->orderTimeService->isOrderAgeGreaterThan($order, $finalizeTransactionTimeInMinutes) === false) {
