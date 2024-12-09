@@ -33,8 +33,7 @@ class ExpireAction
         OrderExpireService              $orderExpireService,
         SettingsService                 $settingsService,
         LoggerInterface                 $logger
-    )
-    {
+    ) {
         $this->orderRepository = $orderRepository;
         $this->salesChannelRepository = $salesChannelRepository;
         $this->orderExpireService = $orderExpireService;
@@ -87,7 +86,7 @@ class ExpireAction
         $criteria->addSorting(new FieldSorting('orderDateTime', FieldSorting::DESCENDING));
         $criteria->setLimit(10);
 
-        $this->logger->debug('Search for orders with payment status in progress older than date',[
+        $this->logger->debug('Search for orders with payment status in progress older than date', [
             'date' => $date->format(Defaults::STORAGE_DATE_TIME_FORMAT),
         ]);
 
