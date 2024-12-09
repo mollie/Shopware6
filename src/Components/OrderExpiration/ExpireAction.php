@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\OrderExpiration;
 
+use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Kiener\MolliePayments\Repository\Order\OrderRepositoryInterface;
 use Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepositoryInterface;
 use Kiener\MolliePayments\Service\Order\OrderExpireService;
@@ -32,7 +33,8 @@ class ExpireAction
         OrderExpireService              $orderExpireService,
         SettingsService                 $settingsService,
         LoggerInterface                 $logger
-    ) {
+    )
+    {
         $this->orderRepository = $orderRepository;
         $this->salesChannelRepository = $salesChannelRepository;
         $this->orderExpireService = $orderExpireService;
@@ -74,7 +76,7 @@ class ExpireAction
         $this->logger->info('Start expire orders for saleschannel', ['salesChannel' => $salesChannelEntity->getName()]);
 
         $date = new \DateTime();
-        $date->modify('-2 months');
+        $date->modify(sprintf('-%d days', (BankTransferPayment::DUE_DATE_MAX_DAYS + 1)));
 
         $criteria = new Criteria();
         $criteria->addAssociation('transactions.stateMachineState');
@@ -85,7 +87,9 @@ class ExpireAction
         $criteria->addSorting(new FieldSorting('orderDateTime', FieldSorting::DESCENDING));
         $criteria->setLimit(10);
 
-        $this->logger->debug('Search for orders with payment status in progress');
+        $this->logger->debug('Search for orders with payment status in progress older than date',[
+            'date' => $date->format(Defaults::STORAGE_DATE_TIME_FORMAT),
+        ]);
 
         $searchResult = $this->orderRepository->search($criteria, $context);
         if ($searchResult->count() === 0) {
