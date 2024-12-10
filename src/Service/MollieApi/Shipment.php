@@ -78,6 +78,7 @@ class Shipment implements ShipmentInterface
                 ];
             }
 
+            $options = $this->addShippingCosts($mollieOrder, $options);
             return $mollieOrder->createShipment($options);
         } catch (ApiException $e) {
             throw new MollieOrderCouldNotBeShippedException(
@@ -120,6 +121,7 @@ class Shipment implements ShipmentInterface
             }
 
             $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId);
+            $options = $this->addShippingCosts($mollieOrder, $options);
 
             return $mollieOrder->createShipment($options);
         } catch (ApiException $e) {
@@ -132,6 +134,54 @@ class Shipment implements ShipmentInterface
                 $e
             );
         }
+    }
+
+    /**
+     * @param \Mollie\Api\Resources\Order $mollieOrder
+     * @param array<mixed> $options
+     * @return array<mixed>
+     */
+    private function addShippingCosts(\Mollie\Api\Resources\Order $mollieOrder, array $options): array
+    {
+        $shippingOptions = [];
+
+        $mollieLines = $mollieOrder->lines();
+
+        $shippableLines = [];
+
+        /**
+         * @var OrderLine $line
+         */
+        foreach ($mollieLines as $line) {
+            if ($line->type === OrderLineType::TYPE_SHIPPING_FEE) {
+                $shippingOptions[] = [
+                    'id' => $line->id,
+                    'quantity' => $line->quantity,
+                ];
+                continue;
+            }
+            if ($line->shippableQuantity > 0) {
+                $shippableLines[$line->id] = $line;
+            }
+        }
+
+
+        foreach ($options['lines'] as $line) {
+            $shippableLine = $shippableLines[$line['id']]??null;
+            if ($shippableLine === null) {
+                continue;
+            }
+            $shippableQuantity = $shippableLine->shippableQuantity - $line['quantity'];
+            if ($shippableQuantity === 0) {
+                unset($shippableLines[$line['id']]);
+            }
+        }
+        if (count($shippableLines) === 0) {
+            $options['lines'] = array_merge($options['lines'], $shippingOptions);
+        }
+
+
+        return $options;
     }
 
     /**
