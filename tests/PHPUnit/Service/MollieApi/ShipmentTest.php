@@ -135,7 +135,7 @@ class ShipmentTest extends TestCase
             ->method('createShipment')
             ->willReturn($this->createMock(MollieShipment::class));
 
-        $this->mollieOrder->method('lines')->willReturn($this->createMock(OrderLineCollection::class));
+        $this->mollieOrder->method('lines')->willReturn([]);
 
 
 
@@ -151,7 +151,7 @@ class ShipmentTest extends TestCase
             ->expects($this->once())
             ->method('createShipment')
             ->willThrowException(new ApiException());
-        $this->mollieOrder->method('lines')->willReturn($this->createMock(OrderLineCollection::class));
+        $this->mollieOrder->method('lines')->willReturn([]);
 
         $this->expectException(MollieOrderCouldNotBeShippedException::class);
 
