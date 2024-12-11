@@ -28,7 +28,8 @@ export default class AdminOrdersAction {
      *
      */
     openLastOrder() {
-        repoOrdersList.getLatestOrderNumber().click(forceOption);
+        repoOrdersList.getLatestOrderNumber().trigger('click');
+        cy.wait(2000);
     }
 
 
@@ -104,7 +105,7 @@ export default class AdminOrdersAction {
 
         cy.wait(2000);
 
-        repoOrdersDetails.getLineItemActionsButton(nthItem).click(forceOption)
+        repoOrdersDetails.getLineItemActionsButton(nthItem).trigger('click')
 
         repoOrdersDetails.getLineItemActionsButtonShipThroughMollie().should('not.have.class', 'is--disabled');
 
