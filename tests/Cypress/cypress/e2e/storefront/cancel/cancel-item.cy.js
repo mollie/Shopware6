@@ -46,7 +46,7 @@ context("Cancel Authorized items", () => {
             createOrderAndOpenAdmin('Klarna');
 
 
-            orderDetailsRepository.getLineItemActionsButton(1).should('be.visible').click({force: true});
+            orderDetailsRepository.getLineItemActionsButton(1).should('be.visible').trigger('click');
 
             orderDetailsRepository.getLineItemActionsButtonCancelThroughMollie().should('not.have.class', 'is--disabled');
             orderDetailsRepository.getLineItemActionsButtonCancelThroughMollie().click({force: true});
@@ -55,7 +55,7 @@ context("Cancel Authorized items", () => {
             cancelItemRepository.getItemLabel().should('not.be.empty');
             cancelItemRepository.getConfirmButton().click({force: true});
             orderDetailsRepository.getLineItemCancelled().should('contain.text', 2);
-            orderDetailsRepository.getLineItemActionsButton(1).click({force: true});
+            orderDetailsRepository.getLineItemActionsButton(1).trigger('click');
             orderDetailsRepository.getLineItemActionsButtonCancelThroughMollie().should('have.class', 'is--disabled');
 
         });
@@ -64,7 +64,7 @@ context("Cancel Authorized items", () => {
             createOrderAndOpenAdmin('PayPal');
 
 
-            orderDetailsRepository.getLineItemActionsButton(1).should('be.visible').click({force: true});
+            orderDetailsRepository.getLineItemActionsButton(1).should('be.visible').trigger('click');
 
             orderDetailsRepository.getLineItemActionsButtonCancelThroughMollie().should('have.class', 'is--disabled');
         });

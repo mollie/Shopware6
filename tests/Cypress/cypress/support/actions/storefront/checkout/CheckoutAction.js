@@ -120,7 +120,7 @@ export default class CheckoutAction {
         cy.get('.address-form-actions:eq(0) button').click();
 
         //since 6.6.8.0 the edit address modal does not close automatically
-        if(shopware.isVersionGreaterEqual('6.6.8.0')){
+        if(shopware.isVersionGreaterEqual('6.6.8.0') && shopware.isVersionLower('6.6.9.0')){
             cy.wait(1000);
             cy.get('.js-pseudo-modal .modal-dialog .btn-close').click();
         }
