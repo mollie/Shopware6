@@ -15,6 +15,7 @@ use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\OrFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
@@ -80,7 +81,11 @@ class ExpireAction
         $criteria = new Criteria();
         $criteria->addAssociation('transactions.stateMachineState');
         $criteria->addAssociation('transactions.paymentMethod');
-        $criteria->addFilter(new EqualsFilter('transactions.stateMachineState.technicalName', OrderTransactionStates::STATE_IN_PROGRESS));
+        $criteria->addFilter(new OrFilter([
+            new EqualsFilter('transactions.stateMachineState.technicalName', OrderTransactionStates::STATE_IN_PROGRESS),
+            new EqualsFilter('transactions.stateMachineState.technicalName', OrderTransactionStates::STATE_UNCONFIRMED)
+        ]));
+
         $criteria->addFilter(new EqualsFilter('salesChannelId', $salesChannelEntity->getId()));
         $criteria->addFilter(new RangeFilter('orderDateTime', [RangeFilter::GTE => $date->format(Defaults::STORAGE_DATE_TIME_FORMAT)]));
         $criteria->addSorting(new FieldSorting('orderDateTime', FieldSorting::DESCENDING));

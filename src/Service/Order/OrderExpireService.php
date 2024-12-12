@@ -9,9 +9,9 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Order\OrderCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Checkout\Order\OrderStates;
 use Shopware\Core\Framework\Context;
 
 class OrderExpireService
@@ -106,7 +106,7 @@ class OrderExpireService
             $lastStatus = $stateMachineState->getTechnicalName();
 
             // disregard any orders that are not in progress
-            if ($lastStatus !== OrderStates::STATE_IN_PROGRESS) {
+            if (!in_array($lastStatus, [OrderTransactionStates::STATE_IN_PROGRESS,OrderTransactionStates::STATE_UNCONFIRMED])) {
                 continue;
             }
 

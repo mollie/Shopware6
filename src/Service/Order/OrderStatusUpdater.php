@@ -102,7 +102,7 @@ class OrderStatusUpdater
                 {
                     # if we are already in_progress...then don't switch to OPEN again
                     # otherwise SEPA bank transfer would switch back to OPEN
-                    if ($currentShopwareStatusKey !== OrderTransactionStates::STATE_IN_PROGRESS || $context->hasState(self::ORDER_STATE_FORCE_OPEN)) {
+                    if (! in_array($currentShopwareStatusKey, [OrderTransactionStates::STATE_IN_PROGRESS, OrderTransactionStates::STATE_UNCONFIRMED]) || $context->hasState(self::ORDER_STATE_FORCE_OPEN)) {
                         $addLog = true;
                         $this->transactionTransitionService->reOpenTransaction($transaction, $context);
                     }
