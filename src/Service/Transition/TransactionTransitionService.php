@@ -49,7 +49,7 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         $defaultState = OrderTransactionStates::STATE_IN_PROGRESS;
         $action = StateMachineTransitionActions::ACTION_PROCESS;
 
-        if (defined('\Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates\OrderTransactionStates::STATE_UNCONFIRMED')) {
+        if (defined('\Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates::STATE_UNCONFIRMED')) {
             $defaultState = OrderTransactionStates::STATE_UNCONFIRMED;
             $action = StateMachineTransitionActions::ACTION_PROCESS_UNCONFIRMED;
         }

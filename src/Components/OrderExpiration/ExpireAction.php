@@ -82,7 +82,7 @@ class ExpireAction
         $orFilterArray = [
             new EqualsFilter('transactions.stateMachineState.technicalName', OrderTransactionStates::STATE_IN_PROGRESS),
         ];
-        if (defined('\Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates\OrderTransactionStates::STATE_UNCONFIRMED')) {
+        if (defined('\Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates::STATE_UNCONFIRMED')) {
             $orFilterArray[] = new EqualsFilter('transactions.stateMachineState.technicalName', OrderTransactionStates::STATE_UNCONFIRMED);
         }
         $criteria = new Criteria();

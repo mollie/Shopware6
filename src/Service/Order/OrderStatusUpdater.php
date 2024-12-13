@@ -101,7 +101,7 @@ class OrderStatusUpdater
             case MolliePaymentStatus::MOLLIE_PAYMENT_OPEN:
                 {
                     $states = [OrderTransactionStates::STATE_IN_PROGRESS];
-                    if (defined('\Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates\OrderTransactionStates::STATE_UNCONFIRMED')) {
+                    if (defined('\Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates::STATE_UNCONFIRMED')) {
                         $states[] =  OrderTransactionStates::STATE_UNCONFIRMED;
                     }
                     # if we are already in_progress...then don't switch to OPEN again
