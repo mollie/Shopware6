@@ -34,7 +34,8 @@ class ExpireAction
         OrderExpireService              $orderExpireService,
         SettingsService                 $settingsService,
         LoggerInterface                 $logger
-    ) {
+    )
+    {
         $this->orderRepository = $orderRepository;
         $this->salesChannelRepository = $salesChannelRepository;
         $this->orderExpireService = $orderExpireService;
@@ -78,13 +79,18 @@ class ExpireAction
         $date = new \DateTime();
         $date->modify(sprintf('-%d days', (BankTransferPayment::DUE_DATE_MAX_DAYS + 1)));
 
+
+        $orFilterArray = [
+            new EqualsFilter('transactions.stateMachineState.technicalName', OrderTransactionStates::STATE_IN_PROGRESS),
+        ];
+        if (defined('\Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates\OrderTransactionStates::STATE_UNCONFIRMED')) {
+            $orFilterArray[] = new EqualsFilter('transactions.stateMachineState.technicalName', OrderTransactionStates::STATE_UNCONFIRMED);
+        }
         $criteria = new Criteria();
         $criteria->addAssociation('transactions.stateMachineState');
         $criteria->addAssociation('transactions.paymentMethod');
-        $criteria->addFilter(new OrFilter([
-            new EqualsFilter('transactions.stateMachineState.technicalName', OrderTransactionStates::STATE_IN_PROGRESS),
-            new EqualsFilter('transactions.stateMachineState.technicalName', OrderTransactionStates::STATE_UNCONFIRMED)
-        ]));
+
+        $criteria->addFilter(new OrFilter($orFilterArray));
 
         $criteria->addFilter(new EqualsFilter('salesChannelId', $salesChannelEntity->getId()));
         $criteria->addFilter(new RangeFilter('orderDateTime', [RangeFilter::GTE => $date->format(Defaults::STORAGE_DATE_TIME_FORMAT)]));
