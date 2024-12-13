@@ -34,8 +34,7 @@ class ExpireAction
         OrderExpireService              $orderExpireService,
         SettingsService                 $settingsService,
         LoggerInterface                 $logger
-    )
-    {
+    ) {
         $this->orderRepository = $orderRepository;
         $this->salesChannelRepository = $salesChannelRepository;
         $this->orderExpireService = $orderExpireService;

@@ -11,7 +11,6 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 
-
 class TransactionTransitionService implements TransactionTransitionServiceInterface
 {
     /**
