@@ -11,6 +11,7 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 
+
 class TransactionTransitionService implements TransactionTransitionServiceInterface
 {
     /**
@@ -46,19 +47,26 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
     public function processTransaction(OrderTransactionEntity $transaction, Context $context): void
     {
         $technicalName = ($transaction->getStateMachineState() instanceof StateMachineStateEntity) ? $transaction->getStateMachineState()->getTechnicalName() : '';
+        $defaultState = OrderTransactionStates::STATE_IN_PROGRESS;
+        $action = StateMachineTransitionActions::ACTION_PROCESS;
 
-        if ($this->isFinalOrTargetStatus($technicalName, [OrderTransactionStates::STATE_UNCONFIRMED])) {
+        if (defined('\Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates\OrderTransactionStates::STATE_UNCONFIRMED')) {
+            $defaultState = OrderTransactionStates::STATE_UNCONFIRMED;
+            $action = StateMachineTransitionActions::ACTION_PROCESS_UNCONFIRMED;
+        }
+
+        if ($this->isFinalOrTargetStatus($technicalName, [$defaultState])) {
             return;
         }
 
         $entityId = $transaction->getId();
         $availableTransitions = $this->getAvailableTransitions($entityId, $context);
 
-        if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_PROCESS_UNCONFIRMED, $availableTransitions)) {
+        if (!$this->transitionIsAllowed($action, $availableTransitions)) {
             $this->reOpenTransaction($transaction, $context);
         }
 
-        $this->performTransition($entityId, StateMachineTransitionActions::ACTION_PROCESS_UNCONFIRMED, $context);
+        $this->performTransition($entityId, $action, $context);
     }
 
     public function reOpenTransaction(OrderTransactionEntity $transaction, Context $context): void
