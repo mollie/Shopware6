@@ -47,7 +47,7 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
     {
         $technicalName = ($transaction->getStateMachineState() instanceof StateMachineStateEntity) ? $transaction->getStateMachineState()->getTechnicalName() : '';
         $defaultState = OrderTransactionStates::STATE_IN_PROGRESS;
-        $action = StateMachineTransitionActions::ACTION_PROCESS;
+        $action = StateMachineTransitionActions::ACTION_DO_PAY;
 
         if (defined('\Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates::STATE_UNCONFIRMED')) {
             $defaultState = OrderTransactionStates::STATE_UNCONFIRMED;
