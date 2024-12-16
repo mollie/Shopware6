@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Controller\Storefront\Webhook;
 
+use DateTimeZone;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatcherAdapterInterface;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
@@ -140,7 +141,7 @@ class NotificationFacade
         # LOAD TRANSACTION
         $swTransaction = $this->getTransaction($swTransactionId, $context);
 
-        if (!$swTransaction instanceof OrderTransactionEntity) {
+        if (! $swTransaction instanceof OrderTransactionEntity) {
             throw new \Exception('Transaction ' . $swTransactionId . ' not found in Shopware');
         }
 
@@ -148,22 +149,20 @@ class NotificationFacade
 
         $swOrder = $swTransaction->getOrder();
 
-        if (!$swOrder instanceof OrderEntity) {
+        if (! $swOrder instanceof OrderEntity) {
             throw new OrderNotFoundException('Shopware Order not found for transaction: ' . $swTransactionId);
         }
 
-        $now = new \DateTime();
-        $now->modify("+2 minutes");
-
-        $changedDate = $swOrder->getUpdatedAt();
-        if ($changedDate === null) {
-            $changedDate = $swOrder->getCreatedAt();
+        $now = new \DateTime('now', new DateTimeZone('UTC'));
+        /** @var ?\DateTimeImmutable $orderCreatedAt */
+        $orderCreatedAt = $swOrder->getCreatedAt();
+        if ($orderCreatedAt !== null) {
+            $createdAt = \DateTime::createFromImmutable($orderCreatedAt);
+            $createdAt->modify('+2 minutes');
+            if ($now < $orderCreatedAt) {
+                throw new WebhookIsTooEarlyException((string)$swOrder->getOrderNumber(), $now, $orderCreatedAt);
+            }
         }
-
-        if ($changedDate !== null && $now < $changedDate) {
-            throw new WebhookIsTooEarlyException((string)$swOrder->getOrderNumber(), $now, $changedDate);
-        }
-
 
 
         # --------------------------------------------------------------------------------------------
@@ -188,13 +187,13 @@ class NotificationFacade
         # verify if the customer really paid with Mollie in the end
         $paymentMethod = $swTransaction->getPaymentMethod();
 
-        if (!$paymentMethod instanceof PaymentMethodEntity) {
+        if (! $paymentMethod instanceof PaymentMethodEntity) {
             throw new \Exception('Transaction ' . $swTransactionId . ' has no payment method!');
         }
 
         $paymentMethodAttributes = new PaymentMethodAttributes($paymentMethod);
 
-        if (!$paymentMethodAttributes->isMolliePayment()) {
+        if (! $paymentMethodAttributes->isMolliePayment()) {
             # just skip it if it has been paid
             # with another payment provider
             # do NOT throw an error
@@ -214,7 +213,7 @@ class NotificationFacade
         $molliePayment = null;
         $mollieOrder = null;
 
-        if (!empty($orderAttributes->getMollieOrderId())) {
+        if (! empty($orderAttributes->getMollieOrderId())) {
             # fetch the order of our mollie ID
             # from our sales channel mollie profile
             $mollieOrder = $this->gatewayMollie->getOrder($mollieOrderId);
@@ -232,7 +231,7 @@ class NotificationFacade
         # --------------------------------------------------------------------------------------------
 
 
-        $logId = (!empty($mollieOrderId)) ? $mollieOrderId : $molliePaymentId;
+        $logId = (! empty($mollieOrderId)) ? $mollieOrderId : $molliePaymentId;
         $this->logger->info('Webhook for order ' . $swOrder->getOrderNumber() . ' and Mollie ID: ' . $logId . ' has been received with Status: ' . $status);
 
 

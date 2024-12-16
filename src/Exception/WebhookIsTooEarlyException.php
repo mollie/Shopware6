@@ -11,7 +11,7 @@ class WebhookIsTooEarlyException extends ShopwareHttpException
     public const MOLLIE_PAYMENTS__WEBHOOK_TOO_EARLY = 'MOLLIE_PAYMENTS__WEBHOOK_TOO_EARLY';
     public function __construct(string $oderNumber, \DateTimeInterface $now, \DateTimeInterface $updatedTime)
     {
-        $message = 'Webhook is too early for order: {{orderNumber}}. The last updateTime of the order is {{lastUpdateTime}}. It should be higher than: {{now}}';
+        $message = 'Webhook is too early for order: {{orderNumber}}. Request will be accepted after: {{lastUpdateTime}}';
         $parameters =[
             'orderNumber' => $oderNumber,
             'lastUpdateTime' => $updatedTime->format('Y-m-d H:i:s'),
