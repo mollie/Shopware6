@@ -31,6 +31,7 @@
 
         <service id="Kiener\MolliePayments\Service\MollieApi\Shipment">
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="event_dispatcher"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\MollieApi\Payment">
