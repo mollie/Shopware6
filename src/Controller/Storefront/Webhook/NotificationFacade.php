@@ -154,13 +154,16 @@ class NotificationFacade
         }
 
         $now = new \DateTime('now', new DateTimeZone('UTC'));
+
         /** @var ?\DateTimeImmutable $orderCreatedAt */
         $orderCreatedAt = $swOrder->getCreatedAt();
+
         if ($orderCreatedAt !== null) {
             $createdAt = \DateTime::createFromImmutable($orderCreatedAt);
             $createdAt->modify('+2 minutes');
-            if ($now < $orderCreatedAt) {
-                throw new WebhookIsTooEarlyException((string)$swOrder->getOrderNumber(), $now, $orderCreatedAt);
+
+            if ($now < $createdAt) {
+                throw new WebhookIsTooEarlyException((string)$swOrder->getOrderNumber(), $now, $createdAt);
             }
         }
 
