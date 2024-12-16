@@ -20,6 +20,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @final
@@ -101,10 +102,10 @@ class CancelItemFacadeBuilder
         /** @var MollieApiFactory $mollieFactory */
         $mollieFactory = $this->testCase->getMockBuilder(MollieApiFactory::class)->disableOriginalConstructor()->getMock();
         $mollieFactory->method('getClient')->willReturn($this->mollieClient);
-
+        $dispatcher = $this->testCase->getMockBuilder(EventDispatcherInterface::class)->getMock();
         $orderLineRepository = new FakeOrderLineItemRepository($this->itemCollection);
 
-        return new CancelItemFacade($mollieFactory, $orderLineRepository, $this->stockManager, new NullLogger());
+        return new CancelItemFacade($mollieFactory, $orderLineRepository, $this->stockManager, $dispatcher, new NullLogger());
     }
 
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Components\CancelManager;
 
 use Kiener\MolliePayments\Components\RefundManager\Integrators\StockManagerInterface;
+use Kiener\MolliePayments\Event\OrderLinesUpdatedEvent;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Repository\OrderLineItem\OrderLineItemRepositoryInterface;
 use Mollie\Api\MollieApiClient;
@@ -11,6 +12,7 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @final
@@ -23,13 +25,15 @@ class CancelItemFacade
     private LoggerInterface $logger;
     private OrderLineItemRepositoryInterface $orderLineItemRepository;
     private StockManagerInterface $stockManager;
+    private EventDispatcherInterface $eventDispatcher;
 
-    public function __construct(MollieApiFactory $clientFactory, OrderLineItemRepositoryInterface $orderLineItemRepository, StockManagerInterface $stockManager, LoggerInterface $logger)
+    public function __construct(MollieApiFactory $clientFactory, OrderLineItemRepositoryInterface $orderLineItemRepository, StockManagerInterface $stockManager, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger)
     {
         $this->client = $clientFactory->getClient();
         $this->logger = $logger;
         $this->orderLineItemRepository = $orderLineItemRepository;
         $this->stockManager = $stockManager;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function cancelItem(string $mollieOrderId, string $mollieLineId, string $shopwareLineId, int $quantity, bool $resetStock, Context $context): CancelItemResponse
@@ -86,6 +90,7 @@ class CancelItemFacade
             $mollieOrder->cancelLines(['lines' => [$lines]]);
             $this->logger->info('Item cancelled successful', ['orderId' => $mollieOrderId, 'mollieLineId' => $mollieLineId, 'quantity' => $quantity]);
 
+            $this->eventDispatcher->dispatch(new OrderLinesUpdatedEvent($mollieOrder));
 
             $response = $response->withData($lines);
         } catch (\Throwable $e) {
