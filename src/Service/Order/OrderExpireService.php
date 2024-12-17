@@ -116,7 +116,7 @@ class OrderExpireService
             if ($this->orderUsesSepaPayment($lastTransaction)) {
                 $bankTransferDueDays = $settings->getPaymentMethodBankTransferDueDateDays();
                 if ($bankTransferDueDays === null) {
-                    $bankTransferDueDays = BankTransferPayment::DUE_DATE_MIN_DAYS;
+                    $bankTransferDueDays = BankTransferPayment::DUE_DATE_MAX_DAYS;
                 }
                 $finalizeTransactionTimeInMinutes = 60 * 60 * 24 * $bankTransferDueDays;
             }
