@@ -3,7 +3,9 @@
 namespace Kiener\MolliePayments\Components\Subscription\DAL\Repository;
 
 use DateTime;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressCollection;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryCollection;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
@@ -21,25 +23,25 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
 class SubscriptionRepository
 {
     /**
-     * @var EntityRepository
+     * @var EntityRepository<SubscriptionCollection>
      */
     private $repoSubscriptions;
 
     /**
-     * @var EntityRepository
+     * @var EntityRepository<SubscriptionAddressCollection>
      */
     private $repoAddresses;
 
     /**
-     * @var EntityRepository
+     * @var EntityRepository<SubscriptionHistoryCollection>
      */
     private $repoHistory;
 
 
     /**
-     * @param EntityRepository $repoSubscriptions
-     * @param EntityRepository $repoAddresses
-     * @param EntityRepository $repoHistory
+     * @param EntityRepository<SubscriptionCollection> $repoSubscriptions
+     * @param EntityRepository<SubscriptionAddressCollection> $repoAddresses
+     * @param EntityRepository<SubscriptionHistoryCollection> $repoHistory
      */
     public function __construct($repoSubscriptions, $repoAddresses, $repoHistory)
     {

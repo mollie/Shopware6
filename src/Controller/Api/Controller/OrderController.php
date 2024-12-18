@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Controller\Api\Order\CancelLineController;
 use Kiener\MolliePayments\Controller\Api\Order\OrderControllerBase;
 use Kiener\MolliePayments\Controller\Api\Order\ShippingControllerBase;
 use Kiener\MolliePayments\Controller\Api\PluginConfig\ConfigControllerBase;
+use Shopware\Core\Checkout\Order\OrderCollection;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -42,10 +43,18 @@ class OrderController extends AbstractController
     private $cancelLineController;
 
     /**
-     * @var EntityRepository
+     * @var EntityRepository<OrderCollection>
      */
     private $orderRepository;
 
+    /**
+     * @param RequestBagFactory $requestBagFactory
+     * @param ConfigControllerBase $baseController
+     * @param ShippingControllerBase $shippingController
+     * @param OrderControllerBase $orderController
+     * @param CancelLineController $cancelLineController
+     * @param EntityRepository<OrderCollection> $orderRepository
+     */
     public function __construct(
         RequestBagFactory $requestBagFactory,
         ConfigControllerBase $baseController,

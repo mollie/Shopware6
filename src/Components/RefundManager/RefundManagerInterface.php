@@ -25,6 +25,8 @@ interface RefundManagerInterface
      */
     public function refund(OrderEntity $order, RefundRequest $request, Context $context): Refund;
 
+    public function cancelAllOrderRefunds(OrderEntity $order, Context $context): bool;
+
     /**
      * @param string $orderId
      * @param string $refundId

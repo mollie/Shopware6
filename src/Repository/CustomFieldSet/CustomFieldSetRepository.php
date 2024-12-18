@@ -4,16 +4,17 @@ namespace Kiener\MolliePayments\Repository\CustomFieldSet;
 
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\System\CustomField\Aggregate\CustomFieldSet\CustomFieldSetCollection;
 
 class CustomFieldSetRepository implements CustomFieldSetRepositoryInterface
 {
     /**
-     * @var EntityRepository
+     * @var EntityRepository<CustomFieldSetCollection>
      */
     private $coreRepository;
 
     /**
-     * @param EntityRepository $customFieldSetRepository
+     * @param EntityRepository<CustomFieldSetCollection> $customFieldSetRepository
      */
     public function __construct($customFieldSetRepository)
     {

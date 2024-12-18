@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Repository\Customer;
 
+use Shopware\Core\Checkout\Customer\CustomerCollection;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
@@ -12,13 +13,13 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 class CustomerRepository implements CustomerRepositoryInterface
 {
     /**
-     * @var EntityRepository
+     * @var EntityRepository<CustomerCollection>
      */
     private $customerRepository;
 
 
     /**
-     * @param EntityRepository $customerRepository
+     * @param EntityRepository<CustomerCollection> $customerRepository
      */
     public function __construct($customerRepository)
     {

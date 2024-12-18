@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 class ShippingMethodService
 {
     /**
-     * @var EntityRepository
+     * @var EntityRepository<ShippingMethodCollection>
      */
     private $shippingMethodRepository;
 
@@ -27,7 +27,7 @@ class ShippingMethodService
     /**
      * Creates a new instance of the shipping method repository.
      *
-     * @param EntityRepository $shippingMethodRepository
+     * @param EntityRepository<ShippingMethodCollection> $shippingMethodRepository
      */
     public function __construct($shippingMethodRepository, AbstractShippingMethodRoute $shippingMethodRoute)
     {

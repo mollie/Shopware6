@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Repository\Product;
 
+use Shopware\Core\Content\Product\ProductCollection;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -13,13 +14,13 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 class ProductRepository implements ProductRepositoryInterface
 {
     /**
-     * @var EntityRepository
+     * @var EntityRepository<ProductCollection>
      */
     private $repoProducts;
 
 
     /**
-     * @param EntityRepository $repoProducts
+     * @param EntityRepository<ProductCollection> $repoProducts
      */
     public function __construct($repoProducts)
     {

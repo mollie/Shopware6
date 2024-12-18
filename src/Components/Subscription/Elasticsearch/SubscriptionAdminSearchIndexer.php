@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Components\Subscription\Elasticsearch;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Dbal\Common\IterableQuery;
@@ -21,14 +22,21 @@ class SubscriptionAdminSearchIndexer extends AbstractAdminIndexer
 {
     private Connection $connection;
     private IteratorFactory $factory;
+    /**
+     * @var EntityRepository<SubscriptionCollection>
+     */
     private EntityRepository $repository;
     private int $indexingBatchSize;
     /**
      * elasticsearch below 6.6 install old doctrine dbal where binary type does not exists yet
      */
     private const TYPE_BINARY = ParameterType::BINARY + Connection::ARRAY_PARAM_OFFSET;
+
     /**
-     * @internal
+     * @param Connection $connection
+     * @param IteratorFactory $factory
+     * @param EntityRepository<SubscriptionCollection> $repository
+     * @param int $indexingBatchSize
      */
     public function __construct(
         Connection       $connection,

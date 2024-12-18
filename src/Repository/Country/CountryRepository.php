@@ -7,16 +7,17 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
+use Shopware\Core\System\Country\CountryCollection;
 
 class CountryRepository implements CountryRepositoryInterface
 {
     /**
-     * @var EntityRepository
+     * @var EntityRepository<CountryCollection>
      */
     private $countryRepository;
 
     /**
-     * @param EntityRepository $countryRepository
+     * @param EntityRepository<CountryCollection> $countryRepository
      */
     public function __construct($countryRepository)
     {

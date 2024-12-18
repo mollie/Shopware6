@@ -91,6 +91,7 @@ class OrderService implements OrderServiceInterface
     public function getOrder(string $orderId, Context $context): OrderEntity
     {
         $criteria = new Criteria([$orderId]);
+
         $criteria->addAssociation('currency');
         $criteria->addAssociation('addresses');
         $criteria->addAssociation('addresses.country');     # required for FlowBuilder -> send confirm email option

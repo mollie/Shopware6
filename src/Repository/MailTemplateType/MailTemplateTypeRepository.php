@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Repository\MailTemplateType;
 
+use Shopware\Core\Content\MailTemplate\Aggregate\MailTemplateType\MailTemplateTypeCollection;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
@@ -12,12 +13,12 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 class MailTemplateTypeRepository implements MailTemplateTypeRepositoryInterface
 {
     /**
-     * @var EntityRepository
+     * @var EntityRepository<MailTemplateTypeCollection>
      */
     private $mailTemplateTypeRepository;
 
     /**
-     * @param EntityRepository $mailTemplateTypeRepository
+     * @param EntityRepository<MailTemplateTypeCollection> $mailTemplateTypeRepository
      */
     public function __construct($mailTemplateTypeRepository)
     {

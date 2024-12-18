@@ -9,16 +9,17 @@ use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEve
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
+use Shopware\Core\System\SalesChannel\SalesChannelCollection;
 
 class SalesChannelRepository implements SalesChannelRepositoryInterface
 {
     /**
-     * @var EntityRepository
+     * @var EntityRepository<SalesChannelCollection>
      */
     private $salesChannelRepository;
 
     /**
-     * @param EntityRepository $salesChannelRepository
+     * @param EntityRepository<SalesChannelCollection> $salesChannelRepository
      */
     public function __construct($salesChannelRepository)
     {

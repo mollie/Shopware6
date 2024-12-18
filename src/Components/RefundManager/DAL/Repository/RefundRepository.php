@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\RefundManager\DAL\Repository;
 
+use Kiener\MolliePayments\Components\RefundManager\DAL\Refund\RefundCollection;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
@@ -13,12 +14,12 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 class RefundRepository implements RefundRepositoryInterface
 {
     /**
-     * @var EntityRepository
+     * @var EntityRepository<RefundCollection>
      */
     private $mollieRefundRepository;
 
     /**
-     * @param EntityRepository $mollieRefundRepository
+     * @param EntityRepository<RefundCollection> $mollieRefundRepository
      */
     public function __construct($mollieRefundRepository)
     {

@@ -15,6 +15,7 @@ use Shopware\Core\Framework\Plugin\Context\ActivateContext;
 use Shopware\Core\Framework\Plugin\Context\InstallContext;
 use Shopware\Core\Framework\Plugin\Context\UpdateContext;
 use Shopware\Core\Kernel;
+use Shopware\Core\System\CustomField\Aggregate\CustomFieldSet\CustomFieldSetCollection;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -56,7 +57,7 @@ class MolliePayments extends Plugin
         }
         # that's the only part we use the Shopware repository directly,
         # and not our custom one, because our repositories are not yet registered in this function
-        /** @var EntityRepository $shopwareRepoCustomFields */
+        /** @var EntityRepository<CustomFieldSetCollection> $shopwareRepoCustomFields */
         $shopwareRepoCustomFields = $this->container->get('custom_field_set.repository');
 
         if ($shopwareRepoCustomFields !== null) {

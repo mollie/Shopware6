@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Components\RefundManager\Elasticsearch;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
+use Kiener\MolliePayments\Components\RefundManager\DAL\Refund\RefundCollection;
 use Kiener\MolliePayments\Components\RefundManager\DAL\Refund\RefundDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Dbal\Common\IterableQuery;
@@ -21,6 +22,9 @@ class RefundAdminSearchIndexer extends AbstractAdminIndexer
 {
     private Connection $connection;
     private IteratorFactory $factory;
+    /**
+     * @var EntityRepository<RefundCollection>
+     */
     private EntityRepository $repository;
     private int $indexingBatchSize;
 
@@ -30,7 +34,10 @@ class RefundAdminSearchIndexer extends AbstractAdminIndexer
     private const TYPE_BINARY = ParameterType::BINARY + Connection::ARRAY_PARAM_OFFSET;
 
     /**
-     * @internal
+     * @param Connection $connection
+     * @param IteratorFactory $factory
+     * @param EntityRepository<RefundCollection> $repository
+     * @param int $indexingBatchSize
      */
     public function __construct(
         Connection       $connection,

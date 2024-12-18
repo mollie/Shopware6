@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Repository\Order;
 
+use Shopware\Core\Checkout\Order\OrderCollection;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
@@ -14,13 +15,13 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 class OrderRepository implements OrderRepositoryInterface
 {
     /**
-     * @var EntityRepository
+     * @var EntityRepository<OrderCollection>
      */
     private $repoOrders;
 
 
     /**
-     * @param EntityRepository $repoOrders
+     * @param EntityRepository<OrderCollection> $repoOrders
      */
     public function __construct($repoOrders)
     {

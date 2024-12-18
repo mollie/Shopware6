@@ -7,7 +7,6 @@ use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
 use Kiener\MolliePayments\Service\OrderService;
-use Kiener\MolliePayments\Service\Refund\RefundCreditNoteService;
 use Kiener\MolliePayments\Service\Refund\RefundService;
 use Kiener\MolliePayments\Traits\Api\ApiTrait;
 use Psr\Log\LoggerInterface;
@@ -41,10 +40,6 @@ class RefundControllerBase extends AbstractController
      */
     private $logger;
 
-    /**
-     * @var RefundCreditNoteService
-     */
-    private $creditNoteService;
 
 
     /**
@@ -57,14 +52,12 @@ class RefundControllerBase extends AbstractController
         OrderService            $orderService,
         RefundManagerInterface  $refundManager,
         RefundService           $refundService,
-        LoggerInterface         $logger,
-        RefundCreditNoteService $creditNoteService
+        LoggerInterface         $logger
     ) {
         $this->orderService = $orderService;
         $this->refundManager = $refundManager;
         $this->refundService = $refundService;
         $this->logger = $logger;
-        $this->creditNoteService = $creditNoteService;
     }
 
 
@@ -364,7 +357,6 @@ class RefundControllerBase extends AbstractController
                 $context
             );
 
-            $this->creditNoteService->createCreditNotes($order, $refund, $refundRequest, $context);
 
             return $this->json([
                 'success' => true,
@@ -388,7 +380,7 @@ class RefundControllerBase extends AbstractController
         try {
             $success = $this->refundManager->cancelRefund($orderId, $refundId, $context);
 
-            $this->creditNoteService->cancelCreditNotes($orderId, $context);
+
 
             return $this->json([
                 'success' => $success

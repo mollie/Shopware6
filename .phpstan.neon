@@ -21,6 +21,8 @@ parameters:
           message: 'might overwrite existing variables'
     scanDirectories:
       - polyfill/Shopware
+    ignoreErrors:
+    		- '#.*Shopware\\Commercial\\ReturnManagement\\Entity\\OrderReturn.*#'
 
 services:
     - class: MolliePayments\PHPStan\Rules\NoManufacturerRule
