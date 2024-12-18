@@ -26,19 +26,20 @@ class OrderReturnHandler
     /**
      * @var EntityRepository<OrderReturnCollection>
      */
-    private EntityRepository $orderReturnRepository;
+    private ?EntityRepository $orderReturnRepository;
     private LoggerInterface $logger;
     private OrderService $orderService;
 
+    private bool $featureDisabled = false;
     /**
      * @param RefundManagerInterface $refundManager
-     * @param EntityRepository<OrderReturnCollection> $orderReturnRepository
+     * @param ?EntityRepository<OrderReturnCollection> $orderReturnRepository
      * @param OrderService $orderService
      * @param LoggerInterface $logger
      */
     public function __construct(
         RefundManagerInterface $refundManager,
-        EntityRepository $orderReturnRepository,
+        ?EntityRepository $orderReturnRepository,
         OrderService $orderService,
         LoggerInterface $logger
     ) {
@@ -46,10 +47,14 @@ class OrderReturnHandler
         $this->orderReturnRepository = $orderReturnRepository;
         $this->logger = $logger;
         $this->orderService = $orderService;
+        $this->featureDisabled = $orderReturnRepository === null;
     }
 
     public function return(OrderEntity $order, Context $context): void
     {
+        if ($this->featureDisabled) {
+            return;
+        }
         $orderReturn = $this->findReturnByOrder($order, $context);
         if ($orderReturn === null) {
             return;
@@ -65,6 +70,9 @@ class OrderReturnHandler
 
     public function cancel(OrderEntity $order, Context $context): void
     {
+        if ($this->featureDisabled) {
+            return;
+        }
         $this->refundManager->cancelAllOrderRefunds($order, $context);
     }
 
