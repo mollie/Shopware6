@@ -34,18 +34,33 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 #[Package('core')]
 class EntityRepository implements EntityRepositoryInterface
 {
+    private EntityDefinition $definition;
+    private EntityReaderInterface $reader;
+    private VersionManager $versionManager;
+    private EntitySearcherInterface $searcher;
+    private EntityAggregatorInterface $aggregator;
+    private EventDispatcherInterface $eventDispatcher;
+    private EntityLoadedEventFactory $eventFactory;
+
     /**
      * @internal
      */
     public function __construct(
-        private readonly EntityDefinition $definition,
-        private readonly EntityReaderInterface $reader,
-        private readonly VersionManager $versionManager,
-        private readonly EntitySearcherInterface $searcher,
-        private readonly EntityAggregatorInterface $aggregator,
-        private readonly EventDispatcherInterface $eventDispatcher,
-        private readonly EntityLoadedEventFactory $eventFactory,
+         EntityDefinition $definition,
+         EntityReaderInterface $reader,
+         VersionManager $versionManager,
+         EntitySearcherInterface $searcher,
+         EntityAggregatorInterface $aggregator,
+         EventDispatcherInterface $eventDispatcher,
+         EntityLoadedEventFactory $eventFactory,
     ) {
+        $this->definition = $definition;
+        $this->reader = $reader;
+        $this->versionManager = $versionManager;
+        $this->searcher = $searcher;
+        $this->aggregator = $aggregator;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->eventFactory = $eventFactory;
     }
 
     public function getDefinition(): EntityDefinition

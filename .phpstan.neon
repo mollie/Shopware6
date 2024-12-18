@@ -23,6 +23,7 @@ parameters:
       - polyfill/Shopware
     ignoreErrors:
     		- '#.*Shopware\\Commercial\\ReturnManagement\\Entity\\OrderReturn.*#'
+    		- identifier: missingType.generics
 
 services:
     - class: MolliePayments\PHPStan\Rules\NoManufacturerRule
