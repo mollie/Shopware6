@@ -3,7 +3,6 @@
 namespace Kiener\MolliePayments\Components\Subscription\Page\Account;
 
 use Kiener\MolliePayments\Compatibility\VersionCompare;
-use Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\SettingsService;

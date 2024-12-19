@@ -11,7 +11,7 @@ use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Exception\WebhookIsTooEarlyException;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
-use Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepositoryInterface;
+use Kiener\MolliePayments\Repository\OrderTransactionRepository;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentDetails;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
@@ -27,6 +27,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEnti
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -50,12 +51,12 @@ class NotificationFacade
     private $statusUpdater;
 
     /**
-     * @var PaymentMethodRepositoryInterface
+     * @var EntityRepository
      */
     private $repoPaymentMethods;
 
     /**
-     * @var OrderTransactionRepositoryInterface
+     * @var OrderTransactionRepository
      */
     private $repoOrderTransactions;
 
@@ -99,8 +100,8 @@ class NotificationFacade
      * @param MollieGatewayInterface $gatewayMollie
      * @param OrderStatusConverter $statusConverter
      * @param OrderStatusUpdater $statusUpdater
-     * @param PaymentMethodRepositoryInterface $repoPaymentMethods
-     * @param OrderTransactionRepositoryInterface $repoOrderTransactions
+     * @param EntityRepository $repoPaymentMethods
+     * @param OrderTransactionRepository $repoOrderTransactions
      * @param FlowBuilderFactory $flowBuilderFactory
      * @param FlowBuilderEventFactory $flowBuilderEventFactory
      * @param SettingsService $serviceService
@@ -109,7 +110,7 @@ class NotificationFacade
      * @param LoggerInterface $logger
      * @throws \Exception
      */
-    public function __construct(MollieGatewayInterface $gatewayMollie, OrderStatusConverter $statusConverter, OrderStatusUpdater $statusUpdater, PaymentMethodRepositoryInterface $repoPaymentMethods, OrderTransactionRepositoryInterface $repoOrderTransactions, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SettingsService $serviceService, SubscriptionManager $subscription, OrderService $orderService, LoggerInterface $logger)
+    public function __construct(MollieGatewayInterface $gatewayMollie, OrderStatusConverter $statusConverter, OrderStatusUpdater $statusUpdater, EntityRepository $repoPaymentMethods, OrderTransactionRepository $repoOrderTransactions, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SettingsService $serviceService, SubscriptionManager $subscription, OrderService $orderService, LoggerInterface $logger)
     {
         $this->gatewayMollie = $gatewayMollie;
         $this->statusConverter = $statusConverter;
@@ -311,7 +312,7 @@ class NotificationFacade
         $criteria->addAssociation('paymentMethod');
         $criteria->addAssociation('stateMachineState');
 
-        return $this->repoOrderTransactions->search($criteria, $context)->first();
+        return $this->repoOrderTransactions->getRepository()->search($criteria, $context)->first();
     }
 
     /**
@@ -344,7 +345,7 @@ class NotificationFacade
 
         $transaction->setPaymentMethodId($shopwarePaymentId);
 
-        $this->repoOrderTransactions->update(
+        $this->repoOrderTransactions->getRepository()->update(
             [
                 [
                     'id' => $transaction->getUniqueIdentifier(),

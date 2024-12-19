@@ -19,7 +19,6 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionE
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class SubscriptionManager implements SubscriptionManagerInterface
@@ -75,7 +74,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
     private $actionRemind;
 
     /**
-     * @var EntityRepository
+     * @var SubscriptionRepository
      */
     private $repoSubscriptions;
 
@@ -91,9 +90,9 @@ class SubscriptionManager implements SubscriptionManagerInterface
      * @param SkipAction $actionSkip
      * @param CancelAction $actionCancel
      * @param RemindAction $actionRemind
-     * @param EntityRepository $repoSubscriptions
+     * @param SubscriptionRepository $repoSubscriptions
      */
-    public function __construct(CreateAction $actionCreate, ConfirmAction $actionConfirm, UpdateAddressAction $actionUpdateAddress, UpdatePaymentAction $actionUpdatePayment, RenewAction $actionRenew, PauseAction $actionPause, ResumeAction $actionResume, SkipAction $actionSkip, CancelAction $actionCancel, RemindAction $actionRemind, EntityRepository $repoSubscriptions)
+    public function __construct(CreateAction $actionCreate, ConfirmAction $actionConfirm, UpdateAddressAction $actionUpdateAddress, UpdatePaymentAction $actionUpdatePayment, RenewAction $actionRenew, PauseAction $actionPause, ResumeAction $actionResume, SkipAction $actionSkip, CancelAction $actionCancel, RemindAction $actionRemind, SubscriptionRepository $repoSubscriptions)
     {
         $this->actionCreate = $actionCreate;
         $this->actionConfirm = $actionConfirm;

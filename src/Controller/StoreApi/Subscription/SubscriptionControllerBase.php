@@ -17,7 +17,6 @@ use Kiener\MolliePayments\Controller\StoreApi\Subscription\Response\Subscription
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
@@ -31,7 +30,7 @@ class SubscriptionControllerBase
     private $subscriptionManager;
 
     /**
-     * @var EntityRepository
+     * @var SubscriptionRepository
      */
     private $repoSubscriptions;
 
@@ -42,10 +41,10 @@ class SubscriptionControllerBase
 
     /**
      * @param SubscriptionManager $subscriptionManager
-     * @param EntityRepository $repoSubscriptions
+     * @param SubscriptionRepository $repoSubscriptions
      * @param LoggerInterface $logger
      */
-    public function __construct(SubscriptionManager $subscriptionManager, EntityRepository $repoSubscriptions, LoggerInterface $logger)
+    public function __construct(SubscriptionManager $subscriptionManager, SubscriptionRepository $repoSubscriptions, LoggerInterface $logger)
     {
         $this->subscriptionManager = $subscriptionManager;
         $this->repoSubscriptions = $repoSubscriptions;

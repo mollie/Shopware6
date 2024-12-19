@@ -46,7 +46,7 @@
         <service id="Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Enricher\LiveDataEnricher">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
-            <argument type="service" id="mollie_subscription.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
             <argument type="service" id="mollie_payments.logger"/>
             <tag name="kernel.event_subscriber"/>
         </service>
@@ -96,7 +96,7 @@
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Actions\SkipAction"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Actions\CancelAction"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Actions\RemindAction"/>
-            <argument type="service" id="mollie_subscription.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
         </service>
 
         <!-- ============================================================================================== -->
@@ -104,7 +104,7 @@
 
         <service id="Kiener\MolliePayments\Components\Subscription\Actions\CreateAction">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="mollie_subscription.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
@@ -119,7 +119,7 @@
 
         <service id="Kiener\MolliePayments\Components\Subscription\Actions\ConfirmAction">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="mollie_subscription.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
@@ -133,7 +133,7 @@
 
         <service id="Kiener\MolliePayments\Components\Subscription\Actions\UpdateAddressAction">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="mollie_subscription.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
@@ -148,7 +148,7 @@
 
         <service id="Kiener\MolliePayments\Components\Subscription\Actions\UpdatePaymentAction">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="mollie_subscription.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
@@ -165,7 +165,7 @@
 
         <service id="Kiener\MolliePayments\Components\Subscription\Actions\RenewAction">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="mollie_subscription.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
@@ -181,7 +181,7 @@
 
         <service id="Kiener\MolliePayments\Components\Subscription\Actions\PauseAction">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="mollie_subscription.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
@@ -195,7 +195,7 @@
 
         <service id="Kiener\MolliePayments\Components\Subscription\Actions\ResumeAction">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="mollie_subscription.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
@@ -209,7 +209,7 @@
 
         <service id="Kiener\MolliePayments\Components\Subscription\Actions\SkipAction">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="mollie_subscription.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
@@ -223,7 +223,7 @@
 
         <service id="Kiener\MolliePayments\Components\Subscription\Actions\CancelAction">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="mollie_subscription.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
@@ -237,7 +237,7 @@
 
         <service id="Kiener\MolliePayments\Components\Subscription\Actions\RemindAction">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="mollie_subscription.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
@@ -260,7 +260,7 @@
         </service>
 
         <service id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler">
-            <argument type="service" id="mollie_subscription.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
         </service>
 
         <service id="Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder">

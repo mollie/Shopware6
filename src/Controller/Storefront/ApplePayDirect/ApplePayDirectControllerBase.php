@@ -13,6 +13,7 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -57,7 +58,7 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
     private $flowBuilderEventFactory;
 
     /**
-     * @var CustomerRepositoryInterface
+     * @var EntityRepository
      */
     private $repoCustomers;
 
@@ -78,11 +79,11 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
      * @param LoggerInterface $logger
      * @param FlowBuilderFactory $flowBuilderFactory
      * @param FlowBuilderEventFactory $flowBuilderEventFactory
-     * @param CustomerRepositoryInterface $repoCustomers
+     * @param EntityRepository $repoCustomers
      * @param OrderService $orderService
      * @throws \Exception
      */
-    public function __construct(ApplePayDirect $applePay, RouterInterface $router, LoggerInterface $logger, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, CustomerRepositoryInterface $repoCustomers, OrderService $orderService)
+    public function __construct(ApplePayDirect $applePay, RouterInterface $router, LoggerInterface $logger, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, EntityRepository $repoCustomers, OrderService $orderService)
     {
         $this->applePay = $applePay;
         $this->router = $router;

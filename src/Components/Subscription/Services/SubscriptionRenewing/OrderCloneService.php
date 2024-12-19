@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing;
 
-
 use Shopware\Core\Checkout\Cart\CartBehavior;
 use Shopware\Core\Checkout\Cart\Order\OrderConversionContext;
 use Shopware\Core\Checkout\Cart\Order\OrderConverter;
@@ -19,7 +18,7 @@ use Shopware\Core\Framework\Uuid\Uuid;
 class OrderCloneService
 {
     /**
-     * @var OrderRepositoryInterface
+     * @var EntityRepository
      */
     private $repoOrders;
 

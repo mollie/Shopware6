@@ -23,7 +23,6 @@ use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 use Kiener\MolliePayments\Service\SettingsService;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 
 class UpdatePaymentAction extends BaseAction
 {
@@ -45,7 +44,7 @@ class UpdatePaymentAction extends BaseAction
 
     /**
      * @param SettingsService $pluginSettings
-     * @param EntityRepository $repoSubscriptions
+     * @param SubscriptionRepository $repoSubscriptions
      * @param SubscriptionBuilder $subscriptionBuilder
      * @param MollieDataBuilder $mollieRequestBuilder
      * @param CustomerService $customers
@@ -60,7 +59,7 @@ class UpdatePaymentAction extends BaseAction
      * @param OrderStatusConverter $orderStatusConverter
      * @throws Exception
      */
-    public function __construct(SettingsService $pluginSettings, EntityRepository $repoSubscriptions, SubscriptionBuilder $subscriptionBuilder, MollieDataBuilder $mollieRequestBuilder, CustomerService $customers, MollieGatewayInterface $gwMollie, CancellationValidator $cancellationValidator, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionHistoryHandler $subscriptionHistory, LoggerInterface $logger, MollieOrderPriceBuilder $priceBuilder, RoutingBuilder $routingBuilder, OrderStatusConverter $orderStatusConverter)
+    public function __construct(SettingsService $pluginSettings, SubscriptionRepository $repoSubscriptions, SubscriptionBuilder $subscriptionBuilder, MollieDataBuilder $mollieRequestBuilder, CustomerService $customers, MollieGatewayInterface $gwMollie, CancellationValidator $cancellationValidator, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionHistoryHandler $subscriptionHistory, LoggerInterface $logger, MollieOrderPriceBuilder $priceBuilder, RoutingBuilder $routingBuilder, OrderStatusConverter $orderStatusConverter)
     {
         parent::__construct(
             $pluginSettings,

@@ -20,7 +20,6 @@ use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 
 class BaseAction
 {
@@ -30,7 +29,7 @@ class BaseAction
     private $pluginSettings;
 
     /**
-     * @var EntityRepository
+     * @var SubscriptionRepository
      */
     private $repoSubscriptions;
 
@@ -82,7 +81,7 @@ class BaseAction
 
     /**
      * @param SettingsService $pluginSettings
-     * @param EntityRepository $repoSubscriptions
+     * @param SubscriptionRepository $repoSubscriptions
      * @param SubscriptionBuilder $subscriptionBuilder
      * @param MollieDataBuilder $mollieRequestBuilder
      * @param CustomerService $customers
@@ -94,7 +93,7 @@ class BaseAction
      * @param LoggerInterface $logger
      * @throws Exception
      */
-    public function __construct(SettingsService $pluginSettings, EntityRepository $repoSubscriptions, SubscriptionBuilder $subscriptionBuilder, MollieDataBuilder $mollieRequestBuilder, CustomerService $customers, MollieGatewayInterface $gwMollie, CancellationValidator $cancellationValidator, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionHistoryHandler $subscriptionHistory, LoggerInterface $logger)
+    public function __construct(SettingsService $pluginSettings, SubscriptionRepository $repoSubscriptions, SubscriptionBuilder $subscriptionBuilder, MollieDataBuilder $mollieRequestBuilder, CustomerService $customers, MollieGatewayInterface $gwMollie, CancellationValidator $cancellationValidator, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionHistoryHandler $subscriptionHistory, LoggerInterface $logger)
     {
         $this->pluginSettings = $pluginSettings;
         $this->repoSubscriptions = $repoSubscriptions;
@@ -128,9 +127,9 @@ class BaseAction
     }
 
     /**
-     * @return EntityRepository
+     * @return SubscriptionRepository
      */
-    protected function getRepository(): EntityRepository
+    protected function getRepository(): SubscriptionRepository
     {
         return $this->repoSubscriptions;
     }

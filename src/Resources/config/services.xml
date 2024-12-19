@@ -22,6 +22,7 @@
         <import resource="services/refundmanager/services.xml"/>
         <import resource="services/controller.xml"/>
         <import resource="services/snippets.xml"/>
+        <import resource="services/repositories.xml"/>
     </imports>
 
 
@@ -151,7 +152,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater"/>
             <argument type="service" id="payment_method.repository"/>
-            <argument type="service" id="order_transaction.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\OrderTransactionRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>

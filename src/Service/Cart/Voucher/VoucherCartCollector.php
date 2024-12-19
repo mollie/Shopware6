@@ -11,6 +11,7 @@ use Shopware\Core\Checkout\Cart\CartBehavior;
 use Shopware\Core\Checkout\Cart\CartDataCollectorInterface;
 use Shopware\Core\Checkout\Cart\LineItem\CartDataCollection;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -20,7 +21,7 @@ class VoucherCartCollector implements CartDataCollectorInterface
     public const VOUCHER_PERMITTED = 'mollie-voucher-permitted';
 
     /**
-     * @var PaymentMethodRepositoryInterface
+     * @var EntityRepository
      */
     private $repoPaymentMethods;
 
@@ -32,9 +33,9 @@ class VoucherCartCollector implements CartDataCollectorInterface
 
     /**
      * @param VoucherService $voucherService
-     * @param PaymentMethodRepositoryInterface $paymentMethodRepository
+     * @param EntityRepository $paymentMethodRepository
      */
-    public function __construct(VoucherService $voucherService, PaymentMethodRepositoryInterface $paymentMethodRepository)
+    public function __construct(VoucherService $voucherService, EntityRepository $paymentMethodRepository)
     {
         $this->voucherService = $voucherService;
         $this->repoPaymentMethods = $paymentMethodRepository;

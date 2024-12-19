@@ -6,6 +6,7 @@ use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
 
 abstract class AbstractRenewalReminderTaskHandler extends ScheduledTaskHandler
@@ -22,11 +23,11 @@ abstract class AbstractRenewalReminderTaskHandler extends ScheduledTaskHandler
 
 
     /**
-     * @param ScheduledTaskRepositoryInterface $scheduledTaskRepository
+     * @param EntityRepository $scheduledTaskRepository
      * @param SubscriptionManager $subscriptionManager
      * @param LoggerInterface $logger
      */
-    public function __construct(ScheduledTaskRepositoryInterface $scheduledTaskRepository, SubscriptionManager $subscriptionManager, LoggerInterface $logger)
+    public function __construct(EntityRepository $scheduledTaskRepository, SubscriptionManager $subscriptionManager, LoggerInterface $logger)
     {
         /** @phpstan-ignore-next-line  */
         parent::__construct($scheduledTaskRepository->getRepository(), $logger);

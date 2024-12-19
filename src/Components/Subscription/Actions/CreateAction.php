@@ -22,7 +22,6 @@ use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttribut
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class CreateAction extends BaseAction
@@ -36,7 +35,7 @@ class CreateAction extends BaseAction
 
     public function __construct(
         SettingsService $pluginSettings,
-        EntityRepository $repoSubscriptions,
+        SubscriptionRepository $repoSubscriptions,
         SubscriptionBuilder $subscriptionBuilder,
         MollieDataBuilder $mollieRequestBuilder,
         CustomerService $customers,

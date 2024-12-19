@@ -7,21 +7,20 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRep
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Uuid\Uuid;
 
 class SubscriptionHistoryHandler
 {
     /**
-     * @var EntityRepository
+     * @var SubscriptionRepository
      */
     private $repoSubscriptions;
 
 
     /**
-     * @param EntityRepository $repoSubscriptions
+     * @param SubscriptionRepository $repoSubscriptions
      */
-    public function __construct(EntityRepository $repoSubscriptions)
+    public function __construct(SubscriptionRepository $repoSubscriptions)
     {
         $this->repoSubscriptions = $repoSubscriptions;
     }

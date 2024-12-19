@@ -45,7 +45,7 @@ class RemindAction extends BaseAction
 
     /**
      * @param SettingsService $pluginSettings
-     * @param EntityRepository $repoSubscriptions
+     * @param SubscriptionRepository $repoSubscriptions
      * @param SubscriptionBuilder $subscriptionBuilder
      * @param MollieDataBuilder $mollieRequestBuilder
      * @param CustomerService $customers
@@ -59,7 +59,7 @@ class RemindAction extends BaseAction
      * @param ReminderValidator $reminderValidator
      * @throws Exception
      */
-    public function __construct(SettingsService $pluginSettings, EntityRepository $repoSubscriptions, SubscriptionBuilder $subscriptionBuilder, MollieDataBuilder $mollieRequestBuilder, CustomerService $customers, MollieGatewayInterface $gwMollie, CancellationValidator $cancellationValidator, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionHistoryHandler $subscriptionHistory, LoggerInterface $logger, EntityRepository $repoSalesChannel, ReminderValidator $reminderValidator)
+    public function __construct(SettingsService $pluginSettings, SubscriptionRepository $repoSubscriptions, SubscriptionBuilder $subscriptionBuilder, MollieDataBuilder $mollieRequestBuilder, CustomerService $customers, MollieGatewayInterface $gwMollie, CancellationValidator $cancellationValidator, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionHistoryHandler $subscriptionHistory, LoggerInterface $logger, EntityRepository $repoSalesChannel, ReminderValidator $reminderValidator)
     {
         parent::__construct(
             $pluginSettings,

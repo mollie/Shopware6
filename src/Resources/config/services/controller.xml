@@ -111,8 +111,8 @@
         <service id="Kiener\MolliePayments\Controller\Api\Webhook\WebhookControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Controller\Storefront\Webhook\NotificationFacade"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
-            <argument type="service" id="order.repository"/>
-            <argument type="service" id="order_transaction.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\OrderRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\OrderTransactionRepository"/>
             <argument type="service" id="mollie_payments.logger"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
@@ -171,8 +171,8 @@
         <service id="Kiener\MolliePayments\Controller\Storefront\Webhook\WebhookControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Controller\Storefront\Webhook\NotificationFacade"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
-            <argument type="service" id="order.repository"/>
-            <argument type="service" id="order_transaction.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\OrderRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\OrderTransactionRepository"/>
             <argument type="service" id="mollie_payments.logger"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
@@ -197,7 +197,7 @@
             <argument type="service" id="Shopware\Storefront\Framework\Routing\Router"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
-            <argument type="service" id="order_transaction.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\OrderTransactionRepository"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
@@ -270,8 +270,7 @@
 
         <service id="Kiener\MolliePayments\Controller\StoreApi\Subscription\SubscriptionControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
-            <argument type="service"
-                      id="mollie_subscription.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
             <argument type="service" id="mollie_payments.logger"/>
             <tag name="controller.service_arguments"/>
         </service>

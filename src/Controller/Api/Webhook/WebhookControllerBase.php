@@ -5,10 +5,10 @@ namespace Kiener\MolliePayments\Controller\Api\Webhook;
 use Kiener\MolliePayments\Components\Subscription\Exception\SubscriptionSkippedException;
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Controller\Storefront\Webhook\NotificationFacade;
-use Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepositoryInterface;
+use Kiener\MolliePayments\Repository\OrderRepository;
+use Kiener\MolliePayments\Repository\OrderTransactionRepository;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -27,7 +27,7 @@ class WebhookControllerBase extends AbstractController
     private $subscriptions;
 
     /**
-     * @var EntityRepository
+     * @var OrderRepository
      */
     private $repoOrders;
 
@@ -37,7 +37,7 @@ class WebhookControllerBase extends AbstractController
     private $logger;
 
     /**
-     * @var OrderTransactionRepositoryInterface
+     * @var OrderTransactionRepository
      */
     private $repoOrderTransactions;
 
@@ -45,11 +45,11 @@ class WebhookControllerBase extends AbstractController
     /**
      * @param NotificationFacade $notificationFacade
      * @param SubscriptionManager $subscriptions
-     * @param EntityRepository $repoOrders
-     * @param OrderTransactionRepositoryInterface $repoOrderTransactions
+     * @param OrderRepository $repoOrders
+     * @param OrderTransactionRepository $repoOrderTransactions
      * @param LoggerInterface $logger
      */
-    public function __construct(NotificationFacade $notificationFacade, SubscriptionManager $subscriptions, EntityRepository $repoOrders, OrderTransactionRepositoryInterface $repoOrderTransactions, LoggerInterface $logger)
+    public function __construct(NotificationFacade $notificationFacade, SubscriptionManager $subscriptions, OrderRepository $repoOrders, OrderTransactionRepository $repoOrderTransactions, LoggerInterface $logger)
     {
         $this->notificationFacade = $notificationFacade;
         $this->subscriptions = $subscriptions;
