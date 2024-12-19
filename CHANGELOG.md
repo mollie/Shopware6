@@ -9,4 +9,5 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Features
 - Return over Shopware Commercial plugins is now transfered to Mollie when the Return status is set to "Done" and can be cancelled with the "Cancelled" status. Please note that the refund cannot be cancelled after two hours.
- 
+### Changes
+- Minimum Supported Shopware version is now 6.4.5.0
