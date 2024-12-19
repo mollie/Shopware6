@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Repository\OrderDelivery;
 
-use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
@@ -13,12 +12,12 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 class OrderDeliveryRepository implements OrderDeliveryRepositoryInterface
 {
     /**
-     * @var EntityRepository<OrderDeliveryCollection>
+     * @var EntityRepository
      */
     private $orderDeliveryRepository;
 
     /**
-     * @param EntityRepository<OrderDeliveryCollection> $orderDeliveryRepository
+     * @param EntityRepository $orderDeliveryRepository
      */
     public function __construct($orderDeliveryRepository)
     {

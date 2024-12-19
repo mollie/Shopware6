@@ -8,17 +8,16 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
-use Shopware\Core\System\Salutation\SalutationCollection;
 
 class SalutationRepository implements SalutationRepositoryInterface
 {
     /**
-     * @var EntityRepository<SalutationCollection>
+     * @var EntityRepository
      */
     private $salutationRepository;
 
     /**
-     * @param EntityRepository<SalutationCollection> $salutationRepository
+     * @param EntityRepository $salutationRepository
      */
     public function __construct($salutationRepository)
     {

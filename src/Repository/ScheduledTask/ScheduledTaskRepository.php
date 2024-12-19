@@ -3,17 +3,16 @@
 namespace Kiener\MolliePayments\Repository\ScheduledTask;
 
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskCollection;
 
 class ScheduledTaskRepository implements ScheduledTaskRepositoryInterface
 {
     /**
-     * @var EntityRepository<ScheduledTaskCollection>
+     * @var EntityRepository
      */
     private $repoScheduledTasks;
 
     /**
-     * @param EntityRepository<ScheduledTaskCollection> $repoScheduledTasks
+     * @param EntityRepository $repoScheduledTasks
      */
     public function __construct($repoScheduledTasks)
     {
@@ -21,7 +20,7 @@ class ScheduledTaskRepository implements ScheduledTaskRepositoryInterface
     }
 
     /**
-     * @return EntityRepository<ScheduledTaskCollection>
+     * @return EntityRepository
      */
     public function getRepository(): EntityRepository
     {

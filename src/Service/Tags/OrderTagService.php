@@ -7,7 +7,6 @@ use Closure;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Service\Tags\Exceptions\CouldNotTagOrderException;
 use Kiener\MolliePayments\Struct\Tags\SubscriptionTag;
-use Shopware\Core\Checkout\Order\OrderCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -19,18 +18,18 @@ use Shopware\Core\System\Tag\TagEntity;
 class OrderTagService
 {
     /**
-     * @var EntityRepository<OrderCollection>
+     * @var EntityRepository
      */
     private $orderRepository;
 
     /**
-     * @var EntityRepository<TagCollection>
+     * @var EntityRepository
      */
     private $tagRepository;
 
     /**
-     * @param EntityRepository<OrderCollection> $orderRepository
-     * @param EntityRepository<TagCollection> $tagRepository
+     * @param EntityRepository $orderRepository
+     * @param EntityRepository $tagRepository
      */
     public function __construct(
         EntityRepository $orderRepository,

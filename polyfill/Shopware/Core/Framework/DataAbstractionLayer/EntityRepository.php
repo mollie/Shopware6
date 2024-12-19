@@ -29,7 +29,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * @final
  *
- * @template TEntityCollection of EntityCollection
+ *
  */
 #[Package('core')]
 class EntityRepository implements EntityRepositoryInterface
@@ -52,7 +52,7 @@ class EntityRepository implements EntityRepositoryInterface
          EntitySearcherInterface $searcher,
          EntityAggregatorInterface $aggregator,
          EventDispatcherInterface $eventDispatcher,
-         EntityLoadedEventFactory $eventFactory,
+         EntityLoadedEventFactory $eventFactory
     ) {
         $this->definition = $definition;
         $this->reader = $reader;

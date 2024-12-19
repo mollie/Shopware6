@@ -6,18 +6,17 @@ namespace Kiener\MolliePayments\Repository\StateMachineState;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateCollection;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity;
 
 class StateMachineStateRepository implements StateMachineStateRepositoryInterface
 {
     /**
-     * @var EntityRepository<StateMachineStateCollection>
+     * @var EntityRepository
      */
     private $stateMachineStateRepository;
 
     /**
-     * @param EntityRepository<StateMachineStateCollection> $stateMachineStateRepository
+     * @param EntityRepository $stateMachineStateRepository
      */
     public function __construct(EntityRepository $stateMachineStateRepository)
     {

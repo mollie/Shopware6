@@ -8,7 +8,6 @@ use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
 use Kiener\MolliePayments\Service\OrderService;
 use Psr\Log\LoggerInterface;
-use Shopware\Commercial\ReturnManagement\Entity\OrderReturn\OrderReturnCollection;
 use Shopware\Commercial\ReturnManagement\Entity\OrderReturn\OrderReturnEntity;
 use Shopware\Commercial\ReturnManagement\Entity\OrderReturnLineItem\OrderReturnLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -24,7 +23,7 @@ class OrderReturnHandler
     private RefundManagerInterface $refundManager;
 
     /**
-     * @var EntityRepository<OrderReturnCollection>
+     * @var EntityRepository
      */
     private ?EntityRepository $orderReturnRepository;
     private LoggerInterface $logger;
@@ -33,7 +32,7 @@ class OrderReturnHandler
     private bool $featureDisabled = false;
     /**
      * @param RefundManagerInterface $refundManager
-     * @param ?EntityRepository<OrderReturnCollection> $orderReturnRepository
+     * @param ?EntityRepository $orderReturnRepository
      * @param OrderService $orderService
      * @param LoggerInterface $logger
      */
@@ -97,6 +96,9 @@ class OrderReturnHandler
     // @phpstan-ignore return.type
     private function findReturnByOrder(OrderEntity $order, Context $context): ?OrderReturnEntity
     {
+        if ($this->orderReturnRepository === null) {
+            return null;
+        }
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('orderId', $order->getId()));
         $criteria->addFilter(new EqualsFilter('orderVersionId', $order->getVersionId()));

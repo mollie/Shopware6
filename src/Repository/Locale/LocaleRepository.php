@@ -7,17 +7,16 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
-use Shopware\Core\System\Locale\LocaleCollection;
 
 class LocaleRepository implements LocaleRepositoryInterface
 {
     /**
-     * @var EntityRepository<LocaleCollection>
+     * @var EntityRepository
      */
     private $localeRepository;
 
     /**
-     * @param EntityRepository<LocaleCollection> $localeRepository
+     * @param EntityRepository $localeRepository
      */
     public function __construct($localeRepository)
     {

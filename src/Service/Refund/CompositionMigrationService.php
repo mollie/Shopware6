@@ -22,12 +22,12 @@ use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
 class CompositionMigrationService implements CompositionMigrationServiceInterface
 {
     /**
-     * @var EntityRepository<RefundItemCollection>
+     * @var EntityRepository
      */
     private $refundItemRepository;
 
     /**
-     * @param EntityRepository<RefundItemCollection> $refundItemRepository
+     * @param EntityRepository $refundItemRepository
      */
     public function __construct(EntityRepository $refundItemRepository)
     {

@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Repository\PaymentMethod;
 
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Handler\Method\PayPalExpressPayment;
-use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
@@ -17,13 +16,13 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 class PaymentMethodRepository implements PaymentMethodRepositoryInterface
 {
     /**
-     * @var EntityRepository<PaymentMethodCollection>
+     * @var EntityRepository
      */
     private $repoPaymentMethods;
 
 
     /**
-     * @param EntityRepository<PaymentMethodCollection> $repoPaymentMethods
+     * @param EntityRepository $repoPaymentMethods
      */
     public function __construct($repoPaymentMethods)
     {

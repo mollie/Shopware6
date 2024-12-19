@@ -8,18 +8,17 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
-use Shopware\Core\System\Language\LanguageCollection;
 use Shopware\Core\System\Language\LanguageEntity;
 
 class LanguageRepository implements LanguageRepositoryInterface
 {
     /**
-     * @var EntityRepository<LanguageCollection>
+     * @var EntityRepository
      */
     private $languageRepository;
 
     /**
-     * @param EntityRepository<LanguageCollection> $languageRepository
+     * @param EntityRepository $languageRepository
      */
     public function __construct($languageRepository)
     {

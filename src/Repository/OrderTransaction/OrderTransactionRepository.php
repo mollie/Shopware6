@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Repository\OrderTransaction;
 
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -16,12 +15,12 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 class OrderTransactionRepository implements OrderTransactionRepositoryInterface
 {
     /**
-     * @var EntityRepository<OrderTransactionCollection>
+     * @var EntityRepository
      */
     private $orderTransactionRepository;
 
     /**
-     * @param EntityRepository<OrderTransactionCollection> $orderTransactionRepository
+     * @param EntityRepository $orderTransactionRepository
      */
     public function __construct($orderTransactionRepository)
     {

@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Repository\OrderLineItem;
 
-use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
@@ -12,12 +11,12 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 class OrderLineItemRepository implements OrderLineItemRepositoryInterface
 {
     /**
-     * @var EntityRepository<OrderLineItemCollection>
+     * @var EntityRepository
      */
     private $repoOrderLineItems;
 
     /**
-     * @param EntityRepository<OrderLineItemCollection> $repoOrderLineItems
+     * @param EntityRepository $repoOrderLineItems
      */
     public function __construct($repoOrderLineItems)
     {

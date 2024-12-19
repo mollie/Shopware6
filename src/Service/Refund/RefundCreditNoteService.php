@@ -13,9 +13,7 @@ use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
-use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
-use Shopware\Core\Checkout\Order\OrderCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -26,12 +24,12 @@ use Shopware\Core\Framework\Uuid\Uuid;
 class RefundCreditNoteService
 {
     /**
-     * @var EntityRepository<OrderCollection>
+     * @var EntityRepository
      */
     private $orderRepository;
 
     /**
-     * @var EntityRepository<OrderLineItemCollection>
+     * @var EntityRepository
      */
     private $orderLineItemRepository;
 
@@ -56,8 +54,8 @@ class RefundCreditNoteService
     private $logger;
 
     /**
-     * @param EntityRepository<OrderCollection> $orderRepository
-     * @param EntityRepository<OrderLineItemCollection> $orderLineItemRepository
+     * @param EntityRepository $orderRepository
+     * @param EntityRepository $orderLineItemRepository
      * @param SettingsService $settingsService
      * @param LoggerInterface $logger
      */

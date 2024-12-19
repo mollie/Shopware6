@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Repository\Media;
 
-use Shopware\Core\Content\Media\MediaCollection;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -12,12 +11,12 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 class MediaRepository implements MediaRepositoryInterface
 {
     /**
-     * @var EntityRepository<MediaCollection>
+     * @var EntityRepository
      */
     private $mediaRepository;
 
     /**
-     * @param EntityRepository<MediaCollection> $mediaRepository
+     * @param EntityRepository $mediaRepository
      */
     public function __construct($mediaRepository)
     {

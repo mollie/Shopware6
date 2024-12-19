@@ -1,5 +1,6 @@
 parameters:
     level: 8
+    checkGenericClassInNonGenericObjectType: false
     paths:
         - ./src
     excludePaths:
@@ -23,7 +24,6 @@ parameters:
       - polyfill/Shopware
     ignoreErrors:
     		- '#.*Shopware\\Commercial\\ReturnManagement\\Entity\\OrderReturn.*#'
-    		- identifier: missingType.generics
 
 services:
     - class: MolliePayments\PHPStan\Rules\NoManufacturerRule
