@@ -20,6 +20,7 @@ use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Service\OrderServiceInterface;
 use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
 use Kiener\MolliePayments\Service\Refund\Item\RefundItemType;
+use Kiener\MolliePayments\Service\Refund\RefundCreditNoteService;
 use Kiener\MolliePayments\Service\Refund\RefundServiceInterface;
 use Kiener\MolliePayments\Struct\MollieApi\OrderLineMetaDataStruct;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
@@ -81,6 +82,7 @@ class RefundManager implements RefundManagerInterface
      * @var LoggerInterface
      */
     private $logger;
+    private RefundCreditNoteService $creditNoteService;
 
 
     /**
@@ -94,8 +96,18 @@ class RefundManager implements RefundManagerInterface
      * @param RefundRepositoryInterface $refundRepository
      * @param LoggerInterface $logger
      */
-    public function __construct(RefundDataBuilder $refundDataBuilder, OrderServiceInterface $orderService, RefundServiceInterface $refundService, Order $mollieOrder, FlowBuilderFactoryInterface $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, StockManagerInterface $stockUpdater, RefundRepositoryInterface $refundRepository, LoggerInterface $logger)
-    {
+    public function __construct(
+        RefundDataBuilder $refundDataBuilder,
+        OrderServiceInterface $orderService,
+        RefundServiceInterface $refundService,
+        Order $mollieOrder,
+        FlowBuilderFactoryInterface $flowBuilderFactory,
+        FlowBuilderEventFactory $flowBuilderEventFactory,
+        StockManagerInterface $stockUpdater,
+        RefundRepositoryInterface $refundRepository,
+        RefundCreditNoteService $creditNoteService,
+        LoggerInterface $logger
+    ) {
         $this->builderData = $refundDataBuilder;
         $this->orderService = $orderService;
         $this->mollie = $mollieOrder;
@@ -106,6 +118,7 @@ class RefundManager implements RefundManagerInterface
         $this->logger = $logger;
 
         $this->flowBuilderDispatcher = $flowBuilderFactory->createDispatcher();
+        $this->creditNoteService = $creditNoteService;
     }
 
 
@@ -300,7 +313,7 @@ class RefundManager implements RefundManagerInterface
                 );
             }
         }
-
+        $this->creditNoteService->createCreditNotes($order, $refund, $request, $context);
         return $refund;
     }
 
@@ -346,6 +359,8 @@ class RefundManager implements RefundManagerInterface
                 'id' => $swRefundId
             ],
         ], $context);
+
+        $this->creditNoteService->cancelCreditNotes($orderId, $context);
 
         return true;
     }
@@ -402,6 +417,18 @@ class RefundManager implements RefundManagerInterface
         }
 
         return $items;
+    }
+
+    public function cancelAllOrderRefunds(OrderEntity $order, Context $context): bool
+    {
+        $refunds = $this->refundService->getRefunds($order, $context);
+        if (count($refunds) === 0) {
+            return true;
+        }
+        foreach ($refunds as $refund) {
+            $this->cancelRefund($order->getId(), $refund['id'], $context);
+        }
+        return true;
     }
 
     private function appendRoundingItemFromMollieOrder(RefundRequest $request, ?\Mollie\Api\Resources\Order $mollieOrder): void

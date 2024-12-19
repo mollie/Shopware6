@@ -27,6 +27,10 @@ class OrderTagService
      */
     private $tagRepository;
 
+    /**
+     * @param EntityRepository $orderRepository
+     * @param EntityRepository $tagRepository
+     */
     public function __construct(
         EntityRepository $orderRepository,
         EntityRepository $tagRepository

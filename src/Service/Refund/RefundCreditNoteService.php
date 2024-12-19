@@ -53,7 +53,12 @@ class RefundCreditNoteService
      */
     private $logger;
 
-
+    /**
+     * @param EntityRepository $orderRepository
+     * @param EntityRepository $orderLineItemRepository
+     * @param SettingsService $settingsService
+     * @param LoggerInterface $logger
+     */
     public function __construct(
         EntityRepository $orderRepository,
         EntityRepository $orderLineItemRepository,

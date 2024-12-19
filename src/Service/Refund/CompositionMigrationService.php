@@ -26,6 +26,9 @@ class CompositionMigrationService implements CompositionMigrationServiceInterfac
      */
     private $refundItemRepository;
 
+    /**
+     * @param EntityRepository $refundItemRepository
+     */
     public function __construct(EntityRepository $refundItemRepository)
     {
         $this->refundItemRepository = $refundItemRepository;

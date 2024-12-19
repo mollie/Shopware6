@@ -15,6 +15,7 @@
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Stock\StockManager"/>
             <argument type="service" id="Kiener\MolliePayments\Components\RefundManager\DAL\Repository\RefundRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Refund\RefundCreditNoteService"/>
             <argument type="service" id="mollie_payments.logger"/>
         </service>
 
@@ -22,6 +23,13 @@
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Refund\RefundService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\RefundManager\Service\OrderReturnHandler">
+            <argument type="service" id="Kiener\MolliePayments\Components\RefundManager\RefundManager"/>
+            <argument type="service" id="order_return.repository" on-invalid="null"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
+            <argument type="service" id="mollie_payments.logger"/>
         </service>
 
 

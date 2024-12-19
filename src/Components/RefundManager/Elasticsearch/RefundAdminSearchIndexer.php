@@ -21,6 +21,9 @@ class RefundAdminSearchIndexer extends AbstractAdminIndexer
 {
     private Connection $connection;
     private IteratorFactory $factory;
+    /**
+     * @var EntityRepository
+     */
     private EntityRepository $repository;
     private int $indexingBatchSize;
 
@@ -30,7 +33,10 @@ class RefundAdminSearchIndexer extends AbstractAdminIndexer
     private const TYPE_BINARY = ParameterType::BINARY + Connection::ARRAY_PARAM_OFFSET;
 
     /**
-     * @internal
+     * @param Connection $connection
+     * @param IteratorFactory $factory
+     * @param EntityRepository $repository
+     * @param int $indexingBatchSize
      */
     public function __construct(
         Connection       $connection,

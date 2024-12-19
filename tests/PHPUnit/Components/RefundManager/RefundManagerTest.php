@@ -10,6 +10,7 @@ use Kiener\MolliePayments\Components\RefundManager\RefundManager;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
 use Kiener\MolliePayments\Service\MollieApi\Order;
+use Kiener\MolliePayments\Service\Refund\RefundCreditNoteService;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order as MollieOrder;
 use MolliePayments\Tests\Fakes\FakeOrderService;
@@ -83,7 +84,7 @@ class RefundManagerTest extends TestCase
         $flowBuilderEventFactory = new FlowBuilderEventFactory('6.4.8.0'); # use any higher version so that we get real events
 
         $this->fakeRefundRespository = new FakeRefundRepository();
-
+        $fakeRefundCreditNotesService = $this->createMock(RefundCreditNoteService::class);
         $this->manager = new RefundManager(
             new RefundDataBuilder($fakeOrderService, $fakeRefundService, $fakeOrder),
             $fakeOrderService,
@@ -93,6 +94,7 @@ class RefundManagerTest extends TestCase
             $flowBuilderEventFactory,
             $this->fakeStockUpdater,
             $this->fakeRefundRespository,
+            $fakeRefundCreditNotesService,
             new NullLogger()
         );
 

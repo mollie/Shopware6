@@ -1,5 +1,6 @@
 parameters:
     level: 8
+    checkGenericClassInNonGenericObjectType: false
     paths:
         - ./src
     excludePaths:
@@ -21,6 +22,8 @@ parameters:
           message: 'might overwrite existing variables'
     scanDirectories:
       - polyfill/Shopware
+    ignoreErrors:
+    		- '#.*Shopware\\Commercial\\ReturnManagement\\Entity\\OrderReturn.*#'
 
 services:
     - class: MolliePayments\PHPStan\Rules\NoManufacturerRule

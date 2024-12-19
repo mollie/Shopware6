@@ -107,4 +107,10 @@ class FakeRefundManager implements RefundManagerInterface
 
         return $refund;
     }
+
+    public function cancelAllOrderRefunds(OrderEntity $order, Context $context): bool
+    {
+        // TODO: Implement cancelAllOrderRefunds() method.
+    }
+
 }
