@@ -148,10 +148,11 @@ class MollieLocaleServiceTest extends TestCase
 
         $foundLocale = new LocaleEntity();
         $foundLocale->setCode($locale);
+        $foundLocale->setUniqueIdentifier('test-locale');
 
         $scLanguage = new LanguageEntity();
         $scLanguage->setLocale($foundLocale);
-
+        $scLanguage->setUniqueIdentifier('test-language');
         return $scLanguage;
     }
 

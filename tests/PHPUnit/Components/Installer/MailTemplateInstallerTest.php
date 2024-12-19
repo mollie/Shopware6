@@ -6,9 +6,6 @@ namespace MolliePayments\Tests\Components\Installer;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ForwardCompatibility\Result;
 use Kiener\MolliePayments\Components\Subscription\Services\Installer\MailTemplateInstaller;
-use Kiener\MolliePayments\Repository\MailTemplate\MailTemplateRepositoryInterface;
-use Kiener\MolliePayments\Repository\MailTemplateType\MailTemplateTypeRepositoryInterface;
-use Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepository;
 use PHPUnit\Framework\Constraint\IsType;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Defaults;
@@ -51,10 +48,10 @@ class MailTemplateInstallerTest extends TestCase
     {
         $this->connection = $this->createMock(Connection::class);
 
-        $this->repoMailTypes = $this->createMock(MailTemplateTypeRepositoryInterface::class);
-        $this->repoMailTemplates = $this->createMock(MailTemplateRepositoryInterface::class);
+        $this->repoMailTypes = $this->createMock(EntityRepository::class);
+        $this->repoMailTemplates = $this->createMock(EntityRepository::class);
 
-        $this->repoSalesChannels = $this->createMock(SalesChannelRepository::class);
+        $this->repoSalesChannels = $this->createMock(EntityRepository::class);
 
         $salesChannelSearchResult = $this->createConfiguredMock(EntitySearchResult::class, [
             'first' => $this->createMock(SalesChannelEntity::class),

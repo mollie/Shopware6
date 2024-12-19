@@ -36,5 +36,4 @@ class FakeTranslator implements TranslatorInterface
     {
         // TODO: Implement getLocale() method.
     }
-
 }

@@ -59,11 +59,11 @@ class OrderTransactionRepository implements OrderTransactionRepositoryInterface
         $criteria->addAssociation('order');
         $criteria->addAssociation('stateMachineState');
         $criteria->addAssociation('paymentMethod');
-        $criteria->addSorting(new FieldSorting('createdAt'));
+        $criteria->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING));
 
         /** @var EntitySearchResult<OrderTransactionEntity> $result */
         $result = $this->orderTransactionRepository->search($criteria, $context);
 
-        return $result->last();
+        return $result->first();
     }
 }

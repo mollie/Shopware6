@@ -6,10 +6,6 @@ use Exception;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieCustomerException;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
-use Kiener\MolliePayments\Repository\Country\CountryRepositoryInterface;
-use Kiener\MolliePayments\Repository\Customer\CustomerRepositoryInterface;
-use Kiener\MolliePayments\Repository\CustomerAddress\CustomerAddressRepositoryInterface;
-use Kiener\MolliePayments\Repository\Salutation\SalutationRepositoryInterface;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
 use Kiener\MolliePayments\Struct\Address\AddressStruct;
 use Kiener\MolliePayments\Struct\CustomerStruct;
@@ -23,6 +19,7 @@ use Shopware\Core\Checkout\Customer\Event\CustomerLoginEvent;
 use Shopware\Core\Checkout\Customer\SalesChannel\RegisterRoute;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\AndFilter;
@@ -47,12 +44,12 @@ class CustomerService implements CustomerServiceInterface
     public const CUSTOM_FIELDS_KEY_EXPRESS_ADDRESS_ID = 'express_address_id';
 
     /**
-     * @var CountryRepositoryInterface
+     * @var EntityRepository
      */
     private $countryRepository;
 
     /**
-     * @var CustomerRepositoryInterface
+     * @var EntityRepository
      */
     private $customerRepository;
 
@@ -68,7 +65,7 @@ class CustomerService implements CustomerServiceInterface
     /** @var SalesChannelContextPersister */
     private $salesChannelContextPersister;
 
-    /** @var SalutationRepositoryInterface */
+    /** @var EntityRepository */
     private $salutationRepository;
 
     /** @var SettingsService */
@@ -89,31 +86,31 @@ class CustomerService implements CustomerServiceInterface
      */
     private $container;
 
-    /** @var CustomerAddressRepositoryInterface */
+    /** @var EntityRepository */
     private $customerAddressRepository;
 
 
     /**
-     * @param CountryRepositoryInterface $countryRepository
-     * @param CustomerRepositoryInterface $customerRepository
+     * @param EntityRepository $countryRepository
+     * @param EntityRepository $customerRepository
      * @param Customer $customerApiService
      * @param EventDispatcherInterface $eventDispatcher
      * @param LoggerInterface $logger
      * @param SalesChannelContextPersister $salesChannelContextPersister
-     * @param SalutationRepositoryInterface $salutationRepository
+     * @param EntityRepository $salutationRepository
      * @param SettingsService $settingsService
      * @param string $shopwareVersion
      * @param ConfigService $configService
      */
     public function __construct(
-        CountryRepositoryInterface         $countryRepository,
-        CustomerRepositoryInterface        $customerRepository,
-        CustomerAddressRepositoryInterface $customerAddressRepository,
+        EntityRepository         $countryRepository,
+        EntityRepository        $customerRepository,
+        EntityRepository $customerAddressRepository,
         Customer                           $customerApiService,
         EventDispatcherInterface           $eventDispatcher,
         LoggerInterface                    $logger,
         SalesChannelContextPersister       $salesChannelContextPersister,
-        SalutationRepositoryInterface      $salutationRepository,
+        EntityRepository      $salutationRepository,
         SettingsService                    $settingsService,
         string                             $shopwareVersion,
         ConfigService                      $configService,

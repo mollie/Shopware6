@@ -8,26 +8,22 @@ use Kiener\MolliePayments\Components\ApplePayDirect\Exceptions\ApplePayDirectDom
 use Kiener\MolliePayments\Components\ApplePayDirect\Gateways\ApplePayDirectDomainAllowListGateway;
 use Kiener\MolliePayments\Components\ApplePayDirect\Models\ApplePayDirectDomainAllowListItem;
 use Kiener\MolliePayments\Components\ApplePayDirect\Models\Collections\ApplePayDirectDomainAllowList;
+use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDirectDomainSanitizer;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDomainVerificationService;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayFormatter;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingBuilder;
-use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDirectDomainSanitizer;
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
-use Kiener\MolliePayments\Repository\Order\OrderAddressRepository;
-use Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepository;
 use Kiener\MolliePayments\Service\Cart\CartBackupService;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
-use Kiener\MolliePayments\Service\ShippingMethodService;
 use Kiener\MolliePayments\Service\ShopService;
 use Mollie\Api\Endpoints\WalletEndpoint;
 use Mollie\Api\MollieApiClient;
 use MolliePayments\Tests\Fakes\FakeCartService;
 use MolliePayments\Tests\Traits\MockTrait;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\Delivery\Struct\Delivery;
@@ -43,6 +39,7 @@ use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTax;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\System\Country\CountryEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
@@ -90,7 +87,7 @@ class ApplePayDirectTest extends TestCase
         $customerService = $this->createDummyMock(CustomerService::class, $this);
 
         /** @var PaymentMethodRepository $repoPaymentMethods */
-        $repoPaymentMethods = $this->createDummyMock(PaymentMethodRepository::class, $this);
+        $repoPaymentMethods = $this->createDummyMock(EntityRepository::class, $this);
 
         /** @var CartBackupService $cartBackupService */
         $cartBackupService = $this->createDummyMock(CartBackupService::class, $this);
@@ -104,8 +101,8 @@ class ApplePayDirectTest extends TestCase
         /** @var OrderService $orderService */
         $orderService = $this->createDummyMock(OrderService::class, $this);
 
-        /** @var OrderAddressRepository $repoOrderAdresses */
-        $repoOrderAdresses = $this->createDummyMock(OrderAddressRepository::class, $this);
+        /** @var EntityRepository $repoOrderAdresses */
+        $repoOrderAdresses = $this->createDummyMock(EntityRepository::class, $this);
 
         $this->validationUrlAllowListGateway = $this->createDummyMock(ApplePayDirectDomainAllowListGateway::class, $this);
 

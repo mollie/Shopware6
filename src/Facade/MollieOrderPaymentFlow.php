@@ -2,8 +2,6 @@
 
 namespace Kiener\MolliePayments\Facade;
 
-use Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepositoryInterface;
-use Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepositoryInterface;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
 use Kiener\MolliePayments\Service\Order\OrderStatusUpdater;
@@ -13,6 +11,7 @@ use Mollie\Api\Resources\Order;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -32,10 +31,10 @@ class MollieOrderPaymentFlow
     /** @var PaymentMethodService */
     private $paymentMethodService;
 
-    /** @var PaymentMethodRepositoryInterface */
+    /** @var EntityRepository */
     private $paymentMethodRepository;
 
-    /** @var OrderTransactionRepositoryInterface */
+    /** @var EntityRepository */
     private $orderTransactionRepository;
 
 
@@ -44,10 +43,10 @@ class MollieOrderPaymentFlow
      * @param OrderStatusUpdater $orderStatusUpdater
      * @param SettingsService $settingsService
      * @param PaymentMethodService $paymentMethodService
-     * @param PaymentMethodRepositoryInterface $paymentMethodRepository
-     * @param OrderTransactionRepositoryInterface $orderTransactionRepository
+     * @param EntityRepository $paymentMethodRepository
+     * @param EntityRepository $orderTransactionRepository
      */
-    public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, PaymentMethodService $paymentMethodService, PaymentMethodRepositoryInterface $paymentMethodRepository, OrderTransactionRepositoryInterface $orderTransactionRepository)
+    public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, PaymentMethodService $paymentMethodService, EntityRepository $paymentMethodRepository, EntityRepository $orderTransactionRepository)
     {
         $this->orderStatusConverter = $orderStatusConverter;
         $this->orderStatusUpdater = $orderStatusUpdater;

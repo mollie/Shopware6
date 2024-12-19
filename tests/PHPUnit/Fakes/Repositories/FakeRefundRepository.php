@@ -65,5 +65,4 @@ class FakeRefundRepository implements RefundRepositoryInterface
     {
         return $this->receivedCreateData;
     }
-
 }

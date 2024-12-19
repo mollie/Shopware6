@@ -9,7 +9,6 @@ use Mollie\Api\Resources\Shipment;
 use Mollie\Api\Resources\Shipment as MollieShipment;
 use Mollie\Api\Resources\ShipmentCollection;
 
-
 class FakeShipment implements ShipmentInterface
 {
 
@@ -77,7 +76,7 @@ class FakeShipment implements ShipmentInterface
     }
 
     /**
-     * @return ShipmentTrackingInfoStruct|null
+     * @return null|ShipmentTrackingInfoStruct
      */
     public function getShippedTracking(): ?ShipmentTrackingInfoStruct
     {
@@ -126,7 +125,7 @@ class FakeShipment implements ShipmentInterface
      * @param string $mollieOrderId
      * @param string $salesChannelId
      * @param array $items
-     * @param ShipmentTrackingInfoStruct|null $tracking
+     * @param null|ShipmentTrackingInfoStruct $tracking
      * @return MollieShipment
      */
     public function shipOrder(string $mollieOrderId, string $salesChannelId, array $items, ?ShipmentTrackingInfoStruct $tracking = null): MollieShipment
@@ -144,7 +143,7 @@ class FakeShipment implements ShipmentInterface
      * @param string $salesChannelId
      * @param string $mollieOrderLineId
      * @param int $quantity
-     * @param ShipmentTrackingInfoStruct|null $tracking
+     * @param null|ShipmentTrackingInfoStruct $tracking
      * @return MollieShipment
      */
     public function shipItem(string $mollieOrderId, string $salesChannelId, string $mollieOrderLineId, int $quantity, ?ShipmentTrackingInfoStruct $tracking = null): MollieShipment
@@ -157,5 +156,4 @@ class FakeShipment implements ShipmentInterface
 
         return new Shipment(new MollieApiClient());
     }
-
 }

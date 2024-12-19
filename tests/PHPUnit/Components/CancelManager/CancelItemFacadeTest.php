@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace PHPUnit\Components\CancelManager;
 
-use Kiener\MolliePayments\Components\CancelManager\CancelItemFacade;
-
 use MolliePayments\Tests\Fakes\CancelItemFacadeBuilder;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Context;
@@ -15,7 +13,6 @@ use Shopware\Core\Framework\Context;
  */
 class CancelItemFacadeTest extends TestCase
 {
-
     private CancelItemFacadeBuilder $cancelManagerBuilder;
 
     public function setUp(): void

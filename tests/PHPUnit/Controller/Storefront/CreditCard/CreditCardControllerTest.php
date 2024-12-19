@@ -145,9 +145,9 @@ final class CreditCardControllerTest extends TestCase
         $this->assertEquals($expected, $actualResponse);
     }
 
-/**
- *
- */
+    /**
+     *
+     */
     public function testResponseNotSuccessWithErrorsRevokeMandate():void
     {
         $customerService = new FakeCustomerService(true);

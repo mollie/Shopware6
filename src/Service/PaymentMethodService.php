@@ -37,8 +37,6 @@ use Kiener\MolliePayments\Handler\Method\TrustlyPayment;
 use Kiener\MolliePayments\Handler\Method\TwintPayment;
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Kiener\MolliePayments\MolliePayments;
-use Kiener\MolliePayments\Repository\Media\MediaRepositoryInterface;
-use Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepositoryInterface;
 use Kiener\MolliePayments\Service\HttpClient\HttpClientInterface;
 use Mollie\Api\Resources\Order;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
@@ -47,6 +45,7 @@ use Shopware\Core\Content\Media\MediaCollection;
 use Shopware\Core\Content\Media\MediaService;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -68,7 +67,7 @@ class PaymentMethodService
     private $mediaService;
 
     /**
-     * @var PaymentMethodRepositoryInterface
+     * @var EntityRepository
      */
     private $paymentRepository;
 
@@ -78,7 +77,7 @@ class PaymentMethodService
     private $pluginIdProvider;
 
     /**
-     * @var MediaRepositoryInterface
+     * @var EntityRepository
      */
     private $mediaRepository;
 
@@ -97,12 +96,12 @@ class PaymentMethodService
     /**
      * @param string $shopwareVersion
      * @param MediaService $mediaService
-     * @param MediaRepositoryInterface $mediaRepository
-     * @param PaymentMethodRepositoryInterface $paymentRepository
+     * @param EntityRepository $mediaRepository
+     * @param EntityRepository $paymentRepository
      * @param PluginIdProvider $pluginIdProvider
      * @param HttpClientInterface $httpClient
      */
-    public function __construct(string $shopwareVersion, MediaService $mediaService, MediaRepositoryInterface $mediaRepository, PaymentMethodRepositoryInterface $paymentRepository, PluginIdProvider $pluginIdProvider, HttpClientInterface $httpClient, PayPalExpressConfig $payPalExpressConfig)
+    public function __construct(string $shopwareVersion, MediaService $mediaService, EntityRepository $mediaRepository, EntityRepository $paymentRepository, PluginIdProvider $pluginIdProvider, HttpClientInterface $httpClient, PayPalExpressConfig $payPalExpressConfig)
     {
         $this->mediaService = $mediaService;
         $this->mediaRepository = $mediaRepository;

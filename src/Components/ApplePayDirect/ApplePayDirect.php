@@ -13,8 +13,6 @@ use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingBui
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
-use Kiener\MolliePayments\Repository\Order\OrderAddressRepositoryInterface;
-use Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepository;
 use Kiener\MolliePayments\Service\Cart\CartBackupService;
 use Kiener\MolliePayments\Service\CartServiceInterface;
 use Kiener\MolliePayments\Service\CustomerService;
@@ -33,6 +31,9 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionColl
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Validation\DataBag\DataBag;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -81,7 +82,7 @@ class ApplePayDirect
     private $customerService;
 
     /**
-     * @var PaymentMethodRepository
+     * @var EntityRepository
      */
     private $repoPaymentMethods;
 
@@ -106,7 +107,7 @@ class ApplePayDirect
     private $orderService;
 
     /**
-     * @var OrderAddressRepositoryInterface
+     * @var EntityRepository
      */
     private $repoOrderAdresses;
 
@@ -130,16 +131,16 @@ class ApplePayDirect
      * @param ApplePayShippingBuilder $shippingBuilder
      * @param SettingsService $pluginSettings
      * @param CustomerService $customerService
-     * @param PaymentMethodRepository $repoPaymentMethods
+     * @param EntityRepository $repoPaymentMethods
      * @param CartBackupService $cartBackupService
      * @param MollieApiFactory $mollieApiFactory
      * @param ShopService $shopService
      * @param OrderService $orderService
-     * @param OrderAddressRepositoryInterface $repoOrderAdresses
+     * @param EntityRepository $repoOrderAdresses
      * @param ApplePayDirectDomainAllowListGateway $domainAllowListGateway
      * @param ApplePayDirectDomainSanitizer $domainSanitizer
      */
-    public function __construct(ApplePayDomainVerificationService $domainFileDownloader, ApplePayPayment $paymentHandler, MolliePaymentDoPay $molliePayments, CartServiceInterface $cartService, ApplePayFormatter $formatter, ApplePayShippingBuilder $shippingBuilder, SettingsService $pluginSettings, CustomerService $customerService, PaymentMethodRepository $repoPaymentMethods, CartBackupService $cartBackupService, MollieApiFactory $mollieApiFactory, ShopService $shopService, OrderService $orderService, OrderAddressRepositoryInterface $repoOrderAdresses, ApplePayDirectDomainAllowListGateway $domainAllowListGateway, ApplePayDirectDomainSanitizer $domainSanitizer)
+    public function __construct(ApplePayDomainVerificationService $domainFileDownloader, ApplePayPayment $paymentHandler, MolliePaymentDoPay $molliePayments, CartServiceInterface $cartService, ApplePayFormatter $formatter, ApplePayShippingBuilder $shippingBuilder, SettingsService $pluginSettings, CustomerService $customerService, EntityRepository $repoPaymentMethods, CartBackupService $cartBackupService, MollieApiFactory $mollieApiFactory, ShopService $shopService, OrderService $orderService, EntityRepository $repoOrderAdresses, ApplePayDirectDomainAllowListGateway $domainAllowListGateway, ApplePayDirectDomainSanitizer $domainSanitizer)
     {
         $this->domainFileDownloader = $domainFileDownloader;
         $this->paymentHandler = $paymentHandler;
@@ -175,7 +176,18 @@ class ApplePayDirect
      */
     public function getActiveApplePayID(SalesChannelContext $context): string
     {
-        return $this->repoPaymentMethods->getActiveApplePayID($context->getContext());
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('handlerIdentifier', ApplePayPayment::class));
+        $criteria->addFilter(new EqualsFilter('active', true));
+
+        /** @var array<string> $paymentMethods */
+        $paymentMethods = $this->repoPaymentMethods->searchIds($criteria, $context->getContext())->getIds();
+
+        if (count($paymentMethods) <= 0) {
+            throw new \Exception('Payment Method Apple Pay Direct not found in system');
+        }
+
+        return (string)$paymentMethods[0];
     }
 
     /**
@@ -194,7 +206,7 @@ class ApplePayDirect
 
         if (is_array($salesChannelPaymentIDs) && $settings->isEnableApplePayDirect()) {
             try {
-                $applePayMethodID = $this->repoPaymentMethods->getActiveApplePayID($context->getContext());
+                $applePayMethodID = $this->getActiveApplePayID($context);
 
                 foreach ($salesChannelPaymentIDs as $tempID) {
                     # verify if our Apple Pay payment method is indeed in use
@@ -444,19 +456,20 @@ class ApplePayDirect
             foreach ($order->getAddresses() as $address) {
                 # attention, Apple Pay does not have a company name
                 # therefore we always need to make sure to remove the company field in our order
-                $this->repoOrderAdresses->updateAddress(
-                    $address->getId(),
-                    $firstname,
-                    $lastname,
-                    '',
-                    '',
-                    '',
-                    $street,
-                    $zipcode,
-                    $city,
-                    $countryID,
-                    $context->getContext()
-                );
+                $this->repoOrderAdresses->update([
+                    [
+                        'id' =>   $address->getId(),
+                        'firstName' => $firstname,
+                        'lastName' => $lastname,
+                        'company' => '',
+                        'department' => '',
+                        'vatId' => '',
+                        'street' => $street,
+                        'zipcode' => $zipcode,
+                        'city' => $city,
+                        'countryId' => $countryID,
+                    ]
+                ], $context->getContext());
             }
         }
 

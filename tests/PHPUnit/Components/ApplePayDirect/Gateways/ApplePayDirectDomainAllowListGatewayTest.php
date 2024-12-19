@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace MolliePayments\Tests\Components\ApplePayDirect\Gateways;
 
-
 use Kiener\MolliePayments\Components\ApplePayDirect\Gateways\ApplePayDirectDomainAllowListGateway;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
@@ -11,12 +10,11 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Shopware\Core\System\SystemConfig\SystemConfigService;
 
 class ApplePayDirectDomainAllowListGatewayTest extends TestCase
 {
     /**
-     * @var SettingsService|MockObject
+     * @var MockObject|SettingsService
      */
     private $service;
 
@@ -31,7 +29,7 @@ class ApplePayDirectDomainAllowListGatewayTest extends TestCase
     private $context;
 
     /**
-     * @var SalesChannelContext|MockObject
+     * @var MockObject|SalesChannelContext
      */
     private $scContext;
 

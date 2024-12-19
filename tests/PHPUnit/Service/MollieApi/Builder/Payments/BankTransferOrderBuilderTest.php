@@ -4,7 +4,6 @@ namespace MolliePayments\Tests\Service\MollieApi\Builder\Payments;
 
 use DateTime;
 use DateTimeZone;
-use Faker\Extension\Container;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Mollie\Api\Types\PaymentMethod;
@@ -18,8 +17,8 @@ class BankTransferOrderBuilderTest extends AbstractMollieOrderBuilder
 {
 
     /**
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function testOrderBuild(): void
     {

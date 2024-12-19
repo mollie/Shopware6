@@ -2,10 +2,10 @@
 
 namespace MolliePayments\Tests\Fakes\Repositories;
 
-use Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepositoryInterface;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
@@ -13,7 +13,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 use Shopware\Core\Framework\Event\NestedEventCollection;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
-class FakePaymentMethodRepository implements PaymentMethodRepositoryInterface
+class FakePaymentMethodRepository extends EntityRepository
 {
     /**
      * @var PaymentMethodEntity
@@ -90,5 +90,4 @@ class FakePaymentMethodRepository implements PaymentMethodRepositoryInterface
     {
         return 'phpunit-id';
     }
-
 }

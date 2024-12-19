@@ -4,7 +4,6 @@ namespace MolliePayments\Tests\Service\MollieApi\Builder\Payments;
 
 use DateTime;
 use DateTimeZone;
-use Faker\Extension\Container;
 use Kiener\MolliePayments\Handler\Method\Przelewy24Payment;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Mollie\Api\Types\PaymentMethod;

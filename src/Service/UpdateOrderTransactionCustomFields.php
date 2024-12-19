@@ -2,22 +2,22 @@
 
 namespace Kiener\MolliePayments\Service;
 
-use Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepositoryInterface;
 use Kiener\MolliePayments\Struct\OrderTransaction\OrderTransactionAttributes;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 
 class UpdateOrderTransactionCustomFields
 {
     /**
-     * @var OrderTransactionRepositoryInterface
+     * @var EntityRepository
      */
     private $repoTransactions;
 
 
     /**
-     * @param OrderTransactionRepositoryInterface $repoTransactions
+     * @param EntityRepository $repoTransactions
      */
-    public function __construct(OrderTransactionRepositoryInterface $repoTransactions)
+    public function __construct(EntityRepository $repoTransactions)
     {
         $this->repoTransactions = $repoTransactions;
     }

@@ -64,5 +64,4 @@ class PosOrderBuilderTest extends AbstractMollieOrderBuilder
 
         $this->assertEquals('term_123', $terminalID);
     }
-
 }

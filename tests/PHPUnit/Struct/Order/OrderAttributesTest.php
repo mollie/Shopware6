@@ -57,7 +57,6 @@ class OrderAttributesTest extends TestCase
 
     public function testReadBankDataFromCustomFields()
     {
-
         $expectedBankName = 'Stichting Mollie Payments';
         $expectedBankBIC = 'TESTNL10';
         $expectedBankAccount = 'NL10TEST000100100';

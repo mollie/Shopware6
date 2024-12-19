@@ -3,12 +3,17 @@
 namespace Kiener\MolliePayments\Subscriber;
 
 use Kiener\MolliePayments\Components\ShipmentManager\ShipmentManager;
-use Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepositoryInterface;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
+use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Shopware\Core\System\StateMachine\Event\StateMachineStateChangeEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -31,7 +36,7 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
     private $orderService;
 
     /**
-     * @var OrderTransactionRepositoryInterface
+     * @var EntityRepository
      */
     private $repoOrderTransactions;
 
@@ -44,10 +49,10 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
      * @param SettingsService $settings
      * @param ShipmentManager $mollieShipment
      * @param OrderService $orderService
-     * @param OrderTransactionRepositoryInterface $repoOrderTransactions
+     * @param EntityRepository $repoOrderTransactions
      * @param LoggerInterface $logger
      */
-    public function __construct(SettingsService $settings, ShipmentManager $mollieShipment, OrderService $orderService, OrderTransactionRepositoryInterface $repoOrderTransactions, LoggerInterface $logger)
+    public function __construct(SettingsService $settings, ShipmentManager $mollieShipment, OrderService $orderService, EntityRepository $repoOrderTransactions, LoggerInterface $logger)
     {
         $this->settings = $settings;
         $this->mollieShipment = $mollieShipment;
@@ -97,8 +102,10 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
         try {
             $order = $this->orderService->getOrderByDeliveryId($orderDeliveryId, $event->getContext());
 
-            $swTransaction = $this->repoOrderTransactions->getLatestOrderTransaction($order->getId(), $event->getContext());
-
+            $swTransaction = $this->getLatestOrderTransaction($order->getId(), $event->getContext());
+            if (!$swTransaction) {
+                throw new \Exception('Order '.$order->getOrderNumber().' does not have transactions');
+            }
             # verify if the customer really paid with Mollie in the end
             $paymentMethod = $swTransaction->getPaymentMethod();
 
@@ -122,5 +129,20 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
             $this->logger->error('Failed to transfer delivery state to mollie: '.$ex->getMessage(), ['exception' => $ex]);
             return;
         }
+    }
+
+    private function getLatestOrderTransaction(string $orderId, Context $context):?OrderTransactionEntity
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('order.id', $orderId));
+        $criteria->addAssociation('order');
+        $criteria->addAssociation('stateMachineState');
+        $criteria->addAssociation('paymentMethod');
+        $criteria->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING));
+
+
+        $result = $this->repoOrderTransactions->search($criteria, $context);
+
+        return $result->first();
     }
 }
